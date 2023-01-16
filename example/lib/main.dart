@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fxdart/fxdart.dart';
+import 'package:fxdart/add.dart';
+import 'package:fxdart/pipe.dart';
 
 void main() {
   runApp(const MyApp());
@@ -50,6 +51,17 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+
+  @override
+  void initState() {
+    //go([add(0, 0), (a) => a + 1, (a) => a + 10, (a) => a + 100, print]);
+    // final wow = Wow();
+
+    final f = pipe(add, [(a) => a + 1, (a) => a + 10, (a) => a + 100, print]);
+    f([0, 1]);
+
+    super.initState();
+  }
 
   void _incrementCounter() {
     setState(() {
