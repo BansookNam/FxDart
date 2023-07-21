@@ -1,1 +1,1 @@
-add(List arg) => arg[0] + arg[1];
+add(List list) => list[0] + list[1];

@@ -1,6 +1,8 @@
+import 'package:fxdart/curry.dart';
+
 import 'error/iterable_element_error.dart';
 
-E reduce<E>(E Function(E value, E element) combine, Iterable<E> iterable) {
+Function reduce = <E>(E Function(E value, E element) combine, Iterable<E> iterable) {
   Iterator<E> iterator = iterable.iterator;
   if (!iterator.moveNext()) {
     throw IterableElementError.noElement();
@@ -10,4 +12,4 @@ E reduce<E>(E Function(E value, E element) combine, Iterable<E> iterable) {
     value = combine(value, iterator.current);
   }
   return value;
-}
+};
