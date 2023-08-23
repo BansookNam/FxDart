@@ -1,39 +1,42 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Welcome to Nav 👋
+[![Version](https://img.shields.io/pub/v/fxdart.svg?style=flat-square)](https://pub.dev/packages/fxdart)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache2.0-yellow.svg)](https://github.com/BansookNam/fxdart/blob/main/LICENSE)
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages).
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages).
--->
+Provide Debuggable Functional Program
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
 
-## Features
+## Install
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+Add fxdart dependency on your pubspec.yaml file
 
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
-```dart
-const like = 'sample';
+```yaml
+fxdart: ^{latest version}
 ```
 
-## Additional information
+## Author
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+👤 **Bansook Nam**
+
+* Website: https://github.com/bansooknam
+* Github: [@bansooknam](https://github.com/bansooknam)
+
+## 🤝 Contributing
+
+Contributions, issues and feature requests are welcome!
+
+Feel free to check [issues page](https://github.com/bansooknam/fxdart/issues). You can also take a look at the [contributing guide](Contributions, issues and feature requests are welcome.).
+
+## Show your support
+
+Give a ⭐️ if this project helped you!
+
+
+## 📝 License
+
+Copyright © 2023 [Bansook Nam](https://github.com/bansooknam).
+
+This project is [MIT](https://github.com/BansookNam/fxdart/blob/main/LICENSE) licensed.
+
+***
+_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
