@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>sortBy — FxDart 101</title>
-  <meta name="description" content="FxDart sortBy tutorial: sort by an extracted key, ascending, always a new list, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/sortBy.html">
+  <meta name="description" content="FxDart sortBy 튜토리얼 — 추출한 키를 기준으로 오름차순 정렬하며 항상 새 리스트를 반환합니다. 라이브 플레이그라운드 포함.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/sortBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/sortBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/sortBy.html">
@@ -43,43 +42,42 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 7 · 집계 › <strong>sortBy</strong></p>
   <h1><code>sortBy</code></h1>
-  <p class="hero-sub">Sorts ascending by a key you extract, instead of writing a comparator by hand.</p>
+  <p class="hero-sub">비교자를 손으로 작성하는 대신, 추출한 키를 기준으로 오름차순 정렬합니다.</p>
 
   <div class="signature">List&lt;A&gt; sortBy&lt;A&gt;(Object? Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;List&lt;A&gt;&gt; sortByAsync&lt;A&gt;(Object? Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.sortBy(Object? Function(T a) f)                    // chain (sync) — still lazy, call .toArray()
 Future&lt;List&lt;T&gt;&gt; FxAsync.sortBy(Object? Function(T a) f)     // chain (async) — already a terminal</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>sortBy</code> is <code><a href="sort.html">sort</a></code>'s
-    convenience sibling: instead of writing
-    <code>(a, b) =&gt; a.age.compareTo(b.age)</code> yourself, you give
-    <code>sortBy</code> a key extractor — <code>(a) =&gt; a['age']</code> —
-    and it builds the comparator for you, always ascending, always
-    comparing the extracted keys with <code>Comparable.compare</code>. Under
-    the hood it's literally <code>sort((a, b) =&gt; compare(f(a), f(b)), iterable)</code>.
+    <code>sortBy</code>는 <code><a href="sort.html">sort</a></code>의
+    편의 버전입니다. <code>(a, b) =&gt; a.age.compareTo(b.age)</code>를
+    직접 쓰는 대신 <code>sortBy</code>에 키 추출 함수 —
+    <code>(a) =&gt; a['age']</code> — 를 넘기면, 비교자를 대신 만들어
+    줍니다. 언제나 오름차순이고, 언제나 추출한 키를
+    <code>Comparable.compare</code>로 비교합니다. 내부적으로는 말
+    그대로 <code>sort((a, b) =&gt; compare(f(a), f(b)), iterable)</code>입니다.
   </p>
   <p>
-    Every guarantee from <code>sort</code> carries over unchanged: the
-    result is always a <strong>new</strong> list, never a mutation of the
-    input. And the same chain-form nuance applies too — on the sync
-    <code>Fx</code> chain, <code>.sortBy(f)</code> returns another
-    <code>Fx&lt;T&gt;</code>, so you still need
-    <code><a href="../101/index.html">.toArray()</a></code> to materialize
-    it, while on the <code>FxAsync</code> chain, <code>.sortBy(f)</code> is
-    already a terminal returning <code>Future&lt;List&lt;T&gt;&gt;</code>.
+    <code>sort</code>의 보장은 하나도 빠짐없이 그대로 적용됩니다.
+    결과는 언제나 <strong>새</strong> 리스트이며, 입력을 변경하지
+    않습니다. 체인 형태의 미묘한 점도 똑같습니다 — 동기
+    <code>Fx</code> 체인에서 <code>.sortBy(f)</code>는 또 다른
+    <code>Fx&lt;T&gt;</code>를 반환하므로 실체화하려면 여전히
+    <code><a href="../101/index.html">.toArray()</a></code>가 필요하고,
+    <code>FxAsync</code> 체인에서 <code>.sortBy(f)</code>는 이미
+    <code>Future&lt;List&lt;T&gt;&gt;</code>를 반환하는 종결 연산자입니다.
   </p>
   <p>
-    If you need descending order, or a multi-key sort, drop back down to
-    <code>sort</code> with an explicit comparator — <code>sortBy</code> only
-    covers the common "ascending by one extracted key" case.
+    내림차순이나 다중 키 정렬이 필요하다면 비교자를 명시하는
+    <code>sort</code>로 내려가세요. <code>sortBy</code>는 "추출한 키
+    하나로 오름차순"이라는 흔한 경우만 다룹니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -103,7 +101,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async — already a terminal</h2>
+  <h2>데모 2 · 비동기 — 이미 종결 연산자</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -120,8 +118,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: sort the people <strong>by age</strong>, youngest first.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 사람들을 <strong>나이순</strong>으로, 어린 사람이 먼저 오도록 정렬해 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -142,10 +140,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="sort.html"><code>sort</code></a> — the comparator-based form this builds on ·
-    <a href="min.html"><code>min</code></a> · <a href="max.html"><code>max</code></a> — for a single extreme instead of a full ranking ·
-    <a href="pluck.html"><code>pluck</code></a> — extract the same key without sorting
+    <strong>관련 함수:</strong>
+    <a href="sort.html"><code>sort</code></a> — 이 함수가 기반으로 삼는 비교자 방식 ·
+    <a href="min.html"><code>min</code></a> · <a href="max.html"><code>max</code></a> — 전체 순위 대신 극값 하나만 필요할 때 ·
+    <a href="pluck.html"><code>pluck</code></a> — 정렬 없이 같은 키만 뽑아내기
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>cases — FxDart 101</title>
-  <meta name="description" content="FxDart cases tutorial: build a predicate/mapper dispatch table with an optional default, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/cases.html">
+  <meta name="description" content="FxDart cases 튜토리얼 — 술어와 매퍼로 이루어진 디스패치 테이블을 만들고, 선택적인 기본값도 지정합니다. 라이브 플레이그라운드 포함.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/cases.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/cases.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/cases.html">
@@ -43,45 +42,44 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 10 · 함수 유틸리티 › <strong>cases</strong></p>
   <h1><code>cases</code></h1>
-  <p class="hero-sub">Builds a predicate/mapper dispatch table, with an optional default.</p>
+  <p class="hero-sub">술어와 매퍼로 이루어진 디스패치 테이블을 만듭니다. 기본값도 선택적으로 지정할 수 있습니다.</p>
 
   <div class="signature">R Function(T value) cases&lt;T, R&gt;(List&lt;(bool Function(T), R Function(T))&gt; pairs, {R Function(T)? orElse})</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>cases</code> builds a matcher out of a list of
-    <code>(predicate, mapper)</code> pairs: it tries each pair in order, and
-    the first one whose predicate returns true has its mapper applied to
-    produce the result. It's a functional stand-in for a chain of
-    <code>if</code>/<code>else if</code>, and it composes nicely with
-    <code>map</code> — the returned function is a plain unary
-    <code>T -&gt; R</code> you can pass straight in.
+    <code>cases</code>는 <code>(predicate, mapper)</code> 쌍의 목록으로
+    매처를 만듭니다. 각 쌍을 순서대로 시도해서, 술어가 참을 반환하는
+    첫 번째 쌍의 매퍼를 적용해 결과를 만듭니다.
+    <code>if</code>/<code>else if</code> 연쇄를 함수형으로 대체하는
+    도구이며, <code>map</code>과도 잘 어울립니다 — 반환값이 그대로
+    넘길 수 있는 평범한 단항 함수 <code>T -&gt; R</code>이기 때문입니다.
   </p>
   <p>
-    <strong>This shape differs from FxTS on purpose.</strong> FxTS's
-    <code>cases</code> is variadic: each <code>[predicate, mapper]</code> pair
-    is its own trailing argument, with an optional final bare function acting
-    as the default, and TypeScript's overloaded generics type each arity by
-    hand. Dart has neither variadic generics nor per-arity overloads, so
-    there's no way to accept "any number of pair arguments" and still get
-    real type checking. FxDart's version instead takes one
-    <code>List</code> of <code>(predicate, mapper)</code> <strong>records</strong>
-    — Dart's tuple type — plus a separate named <code>orElse</code> parameter
-    so the default is never confused with just another pair.
+    <strong>이 형태는 FxTS와 의도적으로 다릅니다.</strong> FxTS의
+    <code>cases</code>는 가변 인자를 받습니다. <code>[predicate, mapper]</code>
+    쌍 하나하나가 개별 인자이고, 마지막에 함수 하나를 그대로 넘기면
+    기본값 역할을 하며, TypeScript는 오버로드된 제네릭으로 각 인자 개수를
+    일일이 타이핑합니다. Dart에는 가변 제네릭도, 인자 개수별 오버로드도
+    없어서 "쌍 인자를 몇 개든" 받으면서 제대로 된 타입 검사까지
+    유지할 방법이 없습니다. 그래서 FxDart 버전은 대신
+    <code>List</code> 하나를 받습니다. 그 안에는 <code>(predicate, mapper)</code>
+    <strong>레코드</strong>, 즉 Dart의 튜플 타입이 들어갑니다. 여기에 더해,
+    기본값이 또 하나의 쌍으로 오해되지 않도록
+    별도의 명명 매개변수 <code>orElse</code>를 둡니다.
   </p>
   <p>
-    If nothing matches and no <code>orElse</code> is given, <code>cases</code>
-    falls back to returning <code>value</code> itself — which only compiles
-    at the call site if <code>T</code> happens to also satisfy <code>R</code>
-    — otherwise it throws a <code>StateError</code> at runtime. In practice,
-    always pass <code>orElse</code> unless you're certain your predicates are
-    exhaustive.
+    아무것도 매치되지 않고 <code>orElse</code>도 주어지지 않으면
+    <code>cases</code>는 <code>value</code> 자체를 반환하려 합니다 —
+    이는 <code>T</code>가 마침 <code>R</code>도 만족할 때에만 호출 지점에서
+    컴파일되며, 그렇지 않으면 런타임에 <code>StateError</code>를 던집니다.
+    실무에서는 술어가 모든 경우를 빠짐없이 다룬다고 확신할 수 있는 게
+    아니라면 항상 <code>orElse</code>를 넘기세요.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -99,7 +97,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · A grading pipeline</h2>
+  <h2>데모 2 · 성적 처리 파이프라인</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -116,9 +114,9 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: classify each size as <code>'small'</code> (&lt;10),
-    <code>'medium'</code> (&lt;30), or <code>'large'</code>.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 각 크기를 <code>'small'</code>(&lt;10),
+    <code>'medium'</code>(&lt;30), <code>'large'</code>로 분류해 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -138,11 +136,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="when.html"><code>when</code></a> / <a href="unless.html"><code>unless</code></a> — a single predicate, same result type ·
-    <a href="throwError.html"><code>throwError</code></a> — a common orElse when no match should be fatal ·
-    <a href="always.html"><code>always</code></a> — a constant orElse ·
-    <a href="matches.html"><code>matches</code></a> — a predicate you can plug into a case
+    <strong>관련 함수:</strong>
+    <a href="when.html"><code>when</code></a> / <a href="unless.html"><code>unless</code></a> — 술어 하나, 결과 타입은 동일 ·
+    <a href="throwError.html"><code>throwError</code></a> — 매치 실패가 치명적이어야 할 때 흔히 쓰는 orElse ·
+    <a href="always.html"><code>always</code></a> — 상수 orElse ·
+    <a href="matches.html"><code>matches</code></a> — case에 끼워 넣을 수 있는 술어
   </div>
 
   <nav class="tut-nav">

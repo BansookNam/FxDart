@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>omitBy — FxDart 101</title>
-  <meta name="description" content="FxDart omitBy tutorial: drop Map entries matching a (key, value) predicate.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/omitBy.html">
+  <meta name="description" content="Tutorial de omitBy en FxDart: descarta las entradas de un Map que cumplan un predicado sobre (clave, valor).">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/omitBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/omitBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/omitBy.html">
@@ -43,29 +42,29 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 9 · Funciones de objeto (Map) › <strong>omitBy</strong></p>
   <h1><code>omitBy</code></h1>
-  <p class="hero-sub">Returns a copy of a <code>Map</code> without the entries matching a predicate.</p>
+  <p class="hero-sub">Devuelve una copia de un <code>Map</code> sin las entradas que cumplan un predicado.</p>
 
   <div class="signature">Map&lt;K, V&gt; omitBy&lt;K, V&gt;(bool Function((K, V) entry) f, Map&lt;K, V&gt; map)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    Where <code>omit</code> takes a fixed list of keys, <code>omitBy</code>
-    takes a predicate and decides entry by entry. The predicate receives the
-    whole entry as a <code>(K, V)</code> record, so you get both the key and
-    the value to work with — read them as <code>e.$1</code> (key) and
-    <code>e.$2</code> (value). This mirrors how <code>entries(map)</code>
-    represents a <code>Map</code> throughout the rest of the library.
+    Mientras que <code>omit</code> recibe una lista fija de claves,
+    <code>omitBy</code> recibe un predicado y decide entrada por entrada. El
+    predicado recibe la entrada completa como un record <code>(K, V)</code>,
+    así que tienes a mano tanto la clave como el valor: se leen con
+    <code>e.$1</code> (clave) y <code>e.$2</code> (valor). Es la misma
+    representación que <code>entries(map)</code> le da a un <code>Map</code>
+    en el resto de la librería.
   </p>
   <p>
-    Use it whenever the thing you want to drop is defined by a condition —
-    "remove failing scores," "remove out-of-stock items" — rather than by a
-    fixed set of key names.
+    Úsalo siempre que lo que quieras descartar venga definido por una
+    condición —"quitar las notas suspensas", "quitar los artículos sin
+    stock"— en lugar de por un conjunto fijo de nombres de clave.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -79,7 +78,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Dropping by value condition</h2>
+  <h2>Demo 2 · Descartar por una condición sobre el valor</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -94,8 +93,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>omitBy</code> to drop entries whose value is <code>false</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>omitBy</code> para descartar las entradas cuyo valor sea <code>false</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -112,11 +111,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="pickBy.html"><code>pickBy</code></a> — the inverse: keep by predicate ·
-    <a href="omit.html"><code>omit</code></a> — drop by a fixed key list ·
-    <a href="isMatch.html"><code>isMatch</code></a> — a ready-made deep predicate for entries ·
-    <a href="evolve.html"><code>evolve</code></a> — transform values instead of dropping them
+    <strong>Relacionado:</strong>
+    <a href="pickBy.html"><code>pickBy</code></a> — el inverso: conservar según un predicado ·
+    <a href="omit.html"><code>omit</code></a> — descartar según una lista fija de claves ·
+    <a href="isMatch.html"><code>isMatch</code></a> — un predicado profundo ya hecho para entradas ·
+    <a href="evolve.html"><code>evolve</code></a> — transformar los valores en lugar de descartarlos
   </div>
 
   <nav class="tut-nav">

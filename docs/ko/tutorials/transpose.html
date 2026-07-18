@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>transpose — FxDart 101</title>
-  <meta name="description" content="FxDart transpose tutorial: turn rows into columns for any number of iterables, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/transpose.html">
+  <meta name="description" content="FxDart transpose 튜토리얼: 개수에 상관없이 여러 이터러블의 행을 열로 뒤집는 방법을 라이브 플레이그라운드와 함께 다룹니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/transpose.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/transpose.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/transpose.html">
@@ -43,34 +42,32 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 6 · 결합 › <strong>transpose</strong></p>
   <h1><code>transpose</code></h1>
-  <p class="hero-sub">Turns a collection of rows into a collection of columns.</p>
+  <p class="hero-sub">행의 모음을 열의 모음으로 뒤집습니다.</p>
 
   <div class="signature">Iterable&lt;List&lt;A&gt;&gt; transpose&lt;A&gt;(Iterable&lt;Iterable&lt;A&gt;&gt; rows)
 FxAsyncIterable&lt;List&lt;A&gt;&gt; transposeAsync&lt;A&gt;(Iterable&lt;FxAsyncIterable&lt;A&gt;&gt; rows)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>transpose</code> is <code>zip</code> generalized to <em>any</em>
-    number of iterables: the n-th output list holds the n-th element of
-    every input row that still has one. Where <code>zip</code>/<code>zip3</code>
-    take each row as a separate argument (because Dart can't express
-    variadic generics), <code>transpose</code> takes all the rows as a
-    <strong>single</strong> iterable of iterables —
-    <code>transpose([row1, row2, row3])</code> — so it works for any row
-    count decided at runtime.
+    <code>transpose</code>는 <code>zip</code>을 이터러블 <em>개수에 제한 없이</em>
+    일반화한 함수입니다. n번째 출력 리스트에는 아직 n번째 원소가 남아 있는 모든
+    입력 행의 n번째 원소가 담깁니다. <code>zip</code>/<code>zip3</code>은 각 행을
+    별도의 인자로 받지만(Dart에서 가변 인자 제네릭을 표현할 수 없기 때문입니다),
+    <code>transpose</code>는 모든 행을 <strong>하나의</strong> 이터러블의
+    이터러블로 받습니다 — <code>transpose([row1, row2, row3])</code> — 덕분에
+    행 개수가 런타임에 결정되더라도 그대로 동작합니다.
   </p>
   <p>
-    Unlike <code>zip</code>, which stops as soon as the shortest input runs
-    dry, <code>transpose</code> keeps going as long as <em>any</em> row still
-    has values left — a shorter row just stops contributing to later output
-    lists, which may end up shorter than the row count. It only stops
-    entirely once every row is exhausted.
+    가장 짧은 입력이 바닥나는 순간 멈추는 <code>zip</code>과 달리,
+    <code>transpose</code>는 <em>어느</em> 행이든 값이 남아 있는 한 계속
+    진행합니다. 짧은 행은 뒤쪽 출력 리스트에 더 이상 기여하지 않을 뿐이며,
+    그 결과 뒤쪽 리스트는 행 개수보다 짧아질 수 있습니다. 모든 행이 완전히
+    소진되어야 비로소 멈춥니다.
   </p>
 
-  <h2>Demo 1 · Basics &amp; ragged rows</h2>
+  <h2>데모 1 · 기본 &amp; 길이가 다른 행</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -93,7 +90,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>데모 2 · 비동기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -108,8 +105,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: transpose the matrix (rows become columns).</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 행렬을 전치해 보세요(행이 열이 됩니다).</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -130,9 +127,9 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="zip.html"><code>zip</code></a> — the two-row special case ·
-    <a href="chunk.html"><code>chunk</code></a> — batch a flat source into rows first ·
+    <strong>관련 함수:</strong>
+    <a href="zip.html"><code>zip</code></a> — 행이 두 개인 특수한 경우 ·
+    <a href="chunk.html"><code>chunk</code></a> — 평평한 소스를 먼저 행으로 묶기 ·
     <a href="reverse.html"><code>reverse</code></a>
   </div>
 

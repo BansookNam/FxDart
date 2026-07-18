@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>consume — FxDart 101</title>
-  <meta name="description" content="FxDart consume tutorial: force a lazy chain's side effects without collecting any values, with an optional limit.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/consume.html">
+  <meta name="description" content="Tutorial de consume en FxDart: fuerza los efectos secundarios de una cadena perezosa sin recopilar ningún valor, con un límite opcional.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/consume.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/consume.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/consume.html">
@@ -43,46 +42,46 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 1 · Primeros pasos › <strong>consume</strong></p>
   <h1><code>consume</code></h1>
-  <p class="hero-sub">Pulls values through a chain and throws them away — for side effects only, optionally capped.</p>
+  <p class="hero-sub">Tira de los valores a través de una cadena y los descarta — solo por sus efectos secundarios, con tope opcional.</p>
 
   <div class="signature">void consume&lt;A&gt;(Iterable&lt;A&gt; iterable, [int? n])
 Future&lt;void&gt; consumeAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable, [int? n])
 void Fx.consume([int? n])        // chain
 Future&lt;void&gt; FxAsync.consume([int? n])</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>consume</code> is the minimal terminal operator: it pulls values
-    through the chain — running whatever <code>peek</code> or
-    <code>mapEffect</code> steps are upstream for their side effects — but
-    discards every value instead of collecting or forwarding it. Reach for
-    it when the whole point of a pipeline is its side effects, and building
-    a <code>List</code> with <code>toArray</code> would just be wasted
-    allocation.
+    <code>consume</code> es el operador terminal mínimo: tira de los valores a
+    través de la cadena — ejecutando por sus efectos secundarios los pasos
+    <code>peek</code> o <code>mapEffect</code> que haya aguas arriba — pero
+    descarta cada valor en lugar de recopilarlo o reenviarlo. Recurre a él
+    cuando todo el sentido de un pipeline son sus efectos secundarios y
+    construir una <code>List</code> con <code>toArray</code> sería tan solo
+    reservar memoria para nada.
   </p>
   <p>
-    The optional <code>n</code> makes it the natural partner for infinite
-    or huge sources: <code>consume(5)</code> pulls exactly 5 values and
-    stops, even if the underlying iterable (<code>range</code> with no
-    bound, <code>cycle</code>, <code>repeat</code> with a huge count) would
-    otherwise go on forever. Omit <code>n</code> to drain a finite iterable
-    completely.
+    El <code>n</code> opcional lo convierte en la pareja natural de las fuentes
+    infinitas o enormes: <code>consume(5)</code> tira exactamente de 5 valores y
+    se detiene, aunque el iterable subyacente (<code>range</code> sin límite,
+    <code>cycle</code>, <code>repeat</code> con una cuenta enorme) siguiera
+    indefinidamente. Omite <code>n</code> para vaciar por completo un iterable
+    finito.
   </p>
   <p>
-    <code>consumeAsync</code> (or <code>.consume()</code> on an
-    <code>FxAsync</code> chain) works the same way, awaiting each pulled
-    value's side effects in turn — handy for forcing an async
-    <code>peek</code>/logging pipeline to actually run without paying to
-    collect a result list you'd throw away anyway.
+    <code>consumeAsync</code> (o <code>.consume()</code> sobre una cadena
+    <code>FxAsync</code>) funciona igual, esperando por turno los efectos
+    secundarios de cada valor del que tira — práctico para forzar que un
+    pipeline asíncrono de <code>peek</code>/logging se ejecute de verdad sin
+    pagar el coste de recopilar una lista de resultados que ibas a tirar de
+    todos modos.
   </p>
 
-  <h2>Demo 1 · Bounding an infinite source</h2>
+  <h2>Demo 1 · Acotar una fuente infinita</h2>
   <p>
-    <code>range(1000000)</code> would normally never finish if fully pulled
-    — but <code>consume(5)</code> stops after 5 elements:
+    <code>range(1000000)</code> normalmente no terminaría nunca si se consumiera
+    entero — pero <code>consume(5)</code> se para tras 5 elementos:
   </p>
   <div class="playground">
 <textarea>
@@ -106,7 +105,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async side effects, no result list</h2>
+  <h2>Demo 2 · Efectos secundarios asíncronos, sin lista de resultados</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -130,9 +129,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: consume only the first 3 values of an effectively-infinite
-    <code>repeat()</code>, logging each one as it's pulled.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: consume solo los 3 primeros valores de un <code>repeat()</code>
+    prácticamente infinito, registrando cada uno conforme se tira de él.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -152,11 +151,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="each.html"><code>each</code></a> — terminal op that also runs f, without the n-limit shortcut ·
-    <a href="toArray.html"><code>toArray</code></a> — terminal op that collects results instead ·
-    <a href="cycle.html"><code>cycle</code></a> — an infinite source consume is often paired with ·
-    <a href="peek.html"><code>peek</code></a> — the lazy side-effect step consume typically forces
+    <strong>Relacionado:</strong>
+    <a href="each.html"><code>each</code></a> — operador terminal que también ejecuta f, sin el atajo del límite n ·
+    <a href="toArray.html"><code>toArray</code></a> — operador terminal que en cambio recopila los resultados ·
+    <a href="cycle.html"><code>cycle</code></a> — una fuente infinita que suele acompañar a consume ·
+    <a href="peek.html"><code>peek</code></a> — el paso perezoso de efecto secundario que consume normalmente fuerza
   </div>
 
   <nav class="tut-nav">

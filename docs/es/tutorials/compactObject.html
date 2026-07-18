@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>compactObject — FxDart 101</title>
-  <meta name="description" content="FxDart compactObject tutorial: shallowly drop null-valued keys from a Map.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/compactObject.html">
+  <meta name="description" content="Tutorial de compactObject en FxDart: elimina de forma superficial las claves con valor null de un Map.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/compactObject.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/compactObject.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/compactObject.html">
@@ -43,31 +42,30 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 9 · Funciones de objeto (Map) › <strong>compactObject</strong></p>
   <h1><code>compactObject</code></h1>
-  <p class="hero-sub">Returns a copy of a <code>Map</code> with every <code>null</code>-valued key removed — one level deep.</p>
+  <p class="hero-sub">Devuelve una copia de un <code>Map</code> sin las claves cuyo valor es <code>null</code> — con un solo nivel de profundidad.</p>
 
   <div class="signature">Map&lt;K, V&gt; compactObject&lt;K, V&gt;(Map&lt;K, V?&gt; map)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>compactObject</code> is the <code>Map</code> counterpart of
-    <a href="compact.html"><code>compact</code></a> (which strips
-    <code>null</code>s out of an <code>Iterable</code>). It's handy for
-    cleaning up a form or a partially-filled record before serializing it —
-    drop the fields nobody filled in, keep everything else.
+    <code>compactObject</code> es la contraparte para <code>Map</code> de
+    <a href="compact.html"><code>compact</code></a> (que quita los
+    <code>null</code> de un <code>Iterable</code>). Viene muy bien para
+    limpiar un formulario o un registro parcialmente relleno antes de
+    serializarlo: descarta los campos que nadie rellenó y conserva el resto.
   </p>
   <p>
-    The cleanup is <strong>shallow</strong>: it only inspects the top-level
-    values. A <code>null</code> nested two levels down, inside a value
-    that's itself a <code>Map</code>, is left completely alone. If you need
-    a recursive clean, you'd write that pass yourself (or call
-    <code>compactObject</code> again on the nested map before assembling the
-    outer one).
+    La limpieza es <strong>superficial</strong>: solo inspecciona los valores
+    del nivel superior. Un <code>null</code> anidado dos niveles más abajo,
+    dentro de un valor que a su vez es un <code>Map</code>, se queda
+    intacto. Si necesitas una limpieza recursiva, tendrás que escribir esa
+    pasada tú mismo (o volver a llamar a <code>compactObject</code> sobre el
+    mapa anidado antes de montar el exterior).
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -79,7 +77,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Proof it's shallow</h2>
+  <h2>Demo 2 · La prueba de que es superficial</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -97,8 +95,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>compactObject</code> to drop the null-valued keys in <code>draft</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>compactObject</code> para descartar las claves con valor null de <code>draft</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -115,11 +113,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="compact.html"><code>compact</code></a> — the <code>Iterable</code> version ·
-    <a href="isEmpty.html"><code>isEmpty</code></a> — a related value-based check ·
-    <a href="omitBy.html"><code>omitBy</code></a> — the general predicate version this specializes ·
-    <a href="evolve.html"><code>evolve</code></a> — transform values instead of dropping them
+    <strong>Relacionado:</strong>
+    <a href="compact.html"><code>compact</code></a> — la versión para <code>Iterable</code> ·
+    <a href="isEmpty.html"><code>isEmpty</code></a> — una comprobación relacionada basada en el valor ·
+    <a href="omitBy.html"><code>omitBy</code></a> — la versión general con predicado que esta especializa ·
+    <a href="evolve.html"><code>evolve</code></a> — transforma los valores en lugar de descartarlos
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>zip — FxDart 101</title>
-  <meta name="description" content="FxDart zip tutorial: pair up elements from two (or three) iterables into records, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/zip.html">
+  <meta name="description" content="Tutorial de zip en FxDart: empareja los elementos de dos (o tres) iterables en records, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/zip.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/zip.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/zip.html">
@@ -43,10 +42,9 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 6 · Combinar › <strong>zip</strong></p>
   <h1><code>zip</code></h1>
-  <p class="hero-sub">Pairs up elements from two iterables into records, stopping at the shorter one.</p>
+  <p class="hero-sub">Empareja los elementos de dos iterables en records y se detiene en el más corto.</p>
 
   <div class="signature">Iterable&lt;(A, B)&gt; zip&lt;A, B&gt;(Iterable&lt;A&gt; iterable1, Iterable&lt;B&gt; iterable2)
 Iterable&lt;(A, B, C)&gt; zip3&lt;A, B, C&gt;(Iterable&lt;A&gt; iterable1, Iterable&lt;B&gt; iterable2, Iterable&lt;C&gt; iterable3)
@@ -54,25 +52,25 @@ FxAsyncIterable&lt;(A, B)&gt; zipAsync&lt;A, B&gt;(FxAsyncIterable&lt;A&gt; iter
 Fx&lt;(T, U)&gt; Fx.zip&lt;U&gt;(Iterable&lt;U&gt; other)        // chain
 FxAsync&lt;(T, U)&gt; FxAsync.zip&lt;U&gt;(FxAsyncIterable&lt;U&gt; other)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>zip</code> walks two iterables side by side and yields one pair
-    per step, stopping the moment either input runs out. Where FxTS returns
-    a TS tuple, FxDart returns a Dart <strong>record</strong> —
-    <code>(A, B)</code> — so you destructure results with
-    <code>.$1</code>/<code>.$2</code> or pattern matching instead of
-    array indices. Since Dart has no variadic generics, each arity gets its
-    own function: <code>zip</code> for two iterables, <code>zip3</code> for
-    three.
+    <code>zip</code> recorre dos iterables en paralelo y produce un par por
+    paso, deteniéndose en cuanto cualquiera de las entradas se agota. Donde
+    FxTS devuelve una tupla de TS, FxDart devuelve un
+    <strong>record</strong> de Dart — <code>(A, B)</code> — de modo que
+    desestructuras los resultados con <code>.$1</code>/<code>.$2</code> o con
+    pattern matching, en lugar de con índices de array. Como Dart no tiene
+    genéricos variádicos, cada aridad tiene su propia función:
+    <code>zip</code> para dos iterables y <code>zip3</code> para tres.
   </p>
   <p>
-    <code>zipAsync</code> issues both sides' <code>next()</code> calls
-    <em>before</em> awaiting either — so it pulls the two sources in
-    parallel per pair rather than sequentially. Zipping two 100ms-per-item
-    sources still only costs ~100ms per pair, not 200ms.
+    <code>zipAsync</code> lanza las llamadas a <code>next()</code> de ambos
+    lados <em>antes</em> de esperar a ninguna de las dos, así que consume las
+    dos fuentes en paralelo en cada par, no secuencialmente. Combinar dos fuentes
+    de 100 ms por elemento sigue costando ~100 ms por par, no 200 ms.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -93,7 +91,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, pulled in parallel per pair</h2>
+  <h2>Demo 2 · Async, con consumo en paralelo por par</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -115,9 +113,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: zip <code>names</code> and <code>ages</code> together into
-    <code>(name, age)</code> records.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: combina <code>names</code> y <code>ages</code> con zip en
+    records <code>(name, age)</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -135,11 +133,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="zipWith.html"><code>zipWith</code></a> — zip and combine in one step ·
-    <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — zip against a running index ·
-    <a href="transpose.html"><code>transpose</code></a> — zip an arbitrary number of rows ·
-    <a href="concat.html"><code>concat</code></a> — chain instead of pair
+    <strong>Relacionado:</strong>
+    <a href="zipWith.html"><code>zipWith</code></a> — emparejar y combinar en un solo paso ·
+    <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — emparejar con un índice creciente ·
+    <a href="transpose.html"><code>transpose</code></a> — emparejar un número arbitrario de filas ·
+    <a href="concat.html"><code>concat</code></a> — encadenar en vez de emparejar
   </div>
 
   <nav class="tut-nav">

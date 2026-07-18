@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>filter — FxDart 101</title>
-  <meta name="description" content="FxDart filter tutorial: keep only the elements a predicate accepts, sync and async, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/filter.html">
+  <meta name="description" content="FxDart filter 튜토리얼: 술어가 통과시킨 원소만 남기는 방법을 동기와 비동기 양쪽에서 라이브 플레이그라운드와 함께 익힙니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/filter.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/filter.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/filter.html">
@@ -43,40 +42,39 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 4 · 필터링 &amp; 중복 제거 › <strong>filter</strong></p>
   <h1><code>filter</code></h1>
-  <p class="hero-sub">Returns a lazy iterable of the elements a predicate returns true for.</p>
+  <p class="hero-sub">술어가 true를 반환한 원소들로 이루어진 지연 이터러블을 반환합니다.</p>
 
   <div class="signature">Iterable&lt;A&gt; filter&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; filterAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.filter(bool Function(T a) f)        // chain (alias: where)
 FxAsync&lt;T&gt; FxAsync.filter(FutureOr&lt;bool&gt; Function(T a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>filter</code> is the other fundamental transformer alongside
-    <code>map</code>: it keeps every element for which the predicate
-    returns <code>true</code> and drops the rest, lazily. Nothing runs
-    until a terminal operator pulls values through, and since <code>Fx</code>
-    extends <code>Iterable</code>, <code>.where(...)</code> works too — it's
-    just an alias for <code>.filter(...)</code> on the chain.
+    <code>filter</code>는 <code>map</code>과 더불어 가장 기본이 되는
+    변환 연산자입니다. 술어가 <code>true</code>를 반환한 원소만 남기고
+    나머지는 버리며, 이 모든 과정은 지연 평가됩니다. 종결 연산자가 값을
+    끌어당기기 전까지는 아무것도 실행되지 않습니다. 또한 <code>Fx</code>가
+    <code>Iterable</code>을 확장하기 때문에 <code>.where(...)</code>도
+    그대로 쓸 수 있습니다 — 체인에서는 <code>.filter(...)</code>의
+    별칭일 뿐입니다.
   </p>
   <p>
-    Because it's lazy, combining <code>filter</code> with <code>take</code>
-    only evaluates as many predicate calls as needed to satisfy the
-    <code>take</code> — see Demo 1.
+    지연 평가되므로 <code>filter</code>를 <code>take</code>와 조합하면
+    <code>take</code>를 충족하는 데 필요한 만큼만 술어가 호출됩니다 —
+    데모 1을 참고하세요.
   </p>
   <p>
-    <code>filterAsync</code> has its own dedicated concurrent implementation
-    (rather than reusing <code>mapAsync</code>'s): when you attach
-    <code>.concurrent(n)</code>, <code>n</code> predicates are evaluated in
-    parallel, but the elements that pass are still released downstream in
-    their original order — concurrency changes throughput, never the
-    result.
+    <code>filterAsync</code>는 <code>mapAsync</code>의 구현을 재사용하지 않고
+    자체 동시성 구현을 갖고 있습니다. <code>.concurrent(n)</code>을 붙이면
+    술어 <code>n</code>개가 병렬로 평가되지만, 통과한 원소는 여전히 원래
+    순서대로 하류로 내보내집니다 — 동시성은 처리량을 바꿀 뿐 결과를 바꾸지
+    않습니다.
   </p>
 
-  <h2>Demo 1 · Basics &amp; laziness</h2>
+  <h2>데모 1 · 기본과 지연 평가</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -103,7 +101,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency</h2>
+  <h2>데모 2 · 비동기, 그리고 동시성</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -129,8 +127,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>filter</code> to keep only ages 18 and over.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>filter</code>로 18세 이상만 남겨 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -147,11 +145,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="reject.html"><code>reject</code></a> — the opposite of filter ·
-    <a href="compact.html"><code>compact</code></a> — filter out nulls ·
-    <a href="map.html"><code>map</code></a> — transform instead of keep/drop ·
-    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
+    <strong>관련 함수:</strong>
+    <a href="reject.html"><code>reject</code></a> — filter의 정반대 ·
+    <a href="compact.html"><code>compact</code></a> — null을 걸러 내기 ·
+    <a href="map.html"><code>map</code></a> — 남기고 버리는 대신 변환하기 ·
+    <a href="concurrent.html"><code>concurrent</code></a> — 병렬 평가
   </div>
 
   <nav class="tut-nav">

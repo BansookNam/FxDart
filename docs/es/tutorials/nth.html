@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>nth — FxDart 101</title>
-  <meta name="description" content="FxDart nth tutorial: safely pull the element at an index, null on out-of-range, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/nth.html">
+  <meta name="description" content="Tutorial de nth en FxDart: obtén con seguridad el elemento de un índice, con null si queda fuera de rango, y un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/nth.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/nth.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/nth.html">
@@ -43,32 +42,32 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 8 · Acceso &amp; predicados › <strong>nth</strong></p>
   <h1><code>nth</code></h1>
-  <p class="hero-sub">Returns the element at a given index, or <code>null</code> when the index is out of range.</p>
+  <p class="hero-sub">Devuelve el elemento que está en un índice dado, o <code>null</code> si el índice queda fuera de rango.</p>
 
   <div class="signature">A? nth&lt;A&gt;(int index, Iterable&lt;A&gt; iterable)
 Future&lt;A?&gt; nthAsync&lt;A&gt;(int index, FxAsyncIterable&lt;A&gt; iterable)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>nth</code> walks the iterable and stops as soon as it reaches
-    <code>index</code>, so it only ever pulls <code>index + 1</code>
-    elements — cheap even on a huge lazy sequence, and much cheaper than
-    materializing the whole thing just to index into a <code>List</code>.
-    A negative index, or one past the end, simply yields <code>null</code>;
-    unlike some languages' array indexing, there's no wraparound-from-the-end
-    behavior here — the index has to be a valid, non-negative position.
+    <code>nth</code> recorre el iterable y se detiene en cuanto llega a
+    <code>index</code>, así que nunca consume más de <code>index + 1</code>
+    elementos — barato incluso sobre una secuencia perezosa enorme, y mucho
+    más barato que materializarla entera solo para indexar en una <code>List</code>.
+    Un índice negativo, o uno más allá del final, simplemente da <code>null</code>;
+    a diferencia de la indexación de arrays de algunos lenguajes, aquí los índices
+    no dan la vuelta para contar desde el final — el índice tiene que ser una posición
+    válida y no negativa.
   </p>
   <p>
-    There's no chain method for <code>nth</code> — call the top-level
-    function (or its async twin) directly on any <code>Iterable</code> or
-    <code>Fx</code> chain, since <code>Fx</code> <em>is</em> an
+    <code>nth</code> no tiene método de cadena: llama directamente a la función
+    de nivel superior (o a su gemela asíncrona) sobre cualquier <code>Iterable</code>
+    o cadena <code>Fx</code>, ya que <code>Fx</code> <em>es</em> un
     <code>Iterable</code>.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -83,8 +82,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Laziness &amp; async</h2>
-  <p>Fetching index 3 only pulls 4 elements from the million-element range — proven with a <code>peek</code> counter:</p>
+  <h2>Demo 2 · Pereza &amp; async</h2>
+  <p>Pedir el índice 3 solo consume 4 elementos del rango de un millón — demostrado con un contador de <code>peek</code>:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -103,8 +102,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>nth</code> to print the silver medalist (index 1), or <code>'unclaimed'</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>nth</code> para imprimir al medallista de plata (índice 1), o <code>'unclaimed'</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -121,11 +120,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="head.html"><code>head</code></a> — shorthand for <code>nth(0, ...)</code> ·
-    <a href="last.html"><code>last</code></a> — the final element ·
-    <a href="find.html"><code>find</code></a> — locate by predicate instead of index ·
-    <a href="slice.html"><code>slice</code></a> — pull a whole range
+    <strong>Relacionado:</strong>
+    <a href="head.html"><code>head</code></a> — atajo para <code>nth(0, ...)</code> ·
+    <a href="last.html"><code>last</code></a> — el último elemento ·
+    <a href="find.html"><code>find</code></a> — localiza por predicado en vez de por índice ·
+    <a href="slice.html"><code>slice</code></a> — extrae un rango entero
   </div>
 
   <nav class="tut-nav">

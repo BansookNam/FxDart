@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>each — FxDart 101</title>
-  <meta name="description" content="FxDart each tutorial: run a function for its side effects over every element of a lazy chain, sync and async.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/each.html">
+  <meta name="description" content="Tutorial de each en FxDart: ejecuta una función por sus efectos secundarios sobre cada elemento de una cadena perezosa, en modo síncrono y asíncrono.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/each.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/each.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/each.html">
@@ -43,41 +42,40 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 1 · Primeros pasos › <strong>each</strong></p>
   <h1><code>each</code></h1>
-  <p class="hero-sub">Runs a function once per element, purely for its side effects.</p>
+  <p class="hero-sub">Ejecuta una función una vez por elemento, únicamente por sus efectos secundarios.</p>
 
   <div class="signature">void each&lt;A&gt;(void Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;void&gt; eachAsync&lt;A&gt;(FutureOr&lt;void&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 void Fx.each(void Function(T a) f)        // chain
 Future&lt;void&gt; FxAsync.each(FutureOr&lt;void&gt; Function(T a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>each</code> is a terminal operator, like <code>toArray</code> —
-    calling it pulls every value through the whole chain. The difference is
-    what it does with those values: instead of collecting them into a
-    <code>List</code>, it just runs <code>f</code> for each one and returns
-    <code>void</code>. Use it when you're printing, logging, writing to a
-    database, or otherwise producing an effect, and you don't need the
-    values back.
+    <code>each</code> es un operador terminal, igual que <code>toArray</code>:
+    al llamarlo tira de todos los valores a través de la cadena entera. La
+    diferencia está en qué hace con esos valores: en lugar de recogerlos en
+    una <code>List</code>, se limita a ejecutar <code>f</code> con cada uno y
+    devuelve <code>void</code>. Úsalo cuando estés imprimiendo, registrando
+    logs, escribiendo en una base de datos o produciendo cualquier otro
+    efecto, y no necesites los valores de vuelta.
   </p>
   <p>
-    It's the FxTS-flavored twin of Dart's own <code>Iterable.forEach</code> —
-    the same idea, given a name consistent with the rest of the FxTS API so
-    it composes naturally with the rest of the chain vocabulary.
+    Es el gemelo con sabor a FxTS del <code>Iterable.forEach</code> propio de
+    Dart: la misma idea, con un nombre coherente con el resto de la API de
+    FxTS para que componga con naturalidad junto al vocabulario de la cadena.
   </p>
   <p>
-    <code>eachAsync</code> (or <code>.each()</code> on an
-    <code>FxAsync</code> chain) awaits <code>f</code> for every element,
-    strictly in the order the elements arrive — even if some individual
-    calls would finish faster than others, <code>each</code> always
-    processes one at a time in sequence. If you want overlap, add
-    <code>.concurrent(n)</code> upstream before <code>.each()</code>.
+    <code>eachAsync</code> (o <code>.each()</code> sobre una cadena
+    <code>FxAsync</code>) espera con await a <code>f</code> para cada
+    elemento, estrictamente en el orden en que llegan; aunque algunas
+    llamadas individuales pudieran terminar antes que otras, <code>each</code>
+    siempre procesa una a una y en secuencia. Si quieres solapamiento, añade
+    <code>.concurrent(n)</code> antes de <code>.each()</code> en la cadena.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -92,11 +90,11 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, strictly in order</h2>
+  <h2>Demo 2 · Asíncrono, estrictamente en orden</h2>
   <p>
-    Even though each element sleeps for a <em>different</em> length of
-    time, <code>eachAsync</code> still processes them 1, 2, 3 — never out
-    of order:
+    Aunque cada elemento duerme durante un tiempo <em>distinto</em>,
+    <code>eachAsync</code> los sigue procesando 1, 2, 3 — nunca fuera de
+    orden:
   </p>
   <div class="playground">
 <textarea>
@@ -115,9 +113,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>each</code> to print a receipt line for every
-    order and keep a running total.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>each</code> para imprimir una línea de recibo por
+    cada pedido y llevar un total acumulado.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -138,11 +136,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="toArray.html"><code>toArray</code></a> — terminal op that collects a List instead ·
-    <a href="consume.html"><code>consume</code></a> — terminal op that discards results and can stop early ·
-    <a href="peek.html"><code>peek</code></a> — same idea, but lazy (not terminal) ·
-    <a href="fx.html"><code>fx</code></a> — the chain that each terminates
+    <strong>Relacionado:</strong>
+    <a href="toArray.html"><code>toArray</code></a> — operador terminal que en su lugar recoge una List ·
+    <a href="consume.html"><code>consume</code></a> — operador terminal que descarta los resultados y puede parar antes ·
+    <a href="peek.html"><code>peek</code></a> — la misma idea, pero perezoso (no terminal) ·
+    <a href="fx.html"><code>fx</code></a> — la cadena que each termina
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>always — FxDart 101</title>
-  <meta name="description" content="FxDart always tutorial: build a function that ignores its argument and always returns a fixed value, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/always.html">
+  <meta name="description" content="Tutorial de always en FxDart: crea una función que ignora su argumento y siempre devuelve un valor fijo, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/always.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/always.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/always.html">
@@ -43,32 +42,31 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 10 · Utilidades de funciones › <strong>always</strong></p>
   <h1><code>always</code></h1>
-  <p class="hero-sub">Returns a function that always returns the same fixed value, ignoring its argument.</p>
+  <p class="hero-sub">Devuelve una función que siempre devuelve el mismo valor fijo, ignorando su argumento.</p>
 
   <div class="signature">T Function([Object? _]) always&lt;T&gt;(T a) => ([Object? _]) => a;</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>always(a)</code> closes over <code>a</code> and hands back a
-    function that discards whatever it's called with and returns <code>a</code>
-    every time. The optional parameter is the trick that makes it fit
-    anywhere a <em>unary</em> callback is expected — a mapper, an
-    <code>orElse</code> handler, a fallback branch — without you writing
-    <code>(_) => a</code> by hand each time.
+    <code>always(a)</code> captura <code>a</code> y te devuelve una
+    función que descarta aquello con lo que la llames y devuelve <code>a</code>
+    cada vez. El parámetro opcional es el truco que le permite encajar en
+    cualquier sitio donde se espere una retrollamada <em>unaria</em> — un
+    mapeador, un manejador <code>orElse</code>, una rama de reserva — sin que
+    tengas que escribir <code>(_) => a</code> a mano cada vez.
   </p>
   <p>
-    It's the constant counterpart to <a href="identity.html"><code>identity</code></a>:
-    <code>identity</code> passes the input through, <code>always</code>
-    throws it away. Both are plain synchronous functions with no async
-    variant or chain form.
+    Es la contraparte constante de <a href="identity.html"><code>identity</code></a>:
+    <code>identity</code> deja pasar la entrada, <code>always</code>
+    la desecha. Ambas son funciones síncronas simples, sin variante asíncrona
+    ni forma encadenada.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
-  <p>Note the optional argument — <code>greet(123)</code> still returns
-    <code>'hi'</code>, which is what lets it act as a <code>map</code> callback:</p>
+  <h2>Demo 1 · Fundamentos</h2>
+  <p>Fíjate en el argumento opcional — <code>greet(123)</code> sigue devolviendo
+    <code>'hi'</code>, que es justo lo que le permite actuar como retrollamada de <code>map</code>:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -84,11 +82,11 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Constant fallback in a dispatch table</h2>
+  <h2>Demo 2 · Valor por defecto constante en una tabla de despacho</h2>
   <p>
-    <code>always</code> is a natural fit for <code>orElse</code> in
-    <a href="cases.html"><code>cases</code></a> — a fixed default that
-    doesn't need to look at the unmatched value:
+    <code>always</code> encaja de forma natural como <code>orElse</code> en
+    <a href="cases.html"><code>cases</code></a> — un valor por defecto fijo que
+    no necesita mirar el valor que no coincidió:
   </p>
   <div class="playground">
 <textarea>
@@ -105,9 +103,9 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>always</code> to replace every score in this list
-    with the string <code>'graded'</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>always</code> para reemplazar cada nota de esta lista
+    por la cadena <code>'graded'</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -124,11 +122,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="identity.html"><code>identity</code></a> — pass the argument through instead ·
-    <a href="cases.html"><code>cases</code></a> — dispatch table that often pairs with always as orElse ·
-    <a href="when.html"><code>when</code></a> — conditional transform, value-in value-out ·
-    <a href="memoize.html"><code>memoize</code></a> — cache a computed value instead of a constant one
+    <strong>Relacionado:</strong>
+    <a href="identity.html"><code>identity</code></a> — deja pasar el argumento en lugar de descartarlo ·
+    <a href="cases.html"><code>cases</code></a> — tabla de despacho que suele acompañarse de always como orElse ·
+    <a href="when.html"><code>when</code></a> — transformación condicional, entra un valor y sale un valor ·
+    <a href="memoize.html"><code>memoize</code></a> — cachea un valor calculado en vez de uno constante
   </div>
 
   <nav class="tut-nav">

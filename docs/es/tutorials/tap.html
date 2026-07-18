@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>tap — FxDart 101</title>
-  <meta name="description" content="FxDart tap tutorial: run a side effect on a value and return it unchanged, data-first, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/tap.html">
+  <meta name="description" content="Tutorial de tap en FxDart: ejecuta un efecto secundario sobre un valor y devuélvelo sin cambios, en forma data-first, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/tap.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/tap.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/tap.html">
@@ -43,31 +42,31 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 10 · Utilidades de funciones › <strong>tap</strong></p>
   <h1><code>tap</code></h1>
-  <p class="hero-sub">Calls a function with a value for its side effect, then returns the value unchanged.</p>
+  <p class="hero-sub">Llama a una función con un valor por su efecto secundario y luego devuelve el valor sin cambios.</p>
 
   <div class="signature">T tap&lt;T&gt;(void Function(T a) f, T a)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>tap</code> is data-first: <code>tap(f, value)</code> runs
-    <code>f(value)</code> — usually a <code>print</code>, a log call, or some
-    other side effect — and then hands <code>value</code> straight back
-    unchanged. It exists so you can peek at a value <em>without breaking the
-    expression it's part of</em>: wrap any single value in <code>tap</code>
-    and the surrounding code doesn't need to change at all.
+    <code>tap</code> es data-first: <code>tap(f, value)</code> ejecuta
+    <code>f(value)</code> —normalmente un <code>print</code>, una llamada de
+    log u otro efecto secundario— y luego te devuelve <code>value</code> tal
+    cual. Existe para que puedas espiar un valor <em>sin romper la expresión
+    de la que forma parte</em>: envuelve cualquier valor individual en
+    <code>tap</code> y el código de alrededor no necesita cambiar en absoluto.
   </p>
   <p>
-    <code>tap</code> operates on one value at a time. Its cousin
-    <a href="peek.html"><code>peek</code></a> is the pipeline version — it
-    runs a side effect for every element of an <code>Iterable</code> as it's
-    pulled through. For a curried, reusable "logger" you close over
-    <code>f</code> yourself: <code>(v) => tap(f, v)</code>, as shown below.
+    <code>tap</code> opera sobre un valor cada vez. Su pariente
+    <a href="peek.html"><code>peek</code></a> es la versión para pipelines:
+    ejecuta un efecto secundario por cada elemento de un <code>Iterable</code>
+    conforme se va tirando de él. Para tener un «logger» reutilizable y
+    currificado, cierras tú mismo sobre <code>f</code>:
+    <code>(v) => tap(f, v)</code>, como se ve abajo.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -79,11 +78,11 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Logging inside a pipe</h2>
+  <h2>Demo 2 · Registrar dentro de un pipe</h2>
   <p>
-    Closing over <code>tap</code> gives a reusable "curried" logger you can
-    drop into a <code>pipe</code> chain to inspect intermediate values without
-    altering the flow of data:
+    Cerrar sobre <code>tap</code> te da un «logger» currificado y reutilizable
+    que puedes soltar en una cadena <code>pipe</code> para inspeccionar valores
+    intermedios sin alterar el flujo de datos:
   </p>
   <div class="playground">
 <textarea>
@@ -107,9 +106,9 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>tap</code> to print each value as it flows through
-    the <code>map</code> callback, before it gets multiplied by 10.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>tap</code> para imprimir cada valor a su paso por
+    el callback de <code>map</code>, antes de que se multiplique por 10.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -126,11 +125,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="peek.html"><code>peek</code></a> — the pipeline version of tap ·
-    <a href="pipe1.html"><code>pipe1</code></a> / <a href="pipe.html"><code>pipe</code></a> — compose a value through functions ·
-    <a href="identity.html"><code>identity</code></a> — pass through with no side effect at all ·
-    <a href="apply.html"><code>apply</code></a> — invoke a function with a dynamic argument list
+    <strong>Relacionado:</strong>
+    <a href="peek.html"><code>peek</code></a> — la versión de tap para pipelines ·
+    <a href="pipe1.html"><code>pipe1</code></a> / <a href="pipe.html"><code>pipe</code></a> — compón un valor a través de funciones ·
+    <a href="identity.html"><code>identity</code></a> — deja pasar sin ningún efecto secundario ·
+    <a href="apply.html"><code>apply</code></a> — invoca una función con una lista dinámica de argumentos
   </div>
 
   <nav class="tut-nav">

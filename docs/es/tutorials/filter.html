@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>filter — FxDart 101</title>
-  <meta name="description" content="FxDart filter tutorial: keep only the elements a predicate accepts, sync and async, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/filter.html">
+  <meta name="description" content="Tutorial de filter en FxDart: conserva solo los elementos que acepta un predicado, en versión síncrona y asíncrona, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/filter.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/filter.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/filter.html">
@@ -43,40 +42,39 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 4 · Filtrado &amp; deduplicación › <strong>filter</strong></p>
   <h1><code>filter</code></h1>
-  <p class="hero-sub">Returns a lazy iterable of the elements a predicate returns true for.</p>
+  <p class="hero-sub">Devuelve un iterable perezoso con los elementos para los que el predicado devuelve true.</p>
 
   <div class="signature">Iterable&lt;A&gt; filter&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; filterAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.filter(bool Function(T a) f)        // chain (alias: where)
 FxAsync&lt;T&gt; FxAsync.filter(FutureOr&lt;bool&gt; Function(T a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>filter</code> is the other fundamental transformer alongside
-    <code>map</code>: it keeps every element for which the predicate
-    returns <code>true</code> and drops the rest, lazily. Nothing runs
-    until a terminal operator pulls values through, and since <code>Fx</code>
-    extends <code>Iterable</code>, <code>.where(...)</code> works too — it's
-    just an alias for <code>.filter(...)</code> on the chain.
+    <code>filter</code> es el otro transformador fundamental junto a
+    <code>map</code>: conserva todos los elementos para los que el predicado
+    devuelve <code>true</code> y descarta el resto, de forma perezosa. No se
+    ejecuta nada hasta que un operador terminal tira de los valores y, como
+    <code>Fx</code> extiende <code>Iterable</code>, <code>.where(...)</code>
+    también funciona — no es más que un alias de <code>.filter(...)</code> en
+    la cadena.
   </p>
   <p>
-    Because it's lazy, combining <code>filter</code> with <code>take</code>
-    only evaluates as many predicate calls as needed to satisfy the
-    <code>take</code> — see Demo 1.
+    Al ser perezoso, combinar <code>filter</code> con <code>take</code>
+    evalúa solo las llamadas al predicado necesarias para satisfacer el
+    <code>take</code> — mira la Demo 1.
   </p>
   <p>
-    <code>filterAsync</code> has its own dedicated concurrent implementation
-    (rather than reusing <code>mapAsync</code>'s): when you attach
-    <code>.concurrent(n)</code>, <code>n</code> predicates are evaluated in
-    parallel, but the elements that pass are still released downstream in
-    their original order — concurrency changes throughput, never the
-    result.
+    <code>filterAsync</code> tiene su propia implementación concurrente
+    (en vez de reutilizar la de <code>mapAsync</code>): cuando le añades
+    <code>.concurrent(n)</code>, se evalúan <code>n</code> predicados en
+    paralelo, pero los elementos que pasan se emiten aguas abajo en su orden
+    original — la concurrencia cambia el rendimiento, nunca el resultado.
   </p>
 
-  <h2>Demo 1 · Basics &amp; laziness</h2>
+  <h2>Demo 1 · Fundamentos &amp; pereza</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -103,7 +101,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency</h2>
+  <h2>Demo 2 · Asíncrono, con concurrencia</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -129,8 +127,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>filter</code> to keep only ages 18 and over.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>filter</code> para conservar solo las edades de 18 en adelante.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -147,11 +145,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="reject.html"><code>reject</code></a> — the opposite of filter ·
-    <a href="compact.html"><code>compact</code></a> — filter out nulls ·
-    <a href="map.html"><code>map</code></a> — transform instead of keep/drop ·
-    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
+    <strong>Relacionado:</strong>
+    <a href="reject.html"><code>reject</code></a> — lo contrario de filter ·
+    <a href="compact.html"><code>compact</code></a> — descarta los null ·
+    <a href="map.html"><code>map</code></a> — transforma en vez de conservar/descartar ·
+    <a href="concurrent.html"><code>concurrent</code></a> — evaluación en paralelo
   </div>
 
   <nav class="tut-nav">

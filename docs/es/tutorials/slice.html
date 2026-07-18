@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>slice — FxDart 101</title>
-  <meta name="description" content="FxDart slice tutorial: pull an index window [start, end) out of an iterable, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/slice.html">
+  <meta name="description" content="Tutorial de slice en FxDart: extrae de un iterable la ventana de índices [start, end), con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/slice.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/slice.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/slice.html">
@@ -43,36 +42,35 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 5 · Segmentación › <strong>slice</strong></p>
   <h1><code>slice</code></h1>
-  <p class="hero-sub">Returns the values between index <code>start</code> (inclusive) and <code>end</code> (exclusive).</p>
+  <p class="hero-sub">Devuelve los valores entre el índice <code>start</code> (incluido) y <code>end</code> (excluido).</p>
 
   <div class="signature">Iterable&lt;A&gt; slice&lt;A&gt;(int start, Iterable&lt;A&gt; iterable, [int? end])
 FxAsyncIterable&lt;A&gt; sliceAsync&lt;A&gt;(int start, FxAsyncIterable&lt;A&gt; iterable, [int? end])
 Fx&lt;T&gt; Fx.slice(int start, [int? end])        // chain
 FxAsync&lt;T&gt; FxAsync.slice(int start, [int? end])</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>slice</code> is a general index window: it yields the elements
-    whose position falls in <code>[start, end)</code>, and omitting
-    <code>end</code> means "to the end of the source". It's a single
-    operator that subsumes both <code>drop</code> (via <code>start</code>)
-    and <code>take</code> (via <code>end</code>) at once.
+    <code>slice</code> es una ventana de índices genérica: emite los elementos
+    cuya posición cae en <code>[start, end)</code>, y omitir <code>end</code>
+    significa «hasta el final de la fuente». Es un único operador que engloba a
+    la vez a <code>drop</code> (mediante <code>start</code>) y a
+    <code>take</code> (mediante <code>end</code>).
   </p>
   <p>
-    Watch the argument order in the data-first form — unlike most FxDart
-    functions, the <code>iterable</code> sits in the <strong>middle</strong>:
-    <code>slice(start, iterable, [end])</code>, mirroring FxTS. The chain
-    form doesn't have this quirk, since the iterable is the receiver:
-    <code>fx(iterable).slice(start, end)</code>. Under the hood
-    <code>slice</code> is still just walking the source once and counting
-    indices, so it stays lazy and works fine on an infinite source as long
-    as you supply an <code>end</code>.
+    Ojo con el orden de los argumentos en la forma data-first: a diferencia de
+    la mayoría de funciones de FxDart, el <code>iterable</code> va en
+    <strong>medio</strong>: <code>slice(start, iterable, [end])</code>,
+    igual que en FxTS. La forma encadenada no tiene esta rareza, porque el
+    iterable es el receptor: <code>fx(iterable).slice(start, end)</code>. Por
+    dentro, <code>slice</code> se limita a recorrer la fuente una vez contando
+    índices, así que sigue siendo perezoso y funciona sin problema sobre una
+    fuente infinita mientras le des un <code>end</code>.
   </p>
 
-  <h2>Demo 1 · Basics &amp; argument order</h2>
+  <h2>Demo 1 · Fundamentos &amp; orden de los argumentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -91,7 +89,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -108,9 +106,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>slice</code> to grab the window from index 2 up to
-    (not including) index 5.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>slice</code> para quedarte con la ventana desde el
+    índice 2 hasta el índice 5 (sin incluirlo).</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -127,10 +125,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="drop.html"><code>drop</code></a> — just the start-index half of slice ·
-    <a href="take.html"><code>take</code></a> — just the count/end half of slice ·
-    <a href="chunk.html"><code>chunk</code></a> — fixed-size windows across the whole source
+    <strong>Relacionado:</strong>
+    <a href="drop.html"><code>drop</code></a> — solo la mitad de slice correspondiente al índice inicial ·
+    <a href="take.html"><code>take</code></a> — solo la mitad de slice correspondiente al final o al conteo ·
+    <a href="chunk.html"><code>chunk</code></a> — ventanas de tamaño fijo a lo largo de toda la fuente
   </div>
 
   <nav class="tut-nav">

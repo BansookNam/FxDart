@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>reduce — FxDart 101</title>
-  <meta name="description" content="FxDart reduce tutorial: fold a pipeline down to one value using its first element as the seed, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/reduce.html">
+  <meta name="description" content="Tutorial de reduce en FxDart: colapsa un pipeline en un solo valor usando su primer elemento como valor inicial, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/reduce.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/reduce.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/reduce.html">
@@ -43,48 +42,47 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>reduce</strong></p>
   <h1><code>reduce</code></h1>
-  <p class="hero-sub">Collapses a pipeline into a single value, using its first element as the starting seed.</p>
+  <p class="hero-sub">Colapsa un pipeline en un único valor, usando su primer elemento como valor inicial.</p>
 
   <div class="signature">A reduce&lt;A&gt;(A Function(A acc, A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;A&gt; reduceAsync&lt;A&gt;(FutureOr&lt;A&gt; Function(A acc, A a) f, FxAsyncIterable&lt;A&gt; iterable)
 T Fx.reduce(T Function(T acc, T a) combine)              // chain (sync, inherited from Iterable)
 Future&lt;T&gt; FxAsync.reduce(FutureOr&lt;T&gt; Function(T acc, T a) f)  // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>reduce</code> is a <strong>terminal</strong> operator: unlike
-    <code>map</code> or <code>filter</code>, calling it immediately pulls
-    every value through the whole lazy pipeline behind it and produces one
-    concrete result. Nothing upstream runs until you call a terminal like
-    this one.
+    <code>reduce</code> es un operador <strong>terminal</strong>: a diferencia
+    de <code>map</code> o <code>filter</code>, llamarlo tira de inmediato de
+    todos los valores a través de todo el pipeline perezoso que tiene detrás y
+    produce un resultado concreto. Nada de lo que hay aguas arriba se ejecuta
+    hasta que llamas a un terminal como este.
   </p>
   <p>
-    This is the <em>unseeded</em> form: it takes the first element of the
-    iterable as the starting accumulator, then combines the rest into it.
-    Because of that, calling it on an empty iterable makes no sense — there's
-    no first element to seed with — so it throws a <code>StateError</code>.
+    Esta es la forma <em>sin valor inicial</em>: toma el primer elemento del
+    iterable como acumulador de partida y va combinando el resto sobre él. Por
+    eso mismo, llamarlo sobre un iterable vacío no tiene sentido —no hay primer
+    elemento del que partir— y por tanto lanza un <code>StateError</code>.
   </p>
   <p>
-    FxTS overloads <code>reduce</code> for both the seeded and unseeded case
-    by argument count — <code>reduce(f, iterable)</code> vs.
-    <code>reduce(f, seed, iterable)</code>. Dart has no arity-based
-    overloading, so FxDart keeps <code>reduce</code> for the unseeded form
-    and renames the seeded one to <code><a href="fold.html">fold</a></code> —
-    matching Dart's own <code>Iterable.fold</code> naming. If you have a seed,
-    reach for <code>fold</code>.
+    FxTS sobrecarga <code>reduce</code> para los casos con y sin valor inicial
+    según el número de argumentos: <code>reduce(f, iterable)</code> frente a
+    <code>reduce(f, seed, iterable)</code>. Dart no tiene sobrecarga por
+    aridad, así que FxDart reserva <code>reduce</code> para la forma sin valor
+    inicial y renombra la otra como <code><a href="fold.html">fold</a></code>,
+    siguiendo la nomenclatura del propio <code>Iterable.fold</code> de Dart. Si
+    tienes un valor inicial, usa <code>fold</code>.
   </p>
   <p>
-    On the sync chain, <code>Fx</code> extends <code>Iterable</code>, so
-    <code>.reduce(f)</code> is simply Dart's built-in method — same contract,
-    same <code>StateError</code> on empty. On the async chain,
-    <code>FxAsync.reduce</code> is spelled out explicitly and awaits each
-    combine step.
+    En la cadena síncrona, <code>Fx</code> extiende <code>Iterable</code>, así
+    que <code>.reduce(f)</code> es simplemente el método integrado de Dart:
+    mismo contrato, mismo <code>StateError</code> cuando está vacío. En la
+    cadena asíncrona, <code>FxAsync.reduce</code> está escrito de forma
+    explícita y espera cada paso de combinación.
   </p>
 
-  <h2>Demo 1 · Basics &amp; the empty-input error</h2>
+  <h2>Demo 1 · Fundamentos &amp; el error con entrada vacía</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -107,12 +105,12 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency</h2>
+  <h2>Demo 2 · Asíncrono, con concurrencia</h2>
   <p>
-    <code>reduce</code> still pulls the whole pipeline behind it — including
-    a <code>.concurrent(n)</code> stage, which evaluates <code>n</code>
-    upstream values at a time while <code>reduce</code> combines them as they
-    arrive in order:
+    <code>reduce</code> sigue tirando de todo el pipeline que tiene detrás,
+    incluida una etapa <code>.concurrent(n)</code>, que evalúa <code>n</code>
+    valores aguas arriba a la vez mientras <code>reduce</code> los combina
+    conforme van llegando en orden:
   </p>
   <div class="playground">
 <textarea>
@@ -133,8 +131,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>reduce</code> to find the <strong>longest</strong> word in the list.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>reduce</code> para encontrar la palabra <strong>más larga</strong> de la lista.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -151,11 +149,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="fold.html"><code>fold</code></a> — the seeded counterpart ·
-    <a href="reduceLazy.html"><code>reduceLazy</code></a> — a reusable, curried reducer ·
-    <a href="sum.html"><code>sum</code></a> — reduce specialized for numbers ·
-    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation upstream
+    <strong>Relacionado:</strong>
+    <a href="fold.html"><code>fold</code></a> — la contraparte con valor inicial ·
+    <a href="reduceLazy.html"><code>reduceLazy</code></a> — un reductor currificado y reutilizable ·
+    <a href="sum.html"><code>sum</code></a> — reduce especializado para números ·
+    <a href="concurrent.html"><code>concurrent</code></a> — evaluación paralela aguas arriba
   </div>
 
   <nav class="tut-nav">

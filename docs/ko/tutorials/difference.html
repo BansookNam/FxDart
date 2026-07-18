@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>difference — FxDart 101</title>
-  <meta name="description" content="FxDart difference tutorial: elements of one iterable that don't occur in another, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/difference.html">
+  <meta name="description" content="FxDart difference 튜토리얼 — 한 이터러블에는 없고 다른 이터러블에만 있는 원소를 골라내는 방법을 라이브 플레이그라운드와 함께 살펴봅니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/difference.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/difference.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/difference.html">
@@ -43,42 +42,41 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 4 · 필터링 &amp; 중복 제거 › <strong>difference</strong></p>
   <h1><code>difference</code></h1>
-  <p class="hero-sub">Returns the elements of the second iterable that do not occur in the first — argument order matters.</p>
+  <p class="hero-sub">첫 번째 이터러블에 없는 두 번째 이터러블의 원소를 반환합니다 — 인자 순서가 중요합니다.</p>
 
   <div class="signature">Iterable&lt;A&gt; difference&lt;A&gt;(Iterable&lt;A&gt; iterable1, Iterable&lt;A&gt; iterable2)
 FxAsyncIterable&lt;A&gt; differenceAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;A&gt; iterable2)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    Read the signature carefully: <code>difference(iterable1, iterable2)</code>
-    walks <strong><code>iterable2</code></strong> and yields each of its
-    elements that is <em>not</em> found in <code>iterable1</code>
-    (deduplicated, like <code>uniq</code>). <code>iterable1</code> is only
-    ever used as a membership set to test against — none of its own
-    elements can appear in the output, and its own duplicates don't matter.
-    This order is not symmetric: swapping the arguments produces a
-    completely different (and generally different-length) result. A useful
-    way to remember it: think of <code>iterable1</code> as "the exclusion
-    list" and <code>iterable2</code> as "the list you're filtering."
+    시그니처를 주의 깊게 보세요. <code>difference(iterable1, iterable2)</code>는
+    <strong><code>iterable2</code></strong>를 순회하면서
+    <em>오직</em> <code>iterable1</code>에 없는 원소만 내보냅니다
+    (<code>uniq</code>처럼 중복은 제거됩니다). <code>iterable1</code>은
+    오직 포함 여부를 검사하는 집합으로만 쓰입니다 — 그 자신의 원소는
+    결과에 절대 나타나지 않으며, 내부의 중복도 아무 영향이 없습니다.
+    이 순서는 대칭이 아닙니다. 인자를 바꾸면 완전히 다른(그리고 대개
+    길이도 다른) 결과가 나옵니다. 기억하기 좋은 방법은
+    <code>iterable1</code>을 "제외 목록", <code>iterable2</code>를
+    "걸러 낼 목록"으로 생각하는 것입니다.
   </p>
   <p>
-    Internally it's <code>differenceBy((a) =&gt; a, iterable1, iterable2)</code> —
-    see <a href="differenceBy.html"><code>differenceBy</code></a> if you
-    need to compare by a computed key instead of value equality.
+    내부 구현은 <code>differenceBy((a) =&gt; a, iterable1, iterable2)</code>입니다 —
+    값 동등성 대신 계산된 키로 비교해야 한다면
+    <a href="differenceBy.html"><code>differenceBy</code></a>를 참고하세요.
   </p>
   <p>
-    There's no chain method for <code>difference</code>; it only exists as
-    a data-first function (and its async counterpart). On the async side,
-    the concurrency marker from <code>.concurrent(n)</code> applies to
-    <strong><code>iterable2</code></strong> — the exclusion set in
-    <code>iterable1</code> is always drained up front before results start
-    flowing.
+    <code>difference</code>에는 체인 메서드가 없습니다. data-first 함수(그리고
+    그 비동기 짝)로만 존재합니다. 비동기 쪽에서는
+    <code>.concurrent(n)</code>이 붙인 동시성 표시가
+    <strong><code>iterable2</code></strong>에 적용됩니다 —
+    <code>iterable1</code>의 제외 집합은 결과가 흘러나오기 전에 항상
+    먼저 전부 소진됩니다.
   </p>
 
-  <h2>Demo 1 · Basics &amp; argument order</h2>
+  <h2>데모 1 · 기본과 인자 순서</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -102,7 +100,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency</h2>
+  <h2>데모 2 · 비동기, 그리고 동시성</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -126,9 +124,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>difference</code> to find the tasks in
-    <code>allTasks</code> that are not yet in <code>completed</code>.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>difference</code>로 <code>allTasks</code> 중 아직
+    <code>completed</code>에 없는 작업을 찾아보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -146,11 +144,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="differenceBy.html"><code>differenceBy</code></a> — the same, by a computed key ·
-    <a href="intersection.html"><code>intersection</code></a> — keep the shared elements instead ·
-    <a href="uniq.html"><code>uniq</code></a> — dedupe a single iterable ·
-    <a href="../tutorials/includes.html"><code>includes</code></a> — test membership in a single iterable
+    <strong>관련 함수:</strong>
+    <a href="differenceBy.html"><code>differenceBy</code></a> — 계산된 키로 비교하는 같은 동작 ·
+    <a href="intersection.html"><code>intersection</code></a> — 반대로 공통 원소만 남기기 ·
+    <a href="uniq.html"><code>uniq</code></a> — 이터러블 하나에서 중복 제거 ·
+    <a href="../tutorials/includes.html"><code>includes</code></a> — 이터러블 하나에 포함되는지 검사
   </div>
 
   <nav class="tut-nav">

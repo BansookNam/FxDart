@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>intersection — FxDart 101</title>
-  <meta name="description" content="FxDart intersection tutorial: elements of one iterable also found in another, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/intersection.html">
+  <meta name="description" content="Tutorial de intersection en FxDart: los elementos de un iterable que también aparecen en otro, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/intersection.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/intersection.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/intersection.html">
@@ -43,41 +42,41 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 4 · Filtrado &amp; deduplicación › <strong>intersection</strong></p>
   <h1><code>intersection</code></h1>
-  <p class="hero-sub"><code>difference</code>'s opposite: elements of the second iterable that ARE also found in the first.</p>
+  <p class="hero-sub">Lo contrario de <code>difference</code>: los elementos del segundo iterable que SÍ aparecen en el primero.</p>
 
   <div class="signature">Iterable&lt;A&gt; intersection&lt;A&gt;(Iterable&lt;A&gt; iterable1, Iterable&lt;A&gt; iterable2)
 FxAsyncIterable&lt;A&gt; intersectionAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;A&gt; iterable2)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>intersection(iterable1, iterable2)</code> shares
-    <code>difference</code>'s argument-order convention: the result walks
-    <strong><code>iterable2</code></strong>, and keeps each element (in
-    <code>iterable2</code>'s order, deduplicated) that <em>is</em> found in
-    <code>iterable1</code>. <code>iterable1</code> is only ever used as a
-    membership set — swap the two arguments and you get the same
-    <em>values</em> in a set-theory sense, but the actual order (and which
-    collection's duplicates get collapsed) is different, since the source
-    of the yielded elements changes. See Demo 1.
+    <code>intersection(iterable1, iterable2)</code> comparte la convención de
+    orden de argumentos de <code>difference</code>: el resultado recorre
+    <strong><code>iterable2</code></strong> y conserva cada elemento (en el
+    orden de <code>iterable2</code>, sin duplicados) que <em>sí</em> se
+    encuentre en <code>iterable1</code>. <code>iterable1</code> se usa
+    únicamente como conjunto de pertenencia — si intercambias los dos
+    argumentos obtienes los mismos <em>valores</em> en el sentido de la teoría
+    de conjuntos, pero el orden real (y de qué colección se colapsan los
+    duplicados) es distinto, porque cambia la fuente de los elementos
+    emitidos. Mira la Demo 1.
   </p>
   <p>
-    Under the hood it's
-    <code>intersectionBy((a) =&gt; a, iterable1, iterable2)</code> — reach
-    for <a href="intersectionBy.html"><code>intersectionBy</code></a>
-    directly when you need to match by a computed key across two lists of
-    full records rather than by value equality.
+    Por dentro es
+    <code>intersectionBy((a) =&gt; a, iterable1, iterable2)</code> — recurre
+    directamente a <a href="intersectionBy.html"><code>intersectionBy</code></a>
+    cuando necesites emparejar por una clave calculada entre dos listas de
+    registros completos en vez de por igualdad de valor.
   </p>
   <p>
-    There's no chain method; call the data-first function. On the async
-    side, the concurrency marker from <code>.concurrent(n)</code> applies to
-    <code>iterable2</code> — <code>iterable1</code> is drained up front to
-    build the membership set.
+    No hay método de cadena; llama a la función data-first. En el lado
+    asíncrono, el marcador de concurrencia de <code>.concurrent(n)</code> se
+    aplica a <code>iterable2</code> — <code>iterable1</code> se consume por
+    completo de antemano para construir el conjunto de pertenencia.
   </p>
 
-  <h2>Demo 1 · Basics &amp; argument order</h2>
+  <h2>Demo 1 · Fundamentos &amp; orden de los argumentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -99,7 +98,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency</h2>
+  <h2>Demo 2 · Asíncrono, con concurrencia</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -122,9 +121,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>intersection</code> to find which of the
-    candidate's skills are actually required.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>intersection</code> para averiguar cuáles de las
+    habilidades del candidato son realmente necesarias.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -143,11 +142,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="difference.html"><code>difference</code></a> — the exclusion counterpart ·
-    <a href="intersectionBy.html"><code>intersectionBy</code></a> — match by a computed key instead ·
-    <a href="uniq.html"><code>uniq</code></a> — dedupe a single iterable ·
-    <a href="../tutorials/includes.html"><code>includes</code></a> — test membership of a single value
+    <strong>Relacionado:</strong>
+    <a href="difference.html"><code>difference</code></a> — la contraparte de exclusión ·
+    <a href="intersectionBy.html"><code>intersectionBy</code></a> — empareja por una clave calculada en su lugar ·
+    <a href="uniq.html"><code>uniq</code></a> — elimina duplicados de un solo iterable ·
+    <a href="../tutorials/includes.html"><code>includes</code></a> — comprueba la pertenencia de un único valor
   </div>
 
   <nav class="tut-nav">

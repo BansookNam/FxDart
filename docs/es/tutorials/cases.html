@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>cases — FxDart 101</title>
-  <meta name="description" content="FxDart cases tutorial: build a predicate/mapper dispatch table with an optional default, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/cases.html">
+  <meta name="description" content="Tutorial de cases en FxDart: construye una tabla de despacho de predicado/mapeador con un valor por defecto opcional, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/cases.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/cases.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/cases.html">
@@ -43,45 +42,45 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 10 · Utilidades de funciones › <strong>cases</strong></p>
   <h1><code>cases</code></h1>
-  <p class="hero-sub">Builds a predicate/mapper dispatch table, with an optional default.</p>
+  <p class="hero-sub">Construye una tabla de despacho de predicado/mapeador, con un valor por defecto opcional.</p>
 
   <div class="signature">R Function(T value) cases&lt;T, R&gt;(List&lt;(bool Function(T), R Function(T))&gt; pairs, {R Function(T)? orElse})</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>cases</code> builds a matcher out of a list of
-    <code>(predicate, mapper)</code> pairs: it tries each pair in order, and
-    the first one whose predicate returns true has its mapper applied to
-    produce the result. It's a functional stand-in for a chain of
-    <code>if</code>/<code>else if</code>, and it composes nicely with
-    <code>map</code> — the returned function is a plain unary
-    <code>T -&gt; R</code> you can pass straight in.
+    <code>cases</code> construye una función de coincidencia a partir de una lista de pares
+    <code>(predicado, mapeador)</code>: prueba cada par en orden y, al primero
+    cuyo predicado devuelve true, le aplica su mapeador para producir el
+    resultado. Es el sustituto funcional de una cadena de
+    <code>if</code>/<code>else if</code>, y compone bien con
+    <code>map</code>: la función devuelta es una función unaria normal
+    <code>T -&gt; R</code> que puedes pasar directamente.
   </p>
   <p>
-    <strong>This shape differs from FxTS on purpose.</strong> FxTS's
-    <code>cases</code> is variadic: each <code>[predicate, mapper]</code> pair
-    is its own trailing argument, with an optional final bare function acting
-    as the default, and TypeScript's overloaded generics type each arity by
-    hand. Dart has neither variadic generics nor per-arity overloads, so
-    there's no way to accept "any number of pair arguments" and still get
-    real type checking. FxDart's version instead takes one
-    <code>List</code> of <code>(predicate, mapper)</code> <strong>records</strong>
-    — Dart's tuple type — plus a separate named <code>orElse</code> parameter
-    so the default is never confused with just another pair.
+    <strong>Esta forma difiere de FxTS a propósito.</strong> El
+    <code>cases</code> de FxTS es variádico: cada par
+    <code>[predicate, mapper]</code> se pasa como su propio argumento final, con
+    una función suelta opcional al final que actúa como valor por defecto, y los genéricos
+    sobrecargados de TypeScript tipan cada aridad a mano. Dart no tiene ni
+    genéricos variádicos ni sobrecargas por aridad, así que no hay forma de
+    aceptar "cualquier número de pares" y conservar una comprobación de tipos
+    real. La versión de FxDart toma en su lugar una única <code>List</code> de
+    <code>(predicado, mapeador)</code> en forma de <strong>registros</strong>
+    —el tipo tupla de Dart— más un parámetro con nombre <code>orElse</code>
+    aparte, para que el valor por defecto nunca se confunda con un par más.
   </p>
   <p>
-    If nothing matches and no <code>orElse</code> is given, <code>cases</code>
-    falls back to returning <code>value</code> itself — which only compiles
-    at the call site if <code>T</code> happens to also satisfy <code>R</code>
-    — otherwise it throws a <code>StateError</code> at runtime. In practice,
-    always pass <code>orElse</code> unless you're certain your predicates are
-    exhaustive.
+    Si no coincide nada y no se pasa <code>orElse</code>, <code>cases</code>
+    recurre a devolver el propio <code>value</code>, lo cual solo compila en el
+    punto de llamada si <code>T</code> resulta satisfacer también <code>R</code>;
+    en caso contrario lanza un <code>StateError</code> en tiempo de ejecución.
+    En la práctica, pasa siempre <code>orElse</code> salvo que tengas la certeza
+    de que tus predicados son exhaustivos.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -99,7 +98,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · A grading pipeline</h2>
+  <h2>Demo 2 · Un pipeline de calificaciones</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -116,9 +115,9 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: classify each size as <code>'small'</code> (&lt;10),
-    <code>'medium'</code> (&lt;30), or <code>'large'</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: clasifica cada tamaño como <code>'small'</code> (&lt;10),
+    <code>'medium'</code> (&lt;30) o <code>'large'</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -138,11 +137,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="when.html"><code>when</code></a> / <a href="unless.html"><code>unless</code></a> — a single predicate, same result type ·
-    <a href="throwError.html"><code>throwError</code></a> — a common orElse when no match should be fatal ·
-    <a href="always.html"><code>always</code></a> — a constant orElse ·
-    <a href="matches.html"><code>matches</code></a> — a predicate you can plug into a case
+    <strong>Relacionado:</strong>
+    <a href="when.html"><code>when</code></a> / <a href="unless.html"><code>unless</code></a> — un solo predicado, mismo tipo de resultado ·
+    <a href="throwError.html"><code>throwError</code></a> — un orElse habitual cuando no encontrar coincidencia debe ser fatal ·
+    <a href="always.html"><code>always</code></a> — un orElse constante ·
+    <a href="matches.html"><code>matches</code></a> — un predicado que puedes conectar a un caso
   </div>
 
   <nav class="tut-nav">

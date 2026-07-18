@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>memoize — FxDart 101</title>
-  <meta name="description" content="FxDart memoize tutorial: cache a unary function's results by argument, sync and async, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/memoize.html">
+  <meta name="description" content="Tutorial de memoize en FxDart: cachea los resultados de una función unaria según su argumento, en modo síncrono y asíncrono, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/memoize.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/memoize.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/memoize.html">
@@ -43,40 +42,39 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 10 · Utilidades de funciones › <strong>memoize</strong></p>
   <h1><code>memoize</code></h1>
-  <p class="hero-sub">Caches a unary function's results, keyed by its argument.</p>
+  <p class="hero-sub">Cachea los resultados de una función unaria, indexados por su argumento.</p>
 
   <div class="signature">R Function(A) memoize&lt;A, R&gt;(R Function(A) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>memoize(f)</code> wraps <code>f</code> in a cache: the first time
-    it's called with a given argument, it runs <code>f</code> and remembers
-    the result; every later call with an <code>==</code>-equal argument
-    returns the cached result instantly, without calling <code>f</code>
-    again. Reach for it when <code>f</code> is expensive (heavy computation,
-    a network call) and is likely to be called repeatedly with the same
-    inputs.
+    <code>memoize(f)</code> envuelve <code>f</code> en una caché: la primera vez
+    que se llama con un argumento dado, ejecuta <code>f</code> y recuerda
+    el resultado; toda llamada posterior con un argumento igual según
+    <code>==</code> devuelve el resultado cacheado al instante, sin volver a
+    llamar a <code>f</code>. Recurre a ella cuando <code>f</code> sea costosa (un cálculo
+    pesado, una llamada de red) y sea probable que se llame repetidamente con las
+    mismas entradas.
   </p>
   <p>
-    FxDart's <code>memoize</code> is <strong>unary only</strong> and keys the
-    cache by the argument's <code>==</code>/<code>hashCode</code>. FxTS's
-    version is variadic and keys on the full argument list via a
-    <code>WeakMap</code>-backed cache — Dart has no direct equivalent (no
-    variadic generics, and <code>WeakMap</code>-style weak keys aren't
-    available for arbitrary objects), so multi-argument functions need to be
-    memoized on a single composite key (a record works well) instead.
+    El <code>memoize</code> de FxDart es <strong>solo unario</strong> e indexa la
+    caché por el <code>==</code>/<code>hashCode</code> del argumento. La versión de
+    FxTS es variádica e indexa por la lista completa de argumentos mediante una caché
+    respaldada por <code>WeakMap</code>; Dart no tiene un equivalente directo (no hay
+    genéricos variádicos, y las claves débiles al estilo <code>WeakMap</code> no están
+    disponibles para objetos arbitrarios), así que las funciones de varios argumentos
+    necesitan memoizarse sobre una única clave compuesta (un record funciona bien).
   </p>
   <p>
-    Because <code>R</code> is unconstrained, <code>f</code> can return a
-    <code>Future</code> — memoizing an async operation caches the
-    <em>Future itself</em>, so a second call returns an already-completed
-    future immediately rather than re-running the work.
+    Como <code>R</code> no tiene restricciones, <code>f</code> puede devolver un
+    <code>Future</code>: memoizar una operación asíncrona cachea el
+    <em>Future en sí</em>, de modo que una segunda llamada devuelve de inmediato un
+    future ya completado en lugar de rehacer el trabajo.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -96,10 +94,10 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Memoizing an async lookup</h2>
+  <h2>Demo 2 · Memoizar una consulta asíncrona</h2>
   <p>
-    The second call to <code>fetchUser(1)</code> returns the cached,
-    already-completed <code>Future</code> — no 150ms wait:
+    La segunda llamada a <code>fetchUser(1)</code> devuelve el <code>Future</code>
+    cacheado y ya completado, sin esperar los 150 ms:
   </p>
   <div class="playground">
 <textarea>
@@ -120,9 +118,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: wrap this "slow" cubing function with <code>memoize</code> so
-    that calling it twice with <code>3</code> only runs the real computation once.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: envuelve con <code>memoize</code> esta función «lenta» que eleva al cubo, para
+    que llamarla dos veces con <code>3</code> ejecute el cálculo real una sola vez.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -143,11 +141,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — used above to simulate a slow async call ·
-    <a href="debounce.html"><code>debounce</code></a> — rate-limit calls instead of caching them ·
-    <a href="identity.html"><code>identity</code></a> — the simplest possible function to wrap ·
-    <a href="always.html"><code>always</code></a> — a constant value, no caching needed
+    <strong>Relacionado:</strong>
+    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — usados arriba para simular una llamada asíncrona lenta ·
+    <a href="debounce.html"><code>debounce</code></a> — limita la frecuencia de las llamadas en lugar de cachearlas ·
+    <a href="identity.html"><code>identity</code></a> — la función más simple posible que envolver ·
+    <a href="always.html"><code>always</code></a> — un valor constante, sin necesidad de caché
   </div>
 
   <nav class="tut-nav">

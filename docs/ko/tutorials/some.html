@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>some — FxDart 101</title>
-  <meta name="description" content="FxDart some tutorial: check that at least one element satisfies a predicate, short-circuiting on the first hit, sync and async.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/some.html">
+  <meta name="description" content="FxDart some 튜토리얼: 원소 중 하나라도 술어를 만족하는지 검사하고 첫 번째로 맞는 값에서 단축 평가하는 방법을 동기와 비동기 모두에서 다룹니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/some.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/some.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/some.html">
@@ -43,34 +42,32 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 8 · 접근 &amp; 술어 › <strong>some</strong></p>
   <h1><code>some</code></h1>
-  <p class="hero-sub">True when at least one element satisfies a predicate — false for an empty iterable.</p>
+  <p class="hero-sub">원소 중 하나라도 술어를 만족하면 true — 빈 이터러블이면 false입니다.</p>
 
   <div class="signature">bool some&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;bool&gt; someAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 bool Fx.some(bool Function(T a) f)                     // chain
 Future&lt;bool&gt; FxAsync.some(FutureOr&lt;bool&gt; Function(T a) f)  // chain</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>some</code> is <code>every</code>'s mirror image: it scans left to
-    right and short-circuits the moment it finds a match, returning
-    <code>true</code> right away. If it never finds one — including on an
-    empty iterable, which is the opposite vacuous case from
-    <code>every</code> — it returns <code>false</code> only after checking
-    everything.
+    <code>some</code>은 <code>every</code>를 거울에 비춘 함수입니다. 왼쪽에서
+    오른쪽으로 훑다가 조건을 만족하는 값을 찾는 순간 단축 평가하며 곧바로
+    <code>true</code>를 반환합니다. 끝까지 찾지 못하면 — 빈 이터러블도 여기에
+    해당하는데, 이는 <code>every</code>와 정반대의 공허참 사례입니다 —
+    전부 확인한 뒤에야 <code>false</code>를 반환합니다.
   </p>
   <p>
-    Unlike <code>every</code>, <code>Fx</code> <em>does</em> define its own
-    <code>.some()</code> chain method (it isn't already covered by
-    <code>Iterable</code>, since Dart's own <code>Iterable</code> has no
-    built-in <code>some</code> — the closest thing, <code>any</code>, does
-    the same job under a different name).
+    <code>every</code>와 달리 <code>Fx</code>는 <em>직접</em>
+    <code>.some()</code> 체인 메서드를 정의합니다(Dart의
+    <code>Iterable</code>에 <code>some</code>이 내장되어 있지 않으므로
+    <code>Iterable</code>만으로는 커버되지 않기 때문입니다 — 가장 비슷한 것은
+    <code>any</code>인데, 이름만 다를 뿐 하는 일은 같습니다).
   </p>
 
-  <h2>Demo 1 · Basics &amp; short-circuiting</h2>
+  <h2>데모 1 · 기본과 단축 평가</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -88,7 +85,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>데모 2 · 비동기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -106,8 +103,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>some</code> to check if anything in the cart costs more than 10.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>some</code>으로 장바구니에 10보다 비싼 항목이 있는지 확인해 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -127,11 +124,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="every.html"><code>every</code></a> — the "all of them" counterpart ·
-    <a href="includes.html"><code>includes</code></a> — a specialization of <code>some</code> ·
-    <a href="find.html"><code>find</code></a> — get the matching element, not just a bool ·
-    <a href="predicates.html"><code>predicates</code></a> — ready-made predicates to pair with <code>some</code>
+    <strong>관련 함수:</strong>
+    <a href="every.html"><code>every</code></a> — "전부 만족하는가"에 대응하는 짝 ·
+    <a href="includes.html"><code>includes</code></a> — <code>some</code>의 특수화된 형태 ·
+    <a href="find.html"><code>find</code></a> — bool이 아니라 일치하는 원소 자체를 얻기 ·
+    <a href="predicates.html"><code>predicates</code></a> — <code>some</code>과 함께 쓰기 좋은 미리 만들어진 술어들
   </div>
 
   <nav class="tut-nav">

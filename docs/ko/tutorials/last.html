@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>last — FxDart 101</title>
-  <meta name="description" content="FxDart last tutorial: get the final element of an iterable, null-safe on empty input, plus a chain-getter gotcha to watch for.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/last.html">
+  <meta name="description" content="FxDart last 튜토리얼: 이터러블의 마지막 원소를 얻습니다. 비어 있으면 null을 반환하며, 체인 게터에 얽힌 함정도 함께 짚습니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/last.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/last.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/last.html">
@@ -43,37 +42,35 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 8 · 접근 &amp; 술어 › <strong>last</strong></p>
   <h1><code>last</code></h1>
-  <p class="hero-sub">Returns the final element of an iterable, or <code>null</code> when it's empty.</p>
+  <p class="hero-sub">이터러블의 마지막 원소를 반환합니다. 비어 있으면 <code>null</code>입니다.</p>
 
   <div class="signature">A? last&lt;A&gt;(Iterable&lt;A&gt; iterable)
 Future&lt;A?&gt; lastAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
 Future&lt;T?&gt; FxAsync.last()  // chain (async only)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>last</code> walks the whole iterable and hands back whatever it
-    saw most recently — <code>null</code> if it never saw anything. Unlike
-    <code>head</code>, there's no shortcut: since a lazy iterable doesn't
-    know where it ends without being asked, <code>last</code> has to consume
-    every element, so it's <code>O(n)</code> even though the pipeline
-    upstream may be lazily built.
+    <code>last</code>는 이터러블 전체를 훑으면서 가장 마지막에 본 값을
+    돌려줍니다 — 아무것도 못 봤다면 <code>null</code>입니다.
+    <code>head</code>와 달리 지름길이 없습니다. 지연 이터러블은 끝까지
+    끌어당겨 보기 전에는 어디서 끝나는지 알 수 없으므로,
+    <code>last</code>는 모든 원소를 소비해야 합니다. 상류 파이프라인이
+    지연으로 구성돼 있더라도 <code>O(n)</code>인 이유입니다.
   </p>
   <p>
-    <strong>Watch out on the sync chain:</strong> <code>Fx</code> extends
-    <code>Iterable</code>, and there is no <code>Fx.last()</code> override —
-    so <code>fx(iterable).last</code> resolves to Dart's own
-    <code>Iterable.last</code> <em>getter</em>, which throws
-    <code>StateError</code> on an empty iterable instead of returning
-    <code>null</code>. The null-safe behavior only exists as the top-level
-    <code>last(iterable)</code> function (or <code>.last()</code> on the
-    <em>async</em> chain, which does have its own override). When in doubt,
-    prefer the top-level function.
+    <strong>동기 체인에서 주의하세요:</strong> <code>Fx</code>는
+    <code>Iterable</code>을 확장하는데 <code>Fx.last()</code> 오버라이드는
+    없습니다 — 그래서 <code>fx(iterable).last</code>는 Dart 자체의
+    <code>Iterable.last</code> <em>게터</em>로 해석되고, 빈 이터러블에서는
+    <code>null</code>을 반환하는 대신 <code>StateError</code>를 던집니다.
+    null 안전한 동작은 최상위 <code>last(iterable)</code> 함수(또는 자체
+    오버라이드를 가진 <code>.last()</code>, 즉 <em>비동기</em> 체인 쪽)에만
+    있습니다. 헷갈린다면 최상위 함수를 쓰세요.
   </p>
 
-  <h2>Demo 1 · Basics, and the chain getter trap</h2>
+  <h2>데모 1 · 기본, 그리고 체인 게터의 함정</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -91,8 +88,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, where the chain form IS null-safe</h2>
-  <p><code>FxAsync</code> defines its own <code>.last()</code>, so on the async chain the getter trap above doesn't apply:</p>
+  <h2>데모 2 · 비동기 — 여기서는 체인 형태가 null 안전합니다</h2>
+  <p><code>FxAsync</code>는 자체 <code>.last()</code>를 정의하므로, 비동기 체인에서는 위의 게터 함정이 적용되지 않습니다:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -109,8 +106,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>last</code> so this prints the final log line, or <code>'no logs yet'</code> when there are none.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>last</code>를 써서 마지막 로그 줄을 출력하고, 로그가 하나도 없으면 <code>'no logs yet'</code>을 출력해 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -127,11 +124,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="head.html"><code>head</code></a> — the O(1) opposite end ·
-    <a href="nth.html"><code>nth</code></a> — pull any index ·
-    <a href="find.html"><code>find</code></a> — first match to a predicate ·
-    <a href="reverse.html"><code>reverse</code></a> — flip the whole sequence
+    <strong>관련 항목:</strong>
+    <a href="head.html"><code>head</code></a> — O(1)로 얻는 반대쪽 끝 ·
+    <a href="nth.html"><code>nth</code></a> — 원하는 인덱스 꺼내기 ·
+    <a href="find.html"><code>find</code></a> — 술어에 처음 걸리는 값 ·
+    <a href="reverse.html"><code>reverse</code></a> — 시퀀스 전체 뒤집기
   </div>
 
   <nav class="tut-nav">

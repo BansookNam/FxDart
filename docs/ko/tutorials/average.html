@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>average — FxDart 101</title>
-  <meta name="description" content="FxDart average tutorial: the mean of every number in a pipeline, NaN when empty, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/average.html">
+  <meta name="description" content="FxDart average 튜토리얼 — 파이프라인이 만들어 내는 모든 숫자의 평균을 구하고, 비어 있으면 NaN을 반환합니다. 라이브 플레이그라운드 포함.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/average.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/average.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/average.html">
@@ -43,39 +42,38 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 7 · 집계 › <strong>average</strong></p>
   <h1><code>average</code></h1>
-  <p class="hero-sub">The mean of every number the pipeline produces — <code>NaN</code> when there are none.</p>
+  <p class="hero-sub">파이프라인이 만들어 내는 모든 숫자의 평균 — 하나도 없으면 <code>NaN</code>입니다.</p>
 
   <div class="signature">double average(Iterable&lt;num&gt; iterable)
 Future&lt;double&gt; averageAsync(FxAsyncIterable&lt;num&gt; iterable)
 double Fx&lt;num&gt;.average()          // chain (sync)
 Future&lt;double&gt; FxAsync&lt;num&gt;.average()  // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>average</code> is a terminal operator that walks the whole
-    pipeline once, tracking both a running total and a running count, then
-    divides. It always returns a <code>double</code>, even for a list of
-    plain <code>int</code>s.
+    <code>average</code>는 파이프라인 전체를 한 번 순회하면서 누적 합과
+    누적 개수를 함께 추적한 뒤 나누는 종결 연산자입니다. 평범한
+    <code>int</code> 리스트에 대해서도 항상 <code>double</code>을
+    반환합니다.
   </p>
   <p>
-    The one behavior worth internalizing: <code>average</code> of an
-    <strong>empty</strong> iterable is <code>double.nan</code> — it's
-    computing <code>0 / 0</code>, not throwing and not defaulting to
-    <code>0</code>. This mirrors FxTS exactly. If your pipeline might be
-    empty, check for that explicitly (<code>result.isNaN</code>) rather than
-    assuming a numeric fallback.
+    꼭 기억해 둘 동작이 하나 있습니다. <code>average</code>는
+    <strong>비어 있는</strong> 이터러블에 대해 <code>double.nan</code>을 반환합니다 —
+    예외를 던지거나 <code>0</code>으로 대체하는 것이 아니라
+    <code>0 / 0</code>을 계산한 결과입니다. FxTS의 동작을 그대로
+    따릅니다. 파이프라인이 비어 있을 수 있다면, 숫자 기본값을 가정하지
+    말고 <code>result.isNaN</code>으로 명시적으로 확인하세요.
   </p>
   <p>
-    Like <code><a href="sum.html">sum</a></code>, the chain form is exposed
-    through a <code>Fx&lt;num&gt;</code> / <code>FxAsync&lt;num&gt;</code>
-    extension, so it only becomes available once the compiler can see your
-    chain's element type is numeric.
+    <code><a href="sum.html">sum</a></code>과 마찬가지로 체인 형태는
+    <code>Fx&lt;num&gt;</code> / <code>FxAsync&lt;num&gt;</code> 확장으로
+    제공됩니다. 따라서 체인의 원소 타입이 숫자임을 컴파일러가 알 수 있을
+    때에만 사용할 수 있습니다.
   </p>
 
-  <h2>Demo 1 · Basics &amp; the empty case</h2>
+  <h2>데모 1 · 기본 사용법 &amp; 빈 경우</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -94,7 +92,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>데모 2 · 비동기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -110,8 +108,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: average only the <strong>passing</strong> scores (&gt;= 60).</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <strong>합격</strong> 점수(&gt;= 60)만 골라 평균을 내 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -128,10 +126,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="sum.html"><code>sum</code></a> — the numerator this divides ·
-    <a href="size.html"><code>size</code></a> — the denominator this divides by ·
-    <a href="min.html"><code>min</code></a> · <a href="max.html"><code>max</code></a> — the other numeric terminals
+    <strong>관련 함수:</strong>
+    <a href="sum.html"><code>sum</code></a> — 평균을 구할 때의 분자 ·
+    <a href="size.html"><code>size</code></a> — 평균을 구할 때의 분모 ·
+    <a href="min.html"><code>min</code></a> · <a href="max.html"><code>max</code></a> — 나머지 숫자 종결 연산자
   </div>
 
   <nav class="tut-nav">

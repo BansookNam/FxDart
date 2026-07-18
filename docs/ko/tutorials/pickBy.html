@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>pickBy — FxDart 101</title>
-  <meta name="description" content="FxDart pickBy tutorial: keep only Map entries matching a (key, value) predicate.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/pickBy.html">
+  <meta name="description" content="FxDart pickBy 튜토리얼: (키, 값) 술어에 맞는 Map 엔트리만 남깁니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/pickBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/pickBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/pickBy.html">
@@ -43,29 +42,28 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 9 · 객체(Map) 함수 › <strong>pickBy</strong></p>
   <h1><code>pickBy</code></h1>
-  <p class="hero-sub">Returns a copy of a <code>Map</code> with only the entries matching a predicate.</p>
+  <p class="hero-sub">술어에 맞는 엔트리만 남긴 <code>Map</code>의 복사본을 반환합니다.</p>
 
   <div class="signature">Map&lt;K, V&gt; pickBy&lt;K, V&gt;(bool Function((K, V) entry) f, Map&lt;K, V&gt; map)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>pickBy</code> is <code>omitBy</code>'s mirror, and shares its
-    calling convention: the predicate receives one <code>(K, V)</code>
-    record per entry, so use <code>e.$1</code> for the key and
-    <code>e.$2</code> for the value. Only entries where the predicate
-    returns <code>true</code> survive into the result.
+    <code>pickBy</code>는 <code>omitBy</code>를 그대로 뒤집은 함수이며,
+    호출 방식도 똑같습니다. 술어는 엔트리마다 <code>(K, V)</code> 레코드
+    하나를 받으므로 키는 <code>e.$1</code>, 값은 <code>e.$2</code>로
+    꺼내 씁니다. 술어가 <code>true</code>를 반환한 엔트리만 결과에
+    남습니다.
   </p>
   <p>
-    A common use: filtering a map of config values or feature flags down to
-    "the ones that matter right now" — active flags, keys with a given
-    prefix, values above a threshold — without hand-writing an
-    entry-by-entry loop.
+    설정 값이나 기능 플래그가 담긴 맵에서 "지금 필요한 것들"만
+    골라낼 때 자주 씁니다 — 활성화된 플래그, 특정 접두사가 붙은 키,
+    임계값을 넘는 값처럼요. 엔트리를 하나씩 도는 반복문을 직접 쓸
+    필요가 없습니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -77,7 +75,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Filtering by key</h2>
+  <h2>데모 2 · 키를 기준으로 걸러내기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -91,8 +89,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>pickBy</code> to keep only entries whose value is <code>true</code>.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>pickBy</code>로 값이 <code>true</code>인 엔트리만 남겨 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -109,11 +107,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="omitBy.html"><code>omitBy</code></a> — the inverse: drop by predicate ·
-    <a href="pick.html"><code>pick</code></a> — keep by a fixed key list ·
-    <a href="matches.html"><code>matches</code></a> — a ready-made predicate for shape matching ·
-    <a href="compactObject.html"><code>compactObject</code></a> — a specialized "drop nulls" pickBy
+    <strong>관련 항목:</strong>
+    <a href="omitBy.html"><code>omitBy</code></a> — 그 반대: 술어로 제거합니다 ·
+    <a href="pick.html"><code>pick</code></a> — 고정된 키 목록으로 남깁니다 ·
+    <a href="matches.html"><code>matches</code></a> — 모양 비교용으로 바로 쓸 수 있는 술어 ·
+    <a href="compactObject.html"><code>compactObject</code></a> — "null을 걷어내는" 용도로 특수화된 pickBy
   </div>
 
   <nav class="tut-nav">

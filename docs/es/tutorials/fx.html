@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>fx — FxDart 101</title>
-  <meta name="description" content="FxDart fx tutorial: the lazy chain model — fx, fxAsync, fxStream — and how nothing runs until a terminal operator pulls it.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/fx.html">
+  <meta name="description" content="Tutorial de fx en FxDart: el modelo de cadenas perezosas — fx, fxAsync, fxStream — y por qué nada se ejecuta hasta que un operador terminal tira de los valores.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/fx.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/fx.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/fx.html">
@@ -43,59 +42,58 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 1 · Primeros pasos › <strong>fx</strong></p>
   <h1><code>fx</code></h1>
-  <p class="hero-sub">Wraps a sequence in a lazy, chainable pipeline — the typed heart of FxDart.</p>
+  <p class="hero-sub">Envuelve una secuencia en un pipeline perezoso y encadenable: el corazón tipado de FxDart.</p>
 
   <div class="signature">Fx&lt;T&gt; fx&lt;T&gt;(Iterable&lt;T&gt; iterable)
 FxAsync&lt;T&gt; fxAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable)
 FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    Everything in this course builds toward one idea: a <strong>chain</strong>.
-    <code>fx(iterable)</code> wraps any <code>Iterable&lt;T&gt;</code> in an
-    <code>Fx&lt;T&gt;</code> — an object with FxTS-style methods like
-    <code>.map()</code>, <code>.filter()</code>, and <code>.take()</code>
-    hung off it. Every one of those calls returns a <em>new</em>
-    <code>Fx</code> wrapping a bit more lazy computation. None of it runs
-    yet. <code>Fx</code> only starts doing work when you call a
-    <strong>terminal operator</strong> — <code>toArray()</code>,
-    <code>each()</code>, <code>consume()</code>, <code>reduce()</code>, and
-    friends — which pulls values through the whole chain, one at a time,
-    from the terminal all the way back to the source.
+    Todo este curso apunta a una sola idea: la <strong>cadena</strong>.
+    <code>fx(iterable)</code> envuelve cualquier <code>Iterable&lt;T&gt;</code> en un
+    <code>Fx&lt;T&gt;</code>: un objeto con métodos al estilo de FxTS como
+    <code>.map()</code>, <code>.filter()</code> y <code>.take()</code>
+    colgando de él. Cada una de esas llamadas devuelve un <em>nuevo</em>
+    <code>Fx</code> que envuelve un poco más de cómputo perezoso. Nada se
+    ejecuta todavía. <code>Fx</code> solo empieza a trabajar cuando llamas a un
+    <strong>operador terminal</strong> — <code>toArray()</code>,
+    <code>each()</code>, <code>consume()</code>, <code>reduce()</code> y
+    compañía —, que tira de los valores a través de toda la cadena, uno a uno,
+    desde el terminal hasta la fuente.
   </p>
   <p>
-    This laziness is why FxDart can safely chain over huge or infinite
-    sequences (<code>range</code>, <code>cycle</code>, <code>repeat</code>):
-    as long as something downstream — usually <code>take(n)</code> — decides
-    how many values to actually pull, the upstream steps only ever run that
-    many times.
+    Esta pereza es lo que permite a FxDart encadenar sin riesgo sobre secuencias
+    enormes o infinitas (<code>range</code>, <code>cycle</code>, <code>repeat</code>):
+    mientras algo aguas abajo — normalmente <code>take(n)</code> — decida
+    cuántos valores pedir de verdad, los pasos de aguas arriba solo se
+    ejecutan esas veces.
   </p>
   <p>
-    <code>fx</code> is the <em>sync</em> half of the chain. Its async
-    counterparts are <code>fxAsync</code>, which wraps an
-    <code>FxAsyncIterable</code> (the thing you get from <code>toAsync</code>,
-    <code>fromStream</code>, or any <code>*Async</code> function), and
-    <code>fxStream</code>, a shortcut that wraps a Dart <code>Stream</code>
-    directly. Both return an <code>FxAsync&lt;T&gt;</code> chain whose
-    methods accept functions that may return a <code>Future</code>, and
-    whose terminal operators all return a <code>Future</code> you
-    <code>await</code>. Switch from sync to async mid-chain with
+    <code>fx</code> es la mitad <em>síncrona</em> de la cadena. Sus equivalentes
+    asíncronos son <code>fxAsync</code>, que envuelve un
+    <code>FxAsyncIterable</code> (lo que obtienes de <code>toAsync</code>,
+    <code>fromStream</code> o cualquier función <code>*Async</code>), y
+    <code>fxStream</code>, un atajo que envuelve directamente un <code>Stream</code>
+    de Dart. Ambos devuelven una cadena <code>FxAsync&lt;T&gt;</code> cuyos
+    métodos aceptan funciones que pueden devolver un <code>Future</code>, y
+    cuyos operadores terminales devuelven todos un <code>Future</code> que
+    esperas con <code>await</code>. Pasa de síncrono a asíncrono a mitad de cadena con
     <code>.toAsync()</code>.
   </p>
   <p>
-    Why does this exist at all, instead of just calling top-level functions
-    like <code>map(f, iterable)</code>? Because Dart cannot type a variadic
-    <code>pipe</code> the way FxTS's TypeScript can (see the next lesson) —
-    <code>fx()</code> chaining is how FxDart gets fully typed, autocompletable
-    pipelines instead.
+    ¿Y por qué existe esto, en lugar de llamar sin más a funciones de nivel
+    superior como <code>map(f, iterable)</code>? Porque Dart no puede tipar un
+    <code>pipe</code> variádico como sí hace TypeScript en FxTS (lo verás en la
+    siguiente lección): el encadenado con <code>fx()</code> es la forma que tiene
+    FxDart de ofrecer pipelines totalmente tipados y con autocompletado.
   </p>
 
-  <h2>Demo 1 · Nothing runs until the terminal op</h2>
-  <p>Watch <code>calls</code> stay at 0 right after building the chain, then
-    jump once <code>toArray()</code> actually pulls the 5 values:</p>
+  <h2>Demo 1 · Nada se ejecuta hasta el operador terminal</h2>
+  <p>Fíjate en que <code>calls</code> se queda en 0 justo después de construir la cadena, y
+    salta en cuanto <code>toArray()</code> tira de verdad de los 5 valores:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -120,11 +118,11 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · fxAsync and fxStream</h2>
+  <h2>Demo 2 · fxAsync y fxStream</h2>
   <p>
-    <code>fxAsync</code> wraps an <code>FxAsyncIterable</code> (here, from
-    <code>toAsync</code>); <code>fxStream</code> wraps a <code>Stream</code>
-    directly. Both give you the same chain methods, async-flavored:
+    <code>fxAsync</code> envuelve un <code>FxAsyncIterable</code> (aquí, desde
+    <code>toAsync</code>); <code>fxStream</code> envuelve un <code>Stream</code>
+    directamente. Ambos te dan los mismos métodos de cadena, en versión asíncrona:
   </p>
   <div class="playground">
 <textarea>
@@ -146,9 +144,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: build a chain that keeps scores of 60 or above, doubles them
-    as bonus points, and takes only the first 2 results.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: construye una cadena que se quede con las puntuaciones de 60 o más, las duplique
+    como puntos extra y tome solo los 2 primeros resultados.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -170,11 +168,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="pipe.html"><code>pipe</code></a> — the dynamically-typed alternative ·
-    <a href="toArray.html"><code>toArray</code></a> — the most common terminal op ·
-    <a href="each.html"><code>each</code></a> — terminal op for side effects ·
-    <a href="consume.html"><code>consume</code></a> — terminal op that discards results
+    <strong>Relacionado:</strong>
+    <a href="pipe.html"><code>pipe</code></a> — la alternativa de tipado dinámico ·
+    <a href="toArray.html"><code>toArray</code></a> — el operador terminal más habitual ·
+    <a href="each.html"><code>each</code></a> — operador terminal para efectos secundarios ·
+    <a href="consume.html"><code>consume</code></a> — operador terminal que descarta los resultados
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>fromEntries — FxDart 101</title>
-  <meta name="description" content="FxDart fromEntries tutorial: build a Map from (key, value) record entries, the inverse of entries().">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/fromEntries.html">
+  <meta name="description" content="Tutorial de fromEntries en FxDart: construye un Map a partir de records (clave, valor), el inverso de entries().">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/fromEntries.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/fromEntries.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/fromEntries.html">
@@ -43,31 +42,32 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 9 · Funciones de objeto (Map) › <strong>fromEntries</strong></p>
   <h1><code>fromEntries</code></h1>
-  <p class="hero-sub">Builds a <code>Map</code> from an iterable of <code>(key, value)</code> records.</p>
+  <p class="hero-sub">Construye un <code>Map</code> a partir de un iterable de records <code>(key, value)</code>.</p>
 
   <div class="signature">Map&lt;K, V&gt; fromEntries&lt;K, V&gt;(Iterable&lt;(K, V)&gt; entries)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    This section ports FxTS's object utilities, and the first thing to
-    understand is the mapping: TypeScript's plain objects become Dart
-    <code>Map</code>s throughout, and TS's <code>[key, value]</code> entry
-    tuples become Dart <code>(K, V)</code> records. <code>fromEntries</code>
-    is the constructor side of that: give it any iterable of records and it
-    folds them into a <code>Map</code>, last-write-wins on duplicate keys —
-    exactly like building the map by hand with a loop.
+    Esta sección porta las utilidades de objeto de FxTS, y lo primero que hay
+    que entender es la correspondencia: los objetos planos de TypeScript pasan
+    a ser <code>Map</code>s de Dart en todas partes, y las tuplas de entrada
+    <code>[key, value]</code> de TS pasan a ser records <code>(K, V)</code> de
+    Dart. <code>fromEntries</code> es el lado constructor de eso: dale
+    cualquier iterable de records y los pliega en un <code>Map</code>, y
+    en las claves duplicadas gana la última escritura — exactamente igual que
+    si construyeras el map a mano con un bucle.
   </p>
   <p>
-    It's the natural partner of <a href="entries.html"><code>entries</code></a>
-    (which does the reverse: <code>Map</code> → records) and pairs nicely
-    with <a href="zip.html"><code>zip</code></a>, which turns two parallel
-    lists into exactly the record shape <code>fromEntries</code> wants.
+    Es la pareja natural de <a href="entries.html"><code>entries</code></a>
+    (que hace lo contrario: <code>Map</code> → records) y combina de maravilla
+    con <a href="zip.html"><code>zip</code></a>, que convierte dos listas
+    paralelas exactamente en la forma de record que <code>fromEntries</code>
+    espera.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -83,7 +83,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Duplicate keys, and round-tripping with <code>entries</code></h2>
+  <h2>Demo 2 · Claves duplicadas, e ida y vuelta con <code>entries</code></h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -100,8 +100,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>fromEntries</code> to turn <code>pairs</code> into a <code>Map</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>fromEntries</code> para convertir <code>pairs</code> en un <code>Map</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -118,11 +118,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="entries.html"><code>entries</code></a> — the reverse direction ·
-    <a href="zip.html"><code>zip</code></a> — build entries from two parallel lists ·
-    <a href="omit.html"><code>omit</code></a> — drop keys from the resulting Map ·
-    <a href="pick.html"><code>pick</code></a> — keep only some keys
+    <strong>Relacionado:</strong>
+    <a href="entries.html"><code>entries</code></a> — la dirección inversa ·
+    <a href="zip.html"><code>zip</code></a> — construir entradas a partir de dos listas paralelas ·
+    <a href="omit.html"><code>omit</code></a> — descartar claves del Map resultante ·
+    <a href="pick.html"><code>pick</code></a> — quedarte solo con algunas claves
   </div>
 
   <nav class="tut-nav">

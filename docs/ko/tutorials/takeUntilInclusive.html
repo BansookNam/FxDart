@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>takeUntilInclusive — FxDart 101</title>
-  <meta name="description" content="FxDart takeUntilInclusive tutorial: take values up to and including the first match, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/takeUntilInclusive.html">
+  <meta name="description" content="FxDart takeUntilInclusive 튜토리얼 — 처음 조건에 맞는 원소까지 포함해서 값을 가져옵니다. 라이브 플레이그라운드 포함.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/takeUntilInclusive.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/takeUntilInclusive.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/takeUntilInclusive.html">
@@ -43,35 +42,35 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 5 · 잘라내기 › <strong>takeUntilInclusive</strong></p>
   <h1><code>takeUntilInclusive</code></h1>
-  <p class="hero-sub">Yields values until the predicate matches — the matching element is included.</p>
+  <p class="hero-sub">술어가 참이 될 때까지 값을 내보냅니다 — 조건에 맞은 원소도 포함됩니다.</p>
 
   <div class="signature">Iterable&lt;A&gt; takeUntilInclusive&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; takeUntilInclusiveAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.takeUntilInclusive(bool Function(T a) f)        // chain
 FxAsync&lt;T&gt; FxAsync.takeUntilInclusive(FutureOr&lt;bool&gt; Function(T a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>takeUntilInclusive</code> is <code>takeWhile</code>'s close cousin,
-    with one deliberate difference: it yields the element that made the
-    predicate true, then stops. <code>takeWhile</code> stops
-    <em>before</em> the failing element; <code>takeUntilInclusive</code>
-    stops <em>after</em> the matching one. Reach for it whenever the
-    matching element itself is part of the answer — "read the log up to and
-    including the first error", "collect steps up to and including the
-    terminator".
+    <code>takeUntilInclusive</code>는 <code>takeWhile</code>과 아주 가까운
+    사촌이지만, 의도된 차이가 하나 있습니다. 술어를 참으로 만든 원소까지
+    내보낸 뒤에 멈춘다는 점입니다. <code>takeWhile</code>은 조건을
+    만족하지 못한 원소 <em>앞에서</em> 멈추고,
+    <code>takeUntilInclusive</code>는 조건에 맞은 원소 <em>뒤에서</em>
+    멈춥니다. 조건에 맞은 원소 자체가 답의 일부일 때 쓰면 됩니다 —
+    "첫 에러까지 포함해서 로그를 읽는다", "종료 표시까지 포함해서 단계를
+    모은다" 같은 경우입니다.
   </p>
   <p>
-    FxTS originally named this <code>takeUntil</code>; FxDart keeps
-    <code>takeUntil</code> (and <code>takeUntilAsync</code>) around as a
-    <code>@Deprecated</code> alias for source parity, but new code should
-    call <code>takeUntilInclusive</code> directly.
+    FxTS에서는 원래 이름이 <code>takeUntil</code>이었습니다. FxDart는
+    FxTS와의 대응을 위해 <code>takeUntil</code>(그리고
+    <code>takeUntilAsync</code>)을 <code>@Deprecated</code> 별칭으로
+    남겨 두었지만, 새로 작성하는 코드는
+    <code>takeUntilInclusive</code>를 바로 호출하세요.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -91,7 +90,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>데모 2 · 비동기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -108,9 +107,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: take the log lines up to and including the first
-    <code>'ERROR'</code>.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 처음 나오는 <code>'ERROR'</code>까지 포함해서 로그 줄을
+    가져와 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -127,10 +126,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="takeWhile.html"><code>takeWhile</code></a> — stops before the match, excludes it ·
-    <a href="dropUntil.html"><code>dropUntil</code></a> — the drop-side counterpart ·
-    <a href="take.html"><code>take</code></a> — take by count
+    <strong>관련 함수:</strong>
+    <a href="takeWhile.html"><code>takeWhile</code></a> — 조건에 맞은 원소 앞에서 멈추며, 그 원소는 제외합니다 ·
+    <a href="dropUntil.html"><code>dropUntil</code></a> — drop 쪽 대응 함수 ·
+    <a href="take.html"><code>take</code></a> — 개수로 가져오기
   </div>
 
   <nav class="tut-nav">

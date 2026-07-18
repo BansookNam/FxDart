@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>max — FxDart 101</title>
-  <meta name="description" content="FxDart max tutorial: the largest number in a pipeline, -infinity when empty, NaN-poisoned, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/max.html">
+  <meta name="description" content="FxDart max 튜토리얼 — 파이프라인에서 가장 큰 숫자를 구하고, 비어 있으면 -무한대를, NaN이 섞이면 NaN을 반환합니다. 라이브 플레이그라운드 포함.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/max.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/max.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/max.html">
@@ -43,36 +42,35 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 7 · 집계 › <strong>max</strong></p>
   <h1><code>max</code></h1>
-  <p class="hero-sub">The largest number in the pipeline — the mirror image of <code>min</code>.</p>
+  <p class="hero-sub">파이프라인에서 가장 큰 숫자 — <code>min</code>을 그대로 뒤집은 함수입니다.</p>
 
   <div class="signature">num max(Iterable&lt;num&gt; iterable)
 Future&lt;num&gt; maxAsync(FxAsyncIterable&lt;num&gt; iterable)
 num Fx&lt;num&gt;.max()          // chain (sync)
 Future&lt;num&gt; FxAsync&lt;num&gt;.max()  // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>max</code> works exactly like <code><a href="min.html">min</a></code>,
-    flipped: it's <code>fold(-double.infinity, ..., iterable)</code>, keeping
-    the largest value seen so far.
+    <code>max</code>는 <code><a href="min.html">min</a></code>과 방향만 반대일 뿐
+    동작이 똑같습니다. 내부적으로는 <code>fold(-double.infinity, ..., iterable)</code>로,
+    지금까지 본 값 중 가장 큰 값을 계속 들고 갑니다.
   </p>
   <p>
-    The same two FxTS-faithful quirks apply, just mirrored:
+    FxTS를 그대로 따른 두 가지 특이 동작도 방향만 뒤집혀 동일하게 적용됩니다.
   </p>
   <ul>
-    <li>An <strong>empty</strong> iterable returns <code>-double.infinity</code>, not <code>null</code>.</li>
-    <li>A single <code>NaN</code> anywhere <strong>poisons</strong> the result to <code>NaN</code> — same reasoning as <code>min</code>: every comparison against <code>NaN</code> is false.</li>
+    <li><strong>비어 있는</strong> 이터러블은 <code>null</code>이 아니라 <code>-double.infinity</code>를 반환합니다.</li>
+    <li>어디든 <code>NaN</code>이 하나라도 있으면 결과가 <strong>오염</strong>되어 <code>NaN</code>이 됩니다 — <code>min</code>과 같은 이유로, <code>NaN</code>과의 비교는 언제나 거짓이기 때문입니다.</li>
   </ul>
   <p>
-    As with the other numeric terminals, the chain form
-    (<code>Fx&lt;num&gt;.max()</code> / <code>FxAsync&lt;num&gt;.max()</code>)
-    is only available when the compiler knows your chain holds numbers.
+    다른 숫자 종결 연산자와 마찬가지로 체인 형태
+    (<code>Fx&lt;num&gt;.max()</code> / <code>FxAsync&lt;num&gt;.max()</code>)는
+    체인이 숫자를 담고 있다는 사실을 컴파일러가 알 수 있을 때에만 사용할 수 있습니다.
   </p>
 
-  <h2>Demo 1 · Basics, empty, and NaN</h2>
+  <h2>데모 1 · 기본 사용법, 빈 경우, NaN</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -93,7 +91,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>데모 2 · 비동기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -109,8 +107,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: find the <strong>highest</strong> temperature in the list.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 목록에서 <strong>가장 높은</strong> 기온을 찾아보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -127,10 +125,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="min.html"><code>min</code></a> — the mirror image ·
-    <a href="sum.html"><code>sum</code></a> · <a href="average.html"><code>average</code></a> — the other numeric terminals ·
-    <a href="sortBy.html"><code>sortBy</code></a> — to rank rather than just find the extreme
+    <strong>관련 함수:</strong>
+    <a href="min.html"><code>min</code></a> — 정반대 방향의 짝 ·
+    <a href="sum.html"><code>sum</code></a> · <a href="average.html"><code>average</code></a> — 나머지 숫자 종결 연산자 ·
+    <a href="sortBy.html"><code>sortBy</code></a> — 극단값만 찾는 대신 순위를 매기고 싶을 때
   </div>
 
   <nav class="tut-nav">

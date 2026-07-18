@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>takeWhile — FxDart 101</title>
-  <meta name="description" content="FxDart takeWhile tutorial: keep taking values as long as a predicate holds, then stop, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/takeWhile.html">
+  <meta name="description" content="Tutorial de takeWhile en FxDart: sigue tomando valores mientras se cumpla un predicado y luego para, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/takeWhile.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/takeWhile.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/takeWhile.html">
@@ -43,34 +42,33 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 5 · Segmentación › <strong>takeWhile</strong></p>
   <h1><code>takeWhile</code></h1>
-  <p class="hero-sub">Yields values as long as a predicate returns true, then stops for good.</p>
+  <p class="hero-sub">Emite valores mientras un predicado devuelva true; después se detiene definitivamente.</p>
 
   <div class="signature">Iterable&lt;A&gt; takeWhile&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; takeWhileAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.takeWhile(bool Function(T value) test)        // chain
 FxAsync&lt;T&gt; FxAsync.takeWhile(FutureOr&lt;bool&gt; Function(T a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    Where <code>take</code> counts values, <code>takeWhile</code> tests them.
-    It yields elements one at a time and stops the <em>instant</em>
-    <code>f</code> returns false — it never looks past that point, even if a
-    later element would have passed. That makes it a natural fit for
-    "consume until the data stops making sense" situations: a sorted stream
-    up to a threshold, a log up to the first anomaly, and so on.
+    Donde <code>take</code> cuenta valores, <code>takeWhile</code> los pone a prueba.
+    Emite los elementos de uno en uno y para en el <em>instante</em> en que
+    <code>f</code> devuelve false: nunca mira más allá de ese punto, aunque un
+    elemento posterior sí habría pasado. Eso lo hace ideal para situaciones de
+    «consume hasta que los datos dejen de tener sentido»: un stream ordenado
+    hasta un umbral, un log hasta la primera anomalía, etc.
   </p>
   <p>
-    Because it's lazy and short-circuits on the first failure, it's cheap to
-    run even over a huge or infinite source — it only ever evaluates the
-    prefix that actually matches.
+    Como es perezoso y cortocircuita en el primer fallo, resulta barato de
+    ejecutar incluso sobre una fuente enorme o infinita: solo evalúa el
+    prefijo que realmente coincide.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
-  <p>Note that <code>2</code> at the end never gets a chance — the predicate
-    already failed on <code>7</code>:</p>
+  <h2>Demo 1 · Fundamentos</h2>
+  <p>Fíjate en que el <code>2</code> del final nunca tiene oportunidad: el
+    predicado ya falló en el <code>7</code>:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -86,7 +84,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -103,8 +101,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: keep temperatures only while they stay below 25.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: conserva las temperaturas solo mientras se mantengan por debajo de 25.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -121,11 +119,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="take.html"><code>take</code></a> — take by count instead of predicate ·
-    <a href="takeUntilInclusive.html"><code>takeUntilInclusive</code></a> — stop after (and including) the match ·
-    <a href="dropWhile.html"><code>dropWhile</code></a> — the inverse ·
-    <a href="filter.html"><code>filter</code></a> — keeps matches everywhere, not just a prefix
+    <strong>Relacionado:</strong>
+    <a href="take.html"><code>take</code></a> — toma por cantidad en lugar de por predicado ·
+    <a href="takeUntilInclusive.html"><code>takeUntilInclusive</code></a> — para después de la coincidencia, incluyéndola ·
+    <a href="dropWhile.html"><code>dropWhile</code></a> — el inverso ·
+    <a href="filter.html"><code>filter</code></a> — conserva las coincidencias en todas partes, no solo en un prefijo
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>join — FxDart 101</title>
-  <meta name="description" content="FxDart join tutorial: concatenate a pipeline's elements into one string, data-first, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/join.html">
+  <meta name="description" content="Tutorial de join en FxDart: concatena los elementos de un pipeline en una sola cadena, data-first, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/join.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/join.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/join.html">
@@ -43,41 +42,40 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>join</strong></p>
   <h1><code>join</code></h1>
-  <p class="hero-sub">Concatenates every element into one string, with a separator between them.</p>
+  <p class="hero-sub">Concatena todos los elementos en una sola cadena, con un separador entre ellos.</p>
 
   <div class="signature">String join&lt;A&gt;(String sep, Iterable&lt;A&gt; iterable)          // data-first: separator FIRST
 Future&lt;String&gt; joinAsync&lt;A&gt;(String sep, FxAsyncIterable&lt;A&gt; iterable)
 String Fx.join([String separator = ''])            // chain (sync, inherited from Iterable)
 Future&lt;String&gt; FxAsync.join([String sep = ','])    // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>join</code> is a terminal operator: it pulls the whole pipeline,
-    calling <code>toString()</code> on each element and stitching the results
-    together with <code>sep</code> in between.
+    <code>join</code> es un operador terminal: tira de todo el pipeline,
+    llama a <code>toString()</code> en cada elemento y cose los resultados
+    intercalando <code>sep</code> entre ellos.
   </p>
   <p>
-    Pay attention to argument order — the top-level, data-first
-    <code>join</code> puts the <strong>separator first</strong>:
-    <code>join(', ', iterable)</code>. That's the FxTS convention (data-first
-    everywhere), and it's the opposite of Dart's own
-    <code>Iterable.join(separator)</code> method, which takes the iterable
-    as the receiver and the separator as its one argument.
+    Fíjate en el orden de los argumentos — el <code>join</code> de nivel
+    superior, data-first, pone el <strong>separador primero</strong>:
+    <code>join(', ', iterable)</code>. Esa es la convención de FxTS (data-first
+    en todas partes), y es justo la contraria del método
+    <code>Iterable.join(separator)</code> del propio Dart, que toma el iterable
+    como receptor y el separador como su único argumento.
   </p>
   <p>
-    That difference bleeds into the chain form in a subtle way: on the
-    <strong>sync</strong> chain, <code>.join(...)</code> is simply Dart's
-    built-in <code>Iterable.join</code>, whose default separator is
-    <code>''</code> (empty) when omitted. But <code>FxAsync.join</code> is
-    written explicitly in FxDart and defaults its separator to
-    <code>','</code> instead — matching FxTS's own default. Don't assume the
-    two chains behave identically when you skip the argument.
+    Esa diferencia se filtra a la forma encadenada de un modo sutil: en la
+    cadena <strong>síncrona</strong>, <code>.join(...)</code> es simplemente el
+    <code>Iterable.join</code> nativo de Dart, cuyo separador por defecto es
+    <code>''</code> (vacío) si se omite. Pero <code>FxAsync.join</code> está
+    escrito explícitamente en FxDart y usa como separador por defecto
+    <code>','</code> — igual que el propio valor por defecto de FxTS. No des por
+    hecho que ambas cadenas se comportan igual cuando omites el argumento.
   </p>
 
-  <h2>Demo 1 · Basics &amp; the two defaults</h2>
+  <h2>Demo 1 · Fundamentos &amp; los dos valores por defecto</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -94,7 +92,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, and its different default</h2>
+  <h2>Demo 2 · Asíncrono, y su valor por defecto distinto</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -117,8 +115,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: join the columns into a single CSV header row, separated by <code>','</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: une las columnas en una única fila de cabecera CSV, separadas por <code>','</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -135,10 +133,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="sort.html"><code>sort</code></a> — order elements before joining them ·
-    <a href="map.html"><code>map</code></a> — format each element before joining ·
-    <a href="size.html"><code>size</code></a> — the other simple string/count terminal
+    <strong>Relacionado:</strong>
+    <a href="sort.html"><code>sort</code></a> — ordena los elementos antes de unirlos ·
+    <a href="map.html"><code>map</code></a> — da formato a cada elemento antes de unirlos ·
+    <a href="size.html"><code>size</code></a> — el otro terminal sencillo de cadena/conteo
   </div>
 
   <nav class="tut-nav">

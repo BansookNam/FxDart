@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>pipe1 — FxDart 101</title>
-  <meta name="description" content="FxDart pipe1 tutorial: apply one function to a value, awaiting it first if it's a Future.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/pipe1.html">
+  <meta name="description" content="FxDart pipe1 튜토리얼: 값에 함수 하나를 적용하되, 값이 Future라면 먼저 await합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/pipe1.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/pipe1.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/pipe1.html">
@@ -43,40 +42,39 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 1 · 시작하기 › <strong>pipe1</strong></p>
   <h1><code>pipe1</code></h1>
-  <p class="hero-sub">Applies one function to a value, awaiting it first if the value is a Future.</p>
+  <p class="hero-sub">값에 함수 하나를 적용합니다. 값이 Future라면 먼저 await합니다.</p>
 
   <div class="signature">FutureOr&lt;R&gt; pipe1&lt;A, R&gt;(FutureOr&lt;A&gt; a, FutureOr&lt;R&gt; Function(A a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>pipe1</code> is the single-step building block that <code>pipe</code>
-    uses internally: apply <code>f</code> to <code>a</code>, but if
-    <code>a</code> is a <code>Future</code>, await it first. If <code>a</code>
-    is a plain value, <code>f</code> runs immediately and <code>pipe1</code>
-    returns whatever <code>f</code> returns — synchronously, with no
-    <code>Future</code> wrapper at all.
+    <code>pipe1</code>은 <code>pipe</code>가 내부적으로 사용하는 한 단계짜리
+    빌딩 블록입니다. <code>a</code>에 <code>f</code>를 적용하되,
+    <code>a</code>가 <code>Future</code>라면 먼저 await합니다.
+    <code>a</code>가 평범한 값이면 <code>f</code>가 즉시 실행되고
+    <code>pipe1</code>은 <code>f</code>가 반환한 값을 그대로 —
+    <code>Future</code>로 감싸지 않고 동기적으로 — 돌려줍니다.
   </p>
   <p>
-    The point is that <code>f</code> itself never has to know or care
-    whether the value it receives came from sync or async work upstream —
-    <code>pipe1</code> normalizes that for you. This is handy when you're
-    composing a value that's <em>sometimes</em> a <code>Future</code>
-    (say, the result of an earlier async step) and you want the next step
-    to look identical either way.
+    핵심은 <code>f</code> 자신은 넘겨받은 값이 상류의 동기 작업에서 왔는지
+    비동기 작업에서 왔는지 알 필요도, 신경 쓸 필요도 없다는 점입니다 —
+    <code>pipe1</code>이 그 차이를 대신 흡수해 줍니다. 값이
+    <em>때로는</em> <code>Future</code>가 되는 상황(예: 앞선 비동기 단계의
+    결과)에서 다음 단계를 어느 쪽이든 똑같은 모습으로 쓰고 싶을 때
+    유용합니다.
   </p>
   <p>
-    Because it only handles one step, you can nest <code>pipe1</code> calls
-    to compose a short chain, or reach for the full <code>pipe</code> (a
-    <code>List&lt;Function&gt;</code>) when there are more than one or two
-    steps.
+    한 단계만 처리하므로, 짧은 체인을 만들려면 <code>pipe1</code> 호출을
+    중첩하면 되고, 단계가 두어 개를 넘어가면
+    <code>List&lt;Function&gt;</code>을 받는 <code>pipe</code>를 쓰는 편이
+    낫습니다.
   </p>
 
-  <h2>Demo 1 · A plain (non-Future) value</h2>
-  <p>With no <code>Future</code> involved, <code>pipe1</code> just calls
-    <code>f(a)</code> directly and returns a plain value:</p>
+  <h2>데모 1 · 평범한 값(Future가 아닌 값)</h2>
+  <p><code>Future</code>가 끼어들지 않으면 <code>pipe1</code>은
+    <code>f(a)</code>를 그대로 호출하고 평범한 값을 반환합니다.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -90,11 +88,11 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Awaiting a Future first</h2>
+  <h2>데모 2 · Future를 먼저 await하기</h2>
   <p>
-    When <code>a</code> is a <code>Future</code>, <code>pipe1</code> awaits
-    it before calling <code>f</code> — chain a few of these together to
-    compose async steps one at a time:
+    <code>a</code>가 <code>Future</code>라면 <code>pipe1</code>은
+    <code>f</code>를 호출하기 전에 await합니다 — 이런 호출을 몇 개
+    이어 붙이면 비동기 단계를 하나씩 조합할 수 있습니다.
   </p>
   <div class="playground">
 <textarea>
@@ -117,8 +115,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>pipe1</code> to turn a delayed name into a greeting.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>pipe1</code>로 지연된 이름을 인사말로 바꿔 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -135,10 +133,10 @@ Future<void> main() async {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="pipe.html"><code>pipe</code></a> — multi-step pipeline built from pipe1 ·
-    <a href="fx.html"><code>fx</code></a> — the typed chain alternative ·
-    <a href="delay.html"><code>delay &amp; sleep</code></a> — the async helpers used above
+    <strong>관련 항목:</strong>
+    <a href="pipe.html"><code>pipe</code></a> — pipe1로 만들어진 다단계 파이프라인 ·
+    <a href="fx.html"><code>fx</code></a> — 타입이 유지되는 체인 대안 ·
+    <a href="delay.html"><code>delay &amp; sleep</code></a> — 위에서 쓴 비동기 헬퍼
   </div>
 
   <nav class="tut-nav">

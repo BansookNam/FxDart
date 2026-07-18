@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>includes — FxDart 101</title>
-  <meta name="description" content="FxDart includes tutorial: check membership in an iterable with ==, short-circuiting, sync and async.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/includes.html">
+  <meta name="description" content="Tutorial de includes en FxDart: comprueba la pertenencia en un iterable usando ==, con cortocircuito, en versión síncrona y asíncrona.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/includes.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/includes.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/includes.html">
@@ -43,32 +42,31 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 8 · Acceso &amp; predicados › <strong>includes</strong></p>
   <h1><code>includes</code></h1>
-  <p class="hero-sub">Returns true when an iterable contains a value, compared with <code>==</code>.</p>
+  <p class="hero-sub">Devuelve true cuando un iterable contiene un valor, comparado con <code>==</code>.</p>
 
   <div class="signature">bool includes&lt;A&gt;(A a, Iterable&lt;A&gt; iterable)
 Future&lt;bool&gt; includesAsync&lt;A&gt;(A a, FxAsyncIterable&lt;A&gt; iterable)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>includes</code> is a thin, FxTS-shaped wrapper: on the sync side
-    it's literally <code>iterable.contains(a)</code>, so there's no separate
-    chain method — <code>Fx</code> already inherits <code>.contains()</code>
-    from <code>Iterable</code>, and it behaves identically. The async
-    version, <code>includesAsync</code>, is built on top of
-    <a href="some.html"><code>someAsync</code></a> (<code>b == a</code> as
-    the predicate), which means it inherits the same short-circuiting: it
-    stops pulling from the source the moment it finds a match.
+    <code>includes</code> es una envoltura fina con la forma de FxTS: en el
+    lado síncrono es literalmente <code>iterable.contains(a)</code>, así que
+    no hay un método de cadena aparte — <code>Fx</code> ya hereda
+    <code>.contains()</code> de <code>Iterable</code> y se comporta igual. La
+    versión asíncrona, <code>includesAsync</code>, está construida sobre
+    <a href="some.html"><code>someAsync</code></a> (con <code>b == a</code>
+    como predicado), lo que significa que hereda el mismo cortocircuito: deja
+    de tirar de la fuente en cuanto encuentra una coincidencia.
   </p>
   <p>
-    Equality is checked with Dart's <code>==</code>, so it respects any
-    <code>operator ==</code> override on your own classes — it isn't limited
-    to primitives.
+    La igualdad se comprueba con el <code>==</code> de Dart, así que respeta
+    cualquier sobrecarga de <code>operator ==</code> en tus propias clases —
+    no se limita a los tipos primitivos.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -83,8 +81,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, and proof it short-circuits</h2>
-  <p>Only 2 of 5 elements are pulled before <code>includesAsync</code> stops:</p>
+  <h2>Demo 2 · Async, y la prueba del cortocircuito</h2>
+  <p>Solo se piden 2 de los 5 elementos antes de que <code>includesAsync</code> se detenga:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -99,8 +97,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>includes</code> to check whether <code>requestId</code> is allowed.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>includes</code> para comprobar si <code>requestId</code> está permitido.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -118,11 +116,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="some.html"><code>some</code></a> — what <code>includesAsync</code> is built from ·
-    <a href="find.html"><code>find</code></a> — get the matching value, not just a bool ·
-    <a href="findIndex.html"><code>findIndex</code></a> — get the position instead ·
-    <a href="isEmpty.html"><code>isEmpty</code></a> — the other value-based check nearby
+    <strong>Relacionado:</strong>
+    <a href="some.html"><code>some</code></a> — la base sobre la que se construye <code>includesAsync</code> ·
+    <a href="find.html"><code>find</code></a> — obtén el valor coincidente, no solo un bool ·
+    <a href="findIndex.html"><code>findIndex</code></a> — obtén la posición en su lugar ·
+    <a href="isEmpty.html"><code>isEmpty</code></a> — la otra comprobación basada en valores que tienes cerca
   </div>
 
   <nav class="tut-nav">

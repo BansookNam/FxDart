@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>find — FxDart 101</title>
-  <meta name="description" content="FxDart find tutorial: get the first element matching a predicate, lazy and short-circuiting, null when nothing matches.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/find.html">
+  <meta name="description" content="Tutorial de find en FxDart: obtén el primer elemento que cumple un predicado, de forma perezosa y con cortocircuito, y null si no hay ninguno.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/find.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/find.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/find.html">
@@ -43,32 +42,32 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 8 · Acceso &amp; predicados › <strong>find</strong></p>
   <h1><code>find</code></h1>
-  <p class="hero-sub">Returns the first element for which a predicate is true, or <code>null</code>.</p>
+  <p class="hero-sub">Devuelve el primer elemento para el que el predicado es cierto, o <code>null</code>.</p>
 
   <div class="signature">A? find&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;A?&gt; findAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 T? Fx.find(bool Function(T a) f)              // chain
 Future&lt;T?&gt; FxAsync.find(FutureOr&lt;bool&gt; Function(T a) f)  // chain</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>find</code> is what <code>head</code> and <code>filter</code>
-    look like fused together — in fact it's implemented as exactly that:
-    <code>head(filter(f, iterable))</code>. That fusion is what makes it
-    lazy and short-circuiting: it pulls elements one at a time, testing each
-    against <code>f</code>, and stops the instant it finds a match. Nothing
-    further downstream is ever touched.
+    <code>find</code> es lo que resulta de fusionar <code>head</code> y
+    <code>filter</code> — de hecho está implementado exactamente así:
+    <code>head(filter(f, iterable))</code>. Esa fusión es la que lo hace
+    perezoso y capaz de cortocircuitar: tira de los elementos de uno en uno,
+    probando cada uno contra <code>f</code>, y se detiene en cuanto encuentra
+    una coincidencia. Nada de lo que viene después llega a tocarse.
   </p>
   <p>
-    Just like <code>head</code>, an unmatched search returns <code>null</code>
-    rather than FxTS's <code>undefined</code>. It's available data-first,
-    as an async variant, and as a method on both the sync and async chains.
+    Igual que <code>head</code>, una búsqueda sin coincidencias devuelve
+    <code>null</code> en lugar del <code>undefined</code> de FxTS. Está
+    disponible en versión data-first, como variante asíncrona y como método
+    tanto en la cadena síncrona como en la asíncrona.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -88,8 +87,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Short-circuiting &amp; async</h2>
-  <p>Only 6 of a million elements are ever checked:</p>
+  <h2>Demo 2 · Cortocircuito &amp; asíncrono</h2>
+  <p>De un millón de elementos solo se comprueban 6:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -111,8 +110,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>find</code> to get the first item with <code>qty &gt; 0</code>, or <code>null</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>find</code> para obtener el primer artículo con <code>qty &gt; 0</code>, o <code>null</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -133,11 +132,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="findIndex.html"><code>findIndex</code></a> — same search, returns a position ·
-    <a href="filter.html"><code>filter</code></a> — every match, not just the first ·
-    <a href="head.html"><code>head</code></a> — what <code>find</code> is built from ·
-    <a href="matches.html"><code>matches</code></a> — a ready-made shape-matching predicate
+    <strong>Relacionado:</strong>
+    <a href="findIndex.html"><code>findIndex</code></a> — la misma búsqueda, pero devuelve una posición ·
+    <a href="filter.html"><code>filter</code></a> — todas las coincidencias, no solo la primera ·
+    <a href="head.html"><code>head</code></a> — la pieza con la que se construye <code>find</code> ·
+    <a href="matches.html"><code>matches</code></a> — un predicado ya hecho para comparar formas
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>concat — FxDart 101</title>
-  <meta name="description" content="FxDart concat tutorial: chain two lazy iterables end to end, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/concat.html">
+  <meta name="description" content="Tutorial de concat en FxDart: encadena dos iterables perezosos uno detrás de otro, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/concat.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/concat.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/concat.html">
@@ -43,35 +42,36 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 6 · Combinar › <strong>concat</strong></p>
   <h1><code>concat</code></h1>
-  <p class="hero-sub">Lazily yields all of the first iterable, then all of the second.</p>
+  <p class="hero-sub">Emite perezosamente todo el primer iterable y, a continuación, todo el segundo.</p>
 
   <div class="signature">Iterable&lt;A&gt; concat&lt;A&gt;(Iterable&lt;A&gt; iterable1, Iterable&lt;A&gt; iterable2)
 FxAsyncIterable&lt;A&gt; concatAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;A&gt; iterable2)
 Fx&lt;T&gt; Fx.concat(Iterable&lt;T&gt; other)        // chain
 FxAsync&lt;T&gt; FxAsync.concat(FxAsyncIterable&lt;T&gt; other)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>concat</code> chains two iterables end to end without copying
-    either one into a new list. It's fully lazy on both sides: the second
-    iterable is never touched at all unless the pipeline actually pulls past
-    the end of the first — so concatenating an expensive or infinite first
-    source with a second one is safe as long as you don't demand more than
-    the first source has.
+    <code>concat</code> encadena dos iterables uno detrás de otro sin copiar
+    ninguno de los dos a una lista nueva. Es totalmente perezoso por ambos lados:
+    el segundo iterable ni se toca mientras el pipeline no tire de valores más
+    allá del final del primero — así que concatenar una primera fuente costosa
+    o infinita con una segunda es seguro siempre que no pidas más de lo que
+    tiene la primera.
   </p>
   <p>
-    <code>concatAsync</code> is a pass-through, like <code>take</code> and
-    <code>concat</code>'s async cousins: it doesn't serialize either side
-    internally, so a <code>concurrent(n)</code> further downstream still
-    gets to overlap pulls against whichever side is currently active.
+    <code>concatAsync</code> es transparente, igual que las primas asíncronas de
+    <code>take</code> y <code>concat</code>: no serializa ninguno de los dos
+    lados internamente, así que un <code>concurrent(n)</code> aguas abajo
+    sigue pudiendo solapar las peticiones contra el lado que esté activo
+    en ese momento.
   </p>
 
-  <h2>Demo 1 · Basics &amp; laziness</h2>
-  <p>The second iterable is a generator with a side effect — watch it never
-    run because <code>take(2)</code> is satisfied by the first list alone:</p>
+  <h2>Demo 1 · Fundamentos &amp; pereza</h2>
+  <p>El segundo iterable es un generador con un efecto secundario — fíjate en
+    que nunca llega a ejecutarse, porque <code>take(2)</code> se satisface solo
+    con la primera lista:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -93,7 +93,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -108,9 +108,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: concatenate <code>morning</code> and <code>evening</code>
-    into one schedule.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: concatena <code>morning</code> y <code>evening</code>
+    en una sola agenda.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -128,10 +128,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="append.html"><code>append</code></a> — add just one trailing value ·
-    <a href="prepend.html"><code>prepend</code></a> — add just one leading value ·
-    <a href="zip.html"><code>zip</code></a> — pair up elements instead of chaining them
+    <strong>Relacionado:</strong>
+    <a href="append.html"><code>append</code></a> — añade un único valor al final ·
+    <a href="prepend.html"><code>prepend</code></a> — añade un único valor al principio ·
+    <a href="zip.html"><code>zip</code></a> — empareja los elementos en vez de encadenarlos
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>chunk — FxDart 101</title>
-  <meta name="description" content="FxDart chunk tutorial: batch a lazy iterable into fixed-size lists, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/chunk.html">
+  <meta name="description" content="FxDart chunk 튜토리얼 — 지연 이터러블을 고정 크기 리스트로 묶어 배치 처리합니다. 라이브 플레이그라운드 포함.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/chunk.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/chunk.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/chunk.html">
@@ -43,34 +42,33 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 5 · 잘라내기 › <strong>chunk</strong></p>
   <h1><code>chunk</code></h1>
-  <p class="hero-sub">Returns a lazy iterable of lists, each holding up to <code>size</code> consecutive elements.</p>
+  <p class="hero-sub">각각 최대 <code>size</code>개의 연속된 원소를 담은 리스트들의 지연 이터러블을 반환합니다.</p>
 
   <div class="signature">Iterable&lt;List&lt;A&gt;&gt; chunk&lt;A&gt;(int size, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;List&lt;A&gt;&gt; chunkAsync&lt;A&gt;(int size, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;List&lt;T&gt;&gt; Fx.chunk(int size)        // chain
 FxAsync&lt;List&lt;T&gt;&gt; FxAsync.chunk(int size)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>chunk</code> batches a flat sequence into fixed-size groups —
-    dealing cards into hands, paginating a result set, sending work to a
-    downstream API in batches of <code>n</code>. It buffers just
-    <code>size</code> elements at a time before yielding each list, so it
-    stays lazy and memory-bounded even over a huge source; only the final
-    chunk is allowed to come up short, if the source doesn't divide evenly.
+    <code>chunk</code>는 평평한 시퀀스를 고정 크기 그룹으로 묶습니다 —
+    카드를 패로 나누거나, 결과 집합을 페이지로 자르거나, 하위 API에
+    <code>n</code>개씩 묶어 작업을 보내는 식입니다. 리스트를 하나 내보내기
+    전에 딱 <code>size</code>개만 버퍼링하므로, 아주 큰 소스에서도
+    지연 평가와 제한된 메모리 사용을 유지합니다. 소스가 딱 나누어떨어지지
+    않는 경우, 개수가 모자랄 수 있는 것은 마지막 청크뿐입니다.
   </p>
   <p>
-    The async version, <code>chunkAsync</code>, awaits <code>size</code>
-    elements before producing each chunk — pair it with
-    <code>.concurrent(n)</code> upstream to fill a chunk's worth of async
-    work concurrently.
+    비동기 버전인 <code>chunkAsync</code>는 청크 하나를 만들기 전에
+    <code>size</code>개를 await합니다 — 상류에
+    <code>.concurrent(n)</code>을 함께 쓰면 청크 하나 분량의 비동기 작업을
+    동시에 처리할 수 있습니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
-  <p>10 items chunked by 3 leaves a shorter final chunk:</p>
+  <h2>데모 1 · 기본</h2>
+  <p>10개를 3씩 묶으면 마지막 청크가 짧게 남습니다.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -86,7 +84,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>데모 2 · 비동기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -103,8 +101,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: deal the cards into hands of 3.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 카드를 3장씩 패로 나눠 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -121,10 +119,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="slice.html"><code>slice</code></a> — a single arbitrary window instead of repeated batches ·
-    <a href="split.html"><code>split</code></a> — group by separator instead of fixed size ·
-    <a href="transpose.html"><code>transpose</code></a> — flip rows and columns of already-chunked data
+    <strong>관련 함수:</strong>
+    <a href="slice.html"><code>slice</code></a> — 반복 배치 대신 임의의 구간 하나 ·
+    <a href="split.html"><code>split</code></a> — 고정 크기 대신 구분자 기준으로 묶기 ·
+    <a href="transpose.html"><code>transpose</code></a> — 이미 청크로 나뉜 데이터의 행과 열 뒤집기
   </div>
 
   <nav class="tut-nav">

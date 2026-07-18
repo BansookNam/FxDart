@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>some — FxDart 101</title>
-  <meta name="description" content="FxDart some tutorial: check that at least one element satisfies a predicate, short-circuiting on the first hit, sync and async.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/some.html">
+  <meta name="description" content="Tutorial de some en FxDart: comprueba que al menos un elemento cumple un predicado, cortocircuitando en el primer acierto, en versión síncrona y asíncrona.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/some.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/some.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/some.html">
@@ -43,34 +42,33 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 8 · Acceso &amp; predicados › <strong>some</strong></p>
   <h1><code>some</code></h1>
-  <p class="hero-sub">True when at least one element satisfies a predicate — false for an empty iterable.</p>
+  <p class="hero-sub">Es true cuando al menos un elemento cumple un predicado — false para un iterable vacío.</p>
 
   <div class="signature">bool some&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;bool&gt; someAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 bool Fx.some(bool Function(T a) f)                     // chain
 Future&lt;bool&gt; FxAsync.some(FutureOr&lt;bool&gt; Function(T a) f)  // chain</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>some</code> is <code>every</code>'s mirror image: it scans left to
-    right and short-circuits the moment it finds a match, returning
-    <code>true</code> right away. If it never finds one — including on an
-    empty iterable, which is the opposite vacuous case from
-    <code>every</code> — it returns <code>false</code> only after checking
-    everything.
+    <code>some</code> es la imagen especular de <code>every</code>: recorre de
+    izquierda a derecha y cortocircuita en cuanto encuentra una coincidencia,
+    devolviendo <code>true</code> de inmediato. Si no encuentra ninguna
+    —incluido el caso del iterable vacío, que es el caso trivial opuesto al de
+    <code>every</code>— devuelve <code>false</code> solo después de haberlo
+    comprobado todo.
   </p>
   <p>
-    Unlike <code>every</code>, <code>Fx</code> <em>does</em> define its own
-    <code>.some()</code> chain method (it isn't already covered by
-    <code>Iterable</code>, since Dart's own <code>Iterable</code> has no
-    built-in <code>some</code> — the closest thing, <code>any</code>, does
-    the same job under a different name).
+    A diferencia de <code>every</code>, <code>Fx</code> <em>sí</em> define su
+    propio método encadenable <code>.some()</code> (no viene ya cubierto por
+    <code>Iterable</code>, porque el <code>Iterable</code> de Dart no tiene un
+    <code>some</code> integrado: lo más parecido, <code>any</code>, hace el
+    mismo trabajo con otro nombre).
   </p>
 
-  <h2>Demo 1 · Basics &amp; short-circuiting</h2>
+  <h2>Demo 1 · Fundamentos &amp; cortocircuito</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -88,7 +86,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -106,8 +104,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>some</code> to check if anything in the cart costs more than 10.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>some</code> para comprobar si algo del carrito cuesta más de 10.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -127,11 +125,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="every.html"><code>every</code></a> — the "all of them" counterpart ·
-    <a href="includes.html"><code>includes</code></a> — a specialization of <code>some</code> ·
-    <a href="find.html"><code>find</code></a> — get the matching element, not just a bool ·
-    <a href="predicates.html"><code>predicates</code></a> — ready-made predicates to pair with <code>some</code>
+    <strong>Relacionado:</strong>
+    <a href="every.html"><code>every</code></a> — la contraparte «todos ellos» ·
+    <a href="includes.html"><code>includes</code></a> — una especialización de <code>some</code> ·
+    <a href="find.html"><code>find</code></a> — obtiene el elemento coincidente, no solo un bool ·
+    <a href="predicates.html"><code>predicates</code></a> — predicados ya hechos para combinar con <code>some</code>
   </div>
 
   <nav class="tut-nav">

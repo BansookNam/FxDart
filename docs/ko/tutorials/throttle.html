@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>throttle — FxDart 101</title>
-  <meta name="description" content="FxDart throttle tutorial: invoke a function at most once per wait period, with leading/trailing edges and cancel(), plus a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/throttle.html">
+  <meta name="description" content="FxDart throttle 튜토리얼: wait 구간마다 함수를 최대 한 번만 실행하는 방법, leading/trailing 에지와 cancel(), 그리고 라이브 플레이그라운드까지.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/throttle.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/throttle.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/throttle.html">
@@ -43,10 +42,9 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 12 · 유틸 › <strong>throttle</strong></p>
   <h1><code>throttle</code></h1>
-  <p class="hero-sub">Invokes a function at most once per wait period — on a schedule, unlike debounce's "wait for quiet."</p>
+  <p class="hero-sub">wait 구간마다 함수를 최대 한 번만 실행합니다 — debounce의 "잠잠해질 때까지 기다리기"와 달리 일정한 주기로 발화합니다.</p>
 
   <div class="signature">Throttled&lt;T&gt; throttle&lt;T&gt;(void Function(T arg) func, Duration wait, {bool leading = true, bool trailing = true})
 
@@ -55,31 +53,31 @@ class Throttled&lt;T&gt; {
   void cancel();
 }</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>throttle</code> guarantees <code>func</code> runs at most once every
-    <code>wait</code>, no matter how often the throttled function is called.
-    That's the key difference from <a href="debounce.html"><code>debounce</code></a>:
-    debounce keeps <em>resetting</em> its timer on every call, so a
-    continuous stream of calls can delay execution indefinitely; throttle's
-    window is fixed once it starts, so calls still get through on a regular
-    cadence — useful for things like scroll or resize handlers where you want
-    periodic updates, not just one at the very end.
+    <code>throttle</code>은 감싼 함수가 아무리 자주 호출되더라도
+    <code>func</code>가 <code>wait</code>마다 최대 한 번만 실행되도록
+    보장합니다. <a href="debounce.html"><code>debounce</code></a>와의 결정적인
+    차이가 여기 있습니다. debounce는 호출이 있을 때마다 타이머를
+    <em>다시 시작</em>하므로 호출이 끊이지 않으면 실행이 무한정 밀릴 수
+    있지만, throttle의 구간은 한 번 시작되면 고정이라 호출이 일정한
+    주기로 계속 통과합니다. 스크롤이나 리사이즈 핸들러처럼 맨 마지막
+    한 번이 아니라 주기적인 갱신이 필요한 곳에 유용합니다.
   </p>
   <p>
-    Both <code>leading</code> and <code>trailing</code> default to
-    <code>true</code>: the first call in a window fires immediately (leading
-    edge), and if more calls arrive before the window closes, the
-    <em>last</em> of those fires once the window ends (trailing edge, with
-    the latest argument). Turn either off to get leading-only or
-    trailing-only behavior. Like <code>debounce</code>, the returned
-    <code>Throttled&lt;T&gt;</code> is a callable class with a
-    <code>.cancel()</code> to drop a pending trailing call.
+    <code>leading</code>과 <code>trailing</code>은 둘 다 기본값이
+    <code>true</code>입니다. 한 구간의 첫 호출은 즉시 발화하고(리딩 에지),
+    구간이 닫히기 전에 호출이 더 들어오면 그중 <em>마지막</em> 호출이
+    구간이 끝날 때 한 번 발화합니다(트레일링 에지, 가장 최근 인자로).
+    둘 중 하나를 끄면 리딩만 또는 트레일링만 동작하게 만들 수 있습니다.
+    <code>debounce</code>와 마찬가지로 반환되는
+    <code>Throttled&lt;T&gt;</code>는 호출 가능한 클래스이며, 대기 중인
+    트레일링 호출을 버리는 <code>.cancel()</code>을 제공합니다.
   </p>
 
-  <h2>Demo 1 · Leading + trailing (the default)</h2>
-  <p>The first call fires immediately; the last call in the window fires
-    again once the window closes:</p>
+  <h2>데모 1 · 리딩 + 트레일링(기본 동작)</h2>
+  <p>첫 호출은 즉시 발화하고, 구간이 닫힐 때 그 구간의 마지막 호출이
+    한 번 더 발화합니다:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -103,11 +101,11 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Tuning leading/trailing, and cancel()</h2>
+  <h2>데모 2 · leading/trailing 조절과 cancel()</h2>
   <p>
-    Turn off <code>leading</code> for trailing-only behavior, off
-    <code>trailing</code> for leading-only, or call <code>.cancel()</code> to
-    drop a pending trailing call:
+    <code>leading</code>을 끄면 트레일링만, <code>trailing</code>을 끄면
+    리딩만 동작하고, <code>.cancel()</code>을 호출하면 대기 중인 트레일링
+    호출을 버립니다.
   </p>
   <div class="playground">
 <textarea>
@@ -149,10 +147,10 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: wrap <code>onClick</code> in <code>throttle</code> (100ms
-    wait) so rapid clicks register at most twice — leading and trailing —
-    instead of three separate times.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>onClick</code>을 <code>throttle</code>로 감싸(wait는 100ms)
+    빠르게 이어진 클릭이 세 번이 아니라 최대 두 번 — 리딩과 트레일링 —
+    만 기록되게 만들어 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -175,11 +173,11 @@ Future<void> main() async {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="debounce.html"><code>debounce</code></a> — waits for quiet instead of a fixed schedule ·
-    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — building timing demos ·
-    <a href="shuffle.html"><code>shuffle</code></a> — seeded randomness ·
-    <a href="concurrent.html"><code>concurrent</code></a> — rate-limiting for async pipelines
+    <strong>관련 함수:</strong>
+    <a href="debounce.html"><code>debounce</code></a> — 고정된 주기가 아니라 잠잠해지기를 기다립니다 ·
+    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — 타이밍 데모를 만드는 재료 ·
+    <a href="shuffle.html"><code>shuffle</code></a> — 시드를 지정하는 난수 ·
+    <a href="concurrent.html"><code>concurrent</code></a> — 비동기 파이프라인의 속도 제한
   </div>
 
   <nav class="tut-nav">

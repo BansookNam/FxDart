@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>head — FxDart 101</title>
-  <meta name="description" content="FxDart head tutorial: grab the first element of an iterable safely, returning null instead of throwing, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/head.html">
+  <meta name="description" content="Tutorial de head en FxDart: obtén el primer elemento de un iterable de forma segura, devolviendo null en lugar de lanzar una excepción, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/head.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/head.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/head.html">
@@ -43,39 +42,38 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 8 · Acceso &amp; predicados › <strong>head</strong></p>
   <h1><code>head</code></h1>
-  <p class="hero-sub">Returns the first element of an iterable, or <code>null</code> when it's empty.</p>
+  <p class="hero-sub">Devuelve el primer elemento de un iterable, o <code>null</code> si está vacío.</p>
 
   <div class="signature">A? head&lt;A&gt;(Iterable&lt;A&gt; iterable)
 Future&lt;A?&gt; headAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
 T? Fx.head()               // chain
 Future&lt;T?&gt; FxAsync.head()  // chain</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>head</code> pulls exactly one element off the front of an iterable
-    and hands it back — or <code>null</code> if there isn't one. This is
-    FxDart's answer to FxTS's <code>head</code>, which returns
-    <code>undefined</code> on an empty array; Dart has no <code>undefined</code>,
-    so every "might not exist" result in this corner of the API collapses to
-    <code>null</code>. That means the natural way to consume it is
+    <code>head</code> toma exactamente un elemento del principio de un iterable
+    y te lo devuelve — o <code>null</code> si no hay ninguno. Es la
+    respuesta de FxDart al <code>head</code> de FxTS, que devuelve
+    <code>undefined</code> con un array vacío; Dart no tiene <code>undefined</code>,
+    así que todo resultado del tipo «puede que no exista» se reduce en esta parte
+    de la API a <code>null</code>. Por eso la forma natural de consumirlo es
     <code>head(list) ?? fallback</code>.
   </p>
   <p>
-    Because <code>head</code> only calls <code>moveNext()</code> once, it
-    costs nothing to call on a huge — even infinite — lazy pipeline: nothing
-    upstream of it runs beyond the single element it needs.
+    Como <code>head</code> solo llama a <code>moveNext()</code> una vez,
+    invocarlo sobre un pipeline perezoso enorme — incluso infinito — no cuesta
+    nada: aguas arriba no se ejecuta nada más allá del único elemento que necesita.
   </p>
   <p>
-    It comes in data-first form (<code>head(iterable)</code>), an async form
-    for <code>FxAsyncIterable</code>, and as a chain method
-    (<code>fx(iterable).head()</code>) on both the sync and async chains.
+    Viene en forma data-first (<code>head(iterable)</code>), en forma asíncrona
+    para <code>FxAsyncIterable</code> y como método de cadena
+    (<code>fx(iterable).head()</code>) tanto en la cadena síncrona como en la asíncrona.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
-  <p>Empty in, <code>null</code> out — no exception, no <code>orElse</code> callback required:</p>
+  <h2>Demo 1 · Fundamentos</h2>
+  <p>Entra vacío, sale <code>null</code>: sin excepciones y sin necesidad de una retrollamada <code>orElse</code>:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -89,11 +87,11 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Laziness, and async short-circuiting</h2>
+  <h2>Demo 2 · Pereza y cortocircuito asíncrono</h2>
   <p>
-    Only one element is ever pulled from the million-element range below.
-    In the async example, the chain awaits the <em>first</em>
-    <code>delay(...)</code> and never even bothers with the second:
+    Del rango de un millón de elementos de abajo solo se extrae uno.
+    En el ejemplo asíncrono, la cadena espera el <em>primer</em>
+    <code>delay(...)</code> y ni siquiera llega a molestarse con el segundo:
   </p>
   <div class="playground">
 <textarea>
@@ -114,9 +112,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>head</code> so this prints the first score, or
-    <code>0</code> when the list is empty.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>head</code> para que esto imprima la primera puntuación, o
+    <code>0</code> cuando la lista esté vacía.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -134,11 +132,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="last.html"><code>last</code></a> — same idea from the other end ·
-    <a href="nth.html"><code>nth</code></a> — pull any index ·
-    <a href="find.html"><code>find</code></a> — first match to a predicate ·
-    <a href="isEmpty.html"><code>isEmpty</code></a> — value-based emptiness check
+    <strong>Relacionado:</strong>
+    <a href="last.html"><code>last</code></a> — la misma idea desde el otro extremo ·
+    <a href="nth.html"><code>nth</code></a> — extrae cualquier índice ·
+    <a href="find.html"><code>find</code></a> — la primera coincidencia con un predicado ·
+    <a href="isEmpty.html"><code>isEmpty</code></a> — comprobación de vacío basada en el valor
   </div>
 
   <nav class="tut-nav">

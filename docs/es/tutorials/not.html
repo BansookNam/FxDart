@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>not — FxDart 101</title>
-  <meta name="description" content="FxDart not tutorial: boolean negation as a function value you can pass around, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/not.html">
+  <meta name="description" content="Tutorial de not en FxDart: la negación booleana como valor de función que puedes pasar de un lado a otro, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/not.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/not.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/not.html">
@@ -43,31 +42,30 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 10 · Utilidades de funciones › <strong>not</strong></p>
   <h1><code>not</code></h1>
-  <p class="hero-sub">Boolean negation as a function you can pass around.</p>
+  <p class="hero-sub">La negación booleana como una función que puedes pasar de un lado a otro.</p>
 
   <div class="signature">bool not(bool a) => !a;</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>not</code> does exactly what <code>!a</code> does — it just does it
-    as a first-class function, so it can be passed where a
-    <code>bool Function(bool)</code> is expected instead of you writing
-    <code>(b) =&gt; !b</code> yourself. FxTS's <code>not</code> works on
-    JavaScript "truthy" values of any type; Dart has no implicit truthiness,
-    so the Dart port only accepts an actual <code>bool</code>.
+    <code>not</code> hace exactamente lo mismo que <code>!a</code> — solo que lo hace
+    como función de primera clase, así que puedes pasarlo donde se espera un
+    <code>bool Function(bool)</code> en lugar de escribir tú mismo
+    <code>(b) =&gt; !b</code>. El <code>not</code> de FxTS opera sobre valores
+    "truthy" de JavaScript de cualquier tipo; Dart no tiene valores truthy implícitos,
+    así que el port a Dart solo acepta un <code>bool</code> real.
   </p>
   <p>
-    Because its signature is <code>bool -&gt; bool</code>, <code>not</code>
-    doubles as a predicate itself wherever the element type is already
-    <code>bool</code> — see <code>some</code>/<code>every</code> in Demo 2.
-    For negating an arbitrary predicate over some other type, use
-    <a href="negate.html"><code>negate</code></a> instead.
+    Como su firma es <code>bool -&gt; bool</code>, <code>not</code> sirve
+    además como predicado en sí mismo siempre que el tipo de los elementos ya sea
+    <code>bool</code> — mira <code>some</code>/<code>every</code> en la Demo 2.
+    Para negar un predicado cualquiera sobre otro tipo, usa
+    <a href="negate.html"><code>negate</code></a>.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -81,10 +79,10 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · As a predicate over booleans</h2>
+  <h2>Demo 2 · Como predicado sobre booleanos</h2>
   <p>
-    <code>not</code> is itself a <code>bool Function(bool)</code>, so it
-    plugs straight into <code>some</code>/<code>every</code> without wrapping:
+    <code>not</code> es en sí mismo un <code>bool Function(bool)</code>, así que
+    encaja directamente en <code>some</code>/<code>every</code> sin envolturas:
   </p>
   <div class="playground">
 <textarea>
@@ -99,9 +97,9 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>not</code> to build the list of "still pending"
-    flags from a list of "done" flags.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>not</code> para construir la lista de flags "aún pendiente"
+    a partir de una lista de flags "hecho".</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -118,11 +116,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="negate.html"><code>negate</code></a> — negate a whole predicate function, not just a bool ·
-    <a href="some.html"><code>some</code></a> / <a href="every.html"><code>every</code></a> — used with not above ·
-    <a href="when.html"><code>when</code></a> — conditional transform ·
-    <a href="unless.html"><code>unless</code></a> — the inverse-condition sibling of when
+    <strong>Relacionado:</strong>
+    <a href="negate.html"><code>negate</code></a> — niega una función predicado entera, no solo un bool ·
+    <a href="some.html"><code>some</code></a> / <a href="every.html"><code>every</code></a> — usados arriba junto a not ·
+    <a href="when.html"><code>when</code></a> — transformación condicional ·
+    <a href="unless.html"><code>unless</code></a> — el hermano de when con la condición invertida
   </div>
 
   <nav class="tut-nav">

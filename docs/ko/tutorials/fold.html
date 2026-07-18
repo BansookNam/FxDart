@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>fold — FxDart 101</title>
-  <meta name="description" content="FxDart fold tutorial: reduce with an explicit seed, safe on empty input, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/fold.html">
+  <meta name="description" content="FxDart fold 튜토리얼: 초깃값을 명시해 접는 reduce로, 빈 입력에도 안전합니다. 라이브 플레이그라운드 포함.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/fold.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/fold.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/fold.html">
@@ -43,42 +42,40 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 7 · 집계 › <strong>fold</strong></p>
   <h1><code>fold</code></h1>
-  <p class="hero-sub">The seeded form of reduce: always safe, even on an empty pipeline.</p>
+  <p class="hero-sub">초깃값을 받는 형태의 reduce입니다. 파이프라인이 비어 있어도 언제나 안전합니다.</p>
 
   <div class="signature">Acc fold&lt;A, Acc&gt;(Acc seed, Acc Function(Acc acc, A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;Acc&gt; foldAsync&lt;A, Acc&gt;(FutureOr&lt;Acc&gt; seed, FutureOr&lt;Acc&gt; Function(Acc acc, A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Acc Fx.fold&lt;Acc&gt;(Acc initialValue, Acc Function(Acc acc, T a) combine)      // chain (sync, inherited from Iterable)
 Future&lt;Acc&gt; FxAsync.fold&lt;Acc&gt;(FutureOr&lt;Acc&gt; seed, FutureOr&lt;Acc&gt; Function(Acc acc, T a) f)  // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>fold</code> is <code><a href="reduce.html">reduce</a></code> with an
-    explicit starting value. In FxTS this is just <code>reduce</code> called
-    with three arguments — <code>reduce(f, seed, iterable)</code>. Dart can't
-    tell overloads apart by argument count, so FxDart splits the two: the
-    unseeded form keeps the name <code>reduce</code>, and the seeded form is
-    renamed <code>fold</code>, matching the name Dart's own
-    <code>Iterable</code> already uses for exactly this operation.
+    <code>fold</code>는 시작 값을 명시적으로 주는
+    <code><a href="reduce.html">reduce</a></code>입니다. FxTS에서는 그저
+    인자를 세 개 넘긴 <code>reduce</code>, 즉 <code>reduce(f, seed, iterable)</code>일
+    뿐입니다. Dart는 인자 개수로 오버로드를 구분하지 못하므로 FxDart는 둘을
+    나눴습니다. 초깃값 없는 형태는 <code>reduce</code>라는 이름을 그대로 쓰고,
+    초깃값을 받는 형태는 <code>fold</code>로 이름을 바꿨습니다. Dart의
+    <code>Iterable</code>이 바로 이 연산에 이미 쓰고 있는 이름이기도 합니다.
   </p>
   <p>
-    Note the argument order carefully: it's <code>fold(seed, f, iterable)</code>
-    — seed first, then the combiner, then the source — mirroring
-    <code>Iterable.fold(initialValue, combine)</code> on the chain form. That's
-    different from FxTS's <code>reduce(f, seed, iterable)</code>, where the
-    function comes first.
+    인자 순서를 잘 봐 두세요. <code>fold(seed, f, iterable)</code>입니다 —
+    초깃값이 먼저, 그다음 결합 함수, 마지막이 소스입니다. 체인 형태에서
+    <code>Iterable.fold(initialValue, combine)</code>과 같은 순서죠. 함수가 먼저
+    오는 FxTS의 <code>reduce(f, seed, iterable)</code>과는 다릅니다.
   </p>
   <p>
-    Because you always supply the seed, <code>fold</code> never throws on an
-    empty iterable — it just returns the seed unchanged. That makes it the
-    safer default whenever you're not sure the pipeline has any elements at
-    all. Like <code>reduce</code>, it's a terminal operator: nothing upstream
-    runs until <code>fold</code> pulls it.
+    초깃값을 항상 직접 넘기기 때문에 <code>fold</code>는 빈 이터러블에서도
+    예외를 던지지 않고 초깃값을 그대로 반환합니다. 그래서 파이프라인에 원소가
+    하나라도 있는지 확신할 수 없을 때 더 안전한 기본 선택지입니다.
+    <code>reduce</code>와 마찬가지로 종결 연산자이므로,
+    <code>fold</code>가 값을 끌어당기기 전까지 상류에서는 아무 일도 일어나지 않습니다.
   </p>
 
-  <h2>Demo 1 · Basics &amp; empty input</h2>
+  <h2>데모 1 · 기본과 빈 입력</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -97,8 +94,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, building up a Map</h2>
-  <p>The seed doesn't have to be a number — here we fold a delayed pipeline into a length histogram:</p>
+  <h2>데모 2 · 비동기, Map 만들어 나가기</h2>
+  <p>초깃값이 숫자일 필요는 없습니다 — 여기서는 지연이 있는 파이프라인을 길이별 히스토그램으로 접습니다:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -118,8 +115,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: <code>fold</code> the deposits into a running balance, starting from <code>1000</code>.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>1000</code>에서 시작해 입금 내역을 <code>fold</code>로 접어 잔액을 계산해 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -136,11 +133,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="reduce.html"><code>reduce</code></a> — the unseeded counterpart ·
-    <a href="reduceLazy.html"><code>reduceLazy</code></a> — a reusable, curried reducer ·
-    <a href="sum.html"><code>sum</code></a> — a common fold, specialized ·
-    <a href="scan.html"><code>scan</code></a> — like fold, but lazily yields every intermediate value
+    <strong>관련 함수:</strong>
+    <a href="reduce.html"><code>reduce</code></a> — 초깃값이 없는 짝 ·
+    <a href="reduceLazy.html"><code>reduceLazy</code></a> — 재사용 가능한 커링된 리듀서 ·
+    <a href="sum.html"><code>sum</code></a> — 흔히 쓰는 fold를 특화한 함수 ·
+    <a href="scan.html"><code>scan</code></a> — fold와 비슷하지만 중간값을 모두 지연 방출
   </div>
 
   <nav class="tut-nav">

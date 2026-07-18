@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>flat — FxDart 101</title>
-  <meta name="description" content="FxDart flat tutorial: flatten nested iterables by a given depth, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/flat.html">
+  <meta name="description" content="Tutorial de flat en FxDart: aplana iterables anidados hasta la profundidad que indiques, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/flat.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/flat.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/flat.html">
@@ -43,49 +42,50 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 3 · Transformar › <strong>flat</strong></p>
   <h1><code>flat</code></h1>
-  <p class="hero-sub">Flattens nested iterables by a given depth — strings are left alone.</p>
+  <p class="hero-sub">Aplana iterables anidados hasta la profundidad indicada — las cadenas se dejan intactas.</p>
 
   <div class="signature">Iterable&lt;dynamic&gt; flat(Iterable&lt;dynamic&gt; iterable, [int depth = 1])
 FxAsyncIterable&lt;dynamic&gt; flatAsync(FxAsyncIterable&lt;dynamic&gt; iterable, [int depth = 1])
 Fx&lt;dynamic&gt; Fx.flat([int depth = 1])        // chain
 FxAsync&lt;dynamic&gt; FxAsync.flat([int depth = 1])</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>flat</code> walks a nested structure of iterables and splices
-    inner elements into the outer sequence, up to <code>depth</code> levels
-    deep (default <code>1</code>). Anything that is an <code>Iterable</code>
-    counts as "flattenable" <em>except</em> <code>String</code> — so
-    <code>flat(['ab', ['cd']])</code> keeps <code>'ab'</code> intact instead
-    of exploding it into characters.
+    <code>flat</code> recorre una estructura anidada de iterables e inserta
+    los elementos interiores en la secuencia exterior, hasta
+    <code>depth</code> niveles de profundidad (por defecto <code>1</code>).
+    Todo lo que sea un <code>Iterable</code> cuenta como "aplanable"
+    <em>excepto</em> <code>String</code> — así que
+    <code>flat(['ab', ['cd']])</code> conserva <code>'ab'</code> entero en
+    vez de descomponerlo en caracteres.
   </p>
   <p>
-    <strong>Why <code>Iterable&lt;dynamic&gt;</code>, and why that's okay:</strong>
-    TypeScript's <code>flat</code> has a <code>DeepFlat</code> conditional
-    type that can describe "the element type after flattening N levels."
-    Dart's type system has no equivalent mechanism — the input's nesting
-    shape isn't known until runtime, so there is no sound way to compute a
-    static element type. Rather than lie with a generic that doesn't hold,
-    the Dart port is honest about it and returns <code>Iterable&lt;dynamic&gt;</code>.
-    If you know the shape of what you're flattening and want a typed
-    result, reach for <a href="flatMap.html"><code>flatMap</code></a>
-    instead: <code>flatMap((row) =&gt; row, matrix)</code> gives you a typed
-    flatten for exactly-one-level-deep, uniformly-shaped data.
+    <strong>Por qué <code>Iterable&lt;dynamic&gt;</code>, y por qué no pasa nada:</strong>
+    el <code>flat</code> de TypeScript tiene un tipo condicional
+    <code>DeepFlat</code> capaz de describir "el tipo del elemento tras
+    aplanar N niveles". El sistema de tipos de Dart no tiene un mecanismo
+    equivalente — la forma del anidamiento de la entrada no se conoce hasta
+    tiempo de ejecución, así que no hay manera sólida de calcular un tipo de
+    elemento estático. En lugar de mentir con un genérico que no se sostiene,
+    el port a Dart es honesto y devuelve <code>Iterable&lt;dynamic&gt;</code>.
+    Si conoces la forma de lo que estás aplanando y quieres un resultado
+    tipado, tira de <a href="flatMap.html"><code>flatMap</code></a>
+    en su lugar: <code>flatMap((row) =&gt; row, matrix)</code> te da un
+    aplanado tipado para datos de exactamente un nivel y forma uniforme.
   </p>
   <p>
-    Like <code>flat</code> in FxTS, <code>flatAsync</code> only recurses
-    into nesting that is already a <em>synchronous</em> <code>Iterable</code>
-    by the time it arrives — it does not await a <code>Future</code> buried
-    inside a nested collection. Combine it with an upstream
-    <code>.map(...).concurrent(n)</code> stage to fetch nested lists in
-    parallel, then let <code>.flat()</code> splice the already-resolved
-    results together.
+    Igual que <code>flat</code> en FxTS, <code>flatAsync</code> solo baja
+    por el anidamiento que ya sea, de forma <em>síncrona</em>, un
+    <code>Iterable</code> en el momento en que llega — no espera a un <code>Future</code>
+    escondido dentro de una colección anidada. Combínalo con una etapa previa
+    <code>.map(...).concurrent(n)</code> para traer las listas anidadas en
+    paralelo, y deja que <code>.flat()</code> junte después los resultados ya
+    resueltos.
   </p>
 
-  <h2>Demo 1 · Basics &amp; depth</h2>
+  <h2>Demo 1 · Fundamentos &amp; profundidad</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -103,10 +103,10 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency</h2>
+  <h2>Demo 2 · Asíncrono, con concurrencia</h2>
   <p>
-    Fetch the (already nested) results concurrently, then flatten the
-    resolved lists:
+    Trae los resultados (ya anidados) de forma concurrente y luego aplana las
+    listas resueltas:
   </p>
   <div class="playground">
 <textarea>
@@ -130,9 +130,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>flat()</code> to flatten <code>scoreGroups</code>
-    by one level.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>flat()</code> para aplanar <code>scoreGroups</code>
+    un nivel.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -152,11 +152,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="flatMap.html"><code>flatMap</code></a> — typed map + flatten in one step ·
-    <a href="map.html"><code>map</code></a> — transform without flattening ·
-    <a href="scan.html"><code>scan</code></a> — running accumulation ·
-    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
+    <strong>Relacionado:</strong>
+    <a href="flatMap.html"><code>flatMap</code></a> — map + aplanado tipado en un solo paso ·
+    <a href="map.html"><code>map</code></a> — transforma sin aplanar ·
+    <a href="scan.html"><code>scan</code></a> — acumulación progresiva ·
+    <a href="concurrent.html"><code>concurrent</code></a> — evaluación en paralelo
   </div>
 
   <nav class="tut-nav">

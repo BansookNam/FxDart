@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>range — FxDart 101</title>
-  <meta name="description" content="FxDart range tutorial: a lazy sequence of integers, counting up or down, to pipe into a chain.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/range.html">
+  <meta name="description" content="FxDart range 튜토리얼: 위로도 아래로도 셀 수 있는 정수의 지연 시퀀스를 만들어 체인에 흘려보내는 방법을 익힙니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/range.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/range.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/range.html">
@@ -43,40 +42,37 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 2 · 시퀀스 생성 › <strong>range</strong></p>
   <h1><code>range</code></h1>
-  <p class="hero-sub">A lazy sequence of integers from start (inclusive) to end (exclusive), stepping by any amount.</p>
+  <p class="hero-sub">시작값(포함)부터 끝값(미포함)까지 원하는 간격으로 증가하는 정수의 지연 시퀀스입니다.</p>
 
   <div class="signature">Iterable&lt;int&gt; range(int start, [int? end, int step = 1])</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>range</code> generates integers on demand, using a <code>sync*</code>
-    generator — nothing is allocated up front. Called with one argument,
-    <code>range(4)</code> counts <code>0, 1, 2, 3</code> (i.e. <code>0</code>
-    up to, but not including, <code>start</code>). Called with two,
-    <code>range(1, 4)</code> counts <code>1, 2, 3</code>. A third argument
-    sets the step — including a <em>negative</em> step to count downward,
-    e.g. <code>range(4, 1, -1)</code> gives <code>4, 3, 2</code>.
+    <code>range</code>는 <code>sync*</code> 제너레이터를 사용해 필요할 때마다
+    정수를 만들어 냅니다 — 미리 할당해 두는 것은 없습니다. 인자를 하나만 주면
+    <code>range(4)</code>는 <code>0, 1, 2, 3</code>을 세고(즉 <code>0</code>부터
+    <code>start</code> 직전까지), 두 개를 주면 <code>range(1, 4)</code>는
+    <code>1, 2, 3</code>을 셉니다. 세 번째 인자는 간격을 정하는데,
+    <em>음수</em> 간격을 주면 거꾸로 셀 수도 있습니다. 예를 들어
+    <code>range(4, 1, -1)</code>은 <code>4, 3, 2</code>를 냅니다.
   </p>
   <p>
-    Because it's lazy, <code>range(1000000)</code> is essentially free to
-    create — the million integers only get produced as something downstream
-    (usually <code>.take(n)</code>) actually pulls them. This makes
-    <code>range</code> the go-to source for demonstrating laziness, and a
-    handy stand-in whenever you need "the first N things" without building
-    a real collection first.
+    지연 평가되기 때문에 <code>range(1000000)</code>을 만드는 비용은 사실상
+    없습니다 — 백만 개의 정수는 하류(보통 <code>.take(n)</code>)에서 실제로
+    끌어당길 때만 생성됩니다. 그래서 <code>range</code>는 지연 평가를 보여 줄 때
+    가장 먼저 꺼내 드는 소스이며, 실제 컬렉션을 먼저 만들지 않고도 "앞의 N개"가
+    필요할 때 쓰기 좋은 대체 수단입니다.
   </p>
   <p>
-    Unlike FxTS's <code>range</code>, which is a finite generator over
-    numbers, this port keeps the same finite contract — there's no
-    unbounded/infinite form here (that's <code>cycle</code>'s job). If you
-    want an endless counter, pair <code>range</code> with <code>cycle</code>
-    and <code>take</code>.
+    FxTS의 <code>range</code>도 숫자에 대한 유한 제너레이터인데, 이 포팅 역시
+    같은 계약을 유지합니다 — 여기에는 무한 형태가 없습니다(그건
+    <code>cycle</code>의 몫입니다). 끝없이 이어지는 카운터가 필요하다면
+    <code>range</code>를 <code>cycle</code>, <code>take</code>와 함께 쓰세요.
   </p>
 
-  <h2>Demo 1 · Counting up, down, and by steps</h2>
+  <h2>데모 1 · 올라가기, 내려가기, 간격 두고 세기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -90,11 +86,11 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Laziness in a chain</h2>
+  <h2>데모 2 · 체인 속의 지연 평가</h2>
   <p>
-    <code>range(1000000)</code> produces nothing up front — only the 4
-    elements <code>take(4)</code> asks for actually run through
-    <code>map</code>:
+    <code>range(1000000)</code>은 미리 아무것도 만들지 않습니다 —
+    <code>take(4)</code>가 요구하는 원소 4개만 실제로
+    <code>map</code>을 거칩니다:
   </p>
   <div class="playground">
 <textarea>
@@ -118,9 +114,9 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: build the even numbers from 2 to 10 inclusive using
-    <code>range</code>'s step argument.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>range</code>의 간격 인자를 써서 2부터 10까지(10 포함)의
+    짝수를 만들어 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -135,11 +131,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="repeat.html"><code>repeat</code></a> — a fixed value repeated n times ·
-    <a href="cycle.html"><code>cycle</code></a> — repeat a whole sequence forever ·
-    <a href="take.html"><code>take</code></a> — bound how much of a range you pull ·
-    <a href="fx.html"><code>fx</code></a> — the chain range is usually wrapped in
+    <strong>관련 함수:</strong>
+    <a href="repeat.html"><code>repeat</code></a> — 고정된 값을 n번 반복 ·
+    <a href="cycle.html"><code>cycle</code></a> — 시퀀스 전체를 무한히 반복 ·
+    <a href="take.html"><code>take</code></a> — 범위에서 얼마나 끌어올지 제한 ·
+    <a href="fx.html"><code>fx</code></a> — range를 대개 감싸게 되는 체인
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>every — FxDart 101</title>
-  <meta name="description" content="FxDart every tutorial: check that every element satisfies a predicate, short-circuiting on the first failure, sync and async.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/every.html">
+  <meta name="description" content="FxDart every 튜토리얼: 모든 원소가 술어를 만족하는지 검사하며 첫 실패에서 단축 평가합니다. 동기와 비동기 모두 다룹니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/every.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/every.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/every.html">
@@ -43,34 +42,33 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 8 · 접근 &amp; 술어 › <strong>every</strong></p>
   <h1><code>every</code></h1>
-  <p class="hero-sub">True when every element satisfies a predicate — vacuously true for an empty iterable.</p>
+  <p class="hero-sub">모든 원소가 술어를 만족할 때 true — 빈 이터러블이면 공허하게 참입니다.</p>
 
   <div class="signature">bool every&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;bool&gt; everyAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Future&lt;bool&gt; FxAsync.every(FutureOr&lt;bool&gt; Function(T a) f)  // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>every</code> scans left to right and bails out — short-circuits —
-    the instant it finds an element that fails the predicate, returning
-    <code>false</code> right there without touching the rest of the
-    iterable. If nothing fails (including the case where there's nothing at
-    all), it returns <code>true</code>: an empty iterable vacuously
-    satisfies "every element is X."
+    <code>every</code>는 왼쪽에서 오른쪽으로 훑다가 술어를 만족하지 못하는
+    원소를 만나는 즉시 빠져나옵니다 — 단축 평가입니다. 나머지 이터러블은
+    건드리지 않고 그 자리에서 <code>false</code>를 반환합니다. 실패하는
+    원소가 하나도 없으면(원소 자체가 아예 없는 경우까지 포함해서)
+    <code>true</code>를 반환합니다. 빈 이터러블은 "모든 원소가 X다"를
+    공허하게 만족하기 때문입니다.
   </p>
   <p>
-    On the sync chain there's no dedicated <code>Fx.every</code> — it isn't
-    needed, since <code>Fx</code> already inherits Dart's own
-    <code>Iterable.every</code>, which has exactly this short-circuiting
-    behavior. The async chain does define its own <code>.every()</code>,
-    because it has to <code>await</code> each predicate call.
+    동기 체인에는 전용 <code>Fx.every</code>가 없습니다 — 필요하지 않기
+    때문입니다. <code>Fx</code>는 이미 Dart 자체의
+    <code>Iterable.every</code>를 상속하고 있고, 그것이 정확히 이런 단축
+    평가 동작을 갖습니다. 반면 비동기 체인은 각 술어 호출을
+    <code>await</code>해야 하므로 자체 <code>.every()</code>를 정의합니다.
   </p>
 
-  <h2>Demo 1 · Basics &amp; short-circuiting</h2>
-  <p>The peek counter stops at 3, not 4 — evaluation halts right at the first failure:</p>
+  <h2>데모 1 · 기본과 단축 평가</h2>
+  <p>peek 카운터가 4가 아니라 3에서 멈춥니다 — 첫 실패 지점에서 평가가 중단됩니다:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -88,7 +86,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>데모 2 · 비동기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -108,8 +106,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>every</code> to check whether everyone passed (score &gt;= 60).</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>every</code>로 전원이 통과했는지(점수 &gt;= 60) 확인해 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -126,11 +124,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="some.html"><code>some</code></a> — the "at least one" counterpart ·
-    <a href="filter.html"><code>filter</code></a> — collect every match instead of a bool ·
-    <a href="find.html"><code>find</code></a> — get the first failing/matching element ·
-    <a href="predicates.html"><code>predicates</code></a> — ready-made predicates to pair with <code>every</code>
+    <strong>관련 항목:</strong>
+    <a href="some.html"><code>some</code></a> — "하나라도 만족하는가"에 대응하는 짝 ·
+    <a href="filter.html"><code>filter</code></a> — bool 대신 일치하는 원소를 모두 모읍니다 ·
+    <a href="find.html"><code>find</code></a> — 처음 실패하거나 일치하는 원소를 얻습니다 ·
+    <a href="predicates.html"><code>predicates</code></a> — <code>every</code>와 함께 쓰기 좋은 기성 술어들
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>findIndex — FxDart 101</title>
-  <meta name="description" content="FxDart findIndex tutorial: get the position of the first match, -1 when nothing matches, lazy and short-circuiting.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/findIndex.html">
+  <meta name="description" content="Tutorial de findIndex en FxDart: obtén la posición de la primera coincidencia, o -1 si no hay ninguna, de forma perezosa y con cortocircuito.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/findIndex.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/findIndex.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/findIndex.html">
@@ -43,34 +42,34 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 8 · Acceso &amp; predicados › <strong>findIndex</strong></p>
   <h1><code>findIndex</code></h1>
-  <p class="hero-sub">Returns the index of the first element for which a predicate is true, or <code>-1</code>.</p>
+  <p class="hero-sub">Devuelve el índice del primer elemento para el que el predicado es cierto, o <code>-1</code>.</p>
 
   <div class="signature">int findIndex&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;int&gt; findIndexAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 int Fx.findIndex(bool Function(T a) f)              // chain
 Future&lt;int&gt; FxAsync.findIndex(FutureOr&lt;bool&gt; Function(T a) f)  // chain</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>findIndex</code> is <code>find</code>'s sibling: same lazy,
-    short-circuiting scan, but it reports <em>where</em> the match was
-    instead of the match itself. Note the different "nothing found"
-    sentinel — this one is <code>-1</code>, an <code>int</code>, matching
-    JavaScript's <code>Array.prototype.findIndex</code>. That's a deliberate
-    contrast with <code>head</code>/<code>find</code>/<code>nth</code>,
-    which all use <code>null</code>: an index has a natural "impossible"
-    value, so FxDart keeps the FxTS convention here instead of inventing an
-    <code>int?</code> return type.
+    <code>findIndex</code> es el hermano de <code>find</code>: el mismo
+    recorrido perezoso y con cortocircuito, pero informa de <em>dónde</em>
+    estaba la coincidencia en vez de la coincidencia en sí. Fíjate en el
+    valor centinela distinto para "no encontrado" — aquí es <code>-1</code>,
+    un <code>int</code>, igual que el <code>Array.prototype.findIndex</code>
+    de JavaScript. Es un contraste deliberado con
+    <code>head</code>/<code>find</code>/<code>nth</code>, que todos usan
+    <code>null</code>: un índice tiene un valor "imposible" natural, así que
+    FxDart mantiene aquí la convención de FxTS en lugar de inventarse un tipo
+    de retorno <code>int?</code>.
   </p>
   <p>
-    Internally it pairs each element with its index (via <code>zipWithIndex</code>)
-    and stops at the first one that passes <code>f</code>.
+    Por dentro empareja cada elemento con su índice (mediante <code>zipWithIndex</code>)
+    y se detiene en el primero que pasa <code>f</code>.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -83,7 +82,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Short-circuiting &amp; async</h2>
+  <h2>Demo 2 · Cortocircuito &amp; asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -105,8 +104,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>findIndex</code> to find bob's position in the queue, or <code>-1</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>findIndex</code> para encontrar la posición de bob en la cola, o <code>-1</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -123,11 +122,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="find.html"><code>find</code></a> — same search, returns the value ·
-    <a href="includes.html"><code>includes</code></a> — just "is it there?" ·
-    <a href="nth.html"><code>nth</code></a> — the inverse: index in, value out ·
-    <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — what powers this under the hood
+    <strong>Relacionado:</strong>
+    <a href="find.html"><code>find</code></a> — la misma búsqueda, pero devuelve el valor ·
+    <a href="includes.html"><code>includes</code></a> — solo "¿está o no?" ·
+    <a href="nth.html"><code>nth</code></a> — el inverso: entra un índice, sale un valor ·
+    <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — lo que lo hace funcionar por dentro
   </div>
 
   <nav class="tut-nav">

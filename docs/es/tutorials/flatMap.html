@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>flatMap — FxDart 101</title>
-  <meta name="description" content="FxDart flatMap tutorial: map each element to an iterable and flatten one level, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/flatMap.html">
+  <meta name="description" content="Tutorial de flatMap en FxDart: transforma cada elemento en un iterable y aplana un nivel, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/flatMap.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/flatMap.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/flatMap.html">
@@ -43,50 +42,49 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 3 · Transformar › <strong>flatMap</strong></p>
   <h1><code>flatMap</code></h1>
-  <p class="hero-sub">Maps each element to an iterable, then flattens the results one level — the same contract as <code>Iterable.expand</code>.</p>
+  <p class="hero-sub">Transforma cada elemento en un iterable y luego aplana los resultados un nivel — el mismo contrato que <code>Iterable.expand</code>.</p>
 
   <div class="signature">Iterable&lt;B&gt; flatMap&lt;A, B&gt;(Iterable&lt;B&gt; Function(A a) f, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;B&gt; flatMapAsync&lt;A, B&gt;(FutureOr&lt;Iterable&lt;B&gt;&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;R&gt; Fx.flatMap&lt;R&gt;(Iterable&lt;R&gt; Function(T a) f)        // chain
 FxAsync&lt;R&gt; FxAsync.flatMap&lt;R&gt;(FutureOr&lt;Iterable&lt;R&gt;&gt; Function(T a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>flatMap</code> is <code>map</code> followed by one level of
-    flattening: each element is turned into a <em>collection</em> of
-    results, and those collections are spliced together into a single flat
-    lazy sequence. It's the tool for "one input, many outputs" — splitting a
-    sentence into words, expanding a user into their orders, turning a range
-    into pairs.
+    <code>flatMap</code> es <code>map</code> seguido de un nivel de
+    aplanado: cada elemento se convierte en una <em>colección</em> de
+    resultados, y esas colecciones se empalman en una única secuencia
+    perezosa y plana. Es la herramienta para «una entrada, muchas salidas»:
+    partir una frase en palabras, expandir un usuario en sus pedidos, convertir
+    un rango en pares.
   </p>
   <p>
-    <strong>FxTS deviation:</strong> in FxTS, the callback can return any mix
-    of plain values and iterables and <code>flatMap</code> figures out what
-    to flatten via <code>DeepFlat</code> type magic. Dart has no equivalent
-    of that conditional type, so the Dart port requires <code>f</code> to
-    <em>always</em> return an <code>Iterable&lt;B&gt;</code> — exactly like
+    <strong>Desviación respecto a FxTS:</strong> en FxTS, el callback puede devolver cualquier mezcla
+    de valores sueltos e iterables y <code>flatMap</code> deduce qué
+    aplanar mediante la magia de tipos de <code>DeepFlat</code>. Dart no tiene equivalente
+    de ese tipo condicional, así que el port a Dart exige que <code>f</code>
+    devuelva <em>siempre</em> un <code>Iterable&lt;B&gt;</code> — exactamente como
     <a href="https://api.dart.dev/stable/dart-core/Iterable/expand.html"><code>Iterable.expand</code></a>.
-    Return a single-element list (<code>[x]</code>) to emit exactly one
-    value per input, or an empty list to emit none.
+    Devuelve una lista de un solo elemento (<code>[x]</code>) para emitir exactamente un
+    valor por entrada, o una lista vacía para no emitir ninguno.
   </p>
   <p>
-    On the async side, <code>flatMapAsync</code>'s internal state machine
-    has to track "which sub-iterable am I currently draining" between pulls,
-    so it consumes its upstream <em>serially</em> — wrapping it in
-    <code>.concurrent(n)</code> only speeds up pulling already-available
-    items, not an <code>await</code> that happens inside the callback
-    itself. If you need concurrent async work per element, do that work in
-    a <code>.map(...).concurrent(n)</code> stage first, then
-    <code>.flatMap((list) =&gt; list)</code> to flatten the already-resolved
-    lists — see Demo 2.
+    En el lado asíncrono, la máquina de estados interna de <code>flatMapAsync</code>
+    tiene que recordar «qué subiterable estoy vaciando ahora mismo» entre extracciones,
+    así que consume su fuente <em>en serie</em>: envolverlo en
+    <code>.concurrent(n)</code> solo acelera la extracción de elementos
+    ya disponibles, no un <code>await</code> que ocurra dentro del propio
+    callback. Si necesitas trabajo asíncrono concurrente por elemento, hazlo en
+    una etapa <code>.map(...).concurrent(n)</code> previa y después
+    <code>.flatMap((list) =&gt; list)</code> para aplanar las
+    listas ya resueltas — mira la Demo 2.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
-  <p>The callback must return an <code>Iterable</code> — here, a 2-element
-    list and a call to <code>String.split</code>:</p>
+  <h2>Demo 1 · Fundamentos</h2>
+  <p>El callback debe devolver un <code>Iterable</code>: aquí, una lista de
+    2 elementos y una llamada a <code>String.split</code>:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -106,10 +104,10 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, the right way to get concurrency</h2>
+  <h2>Demo 2 · Asíncrono, la forma correcta de obtener concurrencia</h2>
   <p>
-    Put the slow <code>await</code> in a <code>.map(...).concurrent(n)</code>
-    stage; let <code>flatMap</code> flatten the results synchronously:
+    Pon el <code>await</code> lento en una etapa <code>.map(...).concurrent(n)</code>
+    y deja que <code>flatMap</code> aplane los resultados de forma síncrona:
   </p>
   <div class="playground">
 <textarea>
@@ -135,9 +133,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>flatMap</code> to split each sentence into words,
-    producing one flat list of words.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>flatMap</code> para partir cada frase en palabras,
+    produciendo una única lista plana de palabras.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -155,11 +153,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="map.html"><code>map</code></a> — transform without flattening ·
-    <a href="flat.html"><code>flat</code></a> — flatten an already-nested iterable ·
-    <a href="mapEffect.html"><code>mapEffect</code></a> — map for side effects ·
-    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
+    <strong>Relacionado:</strong>
+    <a href="map.html"><code>map</code></a> — transformar sin aplanar ·
+    <a href="flat.html"><code>flat</code></a> — aplanar un iterable ya anidado ·
+    <a href="mapEffect.html"><code>mapEffect</code></a> — map para efectos secundarios ·
+    <a href="concurrent.html"><code>concurrent</code></a> — evaluación en paralelo
   </div>
 
   <nav class="tut-nav">

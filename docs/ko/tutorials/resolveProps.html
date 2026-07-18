@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>resolveProps — FxDart 101</title>
-  <meta name="description" content="FxDart resolveProps tutorial: await every value in a Map at once, the map-shaped analogue of Future.wait.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/resolveProps.html">
+  <meta name="description" content="FxDart resolveProps 튜토리얼: Map의 모든 값을 한 번에 await합니다. Future.wait의 맵 버전입니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/resolveProps.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/resolveProps.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/resolveProps.html">
@@ -43,36 +42,34 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 9 · 객체(Map) 함수 › <strong>resolveProps</strong></p>
   <h1><code>resolveProps</code></h1>
-  <p class="hero-sub">Awaits every value of a <code>Map</code> and returns the resolved <code>Map</code> — the map-shaped analogue of <code>Future.wait</code>.</p>
+  <p class="hero-sub"><code>Map</code>의 모든 값을 await한 뒤 값이 모두 채워진 <code>Map</code>을 반환합니다 — <code>Future.wait</code>의 맵 버전입니다.</p>
 
   <div class="signature">Future&lt;Map&lt;K, V&gt;&gt; resolveProps&lt;K, V&gt;(Map&lt;K, FutureOr&lt;V&gt;&gt; map)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>resolveProps</code> solves a specific, common shape of problem:
-    you have a <code>Map</code> whose values are a mix of plain values and
-    <code>Future</code>s — say, several independent API calls keyed by
-    field name — and you want one <code>Future</code> back for the whole,
-    fully-resolved map.
+    <code>resolveProps</code>는 아주 구체적이면서도 흔한 형태의 문제를
+    해결합니다. 값이 일반 값과 <code>Future</code>가 섞여 있는
+    <code>Map</code>이 있고 — 예를 들어 필드 이름을 키로 삼은 여러 개의
+    독립적인 API 호출 — 값이 전부 채워진 맵 전체를 하나의
+    <code>Future</code>로 돌려받고 싶을 때입니다.
   </p>
   <p>
-    Internally it loops over the entries and <code>await</code>s each value
-    in turn, which reads like it should be <em>sequential</em>. In
-    practice, it usually isn't slower than doing them all "at once": a Dart
-    <code>Future</code> starts running the moment it's <em>created</em>, not
-    when it's awaited. So if you build the map with
-    <code>delay(...)</code> or already-in-flight requests as its values —
-    the normal way to call this function — every one of them is already
-    racing by the time <code>resolveProps</code> gets the map; its
-    sequential <code>await</code> loop is just reading off results that are
-    largely ready already, not gating when the work starts. The demo below
-    proves this with a stopwatch.
+    내부 구현은 엔트리를 순회하면서 각 값을 차례로 <code>await</code>합니다.
+    읽어 보면 <em>순차 실행</em>처럼 보이지만, 실제로는 전부 "한꺼번에"
+    처리하는 것보다 느리지 않은 경우가 대부분입니다. Dart의
+    <code>Future</code>는 await될 때가 아니라 <em>생성되는</em> 순간부터
+    실행되기 때문입니다. 그래서 <code>delay(...)</code>나 이미 진행 중인
+    요청을 값으로 넣어 맵을 만들었다면 — 이 함수를 쓰는 일반적인 방식이죠 —
+    <code>resolveProps</code>가 맵을 받는 시점에는 이미 모두가 함께
+    달리고 있습니다. 순차적인 <code>await</code> 루프는 작업 시작 시점을
+    가로막는 것이 아니라, 대체로 이미 준비된 결과를 차례로 읽어 낼 뿐입니다.
+    아래 데모에서 스톱워치로 이를 확인할 수 있습니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -88,8 +85,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Demo 2 · The futures already overlap</h2>
-  <p>Three 100ms delays, but the whole thing finishes well under 300ms — because they all started together:</p>
+  <h2>데모 2 · Future들은 이미 겹쳐서 실행됩니다</h2>
+  <p>100ms 지연이 세 개지만 전체가 300ms에 한참 못 미쳐 끝납니다 — 모두 함께 시작했기 때문입니다.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -109,8 +106,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>resolveProps</code> to await every value in <code>requests</code>.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>resolveProps</code>로 <code>requests</code>의 모든 값을 await해 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -130,11 +127,11 @@ Future<void> main() async {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="evolve.html"><code>evolve</code></a> — the sync cousin, transforming instead of awaiting ·
-    <a href="concurrent.html"><code>concurrent</code></a> — the iterable-shaped version of "run things together" ·
-    <a href="delay.html"><code>delay &amp; sleep</code></a> — used to build the demo futures ·
-    <a href="fromEntries.html"><code>fromEntries</code></a> — build a Map from scratch
+    <strong>관련 항목:</strong>
+    <a href="evolve.html"><code>evolve</code></a> — await 대신 변환을 하는 동기 버전 ·
+    <a href="concurrent.html"><code>concurrent</code></a> — "함께 실행하기"의 이터러블 버전 ·
+    <a href="delay.html"><code>delay &amp; sleep</code></a> — 데모의 Future를 만드는 데 사용 ·
+    <a href="fromEntries.html"><code>fromEntries</code></a> — Map을 처음부터 만들기
   </div>
 
   <nav class="tut-nav">

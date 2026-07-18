@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>unless — FxDart 101</title>
-  <meta name="description" content="FxDart unless tutorial: apply a transform only when a predicate fails, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/unless.html">
+  <meta name="description" content="Tutorial de unless en FxDart: aplica una transformación solo cuando un predicado no se cumple, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/unless.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/unless.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/unless.html">
@@ -43,30 +42,29 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 10 · Utilidades de funciones › <strong>unless</strong></p>
   <h1><code>unless</code></h1>
-  <p class="hero-sub">Applies a callback when a predicate fails, otherwise returns the value unchanged.</p>
+  <p class="hero-sub">Aplica un callback cuando el predicado no se cumple; en caso contrario devuelve el valor sin tocar.</p>
 
   <div class="signature">T unless&lt;T&gt;(bool Function(T) predicate, T Function(T) callback, T value)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>unless</code> is <a href="when.html"><code>when</code></a> with the
-    condition flipped: <code>unless(predicate, callback, value)</code> runs
-    <code>callback(value)</code> when <code>predicate(value)</code> is
-    <strong>false</strong>, and returns <code>value</code> untouched when the
-    predicate holds. It reads well for "fill in a default unless this
-    condition is already satisfied" — validation, backfilling missing data,
-    normalizing edge cases.
+    <code>unless</code> es <a href="when.html"><code>when</code></a> con la
+    condición invertida: <code>unless(predicate, callback, value)</code> ejecuta
+    <code>callback(value)</code> cuando <code>predicate(value)</code> es
+    <strong>false</strong>, y devuelve <code>value</code> intacto cuando el
+    predicado se cumple. Se lee muy bien para "pon un valor por defecto salvo que
+    esta condición ya se cumpla": validación, relleno de datos que faltan,
+    normalización de casos límite.
   </p>
   <p>
-    Like <code>when</code>, both branches must return the same type
-    <code>T</code> in Dart (no union return types), and there's no chain
-    form — it's a plain data-first function.
+    Como en <code>when</code>, en Dart ambas ramas deben devolver el mismo tipo
+    <code>T</code> (no hay tipos de retorno unión), y no existe forma
+    encadenable — es una función data-first normal y corriente.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -80,7 +78,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Backfilling missing data</h2>
+  <h2>Demo 2 · Rellenar datos que faltan</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -95,9 +93,9 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>unless</code> to fill in <code>'general'</code> for
-    any tag that hasn't been set.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>unless</code> para poner <code>'general'</code> en
+    cualquier etiqueta que no se haya establecido.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -116,11 +114,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="when.html"><code>when</code></a> — the inverse-condition sibling of unless ·
-    <a href="cases.html"><code>cases</code></a> — multiple predicates instead of just one ·
-    <a href="throwIf.html"><code>throwIf</code></a> — throw instead of substituting a value ·
-    <a href="compact.html"><code>compact</code></a> — drop missing values instead of filling them in
+    <strong>Relacionado:</strong>
+    <a href="when.html"><code>when</code></a> — el hermano de unless con la condición inversa ·
+    <a href="cases.html"><code>cases</code></a> — varios predicados en lugar de uno solo ·
+    <a href="throwIf.html"><code>throwIf</code></a> — lanza en vez de sustituir el valor ·
+    <a href="compact.html"><code>compact</code></a> — descarta los valores ausentes en lugar de rellenarlos
   </div>
 
   <nav class="tut-nav">

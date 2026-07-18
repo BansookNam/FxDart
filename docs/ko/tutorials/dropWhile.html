@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>dropWhile — FxDart 101</title>
-  <meta name="description" content="FxDart dropWhile tutorial: skip values while a predicate holds, then yield the rest, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/dropWhile.html">
+  <meta name="description" content="FxDart dropWhile 튜토리얼: 술어가 참인 동안 값을 건너뛰고 그 뒤를 모두 내보내는 방법을 라이브 플레이그라운드와 함께 익힙니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/dropWhile.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/dropWhile.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/dropWhile.html">
@@ -43,35 +42,33 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 5 · 잘라내기 › <strong>dropWhile</strong></p>
   <h1><code>dropWhile</code></h1>
-  <p class="hero-sub">Skips values while a predicate returns true, then yields everything after — matches or not.</p>
+  <p class="hero-sub">술어가 true를 반환하는 동안 값을 건너뛰고, 그 뒤로는 술어에 맞든 아니든 모두 내보냅니다.</p>
 
   <div class="signature">Iterable&lt;A&gt; dropWhile&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; dropWhileAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.dropWhile(bool Function(T a) f)        // chain — also aliased as Fx.skipWhile
 FxAsync&lt;T&gt; FxAsync.dropWhile(FutureOr&lt;bool&gt; Function(T a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>dropWhile</code> is <code>takeWhile</code>'s mirror: it skips
-    elements as long as the predicate holds, then — the moment it hits one
-    that fails — switches into "yield everything" mode for good. That
-    switch-over is permanent: once <code>dropWhile</code> starts passing
-    values through, it never goes back to dropping, even if a later element
-    would also have matched.
+    <code>dropWhile</code>은 <code>takeWhile</code>을 뒤집은 함수입니다.
+    술어가 참인 동안은 원소를 건너뛰다가, 술어가 거짓이 되는 원소를 만나는
+    순간부터 "전부 내보내기" 모드로 완전히 전환합니다. 이 전환은 되돌릴 수
+    없습니다. <code>dropWhile</code>이 한 번 값을 흘려보내기 시작하면,
+    뒤에 술어에 맞는 원소가 다시 나오더라도 다시 버리지 않습니다.
   </p>
   <p>
-    Reach for it to strip a variable-length prefix you can't count in
-    advance — leading whitespace-like tokens, header rows, a warm-up period
-    in a metrics stream. On the <code>Fx</code> chain it's also available as
-    <code>skipWhile</code>, matching <code>Iterable.skipWhile</code>.
+    개수를 미리 셀 수 없는 가변 길이의 앞부분을 잘라낼 때 꺼내 쓰세요.
+    공백처럼 앞에 붙는 토큰, 헤더 행, 지표 스트림의 예열 구간 같은
+    경우입니다. <code>Fx</code> 체인에서는 <code>Iterable.skipWhile</code>에
+    맞춘 <code>skipWhile</code>이라는 이름으로도 쓸 수 있습니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
-  <p>Once dropping stops at <code>3</code>, later matching values
-    (<code>2</code> at the end) are kept, not dropped again:</p>
+  <h2>데모 1 · 기본</h2>
+  <p><code>3</code>에서 버리기가 멈춘 뒤로는 술어에 맞는 값
+    (끝에 있는 <code>2</code>)도 다시 버려지지 않고 그대로 남습니다:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -87,7 +84,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>데모 2 · 비동기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -104,9 +101,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: drop temperatures while they stay below 25, then keep the
-    rest.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 온도가 25 미만인 동안은 버리고, 그 뒤로는 모두
+    남겨 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -123,11 +120,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="takeWhile.html"><code>takeWhile</code></a> — the inverse ·
-    <a href="dropUntil.html"><code>dropUntil</code></a> — also drops the matching element ·
-    <a href="drop.html"><code>drop</code></a> — drop by fixed count ·
-    <a href="filter.html"><code>filter</code></a> — drop matches everywhere, not just a prefix
+    <strong>관련 함수:</strong>
+    <a href="takeWhile.html"><code>takeWhile</code></a> — 정반대 동작 ·
+    <a href="dropUntil.html"><code>dropUntil</code></a> — 술어에 맞은 원소까지 버립니다 ·
+    <a href="drop.html"><code>drop</code></a> — 정해진 개수만큼 버립니다 ·
+    <a href="filter.html"><code>filter</code></a> — 앞부분만이 아니라 어디서든 맞는 값을 버립니다
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>flatMap — FxDart 101</title>
-  <meta name="description" content="FxDart flatMap tutorial: map each element to an iterable and flatten one level, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/flatMap.html">
+  <meta name="description" content="FxDart flatMap 튜토리얼: 각 원소를 이터러블로 매핑한 뒤 한 단계 평탄화합니다. 라이브 플레이그라운드 포함.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/flatMap.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/flatMap.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/flatMap.html">
@@ -43,50 +42,48 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 3 · 변환 › <strong>flatMap</strong></p>
   <h1><code>flatMap</code></h1>
-  <p class="hero-sub">Maps each element to an iterable, then flattens the results one level — the same contract as <code>Iterable.expand</code>.</p>
+  <p class="hero-sub">각 원소를 이터러블로 매핑한 다음 결과를 한 단계 평탄화합니다 — <code>Iterable.expand</code>와 동일한 계약입니다.</p>
 
   <div class="signature">Iterable&lt;B&gt; flatMap&lt;A, B&gt;(Iterable&lt;B&gt; Function(A a) f, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;B&gt; flatMapAsync&lt;A, B&gt;(FutureOr&lt;Iterable&lt;B&gt;&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;R&gt; Fx.flatMap&lt;R&gt;(Iterable&lt;R&gt; Function(T a) f)        // chain
 FxAsync&lt;R&gt; FxAsync.flatMap&lt;R&gt;(FutureOr&lt;Iterable&lt;R&gt;&gt; Function(T a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>flatMap</code> is <code>map</code> followed by one level of
-    flattening: each element is turned into a <em>collection</em> of
-    results, and those collections are spliced together into a single flat
-    lazy sequence. It's the tool for "one input, many outputs" — splitting a
-    sentence into words, expanding a user into their orders, turning a range
-    into pairs.
+    <code>flatMap</code>은 <code>map</code> 뒤에 한 단계 평탄화를 붙인 것입니다.
+    각 원소가 결과의 <em>컬렉션</em>으로 바뀌고, 그 컬렉션들이 이어 붙여져
+    하나의 평평한 지연 시퀀스가 됩니다. "입력 하나에 출력 여럿"이 필요할 때
+    쓰는 도구입니다 — 문장을 단어로 쪼개거나, 사용자를 주문 목록으로 펼치거나,
+    범위를 쌍으로 바꾸는 식이죠.
   </p>
   <p>
-    <strong>FxTS deviation:</strong> in FxTS, the callback can return any mix
-    of plain values and iterables and <code>flatMap</code> figures out what
-    to flatten via <code>DeepFlat</code> type magic. Dart has no equivalent
-    of that conditional type, so the Dart port requires <code>f</code> to
-    <em>always</em> return an <code>Iterable&lt;B&gt;</code> — exactly like
-    <a href="https://api.dart.dev/stable/dart-core/Iterable/expand.html"><code>Iterable.expand</code></a>.
-    Return a single-element list (<code>[x]</code>) to emit exactly one
-    value per input, or an empty list to emit none.
+    <strong>FxTS와 다른 점:</strong> FxTS에서는 콜백이 일반 값과 이터러블을
+    섞어서 반환해도 <code>flatMap</code>이 <code>DeepFlat</code> 타입 마법으로
+    무엇을 평탄화할지 알아냅니다. Dart에는 그런 조건부 타입이 없기 때문에,
+    Dart 포팅판은 <code>f</code>가 <em>항상</em>
+    <code>Iterable&lt;B&gt;</code>를 반환하도록 요구합니다 —
+    <a href="https://api.dart.dev/stable/dart-core/Iterable/expand.html"><code>Iterable.expand</code></a>와
+    똑같습니다. 입력 하나당 값 하나만 내보내려면 원소가 하나인 리스트
+    (<code>[x]</code>)를, 아무것도 내보내지 않으려면 빈 리스트를 반환하세요.
   </p>
   <p>
-    On the async side, <code>flatMapAsync</code>'s internal state machine
-    has to track "which sub-iterable am I currently draining" between pulls,
-    so it consumes its upstream <em>serially</em> — wrapping it in
-    <code>.concurrent(n)</code> only speeds up pulling already-available
-    items, not an <code>await</code> that happens inside the callback
-    itself. If you need concurrent async work per element, do that work in
-    a <code>.map(...).concurrent(n)</code> stage first, then
-    <code>.flatMap((list) =&gt; list)</code> to flatten the already-resolved
-    lists — see Demo 2.
+    비동기 쪽에서는 <code>flatMapAsync</code>의 내부 상태 머신이 pull 사이사이에
+    "지금 어느 하위 이터러블을 소진하는 중인지"를 추적해야 하므로 상류를
+    <em>직렬로</em> 소비합니다. 여기에 <code>.concurrent(n)</code>을 감싸면
+    이미 준비된 항목을 끌어오는 속도만 빨라질 뿐, 콜백 안에서 일어나는
+    <code>await</code> 자체는 빨라지지 않습니다. 원소마다 비동기 작업을
+    동시에 처리하고 싶다면 그 작업을 먼저
+    <code>.map(...).concurrent(n)</code> 단계에서 수행한 뒤, 이미 완료된
+    리스트들을 <code>.flatMap((list) =&gt; list)</code>로 평탄화하세요 —
+    데모 2를 보세요.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
-  <p>The callback must return an <code>Iterable</code> — here, a 2-element
-    list and a call to <code>String.split</code>:</p>
+  <h2>데모 1 · 기본</h2>
+  <p>콜백은 반드시 <code>Iterable</code>을 반환해야 합니다 — 여기서는 원소 2개짜리
+    리스트와 <code>String.split</code> 호출을 씁니다:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -106,10 +103,10 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, the right way to get concurrency</h2>
+  <h2>데모 2 · 비동기, 동시성을 제대로 얻는 방법</h2>
   <p>
-    Put the slow <code>await</code> in a <code>.map(...).concurrent(n)</code>
-    stage; let <code>flatMap</code> flatten the results synchronously:
+    느린 <code>await</code>는 <code>.map(...).concurrent(n)</code> 단계에 두고,
+    <code>flatMap</code>은 그 결과를 동기적으로 평탄화하게 하세요:
   </p>
   <div class="playground">
 <textarea>
@@ -135,9 +132,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>flatMap</code> to split each sentence into words,
-    producing one flat list of words.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>flatMap</code>으로 각 문장을 단어로 쪼개어
+    하나의 평평한 단어 리스트를 만들어 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -155,11 +152,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="map.html"><code>map</code></a> — transform without flattening ·
-    <a href="flat.html"><code>flat</code></a> — flatten an already-nested iterable ·
-    <a href="mapEffect.html"><code>mapEffect</code></a> — map for side effects ·
-    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
+    <strong>관련 함수:</strong>
+    <a href="map.html"><code>map</code></a> — 평탄화 없이 변환 ·
+    <a href="flat.html"><code>flat</code></a> — 이미 중첩된 이터러블을 평탄화 ·
+    <a href="mapEffect.html"><code>mapEffect</code></a> — 부수 효과를 위한 map ·
+    <a href="concurrent.html"><code>concurrent</code></a> — 병렬 평가
   </div>
 
   <nav class="tut-nav">

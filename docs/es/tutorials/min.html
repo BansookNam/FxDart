@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>min — FxDart 101</title>
-  <meta name="description" content="FxDart min tutorial: the smallest number in a pipeline, +infinity when empty, NaN-poisoned, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/min.html">
+  <meta name="description" content="Tutorial de min en FxDart: el número más pequeño de un pipeline, +infinito cuando está vacío, envenenado por NaN, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/min.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/min.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/min.html">
@@ -43,47 +42,46 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>min</strong></p>
   <h1><code>min</code></h1>
-  <p class="hero-sub">The smallest number in the pipeline — with FxTS's exact quirks on empty and <code>NaN</code> input.</p>
+  <p class="hero-sub">El número más pequeño del pipeline, con las rarezas exactas de FxTS ante entradas vacías y <code>NaN</code>.</p>
 
   <div class="signature">num min(Iterable&lt;num&gt; iterable)
 Future&lt;num&gt; minAsync(FxAsyncIterable&lt;num&gt; iterable)
 num Fx&lt;num&gt;.min()          // chain (sync)
 Future&lt;num&gt; FxAsync&lt;num&gt;.min()  // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>min</code> is a terminal, numeric-only fold — internally it's
-    <code>fold(double.infinity, ..., iterable)</code>, comparing each element
-    against a running minimum that starts at <code>+infinity</code>.
+    <code>min</code> es un fold terminal, solo numérico: internamente es
+    <code>fold(double.infinity, ..., iterable)</code>, y compara cada elemento
+    contra un mínimo acumulado que empieza en <code>+infinity</code>.
   </p>
   <p>
-    Two behaviors are worth memorizing, because they surprise people coming
-    from a "safe" API and are ported <strong>faithfully from FxTS</strong>:
+    Merece la pena memorizar dos comportamientos, porque sorprenden a quien
+    viene de una API «segura» y están portados <strong>fielmente desde FxTS</strong>:
   </p>
   <ul>
     <li>
-      An <strong>empty</strong> iterable returns <code>double.infinity</code>
-      — not <code>null</code>, not an error. That's simply what the fold seed
-      is when nothing ever beats it.
+      Un iterable <strong>vacío</strong> devuelve <code>double.infinity</code>:
+      ni <code>null</code>, ni un error. Es simplemente el valor inicial del fold
+      cuando nada llega a superarlo.
     </li>
     <li>
-      A single <code>NaN</code> anywhere in the iterable
-      <strong>poisons</strong> the whole result to <code>NaN</code> — every
-      comparison against <code>NaN</code> is false, so once it's the running
-      minimum (or shows up as a candidate), it stays <code>NaN</code> forever.
+      Un solo <code>NaN</code> en cualquier punto del iterable
+      <strong>envenena</strong> todo el resultado y lo convierte en <code>NaN</code>: toda
+      comparación contra <code>NaN</code> es falsa, así que en cuanto pasa a ser el mínimo
+      acumulado (o aparece como candidato), se queda en <code>NaN</code> para siempre.
     </li>
   </ul>
   <p>
-    If you need "smallest, or <code>null</code> if empty" semantics instead,
-    check <code>result.isInfinite</code> yourself, or reach for
+    Si lo que necesitas es la semántica «el más pequeño, o <code>null</code> si está vacío»,
+    comprueba tú mismo <code>result.isInfinite</code>, o recurre a
     <code><a href="find.html">find</a></code> /
-    <code><a href="reduce.html">reduce</a></code> with your own comparator.
+    <code><a href="reduce.html">reduce</a></code> con tu propio comparador.
   </p>
 
-  <h2>Demo 1 · Basics, empty, and NaN</h2>
+  <h2>Demo 1 · Fundamentos, vacío y NaN</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -104,7 +102,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -120,8 +118,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: find the <strong>cheapest</strong> price among the products.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: encuentra el precio <strong>más barato</strong> entre los productos.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -142,10 +140,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="max.html"><code>max</code></a> — the mirror image ·
-    <a href="sum.html"><code>sum</code></a> · <a href="average.html"><code>average</code></a> — the other numeric terminals ·
-    <a href="find.html"><code>find</code></a> — for a null-safe "smallest matching" search
+    <strong>Relacionado:</strong>
+    <a href="max.html"><code>max</code></a> — la imagen especular ·
+    <a href="sum.html"><code>sum</code></a> · <a href="average.html"><code>average</code></a> — los otros terminales numéricos ·
+    <a href="find.html"><code>find</code></a> — para una búsqueda del «menor que coincide» a prueba de nulls
   </div>
 
   <nav class="tut-nav">

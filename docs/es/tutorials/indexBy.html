@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>indexBy — FxDart 101</title>
-  <meta name="description" content="FxDart indexBy tutorial: index every element by a computed key into a Map, last one wins, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/indexBy.html">
+  <meta name="description" content="Tutorial de indexBy en FxDart: indexa cada elemento por una clave calculada en un Map, donde gana el último duplicado, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/indexBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/indexBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/indexBy.html">
@@ -43,40 +42,41 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>indexBy</strong></p>
   <h1><code>indexBy</code></h1>
-  <p class="hero-sub">Indexes every element by a computed key into a <code>Map&lt;K, A&gt;</code> — last duplicate wins.</p>
+  <p class="hero-sub">Indexa cada elemento por una clave calculada en un <code>Map&lt;K, A&gt;</code> — gana el último duplicado.</p>
 
   <div class="signature">Map&lt;K, A&gt; indexBy&lt;A, K&gt;(K Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;Map&lt;K, A&gt;&gt; indexByAsync&lt;A, K&gt;(FutureOr&lt;K&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Map&lt;K, T&gt; Fx.indexBy&lt;K&gt;(K Function(T a) f)          // chain (sync)
 Future&lt;Map&lt;K, T&gt;&gt; FxAsync.indexBy&lt;K&gt;(FutureOr&lt;K&gt; Function(T a) f)  // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>indexBy</code> is <code><a href="groupBy.html">groupBy</a></code>'s
-    sibling: same idea — pull the whole pipeline, compute a key for each
-    element — but instead of collecting a <em>list</em> per key, it keeps
-    exactly <strong>one</strong> value per key: <code>Map&lt;K, A&gt;</code>
-    rather than <code>Map&lt;K, List&lt;A&gt;&gt;</code>.
+    <code>indexBy</code> es el hermano de
+    <code><a href="groupBy.html">groupBy</a></code>: la misma idea — tirar de
+    todo el pipeline y calcular una clave por elemento — pero en vez de
+    reunir una <em>lista</em> por clave, guarda exactamente
+    <strong>un</strong> valor por clave: <code>Map&lt;K, A&gt;</code> en lugar
+    de <code>Map&lt;K, List&lt;A&gt;&gt;</code>.
   </p>
   <p>
-    That means duplicates don't accumulate — they overwrite. If two elements
-    produce the same key, whichever one is processed <strong>last</strong>
-    (i.e. appears later in the iterable) is the one left in the map. This is
-    the natural behavior of repeatedly doing <code>result[key(a)] = a</code>
-    while walking forward, and it matches FxTS. Reach for
-    <code>indexBy</code> specifically when you know keys should be unique
-    (like a database ID) and you want direct <code>O(1)</code> lookup instead
-    of a list you'd have to search.
+    Eso significa que los duplicados no se acumulan: se sobrescriben. Si dos
+    elementos producen la misma clave, el que se procese en
+    <strong>último</strong> lugar (es decir, el que aparece después en el
+    iterable) es el que queda en el map. Es el comportamiento natural de ir
+    haciendo <code>result[key(a)] = a</code> mientras se avanza, y coincide
+    con FxTS. Recurre a <code>indexBy</code> precisamente cuando sepas que las
+    claves deben ser únicas (como un ID de base de datos) y quieres una
+    búsqueda directa <code>O(1)</code> en vez de una lista en la que tendrías
+    que buscar.
   </p>
   <p>
-    If you actually expect duplicate keys and want to keep every value, use
-    <code>groupBy</code> instead — it never discards anything.
+    Si de verdad esperas claves duplicadas y quieres conservar todos los
+    valores, usa <code>groupBy</code> en su lugar — nunca descarta nada.
   </p>
 
-  <h2>Demo 1 · Basics &amp; last-wins</h2>
+  <h2>Demo 1 · Fundamentos &amp; gana el último</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -100,7 +100,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -118,8 +118,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: index the users <strong>by their id</strong>, so you can look one up directly.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: indexa los usuarios <strong>por su id</strong>, para poder buscar uno directamente.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -140,10 +140,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="groupBy.html"><code>groupBy</code></a> — keeps every duplicate instead of overwriting ·
-    <a href="countBy.html"><code>countBy</code></a> — tally instead of keeping the value ·
-    <a href="fromEntries.html"><code>fromEntries</code></a> — build a Map from key/value pairs directly
+    <strong>Relacionado:</strong>
+    <a href="groupBy.html"><code>groupBy</code></a> — conserva todos los duplicados en lugar de sobrescribirlos ·
+    <a href="countBy.html"><code>countBy</code></a> — cuenta en vez de conservar el valor ·
+    <a href="fromEntries.html"><code>fromEntries</code></a> — construye un Map directamente a partir de pares clave/valor
   </div>
 
   <nav class="tut-nav">

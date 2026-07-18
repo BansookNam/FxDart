@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>concurrent — FxDart 101</title>
-  <meta name="description" content="FxDart concurrent tutorial: run n async elements at once while preserving order, the concurrency-marker model, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/concurrent.html">
+  <meta name="description" content="Tutorial de concurrent en FxDart: evalúa n elementos asíncronos a la vez preservando el orden, con el modelo de marcador de concurrencia y un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/concurrent.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/concurrent.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/concurrent.html">
@@ -43,51 +42,50 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 11 · Async &amp; concurrencia › <strong>concurrent</strong></p>
   <h1><code>concurrent</code></h1>
-  <p class="hero-sub">Evaluates up to n elements of an async pipeline at once, while the result still arrives in source order.</p>
+  <p class="hero-sub">Evalúa hasta n elementos de un pipeline asíncrono a la vez, y aun así los resultados llegan en el orden de la fuente.</p>
 
   <div class="signature">FxAsyncIterable&lt;A&gt; concurrentAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
 FxAsync&lt;T&gt; FxAsync.concurrent(int length)        // chain</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>concurrent(n)</code> is FxDart's answer to "run several async steps
-    in parallel, but keep the results in order." It works through the
-    <strong>concurrency-marker</strong> model baked into
-    <code>FxAsyncIterator.next([Concurrent? concurrent])</code>: when you call
-    <code>.concurrent(3)</code>, every pull through it passes a
-    <code>Concurrent(3)</code> marker <em>upstream</em>, one layer at a time,
-    telling whatever produced the values ("evaluate 3 of you at once instead
-    of one"). The upstream operator — typically a lazy <code>map</code> — sees
-    that marker and, instead of awaiting one Future and then starting the
-    next, calls its own source's <code>next()</code> three times without
-    waiting in between, so three Futures are in flight simultaneously. As each
-    settles, <code>concurrent</code> buffers the result but only releases
-    values to <em>you</em> in the original order — so results always come out
-    matching the input sequence, even if a later item finishes before an
-    earlier one.
+    <code>concurrent(n)</code> es la respuesta de FxDart a "ejecuta varios pasos
+    asíncronos en paralelo, pero mantén los resultados en orden". Funciona
+    mediante el modelo de <strong>marcador de concurrencia</strong> integrado en
+    <code>FxAsyncIterator.next([Concurrent? concurrent])</code>: cuando llamas a
+    <code>.concurrent(3)</code>, cada pull que lo atraviesa propaga un marcador
+    <code>Concurrent(3)</code> <em>aguas arriba</em>, capa a capa, diciéndole a
+    quien produzca los valores "evalúa 3 de golpe en vez de uno". El operador de
+    aguas arriba — normalmente un <code>map</code> perezoso — ve ese marcador y, en
+    lugar de esperar un Future y después arrancar el siguiente, llama tres veces
+    al <code>next()</code> de su propia fuente sin esperar entre medias, de modo
+    que hay tres Futures en vuelo a la vez. A medida que cada uno se resuelve,
+    <code>concurrent</code> guarda el resultado en un búfer pero solo <em>te</em>
+    entrega valores en el orden original — así que los resultados siempre salen
+    respetando la secuencia de entrada, aunque un elemento posterior termine
+    antes que uno anterior.
   </p>
   <p>
-    This is the back-channel that <code>toAsync</code>'s lecture mentioned:
-    Dart's <code>Stream</code> has no way to ask an upstream source "give me
-    3 at once" after the fact, because a <code>Stream</code> pushes at its own
-    pace. FxDart's pull-based <code>next()</code> protocol carries that
-    request upstream on every single pull, which is what makes
-    <code>concurrent(n)</code> possible at all.
+    Este es el canal de retorno que mencionaba la lección de <code>toAsync</code>:
+    el <code>Stream</code> de Dart no tiene forma de pedirle a posteriori a una
+    fuente de aguas arriba "dame 3 a la vez", porque un <code>Stream</code> empuja los
+    valores a su propio ritmo. El protocolo <code>next()</code> basado en pull de
+    FxDart lleva esa petición aguas arriba en cada pull, y eso es justamente lo
+    que hace posible <code>concurrent(n)</code>.
   </p>
   <p>
-    Tune <code>n</code> based on what you're limited by: a REST API might
-    tolerate 5-10 concurrent requests, a local CPU-bound task might want
-    <code>n</code> close to your core count, and <code>n = 1</code> is
-    equivalent to plain sequential awaiting (which is exactly what you get
-    without <code>concurrent</code> at all).
+    Ajusta <code>n</code> según lo que te limite: una API REST puede tolerar de 5
+    a 10 peticiones concurrentes, una tarea local limitada por CPU querrá una
+    <code>n</code> cercana a tu número de núcleos, y <code>n = 1</code> equivale
+    a esperar secuencialmente sin más (que es exactamente lo que obtienes sin
+    <code>concurrent</code>).
   </p>
 
-  <h2>Demo 1 · Sequential vs. concurrent(3), timed</h2>
-  <p>Six items, each with a 200ms delay. Sequential takes ~1200ms; asking for
-    3 at a time cuts it to ~400ms:</p>
+  <h2>Demo 1 · Secuencial vs. concurrent(3), cronometrado</h2>
+  <p>Seis elementos, cada uno con 200ms de retardo. En secuencia tarda ~1200ms;
+    pidiendo 3 a la vez baja a ~400ms:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -118,12 +116,12 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Order is preserved, even when completion order isn't</h2>
+  <h2>Demo 2 · El orden se preserva, aunque el de finalización no</h2>
   <p>
-    Item 2 finishes before item 1 here (100ms vs. 300ms), but
-    <code>concurrent(3)</code> still hands back results in source order —
-    compare this with <a href="concurrentPool.html"><code>concurrentPool</code></a>,
-    which does the opposite:
+    Aquí el elemento 2 termina antes que el 1 (100ms frente a 300ms), pero
+    <code>concurrent(3)</code> sigue devolviendo los resultados en el orden de la
+    fuente — compáralo con <a href="concurrentPool.html"><code>concurrentPool</code></a>,
+    que hace justo lo contrario:
   </p>
   <div class="playground">
 <textarea>
@@ -148,10 +146,10 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: this pipeline processes 6 items of 200ms each, sequentially
-    (<code>n = 1</code>). Tune <code>n</code> up and watch the elapsed time
-    drop — try <code>3</code>, then <code>6</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: este pipeline procesa 6 elementos de 200ms cada uno, de forma
+    secuencial (<code>n = 1</code>). Sube <code>n</code> y observa cómo cae el
+    tiempo transcurrido — prueba con <code>3</code> y luego con <code>6</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -178,11 +176,11 @@ Future<void> main() async {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="concurrentPool.html"><code>concurrentPool</code></a> — completion-order variant ·
-    <a href="toAsync.html"><code>toAsync</code></a> — the pull-based model this relies on ·
-    <a href="asyncVariants.html">async variants</a> — the *Async naming convention ·
-    <a href="map.html"><code>map</code></a> — the operator most often paired with concurrent
+    <strong>Relacionado:</strong>
+    <a href="concurrentPool.html"><code>concurrentPool</code></a> — variante por orden de finalización ·
+    <a href="toAsync.html"><code>toAsync</code></a> — el modelo basado en pull en el que se apoya ·
+    <a href="asyncVariants.html">variantes asíncronas</a> — la convención de nombres *Async ·
+    <a href="map.html"><code>map</code></a> — el operador que más a menudo acompaña a concurrent
   </div>
 
   <nav class="tut-nav">

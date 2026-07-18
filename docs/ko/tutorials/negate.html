@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>negate — FxDart 101</title>
-  <meta name="description" content="FxDart negate tutorial: turn any predicate into its logical opposite, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/negate.html">
+  <meta name="description" content="FxDart negate 튜토리얼: 어떤 술어든 논리적으로 뒤집은 술어로 바꾸는 방법을 라이브 플레이그라운드와 함께 알아봅니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/negate.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/negate.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/negate.html">
@@ -43,30 +42,29 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 10 · 함수 유틸리티 › <strong>negate</strong></p>
   <h1><code>negate</code></h1>
-  <p class="hero-sub">Returns a predicate that's the logical negation of the one you pass in.</p>
+  <p class="hero-sub">전달한 술어를 논리적으로 뒤집은 술어를 반환합니다.</p>
 
   <div class="signature">bool Function(T) negate&lt;T&gt;(bool Function(T) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>negate(f)</code> gives you back a new predicate that returns
-    <code>!f(x)</code> for any <code>x</code>. It's most useful when you
-    already have a named predicate (<code>isEven</code>, <code>isEmpty</code>,
-    a <code>matches(pattern)</code> result) and want its opposite as a
-    function value — for <code>filter</code>, <code>reject</code>, or
-    anywhere else a predicate is expected — without redefining the logic.
+    <code>negate(f)</code>는 임의의 <code>x</code>에 대해
+    <code>!f(x)</code>를 반환하는 새 술어를 돌려줍니다. 이미 이름이 붙은 술어가
+    있고(<code>isEven</code>, <code>isEmpty</code>,
+    <code>matches(pattern)</code>의 결과 등) 그 반대를 함수 값으로 쓰고 싶을 때
+    가장 유용합니다 — <code>filter</code>, <code>reject</code>를 비롯해
+    술어를 요구하는 어디에든, 로직을 다시 정의하지 않고 넘길 수 있습니다.
   </p>
   <p>
-    Don't confuse it with <a href="not.html"><code>not</code></a>: <code>not</code>
-    flips a single <code>bool</code> value, <code>negate</code> flips a whole
-    <em>predicate function</em>. <code>negate(f)</code> is roughly
-    <code>(x) =&gt; not(f(x))</code>.
+    <a href="not.html"><code>not</code></a>과 혼동하지 마세요. <code>not</code>은
+    <code>bool</code> 값 하나를 뒤집고, <code>negate</code>는
+    <em>술어 함수</em> 자체를 뒤집습니다. 대략 <code>negate(f)</code>는
+    <code>(x) =&gt; not(f(x))</code>인 셈입니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -83,10 +81,10 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Negating a library predicate</h2>
+  <h2>데모 2 · 라이브러리 술어 뒤집기</h2>
   <p>
-    <code>negate</code> composes with any predicate already in the library,
-    like the value-based <a href="isEmpty.html"><code>isEmpty</code></a>:
+    <code>negate</code>는 라이브러리에 이미 있는 어떤 술어와도 조합됩니다.
+    값 기반 술어인 <a href="isEmpty.html"><code>isEmpty</code></a>가 그 예입니다.
   </p>
   <div class="playground">
 <textarea>
@@ -100,8 +98,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>negate(isVowel)</code> to keep only the consonants.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>negate(isVowel)</code>로 자음만 남겨 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -120,11 +118,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="not.html"><code>not</code></a> — negate a single boolean value ·
-    <a href="filter.html"><code>filter</code></a> / <a href="reject.html"><code>reject</code></a> — the usual home for a negated predicate ·
-    <a href="isEmpty.html"><code>isEmpty</code></a> — a value-based predicate to combine with negate ·
-    <a href="when.html"><code>when</code></a> — apply a callback only when a predicate holds
+    <strong>관련 함수:</strong>
+    <a href="not.html"><code>not</code></a> — 불리언 값 하나를 뒤집기 ·
+    <a href="filter.html"><code>filter</code></a> / <a href="reject.html"><code>reject</code></a> — 뒤집은 술어가 주로 쓰이는 자리 ·
+    <a href="isEmpty.html"><code>isEmpty</code></a> — negate와 조합하기 좋은 값 기반 술어 ·
+    <a href="when.html"><code>when</code></a> — 술어가 참일 때만 콜백 적용하기
   </div>
 
   <nav class="tut-nav">

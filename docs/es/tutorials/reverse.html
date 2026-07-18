@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>reverse — FxDart 101</title>
-  <meta name="description" content="FxDart reverse tutorial: yield a finite iterable back to front, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/reverse.html">
+  <meta name="description" content="Tutorial de reverse en FxDart: recorre un iterable finito del final al principio, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/reverse.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/reverse.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/reverse.html">
@@ -43,34 +42,33 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 6 · Combinar › <strong>reverse</strong></p>
   <h1><code>reverse</code></h1>
-  <p class="hero-sub">Returns the source in reverse order.</p>
+  <p class="hero-sub">Devuelve la fuente en orden inverso.</p>
 
   <div class="signature">Iterable&lt;A&gt; reverse&lt;A&gt;(Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; reverseAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.reverse()        // chain
 FxAsync&lt;T&gt; FxAsync.reverse()</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>reverse</code> yields a source's elements last-to-first. Like
-    <code>takeRight</code> and <code>dropRight</code>, there's no way to know
-    what "last" means without first seeing everything, so <code>reverse</code>
-    <strong>materializes</strong> the whole source into a list before it
-    yields a single value. It's an operator for finite, bufferable sources —
-    it will never terminate on an infinite one.
+    <code>reverse</code> emite los elementos de una fuente del último al
+    primero. Igual que <code>takeRight</code> y <code>dropRight</code>, no hay
+    forma de saber qué significa "el último" sin haberlo visto todo antes, así
+    que <code>reverse</code> <strong>materializa</strong> la fuente entera en
+    una lista antes de emitir un solo valor. Es un operador para fuentes
+    finitas y bufferizables: nunca terminará con una fuente infinita.
   </p>
   <p>
-    <code>reverseAsync</code> follows the same rule: it awaits every element
-    of the upstream first, then replays them back to front. If you only need
-    the tail of a sequence rather than a true reversal, prefer
-    <code>takeRight</code> — it materializes too, but at least stops as soon
-    as it has the values it needs to output in order.
+    <code>reverseAsync</code> sigue la misma regla: primero espera todos los
+    elementos de aguas arriba y luego los reproduce del final al principio. Si
+    solo necesitas la cola de una secuencia en lugar de una inversión de
+    verdad, prefiere <code>takeRight</code>: también materializa, pero al menos
+    para en cuanto tiene los valores que necesita para emitirlos en orden.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -84,7 +82,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async (must buffer the whole source first)</h2>
+  <h2>Demo 2 · Asíncrono (primero hay que almacenar toda la fuente en memoria)</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -103,8 +101,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: reverse the history so the most recent visit comes first.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: invierte el historial para que la visita más reciente aparezca primero.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -121,10 +119,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="takeRight.html"><code>takeRight</code></a> — also materializes, only needs the tail ·
+    <strong>Relacionado:</strong>
+    <a href="takeRight.html"><code>takeRight</code></a> — también materializa, pero solo necesita la cola ·
     <a href="dropRight.html"><code>dropRight</code></a> ·
-    <a href="sort.html"><code>sort</code></a> — also materializes into a new list
+    <a href="sort.html"><code>sort</code></a> — también materializa en una lista nueva
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>takeRight — FxDart 101</title>
-  <meta name="description" content="FxDart takeRight tutorial: keep only the last n values of a finite iterable, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/takeRight.html">
+  <meta name="description" content="Tutorial de takeRight en FxDart: quédate solo con los últimos n valores de un iterable finito, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/takeRight.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/takeRight.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/takeRight.html">
@@ -43,33 +42,32 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 5 · Segmentación › <strong>takeRight</strong></p>
   <h1><code>takeRight</code></h1>
-  <p class="hero-sub">Returns a lazy iterable of the last <code>length</code> values from a source.</p>
+  <p class="hero-sub">Devuelve un iterable perezoso con los últimos <code>length</code> valores de una fuente.</p>
 
   <div class="signature">Iterable&lt;A&gt; takeRight&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; takeRightAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.takeRight(int count)        // chain
 FxAsync&lt;T&gt; FxAsync.takeRight(int count)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>takeRight</code> is <code>take</code>'s mirror image: instead of
-    the first <code>length</code> values, you get the last ones. There's a
-    catch, though — to know what the "last" values are, <code>takeRight</code>
-    has to see every element first. It <strong>materializes</strong> the
-    whole source into a list internally before yielding anything, so unlike
-    most FxDart operators it does not work on infinite sequences.
+    <code>takeRight</code> es la imagen especular de <code>take</code>: en lugar
+    de los primeros <code>length</code> valores, obtienes los últimos. Pero hay
+    una pega: para saber cuáles son los «últimos», <code>takeRight</code> tiene que
+    ver antes todos los elementos. Internamente <strong>materializa</strong> la
+    fuente entera en una lista antes de emitir nada, así que, a diferencia de la
+    mayoría de operadores de FxDart, no funciona sobre secuencias infinitas.
   </p>
   <p>
-    The async version has the same constraint: <code>takeRightAsync</code>
-    drains the entire upstream (awaiting every element) before it can hand
-    back the tail. Reach for it only when you know the source is finite and
-    small enough to buffer.
+    La versión asíncrona tiene la misma restricción: <code>takeRightAsync</code>
+    vacía todo lo que hay aguas arriba (esperando cada elemento) antes de poder
+    devolver la cola. Úsalo solo cuando sepas que la fuente es finita y lo
+    bastante pequeña como para almacenarla en memoria.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -84,7 +82,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async (must buffer the whole source first)</h2>
+  <h2>Demo 2 · Asíncrono (primero hay que almacenar toda la fuente en memoria)</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -103,8 +101,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: keep only the last 3 scores.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: quédate solo con las últimas 3 puntuaciones.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -121,11 +119,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="take.html"><code>take</code></a> — first n instead of last n ·
-    <a href="dropRight.html"><code>dropRight</code></a> — drop the last n ·
-    <a href="reverse.html"><code>reverse</code></a> — also materializes the source ·
-    <a href="slice.html"><code>slice</code></a> — arbitrary index window
+    <strong>Relacionado:</strong>
+    <a href="take.html"><code>take</code></a> — los primeros n en vez de los últimos n ·
+    <a href="dropRight.html"><code>dropRight</code></a> — descarta los últimos n ·
+    <a href="reverse.html"><code>reverse</code></a> — también materializa la fuente ·
+    <a href="slice.html"><code>slice</code></a> — una ventana de índices arbitraria
   </div>
 
   <nav class="tut-nav">

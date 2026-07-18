@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>fromEntries — FxDart 101</title>
-  <meta name="description" content="FxDart fromEntries tutorial: build a Map from (key, value) record entries, the inverse of entries().">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/fromEntries.html">
+  <meta name="description" content="FxDart fromEntries 튜토리얼: (key, value) 레코드 엔트리로 Map을 만듭니다. entries()의 역방향 연산입니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/fromEntries.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/fromEntries.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/fromEntries.html">
@@ -43,31 +42,30 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 9 · 객체(Map) 함수 › <strong>fromEntries</strong></p>
   <h1><code>fromEntries</code></h1>
-  <p class="hero-sub">Builds a <code>Map</code> from an iterable of <code>(key, value)</code> records.</p>
+  <p class="hero-sub"><code>(key, value)</code> 레코드의 이터러블로 <code>Map</code>을 만듭니다.</p>
 
   <div class="signature">Map&lt;K, V&gt; fromEntries&lt;K, V&gt;(Iterable&lt;(K, V)&gt; entries)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    This section ports FxTS's object utilities, and the first thing to
-    understand is the mapping: TypeScript's plain objects become Dart
-    <code>Map</code>s throughout, and TS's <code>[key, value]</code> entry
-    tuples become Dart <code>(K, V)</code> records. <code>fromEntries</code>
-    is the constructor side of that: give it any iterable of records and it
-    folds them into a <code>Map</code>, last-write-wins on duplicate keys —
-    exactly like building the map by hand with a loop.
+    이 섹션은 FxTS의 객체 유틸리티를 포팅한 것으로, 가장 먼저 이해해야 할
+    것은 대응 관계입니다. TypeScript의 일반 객체는 전반적으로 Dart의
+    <code>Map</code>이 되고, TS의 <code>[key, value]</code> 엔트리 튜플은
+    Dart의 <code>(K, V)</code> 레코드가 됩니다. <code>fromEntries</code>는
+    그중 생성하는 쪽입니다. 레코드로 이루어진 이터러블을 넘기면 이를 접어
+    <code>Map</code>으로 만들며, 키가 겹치면 나중 값이 앞선 값을 덮어씁니다 —
+    반복문으로 직접 맵을 만들 때와 똑같습니다.
   </p>
   <p>
-    It's the natural partner of <a href="entries.html"><code>entries</code></a>
-    (which does the reverse: <code>Map</code> → records) and pairs nicely
-    with <a href="zip.html"><code>zip</code></a>, which turns two parallel
-    lists into exactly the record shape <code>fromEntries</code> wants.
+    <a href="entries.html"><code>entries</code></a>(반대 방향, 즉
+    <code>Map</code> → 레코드)와 자연스럽게 짝을 이루며,
+    <a href="zip.html"><code>zip</code></a>과도 잘 어울립니다. zip은 나란한 두
+    리스트를 <code>fromEntries</code>가 원하는 레코드 형태로 정확히 만들어 줍니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -83,7 +81,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Duplicate keys, and round-tripping with <code>entries</code></h2>
+  <h2>데모 2 · 중복 키, 그리고 <code>entries</code>와의 왕복 변환</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -100,8 +98,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>fromEntries</code> to turn <code>pairs</code> into a <code>Map</code>.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>fromEntries</code>로 <code>pairs</code>를 <code>Map</code>으로 바꿔 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -118,11 +116,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="entries.html"><code>entries</code></a> — the reverse direction ·
-    <a href="zip.html"><code>zip</code></a> — build entries from two parallel lists ·
-    <a href="omit.html"><code>omit</code></a> — drop keys from the resulting Map ·
-    <a href="pick.html"><code>pick</code></a> — keep only some keys
+    <strong>관련 함수:</strong>
+    <a href="entries.html"><code>entries</code></a> — 반대 방향 ·
+    <a href="zip.html"><code>zip</code></a> — 나란한 두 리스트로 엔트리 만들기 ·
+    <a href="omit.html"><code>omit</code></a> — 만들어진 Map에서 키 제거 ·
+    <a href="pick.html"><code>pick</code></a> — 일부 키만 남기기
   </div>
 
   <nav class="tut-nav">

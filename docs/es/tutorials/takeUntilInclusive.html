@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>takeUntilInclusive — FxDart 101</title>
-  <meta name="description" content="FxDart takeUntilInclusive tutorial: take values up to and including the first match, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/takeUntilInclusive.html">
+  <meta name="description" content="Tutorial de takeUntilInclusive en FxDart: toma valores hasta la primera coincidencia, incluyéndola, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/takeUntilInclusive.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/takeUntilInclusive.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/takeUntilInclusive.html">
@@ -43,35 +42,33 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 5 · Segmentación › <strong>takeUntilInclusive</strong></p>
   <h1><code>takeUntilInclusive</code></h1>
-  <p class="hero-sub">Yields values until the predicate matches — the matching element is included.</p>
+  <p class="hero-sub">Emite valores hasta que el predicado coincide — el elemento coincidente sí se incluye.</p>
 
   <div class="signature">Iterable&lt;A&gt; takeUntilInclusive&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; takeUntilInclusiveAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.takeUntilInclusive(bool Function(T a) f)        // chain
 FxAsync&lt;T&gt; FxAsync.takeUntilInclusive(FutureOr&lt;bool&gt; Function(T a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>takeUntilInclusive</code> is <code>takeWhile</code>'s close cousin,
-    with one deliberate difference: it yields the element that made the
-    predicate true, then stops. <code>takeWhile</code> stops
-    <em>before</em> the failing element; <code>takeUntilInclusive</code>
-    stops <em>after</em> the matching one. Reach for it whenever the
-    matching element itself is part of the answer — "read the log up to and
-    including the first error", "collect steps up to and including the
-    terminator".
+    <code>takeUntilInclusive</code> es el pariente cercano de <code>takeWhile</code>,
+    con una diferencia deliberada: emite el elemento que hizo verdadero el
+    predicado y luego se detiene. <code>takeWhile</code> se detiene
+    <em>antes</em> del elemento que falla; <code>takeUntilInclusive</code>
+    se detiene <em>después</em> del que coincide. Recurre a él siempre que el
+    elemento coincidente forme parte de la respuesta: «lee el log hasta el
+    primer error, incluido», «recoge los pasos hasta el terminador, incluido».
   </p>
   <p>
-    FxTS originally named this <code>takeUntil</code>; FxDart keeps
-    <code>takeUntil</code> (and <code>takeUntilAsync</code>) around as a
-    <code>@Deprecated</code> alias for source parity, but new code should
-    call <code>takeUntilInclusive</code> directly.
+    FxTS lo llamaba originalmente <code>takeUntil</code>; FxDart mantiene
+    <code>takeUntil</code> (y <code>takeUntilAsync</code>) como alias
+    <code>@Deprecated</code> por paridad con el original, pero el código nuevo
+    debería llamar directamente a <code>takeUntilInclusive</code>.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -91,7 +88,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -108,9 +105,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: take the log lines up to and including the first
-    <code>'ERROR'</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: toma las líneas del log hasta el primer
+    <code>'ERROR'</code>, incluido.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -127,10 +124,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="takeWhile.html"><code>takeWhile</code></a> — stops before the match, excludes it ·
-    <a href="dropUntil.html"><code>dropUntil</code></a> — the drop-side counterpart ·
-    <a href="take.html"><code>take</code></a> — take by count
+    <strong>Relacionado:</strong>
+    <a href="takeWhile.html"><code>takeWhile</code></a> — se detiene antes de la coincidencia y la excluye ·
+    <a href="dropUntil.html"><code>dropUntil</code></a> — el equivalente en el lado de drop ·
+    <a href="take.html"><code>take</code></a> — toma por cantidad
   </div>
 
   <nav class="tut-nav">

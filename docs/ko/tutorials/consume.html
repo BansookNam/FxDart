@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>consume — FxDart 101</title>
-  <meta name="description" content="FxDart consume tutorial: force a lazy chain's side effects without collecting any values, with an optional limit.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/consume.html">
+  <meta name="description" content="FxDart consume 튜토리얼: 값을 수집하지 않고 지연 체인의 부수 효과만 강제로 실행하는 방법과 선택적인 개수 제한을 다룹니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/consume.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/consume.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/consume.html">
@@ -43,46 +42,43 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 1 · 시작하기 › <strong>consume</strong></p>
   <h1><code>consume</code></h1>
-  <p class="hero-sub">Pulls values through a chain and throws them away — for side effects only, optionally capped.</p>
+  <p class="hero-sub">체인을 통해 값을 끌어당긴 뒤 그대로 버립니다 — 부수 효과만을 위한 연산자이며, 개수를 제한할 수도 있습니다.</p>
 
   <div class="signature">void consume&lt;A&gt;(Iterable&lt;A&gt; iterable, [int? n])
 Future&lt;void&gt; consumeAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable, [int? n])
 void Fx.consume([int? n])        // chain
 Future&lt;void&gt; FxAsync.consume([int? n])</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>consume</code> is the minimal terminal operator: it pulls values
-    through the chain — running whatever <code>peek</code> or
-    <code>mapEffect</code> steps are upstream for their side effects — but
-    discards every value instead of collecting or forwarding it. Reach for
-    it when the whole point of a pipeline is its side effects, and building
-    a <code>List</code> with <code>toArray</code> would just be wasted
-    allocation.
+    <code>consume</code>은 가장 단순한 종결 연산자입니다. 체인을 통해 값을
+    끌어당기면서 상류에 있는 <code>peek</code>이나 <code>mapEffect</code>
+    단계의 부수 효과를 실행하지만, 값을 수집하거나 전달하지 않고 전부
+    버립니다. 파이프라인의 목적 자체가 부수 효과이고 <code>toArray</code>로
+    <code>List</code>를 만드는 것이 그저 낭비되는 할당일 뿐일 때 쓰면
+    됩니다.
   </p>
   <p>
-    The optional <code>n</code> makes it the natural partner for infinite
-    or huge sources: <code>consume(5)</code> pulls exactly 5 values and
-    stops, even if the underlying iterable (<code>range</code> with no
-    bound, <code>cycle</code>, <code>repeat</code> with a huge count) would
-    otherwise go on forever. Omit <code>n</code> to drain a finite iterable
-    completely.
+    선택 인자 <code>n</code> 덕분에 무한하거나 아주 큰 소스와도 잘 어울립니다.
+    <code>consume(5)</code>는 정확히 5개의 값만 끌어당기고 멈추므로, 바탕이
+    되는 이터러블이 (상한 없는 <code>range</code>, <code>cycle</code>, 개수가
+    엄청난 <code>repeat</code>처럼) 끝없이 이어지더라도 문제가 없습니다.
+    유한한 이터러블을 끝까지 비우려면 <code>n</code>을 생략하세요.
   </p>
   <p>
-    <code>consumeAsync</code> (or <code>.consume()</code> on an
-    <code>FxAsync</code> chain) works the same way, awaiting each pulled
-    value's side effects in turn — handy for forcing an async
-    <code>peek</code>/logging pipeline to actually run without paying to
-    collect a result list you'd throw away anyway.
+    <code>consumeAsync</code>(또는 <code>FxAsync</code> 체인의
+    <code>.consume()</code>)도 같은 방식으로 동작하며, 끌어당긴 값의 부수
+    효과를 차례로 await합니다. 어차피 버릴 결과 리스트를 수집하는 비용을
+    치르지 않고 비동기 <code>peek</code>/로깅 파이프라인을 실제로 실행시키고
+    싶을 때 유용합니다.
   </p>
 
-  <h2>Demo 1 · Bounding an infinite source</h2>
+  <h2>데모 1 · 무한 소스에 상한 두기</h2>
   <p>
-    <code>range(1000000)</code> would normally never finish if fully pulled
-    — but <code>consume(5)</code> stops after 5 elements:
+    <code>range(1000000)</code>은 전부 끌어당기면 사실상 끝나지 않지만,
+    <code>consume(5)</code>는 5개를 처리한 뒤 멈춥니다.
   </p>
   <div class="playground">
 <textarea>
@@ -106,7 +102,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async side effects, no result list</h2>
+  <h2>데모 2 · 비동기 부수 효과, 결과 리스트 없이</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -130,9 +126,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: consume only the first 3 values of an effectively-infinite
-    <code>repeat()</code>, logging each one as it's pulled.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 사실상 무한한 <code>repeat()</code>에서 앞의 3개 값만 consume 하고,
+    끌어당길 때마다 로그를 남겨 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -152,11 +148,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="each.html"><code>each</code></a> — terminal op that also runs f, without the n-limit shortcut ·
-    <a href="toArray.html"><code>toArray</code></a> — terminal op that collects results instead ·
-    <a href="cycle.html"><code>cycle</code></a> — an infinite source consume is often paired with ·
-    <a href="peek.html"><code>peek</code></a> — the lazy side-effect step consume typically forces
+    <strong>관련 함수:</strong>
+    <a href="each.html"><code>each</code></a> — 마찬가지로 f를 실행하는 종결 연산자, 다만 n 제한은 없음 ·
+    <a href="toArray.html"><code>toArray</code></a> — 대신 결과를 수집하는 종결 연산자 ·
+    <a href="cycle.html"><code>cycle</code></a> — consume과 자주 짝을 이루는 무한 소스 ·
+    <a href="peek.html"><code>peek</code></a> — consume이 주로 강제 실행시키는 지연 부수 효과 단계
   </div>
 
   <nav class="tut-nav">

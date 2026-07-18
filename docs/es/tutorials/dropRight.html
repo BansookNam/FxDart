@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>dropRight — FxDart 101</title>
-  <meta name="description" content="FxDart dropRight tutorial: omit the last n values of a finite iterable, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/dropRight.html">
+  <meta name="description" content="Tutorial de dropRight en FxDart: omite los últimos n valores de un iterable finito, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/dropRight.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/dropRight.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/dropRight.html">
@@ -43,32 +42,31 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 5 · Segmentación › <strong>dropRight</strong></p>
   <h1><code>dropRight</code></h1>
-  <p class="hero-sub">Returns a lazy iterable that omits the last <code>length</code> values.</p>
+  <p class="hero-sub">Devuelve un iterable perezoso que omite los últimos <code>length</code> valores.</p>
 
   <div class="signature">Iterable&lt;A&gt; dropRight&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; dropRightAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.dropRight(int count)        // chain
 FxAsync&lt;T&gt; FxAsync.dropRight(int count)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>dropRight</code> omits the last <code>length</code> values instead
-    of the first. As with <code>takeRight</code>, there's no way to know
-    which elements are "last" without seeing the whole source, so
-    <code>dropRight</code> <strong>materializes</strong> it into a list
-    before yielding anything. It's the right tool when you have, say, a
-    known-size batch and want everything except a trailing footer or
-    sentinel — but it needs a finite source.
+    <code>dropRight</code> omite los últimos <code>length</code> valores en lugar
+    de los primeros. Igual que con <code>takeRight</code>, no hay forma de saber
+    qué elementos son los "últimos" sin ver la fuente entera, así que
+    <code>dropRight</code> la <strong>materializa</strong> en una lista antes de
+    emitir nada. Es la herramienta adecuada cuando tienes, por ejemplo, un lote de
+    tamaño conocido y quieres todo salvo un pie o un centinela final — pero
+    necesita una fuente finita.
   </p>
   <p>
-    <code>dropRightAsync</code> carries the same constraint: it awaits the
-    entire upstream before it can start producing values.
+    <code>dropRightAsync</code> tiene la misma restricción: espera a todo lo que
+    hay aguas arriba antes de poder empezar a producir valores.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -82,7 +80,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async (must buffer the whole source first)</h2>
+  <h2>Demo 2 · Asíncrono (primero hay que almacenar toda la fuente en memoria)</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -99,8 +97,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: drop the last 2 footer lines.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: descarta las 2 últimas líneas del pie.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -117,10 +115,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="drop.html"><code>drop</code></a> — drop from the front instead ·
-    <a href="takeRight.html"><code>takeRight</code></a> — keep the last n instead of dropping them ·
-    <a href="reverse.html"><code>reverse</code></a> — also materializes the source
+    <strong>Relacionado:</strong>
+    <a href="drop.html"><code>drop</code></a> — descarta desde el principio ·
+    <a href="takeRight.html"><code>takeRight</code></a> — se queda con los últimos n en vez de descartarlos ·
+    <a href="reverse.html"><code>reverse</code></a> — también materializa la fuente
   </div>
 
   <nav class="tut-nav">

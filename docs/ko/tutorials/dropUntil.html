@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>dropUntil — FxDart 101</title>
-  <meta name="description" content="FxDart dropUntil tutorial: skip values up to and including the first match, then yield the rest, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/dropUntil.html">
+  <meta name="description" content="FxDart dropUntil 튜토리얼: 처음 술어에 맞는 원소까지 포함해 건너뛴 뒤 나머지를 내보내는 방법을 라이브 플레이그라운드와 함께 익힙니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/dropUntil.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/dropUntil.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/dropUntil.html">
@@ -43,35 +42,33 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 5 · 잘라내기 › <strong>dropUntil</strong></p>
   <h1><code>dropUntil</code></h1>
-  <p class="hero-sub">Skips values until the predicate matches — the matching element is dropped too — then yields the rest.</p>
+  <p class="hero-sub">술어에 맞을 때까지 값을 건너뛰고 — 맞은 원소까지 함께 버린 뒤 — 나머지를 내보냅니다.</p>
 
   <div class="signature">Iterable&lt;A&gt; dropUntil&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; dropUntilAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.dropUntil(bool Function(T a) f)        // chain
 FxAsync&lt;T&gt; FxAsync.dropUntil(FutureOr&lt;bool&gt; Function(T a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>dropUntil</code> is the drop-side counterpart to
-    <code>takeUntilInclusive</code> — and the two treat their matching
-    element in opposite ways. <code>dropWhile</code> stops dropping right
-    <em>before</em> the failing element, keeping it in the output;
-    <code>dropUntil</code> stops <em>at</em> the matching element and
-    discards it along with everything before it. Only elements strictly
-    after the match survive.
+    <code>dropUntil</code>은 <code>takeUntilInclusive</code>에 대응하는
+    drop 쪽 함수이며, 두 함수는 술어에 맞은 원소를 정반대로 다룹니다.
+    <code>dropWhile</code>은 술어가 거짓이 되는 원소 <em>바로 앞에서</em>
+    버리기를 멈추므로 그 원소는 결과에 남습니다. 반면
+    <code>dropUntil</code>은 술어에 맞은 원소 <em>지점에서</em> 멈추면서 그
+    원소까지 앞부분과 함께 버립니다. 오직 그 뒤에 오는 원소만 살아남습니다.
   </p>
   <p>
-    Use it when a marker or sentinel needs to disappear along with the
-    prefix it delimits — "everything after the <code>READY</code> line, not
-    including <code>READY</code> itself".
+    구분자 역할을 하는 마커나 센티널을, 그것이 가르는 앞부분과 함께
+    없애야 할 때 쓰세요. "<code>READY</code> 줄 다음부터 전부, 단
+    <code>READY</code> 자체는 제외"인 경우입니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
-  <p>Compare with <code>dropWhile</code>: here the matching element
-    (<code>3</code> / <code>'STOP'</code>) does not appear in the result:</p>
+  <h2>데모 1 · 기본</h2>
+  <p><code>dropWhile</code>과 비교해 보세요. 여기서는 술어에 맞은 원소
+    (<code>3</code> / <code>'STOP'</code>)가 결과에 나타나지 않습니다:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -87,7 +84,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>데모 2 · 비동기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -104,8 +101,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: drop everything up to and including <code>'READY'</code>.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>'READY'</code>까지 포함해서 그 앞을 모두 버려 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -122,10 +119,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="dropWhile.html"><code>dropWhile</code></a> — keeps the matching element ·
-    <a href="takeUntilInclusive.html"><code>takeUntilInclusive</code></a> — the take-side counterpart ·
-    <a href="drop.html"><code>drop</code></a> — drop by fixed count
+    <strong>관련 함수:</strong>
+    <a href="dropWhile.html"><code>dropWhile</code></a> — 술어에 맞은 원소를 남깁니다 ·
+    <a href="takeUntilInclusive.html"><code>takeUntilInclusive</code></a> — take 쪽 대응 함수 ·
+    <a href="drop.html"><code>drop</code></a> — 정해진 개수만큼 버립니다
   </div>
 
   <nav class="tut-nav">

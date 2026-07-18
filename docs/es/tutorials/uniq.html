@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>uniq — FxDart 101</title>
-  <meta name="description" content="FxDart uniq tutorial: remove duplicate values while preserving first-seen order, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/uniq.html">
+  <meta name="description" content="Tutorial de uniq en FxDart: elimina valores duplicados conservando el orden de primera aparición, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/uniq.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/uniq.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/uniq.html">
@@ -43,40 +42,40 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 4 · Filtrado &amp; deduplicación › <strong>uniq</strong></p>
   <h1><code>uniq</code></h1>
-  <p class="hero-sub">Removes duplicate values, keeping the first occurrence of each and preserving order.</p>
+  <p class="hero-sub">Elimina los valores duplicados, quedándose con la primera aparición de cada uno y conservando el orden.</p>
 
   <div class="signature">Iterable&lt;A&gt; uniq&lt;A&gt;(Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; uniqAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.uniq()        // chain
 FxAsync&lt;T&gt; FxAsync.uniq()</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>uniq</code> walks the iterable once, keeping a <code>Set</code> of
-    values already seen, and yields each element only the first time it
-    shows up. It's implemented as <code>uniqBy((a) =&gt; a, iterable)</code> —
-    the identity key — so if you ever need to dedupe by something other than
-    equality of the whole value, reach for
-    <a href="uniqBy.html"><code>uniqBy</code></a> instead.
+    <code>uniq</code> recorre el iterable una sola vez, manteniendo un
+    <code>Set</code> con los valores ya vistos, y emite cada elemento únicamente
+    la primera vez que aparece. Está implementado como
+    <code>uniqBy((a) =&gt; a, iterable)</code> —con la clave identidad—, así que
+    si alguna vez necesitas deduplicar por algo que no sea la igualdad del valor
+    completo, recurre a
+    <a href="uniqBy.html"><code>uniqBy</code></a> en su lugar.
   </p>
   <p>
-    It's lazy and streaming: the <code>Set</code> only grows as elements are
-    pulled, so it never buffers the whole source up front. Order is
-    preserved — the first occurrence of a value is what survives, not the
-    last.
+    Es perezoso y en streaming: el <code>Set</code> solo crece a medida que se
+    piden elementos, así que nunca almacena la fuente entera por adelantado. El
+    orden se conserva: lo que sobrevive es la primera aparición de un valor, no
+    la última.
   </p>
   <p>
-    On the async side, <code>uniqAsync</code> is safe to combine with
-    <code>.concurrent(n)</code> as long as the concurrency lives in an
-    upstream fetch stage: fetch with <code>.map(...).concurrent(n)</code>
-    first, then apply <code>.uniq()</code> to the already-resolved,
-    in-order results, as in Demo 2.
+    En el lado asíncrono, <code>uniqAsync</code> se puede combinar sin riesgo con
+    <code>.concurrent(n)</code> siempre que la concurrencia viva en una etapa de
+    fetch anterior: primero descarga con <code>.map(...).concurrent(n)</code> y
+    luego aplica <code>.uniq()</code> a los resultados ya resueltos y en orden,
+    como en la Demo 2.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -92,7 +91,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency upstream</h2>
+  <h2>Demo 2 · Asíncrono, con concurrencia aguas arriba</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -113,9 +112,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>uniq</code> to remove duplicate tags, preserving
-    first-seen order.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>uniq</code> para eliminar las etiquetas duplicadas,
+    conservando el orden de primera aparición.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -132,11 +131,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="uniqBy.html"><code>uniqBy</code></a> — dedupe by a computed key ·
-    <a href="difference.html"><code>difference</code></a> — remove elements found in another iterable ·
-    <a href="intersection.html"><code>intersection</code></a> — keep only shared elements ·
-    <a href="compact.html"><code>compact</code></a> — drop nulls
+    <strong>Relacionado:</strong>
+    <a href="uniqBy.html"><code>uniqBy</code></a> — deduplica por una clave calculada ·
+    <a href="difference.html"><code>difference</code></a> — elimina los elementos presentes en otro iterable ·
+    <a href="intersection.html"><code>intersection</code></a> — conserva solo los elementos comunes ·
+    <a href="compact.html"><code>compact</code></a> — descarta los null
   </div>
 
   <nav class="tut-nav">

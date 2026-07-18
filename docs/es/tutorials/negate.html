@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>negate — FxDart 101</title>
-  <meta name="description" content="FxDart negate tutorial: turn any predicate into its logical opposite, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/negate.html">
+  <meta name="description" content="Tutorial de negate en FxDart: convierte cualquier predicado en su opuesto lógico, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/negate.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/negate.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/negate.html">
@@ -43,30 +42,29 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 10 · Utilidades de funciones › <strong>negate</strong></p>
   <h1><code>negate</code></h1>
-  <p class="hero-sub">Returns a predicate that's the logical negation of the one you pass in.</p>
+  <p class="hero-sub">Devuelve un predicado que es la negación lógica del que le pasas.</p>
 
   <div class="signature">bool Function(T) negate&lt;T&gt;(bool Function(T) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>negate(f)</code> gives you back a new predicate that returns
-    <code>!f(x)</code> for any <code>x</code>. It's most useful when you
-    already have a named predicate (<code>isEven</code>, <code>isEmpty</code>,
-    a <code>matches(pattern)</code> result) and want its opposite as a
-    function value — for <code>filter</code>, <code>reject</code>, or
-    anywhere else a predicate is expected — without redefining the logic.
+    <code>negate(f)</code> te devuelve un predicado nuevo que da
+    <code>!f(x)</code> para cualquier <code>x</code>. Resulta más útil cuando ya
+    tienes un predicado con nombre (<code>isEven</code>, <code>isEmpty</code>,
+    el resultado de un <code>matches(pattern)</code>) y quieres su opuesto como
+    valor de función — para <code>filter</code>, <code>reject</code> o
+    cualquier otro sitio donde se espere un predicado — sin volver a definir la lógica.
   </p>
   <p>
-    Don't confuse it with <a href="not.html"><code>not</code></a>: <code>not</code>
-    flips a single <code>bool</code> value, <code>negate</code> flips a whole
-    <em>predicate function</em>. <code>negate(f)</code> is roughly
+    No lo confundas con <a href="not.html"><code>not</code></a>: <code>not</code>
+    invierte un único valor <code>bool</code>, mientras que <code>negate</code> invierte
+    toda una <em>función predicado</em>. <code>negate(f)</code> equivale más o menos a
     <code>(x) =&gt; not(f(x))</code>.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -83,10 +81,10 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Negating a library predicate</h2>
+  <h2>Demo 2 · Negar un predicado de la librería</h2>
   <p>
-    <code>negate</code> composes with any predicate already in the library,
-    like the value-based <a href="isEmpty.html"><code>isEmpty</code></a>:
+    <code>negate</code> se compone con cualquier predicado que ya exista en la librería,
+    como <a href="isEmpty.html"><code>isEmpty</code></a>, que trabaja sobre valores:
   </p>
   <div class="playground">
 <textarea>
@@ -100,8 +98,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>negate(isVowel)</code> to keep only the consonants.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>negate(isVowel)</code> para quedarte solo con las consonantes.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -120,11 +118,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="not.html"><code>not</code></a> — negate a single boolean value ·
-    <a href="filter.html"><code>filter</code></a> / <a href="reject.html"><code>reject</code></a> — the usual home for a negated predicate ·
-    <a href="isEmpty.html"><code>isEmpty</code></a> — a value-based predicate to combine with negate ·
-    <a href="when.html"><code>when</code></a> — apply a callback only when a predicate holds
+    <strong>Relacionado:</strong>
+    <a href="not.html"><code>not</code></a> — niega un único valor booleano ·
+    <a href="filter.html"><code>filter</code></a> / <a href="reject.html"><code>reject</code></a> — el destino habitual de un predicado negado ·
+    <a href="isEmpty.html"><code>isEmpty</code></a> — un predicado sobre valores para combinar con negate ·
+    <a href="when.html"><code>when</code></a> — aplica un callback solo cuando se cumple un predicado
   </div>
 
   <nav class="tut-nav">

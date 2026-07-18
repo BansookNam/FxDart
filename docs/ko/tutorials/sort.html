@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>sort — FxDart 101</title>
-  <meta name="description" content="FxDart sort tutorial: comparator-based sorting that always returns a new list, never mutates, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/sort.html">
+  <meta name="description" content="FxDart sort 튜토리얼 — 비교자를 기준으로 정렬하며 입력을 변경하지 않고 항상 새 리스트를 반환합니다. 라이브 플레이그라운드 포함.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/sort.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/sort.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/sort.html">
@@ -43,10 +42,9 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 7 · 집계 › <strong>sort</strong></p>
   <h1><code>sort</code></h1>
-  <p class="hero-sub">Returns a brand-new sorted list from a comparator — it never mutates its input.</p>
+  <p class="hero-sub">비교자로 정렬한 완전히 새로운 리스트를 반환합니다 — 입력은 절대 변경하지 않습니다.</p>
 
   <div class="signature">List&lt;A&gt; sort&lt;A&gt;(int Function(A a, A b) f, Iterable&lt;A&gt; iterable)
 List&lt;A&gt; toSorted&lt;A&gt;(int Function(A a, A b) f, Iterable&lt;A&gt; iterable)   // alias of sort
@@ -54,40 +52,43 @@ Future&lt;List&lt;A&gt;&gt; sortAsync&lt;A&gt;(int Function(A a, A b) f, FxAsync
 Fx&lt;T&gt; Fx.sort(int Function(T a, T b) f)                    // chain (sync) — still lazy, call .toArray()
 Future&lt;List&lt;T&gt;&gt; FxAsync.sort(int Function(T a, T b) f)     // chain (async) — already a terminal</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>sort</code> takes a standard Dart comparator — return negative if
-    <code>a</code> should come before <code>b</code>, positive if after, zero
-    if tied — and produces a sorted result. The important difference from
-    JavaScript's (and FxTS's) <code>Array.prototype.sort</code> is that
-    FxDart's <code>sort</code> <strong>never mutates its input</strong>. It
-    always allocates a new <code>List</code> (<code>List.of(iterable)..sort(f)</code>),
-    leaving the original iterable exactly as it was. FxTS later added
-    <code>toSorted</code> as the non-mutating alternative to its mutating
-    <code>sort</code>; in FxDart, <code>toSorted</code> is simply an alias —
-    since <code>sort</code> was already non-mutating, there was nothing left
-    to differentiate.
+    <code>sort</code>는 Dart의 표준 비교자를 받습니다 —
+    <code>a</code>가 <code>b</code>보다 앞이면 음수, 뒤면 양수,
+    동등하면 0을 반환하는 그 함수입니다 — 그리고 정렬된 결과를 만들어
+    냅니다. JavaScript(그리고 FxTS)의
+    <code>Array.prototype.sort</code>와 결정적으로 다른 점은
+    FxDart의 <code>sort</code>가 <strong>입력을 절대 변경하지 않는다</strong>는
+    것입니다. 언제나 새 <code>List</code>를 할당하며
+    (<code>List.of(iterable)..sort(f)</code>),
+    원본 이터러블은 그대로 남습니다. FxTS는 나중에 원본을 변경하는
+    <code>sort</code>에 대해 변경을 일으키지 않는 대안으로
+    <code>toSorted</code>를 추가했지만,
+    FxDart에서 <code>toSorted</code>는 그저 별칭입니다 —
+    <code>sort</code>가 이미 원본을 건드리지 않으니 구분할 이유가
+    없기 때문입니다.
   </p>
   <p>
-    There's a nuance on the <strong>chain</strong> form worth calling out
-    explicitly: on the sync <code>Fx</code> chain, <code>.sort(f)</code>
-    returns another <code>Fx&lt;T&gt;</code> — not a <code>List&lt;T&gt;</code> —
-    because <code>Fx</code> wraps its underlying sorted list to stay
-    chainable. You still need a terminal like
-    <code><a href="../101/index.html">.toArray()</a></code> to get a
-    concrete <code>List</code> out of it. The <strong>async</strong> chain
-    doesn't have that wrinkle: <code>FxAsync.sort(f)</code> is already a
-    terminal that returns <code>Future&lt;List&lt;T&gt;&gt;</code> directly,
-    because <code>FxAsync</code> can't return itself from something that
-    needs to <code>await</code> the whole pipeline first.
+    <strong>체인</strong> 형태에는 짚고 넘어갈 만한 미묘한 점이
+    하나 있습니다. 동기 <code>Fx</code> 체인에서 <code>.sort(f)</code>는
+    또 다른 <code>Fx&lt;T&gt;</code>를 반환합니다 —
+    <code>List&lt;T&gt;</code>가 아닙니다. <code>Fx</code>가 계속 체이닝할 수 있도록 내부의 정렬된
+    리스트를 감싸기 때문입니다. 여전히
+    <code><a href="../101/index.html">.toArray()</a></code> 같은 종결
+    연산자를 거쳐야 구체적인 <code>List</code>를 얻을 수 있습니다.
+    <strong>비동기</strong> 체인에는 이런
+    사정이 없습니다. <code>FxAsync.sort(f)</code>는 그 자체가 종결
+    연산자로서 <code>Future&lt;List&lt;T&gt;&gt;</code>를 바로 반환하는데,
+    파이프라인 전체를 먼저 <code>await</code>해야 하는 연산에서
+    <code>FxAsync</code>가 자기 자신을 반환할 수는 없기 때문입니다.
   </p>
   <p>
-    Reach for <code><a href="sortBy.html">sortBy</a></code> instead when you
-    just want to sort by a key you extract, rather than writing the
-    comparator yourself.
+    비교자를 직접 작성하는 대신 추출한 키를 기준으로 정렬하고 싶다면
+    <code><a href="sortBy.html">sortBy</a></code>를 쓰세요.
   </p>
 
-  <h2>Demo 1 · Basics, no mutation, and toSorted</h2>
+  <h2>데모 1 · 기본 사용법, 원본 불변, 그리고 toSorted</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -112,7 +113,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async — already a terminal</h2>
+  <h2>데모 2 · 비동기 — 이미 종결 연산자</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -130,8 +131,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: sort the numbers in <strong>descending</strong> order.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 숫자를 <strong>내림차순</strong>으로 정렬해 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -148,10 +149,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="sortBy.html"><code>sortBy</code></a> — sort by an extracted key instead of a comparator ·
-    <a href="reverse.html"><code>reverse</code></a> — flip element order without comparing ·
-    <a href="partition.html"><code>partition</code></a> — split into two lists by a predicate
+    <strong>관련 함수:</strong>
+    <a href="sortBy.html"><code>sortBy</code></a> — 비교자 대신 추출한 키로 정렬 ·
+    <a href="reverse.html"><code>reverse</code></a> — 비교 없이 순서만 뒤집기 ·
+    <a href="partition.html"><code>partition</code></a> — 술어로 두 리스트로 나누기
   </div>
 
   <nav class="tut-nav">

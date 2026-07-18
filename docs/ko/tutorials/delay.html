@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>delay &amp; sleep — FxDart 101</title>
-  <meta name="description" content="FxDart delay and sleep tutorial: the two building blocks every async demo on this site is built from, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/delay.html">
+  <meta name="description" content="FxDart delay와 sleep 튜토리얼 — 이 사이트의 모든 비동기 데모를 떠받치는 두 가지 기본 재료를 라이브 플레이그라운드와 함께 살펴봅니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/delay.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/delay.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/delay.html">
@@ -43,34 +42,33 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 10 · 함수 유틸리티 › <strong>delay &amp; sleep</strong></p>
   <h1><code>delay</code> &amp; <code>sleep</code></h1>
-  <p class="hero-sub">Wait for a bit, then produce a value (delay) — or just wait (sleep).</p>
+  <p class="hero-sub">잠시 기다렸다가 값을 내놓거나(delay), 그냥 기다리기만 합니다(sleep).</p>
 
   <div class="signature">Future&lt;T&gt; delay&lt;T&gt;(Duration wait, T value)
 Future&lt;void&gt; sleep(Duration wait)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>delay(wait, value)</code> returns a <code>Future</code> that
-    completes with <code>value</code> after <code>wait</code> has elapsed.
-    <code>sleep(wait)</code> is the same idea with nothing to return — it
-    just completes after the duration. Both are thin wrappers over
-    <code>Future.delayed</code>, and both are exactly what you'd reach for to
-    simulate a slow operation: a network call, a database query, anything
-    that takes time and eventually produces (or doesn't produce) a result.
+    <code>delay(wait, value)</code>는 <code>wait</code>가 지난 뒤
+    <code>value</code>로 완료되는 <code>Future</code>를 반환합니다.
+    <code>sleep(wait)</code>은 반환할 값이 없다는 점만 다릅니다 — 그저
+    주어진 시간이 지나면 완료됩니다. 둘 다 <code>Future.delayed</code>를
+    얇게 감싼 것이며, 느린 작업을 흉내 낼 때 가장 먼저 꺼내 쓰게 되는
+    도구입니다. 네트워크 호출, 데이터베이스 쿼리처럼 시간이 걸리고
+    결국 결과를 내놓는(또는 내놓지 않는) 모든 작업 말입니다.
   </p>
   <p>
-    These two functions are the backbone of nearly every async demo across
-    this whole tutorial site. Whenever you see <code>mapAsync</code>,
-    <code>concurrent</code>, <code>debounce</code>, or <code>throttle</code>
-    demonstrated with a <code>Stopwatch</code> proving something ran in
-    parallel or was rate-limited, it's <code>delay</code> or <code>sleep</code>
-    doing the actual waiting under the hood.
+    이 두 함수는 이 튜토리얼 사이트 전반의 거의 모든 비동기 데모를
+    떠받치는 뼈대입니다. <code>mapAsync</code>, <code>concurrent</code>,
+    <code>debounce</code>, <code>throttle</code>을 <code>Stopwatch</code>와
+    함께 보여 주면서 병렬로 실행됐다거나 속도가 제한됐다는 것을 증명하는
+    장면이 나오면, 실제로 기다리는 일을 하고 있는 것은 언제나
+    <code>delay</code> 아니면 <code>sleep</code>입니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -87,10 +85,10 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Simulating concurrent work</h2>
+  <h2>데모 2 · 동시 작업 흉내 내기</h2>
   <p>
-    Three "requests" each take 150ms, but run concurrently — the whole batch
-    still finishes in well under 450ms:
+    각각 150ms가 걸리는 "요청" 세 개를 동시에 실행하면, 전체 묶음은
+    450ms보다 한참 짧은 시간에 끝납니다.
   </p>
   <div class="playground">
 <textarea>
@@ -111,9 +109,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>delay</code> to simulate a 100ms "fetch" that
-    returns <code>'pong'</code>.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>delay</code>로 <code>'pong'</code>을 반환하는 100ms짜리
+    "fetch"를 흉내 내 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -128,11 +126,11 @@ Future<void> main() async {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="memoize.html"><code>memoize</code></a> — caches a delayed Future so it only waits once ·
-    <a href="concurrent.html"><code>concurrent</code></a> — run multiple delays in parallel ·
-    <a href="debounce.html"><code>debounce</code></a> / <a href="throttle.html"><code>throttle</code></a> — rate-limiting built on top of waiting ·
-    <a href="toAsync.html"><code>toAsync</code></a> — turn a plain Iterable into an async pipeline
+    <strong>관련 함수:</strong>
+    <a href="memoize.html"><code>memoize</code></a> — 지연된 Future를 캐시해 한 번만 기다리게 만듭니다 ·
+    <a href="concurrent.html"><code>concurrent</code></a> — 여러 delay를 병렬로 실행 ·
+    <a href="debounce.html"><code>debounce</code></a> / <a href="throttle.html"><code>throttle</code></a> — 기다림 위에 세운 속도 제한 ·
+    <a href="toAsync.html"><code>toAsync</code></a> — 평범한 Iterable을 비동기 파이프라인으로
   </div>
 
   <nav class="tut-nav">

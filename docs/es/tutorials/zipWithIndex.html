@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>zipWithIndex — FxDart 101</title>
-  <meta name="description" content="FxDart zipWithIndex tutorial: pair each element with its 0-based index, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/zipWithIndex.html">
+  <meta name="description" content="Tutorial de zipWithIndex en FxDart: empareja cada elemento con su índice (empezando en 0), con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/zipWithIndex.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/zipWithIndex.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/zipWithIndex.html">
@@ -43,31 +42,30 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 6 · Combinar › <strong>zipWithIndex</strong></p>
   <h1><code>zipWithIndex</code></h1>
-  <p class="hero-sub">Pairs each element with its (0-based) index: <code>(index, value)</code>.</p>
+  <p class="hero-sub">Empareja cada elemento con su índice (empezando en 0): <code>(index, value)</code>.</p>
 
   <div class="signature">Iterable&lt;(int, A)&gt; zipWithIndex&lt;A&gt;(Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;(int, A)&gt; zipWithIndexAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;(int, T)&gt; Fx.zipWithIndex()        // chain
 FxAsync&lt;(int, T)&gt; FxAsync.zipWithIndex()</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>zipWithIndex</code> is <code>zip</code> against an implicit
-    counter: each element comes out paired as <code>(index, value)</code>,
-    counting up from <code>0</code>. It's the lazy-pipeline answer to a
-    manual <code>for (var i = 0; i &lt; list.length; i++)</code> loop — no
-    counter variable to manage, and it composes with the rest of the chain.
+    <code>zipWithIndex</code> es un <code>zip</code> contra un contador
+    implícito: cada elemento sale emparejado como <code>(index, value)</code>,
+    contando desde <code>0</code>. Es la respuesta del pipeline perezoso al
+    bucle manual <code>for (var i = 0; i &lt; list.length; i++)</code>: sin
+    variable contador que gestionar, y se compone con el resto de la cadena.
   </p>
   <p>
-    Because it only needs to track a running counter, <code>zipWithIndex</code>
-    stays lazy and works over an infinite source just as well as a finite
-    one; the async form counts the same way as elements resolve.
+    Como solo necesita llevar la cuenta de un contador, <code>zipWithIndex</code>
+    sigue siendo perezoso y funciona igual de bien sobre una fuente infinita que
+    sobre una finita; la versión asíncrona cuenta igual a medida que se resuelven los elementos.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -81,7 +79,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -98,8 +96,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: pair each runner with their (0-based) finishing position.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: empareja a cada corredor con su posición de llegada (empezando en 0).</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -116,10 +114,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="zip.html"><code>zip</code></a> — pair two iterables together ·
-    <a href="zipWith.html"><code>zipWith</code></a> — zip and combine in one step ·
-    <a href="entries.html"><code>entries</code></a> — pair Map keys with values
+    <strong>Relacionado:</strong>
+    <a href="zip.html"><code>zip</code></a> — empareja dos iterables entre sí ·
+    <a href="zipWith.html"><code>zipWith</code></a> — hace zip y combina en un solo paso ·
+    <a href="entries.html"><code>entries</code></a> — empareja las claves de un Map con sus valores
   </div>
 
   <nav class="tut-nav">

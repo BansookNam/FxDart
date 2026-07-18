@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>zipWith — FxDart 101</title>
-  <meta name="description" content="FxDart zipWith tutorial: zip two iterables and combine each pair through a function in one step, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/zipWith.html">
+  <meta name="description" content="Tutorial de zipWith en FxDart: empareja dos iterables y combina cada par a través de una función en un solo paso, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/zipWith.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/zipWith.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/zipWith.html">
@@ -43,33 +42,33 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 6 · Combinar › <strong>zipWith</strong></p>
   <h1><code>zipWith</code></h1>
-  <p class="hero-sub">Zips two iterables and combines each pair through a function, in one step.</p>
+  <p class="hero-sub">Empareja dos iterables y combina cada par a través de una función, en un solo paso.</p>
 
   <div class="signature">Iterable&lt;C&gt; zipWith&lt;A, B, C&gt;(C Function(A a, B b) f, Iterable&lt;A&gt; iterable1, Iterable&lt;B&gt; iterable2)
 FxAsyncIterable&lt;C&gt; zipWithAsync&lt;A, B, C&gt;(FutureOr&lt;C&gt; Function(A a, B b) f, FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;B&gt; iterable2)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>zipWith</code> is exactly <code>zip</code> followed by
-    <code>map</code> over the resulting pairs — in fact that's how it's
-    implemented in FxDart, as <code>map((r) => f(r.$1, r.$2), zip(...))</code>.
-    Reach for it when you don't actually want the intermediate
-    <code>(A, B)</code> record, just the combined result: multiplying two
-    parallel lists together, formatting a name and an age into one label,
-    and so on.
+    <code>zipWith</code> es exactamente <code>zip</code> seguido de
+    <code>map</code> sobre los pares resultantes — de hecho así está
+    implementado en FxDart, como
+    <code>map((r) => f(r.$1, r.$2), zip(...))</code>. Recurre a él cuando en
+    realidad no quieres el record <code>(A, B)</code> intermedio, sino solo el
+    resultado combinado: multiplicar dos listas paralelas, formatear un nombre
+    y una edad en una sola etiqueta, y cosas así.
   </p>
   <p>
-    It stops at the shorter of the two inputs, same as <code>zip</code>, and
-    the async form <code>zipWithAsync</code> inherits <code>zipAsync</code>'s
-    parallel-per-pair pulling. There's no <code>Fx</code> chain form for
-    <code>zipWith</code> — call the top-level function directly (or build it
-    yourself as <code>.zip(other).map((r) => f(r.$1, r.$2))</code>).
+    Se detiene en la más corta de las dos entradas, igual que
+    <code>zip</code>, y la forma asíncrona <code>zipWithAsync</code> hereda de
+    <code>zipAsync</code> el consumo en paralelo por par. No hay forma
+    encadenable en <code>Fx</code> para <code>zipWith</code>: llama
+    directamente a la función de nivel superior (o constrúyela tú mismo como
+    <code>.zip(other).map((r) => f(r.$1, r.$2))</code>).
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -84,7 +83,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -102,9 +101,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>zipWith</code> to compute the line total
-    (<code>price * quantity</code>) per pair.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>zipWith</code> para calcular el total de línea
+    (<code>price * quantity</code>) de cada par.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -122,9 +121,9 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="zip.html"><code>zip</code></a> — the plain-pairs version this builds on ·
-    <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — zip against a running index ·
+    <strong>Relacionado:</strong>
+    <a href="zip.html"><code>zip</code></a> — la versión de pares simples sobre la que se construye ·
+    <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — emparejar con un índice creciente ·
     <a href="map.html"><code>map</code></a>
   </div>
 

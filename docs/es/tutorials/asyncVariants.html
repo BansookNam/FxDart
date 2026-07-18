@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>async variants — FxDart 101</title>
-  <meta name="description" content="FxDart's *Async naming convention: every lazy and aggregate operator has a twin for FxAsyncIterable, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/asyncVariants.html">
+  <meta name="description" content="La convención de nombres *Async de FxDart: cada operador perezoso y de agregación tiene su gemelo para FxAsyncIterable, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/asyncVariants.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/asyncVariants.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/asyncVariants.html">
@@ -43,10 +42,9 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 11 · Async &amp; concurrencia › <strong>async variants</strong></p>
   <h1>The <code>*Async</code> naming convention</h1>
-  <p class="hero-sub">Every lazy and aggregate operator has a twin that works on FxAsyncIterable — same behavior, async-friendly callback.</p>
+  <p class="hero-sub">Cada operador perezoso y de agregación tiene un gemelo que trabaja sobre FxAsyncIterable: mismo comportamiento, con un callback apto para async.</p>
 
   <div class="signature">Iterable&lt;B&gt; map&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;B&gt; mapAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
@@ -57,35 +55,36 @@ Future&lt;A&gt; reduceAsync&lt;A&gt;(FutureOr&lt;A&gt; Function(A acc, A a) f, F
 Fx&lt;R&gt; Fx.map&lt;R&gt;(R Function(T a) f)             // sync chain
 FxAsync&lt;R&gt; FxAsync.map&lt;R&gt;(FutureOr&lt;R&gt; Function(T a) f)  // async chain — same name!</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    Because Dart has no untyped currying, FxDart can't overload one
-    <code>map</code> to work on both <code>Iterable</code> and
-    <code>FxAsyncIterable</code> in data-first position — the parameter types
-    would collide. So every lazy and aggregate operator ships in two
-    top-level forms: the plain one for <code>Iterable</code>, and an
-    <code>*Async</code> twin for <code>FxAsyncIterable</code> whose callback
-    returns <code>FutureOr&lt;R&gt;</code> instead of <code>R</code>. You've
-    already met a few: <code>map</code>/<code>mapAsync</code>,
+    Como Dart no tiene currificación sin tipos, FxDart no puede sobrecargar un
+    único <code>map</code> para que funcione sobre <code>Iterable</code> y
+    <code>FxAsyncIterable</code> en posición data-first: los tipos de los
+    parámetros chocarían. Por eso cada operador perezoso y de agregación se
+    publica en dos formas de nivel superior: la normal para
+    <code>Iterable</code>, y un gemelo <code>*Async</code> para
+    <code>FxAsyncIterable</code> cuyo callback devuelve
+    <code>FutureOr&lt;R&gt;</code> en lugar de <code>R</code>. Ya has visto
+    algunos: <code>map</code>/<code>mapAsync</code>,
     <code>filter</code>/<code>filterAsync</code>,
     <code>toArray</code>/<code>toArrayAsync</code>,
     <code>reduce</code>/<code>reduceAsync</code>, <code>fold</code>/<code>foldAsync</code>,
-    <code>each</code>/<code>eachAsync</code>, <code>find</code>/<code>findAsync</code> —
-    the pattern holds for essentially every function in the library.
+    <code>each</code>/<code>eachAsync</code>, <code>find</code>/<code>findAsync</code>:
+    el patrón se cumple prácticamente para todas las funciones de la librería.
   </p>
   <p>
-    The chain forms don't need this split. Once you call
-    <code>.toAsync()</code> (or start from <code>fxAsync</code>/<code>fxStream</code>),
-    every subsequent method on that <code>FxAsync</code> chain keeps its
-    <strong>plain</strong> name — <code>.map(...)</code>, not
-    <code>.mapAsync(...)</code> — because the receiver's type already tells
-    Dart which overload to use. The suffix only exists at the top level,
-    where data-first calls need it to disambiguate.
+    Las formas encadenadas no necesitan esta división. En cuanto llamas a
+    <code>.toAsync()</code> (o empiezas desde <code>fxAsync</code>/<code>fxStream</code>),
+    cada método posterior de esa cadena <code>FxAsync</code> conserva su nombre
+    <strong>normal</strong> — <code>.map(...)</code>, no
+    <code>.mapAsync(...)</code> — porque el tipo del receptor ya le dice a Dart
+    qué sobrecarga usar. El sufijo solo existe en el nivel superior, donde las
+    llamadas data-first lo necesitan para desambiguar.
   </p>
 
-  <h2>Demo 1 · A few twins, side by side</h2>
-  <p>Data-first calls always need the <code>Async</code> suffix once you're
-    working with an <code>FxAsyncIterable</code>:</p>
+  <h2>Demo 1 · Unos cuantos gemelos, uno al lado del otro</h2>
+  <p>Las llamadas data-first siempre necesitan el sufijo <code>Async</code> en cuanto
+    trabajas con un <code>FxAsyncIterable</code>:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -107,10 +106,10 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Data-first vs. chain form</h2>
+  <h2>Demo 2 · Forma data-first frente a forma encadenada</h2>
   <p>
-    The chain form reads the same as its sync counterpart — no suffixes —
-    once <code>.toAsync()</code> has switched the receiver's type:
+    La forma encadenada se lee igual que su equivalente síncrona —sin sufijos—
+    una vez que <code>.toAsync()</code> ha cambiado el tipo del receptor:
   </p>
   <div class="playground">
 <textarea>
@@ -138,9 +137,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use the data-first <code>*Async</code> twin of <code>map</code>
-    to uppercase every name in this async pipeline.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa el gemelo data-first <code>*Async</code> de <code>map</code>
+    para poner en mayúsculas cada nombre de este pipeline asíncrono.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -158,11 +157,11 @@ Future<void> main() async {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="toAsync.html"><code>toAsync</code></a> — where async pipelines start ·
-    <a href="streams.html">Stream bridges</a> — fromStream, fxStream, toStream ·
-    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation ·
-    <a href="map.html"><code>map</code></a> — the sync original
+    <strong>Relacionado:</strong>
+    <a href="toAsync.html"><code>toAsync</code></a> — donde empiezan los pipelines asíncronos ·
+    <a href="streams.html">Puentes con Stream</a> — fromStream, fxStream, toStream ·
+    <a href="concurrent.html"><code>concurrent</code></a> — evaluación en paralelo ·
+    <a href="map.html"><code>map</code></a> — el original síncrono
   </div>
 
   <nav class="tut-nav">

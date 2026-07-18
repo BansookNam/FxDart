@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>values — FxDart 101</title>
-  <meta name="description" content="FxDart values tutorial: a lazy Iterable of a Map's values, ready to feed into a chain.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/values.html">
+  <meta name="description" content="Tutorial de values en FxDart: un Iterable perezoso con los valores de un Map, listo para alimentar una cadena.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/values.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/values.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/values.html">
@@ -43,39 +42,40 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 2 · Generar secuencias › <strong>values</strong></p>
   <h1><code>values</code></h1>
-  <p class="hero-sub">The values of a Map, as a plain lazy Iterable — ready to wrap in fx() and chain.</p>
+  <p class="hero-sub">Los valores de un Map, como un Iterable perezoso normal — listo para envolver con fx() y encadenar.</p>
 
   <div class="signature">Iterable&lt;V&gt; values&lt;K, V&gt;(Map&lt;K, V&gt; map)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>values(map)</code> is <code>keys</code>'s twin: a thin wrapper
-    around Dart's <code>map.values</code>, given a name consistent with the
-    rest of the object-function vocabulary so it reads naturally as
-    <code>fx(values(map))</code> next to <code>fx(keys(map))</code> and
-    <code>fx(entries(map))</code>. Like <code>map.values</code> itself,
-    it's already a lazy view — no extra buffering happens.
+    <code>values(map)</code> es el gemelo de <code>keys</code>: un envoltorio
+    fino sobre el <code>map.values</code> de Dart, con un nombre coherente con
+    el resto del vocabulario de funciones de objeto, para que se lea con
+    naturalidad como <code>fx(values(map))</code> junto a
+    <code>fx(keys(map))</code> y <code>fx(entries(map))</code>. Igual que el
+    propio <code>map.values</code>, ya es una vista perezosa: no añade ningún
+    búfer extra.
   </p>
   <p>
-    Because it hands back a plain <code>Iterable&lt;V&gt;</code>, every
-    chain operator you've learned so far applies directly — including the
-    numeric terminals (<code>sum()</code>, <code>average()</code>,
-    <code>min()</code>, <code>max()</code>) when <code>V</code> is a
-    <code>num</code>. This makes <code>values</code> the natural entry
-    point for aggregating a Map's data: total up prices, average scores,
-    find the newest timestamp, and so on.
+    Como te devuelve un <code>Iterable&lt;V&gt;</code> normal, se le aplican
+    directamente todos los operadores de cadena que has aprendido hasta ahora
+    — incluidos los terminales numéricos (<code>sum()</code>,
+    <code>average()</code>, <code>min()</code>, <code>max()</code>) cuando
+    <code>V</code> es un <code>num</code>. Eso convierte a <code>values</code>
+    en el punto de entrada natural para agregar los datos de un Map: sumar
+    precios, promediar puntuaciones, encontrar la marca de tiempo más
+    reciente, etc.
   </p>
   <p>
-    This is also the last stop before <code>map</code> itself — the next
-    lesson, and the operator you'll reach for constantly from here on to
-    reshape whatever <code>values</code>, <code>entries</code>, or any
-    other source hands you.
+    Esta es además la última parada antes de <code>map</code> en sí — la
+    siguiente lección, y el operador al que recurrirás constantemente de aquí
+    en adelante para transformar lo que te entreguen <code>values</code>,
+    <code>entries</code> o cualquier otra fuente.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -92,7 +92,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Aggregating a Map's values</h2>
+  <h2>Demo 2 · Agregar los valores de un Map</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -114,8 +114,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>values</code> to compute the average score.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>values</code> para calcular la puntuación media.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -132,11 +132,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="keys.html"><code>keys</code></a> — the keys of a Map ·
-    <a href="entries.html"><code>entries</code></a> — keys and values paired together ·
-    <a href="map.html"><code>map</code></a> — reshape every value in a chain ·
-    <a href="sum.html"><code>sum · average · min · max</code></a> — the numeric terminals used above
+    <strong>Relacionado:</strong>
+    <a href="keys.html"><code>keys</code></a> — las claves de un Map ·
+    <a href="entries.html"><code>entries</code></a> — claves y valores emparejados ·
+    <a href="map.html"><code>map</code></a> — transformar cada valor dentro de una cadena ·
+    <a href="sum.html"><code>sum · average · min · max</code></a> — los terminales numéricos usados arriba
   </div>
 
   <nav class="tut-nav">

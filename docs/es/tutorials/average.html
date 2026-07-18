@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>average — FxDart 101</title>
-  <meta name="description" content="FxDart average tutorial: the mean of every number in a pipeline, NaN when empty, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/average.html">
+  <meta name="description" content="Tutorial de average en FxDart: la media de todos los números de un pipeline, NaN cuando está vacío, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/average.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/average.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/average.html">
@@ -43,39 +42,39 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>average</strong></p>
   <h1><code>average</code></h1>
-  <p class="hero-sub">The mean of every number the pipeline produces — <code>NaN</code> when there are none.</p>
+  <p class="hero-sub">La media de todos los números que produce el pipeline — <code>NaN</code> cuando no hay ninguno.</p>
 
   <div class="signature">double average(Iterable&lt;num&gt; iterable)
 Future&lt;double&gt; averageAsync(FxAsyncIterable&lt;num&gt; iterable)
 double Fx&lt;num&gt;.average()          // chain (sync)
 Future&lt;double&gt; FxAsync&lt;num&gt;.average()  // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>average</code> is a terminal operator that walks the whole
-    pipeline once, tracking both a running total and a running count, then
-    divides. It always returns a <code>double</code>, even for a list of
-    plain <code>int</code>s.
+    <code>average</code> es un operador terminal que recorre el pipeline
+    entero una sola vez, llevando a la vez un total y un contador
+    acumulados, y luego divide. Siempre devuelve un <code>double</code>,
+    incluso para una lista de <code>int</code> normales.
   </p>
   <p>
-    The one behavior worth internalizing: <code>average</code> of an
-    <strong>empty</strong> iterable is <code>double.nan</code> — it's
-    computing <code>0 / 0</code>, not throwing and not defaulting to
-    <code>0</code>. This mirrors FxTS exactly. If your pipeline might be
-    empty, check for that explicitly (<code>result.isNaN</code>) rather than
-    assuming a numeric fallback.
+    El comportamiento que conviene interiorizar es este: el
+    <code>average</code> de un iterable <strong>vacío</strong> es
+    <code>double.nan</code>; está calculando <code>0 / 0</code>, no lanza una
+    excepción ni recurre por defecto a <code>0</code>. Esto refleja exactamente lo
+    que hace FxTS. Si tu pipeline puede quedar vacío, compruébalo de forma
+    explícita (<code>result.isNaN</code>) en lugar de dar por hecho un valor
+    numérico de reserva.
   </p>
   <p>
-    Like <code><a href="sum.html">sum</a></code>, the chain form is exposed
-    through a <code>Fx&lt;num&gt;</code> / <code>FxAsync&lt;num&gt;</code>
-    extension, so it only becomes available once the compiler can see your
-    chain's element type is numeric.
+    Igual que <code><a href="sum.html">sum</a></code>, la forma encadenada se
+    expone mediante una extensión sobre <code>Fx&lt;num&gt;</code> /
+    <code>FxAsync&lt;num&gt;</code>, así que solo está disponible cuando el
+    compilador puede ver que el tipo de elemento de tu cadena es numérico.
   </p>
 
-  <h2>Demo 1 · Basics &amp; the empty case</h2>
+  <h2>Demo 1 · Fundamentos &amp; el caso vacío</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -94,7 +93,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -110,8 +109,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: average only the <strong>passing</strong> scores (&gt;= 60).</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: promedia solo las notas <strong>aprobadas</strong> (&gt;= 60).</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -128,10 +127,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="sum.html"><code>sum</code></a> — the numerator this divides ·
-    <a href="size.html"><code>size</code></a> — the denominator this divides by ·
-    <a href="min.html"><code>min</code></a> · <a href="max.html"><code>max</code></a> — the other numeric terminals
+    <strong>Relacionado:</strong>
+    <a href="sum.html"><code>sum</code></a> — el numerador de esta división ·
+    <a href="size.html"><code>size</code></a> — el denominador de esta división ·
+    <a href="min.html"><code>min</code></a> · <a href="max.html"><code>max</code></a> — los otros terminales numéricos
   </div>
 
   <nav class="tut-nav">

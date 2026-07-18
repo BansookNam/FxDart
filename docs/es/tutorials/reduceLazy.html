@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>reduceLazy — FxDart 101</title>
-  <meta name="description" content="FxDart reduceLazy tutorial: build a reusable reducer function you can apply to many iterables, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/reduceLazy.html">
+  <meta name="description" content="Tutorial de reduceLazy en FxDart: construye una función reductora reutilizable que puedes aplicar a muchos iterables, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/reduceLazy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/reduceLazy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/reduceLazy.html">
@@ -43,40 +42,40 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>reduceLazy</strong></p>
   <h1><code>reduceLazy</code></h1>
-  <p class="hero-sub">Curries fold's seed and combiner into a reusable reducer function.</p>
+  <p class="hero-sub">Currifica el valor inicial y el combinador de fold en una función reductora reutilizable.</p>
 
   <div class="signature">Acc Function(Iterable&lt;A&gt;) reduceLazy&lt;A, Acc&gt;(Acc Function(Acc acc, A a) f, Acc seed)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>reduceLazy</code> doesn't reduce anything by itself — it
-    <strong>builds a reducer</strong>. Give it a combining function and a
-    seed, and you get back a plain function of type
-    <code>Iterable&lt;A&gt; Function</code> that you can call as many times
-    as you like, against as many different iterables as you like, without
-    repeating the seed and combiner every time.
+    <code>reduceLazy</code> no reduce nada por sí mismo: lo que hace es
+    <strong>construir un reductor</strong>. Le das una función de combinación y
+    un valor inicial, y recibes de vuelta una función corriente de tipo
+    <code>Iterable&lt;A&gt; Function</code> que puedes llamar tantas veces como
+    quieras, sobre tantos iterables distintos como quieras, sin repetir cada
+    vez el valor inicial y el combinador.
   </p>
   <p>
-    Under the hood it's just a thin wrapper around
+    Por dentro es solo una envoltura fina sobre
     <code><a href="fold.html">fold</a></code>:
-    <code>reduceLazy(f, seed)</code> returns
-    <code>(iterable) =&gt; fold(seed, f, iterable)</code>. Notice the argument
-    order flips relative to <code>fold</code> — here it's
-    <code>(f, seed)</code>, matching FxTS's curried style, where the
-    iterable is deliberately left off until later.
+    <code>reduceLazy(f, seed)</code> devuelve
+    <code>(iterable) =&gt; fold(seed, f, iterable)</code>. Fíjate en que el
+    orden de los argumentos se invierte respecto a <code>fold</code>: aquí es
+    <code>(f, seed)</code>, siguiendo el estilo currificado de FxTS, donde el
+    iterable se deja deliberadamente para más tarde.
   </p>
   <p>
-    This is a plain (uncurried-beyond-this) Dart function, so there's no
-    <code>Fx</code> chain method or <code>*Async</code> counterpart for it —
-    but the function it returns happens to accept anything that implements
-    <code>Iterable&lt;A&gt;</code>, which includes <code>Fx&lt;A&gt;</code>.
-    That means you can drop it straight into <code>.to(...)</code> on a chain.
+    Esta es una función Dart corriente (sin currificación más allá de esto),
+    así que no tiene método de cadena <code>Fx</code> ni contraparte
+    <code>*Async</code>. Pero la función que devuelve acepta cualquier cosa que
+    implemente <code>Iterable&lt;A&gt;</code>, lo que incluye a
+    <code>Fx&lt;A&gt;</code>. Es decir, puedes pasarla directamente a
+    <code>.to(...)</code> sobre una cadena.
   </p>
 
-  <h2>Demo 1 · A reusable summer</h2>
+  <h2>Demo 1 · Un sumador reutilizable</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -95,8 +94,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Reused across different lists</h2>
-  <p>The whole point is defining the "how to combine" once and reusing it everywhere:</p>
+  <h2>Demo 2 · Reutilizado sobre listas distintas</h2>
+  <p>La gracia está en definir el "cómo combinar" una sola vez y reutilizarlo en todas partes:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -115,8 +114,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: build a reusable reducer with <code>reduceLazy</code> that finds the <strong>max</strong> value.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: construye con <code>reduceLazy</code> un reductor reutilizable que encuentre el valor <strong>máximo</strong>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -132,11 +131,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="fold.html"><code>fold</code></a> — the seeded reducer this wraps ·
-    <a href="reduce.html"><code>reduce</code></a> — the unseeded terminal ·
-    <a href="pipe.html"><code>pipe</code></a> — compose functions like this into a pipeline ·
-    <a href="memoize.html"><code>memoize</code></a> — another way to build a reusable function
+    <strong>Relacionado:</strong>
+    <a href="fold.html"><code>fold</code></a> — el reductor con valor inicial al que envuelve ·
+    <a href="reduce.html"><code>reduce</code></a> — el terminal sin valor inicial ·
+    <a href="pipe.html"><code>pipe</code></a> — compón funciones como esta en un pipeline ·
+    <a href="memoize.html"><code>memoize</code></a> — otra forma de construir una función reutilizable
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>indexBy — FxDart 101</title>
-  <meta name="description" content="FxDart indexBy tutorial: index every element by a computed key into a Map, last one wins, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/indexBy.html">
+  <meta name="description" content="FxDart indexBy 튜토리얼 — 계산된 키로 모든 원소를 Map에 색인하고 나중 값이 이기는 동작을 라이브 플레이그라운드와 함께 살펴봅니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/indexBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/indexBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/indexBy.html">
@@ -43,40 +42,39 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 7 · 집계 › <strong>indexBy</strong></p>
   <h1><code>indexBy</code></h1>
-  <p class="hero-sub">Indexes every element by a computed key into a <code>Map&lt;K, A&gt;</code> — last duplicate wins.</p>
+  <p class="hero-sub">계산된 키로 모든 원소를 <code>Map&lt;K, A&gt;</code>에 색인합니다 — 키가 겹치면 나중 값이 이깁니다.</p>
 
   <div class="signature">Map&lt;K, A&gt; indexBy&lt;A, K&gt;(K Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;Map&lt;K, A&gt;&gt; indexByAsync&lt;A, K&gt;(FutureOr&lt;K&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Map&lt;K, T&gt; Fx.indexBy&lt;K&gt;(K Function(T a) f)          // chain (sync)
 Future&lt;Map&lt;K, T&gt;&gt; FxAsync.indexBy&lt;K&gt;(FutureOr&lt;K&gt; Function(T a) f)  // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>indexBy</code> is <code><a href="groupBy.html">groupBy</a></code>'s
-    sibling: same idea — pull the whole pipeline, compute a key for each
-    element — but instead of collecting a <em>list</em> per key, it keeps
-    exactly <strong>one</strong> value per key: <code>Map&lt;K, A&gt;</code>
-    rather than <code>Map&lt;K, List&lt;A&gt;&gt;</code>.
+    <code>indexBy</code>는 <code><a href="groupBy.html">groupBy</a></code>의
+    형제입니다. 파이프라인 전체를 끌어당기며 원소마다 키를 계산한다는
+    발상은 같지만, 키마다 <em>리스트</em>를 모으는 대신 값을
+    <strong>하나만</strong> 유지합니다. 즉
+    <code>Map&lt;K, List&lt;A&gt;&gt;</code>가 아니라
+    <code>Map&lt;K, A&gt;</code>입니다.
   </p>
   <p>
-    That means duplicates don't accumulate — they overwrite. If two elements
-    produce the same key, whichever one is processed <strong>last</strong>
-    (i.e. appears later in the iterable) is the one left in the map. This is
-    the natural behavior of repeatedly doing <code>result[key(a)] = a</code>
-    while walking forward, and it matches FxTS. Reach for
-    <code>indexBy</code> specifically when you know keys should be unique
-    (like a database ID) and you want direct <code>O(1)</code> lookup instead
-    of a list you'd have to search.
+    그래서 중복은 쌓이지 않고 덮어씁니다. 두 원소가 같은 키를 만들어 내면
+    <strong>나중에</strong> 처리된 쪽(즉 이터러블에서 뒤에 오는 쪽)이
+    맵에 남습니다. 앞으로 훑어 나가며 <code>result[key(a)] = a</code>를
+    반복하면 자연스럽게 나오는 동작이고, FxTS와도 일치합니다. 키가 유일하다는
+    사실을 알고 있고(데이터베이스 ID처럼) 일일이 뒤져야 하는 리스트 대신
+    <code>O(1)</code> 조회를 바로 쓰고 싶을 때
+    <code>indexBy</code>를 꺼내 쓰면 됩니다.
   </p>
   <p>
-    If you actually expect duplicate keys and want to keep every value, use
-    <code>groupBy</code> instead — it never discards anything.
+    키가 겹칠 것을 예상하고 모든 값을 남기고 싶다면 대신
+    <code>groupBy</code>를 쓰세요. 아무것도 버리지 않습니다.
   </p>
 
-  <h2>Demo 1 · Basics &amp; last-wins</h2>
+  <h2>데모 1 · 기본, 그리고 나중 값이 이기는 동작</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -100,7 +98,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>데모 2 · 비동기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -118,8 +116,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: index the users <strong>by their id</strong>, so you can look one up directly.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 사용자를 <strong>id 기준으로</strong> 색인해서 바로 조회할 수 있게 만들어 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -140,10 +138,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="groupBy.html"><code>groupBy</code></a> — keeps every duplicate instead of overwriting ·
-    <a href="countBy.html"><code>countBy</code></a> — tally instead of keeping the value ·
-    <a href="fromEntries.html"><code>fromEntries</code></a> — build a Map from key/value pairs directly
+    <strong>관련 함수:</strong>
+    <a href="groupBy.html"><code>groupBy</code></a> — 덮어쓰지 않고 중복을 모두 유지 ·
+    <a href="countBy.html"><code>countBy</code></a> — 값을 남기는 대신 개수를 세기 ·
+    <a href="fromEntries.html"><code>fromEntries</code></a> — 키/값 쌍에서 곧바로 Map 만들기
   </div>
 
   <nav class="tut-nav">

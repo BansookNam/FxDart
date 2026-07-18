@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>throwIf — FxDart 101</title>
-  <meta name="description" content="FxDart throwIf tutorial: throw conditionally, otherwise pass the value through, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/throwIf.html">
+  <meta name="description" content="FxDart throwIf 튜토리얼: 조건이 맞으면 예외를 던지고 그렇지 않으면 값을 그대로 통과시키는 방법을 라이브 플레이그라운드와 함께 다룹니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/throwIf.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/throwIf.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/throwIf.html">
@@ -43,30 +42,29 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 10 · 함수 유틸리티 › <strong>throwIf</strong></p>
   <h1><code>throwIf</code></h1>
-  <p class="hero-sub">Throws when a predicate holds; otherwise returns the value unchanged.</p>
+  <p class="hero-sub">술어가 참이면 예외를 던지고, 그렇지 않으면 값을 그대로 반환합니다.</p>
 
   <div class="signature">T throwIf&lt;T&gt;(bool Function(T) predicate, Object Function(T) toError, T value)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>throwIf(predicate, toError, value)</code> is a guard clause you can
-    drop mid-expression: if <code>predicate(value)</code> is true, it throws
-    <code>toError(value)</code>; otherwise it hands <code>value</code> back
-    unchanged. That makes it convenient inside a <code>map</code> callback,
-    where you want to validate every element as it streams through the
-    pipeline and fail loudly the moment one is invalid.
+    <code>throwIf(predicate, toError, value)</code>는 식 한가운데에 끼워 넣을 수
+    있는 가드 절입니다. <code>predicate(value)</code>가 참이면
+    <code>toError(value)</code>를 던지고, 아니면 <code>value</code>를 손대지 않고
+    그대로 돌려줍니다. 덕분에 <code>map</code> 콜백 안에서 쓰기 좋습니다.
+    파이프라인을 흘러가는 원소를 하나씩 검증하다가 잘못된 값이 나오는 순간
+    바로 실패시킬 수 있기 때문입니다.
   </p>
   <p>
-    It's essentially <a href="when.html"><code>when</code></a> where the
-    "then" branch always throws instead of returning a value — so wrap any
-    call site in <code>try</code>/<code>catch</code> to observe or recover
-    from the failure.
+    본질적으로는 <a href="when.html"><code>when</code></a>에서 "then" 분기가
+    값을 반환하는 대신 항상 예외를 던지는 형태입니다. 따라서 호출 지점을
+    <code>try</code>/<code>catch</code>로 감싸야 실패를 관찰하거나 복구할 수
+    있습니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -83,10 +81,10 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Validating a pipeline</h2>
+  <h2>데모 2 · 파이프라인 검증하기</h2>
   <p>
-    Each age is validated as it's mapped; the first violation aborts the
-    whole <code>toArray()</code> call:
+    각 나이는 map을 거치면서 검증되고, 첫 번째 위반이 발생하는 즉시
+    <code>toArray()</code> 호출 전체가 중단됩니다.
   </p>
   <div class="playground">
 <textarea>
@@ -108,9 +106,9 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>throwIf</code> to guard against zero stock while
-    summing this inventory.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 재고 수량을 합산하면서 <code>throwIf</code>로 재고가 0인 경우를
+    막아 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -133,11 +131,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="throwError.html"><code>throwError</code></a> — a standalone throwing function, no condition ·
-    <a href="when.html"><code>when</code></a> — substitute a value instead of throwing ·
-    <a href="cases.html"><code>cases</code></a> — dispatch across multiple predicates ·
-    <a href="add.html"><code>add</code></a> — used above as the reducer
+    <strong>관련 함수:</strong>
+    <a href="throwError.html"><code>throwError</code></a> — 조건 없이 항상 던지는 단독 함수 ·
+    <a href="when.html"><code>when</code></a> — 예외 대신 다른 값으로 대체 ·
+    <a href="cases.html"><code>cases</code></a> — 여러 술어로 분기 ·
+    <a href="add.html"><code>add</code></a> — 위에서 리듀서로 사용한 함수
   </div>
 
   <nav class="tut-nav">

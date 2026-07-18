@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>differenceBy — FxDart 101</title>
-  <meta name="description" content="FxDart differenceBy tutorial: exclude elements by a computed key found in another iterable, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/differenceBy.html">
+  <meta name="description" content="Tutorial de differenceBy en FxDart: excluye elementos por una clave calculada presente en otro iterable, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/differenceBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/differenceBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/differenceBy.html">
@@ -43,43 +42,43 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 4 · Filtrado &amp; deduplicación › <strong>differenceBy</strong></p>
   <h1><code>differenceBy</code></h1>
-  <p class="hero-sub"><code>difference</code>, comparing by a computed key instead of value equality.</p>
+  <p class="hero-sub"><code>difference</code>, comparando por una clave calculada en vez de por igualdad de valor.</p>
 
   <div class="signature">Iterable&lt;A&gt; differenceBy&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable1, Iterable&lt;A&gt; iterable2)
 FxAsyncIterable&lt;A&gt; differenceByAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;A&gt; iterable2)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>differenceBy(f, iterable1, iterable2)</code> follows the exact
-    same argument-order rule as <a href="difference.html"><code>difference</code></a>:
-    the result comes <strong>from <code>iterable2</code></strong>, keeping
-    only the elements whose <code>f</code>-key does <em>not</em> appear
-    among <code>iterable1</code>'s <code>f</code>-keys (with duplicates in
-    the result collapsed). The <code>f</code> function is applied to
-    <em>both</em> iterables, so — unlike <code>differenceBy</code> in some
-    languages — both arguments must share the same element type
-    <code>A</code>; only the derived key type <code>B</code> is what's being
-    compared.
+    <code>differenceBy(f, iterable1, iterable2)</code> sigue exactamente la
+    misma regla de orden de argumentos que <a href="difference.html"><code>difference</code></a>:
+    el resultado sale <strong>de <code>iterable2</code></strong>, y conserva
+    solo los elementos cuya clave <code>f</code> <em>no</em> aparezca entre
+    las claves <code>f</code> de <code>iterable1</code> (colapsando los
+    duplicados del resultado). La función <code>f</code> se aplica a
+    <em>ambos</em> iterables, así que — a diferencia de
+    <code>differenceBy</code> en otros lenguajes — ambos argumentos deben
+    compartir el mismo tipo de elemento <code>A</code>; lo único que se
+    compara es el tipo de clave derivado <code>B</code>.
   </p>
   <p>
-    This is the shape you reach for when the "exclusion list" and the
-    "source list" are full records rather than bare values: a list of
-    blocked user objects and a list of user objects, matched by
-    <code>id</code>; or an unavailable-products list and a product catalog,
-    matched by <code>sku</code>.
+    Esta es la forma que buscas cuando la "lista de exclusión" y la "lista
+    de origen" son registros completos y no valores sueltos: una lista de
+    objetos de usuario bloqueados y una lista de objetos de usuario,
+    emparejadas por <code>id</code>; o una lista de productos no disponibles
+    y un catálogo de productos, emparejados por <code>sku</code>.
   </p>
   <p>
-    <code>difference</code> itself is just
-    <code>differenceBy((a) =&gt; a, iterable1, iterable2)</code>. There's no
-    chain method for either — call the data-first function directly. On the
-    async side, the concurrency marker applies to <code>iterable2</code>,
-    same as <code>differenceAsync</code>.
+    <code>difference</code> no es más que
+    <code>differenceBy((a) =&gt; a, iterable1, iterable2)</code>. No hay
+    método de cadena para ninguna de las dos — llama directamente a la
+    función data-first. En el lado asíncrono, el marcador de concurrencia se
+    aplica a <code>iterable2</code>, igual que en
+    <code>differenceAsync</code>.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -105,7 +104,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency</h2>
+  <h2>Demo 2 · Asíncrono, con concurrencia</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -132,9 +131,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>differenceBy</code> (keyed on <code>'sku'</code>)
-    to find products that are still available.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>differenceBy</code> (con clave <code>'sku'</code>)
+    para encontrar los productos que siguen disponibles.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -158,11 +157,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="difference.html"><code>difference</code></a> — the value-equality version ·
-    <a href="intersectionBy.html"><code>intersectionBy</code></a> — keep by a shared computed key instead ·
-    <a href="uniqBy.html"><code>uniqBy</code></a> — dedupe a single iterable by key ·
-    <a href="compress.html"><code>compress</code></a> — filter by a parallel boolean mask
+    <strong>Relacionado:</strong>
+    <a href="difference.html"><code>difference</code></a> — la versión por igualdad de valor ·
+    <a href="intersectionBy.html"><code>intersectionBy</code></a> — quedarse con los que comparten la clave calculada ·
+    <a href="uniqBy.html"><code>uniqBy</code></a> — elimina duplicados de un solo iterable por clave ·
+    <a href="compress.html"><code>compress</code></a> — filtra con una máscara booleana paralela
   </div>
 
   <nav class="tut-nav">

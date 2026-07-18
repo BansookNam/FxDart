@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>throwError — FxDart 101</title>
-  <meta name="description" content="FxDart throwError tutorial: turn an error-throwing action into a reusable unary function, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/throwError.html">
+  <meta name="description" content="FxDart throwError 튜토리얼: 예외를 던지는 동작을 재사용 가능한 단항 함수로 바꾸는 방법을 라이브 플레이그라운드와 함께 익힙니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/throwError.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/throwError.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/throwError.html">
@@ -43,32 +42,31 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 10 · 함수 유틸리티 › <strong>throwError</strong></p>
   <h1><code>throwError</code></h1>
-  <p class="hero-sub">Returns a unary function that always throws — for slots that expect a function, not a statement.</p>
+  <p class="hero-sub">항상 예외를 던지는 단항 함수를 반환합니다 — 문장이 아니라 함수를 요구하는 자리를 위해서입니다.</p>
 
   <div class="signature">Never Function(T) throwError&lt;T&gt;(Object Function(T) toError)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>throw</code> is a statement in Dart, so you can't drop it directly
-    into a spot that expects a function value. <code>throwError(toError)</code>
-    solves that: give it a function that builds an <code>Object</code> (an
-    exception or error) from the offending value, and you get back a
-    <code>Never Function(T)</code> you can pass anywhere a callback is
-    expected — most commonly as the <code>orElse</code> of
-    <a href="cases.html"><code>cases</code></a>, to turn "nothing matched"
-    into a hard failure instead of a silent fallback.
+    Dart에서 <code>throw</code>는 문장이라 함수 값을 기대하는 자리에
+    그대로 넣을 수 없습니다. <code>throwError(toError)</code>가 이 문제를
+    해결합니다. 문제가 된 값으로부터 <code>Object</code>(예외나 에러)를
+    만드는 함수를 넘기면, 콜백이 필요한 어디에든 전달할 수 있는
+    <code>Never Function(T)</code>를 돌려받습니다. 가장 흔한 쓰임은
+    <code>orElse</code> 자리입니다 —
+    <a href="cases.html"><code>cases</code></a>에 넘겨서
+    "아무것도 일치하지 않음"을 조용한 폴백 대신 확실한 실패로 바꿔 줍니다.
   </p>
   <p>
-    Because the return type is <code>Never</code>, calling it always throws;
-    it never actually returns a value of type <code>T</code>. Wrap any call
-    site in <code>try</code>/<code>catch</code> if you want to recover
-    instead of letting the error propagate.
+    반환 타입이 <code>Never</code>이므로 호출하면 언제나 예외가 발생하며,
+    <code>T</code> 타입의 값을 실제로 반환하는 일은 없습니다. 에러를
+    전파시키지 않고 복구하고 싶다면 호출 지점을
+    <code>try</code>/<code>catch</code>로 감싸세요.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -85,10 +83,10 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · As the fallback of cases</h2>
+  <h2>데모 2 · cases의 폴백으로 사용하기</h2>
   <p>
-    Instead of silently falling through, <code>throwError</code> makes an
-    unmatched value a loud, catchable failure:
+    조용히 흘려보내는 대신, <code>throwError</code>는 일치하지 않은 값을
+    눈에 띄고 잡을 수 있는 실패로 만들어 줍니다.
   </p>
   <div class="playground">
 <textarea>
@@ -111,8 +109,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: build a throwing function for "not implemented" and trigger it.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: "구현되지 않음"을 알리는 예외를 던지는 함수를 만들고 실제로 호출해 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -131,11 +129,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="throwIf.html"><code>throwIf</code></a> — throw conditionally, without a separate builder function ·
-    <a href="cases.html"><code>cases</code></a> — the usual home for throwError as orElse ·
-    <a href="when.html"><code>when</code></a> / <a href="unless.html"><code>unless</code></a> — conditional transforms that don't throw ·
-    <a href="find.html"><code>find</code></a> — returns null instead of throwing on no match
+    <strong>관련 함수:</strong>
+    <a href="throwIf.html"><code>throwIf</code></a> — 별도의 빌더 함수 없이 조건부로 던집니다 ·
+    <a href="cases.html"><code>cases</code></a> — throwError가 orElse로 자리 잡는 곳 ·
+    <a href="when.html"><code>when</code></a> / <a href="unless.html"><code>unless</code></a> — 예외를 던지지 않는 조건부 변환 ·
+    <a href="find.html"><code>find</code></a> — 일치하는 값이 없으면 예외 대신 null을 반환합니다
   </div>
 
   <nav class="tut-nav">

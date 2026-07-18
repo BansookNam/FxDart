@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>omit — FxDart 101</title>
-  <meta name="description" content="FxDart omit tutorial: return a copy of a Map without the given keys, leaving the original untouched.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/omit.html">
+  <meta name="description" content="FxDart omit 튜토리얼: 원본은 그대로 둔 채 지정한 키를 뺀 Map의 복사본을 얻는 방법을 알아봅니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/omit.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/omit.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/omit.html">
@@ -43,29 +42,28 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 9 · 객체(Map) 함수 › <strong>omit</strong></p>
   <h1><code>omit</code></h1>
-  <p class="hero-sub">Returns a copy of a <code>Map</code> without the given keys.</p>
+  <p class="hero-sub">지정한 키를 제외한 <code>Map</code>의 복사본을 반환합니다.</p>
 
   <div class="signature">Map&lt;K, V&gt; omit&lt;K, V&gt;(Iterable&lt;K&gt; keysToOmit, Map&lt;K, V&gt; map)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>omit</code> builds a brand-new <code>Map</code> containing every
-    entry of the original <em>except</em> the keys you list — the source
-    map is never mutated. Keys in <code>keysToOmit</code> that don't
-    actually exist in the map are simply ignored; there's no error for
-    "extra" keys to remove.
+    <code>omit</code>은 원본의 모든 항목을 그대로 담은 새 <code>Map</code>을
+    만들되, 나열한 키만 <em>제외합니다</em> —
+    원본 맵은 절대 변경되지 않습니다.
+    <code>keysToOmit</code>에 넣었지만 실제로는 맵에 없는 키는
+    그냥 무시되며, 제거 목록에 여분의 키가 섞여 있어도 오류가 나지 않습니다.
   </p>
   <p>
-    It's a common redaction/serialization tool: strip a password hash before
-    logging a user object, drop an internal field before sending a response,
-    and so on. Pair it with <code>map()</code> to redact a whole list of
-    maps at once.
+    민감 정보 제거나 직렬화에 흔히 쓰이는 도구입니다. 사용자 객체를 로깅하기 전에
+    비밀번호 해시를 걷어 내거나, 응답을 보내기 전에 내부 필드를 빼는 식이죠.
+    <code>map()</code>과 함께 쓰면 맵으로 이루어진 목록 전체를 한 번에
+    가릴 수 있습니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -78,7 +76,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Redacting a whole list</h2>
+  <h2>데모 2 · 목록 전체에서 민감 정보 제거하기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -98,8 +96,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>omit</code> to drop the <code>'debug'</code> key from <code>config</code>.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>omit</code>으로 <code>config</code>에서 <code>'debug'</code> 키를 제거해 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -116,11 +114,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="pick.html"><code>pick</code></a> — the inverse: keep only some keys ·
-    <a href="omitBy.html"><code>omitBy</code></a> — drop by predicate instead of key list ·
-    <a href="compactObject.html"><code>compactObject</code></a> — drop null-valued keys ·
-    <a href="fromEntries.html"><code>fromEntries</code></a> — build a Map from scratch
+    <strong>관련 함수:</strong>
+    <a href="pick.html"><code>pick</code></a> — 반대로, 일부 키만 남기기 ·
+    <a href="omitBy.html"><code>omitBy</code></a> — 키 목록 대신 술어로 제거하기 ·
+    <a href="compactObject.html"><code>compactObject</code></a> — 값이 null인 키 제거하기 ·
+    <a href="fromEntries.html"><code>fromEntries</code></a> — Map을 처음부터 만들기
   </div>
 
   <nav class="tut-nav">

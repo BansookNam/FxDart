@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>nth — FxDart 101</title>
-  <meta name="description" content="FxDart nth tutorial: safely pull the element at an index, null on out-of-range, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/nth.html">
+  <meta name="description" content="FxDart nth 튜토리얼: 특정 인덱스의 원소를 안전하게 꺼내고 범위를 벗어나면 null을 얻는 방법을 라이브 플레이그라운드와 함께 알아봅니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/nth.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/nth.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/nth.html">
@@ -43,32 +42,29 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 8 · 접근 &amp; 술어 › <strong>nth</strong></p>
   <h1><code>nth</code></h1>
-  <p class="hero-sub">Returns the element at a given index, or <code>null</code> when the index is out of range.</p>
+  <p class="hero-sub">주어진 인덱스의 원소를 반환하고, 인덱스가 범위를 벗어나면 <code>null</code>을 반환합니다.</p>
 
   <div class="signature">A? nth&lt;A&gt;(int index, Iterable&lt;A&gt; iterable)
 Future&lt;A?&gt; nthAsync&lt;A&gt;(int index, FxAsyncIterable&lt;A&gt; iterable)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>nth</code> walks the iterable and stops as soon as it reaches
-    <code>index</code>, so it only ever pulls <code>index + 1</code>
-    elements — cheap even on a huge lazy sequence, and much cheaper than
-    materializing the whole thing just to index into a <code>List</code>.
-    A negative index, or one past the end, simply yields <code>null</code>;
-    unlike some languages' array indexing, there's no wraparound-from-the-end
-    behavior here — the index has to be a valid, non-negative position.
+    <code>nth</code>는 이터러블을 순회하다가 <code>index</code>에 도달하는 즉시
+    멈추므로, 언제나 <code>index + 1</code>개만 꺼냅니다 — 거대한 지연
+    시퀀스에서도 저렴하고, 인덱싱 한 번 하자고 전체를 <code>List</code>로
+    구체화하는 것보다 훨씬 저렴합니다. 음수 인덱스나 끝을 넘어선 인덱스는
+    그냥 <code>null</code>을 내놓습니다. 일부 언어의 배열 인덱싱과 달리 여기에는
+    끝에서부터 되감는 동작이 없습니다 — 인덱스는 유효한 음이 아닌 위치여야 합니다.
   </p>
   <p>
-    There's no chain method for <code>nth</code> — call the top-level
-    function (or its async twin) directly on any <code>Iterable</code> or
-    <code>Fx</code> chain, since <code>Fx</code> <em>is</em> an
-    <code>Iterable</code>.
+    <code>nth</code>에는 체인 메서드가 없습니다 — 최상위 함수(또는 그 비동기
+    쌍둥이)를 임의의 <code>Iterable</code>이나 <code>Fx</code> 체인에 직접
+    호출하세요. <code>Fx</code>는 <em>그 자체가</em> <code>Iterable</code>이기 때문입니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -83,8 +79,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Laziness &amp; async</h2>
-  <p>Fetching index 3 only pulls 4 elements from the million-element range — proven with a <code>peek</code> counter:</p>
+  <h2>데모 2 · 지연 평가 &amp; 비동기</h2>
+  <p>인덱스 3을 가져올 때 100만 개짜리 범위에서 단 4개만 꺼내 온다는 사실을 <code>peek</code> 카운터로 확인합니다.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -103,8 +99,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>nth</code> to print the silver medalist (index 1), or <code>'unclaimed'</code>.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>nth</code>로 은메달리스트(인덱스 1)를 출력하거나, 없으면 <code>'unclaimed'</code>를 출력해 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -121,11 +117,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="head.html"><code>head</code></a> — shorthand for <code>nth(0, ...)</code> ·
-    <a href="last.html"><code>last</code></a> — the final element ·
-    <a href="find.html"><code>find</code></a> — locate by predicate instead of index ·
-    <a href="slice.html"><code>slice</code></a> — pull a whole range
+    <strong>관련 함수:</strong>
+    <a href="head.html"><code>head</code></a> — <code>nth(0, ...)</code>의 축약형 ·
+    <a href="last.html"><code>last</code></a> — 마지막 원소 ·
+    <a href="find.html"><code>find</code></a> — 인덱스 대신 술어로 찾기 ·
+    <a href="slice.html"><code>slice</code></a> — 구간 전체를 꺼내기
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>takeRight — FxDart 101</title>
-  <meta name="description" content="FxDart takeRight tutorial: keep only the last n values of a finite iterable, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/takeRight.html">
+  <meta name="description" content="FxDart takeRight 튜토리얼 — 유한한 이터러블에서 뒤의 n개 값만 남깁니다. 라이브 플레이그라운드 포함.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/takeRight.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/takeRight.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/takeRight.html">
@@ -43,33 +42,32 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 5 · 잘라내기 › <strong>takeRight</strong></p>
   <h1><code>takeRight</code></h1>
-  <p class="hero-sub">Returns a lazy iterable of the last <code>length</code> values from a source.</p>
+  <p class="hero-sub">소스에서 뒤의 <code>length</code>개 값을 담은 지연 이터러블을 반환합니다.</p>
 
   <div class="signature">Iterable&lt;A&gt; takeRight&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; takeRightAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.takeRight(int count)        // chain
 FxAsync&lt;T&gt; FxAsync.takeRight(int count)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>takeRight</code> is <code>take</code>'s mirror image: instead of
-    the first <code>length</code> values, you get the last ones. There's a
-    catch, though — to know what the "last" values are, <code>takeRight</code>
-    has to see every element first. It <strong>materializes</strong> the
-    whole source into a list internally before yielding anything, so unlike
-    most FxDart operators it does not work on infinite sequences.
+    <code>takeRight</code>는 <code>take</code>를 거울에 비친 함수입니다.
+    앞의 <code>length</code>개가 아니라 뒤쪽 값을 돌려줍니다. 다만 한 가지 함정이 있습니다 — "뒤쪽" 값이 무엇인지
+    알려면 <code>takeRight</code>는 먼저 모든 원소를 봐야 합니다. 값을
+    하나라도 내보내기 전에 소스 전체를 리스트로
+    <strong>구체화</strong>하기 때문에, 대부분의 FxDart 연산자와 달리
+    무한 시퀀스에서는 동작하지 않습니다.
   </p>
   <p>
-    The async version has the same constraint: <code>takeRightAsync</code>
-    drains the entire upstream (awaiting every element) before it can hand
-    back the tail. Reach for it only when you know the source is finite and
-    small enough to buffer.
+    비동기 버전에도 같은 제약이 있습니다. <code>takeRightAsync</code>는
+    꼬리 부분을 돌려주기 전에 상류 전체를 (모든 원소를 await 하며)
+    소진합니다. 소스가 유한하고 버퍼링해도 될 만큼 작다는 것을 알 때에만
+    쓰세요.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -84,7 +82,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async (must buffer the whole source first)</h2>
+  <h2>데모 2 · 비동기 (소스 전체를 먼저 버퍼링해야 합니다)</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -103,8 +101,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: keep only the last 3 scores.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 마지막 점수 3개만 남겨 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -121,11 +119,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="take.html"><code>take</code></a> — first n instead of last n ·
-    <a href="dropRight.html"><code>dropRight</code></a> — drop the last n ·
-    <a href="reverse.html"><code>reverse</code></a> — also materializes the source ·
-    <a href="slice.html"><code>slice</code></a> — arbitrary index window
+    <strong>관련 함수:</strong>
+    <a href="take.html"><code>take</code></a> — 뒤의 n개 대신 앞의 n개 ·
+    <a href="dropRight.html"><code>dropRight</code></a> — 뒤의 n개를 버리기 ·
+    <a href="reverse.html"><code>reverse</code></a> — 이쪽도 소스를 구체화합니다 ·
+    <a href="slice.html"><code>slice</code></a> — 임의의 인덱스 구간
   </div>
 
   <nav class="tut-nav">

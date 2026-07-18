@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>prop — FxDart 101</title>
-  <meta name="description" content="FxDart prop tutorial: read a single Map key as a tear-off-friendly function, null on a miss.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/prop.html">
+  <meta name="description" content="Tutorial de prop en FxDart: lee una sola clave de un Map como función reutilizable, con null cuando no existe.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/prop.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/prop.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/prop.html">
@@ -43,32 +42,31 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 9 · Funciones de objeto (Map) › <strong>prop</strong></p>
   <h1><code>prop</code></h1>
-  <p class="hero-sub">Returns the value of a key in a <code>Map</code>, or <code>null</code> when it's missing.</p>
+  <p class="hero-sub">Devuelve el valor de una clave de un <code>Map</code>, o <code>null</code> si no existe.</p>
 
   <div class="signature">V? prop&lt;K, V&gt;(K key, Map&lt;K, V&gt; map)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    On its own, <code>prop('name', user)</code> does exactly what
-    <code>user['name']</code> already does in Dart — a missing key yields
-    <code>null</code> either way. The reason it exists as a function at all
-    is composability: <code>map[key]</code> is an operator, not a value you
-    can pass around, but <code>(m) => prop('name', m)</code> is a plain
-    unary function you can hand to <code>map</code>, <code>juxt</code>,
-    <code>evolve</code>'s callbacks, or anywhere else a
-    <code>Function(Map)</code> is expected.
+    Por sí solo, <code>prop('name', user)</code> hace exactamente lo mismo que
+    <code>user['name']</code> en Dart: si la clave falta, en ambos casos sale
+    <code>null</code>. La razón de que exista como función es la
+    componibilidad: <code>map[key]</code> es un operador, no un valor que
+    puedas pasar por ahí, mientras que <code>(m) => prop('name', m)</code> es
+    una función unaria normal que puedes entregar a <code>map</code>, a
+    <code>juxt</code>, a los callbacks de <code>evolve</code> o a
+    cualquier sitio donde se espere un <code>Function(Map)</code>.
   </p>
   <p>
-    If what you actually want is one field pulled out of a whole <em>list</em>
-    of maps, reach for <a href="pluck.html"><code>pluck</code></a> instead —
-    it's <code>prop</code> already bound to a key and mapped over a
-    collection in one call.
+    Si lo que quieres de verdad es extraer un campo de una <em>lista</em>
+    entera de mapas, tira de <a href="pluck.html"><code>pluck</code></a>: es
+    <code>prop</code> ya fijado a una clave y aplicado con map sobre toda la
+    colección en una sola llamada.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -81,7 +79,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · As a tear-off, vs. <code>pluck</code></h2>
+  <h2>Demo 2 · Como función suelta, frente a <code>pluck</code></h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -100,8 +98,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>prop</code> to read <code>'theme'</code>, or <code>'light'</code> if it's missing.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>prop</code> para leer <code>'theme'</code>, o <code>'light'</code> si no está.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -118,11 +116,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="props.html"><code>props</code></a> — read several keys at once ·
-    <a href="pluck.html"><code>pluck</code></a> — <code>prop</code> mapped over a whole list ·
-    <a href="pick.html"><code>pick</code></a> — keep several keys as a Map ·
-    <a href="evolve.html"><code>evolve</code></a> — transform a value in place
+    <strong>Relacionado:</strong>
+    <a href="props.html"><code>props</code></a> — lee varias claves a la vez ·
+    <a href="pluck.html"><code>pluck</code></a> — <code>prop</code> aplicado con map sobre toda una lista ·
+    <a href="pick.html"><code>pick</code></a> — conserva varias claves como Map ·
+    <a href="evolve.html"><code>evolve</code></a> — transforma un valor in situ
   </div>
 
   <nav class="tut-nav">

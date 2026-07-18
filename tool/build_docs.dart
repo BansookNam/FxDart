@@ -247,11 +247,7 @@ Page _loadPage(String relPath, Locale locale) {
     throw StateError('$relPath: missing front matter');
   }
 
-  final meta = <String, String>{};
-  for (final line in raw.substring(4, end).split('\n')) {
-    final i = line.indexOf(':');
-    if (i > 0) meta[line.substring(0, i).trim()] = line.substring(i + 1).trim();
-  }
+  final meta = _frontMatter(raw);
 
   // Strip blank lines only — the first content line's indentation is part of
   // the <main> layout and must survive the round trip.
@@ -259,16 +255,31 @@ Page _loadPage(String relPath, Locale locale) {
       .substring(end + 5)
       .replaceAll(RegExp(r'^\s*\n'), '')
       .replaceAll(RegExp(r'\s+$'), '');
-  // A translation that drops or renumbers a {{playground:N}} would silently
-  // lose a code sample, so parity with the English source is a build error.
   if (translated && !locale.isBase) {
     final english = File('$root/content/$relPath').readAsStringSync();
+
+    // A translation that drops or renumbers a {{playground:N}} would silently
+    // lose a code sample, so parity with the English source is a build error.
     final expected = _placeholders.allMatches(english).map((m) => m[0]).toList();
     final actual = _placeholders.allMatches(body).map((m) => m[0]).toList();
     if (!_sameOrder(expected, actual)) {
       throw StateError('i18n/${locale.code}/$relPath: placeholder mismatch\n'
           '  expected: $expected\n'
           '  found:    $actual');
+    }
+
+    // Only `title` and `description` are prose. Everything else is structure —
+    // function names and link targets — and a translated `next:` would quietly
+    // break the tutorial chain for that language only.
+    final enMeta = _frontMatter(english);
+    for (final key in enMeta.keys.toList()..addAll(meta.keys)) {
+      if (key == 'title' || key == 'description') continue;
+      if (enMeta[key] != meta[key]) {
+        throw StateError('i18n/${locale.code}/$relPath: front matter `$key` '
+            'must match English exactly (it is structure, not prose)\n'
+            '  English: ${enMeta[key]}\n'
+            '  Found:   ${meta[key]}');
+      }
     }
   }
 
@@ -310,6 +321,18 @@ final _placeholders = RegExp(r'\{\{(?:root|signature|playground:\d+)\}\}');
 
 bool _sameOrder(List<String?> a, List<String?> b) =>
     a.length == b.length && List.generate(a.length, (i) => a[i] == b[i]).every((x) => x);
+
+/// Parses the `---` fenced front matter at the top of a content file.
+Map<String, String> _frontMatter(String raw) {
+  final end = raw.indexOf('\n---\n', 4);
+  if (!raw.startsWith('---\n') || end == -1) return {};
+  final meta = <String, String>{};
+  for (final line in raw.substring(4, end).split('\n')) {
+    final i = line.indexOf(':');
+    if (i > 0) meta[line.substring(0, i).trim()] = line.substring(i + 1).trim();
+  }
+  return meta;
+}
 
 /// Substitutes the locale-invariant code blocks back into the prose, and
 /// resolves {{root}} to the site root. Shared assets live once at the site root

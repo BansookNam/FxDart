@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>intersectionBy — FxDart 101</title>
-  <meta name="description" content="FxDart intersectionBy tutorial: keep elements by a computed key shared with another iterable, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/intersectionBy.html">
+  <meta name="description" content="FxDart intersectionBy 튜토리얼 — 다른 이터러블과 공유하는 계산된 키를 기준으로 원소를 남기는 방법을 라이브 플레이그라운드와 함께 살펴봅니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/intersectionBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/intersectionBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/intersectionBy.html">
@@ -43,40 +42,38 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 4 · 필터링 &amp; 중복 제거 › <strong>intersectionBy</strong></p>
   <h1><code>intersectionBy</code></h1>
-  <p class="hero-sub"><code>intersection</code>, comparing by a computed key instead of value equality.</p>
+  <p class="hero-sub">값 동등성 대신 계산된 키로 비교하는 <code>intersection</code>입니다.</p>
 
   <div class="signature">Iterable&lt;A&gt; intersectionBy&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable1, Iterable&lt;A&gt; iterable2)
 FxAsyncIterable&lt;A&gt; intersectionByAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;A&gt; iterable2)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    Same shape as <a href="differenceBy.html"><code>differenceBy</code></a>,
-    opposite condition: <code>intersectionBy(f, iterable1, iterable2)</code>
-    walks <strong><code>iterable2</code></strong> and keeps each element
-    whose <code>f</code>-key <em>is</em> found among <code>iterable1</code>'s
-    <code>f</code>-keys, deduplicated by that key. <code>f</code> applies to
-    both iterables, so both must share the same element type <code>A</code>
-    — only the comparison key type <code>B</code> can differ from
-    <code>A</code>.
+    <a href="differenceBy.html"><code>differenceBy</code></a>와 형태는 같고
+    조건만 반대입니다. <code>intersectionBy(f, iterable1, iterable2)</code>는
+    <strong><code>iterable2</code></strong>를 훑으면서
+    <code>f</code>로 만든 키가 <em>존재하는</em> 원소만 남깁니다. 비교
+    대상은 <code>iterable1</code>의 <code>f</code>-키이고, 그 키를 기준으로
+    중복도 제거됩니다. <code>f</code>는 양쪽 이터러블에 모두 적용되므로 두
+    이터러블은 같은 원소 타입 <code>A</code>를 공유해야 합니다. 비교 키 타입
+    <code>B</code>만 <code>A</code>와 달라도 됩니다.
   </p>
   <p>
-    This is the natural match for two lists of full records that share an
-    identifying field: a list of "featured" SKUs and a product catalog, a
-    list of active-user IDs and a list of full user objects, and so on.
-    <code>intersection</code> itself is
-    <code>intersectionBy((a) =&gt; a, iterable1, iterable2)</code>.
+    식별용 필드를 공유하는 온전한 레코드 두 목록에 딱 맞는 함수입니다.
+    "추천" SKU 목록과 상품 카탈로그, 활성 사용자 ID 목록과 전체 사용자
+    객체 목록 같은 경우가 그렇습니다. <code>intersection</code> 자체가
+    <code>intersectionBy((a) =&gt; a, iterable1, iterable2)</code>입니다.
   </p>
   <p>
-    No chain method exists; call the data-first function or its async
-    counterpart. The concurrency marker from <code>.concurrent(n)</code>
-    applies to <code>iterable2</code>, exactly as with
-    <code>intersectionAsync</code>.
+    체인 메서드는 없습니다. data-first 함수나 그 비동기 짝을 호출하세요.
+    <code>.concurrent(n)</code>의 동시성 표시는
+    <code>intersectionAsync</code>와 똑같이
+    <code>iterable2</code>에 적용됩니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -102,7 +99,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency</h2>
+  <h2>데모 2 · 비동기, 그리고 동시성</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -129,9 +126,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>intersectionBy</code> (keyed on <code>'sku'</code>)
-    to find products that are on sale.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>intersectionBy</code>를 <code>'sku'</code> 키 기준으로 써서
+    할인 중인 상품을 찾아보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -155,11 +152,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="intersection.html"><code>intersection</code></a> — the value-equality version ·
-    <a href="differenceBy.html"><code>differenceBy</code></a> — exclude by a shared computed key instead ·
-    <a href="uniqBy.html"><code>uniqBy</code></a> — dedupe a single iterable by key ·
-    <a href="compress.html"><code>compress</code></a> — filter by a parallel boolean mask
+    <strong>관련 함수:</strong>
+    <a href="intersection.html"><code>intersection</code></a> — 값 동등성으로 비교하는 버전 ·
+    <a href="differenceBy.html"><code>differenceBy</code></a> — 반대로 공통 계산 키를 가진 원소를 제외하기 ·
+    <a href="uniqBy.html"><code>uniqBy</code></a> — 키 기준으로 이터러블 하나에서 중복 제거 ·
+    <a href="compress.html"><code>compress</code></a> — 나란한 불리언 마스크로 필터링
   </div>
 
   <nav class="tut-nav">

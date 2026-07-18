@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>findIndex — FxDart 101</title>
-  <meta name="description" content="FxDart findIndex tutorial: get the position of the first match, -1 when nothing matches, lazy and short-circuiting.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/findIndex.html">
+  <meta name="description" content="FxDart findIndex 튜토리얼: 지연 평가와 단축 평가로 첫 일치 원소의 위치를 찾고, 없으면 -1을 받는 방법을 익힙니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/findIndex.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/findIndex.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/findIndex.html">
@@ -43,34 +42,34 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 8 · 접근 &amp; 술어 › <strong>findIndex</strong></p>
   <h1><code>findIndex</code></h1>
-  <p class="hero-sub">Returns the index of the first element for which a predicate is true, or <code>-1</code>.</p>
+  <p class="hero-sub">술어가 true인 첫 번째 원소의 인덱스를 반환하며, 없으면 <code>-1</code>을 반환합니다.</p>
 
   <div class="signature">int findIndex&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;int&gt; findIndexAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 int Fx.findIndex(bool Function(T a) f)              // chain
 Future&lt;int&gt; FxAsync.findIndex(FutureOr&lt;bool&gt; Function(T a) f)  // chain</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>findIndex</code> is <code>find</code>'s sibling: same lazy,
-    short-circuiting scan, but it reports <em>where</em> the match was
-    instead of the match itself. Note the different "nothing found"
-    sentinel — this one is <code>-1</code>, an <code>int</code>, matching
-    JavaScript's <code>Array.prototype.findIndex</code>. That's a deliberate
-    contrast with <code>head</code>/<code>find</code>/<code>nth</code>,
-    which all use <code>null</code>: an index has a natural "impossible"
-    value, so FxDart keeps the FxTS convention here instead of inventing an
-    <code>int?</code> return type.
+    <code>findIndex</code>는 <code>find</code>의 형제입니다. 지연 평가와
+    단축 평가로 훑는 방식은 똑같지만, 일치한 값 자체가 아니라 그것이
+    <em>어디에</em> 있었는지를 알려 줍니다. "찾지 못했음"을 나타내는 값이
+    다르다는 점에 주의하세요 — 여기서는 <code>int</code> 타입의
+    <code>-1</code>이며, 자바스크립트의
+    <code>Array.prototype.findIndex</code>를 따른 것입니다. 모두
+    <code>null</code>을 쓰는 <code>head</code>/<code>find</code>/<code>nth</code>와
+    의도적으로 대비되는 선택입니다. 인덱스에는 "불가능한 값"이 자연스럽게
+    존재하므로, FxDart는 <code>int?</code> 반환 타입을 새로 만들기보다
+    이 지점에서는 FxTS의 관례를 그대로 따릅니다.
   </p>
   <p>
-    Internally it pairs each element with its index (via <code>zipWithIndex</code>)
-    and stops at the first one that passes <code>f</code>.
+    내부적으로는 각 원소를 인덱스와 짝지은 뒤(<code>zipWithIndex</code> 사용)
+    <code>f</code>를 통과하는 첫 번째 원소에서 멈춥니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -83,7 +82,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Short-circuiting &amp; async</h2>
+  <h2>데모 2 · 단축 평가와 비동기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -105,8 +104,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>findIndex</code> to find bob's position in the queue, or <code>-1</code>.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>findIndex</code>로 큐에서 bob의 위치를 찾고, 없으면 <code>-1</code>을 받아 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -123,11 +122,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="find.html"><code>find</code></a> — same search, returns the value ·
-    <a href="includes.html"><code>includes</code></a> — just "is it there?" ·
-    <a href="nth.html"><code>nth</code></a> — the inverse: index in, value out ·
-    <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — what powers this under the hood
+    <strong>관련 함수:</strong>
+    <a href="find.html"><code>find</code></a> — 같은 탐색, 값을 반환 ·
+    <a href="includes.html"><code>includes</code></a> — 그저 "있는가?"만 확인 ·
+    <a href="nth.html"><code>nth</code></a> — 그 반대: 인덱스를 넣고 값을 받기 ·
+    <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — 내부 동작을 떠받치는 함수
   </div>
 
   <nav class="tut-nav">

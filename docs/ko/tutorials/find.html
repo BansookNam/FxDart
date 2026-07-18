@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>find — FxDart 101</title>
-  <meta name="description" content="FxDart find tutorial: get the first element matching a predicate, lazy and short-circuiting, null when nothing matches.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/find.html">
+  <meta name="description" content="FxDart find 튜토리얼: 술어와 일치하는 첫 원소를 지연 평가와 단축 평가로 찾고, 없으면 null을 받는 방법을 익힙니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/find.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/find.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/find.html">
@@ -43,32 +42,32 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 8 · 접근 &amp; 술어 › <strong>find</strong></p>
   <h1><code>find</code></h1>
-  <p class="hero-sub">Returns the first element for which a predicate is true, or <code>null</code>.</p>
+  <p class="hero-sub">술어가 true인 첫 번째 원소를 반환하며, 없으면 <code>null</code>을 반환합니다.</p>
 
   <div class="signature">A? find&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;A?&gt; findAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 T? Fx.find(bool Function(T a) f)              // chain
 Future&lt;T?&gt; FxAsync.find(FutureOr&lt;bool&gt; Function(T a) f)  // chain</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>find</code> is what <code>head</code> and <code>filter</code>
-    look like fused together — in fact it's implemented as exactly that:
-    <code>head(filter(f, iterable))</code>. That fusion is what makes it
-    lazy and short-circuiting: it pulls elements one at a time, testing each
-    against <code>f</code>, and stops the instant it finds a match. Nothing
-    further downstream is ever touched.
+    <code>find</code>는 <code>head</code>와 <code>filter</code>를 하나로
+    합친 모습입니다 — 실제로 구현도 정확히 그렇습니다:
+    <code>head(filter(f, iterable))</code>. 이 결합 덕분에 지연 평가와
+    단축 평가가 가능합니다. 원소를 하나씩 끌어와 <code>f</code>로 검사하고,
+    일치하는 것을 찾는 즉시 멈춥니다. 그보다 뒤에 있는 원소는 전혀
+    건드리지 않습니다.
   </p>
   <p>
-    Just like <code>head</code>, an unmatched search returns <code>null</code>
-    rather than FxTS's <code>undefined</code>. It's available data-first,
-    as an async variant, and as a method on both the sync and async chains.
+    <code>head</code>와 마찬가지로, 찾지 못했을 때는 FxTS의
+    <code>undefined</code>가 아니라 <code>null</code>을 반환합니다.
+    data-first 형태, 비동기 버전, 그리고 동기와 비동기 체인 양쪽의
+    메서드로 모두 제공됩니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -88,8 +87,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Short-circuiting &amp; async</h2>
-  <p>Only 6 of a million elements are ever checked:</p>
+  <h2>데모 2 · 단축 평가와 비동기</h2>
+  <p>백만 개의 원소 중 단 6개만 검사합니다:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -111,8 +110,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>find</code> to get the first item with <code>qty &gt; 0</code>, or <code>null</code>.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>find</code>로 <code>qty &gt; 0</code>인 첫 항목을 찾고, 없으면 <code>null</code>을 받아 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -133,11 +132,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="findIndex.html"><code>findIndex</code></a> — same search, returns a position ·
-    <a href="filter.html"><code>filter</code></a> — every match, not just the first ·
-    <a href="head.html"><code>head</code></a> — what <code>find</code> is built from ·
-    <a href="matches.html"><code>matches</code></a> — a ready-made shape-matching predicate
+    <strong>관련 함수:</strong>
+    <a href="findIndex.html"><code>findIndex</code></a> — 같은 탐색, 위치를 반환 ·
+    <a href="filter.html"><code>filter</code></a> — 첫 번째가 아니라 일치하는 모든 원소 ·
+    <a href="head.html"><code>head</code></a> — <code>find</code>를 이루는 재료 ·
+    <a href="matches.html"><code>matches</code></a> — 형태 비교용으로 미리 만들어진 술어
   </div>
 
   <nav class="tut-nav">

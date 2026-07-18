@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>drop — FxDart 101</title>
-  <meta name="description" content="FxDart drop tutorial: skip the first n values of a lazy pipeline, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/drop.html">
+  <meta name="description" content="Tutorial de drop en FxDart: omite los primeros n valores de un pipeline perezoso, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/drop.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/drop.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/drop.html">
@@ -43,32 +42,31 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 5 · Segmentación › <strong>drop</strong></p>
   <h1><code>drop</code></h1>
-  <p class="hero-sub">Returns a lazy iterable that skips the first <code>length</code> values.</p>
+  <p class="hero-sub">Devuelve un iterable perezoso que omite los primeros <code>length</code> valores.</p>
 
   <div class="signature">Iterable&lt;A&gt; drop&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; dropAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.drop(int count)        // chain — also aliased as Fx.skip
 FxAsync&lt;T&gt; FxAsync.drop(int count)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>drop</code> is <code>take</code>'s opposite: it discards the first
-    <code>length</code> values and yields everything after them. It's still
-    lazy — nothing is skipped until the pipeline is actually pulled — and it
-    works fine on infinite sources, since it only needs to count off a fixed
-    number of elements before passing the rest straight through.
+    <code>drop</code> es el opuesto de <code>take</code>: descarta los primeros
+    <code>length</code> valores y emite todo lo que venga después. Sigue siendo
+    perezoso —no se omite nada hasta que alguien tira realmente del pipeline— y
+    funciona sin problemas sobre fuentes infinitas, ya que solo necesita contar
+    un número fijo de elementos antes de dejar pasar el resto tal cual.
   </p>
   <p>
-    On the <code>Fx</code> chain, <code>drop</code> is also available as
-    <code>skip</code>, matching Dart's own <code>Iterable.skip</code> naming
-    (FxDart's <code>Fx</code> already extends <code>Iterable</code>, so both
-    spellings resolve to the same operator).
+    En la cadena <code>Fx</code>, <code>drop</code> también está disponible como
+    <code>skip</code>, siguiendo la nomenclatura del propio <code>Iterable.skip</code>
+    de Dart (el <code>Fx</code> de FxDart ya extiende <code>Iterable</code>, así que
+    ambas grafías resuelven al mismo operador).
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -83,7 +81,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency</h2>
+  <h2>Demo 2 · Asíncrono, con concurrencia</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -104,8 +102,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: drop the first 2 header lines.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: descarta las 2 primeras líneas de cabecera.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -122,11 +120,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="take.html"><code>take</code></a> — the opposite, keep the first n ·
-    <a href="dropRight.html"><code>dropRight</code></a> — drop from the end ·
-    <a href="dropWhile.html"><code>dropWhile</code></a> — drop by predicate ·
-    <a href="slice.html"><code>slice</code></a> — arbitrary index window
+    <strong>Relacionado:</strong>
+    <a href="take.html"><code>take</code></a> — lo contrario, se queda con los primeros n ·
+    <a href="dropRight.html"><code>dropRight</code></a> — descarta desde el final ·
+    <a href="dropWhile.html"><code>dropWhile</code></a> — descarta según un predicado ·
+    <a href="slice.html"><code>slice</code></a> — ventana de índices arbitraria
   </div>
 
   <nav class="tut-nav">

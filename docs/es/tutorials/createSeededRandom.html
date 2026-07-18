@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>createSeededRandom — FxDart 101</title>
-  <meta name="description" content="FxDart createSeededRandom tutorial: a deterministic seeded PRNG for reproducible shuffles and tests, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/createSeededRandom.html">
+  <meta name="description" content="Tutorial de createSeededRandom en FxDart: un PRNG determinista con semilla para barajados y tests reproducibles, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/createSeededRandom.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/createSeededRandom.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/createSeededRandom.html">
@@ -43,37 +42,38 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 12 · Util › <strong>createSeededRandom</strong></p>
   <h1><code>createSeededRandom</code></h1>
-  <p class="hero-sub">A deterministic seeded random generator — the engine behind reproducible shuffles.</p>
+  <p class="hero-sub">Un generador aleatorio determinista con semilla: el motor detrás de los barajados reproducibles.</p>
 
   <div class="signature">double Function() createSeededRandom(int seed)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>createSeededRandom(seed)</code> returns a zero-argument function
-    that produces pseudo-random doubles in <code>[0, 1)</code>. The sequence
-    is fully determined by the seed: two generators built from the same seed
-    yield exactly the same numbers, in the same order, on every platform.
+    <code>createSeededRandom(seed)</code> devuelve una función sin argumentos
+    que produce doubles pseudoaleatorios en <code>[0, 1)</code>. La secuencia
+    queda completamente determinada por la semilla: dos generadores creados a
+    partir de la misma semilla dan exactamente los mismos números, en el mismo
+    orden, en cualquier plataforma.
   </p>
   <p>
-    It's a port of FxTS's internal <code>seededRandom</code> (a
-    Mulberry32-style PRNG) — in FxTS it's private, but FxDart exposes it
-    because deterministic randomness is broadly useful: reproducible tests,
-    stable demo data, property-based fuzzing with replayable failures, or any
-    place where "random, but the same every run" is what you actually want.
-    This is what <a href="shuffle.html"><code>shuffle</code></a> uses under
-    the hood when you pass it a seed.
+    Es un port del <code>seededRandom</code> interno de FxTS (un PRNG al
+    estilo Mulberry32). En FxTS es privado, pero FxDart lo expone porque la
+    aleatoriedad determinista resulta útil en muchos sitios: tests
+    reproducibles, datos de demo estables, fuzzing basado en propiedades con
+    fallos que se pueden reproducir, o cualquier caso donde lo que de verdad
+    quieres es "aleatorio, pero igual en cada ejecución". Es lo que usa
+    <a href="shuffle.html"><code>shuffle</code></a> por debajo cuando le pasas
+    una semilla.
   </p>
   <p>
-    Unlike <code>dart:math</code>'s <code>Random(seed)</code>, the sequence
-    is part of the library's contract with FxTS — a seeded
-    <code>shuffle</code> in FxDart and FxTS produces the same order for the
-    same seed.
+    A diferencia del <code>Random(seed)</code> de <code>dart:math</code>, la
+    secuencia forma parte del contrato de la librería con FxTS: un
+    <code>shuffle</code> con semilla en FxDart y en FxTS produce el mismo
+    orden para la misma semilla.
   </p>
 
-  <h2>Demo 1 · Same seed, same sequence</h2>
+  <h2>Demo 1 · Misma semilla, misma secuencia</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -90,10 +90,10 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Reproducible picks and shuffles</h2>
+  <h2>Demo 2 · Selecciones y barajados reproducibles</h2>
   <p>
-    Turn the generator into whatever random shape you need — here, dice
-    rolls and a seeded <code>shuffle</code>:
+    Convierte el generador en la forma aleatoria que necesites; aquí, tiradas
+    de dados y un <code>shuffle</code> con semilla:
   </p>
   <div class="playground">
 <textarea>
@@ -112,9 +112,9 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: deal two identical "random" hands by building both from the
-    same seed.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: reparte dos manos "aleatorias" idénticas construyendo ambas a
+    partir de la misma semilla.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -133,9 +133,9 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="shuffle.html"><code>shuffle</code></a> — seeded shuffling built on this generator ·
-    <a href="cycle.html"><code>cycle</code></a> &amp; <a href="repeat.html"><code>repeat</code></a> — deterministic infinite sources
+    <strong>Relacionado:</strong>
+    <a href="shuffle.html"><code>shuffle</code></a> — barajado con semilla construido sobre este generador ·
+    <a href="cycle.html"><code>cycle</code></a> &amp; <a href="repeat.html"><code>repeat</code></a> — fuentes infinitas deterministas
   </div>
 
   <nav class="tut-nav">

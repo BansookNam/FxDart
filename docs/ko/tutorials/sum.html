@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>sum — FxDart 101</title>
-  <meta name="description" content="FxDart sum tutorial: add up every number in a pipeline, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/sum.html">
+  <meta name="description" content="FxDart sum 튜토리얼 — 파이프라인이 만들어 내는 모든 숫자를 더합니다. 라이브 플레이그라운드 포함.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/sum.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/sum.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/sum.html">
@@ -43,43 +42,43 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 7 · 집계 › <strong>sum</strong></p>
   <h1><code>sum</code></h1>
-  <p class="hero-sub">Adds up every number a lazy pipeline produces.</p>
+  <p class="hero-sub">지연 파이프라인이 만들어 내는 모든 숫자를 더합니다.</p>
 
   <div class="signature">num sum(Iterable&lt;num&gt; iterable)
 Future&lt;num&gt; sumAsync(FxAsyncIterable&lt;num&gt; iterable)
 num Fx&lt;num&gt;.sum()          // chain (sync)
 Future&lt;num&gt; FxAsync&lt;num&gt;.sum()  // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>sum</code> is a terminal operator, and one of the simplest
-    special-cased folds in the library: it's literally
-    <code>fold(0, (a, b) =&gt; a + b, iterable)</code> underneath. Like every
-    terminal, calling it pulls the entire lazy pipeline upstream of it — so
-    you can build an elaborate chain of <code>map</code>/<code>filter</code>
-    steps and only pay for the values <code>sum</code> actually needs, which
-    is all of them.
+    <code>sum</code>은 종결 연산자이며, 라이브러리에서 특수화된 fold 중
+    가장 단순한 축에 속합니다. 내부적으로는 말 그대로
+    <code>fold(0, (a, b) =&gt; a + b, iterable)</code>입니다. 다른 종결
+    연산자와 마찬가지로 호출하는 순간 상류의 지연 파이프라인 전체를
+    끌어당깁니다 — 그래서 <code>map</code>/<code>filter</code> 단계를
+    아무리 길게 엮어도 <code>sum</code>이 실제로 필요로 하는 값만큼만
+    비용을 치릅니다. 물론 여기서는 그게 전부입니다.
   </p>
   <p>
-    Because the seed is <code>0</code>, summing an empty iterable gives
-    <code>0</code> — no error, no <code>NaN</code>. That's different from its
-    neighbors <code><a href="min.html">min</a></code>,
-    <code><a href="max.html">max</a></code>, and
-    <code><a href="average.html">average</a></code>, which each have their
-    own (surprising!) empty-input behavior worth knowing about.
+    시드가 <code>0</code>이므로 빈 이터러블의 합은 <code>0</code>입니다 —
+    예외도, <code>NaN</code>도 없습니다. 이웃한
+    <code><a href="min.html">min</a></code>,
+    <code><a href="max.html">max</a></code>,
+    <code><a href="average.html">average</a></code>와는 다른 점인데,
+    이들은 각자 (의외의!) 빈 입력 동작이 따로 있으니 알아 둘 필요가
+    있습니다.
   </p>
   <p>
-    The chain form is available as an extension method,
-    <code>Fx&lt;num&gt;.sum()</code> / <code>FxAsync&lt;num&gt;.sum()</code> —
-    it only shows up once your chain's element type is known to be
-    <code>num</code> (or <code>int</code>/<code>double</code>, thanks to
-    generic covariance).
+    체인 형태는 확장 메서드
+    <code>Fx&lt;num&gt;.sum()</code> / <code>FxAsync&lt;num&gt;.sum()</code>으로
+    제공됩니다 — 체인의 원소 타입이 <code>num</code>(제네릭 공변성 덕분에
+    <code>int</code>/<code>double</code>도 포함)임이 알려진 뒤에야
+    나타납니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -101,7 +100,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>데모 2 · 비동기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -118,8 +117,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: sum only the <strong>even</strong> numbers in the list.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 리스트에서 <strong>짝수</strong>만 골라 더해 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -136,10 +135,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="average.html"><code>average</code></a> — sum divided by count ·
-    <a href="fold.html"><code>fold</code></a> — the general form sum specializes ·
-    <a href="min.html"><code>min</code></a> · <a href="max.html"><code>max</code></a> — the other numeric terminals
+    <strong>관련 함수:</strong>
+    <a href="average.html"><code>average</code></a> — 합을 개수로 나눈 값 ·
+    <a href="fold.html"><code>fold</code></a> — sum이 특수화한 일반형 ·
+    <a href="min.html"><code>min</code></a> · <a href="max.html"><code>max</code></a> — 나머지 숫자 종결 연산자
   </div>
 
   <nav class="tut-nav">

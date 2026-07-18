@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>intersection — FxDart 101</title>
-  <meta name="description" content="FxDart intersection tutorial: elements of one iterable also found in another, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/intersection.html">
+  <meta name="description" content="FxDart intersection 튜토리얼 — 한 이터러블의 원소 중 다른 이터러블에도 들어 있는 것만 남기는 방법을 라이브 플레이그라운드와 함께 살펴봅니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/intersection.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/intersection.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/intersection.html">
@@ -43,41 +42,40 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 4 · 필터링 &amp; 중복 제거 › <strong>intersection</strong></p>
   <h1><code>intersection</code></h1>
-  <p class="hero-sub"><code>difference</code>'s opposite: elements of the second iterable that ARE also found in the first.</p>
+  <p class="hero-sub"><code>difference</code>의 반대입니다. 두 번째 이터러블의 원소 중 첫 번째에도 들어 있는 것만 남깁니다.</p>
 
   <div class="signature">Iterable&lt;A&gt; intersection&lt;A&gt;(Iterable&lt;A&gt; iterable1, Iterable&lt;A&gt; iterable2)
 FxAsyncIterable&lt;A&gt; intersectionAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;A&gt; iterable2)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>intersection(iterable1, iterable2)</code> shares
-    <code>difference</code>'s argument-order convention: the result walks
-    <strong><code>iterable2</code></strong>, and keeps each element (in
-    <code>iterable2</code>'s order, deduplicated) that <em>is</em> found in
-    <code>iterable1</code>. <code>iterable1</code> is only ever used as a
-    membership set — swap the two arguments and you get the same
-    <em>values</em> in a set-theory sense, but the actual order (and which
-    collection's duplicates get collapsed) is different, since the source
-    of the yielded elements changes. See Demo 1.
+    <code>intersection(iterable1, iterable2)</code>은
+    <code>difference</code>와 같은 인자 순서 규칙을 따릅니다. 결과는
+    <strong><code>iterable2</code></strong>를 훑으면서
+    <code>iterable1</code>에 <em>들어 있는</em> 원소를
+    (<code>iterable2</code>의 순서대로, 중복은 제거해서) 남깁니다.
+    <code>iterable1</code>은 오직 포함 여부를 확인하는 집합으로만
+    쓰입니다. 두 인자를 바꿔도 집합론적으로는 같은 <em>값</em>이 나오지만,
+    내보내는 원소의 출처가 바뀌므로 실제 순서(그리고 어느 컬렉션의 중복이
+    합쳐지는지)는 달라집니다. 데모 1을 보세요.
   </p>
   <p>
-    Under the hood it's
-    <code>intersectionBy((a) =&gt; a, iterable1, iterable2)</code> — reach
-    for <a href="intersectionBy.html"><code>intersectionBy</code></a>
-    directly when you need to match by a computed key across two lists of
-    full records rather than by value equality.
+    내부적으로는
+    <code>intersectionBy((a) =&gt; a, iterable1, iterable2)</code>입니다.
+    값 동등성이 아니라 계산된 키로 온전한 레코드 두 목록을 맞춰야 한다면
+    <a href="intersectionBy.html"><code>intersectionBy</code></a>를
+    바로 쓰세요.
   </p>
   <p>
-    There's no chain method; call the data-first function. On the async
-    side, the concurrency marker from <code>.concurrent(n)</code> applies to
-    <code>iterable2</code> — <code>iterable1</code> is drained up front to
-    build the membership set.
+    체인 메서드는 없으니 data-first 함수를 호출하세요. 비동기 쪽에서는
+    <code>.concurrent(n)</code>의 동시성 표시가
+    <code>iterable2</code>에 적용됩니다. <code>iterable1</code>은 포함
+    여부 집합을 만들기 위해 미리 전부 소비합니다.
   </p>
 
-  <h2>Demo 1 · Basics &amp; argument order</h2>
+  <h2>데모 1 · 기본과 인자 순서</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -99,7 +97,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency</h2>
+  <h2>데모 2 · 비동기, 그리고 동시성</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -122,9 +120,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>intersection</code> to find which of the
-    candidate's skills are actually required.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>intersection</code>으로 지원자의 기술 중 실제로
+    요구되는 것이 무엇인지 찾아보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -143,11 +141,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="difference.html"><code>difference</code></a> — the exclusion counterpart ·
-    <a href="intersectionBy.html"><code>intersectionBy</code></a> — match by a computed key instead ·
-    <a href="uniq.html"><code>uniq</code></a> — dedupe a single iterable ·
-    <a href="../tutorials/includes.html"><code>includes</code></a> — test membership of a single value
+    <strong>관련 함수:</strong>
+    <a href="difference.html"><code>difference</code></a> — 제외하는 쪽의 짝 ·
+    <a href="intersectionBy.html"><code>intersectionBy</code></a> — 대신 계산된 키로 맞추기 ·
+    <a href="uniq.html"><code>uniq</code></a> — 이터러블 하나에서 중복 제거 ·
+    <a href="../tutorials/includes.html"><code>includes</code></a> — 값 하나의 포함 여부 확인
   </div>
 
   <nav class="tut-nav">

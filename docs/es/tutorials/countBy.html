@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>countBy — FxDart 101</title>
-  <meta name="description" content="FxDart countBy tutorial: tally how many elements map to each computed key, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/countBy.html">
+  <meta name="description" content="Tutorial de countBy en FxDart: cuenta cuántos elementos caen en cada clave calculada, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/countBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/countBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/countBy.html">
@@ -43,40 +42,39 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>countBy</strong></p>
   <h1><code>countBy</code></h1>
-  <p class="hero-sub">Tallies how many elements map to each computed key.</p>
+  <p class="hero-sub">Cuenta cuántos elementos caen en cada clave calculada.</p>
 
   <div class="signature">Map&lt;K, int&gt; countBy&lt;A, K&gt;(K Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;Map&lt;K, int&gt;&gt; countByAsync&lt;A, K&gt;(FutureOr&lt;K&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Map&lt;K, int&gt; Fx.countBy&lt;K&gt;(K Function(T a) f)          // chain (sync)
 Future&lt;Map&lt;K, int&gt;&gt; FxAsync.countBy&lt;K&gt;(FutureOr&lt;K&gt; Function(T a) f)  // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>countBy</code> completes the trio with
-    <code><a href="groupBy.html">groupBy</a></code> and
-    <code><a href="indexBy.html">indexBy</a></code>: same idea of pulling the
-    whole pipeline and computing a key per element, but this time it doesn't
-    keep the elements at all — it just increments a counter per key. The
-    result is a <code>Map&lt;K, int&gt;</code>: how many elements produced
-    each key.
+    <code>countBy</code> completa el trío junto a
+    <code><a href="groupBy.html">groupBy</a></code> e
+    <code><a href="indexBy.html">indexBy</a></code>: la misma idea de tirar de
+    todo el pipeline y calcular una clave por elemento, pero esta vez no
+    conserva los elementos en absoluto — solo incrementa un contador por
+    clave. El resultado es un <code>Map&lt;K, int&gt;</code>: cuántos
+    elementos produjeron cada clave.
   </p>
   <p>
-    Think of the three as answering different questions about the same
-    grouping: <code>groupBy</code> — "give me every element for this key",
-    <code>indexBy</code> — "give me the last element for this key", and
-    <code>countBy</code> — "how many elements had this key?" If all you need
-    is the tally, <code>countBy</code> is cheaper than
-    <code>groupBy(...).map((k, v) =&gt; MapEntry(k, v.length))</code> since it
-    never allocates the intermediate lists.
+    Piensa en los tres como respuestas a preguntas distintas sobre la misma
+    agrupación: <code>groupBy</code> — "dame todos los elementos de esta clave",
+    <code>indexBy</code> — "dame el último elemento de esta clave", y
+    <code>countBy</code> — "¿cuántos elementos tuvieron esta clave?". Si lo
+    único que necesitas es el recuento, <code>countBy</code> sale más barato que
+    <code>groupBy(...).map((k, v) =&gt; MapEntry(k, v.length))</code>, porque
+    nunca reserva las listas intermedias.
   </p>
   <p>
-    As always, it's a terminal — nothing upstream runs until <code>countBy</code> pulls it.
+    Como siempre, es un operador terminal: nada de lo que hay arriba se ejecuta hasta que <code>countBy</code> tira de ello.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -94,7 +92,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -111,8 +109,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: count how many votes each candidate received.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: cuenta cuántos votos recibió cada candidato.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -129,10 +127,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="groupBy.html"><code>groupBy</code></a> — keeps every element instead of just a count ·
-    <a href="indexBy.html"><code>indexBy</code></a> — keeps the last element instead of a count ·
-    <a href="size.html"><code>size</code></a> — a total count with no key at all
+    <strong>Relacionado:</strong>
+    <a href="groupBy.html"><code>groupBy</code></a> — conserva todos los elementos en lugar de solo un recuento ·
+    <a href="indexBy.html"><code>indexBy</code></a> — conserva el último elemento en lugar de un recuento ·
+    <a href="size.html"><code>size</code></a> — un recuento total, sin clave alguna
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>apply — FxDart 101</title>
-  <meta name="description" content="FxDart apply tutorial: invoke a function with arguments collected in a List, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/apply.html">
+  <meta name="description" content="Tutorial de apply en FxDart: invoca una función con los argumentos recogidos en una List, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/apply.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/apply.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/apply.html">
@@ -43,40 +42,39 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 10 · Utilidades de funciones › <strong>apply</strong></p>
   <h1><code>apply</code></h1>
-  <p class="hero-sub">Calls a function with a List of arguments as its positional parameters.</p>
+  <p class="hero-sub">Llama a una función pasándole una List de argumentos como parámetros posicionales.</p>
 
   <div class="signature">R apply&lt;R&gt;(Function f, List&lt;Object?&gt; args)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>apply</code> exists for the moments when the arguments to a call
-    aren't sitting in separate variables — they're already collected in a
-    <code>List</code> (parsed from input, gathered from a config, produced by
-    <a href="juxt.html"><code>juxt</code></a>) and you need to invoke an
-    arbitrary function with them. Under the hood it's a thin wrapper over
-    Dart's own <code>Function.apply</code>, with the result cast to <code>R</code>.
+    <code>apply</code> existe para esos momentos en los que los argumentos de una
+    llamada no están en variables sueltas — ya vienen recogidos en una
+    <code>List</code> (parseada de una entrada, sacada de una configuración, producida por
+    <a href="juxt.html"><code>juxt</code></a>) y necesitas invocar con ellos una
+    función arbitraria. Por dentro es una envoltura mínima sobre el propio
+    <code>Function.apply</code> de Dart, con el resultado convertido a <code>R</code>.
   </p>
   <p>
-    Because <code>f</code> is typed as the bare <code>Function</code>,
-    <code>apply</code> is inherently dynamic — Dart can't check the argument
-    count or types against <code>f</code>'s signature at compile time, only at
-    runtime. Reach for it only when you genuinely have a dynamic arg list;
-    for anything else, call the function directly.
+    Como <code>f</code> está tipada simplemente como <code>Function</code>,
+    <code>apply</code> es dinámico por naturaleza: Dart no puede comprobar el número
+    ni los tipos de los argumentos contra la firma de <code>f</code> en tiempo de
+    compilación, solo en tiempo de ejecución. Recurre a él únicamente cuando de verdad
+    tengas una lista dinámica de argumentos; para todo lo demás, llama a la función directamente.
   </p>
   <p>
-    A related but separate concern is <em>currying</em> — pre-filling some
-    arguments of a function ahead of time. FxTS has a fully generic
-    <code>curry</code>; Dart's type system has no equivalent for arbitrary
-    arities, so FxDart ships only a
-    <code>@Deprecated</code> two-argument <code>curry</code> stub as a
-    migration aid. Prefer writing the closure yourself:
+    Un asunto relacionado pero distinto es la <em>currificación</em> — rellenar de
+    antemano algunos argumentos de una función. FxTS tiene un
+    <code>curry</code> totalmente genérico; el sistema de tipos de Dart no tiene equivalente
+    para aridades arbitrarias, así que FxDart solo incluye un stub
+    <code>@Deprecated</code> de <code>curry</code> para dos argumentos como
+    ayuda a la migración. Es preferible que escribas tú el closure:
     <code>(b) => f(a, b)</code>.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -94,10 +92,10 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Dispatching dynamic calls</h2>
+  <h2>Demo 2 · Despachar llamadas dinámicas</h2>
   <p>
-    A small command dispatcher, where each handler has a different arity and
-    the arguments arrive as a runtime <code>List</code>:
+    Un pequeño despachador de comandos, donde cada manejador tiene una aridad distinta y
+    los argumentos llegan como una <code>List</code> en tiempo de ejecución:
   </p>
   <div class="playground">
 <textarea>
@@ -123,9 +121,9 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: call <code>greet</code> below using <code>apply</code> with the
-    argument list <code>['Kim', 'Hello']</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: llama a <code>greet</code> más abajo usando <code>apply</code> con la
+    lista de argumentos <code>['Kim', 'Hello']</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -142,11 +140,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="juxt.html"><code>juxt</code></a> — often the source of a dynamic arg list ·
-    <a href="tap.html"><code>tap</code></a> — run a side effect without changing the value ·
-    <a href="cases.html"><code>cases</code></a> — dispatch on predicates instead of a name ·
-    <a href="pipe.html"><code>pipe</code></a> — dynamic composition, same trade-off as apply
+    <strong>Relacionado:</strong>
+    <a href="juxt.html"><code>juxt</code></a> — a menudo el origen de una lista dinámica de argumentos ·
+    <a href="tap.html"><code>tap</code></a> — ejecuta un efecto secundario sin cambiar el valor ·
+    <a href="cases.html"><code>cases</code></a> — despacha por predicados en lugar de por nombre ·
+    <a href="pipe.html"><code>pipe</code></a> — composición dinámica, con el mismo compromiso que apply
   </div>
 
   <nav class="tut-nav">

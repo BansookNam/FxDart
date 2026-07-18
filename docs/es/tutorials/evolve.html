@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>evolve — FxDart 101</title>
-  <meta name="description" content="FxDart evolve tutorial: transform selected Map values by key, leaving the rest untouched.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/evolve.html">
+  <meta name="description" content="Tutorial de evolve en FxDart: transforma valores concretos de un Map según su clave, dejando el resto intacto.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/evolve.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/evolve.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/evolve.html">
@@ -43,37 +42,37 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 9 · Funciones de objeto (Map) › <strong>evolve</strong></p>
   <h1><code>evolve</code></h1>
-  <p class="hero-sub">Runs selected values through per-key transformation functions, leaving the rest of the <code>Map</code> as-is.</p>
+  <p class="hero-sub">Pasa los valores seleccionados por funciones de transformación asociadas a cada clave, dejando el resto del <code>Map</code> tal cual.</p>
 
   <div class="signature">Map&lt;K, Object?&gt; evolve&lt;K&gt;(
     Map&lt;K, Object? Function(Object? value)&gt; transformations,
     Map&lt;K, Object?&gt; map)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>evolve</code> takes a "recipe" map — key to transformation
-    function — and a data map, and produces a new map where every key that
-    appears in the recipe has its value passed through the matching
-    function; every other key is copied through unchanged.
+    <code>evolve</code> recibe un map de "receta" —clave a función de
+    transformación— y un map de datos, y produce un map nuevo en el que cada
+    clave que aparece en la receta pasa su valor por la función
+    correspondiente; el resto de las claves se copian sin cambios.
   </p>
   <p>
-    Notice the signature is deliberately loose: both maps are typed with
-    <code>Object?</code> values, mirroring FxTS's dynamically-typed
-    original. That means your transformation functions receive
-    <code>Object?</code> and must cast (<code>v as String</code>,
-    <code>v as int</code>, …) before doing anything type-specific — a
-    small tax for the flexibility of applying different transformations to
-    different value types within a single map. If you know the shape of
-    your data ahead of time and don't need per-key heterogeneity, a plain
-    <code>{...map, 'key': f(map['key'])}</code> spread is often more
-    idiomatic Dart; reach for <code>evolve</code> when the recipe itself is
-    data (e.g. built once and reused across many maps).
+    Fíjate en que la firma es deliberadamente laxa: ambos maps están tipados
+    con valores <code>Object?</code>, reflejando el original de FxTS con
+    tipado dinámico. Eso significa que tus funciones de transformación
+    reciben <code>Object?</code> y deben hacer un cast
+    (<code>v as String</code>, <code>v as int</code>, …) antes de hacer nada
+    específico de un tipo: un pequeño peaje a cambio de la flexibilidad de
+    aplicar transformaciones distintas a tipos de valor distintos dentro de un
+    mismo map. Si conoces de antemano la forma de tus datos y no necesitas esa
+    heterogeneidad por clave, un simple spread
+    <code>{...map, 'key': f(map['key'])}</code> suele ser Dart más
+    idiomático; recurre a <code>evolve</code> cuando la propia receta sea
+    datos (por ejemplo, construida una vez y reutilizada en muchos maps).
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -91,7 +90,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Parsing raw string fields</h2>
+  <h2>Demo 2 · Parsear campos de texto en crudo</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -114,8 +113,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>evolve</code> to double the <code>'price'</code> field and leave <code>'title'</code> untouched.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>evolve</code> para duplicar el campo <code>'price'</code> y dejar <code>'title'</code> intacto.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -132,11 +131,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="prop.html"><code>prop</code></a> — read a single value out ·
-    <a href="omitBy.html"><code>omitBy</code></a> — drop entries instead of transforming them ·
-    <a href="compactObject.html"><code>compactObject</code></a> — a specialized cleanup pass ·
-    <a href="resolveProps.html"><code>resolveProps</code></a> — the async cousin, awaiting instead of transforming
+    <strong>Relacionado:</strong>
+    <a href="prop.html"><code>prop</code></a> — leer un único valor ·
+    <a href="omitBy.html"><code>omitBy</code></a> — descartar entradas en lugar de transformarlas ·
+    <a href="compactObject.html"><code>compactObject</code></a> — una pasada de limpieza especializada ·
+    <a href="resolveProps.html"><code>resolveProps</code></a> — el primo asíncrono, que espera en lugar de transformar
   </div>
 
   <nav class="tut-nav">

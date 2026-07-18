@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>cycle — FxDart 101</title>
-  <meta name="description" content="FxDart cycle tutorial: repeat a sequence forever — an infinite source that must always be paired with take.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/cycle.html">
+  <meta name="description" content="Tutorial de cycle en FxDart: repite una secuencia para siempre — una fuente infinita que siempre debe combinarse con take.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/cycle.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/cycle.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/cycle.html">
@@ -43,42 +42,42 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 2 · Generar secuencias › <strong>cycle</strong></p>
   <h1><code>cycle</code></h1>
-  <p class="hero-sub">Yields a sequence, then repeats it — forever. Always pair it with a bound like take.</p>
+  <p class="hero-sub">Emite una secuencia y luego la repite — para siempre. Combínala siempre con un límite como take.</p>
 
   <div class="signature">Iterable&lt;T&gt; cycle&lt;T&gt;(Iterable&lt;T&gt; iterable)
 FxAsyncIterable&lt;T&gt; cycleAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable)
 Fx&lt;T&gt; Fx.cycle()        // chain
 FxAsync&lt;T&gt; FxAsync.cycle()</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>cycle</code> is <strong>infinite</strong>: it plays the source
-    sequence once, buffering its values as it goes, then loops over that
-    buffer forever. Unlike everything else in this section,
-    <code>cycle</code> never runs out on its own — you must always pair it
-    with something that decides when to stop, almost always
-    <code>.take(n)</code>. Calling <code>toArray()</code> or
-    <code>consume()</code> directly on a bare <code>cycle(...)</code>
-    without a bound in between will hang.
+    <code>cycle</code> es <strong>infinito</strong>: reproduce la secuencia
+    fuente una vez, guardando sus valores en un búfer sobre la marcha, y
+    después recorre ese búfer en bucle para siempre. A diferencia de todo lo
+    demás en esta sección, <code>cycle</code> nunca se agota por su cuenta —
+    siempre tienes que combinarlo con algo que decida cuándo parar, casi
+    siempre <code>.take(n)</code>. Llamar a <code>toArray()</code> o a
+    <code>consume()</code> directamente sobre un <code>cycle(...)</code> pelado
+    sin un límite en medio se quedará colgado.
   </p>
   <p>
-    One edge case worth knowing: cycling an <em>empty</em> source yields
-    nothing at all, rather than looping forever over zero elements — so
-    <code>cycle([])</code> is safe and simply produces an empty result.
+    Un caso límite que conviene conocer: ciclar una fuente <em>vacía</em> no
+    emite nada en absoluto, en lugar de dar vueltas eternamente sobre cero
+    elementos — así que <code>cycle([])</code> es seguro y simplemente produce
+    un resultado vacío.
   </p>
   <p>
-    It's a natural building block for round-robin assignment (cycle through
-    a small list of workers/colors/slots as you map over a longer one) or
-    for repeating a short async sequence to model a polling loop. The async
-    form, <code>cycleAsync</code> (or <code>.cycle()</code> on an
-    <code>FxAsync</code> chain), buffers and loops the same way, but pulls
-    each round through the usual async protocol.
+    Es una pieza natural para el reparto round-robin (recorrer en ciclo una
+    lista corta de trabajadores/colores/huecos mientras haces map sobre una más
+    larga) o para repetir una secuencia asíncrona corta y modelar así un bucle
+    de sondeo. La forma asíncrona, <code>cycleAsync</code> (o <code>.cycle()</code>
+    en una cadena <code>FxAsync</code>), hace el búfer y el bucle igual, pero
+    tira de cada vuelta a través del protocolo asíncrono habitual.
   </p>
 
-  <h2>Demo 1 · Infinite, bounded by take</h2>
+  <h2>Demo 1 · Infinito, acotado con take</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -98,7 +97,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async cycle, still bounded by take</h2>
+  <h2>Demo 2 · Ciclo asíncrono, también acotado con take</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -118,8 +117,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: cycle through traffic-light colors and take the first 8.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: recorre en ciclo los colores de un semáforo y toma los 8 primeros.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -136,11 +135,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="range.html"><code>range</code></a> — a finite counting sequence ·
-    <a href="repeat.html"><code>repeat</code></a> — repeat a single value, a fixed number of times ·
-    <a href="take.html"><code>take</code></a> — the bound cycle almost always needs ·
-    <a href="concurrent.html"><code>concurrent</code></a> — overlap an async cycle's work
+    <strong>Relacionado:</strong>
+    <a href="range.html"><code>range</code></a> — una secuencia de conteo finita ·
+    <a href="repeat.html"><code>repeat</code></a> — repite un único valor, un número fijo de veces ·
+    <a href="take.html"><code>take</code></a> — el límite que cycle casi siempre necesita ·
+    <a href="concurrent.html"><code>concurrent</code></a> — solapa el trabajo de un cycle asíncrono
   </div>
 
   <nav class="tut-nav">

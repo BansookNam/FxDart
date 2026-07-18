@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>split — FxDart 101</title>
-  <meta name="description" content="FxDart split tutorial: split a character iterable on a separator, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/split.html">
+  <meta name="description" content="Tutorial de split en FxDart: divide un iterable de caracteres según un separador, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/split.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/split.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/split.html">
@@ -43,34 +42,33 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 5 · Segmentación › <strong>split</strong></p>
   <h1><code>split</code></h1>
-  <p class="hero-sub">Splits an iterable of single-character strings on a separator character.</p>
+  <p class="hero-sub">Divide un iterable de cadenas de un solo carácter según un carácter separador.</p>
 
   <div class="signature">Iterable&lt;String&gt; split(String sep, Iterable&lt;String&gt; iterable)
 FxAsyncIterable&lt;String&gt; splitAsync(String sep, FxAsyncIterable&lt;String&gt; iterable)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>split</code> is a direct port of FxTS's character-wise
-    <code>split</code>, and that shows in its signature: it doesn't take a
-    <code>String</code> at all — it takes an <code>Iterable&lt;String&gt;</code>
-    of single characters, and walks it one character at a time, accumulating
-    a piece until it sees one equal to <code>sep</code>. In Dart, the
-    idiomatic way to get that character iterable is
-    <code>myString.split('')</code> (Dart's own <code>String.split</code>
-    with an empty pattern breaks a string into its individual characters).
+    <code>split</code> es un port directo del <code>split</code> carácter a
+    carácter de FxTS, y eso se nota en su firma: no recibe un
+    <code>String</code> en absoluto — recibe un <code>Iterable&lt;String&gt;</code>
+    de caracteres sueltos, y lo recorre carácter a carácter, acumulando
+    un fragmento hasta que ve uno igual a <code>sep</code>. En Dart, la
+    forma idiomática de obtener ese iterable de caracteres es
+    <code>myString.split('')</code> (el propio <code>String.split</code> de Dart
+    con un patrón vacío descompone una cadena en sus caracteres individuales).
   </p>
   <p>
-    A trailing separator produces a trailing empty string in the output,
-    matching FxTS's behavior — <code>'a,b,'</code> splits into
-    <code>('a', 'b', '')</code>, not just <code>('a', 'b')</code>. There's no
-    <code>Fx</code> chain form for <code>split</code>; call the top-level
-    function (or <code>splitAsync</code>) directly.
+    Un separador final produce una cadena vacía al final de la salida,
+    igual que en FxTS — <code>'a,b,'</code> se divide en
+    <code>('a', 'b', '')</code>, no solo en <code>('a', 'b')</code>. No hay
+    forma de cadena <code>Fx</code> para <code>split</code>; llama a la función
+    de nivel superior (o a <code>splitAsync</code>) directamente.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -86,7 +84,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -101,9 +99,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>split</code> to break <code>csv</code> into color
-    names on <code>'|'</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>split</code> para descomponer <code>csv</code> en
+    nombres de colores según <code>'|'</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -120,10 +118,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="chunk.html"><code>chunk</code></a> — group by fixed size instead of separator ·
-    <a href="unicodeToArray.html"><code>unicodeToArray</code></a> — get a proper character array (grapheme-aware) ·
-    <a href="join.html"><code>join</code></a> — the inverse operation
+    <strong>Relacionado:</strong>
+    <a href="chunk.html"><code>chunk</code></a> — agrupa por tamaño fijo en lugar de por separador ·
+    <a href="unicodeToArray.html"><code>unicodeToArray</code></a> — obtén un array de caracteres correcto (consciente de los grafemas) ·
+    <a href="join.html"><code>join</code></a> — la operación inversa
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>slice — FxDart 101</title>
-  <meta name="description" content="FxDart slice tutorial: pull an index window [start, end) out of an iterable, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/slice.html">
+  <meta name="description" content="FxDart slice 튜토리얼: 이터러블에서 [start, end) 인덱스 구간을 잘라내는 방법을 라이브 플레이그라운드와 함께 다룹니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/slice.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/slice.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/slice.html">
@@ -43,36 +42,35 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 5 · 잘라내기 › <strong>slice</strong></p>
   <h1><code>slice</code></h1>
-  <p class="hero-sub">Returns the values between index <code>start</code> (inclusive) and <code>end</code> (exclusive).</p>
+  <p class="hero-sub">인덱스 <code>start</code>(포함)부터 <code>end</code>(미포함) 사이의 값을 반환합니다.</p>
 
   <div class="signature">Iterable&lt;A&gt; slice&lt;A&gt;(int start, Iterable&lt;A&gt; iterable, [int? end])
 FxAsyncIterable&lt;A&gt; sliceAsync&lt;A&gt;(int start, FxAsyncIterable&lt;A&gt; iterable, [int? end])
 Fx&lt;T&gt; Fx.slice(int start, [int? end])        // chain
 FxAsync&lt;T&gt; FxAsync.slice(int start, [int? end])</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>slice</code> is a general index window: it yields the elements
-    whose position falls in <code>[start, end)</code>, and omitting
-    <code>end</code> means "to the end of the source". It's a single
-    operator that subsumes both <code>drop</code> (via <code>start</code>)
-    and <code>take</code> (via <code>end</code>) at once.
+    <code>slice</code>는 범용 인덱스 구간 연산자입니다. 위치가
+    <code>[start, end)</code>에 해당하는 원소를 내보내며,
+    <code>end</code>를 생략하면 "소스 끝까지"라는 뜻입니다.
+    <code>drop</code>(<code>start</code>로)과
+    <code>take</code>(<code>end</code>로)를 한 번에 아우르는 단일 연산자인 셈입니다.
   </p>
   <p>
-    Watch the argument order in the data-first form — unlike most FxDart
-    functions, the <code>iterable</code> sits in the <strong>middle</strong>:
-    <code>slice(start, iterable, [end])</code>, mirroring FxTS. The chain
-    form doesn't have this quirk, since the iterable is the receiver:
-    <code>fx(iterable).slice(start, end)</code>. Under the hood
-    <code>slice</code> is still just walking the source once and counting
-    indices, so it stays lazy and works fine on an infinite source as long
-    as you supply an <code>end</code>.
+    data-first 형태에서는 인자 순서에 주의하세요 — 대부분의 FxDart 함수와 달리
+    <code>iterable</code>이 <strong>가운데</strong>에 옵니다:
+    <code>slice(start, iterable, [end])</code>로, FxTS를 그대로 따랐습니다.
+    체인 형태에서는 이터러블이 수신자이므로 이런 특이점이 없습니다:
+    <code>fx(iterable).slice(start, end)</code>. 내부적으로
+    <code>slice</code>는 소스를 한 번 훑으며 인덱스를 세는 것뿐이라
+    지연 평가가 유지되고, <code>end</code>만 넘겨 준다면 무한 소스에서도
+    문제없이 동작합니다.
   </p>
 
-  <h2>Demo 1 · Basics &amp; argument order</h2>
+  <h2>데모 1 · 기본과 인자 순서</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -91,7 +89,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>데모 2 · 비동기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -108,9 +106,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>slice</code> to grab the window from index 2 up to
-    (not including) index 5.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>slice</code>로 인덱스 2부터 5 직전까지의 구간을
+    잘라내 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -127,10 +125,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="drop.html"><code>drop</code></a> — just the start-index half of slice ·
-    <a href="take.html"><code>take</code></a> — just the count/end half of slice ·
-    <a href="chunk.html"><code>chunk</code></a> — fixed-size windows across the whole source
+    <strong>관련 함수:</strong>
+    <a href="drop.html"><code>drop</code></a> — slice에서 시작 인덱스 쪽만 담당 ·
+    <a href="take.html"><code>take</code></a> — slice에서 개수/끝 쪽만 담당 ·
+    <a href="chunk.html"><code>chunk</code></a> — 소스 전체를 고정 크기 구간으로 나누기
   </div>
 
   <nav class="tut-nav">

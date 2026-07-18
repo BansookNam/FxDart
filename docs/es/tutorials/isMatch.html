@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>isMatch — FxDart 101</title>
-  <meta name="description" content="FxDart isMatch tutorial: deep partial matching against a Map or list pattern.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/isMatch.html">
+  <meta name="description" content="Tutorial de isMatch en FxDart: coincidencia parcial y profunda contra un patrón de Map o de lista.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/isMatch.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/isMatch.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/isMatch.html">
@@ -43,38 +42,37 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 9 · Funciones de objeto (Map) › <strong>isMatch</strong></p>
   <h1><code>isMatch</code></h1>
-  <p class="hero-sub">Deep partial match: does <code>target</code> contain everything described by <code>pattern</code>?</p>
+  <p class="hero-sub">Coincidencia parcial profunda: ¿contiene <code>target</code> todo lo que describe <code>pattern</code>?</p>
 
   <div class="signature">bool isMatch(Object? target, Object? pattern)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>isMatch</code> recurses through <code>pattern</code> and checks
-    that <code>target</code> "contains" it, with different rules per shape:
+    <code>isMatch</code> recorre <code>pattern</code> de forma recursiva y comprueba
+    que <code>target</code> lo "contiene", con reglas distintas según la forma:
   </p>
   <p>
-    <strong>Maps</strong> match partially — every key in <code>pattern</code>
-    must exist in <code>target</code> with a recursively-matching value, but
-    <code>target</code> is free to have <em>extra</em> keys the pattern
-    doesn't mention. <strong>Lists/iterables</strong> match pairwise from
-    the front, and here's the twist worth remembering: the pattern only has
-    to be a <strong>prefix</strong> of the target. <code>[1, 2, 3]</code>
-    matches the pattern <code>[1, 2]</code>, but <em>not</em> the pattern
-    <code>[1, 2, 3, 4]</code> — the pattern can't be longer than the target.
-    Anything else (numbers, strings, booleans, …) is compared with plain
-    <code>==</code>.
+    Los <strong>Map</strong> coinciden parcialmente: cada clave de <code>pattern</code>
+    debe existir en <code>target</code> con un valor que coincida recursivamente, pero
+    <code>target</code> puede tener claves <em>de más</em> que el patrón
+    no menciona. Las <strong>listas/iterables</strong> se comparan por pares desde
+    el principio, y aquí está el detalle que conviene recordar: el patrón solo
+    tiene que ser un <strong>prefijo</strong> del target. <code>[1, 2, 3]</code>
+    coincide con el patrón <code>[1, 2]</code>, pero <em>no</em> con el patrón
+    <code>[1, 2, 3, 4]</code> — el patrón no puede ser más largo que el target.
+    Cualquier otra cosa (números, cadenas, booleanos, …) se compara con un
+    <code>==</code> normal.
   </p>
   <p>
-    Because the rules nest, you get deep matching almost for free: a
-    pattern like <code>{'address': {'city': 'seoul'}}</code> matches a user
-    map with a much larger, deeply nested <code>address</code> value, as
-    long as <code>city</code> is <code>'seoul'</code> somewhere inside it.
+    Como las reglas anidan, la coincidencia profunda te sale casi gratis: un
+    patrón como <code>{'address': {'city': 'seoul'}}</code> coincide con un map
+    de usuario con un valor <code>address</code> mucho más grande y anidado,
+    siempre que <code>city</code> sea <code>'seoul'</code> en algún punto dentro de él.
   </p>
 
-  <h2>Demo 1 · Map matching</h2>
+  <h2>Demo 1 · Coincidencia de Map</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -95,7 +93,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · List prefix matching, and filtering with it</h2>
+  <h2>Demo 2 · Coincidencia por prefijo en listas, y filtrar con ella</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -116,8 +114,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>isMatch</code> to check whether <code>order</code> matches <code>{'status': 'shipped'}</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>isMatch</code> para comprobar si <code>order</code> coincide con <code>{'status': 'shipped'}</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -134,11 +132,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="matches.html"><code>matches</code></a> — the curried, filter-ready version of this ·
-    <a href="pickBy.html"><code>pickBy</code></a> — often paired for shape-based filtering ·
-    <a href="find.html"><code>find</code></a> — locate the first matching element ·
-    <a href="omitBy.html"><code>omitBy</code></a> — drop entries by predicate
+    <strong>Relacionado:</strong>
+    <a href="matches.html"><code>matches</code></a> — la versión currificada de esto, lista para filtrar ·
+    <a href="pickBy.html"><code>pickBy</code></a> — suele acompañarla para filtrar por forma ·
+    <a href="find.html"><code>find</code></a> — localiza el primer elemento que coincide ·
+    <a href="omitBy.html"><code>omitBy</code></a> — descarta entradas según un predicado
   </div>
 
   <nav class="tut-nav">

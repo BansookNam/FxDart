@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>append — FxDart 101</title>
-  <meta name="description" content="FxDart append tutorial: add one value to the end of a lazy iterable, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/append.html">
+  <meta name="description" content="FxDart append 튜토리얼 - 지연 평가되는 이터러블 끝에 값 하나를 덧붙이는 법을 라이브 플레이그라운드와 함께 다룹니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/append.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/append.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/append.html">
@@ -43,32 +42,30 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 6 · 결합 › <strong>append</strong></p>
   <h1><code>append</code></h1>
-  <p class="hero-sub">Yields all values of the source, then one extra value at the end.</p>
+  <p class="hero-sub">원본의 모든 값을 내보낸 다음, 마지막에 값 하나를 더 내보냅니다.</p>
 
   <div class="signature">Iterable&lt;A&gt; append&lt;A&gt;(A a, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; appendAsync&lt;A&gt;(FutureOr&lt;A&gt; a, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.append(T a)        // chain
 FxAsync&lt;T&gt; FxAsync.append(FutureOr&lt;T&gt; a)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>append</code> is the simplest way to tack a single trailing value
-    onto a lazy sequence without materializing anything: it just yields
-    through the whole source and then yields <code>a</code> once the source
-    is exhausted. Because the source is only consumed when pulled, this
-    works fine even when the source is expensive to compute — the extra
-    value is truly the last thing produced.
+    <code>append</code>는 아무것도 미리 만들어 두지 않고 지연 시퀀스 뒤에
+    값 하나를 붙이는 가장 단순한 방법입니다. 원본을 그대로 흘려보내다가
+    원본이 소진되면 <code>a</code>를 한 번 내보낼 뿐입니다. 원본은 값을
+    끌어당길 때만 소비되므로, 계산 비용이 큰 원본이어도 문제없이
+    동작합니다 — 추가된 값은 실제로 가장 마지막에 생성됩니다.
   </p>
   <p>
-    On the async side, <code>a</code> itself may be a <code>Future</code> —
-    <code>appendAsync</code> awaits it only once the upstream is done, so a
-    slow "closing" value doesn't hold anything up early.
+    비동기 쪽에서는 <code>a</code> 자체가 <code>Future</code>일 수 있습니다.
+    <code>appendAsync</code>는 상류가 끝난 뒤에야 이를 await 하므로, 느린
+    "마무리" 값 때문에 앞단이 미리 붙잡히는 일이 없습니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -82,7 +79,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with a future value</h2>
+  <h2>데모 2 · 비동기, future 값과 함께</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -99,8 +96,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: append <code>'cool'</code> to the end of the steps.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: steps 끝에 <code>'cool'</code>을 덧붙여 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -117,9 +114,9 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="prepend.html"><code>prepend</code></a> — add a value at the front instead ·
-    <a href="concat.html"><code>concat</code></a> — join two full iterables ·
+    <strong>관련 항목:</strong>
+    <a href="prepend.html"><code>prepend</code></a> — 대신 앞쪽에 값을 추가 ·
+    <a href="concat.html"><code>concat</code></a> — 두 이터러블 전체를 이어 붙임 ·
     <a href="reverse.html"><code>reverse</code></a>
   </div>
 

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>partition — FxDart 101</title>
-  <meta name="description" content="FxDart partition tutorial: split a pipeline into a (pass, fail) record by a predicate, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/partition.html">
+  <meta name="description" content="FxDart partition 튜토리얼: 술어를 기준으로 파이프라인을 (통과, 탈락) 레코드로 나눕니다. 라이브 플레이그라운드 포함.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/partition.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/partition.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/partition.html">
@@ -43,43 +42,42 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 7 · 집계 › <strong>partition</strong></p>
   <h1><code>partition</code></h1>
-  <p class="hero-sub">Splits a pipeline into two lists at once, by a single predicate.</p>
+  <p class="hero-sub">술어 하나로 파이프라인을 두 개의 리스트로 한 번에 나눕니다.</p>
 
   <div class="signature">(List&lt;A&gt;, List&lt;A&gt;) partition&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;(List&lt;A&gt;, List&lt;A&gt;)&gt; partitionAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 (List&lt;T&gt;, List&lt;T&gt;) Fx.partition(bool Function(T a) f)
 Future&lt;(List&lt;T&gt;, List&lt;T&gt;)&gt; FxAsync.partition(FutureOr&lt;bool&gt; Function(T a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>partition</code> is a terminal operator that walks the pipeline
-    once and sorts every element into one of two lists based on a predicate:
-    elements the predicate returns <code>true</code> for go into the first
-    list, everything else into the second. It's equivalent to calling
-    <code><a href="filter.html">filter</a></code> and
-    <code><a href="reject.html">reject</a></code> separately, but in a single
-    pass over the data.
+    <code>partition</code>은 파이프라인을 한 번만 순회하면서 술어를
+    기준으로 모든 원소를 두 리스트 중 하나에 넣는 종결 연산자입니다.
+    술어가 <code>true</code>를 반환한 원소는 첫 번째 리스트로, 나머지는
+    두 번째 리스트로 갑니다.
+    <code><a href="filter.html">filter</a></code>와
+    <code><a href="reject.html">reject</a></code>를 따로 호출하는 것과
+    같지만, 데이터를 한 번만 훑는다는 점이 다릅니다.
   </p>
   <p>
-    FxTS returns a two-element tuple, <code>[pass, fail]</code>. Dart has no
-    tuple type built into JS-style arrays, so FxDart uses a native Dart
-    <strong>record</strong>: <code>(List&lt;A&gt;, List&lt;A&gt;)</code>. Access
-    the two lists with <code>.$1</code> (pass) and <code>.$2</code> (fail),
-    or destructure them directly with pattern-matching syntax:
-    <code>final (pass, fail) = partition(f, iterable);</code>. This is the
-    same tuple-to-record convention used by
-    <code><a href="zip.html">zip</a></code> and
-    <code><a href="entries.html">entries</a></code> elsewhere in FxDart.
+    FxTS는 두 개짜리 튜플 <code>[pass, fail]</code>을 반환합니다. Dart에는
+    JS 배열 같은 튜플 타입이 없으므로 FxDart는 네이티브 Dart
+    <strong>레코드</strong>를 씁니다: <code>(List&lt;A&gt;, List&lt;A&gt;)</code>.
+    두 리스트는 <code>.$1</code>(통과)과 <code>.$2</code>(탈락)로 꺼내거나,
+    패턴 매칭 문법으로 바로 구조 분해할 수 있습니다:
+    <code>final (pass, fail) = partition(f, iterable);</code>. 이는 FxDart의
+    다른 곳에서 <code><a href="zip.html">zip</a></code>과
+    <code><a href="entries.html">entries</a></code>가 따르는 튜플-레코드
+    규약과 동일합니다.
   </p>
   <p>
-    As with every terminal in this section, it pulls the whole lazy pipeline
-    upstream of it, sync or async.
+    이 섹션의 다른 종결 연산자와 마찬가지로, 상류의 지연 파이프라인
+    전체를 끌어당깁니다. 동기든 비동기든 마찬가지입니다.
   </p>
 
-  <h2>Demo 1 · Basics &amp; destructuring</h2>
+  <h2>데모 1 · 기본과 구조 분해</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -98,7 +96,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>데모 2 · 비동기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -115,8 +113,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: partition the scores into <strong>pass</strong> (&gt;= 60) and <strong>fail</strong> (&lt; 60).</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 점수를 <strong>합격</strong>(&gt;= 60)과 <strong>불합격</strong>(&lt; 60)으로 나눠 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -134,10 +132,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="filter.html"><code>filter</code></a> · <a href="reject.html"><code>reject</code></a> — the two halves partition combines ·
-    <a href="groupBy.html"><code>groupBy</code></a> — grouping into more than two buckets ·
-    <a href="sort.html"><code>sort</code></a> — order within each side, if you need it
+    <strong>관련 항목:</strong>
+    <a href="filter.html"><code>filter</code></a> · <a href="reject.html"><code>reject</code></a> — partition이 합쳐 놓은 두 갈래 ·
+    <a href="groupBy.html"><code>groupBy</code></a> — 셋 이상의 그룹으로 묶기 ·
+    <a href="sort.html"><code>sort</code></a> — 필요하다면 각 갈래 안에서 정렬하기
   </div>
 
   <nav class="tut-nav">

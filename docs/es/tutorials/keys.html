@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>keys — FxDart 101</title>
-  <meta name="description" content="FxDart keys tutorial: a lazy Iterable of a Map's keys, ready to feed into a chain.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/keys.html">
+  <meta name="description" content="Tutorial de keys en FxDart: un Iterable perezoso con las claves de un Map, listo para alimentar una cadena.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/keys.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/keys.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/keys.html">
@@ -43,39 +42,40 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 2 · Generar secuencias › <strong>keys</strong></p>
   <h1><code>keys</code></h1>
-  <p class="hero-sub">The keys of a Map, as a plain lazy Iterable — ready to wrap in fx() and chain.</p>
+  <p class="hero-sub">Las claves de un Map, como un Iterable perezoso normal — listo para envolver con fx() y encadenar.</p>
 
   <div class="signature">Iterable&lt;K&gt; keys&lt;K, V&gt;(Map&lt;K, V&gt; map)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>keys(map)</code> is a thin, FxTS-flavored wrapper around Dart's
-    own <code>map.keys</code> — it exists mainly so the object-function
-    vocabulary (<code>entries</code>, <code>keys</code>, <code>values</code>)
-    reads consistently and slots straight into <code>fx()</code>. Dart's
-    <code>Map.keys</code> is already a lazy view, so <code>keys</code>
-    doesn't add any extra buffering — it just hands you the same lazy
-    <code>Iterable&lt;K&gt;</code>.
+    <code>keys(map)</code> es un envoltorio fino, al estilo FxTS, sobre el
+    propio <code>map.keys</code> de Dart — existe sobre todo para que el
+    vocabulario de funciones de objeto (<code>entries</code>,
+    <code>keys</code>, <code>values</code>) se lea de forma coherente y encaje
+    directamente en <code>fx()</code>. El <code>Map.keys</code> de Dart ya es
+    una vista perezosa, así que <code>keys</code> no añade ningún búfer
+    extra: simplemente te entrega ese mismo
+    <code>Iterable&lt;K&gt;</code> perezoso.
   </p>
   <p>
-    Reach for it when you want to filter, transform, or collect a Map's key
-    set using the rest of the chain vocabulary, rather than reaching for
-    <code>.where()</code>/<code>.toList()</code> on <code>map.keys</code>
-    directly — the two are equivalent, but <code>fx(keys(map))</code> reads
-    naturally next to <code>fx(values(map))</code> and
+    Recurre a él cuando quieras filtrar, transformar o recolectar el conjunto
+    de claves de un Map con el resto del vocabulario de la cadena, en lugar de
+    llamar a <code>.where()</code>/<code>.toList()</code> sobre
+    <code>map.keys</code> directamente — son equivalentes, pero
+    <code>fx(keys(map))</code> se lee con naturalidad junto a
+    <code>fx(values(map))</code> y
     <code>fx(entries(map))</code>.
   </p>
   <p>
-    If you need the keys <em>and</em> values together, use
-    <code>entries</code> instead — pulling <code>keys</code> and
-    <code>values</code> separately does not guarantee they line up if the
-    underlying map were mutated between the two calls.
+    Si necesitas las claves <em>y</em> los valores a la vez, usa
+    <code>entries</code>: obtener <code>keys</code> y
+    <code>values</code> por separado no garantiza que se correspondan si el
+    map subyacente se mutara entre ambas llamadas.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -92,7 +92,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Filtering a Map by its keys</h2>
+  <h2>Demo 2 · Filtrar un Map por sus claves</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -109,9 +109,9 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>keys</code> and <code>sort</code> to get an
-    alphabetically sorted list of item names.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>keys</code> y <code>sort</code> para obtener una
+    lista de nombres de artículos ordenada alfabéticamente.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -129,11 +129,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="entries.html"><code>entries</code></a> — keys and values paired together ·
-    <a href="values.html"><code>values</code></a> — the values of a Map ·
-    <a href="pick.html"><code>pick</code></a> — build a new Map from a subset of keys ·
-    <a href="fx.html"><code>fx</code></a> — the chain keys results feed into
+    <strong>Relacionado:</strong>
+    <a href="entries.html"><code>entries</code></a> — claves y valores emparejados ·
+    <a href="values.html"><code>values</code></a> — los valores de un Map ·
+    <a href="pick.html"><code>pick</code></a> — construir un Map nuevo a partir de un subconjunto de claves ·
+    <a href="fx.html"><code>fx</code></a> — la cadena a la que alimentan los resultados de keys
   </div>
 
   <nav class="tut-nav">

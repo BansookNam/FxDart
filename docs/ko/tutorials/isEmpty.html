@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>isEmpty — FxDart 101</title>
-  <meta name="description" content="FxDart isEmpty tutorial: a value-based emptiness check for null, strings, and collections, usable as a filter-friendly predicate.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/isEmpty.html">
+  <meta name="description" content="FxDart isEmpty 튜토리얼 — null, 문자열, 컬렉션을 아우르는 값 기반 비어 있음 검사를 filter에 바로 넘길 수 있는 술어로 활용해 봅니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/isEmpty.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/isEmpty.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/isEmpty.html">
@@ -43,33 +42,32 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 8 · 접근 &amp; 술어 › <strong>isEmpty</strong></p>
   <h1><code>isEmpty</code></h1>
-  <p class="hero-sub">A value-based emptiness check: true for <code>null</code>, <code>''</code>, and empty collections.</p>
+  <p class="hero-sub">값 기반 비어 있음 검사입니다. <code>null</code>, <code>''</code>, 그리고 빈 컬렉션에 대해 true를 반환합니다.</p>
 
   <div class="signature">bool isEmpty(Object? value)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    This is <strong>not</strong> the same thing as <code>Iterable.isEmpty</code>,
-    the getter you already get for free on every <code>List</code>, <code>Set</code>,
-    or <code>Fx</code> chain. That getter only exists on iterables, and blows
-    up (or is simply unavailable) on <code>null</code>. FxTS's <code>isEmpty</code>
-    takes <em>any</em> value and answers a broader question: is this thing
-    "nothing" in a practical sense? It returns <code>true</code> for
-    <code>null</code>, an empty <code>String</code>, and an empty
-    <code>Iterable</code>/<code>Map</code>/<code>Set</code> — and
-    <code>false</code> for everything else, including numbers and booleans,
-    which are never considered "empty."
+    이것은 <strong>결코</strong> <code>Iterable.isEmpty</code>와 같은 것이
+    아닙니다 — 모든 <code>List</code>, <code>Set</code>, <code>Fx</code> 체인에서
+    이미 거저 얻는 그 게터 말입니다.
+    그 게터는 이터러블에만 있어서, <code>null</code>에 대해서는 예외가 나거나
+    아예 쓸 수조차 없습니다. FxTS의 <code>isEmpty</code>는 <em>어떤</em>
+    값이든 받아서 더 넓은 질문에 답합니다. 실용적인 의미에서 이 값은
+    "아무것도 아닌" 것인가? <code>null</code>, 빈 <code>String</code>, 그리고
+    빈 <code>Iterable</code>/<code>Map</code>/<code>Set</code>에 대해
+    <code>true</code>를 반환하고, 그 밖의 모든 값에는 <code>false</code>를
+    반환합니다. 숫자와 불리언도 여기 포함되며, 결코 "비어 있다"고 보지 않습니다.
   </p>
   <p>
-    Because it takes a single <code>Object?</code> argument, it tears off
-    directly into <code>filter</code>, <code>reject</code>, or any other
-    predicate-shaped slot without a wrapper lambda.
+    인자가 <code>Object?</code> 하나뿐이라서, 별도의 람다로 감쌀 필요 없이
+    <code>filter</code>나 <code>reject</code>를 비롯해 술어 자리를 요구하는
+    어디에든 tear-off로 그대로 넘길 수 있습니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -86,10 +84,10 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · As a filter-friendly tear-off</h2>
+  <h2>데모 2 · filter에 바로 넘기는 tear-off로</h2>
   <p>
-    A mixed bag of values, kept down to the ones <code>isEmpty</code> considers empty
-    (the printed empty string shows up as nothing between the commas):
+    잡다한 값들을 모아 놓고, <code>isEmpty</code>가 비어 있다고 보는 것만
+    남깁니다(출력된 빈 문자열은 쉼표 사이의 빈 자리로 나타납니다):
   </p>
   <div class="playground">
 <textarea>
@@ -105,8 +103,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>isEmpty</code> to print <code>'no comment'</code> when <code>comment</code> is empty, or the comment itself.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>isEmpty</code>로 <code>comment</code>가 비어 있으면 <code>'no comment'</code>를, 아니면 댓글 자체를 출력해 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -123,11 +121,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="compact.html"><code>compact</code></a> — drop nulls from an iterable ·
-    <a href="compactObject.html"><code>compactObject</code></a> — drop nulls from a Map ·
-    <a href="predicates.html"><code>predicates</code></a> — more filter-friendly type checks ·
-    <a href="includes.html"><code>includes</code></a> — the neighboring membership check
+    <strong>관련 함수:</strong>
+    <a href="compact.html"><code>compact</code></a> — 이터러블에서 null 제거하기 ·
+    <a href="compactObject.html"><code>compactObject</code></a> — Map에서 null 제거하기 ·
+    <a href="predicates.html"><code>predicates</code></a> — filter에 바로 쓸 수 있는 타입 검사 모음 ·
+    <a href="includes.html"><code>includes</code></a> — 이웃한 포함 여부 검사
   </div>
 
   <nav class="tut-nav">

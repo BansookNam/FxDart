@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>throttle — FxDart 101</title>
-  <meta name="description" content="FxDart throttle tutorial: invoke a function at most once per wait period, with leading/trailing edges and cancel(), plus a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/throttle.html">
+  <meta name="description" content="Tutorial de throttle en FxDart: invoca una función como máximo una vez por periodo de espera, con flancos leading/trailing y cancel(), más playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/throttle.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/throttle.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/throttle.html">
@@ -43,10 +42,9 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 12 · Util › <strong>throttle</strong></p>
   <h1><code>throttle</code></h1>
-  <p class="hero-sub">Invokes a function at most once per wait period — on a schedule, unlike debounce's "wait for quiet."</p>
+  <p class="hero-sub">Invoca una función como máximo una vez por periodo de espera — a un ritmo fijo, a diferencia del «esperar a que haya calma» de debounce.</p>
 
   <div class="signature">Throttled&lt;T&gt; throttle&lt;T&gt;(void Function(T arg) func, Duration wait, {bool leading = true, bool trailing = true})
 
@@ -55,31 +53,34 @@ class Throttled&lt;T&gt; {
   void cancel();
 }</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>throttle</code> guarantees <code>func</code> runs at most once every
-    <code>wait</code>, no matter how often the throttled function is called.
-    That's the key difference from <a href="debounce.html"><code>debounce</code></a>:
-    debounce keeps <em>resetting</em> its timer on every call, so a
-    continuous stream of calls can delay execution indefinitely; throttle's
-    window is fixed once it starts, so calls still get through on a regular
-    cadence — useful for things like scroll or resize handlers where you want
-    periodic updates, not just one at the very end.
+    <code>throttle</code> garantiza que <code>func</code> se ejecute como
+    máximo una vez cada <code>wait</code>, por muchas veces que se llame a la
+    función con throttle. Esa es la diferencia clave con
+    <a href="debounce.html"><code>debounce</code></a>: debounce
+    <em>reinicia</em> su temporizador en cada llamada, así que un flujo
+    continuo de llamadas puede retrasar la ejecución indefinidamente; la
+    ventana de throttle es fija una vez arranca, así que las llamadas siguen
+    pasando con una cadencia regular — útil para cosas como manejadores de
+    scroll o resize, donde quieres actualizaciones periódicas y no solo una al
+    final del todo.
   </p>
   <p>
-    Both <code>leading</code> and <code>trailing</code> default to
-    <code>true</code>: the first call in a window fires immediately (leading
-    edge), and if more calls arrive before the window closes, the
-    <em>last</em> of those fires once the window ends (trailing edge, with
-    the latest argument). Turn either off to get leading-only or
-    trailing-only behavior. Like <code>debounce</code>, the returned
-    <code>Throttled&lt;T&gt;</code> is a callable class with a
-    <code>.cancel()</code> to drop a pending trailing call.
+    Tanto <code>leading</code> como <code>trailing</code> valen
+    <code>true</code> por defecto: la primera llamada de una ventana se
+    dispara de inmediato (flanco de subida) y, si llegan más llamadas antes de
+    que la ventana se cierre, la <em>última</em> se dispara al terminar la
+    ventana (flanco de bajada, con el argumento más reciente). Desactiva
+    cualquiera de los dos para obtener un comportamiento solo-leading o
+    solo-trailing. Igual que <code>debounce</code>, el
+    <code>Throttled&lt;T&gt;</code> devuelto es una clase invocable con un
+    <code>.cancel()</code> para descartar una llamada trailing pendiente.
   </p>
 
-  <h2>Demo 1 · Leading + trailing (the default)</h2>
-  <p>The first call fires immediately; the last call in the window fires
-    again once the window closes:</p>
+  <h2>Demo 1 · Leading + trailing (el valor por defecto)</h2>
+  <p>La primera llamada se dispara de inmediato; la última de la ventana se
+    dispara otra vez cuando la ventana se cierra:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -103,11 +104,11 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Tuning leading/trailing, and cancel()</h2>
+  <h2>Demo 2 · Ajustar leading/trailing, y cancel()</h2>
   <p>
-    Turn off <code>leading</code> for trailing-only behavior, off
-    <code>trailing</code> for leading-only, or call <code>.cancel()</code> to
-    drop a pending trailing call:
+    Desactiva <code>leading</code> para un comportamiento solo-trailing,
+    desactiva <code>trailing</code> para solo-leading, o llama a
+    <code>.cancel()</code> para descartar una llamada trailing pendiente:
   </p>
   <div class="playground">
 <textarea>
@@ -149,10 +150,10 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: wrap <code>onClick</code> in <code>throttle</code> (100ms
-    wait) so rapid clicks register at most twice — leading and trailing —
-    instead of three separate times.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: envuelve <code>onClick</code> en <code>throttle</code> (100 ms
+    de espera) para que los clics rápidos se registren como mucho dos veces
+    —leading y trailing— en lugar de tres veces por separado.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -175,11 +176,11 @@ Future<void> main() async {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="debounce.html"><code>debounce</code></a> — waits for quiet instead of a fixed schedule ·
-    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — building timing demos ·
-    <a href="shuffle.html"><code>shuffle</code></a> — seeded randomness ·
-    <a href="concurrent.html"><code>concurrent</code></a> — rate-limiting for async pipelines
+    <strong>Relacionado:</strong>
+    <a href="debounce.html"><code>debounce</code></a> — espera a que haya calma en vez de seguir un ritmo fijo ·
+    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — para construir demos con tiempos ·
+    <a href="shuffle.html"><code>shuffle</code></a> — aleatoriedad con semilla ·
+    <a href="concurrent.html"><code>concurrent</code></a> — limitación de tasa para pipelines asíncronos
   </div>
 
   <nav class="tut-nav">

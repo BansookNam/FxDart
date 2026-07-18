@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>throwIf — FxDart 101</title>
-  <meta name="description" content="FxDart throwIf tutorial: throw conditionally, otherwise pass the value through, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/throwIf.html">
+  <meta name="description" content="Tutorial de throwIf en FxDart: lanza de forma condicional y, si no, deja pasar el valor, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/throwIf.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/throwIf.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/throwIf.html">
@@ -43,30 +42,30 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 10 · Utilidades de funciones › <strong>throwIf</strong></p>
   <h1><code>throwIf</code></h1>
-  <p class="hero-sub">Throws when a predicate holds; otherwise returns the value unchanged.</p>
+  <p class="hero-sub">Lanza cuando se cumple un predicado; en caso contrario devuelve el valor sin cambios.</p>
 
   <div class="signature">T throwIf&lt;T&gt;(bool Function(T) predicate, Object Function(T) toError, T value)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>throwIf(predicate, toError, value)</code> is a guard clause you can
-    drop mid-expression: if <code>predicate(value)</code> is true, it throws
-    <code>toError(value)</code>; otherwise it hands <code>value</code> back
-    unchanged. That makes it convenient inside a <code>map</code> callback,
-    where you want to validate every element as it streams through the
-    pipeline and fail loudly the moment one is invalid.
+    <code>throwIf(predicate, toError, value)</code> es una cláusula de guarda
+    que puedes soltar en mitad de una expresión: si
+    <code>predicate(value)</code> es true, lanza
+    <code>toError(value)</code>; si no, te devuelve <code>value</code> sin
+    cambios. Eso lo hace cómodo dentro de un callback de <code>map</code>,
+    cuando quieres validar cada elemento a su paso por el pipeline y fallar
+    ruidosamente en cuanto uno no sea válido.
   </p>
   <p>
-    It's essentially <a href="when.html"><code>when</code></a> where the
-    "then" branch always throws instead of returning a value — so wrap any
-    call site in <code>try</code>/<code>catch</code> to observe or recover
-    from the failure.
+    Es básicamente <a href="when.html"><code>when</code></a> con una rama
+    «then» que siempre lanza en lugar de devolver un valor — así que envuelve
+    cualquier punto de llamada en <code>try</code>/<code>catch</code> para
+    observar el fallo o recuperarte de él.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -83,10 +82,10 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Validating a pipeline</h2>
+  <h2>Demo 2 · Validar un pipeline</h2>
   <p>
-    Each age is validated as it's mapped; the first violation aborts the
-    whole <code>toArray()</code> call:
+    Cada edad se valida conforme se mapea; la primera infracción aborta la
+    llamada entera a <code>toArray()</code>:
   </p>
   <div class="playground">
 <textarea>
@@ -108,9 +107,9 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>throwIf</code> to guard against zero stock while
-    summing this inventory.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>throwIf</code> para protegerte del stock a cero
+    mientras sumas este inventario.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -133,11 +132,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="throwError.html"><code>throwError</code></a> — a standalone throwing function, no condition ·
-    <a href="when.html"><code>when</code></a> — substitute a value instead of throwing ·
-    <a href="cases.html"><code>cases</code></a> — dispatch across multiple predicates ·
-    <a href="add.html"><code>add</code></a> — used above as the reducer
+    <strong>Relacionado:</strong>
+    <a href="throwError.html"><code>throwError</code></a> — una función que lanza por sí sola, sin condición ·
+    <a href="when.html"><code>when</code></a> — sustituye un valor en vez de lanzar ·
+    <a href="cases.html"><code>cases</code></a> — despacha entre varios predicados ·
+    <a href="add.html"><code>add</code></a> — usado arriba como reductor
   </div>
 
   <nav class="tut-nav">

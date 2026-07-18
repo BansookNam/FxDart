@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>size — FxDart 101</title>
-  <meta name="description" content="FxDart size tutorial: count the elements a pipeline produces, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/size.html">
+  <meta name="description" content="Tutorial de size en FxDart: cuenta los elementos que produce un pipeline, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/size.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/size.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/size.html">
@@ -43,42 +42,42 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>size</strong></p>
   <h1><code>size</code></h1>
-  <p class="hero-sub">Counts how many elements a lazy pipeline produces.</p>
+  <p class="hero-sub">Cuenta cuántos elementos produce un pipeline perezoso.</p>
 
   <div class="signature">int size&lt;A&gt;(Iterable&lt;A&gt; iterable)
 Future&lt;int&gt; sizeAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
 int Fx.size()          // chain (sync)
 Future&lt;int&gt; FxAsync.size()  // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>size</code> is a terminal operator that counts elements by walking
-    through all of them — there's no shortcut, because the upstream pipeline
-    might be a lazily-computed <code>map</code>/<code>filter</code> chain with
-    no fixed length until it's actually pulled. That means calling
-    <code>size</code> on a <code>filter</code>ed million-element
-    <code>range</code> really does iterate all million values; it just
-    doesn't build a <code>List</code> to do it.
+    <code>size</code> es un operador terminal que cuenta los elementos
+    recorriéndolos todos: no hay atajo posible, porque el pipeline de aguas
+    arriba puede ser una cadena de <code>map</code>/<code>filter</code>
+    evaluada de forma perezosa, sin longitud fija hasta que realmente se tira
+    de ella. Es decir, llamar a <code>size</code> sobre un <code>range</code>
+    de un millón de elementos con <code>filter</code> recorre de verdad el
+    millón de valores; simplemente no construye una <code>List</code> para
+    ello.
   </p>
   <p>
-    It works on any element type — unlike the numeric terminals
-    (<code><a href="sum.html">sum</a></code>,
+    Funciona con cualquier tipo de elemento: a diferencia de los terminales
+    numéricos (<code><a href="sum.html">sum</a></code>,
     <code><a href="min.html">min</a></code>,
     <code><a href="max.html">max</a></code>,
-    <code><a href="average.html">average</a></code>), <code>size</code>
-    doesn't care what's inside the iterable, only how many there are.
+    <code><a href="average.html">average</a></code>), a <code>size</code> no le
+    importa qué hay dentro del iterable, solo cuántos elementos hay.
   </p>
   <p>
-    If you already have a concrete <code>List</code>, its <code>.length</code>
-    is free — reach for <code>size</code> specifically when you're counting
-    the output of a lazy chain without wanting to materialize it into a
-    <code>List</code> first via <code><a href="../101/index.html">toArray</a></code>.
+    Si ya tienes una <code>List</code> concreta, su <code>.length</code> es
+    gratis: recurre a <code>size</code> precisamente cuando quieras contar la
+    salida de una cadena perezosa sin materializarla antes en una
+    <code>List</code> con <code><a href="../101/index.html">toArray</a></code>.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -94,7 +93,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -111,8 +110,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: count how many entries are <strong>out of stock</strong> (value <code>== 0</code>).</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: cuenta cuántas entradas están <strong>sin stock</strong> (valor <code>== 0</code>).</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -129,10 +128,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="average.html"><code>average</code></a> — uses a size-like count internally ·
-    <a href="isEmpty.html"><code>isEmpty</code></a> — a cheaper check when you only need to know "any at all?" ·
-    <a href="../101/index.html">toArray</a> — materialize instead of just counting
+    <strong>Relacionado:</strong>
+    <a href="average.html"><code>average</code></a> — usa internamente un conteo similar a size ·
+    <a href="isEmpty.html"><code>isEmpty</code></a> — una comprobación más barata cuando solo necesitas saber «¿hay alguno?» ·
+    <a href="../101/index.html">toArray</a> — materializa en lugar de solo contar
   </div>
 
   <nav class="tut-nav">

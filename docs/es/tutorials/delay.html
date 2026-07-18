@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>delay &amp; sleep — FxDart 101</title>
-  <meta name="description" content="FxDart delay and sleep tutorial: the two building blocks every async demo on this site is built from, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/delay.html">
+  <meta name="description" content="Tutorial de delay y sleep en FxDart: los dos ladrillos con los que está construida cada demo asíncrona de este sitio, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/delay.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/delay.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/delay.html">
@@ -43,34 +42,34 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 10 · Utilidades de funciones › <strong>delay &amp; sleep</strong></p>
   <h1><code>delay</code> &amp; <code>sleep</code></h1>
-  <p class="hero-sub">Wait for a bit, then produce a value (delay) — or just wait (sleep).</p>
+  <p class="hero-sub">Espera un poco y produce un valor (delay) — o simplemente espera (sleep).</p>
 
   <div class="signature">Future&lt;T&gt; delay&lt;T&gt;(Duration wait, T value)
 Future&lt;void&gt; sleep(Duration wait)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>delay(wait, value)</code> returns a <code>Future</code> that
-    completes with <code>value</code> after <code>wait</code> has elapsed.
-    <code>sleep(wait)</code> is the same idea with nothing to return — it
-    just completes after the duration. Both are thin wrappers over
-    <code>Future.delayed</code>, and both are exactly what you'd reach for to
-    simulate a slow operation: a network call, a database query, anything
-    that takes time and eventually produces (or doesn't produce) a result.
+    <code>delay(wait, value)</code> devuelve un <code>Future</code> que se
+    completa con <code>value</code> una vez transcurrido <code>wait</code>.
+    <code>sleep(wait)</code> es la misma idea pero sin nada que devolver —
+    simplemente se completa al cabo de esa duración. Ambas son envoltorios
+    finos sobre <code>Future.delayed</code>, y ambas son justo lo que
+    usarías para simular una operación lenta: una llamada de red, una
+    consulta a base de datos, cualquier cosa que tarde y acabe produciendo
+    (o no) un resultado.
   </p>
   <p>
-    These two functions are the backbone of nearly every async demo across
-    this whole tutorial site. Whenever you see <code>mapAsync</code>,
-    <code>concurrent</code>, <code>debounce</code>, or <code>throttle</code>
-    demonstrated with a <code>Stopwatch</code> proving something ran in
-    parallel or was rate-limited, it's <code>delay</code> or <code>sleep</code>
-    doing the actual waiting under the hood.
+    Estas dos funciones son la columna vertebral de casi todas las demos
+    asíncronas de este sitio de tutoriales. Cada vez que veas
+    <code>mapAsync</code>, <code>concurrent</code>, <code>debounce</code> o
+    <code>throttle</code> demostrados con un <code>Stopwatch</code> que
+    prueba que algo corrió en paralelo o quedó limitado en ritmo, es
+    <code>delay</code> o <code>sleep</code> quien está esperando por debajo.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -87,10 +86,10 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Simulating concurrent work</h2>
+  <h2>Demo 2 · Simular trabajo concurrente</h2>
   <p>
-    Three "requests" each take 150ms, but run concurrently — the whole batch
-    still finishes in well under 450ms:
+    Tres "peticiones" tardan 150 ms cada una, pero corren de forma
+    concurrente — el lote entero termina bastante por debajo de 450 ms:
   </p>
   <div class="playground">
 <textarea>
@@ -111,9 +110,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>delay</code> to simulate a 100ms "fetch" that
-    returns <code>'pong'</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>delay</code> para simular un "fetch" de 100 ms que
+    devuelve <code>'pong'</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -128,11 +127,11 @@ Future<void> main() async {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="memoize.html"><code>memoize</code></a> — caches a delayed Future so it only waits once ·
-    <a href="concurrent.html"><code>concurrent</code></a> — run multiple delays in parallel ·
-    <a href="debounce.html"><code>debounce</code></a> / <a href="throttle.html"><code>throttle</code></a> — rate-limiting built on top of waiting ·
-    <a href="toAsync.html"><code>toAsync</code></a> — turn a plain Iterable into an async pipeline
+    <strong>Relacionado:</strong>
+    <a href="memoize.html"><code>memoize</code></a> — cachea un Future retardado para que solo espere una vez ·
+    <a href="concurrent.html"><code>concurrent</code></a> — ejecuta varios delays en paralelo ·
+    <a href="debounce.html"><code>debounce</code></a> / <a href="throttle.html"><code>throttle</code></a> — limitar el ritmo, construido sobre la espera ·
+    <a href="toAsync.html"><code>toAsync</code></a> — convierte un Iterable normal en un pipeline asíncrono
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>scan — FxDart 101</title>
-  <meta name="description" content="FxDart scan tutorial: a lazy running accumulation, seeded or unseeded, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/scan.html">
+  <meta name="description" content="Tutorial de scan en FxDart: una acumulación progresiva y perezosa, con o sin valor inicial, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/scan.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/scan.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/scan.html">
@@ -43,10 +42,9 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 3 · Transformar › <strong>scan</strong></p>
   <h1><code>scan</code></h1>
-  <p class="hero-sub">A lazy running accumulation — like <code>reduce</code>, but it yields every intermediate value instead of only the last.</p>
+  <p class="hero-sub">Una acumulación progresiva y perezosa — como <code>reduce</code>, pero emite todos los valores intermedios en lugar de solo el último.</p>
 
   <div class="signature">Iterable&lt;B&gt; scan&lt;A, B&gt;(B Function(B acc, A a) f, B seed, Iterable&lt;A&gt; iterable)
 Iterable&lt;A&gt; scan1&lt;A&gt;(A Function(A acc, A a) f, Iterable&lt;A&gt; iterable)
@@ -55,36 +53,39 @@ FxAsyncIterable&lt;A&gt; scan1Async&lt;A&gt;(FutureOr&lt;A&gt; Function(A acc, A
 Fx&lt;B&gt; Fx.scan&lt;B&gt;(B Function(B acc, T a) f, B seed)        // chain
 FxAsync&lt;B&gt; FxAsync.scan&lt;B&gt;(FutureOr&lt;B&gt; Function(B acc, T a) f, FutureOr&lt;B&gt; seed)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>scan</code> is <code>reduce</code>/<code>fold</code> with its
-    intermediate steps exposed: instead of collapsing an iterable down to
-    one final value, it emits <em>every</em> running accumulation, including
-    the seed itself as the first value. That first-value-is-the-seed detail
-    matters — <code>scan(f, 0, [1, 2, 3])</code> yields four values
-    (<code>0</code>, then three running sums), not three.
+    <code>scan</code> es <code>reduce</code>/<code>fold</code> con sus pasos
+    intermedios a la vista: en lugar de colapsar un iterable en un único valor
+    final, emite <em>todas</em> las acumulaciones parciales, incluido el propio
+    valor inicial como primer valor. Ese detalle de que el primer valor es el valor inicial
+    importa: <code>scan(f, 0, [1, 2, 3])</code> emite cuatro valores
+    (<code>0</code> y luego tres sumas parciales), no tres.
   </p>
   <p>
-    <code>scan1</code> is the unseeded variant, ported from FxTS's
-    <code>scan(f, iterable)</code> overload (no seed argument). It uses the
-    first element of the iterable as the initial accumulator and yields it
-    immediately, then keeps folding the rest — mirroring <code>reduce</code>'s
-    relationship to <code>fold</code>. On an empty iterable, <code>scan1</code>
-    has no first element to seed with, so it yields nothing at all. Note
-    there is no chain method for <code>scan1</code> (only <code>scan</code> is
-    on <code>Fx</code>/<code>FxAsync</code>) — call it data-first:
+    <code>scan1</code> es la variante sin valor inicial, portada de la sobrecarga
+    <code>scan(f, iterable)</code> de FxTS (sin argumento de valor inicial). Usa el
+    primer elemento del iterable como acumulador inicial y lo emite de
+    inmediato, y luego sigue plegando el resto, reflejando la relación de
+    <code>reduce</code> con <code>fold</code>. Sobre un iterable vacío,
+    <code>scan1</code> no tiene primer elemento con el que arrancar, así que no
+    emite nada en absoluto. Ten en cuenta que no hay método de cadena para
+    <code>scan1</code> (solo <code>scan</code> está en
+    <code>Fx</code>/<code>FxAsync</code>): llámalo en forma data-first,
     <code>scan1(f, iterable)</code>.
   </p>
   <p>
-    Both are lazy: nothing runs until you pull. On the async side,
-    <code>scanAsync</code>/<code>scan1Async</code> still fold one step at a
-    time in order (each step needs the previous result), so
-    <code>.concurrent(n)</code> doesn't parallelize the fold itself — but it
-    does let an upstream fetch stage run concurrently, as long as the
-    accumulator function itself stays cheap. See Demo 2.
+    Ambos son perezosos: no se ejecuta nada hasta que consumes la
+    secuencia. En el lado
+    asíncrono, <code>scanAsync</code>/<code>scan1Async</code> siguen plegando
+    paso a paso y en orden (cada paso necesita el resultado anterior), así que
+    <code>.concurrent(n)</code> no paraleliza el pliegue en sí; lo que sí hace
+    es permitir que una etapa de descarga aguas arriba se ejecute con
+    concurrencia, siempre que la propia función acumuladora sea barata. Mira la
+    Demo 2.
   </p>
 
-  <h2>Demo 1 · Basics — scan and scan1</h2>
+  <h2>Demo 1 · Fundamentos — scan y scan1</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -108,10 +109,10 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency upstream</h2>
+  <h2>Demo 2 · Asíncrono, con concurrencia aguas arriba</h2>
   <p>
-    The fold itself stays sequential, but the fetch that feeds it doesn't
-    have to:
+    El pliegue en sí sigue siendo secuencial, pero la descarga que lo alimenta
+    no tiene por qué serlo:
   </p>
   <div class="playground">
 <textarea>
@@ -136,9 +137,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>scan</code> to produce a running total of steps,
-    seeded at <code>0</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>scan</code> para producir un total acumulado de
+    pasos, con <code>0</code> como valor inicial.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -155,11 +156,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="../tutorials/reduce.html"><code>reduce</code>/<code>fold</code></a> — collapse to one final value ·
-    <a href="flat.html"><code>flat</code></a> — flatten nested iterables ·
-    <a href="peek.html"><code>peek</code></a> — observe without transforming ·
-    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
+    <strong>Relacionado:</strong>
+    <a href="../tutorials/reduce.html"><code>reduce</code>/<code>fold</code></a> — colapsa a un único valor final ·
+    <a href="flat.html"><code>flat</code></a> — aplana iterables anidados ·
+    <a href="peek.html"><code>peek</code></a> — observa sin transformar ·
+    <a href="concurrent.html"><code>concurrent</code></a> — evaluación paralela
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>toArray — FxDart 101</title>
-  <meta name="description" content="FxDart toArray tutorial: the terminal operator that materializes a lazy chain into a List, sync and async.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/toArray.html">
+  <meta name="description" content="Tutorial de toArray en FxDart: el operador terminal que materializa una cadena perezosa en una List, en versión síncrona y asíncrona.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/toArray.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/toArray.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/toArray.html">
@@ -43,45 +42,44 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 1 · Primeros pasos › <strong>toArray</strong></p>
   <h1><code>toArray</code></h1>
-  <p class="hero-sub">Materializes a lazy iterable — pulling every value and collecting them into a List.</p>
+  <p class="hero-sub">Materializa un iterable perezoso: tira de todos los valores y los recoge en una List.</p>
 
   <div class="signature">List&lt;A&gt; toArray&lt;A&gt;(Iterable&lt;A&gt; iterable)
 Future&lt;List&lt;A&gt;&gt; toArrayAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
 List&lt;T&gt; Fx.toArray()        // chain
 Future&lt;List&lt;T&gt;&gt; FxAsync.toArray()</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>toArray</code> is the workhorse <strong>terminal operator</strong>:
-    it's what actually runs a chain that was, until this point, nothing but
-    a plan. Calling <code>.toArray()</code> pulls every remaining value out
-    of the iterable, in order, and collects them into a real
-    <code>List&lt;T&gt;</code>. Everything upstream — every <code>.map()</code>,
-    <code>.filter()</code>, <code>.take()</code> — only runs because
-    <code>toArray</code> asked for values.
+    <code>toArray</code> es el <strong>operador terminal</strong> por excelencia:
+    es lo que de verdad ejecuta una cadena que, hasta ese momento, no era más
+    que un plan. Llamar a <code>.toArray()</code> extrae en orden todos los
+    valores que queden en el iterable y los recoge en una
+    <code>List&lt;T&gt;</code> de verdad. Todo lo que hay aguas arriba —cada
+    <code>.map()</code>, <code>.filter()</code>, <code>.take()</code>— solo se
+    ejecuta porque <code>toArray</code> pidió valores.
   </p>
   <p>
-    That also means <code>toArray</code> is exactly the operator you must
-    <em>not</em> call directly on an infinite or unbounded source
-    (<code>range</code> with no end, <code>cycle</code>, <code>repeat</code>
-    with a huge count) — it will try to pull forever. Bound it first with
-    <code>take(n)</code>, then call <code>toArray</code> on the bounded
-    result.
+    Eso también significa que <code>toArray</code> es justo el operador que
+    <em>no</em> debes llamar directamente sobre una fuente infinita o no
+    acotada (<code>range</code> sin fin, <code>cycle</code>,
+    <code>repeat</code> con un número enorme de repeticiones): intentará tirar de ella para
+    siempre. Acótala primero con <code>take(n)</code> y luego llama a
+    <code>toArray</code> sobre el resultado acotado.
   </p>
   <p>
-    The async version, <code>toArrayAsync</code> (or <code>.toArray()</code>
-    on an <code>FxAsync</code> chain), awaits each element as it's pulled
-    and returns a <code>Future&lt;List&lt;T&gt;&gt;</code>. Combined with
-    <code>.concurrent(n)</code> upstream, the individual awaits can overlap
-    even though the final list still comes back in the original order.
+    La versión asíncrona, <code>toArrayAsync</code> (o <code>.toArray()</code>
+    sobre una cadena <code>FxAsync</code>), espera cada elemento conforme lo
+    extrae y devuelve un <code>Future&lt;List&lt;T&gt;&gt;</code>. Combinada
+    con <code>.concurrent(n)</code> aguas arriba, las esperas individuales
+    pueden solaparse aunque la lista final siga llegando en el orden original.
   </p>
 
-  <h2>Demo 1 · Basics &amp; laziness</h2>
-  <p>Note how <code>map</code> only actually runs for the 3 values that
-    <code>take(3)</code> allows through — out of a million:</p>
+  <h2>Demo 1 · Fundamentos &amp; pereza</h2>
+  <p>Fíjate en que <code>map</code> solo se ejecuta de verdad para los 3
+    valores que <code>take(3)</code> deja pasar — de entre un millón:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -106,11 +104,12 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency</h2>
+  <h2>Demo 2 · Asíncrono, con concurrencia</h2>
   <p>
-    <code>.toArray()</code> on an <code>FxAsync</code> chain awaits every
-    element and hands back the whole list at once; add
-    <code>.concurrent(n)</code> upstream to overlap the individual waits:
+    <code>.toArray()</code> sobre una cadena <code>FxAsync</code> espera cada
+    elemento y te devuelve la lista entera de golpe; añade
+    <code>.concurrent(n)</code> aguas arriba para solapar las esperas
+    individuales:
   </p>
   <div class="playground">
 <textarea>
@@ -132,8 +131,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: materialize the first 4 squares of a huge range into a List.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: materializa en una List los 4 primeros cuadrados de un rango enorme.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -148,11 +147,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="each.html"><code>each</code></a> — terminal op for side effects instead of a List ·
-    <a href="consume.html"><code>consume</code></a> — terminal op that discards results entirely ·
-    <a href="fx.html"><code>fx</code></a> — the chain that toArray terminates ·
-    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
+    <strong>Relacionado:</strong>
+    <a href="each.html"><code>each</code></a> — operador terminal para efectos secundarios en vez de una List ·
+    <a href="consume.html"><code>consume</code></a> — operador terminal que descarta los resultados por completo ·
+    <a href="fx.html"><code>fx</code></a> — la cadena que toArray termina ·
+    <a href="concurrent.html"><code>concurrent</code></a> — evaluación en paralelo
   </div>
 
   <nav class="tut-nav">

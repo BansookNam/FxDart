@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>concurrentPool — FxDart 101</title>
-  <meta name="description" content="FxDart concurrentPool tutorial: a fixed-size pool of in-flight requests that yields results in completion order, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/concurrentPool.html">
+  <meta name="description" content="Tutorial de concurrentPool en FxDart: un pool de tamaño fijo de peticiones en vuelo que emite los resultados por orden de finalización, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/concurrentPool.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/concurrentPool.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/concurrentPool.html">
@@ -43,40 +42,40 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 11 · Async &amp; concurrencia › <strong>concurrentPool</strong></p>
   <h1><code>concurrentPool</code></h1>
-  <p class="hero-sub">Like concurrent, but yields results in completion order — whichever finishes first comes out first.</p>
+  <p class="hero-sub">Como concurrent, pero emite los resultados por orden de finalización — el primero que acaba es el primero que sale.</p>
 
   <div class="signature">FxAsyncIterable&lt;A&gt; concurrentPoolAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
 FxAsync&lt;T&gt; FxAsync.concurrentPool(int length)        // chain</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>concurrentPool(n)</code> keeps up to <code>n</code> requests in
-    flight against the upstream source, exactly like <code>concurrent(n)</code>
-    — but it hands results back to you in the order they <strong>complete</strong>,
-    not the order they started in. Think of it as a worker pool: as soon as
-    one slot frees up, the next pending item is launched into it, and
-    whichever finishes first is yielded first. This matches FxTS's
-    <code>concurrentPool</code> and is the right tool when you don't care
-    which result came from which input — you just want to react to results as
-    soon as each one is ready (e.g. updating a progress list as each fetch
-    lands), rather than blocking on the slowest one to preserve order.
+    <code>concurrentPool(n)</code> mantiene hasta <code>n</code> peticiones en
+    vuelo contra la fuente de aguas arriba, igual que <code>concurrent(n)</code>
+    — pero te devuelve los resultados en el orden en que <strong>terminan</strong>,
+    no en el que empezaron. Piénsalo como un pool de workers: en cuanto se libera
+    un hueco, se lanza en él el siguiente elemento pendiente, y el primero que
+    acaba es el primero que se emite. Esto coincide con el
+    <code>concurrentPool</code> de FxTS y es la herramienta adecuada cuando no te
+    importa qué resultado vino de qué entrada — solo quieres reaccionar a cada
+    resultado en cuanto está listo (por ejemplo, actualizar una lista de progreso
+    conforme aterriza cada fetch), en lugar de bloquearte con el más lento para
+    conservar el orden.
   </p>
   <p>
-    Unlike <code>concurrent</code>, which is driven by the downstream demand
-    marker, <code>concurrentPool</code> <strong>eagerly keeps its pool
-    full</strong>: from the first pull onward it holds up to <code>n</code>
-    requests in flight no matter how many consumers are waiting. Even a
-    one-pull-at-a-time terminal like <code>.toArray()</code> or
-    <code>.each()</code> gets the full overlap — and sees results in the
-    order they finish.
+    A diferencia de <code>concurrent</code>, que se guía por el marcador de
+    demanda que llega de aguas abajo, <code>concurrentPool</code> <strong>mantiene
+    su pool lleno de forma ansiosa</strong>: desde el primer pull conserva hasta
+    <code>n</code> peticiones en vuelo, haya los consumidores que haya
+    esperando. Incluso un operador terminal que tira de uno en uno como
+    <code>.toArray()</code> o <code>.each()</code> obtiene todo el solapamiento
+    — y ve los resultados en el orden en que terminan.
   </p>
 
-  <h2>Demo 1 · Completion order</h2>
-  <p>Item 1 is slowest (300ms) and item 2 is fastest (100ms) — the result
-    comes out fastest-first, straight from <code>.toArray()</code>:</p>
+  <h2>Demo 1 · Orden de finalización</h2>
+  <p>El elemento 1 es el más lento (300ms) y el 2 el más rápido (100ms) — el
+    resultado sale con el más rápido primero, directamente desde <code>.toArray()</code>:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -97,9 +96,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Contrast with concurrent</h2>
-  <p>Same delays, same pool size of 3 — the only difference is which order
-    the results land in:</p>
+  <h2>Demo 2 · Contraste con concurrent</h2>
+  <p>Los mismos retardos, el mismo pool de tamaño 3 — la única diferencia es en
+    qué orden llegan los resultados:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -132,10 +131,10 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: this pool size of 1 processes items one at a time, in launch
-    order. Bump it to 3 so all three race at once, and watch the printed
-    order switch to completion order.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: este pool de tamaño 1 procesa los elementos de uno en uno, en el
+    orden en que se lanzan. Súbelo a 3 para que los tres compitan a la vez y
+    observa cómo el orden impreso pasa a ser el de finalización.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -163,11 +162,11 @@ Future<void> main() async {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="concurrent.html"><code>concurrent</code></a> — order-preserving variant ·
-    <a href="toAsync.html"><code>toAsync</code></a> — the pull-based model this relies on ·
-    <a href="streams.html">Stream bridges</a> — apply concurrentPool before toStream() ·
-    <a href="debounce.html"><code>debounce</code></a> — rate-limiting for callbacks
+    <strong>Relacionado:</strong>
+    <a href="concurrent.html"><code>concurrent</code></a> — variante que preserva el orden ·
+    <a href="toAsync.html"><code>toAsync</code></a> — el modelo basado en pull en el que se apoya ·
+    <a href="streams.html">puentes con Stream</a> — aplica concurrentPool antes de toStream() ·
+    <a href="debounce.html"><code>debounce</code></a> — limitación de frecuencia para callbacks
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>uniqBy — FxDart 101</title>
-  <meta name="description" content="FxDart uniqBy tutorial: remove duplicates by a computed key, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/uniqBy.html">
+  <meta name="description" content="FxDart uniqBy 튜토리얼: 계산된 키를 기준으로 중복을 제거하는 방법을 라이브 플레이그라운드와 함께 익힙니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/uniqBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/uniqBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/uniqBy.html">
@@ -43,38 +42,37 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 4 · 필터링 &amp; 중복 제거 › <strong>uniqBy</strong></p>
   <h1><code>uniqBy</code></h1>
-  <p class="hero-sub">Removes duplicates as determined by a key function, rather than value equality.</p>
+  <p class="hero-sub">값의 동등성이 아니라 키 함수가 정하는 기준으로 중복을 제거합니다.</p>
 
   <div class="signature">Iterable&lt;A&gt; uniqBy&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; uniqByAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.uniqBy&lt;B&gt;(B Function(T a) f)        // chain
 FxAsync&lt;T&gt; FxAsync.uniqBy&lt;B&gt;(FutureOr&lt;B&gt; Function(T a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>uniqBy</code> is <code>uniq</code>'s general form: instead of
-    comparing whole elements, it runs each element through <code>f</code>
-    and keeps only the first element to produce each distinct key. It's the
-    tool for "one row per customer," "one event per type," or dedupe by any
-    field or computed value — <code>uniq</code> itself is just
-    <code>uniqBy((a) =&gt; a, iterable)</code>.
+    <code>uniqBy</code>는 <code>uniq</code>의 일반화된 형태입니다. 원소 전체를
+    비교하는 대신 각 원소를 <code>f</code>에 통과시켜, 서로 다른 키마다 그
+    키를 처음 만들어 낸 원소만 남깁니다. "고객당 한 행", "타입당 이벤트 하나"
+    같은 요구나 임의의 필드 또는 계산된 값으로 중복을 없앨 때 쓰는 도구이며,
+    <code>uniq</code> 자체도 결국 <code>uniqBy((a) =&gt; a, iterable)</code>일
+    뿐입니다.
   </p>
   <p>
-    As with <code>uniq</code>, it's lazy and order-preserving: the first
-    element for each key wins, and the internal <code>Set&lt;B&gt;</code>
-    of seen keys only grows as you pull.
+    <code>uniq</code>와 마찬가지로 지연 평가되고 순서를 보존합니다. 각 키에
+    대해 가장 먼저 등장한 원소가 살아남고, 이미 본 키를 담는 내부
+    <code>Set&lt;B&gt;</code>는 값을 끌어당길 때마다 조금씩 커집니다.
   </p>
   <p>
-    The same async rule applies here as with <code>uniq</code>: put the
-    concurrency in an upstream fetch (<code>.map(...).concurrent(n)</code>),
-    then apply <code>uniqBy</code>/<code>uniqByAsync</code> to the
-    already-resolved, in-order stream.
+    비동기 규칙도 <code>uniq</code>와 같습니다. 동시성은 상류의
+    fetch(<code>.map(...).concurrent(n)</code>)에 두고, 이미 해소되어 순서가
+    정해진 스트림에 <code>uniqBy</code>/<code>uniqByAsync</code>를
+    적용하세요.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -98,7 +96,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency upstream</h2>
+  <h2>데모 2 · 비동기, 그리고 상류의 동시성</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -127,9 +125,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>uniqBy</code> to keep only the first event of each
-    <code>'type'</code>.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>uniqBy</code>로 각 <code>'type'</code>의 첫 이벤트만
+    남겨 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -150,11 +148,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="uniq.html"><code>uniq</code></a> — dedupe by value equality ·
-    <a href="differenceBy.html"><code>differenceBy</code></a> — remove by a computed key against another iterable ·
-    <a href="intersectionBy.html"><code>intersectionBy</code></a> — keep by a computed key shared with another iterable ·
-    <a href="../tutorials/groupBy.html"><code>groupBy</code></a> — keep every element, grouped by key
+    <strong>관련 함수:</strong>
+    <a href="uniq.html"><code>uniq</code></a> — 값의 동등성으로 중복 제거 ·
+    <a href="differenceBy.html"><code>differenceBy</code></a> — 계산된 키로 다른 이터러블과 비교해 제거 ·
+    <a href="intersectionBy.html"><code>intersectionBy</code></a> — 계산된 키로 다른 이터러블과 공유되는 것만 남기기 ·
+    <a href="../tutorials/groupBy.html"><code>groupBy</code></a> — 원소를 모두 남기고 키별로 묶기
   </div>
 
   <nav class="tut-nav">

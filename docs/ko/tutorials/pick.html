@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>pick — FxDart 101</title>
-  <meta name="description" content="FxDart pick tutorial: return a copy of a Map with only the given keys, missing keys simply absent.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/pick.html">
+  <meta name="description" content="FxDart pick 튜토리얼: 지정한 키만 남긴 Map의 복사본을 반환하며, 없는 키는 결과에서도 그냥 빠집니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/pick.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/pick.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/pick.html">
@@ -43,28 +42,26 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 9 · 객체(Map) 함수 › <strong>pick</strong></p>
   <h1><code>pick</code></h1>
-  <p class="hero-sub">Returns a copy of a <code>Map</code> with only the given keys.</p>
+  <p class="hero-sub">지정한 키만 남긴 <code>Map</code>의 복사본을 반환합니다.</p>
 
   <div class="signature">Map&lt;K, V&gt; pick&lt;K, V&gt;(Iterable&lt;K&gt; keysToPick, Map&lt;K, V&gt; map)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>pick</code> is <code>omit</code>'s mirror: instead of listing what
-    to remove, you list what to keep. Requested keys that aren't present in
-    the source map are simply absent from the result — <code>pick</code>
-    does not insert them with a <code>null</code> placeholder, so the
-    result's key set can be smaller than <code>keysToPick</code>.
+    <code>pick</code>은 <code>omit</code>을 뒤집은 것입니다. 무엇을 뺄지
+    나열하는 대신 무엇을 남길지 나열하죠. 요청한 키가 원본 맵에 없으면
+    결과에서도 그냥 빠집니다 — <code>pick</code>은 <code>null</code>
+    자리표시자를 채워 넣지 않으므로, 결과의 키 집합이
+    <code>keysToPick</code>보다 작을 수 있습니다.
   </p>
   <p>
-    Reach for it whenever you want a narrow "view" of a larger map: a public
-    API response derived from an internal record, a summary row derived
-    from a full one, and so on.
+    큰 맵의 좁은 "뷰"가 필요할 때마다 쓰면 됩니다. 내부 레코드에서
+    뽑아낸 공개 API 응답이라든지, 전체 행에서 뽑아낸 요약 행처럼요.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -79,7 +76,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Slimming a whole list</h2>
+  <h2>데모 2 · 리스트 전체를 가볍게 만들기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -96,8 +93,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>pick</code> to keep only <code>'id'</code> and <code>'email'</code> from <code>profile</code>.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>pick</code>으로 <code>profile</code>에서 <code>'id'</code>와 <code>'email'</code>만 남겨 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -114,11 +111,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="omit.html"><code>omit</code></a> — the inverse: drop only some keys ·
-    <a href="pickBy.html"><code>pickBy</code></a> — keep by predicate instead of key list ·
-    <a href="props.html"><code>props</code></a> — pull several values out as a List ·
-    <a href="prop.html"><code>prop</code></a> — pull a single value out
+    <strong>관련 항목:</strong>
+    <a href="omit.html"><code>omit</code></a> — 그 반대: 일부 키만 제거합니다 ·
+    <a href="pickBy.html"><code>pickBy</code></a> — 키 목록 대신 술어로 남깁니다 ·
+    <a href="props.html"><code>props</code></a> — 여러 값을 List로 뽑아냅니다 ·
+    <a href="prop.html"><code>prop</code></a> — 값 하나를 뽑아냅니다
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>groupBy — FxDart 101</title>
-  <meta name="description" content="FxDart groupBy tutorial: bucket every element by a computed key into a Map of Lists, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/groupBy.html">
+  <meta name="description" content="Tutorial de groupBy en FxDart: reparte cada elemento en cubetas según una clave calculada, obteniendo un Map de Lists, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/groupBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/groupBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/groupBy.html">
@@ -43,41 +42,41 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>groupBy</strong></p>
   <h1><code>groupBy</code></h1>
-  <p class="hero-sub">Buckets every element into a <code>Map&lt;K, List&lt;A&gt;&gt;</code> by a computed key.</p>
+  <p class="hero-sub">Reparte cada elemento en un <code>Map&lt;K, List&lt;A&gt;&gt;</code> según una clave calculada.</p>
 
   <div class="signature">Map&lt;K, List&lt;A&gt;&gt; groupBy&lt;A, K&gt;(K Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;Map&lt;K, List&lt;A&gt;&gt;&gt; groupByAsync&lt;A, K&gt;(FutureOr&lt;K&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Map&lt;K, List&lt;T&gt;&gt; Fx.groupBy&lt;K&gt;(K Function(T a) f)          // chain (sync)
 Future&lt;Map&lt;K, List&lt;T&gt;&gt;&gt; FxAsync.groupBy&lt;K&gt;(FutureOr&lt;K&gt; Function(T a) f)  // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>groupBy</code> is a terminal operator that pulls the whole
-    pipeline and sorts each value into a bucket, keyed by whatever
-    <code>f</code> returns for it. Every element is kept — nothing is
-    dropped, unlike <code><a href="filter.html">filter</a></code> — it's
-    just reorganized into buckets.
+    <code>groupBy</code> es un operador terminal que tira de todo el
+    pipeline y coloca cada valor en una cubeta, identificada por lo que
+    <code>f</code> devuelva para él. Todos los elementos se conservan: no se
+    descarta ninguno, a diferencia de
+    <code><a href="filter.html">filter</a></code>; simplemente se
+    reorganizan en cubetas.
   </p>
   <p>
-    FxTS's version returns a plain JS object; since Dart has no anonymous
-    object literal with arbitrary computed keys, FxDart returns a
-    <code>Map&lt;K, List&lt;A&gt;&gt;</code> instead — one of the standard
-    TS-object-to-Dart-Map conversions used throughout this section
-    (<code><a href="indexBy.html">indexBy</a></code> and
-    <code><a href="countBy.html">countBy</a></code> do the same).
+    La versión de FxTS devuelve un objeto JS normal; como Dart no tiene
+    literales de objeto anónimos con claves calculadas arbitrarias, FxDart
+    devuelve en su lugar un <code>Map&lt;K, List&lt;A&gt;&gt;</code>: una de las
+    conversiones estándar de objeto TS a Map de Dart que se usan en toda esta sección
+    (<code><a href="indexBy.html">indexBy</a></code> y
+    <code><a href="countBy.html">countBy</a></code> hacen lo mismo).
   </p>
   <p>
-    Order matters within each bucket: elements land in each list in the same
-    relative order they appeared in the source. And because it's a terminal,
-    this works exactly the same whether the upstream pipeline is a plain
-    list or a chain of lazy <code>map</code>/<code>filter</code> steps — you
-    just pay the cost once, when <code>groupBy</code> pulls it.
+    El orden importa dentro de cada cubeta: los elementos caen en cada lista en el mismo
+    orden relativo en que aparecían en la fuente. Y como es un terminal,
+    esto funciona exactamente igual tanto si aguas arriba hay una lista simple
+    como una cadena de pasos perezosos <code>map</code>/<code>filter</code>: solo
+    pagas el coste una vez, cuando <code>groupBy</code> tira de ella.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -97,7 +96,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -116,8 +115,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: group the words <strong>by their length</strong>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: agrupa las palabras <strong>por su longitud</strong>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -134,10 +133,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="indexBy.html"><code>indexBy</code></a> — one value per key instead of a list ·
-    <a href="countBy.html"><code>countBy</code></a> — count per key instead of collecting ·
-    <a href="partition.html"><code>partition</code></a> — grouping into exactly two buckets
+    <strong>Relacionado:</strong>
+    <a href="indexBy.html"><code>indexBy</code></a> — un solo valor por clave en vez de una lista ·
+    <a href="countBy.html"><code>countBy</code></a> — cuenta por clave en vez de recolectar ·
+    <a href="partition.html"><code>partition</code></a> — agrupar en exactamente dos cubetas
   </div>
 
   <nav class="tut-nav">

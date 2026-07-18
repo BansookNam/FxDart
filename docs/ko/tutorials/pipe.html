@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>pipe — FxDart 101</title>
-  <meta name="description" content="FxDart pipe tutorial: left-to-right function composition over a value, dynamically typed — and why fx() chains are the typed alternative.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/pipe.html">
+  <meta name="description" content="FxDart pipe 튜토리얼: 값을 함수 목록에 좌에서 우로 통과시키는 동적 타입 합성과, 타입이 유지되는 대안인 fx() 체인을 살펴봅니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/pipe.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/pipe.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/pipe.html">
@@ -43,47 +42,46 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 1 · 시작하기 › <strong>pipe</strong></p>
   <h1><code>pipe</code></h1>
-  <p class="hero-sub">Runs a value through a list of functions, left to right — dynamically typed.</p>
+  <p class="hero-sub">값을 함수 목록에 좌에서 우로 통과시킵니다 — 타입은 동적입니다.</p>
 
   <div class="signature">dynamic pipe(dynamic a, List&lt;Function&gt; fns)
 dynamic Function(dynamic a) pipeLazy(List&lt;Function&gt; fns)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    In FxTS, <code>pipe(x, f, g, h)</code> is a curried, fully-typed
-    pipeline: TypeScript has enough overloads and generics tricks to infer
-    the type flowing out of each step. <strong>Dart cannot do this.</strong>
-    There is no variadic-generic overload trick available, so FxDart's
-    <code>pipe</code> is honest about the trade-off: it takes a plain
-    <code>List&lt;Function&gt;</code> and threads a <code>dynamic</code>
-    value through each one in order. Each function receives whatever the
-    previous one returned, with no static type checking in between.
+    FxTS에서 <code>pipe(x, f, g, h)</code>는 커링된, 타입이 완전히
+    유지되는 파이프라인입니다. TypeScript는 오버로드와 제네릭 트릭을
+    충분히 동원할 수 있어서 각 단계에서 흘러나오는 타입을 추론합니다.
+    <strong>Dart는 이렇게 할 수 없습니다.</strong> 가변 인자 제네릭
+    오버로드 같은 수단이 없기 때문에, FxDart의 <code>pipe</code>는
+    이 절충을 솔직하게 드러냅니다. 평범한
+    <code>List&lt;Function&gt;</code>을 받아 <code>dynamic</code> 값을
+    순서대로 각 함수에 흘려보낼 뿐입니다. 각 함수는 앞 함수가 반환한
+    값을 그대로 받으며, 그 사이에 정적 타입 검사는 없습니다.
   </p>
   <p>
-    That means <code>pipe</code> still works, and still reads nicely for a
-    short, throwaway transformation — but a step that expects the wrong
-    type will only fail at <em>run time</em>, and the whole pipeline's
-    result type is just <code>dynamic</code>. If a step in the list
-    returns a <code>Future</code>, <code>pipe</code> automatically awaits
-    it before feeding the value to the next step, so sync and async
-    functions can sit in the same list.
+    그래도 <code>pipe</code>는 잘 동작하고, 짧게 쓰고 버릴 변환이라면
+    읽기도 좋습니다 — 다만 타입이 맞지 않는 단계는 <em>런타임</em>에야
+    실패하고, 파이프라인 전체의 결과 타입도 그저 <code>dynamic</code>일
+    뿐입니다. 목록 안의 어떤 단계가 <code>Future</code>를 반환하면
+    <code>pipe</code>가 알아서 await한 뒤 다음 단계에 값을 넘기므로,
+    동기 함수와 비동기 함수를 한 목록에 섞어 둘 수 있습니다.
   </p>
   <p>
-    For anything you'll keep and maintain, prefer the <code>fx()</code>
-    chain instead: <code>fx(x).map(f).filter(g)</code> is fully typed, gets
-    autocomplete, and catches mismatched types at compile time — it's the
-    typed alternative to exactly this kind of pipeline. Reach for
-    <code>pipe</code> when the steps are dynamic by nature (e.g. built from
-    a runtime list of functions) or when you're prototyping quickly.
-    <code>pipeLazy</code> is the same idea, deferred: it returns a function
-    you can call later instead of running immediately.
+    오래 두고 유지할 코드라면 <code>fx()</code> 체인을 쓰는 편이
+    낫습니다. <code>fx(x).map(f).filter(g)</code>는 타입이 완전히
+    유지되고, 자동 완성이 되며, 타입 불일치를 컴파일 시점에 잡아냅니다 —
+    바로 이런 파이프라인의 타입 있는 대안입니다. <code>pipe</code>는
+    단계 구성 자체가 동적일 때(예: 런타임에 만들어진 함수 목록에서
+    조립할 때)나 빠르게 프로토타이핑할 때 꺼내 쓰세요.
+    <code>pipeLazy</code>는 같은 개념을 지연시킨 것으로, 즉시 실행하는
+    대신 나중에 호출할 함수를 반환합니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
-  <p>A short pipeline built from FxDart's data-first functions:</p>
+  <h2>데모 1 · 기본</h2>
+  <p>FxDart의 data-first 함수들로 조립한 짧은 파이프라인입니다.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -103,11 +101,11 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · The honest downside</h2>
+  <h2>데모 2 · 감추지 않은 단점</h2>
   <p>
-    A step that expects the wrong type compiles fine and only blows up when
-    it actually runs — this is exactly what <code>fx()</code> chains are
-    designed to prevent:
+    타입이 맞지 않는 단계도 컴파일은 멀쩡히 통과하고, 실제로 실행될 때
+    비로소 터집니다 — <code>fx()</code> 체인은 정확히 이걸 막으려고
+    있습니다.
   </p>
   <div class="playground">
 <textarea>
@@ -132,8 +130,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: pipe a list of numbers through a filter step and a sum step.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 숫자 리스트를 필터 단계와 합계 단계에 통과시켜 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -152,10 +150,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="fx.html"><code>fx</code></a> — the typed chain alternative ·
-    <a href="pipe1.html"><code>pipe1</code></a> — a single pipe step, sync/async aware ·
-    <a href="toArray.html"><code>toArray</code></a> — common final step in a pipe
+    <strong>관련 항목:</strong>
+    <a href="fx.html"><code>fx</code></a> — 타입이 유지되는 체인 대안 ·
+    <a href="pipe1.html"><code>pipe1</code></a> — 동기/비동기를 모두 다루는 단일 파이프 단계 ·
+    <a href="toArray.html"><code>toArray</code></a> — 파이프의 흔한 마지막 단계
   </div>
 
   <nav class="tut-nav">

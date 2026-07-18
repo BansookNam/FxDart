@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>repeat — FxDart 101</title>
-  <meta name="description" content="FxDart repeat tutorial: yield the same value n times, lazily.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/repeat.html">
+  <meta name="description" content="Tutorial de repeat en FxDart: emite el mismo valor n veces, de forma perezosa.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/repeat.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/repeat.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/repeat.html">
@@ -43,37 +42,37 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 2 · Generar secuencias › <strong>repeat</strong></p>
   <h1><code>repeat</code></h1>
-  <p class="hero-sub">Yields the same value n times — a lazy, finite source for padding and pairing.</p>
+  <p class="hero-sub">Emite el mismo valor n veces — una fuente perezosa y finita para rellenar y emparejar.</p>
 
   <div class="signature">Iterable&lt;T&gt; repeat&lt;T&gt;(int n, T value)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>repeat(n, value)</code> yields <code>value</code> exactly
-    <code>n</code> times, then stops — it's finite and lazy, like the rest
-    of this section's generators. Note that it repeats the <em>same</em>
-    value (or the same object reference, for non-primitives) every time; if
-    you need a fresh value per iteration, generate it separately (e.g. with
-    <code>map</code> over the result) rather than expecting
-    <code>repeat</code> to call a factory function.
+    <code>repeat(n, value)</code> emite <code>value</code> exactamente
+    <code>n</code> veces y se detiene: es finito y perezoso, como el resto de
+    generadores de esta sección. Ten en cuenta que repite el <em>mismo</em>
+    valor (o la misma referencia de objeto, si no es un primitivo) cada vez; si
+    necesitas un valor nuevo en cada iteración, genéralo aparte (por ejemplo,
+    con un <code>map</code> sobre el resultado) en lugar de esperar que
+    <code>repeat</code> llame a una función de fábrica.
   </p>
   <p>
-    It's most useful paired with something else: <code>zip</code> it
-    against a variable-length sequence to stamp a constant label onto every
-    element, or use <code>fx(...).join()</code> to build a fixed-width
-    separator string. <code>repeat(0, value)</code> is a valid, perfectly
-    normal way to get an empty iterable.
+    Resulta más útil combinado con otra cosa: aplícale <code>zip</code> con una
+    secuencia de longitud variable para estampar una etiqueta constante en cada
+    elemento, o usa <code>fx(...).join()</code> para construir una cadena
+    separadora de ancho fijo. <code>repeat(0, value)</code> es una forma válida
+    y perfectamente normal de obtener un iterable vacío.
   </p>
   <p>
-    If you actually want to repeat a whole <em>sequence</em> rather than
-    one value — and keep going forever instead of a fixed <code>n</code>
-    times — that's <code>cycle</code>, covered next.
+    Si lo que quieres es repetir una <em>secuencia</em> entera en vez de un
+    único valor —y seguir indefinidamente en lugar de un número fijo
+    <code>n</code> de veces— eso es <code>cycle</code>, que veremos a
+    continuación.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -86,10 +85,11 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Pairing a constant with a variable sequence</h2>
+  <h2>Demo 2 · Emparejar una constante con una secuencia variable</h2>
   <p>
-    <code>repeat</code> yields the SAME value every time — pair it with
-    <code>zip</code> to stamp a constant onto a variable-length sequence:
+    <code>repeat</code> emite el MISMO valor cada vez: combínalo con
+    <code>zip</code> para estampar una constante sobre una secuencia de
+    longitud variable:
   </p>
   <div class="playground">
 <textarea>
@@ -106,9 +106,9 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: build a 5-item <code>List&lt;int&gt;</code> of the value 7
-    using <code>repeat</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: construye una <code>List&lt;int&gt;</code> de 5 elementos con
+    el valor 7 usando <code>repeat</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -123,11 +123,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="range.html"><code>range</code></a> — a lazy sequence of increasing/decreasing integers ·
-    <a href="cycle.html"><code>cycle</code></a> — repeat a whole sequence, forever ·
-    <a href="zip.html"><code>zip</code></a> — pairs repeat is often used with ·
-    <a href="fx.html"><code>fx</code></a> — the chain repeat is usually wrapped in
+    <strong>Relacionado:</strong>
+    <a href="range.html"><code>range</code></a> — una secuencia perezosa de enteros crecientes o decrecientes ·
+    <a href="cycle.html"><code>cycle</code></a> — repite una secuencia entera, para siempre ·
+    <a href="zip.html"><code>zip</code></a> — empareja, se usa a menudo junto a repeat ·
+    <a href="fx.html"><code>fx</code></a> — la cadena en la que repeat suele envolverse
   </div>
 
   <nav class="tut-nav">

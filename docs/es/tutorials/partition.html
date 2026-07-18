@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>partition — FxDart 101</title>
-  <meta name="description" content="FxDart partition tutorial: split a pipeline into a (pass, fail) record by a predicate, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/partition.html">
+  <meta name="description" content="Tutorial de partition en FxDart: divide un pipeline en un record (los que pasan, los que no) según un predicado, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/partition.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/partition.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/partition.html">
@@ -43,43 +42,44 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>partition</strong></p>
   <h1><code>partition</code></h1>
-  <p class="hero-sub">Splits a pipeline into two lists at once, by a single predicate.</p>
+  <p class="hero-sub">Divide un pipeline en dos listas de una sola vez, con un único predicado.</p>
 
   <div class="signature">(List&lt;A&gt;, List&lt;A&gt;) partition&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;(List&lt;A&gt;, List&lt;A&gt;)&gt; partitionAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 (List&lt;T&gt;, List&lt;T&gt;) Fx.partition(bool Function(T a) f)
 Future&lt;(List&lt;T&gt;, List&lt;T&gt;)&gt; FxAsync.partition(FutureOr&lt;bool&gt; Function(T a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>partition</code> is a terminal operator that walks the pipeline
-    once and sorts every element into one of two lists based on a predicate:
-    elements the predicate returns <code>true</code> for go into the first
-    list, everything else into the second. It's equivalent to calling
-    <code><a href="filter.html">filter</a></code> and
-    <code><a href="reject.html">reject</a></code> separately, but in a single
-    pass over the data.
+    <code>partition</code> es un operador terminal que recorre el pipeline
+    una sola vez y reparte cada elemento en una de dos listas según un
+    predicado: los elementos para los que el predicado devuelve
+    <code>true</code> van a la primera lista, y todo lo demás a la segunda.
+    Equivale a llamar por separado a
+    <code><a href="filter.html">filter</a></code> y
+    <code><a href="reject.html">reject</a></code>, pero en una sola pasada
+    sobre los datos.
   </p>
   <p>
-    FxTS returns a two-element tuple, <code>[pass, fail]</code>. Dart has no
-    tuple type built into JS-style arrays, so FxDart uses a native Dart
-    <strong>record</strong>: <code>(List&lt;A&gt;, List&lt;A&gt;)</code>. Access
-    the two lists with <code>.$1</code> (pass) and <code>.$2</code> (fail),
-    or destructure them directly with pattern-matching syntax:
-    <code>final (pass, fail) = partition(f, iterable);</code>. This is the
-    same tuple-to-record convention used by
-    <code><a href="zip.html">zip</a></code> and
-    <code><a href="entries.html">entries</a></code> elsewhere in FxDart.
+    FxTS devuelve una tupla de dos elementos, <code>[pass, fail]</code>. Dart
+    no tiene un tipo tupla integrado al estilo de los arrays de JS, así que
+    FxDart usa un <strong>record</strong> nativo de Dart:
+    <code>(List&lt;A&gt;, List&lt;A&gt;)</code>. Accede a las dos listas con
+    <code>.$1</code> (los que pasan) y <code>.$2</code> (los que no), o
+    desestructúralas directamente con la sintaxis de patrones:
+    <code>final (pass, fail) = partition(f, iterable);</code>. Es la misma
+    convención de tupla a record que usan
+    <code><a href="zip.html">zip</a></code> y
+    <code><a href="entries.html">entries</a></code> en el resto de FxDart.
   </p>
   <p>
-    As with every terminal in this section, it pulls the whole lazy pipeline
-    upstream of it, sync or async.
+    Como todos los terminales de esta sección, tira de todo el pipeline
+    perezoso que tenga aguas arriba, sea síncrono o asíncrono.
   </p>
 
-  <h2>Demo 1 · Basics &amp; destructuring</h2>
+  <h2>Demo 1 · Fundamentos y desestructuración</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -98,7 +98,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -115,8 +115,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: partition the scores into <strong>pass</strong> (&gt;= 60) and <strong>fail</strong> (&lt; 60).</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: reparte las notas en <strong>aprobadas</strong> (&gt;= 60) y <strong>suspensas</strong> (&lt; 60).</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -134,10 +134,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="filter.html"><code>filter</code></a> · <a href="reject.html"><code>reject</code></a> — the two halves partition combines ·
-    <a href="groupBy.html"><code>groupBy</code></a> — grouping into more than two buckets ·
-    <a href="sort.html"><code>sort</code></a> — order within each side, if you need it
+    <strong>Relacionado:</strong>
+    <a href="filter.html"><code>filter</code></a> · <a href="reject.html"><code>reject</code></a> — las dos mitades que partition combina ·
+    <a href="groupBy.html"><code>groupBy</code></a> — agrupar en más de dos cubetas ·
+    <a href="sort.html"><code>sort</code></a> — ordenar dentro de cada lado, si lo necesitas
   </div>
 
   <nav class="tut-nav">

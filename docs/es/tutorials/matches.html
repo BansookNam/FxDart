@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>matches — FxDart 101</title>
-  <meta name="description" content="FxDart matches tutorial: the curried, filter-ready predicate form of isMatch.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/matches.html">
+  <meta name="description" content="Tutorial de matches en FxDart: la forma currificada de isMatch, un predicado listo para usar con filter.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/matches.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/matches.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/matches.html">
@@ -43,31 +42,31 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 9 · Funciones de objeto (Map) › <strong>matches</strong></p>
   <h1><code>matches</code></h1>
-  <p class="hero-sub">Curried <code>isMatch</code>: bind a pattern once, get back a reusable predicate.</p>
+  <p class="hero-sub"><code>isMatch</code> currificado: fijas un patrón una vez y recibes un predicado reutilizable.</p>
 
   <div class="signature">bool Function(Object? target) matches(Object? pattern)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>isMatch(target, pattern)</code> needs both arguments up front,
-    which makes it awkward to hand to <code>filter</code>, <code>find</code>,
-    <code>every</code>, or anywhere else that wants a single-argument
-    <code>bool Function(A)</code>. <code>matches(pattern)</code> closes over
-    the pattern and returns exactly that shape:
-    <code>matches(pattern)(target) == isMatch(target, pattern)</code>. Build
-    the predicate once, reuse it across a whole pipeline.
+    <code>isMatch(target, pattern)</code> necesita los dos argumentos de golpe,
+    lo que lo hace incómodo de pasar a <code>filter</code>, <code>find</code>,
+    <code>every</code> o a cualquier otro sitio que espere un
+    <code>bool Function(A)</code> de un solo argumento. <code>matches(pattern)</code>
+    captura el patrón en un cierre y devuelve justo esa forma:
+    <code>matches(pattern)(target) == isMatch(target, pattern)</code>. Construyes
+    el predicado una vez y lo reutilizas en todo un pipeline.
   </p>
   <p>
-    This is FxDart's version of currying for a two-argument function where
-    Dart can't infer a general curry — see the deprecated top-level
-    <code>curry</code> if you're curious why a generic version doesn't
-    exist — but a purpose-built curried form like this one works great.
+    Esta es la versión de currificación de FxDart para una función de dos
+    argumentos allí donde Dart no puede inferir un curry general — mira la función
+    de nivel superior obsoleta <code>curry</code> si te pica la curiosidad de por qué
+    no existe una versión genérica —, pero una forma currificada hecha a medida como
+    esta funciona de maravilla.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -81,7 +80,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Dropping straight into filter/find</h2>
+  <h2>Demo 2 · Enchufarlo directamente en filter/find</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -102,8 +101,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>matches</code> to build a predicate for <code>{'active': true}</code> and filter <code>users</code> with it.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>matches</code> para construir un predicado para <code>{'active': true}</code> y filtra <code>users</code> con él.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -123,11 +122,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="isMatch.html"><code>isMatch</code></a> — the two-argument function this curries ·
-    <a href="filter.html"><code>filter</code></a> — the most common place to plug this in ·
-    <a href="find.html"><code>find</code></a> — grab just the first match ·
-    <a href="predicates.html"><code>predicates</code></a> — more ready-made, filter-friendly checks
+    <strong>Relacionado:</strong>
+    <a href="isMatch.html"><code>isMatch</code></a> — la función de dos argumentos que esto currifica ·
+    <a href="filter.html"><code>filter</code></a> — el sitio más habitual donde enchufarlo ·
+    <a href="find.html"><code>find</code></a> — quédate solo con la primera coincidencia ·
+    <a href="predicates.html"><code>predicates</code></a> — más comprobaciones ya hechas y listas para filter
   </div>
 
   <nav class="tut-nav">

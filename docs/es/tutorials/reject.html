@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>reject — FxDart 101</title>
-  <meta name="description" content="FxDart reject tutorial: the exact opposite of filter, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/reject.html">
+  <meta name="description" content="Tutorial de reject en FxDart: exactamente lo contrario de filter, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/reject.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/reject.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/reject.html">
@@ -43,35 +42,34 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 4 · Filtrado &amp; deduplicación › <strong>reject</strong></p>
   <h1><code>reject</code></h1>
-  <p class="hero-sub">Keeps every element a predicate returns false for — the mirror image of filter.</p>
+  <p class="hero-sub">Se queda con todos los elementos para los que un predicado devuelve false — la imagen especular de filter.</p>
 
   <div class="signature">Iterable&lt;A&gt; reject&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; rejectAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.reject(bool Function(T a) f)        // chain
 FxAsync&lt;T&gt; FxAsync.reject(FutureOr&lt;bool&gt; Function(T a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>reject</code> is implemented as
-    <code>filter((a) =&gt; !f(a), iterable)</code> — it exists purely for
-    readability. <code>list.reject(isInvalid)</code> reads more naturally
-    than <code>list.filter((a) =&gt; !isInvalid(a))</code>, especially once
-    the predicate already has a clear, positive name. Pick whichever of
-    <code>filter</code>/<code>reject</code> lets you avoid writing a
-    negation at the call site.
+    <code>reject</code> está implementado como
+    <code>filter((a) =&gt; !f(a), iterable)</code>: existe puramente por
+    legibilidad. <code>list.reject(isInvalid)</code> se lee de forma más
+    natural que <code>list.filter((a) =&gt; !isInvalid(a))</code>, sobre todo
+    cuando el predicado ya tiene un nombre claro y en positivo. Elige entre
+    <code>filter</code> y <code>reject</code> el que te evite escribir una
+    negación en el punto de llamada.
   </p>
   <p>
-    Everything about <code>filter</code>'s behavior carries over unchanged:
-    it's lazy, and the async form inherits <code>filterAsync</code>'s
-    dedicated concurrent path, so <code>.concurrent(n)</code> genuinely
-    evaluates <code>n</code> predicates in parallel while still returning
-    results in original order.
+    Todo el comportamiento de <code>filter</code> se traslada sin cambios: es
+    perezoso, y la forma asíncrona hereda el camino concurrente dedicado de
+    <code>filterAsync</code>, así que <code>.concurrent(n)</code> evalúa
+    realmente <code>n</code> predicados en paralelo sin dejar de devolver los
+    resultados en el orden original.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -90,7 +88,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency</h2>
+  <h2>Demo 2 · Asíncrono, con concurrencia</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -114,9 +112,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>reject</code> to drop the <code>'info: ok'</code>
-    lines, keeping only the errors.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>reject</code> para descartar las líneas
+    <code>'info: ok'</code> y quedarte solo con los errores.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -133,11 +131,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="filter.html"><code>filter</code></a> — the function reject delegates to ·
-    <a href="compact.html"><code>compact</code></a> — reject nulls specifically ·
-    <a href="uniq.html"><code>uniq</code></a> — remove duplicates ·
-    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
+    <strong>Relacionado:</strong>
+    <a href="filter.html"><code>filter</code></a> — la función en la que reject delega ·
+    <a href="compact.html"><code>compact</code></a> — descarta específicamente los nulos ·
+    <a href="uniq.html"><code>uniq</code></a> — elimina duplicados ·
+    <a href="concurrent.html"><code>concurrent</code></a> — evaluación paralela
   </div>
 
   <nav class="tut-nav">

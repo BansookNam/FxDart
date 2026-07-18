@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>compress — FxDart 101</title>
-  <meta name="description" content="FxDart compress tutorial: filter an iterable by a parallel list of booleans, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/compress.html">
+  <meta name="description" content="Tutorial de compress en FxDart: filtra un iterable con una lista paralela de booleanos, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/compress.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/compress.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/compress.html">
@@ -43,36 +42,35 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 4 · Filtrado &amp; deduplicación › <strong>compress</strong></p>
   <h1><code>compress</code></h1>
-  <p class="hero-sub">Keeps the elements of an iterable wherever a parallel list of booleans is true.</p>
+  <p class="hero-sub">Conserva los elementos de un iterable allí donde una lista paralela de booleanos vale true.</p>
 
   <div class="signature">Iterable&lt;B&gt; compress&lt;B&gt;(List&lt;bool&gt; selectors, Iterable&lt;B&gt; iterable)
 FxAsyncIterable&lt;B&gt; compressAsync&lt;B&gt;(List&lt;bool&gt; selectors, FxAsyncIterable&lt;B&gt; iterable)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>compress</code> is a positional mask: element <code>i</code> of
-    <code>iterable</code> survives only if <code>selectors[i]</code> is
-    <code>true</code>. It's built directly out of two functions you already
-    know — <code>map((r) =&gt; r.$2, filter((r) =&gt; r.$1, zip(selectors, iterable)))</code> —
-    zip the mask with the data, filter to the true pairs, then unwrap. That
-    also means it inherits <code>zip</code>'s behavior on mismatched
-    lengths: iteration stops as soon as the <em>shorter</em> of
-    <code>selectors</code> or <code>iterable</code> runs out, so a short
-    selector list silently truncates the result. Reach for it when you
-    already have (or can cheaply compute) a boolean mask up front — for
-    example, "which quiz answers were correct" — rather than recomputing a
-    predicate per element the way <code>filter</code> would.
+    <code>compress</code> es una máscara posicional: el elemento <code>i</code> de
+    <code>iterable</code> sobrevive solo si <code>selectors[i]</code> es
+    <code>true</code>. Está construido directamente a partir de dos funciones que ya
+    conoces — <code>map((r) =&gt; r.$2, filter((r) =&gt; r.$1, zip(selectors, iterable)))</code> —
+    combina la máscara con los datos, filtra los pares que dan true y desempaqueta. Eso
+    también significa que hereda el comportamiento de <code>zip</code> ante longitudes
+    distintas: la iteración se detiene en cuanto se agota el <em>más corto</em> de
+    <code>selectors</code> o <code>iterable</code>, así que una lista de selectores
+    corta trunca el resultado en silencio. Úsalo cuando ya tengas de antemano (o puedas
+    calcular a bajo coste) una máscara booleana — por ejemplo, "qué respuestas
+    del test fueron correctas" — en vez de recalcular un predicado por elemento como
+    haría <code>filter</code>.
   </p>
   <p>
-    There's no chain method; call the data-first function or its async
-    counterpart directly, or wrap the result with <code>fx(...)</code> /
-    <code>fxAsync(...)</code> to keep chaining.
+    No hay método de cadena; llama directamente a la función data-first o a su
+    contraparte asíncrona, o envuelve el resultado con <code>fx(...)</code> /
+    <code>fxAsync(...)</code> para seguir encadenando.
   </p>
 
-  <h2>Demo 1 · Basics &amp; length mismatch</h2>
+  <h2>Demo 1 · Fundamentos &amp; longitudes distintas</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -92,7 +90,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency</h2>
+  <h2>Demo 2 · Asíncrono, con concurrencia</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -118,9 +116,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>compress</code> to keep only the correct
-    answers.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>compress</code> para quedarte solo con las respuestas
+    correctas.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -138,11 +136,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="filter.html"><code>filter</code></a> — filter by a predicate instead of a precomputed mask ·
-    <a href="../tutorials/zip.html"><code>zip</code></a> — the function compress is built on ·
-    <a href="differenceBy.html"><code>differenceBy</code></a> — filter by membership against another iterable ·
-    <a href="../tutorials/partition.html"><code>partition</code></a> — split into kept/rejected in one pass
+    <strong>Relacionado:</strong>
+    <a href="filter.html"><code>filter</code></a> — filtra por predicado en lugar de por una máscara precalculada ·
+    <a href="../tutorials/zip.html"><code>zip</code></a> — la función sobre la que se construye compress ·
+    <a href="differenceBy.html"><code>differenceBy</code></a> — filtra por pertenencia a otro iterable ·
+    <a href="../tutorials/partition.html"><code>partition</code></a> — divide en conservados/descartados en una sola pasada
   </div>
 
   <nav class="tut-nav">

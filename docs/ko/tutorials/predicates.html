@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>predicates — FxDart 101</title>
-  <meta name="description" content="FxDart type predicates: isNull, isBoolean, isNumber, isString, isDate, isList, isMap, and friends, as filter-friendly tear-offs.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/predicates.html">
+  <meta name="description" content="FxDart의 타입 술어 모음 - isNull, isBoolean, isNumber, isString, isDate, isList, isMap 등을 filter에 그대로 넘길 수 있는 tear-off 함수로 제공합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/predicates.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/predicates.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/predicates.html">
@@ -43,10 +42,9 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 8 · 접근 &amp; 술어 › <strong>predicates</strong></p>
   <h1><code>predicates</code></h1>
-  <p class="hero-sub">A small family of type/value checks, kept around as tear-off-friendly functions for <code>filter</code>, <code>takeWhile</code>, and friends.</p>
+  <p class="hero-sub"><code>filter</code>, <code>takeWhile</code> 같은 함수에 tear-off로 넘기기 좋도록 준비해 둔 작은 타입/값 검사 모음입니다.</p>
 
   <div class="signature">bool isNull(Object? a)
 bool isNotNull(Object? a)
@@ -58,32 +56,33 @@ bool isDate(Object? a)
 bool isList(Object? a)
 bool isMap(Object? a)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    In everyday Dart you'd just write <code>a is String</code> — that's
-    idiomatic, and nothing here replaces it. These functions exist for one
-    specific reason: Dart's <code>is</code> operator can't be torn off as a
-    first-class function value, but <code>filter</code>, <code>takeWhile</code>,
-    <code>find</code>, and friends all want a <code>bool Function(A)</code>.
-    <code>filter(isString, mixedList)</code> reads better than
-    <code>filter((a) => a is String, mixedList)</code>, and that's the whole
-    point of this page.
+    평범한 Dart 코드라면 그냥 <code>a is String</code>이라고 쓰면 됩니다 —
+    그게 관용적인 방식이고, 여기 있는 함수들이 그것을 대체하지도 않습니다.
+    이 함수들이 존재하는 이유는 하나입니다. Dart의 <code>is</code> 연산자는
+    일급 함수 값으로 tear-off 할 수 없는데, <code>filter</code>,
+    <code>takeWhile</code>, <code>find</code> 같은 함수들은 모두
+    <code>bool Function(A)</code>를 원하기 때문입니다.
+    <code>filter(isString, mixedList)</code>가
+    <code>filter((a) => a is String, mixedList)</code>보다 읽기 좋다는 것,
+    이 페이지의 요점은 그게 전부입니다.
   </p>
   <p>
-    <code>isNil</code> is a straight port of FxTS's "is <code>null</code> or
-    <code>undefined</code>" check — since Dart collapses both into
-    <code>null</code>, it's byte-for-byte identical to <code>isNull</code>.
-    Three more names exist purely for FxTS parity and are marked
-    <code>@Deprecated</code>: <code>isUndefined</code> (there's no
-    <code>undefined</code> in Dart, so it's just <code>isNull</code>),
-    <code>isArray</code> (JS <code>Array</code> → Dart <code>List</code>, so
-    it's <code>isList</code>), and <code>isObject</code> (JS plain object →
-    Dart <code>Map</code>, so it's <code>isMap</code>). Reach for the
-    non-deprecated name in new code; the aliases are there so ported call
-    sites still compile.
+    <code>isNil</code>은 FxTS의 "<code>null</code> 또는
+    <code>undefined</code>인가" 검사를 그대로 옮긴 것입니다. Dart는 둘을
+    <code>null</code> 하나로 합쳐 두었으므로, <code>isNull</code>과 완전히
+    동일합니다. 오직 FxTS와의 이름 대응을 위해 남겨 둔 이름이 세 개 더 있고
+    <code>@Deprecated</code>로 표시되어 있습니다. <code>isUndefined</code>
+    (Dart에는 <code>undefined</code>가 없으니 그냥 <code>isNull</code>입니다),
+    <code>isArray</code> (JS의 <code>Array</code> → Dart의 <code>List</code>이니
+    <code>isList</code>입니다), <code>isObject</code> (JS의 평범한 객체 →
+    Dart의 <code>Map</code>이니 <code>isMap</code>입니다). 새로 쓰는 코드에서는
+    deprecated 되지 않은 이름을 쓰세요. 별칭들은 포팅된 호출부가 그대로
+    컴파일되도록 남겨 둔 것입니다.
   </p>
 
-  <h2>Demo 1 · Filter-friendly tear-offs</h2>
+  <h2>데모 1 · filter에 바로 넘기는 tear-off</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -103,7 +102,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · <code>isNil</code> and the deprecated aliases</h2>
+  <h2>데모 2 · <code>isNil</code>과 deprecated 별칭들</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -120,8 +119,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>isNotNull</code> to filter the <code>null</code> out of <code>row</code>.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>isNotNull</code>로 <code>row</code>에서 <code>null</code>을 걸러내 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -138,11 +137,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="filter.html"><code>filter</code></a> — the usual place these get plugged in ·
-    <a href="isEmpty.html"><code>isEmpty</code></a> — a value-based check, not a type check ·
-    <a href="compact.html"><code>compact</code></a> — drop nulls from an iterable ·
-    <a href="matches.html"><code>matches</code></a> — a predicate for shape, not type
+    <strong>관련 항목:</strong>
+    <a href="filter.html"><code>filter</code></a> — 이 함수들이 주로 쓰이는 자리 ·
+    <a href="isEmpty.html"><code>isEmpty</code></a> — 타입이 아니라 값을 보는 검사 ·
+    <a href="compact.html"><code>compact</code></a> — 이터러블에서 null을 제거 ·
+    <a href="matches.html"><code>matches</code></a> — 타입이 아니라 형태를 보는 술어
   </div>
 
   <nav class="tut-nav">

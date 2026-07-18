@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Stream bridges — FxDart 101</title>
-  <meta name="description" content="FxDart Stream bridges: fromStream, fxStream, and toStream() — round-trip between Dart Streams and FxAsyncIterable, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/streams.html">
+  <meta name="description" content="Puentes con Stream en FxDart: fromStream, fxStream y toStream() — ida y vuelta entre los Stream de Dart y FxAsyncIterable, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/streams.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/streams.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/streams.html">
@@ -43,43 +42,42 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 11 · Async &amp; concurrencia › <strong>Stream bridges</strong></p>
   <h1>Stream bridges</h1>
-  <p class="hero-sub">fromStream, fxStream, and .toStream() — cross freely between Dart's Stream and FxDart's FxAsyncIterable.</p>
+  <p class="hero-sub">fromStream, fxStream y .toStream() — cruza libremente entre el Stream de Dart y el FxAsyncIterable de FxDart.</p>
 
   <div class="signature">FxAsyncIterable&lt;T&gt; fromStream&lt;T&gt;(Stream&lt;T&gt; stream)
 FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)          // chain, wraps fromStream
 Stream&lt;T&gt; FxAsyncIterableToStream.toStream&lt;T&gt;()   // extension on FxAsyncIterable
 Stream&lt;T&gt; FxAsync.toStream()                        // chain</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>fromStream</code> converts any <code>Stream</code> — single- or
-    broadcast-subscription — into an <code>FxAsyncIterable</code>, so you can
-    run the whole FxDart operator set (<code>map</code>, <code>filter</code>,
-    <code>concurrent</code>, …) over data that's arriving from a socket, a
-    file, a widget's event stream, or anywhere else Dart hands you a
-    <code>Stream</code>. <code>fxStream(stream)</code> is the same thing, but
-    returns a chainable <code>FxAsync</code> directly instead of a raw
-    <code>FxAsyncIterable</code> — the async counterpart of <code>fx</code>
-    and <code>fxAsync</code>.
+    <code>fromStream</code> convierte cualquier <code>Stream</code> — de
+    suscripción única o broadcast — en un <code>FxAsyncIterable</code>, para que puedas
+    aplicar todo el conjunto de operadores de FxDart (<code>map</code>, <code>filter</code>,
+    <code>concurrent</code>, …) sobre datos que llegan desde un socket, un
+    fichero, el stream de eventos de un widget, o de cualquier otro sitio donde Dart te dé un
+    <code>Stream</code>. <code>fxStream(stream)</code> hace lo mismo, pero
+    devuelve directamente un <code>FxAsync</code> encadenable en lugar de un
+    <code>FxAsyncIterable</code> a secas — el equivalente asíncrono de <code>fx</code>
+    y <code>fxAsync</code>.
   </p>
   <p>
-    Going the other way, <code>.toStream()</code> drives an
-    <code>FxAsyncIterable</code> (or <code>FxAsync</code> chain) to completion
-    and re-emits its values as a plain <code>Stream</code> — handy when some
-    other API (a <code>StreamBuilder</code>, for example) expects one. One
-    caveat: <code>toStream()</code> always pulls <strong>sequentially</strong>,
-    ignoring any <code>concurrent(n)</code> upstream of it — apply
-    <code>concurrent</code>/<code>concurrentPool</code> to the chain
-    <em>before</em> calling <code>.toStream()</code> if you need the
-    parallelism to actually happen; the stream conversion itself won't add it.
+    En el sentido contrario, <code>.toStream()</code> lleva un
+    <code>FxAsyncIterable</code> (o una cadena <code>FxAsync</code>) hasta el final
+    y reemite sus valores como un <code>Stream</code> normal — útil cuando otra
+    API (un <code>StreamBuilder</code>, por ejemplo) espera uno. Una
+    advertencia: <code>toStream()</code> siempre tira de los valores <strong>secuencialmente</strong>,
+    ignorando cualquier <code>concurrent(n)</code> que haya aguas arriba — aplica
+    <code>concurrent</code>/<code>concurrentPool</code> a la cadena
+    <em>antes</em> de llamar a <code>.toStream()</code> si quieres que el
+    paralelismo ocurra de verdad; la conversión a stream por sí sola no lo añade.
   </p>
 
-  <h2>Demo 1 · fromStream and fxStream</h2>
-  <p>Both wrap a <code>Stream.fromIterable</code> so you can pipe an existing
-    stream through FxDart operators:</p>
+  <h2>Demo 1 · fromStream y fxStream</h2>
+  <p>Ambos envuelven un <code>Stream.fromIterable</code> para que puedas pasar un
+    stream existente por los operadores de FxDart:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -99,12 +97,12 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Round-trip, with a finite periodic stream</h2>
+  <h2>Demo 2 · Ida y vuelta, con un stream periódico finito</h2>
   <p>
-    <code>Stream.periodic</code> never ends on its own, so
-    <code>.take(n)</code> keeps the demo finite. The second half shows the
-    reverse direction — building an <code>FxAsync</code> chain, then handing
-    it back out as a plain <code>Stream</code> with <code>.toStream()</code>:
+    <code>Stream.periodic</code> nunca termina por sí solo, así que
+    <code>.take(n)</code> mantiene la demo finita. La segunda mitad muestra la
+    dirección inversa — construir una cadena <code>FxAsync</code> y devolverla
+    hacia fuera como un <code>Stream</code> normal con <code>.toStream()</code>:
   </p>
   <div class="playground">
 <textarea>
@@ -127,8 +125,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: keep only the values &gt;= 10 from this stream.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: quédate solo con los valores &gt;= 10 de este stream.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -146,11 +144,11 @@ Future<void> main() async {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="toAsync.html"><code>toAsync</code></a> — lift a plain Iterable instead ·
-    <a href="asyncVariants.html">async variants</a> — the *Async naming convention ·
-    <a href="concurrent.html"><code>concurrent</code></a> — apply before toStream() for real parallelism ·
-    <a href="concurrentPool.html"><code>concurrentPool</code></a> — completion-order variant
+    <strong>Relacionado:</strong>
+    <a href="toAsync.html"><code>toAsync</code></a> — eleva un Iterable normal en su lugar ·
+    <a href="asyncVariants.html">variantes asíncronas</a> — la convención de nombres *Async ·
+    <a href="concurrent.html"><code>concurrent</code></a> — aplícalo antes de toStream() para tener paralelismo real ·
+    <a href="concurrentPool.html"><code>concurrentPool</code></a> — variante por orden de finalización
   </div>
 
   <nav class="tut-nav">

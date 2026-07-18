@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>fold — FxDart 101</title>
-  <meta name="description" content="FxDart fold tutorial: reduce with an explicit seed, safe on empty input, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/fold.html">
+  <meta name="description" content="Tutorial de fold en FxDart: reduce con un valor inicial explícito, seguro incluso con entrada vacía, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/fold.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/fold.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/fold.html">
@@ -43,42 +42,41 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>fold</strong></p>
   <h1><code>fold</code></h1>
-  <p class="hero-sub">The seeded form of reduce: always safe, even on an empty pipeline.</p>
+  <p class="hero-sub">La forma de reduce con valor inicial: siempre segura, incluso sobre un pipeline vacío.</p>
 
   <div class="signature">Acc fold&lt;A, Acc&gt;(Acc seed, Acc Function(Acc acc, A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;Acc&gt; foldAsync&lt;A, Acc&gt;(FutureOr&lt;Acc&gt; seed, FutureOr&lt;Acc&gt; Function(Acc acc, A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Acc Fx.fold&lt;Acc&gt;(Acc initialValue, Acc Function(Acc acc, T a) combine)      // chain (sync, inherited from Iterable)
 Future&lt;Acc&gt; FxAsync.fold&lt;Acc&gt;(FutureOr&lt;Acc&gt; seed, FutureOr&lt;Acc&gt; Function(Acc acc, T a) f)  // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>fold</code> is <code><a href="reduce.html">reduce</a></code> with an
-    explicit starting value. In FxTS this is just <code>reduce</code> called
-    with three arguments — <code>reduce(f, seed, iterable)</code>. Dart can't
-    tell overloads apart by argument count, so FxDart splits the two: the
-    unseeded form keeps the name <code>reduce</code>, and the seeded form is
-    renamed <code>fold</code>, matching the name Dart's own
-    <code>Iterable</code> already uses for exactly this operation.
+    <code>fold</code> es <code><a href="reduce.html">reduce</a></code> con un
+    valor inicial explícito. En FxTS esto es simplemente <code>reduce</code> llamado
+    con tres argumentos — <code>reduce(f, seed, iterable)</code>. Dart no puede
+    distinguir sobrecargas por el número de argumentos, así que FxDart separa las dos: la
+    forma sin valor inicial conserva el nombre <code>reduce</code>, y la forma con valor inicial pasa a
+    llamarse <code>fold</code>, igual que el nombre que el propio
+    <code>Iterable</code> de Dart ya usa para esta misma operación.
   </p>
   <p>
-    Note the argument order carefully: it's <code>fold(seed, f, iterable)</code>
-    — seed first, then the combiner, then the source — mirroring
-    <code>Iterable.fold(initialValue, combine)</code> on the chain form. That's
-    different from FxTS's <code>reduce(f, seed, iterable)</code>, where the
-    function comes first.
+    Fíjate bien en el orden de los argumentos: es <code>fold(seed, f, iterable)</code>
+    — primero el valor inicial, luego el combinador y después la fuente — reflejando
+    <code>Iterable.fold(initialValue, combine)</code> en la forma encadenada. Eso es
+    distinto del <code>reduce(f, seed, iterable)</code> de FxTS, donde la
+    función va primero.
   </p>
   <p>
-    Because you always supply the seed, <code>fold</code> never throws on an
-    empty iterable — it just returns the seed unchanged. That makes it the
-    safer default whenever you're not sure the pipeline has any elements at
-    all. Like <code>reduce</code>, it's a terminal operator: nothing upstream
-    runs until <code>fold</code> pulls it.
+    Como siempre aportas el valor inicial, <code>fold</code> nunca lanza sobre un
+    iterable vacío: simplemente devuelve el valor inicial intacto. Eso lo convierte en la
+    opción más segura siempre que no tengas la certeza de que el pipeline contenga algún
+    elemento. Como <code>reduce</code>, es un operador terminal: nada de lo que hay
+    aguas arriba se ejecuta hasta que <code>fold</code> tira de ello.
   </p>
 
-  <h2>Demo 1 · Basics &amp; empty input</h2>
+  <h2>Demo 1 · Fundamentos &amp; entrada vacía</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -97,8 +95,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, building up a Map</h2>
-  <p>The seed doesn't have to be a number — here we fold a delayed pipeline into a length histogram:</p>
+  <h2>Demo 2 · Asíncrono, construyendo un Map</h2>
+  <p>El valor inicial no tiene por qué ser un número: aquí plegamos un pipeline con retardo en un histograma de longitudes:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -118,8 +116,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: <code>fold</code> the deposits into a running balance, starting from <code>1000</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: pliega con <code>fold</code> los depósitos en un saldo acumulado, partiendo de <code>1000</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -136,11 +134,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="reduce.html"><code>reduce</code></a> — the unseeded counterpart ·
-    <a href="reduceLazy.html"><code>reduceLazy</code></a> — a reusable, curried reducer ·
-    <a href="sum.html"><code>sum</code></a> — a common fold, specialized ·
-    <a href="scan.html"><code>scan</code></a> — like fold, but lazily yields every intermediate value
+    <strong>Relacionado:</strong>
+    <a href="reduce.html"><code>reduce</code></a> — la contraparte sin valor inicial ·
+    <a href="reduceLazy.html"><code>reduceLazy</code></a> — un reductor currificado y reutilizable ·
+    <a href="sum.html"><code>sum</code></a> — un fold habitual, ya especializado ·
+    <a href="scan.html"><code>scan</code></a> — como fold, pero emite perezosamente cada valor intermedio
   </div>
 
   <nav class="tut-nav">

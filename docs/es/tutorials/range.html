@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>range — FxDart 101</title>
-  <meta name="description" content="FxDart range tutorial: a lazy sequence of integers, counting up or down, to pipe into a chain.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/range.html">
+  <meta name="description" content="Tutorial de range en FxDart: una secuencia perezosa de enteros, ascendente o descendente, lista para encadenar.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/range.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/range.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/range.html">
@@ -43,40 +42,39 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 2 · Generar secuencias › <strong>range</strong></p>
   <h1><code>range</code></h1>
-  <p class="hero-sub">A lazy sequence of integers from start (inclusive) to end (exclusive), stepping by any amount.</p>
+  <p class="hero-sub">Una secuencia perezosa de enteros desde el inicio (incluido) hasta el final (excluido), con el paso que quieras.</p>
 
   <div class="signature">Iterable&lt;int&gt; range(int start, [int? end, int step = 1])</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>range</code> generates integers on demand, using a <code>sync*</code>
-    generator — nothing is allocated up front. Called with one argument,
-    <code>range(4)</code> counts <code>0, 1, 2, 3</code> (i.e. <code>0</code>
-    up to, but not including, <code>start</code>). Called with two,
-    <code>range(1, 4)</code> counts <code>1, 2, 3</code>. A third argument
-    sets the step — including a <em>negative</em> step to count downward,
-    e.g. <code>range(4, 1, -1)</code> gives <code>4, 3, 2</code>.
+    <code>range</code> genera enteros bajo demanda, usando un generador
+    <code>sync*</code>: no se reserva nada por adelantado. Llamado con un solo
+    argumento, <code>range(4)</code> cuenta <code>0, 1, 2, 3</code> (es decir,
+    desde <code>0</code> hasta <code>start</code>, sin incluirlo). Con dos,
+    <code>range(1, 4)</code> cuenta <code>1, 2, 3</code>. Un tercer argumento
+    fija el paso, incluido un paso <em>negativo</em> para contar hacia atrás:
+    por ejemplo, <code>range(4, 1, -1)</code> da <code>4, 3, 2</code>.
   </p>
   <p>
-    Because it's lazy, <code>range(1000000)</code> is essentially free to
-    create — the million integers only get produced as something downstream
-    (usually <code>.take(n)</code>) actually pulls them. This makes
-    <code>range</code> the go-to source for demonstrating laziness, and a
-    handy stand-in whenever you need "the first N things" without building
-    a real collection first.
+    Como es perezoso, crear <code>range(1000000)</code> resulta prácticamente
+    gratis: el millón de enteros solo se produce cuando algo aguas abajo
+    (normalmente <code>.take(n)</code>) tira realmente de ellos. Eso convierte
+    a <code>range</code> en la fuente de referencia para demostrar la
+    evaluación perezosa, y en un sustituto muy práctico siempre que necesites
+    "las primeras N cosas" sin construir antes una colección real.
   </p>
   <p>
-    Unlike FxTS's <code>range</code>, which is a finite generator over
-    numbers, this port keeps the same finite contract — there's no
-    unbounded/infinite form here (that's <code>cycle</code>'s job). If you
-    want an endless counter, pair <code>range</code> with <code>cycle</code>
-    and <code>take</code>.
+    A diferencia del <code>range</code> de FxTS, que es un generador finito
+    sobre números, este port mantiene el mismo contrato finito: aquí no hay una
+    forma ilimitada o infinita (de eso se encarga <code>cycle</code>). Si
+    quieres un contador sin fin, combina <code>range</code> con
+    <code>cycle</code> y <code>take</code>.
   </p>
 
-  <h2>Demo 1 · Counting up, down, and by steps</h2>
+  <h2>Demo 1 · Contar hacia arriba, hacia abajo y con pasos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -90,10 +88,10 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Laziness in a chain</h2>
+  <h2>Demo 2 · La pereza dentro de una cadena</h2>
   <p>
-    <code>range(1000000)</code> produces nothing up front — only the 4
-    elements <code>take(4)</code> asks for actually run through
+    <code>range(1000000)</code> no produce nada por adelantado: solo los 4
+    elementos que pide <code>take(4)</code> pasan realmente por
     <code>map</code>:
   </p>
   <div class="playground">
@@ -118,9 +116,9 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: build the even numbers from 2 to 10 inclusive using
-    <code>range</code>'s step argument.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: construye los números pares del 2 al 10 incluido usando
+    el argumento de paso de <code>range</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -135,11 +133,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="repeat.html"><code>repeat</code></a> — a fixed value repeated n times ·
-    <a href="cycle.html"><code>cycle</code></a> — repeat a whole sequence forever ·
-    <a href="take.html"><code>take</code></a> — bound how much of a range you pull ·
-    <a href="fx.html"><code>fx</code></a> — the chain range is usually wrapped in
+    <strong>Relacionado:</strong>
+    <a href="repeat.html"><code>repeat</code></a> — un valor fijo repetido n veces ·
+    <a href="cycle.html"><code>cycle</code></a> — repite una secuencia entera para siempre ·
+    <a href="take.html"><code>take</code></a> — acota cuánto tiras de un range ·
+    <a href="fx.html"><code>fx</code></a> — la cadena en la que range suele envolverse
   </div>
 
   <nav class="tut-nav">

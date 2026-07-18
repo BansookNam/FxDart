@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>apply — FxDart 101</title>
-  <meta name="description" content="FxDart apply tutorial: invoke a function with arguments collected in a List, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/apply.html">
+  <meta name="description" content="FxDart apply 튜토리얼 - List에 모아 둔 인자로 함수를 호출하는 법을 라이브 플레이그라운드와 함께 다룹니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/apply.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/apply.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/apply.html">
@@ -43,40 +42,39 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 10 · 함수 유틸리티 › <strong>apply</strong></p>
   <h1><code>apply</code></h1>
-  <p class="hero-sub">Calls a function with a List of arguments as its positional parameters.</p>
+  <p class="hero-sub">인자가 담긴 List를 위치 파라미터로 넘겨 함수를 호출합니다.</p>
 
   <div class="signature">R apply&lt;R&gt;(Function f, List&lt;Object?&gt; args)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>apply</code> exists for the moments when the arguments to a call
-    aren't sitting in separate variables — they're already collected in a
-    <code>List</code> (parsed from input, gathered from a config, produced by
-    <a href="juxt.html"><code>juxt</code></a>) and you need to invoke an
-    arbitrary function with them. Under the hood it's a thin wrapper over
-    Dart's own <code>Function.apply</code>, with the result cast to <code>R</code>.
+    <code>apply</code>는 호출에 넘길 인자들이 개별 변수로 흩어져 있지 않고
+    이미 <code>List</code>에 모여 있을 때를 위한 함수입니다(입력에서
+    파싱했거나, 설정에서 모았거나,
+    <a href="juxt.html"><code>juxt</code></a>가 만들어 낸 경우처럼) —
+    그 인자들로 임의의 함수를 호출해야 할 때 씁니다. 내부적으로는 Dart의
+    <code>Function.apply</code>를 얇게 감싸고 결과를 <code>R</code>로
+    캐스팅한 것입니다.
   </p>
   <p>
-    Because <code>f</code> is typed as the bare <code>Function</code>,
-    <code>apply</code> is inherently dynamic — Dart can't check the argument
-    count or types against <code>f</code>'s signature at compile time, only at
-    runtime. Reach for it only when you genuinely have a dynamic arg list;
-    for anything else, call the function directly.
+    <code>f</code>의 타입이 그냥 <code>Function</code>이기 때문에
+    <code>apply</code>는 본질적으로 동적입니다 — Dart는 인자 개수나 타입을
+    <code>f</code>의 시그니처와 대조해 컴파일 타임에 검사할 수 없고, 런타임에만
+    확인합니다. 정말로 동적인 인자 목록을 다룰 때만 꺼내 쓰고, 그 밖의
+    경우에는 함수를 직접 호출하세요.
   </p>
   <p>
-    A related but separate concern is <em>currying</em> — pre-filling some
-    arguments of a function ahead of time. FxTS has a fully generic
-    <code>curry</code>; Dart's type system has no equivalent for arbitrary
-    arities, so FxDart ships only a
-    <code>@Deprecated</code> two-argument <code>curry</code> stub as a
-    migration aid. Prefer writing the closure yourself:
+    관련은 있지만 별개의 주제로 <em>커링</em>이 있습니다 — 함수의 일부 인자를
+    미리 채워 두는 것이죠. FxTS에는 완전한 제네릭 <code>curry</code>가 있지만
+    Dart의 타입 시스템에는 임의의 인자 개수를 다룰 방법이 없어서, FxDart는
+    마이그레이션 보조용으로 <code>@Deprecated</code> 처리된 2인자
+    <code>curry</code> 스텁만 제공합니다. 클로저를 직접 작성하는 편이 낫습니다:
     <code>(b) => f(a, b)</code>.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -94,10 +92,10 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Dispatching dynamic calls</h2>
+  <h2>데모 2 · 동적 호출 디스패치하기</h2>
   <p>
-    A small command dispatcher, where each handler has a different arity and
-    the arguments arrive as a runtime <code>List</code>:
+    핸들러마다 인자 개수가 다르고 인자는 런타임 <code>List</code>로 들어오는
+    간단한 커맨드 디스패처입니다:
   </p>
   <div class="playground">
 <textarea>
@@ -123,9 +121,9 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: call <code>greet</code> below using <code>apply</code> with the
-    argument list <code>['Kim', 'Hello']</code>.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 아래 <code>greet</code>를 인자 목록
+    <code>['Kim', 'Hello']</code>와 함께 <code>apply</code>로 호출해 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -142,11 +140,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="juxt.html"><code>juxt</code></a> — often the source of a dynamic arg list ·
-    <a href="tap.html"><code>tap</code></a> — run a side effect without changing the value ·
-    <a href="cases.html"><code>cases</code></a> — dispatch on predicates instead of a name ·
-    <a href="pipe.html"><code>pipe</code></a> — dynamic composition, same trade-off as apply
+    <strong>관련 항목:</strong>
+    <a href="juxt.html"><code>juxt</code></a> — 동적 인자 목록이 만들어지는 대표적인 출처 ·
+    <a href="tap.html"><code>tap</code></a> — 값을 바꾸지 않고 부수 효과만 실행 ·
+    <a href="cases.html"><code>cases</code></a> — 이름 대신 술어로 디스패치 ·
+    <a href="pipe.html"><code>pipe</code></a> — 동적 조합, apply와 같은 트레이드오프
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>last — FxDart 101</title>
-  <meta name="description" content="FxDart last tutorial: get the final element of an iterable, null-safe on empty input, plus a chain-getter gotcha to watch for.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/last.html">
+  <meta name="description" content="Tutorial de last en FxDart: obtén el último elemento de un iterable, seguro frente a entradas vacías, y cuidado con la trampa del getter en la cadena.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/last.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/last.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/last.html">
@@ -43,37 +42,36 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 8 · Acceso &amp; predicados › <strong>last</strong></p>
   <h1><code>last</code></h1>
-  <p class="hero-sub">Returns the final element of an iterable, or <code>null</code> when it's empty.</p>
+  <p class="hero-sub">Devuelve el último elemento de un iterable, o <code>null</code> si está vacío.</p>
 
   <div class="signature">A? last&lt;A&gt;(Iterable&lt;A&gt; iterable)
 Future&lt;A?&gt; lastAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
 Future&lt;T?&gt; FxAsync.last()  // chain (async only)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>last</code> walks the whole iterable and hands back whatever it
-    saw most recently — <code>null</code> if it never saw anything. Unlike
-    <code>head</code>, there's no shortcut: since a lazy iterable doesn't
-    know where it ends without being asked, <code>last</code> has to consume
-    every element, so it's <code>O(n)</code> even though the pipeline
-    upstream may be lazily built.
+    <code>last</code> recorre el iterable entero y devuelve lo último que vio
+    — <code>null</code> si nunca vio nada. A diferencia de
+    <code>head</code>, aquí no hay atajo: como un iterable perezoso no sabe
+    dónde termina sin que se lo pregunten, <code>last</code> tiene que
+    consumir todos los elementos, así que es <code>O(n)</code> aunque el
+    pipeline anterior se haya construido de forma perezosa.
   </p>
   <p>
-    <strong>Watch out on the sync chain:</strong> <code>Fx</code> extends
-    <code>Iterable</code>, and there is no <code>Fx.last()</code> override —
-    so <code>fx(iterable).last</code> resolves to Dart's own
-    <code>Iterable.last</code> <em>getter</em>, which throws
-    <code>StateError</code> on an empty iterable instead of returning
-    <code>null</code>. The null-safe behavior only exists as the top-level
-    <code>last(iterable)</code> function (or <code>.last()</code> on the
-    <em>async</em> chain, which does have its own override). When in doubt,
-    prefer the top-level function.
+    <strong>Ojo en la cadena síncrona:</strong> <code>Fx</code> extiende
+    <code>Iterable</code> y no hay ninguna redefinición de
+    <code>Fx.last()</code>, así que <code>fx(iterable).last</code> resuelve al
+    <code>Iterable.last</code> propio de Dart — el <em>getter</em> — que lanza
+    <code>StateError</code> con un iterable vacío en lugar de devolver
+    <code>null</code>. El comportamiento seguro frente a nulos solo existe en
+    la función de nivel superior <code>last(iterable)</code> (o en
+    <code>.last()</code> sobre la cadena <em>asíncrona</em>, que sí tiene su
+    propia redefinición). Ante la duda, prefiere la función de nivel superior.
   </p>
 
-  <h2>Demo 1 · Basics, and the chain getter trap</h2>
+  <h2>Demo 1 · Fundamentos y la trampa del getter en la cadena</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -91,8 +89,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, where the chain form IS null-safe</h2>
-  <p><code>FxAsync</code> defines its own <code>.last()</code>, so on the async chain the getter trap above doesn't apply:</p>
+  <h2>Demo 2 · Async, donde la forma encadenada SÍ es segura frente a nulos</h2>
+  <p><code>FxAsync</code> define su propio <code>.last()</code>, así que en la cadena asíncrona la trampa del getter anterior no aplica:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -109,8 +107,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>last</code> so this prints the final log line, or <code>'no logs yet'</code> when there are none.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>last</code> para que esto imprima la última línea del log, o <code>'no logs yet'</code> cuando no haya ninguna.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -127,11 +125,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="head.html"><code>head</code></a> — the O(1) opposite end ·
-    <a href="nth.html"><code>nth</code></a> — pull any index ·
-    <a href="find.html"><code>find</code></a> — first match to a predicate ·
-    <a href="reverse.html"><code>reverse</code></a> — flip the whole sequence
+    <strong>Relacionado:</strong>
+    <a href="head.html"><code>head</code></a> — el extremo opuesto, en O(1) ·
+    <a href="nth.html"><code>nth</code></a> — obtener cualquier índice ·
+    <a href="find.html"><code>find</code></a> — la primera coincidencia con un predicado ·
+    <a href="reverse.html"><code>reverse</code></a> — invertir toda la secuencia
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>uniqBy — FxDart 101</title>
-  <meta name="description" content="FxDart uniqBy tutorial: remove duplicates by a computed key, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/uniqBy.html">
+  <meta name="description" content="Tutorial de uniqBy en FxDart: elimina duplicados según una clave calculada, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/uniqBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/uniqBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/uniqBy.html">
@@ -43,38 +42,38 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 4 · Filtrado &amp; deduplicación › <strong>uniqBy</strong></p>
   <h1><code>uniqBy</code></h1>
-  <p class="hero-sub">Removes duplicates as determined by a key function, rather than value equality.</p>
+  <p class="hero-sub">Elimina duplicados según lo que determine una función de clave, en lugar de por igualdad de valores.</p>
 
   <div class="signature">Iterable&lt;A&gt; uniqBy&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; uniqByAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.uniqBy&lt;B&gt;(B Function(T a) f)        // chain
 FxAsync&lt;T&gt; FxAsync.uniqBy&lt;B&gt;(FutureOr&lt;B&gt; Function(T a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>uniqBy</code> is <code>uniq</code>'s general form: instead of
-    comparing whole elements, it runs each element through <code>f</code>
-    and keeps only the first element to produce each distinct key. It's the
-    tool for "one row per customer," "one event per type," or dedupe by any
-    field or computed value — <code>uniq</code> itself is just
+    <code>uniqBy</code> es la forma general de <code>uniq</code>: en vez de
+    comparar los elementos enteros, pasa cada elemento por <code>f</code> y
+    conserva solo el primer elemento que produce cada clave distinta. Es la
+    herramienta para "una fila por cliente", "un evento por tipo" o para
+    deduplicar por cualquier campo o valor calculado — el propio
+    <code>uniq</code> no es más que
     <code>uniqBy((a) =&gt; a, iterable)</code>.
   </p>
   <p>
-    As with <code>uniq</code>, it's lazy and order-preserving: the first
-    element for each key wins, and the internal <code>Set&lt;B&gt;</code>
-    of seen keys only grows as you pull.
+    Igual que <code>uniq</code>, es perezoso y conserva el orden: gana el primer
+    elemento de cada clave, y el <code>Set&lt;B&gt;</code> interno de claves
+    vistas solo crece a medida que tiras de los valores.
   </p>
   <p>
-    The same async rule applies here as with <code>uniq</code>: put the
-    concurrency in an upstream fetch (<code>.map(...).concurrent(n)</code>),
-    then apply <code>uniqBy</code>/<code>uniqByAsync</code> to the
-    already-resolved, in-order stream.
+    Aquí aplica la misma regla asíncrona que en <code>uniq</code>: pon la
+    concurrencia en un fetch anterior (<code>.map(...).concurrent(n)</code>) y
+    luego aplica <code>uniqBy</code>/<code>uniqByAsync</code> al flujo ya
+    resuelto y en orden.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -98,7 +97,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency upstream</h2>
+  <h2>Demo 2 · Asíncrono, con concurrencia aguas arriba</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -127,9 +126,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>uniqBy</code> to keep only the first event of each
-    <code>'type'</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>uniqBy</code> para quedarte solo con el primer evento
+    de cada <code>'type'</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -150,11 +149,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="uniq.html"><code>uniq</code></a> — dedupe by value equality ·
-    <a href="differenceBy.html"><code>differenceBy</code></a> — remove by a computed key against another iterable ·
-    <a href="intersectionBy.html"><code>intersectionBy</code></a> — keep by a computed key shared with another iterable ·
-    <a href="../tutorials/groupBy.html"><code>groupBy</code></a> — keep every element, grouped by key
+    <strong>Relacionado:</strong>
+    <a href="uniq.html"><code>uniq</code></a> — deduplica por igualdad de valores ·
+    <a href="differenceBy.html"><code>differenceBy</code></a> — elimina por una clave calculada frente a otro iterable ·
+    <a href="intersectionBy.html"><code>intersectionBy</code></a> — conserva por una clave calculada compartida con otro iterable ·
+    <a href="../tutorials/groupBy.html"><code>groupBy</code></a> — conserva todos los elementos, agrupados por clave
   </div>
 
   <nav class="tut-nav">

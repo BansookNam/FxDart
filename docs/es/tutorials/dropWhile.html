@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>dropWhile — FxDart 101</title>
-  <meta name="description" content="FxDart dropWhile tutorial: skip values while a predicate holds, then yield the rest, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/dropWhile.html">
+  <meta name="description" content="Tutorial de dropWhile en FxDart: omite valores mientras se cumpla un predicado y luego emite el resto, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/dropWhile.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/dropWhile.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/dropWhile.html">
@@ -43,35 +42,36 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 5 · Segmentación › <strong>dropWhile</strong></p>
   <h1><code>dropWhile</code></h1>
-  <p class="hero-sub">Skips values while a predicate returns true, then yields everything after — matches or not.</p>
+  <p class="hero-sub">Omite valores mientras un predicado devuelva true y luego emite todo lo demás, coincida o no.</p>
 
   <div class="signature">Iterable&lt;A&gt; dropWhile&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; dropWhileAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.dropWhile(bool Function(T a) f)        // chain — also aliased as Fx.skipWhile
 FxAsync&lt;T&gt; FxAsync.dropWhile(FutureOr&lt;bool&gt; Function(T a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>dropWhile</code> is <code>takeWhile</code>'s mirror: it skips
-    elements as long as the predicate holds, then — the moment it hits one
-    that fails — switches into "yield everything" mode for good. That
-    switch-over is permanent: once <code>dropWhile</code> starts passing
-    values through, it never goes back to dropping, even if a later element
-    would also have matched.
+    <code>dropWhile</code> es el espejo de <code>takeWhile</code>: omite
+    elementos mientras el predicado se cumpla y, en cuanto encuentra uno
+    que falla, cambia definitivamente al modo "emitir todo". Ese cambio es
+    permanente: una vez que <code>dropWhile</code> empieza a dejar pasar
+    valores, ya nunca vuelve a descartar, aunque un elemento posterior
+    también hubiera coincidido.
   </p>
   <p>
-    Reach for it to strip a variable-length prefix you can't count in
-    advance — leading whitespace-like tokens, header rows, a warm-up period
-    in a metrics stream. On the <code>Fx</code> chain it's also available as
-    <code>skipWhile</code>, matching <code>Iterable.skipWhile</code>.
+    Recurre a él para recortar un prefijo de longitud variable que no puedes
+    contar de antemano: tokens iniciales tipo espacio en blanco, filas de
+    cabecera, un periodo de calentamiento en un flujo de métricas. En la
+    cadena <code>Fx</code> también está disponible como
+    <code>skipWhile</code>, igual que <code>Iterable.skipWhile</code>.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
-  <p>Once dropping stops at <code>3</code>, later matching values
-    (<code>2</code> at the end) are kept, not dropped again:</p>
+  <h2>Demo 1 · Fundamentos</h2>
+  <p>Una vez que el descarte se detiene en <code>3</code>, los valores
+    coincidentes posteriores (el <code>2</code> del final) se conservan, no se
+    vuelven a descartar:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -87,7 +87,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -104,9 +104,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: drop temperatures while they stay below 25, then keep the
-    rest.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: descarta las temperaturas mientras se mantengan por debajo de
+    25 y luego conserva el resto.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -123,11 +123,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="takeWhile.html"><code>takeWhile</code></a> — the inverse ·
-    <a href="dropUntil.html"><code>dropUntil</code></a> — also drops the matching element ·
-    <a href="drop.html"><code>drop</code></a> — drop by fixed count ·
-    <a href="filter.html"><code>filter</code></a> — drop matches everywhere, not just a prefix
+    <strong>Relacionado:</strong>
+    <a href="takeWhile.html"><code>takeWhile</code></a> — el inverso ·
+    <a href="dropUntil.html"><code>dropUntil</code></a> — descarta también el elemento coincidente ·
+    <a href="drop.html"><code>drop</code></a> — descarta por número fijo ·
+    <a href="filter.html"><code>filter</code></a> — descarta coincidencias en cualquier posición, no solo en un prefijo
   </div>
 
   <nav class="tut-nav">

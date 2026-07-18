@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>isEmpty — FxDart 101</title>
-  <meta name="description" content="FxDart isEmpty tutorial: a value-based emptiness check for null, strings, and collections, usable as a filter-friendly predicate.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/isEmpty.html">
+  <meta name="description" content="Tutorial de isEmpty en FxDart: una comprobación de vacío basada en el valor para null, cadenas y colecciones, usable como predicado en filtros.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/isEmpty.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/isEmpty.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/isEmpty.html">
@@ -43,33 +42,32 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 8 · Acceso &amp; predicados › <strong>isEmpty</strong></p>
   <h1><code>isEmpty</code></h1>
-  <p class="hero-sub">A value-based emptiness check: true for <code>null</code>, <code>''</code>, and empty collections.</p>
+  <p class="hero-sub">Una comprobación de vacío basada en el valor: true para <code>null</code>, <code>''</code> y colecciones vacías.</p>
 
   <div class="signature">bool isEmpty(Object? value)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    This is <strong>not</strong> the same thing as <code>Iterable.isEmpty</code>,
-    the getter you already get for free on every <code>List</code>, <code>Set</code>,
-    or <code>Fx</code> chain. That getter only exists on iterables, and blows
-    up (or is simply unavailable) on <code>null</code>. FxTS's <code>isEmpty</code>
-    takes <em>any</em> value and answers a broader question: is this thing
-    "nothing" in a practical sense? It returns <code>true</code> for
-    <code>null</code>, an empty <code>String</code>, and an empty
-    <code>Iterable</code>/<code>Map</code>/<code>Set</code> — and
-    <code>false</code> for everything else, including numbers and booleans,
-    which are never considered "empty."
+    Esto <strong>no</strong> es lo mismo que <code>Iterable.isEmpty</code>,
+    el getter que ya tienes gratis en cualquier <code>List</code>, <code>Set</code>
+    o cadena <code>Fx</code>. Ese getter solo existe en los iterables, y revienta
+    (o sencillamente no está disponible) con <code>null</code>. El <code>isEmpty</code>
+    de FxTS acepta <em>cualquier</em> valor y responde a una pregunta más amplia:
+    ¿esto es "nada" en un sentido práctico? Devuelve <code>true</code> para
+    <code>null</code>, un <code>String</code> vacío y un
+    <code>Iterable</code>/<code>Map</code>/<code>Set</code> vacío — y
+    <code>false</code> para todo lo demás, incluidos números y booleanos,
+    que nunca se consideran "vacíos".
   </p>
   <p>
-    Because it takes a single <code>Object?</code> argument, it tears off
-    directly into <code>filter</code>, <code>reject</code>, or any other
-    predicate-shaped slot without a wrapper lambda.
+    Como recibe un único argumento <code>Object?</code>, se pasa directamente
+    como tear-off a <code>filter</code>, <code>reject</code> o cualquier otro
+    hueco con forma de predicado, sin necesidad de una lambda envolvente.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -86,10 +84,10 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · As a filter-friendly tear-off</h2>
+  <h2>Demo 2 · Como tear-off listo para filtrar</h2>
   <p>
-    A mixed bag of values, kept down to the ones <code>isEmpty</code> considers empty
-    (the printed empty string shows up as nothing between the commas):
+    Una mezcla variada de valores, reducida a los que <code>isEmpty</code> considera vacíos
+    (la cadena vacía impresa aparece como nada entre las comas):
   </p>
   <div class="playground">
 <textarea>
@@ -105,8 +103,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>isEmpty</code> to print <code>'no comment'</code> when <code>comment</code> is empty, or the comment itself.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>isEmpty</code> para imprimir <code>'no comment'</code> cuando <code>comment</code> esté vacío, o el propio comentario.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -123,11 +121,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="compact.html"><code>compact</code></a> — drop nulls from an iterable ·
-    <a href="compactObject.html"><code>compactObject</code></a> — drop nulls from a Map ·
-    <a href="predicates.html"><code>predicates</code></a> — more filter-friendly type checks ·
-    <a href="includes.html"><code>includes</code></a> — the neighboring membership check
+    <strong>Relacionado:</strong>
+    <a href="compact.html"><code>compact</code></a> — descarta los null de un iterable ·
+    <a href="compactObject.html"><code>compactObject</code></a> — descarta los null de un Map ·
+    <a href="predicates.html"><code>predicates</code></a> — más comprobaciones de tipo listas para filtrar ·
+    <a href="includes.html"><code>includes</code></a> — la comprobación de pertenencia vecina
   </div>
 
   <nav class="tut-nav">

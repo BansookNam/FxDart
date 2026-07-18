@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>entries — FxDart 101</title>
-  <meta name="description" content="FxDart entries tutorial: turn a Map's (key, value) pairs into a lazy iterable of records, ready to chain.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/entries.html">
+  <meta name="description" content="Tutorial de entries en FxDart: convierte los pares (clave, valor) de un Map en un iterable perezoso de records, listo para encadenar.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/entries.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/entries.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/entries.html">
@@ -43,39 +42,38 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 2 · Generar secuencias › <strong>entries</strong></p>
   <h1><code>entries</code></h1>
-  <p class="hero-sub">Yields a Map's (key, value) pairs as records — the entry point for chaining over a Map.</p>
+  <p class="hero-sub">Emite los pares (clave, valor) de un Map como records: el punto de entrada para encadenar sobre un Map.</p>
 
   <div class="signature">Iterable&lt;(K, V)&gt; entries&lt;K, V&gt;(Map&lt;K, V&gt; map)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    A Dart <code>Map</code> isn't an <code>Iterable</code> the way a
-    <code>List</code> is, so there's no <code>fx(someMap)</code> directly.
-    <code>entries</code> is the bridge: it yields each key/value pair of the
-    map as a <code>(K, V)</code> record, giving you a plain lazy
-    <code>Iterable</code> you <em>can</em> wrap with <code>fx()</code> and
-    chain like anything else. This mirrors FxTS's <code>entries</code>,
-    which does the same for a JS object.
+    Un <code>Map</code> de Dart no es un <code>Iterable</code> como sí lo es
+    una <code>List</code>, así que no existe un <code>fx(someMap)</code>
+    directo. <code>entries</code> es el puente: emite cada par clave/valor del
+    map como un record <code>(K, V)</code>, dándote un <code>Iterable</code>
+    perezoso normal que <em>sí</em> puedes envolver con <code>fx()</code> y
+    encadenar como cualquier otro. Esto refleja el <code>entries</code> de
+    FxTS, que hace lo mismo con un objeto de JS.
   </p>
   <p>
-    Because the pairs are Dart records, you can destructure them directly
-    in a <code>for</code> loop — <code>for (final (key, value) in
-    entries(map))</code> — or access the positional fields
-    <code>.$1</code> (key) and <code>.$2</code> (value) inside a
-    <code>map</code>/<code>filter</code> callback when destructuring isn't
-    convenient.
+    Como los pares son records de Dart, puedes desestructurarlos directamente
+    en un bucle <code>for</code> — <code>for (final (key, value) in
+    entries(map))</code> — o acceder a los campos posicionales
+    <code>.$1</code> (clave) y <code>.$2</code> (valor) dentro de una
+    retrollamada de <code>map</code>/<code>filter</code> cuando desestructurar
+    no resulte cómodo.
   </p>
   <p>
-    <code>entries</code> is lazy like everything else here, but a
-    <code>Map</code>'s entries aren't infinite, so there's rarely a reason
-    to bound it with <code>take</code> — it's more about turning a Map into
-    something chainable than about controlling how much gets pulled.
+    <code>entries</code> es perezoso como todo lo demás aquí, pero las
+    entradas de un <code>Map</code> no son infinitas, así que rara vez hay
+    motivo para acotarlo con <code>take</code>: se trata más de convertir un
+    Map en algo encadenable que de controlar cuánto se llega a consumir.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -93,9 +91,9 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Chaining over a Map</h2>
-  <p>Wrap <code>entries(map)</code> with <code>fx()</code> to filter and
-    reshape a Map's contents:</p>
+  <h2>Demo 2 · Encadenar sobre un Map</h2>
+  <p>Envuelve <code>entries(map)</code> con <code>fx()</code> para filtrar y
+    transformar el contenido de un Map:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -115,8 +113,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: turn a Map of scores into "name: PASS/FAIL" strings.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: convierte un Map de notas en cadenas "nombre: PASS/FAIL".</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -136,11 +134,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="keys.html"><code>keys</code></a> — just the keys of a Map ·
-    <a href="values.html"><code>values</code></a> — just the values of a Map ·
-    <a href="fromEntries.html"><code>fromEntries</code></a> — the inverse: build a Map back from pairs ·
-    <a href="fx.html"><code>fx</code></a> — the chain entries results feed into
+    <strong>Relacionado:</strong>
+    <a href="keys.html"><code>keys</code></a> — solo las claves de un Map ·
+    <a href="values.html"><code>values</code></a> — solo los valores de un Map ·
+    <a href="fromEntries.html"><code>fromEntries</code></a> — la inversa: reconstruir un Map a partir de los pares ·
+    <a href="fx.html"><code>fx</code></a> — la cadena a la que alimentan los resultados de entries
   </div>
 
   <nav class="tut-nav">

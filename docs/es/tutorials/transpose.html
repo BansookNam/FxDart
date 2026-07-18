@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>transpose — FxDart 101</title>
-  <meta name="description" content="FxDart transpose tutorial: turn rows into columns for any number of iterables, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/transpose.html">
+  <meta name="description" content="Tutorial de transpose en FxDart: convierte filas en columnas para cualquier número de iterables, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/transpose.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/transpose.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/transpose.html">
@@ -43,34 +42,35 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 6 · Combinar › <strong>transpose</strong></p>
   <h1><code>transpose</code></h1>
-  <p class="hero-sub">Turns a collection of rows into a collection of columns.</p>
+  <p class="hero-sub">Convierte una colección de filas en una colección de columnas.</p>
 
   <div class="signature">Iterable&lt;List&lt;A&gt;&gt; transpose&lt;A&gt;(Iterable&lt;Iterable&lt;A&gt;&gt; rows)
 FxAsyncIterable&lt;List&lt;A&gt;&gt; transposeAsync&lt;A&gt;(Iterable&lt;FxAsyncIterable&lt;A&gt;&gt; rows)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>transpose</code> is <code>zip</code> generalized to <em>any</em>
-    number of iterables: the n-th output list holds the n-th element of
-    every input row that still has one. Where <code>zip</code>/<code>zip3</code>
-    take each row as a separate argument (because Dart can't express
-    variadic generics), <code>transpose</code> takes all the rows as a
-    <strong>single</strong> iterable of iterables —
-    <code>transpose([row1, row2, row3])</code> — so it works for any row
-    count decided at runtime.
+    <code>transpose</code> es <code>zip</code> generalizado a <em>cualquier</em>
+    número de iterables: la n-ésima lista de salida contiene el n-ésimo
+    elemento de cada fila de entrada que aún tenga uno. Mientras que
+    <code>zip</code>/<code>zip3</code> toman cada fila como un argumento
+    aparte (porque Dart no puede expresar genéricos variádicos),
+    <code>transpose</code> toma todas las filas como un
+    <strong>único</strong> iterable de iterables —
+    <code>transpose([row1, row2, row3])</code> — así que funciona para
+    cualquier número de filas decidido en tiempo de ejecución.
   </p>
   <p>
-    Unlike <code>zip</code>, which stops as soon as the shortest input runs
-    dry, <code>transpose</code> keeps going as long as <em>any</em> row still
-    has values left — a shorter row just stops contributing to later output
-    lists, which may end up shorter than the row count. It only stops
-    entirely once every row is exhausted.
+    A diferencia de <code>zip</code>, que para en cuanto se agota la entrada
+    más corta, <code>transpose</code> sigue mientras <em>alguna</em> fila
+    todavía tenga valores: una fila más corta simplemente deja de contribuir a
+    las listas de salida posteriores, que pueden acabar siendo más cortas que
+    el número de filas. Solo se detiene del todo cuando se han agotado todas
+    las filas.
   </p>
 
-  <h2>Demo 1 · Basics &amp; ragged rows</h2>
+  <h2>Demo 1 · Fundamentos &amp; filas desiguales</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -93,7 +93,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -108,8 +108,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: transpose the matrix (rows become columns).</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: transpón la matriz (las filas pasan a ser columnas).</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -130,9 +130,9 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="zip.html"><code>zip</code></a> — the two-row special case ·
-    <a href="chunk.html"><code>chunk</code></a> — batch a flat source into rows first ·
+    <strong>Relacionado:</strong>
+    <a href="zip.html"><code>zip</code></a> — el caso particular de dos filas ·
+    <a href="chunk.html"><code>chunk</code></a> — agrupa antes una fuente plana en filas ·
     <a href="reverse.html"><code>reverse</code></a>
   </div>
 

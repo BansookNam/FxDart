@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>difference — FxDart 101</title>
-  <meta name="description" content="FxDart difference tutorial: elements of one iterable that don't occur in another, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/difference.html">
+  <meta name="description" content="Tutorial de difference en FxDart: los elementos de un iterable que no aparecen en otro, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/difference.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/difference.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/difference.html">
@@ -43,42 +42,43 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 4 · Filtrado &amp; deduplicación › <strong>difference</strong></p>
   <h1><code>difference</code></h1>
-  <p class="hero-sub">Returns the elements of the second iterable that do not occur in the first — argument order matters.</p>
+  <p class="hero-sub">Devuelve los elementos del segundo iterable que no aparecen en el primero — el orden de los argumentos importa.</p>
 
   <div class="signature">Iterable&lt;A&gt; difference&lt;A&gt;(Iterable&lt;A&gt; iterable1, Iterable&lt;A&gt; iterable2)
 FxAsyncIterable&lt;A&gt; differenceAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;A&gt; iterable2)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    Read the signature carefully: <code>difference(iterable1, iterable2)</code>
-    walks <strong><code>iterable2</code></strong> and yields each of its
-    elements that is <em>not</em> found in <code>iterable1</code>
-    (deduplicated, like <code>uniq</code>). <code>iterable1</code> is only
-    ever used as a membership set to test against — none of its own
-    elements can appear in the output, and its own duplicates don't matter.
-    This order is not symmetric: swapping the arguments produces a
-    completely different (and generally different-length) result. A useful
-    way to remember it: think of <code>iterable1</code> as "the exclusion
-    list" and <code>iterable2</code> as "the list you're filtering."
+    Lee la firma con atención: <code>difference(iterable1, iterable2)</code>
+    recorre <strong><code>iterable2</code></strong> y emite cada uno de sus
+    elementos que <em>no</em> se encuentre en <code>iterable1</code>
+    (sin duplicados, como <code>uniq</code>). <code>iterable1</code> se usa
+    únicamente como conjunto de pertenencia contra el que comprobar —
+    ninguno de sus propios elementos puede aparecer en la salida, y sus
+    duplicados dan igual. Este orden no es simétrico: intercambiar los
+    argumentos produce un resultado completamente distinto (y por lo general
+    de distinta longitud). Una forma útil de recordarlo: piensa en
+    <code>iterable1</code> como "la lista de exclusión" y en
+    <code>iterable2</code> como "la lista que estás filtrando".
   </p>
   <p>
-    Internally it's <code>differenceBy((a) =&gt; a, iterable1, iterable2)</code> —
-    see <a href="differenceBy.html"><code>differenceBy</code></a> if you
-    need to compare by a computed key instead of value equality.
+    Por dentro es <code>differenceBy((a) =&gt; a, iterable1, iterable2)</code> —
+    mira <a href="differenceBy.html"><code>differenceBy</code></a> si
+    necesitas comparar por una clave calculada en vez de por igualdad de
+    valor.
   </p>
   <p>
-    There's no chain method for <code>difference</code>; it only exists as
-    a data-first function (and its async counterpart). On the async side,
-    the concurrency marker from <code>.concurrent(n)</code> applies to
-    <strong><code>iterable2</code></strong> — the exclusion set in
-    <code>iterable1</code> is always drained up front before results start
-    flowing.
+    No hay método de cadena para <code>difference</code>; solo existe como
+    función data-first (y su contraparte asíncrona). En el lado asíncrono,
+    el marcador de concurrencia de <code>.concurrent(n)</code> se aplica a
+    <strong><code>iterable2</code></strong> — el conjunto de exclusión de
+    <code>iterable1</code> siempre se consume por completo antes de que
+    empiecen a fluir los resultados.
   </p>
 
-  <h2>Demo 1 · Basics &amp; argument order</h2>
+  <h2>Demo 1 · Fundamentos &amp; orden de los argumentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -102,7 +102,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency</h2>
+  <h2>Demo 2 · Asíncrono, con concurrencia</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -126,9 +126,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>difference</code> to find the tasks in
-    <code>allTasks</code> that are not yet in <code>completed</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>difference</code> para encontrar las tareas de
+    <code>allTasks</code> que aún no están en <code>completed</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -146,11 +146,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="differenceBy.html"><code>differenceBy</code></a> — the same, by a computed key ·
-    <a href="intersection.html"><code>intersection</code></a> — keep the shared elements instead ·
-    <a href="uniq.html"><code>uniq</code></a> — dedupe a single iterable ·
-    <a href="../tutorials/includes.html"><code>includes</code></a> — test membership in a single iterable
+    <strong>Relacionado:</strong>
+    <a href="differenceBy.html"><code>differenceBy</code></a> — lo mismo, por una clave calculada ·
+    <a href="intersection.html"><code>intersection</code></a> — quedarse con los elementos comunes en su lugar ·
+    <a href="uniq.html"><code>uniq</code></a> — elimina duplicados de un solo iterable ·
+    <a href="../tutorials/includes.html"><code>includes</code></a> — comprueba la pertenencia en un solo iterable
   </div>
 
   <nav class="tut-nav">

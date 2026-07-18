@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>cycle — FxDart 101</title>
-  <meta name="description" content="FxDart cycle tutorial: repeat a sequence forever — an infinite source that must always be paired with take.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/cycle.html">
+  <meta name="description" content="FxDart cycle 튜토리얼: 시퀀스를 무한히 반복하는 소스 — 반드시 take와 함께 써야 하는 이유를 라이브 플레이그라운드와 함께 배웁니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/cycle.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/cycle.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/cycle.html">
@@ -43,42 +42,40 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 2 · 시퀀스 생성 › <strong>cycle</strong></p>
   <h1><code>cycle</code></h1>
-  <p class="hero-sub">Yields a sequence, then repeats it — forever. Always pair it with a bound like take.</p>
+  <p class="hero-sub">시퀀스를 내보낸 뒤 그것을 계속 반복합니다 — 무한히. 항상 take처럼 개수를 제한하는 연산과 함께 쓰세요.</p>
 
   <div class="signature">Iterable&lt;T&gt; cycle&lt;T&gt;(Iterable&lt;T&gt; iterable)
 FxAsyncIterable&lt;T&gt; cycleAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable)
 Fx&lt;T&gt; Fx.cycle()        // chain
 FxAsync&lt;T&gt; FxAsync.cycle()</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>cycle</code> is <strong>infinite</strong>: it plays the source
-    sequence once, buffering its values as it goes, then loops over that
-    buffer forever. Unlike everything else in this section,
-    <code>cycle</code> never runs out on its own — you must always pair it
-    with something that decides when to stop, almost always
-    <code>.take(n)</code>. Calling <code>toArray()</code> or
-    <code>consume()</code> directly on a bare <code>cycle(...)</code>
-    without a bound in between will hang.
+    <code>cycle</code>은 <strong>무한</strong>합니다. 소스 시퀀스를 한 번
+    흘려보내면서 값을 버퍼에 담아 두고, 그 다음부터는 그 버퍼를 영원히
+    반복합니다. 이 섹션의 다른 함수들과 달리 <code>cycle</code>은 스스로
+    끝나는 법이 없습니다 — 언제 멈출지 결정하는 무언가와 반드시 짝지어야
+    하며, 대개는 <code>.take(n)</code>입니다. 중간에 아무 제한도 두지 않고
+    <code>cycle(...)</code>에 곧바로 <code>toArray()</code>나
+    <code>consume()</code>을 호출하면 영영 끝나지 않습니다.
   </p>
   <p>
-    One edge case worth knowing: cycling an <em>empty</em> source yields
-    nothing at all, rather than looping forever over zero elements — so
-    <code>cycle([])</code> is safe and simply produces an empty result.
+    알아 둘 만한 특수한 경우가 하나 있습니다. <em>빈</em> 소스를 순환시키면
+    원소 0개를 영원히 도는 대신 아무것도 내보내지 않습니다 — 즉
+    <code>cycle([])</code>은 안전하며 그냥 빈 결과를 만듭니다.
   </p>
   <p>
-    It's a natural building block for round-robin assignment (cycle through
-    a small list of workers/colors/slots as you map over a longer one) or
-    for repeating a short async sequence to model a polling loop. The async
-    form, <code>cycleAsync</code> (or <code>.cycle()</code> on an
-    <code>FxAsync</code> chain), buffers and loops the same way, but pulls
-    each round through the usual async protocol.
+    라운드 로빈 할당(더 긴 컬렉션을 map으로 순회하면서 작업자, 색상, 슬롯
+    같은 작은 리스트를 돌려 쓰는 경우)이나, 짧은 비동기 시퀀스를 반복해
+    폴링 루프를 흉내 내는 데 딱 맞는 구성 요소입니다. 비동기 버전인
+    <code>cycleAsync</code>(또는 <code>FxAsync</code> 체인에서의
+    <code>.cycle()</code>)도 같은 방식으로 버퍼링하고 반복하되, 매 회차를
+    평소의 비동기 프로토콜로 끌어당깁니다.
   </p>
 
-  <h2>Demo 1 · Infinite, bounded by take</h2>
+  <h2>데모 1 · 무한 시퀀스를 take로 제한하기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -98,7 +95,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async cycle, still bounded by take</h2>
+  <h2>데모 2 · 비동기 cycle, 역시 take로 제한</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -118,8 +115,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: cycle through traffic-light colors and take the first 8.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 신호등 색을 순환시켜 앞의 8개를 가져와 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -136,11 +133,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="range.html"><code>range</code></a> — a finite counting sequence ·
-    <a href="repeat.html"><code>repeat</code></a> — repeat a single value, a fixed number of times ·
-    <a href="take.html"><code>take</code></a> — the bound cycle almost always needs ·
-    <a href="concurrent.html"><code>concurrent</code></a> — overlap an async cycle's work
+    <strong>관련 함수:</strong>
+    <a href="range.html"><code>range</code></a> — 유한한 수 세기 시퀀스 ·
+    <a href="repeat.html"><code>repeat</code></a> — 하나의 값을 정해진 횟수만큼 반복합니다 ·
+    <a href="take.html"><code>take</code></a> — cycle에 거의 언제나 필요한 제한 ·
+    <a href="concurrent.html"><code>concurrent</code></a> — 비동기 cycle의 작업을 겹쳐 실행합니다
   </div>
 
   <nav class="tut-nav">

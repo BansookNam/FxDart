@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>matches — FxDart 101</title>
-  <meta name="description" content="FxDart matches tutorial: the curried, filter-ready predicate form of isMatch.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/matches.html">
+  <meta name="description" content="FxDart matches 튜토리얼 — isMatch를 커링해 filter에 바로 넘길 수 있는 술어 형태로 만듭니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/matches.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/matches.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/matches.html">
@@ -43,31 +42,30 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 9 · 객체(Map) 함수 › <strong>matches</strong></p>
   <h1><code>matches</code></h1>
-  <p class="hero-sub">Curried <code>isMatch</code>: bind a pattern once, get back a reusable predicate.</p>
+  <p class="hero-sub">커링된 <code>isMatch</code> — 패턴을 한 번 묶어 두고 재사용 가능한 술어를 돌려받습니다.</p>
 
   <div class="signature">bool Function(Object? target) matches(Object? pattern)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>isMatch(target, pattern)</code> needs both arguments up front,
-    which makes it awkward to hand to <code>filter</code>, <code>find</code>,
-    <code>every</code>, or anywhere else that wants a single-argument
-    <code>bool Function(A)</code>. <code>matches(pattern)</code> closes over
-    the pattern and returns exactly that shape:
-    <code>matches(pattern)(target) == isMatch(target, pattern)</code>. Build
-    the predicate once, reuse it across a whole pipeline.
+    <code>isMatch(target, pattern)</code>은 두 인자를 한꺼번에 받아야 해서
+    <code>filter</code>, <code>find</code>, <code>every</code>처럼 인자 하나짜리
+    <code>bool Function(A)</code>를 원하는 자리에 넘기기가 불편합니다.
+    <code>matches(pattern)</code>은 패턴을 클로저로 감싸 바로 그 형태를
+    반환합니다.
+    <code>matches(pattern)(target) == isMatch(target, pattern)</code>이 성립하죠.
+    술어를 한 번 만들어 두고 파이프라인 전체에서 재사용하세요.
   </p>
   <p>
-    This is FxDart's version of currying for a two-argument function where
-    Dart can't infer a general curry — see the deprecated top-level
-    <code>curry</code> if you're curious why a generic version doesn't
-    exist — but a purpose-built curried form like this one works great.
+    Dart에서는 범용 커링을 타입 추론으로 표현할 수 없기 때문에, FxDart는 이렇게
+    두 인자 함수마다 커링 형태를 따로 제공합니다 — 왜 범용 버전이 없는지
+    궁금하다면 deprecated된 최상위 <code>curry</code>를 보세요 — 대신 이처럼
+    목적에 맞게 만든 커링 형태는 아주 잘 동작합니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -81,7 +79,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Dropping straight into filter/find</h2>
+  <h2>데모 2 · filter/find에 그대로 끼워 넣기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -102,8 +100,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>matches</code> to build a predicate for <code>{'active': true}</code> and filter <code>users</code> with it.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>matches</code>로 <code>{'active': true}</code>에 대한 술어를 만들어 <code>users</code>를 걸러 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -123,11 +121,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="isMatch.html"><code>isMatch</code></a> — the two-argument function this curries ·
-    <a href="filter.html"><code>filter</code></a> — the most common place to plug this in ·
-    <a href="find.html"><code>find</code></a> — grab just the first match ·
-    <a href="predicates.html"><code>predicates</code></a> — more ready-made, filter-friendly checks
+    <strong>관련 함수:</strong>
+    <a href="isMatch.html"><code>isMatch</code></a> — 이 함수가 커링하는 두 인자 버전 ·
+    <a href="filter.html"><code>filter</code></a> — 가장 자주 끼워 넣게 되는 자리 ·
+    <a href="find.html"><code>find</code></a> — 첫 번째로 일치하는 값만 얻기 ·
+    <a href="predicates.html"><code>predicates</code></a> — 곧바로 쓸 수 있는 다른 검사 함수들
   </div>
 
   <nav class="tut-nav">

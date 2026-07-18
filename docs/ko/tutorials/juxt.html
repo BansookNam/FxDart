@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>juxt — FxDart 101</title>
-  <meta name="description" content="FxDart juxt tutorial: apply several functions to the same value and collect all the results, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/juxt.html">
+  <meta name="description" content="FxDart juxt 튜토리얼 — 같은 값에 여러 함수를 적용해 결과를 한꺼번에 모으는 방법을 라이브 플레이그라운드로 익혀 봅니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/juxt.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/juxt.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/juxt.html">
@@ -43,32 +42,29 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 10 · 함수 유틸리티 › <strong>juxt</strong></p>
   <h1><code>juxt</code></h1>
-  <p class="hero-sub">Applies every function in a list to the same value and collects the results.</p>
+  <p class="hero-sub">리스트에 담긴 모든 함수를 같은 값에 적용하고 그 결과를 모읍니다.</p>
 
   <div class="signature">List&lt;R&gt; Function(T a) juxt&lt;T, R&gt;(List&lt;R Function(T a)&gt; fns)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    Give <code>juxt</code> a list of functions that all accept the same
-    input, and it gives you back one function that runs the input through
-    every one of them and returns a <code>List</code> of the results, in
-    order. It's a compact way to compute several independent views of a
-    single value without repeating yourself.
+    같은 입력을 받는 함수들의 리스트를 <code>juxt</code>에 넘기면, 그 입력을
+    모든 함수에 통과시켜 결과를 순서대로 담은 <code>List</code>를 반환하는
+    함수 하나를 돌려줍니다. 같은 코드를 반복하지 않고도 값 하나에서
+    서로 독립적인 여러 관점을 뽑아내는 간결한 방법입니다.
   </p>
   <p>
-    FxTS's <code>juxt</code> is variadic and can accept functions with
-    different argument counts. Dart has no variadic generics, so FxDart's
-    version takes a single unary function <code>T -&gt; R</code> per entry
-    — still enough to cover the common case of "run these N read-only
-    projections against this one value."
+    FxTS의 <code>juxt</code>는 가변 인자를 받고 인자 개수가 서로 다른 함수도
+    받을 수 있습니다. Dart에는 가변 제네릭이 없어서 FxDart 버전은 항목마다
+    단항 함수 <code>T -&gt; R</code> 하나씩만 받습니다 — 그래도 "이 값 하나에
+    읽기 전용 투영 N개를 돌린다"는 흔한 경우를 감당하기에는 충분합니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
-  <p>The classic example from the dartdoc: computing the min and max of a
-    list in one pass:</p>
+  <h2>데모 1 · 기본</h2>
+  <p>dartdoc에 나오는 전형적인 예제입니다. 리스트의 최솟값과 최댓값을
+    한 번에 계산합니다:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -80,8 +76,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Projecting several fields</h2>
-  <p>Pulling multiple fields out of a record-like <code>Map</code> at once:</p>
+  <h2>데모 2 · 여러 필드 투영하기</h2>
+  <p>레코드 같은 <code>Map</code>에서 여러 필드를 한꺼번에 꺼냅니다:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -106,9 +102,9 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>juxt</code> to compute the <code>sum</code> and
-    <code>average</code> of this list in a single pass.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>juxt</code>로 이 리스트의 <code>sum</code>과
+    <code>average</code>를 한 번에 계산해 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -125,11 +121,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="apply.html"><code>apply</code></a> — call a function with a dynamic argument list ·
-    <a href="cases.html"><code>cases</code></a> — pick one function based on a predicate instead of running them all ·
-    <a href="min.html"><code>min</code></a> / <a href="max.html"><code>max</code></a> — used together in the demo above ·
-    <a href="zip.html"><code>zip</code></a> — combine values from two sequences instead of one
+    <strong>관련 함수:</strong>
+    <a href="apply.html"><code>apply</code></a> — 동적인 인자 목록으로 함수 호출하기 ·
+    <a href="cases.html"><code>cases</code></a> — 전부 실행하는 대신 술어로 함수 하나 고르기 ·
+    <a href="min.html"><code>min</code></a> / <a href="max.html"><code>max</code></a> — 위 데모에서 함께 쓴 함수 ·
+    <a href="zip.html"><code>zip</code></a> — 하나가 아니라 두 시퀀스의 값을 결합하기
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>resolveProps — FxDart 101</title>
-  <meta name="description" content="FxDart resolveProps tutorial: await every value in a Map at once, the map-shaped analogue of Future.wait.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/resolveProps.html">
+  <meta name="description" content="Tutorial de resolveProps en FxDart: espera todos los valores de un Map a la vez, el análogo con forma de mapa de Future.wait.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/resolveProps.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/resolveProps.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/resolveProps.html">
@@ -43,36 +42,35 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 9 · Funciones de objeto (Map) › <strong>resolveProps</strong></p>
   <h1><code>resolveProps</code></h1>
-  <p class="hero-sub">Awaits every value of a <code>Map</code> and returns the resolved <code>Map</code> — the map-shaped analogue of <code>Future.wait</code>.</p>
+  <p class="hero-sub">Espera todos los valores de un <code>Map</code> y devuelve el <code>Map</code> ya resuelto — el análogo con forma de mapa de <code>Future.wait</code>.</p>
 
   <div class="signature">Future&lt;Map&lt;K, V&gt;&gt; resolveProps&lt;K, V&gt;(Map&lt;K, FutureOr&lt;V&gt;&gt; map)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>resolveProps</code> solves a specific, common shape of problem:
-    you have a <code>Map</code> whose values are a mix of plain values and
-    <code>Future</code>s — say, several independent API calls keyed by
-    field name — and you want one <code>Future</code> back for the whole,
-    fully-resolved map.
+    <code>resolveProps</code> resuelve un tipo de problema concreto y muy
+    habitual: tienes un <code>Map</code> cuyos valores son una mezcla de
+    valores normales y <code>Future</code>s —por ejemplo, varias llamadas a API
+    independientes indexadas por nombre de campo— y quieres recibir un único
+    <code>Future</code> con el mapa entero ya resuelto.
   </p>
   <p>
-    Internally it loops over the entries and <code>await</code>s each value
-    in turn, which reads like it should be <em>sequential</em>. In
-    practice, it usually isn't slower than doing them all "at once": a Dart
-    <code>Future</code> starts running the moment it's <em>created</em>, not
-    when it's awaited. So if you build the map with
-    <code>delay(...)</code> or already-in-flight requests as its values —
-    the normal way to call this function — every one of them is already
-    racing by the time <code>resolveProps</code> gets the map; its
-    sequential <code>await</code> loop is just reading off results that are
-    largely ready already, not gating when the work starts. The demo below
-    proves this with a stopwatch.
+    Internamente recorre las entradas y hace <code>await</code> sobre cada
+    valor uno tras otro, lo que parece que debería ser <em>secuencial</em>. En la
+    práctica, normalmente no es más lento que lanzarlos todos "a la vez": en
+    Dart, un <code>Future</code> empieza a ejecutarse en el momento en que se
+    <em>crea</em>, no cuando se espera. Así que si construyes el mapa con
+    <code>delay(...)</code> o con peticiones que ya están en vuelo como valores
+    —la forma habitual de llamar a esta función—, todas ellas ya se están
+    ejecutando cuando <code>resolveProps</code> recibe el mapa; su bucle
+    secuencial de <code>await</code> se limita a leer resultados que en su
+    mayoría ya están listos, no a decidir cuándo empieza el trabajo. La demo de
+    abajo lo demuestra con un cronómetro.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -88,8 +86,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Demo 2 · The futures already overlap</h2>
-  <p>Three 100ms delays, but the whole thing finishes well under 300ms — because they all started together:</p>
+  <h2>Demo 2 · Los futures ya se solapan</h2>
+  <p>Tres esperas de 100 ms, pero el conjunto termina muy por debajo de 300 ms, porque todas arrancaron a la vez:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -109,8 +107,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>resolveProps</code> to await every value in <code>requests</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>resolveProps</code> para esperar todos los valores de <code>requests</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -130,11 +128,11 @@ Future<void> main() async {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="evolve.html"><code>evolve</code></a> — the sync cousin, transforming instead of awaiting ·
-    <a href="concurrent.html"><code>concurrent</code></a> — the iterable-shaped version of "run things together" ·
-    <a href="delay.html"><code>delay &amp; sleep</code></a> — used to build the demo futures ·
-    <a href="fromEntries.html"><code>fromEntries</code></a> — build a Map from scratch
+    <strong>Relacionado:</strong>
+    <a href="evolve.html"><code>evolve</code></a> — el primo síncrono, que transforma en lugar de esperar ·
+    <a href="concurrent.html"><code>concurrent</code></a> — la versión con forma de iterable de "ejecutar cosas a la vez" ·
+    <a href="delay.html"><code>delay &amp; sleep</code></a> — se usan para construir los futures de la demo ·
+    <a href="fromEntries.html"><code>fromEntries</code></a> — construye un Map desde cero
   </div>
 
   <nav class="tut-nav">

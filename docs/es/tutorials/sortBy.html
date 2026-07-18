@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>sortBy — FxDart 101</title>
-  <meta name="description" content="FxDart sortBy tutorial: sort by an extracted key, ascending, always a new list, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/sortBy.html">
+  <meta name="description" content="Tutorial de sortBy en FxDart: ordena de forma ascendente por una clave extraída, siempre en una lista nueva, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/sortBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/sortBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/sortBy.html">
@@ -43,43 +42,42 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>sortBy</strong></p>
   <h1><code>sortBy</code></h1>
-  <p class="hero-sub">Sorts ascending by a key you extract, instead of writing a comparator by hand.</p>
+  <p class="hero-sub">Ordena de forma ascendente por una clave que extraes, en lugar de escribir un comparador a mano.</p>
 
   <div class="signature">List&lt;A&gt; sortBy&lt;A&gt;(Object? Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;List&lt;A&gt;&gt; sortByAsync&lt;A&gt;(Object? Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.sortBy(Object? Function(T a) f)                    // chain (sync) — still lazy, call .toArray()
 Future&lt;List&lt;T&gt;&gt; FxAsync.sortBy(Object? Function(T a) f)     // chain (async) — already a terminal</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>sortBy</code> is <code><a href="sort.html">sort</a></code>'s
-    convenience sibling: instead of writing
-    <code>(a, b) =&gt; a.age.compareTo(b.age)</code> yourself, you give
-    <code>sortBy</code> a key extractor — <code>(a) =&gt; a['age']</code> —
-    and it builds the comparator for you, always ascending, always
-    comparing the extracted keys with <code>Comparable.compare</code>. Under
-    the hood it's literally <code>sort((a, b) =&gt; compare(f(a), f(b)), iterable)</code>.
+    <code>sortBy</code> es el hermano cómodo de
+    <code><a href="sort.html">sort</a></code>: en lugar de escribir tú
+    <code>(a, b) =&gt; a.age.compareTo(b.age)</code>, le das a
+    <code>sortBy</code> un extractor de clave — <code>(a) =&gt; a['age']</code> —
+    y construye el comparador por ti, siempre ascendente, comparando
+    siempre las claves extraídas con <code>Comparable.compare</code>. Por
+    debajo es literalmente <code>sort((a, b) =&gt; compare(f(a), f(b)), iterable)</code>.
   </p>
   <p>
-    Every guarantee from <code>sort</code> carries over unchanged: the
-    result is always a <strong>new</strong> list, never a mutation of the
-    input. And the same chain-form nuance applies too — on the sync
-    <code>Fx</code> chain, <code>.sortBy(f)</code> returns another
-    <code>Fx&lt;T&gt;</code>, so you still need
-    <code><a href="../101/index.html">.toArray()</a></code> to materialize
-    it, while on the <code>FxAsync</code> chain, <code>.sortBy(f)</code> is
-    already a terminal returning <code>Future&lt;List&lt;T&gt;&gt;</code>.
+    Todas las garantías de <code>sort</code> se mantienen sin cambios: el
+    resultado siempre es una lista <strong>nueva</strong>, nunca una mutación de
+    la entrada. Y el mismo matiz de la forma de cadena también se aplica: en la
+    cadena síncrona <code>Fx</code>, <code>.sortBy(f)</code> devuelve otro
+    <code>Fx&lt;T&gt;</code>, así que sigues necesitando
+    <code><a href="../101/index.html">.toArray()</a></code> para materializarlo,
+    mientras que en la cadena <code>FxAsync</code>, <code>.sortBy(f)</code> ya
+    es un terminal que devuelve <code>Future&lt;List&lt;T&gt;&gt;</code>.
   </p>
   <p>
-    If you need descending order, or a multi-key sort, drop back down to
-    <code>sort</code> with an explicit comparator — <code>sortBy</code> only
-    covers the common "ascending by one extracted key" case.
+    Si necesitas orden descendente, o una ordenación por varias claves, vuelve
+    a <code>sort</code> con un comparador explícito — <code>sortBy</code>
+    solo cubre el caso habitual de "ascendente por una clave extraída".
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -103,7 +101,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async — already a terminal</h2>
+  <h2>Demo 2 · Asíncrono — ya es un terminal</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -120,8 +118,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: sort the people <strong>by age</strong>, youngest first.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: ordena a las personas <strong>por edad</strong>, de menor a mayor.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -142,10 +140,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="sort.html"><code>sort</code></a> — the comparator-based form this builds on ·
-    <a href="min.html"><code>min</code></a> · <a href="max.html"><code>max</code></a> — for a single extreme instead of a full ranking ·
-    <a href="pluck.html"><code>pluck</code></a> — extract the same key without sorting
+    <strong>Relacionado:</strong>
+    <a href="sort.html"><code>sort</code></a> — la forma basada en comparador sobre la que se construye ·
+    <a href="min.html"><code>min</code></a> · <a href="max.html"><code>max</code></a> — para un solo extremo en lugar de una ordenación completa ·
+    <a href="pluck.html"><code>pluck</code></a> — extrae la misma clave sin ordenar
   </div>
 
   <nav class="tut-nav">

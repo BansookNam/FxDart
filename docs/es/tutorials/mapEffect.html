@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>mapEffect — FxDart 101</title>
-  <meta name="description" content="FxDart mapEffect tutorial: map used for side effects, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/mapEffect.html">
+  <meta name="description" content="Tutorial de mapEffect en FxDart: map usado por sus efectos secundarios, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/mapEffect.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/mapEffect.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/mapEffect.html">
@@ -43,38 +42,37 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 3 · Transformar › <strong>mapEffect</strong></p>
   <h1><code>mapEffect</code></h1>
-  <p class="hero-sub">Exactly like map — a naming convention for when the function is really there for its side effect.</p>
+  <p class="hero-sub">Idéntico a map — una convención de nombres para cuando la función está ahí por su efecto secundario.</p>
 
   <div class="signature">Iterable&lt;B&gt; mapEffect&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;B&gt; mapEffectAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;R&gt; Fx.mapEffect&lt;R&gt;(R Function(T a) f)        // chain
 FxAsync&lt;R&gt; FxAsync.mapEffect&lt;R&gt;(FutureOr&lt;R&gt; Function(T a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    Look at the source and you'll find <code>mapEffect</code> is literally
-    <code>B mapEffect(f, iterable) =&gt; map(f, iterable);</code> — same
-    function, same laziness, same signature. It exists purely to document
-    <em>intent</em> at the call site: reach for <code>mapEffect</code> when
-    the callback's return value matters less than what it does along the way
-    (writing to a log, saving to a database, incrementing a counter), and
-    reach for <code>map</code> when the return value is the point.
+    Si miras el código fuente verás que <code>mapEffect</code> es literalmente
+    <code>B mapEffect(f, iterable) =&gt; map(f, iterable);</code> — la misma
+    función, la misma pereza, la misma firma. Existe únicamente para
+    documentar la <em>intención</em> en el punto de llamada: usa
+    <code>mapEffect</code> cuando el valor de retorno del callback importa
+    menos que lo que hace por el camino (escribir en un log, guardar en una
+    base de datos, incrementar un contador), y usa <code>map</code> cuando el
+    valor de retorno es lo que buscas.
   </p>
   <p>
-    Because it's a plain alias, everything you know about <code>map</code>
-    carries over unchanged: it is lazy, it composes with
-    <code>.concurrent(n)</code> on the async side, and it has no special
-    error handling of its own. There's no behavioral reason to pick one over
-    the other — it's a readability signal for the next person (often you)
-    reading the pipeline.
+    Al ser un simple alias, todo lo que sabes de <code>map</code> se aplica
+    sin cambios: es perezoso, compone con <code>.concurrent(n)</code> en el
+    lado asíncrono y no tiene ningún manejo de errores propio. No hay ninguna
+    razón de comportamiento para elegir uno u otro — es una señal de
+    legibilidad para quien lea el pipeline después (a menudo, tú mismo).
   </p>
 
-  <h2>Demo 1 · Basics</h2>
-  <p>The callback both records a side effect and returns a transformed value —
-    same shape as <code>map</code>, different intent at the call site:</p>
+  <h2>Demo 1 · Fundamentos</h2>
+  <p>El callback registra un efecto secundario y además devuelve un valor
+    transformado — la misma forma que <code>map</code>, distinta intención en el punto de llamada:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -98,11 +96,11 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency</h2>
+  <h2>Demo 2 · Asíncrono, con concurrencia</h2>
   <p>
-    <code>mapEffectAsync</code> runs on the exact same engine as
-    <code>mapAsync</code>, so <code>.concurrent(n)</code> parallelizes it the
-    same way — handy for "process and persist" pipelines:
+    <code>mapEffectAsync</code> se ejecuta exactamente sobre el mismo motor que
+    <code>mapAsync</code>, así que <code>.concurrent(n)</code> lo paraleliza
+    igual — muy útil para pipelines de "procesar y persistir":
   </p>
   <div class="playground">
 <textarea>
@@ -131,10 +129,10 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>mapEffect</code> to <code>print</code> a
-    <code>'billing $&lt;dollars&gt;'</code> line for each amount while
-    converting cents to dollars.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>mapEffect</code> para hacer <code>print</code> de una
+    línea <code>'billing $&lt;dollars&gt;'</code> por cada importe mientras
+    conviertes céntimos a dólares.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -152,11 +150,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="map.html"><code>map</code></a> — the function mapEffect delegates to ·
-    <a href="peek.html"><code>peek</code></a> — observe without changing the value at all ·
-    <a href="flatMap.html"><code>flatMap</code></a> — map + flatten ·
-    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
+    <strong>Relacionado:</strong>
+    <a href="map.html"><code>map</code></a> — la función en la que delega mapEffect ·
+    <a href="peek.html"><code>peek</code></a> — observar sin cambiar el valor en absoluto ·
+    <a href="flatMap.html"><code>flatMap</code></a> — map + aplanado ·
+    <a href="concurrent.html"><code>concurrent</code></a> — evaluación en paralelo
   </div>
 
   <nav class="tut-nav">

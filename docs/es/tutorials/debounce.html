@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>debounce — FxDart 101</title>
-  <meta name="description" content="FxDart debounce tutorial: delay a function call until things go quiet, with leading edge and cancel(), plus a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/debounce.html">
+  <meta name="description" content="Tutorial de debounce en FxDart: retrasa la llamada a una función hasta que todo se calma, con flanco de subida y cancel(), y playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/debounce.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/debounce.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/debounce.html">
@@ -43,10 +42,9 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 12 · Util › <strong>debounce</strong></p>
   <h1><code>debounce</code></h1>
-  <p class="hero-sub">Delays a function call until wait has passed since the last call — only the trailing call in a burst survives.</p>
+  <p class="hero-sub">Retrasa la llamada a una función hasta que pasa wait desde la última llamada — de una ráfaga solo sobrevive la última.</p>
 
   <div class="signature">Debounced&lt;T&gt; debounce&lt;T&gt;(void Function(T arg) func, Duration wait, {bool leading = false})
 
@@ -55,34 +53,35 @@ class Debounced&lt;T&gt; {
   void cancel();
 }</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>debounce</code> wraps a callback so that repeated calls in quick
-    succession collapse into a single call. Every call restarts a timer of
-    length <code>wait</code>; the wrapped <code>func</code> only actually
-    fires once <code>wait</code> has passed <em>without</em> another call —
-    and it fires with whatever argument was passed in that last call. This is
-    the classic "wait for the user to stop typing before searching" pattern.
+    <code>debounce</code> envuelve un callback para que las llamadas
+    repetidas en rápida sucesión se colapsen en una sola. Cada llamada
+    reinicia un temporizador de duración <code>wait</code>; la función
+    <code>func</code> envuelta solo se dispara de verdad cuando pasa
+    <code>wait</code> <em>sin</em> otra llamada — y lo hace con el argumento
+    que recibió esa última llamada. Es el patrón clásico de "espera a que el
+    usuario deje de teclear antes de buscar".
   </p>
   <p>
-    In JS, FxTS attaches a <code>.cancel()</code> method directly onto the
-    returned function. Dart functions can't carry extra members, so FxDart
-    returns a <code>Debounced&lt;T&gt;</code> instead — a class with a
-    <code>call(T arg)</code> method, which Dart lets you invoke with plain
-    function-call syntax (<code>debounced(arg)</code>) thanks to the
-    <code>call()</code> convention, plus an explicit <code>.cancel()</code> to
-    drop any pending invocation.
+    En JS, FxTS engancha un método <code>.cancel()</code> directamente a la
+    función devuelta. Las funciones de Dart no pueden llevar miembros extra,
+    así que FxDart devuelve un <code>Debounced&lt;T&gt;</code> — una clase con
+    un método <code>call(T arg)</code>, que Dart te deja invocar con sintaxis
+    normal de llamada a función (<code>debounced(arg)</code>) gracias a la
+    convención <code>call()</code>, más un <code>.cancel()</code> explícito
+    para descartar cualquier invocación pendiente.
   </p>
   <p>
-    By default (<code>leading: false</code>), only the <strong>trailing</strong>
-    edge fires — the last call in a burst, after things go quiet. Pass
-    <code>leading: true</code> and the <strong>first</strong> call in a burst
-    fires immediately instead, with every call before the next quiet period
-    suppressed.
+    Por defecto (<code>leading: false</code>) solo se dispara el flanco
+    <strong>de bajada</strong> — la última llamada de la ráfaga, cuando todo
+    se calma. Pasa <code>leading: true</code> y será la
+    <strong>primera</strong> llamada de la ráfaga la que se dispare de
+    inmediato, suprimiendo el resto hasta el siguiente periodo de calma.
   </p>
 
-  <h2>Demo 1 · Trailing edge (the default)</h2>
-  <p>Three rapid calls collapse into one — only the last argument survives:</p>
+  <h2>Demo 1 · Flanco de bajada (el valor por defecto)</h2>
+  <p>Tres llamadas rápidas se colapsan en una — solo sobrevive el último argumento:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -104,10 +103,11 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Leading edge and cancel()</h2>
+  <h2>Demo 2 · Flanco de subida y cancel()</h2>
   <p>
-    <code>leading: true</code> fires immediately and suppresses the rest of
-    the burst; <code>.cancel()</code> drops a pending trailing call entirely:
+    <code>leading: true</code> dispara de inmediato y suprime el resto de la
+    ráfaga; <code>.cancel()</code> descarta por completo una llamada de
+    bajada pendiente:
   </p>
   <div class="playground">
 <textarea>
@@ -138,9 +138,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: wrap <code>save</code> in <code>debounce</code> (100ms wait)
-    so only the final value survives the burst of calls below.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: envuelve <code>save</code> en <code>debounce</code> (100 ms de espera)
+    para que solo sobreviva el valor final de la ráfaga de llamadas de abajo.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -163,11 +163,11 @@ Future<void> main() async {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="throttle.html"><code>throttle</code></a> — fires on a schedule instead of after quiet ·
-    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — building timing demos ·
-    <a href="concurrent.html"><code>concurrent</code></a> — rate-limiting for async pipelines ·
-    <a href="shuffle.html"><code>shuffle</code></a> — seeded randomness
+    <strong>Relacionado:</strong>
+    <a href="throttle.html"><code>throttle</code></a> — se dispara a intervalos regulares en lugar de tras la calma ·
+    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — para montar demos con temporización ·
+    <a href="concurrent.html"><code>concurrent</code></a> — limitar el ritmo de pipelines asíncronos ·
+    <a href="shuffle.html"><code>shuffle</code></a> — aleatoriedad con semilla
   </div>
 
   <nav class="tut-nav">

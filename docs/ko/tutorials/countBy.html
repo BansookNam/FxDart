@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>countBy — FxDart 101</title>
-  <meta name="description" content="FxDart countBy tutorial: tally how many elements map to each computed key, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/countBy.html">
+  <meta name="description" content="FxDart countBy 튜토리얼: 계산된 키별로 원소가 몇 개씩 대응되는지 집계하는 방법을 라이브 플레이그라운드와 함께 배웁니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/countBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/countBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/countBy.html">
@@ -43,40 +42,39 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 7 · 집계 › <strong>countBy</strong></p>
   <h1><code>countBy</code></h1>
-  <p class="hero-sub">Tallies how many elements map to each computed key.</p>
+  <p class="hero-sub">계산된 키별로 원소가 몇 개씩 대응되는지 집계합니다.</p>
 
   <div class="signature">Map&lt;K, int&gt; countBy&lt;A, K&gt;(K Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;Map&lt;K, int&gt;&gt; countByAsync&lt;A, K&gt;(FutureOr&lt;K&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Map&lt;K, int&gt; Fx.countBy&lt;K&gt;(K Function(T a) f)          // chain (sync)
 Future&lt;Map&lt;K, int&gt;&gt; FxAsync.countBy&lt;K&gt;(FutureOr&lt;K&gt; Function(T a) f)  // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>countBy</code> completes the trio with
-    <code><a href="groupBy.html">groupBy</a></code> and
-    <code><a href="indexBy.html">indexBy</a></code>: same idea of pulling the
-    whole pipeline and computing a key per element, but this time it doesn't
-    keep the elements at all — it just increments a counter per key. The
-    result is a <code>Map&lt;K, int&gt;</code>: how many elements produced
-    each key.
+    <code>countBy</code>는
+    <code><a href="groupBy.html">groupBy</a></code>,
+    <code><a href="indexBy.html">indexBy</a></code>와 함께 삼총사를 완성합니다.
+    파이프라인 전체를 끌어당기며 원소마다 키를 계산한다는 발상은 같지만,
+    이번에는 원소를 전혀 보관하지 않고 키별 카운터만 증가시킵니다.
+    결과는 <code>Map&lt;K, int&gt;</code>, 즉 각 키를 만들어 낸 원소가
+    몇 개인지입니다.
   </p>
   <p>
-    Think of the three as answering different questions about the same
-    grouping: <code>groupBy</code> — "give me every element for this key",
-    <code>indexBy</code> — "give me the last element for this key", and
-    <code>countBy</code> — "how many elements had this key?" If all you need
-    is the tally, <code>countBy</code> is cheaper than
-    <code>groupBy(...).map((k, v) =&gt; MapEntry(k, v.length))</code> since it
-    never allocates the intermediate lists.
+    이 셋은 같은 그룹화에 대해 서로 다른 질문에 답한다고 생각하면 됩니다.
+    <code>groupBy</code>는 "이 키에 해당하는 원소를 전부 달라",
+    <code>indexBy</code>는 "이 키의 마지막 원소를 달라",
+    <code>countBy</code>는 "이 키를 가진 원소가 몇 개냐"입니다.
+    집계만 필요하다면 <code>countBy</code>가
+    <code>groupBy(...).map((k, v) =&gt; MapEntry(k, v.length))</code>보다
+    저렴합니다. 중간 리스트를 전혀 할당하지 않기 때문입니다.
   </p>
   <p>
-    As always, it's a terminal — nothing upstream runs until <code>countBy</code> pulls it.
+    늘 그렇듯 종결 연산자입니다 — <code>countBy</code>가 값을 끌어당기기 전까지 상류에서는 아무 일도 일어나지 않습니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -94,7 +92,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>데모 2 · 비동기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -111,8 +109,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: count how many votes each candidate received.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 각 후보가 몇 표를 받았는지 세어 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -129,10 +127,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="groupBy.html"><code>groupBy</code></a> — keeps every element instead of just a count ·
-    <a href="indexBy.html"><code>indexBy</code></a> — keeps the last element instead of a count ·
-    <a href="size.html"><code>size</code></a> — a total count with no key at all
+    <strong>관련 함수:</strong>
+    <a href="groupBy.html"><code>groupBy</code></a> — 개수 대신 모든 원소를 보관합니다 ·
+    <a href="indexBy.html"><code>indexBy</code></a> — 개수 대신 마지막 원소를 보관합니다 ·
+    <a href="size.html"><code>size</code></a> — 키 없이 전체 개수만 셉니다
   </div>
 
   <nav class="tut-nav">

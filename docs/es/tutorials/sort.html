@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>sort — FxDart 101</title>
-  <meta name="description" content="FxDart sort tutorial: comparator-based sorting that always returns a new list, never mutates, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/sort.html">
+  <meta name="description" content="Tutorial de sort en FxDart: ordenación basada en comparador que siempre devuelve una lista nueva y nunca muta, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/sort.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/sort.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/sort.html">
@@ -43,10 +42,9 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>sort</strong></p>
   <h1><code>sort</code></h1>
-  <p class="hero-sub">Returns a brand-new sorted list from a comparator — it never mutates its input.</p>
+  <p class="hero-sub">Devuelve una lista ordenada completamente nueva a partir de un comparador — nunca muta su entrada.</p>
 
   <div class="signature">List&lt;A&gt; sort&lt;A&gt;(int Function(A a, A b) f, Iterable&lt;A&gt; iterable)
 List&lt;A&gt; toSorted&lt;A&gt;(int Function(A a, A b) f, Iterable&lt;A&gt; iterable)   // alias of sort
@@ -54,40 +52,40 @@ Future&lt;List&lt;A&gt;&gt; sortAsync&lt;A&gt;(int Function(A a, A b) f, FxAsync
 Fx&lt;T&gt; Fx.sort(int Function(T a, T b) f)                    // chain (sync) — still lazy, call .toArray()
 Future&lt;List&lt;T&gt;&gt; FxAsync.sort(int Function(T a, T b) f)     // chain (async) — already a terminal</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>sort</code> takes a standard Dart comparator — return negative if
-    <code>a</code> should come before <code>b</code>, positive if after, zero
-    if tied — and produces a sorted result. The important difference from
-    JavaScript's (and FxTS's) <code>Array.prototype.sort</code> is that
-    FxDart's <code>sort</code> <strong>never mutates its input</strong>. It
-    always allocates a new <code>List</code> (<code>List.of(iterable)..sort(f)</code>),
-    leaving the original iterable exactly as it was. FxTS later added
-    <code>toSorted</code> as the non-mutating alternative to its mutating
-    <code>sort</code>; in FxDart, <code>toSorted</code> is simply an alias —
-    since <code>sort</code> was already non-mutating, there was nothing left
-    to differentiate.
+    <code>sort</code> recibe un comparador estándar de Dart — devuelve negativo si
+    <code>a</code> debe ir antes que <code>b</code>, positivo si va después, cero
+    si empatan — y produce un resultado ordenado. La diferencia importante con
+    <code>Array.prototype.sort</code> de JavaScript (y de FxTS) es que el
+    <code>sort</code> de FxDart <strong>nunca muta su entrada</strong>. Siempre
+    crea una <code>List</code> nueva (<code>List.of(iterable)..sort(f)</code>),
+    dejando el iterable original tal cual estaba. FxTS añadió más tarde
+    <code>toSorted</code> como alternativa no mutante a su <code>sort</code>
+    mutante; en FxDart, <code>toSorted</code> es simplemente un alias —
+    como <code>sort</code> ya era no mutante, no quedaba nada
+    que diferenciar.
   </p>
   <p>
-    There's a nuance on the <strong>chain</strong> form worth calling out
-    explicitly: on the sync <code>Fx</code> chain, <code>.sort(f)</code>
-    returns another <code>Fx&lt;T&gt;</code> — not a <code>List&lt;T&gt;</code> —
-    because <code>Fx</code> wraps its underlying sorted list to stay
-    chainable. You still need a terminal like
-    <code><a href="../101/index.html">.toArray()</a></code> to get a
-    concrete <code>List</code> out of it. The <strong>async</strong> chain
-    doesn't have that wrinkle: <code>FxAsync.sort(f)</code> is already a
-    terminal that returns <code>Future&lt;List&lt;T&gt;&gt;</code> directly,
-    because <code>FxAsync</code> can't return itself from something that
-    needs to <code>await</code> the whole pipeline first.
+    Hay un matiz en la forma de <strong>cadena</strong> que conviene señalar
+    explícitamente: en la cadena síncrona <code>Fx</code>, <code>.sort(f)</code>
+    devuelve otro <code>Fx&lt;T&gt;</code> — no una <code>List&lt;T&gt;</code> —
+    porque <code>Fx</code> envuelve la lista ordenada subyacente para seguir
+    siendo encadenable. Sigues necesitando un terminal como
+    <code><a href="../101/index.html">.toArray()</a></code> para obtener una
+    <code>List</code> concreta. La cadena <strong>asíncrona</strong> no tiene
+    esa peculiaridad: <code>FxAsync.sort(f)</code> ya es un
+    terminal que devuelve <code>Future&lt;List&lt;T&gt;&gt;</code> directamente,
+    porque <code>FxAsync</code> no puede devolverse a sí mismo desde algo que
+    necesita hacer <code>await</code> de todo el pipeline primero.
   </p>
   <p>
-    Reach for <code><a href="sortBy.html">sortBy</a></code> instead when you
-    just want to sort by a key you extract, rather than writing the
-    comparator yourself.
+    Recurre a <code><a href="sortBy.html">sortBy</a></code> en su lugar cuando
+    solo quieras ordenar por una clave que extraes, en vez de escribir el
+    comparador tú mismo.
   </p>
 
-  <h2>Demo 1 · Basics, no mutation, and toSorted</h2>
+  <h2>Demo 1 · Fundamentos, sin mutación, y toSorted</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -112,7 +110,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async — already a terminal</h2>
+  <h2>Demo 2 · Asíncrono — ya es un terminal</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -130,8 +128,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: sort the numbers in <strong>descending</strong> order.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: ordena los números en orden <strong>descendente</strong>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -148,10 +146,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="sortBy.html"><code>sortBy</code></a> — sort by an extracted key instead of a comparator ·
-    <a href="reverse.html"><code>reverse</code></a> — flip element order without comparing ·
-    <a href="partition.html"><code>partition</code></a> — split into two lists by a predicate
+    <strong>Relacionado:</strong>
+    <a href="sortBy.html"><code>sortBy</code></a> — ordena por una clave extraída en lugar de un comparador ·
+    <a href="reverse.html"><code>reverse</code></a> — invierte el orden de los elementos sin comparar ·
+    <a href="partition.html"><code>partition</code></a> — divide en dos listas según un predicado
   </div>
 
   <nav class="tut-nav">

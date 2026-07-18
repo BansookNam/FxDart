@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>compact — FxDart 101</title>
-  <meta name="description" content="FxDart compact tutorial: drop nulls and narrow the element type, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/compact.html">
+  <meta name="description" content="Tutorial de compact en FxDart: descarta los null y estrecha el tipo del elemento, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/compact.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/compact.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/compact.html">
@@ -43,39 +42,38 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 4 · Filtrado &amp; deduplicación › <strong>compact</strong></p>
   <h1><code>compact</code></h1>
-  <p class="hero-sub">Filters out null and narrows the element type from <code>T?</code> to <code>T</code> at the same time.</p>
+  <p class="hero-sub">Filtra los null y, a la vez, estrecha el tipo del elemento de <code>T?</code> a <code>T</code>.</p>
 
   <div class="signature">Iterable&lt;A&gt; compact&lt;A&gt;(Iterable&lt;A?&gt; iterable)
 FxAsyncIterable&lt;A&gt; compactAsync&lt;A&gt;(FxAsyncIterable&lt;A?&gt; iterable)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>compact</code> takes an <code>Iterable&lt;A?&gt;</code> and
-    returns an <code>Iterable&lt;A&gt;</code> — every <code>null</code> is
-    dropped, and the type checker knows it: nothing downstream needs a
-    null check anymore. This is the FxDart equivalent of FxTS's
-    <code>compact</code>, which drops all six JS falsy values
+    <code>compact</code> toma un <code>Iterable&lt;A?&gt;</code> y
+    devuelve un <code>Iterable&lt;A&gt;</code> — cada <code>null</code>
+    desaparece, y el verificador de tipos lo sabe: nada de lo que venga
+    después necesita ya comprobar null. Este es el equivalente en FxDart del
+    <code>compact</code> de FxTS, que descarta los seis valores falsy de JS
     (<code>undefined</code>, <code>null</code>, <code>0</code>,
-    <code>''</code>, <code>NaN</code>, <code>false</code>). Dart has no
-    single "falsy" concept, so the port only removes <code>null</code> —
-    a deliberate, narrower behavior that's easy to reason about.
+    <code>''</code>, <code>NaN</code>, <code>false</code>). Dart no tiene un
+    concepto único de "falsy", así que el port solo elimina <code>null</code> —
+    un comportamiento deliberadamente más estrecho y fácil de razonar.
   </p>
   <p>
-    It shows up constantly after <a href="pluck.html"><code>pluck</code></a>
-    or any lookup that returns <code>T?</code>: <code>compact(pluck(key, records))</code>
-    gives you a clean, non-nullable list in one step.
+    Aparece constantemente después de <a href="pluck.html"><code>pluck</code></a>
+    o de cualquier búsqueda que devuelva <code>T?</code>: <code>compact(pluck(key, records))</code>
+    te da una lista limpia y no nullable en un solo paso.
   </p>
   <p>
-    There is <strong>no chain method</strong> for <code>compact</code> —
-    only the data-first top-level function and its async counterpart exist.
-    Call it directly, or wrap the result with <code>fx(...)</code> /
-    <code>fxAsync(...)</code> to keep chaining.
+    <strong>No hay método de cadena</strong> para <code>compact</code> —
+    solo existen la función de nivel superior data-first y su contraparte asíncrona.
+    Llámala directamente, o envuelve el resultado con <code>fx(...)</code> /
+    <code>fxAsync(...)</code> para seguir encadenando.
   </p>
 
-  <h2>Demo 1 · Basics &amp; type narrowing</h2>
+  <h2>Demo 1 · Fundamentos &amp; estrechamiento de tipos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -96,7 +94,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, with concurrency</h2>
+  <h2>Demo 2 · Asíncrono, con concurrencia</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -120,8 +118,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>compact</code> to drop the nulls from
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>compact</code> para descartar los null de
     <code>answers</code>.</p>
   <div class="playground">
 <textarea>
@@ -139,11 +137,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="pluck.html"><code>pluck</code></a> — a common source of nullable values ·
-    <a href="reject.html"><code>reject</code></a> — drop by arbitrary predicate ·
-    <a href="../tutorials/compactObject.html"><code>compactObject</code></a> — the Map-keyed equivalent ·
-    <a href="uniq.html"><code>uniq</code></a> — remove duplicates
+    <strong>Relacionado:</strong>
+    <a href="pluck.html"><code>pluck</code></a> — una fuente habitual de valores nullable ·
+    <a href="reject.html"><code>reject</code></a> — descarta según un predicado cualquiera ·
+    <a href="../tutorials/compactObject.html"><code>compactObject</code></a> — el equivalente para Map ·
+    <a href="uniq.html"><code>uniq</code></a> — elimina duplicados
   </div>
 
   <nav class="tut-nav">

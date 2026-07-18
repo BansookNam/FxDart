@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>keys — FxDart 101</title>
-  <meta name="description" content="FxDart keys tutorial: a lazy Iterable of a Map's keys, ready to feed into a chain.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/keys.html">
+  <meta name="description" content="FxDart keys 튜토리얼: Map의 키를 체인에 바로 흘려보낼 수 있는 지연 Iterable로 얻습니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/keys.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/keys.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/keys.html">
@@ -43,39 +42,37 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 2 · 시퀀스 생성 › <strong>keys</strong></p>
   <h1><code>keys</code></h1>
-  <p class="hero-sub">The keys of a Map, as a plain lazy Iterable — ready to wrap in fx() and chain.</p>
+  <p class="hero-sub">Map의 키를 평범한 지연 Iterable로 — fx()로 감싸 바로 체이닝할 수 있습니다.</p>
 
   <div class="signature">Iterable&lt;K&gt; keys&lt;K, V&gt;(Map&lt;K, V&gt; map)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>keys(map)</code> is a thin, FxTS-flavored wrapper around Dart's
-    own <code>map.keys</code> — it exists mainly so the object-function
-    vocabulary (<code>entries</code>, <code>keys</code>, <code>values</code>)
-    reads consistently and slots straight into <code>fx()</code>. Dart's
-    <code>Map.keys</code> is already a lazy view, so <code>keys</code>
-    doesn't add any extra buffering — it just hands you the same lazy
-    <code>Iterable&lt;K&gt;</code>.
+    <code>keys(map)</code>은 Dart의 <code>map.keys</code>를 FxTS 스타일로
+    얇게 감싼 것입니다 — 객체 관련 함수 어휘(<code>entries</code>,
+    <code>keys</code>, <code>values</code>)를 일관되게 읽히도록 하고
+    <code>fx()</code>에 자연스럽게 끼워 넣기 위해 존재하죠. Dart의
+    <code>Map.keys</code>는 이미 지연 뷰이므로 <code>keys</code>가 별도의
+    버퍼링을 더하지는 않습니다 — 동일한 지연
+    <code>Iterable&lt;K&gt;</code>를 그대로 건네줄 뿐입니다.
   </p>
   <p>
-    Reach for it when you want to filter, transform, or collect a Map's key
-    set using the rest of the chain vocabulary, rather than reaching for
-    <code>.where()</code>/<code>.toList()</code> on <code>map.keys</code>
-    directly — the two are equivalent, but <code>fx(keys(map))</code> reads
-    naturally next to <code>fx(values(map))</code> and
-    <code>fx(entries(map))</code>.
+    <code>map.keys</code>에 <code>.where()</code>/<code>.toList()</code>를
+    직접 붙이는 대신, 나머지 체인 어휘로 Map의 키 집합을 필터링하거나
+    변환하거나 모으고 싶을 때 꺼내 쓰세요 — 둘은 동등하지만
+    <code>fx(keys(map))</code>은 <code>fx(values(map))</code>,
+    <code>fx(entries(map))</code> 옆에 나란히 두었을 때 훨씬 자연스럽게
+    읽힙니다.
   </p>
   <p>
-    If you need the keys <em>and</em> values together, use
-    <code>entries</code> instead — pulling <code>keys</code> and
-    <code>values</code> separately does not guarantee they line up if the
-    underlying map were mutated between the two calls.
+    키와 값이 <em>함께</em> 필요하다면 <code>entries</code>를 쓰세요 —
+    <code>keys</code>와 <code>values</code>를 따로 꺼내면 두 호출 사이에
+    원본 Map이 변경됐을 때 서로 짝이 맞는다는 보장이 없습니다.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>데모 1 · 기본</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -92,7 +89,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Filtering a Map by its keys</h2>
+  <h2>데모 2 · 키로 Map 필터링하기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -109,9 +106,9 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>keys</code> and <code>sort</code> to get an
-    alphabetically sorted list of item names.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>keys</code>와 <code>sort</code>로 아이템 이름을
+    알파벳순으로 정렬한 목록을 만들어 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -129,11 +126,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="entries.html"><code>entries</code></a> — keys and values paired together ·
-    <a href="values.html"><code>values</code></a> — the values of a Map ·
-    <a href="pick.html"><code>pick</code></a> — build a new Map from a subset of keys ·
-    <a href="fx.html"><code>fx</code></a> — the chain keys results feed into
+    <strong>관련 항목:</strong>
+    <a href="entries.html"><code>entries</code></a> — 키와 값을 쌍으로 함께 ·
+    <a href="values.html"><code>values</code></a> — Map의 값 ·
+    <a href="pick.html"><code>pick</code></a> — 키의 부분집합으로 새 Map 만들기 ·
+    <a href="fx.html"><code>fx</code></a> — keys의 결과가 흘러 들어가는 체인
   </div>
 
   <nav class="tut-nav">

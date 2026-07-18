@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>predicates — FxDart 101</title>
-  <meta name="description" content="FxDart type predicates: isNull, isBoolean, isNumber, isString, isDate, isList, isMap, and friends, as filter-friendly tear-offs.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/predicates.html">
+  <meta name="description" content="Predicados de tipo de FxDart: isNull, isBoolean, isNumber, isString, isDate, isList, isMap y compañía, listos para usar con filter.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/predicates.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/predicates.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/predicates.html">
@@ -43,10 +42,9 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 8 · Acceso &amp; predicados › <strong>predicates</strong></p>
   <h1><code>predicates</code></h1>
-  <p class="hero-sub">A small family of type/value checks, kept around as tear-off-friendly functions for <code>filter</code>, <code>takeWhile</code>, and friends.</p>
+  <p class="hero-sub">Una pequeña familia de comprobaciones de tipo y de valor, disponibles como funciones que se pasan tal cual a <code>filter</code>, <code>takeWhile</code> y compañía.</p>
 
   <div class="signature">bool isNull(Object? a)
 bool isNotNull(Object? a)
@@ -58,32 +56,32 @@ bool isDate(Object? a)
 bool isList(Object? a)
 bool isMap(Object? a)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    In everyday Dart you'd just write <code>a is String</code> — that's
-    idiomatic, and nothing here replaces it. These functions exist for one
-    specific reason: Dart's <code>is</code> operator can't be torn off as a
-    first-class function value, but <code>filter</code>, <code>takeWhile</code>,
-    <code>find</code>, and friends all want a <code>bool Function(A)</code>.
-    <code>filter(isString, mixedList)</code> reads better than
-    <code>filter((a) => a is String, mixedList)</code>, and that's the whole
-    point of this page.
+    En Dart del día a día escribirías simplemente <code>a is String</code>: es
+    lo idiomático y nada de aquí lo sustituye. Estas funciones existen por un
+    motivo muy concreto: el operador <code>is</code> de Dart no se puede pasar
+    como valor de función, pero <code>filter</code>, <code>takeWhile</code>,
+    <code>find</code> y compañía esperan un <code>bool Function(A)</code>.
+    <code>filter(isString, mixedList)</code> se lee mejor que
+    <code>filter((a) => a is String, mixedList)</code>, y de eso va toda esta
+    página.
   </p>
   <p>
-    <code>isNil</code> is a straight port of FxTS's "is <code>null</code> or
-    <code>undefined</code>" check — since Dart collapses both into
-    <code>null</code>, it's byte-for-byte identical to <code>isNull</code>.
-    Three more names exist purely for FxTS parity and are marked
-    <code>@Deprecated</code>: <code>isUndefined</code> (there's no
-    <code>undefined</code> in Dart, so it's just <code>isNull</code>),
-    <code>isArray</code> (JS <code>Array</code> → Dart <code>List</code>, so
-    it's <code>isList</code>), and <code>isObject</code> (JS plain object →
-    Dart <code>Map</code>, so it's <code>isMap</code>). Reach for the
-    non-deprecated name in new code; the aliases are there so ported call
-    sites still compile.
+    <code>isNil</code> es un port directo de la comprobación "es
+    <code>null</code> o <code>undefined</code>" de FxTS; como Dart colapsa
+    ambos en <code>null</code>, es idéntica byte a byte a <code>isNull</code>.
+    Existen tres nombres más solo por paridad con FxTS, marcados como
+    <code>@Deprecated</code>: <code>isUndefined</code> (en Dart no hay
+    <code>undefined</code>, así que es <code>isNull</code> a secas),
+    <code>isArray</code> (el <code>Array</code> de JS → <code>List</code> en
+    Dart, así que es <code>isList</code>) e <code>isObject</code> (el objeto
+    plano de JS → <code>Map</code> en Dart, así que es <code>isMap</code>). En
+    código nuevo usa el nombre no obsoleto; los alias están ahí para que las
+    llamadas portadas sigan compilando.
   </p>
 
-  <h2>Demo 1 · Filter-friendly tear-offs</h2>
+  <h2>Demo 1 · Predicados listos para filtrar</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -103,7 +101,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · <code>isNil</code> and the deprecated aliases</h2>
+  <h2>Demo 2 · <code>isNil</code> y los alias obsoletos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -120,8 +118,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>isNotNull</code> to filter the <code>null</code> out of <code>row</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>isNotNull</code> para filtrar el <code>null</code> de <code>row</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -138,11 +136,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="filter.html"><code>filter</code></a> — the usual place these get plugged in ·
-    <a href="isEmpty.html"><code>isEmpty</code></a> — a value-based check, not a type check ·
-    <a href="compact.html"><code>compact</code></a> — drop nulls from an iterable ·
-    <a href="matches.html"><code>matches</code></a> — a predicate for shape, not type
+    <strong>Relacionado:</strong>
+    <a href="filter.html"><code>filter</code></a> — el sitio habitual donde se enchufan ·
+    <a href="isEmpty.html"><code>isEmpty</code></a> — una comprobación de valor, no de tipo ·
+    <a href="compact.html"><code>compact</code></a> — descarta los nulos de un iterable ·
+    <a href="matches.html"><code>matches</code></a> — un predicado de forma, no de tipo
   </div>
 
   <nav class="tut-nav">

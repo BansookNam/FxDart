@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>take — FxDart 101</title>
-  <meta name="description" content="FxDart take tutorial: pull the first n values off any lazy pipeline — even an infinite one — with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/take.html">
+  <meta name="description" content="Tutorial de take en FxDart: toma los primeros n valores de cualquier pipeline perezoso, incluso de uno infinito, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/take.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/take.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/take.html">
@@ -43,37 +42,36 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 5 · Segmentación › <strong>take</strong></p>
   <h1><code>take</code></h1>
-  <p class="hero-sub">Returns a lazy iterable of the first <code>length</code> values from a source.</p>
+  <p class="hero-sub">Devuelve un iterable perezoso con los primeros <code>length</code> valores de una fuente.</p>
 
   <div class="signature">Iterable&lt;A&gt; take&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; takeAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.take(int count)        // chain
 FxAsync&lt;T&gt; FxAsync.take(int count)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>take</code> is how a lazy pipeline stays finite. It stops pulling
-    from its source the moment it has yielded <code>length</code> values —
-    the upstream never sees more requests than that. Because FxDart sources
-    like <code>range</code>, <code>repeat</code>, and <code>cycle</code> can
-    be infinite, <code>take</code> is often the only thing that makes a
-    pipeline safe to run at all.
+    <code>take</code> es lo que mantiene finito a un pipeline perezoso. Deja de
+    pedir valores a su fuente en cuanto ha emitido <code>length</code> valores:
+    aguas arriba nunca recibe más peticiones que esas. Dado que fuentes de
+    FxDart como <code>range</code>, <code>repeat</code> y <code>cycle</code>
+    pueden ser infinitas, muchas veces <code>take</code> es lo único que hace
+    que un pipeline sea seguro de ejecutar.
   </p>
   <p>
-    It comes as a data-first function (<code>take(n, iterable)</code>) and as
-    a chain method (<code>fx(iterable).take(n)</code>). On the async side,
-    <code>takeAsync</code>/<code>.take()</code> is a pass-through: it doesn't
-    serialize the upstream, so a <code>concurrent(n)</code> further up the
-    chain keeps overlapping its pulls right up until <code>take</code> has
-    what it needs.
+    Viene como función data-first (<code>take(n, iterable)</code>) y como método
+    de cadena (<code>fx(iterable).take(n)</code>). En el lado asíncrono,
+    <code>takeAsync</code>/<code>.take()</code> es transparente: no serializa lo
+    que hay aguas arriba, así que un <code>concurrent(n)</code> más arriba en la
+    cadena sigue solapando sus peticiones hasta que <code>take</code> tiene lo
+    que necesita.
   </p>
 
-  <h2>Demo 1 · Basics, and taking from an infinite source</h2>
-  <p><code>cycle</code> repeats its input forever — without
-    <code>take</code>, iterating it would never finish:</p>
+  <h2>Demo 1 · Fundamentos, y tomar de una fuente infinita</h2>
+  <p><code>cycle</code> repite su entrada para siempre; sin
+    <code>take</code>, iterarlo no terminaría nunca:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -89,11 +87,11 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, still overlapping under concurrent</h2>
+  <h2>Demo 2 · Asíncrono, y sigue solapando bajo concurrent</h2>
   <p>
-    Only 4 values are ever pulled here, but <code>concurrent(3)</code>
-    upstream still evaluates them 3-at-a-time — <code>take</code> doesn't
-    force everything sequential:
+    Aquí solo se piden 4 valores, pero el <code>concurrent(3)</code> de aguas
+    arriba los sigue evaluando de 3 en 3 — <code>take</code> no obliga a que
+    todo sea secuencial:
   </p>
   <div class="playground">
 <textarea>
@@ -117,8 +115,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: take only the first 3 names from the queue.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: toma solo los 3 primeros nombres de la cola.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -135,11 +133,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="takeRight.html"><code>takeRight</code></a> — last n instead of first n ·
-    <a href="takeWhile.html"><code>takeWhile</code></a> — take by predicate ·
-    <a href="range.html"><code>range</code></a> · <a href="cycle.html"><code>cycle</code></a> — infinite sources ·
-    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
+    <strong>Relacionado:</strong>
+    <a href="takeRight.html"><code>takeRight</code></a> — los últimos n en vez de los primeros n ·
+    <a href="takeWhile.html"><code>takeWhile</code></a> — tomar según un predicado ·
+    <a href="range.html"><code>range</code></a> · <a href="cycle.html"><code>cycle</code></a> — fuentes infinitas ·
+    <a href="concurrent.html"><code>concurrent</code></a> — evaluación en paralelo
   </div>
 
   <nav class="tut-nav">

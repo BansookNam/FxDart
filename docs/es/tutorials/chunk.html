@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>chunk — FxDart 101</title>
-  <meta name="description" content="FxDart chunk tutorial: batch a lazy iterable into fixed-size lists, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/chunk.html">
+  <meta name="description" content="Tutorial de chunk en FxDart: agrupa un iterable perezoso en listas de tamaño fijo, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/chunk.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/chunk.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/chunk.html">
@@ -43,34 +42,34 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 5 · Segmentación › <strong>chunk</strong></p>
   <h1><code>chunk</code></h1>
-  <p class="hero-sub">Returns a lazy iterable of lists, each holding up to <code>size</code> consecutive elements.</p>
+  <p class="hero-sub">Devuelve un iterable perezoso de listas, cada una con hasta <code>size</code> elementos consecutivos.</p>
 
   <div class="signature">Iterable&lt;List&lt;A&gt;&gt; chunk&lt;A&gt;(int size, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;List&lt;A&gt;&gt; chunkAsync&lt;A&gt;(int size, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;List&lt;T&gt;&gt; Fx.chunk(int size)        // chain
 FxAsync&lt;List&lt;T&gt;&gt; FxAsync.chunk(int size)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>chunk</code> batches a flat sequence into fixed-size groups —
-    dealing cards into hands, paginating a result set, sending work to a
-    downstream API in batches of <code>n</code>. It buffers just
-    <code>size</code> elements at a time before yielding each list, so it
-    stays lazy and memory-bounded even over a huge source; only the final
-    chunk is allowed to come up short, if the source doesn't divide evenly.
+    <code>chunk</code> agrupa una secuencia plana en bloques de tamaño fijo:
+    repartir cartas en manos, paginar un conjunto de resultados, enviar
+    trabajo a una API en lotes de <code>n</code>. Solo mantiene en memoria
+    <code>size</code> elementos a la vez antes de emitir cada lista, así que
+    sigue siendo perezoso y de memoria acotada incluso sobre una fuente
+    enorme; únicamente el último chunk puede quedarse corto, si la fuente no
+    se divide de forma exacta.
   </p>
   <p>
-    The async version, <code>chunkAsync</code>, awaits <code>size</code>
-    elements before producing each chunk — pair it with
-    <code>.concurrent(n)</code> upstream to fill a chunk's worth of async
-    work concurrently.
+    La versión asíncrona, <code>chunkAsync</code>, espera <code>size</code>
+    elementos antes de producir cada chunk; combínala con
+    <code>.concurrent(n)</code> aguas arriba para resolver de forma
+    concurrente el trabajo asíncrono de un chunk entero.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
-  <p>10 items chunked by 3 leaves a shorter final chunk:</p>
+  <h2>Demo 1 · Fundamentos</h2>
+  <p>10 elementos troceados de 3 en 3 dejan un último chunk más corto:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -86,7 +85,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -103,8 +102,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: deal the cards into hands of 3.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: reparte las cartas en manos de 3.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -121,10 +120,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="slice.html"><code>slice</code></a> — a single arbitrary window instead of repeated batches ·
-    <a href="split.html"><code>split</code></a> — group by separator instead of fixed size ·
-    <a href="transpose.html"><code>transpose</code></a> — flip rows and columns of already-chunked data
+    <strong>Relacionado:</strong>
+    <a href="slice.html"><code>slice</code></a> — una única ventana arbitraria en lugar de lotes repetidos ·
+    <a href="split.html"><code>split</code></a> — agrupa por separador en lugar de por tamaño fijo ·
+    <a href="transpose.html"><code>transpose</code></a> — intercambia filas y columnas de datos ya troceados
   </div>
 
   <nav class="tut-nav">

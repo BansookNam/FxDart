@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>omit — FxDart 101</title>
-  <meta name="description" content="FxDart omit tutorial: return a copy of a Map without the given keys, leaving the original untouched.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/omit.html">
+  <meta name="description" content="Tutorial de omit en FxDart: devuelve una copia de un Map sin las claves indicadas, dejando el original intacto.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/omit.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/omit.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/omit.html">
@@ -43,29 +42,28 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 9 · Funciones de objeto (Map) › <strong>omit</strong></p>
   <h1><code>omit</code></h1>
-  <p class="hero-sub">Returns a copy of a <code>Map</code> without the given keys.</p>
+  <p class="hero-sub">Devuelve una copia de un <code>Map</code> sin las claves indicadas.</p>
 
   <div class="signature">Map&lt;K, V&gt; omit&lt;K, V&gt;(Iterable&lt;K&gt; keysToOmit, Map&lt;K, V&gt; map)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>omit</code> builds a brand-new <code>Map</code> containing every
-    entry of the original <em>except</em> the keys you list — the source
-    map is never mutated. Keys in <code>keysToOmit</code> that don't
-    actually exist in the map are simply ignored; there's no error for
-    "extra" keys to remove.
+    <code>omit</code> construye un <code>Map</code> completamente nuevo con todas
+    las entradas del original <em>excepto</em> las claves que enumeres — el mapa
+    de origen nunca se muta. Las claves de <code>keysToOmit</code> que no existen
+    realmente en el mapa se ignoran sin más; no da error por indicar claves
+    "de sobra" para eliminar.
   </p>
   <p>
-    It's a common redaction/serialization tool: strip a password hash before
-    logging a user object, drop an internal field before sending a response,
-    and so on. Pair it with <code>map()</code> to redact a whole list of
-    maps at once.
+    Es una herramienta habitual para ocultar datos y serializar: quitar el hash de la
+    contraseña antes de registrar en el log un objeto de usuario, descartar un campo interno
+    antes de enviar una respuesta, y cosas así. Combínalo con <code>map()</code>
+    para censurar de golpe una lista entera de mapas.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -78,7 +76,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Redacting a whole list</h2>
+  <h2>Demo 2 · Censurar una lista entera</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -98,8 +96,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>omit</code> to drop the <code>'debug'</code> key from <code>config</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>omit</code> para descartar la clave <code>'debug'</code> de <code>config</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -116,11 +114,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="pick.html"><code>pick</code></a> — the inverse: keep only some keys ·
-    <a href="omitBy.html"><code>omitBy</code></a> — drop by predicate instead of key list ·
-    <a href="compactObject.html"><code>compactObject</code></a> — drop null-valued keys ·
-    <a href="fromEntries.html"><code>fromEntries</code></a> — build a Map from scratch
+    <strong>Relacionado:</strong>
+    <a href="pick.html"><code>pick</code></a> — el inverso: conservar solo algunas claves ·
+    <a href="omitBy.html"><code>omitBy</code></a> — descartar por predicado en vez de por lista de claves ·
+    <a href="compactObject.html"><code>compactObject</code></a> — descartar las claves con valor null ·
+    <a href="fromEntries.html"><code>fromEntries</code></a> — construir un Map desde cero
   </div>
 
   <nav class="tut-nav">

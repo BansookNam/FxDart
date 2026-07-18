@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>concurrentPool — FxDart 101</title>
-  <meta name="description" content="FxDart concurrentPool tutorial: a fixed-size pool of in-flight requests that yields results in completion order, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/concurrentPool.html">
+  <meta name="description" content="FxDart concurrentPool 튜토리얼: 고정 크기 풀로 요청을 진행시키면서 완료 순서대로 결과를 내보내는 방법을 라이브 플레이그라운드와 함께 다룹니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/concurrentPool.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/concurrentPool.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/concurrentPool.html">
@@ -43,40 +42,37 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 11 · 비동기 &amp; 동시성 › <strong>concurrentPool</strong></p>
   <h1><code>concurrentPool</code></h1>
-  <p class="hero-sub">Like concurrent, but yields results in completion order — whichever finishes first comes out first.</p>
+  <p class="hero-sub">concurrent와 같지만 결과를 완료 순서대로 내보냅니다 — 먼저 끝난 것이 먼저 나옵니다.</p>
 
   <div class="signature">FxAsyncIterable&lt;A&gt; concurrentPoolAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
 FxAsync&lt;T&gt; FxAsync.concurrentPool(int length)        // chain</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>concurrentPool(n)</code> keeps up to <code>n</code> requests in
-    flight against the upstream source, exactly like <code>concurrent(n)</code>
-    — but it hands results back to you in the order they <strong>complete</strong>,
-    not the order they started in. Think of it as a worker pool: as soon as
-    one slot frees up, the next pending item is launched into it, and
-    whichever finishes first is yielded first. This matches FxTS's
-    <code>concurrentPool</code> and is the right tool when you don't care
-    which result came from which input — you just want to react to results as
-    soon as each one is ready (e.g. updating a progress list as each fetch
-    lands), rather than blocking on the slowest one to preserve order.
+    <code>concurrentPool(n)</code>은 <code>concurrent(n)</code>과 똑같이 상류
+    소스에 대해 최대 <code>n</code>개의 요청을 진행 상태로 유지합니다. 다만
+    결과를 돌려주는 순서가 시작한 순서가 아니라 <strong>완료</strong> 순서라는
+    점이 다릅니다. 워커 풀을 떠올리면 됩니다. 슬롯이 하나 비는 즉시 대기 중인
+    다음 항목이 그 자리에 투입되고, 먼저 끝난 것이 먼저 나옵니다. FxTS의
+    <code>concurrentPool</code>과 동일한 동작이며, 어떤 결과가 어떤 입력에서
+    나왔는지는 중요하지 않고 그저 준비되는 대로 결과에 반응하고 싶을 때
+    (예: 각 fetch가 도착할 때마다 진행 목록을 갱신할 때) 적합합니다. 순서를
+    지키려고 가장 느린 항목을 기다릴 필요가 없습니다.
   </p>
   <p>
-    Unlike <code>concurrent</code>, which is driven by the downstream demand
-    marker, <code>concurrentPool</code> <strong>eagerly keeps its pool
-    full</strong>: from the first pull onward it holds up to <code>n</code>
-    requests in flight no matter how many consumers are waiting. Even a
-    one-pull-at-a-time terminal like <code>.toArray()</code> or
-    <code>.each()</code> gets the full overlap — and sees results in the
-    order they finish.
+    하류의 요구 마커에 의해 구동되는 <code>concurrent</code>와 달리,
+    <code>concurrentPool</code>은 <strong>적극적으로 풀을 가득 채웁니다</strong>.
+    첫 pull부터 소비자가 몇 개를 기다리든 상관없이 최대 <code>n</code>개의
+    요청을 계속 진행 상태로 유지합니다. 그래서 <code>.toArray()</code>나
+    <code>.each()</code>처럼 한 번에 하나씩만 당겨 가는 종결 연산자도 온전한
+    중첩 실행 효과를 얻으며, 결과는 끝나는 순서대로 보게 됩니다.
   </p>
 
-  <h2>Demo 1 · Completion order</h2>
-  <p>Item 1 is slowest (300ms) and item 2 is fastest (100ms) — the result
-    comes out fastest-first, straight from <code>.toArray()</code>:</p>
+  <h2>데모 1 · 완료 순서</h2>
+  <p>항목 1이 가장 느리고(300ms) 항목 2가 가장 빠릅니다(100ms). 결과는
+    <code>.toArray()</code>에서 곧바로 빠른 것부터 나옵니다.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -97,9 +93,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Contrast with concurrent</h2>
-  <p>Same delays, same pool size of 3 — the only difference is which order
-    the results land in:</p>
+  <h2>데모 2 · concurrent와의 비교</h2>
+  <p>지연 시간도 같고 풀 크기도 3으로 같습니다. 차이는 오직 결과가 도착하는
+    순서뿐입니다.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -132,10 +128,10 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: this pool size of 1 processes items one at a time, in launch
-    order. Bump it to 3 so all three race at once, and watch the printed
-    order switch to completion order.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 풀 크기가 1인 이 코드는 항목을 시작 순서대로 하나씩 처리합니다.
+    3으로 올려 세 개가 동시에 경쟁하게 만들고, 출력 순서가 완료 순서로
+    바뀌는 것을 확인해 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -163,11 +159,11 @@ Future<void> main() async {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="concurrent.html"><code>concurrent</code></a> — order-preserving variant ·
-    <a href="toAsync.html"><code>toAsync</code></a> — the pull-based model this relies on ·
-    <a href="streams.html">Stream bridges</a> — apply concurrentPool before toStream() ·
-    <a href="debounce.html"><code>debounce</code></a> — rate-limiting for callbacks
+    <strong>관련 함수:</strong>
+    <a href="concurrent.html"><code>concurrent</code></a> — 순서를 보존하는 변형 ·
+    <a href="toAsync.html"><code>toAsync</code></a> — 이 동작이 기반으로 삼는 pull 기반 모델 ·
+    <a href="streams.html">Stream 브리지</a> — toStream() 앞에 concurrentPool 적용하기 ·
+    <a href="debounce.html"><code>debounce</code></a> — 콜백에 대한 호출 빈도 제한
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>toAsync — FxDart 101</title>
-  <meta name="description" content="FxDart toAsync tutorial: lift a plain Iterable into an FxAsyncIterable and understand the pull-based async model, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/toAsync.html">
+  <meta name="description" content="FxDart toAsync 튜토리얼: 평범한 Iterable을 FxAsyncIterable로 끌어올리고 pull 기반 비동기 모델을 이해하는 방법을 라이브 플레이그라운드와 함께 다룹니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/toAsync.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/toAsync.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/toAsync.html">
@@ -43,50 +42,51 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 11 · 비동기 &amp; 동시성 › <strong>toAsync</strong></p>
   <h1><code>toAsync</code></h1>
-  <p class="hero-sub">Lifts a plain Iterable — of values or Futures — into an FxAsyncIterable, the entry point to FxDart's async pipeline.</p>
+  <p class="hero-sub">값이든 Future든, 평범한 Iterable을 FxDart 비동기 파이프라인의 출발점인 FxAsyncIterable로 끌어올립니다.</p>
 
   <div class="signature">FxAsyncIterable&lt;T&gt; toAsync&lt;T&gt;(Iterable&lt;FutureOr&lt;T&gt;&gt; iterable)
 FxAsync&lt;T&gt; Fx.toAsync&lt;T&gt;()        // chain, on a sync Fx</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    Every async pipeline in FxDart starts with <code>toAsync</code>. It takes
-    a plain <code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code> — a list of plain
-    values, a list of Futures, or a mix — and wraps it in an
-    <code>FxAsyncIterable</code>, the type every <code>*Async</code> operator
-    and the <code>FxAsync</code> chain understand. Whenever an element turns
-    out to be a <code>Future</code>, it's awaited automatically as it's pulled.
+    FxDart의 모든 비동기 파이프라인은 <code>toAsync</code>에서 시작합니다.
+    평범한 <code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code> — 값의 리스트든,
+    Future의 리스트든, 둘이 섞여 있든 — 를 받아서 모든 <code>*Async</code>
+    연산자와 <code>FxAsync</code> 체인이 이해하는 타입인
+    <code>FxAsyncIterable</code>로 감쌉니다. 원소가 <code>Future</code>인 경우에는
+    끌어당기는 시점에 자동으로 await됩니다.
   </p>
   <p>
-    <code>FxAsyncIterable</code> is <strong>pull-based</strong>: nothing runs
-    until a terminal (<code>toArrayAsync</code>, <code>eachAsync</code>, the
-    <code>FxAsync</code> chain's <code>.toArray()</code>, …) calls
-    <code>next()</code> on it, one step at a time — exactly like a plain
-    <code>Iterable</code>, just asynchronous. This is a deliberate departure
-    from Dart's <code>Stream</code>, which is <em>push</em>-based: once a
-    stream starts emitting, it decides the pace, and there's no way for a
-    downstream consumer to tell it "evaluate 3 of these at once." FxDart's
-    <code>next([Concurrent? concurrent])</code> protocol adds exactly that
-    back-channel — a downstream operator like <code>concurrent(n)</code> can
-    pass a marker <em>upstream</em> through every pull, asking the source to
-    run <code>n</code> items in parallel. Streams have no equivalent hook, which
-    is the whole reason FxDart defines its own async iterable instead of
-    building on <code>Stream</code>.
+    <code>FxAsyncIterable</code>은 <strong>pull 기반</strong>입니다. 종결
+    연산자(<code>toArrayAsync</code>, <code>eachAsync</code>,
+    <code>FxAsync</code> 체인의 <code>.toArray()</code> 등)가
+    <code>next()</code>를 호출하기 전까지는 아무것도 실행되지 않고, 한 번에 한
+    단계씩만 진행됩니다 — 평범한 <code>Iterable</code>과 똑같되 비동기라는
+    점만 다릅니다. 이는 Dart의 <code>Stream</code>과 의도적으로 갈라지는
+    지점입니다. 스트림은 <em>push</em> 기반이라, 일단 값을 내보내기 시작하면
+    스스로 페이스를 정하며, 하류 소비자가 "이 중 3개를 한 번에 평가해 달라"고
+    말할 방법이 없습니다. FxDart의
+    <code>next([Concurrent? concurrent])</code> 프로토콜이 바로 그 역채널을
+    더해 줍니다. <code>concurrent(n)</code> 같은 하류 연산자가 매 pull마다
+    마커를 <em>상류</em>로 실어 보내 소스에게 <code>n</code>개를 병렬로 실행하라고
+    요청할 수 있습니다. 스트림에는 이에 해당하는 훅이 없으며, FxDart가
+    <code>Stream</code> 위에 얹는 대신 자체 비동기 이터러블을 정의한 이유도
+    오로지 이것입니다.
   </p>
   <p>
-    Use the top-level <code>toAsync(iterable)</code> for a raw
-    <code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code>, or the chain method
-    <code>fx(iterable).toAsync()</code> to switch an existing <code>Fx</code>
-    chain into its <code>FxAsync</code> counterpart. Both are lazy: building
-    the pipeline does nothing until something pulls.
+    날것의 <code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code>에는 최상위 함수
+    <code>toAsync(iterable)</code>을, 이미 만들어 둔 <code>Fx</code> 체인을
+    <code>FxAsync</code> 체인으로 전환할 때는 체인 메서드
+    <code>fx(iterable).toAsync()</code>를 쓰세요. 둘 다 지연 평가되므로,
+    파이프라인을 구성하는 것만으로는 무엇도 실행되지 않고 누군가 값을 끌어당겨야
+    비로소 움직입니다.
   </p>
 
-  <h2>Demo 1 · Values, Futures, and the chain form</h2>
-  <p><code>toAsync</code> accepts plain values, Futures, or a mix of both —
-    and the chain form does the same thing from an existing <code>Fx</code>:</p>
+  <h2>데모 1 · 값, Future, 그리고 체인 형태</h2>
+  <p><code>toAsync</code>는 평범한 값도, Future도, 둘이 섞인 것도 받습니다 —
+    체인 형태는 이미 있는 <code>Fx</code>에서 같은 일을 합니다.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -112,14 +112,14 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Why the pull-based model matters</h2>
+  <h2>데모 2 · pull 기반 모델이 중요한 이유</h2>
   <p>
-    In Dart, a <code>Future</code> starts running the instant it's created —
-    not when it's awaited. So three Futures built eagerly in a list literal
-    are already racing before <code>toAsync</code> ever touches them. Contrast
-    that with <code>mapAsync</code> (or chain <code>.map</code>), which creates
-    one new Future per element only when it's <em>pulled</em> — lazily, one at
-    a time, unless you add <code>concurrent(n)</code>:
+    Dart에서 <code>Future</code>는 await하는 시점이 아니라 생성되는 즉시
+    실행을 시작합니다. 그래서 리스트 리터럴 안에서 미리 만들어진 Future 세 개는
+    <code>toAsync</code>가 손대기도 전에 이미 함께 달리고 있습니다. 반면
+    <code>mapAsync</code>(또는 체인의 <code>.map</code>)는 원소를 실제로
+    <em>끌어당길 때</em> 비로소 원소마다 새 Future를 하나씩 만듭니다 —
+    <code>concurrent(n)</code>을 붙이지 않는 한, 지연 평가로 하나씩 말이죠.
   </p>
   <div class="playground">
 <textarea>
@@ -153,9 +153,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: filter the list below so only passing scores (&gt;= 60) make
-    it into the result.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 아래 리스트를 필터링해서 합격 점수(&gt;= 60)만 결과에 남도록
+    해 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -173,11 +173,11 @@ Future<void> main() async {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="asyncVariants.html"><code>*Async</code> naming convention</a> — mapAsync, filterAsync, … ·
-    <a href="streams.html">Stream bridges</a> — fromStream, fxStream, toStream ·
-    <a href="concurrent.html"><code>concurrent</code></a> — the back-channel in action ·
-    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — building async demos
+    <strong>관련 함수:</strong>
+    <a href="asyncVariants.html"><code>*Async</code> 명명 규칙</a> — mapAsync, filterAsync, … ·
+    <a href="streams.html">Stream 브리지</a> — fromStream, fxStream, toStream ·
+    <a href="concurrent.html"><code>concurrent</code></a> — 역채널이 실제로 동작하는 모습 ·
+    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — 비동기 데모 만들기
   </div>
 
   <nav class="tut-nav">

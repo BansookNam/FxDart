@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>pickBy — FxDart 101</title>
-  <meta name="description" content="FxDart pickBy tutorial: keep only Map entries matching a (key, value) predicate.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/pickBy.html">
+  <meta name="description" content="Tutorial de pickBy en FxDart: conserva solo las entradas de un Map que cumplen un predicado sobre (clave, valor).">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/pickBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/pickBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/pickBy.html">
@@ -43,29 +42,29 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 9 · Funciones de objeto (Map) › <strong>pickBy</strong></p>
   <h1><code>pickBy</code></h1>
-  <p class="hero-sub">Returns a copy of a <code>Map</code> with only the entries matching a predicate.</p>
+  <p class="hero-sub">Devuelve una copia de un <code>Map</code> únicamente con las entradas que cumplen un predicado.</p>
 
   <div class="signature">Map&lt;K, V&gt; pickBy&lt;K, V&gt;(bool Function((K, V) entry) f, Map&lt;K, V&gt; map)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>pickBy</code> is <code>omitBy</code>'s mirror, and shares its
-    calling convention: the predicate receives one <code>(K, V)</code>
-    record per entry, so use <code>e.$1</code> for the key and
-    <code>e.$2</code> for the value. Only entries where the predicate
-    returns <code>true</code> survive into the result.
+    <code>pickBy</code> es el espejo de <code>omitBy</code> y comparte su
+    convención de llamada: el predicado recibe un registro
+    <code>(K, V)</code> por entrada, así que usa <code>e.$1</code> para la
+    clave y <code>e.$2</code> para el valor. Solo sobreviven en el
+    resultado las entradas para las que el predicado devuelve
+    <code>true</code>.
   </p>
   <p>
-    A common use: filtering a map of config values or feature flags down to
-    "the ones that matter right now" — active flags, keys with a given
-    prefix, values above a threshold — without hand-writing an
-    entry-by-entry loop.
+    Un uso habitual: reducir un mapa de configuración o de feature flags a
+    "los que importan ahora mismo" — flags activos, claves con un prefijo
+    determinado, valores por encima de un umbral — sin escribir a mano un
+    bucle entrada por entrada.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -77,7 +76,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Filtering by key</h2>
+  <h2>Demo 2 · Filtrar por clave</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -91,8 +90,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: use <code>pickBy</code> to keep only entries whose value is <code>true</code>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: usa <code>pickBy</code> para conservar solo las entradas cuyo valor sea <code>true</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -109,11 +108,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="omitBy.html"><code>omitBy</code></a> — the inverse: drop by predicate ·
-    <a href="pick.html"><code>pick</code></a> — keep by a fixed key list ·
-    <a href="matches.html"><code>matches</code></a> — a ready-made predicate for shape matching ·
-    <a href="compactObject.html"><code>compactObject</code></a> — a specialized "drop nulls" pickBy
+    <strong>Relacionado:</strong>
+    <a href="omitBy.html"><code>omitBy</code></a> — el inverso: descarta por predicado ·
+    <a href="pick.html"><code>pick</code></a> — conserva según una lista fija de claves ·
+    <a href="matches.html"><code>matches</code></a> — un predicado ya hecho para comparar formas ·
+    <a href="compactObject.html"><code>compactObject</code></a> — un pickBy especializado en "descartar nulls"
   </div>
 
   <nav class="tut-nav">
