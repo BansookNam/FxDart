@@ -26,6 +26,7 @@ FILES=(
   "lib/src/strict/access.dart"
   "lib/src/strict/object.dart"
   "lib/src/strict/func.dart"
+  "lib/src/strict/curried.dart"
   "lib/src/strict/predicates.dart"
   "lib/src/util/timing.dart"
   "lib/src/util/shuffle.dart"

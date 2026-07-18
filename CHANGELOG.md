@@ -1,3 +1,9 @@
+## 0.1.3
+
+* Docs site: new tutorials for `curried`/`uncurried` and `createSeededRandom`
+  (previously undocumented), wired into the FxDart 101 course; the playground
+  bundle now includes the currying extensions.
+
 ## 0.1.2
 
 * `.curried` / `.uncurried` extension getters (arity 2–5): a fully typed,

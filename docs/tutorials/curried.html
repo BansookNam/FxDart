@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>curried &amp; uncurried — FxDart 101</title>
+  <meta name="description" content="FxDart curried tutorial: fully typed currying via extension getters — the Dart-native replacement for FxTS curry, with a live playground.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 10 · Function utilities › <strong>curried &amp; uncurried</strong></p>
+  <h1><code>.curried</code> &amp; <code>.uncurried</code></h1>
+  <p class="hero-sub">Fully typed currying as extension getters — the Dart-native replacement for FxTS <code>curry</code>.</p>
+
+  <div class="signature">R Function(B) Function(A) get curried  // on R Function(A, B), up to arity 5
+R Function(A, B) get uncurried        // on R Function(B) Function(A), up to 5 levels</div>
+
+  <h2>Lecture</h2>
+  <p>
+    Currying turns a function of several arguments into a chain of unary
+    functions: <code>add(1, 2)</code> becomes <code>add.curried(1)(2)</code>.
+    The payoff is <strong>partial application</strong> — fixing the first
+    argument yields a new function, which is exactly the shape callbacks like
+    <code>map</code> and <code>filter</code> want.
+  </p>
+  <p>
+    FxTS ships this as a function, <code>curry(f)</code>, built on two things
+    Dart doesn't have: runtime arity reflection (<code>fn.length</code>) and
+    recursive conditional types. FxDart instead declares one extension per
+    arity (2–5), all exposing the same <code>curried</code> getter, and lets
+    the compiler pick the right one from the function's <em>static</em> type.
+    The arity dispatch FxTS does at runtime happens at compile time — and the
+    result is fully typed, with zero casts: <code>add.curried(1)</code>
+    <em>is</em> an <code>int Function(int)</code>.
+  </p>
+  <p>
+    <code>.uncurried</code> is the inverse: it flattens a chain of unary
+    functions back into one multi-argument function. When a chain is nested
+    deeper than two levels, the deepest matching arity wins; apply an
+    extension explicitly (<code>Uncurry2(f).uncurried</code>) to flatten
+    fewer levels. The full design story — including why the getter is named
+    <code>curried</code> and not <code>curry</code> — is in
+    <a href="https://github.com/BansookNam/FxDart/blob/main/WHY_CURRIED.md">WHY_CURRIED.md</a>.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+int add2(int a, int b) => a + b;
+int add3(int a, int b, int c) => a + b + c;
+
+void main() {
+  print(add2.curried(1)(2)); // 3
+  print(add3.curried(1)(2)(3)); // 6
+
+  // Partial application: fixing arguments yields new, fully typed functions.
+  final addTen = add2.curried(10); // int Function(int)
+  print(addTen(5)); // 15
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Partial application in a pipeline</h2>
+  <p>
+    A curried binary function slots straight into <code>map</code> — no
+    wrapper closure needed:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+int multiply(int a, int b) => a * b;
+String echoTimes(String s, int times) => s * times;
+
+void main() {
+  print(fx([1, 2, 3]).map(multiply.curried(10)).toArray()); // [10, 20, 30]
+
+  print(fx([1, 2, 3]).map(echoTimes.curried('na')).toArray());
+  // [na, nana, nanana]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 3 · Round trip with <code>uncurried</code></h2>
+  <p>
+    Hand-written curried closures flatten back to the data-first shape, and
+    <code>curried</code> / <code>uncurried</code> are exact inverses:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+int add3(int a, int b, int c) => a + b + c;
+
+void main() {
+  // A hand-written 2-level closure, flattened.
+  final greet = (String greeting) => (String name) => '$greeting, $name!';
+  print(greet.uncurried('Hello', 'FxDart')); // Hello, FxDart!
+
+  // Round trip: the deepest matching arity wins, so the whole chain flattens.
+  print(add3.curried.uncurried(1, 2, 3)); // 6
+
+  // Explicit extension application flattens fewer levels.
+  final partial = Uncurry2(add3.curried).uncurried; // (a, b) => c => int
+  print(partial(1, 2)(3)); // 6
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>.curried</code> to build a <code>clampTo100</code>
+    function from <code>clamp</code> below, then map it over the list.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+int clamp(int max, int value) => value > max ? max : value;
+
+void main() {
+  // TODO: derive clampTo100 from clamp with .curried
+  final clampTo100 = clamp.curried(100);
+
+  print(fx([50, 99, 150, 300]).map(clampTo100).toArray());
+  // [50, 99, 100, 100]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Note:</strong> the chain is strictly unary — FxTS's mixed
+    application <code>add(1, 2)(3)</code> has no equivalent. Named/optional
+    parameters and values typed as bare <code>Function</code> don't match the
+    extensions; write a closure there. The deprecated top-level
+    <code>curry</code> stub remains only to steer FxTS migrations here.
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="pipe.html"><code>pipe</code></a> — composition, the main consumer of partially applied functions ·
+    <a href="identity.html"><code>identity</code></a> &amp; <a href="always.html"><code>always</code></a> — other function-shape helpers ·
+    <a href="apply.html"><code>apply</code></a> — spread a list into positional arguments
+  </div>
+
+  <nav class="tut-nav">
+    <a href="unicodeToArray.html">← Previous: unicodeToArray</a>
+    <a href="toAsync.html">Next: toAsync →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>
