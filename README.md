@@ -1,18 +1,148 @@
-# Welcome to Nav 👋
+# fxdart
+
+A functional programming library for Dart, ported from **[FxTS](https://github.com/marpple/FxTS)**.
+Lazy evaluation, concurrent async iteration, and pipeline-style composition — the FxTS
+programming model, rebuilt on Dart's type system.
+
 [![Version](https://img.shields.io/pub/v/fxdart.svg?style=flat-square)](https://pub.dev/packages/fxdart)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache2.0-yellow.svg)](https://github.com/BansookNam/fxdart/blob/main/LICENSE)
 
+## Why fxdart?
 
-Provide Debuggable Functional Program
-
+- **Lazy evaluation** — operators build a pipeline and do no work until a terminal
+  operator runs, so `fx(hugeList).map(f).filter(g).take(3)` only computes 3 results.
+- **Concurrency you can dial** — `concurrent(n)` evaluates the *upstream* chain
+  `n` items at a time while preserving order, turning six 1-second requests into
+  a ~2-second batch with one method call.
+- **Type-safe pipelines** — the `fx()` chain keeps full static typing end to end;
+  sync operators are plain functions over native `Iterable`s, so everything
+  interops with ordinary Dart code.
+- **One mental model for sync and async** — the same operator names work on
+  `Iterable` (sync) and `FxAsyncIterable` (async), with `Stream` bridges in both
+  directions.
 
 ## Install
 
-Add fxdart dependency on your pubspec.yaml file
-
 ```yaml
-fxdart: ^{latest version}
+dependencies:
+  fxdart: ^0.1.0
 ```
+
+## Usage
+
+### Sync pipelines
+
+Sync operators are data-first functions over lazy `Iterable`s; the `fx()` chain
+composes them with full type inference:
+
+```dart
+import 'package:fxdart/fxdart.dart';
+
+fx([1, 2, 3, 4, 5])
+    .map((a) => a + 10)
+    .filter((a) => a % 2 == 0)
+    .toArray(); // [12, 14]
+
+// Equivalent with top-level functions:
+toArray(filter((a) => a % 2 == 0, map((a) => a + 10, [1, 2, 3, 4, 5])));
+
+// Laziness: only 3 squares are ever computed.
+fx(range(1, 1000000)).map((a) => a * a).take(3).toArray(); // [1, 4, 9]
+```
+
+### Async pipelines
+
+Async operators work on `FxAsyncIterable<T>` — a pull-based protocol ported from
+FxTS's `AsyncIterable` handling. Lift values in with `toAsync` / `fromStream`
+(or `.toAsync()` on a chain), and out with `.toArray()` / `.toStream()`:
+
+```dart
+await fx([1, 2, 3, 4])
+    .toAsync()
+    .map((a) async => a + 10) // callbacks may be async
+    .filter((a) => a % 2 == 0)
+    .toArray(); // [12, 14]
+
+// Streams bridge both ways.
+await fxStream(Stream.fromIterable([1, 2, 3])).map((a) => a * 2).toArray();
+```
+
+### Concurrency
+
+`concurrent(n)` is FxTS's signature feature, ported faithfully: a concurrency
+marker travels *backwards* through the pipeline's iterator protocol, so the
+upstream chain evaluates `n` items at once while results stay in order.
+
+```dart
+// 6 requests of 1s complete in ~2s instead of ~6s.
+await fx([1, 2, 3, 4, 5, 6])
+    .toAsync()
+    .map((id) => fetchUser(id))
+    .concurrent(3)
+    .toArray();
+```
+
+`concurrentPool(n)` is the completion-order variant (faster first results, no
+ordering guarantee). This back-channel protocol is why fxdart has its own
+`FxAsyncIterable` instead of building on push-based `Stream`s, which cannot
+express it.
+
+## API overview
+
+| Category | Functions |
+|---|---|
+| **Generate** | `range`, `repeat`, `cycle`, `entries`, `keys`, `values` |
+| **Transform (lazy)** | `map`, `mapEffect`, `flatMap`, `flat`, `scan`, `scan1`, `peek`, `pluck` |
+| **Filter (lazy)** | `filter`, `reject`, `compact`, `uniq`, `uniqBy`, `difference(By)`, `intersection(By)`, `compress` |
+| **Slice (lazy)** | `take`, `takeRight`, `takeWhile`, `takeUntilInclusive`, `drop`, `dropRight`, `dropWhile`, `dropUntil`, `slice`, `chunk`, `split` |
+| **Combine (lazy)** | `append`, `prepend`, `concat`, `zip`, `zip3`, `zipWith`, `zipWithIndex`, `transpose`, `reverse`, `fork` |
+| **Aggregate** | `reduce`, `fold`, `reduceLazy`, `toArray`, `sum`, `average`, `min`, `max`, `size`, `join`, `groupBy`, `indexBy`, `countBy`, `sort`, `sortBy`, `toSorted`, `partition`, `each`, `consume` |
+| **Access** | `head`, `last`, `nth`, `find`, `findIndex`, `includes`, `isEmpty`, `every`, `some` |
+| **Object (Map)** | `omit`, `pick`, `omitBy`, `pickBy`, `prop`, `props`, `evolve`, `fromEntries`, `compactObject`, `resolveProps`, `isMatch`, `matches` |
+| **Function** | `pipe`, `pipe1`, `pipeLazy`, `identity`, `always`, `tap`, `apply`, `juxt`, `memoize`, `negate`, `not`, `when`, `unless`, `throwError`, `throwIf`, `cases`, `add`, `gt`, `gte`, `lt`, `lte`, `delay`, `sleep`, `unicodeToArray` |
+| **Predicates** | `isNull`, `isNotNull`, `isNil`, `isBoolean`, `isNumber`, `isString`, `isDate`, `isList`, `isMap` |
+| **Async** | every lazy/aggregate operator has an `*Async` twin (`mapAsync`, `toArrayAsync`, ...), plus `toAsync`, `fromStream`, `concurrentAsync`, `concurrentPoolAsync`, `asyncEmpty` |
+| **Util** | `debounce`, `throttle`, `shuffle`, `createSeededRandom` |
+| **Chains** | `fx()` (sync, extends `Iterable`), `fxAsync()`, `fxStream()`; `Fx<num>`/`FxAsync<num>` gain `sum`/`average`/`min`/`max` |
+
+## Differences from FxTS
+
+Dart has no function overloads, variadic generics, or conditional types, so some
+APIs deliberately deviate:
+
+| FxTS | fxdart |
+|---|---|
+| curried data-last (`map(f)` inside `pipe`) | `fx()` chain (typed) or dynamic `pipe(value, [closures])` |
+| one `map` dispatching sync/async | `map` (Iterable) / `mapAsync` (FxAsyncIterable); chains use plain names |
+| `reduce(f, seed, iter)` overload | `fold(seed, f, iter)` (unseeded `reduce(f, iter)` unchanged) |
+| tuples (`zip`, `entries`, `partition`) | Dart records: `(A, B)` |
+| TS objects (`omit`, `pick`, `evolve`, ...) | `Map`-based equivalents |
+| `undefined` | `null` (`head`/`find`/`nth` return `T?`) |
+| `AsyncIterable` / `for await` | `FxAsyncIterable` + `toStream()` / `fromStream()` bridges |
+| variadic `zip`/`juxt`/`cases` | fixed arities (`zip`/`zip3`) or list/record parameters |
+| `curry` | deprecated stub — write closures instead |
+
+Unportable APIs are kept as `@Deprecated` stubs with `//TODO(port)` notes
+(`curry`, `isUndefined`, `isArray`, `isObject`, `takeUntil`) so migrating code
+gets analyzer guidance instead of silent breakage.
+
+## Testing
+
+The FxTS spec suite has been ported alongside the library: **850+ tests**
+covering sync/async behavior, error propagation, laziness, and
+concurrency timing across every operator.
+
+```sh
+dart test
+```
+
+## Acknowledgments
+
+Great thanks to **Indong Yoo**, CTO of [Marpple](https://www.marpple.com), the
+creator of [FxTS](https://github.com/marpple/FxTS) (and FxJS before it), whose
+functional programming model — lazy iteration with first-class, order-preserving
+concurrency — this library ports to Dart. All core ideas, operator semantics,
+and the original test suite come from the
+[marpple/FxTS](https://github.com/marpple/FxTS) repository.
 
 ## Author
 
@@ -24,19 +154,10 @@ fxdart: ^{latest version}
 ## 🤝 Contributing
 
 Contributions, issues and feature requests are welcome!
-
-Feel free to check [issues page](https://github.com/bansooknam/fxdart/issues). You can also take a look at the [contributing guide](Contributions, issues and feature requests are welcome.).
-
-## Show your support
-
-Give a ⭐️ if this project helped you!
-
+Feel free to check the [issues page](https://github.com/bansooknam/fxdart/issues).
 
 ## 📝 License
 
 Copyright © 2023 [Bansook Nam](https://github.com/bansooknam).
 
 This project is [MIT](https://github.com/BansookNam/fxdart/blob/main/LICENSE) licensed.
-
-***
-_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
