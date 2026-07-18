@@ -7,6 +7,7 @@ Lazy evaluation, concurrent async iteration, and pipeline-style composition — 
 programming model, rebuilt on Dart's type system.
 
 [![Version](https://img.shields.io/pub/v/fxdart.svg?style=flat-square)](https://pub.dev/packages/fxdart)
+[![codecov](https://codecov.io/gh/BansookNam/FxDart/branch/main/graph/badge.svg)](https://codecov.io/gh/BansookNam/FxDart)
 
 **📚 Interactive docs: [FxDart 101](https://bansooknam.github.io/FxDart/)** — a
 guided course with a live in-browser playground for every function (served from
@@ -152,6 +153,13 @@ concurrency timing across every operator.
 
 ```sh
 dart test
+```
+
+Coverage is measured on every push and pull request and reported to
+[Codecov](https://app.codecov.io/gh/BansookNam/FxDart). To reproduce locally:
+
+```sh
+dart run coverage:test_with_coverage   # writes coverage/lcov.info
 ```
 
 ## Acknowledgments
