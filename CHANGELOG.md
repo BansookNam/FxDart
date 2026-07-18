@@ -1,3 +1,11 @@
+## 0.2.0
+
+* Comprehensive docs site overhaul: tutorials for `curried`/`uncurried` and
+  `createSeededRandom` now part of the FxDart 101 course with live in-browser
+  playground examples.
+* Logo and branding refresh for docs site.
+* Enhanced playground bundle with full currying extensions support.
+
 ## 0.1.3
 
 * Docs site: new tutorials for `curried`/`uncurried` and `createSeededRandom`
