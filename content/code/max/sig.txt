@@ -1,0 +1,4 @@
+num max(Iterable&lt;num&gt; iterable)
+Future&lt;num&gt; maxAsync(FxAsyncIterable&lt;num&gt; iterable)
+num Fx&lt;num&gt;.max()          // chain (sync)
+Future&lt;num&gt; FxAsync&lt;num&gt;.max()  // chain (async)

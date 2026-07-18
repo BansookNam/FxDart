@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>uniqBy — FxDart 101</title>
+  <meta name="description" content="FxDart uniqBy tutorial: remove duplicates by a computed key, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/uniqBy.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/uniqBy.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/uniqBy.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/uniqBy.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/uniqBy.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/uniqBy.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/uniqBy.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/uniqBy.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/uniqBy.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Inicio</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/uniqBy.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/uniqBy.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/uniqBy.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/uniqBy.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/uniqBy.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/uniqBy.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/uniqBy.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 4 · Filtrado &amp; deduplicación › <strong>uniqBy</strong></p>
+  <h1><code>uniqBy</code></h1>
+  <p class="hero-sub">Removes duplicates as determined by a key function, rather than value equality.</p>
+
+  <div class="signature">Iterable&lt;A&gt; uniqBy&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; uniqByAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.uniqBy&lt;B&gt;(B Function(T a) f)        // chain
+FxAsync&lt;T&gt; FxAsync.uniqBy&lt;B&gt;(FutureOr&lt;B&gt; Function(T a) f)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>uniqBy</code> is <code>uniq</code>'s general form: instead of
+    comparing whole elements, it runs each element through <code>f</code>
+    and keeps only the first element to produce each distinct key. It's the
+    tool for "one row per customer," "one event per type," or dedupe by any
+    field or computed value — <code>uniq</code> itself is just
+    <code>uniqBy((a) =&gt; a, iterable)</code>.
+  </p>
+  <p>
+    As with <code>uniq</code>, it's lazy and order-preserving: the first
+    element for each key wins, and the internal <code>Set&lt;B&gt;</code>
+    of seen keys only grows as you pull.
+  </p>
+  <p>
+    The same async rule applies here as with <code>uniq</code>: put the
+    concurrency in an upstream fetch (<code>.map(...).concurrent(n)</code>),
+    then apply <code>uniqBy</code>/<code>uniqByAsync</code> to the
+    already-resolved, in-order stream.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final people = [
+    {'name': 'kim', 'dept': 'eng'},
+    {'name': 'lee', 'dept': 'eng'},
+    {'name': 'park', 'dept': 'sales'},
+  ];
+
+  // Data-first form: keep the first person seen from each department.
+  final firstPerDept = uniqBy((p) => p['dept'], people);
+  print(toArray(firstPerDept));
+  // [{name: kim, dept: eng}, {name: park, dept: sales}]
+
+  // Chain form: dedupe numbers by their remainder mod 3.
+  final result = fx([1, 4, 2, 7, 9]).uniqBy((a) => a % 3).toArray();
+  print(result); // [1, 2, 9]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with concurrency upstream</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  // Fetch orders concurrently, then keep only the first order per customer.
+  final orders = [
+    {'customer': 'a', 'amount': 10},
+    {'customer': 'b', 'amount': 20},
+    {'customer': 'a', 'amount': 30},
+  ];
+
+  final fetched = fx(orders)
+      .toAsync()
+      .map((o) => delay(Duration(milliseconds: 100), o))
+      .concurrent(3);
+
+  final firstPerCustomer =
+      await fxAsync(uniqByAsync((o) => o['customer'], fetched)).toArray();
+
+  print(firstPerCustomer); // [{customer: a, amount: 10}, {customer: b, amount: 20}]
+  print('took ${sw.elapsedMilliseconds}ms'); // ~100ms
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>uniqBy</code> to keep only the first event of each
+    <code>'type'</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final events = [
+    {'type': 'click', 'id': 1},
+    {'type': 'click', 'id': 2},
+    {'type': 'scroll', 'id': 3},
+  ];
+
+  // TODO: use uniqBy to keep only the first event of each 'type'.
+  final result = fx(events).toArray();
+
+  print(result);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="uniq.html"><code>uniq</code></a> — dedupe by value equality ·
+    <a href="differenceBy.html"><code>differenceBy</code></a> — remove by a computed key against another iterable ·
+    <a href="intersectionBy.html"><code>intersectionBy</code></a> — keep by a computed key shared with another iterable ·
+    <a href="../tutorials/groupBy.html"><code>groupBy</code></a> — keep every element, grouped by key
+  </div>
+
+  <nav class="tut-nav">
+    <a href="uniq.html">← Anterior: uniq</a>
+    <a href="difference.html">Siguiente: difference →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

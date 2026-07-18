@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>zipWithIndex — FxDart 101</title>
+  <meta name="description" content="FxDart zipWithIndex tutorial: pair each element with its 0-based index, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/zipWithIndex.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/zipWithIndex.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/zipWithIndex.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/zipWithIndex.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/zipWithIndex.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/zipWithIndex.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/zipWithIndex.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/zipWithIndex.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/zipWithIndex.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Inicio</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/zipWithIndex.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/zipWithIndex.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/zipWithIndex.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/zipWithIndex.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/zipWithIndex.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/zipWithIndex.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/zipWithIndex.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 6 · Combinar › <strong>zipWithIndex</strong></p>
+  <h1><code>zipWithIndex</code></h1>
+  <p class="hero-sub">Pairs each element with its (0-based) index: <code>(index, value)</code>.</p>
+
+  <div class="signature">Iterable&lt;(int, A)&gt; zipWithIndex&lt;A&gt;(Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;(int, A)&gt; zipWithIndexAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;(int, T)&gt; Fx.zipWithIndex()        // chain
+FxAsync&lt;(int, T)&gt; FxAsync.zipWithIndex()</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>zipWithIndex</code> is <code>zip</code> against an implicit
+    counter: each element comes out paired as <code>(index, value)</code>,
+    counting up from <code>0</code>. It's the lazy-pipeline answer to a
+    manual <code>for (var i = 0; i &lt; list.length; i++)</code> loop — no
+    counter variable to manage, and it composes with the rest of the chain.
+  </p>
+  <p>
+    Because it only needs to track a running counter, <code>zipWithIndex</code>
+    stays lazy and works over an infinite source just as well as a finite
+    one; the async form counts the same way as elements resolve.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(zipWithIndex(['a', 'b', 'c'])); // ((0, a), (1, b), (2, c))
+
+  final result = fx(['x', 'y', 'z']).zipWithIndex().toArray();
+  print(result); // [(0, x), (1, y), (2, z)]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final result = await fx(['a', 'b', 'c'])
+      .toAsync()
+      .map((a) => delay(Duration(milliseconds: 50), a))
+      .zipWithIndex()
+      .toArray();
+
+  print(result); // [(0, a), (1, b), (2, c)]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: pair each runner with their (0-based) finishing position.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final runners = ['ana', 'boo', 'cid'];
+
+  // TODO: pair each runner with their (0-based) finishing position
+  final placements = fx(runners).toArray();
+
+  print(placements);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="zip.html"><code>zip</code></a> — pair two iterables together ·
+    <a href="zipWith.html"><code>zipWith</code></a> — zip and combine in one step ·
+    <a href="entries.html"><code>entries</code></a> — pair Map keys with values
+  </div>
+
+  <nav class="tut-nav">
+    <a href="zipWith.html">← Anterior: zipWith</a>
+    <a href="transpose.html">Siguiente: transpose →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

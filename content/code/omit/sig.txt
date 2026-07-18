@@ -1,0 +1,1 @@
+Map&lt;K, V&gt; omit&lt;K, V&gt;(Iterable&lt;K&gt; keysToOmit, Map&lt;K, V&gt; map)

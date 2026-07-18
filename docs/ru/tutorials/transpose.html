@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>transpose — FxDart 101</title>
+  <meta name="description" content="FxDart transpose tutorial: turn rows into columns for any number of iterables, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/transpose.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/transpose.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/transpose.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/transpose.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/transpose.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/transpose.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/transpose.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/transpose.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/transpose.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Главная</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/transpose.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/transpose.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/transpose.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/transpose.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/transpose.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/transpose.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/transpose.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 6 · Объединение › <strong>transpose</strong></p>
+  <h1><code>transpose</code></h1>
+  <p class="hero-sub">Turns a collection of rows into a collection of columns.</p>
+
+  <div class="signature">Iterable&lt;List&lt;A&gt;&gt; transpose&lt;A&gt;(Iterable&lt;Iterable&lt;A&gt;&gt; rows)
+FxAsyncIterable&lt;List&lt;A&gt;&gt; transposeAsync&lt;A&gt;(Iterable&lt;FxAsyncIterable&lt;A&gt;&gt; rows)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>transpose</code> is <code>zip</code> generalized to <em>any</em>
+    number of iterables: the n-th output list holds the n-th element of
+    every input row that still has one. Where <code>zip</code>/<code>zip3</code>
+    take each row as a separate argument (because Dart can't express
+    variadic generics), <code>transpose</code> takes all the rows as a
+    <strong>single</strong> iterable of iterables —
+    <code>transpose([row1, row2, row3])</code> — so it works for any row
+    count decided at runtime.
+  </p>
+  <p>
+    Unlike <code>zip</code>, which stops as soon as the shortest input runs
+    dry, <code>transpose</code> keeps going as long as <em>any</em> row still
+    has values left — a shorter row just stops contributing to later output
+    lists, which may end up shorter than the row count. It only stops
+    entirely once every row is exhausted.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; ragged rows</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // transpose takes the rows as ONE iterable of iterables:
+  final rows = [
+    [1, 2, 3],
+    [4, 5, 6],
+  ];
+  print(transpose(rows)); // ([1, 4], [2, 5], [3, 6])
+
+  // Ragged rows: once a row runs out it just stops contributing.
+  final ragged = [
+    [1, 2, 3],
+    [4, 5],
+  ];
+  print(transpose(ragged)); // ([1, 4], [2, 5], [3])
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final rowA = fx([1, 2, 3]).toAsync().map((a) => delay(Duration(milliseconds: 50), a));
+  final rowB = fx([4, 5, 6]).toAsync().map((a) => delay(Duration(milliseconds: 50), a));
+
+  final result = await toArrayAsync(transposeAsync([rowA, rowB]));
+  print(result); // [[1, 4], [2, 5], [3, 6]]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: transpose the matrix (rows become columns).</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final matrix = [
+    [1, 2],
+    [3, 4],
+    [5, 6],
+  ];
+
+  // TODO: transpose the matrix (rows become columns)
+  final result = matrix;
+
+  print(result);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="zip.html"><code>zip</code></a> — the two-row special case ·
+    <a href="chunk.html"><code>chunk</code></a> — batch a flat source into rows first ·
+    <a href="reverse.html"><code>reverse</code></a>
+  </div>
+
+  <nav class="tut-nav">
+    <a href="zipWithIndex.html">← Назад: zipWithIndex</a>
+    <a href="reverse.html">Далее: reverse →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>join — FxDart 101</title>
+  <meta name="description" content="FxDart join tutorial: concatenate a pipeline's elements into one string, data-first, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/join.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/join.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/join.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/join.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/join.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/join.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/join.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/join.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/join.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Início</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/join.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/join.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/join.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/join.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/join.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/join.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/join.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 7 · Agregando › <strong>join</strong></p>
+  <h1><code>join</code></h1>
+  <p class="hero-sub">Concatenates every element into one string, with a separator between them.</p>
+
+  <div class="signature">String join&lt;A&gt;(String sep, Iterable&lt;A&gt; iterable)          // data-first: separator FIRST
+Future&lt;String&gt; joinAsync&lt;A&gt;(String sep, FxAsyncIterable&lt;A&gt; iterable)
+String Fx.join([String separator = ''])            // chain (sync, inherited from Iterable)
+Future&lt;String&gt; FxAsync.join([String sep = ','])    // chain (async)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>join</code> is a terminal operator: it pulls the whole pipeline,
+    calling <code>toString()</code> on each element and stitching the results
+    together with <code>sep</code> in between.
+  </p>
+  <p>
+    Pay attention to argument order — the top-level, data-first
+    <code>join</code> puts the <strong>separator first</strong>:
+    <code>join(', ', iterable)</code>. That's the FxTS convention (data-first
+    everywhere), and it's the opposite of Dart's own
+    <code>Iterable.join(separator)</code> method, which takes the iterable
+    as the receiver and the separator as its one argument.
+  </p>
+  <p>
+    That difference bleeds into the chain form in a subtle way: on the
+    <strong>sync</strong> chain, <code>.join(...)</code> is simply Dart's
+    built-in <code>Iterable.join</code>, whose default separator is
+    <code>''</code> (empty) when omitted. But <code>FxAsync.join</code> is
+    written explicitly in FxDart and defaults its separator to
+    <code>','</code> instead — matching FxTS's own default. Don't assume the
+    two chains behave identically when you skip the argument.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; the two defaults</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form: separator comes FIRST, unlike Dart's Iterable.join.
+  print(join(', ', ['a', 'b', 'c'])); // a, b, c
+
+  // Chain form reuses Dart's built-in Iterable.join(separator), whose
+  // default separator is '' (empty), not ',':
+  print(fx([1, 2, 3]).join('-')); // 1-2-3
+  print(fx([1, 2, 3]).join()); // 123
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, and its different default</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // joinAsync collects every value first, then joins them.
+  final csv = await joinAsync(
+      ',',
+      toAsync([
+        delay(const Duration(milliseconds: 100), 'a'),
+        delay(const Duration(milliseconds: 100), 'b'),
+        delay(const Duration(milliseconds: 100), 'c'),
+      ]));
+  print(csv); // a,b,c
+
+  // FxAsync.join defaults its separator to ',' (not '' like the sync chain):
+  final defaulted = await fx(['x', 'y', 'z']).toAsync().join();
+  print(defaulted); // x,y,z
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: join the columns into a single CSV header row, separated by <code>','</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final columns = ['id', 'name', 'email'];
+
+  // TODO: join the columns into a single CSV header row, separated by ','.
+  final header = join(' ', columns);
+
+  print(header);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="sort.html"><code>sort</code></a> — order elements before joining them ·
+    <a href="map.html"><code>map</code></a> — format each element before joining ·
+    <a href="size.html"><code>size</code></a> — the other simple string/count terminal
+  </div>
+
+  <nav class="tut-nav">
+    <a href="size.html">← Anterior: size</a>
+    <a href="groupBy.html">Próximo: groupBy →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

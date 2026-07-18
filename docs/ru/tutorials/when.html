@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>when — FxDart 101</title>
+  <meta name="description" content="FxDart when tutorial: apply a transform only when a predicate holds, otherwise pass the value through, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/when.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/when.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/when.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/when.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/when.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/when.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/when.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/when.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/when.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Главная</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/when.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/when.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/when.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/when.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/when.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/when.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/when.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 10 · Утилиты для функций › <strong>when</strong></p>
+  <h1><code>when</code></h1>
+  <p class="hero-sub">Applies a callback when a predicate holds, otherwise returns the value unchanged.</p>
+
+  <div class="signature">T when&lt;T&gt;(bool Function(T) predicate, T Function(T) callback, T value)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>when(predicate, callback, value)</code> is a single conditional
+    expressed as data: if <code>predicate(value)</code> is true, the result
+    is <code>callback(value)</code>; otherwise the result is <code>value</code>
+    itself, untouched. It reads nicely inside a <code>map</code> callback when
+    you want to transform only the elements that need it and leave the rest alone.
+  </p>
+  <p>
+    FxTS's version can widen the return type to a union <code>T | R</code>
+    when the branches disagree. Dart has no union types, so both the
+    <code>callback</code> branch and the pass-through branch must share the
+    same type <code>T</code> — if you need genuinely different result types,
+    reach for <a href="cases.html"><code>cases</code></a> instead, which
+    allows <code>R</code> to differ from the input type.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(when<int>((n) => n < 0, (n) => -n, -5)); // 5
+  print(when<int>((n) => n < 0, (n) => -n, 5));  // 5 (unchanged)
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Clamping values in a pipeline</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final clamped = fx([-3, 4, -1, 10])
+      .map((n) => when((x) => x < 0, (x) => 0, n))
+      .toArray();
+  print(clamped); // [0, 4, 0, 10]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>when</code> to double only the positive prices,
+    leaving negative ones untouched.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final prices = [10, -5, 20, -1];
+
+  // TODO: use `when` to double only the positive prices
+  final adjusted =
+      fx(prices).map((p) => when((x) => x > 0, (x) => x * 2, p)).toArray();
+
+  print(adjusted); // [20, -5, 40, -1]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="unless.html"><code>unless</code></a> — the inverse-condition sibling of when ·
+    <a href="cases.html"><code>cases</code></a> — multiple predicates, and a differing result type ·
+    <a href="not.html"><code>not</code></a> / <a href="negate.html"><code>negate</code></a> — build the predicate you pass in ·
+    <a href="map.html"><code>map</code></a> — the usual place to use when as a callback
+  </div>
+
+  <nav class="tut-nav">
+    <a href="not.html">← Назад: not</a>
+    <a href="unless.html">Далее: unless →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

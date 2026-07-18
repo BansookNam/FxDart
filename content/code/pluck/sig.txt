@@ -1,0 +1,2 @@
+Iterable&lt;V?&gt; pluck&lt;K, V&gt;(K key, Iterable&lt;Map&lt;K, V&gt;&gt; iterable)
+FxAsyncIterable&lt;V?&gt; pluckAsync&lt;K, V&gt;(K key, FxAsyncIterable&lt;Map&lt;K, V&gt;&gt; iterable)

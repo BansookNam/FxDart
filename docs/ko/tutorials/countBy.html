@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>countBy — FxDart 101</title>
+  <meta name="description" content="FxDart countBy tutorial: tally how many elements map to each computed key, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/countBy.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/countBy.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/countBy.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/countBy.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/countBy.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/countBy.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/countBy.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/countBy.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/countBy.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">홈</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/countBy.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/countBy.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/countBy.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/countBy.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/countBy.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/countBy.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/countBy.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 7 · 집계 › <strong>countBy</strong></p>
+  <h1><code>countBy</code></h1>
+  <p class="hero-sub">Tallies how many elements map to each computed key.</p>
+
+  <div class="signature">Map&lt;K, int&gt; countBy&lt;A, K&gt;(K Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;Map&lt;K, int&gt;&gt; countByAsync&lt;A, K&gt;(FutureOr&lt;K&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Map&lt;K, int&gt; Fx.countBy&lt;K&gt;(K Function(T a) f)          // chain (sync)
+Future&lt;Map&lt;K, int&gt;&gt; FxAsync.countBy&lt;K&gt;(FutureOr&lt;K&gt; Function(T a) f)  // chain (async)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>countBy</code> completes the trio with
+    <code><a href="groupBy.html">groupBy</a></code> and
+    <code><a href="indexBy.html">indexBy</a></code>: same idea of pulling the
+    whole pipeline and computing a key per element, but this time it doesn't
+    keep the elements at all — it just increments a counter per key. The
+    result is a <code>Map&lt;K, int&gt;</code>: how many elements produced
+    each key.
+  </p>
+  <p>
+    Think of the three as answering different questions about the same
+    grouping: <code>groupBy</code> — "give me every element for this key",
+    <code>indexBy</code> — "give me the last element for this key", and
+    <code>countBy</code> — "how many elements had this key?" If all you need
+    is the tally, <code>countBy</code> is cheaper than
+    <code>groupBy(...).map((k, v) =&gt; MapEntry(k, v.length))</code> since it
+    never allocates the intermediate lists.
+  </p>
+  <p>
+    As always, it's a terminal — nothing upstream runs until <code>countBy</code> pulls it.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final grades = ['A', 'B', 'A', 'C', 'B', 'A'];
+
+  // Data-first form: counts how many elements map to each key.
+  print(countBy((g) => g, grades)); // {A: 3, B: 2, C: 1}
+
+  // Chain form:
+  final byParity = fx(range(10)).countBy((a) => a.isEven ? 'even' : 'odd');
+  print(byParity); // {even: 5, odd: 5}
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final visits = ['home', 'docs', 'home', 'home', 'docs'];
+
+  final counts = await fx(visits)
+      .toAsync()
+      .countBy((page) => delay(const Duration(milliseconds: 100), page));
+
+  print(counts); // {home: 3, docs: 2}
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: count how many votes each candidate received.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final votes = ['cat', 'dog', 'cat', 'bird', 'dog', 'cat'];
+
+  // TODO: count how many votes each candidate received.
+  final tally = fx(votes).groupBy((v) => v);
+
+  print(tally);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="groupBy.html"><code>groupBy</code></a> — keeps every element instead of just a count ·
+    <a href="indexBy.html"><code>indexBy</code></a> — keeps the last element instead of a count ·
+    <a href="size.html"><code>size</code></a> — a total count with no key at all
+  </div>
+
+  <nav class="tut-nav">
+    <a href="indexBy.html">← 이전: indexBy</a>
+    <a href="sort.html">다음: sort →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

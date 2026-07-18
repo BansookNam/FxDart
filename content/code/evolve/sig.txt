@@ -1,0 +1,3 @@
+Map&lt;K, Object?&gt; evolve&lt;K&gt;(
+    Map&lt;K, Object? Function(Object? value)&gt; transformations,
+    Map&lt;K, Object?&gt; map)

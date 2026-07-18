@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>every — FxDart 101</title>
+  <meta name="description" content="FxDart every tutorial: check that every element satisfies a predicate, short-circuiting on the first failure, sync and async.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/every.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/every.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/every.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/every.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/every.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/every.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/every.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/every.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/every.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">홈</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/every.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/every.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/every.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/every.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/every.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/every.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/every.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 8 · 접근 &amp; 술어 › <strong>every</strong></p>
+  <h1><code>every</code></h1>
+  <p class="hero-sub">True when every element satisfies a predicate — vacuously true for an empty iterable.</p>
+
+  <div class="signature">bool every&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;bool&gt; everyAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Future&lt;bool&gt; FxAsync.every(FutureOr&lt;bool&gt; Function(T a) f)  // chain (async)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>every</code> scans left to right and bails out — short-circuits —
+    the instant it finds an element that fails the predicate, returning
+    <code>false</code> right there without touching the rest of the
+    iterable. If nothing fails (including the case where there's nothing at
+    all), it returns <code>true</code>: an empty iterable vacuously
+    satisfies "every element is X."
+  </p>
+  <p>
+    On the sync chain there's no dedicated <code>Fx.every</code> — it isn't
+    needed, since <code>Fx</code> already inherits Dart's own
+    <code>Iterable.every</code>, which has exactly this short-circuiting
+    behavior. The async chain does define its own <code>.every()</code>,
+    because it has to <code>await</code> each predicate call.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; short-circuiting</h2>
+  <p>The peek counter stops at 3, not 4 — evaluation halts right at the first failure:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(every((a) => a > 0, [1, 2, 3]));  // true
+  print(every((a) => a > 0, [1, -2, 3])); // false
+  print(every((a) => a > 0, <int>[]));    // true — vacuously true
+
+  var checked = 0;
+  final result = fx([1, 2, -3, 4]).peek((_) => checked++).every((a) => a > 0);
+  print(result);              // false
+  print('checked $checked');  // checked 3 — stopped at the first failure
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final allPassed = await fx([10, 20, 30])
+      .toAsync()
+      .map((a) => delay(Duration(milliseconds: 30), a))
+      .every((a) => a >= 10);
+  print(allPassed); // true
+
+  final anyFailed = await everyAsync(
+      (a) => delay(Duration(milliseconds: 30), a % 2 == 0),
+      fx([2, 4, 5, 8]).toAsync());
+  print(anyFailed); // false
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>every</code> to check whether everyone passed (score &gt;= 60).</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final scores = [82, 91, 76, 88];
+
+  // TODO: use every to check whether everyone passed (score >= 60)
+  final allPassed = false;
+
+  print(allPassed);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="some.html"><code>some</code></a> — the "at least one" counterpart ·
+    <a href="filter.html"><code>filter</code></a> — collect every match instead of a bool ·
+    <a href="find.html"><code>find</code></a> — get the first failing/matching element ·
+    <a href="predicates.html"><code>predicates</code></a> — ready-made predicates to pair with <code>every</code>
+  </div>
+
+  <nav class="tut-nav">
+    <a href="isEmpty.html">← 이전: isEmpty</a>
+    <a href="some.html">다음: some →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

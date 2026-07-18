@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>prop — FxDart 101</title>
+  <meta name="description" content="FxDart prop tutorial: read a single Map key as a tear-off-friendly function, null on a miss.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/prop.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/prop.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/prop.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/prop.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/prop.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/prop.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/prop.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/prop.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/prop.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Inicio</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/prop.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/prop.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/prop.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/prop.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/prop.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/prop.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/prop.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 9 · Funciones de objeto (Map) › <strong>prop</strong></p>
+  <h1><code>prop</code></h1>
+  <p class="hero-sub">Returns the value of a key in a <code>Map</code>, or <code>null</code> when it's missing.</p>
+
+  <div class="signature">V? prop&lt;K, V&gt;(K key, Map&lt;K, V&gt; map)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    On its own, <code>prop('name', user)</code> does exactly what
+    <code>user['name']</code> already does in Dart — a missing key yields
+    <code>null</code> either way. The reason it exists as a function at all
+    is composability: <code>map[key]</code> is an operator, not a value you
+    can pass around, but <code>(m) => prop('name', m)</code> is a plain
+    unary function you can hand to <code>map</code>, <code>juxt</code>,
+    <code>evolve</code>'s callbacks, or anywhere else a
+    <code>Function(Map)</code> is expected.
+  </p>
+  <p>
+    If what you actually want is one field pulled out of a whole <em>list</em>
+    of maps, reach for <a href="pluck.html"><code>pluck</code></a> instead —
+    it's <code>prop</code> already bound to a key and mapped over a
+    collection in one call.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final user = {'id': 1, 'name': 'kim'};
+  print(prop('name', user));  // kim
+  print(prop('email', user)); // null — same as user['email']
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · As a tear-off, vs. <code>pluck</code></h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final users = [
+    {'name': 'kim', 'age': 32},
+    {'name': 'lee', 'age': 27},
+  ];
+
+  final names = fx(users).map((u) => prop('name', u)).toArray();
+  print(names); // [kim, lee]
+
+  print(pluck('name', users).toList()); // [kim, lee] — same result, one call
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>prop</code> to read <code>'theme'</code>, or <code>'light'</code> if it's missing.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final settings = {'theme': 'dark', 'volume': 80};
+
+  // TODO: use prop to read 'theme', or 'light' if missing
+  final theme = 'light';
+
+  print(theme);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="props.html"><code>props</code></a> — read several keys at once ·
+    <a href="pluck.html"><code>pluck</code></a> — <code>prop</code> mapped over a whole list ·
+    <a href="pick.html"><code>pick</code></a> — keep several keys as a Map ·
+    <a href="evolve.html"><code>evolve</code></a> — transform a value in place
+  </div>
+
+  <nav class="tut-nav">
+    <a href="pickBy.html">← Anterior: pickBy</a>
+    <a href="props.html">Siguiente: props →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

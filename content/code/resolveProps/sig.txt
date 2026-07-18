@@ -1,0 +1,1 @@
+Future&lt;Map&lt;K, V&gt;&gt; resolveProps&lt;K, V&gt;(Map&lt;K, FutureOr&lt;V&gt;&gt; map)

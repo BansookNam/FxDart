@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>async variants — FxDart 101</title>
+  <meta name="description" content="FxDart's *Async naming convention: every lazy and aggregate operator has a twin for FxAsyncIterable, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/asyncVariants.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/asyncVariants.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/asyncVariants.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/asyncVariants.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/asyncVariants.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/asyncVariants.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/asyncVariants.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/asyncVariants.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/asyncVariants.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Главная</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/asyncVariants.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/asyncVariants.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/asyncVariants.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/asyncVariants.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/asyncVariants.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/asyncVariants.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/asyncVariants.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 11 · Асинхронность &amp; конкурентность › <strong>async variants</strong></p>
+  <h1>The <code>*Async</code> naming convention</h1>
+  <p class="hero-sub">Every lazy and aggregate operator has a twin that works on FxAsyncIterable — same behavior, async-friendly callback.</p>
+
+  <div class="signature">Iterable&lt;B&gt; map&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;B&gt; mapAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+
+Future&lt;List&lt;A&gt;&gt; toArrayAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+Future&lt;A&gt; reduceAsync&lt;A&gt;(FutureOr&lt;A&gt; Function(A acc, A a) f, FxAsyncIterable&lt;A&gt; iterable)
+
+Fx&lt;R&gt; Fx.map&lt;R&gt;(R Function(T a) f)             // sync chain
+FxAsync&lt;R&gt; FxAsync.map&lt;R&gt;(FutureOr&lt;R&gt; Function(T a) f)  // async chain — same name!</div>
+
+  <h2>Lecture</h2>
+  <p>
+    Because Dart has no untyped currying, FxDart can't overload one
+    <code>map</code> to work on both <code>Iterable</code> and
+    <code>FxAsyncIterable</code> in data-first position — the parameter types
+    would collide. So every lazy and aggregate operator ships in two
+    top-level forms: the plain one for <code>Iterable</code>, and an
+    <code>*Async</code> twin for <code>FxAsyncIterable</code> whose callback
+    returns <code>FutureOr&lt;R&gt;</code> instead of <code>R</code>. You've
+    already met a few: <code>map</code>/<code>mapAsync</code>,
+    <code>filter</code>/<code>filterAsync</code>,
+    <code>toArray</code>/<code>toArrayAsync</code>,
+    <code>reduce</code>/<code>reduceAsync</code>, <code>fold</code>/<code>foldAsync</code>,
+    <code>each</code>/<code>eachAsync</code>, <code>find</code>/<code>findAsync</code> —
+    the pattern holds for essentially every function in the library.
+  </p>
+  <p>
+    The chain forms don't need this split. Once you call
+    <code>.toAsync()</code> (or start from <code>fxAsync</code>/<code>fxStream</code>),
+    every subsequent method on that <code>FxAsync</code> chain keeps its
+    <strong>plain</strong> name — <code>.map(...)</code>, not
+    <code>.mapAsync(...)</code> — because the receiver's type already tells
+    Dart which overload to use. The suffix only exists at the top level,
+    where data-first calls need it to disambiguate.
+  </p>
+
+  <h2>Demo 1 · A few twins, side by side</h2>
+  <p>Data-first calls always need the <code>Async</code> suffix once you're
+    working with an <code>FxAsyncIterable</code>:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // Every sync op has a data-first *Async twin that works on
+  // FxAsyncIterable instead of Iterable.
+  final doubled = await toArrayAsync(
+      mapAsync((a) => a * 2, toAsync([1, 2, 3])));
+  print(doubled); // [2, 4, 6]
+
+  final evens = await toArrayAsync(
+      filterAsync((a) async => a.isEven, toAsync([1, 2, 3, 4, 5, 6])));
+  print(evens); // [2, 4, 6]
+
+  final total = await reduceAsync((acc, a) => acc + a, toAsync([1, 2, 3, 4]));
+  print(total); // 10
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Data-first vs. chain form</h2>
+  <p>
+    The chain form reads the same as its sync counterpart — no suffixes —
+    once <code>.toAsync()</code> has switched the receiver's type:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final input = [1, 2, 3, 4, 5, 6];
+
+  // Data-first: every step names its *Async twin explicitly.
+  final dataFirst = await toArrayAsync(filterAsync(
+      (a) async => a > 30, mapAsync((a) => a * 10, toAsync(input))));
+  print(dataFirst); // [40, 50, 60]
+
+  // Chain form: .toAsync() flips the chain into async mode once, then every
+  // method keeps its plain name — map, filter, toArray — no *Async suffix.
+  final chained = await fx(input)
+      .toAsync()
+      .map((a) => a * 10)
+      .filter((a) => a > 30)
+      .toArray();
+  print(chained); // [40, 50, 60]
+
+  print(dataFirst.toString() == chained.toString()); // true
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use the data-first <code>*Async</code> twin of <code>map</code>
+    to uppercase every name in this async pipeline.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final names = ['ann', 'bo', 'cara', 'di'];
+
+  // TODO: use the *Async twin of `map` (data-first, on toAsync(names)) to
+  // uppercase every name, then toArrayAsync to collect the result.
+  final shouted = await toArrayAsync(toAsync(names));
+
+  print(shouted); // currently [ann, bo, cara, di] — should be uppercase
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="toAsync.html"><code>toAsync</code></a> — where async pipelines start ·
+    <a href="streams.html">Stream bridges</a> — fromStream, fxStream, toStream ·
+    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation ·
+    <a href="map.html"><code>map</code></a> — the sync original
+  </div>
+
+  <nav class="tut-nav">
+    <a href="../../101/index.html">← FxDart 101</a>
+    <a href="streams.html">Далее: streams →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

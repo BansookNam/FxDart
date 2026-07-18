@@ -1,0 +1,6 @@
+Iterable&lt;B&gt; scan&lt;A, B&gt;(B Function(B acc, A a) f, B seed, Iterable&lt;A&gt; iterable)
+Iterable&lt;A&gt; scan1&lt;A&gt;(A Function(A acc, A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;B&gt; scanAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(B acc, A a) f, FutureOr&lt;B&gt; seed, FxAsyncIterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; scan1Async&lt;A&gt;(FutureOr&lt;A&gt; Function(A acc, A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;B&gt; Fx.scan&lt;B&gt;(B Function(B acc, T a) f, B seed)        // chain
+FxAsync&lt;B&gt; FxAsync.scan&lt;B&gt;(FutureOr&lt;B&gt; Function(B acc, T a) f, FutureOr&lt;B&gt; seed)

@@ -1,0 +1,4 @@
+Iterable&lt;A&gt; takeUntilInclusive&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; takeUntilInclusiveAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.takeUntilInclusive(bool Function(T a) f)        // chain
+FxAsync&lt;T&gt; FxAsync.takeUntilInclusive(FutureOr&lt;bool&gt; Function(T a) f)

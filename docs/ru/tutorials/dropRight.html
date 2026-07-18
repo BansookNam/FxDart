@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>dropRight — FxDart 101</title>
+  <meta name="description" content="FxDart dropRight tutorial: omit the last n values of a finite iterable, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/dropRight.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/dropRight.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/dropRight.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/dropRight.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/dropRight.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/dropRight.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/dropRight.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/dropRight.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/dropRight.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Главная</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/dropRight.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/dropRight.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/dropRight.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/dropRight.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/dropRight.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/dropRight.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/dropRight.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 5 · Срезы › <strong>dropRight</strong></p>
+  <h1><code>dropRight</code></h1>
+  <p class="hero-sub">Returns a lazy iterable that omits the last <code>length</code> values.</p>
+
+  <div class="signature">Iterable&lt;A&gt; dropRight&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; dropRightAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.dropRight(int count)        // chain
+FxAsync&lt;T&gt; FxAsync.dropRight(int count)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>dropRight</code> omits the last <code>length</code> values instead
+    of the first. As with <code>takeRight</code>, there's no way to know
+    which elements are "last" without seeing the whole source, so
+    <code>dropRight</code> <strong>materializes</strong> it into a list
+    before yielding anything. It's the right tool when you have, say, a
+    known-size batch and want everything except a trailing footer or
+    sentinel — but it needs a finite source.
+  </p>
+  <p>
+    <code>dropRightAsync</code> carries the same constraint: it awaits the
+    entire upstream before it can start producing values.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(dropRight(2, [1, 2, 3, 4, 5])); // (1, 2, 3)
+
+  final result = fx([10, 20, 30, 40]).dropRight(1).toArray();
+  print(result); // [10, 20, 30]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async (must buffer the whole source first)</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final result = await fx([1, 2, 3, 4, 5])
+      .toAsync()
+      .map((a) => delay(Duration(milliseconds: 50), a * 10))
+      .dropRight(2)
+      .toArray();
+
+  print(result); // [10, 20, 30]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: drop the last 2 footer lines.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final lines = ['data1', 'data2', 'data3', '# footer', '# more footer'];
+
+  // TODO: drop the last 2 footer lines
+  final data = fx(lines).toArray();
+
+  print(data);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="drop.html"><code>drop</code></a> — drop from the front instead ·
+    <a href="takeRight.html"><code>takeRight</code></a> — keep the last n instead of dropping them ·
+    <a href="reverse.html"><code>reverse</code></a> — also materializes the source
+  </div>
+
+  <nav class="tut-nav">
+    <a href="drop.html">← Назад: drop</a>
+    <a href="dropWhile.html">Далее: dropWhile →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

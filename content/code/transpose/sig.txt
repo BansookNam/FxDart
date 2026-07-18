@@ -1,0 +1,2 @@
+Iterable&lt;List&lt;A&gt;&gt; transpose&lt;A&gt;(Iterable&lt;Iterable&lt;A&gt;&gt; rows)
+FxAsyncIterable&lt;List&lt;A&gt;&gt; transposeAsync&lt;A&gt;(Iterable&lt;FxAsyncIterable&lt;A&gt;&gt; rows)

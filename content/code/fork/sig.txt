@@ -1,0 +1,2 @@
+Iterable&lt;T&gt; fork&lt;T&gt;(Iterable&lt;T&gt; iterable)
+FxAsyncIterable&lt;T&gt; forkAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable)

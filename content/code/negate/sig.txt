@@ -1,0 +1,1 @@
+bool Function(T) negate&lt;T&gt;(bool Function(T) f)

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>keys — FxDart 101</title>
+  <meta name="description" content="FxDart keys tutorial: a lazy Iterable of a Map's keys, ready to feed into a chain.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/keys.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/keys.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/keys.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/keys.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/keys.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/keys.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/keys.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/keys.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/keys.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">홈</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/keys.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/keys.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/keys.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/keys.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/keys.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/keys.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/keys.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 2 · 시퀀스 생성 › <strong>keys</strong></p>
+  <h1><code>keys</code></h1>
+  <p class="hero-sub">The keys of a Map, as a plain lazy Iterable — ready to wrap in fx() and chain.</p>
+
+  <div class="signature">Iterable&lt;K&gt; keys&lt;K, V&gt;(Map&lt;K, V&gt; map)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>keys(map)</code> is a thin, FxTS-flavored wrapper around Dart's
+    own <code>map.keys</code> — it exists mainly so the object-function
+    vocabulary (<code>entries</code>, <code>keys</code>, <code>values</code>)
+    reads consistently and slots straight into <code>fx()</code>. Dart's
+    <code>Map.keys</code> is already a lazy view, so <code>keys</code>
+    doesn't add any extra buffering — it just hands you the same lazy
+    <code>Iterable&lt;K&gt;</code>.
+  </p>
+  <p>
+    Reach for it when you want to filter, transform, or collect a Map's key
+    set using the rest of the chain vocabulary, rather than reaching for
+    <code>.where()</code>/<code>.toList()</code> on <code>map.keys</code>
+    directly — the two are equivalent, but <code>fx(keys(map))</code> reads
+    naturally next to <code>fx(values(map))</code> and
+    <code>fx(entries(map))</code>.
+  </p>
+  <p>
+    If you need the keys <em>and</em> values together, use
+    <code>entries</code> instead — pulling <code>keys</code> and
+    <code>values</code> separately does not guarantee they line up if the
+    underlying map were mutated between the two calls.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final ages = {'kim': 32, 'lee': 27, 'park': 41};
+
+  print(toArray(keys(ages))); // [kim, lee, park]
+
+  // Chain form:
+  final loud = fx(keys(ages)).map((k) => k.toUpperCase()).toArray();
+  print(loud); // [KIM, LEE, PARK]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Filtering a Map by its keys</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // keys() turns a Map's key set into a plain lazy Iterable, so the usual
+  // chain operators apply — here, count how many item names start with 'a'.
+  final prices = {'apple': 1.5, 'banana': 0.5, 'avocado': 2.0, 'kiwi': 1.2};
+
+  final aKeys = fx(keys(prices)).filter((k) => k.startsWith('a')).toArray();
+  print(aKeys); // [apple, avocado]
+  print('count: ${aKeys.length}'); // count: 2
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>keys</code> and <code>sort</code> to get an
+    alphabetically sorted list of item names.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final inventory = {'apples': 4, 'bananas': 0, 'cherries': 12};
+
+  // TODO: use keys() and sort() to get an alphabetically sorted list of
+  // the inventory's item names.
+  final names = fx(keys(inventory)).sort((a, b) => a.compareTo(b)).toArray();
+
+  print(names); // [apples, bananas, cherries]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="entries.html"><code>entries</code></a> — keys and values paired together ·
+    <a href="values.html"><code>values</code></a> — the values of a Map ·
+    <a href="pick.html"><code>pick</code></a> — build a new Map from a subset of keys ·
+    <a href="fx.html"><code>fx</code></a> — the chain keys results feed into
+  </div>
+
+  <nav class="tut-nav">
+    <a href="entries.html">← 이전: entries</a>
+    <a href="values.html">다음: values →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

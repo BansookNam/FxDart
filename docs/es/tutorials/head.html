@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>head — FxDart 101</title>
+  <meta name="description" content="FxDart head tutorial: grab the first element of an iterable safely, returning null instead of throwing, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/head.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/head.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/head.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/head.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/head.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/head.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/head.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/head.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/head.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Inicio</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/head.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/head.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/head.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/head.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/head.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/head.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/head.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 8 · Acceso &amp; predicados › <strong>head</strong></p>
+  <h1><code>head</code></h1>
+  <p class="hero-sub">Returns the first element of an iterable, or <code>null</code> when it's empty.</p>
+
+  <div class="signature">A? head&lt;A&gt;(Iterable&lt;A&gt; iterable)
+Future&lt;A?&gt; headAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+T? Fx.head()               // chain
+Future&lt;T?&gt; FxAsync.head()  // chain</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>head</code> pulls exactly one element off the front of an iterable
+    and hands it back — or <code>null</code> if there isn't one. This is
+    FxDart's answer to FxTS's <code>head</code>, which returns
+    <code>undefined</code> on an empty array; Dart has no <code>undefined</code>,
+    so every "might not exist" result in this corner of the API collapses to
+    <code>null</code>. That means the natural way to consume it is
+    <code>head(list) ?? fallback</code>.
+  </p>
+  <p>
+    Because <code>head</code> only calls <code>moveNext()</code> once, it
+    costs nothing to call on a huge — even infinite — lazy pipeline: nothing
+    upstream of it runs beyond the single element it needs.
+  </p>
+  <p>
+    It comes in data-first form (<code>head(iterable)</code>), an async form
+    for <code>FxAsyncIterable</code>, and as a chain method
+    (<code>fx(iterable).head()</code>) on both the sync and async chains.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <p>Empty in, <code>null</code> out — no exception, no <code>orElse</code> callback required:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(head([10, 20, 30])); // 10
+  print(head(<int>[]));      // null
+
+  print(fx(['a', 'b', 'c']).head()); // a
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Laziness, and async short-circuiting</h2>
+  <p>
+    Only one element is ever pulled from the million-element range below.
+    In the async example, the chain awaits the <em>first</em>
+    <code>delay(...)</code> and never even bothers with the second:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  var pulled = 0;
+  final first = fx(range(1000000)).peek((_) => pulled++).head();
+  print(first);            // 0
+  print('pulled $pulled'); // pulled 1
+
+  final firstReady = await fx(['slow', 'never awaited'])
+      .toAsync()
+      .map((v) => delay(Duration(milliseconds: 50), v))
+      .head();
+  print(firstReady); // slow — only the first delay() ever fires
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>head</code> so this prints the first score, or
+    <code>0</code> when the list is empty.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final scores = <int>[88, 73, 95];
+
+  // TODO: use head(scores) to print the first score, falling back to 0
+  // if the list is empty.
+  final firstScore = 0;
+
+  print('First score: $firstScore');
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="last.html"><code>last</code></a> — same idea from the other end ·
+    <a href="nth.html"><code>nth</code></a> — pull any index ·
+    <a href="find.html"><code>find</code></a> — first match to a predicate ·
+    <a href="isEmpty.html"><code>isEmpty</code></a> — value-based emptiness check
+  </div>
+
+  <nav class="tut-nav">
+    <a href="partition.html">← Anterior: partition</a>
+    <a href="last.html">Siguiente: last →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>some — FxDart 101</title>
+  <meta name="description" content="FxDart some tutorial: check that at least one element satisfies a predicate, short-circuiting on the first hit, sync and async.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/some.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/some.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/some.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/some.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/some.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/some.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/some.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/some.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/some.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Главная</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/some.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/some.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/some.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/some.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/some.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/some.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/some.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 8 · Доступ &amp; предикаты › <strong>some</strong></p>
+  <h1><code>some</code></h1>
+  <p class="hero-sub">True when at least one element satisfies a predicate — false for an empty iterable.</p>
+
+  <div class="signature">bool some&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;bool&gt; someAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+bool Fx.some(bool Function(T a) f)                     // chain
+Future&lt;bool&gt; FxAsync.some(FutureOr&lt;bool&gt; Function(T a) f)  // chain</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>some</code> is <code>every</code>'s mirror image: it scans left to
+    right and short-circuits the moment it finds a match, returning
+    <code>true</code> right away. If it never finds one — including on an
+    empty iterable, which is the opposite vacuous case from
+    <code>every</code> — it returns <code>false</code> only after checking
+    everything.
+  </p>
+  <p>
+    Unlike <code>every</code>, <code>Fx</code> <em>does</em> define its own
+    <code>.some()</code> chain method (it isn't already covered by
+    <code>Iterable</code>, since Dart's own <code>Iterable</code> has no
+    built-in <code>some</code> — the closest thing, <code>any</code>, does
+    the same job under a different name).
+  </p>
+
+  <h2>Demo 1 · Basics &amp; short-circuiting</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(some((a) => a > 10, [1, 2, 3])); // false
+  print(some((a) => a > 2, [1, 2, 3]));  // true
+  print(some((a) => true, <int>[]));     // false — nothing to satisfy it
+
+  var checked = 0;
+  final found = fx([1, 2, 3, 4]).peek((_) => checked++).some((a) => a == 2);
+  print(found);               // true
+  print('checked $checked');  // checked 2
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final anyOnline = await fx(['off', 'off', 'on'])
+      .toAsync()
+      .some((s) => delay(Duration(milliseconds: 30), s == 'on'));
+  print(anyOnline); // true
+
+  final anyNegative = await someAsync(
+      (a) => delay(Duration(milliseconds: 30), a < 0), fx([1, 2, 3]).toAsync());
+  print(anyNegative); // false
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>some</code> to check if anything in the cart costs more than 10.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final cart = [
+    {'item': 'book', 'price': 12},
+    {'item': 'pen', 'price': 2},
+  ];
+
+  // TODO: use some to check if anything in the cart costs more than 10
+  final hasExpensiveItem = false;
+
+  print(hasExpensiveItem);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="every.html"><code>every</code></a> — the "all of them" counterpart ·
+    <a href="includes.html"><code>includes</code></a> — a specialization of <code>some</code> ·
+    <a href="find.html"><code>find</code></a> — get the matching element, not just a bool ·
+    <a href="predicates.html"><code>predicates</code></a> — ready-made predicates to pair with <code>some</code>
+  </div>
+
+  <nav class="tut-nav">
+    <a href="every.html">← Назад: every</a>
+    <a href="predicates.html">Далее: predicates →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

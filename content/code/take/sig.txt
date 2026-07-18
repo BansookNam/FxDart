@@ -1,0 +1,4 @@
+Iterable&lt;A&gt; take&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; takeAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.take(int count)        // chain
+FxAsync&lt;T&gt; FxAsync.take(int count)

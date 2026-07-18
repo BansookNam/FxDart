@@ -1,0 +1,4 @@
+Map&lt;K, A&gt; indexBy&lt;A, K&gt;(K Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;Map&lt;K, A&gt;&gt; indexByAsync&lt;A, K&gt;(FutureOr&lt;K&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Map&lt;K, T&gt; Fx.indexBy&lt;K&gt;(K Function(T a) f)          // chain (sync)
+Future&lt;Map&lt;K, T&gt;&gt; FxAsync.indexBy&lt;K&gt;(FutureOr&lt;K&gt; Function(T a) f)  // chain (async)

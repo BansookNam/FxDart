@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>cases — FxDart 101</title>
+  <meta name="description" content="FxDart cases tutorial: build a predicate/mapper dispatch table with an optional default, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/cases.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/cases.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/cases.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/cases.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/cases.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/cases.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/cases.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/cases.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/cases.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">ホーム</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/cases.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/cases.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/cases.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/cases.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/cases.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/cases.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/cases.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 10 · 関数ユーティリティ › <strong>cases</strong></p>
+  <h1><code>cases</code></h1>
+  <p class="hero-sub">Builds a predicate/mapper dispatch table, with an optional default.</p>
+
+  <div class="signature">R Function(T value) cases&lt;T, R&gt;(List&lt;(bool Function(T), R Function(T))&gt; pairs, {R Function(T)? orElse})</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>cases</code> builds a matcher out of a list of
+    <code>(predicate, mapper)</code> pairs: it tries each pair in order, and
+    the first one whose predicate returns true has its mapper applied to
+    produce the result. It's a functional stand-in for a chain of
+    <code>if</code>/<code>else if</code>, and it composes nicely with
+    <code>map</code> — the returned function is a plain unary
+    <code>T -&gt; R</code> you can pass straight in.
+  </p>
+  <p>
+    <strong>This shape differs from FxTS on purpose.</strong> FxTS's
+    <code>cases</code> is variadic: each <code>[predicate, mapper]</code> pair
+    is its own trailing argument, with an optional final bare function acting
+    as the default, and TypeScript's overloaded generics type each arity by
+    hand. Dart has neither variadic generics nor per-arity overloads, so
+    there's no way to accept "any number of pair arguments" and still get
+    real type checking. FxDart's version instead takes one
+    <code>List</code> of <code>(predicate, mapper)</code> <strong>records</strong>
+    — Dart's tuple type — plus a separate named <code>orElse</code> parameter
+    so the default is never confused with just another pair.
+  </p>
+  <p>
+    If nothing matches and no <code>orElse</code> is given, <code>cases</code>
+    falls back to returning <code>value</code> itself — which only compiles
+    at the call site if <code>T</code> happens to also satisfy <code>R</code>
+    — otherwise it throws a <code>StateError</code> at runtime. In practice,
+    always pass <code>orElse</code> unless you're certain your predicates are
+    exhaustive.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final classify = cases<int, String>([
+    ((n) => n < 0, (n) => 'negative'),
+    ((n) => n == 0, (n) => 'zero'),
+  ], orElse: (n) => 'positive');
+
+  print(classify(-4)); // negative
+  print(classify(0));  // zero
+  print(classify(9));  // positive
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · A grading pipeline</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final grade = cases<int, String>([
+    ((n) => n >= 90, (n) => 'A'),
+    ((n) => n >= 80, (n) => 'B'),
+    ((n) => n >= 70, (n) => 'C'),
+  ], orElse: (n) => 'F');
+
+  print(fx([95, 83, 61, 72]).map(grade).toArray()); // [A, B, F, C]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: classify each size as <code>'small'</code> (&lt;10),
+    <code>'medium'</code> (&lt;30), or <code>'large'</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final sizes = [3, 12, 40];
+
+  // TODO: classify each size as small (<10), medium (<30), or large
+  final label = cases<int, String>([
+    ((n) => n < 10, (n) => 'small'),
+    ((n) => n < 30, (n) => 'medium'),
+  ], orElse: (n) => 'large');
+
+  print(fx(sizes).map(label).toArray()); // [small, medium, large]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="when.html"><code>when</code></a> / <a href="unless.html"><code>unless</code></a> — a single predicate, same result type ·
+    <a href="throwError.html"><code>throwError</code></a> — a common orElse when no match should be fatal ·
+    <a href="always.html"><code>always</code></a> — a constant orElse ·
+    <a href="matches.html"><code>matches</code></a> — a predicate you can plug into a case
+  </div>
+
+  <nav class="tut-nav">
+    <a href="throwIf.html">← 前: throwIf</a>
+    <a href="add.html">次: add →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+---
+slug: index
+title: FxDart — Dart를 위한 함수형 프로그래밍
+description: FxDart는 FxTS를 포팅한 Dart 함수형 프로그래밍 라이브러리입니다. 지연 평가, 동시성 비동기 순회, 파이프라인 방식의 조합을 지원합니다.
+---
+  <p class="hero-logo"><img src="assets/logo-web.png" width="960" height="294"
+      alt="FxDart"></p>
+  <h1>지연 평가와 동시성을 기본으로 갖춘,<br>Dart를 위한 함수형 프로그래밍.</h1>
+  <p class="hero-sub">
+    FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>를 Dart로 포팅한 라이브러리입니다 —
+    동기 데이터와 비동기 데이터 위에서 <strong>지연 파이프라인</strong>을 조합할 수 있게 해 주며,
+    1초짜리 요청 여섯 개를 순차 실행에서 2초짜리 동시 실행 묶음으로 바꾸는 데
+    메서드 호출 하나면 충분합니다.
+  </p>
+
+  {{playground:0}}
+  <p class="dim">▲ 실제로 동작합니다 — 코드를 수정하고 <strong>Run</strong>을 눌러 보세요.
+    실제 Dart 컴파일러로 컴파일되어 브라우저에서 실행됩니다.</p>
+
+  <h2>FxDart란?</h2>
+  <p>
+    FxDart는 FxTS의 프로그래밍 모델을 Dart로 가져옵니다. 컬렉션과 비동기 데이터를
+    변환하는 작고 조합 가능한 함수 약 120개로 이루어진 도구 모음입니다.
+    핵심은 세 가지입니다.
+  </p>
+  <ul>
+    <li><strong>지연 평가</strong> — <code>map</code>,
+      <code>filter</code>, <code>take</code> 같은 연산자는 파이프라인을 구성할 뿐
+      실제 작업은 하지 않습니다. 종결 연산자(<code>toArray</code>, <code>each</code>,
+      <code>reduce</code>…)가 값을 끌어당길 때 비로소 계산이 일어납니다. 100만 개짜리
+      범위를 <code>.take(3)</code>으로 처리하면 정확히 3개만 계산됩니다.</li>
+    <li><strong>동기와 비동기를 아우르는 하나의 모델</strong> — 동일한 연산자 이름이
+      일반 <code>Iterable</code>에서도, FxDart의 풀 기반 비동기 시퀀스인
+      <code>FxAsyncIterable</code>에서도 그대로 동작합니다(<code>Stream</code>과는
+      양방향으로 이어집니다).</li>
+    <li><strong>선언적 동시성</strong> — <code>concurrent(n)</code>은
+      <em>상류</em> 파이프라인에 한 번에 <code>n</code>개씩 평가하도록 요청하면서도
+      결과의 순서는 그대로 유지합니다. FxTS를 대표하는 기능이며,
+      Dart에 충실하게 포팅했습니다.</li>
+  </ul>
+
+  <h2>왜 필요한가?</h2>
+  <p>
+    Dart에는 이미 <code>Iterable</code>과 <code>Stream</code>이 있습니다. FxDart는
+    그것들이 한계에 부딪히는 지점에서 제 몫을 합니다.
+  </p>
+  <table>
+    <tr><th>문제</th><th>순수 Dart</th><th>FxDart</th></tr>
+    <tr>
+      <td>동시 API 호출을 <em>n</em>개로 제한하면서 순서 유지</td>
+      <td>직접 만든 큐, <code>Completer</code>, 세심한 상태 관리</td>
+      <td><code>.map(fetch).concurrent(3)</code></td>
+    </tr>
+    <tr>
+      <td>비동기 변환 파이프라인</td>
+      <td><code>Stream</code>은 푸시 기반이라 <code>await</code>와 배압, 지연 평가를 섞으면 복잡해집니다</td>
+      <td>풀 기반 체인 — 각 값은 요청받았을 때만 계산됩니다</td>
+    </tr>
+    <tr>
+      <td>데이터 가공(그룹화, 인덱싱, 카운트, 분할, zip, 청크…)</td>
+      <td>매번 직접 작성하는 반복문</td>
+      <td>개념마다 하나씩, 충분히 검증된 이름 있는 함수</td>
+    </tr>
+    <tr>
+      <td>읽기 쉬운 다단계 변환</td>
+      <td>중첩 호출 또는 중간 변수</td>
+      <td>완전한 타입이 유지되는 좌에서 우로 흐르는 <code>fx()</code> 체인</td>
+    </tr>
+  </table>
+
+  <h2>장점 &amp; 단점</h2>
+  <div class="proscons">
+    <div class="box pros">
+      <h3>✓ 장점</h3>
+      <ul>
+        <li><strong>거저 얻는 지연 평가</strong> — 파이프라인은 단축 평가되며, 요청된 값만 계산됩니다.</li>
+        <li><strong>순서를 보존하는 동시성</strong>을 연산자 하나로: <code>concurrent(n)</code>, 완료 순서가 필요하면 <code>concurrentPool(n)</code>.</li>
+        <li><strong>완전한 타입 체인</strong> — <code>fx()</code>는 처음부터 끝까지 타입 추론을 유지합니다. 동기 연산자는 네이티브 <code>Iterable</code>을 다루는 평범한 함수이므로 일반 Dart 코드와 그대로 어울립니다.</li>
+        <li><strong>작고 목적이 분명한 함수</strong> — 변환 / 필터 / 슬라이스 / 결합 / 집계 / 객체 / 유틸을 아우르는 약 120개의 연산자.</li>
+        <li><strong>검증된 동작</strong> — FxTS의 동작을 850개가 넘는 테스트와 함께 그대로 옮겼습니다.</li>
+        <li><strong>의존성 없음</strong> — 순수 Dart.</li>
+      </ul>
+    </div>
+    <div class="box cons">
+      <h3>✗ 단점</h3>
+      <ul>
+        <li><strong>data-last 커링 없음</strong> — Dart에는 함수 오버로드가 없어서 FxTS의 커링된 <code>pipe</code> 스타일이 체인으로 바뀝니다. 동적인 <code>pipe()</code>는 정적 타입을 잃습니다.</li>
+        <li><strong>또 하나의 비동기 추상화</strong> — <code>Stream</code>으로는 동시성 역채널을 표현할 수 없기 때문에 <code>FxAsyncIterable</code>이 존재합니다. 상호 변환은 쉽지만, 익혀야 할 개념이 하나 늘어납니다.</li>
+        <li><strong>학습 곡선</strong> — 지연 파이프라인으로 사고하는 방식은 명령형 반복문과 다릅니다.</li>
+        <li><strong>항상 가장 빠르지는 않음</strong> — 아주 작은 핫 루프라면 손으로 쓴 <code>for</code>가 연산자 조합보다 빠를 수 있습니다. FxDart는 명료함과 I/O 바운드 작업에 최적화되어 있습니다.</li>
+        <li><strong>그대로 옮겨지지 않는 TS API도 있음</strong> — 대신 Dart다운 표기를 따릅니다. <code>curry</code>는 타입이 있는 <a href="tutorials/curried.html"><code>.curried</code></a> 확장 게터가 되었고, 기존 이름은 마이그레이션을 위한 deprecated 스텁으로 남겨 두었습니다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>동시성 맛보기</h2>
+  <p>각각 300&nbsp;ms가 걸리는 가짜 요청 여섯 개 — 순차 실행이면 약 1.8&nbsp;s,
+    <code>concurrent(3)</code>을 쓰면 약 0.6&nbsp;s입니다. 숫자를 바꿔 보세요.</p>
+  {{playground:1}}
+
+  <h2>학습 시작하기</h2>
+  <div class="grid">
+    <a class="card" href="101/index.html">
+      <h3>FxDart 101 →</h3>
+      <p>강의와 라이브 데모, 그리고 모든 함수마다 마련된 플레이그라운드로 이루어진 가이드 코스.</p>
+    </a>
+    <a class="card" href="tutorials/map.html">
+      <h3>첫 번째 강의: map →</h3>
+      <p>가장 기본이 되는 연산자부터 시작하세요.</p>
+    </a>
+    <a class="card" href="https://github.com/bansooknam/fxDart">
+      <h3>설치 →</h3>
+      <p>pubspec에 fxdart를 추가하고 소스 코드를 살펴보세요.</p>
+    </a>
+  </div>

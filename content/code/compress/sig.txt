@@ -1,0 +1,2 @@
+Iterable&lt;B&gt; compress&lt;B&gt;(List&lt;bool&gt; selectors, Iterable&lt;B&gt; iterable)
+FxAsyncIterable&lt;B&gt; compressAsync&lt;B&gt;(List&lt;bool&gt; selectors, FxAsyncIterable&lt;B&gt; iterable)

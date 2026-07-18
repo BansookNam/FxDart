@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>fx — FxDart 101</title>
+  <meta name="description" content="FxDart fx tutorial: the lazy chain model — fx, fxAsync, fxStream — and how nothing runs until a terminal operator pulls it.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/fx.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/fx.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/fx.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/fx.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/fx.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/fx.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/fx.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/fx.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/fx.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">ホーム</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/fx.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/fx.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/fx.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/fx.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/fx.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/fx.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/fx.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 1 · はじめに › <strong>fx</strong></p>
+  <h1><code>fx</code></h1>
+  <p class="hero-sub">Wraps a sequence in a lazy, chainable pipeline — the typed heart of FxDart.</p>
+
+  <div class="signature">Fx&lt;T&gt; fx&lt;T&gt;(Iterable&lt;T&gt; iterable)
+FxAsync&lt;T&gt; fxAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable)
+FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    Everything in this course builds toward one idea: a <strong>chain</strong>.
+    <code>fx(iterable)</code> wraps any <code>Iterable&lt;T&gt;</code> in an
+    <code>Fx&lt;T&gt;</code> — an object with FxTS-style methods like
+    <code>.map()</code>, <code>.filter()</code>, and <code>.take()</code>
+    hung off it. Every one of those calls returns a <em>new</em>
+    <code>Fx</code> wrapping a bit more lazy computation. None of it runs
+    yet. <code>Fx</code> only starts doing work when you call a
+    <strong>terminal operator</strong> — <code>toArray()</code>,
+    <code>each()</code>, <code>consume()</code>, <code>reduce()</code>, and
+    friends — which pulls values through the whole chain, one at a time,
+    from the terminal all the way back to the source.
+  </p>
+  <p>
+    This laziness is why FxDart can safely chain over huge or infinite
+    sequences (<code>range</code>, <code>cycle</code>, <code>repeat</code>):
+    as long as something downstream — usually <code>take(n)</code> — decides
+    how many values to actually pull, the upstream steps only ever run that
+    many times.
+  </p>
+  <p>
+    <code>fx</code> is the <em>sync</em> half of the chain. Its async
+    counterparts are <code>fxAsync</code>, which wraps an
+    <code>FxAsyncIterable</code> (the thing you get from <code>toAsync</code>,
+    <code>fromStream</code>, or any <code>*Async</code> function), and
+    <code>fxStream</code>, a shortcut that wraps a Dart <code>Stream</code>
+    directly. Both return an <code>FxAsync&lt;T&gt;</code> chain whose
+    methods accept functions that may return a <code>Future</code>, and
+    whose terminal operators all return a <code>Future</code> you
+    <code>await</code>. Switch from sync to async mid-chain with
+    <code>.toAsync()</code>.
+  </p>
+  <p>
+    Why does this exist at all, instead of just calling top-level functions
+    like <code>map(f, iterable)</code>? Because Dart cannot type a variadic
+    <code>pipe</code> the way FxTS's TypeScript can (see the next lesson) —
+    <code>fx()</code> chaining is how FxDart gets fully typed, autocompletable
+    pipelines instead.
+  </p>
+
+  <h2>Demo 1 · Nothing runs until the terminal op</h2>
+  <p>Watch <code>calls</code> stay at 0 right after building the chain, then
+    jump once <code>toArray()</code> actually pulls the 5 values:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Nothing runs until a terminal operator pulls values through.
+  var calls = 0;
+  final chain = fx([1, 2, 3, 4, 5])
+      .map((a) {
+        calls++;
+        return a * 10;
+      })
+      .filter((a) => a > 20);
+
+  print('calls before terminal op: $calls'); // 0 — still just a plan
+
+  final result = chain.toArray();
+
+  print(result);                 // [30, 40, 50]
+  print('calls after toArray: $calls'); // 5
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · fxAsync and fxStream</h2>
+  <p>
+    <code>fxAsync</code> wraps an <code>FxAsyncIterable</code> (here, from
+    <code>toAsync</code>); <code>fxStream</code> wraps a <code>Stream</code>
+    directly. Both give you the same chain methods, async-flavored:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // fxAsync wraps an FxAsyncIterable (from toAsync/fromStream/*Async ops).
+  final total = await fxAsync(toAsync([1, 2, 3]))
+      .map((a) => delay(const Duration(milliseconds: 50), a * 10))
+      .reduce((acc, a) => acc + a);
+  print('fxAsync total: $total'); // 60
+
+  // fxStream wraps a Dart Stream directly.
+  final doubled = await fxStream(Stream.fromIterable([1, 2, 3]))
+      .map((a) => a * 2)
+      .toArray();
+  print('fxStream doubled: $doubled'); // [2, 4, 6]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: build a chain that keeps scores of 60 or above, doubles them
+    as bonus points, and takes only the first 2 results.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final scores = [55, 72, 88, 40, 91, 63];
+
+  // TODO: build a lazy chain that keeps scores >= 60, doubles them as bonus
+  // points, and takes only the first 2 — then run it with toArray().
+  final bonus = fx(scores)
+      .filter((s) => s >= 60)
+      .map((s) => s * 2)
+      .take(2)
+      .toArray();
+
+  print(bonus); // [144, 176]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="pipe.html"><code>pipe</code></a> — the dynamically-typed alternative ·
+    <a href="toArray.html"><code>toArray</code></a> — the most common terminal op ·
+    <a href="each.html"><code>each</code></a> — terminal op for side effects ·
+    <a href="consume.html"><code>consume</code></a> — terminal op that discards results
+  </div>
+
+  <nav class="tut-nav">
+    <a href="../../101/index.html">← FxDart 101</a>
+    <a href="pipe.html">次: pipe →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

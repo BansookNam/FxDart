@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>memoize — FxDart 101</title>
+  <meta name="description" content="FxDart memoize tutorial: cache a unary function's results by argument, sync and async, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/memoize.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/memoize.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/memoize.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/memoize.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/memoize.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/memoize.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/memoize.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/memoize.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/memoize.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Главная</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/memoize.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/memoize.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/memoize.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/memoize.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/memoize.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/memoize.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/memoize.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 10 · Утилиты для функций › <strong>memoize</strong></p>
+  <h1><code>memoize</code></h1>
+  <p class="hero-sub">Caches a unary function's results, keyed by its argument.</p>
+
+  <div class="signature">R Function(A) memoize&lt;A, R&gt;(R Function(A) f)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>memoize(f)</code> wraps <code>f</code> in a cache: the first time
+    it's called with a given argument, it runs <code>f</code> and remembers
+    the result; every later call with an <code>==</code>-equal argument
+    returns the cached result instantly, without calling <code>f</code>
+    again. Reach for it when <code>f</code> is expensive (heavy computation,
+    a network call) and is likely to be called repeatedly with the same
+    inputs.
+  </p>
+  <p>
+    FxDart's <code>memoize</code> is <strong>unary only</strong> and keys the
+    cache by the argument's <code>==</code>/<code>hashCode</code>. FxTS's
+    version is variadic and keys on the full argument list via a
+    <code>WeakMap</code>-backed cache — Dart has no direct equivalent (no
+    variadic generics, and <code>WeakMap</code>-style weak keys aren't
+    available for arbitrary objects), so multi-argument functions need to be
+    memoized on a single composite key (a record works well) instead.
+  </p>
+  <p>
+    Because <code>R</code> is unconstrained, <code>f</code> can return a
+    <code>Future</code> — memoizing an async operation caches the
+    <em>Future itself</em>, so a second call returns an already-completed
+    future immediately rather than re-running the work.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  var calls = 0;
+  final square = memoize<int, int>((n) {
+    calls++;
+    return n * n;
+  });
+
+  print(square(5)); // 25
+  print(square(5)); // 25 (cached)
+  print(square(6)); // 36
+  print('square ran $calls times'); // square ran 2 times — not 3
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Memoizing an async lookup</h2>
+  <p>
+    The second call to <code>fetchUser(1)</code> returns the cached,
+    already-completed <code>Future</code> — no 150ms wait:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final fetchUser = memoize<int, Future<String>>(
+      (id) => delay(Duration(milliseconds: 150), 'user$id'));
+
+  final sw = Stopwatch()..start();
+  print(await fetchUser(1)); // user1, ~150ms
+  print('first call: ${sw.elapsedMilliseconds}ms');
+
+  sw.reset();
+  print(await fetchUser(1)); // user1, cached — instant
+  print('second call: ${sw.elapsedMilliseconds}ms');
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: wrap this "slow" cubing function with <code>memoize</code> so
+    that calling it twice with <code>3</code> only runs the real computation once.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  var calls = 0;
+
+  // TODO: wrap this function with memoize
+  final cached = memoize<int, int>((n) {
+    calls++;
+    return n * n * n;
+  });
+
+  print([cached(3), cached(3), cached(4)]); // [27, 27, 64]
+  print('calls: $calls'); // calls: 2
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — used above to simulate a slow async call ·
+    <a href="debounce.html"><code>debounce</code></a> — rate-limit calls instead of caching them ·
+    <a href="identity.html"><code>identity</code></a> — the simplest possible function to wrap ·
+    <a href="always.html"><code>always</code></a> — a constant value, no caching needed
+  </div>
+
+  <nav class="tut-nav">
+    <a href="juxt.html">← Назад: juxt</a>
+    <a href="negate.html">Далее: negate →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

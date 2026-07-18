@@ -1,0 +1,2 @@
+Iterable&lt;A&gt; intersection&lt;A&gt;(Iterable&lt;A&gt; iterable1, Iterable&lt;A&gt; iterable2)
+FxAsyncIterable&lt;A&gt; intersectionAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;A&gt; iterable2)

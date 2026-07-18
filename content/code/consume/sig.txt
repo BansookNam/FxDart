@@ -1,0 +1,4 @@
+void consume&lt;A&gt;(Iterable&lt;A&gt; iterable, [int? n])
+Future&lt;void&gt; consumeAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable, [int? n])
+void Fx.consume([int? n])        // chain
+Future&lt;void&gt; FxAsync.consume([int? n])

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>resolveProps — FxDart 101</title>
+  <meta name="description" content="FxDart resolveProps tutorial: await every value in a Map at once, the map-shaped analogue of Future.wait.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/resolveProps.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/resolveProps.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/resolveProps.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/resolveProps.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/resolveProps.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/resolveProps.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/resolveProps.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/resolveProps.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/resolveProps.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Главная</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/resolveProps.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/resolveProps.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/resolveProps.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/resolveProps.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/resolveProps.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/resolveProps.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/resolveProps.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 9 · Функции для объектов (Map) › <strong>resolveProps</strong></p>
+  <h1><code>resolveProps</code></h1>
+  <p class="hero-sub">Awaits every value of a <code>Map</code> and returns the resolved <code>Map</code> — the map-shaped analogue of <code>Future.wait</code>.</p>
+
+  <div class="signature">Future&lt;Map&lt;K, V&gt;&gt; resolveProps&lt;K, V&gt;(Map&lt;K, FutureOr&lt;V&gt;&gt; map)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>resolveProps</code> solves a specific, common shape of problem:
+    you have a <code>Map</code> whose values are a mix of plain values and
+    <code>Future</code>s — say, several independent API calls keyed by
+    field name — and you want one <code>Future</code> back for the whole,
+    fully-resolved map.
+  </p>
+  <p>
+    Internally it loops over the entries and <code>await</code>s each value
+    in turn, which reads like it should be <em>sequential</em>. In
+    practice, it usually isn't slower than doing them all "at once": a Dart
+    <code>Future</code> starts running the moment it's <em>created</em>, not
+    when it's awaited. So if you build the map with
+    <code>delay(...)</code> or already-in-flight requests as its values —
+    the normal way to call this function — every one of them is already
+    racing by the time <code>resolveProps</code> gets the map; its
+    sequential <code>await</code> loop is just reading off results that are
+    largely ready already, not gating when the work starts. The demo below
+    proves this with a stopwatch.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final result = await resolveProps({
+    'a': Future.value(1),
+    'b': 2,
+    'c': Future.value(3),
+  });
+  print(result); // {a: 1, b: 2, c: 3}
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · The futures already overlap</h2>
+  <p>Three 100ms delays, but the whole thing finishes well under 300ms — because they all started together:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  final result = await resolveProps({
+    'a': delay(Duration(milliseconds: 100), 1),
+    'b': delay(Duration(milliseconds: 100), 2),
+    'c': delay(Duration(milliseconds: 100), 3),
+  });
+
+  print(result); // {a: 1, b: 2, c: 3}
+  print(sw.elapsedMilliseconds < 250); // true
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>resolveProps</code> to await every value in <code>requests</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final requests = {
+    'user': Future.value('kim'),
+    'role': Future.value('admin'),
+  };
+
+  // TODO: use resolveProps to await every value in `requests`
+  final Map<String, String> resolved = {};
+
+  print(resolved);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="evolve.html"><code>evolve</code></a> — the sync cousin, transforming instead of awaiting ·
+    <a href="concurrent.html"><code>concurrent</code></a> — the iterable-shaped version of "run things together" ·
+    <a href="delay.html"><code>delay &amp; sleep</code></a> — used to build the demo futures ·
+    <a href="fromEntries.html"><code>fromEntries</code></a> — build a Map from scratch
+  </div>
+
+  <nav class="tut-nav">
+    <a href="compactObject.html">← Назад: compactObject</a>
+    <a href="isMatch.html">Далее: isMatch →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

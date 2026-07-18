@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>isEmpty — FxDart 101</title>
+  <meta name="description" content="FxDart isEmpty tutorial: a value-based emptiness check for null, strings, and collections, usable as a filter-friendly predicate.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/isEmpty.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/isEmpty.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/isEmpty.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/isEmpty.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/isEmpty.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/isEmpty.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/isEmpty.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/isEmpty.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/isEmpty.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Início</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/isEmpty.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/isEmpty.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/isEmpty.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/isEmpty.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/isEmpty.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/isEmpty.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/isEmpty.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 8 · Acesso &amp; predicados › <strong>isEmpty</strong></p>
+  <h1><code>isEmpty</code></h1>
+  <p class="hero-sub">A value-based emptiness check: true for <code>null</code>, <code>''</code>, and empty collections.</p>
+
+  <div class="signature">bool isEmpty(Object? value)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    This is <strong>not</strong> the same thing as <code>Iterable.isEmpty</code>,
+    the getter you already get for free on every <code>List</code>, <code>Set</code>,
+    or <code>Fx</code> chain. That getter only exists on iterables, and blows
+    up (or is simply unavailable) on <code>null</code>. FxTS's <code>isEmpty</code>
+    takes <em>any</em> value and answers a broader question: is this thing
+    "nothing" in a practical sense? It returns <code>true</code> for
+    <code>null</code>, an empty <code>String</code>, and an empty
+    <code>Iterable</code>/<code>Map</code>/<code>Set</code> — and
+    <code>false</code> for everything else, including numbers and booleans,
+    which are never considered "empty."
+  </p>
+  <p>
+    Because it takes a single <code>Object?</code> argument, it tears off
+    directly into <code>filter</code>, <code>reject</code>, or any other
+    predicate-shaped slot without a wrapper lambda.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(isEmpty(null));       // true
+  print(isEmpty(''));         // true
+  print(isEmpty([]));         // true
+  print(isEmpty({}));         // true
+  print(isEmpty([1, 2]));     // false
+  print(isEmpty(0));          // false — numbers are never "empty"
+  print(isEmpty(false));      // false
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · As a filter-friendly tear-off</h2>
+  <p>
+    A mixed bag of values, kept down to the ones <code>isEmpty</code> considers empty
+    (the printed empty string shows up as nothing between the commas):
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final values = <Object?>[null, '', 'hi', [], [1], 0];
+
+  // isEmpty is a plain unary function, so it tears off straight into filter:
+  final empties = filter(isEmpty, values);
+  print(empties.toList()); // [null, , []]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>isEmpty</code> to print <code>'no comment'</code> when <code>comment</code> is empty, or the comment itself.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final comment = '';
+
+  // TODO: use isEmpty(comment) to print 'no comment' when empty, else the comment
+  final display = comment;
+
+  print(display);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="compact.html"><code>compact</code></a> — drop nulls from an iterable ·
+    <a href="compactObject.html"><code>compactObject</code></a> — drop nulls from a Map ·
+    <a href="predicates.html"><code>predicates</code></a> — more filter-friendly type checks ·
+    <a href="includes.html"><code>includes</code></a> — the neighboring membership check
+  </div>
+
+  <nav class="tut-nav">
+    <a href="includes.html">← Anterior: includes</a>
+    <a href="every.html">Próximo: every →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

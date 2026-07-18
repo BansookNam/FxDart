@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>intersectionBy — FxDart 101</title>
+  <meta name="description" content="FxDart intersectionBy tutorial: keep elements by a computed key shared with another iterable, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/intersectionBy.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/intersectionBy.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/intersectionBy.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/intersectionBy.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/intersectionBy.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/intersectionBy.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/intersectionBy.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/intersectionBy.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/intersectionBy.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Inicio</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/intersectionBy.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/intersectionBy.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/intersectionBy.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/intersectionBy.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/intersectionBy.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/intersectionBy.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/intersectionBy.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 4 · Filtrado &amp; deduplicación › <strong>intersectionBy</strong></p>
+  <h1><code>intersectionBy</code></h1>
+  <p class="hero-sub"><code>intersection</code>, comparing by a computed key instead of value equality.</p>
+
+  <div class="signature">Iterable&lt;A&gt; intersectionBy&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable1, Iterable&lt;A&gt; iterable2)
+FxAsyncIterable&lt;A&gt; intersectionByAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;A&gt; iterable2)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    Same shape as <a href="differenceBy.html"><code>differenceBy</code></a>,
+    opposite condition: <code>intersectionBy(f, iterable1, iterable2)</code>
+    walks <strong><code>iterable2</code></strong> and keeps each element
+    whose <code>f</code>-key <em>is</em> found among <code>iterable1</code>'s
+    <code>f</code>-keys, deduplicated by that key. <code>f</code> applies to
+    both iterables, so both must share the same element type <code>A</code>
+    — only the comparison key type <code>B</code> can differ from
+    <code>A</code>.
+  </p>
+  <p>
+    This is the natural match for two lists of full records that share an
+    identifying field: a list of "featured" SKUs and a product catalog, a
+    list of active-user IDs and a list of full user objects, and so on.
+    <code>intersection</code> itself is
+    <code>intersectionBy((a) =&gt; a, iterable1, iterable2)</code>.
+  </p>
+  <p>
+    No chain method exists; call the data-first function or its async
+    counterpart. The concurrency marker from <code>.concurrent(n)</code>
+    applies to <code>iterable2</code>, exactly as with
+    <code>intersectionAsync</code>.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form. Same order rule as intersection: the result comes
+  // FROM iterable2, keeping elements whose f-key is ALSO present in
+  // iterable1's f-keys.
+  final featured = [
+    {'sku': 'A1'},
+    {'sku': 'B2'},
+  ];
+  final catalog = [
+    {'sku': 'A1', 'title': 'Keyboard'},
+    {'sku': 'B2', 'title': 'Mouse'},
+    {'sku': 'C3', 'title': 'Monitor'},
+  ];
+
+  final featuredProducts = intersectionBy((p) => p['sku'], featured, catalog);
+  print(toArray(featuredProducts));
+  // [{sku: A1, title: Keyboard}, {sku: B2, title: Mouse}]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with concurrency</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  // The concurrency marker applies to iterable2, as with intersectionAsync.
+  final featured = toAsync([
+    {'sku': 'A1'},
+  ]);
+  final catalog = fx([
+    {'sku': 'A1', 'title': 'Keyboard'},
+    {'sku': 'B2', 'title': 'Mouse'},
+  ]).toAsync().map((p) => delay(Duration(milliseconds: 100), p)).concurrent(2);
+
+  final featuredProducts = await fxAsync(
+          intersectionByAsync((p) => p['sku'], featured, catalog))
+      .toArray();
+
+  print(featuredProducts); // [{sku: A1, title: Keyboard}]
+  print('took ${sw.elapsedMilliseconds}ms'); // ~100ms
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>intersectionBy</code> (keyed on <code>'sku'</code>)
+    to find products that are on sale.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final onSale = [
+    {'sku': 'B2'},
+  ];
+  final products = [
+    {'sku': 'A1', 'title': 'Keyboard'},
+    {'sku': 'B2', 'title': 'Mouse'},
+  ];
+
+  // TODO: use intersectionBy (keyed on 'sku') to find products that are
+  // on sale.
+  final saleProducts = toArray(products);
+
+  print(saleProducts);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="intersection.html"><code>intersection</code></a> — the value-equality version ·
+    <a href="differenceBy.html"><code>differenceBy</code></a> — exclude by a shared computed key instead ·
+    <a href="uniqBy.html"><code>uniqBy</code></a> — dedupe a single iterable by key ·
+    <a href="compress.html"><code>compress</code></a> — filter by a parallel boolean mask
+  </div>
+
+  <nav class="tut-nav">
+    <a href="intersection.html">← Anterior: intersection</a>
+    <a href="compress.html">Siguiente: compress →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

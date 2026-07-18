@@ -1,0 +1,4 @@
+Iterable&lt;B&gt; map&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;B&gt; mapAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;R&gt; Fx.map&lt;R&gt;(R Function(T a) f)        // chain
+FxAsync&lt;R&gt; FxAsync.map&lt;R&gt;(FutureOr&lt;R&gt; Function(T a) f)

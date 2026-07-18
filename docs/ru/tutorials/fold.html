@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>fold — FxDart 101</title>
+  <meta name="description" content="FxDart fold tutorial: reduce with an explicit seed, safe on empty input, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/fold.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/fold.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/fold.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/fold.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/fold.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/fold.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/fold.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/fold.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/fold.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Главная</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/fold.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/fold.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/fold.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/fold.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/fold.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/fold.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/fold.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 7 · Агрегация › <strong>fold</strong></p>
+  <h1><code>fold</code></h1>
+  <p class="hero-sub">The seeded form of reduce: always safe, even on an empty pipeline.</p>
+
+  <div class="signature">Acc fold&lt;A, Acc&gt;(Acc seed, Acc Function(Acc acc, A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;Acc&gt; foldAsync&lt;A, Acc&gt;(FutureOr&lt;Acc&gt; seed, FutureOr&lt;Acc&gt; Function(Acc acc, A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Acc Fx.fold&lt;Acc&gt;(Acc initialValue, Acc Function(Acc acc, T a) combine)      // chain (sync, inherited from Iterable)
+Future&lt;Acc&gt; FxAsync.fold&lt;Acc&gt;(FutureOr&lt;Acc&gt; seed, FutureOr&lt;Acc&gt; Function(Acc acc, T a) f)  // chain (async)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>fold</code> is <code><a href="reduce.html">reduce</a></code> with an
+    explicit starting value. In FxTS this is just <code>reduce</code> called
+    with three arguments — <code>reduce(f, seed, iterable)</code>. Dart can't
+    tell overloads apart by argument count, so FxDart splits the two: the
+    unseeded form keeps the name <code>reduce</code>, and the seeded form is
+    renamed <code>fold</code>, matching the name Dart's own
+    <code>Iterable</code> already uses for exactly this operation.
+  </p>
+  <p>
+    Note the argument order carefully: it's <code>fold(seed, f, iterable)</code>
+    — seed first, then the combiner, then the source — mirroring
+    <code>Iterable.fold(initialValue, combine)</code> on the chain form. That's
+    different from FxTS's <code>reduce(f, seed, iterable)</code>, where the
+    function comes first.
+  </p>
+  <p>
+    Because you always supply the seed, <code>fold</code> never throws on an
+    empty iterable — it just returns the seed unchanged. That makes it the
+    safer default whenever you're not sure the pipeline has any elements at
+    all. Like <code>reduce</code>, it's a terminal operator: nothing upstream
+    runs until <code>fold</code> pulls it.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; empty input</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form: seed first, then the combiner, then the iterable.
+  print(fold<int, int>(100, (acc, a) => acc + a, [1, 2, 3])); // 106
+
+  // Works on an empty iterable, unlike reduce:
+  print(fold<int, int>(0, (acc, a) => acc + a, <int>[])); // 0
+
+  // Chain form uses Dart's built-in Iterable.fold(initialValue, combine):
+  final joined = fx(['a', 'b', 'c']).fold<String>('', (acc, a) => '$acc$a');
+  print(joined); // abc
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, building up a Map</h2>
+  <p>The seed doesn't have to be a number — here we fold a delayed pipeline into a length histogram:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // foldAsync / FxAsync.fold(seed, f) build up a Map while pulling the pipeline.
+  final histogram = await fx(['a', 'bb', 'c', 'dd', 'e'])
+      .toAsync()
+      .map((s) => delay(const Duration(milliseconds: 100), s))
+      .fold<Map<int, int>>(<int, int>{}, (acc, s) {
+    acc.update(s.length, (n) => n + 1, ifAbsent: () => 1);
+    return acc;
+  });
+
+  print(histogram); // {1: 3, 2: 2}
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: <code>fold</code> the deposits into a running balance, starting from <code>1000</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final deposits = [100, -30, 50, -20, 200];
+
+  // TODO: fold deposits into a running balance, starting from 1000.
+  final balance = fold<int, int>(1000, (acc, a) => acc, deposits);
+
+  print(balance);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="reduce.html"><code>reduce</code></a> — the unseeded counterpart ·
+    <a href="reduceLazy.html"><code>reduceLazy</code></a> — a reusable, curried reducer ·
+    <a href="sum.html"><code>sum</code></a> — a common fold, specialized ·
+    <a href="scan.html"><code>scan</code></a> — like fold, but lazily yields every intermediate value
+  </div>
+
+  <nav class="tut-nav">
+    <a href="reduce.html">← Назад: reduce</a>
+    <a href="reduceLazy.html">Далее: reduceLazy →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>throwIf — FxDart 101</title>
+  <meta name="description" content="FxDart throwIf tutorial: throw conditionally, otherwise pass the value through, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/throwIf.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/throwIf.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/throwIf.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/throwIf.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/throwIf.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/throwIf.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/throwIf.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/throwIf.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/throwIf.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Início</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/throwIf.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/throwIf.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/throwIf.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/throwIf.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/throwIf.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/throwIf.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/throwIf.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 10 · Utilitários de função › <strong>throwIf</strong></p>
+  <h1><code>throwIf</code></h1>
+  <p class="hero-sub">Throws when a predicate holds; otherwise returns the value unchanged.</p>
+
+  <div class="signature">T throwIf&lt;T&gt;(bool Function(T) predicate, Object Function(T) toError, T value)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>throwIf(predicate, toError, value)</code> is a guard clause you can
+    drop mid-expression: if <code>predicate(value)</code> is true, it throws
+    <code>toError(value)</code>; otherwise it hands <code>value</code> back
+    unchanged. That makes it convenient inside a <code>map</code> callback,
+    where you want to validate every element as it streams through the
+    pipeline and fail loudly the moment one is invalid.
+  </p>
+  <p>
+    It's essentially <a href="when.html"><code>when</code></a> where the
+    "then" branch always throws instead of returning a value — so wrap any
+    call site in <code>try</code>/<code>catch</code> to observe or recover
+    from the failure.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(throwIf<int>((n) => n < 0, (n) => ArgumentError('negative: $n'), 5)); // 5
+
+  try {
+    throwIf<int>((n) => n < 0, (n) => ArgumentError('negative: $n'), -5);
+  } catch (e) {
+    print('caught: $e'); // caught: Invalid argument(s): negative: -5
+  }
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Validating a pipeline</h2>
+  <p>
+    Each age is validated as it's mapped; the first violation aborts the
+    whole <code>toArray()</code> call:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final ages = [22, 17, 30];
+
+  try {
+    final validated = fx(ages)
+        .map((a) =>
+            throwIf<int>((n) => n < 18, (n) => ArgumentError('too young: $n'), a))
+        .toArray();
+    print(validated);
+  } catch (e) {
+    print('caught: $e'); // caught: Invalid argument(s): too young: 17
+  }
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>throwIf</code> to guard against zero stock while
+    summing this inventory.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final stock = [5, 0, 3];
+
+  // TODO: use throwIf to guard against zero stock while summing
+  try {
+    final total = fx(stock)
+        .map((n) =>
+            throwIf<int>((v) => v == 0, (v) => StateError('out of stock'), n))
+        .reduce(add);
+    print(total);
+  } catch (e) {
+    print('caught: $e'); // caught: Bad state: out of stock
+  }
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="throwError.html"><code>throwError</code></a> — a standalone throwing function, no condition ·
+    <a href="when.html"><code>when</code></a> — substitute a value instead of throwing ·
+    <a href="cases.html"><code>cases</code></a> — dispatch across multiple predicates ·
+    <a href="add.html"><code>add</code></a> — used above as the reducer
+  </div>
+
+  <nav class="tut-nav">
+    <a href="throwError.html">← Anterior: throwError</a>
+    <a href="cases.html">Próximo: cases →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

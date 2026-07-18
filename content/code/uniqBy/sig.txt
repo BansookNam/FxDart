@@ -1,0 +1,4 @@
+Iterable&lt;A&gt; uniqBy&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; uniqByAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.uniqBy&lt;B&gt;(B Function(T a) f)        // chain
+FxAsync&lt;T&gt; FxAsync.uniqBy&lt;B&gt;(FutureOr&lt;B&gt; Function(T a) f)

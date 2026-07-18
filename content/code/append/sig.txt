@@ -1,0 +1,4 @@
+Iterable&lt;A&gt; append&lt;A&gt;(A a, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; appendAsync&lt;A&gt;(FutureOr&lt;A&gt; a, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.append(T a)        // chain
+FxAsync&lt;T&gt; FxAsync.append(FutureOr&lt;T&gt; a)

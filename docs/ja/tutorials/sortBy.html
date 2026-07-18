@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>sortBy — FxDart 101</title>
+  <meta name="description" content="FxDart sortBy tutorial: sort by an extracted key, ascending, always a new list, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/sortBy.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/sortBy.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/sortBy.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/sortBy.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/sortBy.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/sortBy.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/sortBy.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/sortBy.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/sortBy.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">ホーム</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/sortBy.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/sortBy.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/sortBy.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/sortBy.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/sortBy.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/sortBy.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/sortBy.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 7 · 集約 › <strong>sortBy</strong></p>
+  <h1><code>sortBy</code></h1>
+  <p class="hero-sub">Sorts ascending by a key you extract, instead of writing a comparator by hand.</p>
+
+  <div class="signature">List&lt;A&gt; sortBy&lt;A&gt;(Object? Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;List&lt;A&gt;&gt; sortByAsync&lt;A&gt;(Object? Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.sortBy(Object? Function(T a) f)                    // chain (sync) — still lazy, call .toArray()
+Future&lt;List&lt;T&gt;&gt; FxAsync.sortBy(Object? Function(T a) f)     // chain (async) — already a terminal</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>sortBy</code> is <code><a href="sort.html">sort</a></code>'s
+    convenience sibling: instead of writing
+    <code>(a, b) =&gt; a.age.compareTo(b.age)</code> yourself, you give
+    <code>sortBy</code> a key extractor — <code>(a) =&gt; a['age']</code> —
+    and it builds the comparator for you, always ascending, always
+    comparing the extracted keys with <code>Comparable.compare</code>. Under
+    the hood it's literally <code>sort((a, b) =&gt; compare(f(a), f(b)), iterable)</code>.
+  </p>
+  <p>
+    Every guarantee from <code>sort</code> carries over unchanged: the
+    result is always a <strong>new</strong> list, never a mutation of the
+    input. And the same chain-form nuance applies too — on the sync
+    <code>Fx</code> chain, <code>.sortBy(f)</code> returns another
+    <code>Fx&lt;T&gt;</code>, so you still need
+    <code><a href="../101/index.html">.toArray()</a></code> to materialize
+    it, while on the <code>FxAsync</code> chain, <code>.sortBy(f)</code> is
+    already a terminal returning <code>Future&lt;List&lt;T&gt;&gt;</code>.
+  </p>
+  <p>
+    If you need descending order, or a multi-key sort, drop back down to
+    <code>sort</code> with an explicit comparator — <code>sortBy</code> only
+    covers the common "ascending by one extracted key" case.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final people = [
+    {'name': 'kim', 'age': 32},
+    {'name': 'lee', 'age': 27},
+    {'name': 'park', 'age': 41},
+  ];
+
+  // Data-first form: key extractor, then the iterable. Ascending, and never
+  // mutates the input (same NEW-list guarantee as sort).
+  final byAge = sortBy((p) => p['age'], people);
+  print(byAge.map((p) => p['name']).toList()); // [lee, kim, park]
+
+  // Chain form:
+  final byName = fx(people).sortBy((p) => p['name']).toArray();
+  print(byName.map((p) => p['name']).toList()); // [kim, lee, park]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async — already a terminal</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // Async chain: .sortBy(f) is a terminal returning Future<List<T>> directly.
+  final ranked = await fx(['banana', 'fig', 'kiwi', 'apple'])
+      .toAsync()
+      .map((s) => delay(const Duration(milliseconds: 100), s))
+      .sortBy((s) => s.length);
+
+  print(ranked); // [fig, kiwi, apple, banana]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: sort the people <strong>by age</strong>, youngest first.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final people = [
+    {'name': 'kim', 'age': 32},
+    {'name': 'lee', 'age': 27},
+    {'name': 'park', 'age': 41},
+  ];
+
+  // TODO: sort the people BY AGE, youngest first.
+  final sorted = sortBy((p) => p['name'], people);
+
+  print(sorted.map((p) => p['name']).toList());
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="sort.html"><code>sort</code></a> — the comparator-based form this builds on ·
+    <a href="min.html"><code>min</code></a> · <a href="max.html"><code>max</code></a> — for a single extreme instead of a full ranking ·
+    <a href="pluck.html"><code>pluck</code></a> — extract the same key without sorting
+  </div>
+
+  <nav class="tut-nav">
+    <a href="sort.html">← 前: sort</a>
+    <a href="partition.html">次: partition →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

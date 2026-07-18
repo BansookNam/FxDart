@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>flatMap — FxDart 101</title>
+  <meta name="description" content="FxDart flatMap tutorial: map each element to an iterable and flatten one level, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/flatMap.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/flatMap.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/flatMap.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/flatMap.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/flatMap.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/flatMap.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/flatMap.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/flatMap.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/flatMap.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Início</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/flatMap.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/flatMap.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/flatMap.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/flatMap.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/flatMap.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/flatMap.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/flatMap.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 3 · Transformando › <strong>flatMap</strong></p>
+  <h1><code>flatMap</code></h1>
+  <p class="hero-sub">Maps each element to an iterable, then flattens the results one level — the same contract as <code>Iterable.expand</code>.</p>
+
+  <div class="signature">Iterable&lt;B&gt; flatMap&lt;A, B&gt;(Iterable&lt;B&gt; Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;B&gt; flatMapAsync&lt;A, B&gt;(FutureOr&lt;Iterable&lt;B&gt;&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;R&gt; Fx.flatMap&lt;R&gt;(Iterable&lt;R&gt; Function(T a) f)        // chain
+FxAsync&lt;R&gt; FxAsync.flatMap&lt;R&gt;(FutureOr&lt;Iterable&lt;R&gt;&gt; Function(T a) f)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>flatMap</code> is <code>map</code> followed by one level of
+    flattening: each element is turned into a <em>collection</em> of
+    results, and those collections are spliced together into a single flat
+    lazy sequence. It's the tool for "one input, many outputs" — splitting a
+    sentence into words, expanding a user into their orders, turning a range
+    into pairs.
+  </p>
+  <p>
+    <strong>FxTS deviation:</strong> in FxTS, the callback can return any mix
+    of plain values and iterables and <code>flatMap</code> figures out what
+    to flatten via <code>DeepFlat</code> type magic. Dart has no equivalent
+    of that conditional type, so the Dart port requires <code>f</code> to
+    <em>always</em> return an <code>Iterable&lt;B&gt;</code> — exactly like
+    <a href="https://api.dart.dev/stable/dart-core/Iterable/expand.html"><code>Iterable.expand</code></a>.
+    Return a single-element list (<code>[x]</code>) to emit exactly one
+    value per input, or an empty list to emit none.
+  </p>
+  <p>
+    On the async side, <code>flatMapAsync</code>'s internal state machine
+    has to track "which sub-iterable am I currently draining" between pulls,
+    so it consumes its upstream <em>serially</em> — wrapping it in
+    <code>.concurrent(n)</code> only speeds up pulling already-available
+    items, not an <code>await</code> that happens inside the callback
+    itself. If you need concurrent async work per element, do that work in
+    a <code>.map(...).concurrent(n)</code> stage first, then
+    <code>.flatMap((list) =&gt; list)</code> to flatten the already-resolved
+    lists — see Demo 2.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <p>The callback must return an <code>Iterable</code> — here, a 2-element
+    list and a call to <code>String.split</code>:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form: f MUST return an Iterable<B> -- same contract as
+  // Iterable.expand.
+  print(toArray(flatMap((a) => [a, a * 10], [1, 2, 3])));
+  // [1, 10, 2, 20, 3, 30]
+
+  // Chain form: split words into individual characters.
+  final letters = fx(['ab', 'cd'])
+      .flatMap((word) => word.split(''))
+      .toArray();
+  print(letters); // [a, b, c, d]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, the right way to get concurrency</h2>
+  <p>
+    Put the slow <code>await</code> in a <code>.map(...).concurrent(n)</code>
+    stage; let <code>flatMap</code> flatten the results synchronously:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  // Fetch (the slow part) concurrently first, THEN flatten. flatMap itself
+  // pulls its upstream serially, so put the concurrency in the async step
+  // that produces each list, not inside flatMap's own callback.
+  final userIds = [1, 2, 3];
+  final orderIds = await fx(userIds)
+      .toAsync()
+      .map((id) => delay(Duration(milliseconds: 150), [id * 100, id * 100 + 1]))
+      .concurrent(3)
+      .flatMap((list) => list)
+      .toArray();
+
+  print(orderIds); // [100, 101, 200, 201, 300, 301]
+  print('took ${sw.elapsedMilliseconds}ms'); // ~150ms, not ~450ms
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>flatMap</code> to split each sentence into words,
+    producing one flat list of words.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final sentences = ['fx is lazy', 'dart is typed'];
+
+  // TODO: use flatMap to split each sentence into words, producing one flat
+  // list of words.
+  final words = fx(sentences).map((s) => s).toArray();
+
+  print(words);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="map.html"><code>map</code></a> — transform without flattening ·
+    <a href="flat.html"><code>flat</code></a> — flatten an already-nested iterable ·
+    <a href="mapEffect.html"><code>mapEffect</code></a> — map for side effects ·
+    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
+  </div>
+
+  <nav class="tut-nav">
+    <a href="mapEffect.html">← Anterior: mapEffect</a>
+    <a href="flat.html">Próximo: flat →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

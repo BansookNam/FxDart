@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>last — FxDart 101</title>
+  <meta name="description" content="FxDart last tutorial: get the final element of an iterable, null-safe on empty input, plus a chain-getter gotcha to watch for.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/last.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/last.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/last.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/last.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/last.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/last.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/last.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/last.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/last.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">首页</a>
+      <a href="../../101/index.html">FxDart 入门</a>
+      <a href="../../101/index.html#api">API 教程</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="语言">
+      <span class="lang-label">语言</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/last.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/last.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/last.html" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/last.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/last.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/last.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/last.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">本页尚未翻译，因此以英文显示。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">参与翻译</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 入门</a> › 章节 8 · 取值 &amp; 判定 › <strong>last</strong></p>
+  <h1><code>last</code></h1>
+  <p class="hero-sub">Returns the final element of an iterable, or <code>null</code> when it's empty.</p>
+
+  <div class="signature">A? last&lt;A&gt;(Iterable&lt;A&gt; iterable)
+Future&lt;A?&gt; lastAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+Future&lt;T?&gt; FxAsync.last()  // chain (async only)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>last</code> walks the whole iterable and hands back whatever it
+    saw most recently — <code>null</code> if it never saw anything. Unlike
+    <code>head</code>, there's no shortcut: since a lazy iterable doesn't
+    know where it ends without being asked, <code>last</code> has to consume
+    every element, so it's <code>O(n)</code> even though the pipeline
+    upstream may be lazily built.
+  </p>
+  <p>
+    <strong>Watch out on the sync chain:</strong> <code>Fx</code> extends
+    <code>Iterable</code>, and there is no <code>Fx.last()</code> override —
+    so <code>fx(iterable).last</code> resolves to Dart's own
+    <code>Iterable.last</code> <em>getter</em>, which throws
+    <code>StateError</code> on an empty iterable instead of returning
+    <code>null</code>. The null-safe behavior only exists as the top-level
+    <code>last(iterable)</code> function (or <code>.last()</code> on the
+    <em>async</em> chain, which does have its own override). When in doubt,
+    prefer the top-level function.
+  </p>
+
+  <h2>Demo 1 · Basics, and the chain getter trap</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(last([1, 2, 3])); // 3
+  print(last(<int>[]));   // null
+
+  try {
+    fx(<int>[]).last;
+  } on StateError catch (e) {
+    print('Iterable.last threw: $e');
+  }
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, where the chain form IS null-safe</h2>
+  <p><code>FxAsync</code> defines its own <code>.last()</code>, so on the async chain the getter trap above doesn't apply:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final result = await fx([1, 2, 3])
+      .toAsync()
+      .map((a) => delay(Duration(milliseconds: 50), a * 10))
+      .last();
+  print(result); // 30
+
+  print(await fxAsync(asyncEmpty<int>()).last()); // null
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>last</code> so this prints the final log line, or <code>'no logs yet'</code> when there are none.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final log = <String>['start', 'processing', 'done'];
+
+  // TODO: use last(log) to print the final log line, or 'no logs yet'
+  final finalLine = 'no logs yet';
+
+  print(finalLine);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="head.html"><code>head</code></a> — the O(1) opposite end ·
+    <a href="nth.html"><code>nth</code></a> — pull any index ·
+    <a href="find.html"><code>find</code></a> — first match to a predicate ·
+    <a href="reverse.html"><code>reverse</code></a> — flip the whole sequence
+  </div>
+
+  <nav class="tut-nav">
+    <a href="head.html">← 上一节： head</a>
+    <a href="nth.html">下一节： nth →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart 是 <a href="https://github.com/marpple/FxTS">FxTS</a> 的移植版本。特别感谢 <strong>Indong Yoo</strong>（Marpple CTO）与 FxTS 团队，本库的设计思路、语义和测试套件均源于他们的工作。</p>
+  <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 运行","pgReset":"重置","pgCompiling":"编译中…","pgCompileError":"编译错误","pgError":"错误","pgLoading":"正在加载运行时…","pgRunning":"运行中…","pgNoOutput":"（无输出）","pgLoadFailed":"无法加载 FxDart 库"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

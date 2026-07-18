@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>mapEffect — FxDart 101</title>
+  <meta name="description" content="FxDart mapEffect tutorial: map used for side effects, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/mapEffect.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/mapEffect.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/mapEffect.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/mapEffect.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/mapEffect.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/mapEffect.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/mapEffect.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/mapEffect.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/mapEffect.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">홈</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/mapEffect.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/mapEffect.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/mapEffect.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/mapEffect.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/mapEffect.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/mapEffect.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/mapEffect.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 3 · 변환 › <strong>mapEffect</strong></p>
+  <h1><code>mapEffect</code></h1>
+  <p class="hero-sub">Exactly like map — a naming convention for when the function is really there for its side effect.</p>
+
+  <div class="signature">Iterable&lt;B&gt; mapEffect&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;B&gt; mapEffectAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;R&gt; Fx.mapEffect&lt;R&gt;(R Function(T a) f)        // chain
+FxAsync&lt;R&gt; FxAsync.mapEffect&lt;R&gt;(FutureOr&lt;R&gt; Function(T a) f)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    Look at the source and you'll find <code>mapEffect</code> is literally
+    <code>B mapEffect(f, iterable) =&gt; map(f, iterable);</code> — same
+    function, same laziness, same signature. It exists purely to document
+    <em>intent</em> at the call site: reach for <code>mapEffect</code> when
+    the callback's return value matters less than what it does along the way
+    (writing to a log, saving to a database, incrementing a counter), and
+    reach for <code>map</code> when the return value is the point.
+  </p>
+  <p>
+    Because it's a plain alias, everything you know about <code>map</code>
+    carries over unchanged: it is lazy, it composes with
+    <code>.concurrent(n)</code> on the async side, and it has no special
+    error handling of its own. There's no behavioral reason to pick one over
+    the other — it's a readability signal for the next person (often you)
+    reading the pipeline.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <p>The callback both records a side effect and returns a transformed value —
+    same shape as <code>map</code>, different intent at the call site:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form: identical behavior to map, different intent.
+  final logged = <String>[];
+  final result = mapEffect((a) {
+    logged.add('processing $a');
+    return a * 2;
+  }, [1, 2, 3]);
+
+  print(toArray(result)); // [2, 4, 6]
+  print(logged); // [processing 1, processing 2, processing 3]
+
+  // Chain form:
+  final chained =
+      fx([10, 20, 30]).mapEffect((a) => a ~/ 10).toArray();
+  print(chained); // [1, 2, 3]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with concurrency</h2>
+  <p>
+    <code>mapEffectAsync</code> runs on the exact same engine as
+    <code>mapAsync</code>, so <code>.concurrent(n)</code> parallelizes it the
+    same way — handy for "process and persist" pipelines:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  // mapEffectAsync -- same execution engine as mapAsync, used here to
+  // fire off a "save to db" side effect while producing a result.
+  final saved = <int>[];
+  final result = await fx([1, 2, 3, 4])
+      .toAsync()
+      .mapEffect((a) async {
+        await delay(Duration(milliseconds: 100), null);
+        saved.add(a);
+        return a * a;
+      })
+      .concurrent(4)
+      .toArray();
+
+  print(result); // [1, 4, 9, 16]
+  print(saved.length); // 4
+  print('took ${sw.elapsedMilliseconds}ms'); // ~100ms with concurrency
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>mapEffect</code> to <code>print</code> a
+    <code>'billing $&lt;dollars&gt;'</code> line for each amount while
+    converting cents to dollars.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final centsAmounts = [1050, 2200, 375];
+
+  // TODO: use mapEffect to log 'billing $<dollars>' for each amount while
+  // converting cents to dollars (a double).
+  final dollars = fx(centsAmounts).map((c) => c / 100).toArray();
+
+  print(dollars);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="map.html"><code>map</code></a> — the function mapEffect delegates to ·
+    <a href="peek.html"><code>peek</code></a> — observe without changing the value at all ·
+    <a href="flatMap.html"><code>flatMap</code></a> — map + flatten ·
+    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
+  </div>
+
+  <nav class="tut-nav">
+    <a href="map.html">← 이전: map</a>
+    <a href="flatMap.html">다음: flatMap →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

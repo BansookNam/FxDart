@@ -1,0 +1,1 @@
+Map&lt;K, V&gt; omitBy&lt;K, V&gt;(bool Function((K, V) entry) f, Map&lt;K, V&gt; map)

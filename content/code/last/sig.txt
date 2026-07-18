@@ -1,0 +1,3 @@
+A? last&lt;A&gt;(Iterable&lt;A&gt; iterable)
+Future&lt;A?&gt; lastAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+Future&lt;T?&gt; FxAsync.last()  // chain (async only)

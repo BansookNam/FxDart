@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>reject — FxDart 101</title>
+  <meta name="description" content="FxDart reject tutorial: the exact opposite of filter, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/reject.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/reject.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/reject.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/reject.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/reject.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/reject.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/reject.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/reject.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/reject.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Главная</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/reject.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/reject.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/reject.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/reject.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/reject.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/reject.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/reject.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 4 · Фильтрация &amp; дедупликация › <strong>reject</strong></p>
+  <h1><code>reject</code></h1>
+  <p class="hero-sub">Keeps every element a predicate returns false for — the mirror image of filter.</p>
+
+  <div class="signature">Iterable&lt;A&gt; reject&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; rejectAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.reject(bool Function(T a) f)        // chain
+FxAsync&lt;T&gt; FxAsync.reject(FutureOr&lt;bool&gt; Function(T a) f)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>reject</code> is implemented as
+    <code>filter((a) =&gt; !f(a), iterable)</code> — it exists purely for
+    readability. <code>list.reject(isInvalid)</code> reads more naturally
+    than <code>list.filter((a) =&gt; !isInvalid(a))</code>, especially once
+    the predicate already has a clear, positive name. Pick whichever of
+    <code>filter</code>/<code>reject</code> lets you avoid writing a
+    negation at the call site.
+  </p>
+  <p>
+    Everything about <code>filter</code>'s behavior carries over unchanged:
+    it's lazy, and the async form inherits <code>filterAsync</code>'s
+    dedicated concurrent path, so <code>.concurrent(n)</code> genuinely
+    evaluates <code>n</code> predicates in parallel while still returning
+    results in original order.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form: reject keeps everything filter would drop.
+  print(toArray(reject((a) => a % 2 == 0, [0, 1, 2, 3, 4, 5, 6])));
+  // [1, 3, 5]
+
+  // Chain form:
+  final result = fx(['ok', 'error', 'ok', 'timeout'])
+      .reject((s) => s == 'ok')
+      .toArray();
+  print(result); // [error, timeout]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with concurrency</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  // rejectAsync delegates to filterAsync's concurrent predicate evaluation.
+  final result = await fx([1, 2, 3, 4, 5, 6])
+      .toAsync()
+      .reject((a) async {
+        await delay(Duration(milliseconds: 150), null);
+        return a.isEven;
+      })
+      .concurrent(3)
+      .toArray();
+
+  print(result); // [1, 3, 5]
+  print('took ${sw.elapsedMilliseconds}ms'); // ~300ms, not ~900ms
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>reject</code> to drop the <code>'info: ok'</code>
+    lines, keeping only the errors.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final logs = ['info: ok', 'error: disk full', 'info: ok', 'error: timeout'];
+
+  // TODO: use reject to drop the 'info: ok' lines, keeping only the errors.
+  final errors = fx(logs).toArray();
+
+  print(errors);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="filter.html"><code>filter</code></a> — the function reject delegates to ·
+    <a href="compact.html"><code>compact</code></a> — reject nulls specifically ·
+    <a href="uniq.html"><code>uniq</code></a> — remove duplicates ·
+    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
+  </div>
+
+  <nav class="tut-nav">
+    <a href="filter.html">← Назад: filter</a>
+    <a href="compact.html">Далее: compact →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

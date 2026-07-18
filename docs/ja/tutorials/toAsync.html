@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>toAsync — FxDart 101</title>
+  <meta name="description" content="FxDart toAsync tutorial: lift a plain Iterable into an FxAsyncIterable and understand the pull-based async model, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/toAsync.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/toAsync.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/toAsync.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/toAsync.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/toAsync.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/toAsync.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/toAsync.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/toAsync.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/toAsync.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">ホーム</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/toAsync.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/toAsync.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/toAsync.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/toAsync.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/toAsync.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/toAsync.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/toAsync.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 11 · 非同期 &amp; 並行処理 › <strong>toAsync</strong></p>
+  <h1><code>toAsync</code></h1>
+  <p class="hero-sub">Lifts a plain Iterable — of values or Futures — into an FxAsyncIterable, the entry point to FxDart's async pipeline.</p>
+
+  <div class="signature">FxAsyncIterable&lt;T&gt; toAsync&lt;T&gt;(Iterable&lt;FutureOr&lt;T&gt;&gt; iterable)
+FxAsync&lt;T&gt; Fx.toAsync&lt;T&gt;()        // chain, on a sync Fx</div>
+
+  <h2>Lecture</h2>
+  <p>
+    Every async pipeline in FxDart starts with <code>toAsync</code>. It takes
+    a plain <code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code> — a list of plain
+    values, a list of Futures, or a mix — and wraps it in an
+    <code>FxAsyncIterable</code>, the type every <code>*Async</code> operator
+    and the <code>FxAsync</code> chain understand. Whenever an element turns
+    out to be a <code>Future</code>, it's awaited automatically as it's pulled.
+  </p>
+  <p>
+    <code>FxAsyncIterable</code> is <strong>pull-based</strong>: nothing runs
+    until a terminal (<code>toArrayAsync</code>, <code>eachAsync</code>, the
+    <code>FxAsync</code> chain's <code>.toArray()</code>, …) calls
+    <code>next()</code> on it, one step at a time — exactly like a plain
+    <code>Iterable</code>, just asynchronous. This is a deliberate departure
+    from Dart's <code>Stream</code>, which is <em>push</em>-based: once a
+    stream starts emitting, it decides the pace, and there's no way for a
+    downstream consumer to tell it "evaluate 3 of these at once." FxDart's
+    <code>next([Concurrent? concurrent])</code> protocol adds exactly that
+    back-channel — a downstream operator like <code>concurrent(n)</code> can
+    pass a marker <em>upstream</em> through every pull, asking the source to
+    run <code>n</code> items in parallel. Streams have no equivalent hook, which
+    is the whole reason FxDart defines its own async iterable instead of
+    building on <code>Stream</code>.
+  </p>
+  <p>
+    Use the top-level <code>toAsync(iterable)</code> for a raw
+    <code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code>, or the chain method
+    <code>fx(iterable).toAsync()</code> to switch an existing <code>Fx</code>
+    chain into its <code>FxAsync</code> counterpart. Both are lazy: building
+    the pipeline does nothing until something pulls.
+  </p>
+
+  <h2>Demo 1 · Values, Futures, and the chain form</h2>
+  <p><code>toAsync</code> accepts plain values, Futures, or a mix of both —
+    and the chain form does the same thing from an existing <code>Fx</code>:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // toAsync() lifts a plain Iterable of values into an FxAsyncIterable.
+  final justValues = toAsync([1, 2, 3]);
+  print(await toArrayAsync(justValues)); // [1, 2, 3]
+
+  // It also accepts an Iterable<FutureOr<T>> — any Future elements are
+  // awaited as they're pulled.
+  final mixedFutures = toAsync([
+    delay(const Duration(milliseconds: 50), 10),
+    20,
+    delay(const Duration(milliseconds: 50), 30),
+  ]);
+  print(await toArrayAsync(mixedFutures)); // [10, 20, 30]
+
+  // Chain form: fx(iterable).toAsync()
+  final chained = await fx([1, 2, 3]).toAsync().map((a) => a * 2).toArray();
+  print(chained); // [2, 4, 6]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Why the pull-based model matters</h2>
+  <p>
+    In Dart, a <code>Future</code> starts running the instant it's created —
+    not when it's awaited. So three Futures built eagerly in a list literal
+    are already racing before <code>toAsync</code> ever touches them. Contrast
+    that with <code>mapAsync</code> (or chain <code>.map</code>), which creates
+    one new Future per element only when it's <em>pulled</em> — lazily, one at
+    a time, unless you add <code>concurrent(n)</code>:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  // These three Futures are created right here, eagerly — Dart starts a
+  // Future's work the moment it's constructed, not when it's awaited.
+  // By the time toAsync/toArrayAsync touch them, all three are already
+  // racing in parallel, so the total time is ~200ms, not ~600ms.
+  final alreadyStarted = toAsync([
+    delay(const Duration(milliseconds: 200), 'a'),
+    delay(const Duration(milliseconds: 200), 'b'),
+    delay(const Duration(milliseconds: 200), 'c'),
+  ]);
+  print(await toArrayAsync(alreadyStarted)); // [a, b, c]
+  print('eager futures: ${sw.elapsedMilliseconds}ms'); // ~200ms
+
+  // Contrast: mapAsync creates one Future per element, lazily, only when
+  // pulled — so without concurrent(n) they run one at a time.
+  sw.reset();
+  final lazyPerPull = await fx(['x', 'y', 'z'])
+      .toAsync()
+      .map((a) => delay(const Duration(milliseconds: 200), a))
+      .toArray();
+  print(lazyPerPull); // [x, y, z]
+  print('lazy pulls: ${sw.elapsedMilliseconds}ms'); // ~600ms
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: filter the list below so only passing scores (&gt;= 60) make
+    it into the result.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final scores = [88, 42, 95, 61];
+
+  // TODO: lift `scores` into an async pipeline with toAsync(), keep only
+  // the passing scores (>= 60), and collect them with toArrayAsync.
+  final passing = await toArrayAsync(toAsync(scores));
+
+  print(passing); // currently [88, 42, 95, 61] — should be [88, 95]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="asyncVariants.html"><code>*Async</code> naming convention</a> — mapAsync, filterAsync, … ·
+    <a href="streams.html">Stream bridges</a> — fromStream, fxStream, toStream ·
+    <a href="concurrent.html"><code>concurrent</code></a> — the back-channel in action ·
+    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — building async demos
+  </div>
+
+  <nav class="tut-nav">
+    <a href="../../101/index.html">← FxDart 101</a>
+    <a href="asyncVariants.html">次: async variants →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>size — FxDart 101</title>
+  <meta name="description" content="FxDart size tutorial: count the elements a pipeline produces, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/size.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/size.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/size.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/size.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/size.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/size.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/size.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/size.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/size.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Inicio</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/size.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/size.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/size.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/size.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/size.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/size.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/size.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>size</strong></p>
+  <h1><code>size</code></h1>
+  <p class="hero-sub">Counts how many elements a lazy pipeline produces.</p>
+
+  <div class="signature">int size&lt;A&gt;(Iterable&lt;A&gt; iterable)
+Future&lt;int&gt; sizeAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+int Fx.size()          // chain (sync)
+Future&lt;int&gt; FxAsync.size()  // chain (async)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>size</code> is a terminal operator that counts elements by walking
+    through all of them — there's no shortcut, because the upstream pipeline
+    might be a lazily-computed <code>map</code>/<code>filter</code> chain with
+    no fixed length until it's actually pulled. That means calling
+    <code>size</code> on a <code>filter</code>ed million-element
+    <code>range</code> really does iterate all million values; it just
+    doesn't build a <code>List</code> to do it.
+  </p>
+  <p>
+    It works on any element type — unlike the numeric terminals
+    (<code><a href="sum.html">sum</a></code>,
+    <code><a href="min.html">min</a></code>,
+    <code><a href="max.html">max</a></code>,
+    <code><a href="average.html">average</a></code>), <code>size</code>
+    doesn't care what's inside the iterable, only how many there are.
+  </p>
+  <p>
+    If you already have a concrete <code>List</code>, its <code>.length</code>
+    is free — reach for <code>size</code> specifically when you're counting
+    the output of a lazy chain without wanting to materialize it into a
+    <code>List</code> first via <code><a href="../101/index.html">toArray</a></code>.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form: counts elements by pulling the whole pipeline.
+  print(size(range(1000000).where((a) => a % 7 == 0))); // 142858
+
+  // Chain form:
+  final count = fx([1, 2, 3, 4, 5, 6]).filter((a) => a.isEven).size();
+  print(count); // 3
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // sizeAsync / .toAsync().size() still has to pull every element to count them.
+  final count = await fx(['a', 'bb', 'ccc', 'd'])
+      .toAsync()
+      .filter((s) => delay(const Duration(milliseconds: 100), s.length > 1))
+      .size();
+
+  print(count); // 2
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: count how many entries are <strong>out of stock</strong> (value <code>== 0</code>).</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final inventory = [3, 0, 7, 0, 5, 0, 9];
+
+  // TODO: count how many entries are OUT OF STOCK (value == 0).
+  final count = fx(inventory).size();
+
+  print(count);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="average.html"><code>average</code></a> — uses a size-like count internally ·
+    <a href="isEmpty.html"><code>isEmpty</code></a> — a cheaper check when you only need to know "any at all?" ·
+    <a href="../101/index.html">toArray</a> — materialize instead of just counting
+  </div>
+
+  <nav class="tut-nav">
+    <a href="max.html">← Anterior: max</a>
+    <a href="join.html">Siguiente: join →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

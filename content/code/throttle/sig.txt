@@ -1,0 +1,6 @@
+Throttled&lt;T&gt; throttle&lt;T&gt;(void Function(T arg) func, Duration wait, {bool leading = true, bool trailing = true})
+
+class Throttled&lt;T&gt; {
+  void call(T arg);   // Throttled is callable: throttled(arg)
+  void cancel();
+}

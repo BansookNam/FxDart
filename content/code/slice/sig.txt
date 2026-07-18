@@ -1,0 +1,4 @@
+Iterable&lt;A&gt; slice&lt;A&gt;(int start, Iterable&lt;A&gt; iterable, [int? end])
+FxAsyncIterable&lt;A&gt; sliceAsync&lt;A&gt;(int start, FxAsyncIterable&lt;A&gt; iterable, [int? end])
+Fx&lt;T&gt; Fx.slice(int start, [int? end])        // chain
+FxAsync&lt;T&gt; FxAsync.slice(int start, [int? end])

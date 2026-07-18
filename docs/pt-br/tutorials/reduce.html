@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>reduce — FxDart 101</title>
+  <meta name="description" content="FxDart reduce tutorial: fold a pipeline down to one value using its first element as the seed, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/reduce.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/reduce.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/reduce.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/reduce.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/reduce.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/reduce.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/reduce.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/reduce.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/reduce.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Início</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/reduce.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/reduce.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/reduce.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/reduce.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/reduce.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/reduce.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/reduce.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 7 · Agregando › <strong>reduce</strong></p>
+  <h1><code>reduce</code></h1>
+  <p class="hero-sub">Collapses a pipeline into a single value, using its first element as the starting seed.</p>
+
+  <div class="signature">A reduce&lt;A&gt;(A Function(A acc, A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;A&gt; reduceAsync&lt;A&gt;(FutureOr&lt;A&gt; Function(A acc, A a) f, FxAsyncIterable&lt;A&gt; iterable)
+T Fx.reduce(T Function(T acc, T a) combine)              // chain (sync, inherited from Iterable)
+Future&lt;T&gt; FxAsync.reduce(FutureOr&lt;T&gt; Function(T acc, T a) f)  // chain (async)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>reduce</code> is a <strong>terminal</strong> operator: unlike
+    <code>map</code> or <code>filter</code>, calling it immediately pulls
+    every value through the whole lazy pipeline behind it and produces one
+    concrete result. Nothing upstream runs until you call a terminal like
+    this one.
+  </p>
+  <p>
+    This is the <em>unseeded</em> form: it takes the first element of the
+    iterable as the starting accumulator, then combines the rest into it.
+    Because of that, calling it on an empty iterable makes no sense — there's
+    no first element to seed with — so it throws a <code>StateError</code>.
+  </p>
+  <p>
+    FxTS overloads <code>reduce</code> for both the seeded and unseeded case
+    by argument count — <code>reduce(f, iterable)</code> vs.
+    <code>reduce(f, seed, iterable)</code>. Dart has no arity-based
+    overloading, so FxDart keeps <code>reduce</code> for the unseeded form
+    and renames the seeded one to <code><a href="fold.html">fold</a></code> —
+    matching Dart's own <code>Iterable.fold</code> naming. If you have a seed,
+    reach for <code>fold</code>.
+  </p>
+  <p>
+    On the sync chain, <code>Fx</code> extends <code>Iterable</code>, so
+    <code>.reduce(f)</code> is simply Dart's built-in method — same contract,
+    same <code>StateError</code> on empty. On the async chain,
+    <code>FxAsync.reduce</code> is spelled out explicitly and awaits each
+    combine step.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; the empty-input error</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form: largest value, first element becomes the seed.
+  print(reduce((acc, a) => acc > a ? acc : a, [3, 7, 2, 9, 4])); // 9
+
+  // Chain form uses Dart's built-in Iterable.reduce (same contract):
+  final total = fx([1, 2, 3, 4]).reduce((acc, a) => acc + a);
+  print(total); // 10
+
+  // Unseeded reduce throws on empty input:
+  try {
+    reduce((acc, a) => acc + a, <int>[]);
+  } on StateError catch (e) {
+    print('StateError: ${e.message}');
+  }
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with concurrency</h2>
+  <p>
+    <code>reduce</code> still pulls the whole pipeline behind it — including
+    a <code>.concurrent(n)</code> stage, which evaluates <code>n</code>
+    upstream values at a time while <code>reduce</code> combines them as they
+    arrive in order:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  final total = await fx([1, 2, 3, 4, 5, 6])
+      .toAsync()
+      .map((a) => delay(const Duration(milliseconds: 150), a))
+      .concurrent(3)
+      .reduce((acc, a) => acc + a);
+
+  print(total); // 21
+  print('took ${sw.elapsedMilliseconds}ms');
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>reduce</code> to find the <strong>longest</strong> word in the list.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final words = ['fx', 'dart', 'lazy', 'pipeline', 'go'];
+
+  // TODO: use reduce to find the LONGEST word in the list.
+  final longest = reduce<String>((acc, a) => acc, words);
+
+  print(longest);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="fold.html"><code>fold</code></a> — the seeded counterpart ·
+    <a href="reduceLazy.html"><code>reduceLazy</code></a> — a reusable, curried reducer ·
+    <a href="sum.html"><code>sum</code></a> — reduce specialized for numbers ·
+    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation upstream
+  </div>
+
+  <nav class="tut-nav">
+    <a href="fork.html">← Anterior: fork</a>
+    <a href="fold.html">Próximo: fold →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

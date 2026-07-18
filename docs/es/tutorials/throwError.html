@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>throwError — FxDart 101</title>
+  <meta name="description" content="FxDart throwError tutorial: turn an error-throwing action into a reusable unary function, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/throwError.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/throwError.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/throwError.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/throwError.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/throwError.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/throwError.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/throwError.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/throwError.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/throwError.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Inicio</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/throwError.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/throwError.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/throwError.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/throwError.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/throwError.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/throwError.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/throwError.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 10 · Utilidades de funciones › <strong>throwError</strong></p>
+  <h1><code>throwError</code></h1>
+  <p class="hero-sub">Returns a unary function that always throws — for slots that expect a function, not a statement.</p>
+
+  <div class="signature">Never Function(T) throwError&lt;T&gt;(Object Function(T) toError)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>throw</code> is a statement in Dart, so you can't drop it directly
+    into a spot that expects a function value. <code>throwError(toError)</code>
+    solves that: give it a function that builds an <code>Object</code> (an
+    exception or error) from the offending value, and you get back a
+    <code>Never Function(T)</code> you can pass anywhere a callback is
+    expected — most commonly as the <code>orElse</code> of
+    <a href="cases.html"><code>cases</code></a>, to turn "nothing matched"
+    into a hard failure instead of a silent fallback.
+  </p>
+  <p>
+    Because the return type is <code>Never</code>, calling it always throws;
+    it never actually returns a value of type <code>T</code>. Wrap any call
+    site in <code>try</code>/<code>catch</code> if you want to recover
+    instead of letting the error propagate.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final fail = throwError<String>((msg) => StateError(msg));
+
+  try {
+    fail('boom');
+  } catch (e) {
+    print('caught: $e'); // caught: Bad state: boom
+  }
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · As the fallback of cases</h2>
+  <p>
+    Instead of silently falling through, <code>throwError</code> makes an
+    unmatched value a loud, catchable failure:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final classify = cases<int, String>([
+    ((n) => n > 0, (n) => 'positive'),
+    ((n) => n == 0, (n) => 'zero'),
+  ], orElse: throwError((n) => ArgumentError('unsupported value: $n')));
+
+  print(classify(7)); // positive
+
+  try {
+    classify(-1);
+  } catch (e) {
+    print('caught: $e'); // caught: Invalid argument(s): unsupported value: -1
+  }
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: build a throwing function for "not implemented" and trigger it.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // TODO: build a throwing function for "not implemented" and trigger it
+  final notImplemented = throwError<String>((name) => UnimplementedError(name));
+
+  try {
+    notImplemented('exportPdf');
+  } catch (e) {
+    print('caught: $e'); // caught: UnimplementedError: exportPdf
+  }
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="throwIf.html"><code>throwIf</code></a> — throw conditionally, without a separate builder function ·
+    <a href="cases.html"><code>cases</code></a> — the usual home for throwError as orElse ·
+    <a href="when.html"><code>when</code></a> / <a href="unless.html"><code>unless</code></a> — conditional transforms that don't throw ·
+    <a href="find.html"><code>find</code></a> — returns null instead of throwing on no match
+  </div>
+
+  <nav class="tut-nav">
+    <a href="unless.html">← Anterior: unless</a>
+    <a href="throwIf.html">Siguiente: throwIf →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

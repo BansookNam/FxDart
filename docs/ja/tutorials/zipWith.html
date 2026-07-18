@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>zipWith — FxDart 101</title>
+  <meta name="description" content="FxDart zipWith tutorial: zip two iterables and combine each pair through a function in one step, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/zipWith.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/zipWith.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/zipWith.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/zipWith.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/zipWith.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/zipWith.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/zipWith.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/zipWith.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/zipWith.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">ホーム</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/zipWith.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/zipWith.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/zipWith.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/zipWith.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/zipWith.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/zipWith.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/zipWith.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 6 · 結合 › <strong>zipWith</strong></p>
+  <h1><code>zipWith</code></h1>
+  <p class="hero-sub">Zips two iterables and combines each pair through a function, in one step.</p>
+
+  <div class="signature">Iterable&lt;C&gt; zipWith&lt;A, B, C&gt;(C Function(A a, B b) f, Iterable&lt;A&gt; iterable1, Iterable&lt;B&gt; iterable2)
+FxAsyncIterable&lt;C&gt; zipWithAsync&lt;A, B, C&gt;(FutureOr&lt;C&gt; Function(A a, B b) f, FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;B&gt; iterable2)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>zipWith</code> is exactly <code>zip</code> followed by
+    <code>map</code> over the resulting pairs — in fact that's how it's
+    implemented in FxDart, as <code>map((r) => f(r.$1, r.$2), zip(...))</code>.
+    Reach for it when you don't actually want the intermediate
+    <code>(A, B)</code> record, just the combined result: multiplying two
+    parallel lists together, formatting a name and an age into one label,
+    and so on.
+  </p>
+  <p>
+    It stops at the shorter of the two inputs, same as <code>zip</code>, and
+    the async form <code>zipWithAsync</code> inherits <code>zipAsync</code>'s
+    parallel-per-pair pulling. There's no <code>Fx</code> chain form for
+    <code>zipWith</code> — call the top-level function directly (or build it
+    yourself as <code>.zip(other).map((r) => f(r.$1, r.$2))</code>).
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(zipWith((a, b) => '$a$b', ['x', 'y', 'z'], [1, 2, 3]));
+  // (x1, y2, z3)
+
+  final result = zipWith((a, b) => a + b, [1, 2, 3], [10, 20, 30]);
+  print(toArray(result)); // [11, 22, 33]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final letters =
+      fx(['a', 'b', 'c']).toAsync().map((a) => delay(Duration(milliseconds: 50), a));
+  final numbers =
+      fx([1, 2, 3]).toAsync().map((a) => delay(Duration(milliseconds: 50), a));
+
+  final result =
+      await toArrayAsync(zipWithAsync((a, b) => '$a$b', letters, numbers));
+  print(result); // [a1, b2, c3]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>zipWith</code> to compute the line total
+    (<code>price * quantity</code>) per pair.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final prices = [10, 20, 30];
+  final quantities = [2, 1, 3];
+
+  // TODO: use zipWith to compute the line total (price * quantity) per pair
+  final totals = prices;
+
+  print(totals);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="zip.html"><code>zip</code></a> — the plain-pairs version this builds on ·
+    <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — zip against a running index ·
+    <a href="map.html"><code>map</code></a>
+  </div>
+
+  <nav class="tut-nav">
+    <a href="zip.html">← 前: zip</a>
+    <a href="zipWithIndex.html">次: zipWithIndex →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

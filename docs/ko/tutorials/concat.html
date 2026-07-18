@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>concat — FxDart 101</title>
+  <meta name="description" content="FxDart concat tutorial: chain two lazy iterables end to end, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/concat.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/concat.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/concat.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/concat.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/concat.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/concat.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/concat.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/concat.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/concat.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">홈</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/concat.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/concat.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/concat.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/concat.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/concat.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/concat.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/concat.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 6 · 결합 › <strong>concat</strong></p>
+  <h1><code>concat</code></h1>
+  <p class="hero-sub">Lazily yields all of the first iterable, then all of the second.</p>
+
+  <div class="signature">Iterable&lt;A&gt; concat&lt;A&gt;(Iterable&lt;A&gt; iterable1, Iterable&lt;A&gt; iterable2)
+FxAsyncIterable&lt;A&gt; concatAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;A&gt; iterable2)
+Fx&lt;T&gt; Fx.concat(Iterable&lt;T&gt; other)        // chain
+FxAsync&lt;T&gt; FxAsync.concat(FxAsyncIterable&lt;T&gt; other)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>concat</code> chains two iterables end to end without copying
+    either one into a new list. It's fully lazy on both sides: the second
+    iterable is never touched at all unless the pipeline actually pulls past
+    the end of the first — so concatenating an expensive or infinite first
+    source with a second one is safe as long as you don't demand more than
+    the first source has.
+  </p>
+  <p>
+    <code>concatAsync</code> is a pass-through, like <code>take</code> and
+    <code>concat</code>'s async cousins: it doesn't serialize either side
+    internally, so a <code>concurrent(n)</code> further downstream still
+    gets to overlap pulls against whichever side is currently active.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; laziness</h2>
+  <p>The second iterable is a generator with a side effect — watch it never
+    run because <code>take(2)</code> is satisfied by the first list alone:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(concat([1, 2], [3, 4])); // (1, 2, 3, 4)
+
+  // Lazy: the second iterable is never touched unless pulled that far.
+  var secondTouched = false;
+  Iterable<int> second() sync* {
+    secondTouched = true;
+    yield 99;
+  }
+
+  final result = fx(concat([1, 2], second())).take(2).toArray();
+  print(result); // [1, 2]
+  print('second touched: $secondTouched'); // false
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final left = fx([1, 2]).toAsync().map((a) => delay(Duration(milliseconds: 50), a));
+  final right = fx([3, 4]).toAsync().map((a) => delay(Duration(milliseconds: 50), a));
+
+  final result = await left.concat(right).toArray();
+  print(result); // [1, 2, 3, 4]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: concatenate <code>morning</code> and <code>evening</code>
+    into one schedule.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final morning = ['wake', 'coffee'];
+  final evening = ['dinner', 'sleep'];
+
+  // TODO: concatenate morning and evening into one schedule
+  final schedule = fx(morning).toArray();
+
+  print(schedule);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="append.html"><code>append</code></a> — add just one trailing value ·
+    <a href="prepend.html"><code>prepend</code></a> — add just one leading value ·
+    <a href="zip.html"><code>zip</code></a> — pair up elements instead of chaining them
+  </div>
+
+  <nav class="tut-nav">
+    <a href="prepend.html">← 이전: prepend</a>
+    <a href="zip.html">다음: zip →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

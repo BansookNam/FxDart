@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>takeWhile — FxDart 101</title>
+  <meta name="description" content="FxDart takeWhile tutorial: keep taking values as long as a predicate holds, then stop, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/takeWhile.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/takeWhile.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/takeWhile.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/takeWhile.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/takeWhile.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/takeWhile.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/takeWhile.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/takeWhile.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/takeWhile.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Início</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/takeWhile.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/takeWhile.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/takeWhile.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/takeWhile.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/takeWhile.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/takeWhile.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/takeWhile.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 5 · Fatiamento › <strong>takeWhile</strong></p>
+  <h1><code>takeWhile</code></h1>
+  <p class="hero-sub">Yields values as long as a predicate returns true, then stops for good.</p>
+
+  <div class="signature">Iterable&lt;A&gt; takeWhile&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; takeWhileAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.takeWhile(bool Function(T value) test)        // chain
+FxAsync&lt;T&gt; FxAsync.takeWhile(FutureOr&lt;bool&gt; Function(T a) f)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    Where <code>take</code> counts values, <code>takeWhile</code> tests them.
+    It yields elements one at a time and stops the <em>instant</em>
+    <code>f</code> returns false — it never looks past that point, even if a
+    later element would have passed. That makes it a natural fit for
+    "consume until the data stops making sense" situations: a sorted stream
+    up to a threshold, a log up to the first anomaly, and so on.
+  </p>
+  <p>
+    Because it's lazy and short-circuits on the first failure, it's cheap to
+    run even over a huge or infinite source — it only ever evaluates the
+    prefix that actually matches.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <p>Note that <code>2</code> at the end never gets a chance — the predicate
+    already failed on <code>7</code>:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Stops at the first element that fails the test, even though a later
+  // element (2) would have passed:
+  print(takeWhile((a) => a < 5, [1, 2, 3, 7, 2])); // (1, 2, 3)
+
+  final result = fx([2, 4, 6, 7, 8]).takeWhile((a) => a.isEven).toArray();
+  print(result); // [2, 4, 6]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final result = await fx([1, 2, 3, 8, 4])
+      .toAsync()
+      .map((a) => delay(Duration(milliseconds: 50), a))
+      .takeWhile((a) => a < 5)
+      .toArray();
+
+  print(result); // [1, 2, 3]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: keep temperatures only while they stay below 25.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final temps = [18, 19, 21, 24, 30, 22, 17];
+
+  // TODO: keep temperatures only while they stay below 25
+  final mild = fx(temps).toArray();
+
+  print(mild);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="take.html"><code>take</code></a> — take by count instead of predicate ·
+    <a href="takeUntilInclusive.html"><code>takeUntilInclusive</code></a> — stop after (and including) the match ·
+    <a href="dropWhile.html"><code>dropWhile</code></a> — the inverse ·
+    <a href="filter.html"><code>filter</code></a> — keeps matches everywhere, not just a prefix
+  </div>
+
+  <nav class="tut-nav">
+    <a href="takeRight.html">← Anterior: takeRight</a>
+    <a href="takeUntilInclusive.html">Próximo: takeUntilInclusive →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

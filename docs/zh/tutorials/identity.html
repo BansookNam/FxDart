@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>identity — FxDart 101</title>
+  <meta name="description" content="FxDart identity tutorial: the function that returns its argument unchanged, and why that's useful as a default callback.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/identity.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/identity.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/identity.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/identity.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/identity.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/identity.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/identity.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/identity.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/identity.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">首页</a>
+      <a href="../../101/index.html">FxDart 入门</a>
+      <a href="../../101/index.html#api">API 教程</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="语言">
+      <span class="lang-label">语言</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/identity.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/identity.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/identity.html" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/identity.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/identity.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/identity.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/identity.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">本页尚未翻译，因此以英文显示。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">参与翻译</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 入门</a> › 章节 10 · 函数工具 › <strong>identity</strong></p>
+  <h1><code>identity</code></h1>
+  <p class="hero-sub">Returns its argument unchanged.</p>
+
+  <div class="signature">T identity&lt;T&gt;(T a) => a;</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>identity</code> is the simplest function in the library, and one of
+    the most useful: it takes a value and hands it straight back. On its own
+    that looks pointless. Its value shows up whenever an API <em>expects a
+    function</em> but you don't actually want to transform anything — a
+    default key function for <code>groupBy</code>/<code>sortBy</code>, a
+    placeholder branch in a dispatch table, or the "no-op" arm of a
+    conditional pipeline.
+  </p>
+  <p>
+    Because <code>identity</code> is generic (<code>T identity&lt;T&gt;(T a)</code>),
+    it slots into any unary-function position without you writing
+    <code>(x) => x</code> yourself. It has no async variant and no chain
+    form — it's a plain value-in, value-out function you pass around.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <p>Used directly, and as the key function for a grouping operation where
+    "group by the value itself" is exactly what you want:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(identity(5)); // 5
+  print(identity('hello')); // hello
+
+  // realistic: group numbers by their own value
+  final byValue = groupBy(identity, [1, 1, 2, 3, 3, 3]);
+  print(byValue); // {1: [1, 1], 2: [2], 3: [3, 3, 3]}
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · As the "do nothing" branch</h2>
+  <p>
+    A dispatch table of string transforms, where one entry deliberately does
+    nothing — <code>identity</code> fills that slot cleanly instead of a
+    hand-written no-op lambda:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final transforms = <String, String Function(String)>{
+    'upper': (s) => s.toUpperCase(),
+    'none': identity,
+  };
+
+  print(transforms['upper']!('hi')); // HI
+  print(transforms['none']!('hi'));  // hi
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: <code>sortBy</code> takes a key function. Use <code>identity</code>
+    as that key to sort this list of words by their natural (string) order.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final words = ['pear', 'apple', 'fig'];
+
+  // TODO: sort `words` using identity as the key function
+  final sorted = fx(words).sortBy(identity).toArray();
+
+  print(sorted); // [apple, fig, pear]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="always.html"><code>always</code></a> — a constant instead of a pass-through ·
+    <a href="tap.html"><code>tap</code></a> — pass through, but run a side effect first ·
+    <a href="cases.html"><code>cases</code></a> — dispatch table with predicates ·
+    <a href="sortBy.html"><code>sortBy</code></a> — a common home for a key function
+  </div>
+
+  <nav class="tut-nav">
+    <a href="matches.html">← 上一节： matches</a>
+    <a href="always.html">下一节： always →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart 是 <a href="https://github.com/marpple/FxTS">FxTS</a> 的移植版本。特别感谢 <strong>Indong Yoo</strong>（Marpple CTO）与 FxTS 团队，本库的设计思路、语义和测试套件均源于他们的工作。</p>
+  <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 运行","pgReset":"重置","pgCompiling":"编译中…","pgCompileError":"编译错误","pgError":"错误","pgLoading":"正在加载运行时…","pgRunning":"运行中…","pgNoOutput":"（无输出）","pgLoadFailed":"无法加载 FxDart 库"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

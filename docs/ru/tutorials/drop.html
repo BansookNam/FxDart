@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>drop — FxDart 101</title>
+  <meta name="description" content="FxDart drop tutorial: skip the first n values of a lazy pipeline, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/drop.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/drop.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/drop.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/drop.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/drop.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/drop.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/drop.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/drop.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/drop.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Главная</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/drop.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/drop.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/drop.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/drop.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/drop.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/drop.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/drop.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 5 · Срезы › <strong>drop</strong></p>
+  <h1><code>drop</code></h1>
+  <p class="hero-sub">Returns a lazy iterable that skips the first <code>length</code> values.</p>
+
+  <div class="signature">Iterable&lt;A&gt; drop&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; dropAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.drop(int count)        // chain — also aliased as Fx.skip
+FxAsync&lt;T&gt; FxAsync.drop(int count)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>drop</code> is <code>take</code>'s opposite: it discards the first
+    <code>length</code> values and yields everything after them. It's still
+    lazy — nothing is skipped until the pipeline is actually pulled — and it
+    works fine on infinite sources, since it only needs to count off a fixed
+    number of elements before passing the rest straight through.
+  </p>
+  <p>
+    On the <code>Fx</code> chain, <code>drop</code> is also available as
+    <code>skip</code>, matching Dart's own <code>Iterable.skip</code> naming
+    (FxDart's <code>Fx</code> already extends <code>Iterable</code>, so both
+    spellings resolve to the same operator).
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(drop(2, [1, 2, 3, 4, 5])); // (3, 4, 5)
+
+  // Chain form (also aliased as .skip, matching Iterable):
+  final result = fx([1, 2, 3, 4, 5]).drop(2).toArray();
+  print(result); // [3, 4, 5]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with concurrency</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  final result = await fx(range(6))
+      .toAsync()
+      .map((a) => delay(Duration(milliseconds: 100), a))
+      .concurrent(3)
+      .drop(2)
+      .toArray();
+
+  print(result); // [2, 3, 4, 5]
+  print('took ${sw.elapsedMilliseconds}ms');
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: drop the first 2 header lines.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final lines = ['# header', '# more header', 'data1', 'data2', 'data3'];
+
+  // TODO: drop the first 2 header lines
+  final data = fx(lines).toArray();
+
+  print(data);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="take.html"><code>take</code></a> — the opposite, keep the first n ·
+    <a href="dropRight.html"><code>dropRight</code></a> — drop from the end ·
+    <a href="dropWhile.html"><code>dropWhile</code></a> — drop by predicate ·
+    <a href="slice.html"><code>slice</code></a> — arbitrary index window
+  </div>
+
+  <nav class="tut-nav">
+    <a href="takeUntilInclusive.html">← Назад: takeUntilInclusive</a>
+    <a href="dropRight.html">Далее: dropRight →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

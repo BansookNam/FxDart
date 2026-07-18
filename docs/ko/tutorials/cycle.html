@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>cycle — FxDart 101</title>
+  <meta name="description" content="FxDart cycle tutorial: repeat a sequence forever — an infinite source that must always be paired with take.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/cycle.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/cycle.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/cycle.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/cycle.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/cycle.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/cycle.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/cycle.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/cycle.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/cycle.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">홈</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/cycle.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/cycle.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/cycle.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/cycle.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/cycle.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/cycle.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/cycle.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 2 · 시퀀스 생성 › <strong>cycle</strong></p>
+  <h1><code>cycle</code></h1>
+  <p class="hero-sub">Yields a sequence, then repeats it — forever. Always pair it with a bound like take.</p>
+
+  <div class="signature">Iterable&lt;T&gt; cycle&lt;T&gt;(Iterable&lt;T&gt; iterable)
+FxAsyncIterable&lt;T&gt; cycleAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable)
+Fx&lt;T&gt; Fx.cycle()        // chain
+FxAsync&lt;T&gt; FxAsync.cycle()</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>cycle</code> is <strong>infinite</strong>: it plays the source
+    sequence once, buffering its values as it goes, then loops over that
+    buffer forever. Unlike everything else in this section,
+    <code>cycle</code> never runs out on its own — you must always pair it
+    with something that decides when to stop, almost always
+    <code>.take(n)</code>. Calling <code>toArray()</code> or
+    <code>consume()</code> directly on a bare <code>cycle(...)</code>
+    without a bound in between will hang.
+  </p>
+  <p>
+    One edge case worth knowing: cycling an <em>empty</em> source yields
+    nothing at all, rather than looping forever over zero elements — so
+    <code>cycle([])</code> is safe and simply produces an empty result.
+  </p>
+  <p>
+    It's a natural building block for round-robin assignment (cycle through
+    a small list of workers/colors/slots as you map over a longer one) or
+    for repeating a short async sequence to model a polling loop. The async
+    form, <code>cycleAsync</code> (or <code>.cycle()</code> on an
+    <code>FxAsync</code> chain), buffers and loops the same way, but pulls
+    each round through the usual async protocol.
+  </p>
+
+  <h2>Demo 1 · Infinite, bounded by take</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // cycle repeats its source FOREVER — always pair it with take (or some
+  // other bound) or the pipeline will never finish.
+  final result = fx([1, 2, 3]).cycle().take(7).toArray();
+  print(result); // [1, 2, 3, 1, 2, 3, 1]
+
+  // Data-first form is the same:
+  print(toArray(take(5, cycle(['a', 'b'])))); // [a, b, a, b, a]
+
+  // An empty source cycles to nothing, rather than hanging:
+  print(toArray(take(3, cycle(<int>[])))); // []
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async cycle, still bounded by take</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // cycleAsync/.cycle() on an FxAsync chain works the same way — still
+  // pair it with .take(n), just on the async side.
+  final result = await fx(['x', 'y'])
+      .toAsync()
+      .cycle()
+      .map((a) => delay(const Duration(milliseconds: 50), a.toUpperCase()))
+      .take(5)
+      .toArray();
+
+  print(result); // [X, Y, X, Y, X]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: cycle through traffic-light colors and take the first 8.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // TODO: cycle through these traffic-light colors and take the first 8.
+  final colors = ['red', 'yellow', 'green'];
+
+  final sequence = fx(colors).cycle().take(8).toArray();
+
+  print(sequence); // [red, yellow, green, red, yellow, green, red, yellow]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="range.html"><code>range</code></a> — a finite counting sequence ·
+    <a href="repeat.html"><code>repeat</code></a> — repeat a single value, a fixed number of times ·
+    <a href="take.html"><code>take</code></a> — the bound cycle almost always needs ·
+    <a href="concurrent.html"><code>concurrent</code></a> — overlap an async cycle's work
+  </div>
+
+  <nav class="tut-nav">
+    <a href="repeat.html">← 이전: repeat</a>
+    <a href="entries.html">다음: entries →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+Iterable&lt;A&gt; dropRight&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; dropRightAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.dropRight(int count)        // chain
+FxAsync&lt;T&gt; FxAsync.dropRight(int count)

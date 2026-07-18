@@ -1,0 +1,1 @@
+T tap&lt;T&gt;(void Function(T a) f, T a)

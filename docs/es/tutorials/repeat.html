@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>repeat — FxDart 101</title>
+  <meta name="description" content="FxDart repeat tutorial: yield the same value n times, lazily.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/repeat.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/repeat.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/repeat.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/repeat.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/repeat.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/repeat.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/repeat.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/repeat.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/repeat.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Inicio</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/repeat.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/repeat.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/repeat.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/repeat.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/repeat.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/repeat.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/repeat.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 2 · Generar secuencias › <strong>repeat</strong></p>
+  <h1><code>repeat</code></h1>
+  <p class="hero-sub">Yields the same value n times — a lazy, finite source for padding and pairing.</p>
+
+  <div class="signature">Iterable&lt;T&gt; repeat&lt;T&gt;(int n, T value)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>repeat(n, value)</code> yields <code>value</code> exactly
+    <code>n</code> times, then stops — it's finite and lazy, like the rest
+    of this section's generators. Note that it repeats the <em>same</em>
+    value (or the same object reference, for non-primitives) every time; if
+    you need a fresh value per iteration, generate it separately (e.g. with
+    <code>map</code> over the result) rather than expecting
+    <code>repeat</code> to call a factory function.
+  </p>
+  <p>
+    It's most useful paired with something else: <code>zip</code> it
+    against a variable-length sequence to stamp a constant label onto every
+    element, or use <code>fx(...).join()</code> to build a fixed-width
+    separator string. <code>repeat(0, value)</code> is a valid, perfectly
+    normal way to get an empty iterable.
+  </p>
+  <p>
+    If you actually want to repeat a whole <em>sequence</em> rather than
+    one value — and keep going forever instead of a fixed <code>n</code>
+    times — that's <code>cycle</code>, covered next.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(toArray(repeat(3, 'x')));  // [x, x, x]
+  print(toArray(repeat(0, 'x')));  // [] — n=0 yields nothing
+  print(fx(repeat(4, '-')).join()); // ----
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Pairing a constant with a variable sequence</h2>
+  <p>
+    <code>repeat</code> yields the SAME value every time — pair it with
+    <code>zip</code> to stamp a constant onto a variable-length sequence:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // repeat yields the SAME value n times — pair it with zip/zipWithIndex
+  // to stamp a constant onto a variable-length sequence.
+  final names = ['kim', 'lee', 'park'];
+  final labeled = fx(names).zip(repeat(names.length, 'pending')).toArray();
+
+  print(labeled); // [(kim, pending), (lee, pending), (park, pending)]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: build a 5-item <code>List&lt;int&gt;</code> of the value 7
+    using <code>repeat</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // TODO: build a 5-item List<int> of the value 7 using repeat.
+  final sevens = fx(repeat(5, 7)).toArray();
+
+  print(sevens); // [7, 7, 7, 7, 7]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="range.html"><code>range</code></a> — a lazy sequence of increasing/decreasing integers ·
+    <a href="cycle.html"><code>cycle</code></a> — repeat a whole sequence, forever ·
+    <a href="zip.html"><code>zip</code></a> — pairs repeat is often used with ·
+    <a href="fx.html"><code>fx</code></a> — the chain repeat is usually wrapped in
+  </div>
+
+  <nav class="tut-nav">
+    <a href="range.html">← Anterior: range</a>
+    <a href="cycle.html">Siguiente: cycle →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,2 @@
+A? nth&lt;A&gt;(int index, Iterable&lt;A&gt; iterable)
+Future&lt;A?&gt; nthAsync&lt;A&gt;(int index, FxAsyncIterable&lt;A&gt; iterable)

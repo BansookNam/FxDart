@@ -1,0 +1,2 @@
+Iterable&lt;C&gt; zipWith&lt;A, B, C&gt;(C Function(A a, B b) f, Iterable&lt;A&gt; iterable1, Iterable&lt;B&gt; iterable2)
+FxAsyncIterable&lt;C&gt; zipWithAsync&lt;A, B, C&gt;(FutureOr&lt;C&gt; Function(A a, B b) f, FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;B&gt; iterable2)

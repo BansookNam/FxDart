@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>sort — FxDart 101</title>
+  <meta name="description" content="FxDart sort tutorial: comparator-based sorting that always returns a new list, never mutates, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/sort.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/sort.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/sort.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/sort.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/sort.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/sort.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/sort.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/sort.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/sort.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Início</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/sort.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/sort.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/sort.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/sort.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/sort.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/sort.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/sort.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 7 · Agregando › <strong>sort</strong></p>
+  <h1><code>sort</code></h1>
+  <p class="hero-sub">Returns a brand-new sorted list from a comparator — it never mutates its input.</p>
+
+  <div class="signature">List&lt;A&gt; sort&lt;A&gt;(int Function(A a, A b) f, Iterable&lt;A&gt; iterable)
+List&lt;A&gt; toSorted&lt;A&gt;(int Function(A a, A b) f, Iterable&lt;A&gt; iterable)   // alias of sort
+Future&lt;List&lt;A&gt;&gt; sortAsync&lt;A&gt;(int Function(A a, A b) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.sort(int Function(T a, T b) f)                    // chain (sync) — still lazy, call .toArray()
+Future&lt;List&lt;T&gt;&gt; FxAsync.sort(int Function(T a, T b) f)     // chain (async) — already a terminal</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>sort</code> takes a standard Dart comparator — return negative if
+    <code>a</code> should come before <code>b</code>, positive if after, zero
+    if tied — and produces a sorted result. The important difference from
+    JavaScript's (and FxTS's) <code>Array.prototype.sort</code> is that
+    FxDart's <code>sort</code> <strong>never mutates its input</strong>. It
+    always allocates a new <code>List</code> (<code>List.of(iterable)..sort(f)</code>),
+    leaving the original iterable exactly as it was. FxTS later added
+    <code>toSorted</code> as the non-mutating alternative to its mutating
+    <code>sort</code>; in FxDart, <code>toSorted</code> is simply an alias —
+    since <code>sort</code> was already non-mutating, there was nothing left
+    to differentiate.
+  </p>
+  <p>
+    There's a nuance on the <strong>chain</strong> form worth calling out
+    explicitly: on the sync <code>Fx</code> chain, <code>.sort(f)</code>
+    returns another <code>Fx&lt;T&gt;</code> — not a <code>List&lt;T&gt;</code> —
+    because <code>Fx</code> wraps its underlying sorted list to stay
+    chainable. You still need a terminal like
+    <code><a href="../101/index.html">.toArray()</a></code> to get a
+    concrete <code>List</code> out of it. The <strong>async</strong> chain
+    doesn't have that wrinkle: <code>FxAsync.sort(f)</code> is already a
+    terminal that returns <code>Future&lt;List&lt;T&gt;&gt;</code> directly,
+    because <code>FxAsync</code> can't return itself from something that
+    needs to <code>await</code> the whole pipeline first.
+  </p>
+  <p>
+    Reach for <code><a href="sortBy.html">sortBy</a></code> instead when you
+    just want to sort by a key you extract, rather than writing the
+    comparator yourself.
+  </p>
+
+  <h2>Demo 1 · Basics, no mutation, and toSorted</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final original = [5, 2, 8, 1, 9];
+
+  // Data-first form: always returns a NEW list, unlike JS/FxTS array.sort
+  // which mutates in place.
+  final sorted = sort<int>((a, b) => a.compareTo(b), original);
+  print(sorted); // [1, 2, 5, 8, 9]
+  print(original); // [5, 2, 8, 1, 9]  <- untouched
+
+  // toSorted is just an alias of sort, kept for FxTS familiarity:
+  print(toSorted<int>((a, b) => b.compareTo(a), original)); // [9, 8, 5, 2, 1]
+
+  // Chain form: .sort(f) returns another Fx (still lazy on paper), so pull
+  // it with .toArray() to get a concrete List:
+  final chained = fx(original).sort((a, b) => a.compareTo(b)).toArray();
+  print(chained); // [1, 2, 5, 8, 9]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async — already a terminal</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // On the async chain, .sort(f) is already a terminal that returns
+  // Future<List<T>> directly (no extra .toArray() needed).
+  final result = await fx([5, 2, 8, 1, 9])
+      .toAsync()
+      .map((a) => delay(const Duration(milliseconds: 100), a))
+      .sort((a, b) => a.compareTo(b));
+
+  print(result); // [1, 2, 5, 8, 9]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: sort the numbers in <strong>descending</strong> order.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final numbers = [42, 7, 19, 3, 88, 25];
+
+  // TODO: sort the numbers in DESCENDING order.
+  final sorted = sort<int>((a, b) => a.compareTo(b), numbers);
+
+  print(sorted);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="sortBy.html"><code>sortBy</code></a> — sort by an extracted key instead of a comparator ·
+    <a href="reverse.html"><code>reverse</code></a> — flip element order without comparing ·
+    <a href="partition.html"><code>partition</code></a> — split into two lists by a predicate
+  </div>
+
+  <nav class="tut-nav">
+    <a href="countBy.html">← Anterior: countBy</a>
+    <a href="sortBy.html">Próximo: sortBy →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

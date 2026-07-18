@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>sum — FxDart 101</title>
+  <meta name="description" content="FxDart sum tutorial: add up every number in a pipeline, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/sum.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/sum.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/sum.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/sum.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/sum.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/sum.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/sum.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/sum.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/sum.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Главная</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/sum.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/sum.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/sum.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/sum.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/sum.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/sum.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/sum.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 7 · Агрегация › <strong>sum</strong></p>
+  <h1><code>sum</code></h1>
+  <p class="hero-sub">Adds up every number a lazy pipeline produces.</p>
+
+  <div class="signature">num sum(Iterable&lt;num&gt; iterable)
+Future&lt;num&gt; sumAsync(FxAsyncIterable&lt;num&gt; iterable)
+num Fx&lt;num&gt;.sum()          // chain (sync)
+Future&lt;num&gt; FxAsync&lt;num&gt;.sum()  // chain (async)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>sum</code> is a terminal operator, and one of the simplest
+    special-cased folds in the library: it's literally
+    <code>fold(0, (a, b) =&gt; a + b, iterable)</code> underneath. Like every
+    terminal, calling it pulls the entire lazy pipeline upstream of it — so
+    you can build an elaborate chain of <code>map</code>/<code>filter</code>
+    steps and only pay for the values <code>sum</code> actually needs, which
+    is all of them.
+  </p>
+  <p>
+    Because the seed is <code>0</code>, summing an empty iterable gives
+    <code>0</code> — no error, no <code>NaN</code>. That's different from its
+    neighbors <code><a href="min.html">min</a></code>,
+    <code><a href="max.html">max</a></code>, and
+    <code><a href="average.html">average</a></code>, which each have their
+    own (surprising!) empty-input behavior worth knowing about.
+  </p>
+  <p>
+    The chain form is available as an extension method,
+    <code>Fx&lt;num&gt;.sum()</code> / <code>FxAsync&lt;num&gt;.sum()</code> —
+    it only shows up once your chain's element type is known to be
+    <code>num</code> (or <code>int</code>/<code>double</code>, thanks to
+    generic covariance).
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form:
+  print(sum([1, 2, 3, 4])); // 10
+
+  // Chain form (Fx<num> extension), pulls the lazy pipeline:
+  final total = fx([1, 2, 3, 4, 5])
+      .filter((a) => a.isOdd)
+      .map((a) => a * 10)
+      .sum();
+  print(total); // 90
+
+  // Empty iterable sums to 0 (the fold seed), unlike min/max:
+  print(sum(<num>[])); // 0
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // sumAsync / .toAsync().sum() pulls each delayed value then totals them.
+  final total = await fx([1, 2, 3, 4])
+      .toAsync()
+      .map((a) => delay(const Duration(milliseconds: 100), a * a))
+      .sum();
+
+  print(total); // 30 (1 + 4 + 9 + 16)
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: sum only the <strong>even</strong> numbers in the list.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+  // TODO: sum only the EVEN numbers in the list.
+  final total = fx(numbers).sum();
+
+  print(total);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="average.html"><code>average</code></a> — sum divided by count ·
+    <a href="fold.html"><code>fold</code></a> — the general form sum specializes ·
+    <a href="min.html"><code>min</code></a> · <a href="max.html"><code>max</code></a> — the other numeric terminals
+  </div>
+
+  <nav class="tut-nav">
+    <a href="reduceLazy.html">← Назад: reduceLazy</a>
+    <a href="average.html">Далее: average →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

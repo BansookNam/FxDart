@@ -1,0 +1,1 @@
+R Function(T value) cases&lt;T, R&gt;(List&lt;(bool Function(T), R Function(T))&gt; pairs, {R Function(T)? orElse})

@@ -1,0 +1,9 @@
+bool isNull(Object? a)
+bool isNotNull(Object? a)
+bool isNil(Object? a)       // == isNull; Dart has no separate `undefined`
+bool isBoolean(Object? a)
+bool isNumber(Object? a)
+bool isString(Object? a)
+bool isDate(Object? a)
+bool isList(Object? a)
+bool isMap(Object? a)

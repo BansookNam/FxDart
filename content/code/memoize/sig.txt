@@ -1,0 +1,1 @@
+R Function(A) memoize&lt;A, R&gt;(R Function(A) f)

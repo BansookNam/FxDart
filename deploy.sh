@@ -39,8 +39,14 @@ if [[ $SKIP_BUILD -eq 0 ]]; then
 
   step "Analyzing library sources"
   dart analyze lib
+
+  step "Rendering docs/ from content/ + i18n/"
+  dart run tool/build_docs.dart
 else
   step "Skipping build (-s)"
+
+  step "Verifying docs/ is current"
+  dart run tool/build_docs.dart --check
 fi
 
 # ---------------------------------------------------------------- sanity
@@ -51,13 +57,16 @@ for required in docs/index.html docs/101/index.html docs/css/site.css \
 done
 echo "ok — $(find docs -type f | wc -l | tr -d ' ') files under docs/"
 
+step "Translation coverage"
+dart run tool/build_docs.dart --status
+
 # ---------------------------------------------------------------- stage
 # Staged by path, deliberately. A docs deploy must not sweep up unrelated
 # work-in-progress in lib/ or test/ — if you want source changes in the same
 # push, commit them yourself first. This also leaves the untracked
 # example/_snip_*.dart scratch files alone.
 step "Staging changes"
-git add docs tools deploy.sh DEPLOY.md
+git add docs content i18n tool tools deploy.sh DEPLOY.md
 
 if git diff --cached --quiet; then
   echo "nothing to deploy — docs/ is already up to date."

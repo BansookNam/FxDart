@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>peek — FxDart 101</title>
+  <meta name="description" content="FxDart peek tutorial: observe elements flowing through a pipeline without transforming them, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/peek.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/peek.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/peek.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/peek.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/peek.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/peek.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/peek.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/peek.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/peek.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">首页</a>
+      <a href="../../101/index.html">FxDart 入门</a>
+      <a href="../../101/index.html#api">API 教程</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="语言">
+      <span class="lang-label">语言</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/peek.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/peek.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/peek.html" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/peek.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/peek.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/peek.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/peek.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">本页尚未翻译，因此以英文显示。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">参与翻译</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 入门</a> › 章节 3 · 转换 › <strong>peek</strong></p>
+  <h1><code>peek</code></h1>
+  <p class="hero-sub">Runs a function for each element without changing anything — the pipeline equivalent of a debugger breakpoint.</p>
+
+  <div class="signature">Iterable&lt;A&gt; peek&lt;A&gt;(void Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; peekAsync&lt;A&gt;(FutureOr&lt;void&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.peek(void Function(T a) f)        // chain
+FxAsync&lt;T&gt; FxAsync.peek(FutureOr&lt;void&gt; Function(T a) f)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>peek</code> is <code>mapEffect</code>'s stricter cousin: where
+    <code>mapEffect</code> can still change the value (it's <code>map</code>
+    under a different name), <code>peek</code>'s callback returns
+    <code>void</code> — it is only ever allowed to look. The element that
+    went in comes back out completely untouched. Reach for it to drop a
+    <code>print</code>, a metric, or a log line into the middle of a
+    pipeline while debugging, without risking a typo that silently mutates
+    the data.
+  </p>
+  <p>
+    It's just as lazy as everything else here: the callback fires exactly
+    once per element that gets pulled through, in order, and not before.
+  </p>
+  <p>
+    <code>peekAsync</code> is built directly on top of <code>mapAsync</code>
+    (it awaits <code>f</code>, then re-yields the original value), so it
+    shares <code>map</code>'s concurrency behavior exactly:
+    <code>.concurrent(n)</code> genuinely runs <code>n</code> callbacks in
+    parallel — unlike <code>flatMap</code> or <code>scan</code>, whose
+    internal state machines have to stay sequential.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <p>Same values in, same values out — <code>peek</code> only ever
+    observes:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form: peek runs f for its side effect and yields a untouched.
+  final seen = <int>[];
+  final result = toArray(peek((a) => seen.add(a), [1, 2, 3]));
+  print(result); // [1, 2, 3] -- same values in, same values out
+  print(seen);   // [1, 2, 3]
+
+  // Chain form: a debug print dropped into the middle of a pipeline,
+  // without disturbing the values flowing through it.
+  final total = fx([1, 2, 3, 4])
+      .map((a) => a * a)
+      .peek((a) => print('squared: $a'))
+      .fold(0, (acc, a) => acc + a);
+  print('total: $total'); // total: 30
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with real concurrency</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  // peekAsync is built directly on mapAsync, so concurrent(n) parallelizes
+  // its side effect just like it does for map.
+  final logged = <int>[];
+  final result = await fx([1, 2, 3])
+      .toAsync()
+      .peek((a) async {
+        await delay(Duration(milliseconds: 150), null);
+        logged.add(a);
+      })
+      .concurrent(3)
+      .toArray();
+
+  print(result); // [1, 2, 3]
+  print(logged.length); // 3
+  print('took ${sw.elapsedMilliseconds}ms'); // ~150ms with concurrency
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>peek</code> to print
+    <code>'checking price: $p'</code> for each price without changing the
+    values, then sum them with <code>fold</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final prices = [10, 25, 40];
+
+  // TODO: use peek to print 'checking price: $p' for each price, without
+  // changing the values, then sum them with fold.
+  final total = fx(prices).fold(0, (acc, p) => acc + p);
+
+  print('total: $total');
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="mapEffect.html"><code>mapEffect</code></a> — like peek, but can transform ·
+    <a href="map.html"><code>map</code></a> — transform each element ·
+    <a href="pluck.html"><code>pluck</code></a> — pull one field out of each map ·
+    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
+  </div>
+
+  <nav class="tut-nav">
+    <a href="scan.html">← 上一节： scan</a>
+    <a href="pluck.html">下一节： pluck →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart 是 <a href="https://github.com/marpple/FxTS">FxTS</a> 的移植版本。特别感谢 <strong>Indong Yoo</strong>（Marpple CTO）与 FxTS 团队，本库的设计思路、语义和测试套件均源于他们的工作。</p>
+  <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 运行","pgReset":"重置","pgCompiling":"编译中…","pgCompileError":"编译错误","pgError":"错误","pgLoading":"正在加载运行时…","pgRunning":"运行中…","pgNoOutput":"（无输出）","pgLoadFailed":"无法加载 FxDart 库"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

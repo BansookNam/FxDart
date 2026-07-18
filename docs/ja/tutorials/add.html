@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>add — FxDart 101</title>
+  <meta name="description" content="FxDart add tutorial: a generic + as a function value, usable as a reducer, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/add.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/add.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/add.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/add.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/add.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/add.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/add.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/add.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/add.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">ホーム</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/add.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/add.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/add.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/add.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/add.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/add.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/add.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 10 · 関数ユーティリティ › <strong>add</strong></p>
+  <h1><code>add</code></h1>
+  <p class="hero-sub">Adds two values of the same type, as a function you can pass around.</p>
+
+  <div class="signature">T add&lt;T extends Object&gt;(T a, T b) => (a as dynamic) + b as T;</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>add(a, b)</code> is <code>+</code> packaged as a function value.
+    Since it dispatches to <code>+</code> dynamically, it works for anything
+    that supports the operator — <code>num</code>, <code>String</code>
+    concatenation, even <code>List</code> concatenation — mirroring FxTS's
+    <code>add</code>, which accepts both numbers and strings.
+  </p>
+  <p>
+    Its real value shows up wherever an API wants a binary
+    <code>(T, T) -&gt; T</code> function rather than an inline
+    <code>(a, b) =&gt; a + b</code> — most naturally as the combining
+    function for <code>reduce</code>/<code>fold</code>. It's a binary
+    function though, so to use it as a unary <code>map</code> callback
+    (adding a fixed amount to every element) you close over one side
+    yourself: <code>(b) =&gt; add(n, b)</code>.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(add(2, 3));         // 5
+  print(add('foo', 'bar')); // foobar
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · As a reducer, and closed over for map</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // add as a reducer
+  print(fx([1, 2, 3, 4]).reduce(add)); // 10
+
+  // add closed over for use as a unary map callback
+  int Function(int) plus(int n) => (b) => add(n, b);
+  print(fx([1, 2, 3]).map(plus(10)).toArray()); // [11, 12, 13]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>fold</code> + <code>add</code> to concatenate all
+    the parts into one string.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final parts = ['foo', 'bar', 'baz'];
+
+  // TODO: use fold + add to concatenate all the parts into one string
+  final joined = fold('', add, parts);
+
+  print(joined); // foobarbaz
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="reduce.html"><code>reduce</code></a> / <a href="fold.html"><code>fold</code></a> — the usual home for add as a combiner ·
+    <a href="sum.html"><code>sum</code></a> — a ready-made sum for Iterable&lt;num&gt; ·
+    <a href="comparisons.html"><code>gt · gte · lt · lte</code></a> — the comparison counterparts to add ·
+    <a href="apply.html"><code>apply</code></a> — call any function with a dynamic argument list
+  </div>
+
+  <nav class="tut-nav">
+    <a href="cases.html">← 前: cases</a>
+    <a href="comparisons.html">次: gt · gte · lt · lte →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

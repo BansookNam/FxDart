@@ -1,0 +1,4 @@
+Iterable&lt;T&gt; cycle&lt;T&gt;(Iterable&lt;T&gt; iterable)
+FxAsyncIterable&lt;T&gt; cycleAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable)
+Fx&lt;T&gt; Fx.cycle()        // chain
+FxAsync&lt;T&gt; FxAsync.cycle()

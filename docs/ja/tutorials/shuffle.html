@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>shuffle — FxDart 101</title>
+  <meta name="description" content="FxDart shuffle tutorial: Fisher-Yates shuffle with an optional seed for reproducible order, sync and async, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/shuffle.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/shuffle.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/shuffle.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/shuffle.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/shuffle.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/shuffle.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/shuffle.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/shuffle.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/shuffle.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">ホーム</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/shuffle.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/shuffle.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/shuffle.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/shuffle.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/shuffle.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/shuffle.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/shuffle.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 12 · ユーティリティ › <strong>shuffle</strong></p>
+  <h1><code>shuffle</code></h1>
+  <p class="hero-sub">Returns a new list with elements in shuffled order — pass a seed for a reproducible result.</p>
+
+  <div class="signature">List&lt;T&gt; shuffle&lt;T&gt;(Iterable&lt;T&gt; iterable, [int? seed])
+Future&lt;List&lt;T&gt;&gt; shuffleAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable, [int? seed])</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>shuffle</code> runs a Fisher-Yates shuffle over the elements of
+    <code>iterable</code> and returns a brand-new <code>List&lt;T&gt;</code> —
+    the input is never mutated. Called with no seed, it uses
+    <code>dart:math</code>'s <code>Random</code>, so every call gives a
+    different order, exactly as you'd expect for something like a card deck
+    or a randomized quiz.
+  </p>
+  <p>
+    Pass an <code>int</code> <code>seed</code> and shuffle switches to a
+    seeded PRNG (a Dart port of the same Mulberry32-style generator FxTS
+    uses), so the <em>same seed always produces the same order</em> — on any
+    run, on any machine. That determinism is what makes seeded shuffling
+    useful for things like reproducible test fixtures, "daily challenge"
+    puzzles where everyone with today's seed sees the same layout, or
+    deterministic replays of a randomized simulation.
+  </p>
+  <p>
+    <code>shuffleAsync</code> is the <code>*Async</code> twin: it materializes
+    an <code>FxAsyncIterable</code> first (via <code>toArrayAsync</code>
+    internally) and then shuffles the result, so a seeded async shuffle
+    produces the identical order to its sync counterpart given the same seed.
+  </p>
+
+  <h2>Demo 1 · Seeded determinism</h2>
+  <p>Same seed, same order — every time. A different seed gives a different
+    (but still reproducible) order:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final deck = [1, 2, 3, 4, 5, 6, 7, 8];
+
+  // No seed: a fresh, unpredictable order every run.
+  print(shuffle(deck)); // e.g. [4, 7, 1, 8, 3, 6, 2, 5] — different every run
+
+  // Same seed, same order — every time, on every machine.
+  final a = shuffle(deck, 42);
+  final b = shuffle(deck, 42);
+  print(a); // [3, 8, 2, 1, 7, 6, 4, 5]
+  print(a.toString() == b.toString()); // true
+
+  // A different seed gives a different (still deterministic) order.
+  final c = shuffle(deck, 7);
+  print(a.toString() == c.toString()); // false
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · shuffleAsync matches the sync order, and nothing is lost</h2>
+  <p>
+    Same seed gives the identical order whether the source is sync or async
+    — and every element from the input is still present, just reordered:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final deck = [1, 2, 3, 4, 5];
+
+  // shuffleAsync is the *Async twin — same seed gives the identical order
+  // as the sync version, so a pipeline can switch between sync and async
+  // sources without changing the reproducible result.
+  final syncShuffled = shuffle(deck, 99);
+  final asyncShuffled = await shuffleAsync(toAsync(deck), 99);
+  print(syncShuffled); // [1, 3, 5, 4, 2]
+  print(syncShuffled.toString() == asyncShuffled.toString()); // true
+
+  // No elements are lost or duplicated — only reordered.
+  print(List.of(syncShuffled)..sort()); // [1, 2, 3, 4, 5]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: give this turn order a seed so it's reproducible across app
+    restarts instead of random every time.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final players = ['ann', 'bo', 'cara', 'di', 'eli'];
+
+  // TODO: pass a seed (e.g. 7) to shuffle() so this turn order is
+  // reproducible across app restarts instead of random every time.
+  final turnOrder = shuffle(players);
+
+  print(turnOrder.length); // 5
+  print(List.of(turnOrder)..sort()); // [ann, bo, cara, di, eli]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="throttle.html"><code>throttle</code></a> — rate-limiting for callbacks ·
+    <a href="debounce.html"><code>debounce</code></a> — wait-for-quiet rate limiting ·
+    <a href="toAsync.html"><code>toAsync</code></a> — lifting a list for shuffleAsync ·
+    <a href="sort.html"><code>sort</code></a> — the opposite instinct: deterministic order
+  </div>
+
+  <nav class="tut-nav">
+    <a href="../../101/index.html">← FxDart 101</a>
+    <a href="createSeededRandom.html">次: createSeededRandom →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

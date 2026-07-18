@@ -15,6 +15,12 @@
 (function () {
   'use strict';
 
+  // Localized UI strings. The page generator (tool/build_docs.dart) emits
+  // window.FXDART_I18N per locale; the English defaults below are the fallback
+  // so this file keeps working standalone and when a key is untranslated.
+  var I18N = window.FXDART_I18N || {};
+  function t(key, fallback) { return I18N[key] || fallback; }
+
   var script = document.currentScript;
   var ROOT = script.src.replace(/js\/playground\.js.*$/, '');
   var COMPILE_URL = 'https://stable.api.dartpad.dev/api/v3/compileNewDDC';
@@ -25,7 +31,7 @@
       // no-cache: always revalidate so a redeployed library bundle (or a
       // stale partial cache entry) can never be silently mismatched.
       libPromise = fetch(ROOT + 'assets/fxdart_single.dart', { cache: 'no-cache' }).then(function (r) {
-        if (!r.ok) throw new Error('Could not load fxdart library (' + r.status + ')');
+        if (!r.ok) throw new Error(t('pgLoadFailed', 'Could not load the FxDart library') + ' (' + r.status + ')');
         return r.text();
       });
     }
@@ -77,8 +83,8 @@
     textarea.value = initial;
 
     var toolbar = el('div', 'pg-toolbar');
-    var runBtn = el('button', 'pg-run', '▶ Run');
-    var resetBtn = el('button', 'pg-reset', 'Reset');
+    var runBtn = el('button', 'pg-run', t('pgRun', '\u25b6 Run'));
+    var resetBtn = el('button', 'pg-reset', t('pgReset', 'Reset'));
     var status = el('span', 'pg-status', '');
     toolbar.appendChild(runBtn);
     toolbar.appendChild(resetBtn);
@@ -125,7 +131,7 @@
       output.style.display = 'block';
       output.textContent = '';
       runBtn.disabled = true;
-      status.textContent = 'Compiling…';
+      status.textContent = t('pgCompiling', 'Compiling\u2026');
 
       getLib().then(function (lib) {
         var built = buildSource(lib, getCode());
@@ -138,7 +144,7 @@
             if (!resp.ok) {
               var msg;
               try { msg = JSON.parse(text).error || text; } catch (e) { msg = text; }
-              status.textContent = 'Compile error';
+              status.textContent = t('pgCompileError', 'Compile error');
               appendOut(remapErrors(String(msg), built.offset), 'pg-err');
               runBtn.disabled = false;
               return;
@@ -148,14 +154,14 @@
           });
         });
       }).catch(function (err) {
-        status.textContent = 'Error';
+        status.textContent = t('pgError', 'Error');
         appendOut(String(err), 'pg-err');
         runBtn.disabled = false;
       });
     }
 
     function execute(js) {
-      status.textContent = 'Loading runtime…';
+      status.textContent = t('pgLoading', 'Loading runtime\u2026');
       iframe = document.createElement('iframe');
       iframe.setAttribute('sandbox', 'allow-scripts');
       iframe.style.display = 'none';
@@ -169,7 +175,7 @@
         if (d.type === 'ready') {
           iframe.contentWindow.postMessage({ command: 'execute', js: js }, '*');
         } else if (d.type === 'started') {
-          status.textContent = 'Running…';
+          status.textContent = t('pgRunning', 'Running\u2026');
         } else if (d.type === 'stdout') {
           gotOutput = true;
           appendOut(d.message, 'pg-out');
@@ -183,7 +189,7 @@
           status.textContent = '';
           runBtn.disabled = false;
           setTimeout(function () {
-            if (!gotOutput) appendOut('(no output)', 'pg-dim');
+            if (!gotOutput) appendOut(t('pgNoOutput', '(no output)'), 'pg-dim');
           }, 3000);
         }
       };

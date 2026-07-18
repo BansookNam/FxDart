@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>pick — FxDart 101</title>
+  <meta name="description" content="FxDart pick tutorial: return a copy of a Map with only the given keys, missing keys simply absent.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/pick.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/pick.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/pick.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/pick.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/pick.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/pick.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/pick.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/pick.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/pick.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Início</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/pick.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/pick.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/pick.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/pick.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/pick.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/pick.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/pick.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 9 · Funções de objeto (Map) › <strong>pick</strong></p>
+  <h1><code>pick</code></h1>
+  <p class="hero-sub">Returns a copy of a <code>Map</code> with only the given keys.</p>
+
+  <div class="signature">Map&lt;K, V&gt; pick&lt;K, V&gt;(Iterable&lt;K&gt; keysToPick, Map&lt;K, V&gt; map)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>pick</code> is <code>omit</code>'s mirror: instead of listing what
+    to remove, you list what to keep. Requested keys that aren't present in
+    the source map are simply absent from the result — <code>pick</code>
+    does not insert them with a <code>null</code> placeholder, so the
+    result's key set can be smaller than <code>keysToPick</code>.
+  </p>
+  <p>
+    Reach for it whenever you want a narrow "view" of a larger map: a public
+    API response derived from an internal record, a summary row derived
+    from a full one, and so on.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final user = {'id': 1, 'name': 'kim', 'password': 'secret', 'age': 32};
+  print(pick(['id', 'name'], user)); // {id: 1, name: kim}
+
+  // Keys that don't exist are simply skipped, not filled with null:
+  print(pick(['id', 'nickname'], user)); // {id: 1}
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Slimming a whole list</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final rows = [
+    {'id': 1, 'name': 'kim', 'temp': 'x'},
+    {'id': 2, 'name': 'lee', 'temp': 'y'},
+  ];
+
+  final slim = fx(rows).map((r) => pick(['id', 'name'], r)).toArray();
+  print(slim); // [{id: 1, name: kim}, {id: 2, name: lee}]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>pick</code> to keep only <code>'id'</code> and <code>'email'</code> from <code>profile</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final profile = {'id': 7, 'email': 'a@b.com', 'passwordHash': 'xyz'};
+
+  // TODO: use pick to keep only 'id' and 'email'
+  final publicProfile = profile;
+
+  print(publicProfile);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="omit.html"><code>omit</code></a> — the inverse: drop only some keys ·
+    <a href="pickBy.html"><code>pickBy</code></a> — keep by predicate instead of key list ·
+    <a href="props.html"><code>props</code></a> — pull several values out as a List ·
+    <a href="prop.html"><code>prop</code></a> — pull a single value out
+  </div>
+
+  <nav class="tut-nav">
+    <a href="omit.html">← Anterior: omit</a>
+    <a href="omitBy.html">Próximo: omitBy →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

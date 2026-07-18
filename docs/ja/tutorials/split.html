@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>split — FxDart 101</title>
+  <meta name="description" content="FxDart split tutorial: split a character iterable on a separator, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/split.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/split.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/split.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/split.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/split.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/split.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/split.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/split.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/split.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">ホーム</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/split.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/split.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/split.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/split.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/split.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/split.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/split.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 5 · スライス › <strong>split</strong></p>
+  <h1><code>split</code></h1>
+  <p class="hero-sub">Splits an iterable of single-character strings on a separator character.</p>
+
+  <div class="signature">Iterable&lt;String&gt; split(String sep, Iterable&lt;String&gt; iterable)
+FxAsyncIterable&lt;String&gt; splitAsync(String sep, FxAsyncIterable&lt;String&gt; iterable)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>split</code> is a direct port of FxTS's character-wise
+    <code>split</code>, and that shows in its signature: it doesn't take a
+    <code>String</code> at all — it takes an <code>Iterable&lt;String&gt;</code>
+    of single characters, and walks it one character at a time, accumulating
+    a piece until it sees one equal to <code>sep</code>. In Dart, the
+    idiomatic way to get that character iterable is
+    <code>myString.split('')</code> (Dart's own <code>String.split</code>
+    with an empty pattern breaks a string into its individual characters).
+  </p>
+  <p>
+    A trailing separator produces a trailing empty string in the output,
+    matching FxTS's behavior — <code>'a,b,'</code> splits into
+    <code>('a', 'b', '')</code>, not just <code>('a', 'b')</code>. There's no
+    <code>Fx</code> chain form for <code>split</code>; call the top-level
+    function (or <code>splitAsync</code>) directly.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // split iterates an iterable of single characters, so pass a string split
+  // into chars with the built-in String.split(''):
+  print(split(',', 'a,b,c'.split(''))); // (a, b, c)
+
+  // A trailing separator produces a trailing empty piece:
+  print(split(',', 'a,b,'.split(''))); // (a, b, )
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final result = await toArrayAsync(
+    splitAsync(',', toAsync('x,y,z'.split(''))),
+  );
+
+  print(result); // [x, y, z]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>split</code> to break <code>csv</code> into color
+    names on <code>'|'</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  const csv = 'red|green|blue';
+
+  // TODO: use split to break csv into color names on '|'
+  final colors = toArray(csv.split(''));
+
+  print(colors);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="chunk.html"><code>chunk</code></a> — group by fixed size instead of separator ·
+    <a href="unicodeToArray.html"><code>unicodeToArray</code></a> — get a proper character array (grapheme-aware) ·
+    <a href="join.html"><code>join</code></a> — the inverse operation
+  </div>
+
+  <nav class="tut-nav">
+    <a href="chunk.html">← 前: chunk</a>
+    <a href="append.html">次: append →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

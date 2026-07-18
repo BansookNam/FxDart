@@ -1,0 +1,4 @@
+String join&lt;A&gt;(String sep, Iterable&lt;A&gt; iterable)          // data-first: separator FIRST
+Future&lt;String&gt; joinAsync&lt;A&gt;(String sep, FxAsyncIterable&lt;A&gt; iterable)
+String Fx.join([String separator = ''])            // chain (sync, inherited from Iterable)
+Future&lt;String&gt; FxAsync.join([String sep = ','])    // chain (async)

@@ -1,0 +1,4 @@
+num min(Iterable&lt;num&gt; iterable)
+Future&lt;num&gt; minAsync(FxAsyncIterable&lt;num&gt; iterable)
+num Fx&lt;num&gt;.min()          // chain (sync)
+Future&lt;num&gt; FxAsync&lt;num&gt;.min()  // chain (async)

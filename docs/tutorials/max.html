@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>max — FxDart 101</title>
   <meta name="description" content="FxDart max tutorial: the largest number in a pipeline, -infinity when empty, NaN-poisoned, with a live playground.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/max.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/max.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/max.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/max.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/max.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/max.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/max.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/max.html">
   <link rel="stylesheet" href="../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
 </head>
@@ -15,8 +23,21 @@
     <nav>
       <a href="../index.html">Home</a>
       <a href="../101/index.html">FxDart 101</a>
+      <a href="../101/index.html#api">API Tutorials</a>
       <a href="https://github.com/bansooknam/fxDart">GitHub</a>
       <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Language">
+      <span class="lang-label">Language</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/max.html" hreflang="en" lang="en" aria-current="page">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/max.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/max.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/max.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/max.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/max.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/max.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
     </nav>
   </div>
 </header>
@@ -111,13 +132,15 @@ void main() {
   </div>
 
   <nav class="tut-nav">
-    <a href="min.html">← min</a>
+    <a href="min.html">← Previous: min</a>
     <a href="size.html">Next: size →</a>
   </nav>
 </main>
 <footer class="site-footer">
-  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a>. Great thanks to <strong>Indong Yoo</strong> (CTO, Marpple) and the FxTS team for the ideas, semantics, and test suite this library is built on.</p>
+  <p>Playground compiles via the DartPad compile service. © Bansook Nam · MIT License</p>
 </footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Run","pgReset":"Reset","pgCompiling":"Compiling…","pgCompileError":"Compile error","pgError":"Error","pgLoading":"Loading runtime…","pgRunning":"Running…","pgNoOutput":"(no output)","pgLoadFailed":"Could not load the FxDart library"};</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

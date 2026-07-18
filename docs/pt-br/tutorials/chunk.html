@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>chunk — FxDart 101</title>
+  <meta name="description" content="FxDart chunk tutorial: batch a lazy iterable into fixed-size lists, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/chunk.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/chunk.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/chunk.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/chunk.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/chunk.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/chunk.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/chunk.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/chunk.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/chunk.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Início</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/chunk.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/chunk.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/chunk.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/chunk.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/chunk.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/chunk.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/chunk.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 5 · Fatiamento › <strong>chunk</strong></p>
+  <h1><code>chunk</code></h1>
+  <p class="hero-sub">Returns a lazy iterable of lists, each holding up to <code>size</code> consecutive elements.</p>
+
+  <div class="signature">Iterable&lt;List&lt;A&gt;&gt; chunk&lt;A&gt;(int size, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;List&lt;A&gt;&gt; chunkAsync&lt;A&gt;(int size, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;List&lt;T&gt;&gt; Fx.chunk(int size)        // chain
+FxAsync&lt;List&lt;T&gt;&gt; FxAsync.chunk(int size)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>chunk</code> batches a flat sequence into fixed-size groups —
+    dealing cards into hands, paginating a result set, sending work to a
+    downstream API in batches of <code>n</code>. It buffers just
+    <code>size</code> elements at a time before yielding each list, so it
+    stays lazy and memory-bounded even over a huge source; only the final
+    chunk is allowed to come up short, if the source doesn't divide evenly.
+  </p>
+  <p>
+    The async version, <code>chunkAsync</code>, awaits <code>size</code>
+    elements before producing each chunk — pair it with
+    <code>.concurrent(n)</code> upstream to fill a chunk's worth of async
+    work concurrently.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <p>10 items chunked by 3 leaves a shorter final chunk:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Last chunk may be shorter than `size`:
+  print(chunk(3, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]));
+  // ([1, 2, 3], [4, 5, 6], [7, 8, 9], [10])
+
+  final result = fx([1, 2, 3, 4, 5]).chunk(2).toArray();
+  print(result); // [[1, 2], [3, 4], [5]]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final result = await fx([1, 2, 3, 4, 5])
+      .toAsync()
+      .map((a) => delay(Duration(milliseconds: 50), a * 10))
+      .chunk(2)
+      .toArray();
+
+  print(result); // [[10, 20], [30, 40], [50]]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: deal the cards into hands of 3.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final cards = ['A', 'K', 'Q', 'J', '10', '9', '8'];
+
+  // TODO: deal the cards into hands of 3
+  final hands = fx(cards).toArray();
+
+  print(hands);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="slice.html"><code>slice</code></a> — a single arbitrary window instead of repeated batches ·
+    <a href="split.html"><code>split</code></a> — group by separator instead of fixed size ·
+    <a href="transpose.html"><code>transpose</code></a> — flip rows and columns of already-chunked data
+  </div>
+
+  <nav class="tut-nav">
+    <a href="slice.html">← Anterior: slice</a>
+    <a href="split.html">Próximo: split →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+bool gt(Object? a, Object? b)   // a &gt; b
+bool gte(Object? a, Object? b)  // a &gt;= b
+bool lt(Object? a, Object? b)   // a &lt; b
+bool lte(Object? a, Object? b)  // a &lt;= b

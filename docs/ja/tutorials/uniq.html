@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>uniq — FxDart 101</title>
+  <meta name="description" content="FxDart uniq tutorial: remove duplicate values while preserving first-seen order, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/uniq.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/uniq.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/uniq.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/uniq.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/uniq.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/uniq.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/uniq.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/uniq.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/uniq.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">ホーム</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/uniq.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/uniq.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/uniq.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/uniq.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/uniq.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/uniq.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/uniq.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 4 · フィルタリング &amp; 重複除去 › <strong>uniq</strong></p>
+  <h1><code>uniq</code></h1>
+  <p class="hero-sub">Removes duplicate values, keeping the first occurrence of each and preserving order.</p>
+
+  <div class="signature">Iterable&lt;A&gt; uniq&lt;A&gt;(Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; uniqAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.uniq()        // chain
+FxAsync&lt;T&gt; FxAsync.uniq()</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>uniq</code> walks the iterable once, keeping a <code>Set</code> of
+    values already seen, and yields each element only the first time it
+    shows up. It's implemented as <code>uniqBy((a) =&gt; a, iterable)</code> —
+    the identity key — so if you ever need to dedupe by something other than
+    equality of the whole value, reach for
+    <a href="uniqBy.html"><code>uniqBy</code></a> instead.
+  </p>
+  <p>
+    It's lazy and streaming: the <code>Set</code> only grows as elements are
+    pulled, so it never buffers the whole source up front. Order is
+    preserved — the first occurrence of a value is what survives, not the
+    last.
+  </p>
+  <p>
+    On the async side, <code>uniqAsync</code> is safe to combine with
+    <code>.concurrent(n)</code> as long as the concurrency lives in an
+    upstream fetch stage: fetch with <code>.map(...).concurrent(n)</code>
+    first, then apply <code>.uniq()</code> to the already-resolved,
+    in-order results, as in Demo 2.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form:
+  print(toArray(uniq([1, 2, 2, 3, 1, 4]))); // [1, 2, 3, 4]
+
+  // Chain form:
+  final result = fx(['a', 'b', 'a', 'c', 'b']).uniq().toArray();
+  print(result); // [a, b, c]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with concurrency upstream</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  final result = await fx([1, 2, 2, 3, 1, 4])
+      .toAsync()
+      .map((a) => delay(Duration(milliseconds: 100), a))
+      .concurrent(3)
+      .uniq()
+      .toArray();
+
+  print(result); // [1, 2, 3, 4] -- correct even with concurrent fetching
+  print('took ${sw.elapsedMilliseconds}ms'); // ~200ms (2 batches of 3)
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>uniq</code> to remove duplicate tags, preserving
+    first-seen order.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final tags = ['red', 'blue', 'green', 'red', 'blue'];
+
+  // TODO: use uniq to remove duplicate tags, preserving first-seen order.
+  final result = fx(tags).toArray();
+
+  print(result);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="uniqBy.html"><code>uniqBy</code></a> — dedupe by a computed key ·
+    <a href="difference.html"><code>difference</code></a> — remove elements found in another iterable ·
+    <a href="intersection.html"><code>intersection</code></a> — keep only shared elements ·
+    <a href="compact.html"><code>compact</code></a> — drop nulls
+  </div>
+
+  <nav class="tut-nav">
+    <a href="compact.html">← 前: compact</a>
+    <a href="uniqBy.html">次: uniqBy →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

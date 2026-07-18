@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>compactObject — FxDart 101</title>
+  <meta name="description" content="FxDart compactObject tutorial: shallowly drop null-valued keys from a Map.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/compactObject.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/compactObject.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/compactObject.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/compactObject.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/compactObject.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/compactObject.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/compactObject.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/compactObject.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/compactObject.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Главная</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/compactObject.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/compactObject.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/compactObject.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/compactObject.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/compactObject.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/compactObject.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/compactObject.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 9 · Функции для объектов (Map) › <strong>compactObject</strong></p>
+  <h1><code>compactObject</code></h1>
+  <p class="hero-sub">Returns a copy of a <code>Map</code> with every <code>null</code>-valued key removed — one level deep.</p>
+
+  <div class="signature">Map&lt;K, V&gt; compactObject&lt;K, V&gt;(Map&lt;K, V?&gt; map)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>compactObject</code> is the <code>Map</code> counterpart of
+    <a href="compact.html"><code>compact</code></a> (which strips
+    <code>null</code>s out of an <code>Iterable</code>). It's handy for
+    cleaning up a form or a partially-filled record before serializing it —
+    drop the fields nobody filled in, keep everything else.
+  </p>
+  <p>
+    The cleanup is <strong>shallow</strong>: it only inspects the top-level
+    values. A <code>null</code> nested two levels down, inside a value
+    that's itself a <code>Map</code>, is left completely alone. If you need
+    a recursive clean, you'd write that pass yourself (or call
+    <code>compactObject</code> again on the nested map before assembling the
+    outer one).
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final form = {'name': 'kim', 'nickname': null, 'age': 32, 'bio': null};
+  print(compactObject(form)); // {name: kim, age: 32}
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Proof it's shallow</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final nested = {
+    'id': 1,
+    'address': {'city': 'seoul', 'zip': null},
+    'nickname': null,
+  };
+
+  print(compactObject(nested));
+  // {id: 1, address: {city: seoul, zip: null}} — nested null NOT removed
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>compactObject</code> to drop the null-valued keys in <code>draft</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final draft = {'title': 'hello', 'subtitle': null, 'body': 'world'};
+
+  // TODO: use compactObject to drop null-valued keys
+  final cleaned = draft;
+
+  print(cleaned);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="compact.html"><code>compact</code></a> — the <code>Iterable</code> version ·
+    <a href="isEmpty.html"><code>isEmpty</code></a> — a related value-based check ·
+    <a href="omitBy.html"><code>omitBy</code></a> — the general predicate version this specializes ·
+    <a href="evolve.html"><code>evolve</code></a> — transform values instead of dropping them
+  </div>
+
+  <nav class="tut-nav">
+    <a href="evolve.html">← Назад: evolve</a>
+    <a href="resolveProps.html">Далее: resolveProps →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

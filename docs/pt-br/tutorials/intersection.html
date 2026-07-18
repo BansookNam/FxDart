@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>intersection — FxDart 101</title>
+  <meta name="description" content="FxDart intersection tutorial: elements of one iterable also found in another, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/intersection.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/intersection.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/intersection.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/intersection.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/intersection.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/intersection.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/intersection.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/intersection.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/intersection.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Início</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/intersection.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/intersection.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/intersection.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/intersection.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/intersection.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/intersection.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/intersection.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 4 · Filtragem &amp; deduplicação › <strong>intersection</strong></p>
+  <h1><code>intersection</code></h1>
+  <p class="hero-sub"><code>difference</code>'s opposite: elements of the second iterable that ARE also found in the first.</p>
+
+  <div class="signature">Iterable&lt;A&gt; intersection&lt;A&gt;(Iterable&lt;A&gt; iterable1, Iterable&lt;A&gt; iterable2)
+FxAsyncIterable&lt;A&gt; intersectionAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;A&gt; iterable2)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>intersection(iterable1, iterable2)</code> shares
+    <code>difference</code>'s argument-order convention: the result walks
+    <strong><code>iterable2</code></strong>, and keeps each element (in
+    <code>iterable2</code>'s order, deduplicated) that <em>is</em> found in
+    <code>iterable1</code>. <code>iterable1</code> is only ever used as a
+    membership set — swap the two arguments and you get the same
+    <em>values</em> in a set-theory sense, but the actual order (and which
+    collection's duplicates get collapsed) is different, since the source
+    of the yielded elements changes. See Demo 1.
+  </p>
+  <p>
+    Under the hood it's
+    <code>intersectionBy((a) =&gt; a, iterable1, iterable2)</code> — reach
+    for <a href="intersectionBy.html"><code>intersectionBy</code></a>
+    directly when you need to match by a computed key across two lists of
+    full records rather than by value equality.
+  </p>
+  <p>
+    There's no chain method; call the data-first function. On the async
+    side, the concurrency marker from <code>.concurrent(n)</code> applies to
+    <code>iterable2</code> — <code>iterable1</code> is drained up front to
+    build the membership set.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; argument order</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form. Same argument-order rule as difference: the result
+  // comes FROM iterable2, in iterable2's order, keeping only elements ALSO
+  // found in iterable1.
+  final inStock = {'mouse', 'keyboard', 'monitor'};
+  final wishlist = ['monitor', 'mouse', 'headphones', 'mouse'];
+
+  print(toArray(intersection(inStock, wishlist)));
+  // [monitor, mouse] -- wishlist's order, deduped, filtered to in-stock items
+
+  // Swap the arguments: now the ORDER comes from inStock instead.
+  print(toArray(intersection(wishlist, inStock)));
+  // [mouse, monitor] -- inStock's own iteration order this time
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with concurrency</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  // The concurrency marker applies to iterable2, as with differenceAsync.
+  final inStock = toAsync([2, 3, 4]);
+  final wishlist = fx([1, 2, 4, 5])
+      .toAsync()
+      .map((a) => delay(Duration(milliseconds: 100), a))
+      .concurrent(4);
+
+  final available = await fxAsync(intersectionAsync(inStock, wishlist)).toArray();
+
+  print(available); // [2, 4]
+  print('took ${sw.elapsedMilliseconds}ms'); // ~100ms
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>intersection</code> to find which of the
+    candidate's skills are actually required.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final requiredSkills = ['dart', 'sql'];
+  final candidateSkills = ['dart', 'python', 'sql', 'sql'];
+
+  // TODO: use intersection to find which of the candidate's skills are
+  // actually required.
+  final matched = toArray(candidateSkills);
+
+  print(matched);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="difference.html"><code>difference</code></a> — the exclusion counterpart ·
+    <a href="intersectionBy.html"><code>intersectionBy</code></a> — match by a computed key instead ·
+    <a href="uniq.html"><code>uniq</code></a> — dedupe a single iterable ·
+    <a href="../tutorials/includes.html"><code>includes</code></a> — test membership of a single value
+  </div>
+
+  <nav class="tut-nav">
+    <a href="differenceBy.html">← Anterior: differenceBy</a>
+    <a href="intersectionBy.html">Próximo: intersectionBy →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

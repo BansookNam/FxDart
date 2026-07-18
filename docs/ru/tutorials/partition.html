@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>partition — FxDart 101</title>
+  <meta name="description" content="FxDart partition tutorial: split a pipeline into a (pass, fail) record by a predicate, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/partition.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/partition.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/partition.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/partition.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/partition.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/partition.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/partition.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/partition.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/partition.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Главная</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/partition.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/partition.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/partition.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/partition.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/partition.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/partition.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/partition.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 7 · Агрегация › <strong>partition</strong></p>
+  <h1><code>partition</code></h1>
+  <p class="hero-sub">Splits a pipeline into two lists at once, by a single predicate.</p>
+
+  <div class="signature">(List&lt;A&gt;, List&lt;A&gt;) partition&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;(List&lt;A&gt;, List&lt;A&gt;)&gt; partitionAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+(List&lt;T&gt;, List&lt;T&gt;) Fx.partition(bool Function(T a) f)
+Future&lt;(List&lt;T&gt;, List&lt;T&gt;)&gt; FxAsync.partition(FutureOr&lt;bool&gt; Function(T a) f)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>partition</code> is a terminal operator that walks the pipeline
+    once and sorts every element into one of two lists based on a predicate:
+    elements the predicate returns <code>true</code> for go into the first
+    list, everything else into the second. It's equivalent to calling
+    <code><a href="filter.html">filter</a></code> and
+    <code><a href="reject.html">reject</a></code> separately, but in a single
+    pass over the data.
+  </p>
+  <p>
+    FxTS returns a two-element tuple, <code>[pass, fail]</code>. Dart has no
+    tuple type built into JS-style arrays, so FxDart uses a native Dart
+    <strong>record</strong>: <code>(List&lt;A&gt;, List&lt;A&gt;)</code>. Access
+    the two lists with <code>.$1</code> (pass) and <code>.$2</code> (fail),
+    or destructure them directly with pattern-matching syntax:
+    <code>final (pass, fail) = partition(f, iterable);</code>. This is the
+    same tuple-to-record convention used by
+    <code><a href="zip.html">zip</a></code> and
+    <code><a href="entries.html">entries</a></code> elsewhere in FxDart.
+  </p>
+  <p>
+    As with every terminal in this section, it pulls the whole lazy pipeline
+    upstream of it, sync or async.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; destructuring</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form returns a (pass, fail) record -- access with .$1/.$2.
+  final result = partition((a) => a.isEven, [1, 2, 3, 4, 5, 6]);
+  print(result.$1); // [2, 4, 6]  (pass: predicate true)
+  print(result.$2); // [1, 3, 5]  (fail: predicate false)
+
+  // Chain form, destructured directly:
+  final (evens, odds) = fx([1, 2, 3, 4, 5, 6]).partition((a) => a.isEven);
+  print(evens); // [2, 4, 6]
+  print(odds); // [1, 3, 5]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final (ok, failed) = await fx([1, 2, 3, 4, 5, 6])
+      .toAsync()
+      .map((a) => delay(const Duration(milliseconds: 100), a))
+      .partition((a) => a % 3 == 0);
+
+  print(ok); // [3, 6]
+  print(failed); // [1, 2, 4, 5]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: partition the scores into <strong>pass</strong> (&gt;= 60) and <strong>fail</strong> (&lt; 60).</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final scores = [55, 82, 40, 91, 60, 38, 77];
+
+  // TODO: partition the scores into PASS (>= 60) and FAIL (< 60).
+  final (a, b) = fx(scores).partition((s) => s.isEven);
+
+  print(a);
+  print(b);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="filter.html"><code>filter</code></a> · <a href="reject.html"><code>reject</code></a> — the two halves partition combines ·
+    <a href="groupBy.html"><code>groupBy</code></a> — grouping into more than two buckets ·
+    <a href="sort.html"><code>sort</code></a> — order within each side, if you need it
+  </div>
+
+  <nav class="tut-nav">
+    <a href="sortBy.html">← Назад: sortBy</a>
+    <a href="head.html">Далее: head →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

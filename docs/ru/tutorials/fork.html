@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>fork — FxDart 101</title>
+  <meta name="description" content="FxDart fork tutorial: branch one buffered iteration of a source into multiple independent readers, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/fork.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/fork.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/fork.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/fork.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/fork.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/fork.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/fork.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/fork.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/fork.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Главная</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/fork.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/fork.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/fork.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/fork.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/fork.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/fork.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/fork.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 6 · Объединение › <strong>fork</strong></p>
+  <h1><code>fork</code></h1>
+  <p class="hero-sub">Branches one buffered iteration of a source into independent, replayable readers.</p>
+
+  <div class="signature">Iterable&lt;T&gt; fork&lt;T&gt;(Iterable&lt;T&gt; iterable)
+FxAsyncIterable&lt;T&gt; forkAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    Iterating the same Dart <code>Iterable</code> object twice normally runs
+    its source twice — a <code>sync*</code> generator restarts from scratch
+    every time you ask for a fresh <code>.iterator</code>. That's wasteful
+    (or outright wrong) when producing a value is expensive: a network
+    fetch, a slow computation, a stream you can only read once.
+    <code>fork</code> fixes this: every call to <code>fork(iterable)</code>
+    with the <em>same</em> <code>iterable</code> object returns an
+    independent cursor over one shared, lazily-growing buffer. The
+    underlying source is walked exactly once, no matter how many forks read
+    from it or in what order.
+  </p>
+  <p>
+    The sharing is keyed by the identity of the <code>iterable</code> you
+    pass in (via an internal <code>Expando</code>), so you must fork the
+    <em>same object</em> — not two separately-constructed iterables that
+    happen to look alike. Each fork can be consumed at its own pace: reading
+    ahead on one fork pulls new values from the source and appends them to
+    the shared buffer; a fork that's behind just replays values already in
+    the buffer, at no extra cost. <code>forkAsync</code> works the same way
+    for <code>FxAsyncIterable</code>, and additionally lets concurrent
+    downstream demand from multiple forks pull the shared async source in
+    parallel.
+  </p>
+
+  <h2>Demo 1 · One source, two branches, proven with a counter</h2>
+  <p>
+    <code>source()</code> increments <code>calls</code> every time it
+    produces a value. Both <code>evens</code> and <code>doubled</code> fork
+    the exact same <code>shared</code> object — if the source ran twice,
+    <code>calls</code> would end up at 10, not 5:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  var calls = 0;
+  Iterable<int> source() sync* {
+    for (var i = 1; i <= 5; i++) {
+      calls++;
+      yield i;
+    }
+  }
+
+  final shared = source();
+
+  // Both branches fork the SAME `shared` object, so they share one buffered
+  // iteration of the underlying generator:
+  final evens = fork(shared).where((a) => a.isEven).toList();
+  final doubled = fork(shared).map((a) => a * 2).toList();
+
+  print(evens); // [2, 4]
+  print(doubled); // [2, 4, 6, 8, 10]
+  print('source ran $calls times'); // 5 — not 10
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Forks at different paces share one buffer</h2>
+  <p>
+    Branch <code>a</code> races ahead and pulls two fresh values; when
+    branch <code>b</code> asks for its first two, it simply replays what
+    <code>a</code> already buffered — no new calls to <code>source()</code>
+    until <code>b</code> needs a third value neither fork has seen yet:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  var calls = 0;
+  Iterable<int> source() sync* {
+    for (var i = 1; i <= 5; i++) {
+      calls++;
+      yield i;
+    }
+  }
+
+  final shared = source();
+  final a = fork(shared).iterator;
+  final b = fork(shared).iterator;
+
+  a.moveNext();
+  print('a: ${a.current}, calls: $calls'); // a: 1, calls: 1
+  a.moveNext();
+  print('a: ${a.current}, calls: $calls'); // a: 2, calls: 2
+
+  // b catches up by replaying the buffer — no new calls to source() yet:
+  b.moveNext();
+  print('b: ${b.current}, calls: $calls'); // b: 1, calls: 2
+  b.moveNext();
+  print('b: ${b.current}, calls: $calls'); // b: 2, calls: 2
+
+  // Only now does b need a value neither fork has buffered:
+  b.moveNext();
+  print('b: ${b.current}, calls: $calls'); // b: 3, calls: 3
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>
+    Exercise: right now <code>readings</code> is iterated twice with no
+    <code>fork</code>, so <code>sensor()</code> runs twice and
+    <code>reads</code> ends up at 6. Fork <code>readings</code> for each
+    consumer so the sensor is only read once (<code>reads</code> should be
+    3).
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  var reads = 0;
+  Iterable<int> sensor() sync* {
+    for (final v in [10, 20, 30]) {
+      reads++;
+      yield v;
+    }
+  }
+
+  final readings = sensor();
+
+  // TODO: fork `readings` for each consumer so the sensor is only read once
+  final total = readings.toList();
+  final doubled = readings.toList();
+
+  print(total);
+  print(doubled);
+  print('reads: $reads');
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="peek.html"><code>peek</code></a> — observe without branching ·
+    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation within one branch ·
+    <a href="memoize.html"><code>memoize</code></a> — cache a single value instead of a whole sequence
+  </div>
+
+  <nav class="tut-nav">
+    <a href="reverse.html">← Назад: reverse</a>
+    <a href="reduce.html">Далее: reduce →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

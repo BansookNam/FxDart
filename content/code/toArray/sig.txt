@@ -1,0 +1,4 @@
+List&lt;A&gt; toArray&lt;A&gt;(Iterable&lt;A&gt; iterable)
+Future&lt;List&lt;A&gt;&gt; toArrayAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+List&lt;T&gt; Fx.toArray()        // chain
+Future&lt;List&lt;T&gt;&gt; FxAsync.toArray()

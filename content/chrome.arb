@@ -1,0 +1,73 @@
+{
+  "@@locale": "en",
+  "@@context": "Site chrome for the FxDart docs. This file is the English source of truth; translations live in i18n/<locale>/chrome.arb and may omit any key, which then falls back to the English text here. Function names (map, filter, concurrent…), 'FxDart', 'FxTS', 'Dart', and anything inside <code> must never be translated.",
+
+  "navHome": "Home",
+  "@navHome": { "description": "Top nav link to the landing page." },
+
+  "nav101": "FxDart 101",
+  "@nav101": { "description": "Top nav link to the course index. 'FxDart 101' is the course's proper name — keep 'FxDart', but '101' may be replaced with the local idiom for a beginner course if one exists." },
+
+  "navApi": "API Tutorials",
+  "@navApi": { "description": "Top nav link jumping to the per-function tutorial list." },
+
+  "langLabel": "Language",
+  "@langLabel": { "description": "Label preceding the language switcher." },
+
+  "crumb101": "FxDart 101",
+  "@crumb101": { "description": "Course name in the breadcrumb and the tutorial back-link. Keep consistent with nav101." },
+
+  "sectionWord": "Section",
+  "@sectionWord": { "description": "Rendered as 'Section 3 · Transforming'. Translate only the word; the number and the '·' separator are added by the generator." },
+
+  "prevPrefix": "Previous: ",
+  "@prevPrefix": { "description": "Prefix on the previous-tutorial link, e.g. '← Previous: cases'. Keep the trailing space; the function name that follows is never translated." },
+
+  "nextPrefix": "Next: ",
+  "@nextPrefix": { "description": "Prefix on the next-tutorial link, e.g. 'Next: mapEffect →'. Keep the trailing space; the function name that follows is never translated." },
+
+  "footerCredit": "FxDart is a port of <a href=\"https://github.com/marpple/FxTS\">FxTS</a>. Great thanks to <strong>Indong Yoo</strong> (CTO, Marpple) and the FxTS team for the ideas, semantics, and test suite this library is built on.",
+  "@footerCredit": { "description": "Footer attribution. Contains HTML — keep the <a> and <strong> tags and the href intact. 'Indong Yoo' is a person's name: transliterate only if that is the norm for the target language." },
+
+  "footerLegal": "Playground compiles via the DartPad compile service. © Bansook Nam · MIT License",
+  "@footerLegal": { "description": "Footer legal line. 'DartPad' and 'MIT License' are proper nouns; 'Bansook Nam' is a person's name." },
+
+  "untranslated": "This page has not been translated yet, so it is shown in English.",
+  "@untranslated": { "description": "Banner on a page that exists only in English. The UI around it is still localized." },
+
+  "outdated": "This translation may be out of date — the English page has changed since it was written.",
+  "@outdated": { "description": "Banner on a translated page whose English source has changed since the translation was recorded." },
+
+  "contributeCta": "Help translate it",
+  "@contributeCta": { "description": "Link text following the untranslated banner." },
+
+  "contributeUrl": "https://github.com/bansooknam/fxDart/blob/main/i18n/README.md",
+  "@contributeUrl": { "description": "NOT user-visible text — a URL. Leave unchanged unless a localized contributing guide exists." },
+
+  "pgRun": "▶ Run",
+  "@pgRun": { "description": "Playground button that compiles and runs the snippet. Keep the ▶ glyph." },
+
+  "pgReset": "Reset",
+  "@pgReset": { "description": "Playground button restoring the original snippet." },
+
+  "pgCompiling": "Compiling…",
+  "@pgCompiling": { "description": "Playground status while the snippet is compiling." },
+
+  "pgCompileError": "Compile error",
+  "@pgCompileError": { "description": "Playground status when compilation fails." },
+
+  "pgError": "Error",
+  "@pgError": { "description": "Playground status for a non-compile failure, e.g. a network error." },
+
+  "pgLoading": "Loading runtime…",
+  "@pgLoading": { "description": "Playground status while the compiled runtime loads." },
+
+  "pgRunning": "Running…",
+  "@pgRunning": { "description": "Playground status while the snippet executes." },
+
+  "pgNoOutput": "(no output)",
+  "@pgNoOutput": { "description": "Shown in the playground console when a snippet ran but printed nothing. Keep the parentheses." },
+
+  "pgLoadFailed": "Could not load the FxDart library",
+  "@pgLoadFailed": { "description": "Playground error when the bundled library fails to fetch. 'FxDart' is the product name." }
+}

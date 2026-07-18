@@ -1,0 +1,2 @@
+dynamic pipe(dynamic a, List&lt;Function&gt; fns)
+dynamic Function(dynamic a) pipeLazy(List&lt;Function&gt; fns)

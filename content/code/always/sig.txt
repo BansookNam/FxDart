@@ -1,0 +1,1 @@
+T Function([Object? _]) always&lt;T&gt;(T a) => ([Object? _]) => a;

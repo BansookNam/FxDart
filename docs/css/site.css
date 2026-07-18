@@ -273,3 +273,48 @@ footer.site-footer {
   padding: 1.4rem 1.25rem 2.2rem; text-align: center;
 }
 footer.site-footer a { color: var(--text-dim); }
+
+/* language switcher + translation status
+   ---------------------------------------------------------------------- */
+/* Pushed to the far end of the header bar; wraps under the nav on narrow
+   screens rather than squeezing it. Plain links, no JS — the switcher works
+   with scripting disabled and crawlers follow it to the localized pages. */
+.lang-switcher {
+  margin-inline-start: auto;
+  display: flex; align-items: baseline; gap: 0.5rem;
+  font-size: 0.85rem;
+}
+.lang-switcher .lang-label {
+  color: var(--text-dim); opacity: 0.75;
+}
+.lang-switcher .lang-label::after { content: ':'; }
+.lang-switcher ul {
+  display: flex; flex-wrap: wrap; gap: 0.1rem 0.6rem;
+  list-style: none; margin: 0; padding: 0;
+}
+.lang-switcher a {
+  color: var(--text-dim); text-decoration: none; white-space: nowrap;
+}
+.lang-switcher a:hover { color: var(--accent); }
+.lang-switcher a[aria-current="page"] {
+  color: var(--text); font-weight: 600;
+}
+
+/* Shown on a page that exists only in English. */
+.i18n-banner {
+  margin: 0 0 1.5rem;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--border);
+  border-inline-start: 3px solid var(--accent);
+  border-radius: 6px;
+  background: var(--bg-soft);
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+.i18n-banner a { color: var(--accent-strong); }
+
+@media (max-width: 640px) {
+  /* Full-width row under the nav; the label would eat most of a phone line. */
+  .lang-switcher { margin-inline-start: 0; flex-basis: 100%; }
+  .lang-switcher .lang-label { display: none; }
+}

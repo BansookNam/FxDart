@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>matches — FxDart 101</title>
+  <meta name="description" content="FxDart matches tutorial: the curried, filter-ready predicate form of isMatch.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/matches.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/matches.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/matches.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/matches.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/matches.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/matches.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/matches.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/matches.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/matches.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">ホーム</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/matches.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/matches.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/matches.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/matches.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/matches.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/matches.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/matches.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 9 · オブジェクト（Map）関数 › <strong>matches</strong></p>
+  <h1><code>matches</code></h1>
+  <p class="hero-sub">Curried <code>isMatch</code>: bind a pattern once, get back a reusable predicate.</p>
+
+  <div class="signature">bool Function(Object? target) matches(Object? pattern)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>isMatch(target, pattern)</code> needs both arguments up front,
+    which makes it awkward to hand to <code>filter</code>, <code>find</code>,
+    <code>every</code>, or anywhere else that wants a single-argument
+    <code>bool Function(A)</code>. <code>matches(pattern)</code> closes over
+    the pattern and returns exactly that shape:
+    <code>matches(pattern)(target) == isMatch(target, pattern)</code>. Build
+    the predicate once, reuse it across a whole pipeline.
+  </p>
+  <p>
+    This is FxDart's version of currying for a two-argument function where
+    Dart can't infer a general curry — see the deprecated top-level
+    <code>curry</code> if you're curious why a generic version doesn't
+    exist — but a purpose-built curried form like this one works great.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final isClick = matches({'type': 'click'});
+
+  print(isClick({'type': 'click', 'x': 1})); // true
+  print(isClick({'type': 'scroll'}));        // false
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Dropping straight into filter/find</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final events = [
+    {'type': 'click', 'x': 1},
+    {'type': 'scroll', 'y': 5},
+    {'type': 'click', 'x': 9},
+  ];
+
+  print(filter(matches({'type': 'click'}), events).toList());
+  // [{type: click, x: 1}, {type: click, x: 9}]
+
+  print(find(matches({'type': 'scroll'}), events));
+  // {type: scroll, y: 5}
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>matches</code> to build a predicate for <code>{'active': true}</code> and filter <code>users</code> with it.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final users = [
+    {'name': 'kim', 'active': true},
+    {'name': 'lee', 'active': false},
+  ];
+
+  // TODO: use matches to build a predicate for {'active': true} and filter with it
+  final activeUsers = users;
+
+  print(activeUsers);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="isMatch.html"><code>isMatch</code></a> — the two-argument function this curries ·
+    <a href="filter.html"><code>filter</code></a> — the most common place to plug this in ·
+    <a href="find.html"><code>find</code></a> — grab just the first match ·
+    <a href="predicates.html"><code>predicates</code></a> — more ready-made, filter-friendly checks
+  </div>
+
+  <nav class="tut-nav">
+    <a href="isMatch.html">← 前: isMatch</a>
+    <a href="identity.html">次: identity →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

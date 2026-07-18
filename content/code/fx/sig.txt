@@ -1,0 +1,3 @@
+Fx&lt;T&gt; fx&lt;T&gt;(Iterable&lt;T&gt; iterable)
+FxAsync&lt;T&gt; fxAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable)
+FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)

@@ -1,0 +1,4 @@
+Iterable&lt;B&gt; flatMap&lt;A, B&gt;(Iterable&lt;B&gt; Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;B&gt; flatMapAsync&lt;A, B&gt;(FutureOr&lt;Iterable&lt;B&gt;&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;R&gt; Fx.flatMap&lt;R&gt;(Iterable&lt;R&gt; Function(T a) f)        // chain
+FxAsync&lt;R&gt; FxAsync.flatMap&lt;R&gt;(FutureOr&lt;Iterable&lt;R&gt;&gt; Function(T a) f)

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>props — FxDart 101</title>
+  <meta name="description" content="FxDart props tutorial: read several Map keys at once as a List, missing keys become null.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/props.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/props.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/props.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/props.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/props.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/props.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/props.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/props.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/props.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">ホーム</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/props.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/props.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/props.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/props.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/props.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/props.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/props.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 9 · オブジェクト（Map）関数 › <strong>props</strong></p>
+  <h1><code>props</code></h1>
+  <p class="hero-sub">Returns the values of several keys in a <code>Map</code>, as a <code>List</code>.</p>
+
+  <div class="signature">List&lt;V?&gt; props&lt;K, V&gt;(Iterable&lt;K&gt; propKeys, Map&lt;K, V&gt; map)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>props</code> is <code>prop</code> applied to several keys at once,
+    in order: give it a list of keys and a map, and get back a
+    <code>List&lt;V?&gt;</code> with one slot per requested key. Unlike
+    <a href="pick.html"><code>pick</code></a>, a missing key does not get
+    dropped from the result — it becomes <code>null</code> in that
+    position, so the output <code>List</code> always has the same length as
+    <code>propKeys</code>. That positional guarantee is what makes it pair
+    so well with Dart's list-destructuring pattern.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final user = {'id': 1, 'name': 'kim', 'age': 32};
+  print(props(['name', 'age'], user));      // [kim, 32]
+  print(props(['name', 'nickname'], user)); // [kim, null] — missing key is null, not dropped
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Destructuring the result</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final coord = {'lat': 37.5, 'lng': 127.0};
+
+  final [lat, lng] = props(['lat', 'lng'], coord);
+  print('lat=$lat lng=$lng'); // lat=37.5 lng=127.0
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>props</code> to pull <code>['first', 'last']</code> out of <code>row</code> as a <code>List</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final row = {'first': 'Ada', 'last': 'Lovelace', 'age': 36};
+
+  // TODO: use props to pull ['first', 'last'] out as a List
+  final nameParts = <String?>[];
+
+  print(nameParts);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="prop.html"><code>prop</code></a> — a single key at a time ·
+    <a href="pick.html"><code>pick</code></a> — the Map-shaped equivalent ·
+    <a href="fromEntries.html"><code>fromEntries</code></a> — build a Map back up ·
+    <a href="evolve.html"><code>evolve</code></a> — transform selected values in place
+  </div>
+
+  <nav class="tut-nav">
+    <a href="prop.html">← 前: prop</a>
+    <a href="evolve.html">次: evolve →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>throttle — FxDart 101</title>
+  <meta name="description" content="FxDart throttle tutorial: invoke a function at most once per wait period, with leading/trailing edges and cancel(), plus a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/throttle.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/throttle.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/throttle.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/throttle.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/throttle.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/throttle.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/throttle.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/throttle.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/throttle.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Início</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/throttle.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/throttle.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/throttle.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/throttle.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/throttle.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/throttle.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/throttle.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 12 · Util › <strong>throttle</strong></p>
+  <h1><code>throttle</code></h1>
+  <p class="hero-sub">Invokes a function at most once per wait period — on a schedule, unlike debounce's "wait for quiet."</p>
+
+  <div class="signature">Throttled&lt;T&gt; throttle&lt;T&gt;(void Function(T arg) func, Duration wait, {bool leading = true, bool trailing = true})
+
+class Throttled&lt;T&gt; {
+  void call(T arg);   // Throttled is callable: throttled(arg)
+  void cancel();
+}</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>throttle</code> guarantees <code>func</code> runs at most once every
+    <code>wait</code>, no matter how often the throttled function is called.
+    That's the key difference from <a href="debounce.html"><code>debounce</code></a>:
+    debounce keeps <em>resetting</em> its timer on every call, so a
+    continuous stream of calls can delay execution indefinitely; throttle's
+    window is fixed once it starts, so calls still get through on a regular
+    cadence — useful for things like scroll or resize handlers where you want
+    periodic updates, not just one at the very end.
+  </p>
+  <p>
+    Both <code>leading</code> and <code>trailing</code> default to
+    <code>true</code>: the first call in a window fires immediately (leading
+    edge), and if more calls arrive before the window closes, the
+    <em>last</em> of those fires once the window ends (trailing edge, with
+    the latest argument). Turn either off to get leading-only or
+    trailing-only behavior. Like <code>debounce</code>, the returned
+    <code>Throttled&lt;T&gt;</code> is a callable class with a
+    <code>.cancel()</code> to drop a pending trailing call.
+  </p>
+
+  <h2>Demo 1 · Leading + trailing (the default)</h2>
+  <p>The first call fires immediately; the last call in the window fires
+    again once the window closes:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final calls = <String>[];
+  final throttled =
+      throttle<String>((s) => calls.add(s), const Duration(milliseconds: 100));
+
+  // Default is leading: true, trailing: true.
+  throttled('a'); // fires immediately (leading edge)
+  print(calls); // [a]
+
+  throttled('b');
+  throttled('c'); // both arrive inside the 100ms window, so they're throttled
+  print(calls); // [a] — still just the leading call
+
+  await sleep(const Duration(milliseconds: 150));
+  print(calls); // [a, c] — trailing edge fires with the latest argument
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Tuning leading/trailing, and cancel()</h2>
+  <p>
+    Turn off <code>leading</code> for trailing-only behavior, off
+    <code>trailing</code> for leading-only, or call <code>.cancel()</code> to
+    drop a pending trailing call:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // leading: false — suppress the immediate call, only the trailing edge fires.
+  final trailingOnlyCalls = <String>[];
+  final trailingOnly = throttle<String>(
+      (s) => trailingOnlyCalls.add(s), const Duration(milliseconds: 100),
+      leading: false, trailing: true);
+  trailingOnly('a');
+  trailingOnly('b');
+  print(trailingOnlyCalls); // [] — no leading call this time
+  await sleep(const Duration(milliseconds: 150));
+  print(trailingOnlyCalls); // [b]
+
+  // trailing: false — only the leading edge ever fires.
+  final leadingOnlyCalls = <String>[];
+  final leadingOnly = throttle<String>(
+      (s) => leadingOnlyCalls.add(s), const Duration(milliseconds: 100),
+      leading: true, trailing: false);
+  leadingOnly('x');
+  leadingOnly('y');
+  leadingOnly('z');
+  await sleep(const Duration(milliseconds: 150));
+  print(leadingOnlyCalls); // [x] — y and z are dropped, no trailing call
+
+  // .cancel() drops a pending trailing call.
+  final cancelCalls = <String>[];
+  final cancelThrottled = throttle<String>(
+      (s) => cancelCalls.add(s), const Duration(milliseconds: 100));
+  cancelThrottled('first');
+  cancelThrottled('second'); // would trigger a trailing call...
+  cancelThrottled.cancel(); // ...but this cancels it
+  await sleep(const Duration(milliseconds: 150));
+  print(cancelCalls); // [first]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: wrap <code>onClick</code> in <code>throttle</code> (100ms
+    wait) so rapid clicks register at most twice — leading and trailing —
+    instead of three separate times.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final clicks = <String>[];
+
+  // TODO: wrap this in throttle() with a 100ms wait so rapid clicks only
+  // register once per 100ms window (leading + trailing).
+  void onClick(String label) => clicks.add(label);
+
+  onClick('click1');
+  onClick('click2');
+  onClick('click3');
+
+  await sleep(const Duration(milliseconds: 150));
+  print(clicks); // currently [click1, click2, click3] — want just 2 calls
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="debounce.html"><code>debounce</code></a> — waits for quiet instead of a fixed schedule ·
+    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — building timing demos ·
+    <a href="shuffle.html"><code>shuffle</code></a> — seeded randomness ·
+    <a href="concurrent.html"><code>concurrent</code></a> — rate-limiting for async pipelines
+  </div>
+
+  <nav class="tut-nav">
+    <a href="../../101/index.html">← FxDart 101</a>
+    <a href="shuffle.html">Próximo: shuffle →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

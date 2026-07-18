@@ -1,0 +1,4 @@
+Iterable&lt;(int, A)&gt; zipWithIndex&lt;A&gt;(Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;(int, A)&gt; zipWithIndexAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;(int, T)&gt; Fx.zipWithIndex()        // chain
+FxAsync&lt;(int, T)&gt; FxAsync.zipWithIndex()

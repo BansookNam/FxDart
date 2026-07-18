@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>range — FxDart 101</title>
+  <meta name="description" content="FxDart range tutorial: a lazy sequence of integers, counting up or down, to pipe into a chain.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/range.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/range.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/range.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/range.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/range.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/range.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/range.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/range.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/range.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">홈</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/range.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/range.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/range.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/range.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/range.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/range.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/range.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 2 · 시퀀스 생성 › <strong>range</strong></p>
+  <h1><code>range</code></h1>
+  <p class="hero-sub">A lazy sequence of integers from start (inclusive) to end (exclusive), stepping by any amount.</p>
+
+  <div class="signature">Iterable&lt;int&gt; range(int start, [int? end, int step = 1])</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>range</code> generates integers on demand, using a <code>sync*</code>
+    generator — nothing is allocated up front. Called with one argument,
+    <code>range(4)</code> counts <code>0, 1, 2, 3</code> (i.e. <code>0</code>
+    up to, but not including, <code>start</code>). Called with two,
+    <code>range(1, 4)</code> counts <code>1, 2, 3</code>. A third argument
+    sets the step — including a <em>negative</em> step to count downward,
+    e.g. <code>range(4, 1, -1)</code> gives <code>4, 3, 2</code>.
+  </p>
+  <p>
+    Because it's lazy, <code>range(1000000)</code> is essentially free to
+    create — the million integers only get produced as something downstream
+    (usually <code>.take(n)</code>) actually pulls them. This makes
+    <code>range</code> the go-to source for demonstrating laziness, and a
+    handy stand-in whenever you need "the first N things" without building
+    a real collection first.
+  </p>
+  <p>
+    Unlike FxTS's <code>range</code>, which is a finite generator over
+    numbers, this port keeps the same finite contract — there's no
+    unbounded/infinite form here (that's <code>cycle</code>'s job). If you
+    want an endless counter, pair <code>range</code> with <code>cycle</code>
+    and <code>take</code>.
+  </p>
+
+  <h2>Demo 1 · Counting up, down, and by steps</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(toArray(range(4)));        // [0, 1, 2, 3] — one arg counts 0..start
+  print(toArray(range(1, 4)));     // [1, 2, 3]
+  print(toArray(range(4, 1, -1))); // [4, 3, 2] — negative step counts down
+  print(toArray(range(0, 10, 3))); // [0, 3, 6, 9]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Laziness in a chain</h2>
+  <p>
+    <code>range(1000000)</code> produces nothing up front — only the 4
+    elements <code>take(4)</code> asks for actually run through
+    <code>map</code>:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // range is lazy (sync*), so range(1000000) allocates nothing up front —
+  // only the elements take(4) actually pulls get generated.
+  var calls = 0;
+  final result = fx(range(1000000))
+      .map((a) {
+        calls++;
+        return a * a;
+      })
+      .take(4)
+      .toArray();
+
+  print(result);          // [0, 1, 4, 9]
+  print('calls: $calls'); // 4 — not 1000000
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: build the even numbers from 2 to 10 inclusive using
+    <code>range</code>'s step argument.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // TODO: use range to build the even numbers from 2 to 10 inclusive.
+  final evens = fx(range(2, 11, 2)).toArray();
+
+  print(evens); // [2, 4, 6, 8, 10]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="repeat.html"><code>repeat</code></a> — a fixed value repeated n times ·
+    <a href="cycle.html"><code>cycle</code></a> — repeat a whole sequence forever ·
+    <a href="take.html"><code>take</code></a> — bound how much of a range you pull ·
+    <a href="fx.html"><code>fx</code></a> — the chain range is usually wrapped in
+  </div>
+
+  <nav class="tut-nav">
+    <a href="consume.html">← 이전: consume</a>
+    <a href="repeat.html">다음: repeat →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

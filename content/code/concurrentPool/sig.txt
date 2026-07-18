@@ -1,0 +1,2 @@
+FxAsyncIterable&lt;A&gt; concurrentPoolAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
+FxAsync&lt;T&gt; FxAsync.concurrentPool(int length)        // chain

@@ -1,0 +1,1 @@
+FutureOr&lt;R&gt; pipe1&lt;A, R&gt;(FutureOr&lt;A&gt; a, FutureOr&lt;R&gt; Function(A a) f)

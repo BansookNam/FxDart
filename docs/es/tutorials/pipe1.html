@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>pipe1 — FxDart 101</title>
+  <meta name="description" content="FxDart pipe1 tutorial: apply one function to a value, awaiting it first if it's a Future.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/pipe1.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/pipe1.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/pipe1.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/pipe1.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/pipe1.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/pipe1.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/pipe1.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/pipe1.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/pipe1.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Inicio</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/pipe1.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/pipe1.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/pipe1.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/pipe1.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/pipe1.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/pipe1.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/pipe1.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 1 · Primeros pasos › <strong>pipe1</strong></p>
+  <h1><code>pipe1</code></h1>
+  <p class="hero-sub">Applies one function to a value, awaiting it first if the value is a Future.</p>
+
+  <div class="signature">FutureOr&lt;R&gt; pipe1&lt;A, R&gt;(FutureOr&lt;A&gt; a, FutureOr&lt;R&gt; Function(A a) f)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>pipe1</code> is the single-step building block that <code>pipe</code>
+    uses internally: apply <code>f</code> to <code>a</code>, but if
+    <code>a</code> is a <code>Future</code>, await it first. If <code>a</code>
+    is a plain value, <code>f</code> runs immediately and <code>pipe1</code>
+    returns whatever <code>f</code> returns — synchronously, with no
+    <code>Future</code> wrapper at all.
+  </p>
+  <p>
+    The point is that <code>f</code> itself never has to know or care
+    whether the value it receives came from sync or async work upstream —
+    <code>pipe1</code> normalizes that for you. This is handy when you're
+    composing a value that's <em>sometimes</em> a <code>Future</code>
+    (say, the result of an earlier async step) and you want the next step
+    to look identical either way.
+  </p>
+  <p>
+    Because it only handles one step, you can nest <code>pipe1</code> calls
+    to compose a short chain, or reach for the full <code>pipe</code> (a
+    <code>List&lt;Function&gt;</code>) when there are more than one or two
+    steps.
+  </p>
+
+  <h2>Demo 1 · A plain (non-Future) value</h2>
+  <p>With no <code>Future</code> involved, <code>pipe1</code> just calls
+    <code>f(a)</code> directly and returns a plain value:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // With a plain (non-Future) value, pipe1 just calls f(a) directly.
+  final result = pipe1(21, (int a) => a * 2);
+  print(result); // 42
+  print(result.runtimeType); // int
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Awaiting a Future first</h2>
+  <p>
+    When <code>a</code> is a <code>Future</code>, <code>pipe1</code> awaits
+    it before calling <code>f</code> — chain a few of these together to
+    compose async steps one at a time:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // When `a` is a Future, pipe1 awaits it before calling f — so f itself
+  // never has to know whether it's chained after sync or async work.
+  final pending = delay(const Duration(milliseconds: 100), 10);
+
+  final result = await pipe1(pending, (int a) => a + 5);
+  print(result); // 15
+
+  // Chaining pipe1 calls composes async steps one at a time.
+  final chained = await pipe1(
+      pipe1(delay(const Duration(milliseconds: 50), 2), (int a) => a * 3),
+      (int a) => a + 1);
+  print(chained); // 7
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>pipe1</code> to turn a delayed name into a greeting.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // TODO: use pipe1 to turn a delayed name into a greeting.
+  final greeting = await pipe1(
+      delay(const Duration(milliseconds: 80), 'kim'),
+      (String name) => 'hello, $name!');
+
+  print(greeting); // hello, kim!
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="pipe.html"><code>pipe</code></a> — multi-step pipeline built from pipe1 ·
+    <a href="fx.html"><code>fx</code></a> — the typed chain alternative ·
+    <a href="delay.html"><code>delay &amp; sleep</code></a> — the async helpers used above
+  </div>
+
+  <nav class="tut-nav">
+    <a href="pipe.html">← Anterior: pipe</a>
+    <a href="toArray.html">Siguiente: toArray →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

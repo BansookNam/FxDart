@@ -1,0 +1,4 @@
+FxAsyncIterable&lt;T&gt; fromStream&lt;T&gt;(Stream&lt;T&gt; stream)
+FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)          // chain, wraps fromStream
+Stream&lt;T&gt; FxAsyncIterableToStream.toStream&lt;T&gt;()   // extension on FxAsyncIterable
+Stream&lt;T&gt; FxAsync.toStream()                        // chain

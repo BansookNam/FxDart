@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>consume — FxDart 101</title>
+  <meta name="description" content="FxDart consume tutorial: force a lazy chain's side effects without collecting any values, with an optional limit.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/consume.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/consume.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/consume.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/consume.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/consume.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/consume.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/consume.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/consume.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/consume.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Inicio</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/consume.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/consume.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/consume.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/consume.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/consume.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/consume.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/consume.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 1 · Primeros pasos › <strong>consume</strong></p>
+  <h1><code>consume</code></h1>
+  <p class="hero-sub">Pulls values through a chain and throws them away — for side effects only, optionally capped.</p>
+
+  <div class="signature">void consume&lt;A&gt;(Iterable&lt;A&gt; iterable, [int? n])
+Future&lt;void&gt; consumeAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable, [int? n])
+void Fx.consume([int? n])        // chain
+Future&lt;void&gt; FxAsync.consume([int? n])</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>consume</code> is the minimal terminal operator: it pulls values
+    through the chain — running whatever <code>peek</code> or
+    <code>mapEffect</code> steps are upstream for their side effects — but
+    discards every value instead of collecting or forwarding it. Reach for
+    it when the whole point of a pipeline is its side effects, and building
+    a <code>List</code> with <code>toArray</code> would just be wasted
+    allocation.
+  </p>
+  <p>
+    The optional <code>n</code> makes it the natural partner for infinite
+    or huge sources: <code>consume(5)</code> pulls exactly 5 values and
+    stops, even if the underlying iterable (<code>range</code> with no
+    bound, <code>cycle</code>, <code>repeat</code> with a huge count) would
+    otherwise go on forever. Omit <code>n</code> to drain a finite iterable
+    completely.
+  </p>
+  <p>
+    <code>consumeAsync</code> (or <code>.consume()</code> on an
+    <code>FxAsync</code> chain) works the same way, awaiting each pulled
+    value's side effects in turn — handy for forcing an async
+    <code>peek</code>/logging pipeline to actually run without paying to
+    collect a result list you'd throw away anyway.
+  </p>
+
+  <h2>Demo 1 · Bounding an infinite source</h2>
+  <p>
+    <code>range(1000000)</code> would normally never finish if fully pulled
+    — but <code>consume(5)</code> stops after 5 elements:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // consume pulls values through the chain (running peek/mapEffect for
+  // their side effects) but throws the results away — no List is built.
+  var seen = <int>[];
+  fx(range(1000000))
+      .peek((a) => seen.add(a))
+      .consume(5); // only pull 5, even though range has a million
+
+  print(seen); // [0, 1, 2, 3, 4]
+
+  // consume() with no argument drains the whole (finite!) iterable.
+  var count = 0;
+  fx([1, 2, 3, 4]).peek((_) => count++).consume();
+  print('count: $count'); // 4
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async side effects, no result list</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // consumeAsync forces an async chain's side effects without collecting
+  // a List back — handy when you only care about the effects (logging,
+  // writes, ...) and not the values.
+  var processed = 0;
+
+  await fx([1, 2, 3])
+      .toAsync()
+      .peek((a) async {
+        await sleep(const Duration(milliseconds: 50));
+        processed++;
+      })
+      .consume();
+
+  print('processed: $processed'); // 3
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: consume only the first 3 values of an effectively-infinite
+    <code>repeat()</code>, logging each one as it's pulled.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  var loggedCount = 0;
+
+  // TODO: consume only the first 3 values of an infinite repeat(), logging
+  // each one as it is pulled.
+  fx(repeat(1000000, 'ping'))
+      .peek((_) => loggedCount++)
+      .consume(3);
+
+  print(loggedCount); // 3
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="each.html"><code>each</code></a> — terminal op that also runs f, without the n-limit shortcut ·
+    <a href="toArray.html"><code>toArray</code></a> — terminal op that collects results instead ·
+    <a href="cycle.html"><code>cycle</code></a> — an infinite source consume is often paired with ·
+    <a href="peek.html"><code>peek</code></a> — the lazy side-effect step consume typically forces
+  </div>
+
+  <nav class="tut-nav">
+    <a href="each.html">← Anterior: each</a>
+    <a href="range.html">Siguiente: range →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

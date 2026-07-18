@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>omit — FxDart 101</title>
+  <meta name="description" content="FxDart omit tutorial: return a copy of a Map without the given keys, leaving the original untouched.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/omit.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/omit.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/omit.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/omit.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/omit.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/omit.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/omit.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/omit.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/omit.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">首页</a>
+      <a href="../../101/index.html">FxDart 入门</a>
+      <a href="../../101/index.html#api">API 教程</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="语言">
+      <span class="lang-label">语言</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/omit.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/omit.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/omit.html" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/omit.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/omit.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/omit.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/omit.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">本页尚未翻译，因此以英文显示。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">参与翻译</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 入门</a> › 章节 9 · 对象（Map）函数 › <strong>omit</strong></p>
+  <h1><code>omit</code></h1>
+  <p class="hero-sub">Returns a copy of a <code>Map</code> without the given keys.</p>
+
+  <div class="signature">Map&lt;K, V&gt; omit&lt;K, V&gt;(Iterable&lt;K&gt; keysToOmit, Map&lt;K, V&gt; map)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>omit</code> builds a brand-new <code>Map</code> containing every
+    entry of the original <em>except</em> the keys you list — the source
+    map is never mutated. Keys in <code>keysToOmit</code> that don't
+    actually exist in the map are simply ignored; there's no error for
+    "extra" keys to remove.
+  </p>
+  <p>
+    It's a common redaction/serialization tool: strip a password hash before
+    logging a user object, drop an internal field before sending a response,
+    and so on. Pair it with <code>map()</code> to redact a whole list of
+    maps at once.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final user = {'id': 1, 'name': 'kim', 'password': 'secret'};
+  print(omit(['password'], user)); // {id: 1, name: kim}
+  print(user); // {id: 1, name: kim, password: secret} — original untouched
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Redacting a whole list</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final users = [
+    {'id': 1, 'name': 'kim', 'ssn': '111-11'},
+    {'id': 2, 'name': 'lee', 'ssn': '222-22'},
+  ];
+
+  final redacted = fx(users).map((u) => omit(['ssn'], u)).toArray();
+  print(redacted); // [{id: 1, name: kim}, {id: 2, name: lee}]
+
+  // Omitting a key that doesn't exist is a no-op:
+  print(omit(['nickname'], users[0])); // {id: 1, name: kim, ssn: 111-11}
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>omit</code> to drop the <code>'debug'</code> key from <code>config</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final config = {'host': 'localhost', 'port': 8080, 'debug': true};
+
+  // TODO: use omit to drop the 'debug' key
+  final publicConfig = config;
+
+  print(publicConfig);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="pick.html"><code>pick</code></a> — the inverse: keep only some keys ·
+    <a href="omitBy.html"><code>omitBy</code></a> — drop by predicate instead of key list ·
+    <a href="compactObject.html"><code>compactObject</code></a> — drop null-valued keys ·
+    <a href="fromEntries.html"><code>fromEntries</code></a> — build a Map from scratch
+  </div>
+
+  <nav class="tut-nav">
+    <a href="fromEntries.html">← 上一节： fromEntries</a>
+    <a href="pick.html">下一节： pick →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart 是 <a href="https://github.com/marpple/FxTS">FxTS</a> 的移植版本。特别感谢 <strong>Indong Yoo</strong>（Marpple CTO）与 FxTS 团队，本库的设计思路、语义和测试套件均源于他们的工作。</p>
+  <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 运行","pgReset":"重置","pgCompiling":"编译中…","pgCompileError":"编译错误","pgError":"错误","pgLoading":"正在加载运行时…","pgRunning":"运行中…","pgNoOutput":"（无输出）","pgLoadFailed":"无法加载 FxDart 库"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

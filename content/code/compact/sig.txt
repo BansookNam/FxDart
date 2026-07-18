@@ -1,0 +1,2 @@
+Iterable&lt;A&gt; compact&lt;A&gt;(Iterable&lt;A?&gt; iterable)
+FxAsyncIterable&lt;A&gt; compactAsync&lt;A&gt;(FxAsyncIterable&lt;A?&gt; iterable)

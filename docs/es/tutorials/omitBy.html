@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>omitBy — FxDart 101</title>
+  <meta name="description" content="FxDart omitBy tutorial: drop Map entries matching a (key, value) predicate.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/omitBy.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/omitBy.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/omitBy.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/omitBy.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/omitBy.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/omitBy.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/omitBy.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/omitBy.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/omitBy.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Inicio</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/omitBy.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/omitBy.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/omitBy.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/omitBy.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/omitBy.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/omitBy.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/omitBy.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 9 · Funciones de objeto (Map) › <strong>omitBy</strong></p>
+  <h1><code>omitBy</code></h1>
+  <p class="hero-sub">Returns a copy of a <code>Map</code> without the entries matching a predicate.</p>
+
+  <div class="signature">Map&lt;K, V&gt; omitBy&lt;K, V&gt;(bool Function((K, V) entry) f, Map&lt;K, V&gt; map)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    Where <code>omit</code> takes a fixed list of keys, <code>omitBy</code>
+    takes a predicate and decides entry by entry. The predicate receives the
+    whole entry as a <code>(K, V)</code> record, so you get both the key and
+    the value to work with — read them as <code>e.$1</code> (key) and
+    <code>e.$2</code> (value). This mirrors how <code>entries(map)</code>
+    represents a <code>Map</code> throughout the rest of the library.
+  </p>
+  <p>
+    Use it whenever the thing you want to drop is defined by a condition —
+    "remove failing scores," "remove out-of-stock items" — rather than by a
+    fixed set of key names.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final scores = {'alice': 92, 'bob': 41, 'carol': 78};
+
+  print(omitBy((e) => e.$2 < 60, scores));    // {alice: 92, carol: 78}
+  print(omitBy((e) => e.$1 == 'bob', scores)); // {alice: 92, carol: 78}
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Dropping by value condition</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final inventory = {'sword': 0, 'shield': 3, 'potion': 0, 'bow': 5};
+
+  // Drop out-of-stock items:
+  final inStock = omitBy((e) => e.$2 == 0, inventory);
+  print(inStock); // {shield: 3, bow: 5}
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>omitBy</code> to drop entries whose value is <code>false</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final flags = {'featureA': true, 'featureB': false, 'featureC': true};
+
+  // TODO: use omitBy to drop entries whose value is false
+  final enabledOnly = flags;
+
+  print(enabledOnly);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="pickBy.html"><code>pickBy</code></a> — the inverse: keep by predicate ·
+    <a href="omit.html"><code>omit</code></a> — drop by a fixed key list ·
+    <a href="isMatch.html"><code>isMatch</code></a> — a ready-made deep predicate for entries ·
+    <a href="evolve.html"><code>evolve</code></a> — transform values instead of dropping them
+  </div>
+
+  <nav class="tut-nav">
+    <a href="pick.html">← Anterior: pick</a>
+    <a href="pickBy.html">Siguiente: pickBy →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

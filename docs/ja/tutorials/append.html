@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>append — FxDart 101</title>
+  <meta name="description" content="FxDart append tutorial: add one value to the end of a lazy iterable, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/append.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/append.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/append.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/append.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/append.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/append.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/append.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/append.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/append.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">ホーム</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/append.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/append.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/append.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/append.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/append.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/append.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/append.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 6 · 結合 › <strong>append</strong></p>
+  <h1><code>append</code></h1>
+  <p class="hero-sub">Yields all values of the source, then one extra value at the end.</p>
+
+  <div class="signature">Iterable&lt;A&gt; append&lt;A&gt;(A a, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; appendAsync&lt;A&gt;(FutureOr&lt;A&gt; a, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.append(T a)        // chain
+FxAsync&lt;T&gt; FxAsync.append(FutureOr&lt;T&gt; a)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>append</code> is the simplest way to tack a single trailing value
+    onto a lazy sequence without materializing anything: it just yields
+    through the whole source and then yields <code>a</code> once the source
+    is exhausted. Because the source is only consumed when pulled, this
+    works fine even when the source is expensive to compute — the extra
+    value is truly the last thing produced.
+  </p>
+  <p>
+    On the async side, <code>a</code> itself may be a <code>Future</code> —
+    <code>appendAsync</code> awaits it only once the upstream is done, so a
+    slow "closing" value doesn't hold anything up early.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(append(4, [1, 2, 3])); // (1, 2, 3, 4)
+
+  final result = fx(['a', 'b']).append('c').toArray();
+  print(result); // [a, b, c]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with a future value</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // The appended value may itself be a Future:
+  final result = await fx([1, 2, 3])
+      .toAsync()
+      .append(delay(Duration(milliseconds: 50), 4))
+      .toArray();
+
+  print(result); // [1, 2, 3, 4]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: append <code>'cool'</code> to the end of the steps.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final steps = ['mix', 'bake'];
+
+  // TODO: append 'cool' to the end of the steps
+  final allSteps = fx(steps).toArray();
+
+  print(allSteps);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="prepend.html"><code>prepend</code></a> — add a value at the front instead ·
+    <a href="concat.html"><code>concat</code></a> — join two full iterables ·
+    <a href="reverse.html"><code>reverse</code></a>
+  </div>
+
+  <nav class="tut-nav">
+    <a href="split.html">← 前: split</a>
+    <a href="prepend.html">次: prepend →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

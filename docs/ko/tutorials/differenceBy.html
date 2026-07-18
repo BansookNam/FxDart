@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>differenceBy — FxDart 101</title>
+  <meta name="description" content="FxDart differenceBy tutorial: exclude elements by a computed key found in another iterable, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/differenceBy.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/differenceBy.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/differenceBy.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/differenceBy.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/differenceBy.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/differenceBy.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/differenceBy.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/differenceBy.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/differenceBy.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">홈</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/differenceBy.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/differenceBy.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/differenceBy.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/differenceBy.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/differenceBy.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/differenceBy.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/differenceBy.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 4 · 필터링 &amp; 중복 제거 › <strong>differenceBy</strong></p>
+  <h1><code>differenceBy</code></h1>
+  <p class="hero-sub"><code>difference</code>, comparing by a computed key instead of value equality.</p>
+
+  <div class="signature">Iterable&lt;A&gt; differenceBy&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable1, Iterable&lt;A&gt; iterable2)
+FxAsyncIterable&lt;A&gt; differenceByAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;A&gt; iterable2)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>differenceBy(f, iterable1, iterable2)</code> follows the exact
+    same argument-order rule as <a href="difference.html"><code>difference</code></a>:
+    the result comes <strong>from <code>iterable2</code></strong>, keeping
+    only the elements whose <code>f</code>-key does <em>not</em> appear
+    among <code>iterable1</code>'s <code>f</code>-keys (with duplicates in
+    the result collapsed). The <code>f</code> function is applied to
+    <em>both</em> iterables, so — unlike <code>differenceBy</code> in some
+    languages — both arguments must share the same element type
+    <code>A</code>; only the derived key type <code>B</code> is what's being
+    compared.
+  </p>
+  <p>
+    This is the shape you reach for when the "exclusion list" and the
+    "source list" are full records rather than bare values: a list of
+    blocked user objects and a list of user objects, matched by
+    <code>id</code>; or an unavailable-products list and a product catalog,
+    matched by <code>sku</code>.
+  </p>
+  <p>
+    <code>difference</code> itself is just
+    <code>differenceBy((a) =&gt; a, iterable1, iterable2)</code>. There's no
+    chain method for either — call the data-first function directly. On the
+    async side, the concurrency marker applies to <code>iterable2</code>,
+    same as <code>differenceAsync</code>.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form. Same argument order rule as difference: the result
+  // comes FROM iterable2, filtered by f-keys seen in iterable1. Both
+  // iterables share the same element type -- f is applied to both sides.
+  final blocked = [
+    {'id': 2},
+    {'id': 4},
+  ];
+  final users = [
+    {'id': 1, 'name': 'kim'},
+    {'id': 2, 'name': 'lee'},
+    {'id': 3, 'name': 'park'},
+  ];
+
+  final allowed = differenceBy((u) => u['id'], blocked, users);
+  print(toArray(allowed));
+  // [{id: 1, name: kim}, {id: 3, name: park}]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with concurrency</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  // The concurrency marker applies to iterable2, as with differenceAsync.
+  final blocked = toAsync([
+    {'id': 2},
+  ]);
+  final users = fx([
+    {'id': 1, 'name': 'kim'},
+    {'id': 2, 'name': 'lee'},
+    {'id': 3, 'name': 'park'},
+  ]).toAsync().map((u) => delay(Duration(milliseconds: 100), u)).concurrent(3);
+
+  final allowed =
+      await fxAsync(differenceByAsync((u) => u['id'], blocked, users)).toArray();
+
+  print(allowed); // [{id: 1, name: kim}, {id: 3, name: park}]
+  print('took ${sw.elapsedMilliseconds}ms'); // ~100ms
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>differenceBy</code> (keyed on <code>'sku'</code>)
+    to find products that are still available.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final unavailable = [
+    {'sku': 'A1'},
+  ];
+  final products = [
+    {'sku': 'A1', 'title': 'Keyboard'},
+    {'sku': 'B2', 'title': 'Mouse'},
+  ];
+
+  // TODO: use differenceBy (keyed on 'sku') to find products that are
+  // still available.
+  final available = toArray(products);
+
+  print(available);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="difference.html"><code>difference</code></a> — the value-equality version ·
+    <a href="intersectionBy.html"><code>intersectionBy</code></a> — keep by a shared computed key instead ·
+    <a href="uniqBy.html"><code>uniqBy</code></a> — dedupe a single iterable by key ·
+    <a href="compress.html"><code>compress</code></a> — filter by a parallel boolean mask
+  </div>
+
+  <nav class="tut-nav">
+    <a href="difference.html">← 이전: difference</a>
+    <a href="intersection.html">다음: intersection →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

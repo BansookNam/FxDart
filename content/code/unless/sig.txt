@@ -1,0 +1,1 @@
+T unless&lt;T&gt;(bool Function(T) predicate, T Function(T) callback, T value)

@@ -1,0 +1,49 @@
+{
+  "@@locale": "ru",
+
+  "navHome": "Главная",
+
+  "nav101": "FxDart 101",
+
+  "navApi": "Руководства по API",
+
+  "langLabel": "Язык",
+
+  "crumb101": "FxDart 101",
+
+  "sectionWord": "Раздел",
+
+  "prevPrefix": "Назад: ",
+
+  "nextPrefix": "Далее: ",
+
+  "footerCredit": "FxDart — это порт <a href=\"https://github.com/marpple/FxTS\">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.",
+
+  "footerLegal": "Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License",
+
+  "untranslated": "Эта страница ещё не переведена, поэтому показана на английском.",
+
+  "outdated": "Возможно, этот перевод устарел — английская страница изменилась после его создания.",
+
+  "contributeCta": "Помогите с переводом",
+
+  "contributeUrl": "https://github.com/bansooknam/fxDart/blob/main/i18n/README.md",
+
+  "pgRun": "▶ Запустить",
+
+  "pgReset": "Сбросить",
+
+  "pgCompiling": "Компиляция…",
+
+  "pgCompileError": "Ошибка компиляции",
+
+  "pgError": "Ошибка",
+
+  "pgLoading": "Загрузка среды выполнения…",
+
+  "pgRunning": "Выполнение…",
+
+  "pgNoOutput": "(нет вывода)",
+
+  "pgLoadFailed": "Не удалось загрузить библиотеку FxDart"
+}

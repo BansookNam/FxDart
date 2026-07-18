@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>delay &amp; sleep — FxDart 101</title>
+  <meta name="description" content="FxDart delay and sleep tutorial: the two building blocks every async demo on this site is built from, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/delay.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/delay.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/delay.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/delay.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/delay.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/delay.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/delay.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/delay.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/delay.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">홈</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/delay.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/delay.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/delay.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/delay.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/delay.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/delay.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/delay.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 10 · 함수 유틸리티 › <strong>delay &amp; sleep</strong></p>
+  <h1><code>delay</code> &amp; <code>sleep</code></h1>
+  <p class="hero-sub">Wait for a bit, then produce a value (delay) — or just wait (sleep).</p>
+
+  <div class="signature">Future&lt;T&gt; delay&lt;T&gt;(Duration wait, T value)
+Future&lt;void&gt; sleep(Duration wait)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>delay(wait, value)</code> returns a <code>Future</code> that
+    completes with <code>value</code> after <code>wait</code> has elapsed.
+    <code>sleep(wait)</code> is the same idea with nothing to return — it
+    just completes after the duration. Both are thin wrappers over
+    <code>Future.delayed</code>, and both are exactly what you'd reach for to
+    simulate a slow operation: a network call, a database query, anything
+    that takes time and eventually produces (or doesn't produce) a result.
+  </p>
+  <p>
+    These two functions are the backbone of nearly every async demo across
+    this whole tutorial site. Whenever you see <code>mapAsync</code>,
+    <code>concurrent</code>, <code>debounce</code>, or <code>throttle</code>
+    demonstrated with a <code>Stopwatch</code> proving something ran in
+    parallel or was rate-limited, it's <code>delay</code> or <code>sleep</code>
+    doing the actual waiting under the hood.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+  final v = await delay(Duration(milliseconds: 150), 'done');
+  print(v); // done
+  print(sw.elapsedMilliseconds >= 150); // true
+
+  await sleep(Duration(milliseconds: 50));
+  print('after sleep'); // after sleep
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Simulating concurrent work</h2>
+  <p>
+    Three "requests" each take 150ms, but run concurrently — the whole batch
+    still finishes in well under 450ms:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  final result = await fx([1, 2, 3])
+      .toAsync()
+      .map((n) => delay(Duration(milliseconds: 150), n * 10))
+      .concurrent(3)
+      .toArray();
+
+  print(result); // [10, 20, 30]
+  print('took < 300ms: ${sw.elapsedMilliseconds < 300}'); // true
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>delay</code> to simulate a 100ms "fetch" that
+    returns <code>'pong'</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // TODO: use delay to simulate a 100ms fetch that returns 'pong'
+  final response = await delay(Duration(milliseconds: 100), 'pong');
+
+  print(response); // pong
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="memoize.html"><code>memoize</code></a> — caches a delayed Future so it only waits once ·
+    <a href="concurrent.html"><code>concurrent</code></a> — run multiple delays in parallel ·
+    <a href="debounce.html"><code>debounce</code></a> / <a href="throttle.html"><code>throttle</code></a> — rate-limiting built on top of waiting ·
+    <a href="toAsync.html"><code>toAsync</code></a> — turn a plain Iterable into an async pipeline
+  </div>
+
+  <nav class="tut-nav">
+    <a href="comparisons.html">← 이전: gt · gte · lt · lte</a>
+    <a href="unicodeToArray.html">다음: unicodeToArray →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

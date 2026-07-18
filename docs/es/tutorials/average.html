@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>average — FxDart 101</title>
+  <meta name="description" content="FxDart average tutorial: the mean of every number in a pipeline, NaN when empty, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/average.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/average.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/average.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/average.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/average.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/average.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/average.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/average.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/average.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Inicio</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/average.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/average.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/average.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/average.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/average.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/average.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/average.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>average</strong></p>
+  <h1><code>average</code></h1>
+  <p class="hero-sub">The mean of every number the pipeline produces — <code>NaN</code> when there are none.</p>
+
+  <div class="signature">double average(Iterable&lt;num&gt; iterable)
+Future&lt;double&gt; averageAsync(FxAsyncIterable&lt;num&gt; iterable)
+double Fx&lt;num&gt;.average()          // chain (sync)
+Future&lt;double&gt; FxAsync&lt;num&gt;.average()  // chain (async)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>average</code> is a terminal operator that walks the whole
+    pipeline once, tracking both a running total and a running count, then
+    divides. It always returns a <code>double</code>, even for a list of
+    plain <code>int</code>s.
+  </p>
+  <p>
+    The one behavior worth internalizing: <code>average</code> of an
+    <strong>empty</strong> iterable is <code>double.nan</code> — it's
+    computing <code>0 / 0</code>, not throwing and not defaulting to
+    <code>0</code>. This mirrors FxTS exactly. If your pipeline might be
+    empty, check for that explicitly (<code>result.isNaN</code>) rather than
+    assuming a numeric fallback.
+  </p>
+  <p>
+    Like <code><a href="sum.html">sum</a></code>, the chain form is exposed
+    through a <code>Fx&lt;num&gt;</code> / <code>FxAsync&lt;num&gt;</code>
+    extension, so it only becomes available once the compiler can see your
+    chain's element type is numeric.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; the empty case</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form:
+  print(average([2, 4, 6, 8])); // 5.0
+
+  // Empty iterable averages to NaN (0/0), not 0 or an error:
+  print(average(<num>[])); // NaN
+
+  // Chain form:
+  final avg = fx([1, 2, 3, 4, 5]).filter((a) => a > 2).average();
+  print(avg); // 4.0
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final scores = await fx(['10', '20', '30'])
+      .toAsync()
+      .map((s) => delay(const Duration(milliseconds: 100), int.parse(s)))
+      .average();
+
+  print(scores); // 20.0
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: average only the <strong>passing</strong> scores (&gt;= 60).</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final scores = [88, 45, 92, 67, 30, 99, 71];
+
+  // TODO: average only the PASSING scores (>= 60).
+  final passingAvg = fx(scores).average();
+
+  print(passingAvg);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="sum.html"><code>sum</code></a> — the numerator this divides ·
+    <a href="size.html"><code>size</code></a> — the denominator this divides by ·
+    <a href="min.html"><code>min</code></a> · <a href="max.html"><code>max</code></a> — the other numeric terminals
+  </div>
+
+  <nav class="tut-nav">
+    <a href="sum.html">← Anterior: sum</a>
+    <a href="min.html">Siguiente: min →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

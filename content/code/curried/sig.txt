@@ -1,0 +1,2 @@
+R Function(B) Function(A) get curried  // on R Function(A, B), up to arity 5
+R Function(A, B) get uncurried        // on R Function(B) Function(A), up to 5 levels

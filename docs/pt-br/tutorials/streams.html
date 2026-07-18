@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stream bridges — FxDart 101</title>
+  <meta name="description" content="FxDart Stream bridges: fromStream, fxStream, and toStream() — round-trip between Dart Streams and FxAsyncIterable, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/streams.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/streams.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/streams.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/streams.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/streams.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/streams.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/streams.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/streams.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/streams.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Início</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/streams.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/streams.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/streams.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/streams.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/streams.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/streams.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/streams.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 11 · Async &amp; concorrência › <strong>Stream bridges</strong></p>
+  <h1>Stream bridges</h1>
+  <p class="hero-sub">fromStream, fxStream, and .toStream() — cross freely between Dart's Stream and FxDart's FxAsyncIterable.</p>
+
+  <div class="signature">FxAsyncIterable&lt;T&gt; fromStream&lt;T&gt;(Stream&lt;T&gt; stream)
+FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)          // chain, wraps fromStream
+Stream&lt;T&gt; FxAsyncIterableToStream.toStream&lt;T&gt;()   // extension on FxAsyncIterable
+Stream&lt;T&gt; FxAsync.toStream()                        // chain</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>fromStream</code> converts any <code>Stream</code> — single- or
+    broadcast-subscription — into an <code>FxAsyncIterable</code>, so you can
+    run the whole FxDart operator set (<code>map</code>, <code>filter</code>,
+    <code>concurrent</code>, …) over data that's arriving from a socket, a
+    file, a widget's event stream, or anywhere else Dart hands you a
+    <code>Stream</code>. <code>fxStream(stream)</code> is the same thing, but
+    returns a chainable <code>FxAsync</code> directly instead of a raw
+    <code>FxAsyncIterable</code> — the async counterpart of <code>fx</code>
+    and <code>fxAsync</code>.
+  </p>
+  <p>
+    Going the other way, <code>.toStream()</code> drives an
+    <code>FxAsyncIterable</code> (or <code>FxAsync</code> chain) to completion
+    and re-emits its values as a plain <code>Stream</code> — handy when some
+    other API (a <code>StreamBuilder</code>, for example) expects one. One
+    caveat: <code>toStream()</code> always pulls <strong>sequentially</strong>,
+    ignoring any <code>concurrent(n)</code> upstream of it — apply
+    <code>concurrent</code>/<code>concurrentPool</code> to the chain
+    <em>before</em> calling <code>.toStream()</code> if you need the
+    parallelism to actually happen; the stream conversion itself won't add it.
+  </p>
+
+  <h2>Demo 1 · fromStream and fxStream</h2>
+  <p>Both wrap a <code>Stream.fromIterable</code> so you can pipe an existing
+    stream through FxDart operators:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // fromStream() lifts any Stream into an FxAsyncIterable.
+  final stream = Stream.fromIterable([1, 2, 3, 4, 5]);
+  final doubled = await toArrayAsync(mapAsync((a) => a * 2, fromStream(stream)));
+  print(doubled); // [2, 4, 6, 8, 10]
+
+  // fxStream() does the same but hands back a chainable FxAsync directly.
+  final chained = await fxStream(Stream.fromIterable([1, 2, 3, 4, 5]))
+      .filter((a) => a.isOdd)
+      .toArray();
+  print(chained); // [1, 3, 5]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Round-trip, with a finite periodic stream</h2>
+  <p>
+    <code>Stream.periodic</code> never ends on its own, so
+    <code>.take(n)</code> keeps the demo finite. The second half shows the
+    reverse direction — building an <code>FxAsync</code> chain, then handing
+    it back out as a plain <code>Stream</code> with <code>.toStream()</code>:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // Stream.periodic never ends on its own, so take(5) keeps this finite.
+  final source =
+      Stream.periodic(const Duration(milliseconds: 30), (i) => i).take(5);
+  final squared = await fxStream(source).map((a) => a * a).toArray();
+  print(squared); // [0, 1, 4, 9, 16]
+
+  // Round-trip: build an FxAsync chain, then hand it back out as a Stream
+  // with .toStream() for code that expects one (e.g. a widget builder).
+  final roundTrip = fx([1, 2, 3]).toAsync().map((a) => a * 100).toStream();
+  await for (final v in roundTrip) {
+    print(v); // 100, 200, 300
+  }
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: keep only the values &gt;= 10 from this stream.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final source = Stream.fromIterable([5, 12, 8, 20, 3]);
+
+  // TODO: use fxStream(source) and .filter(...) to keep only values >= 10,
+  // then .toArray() to collect them.
+  final result = await fxStream(source).toArray();
+
+  print(result); // currently [5, 12, 8, 20, 3] — should be [12, 20]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="toAsync.html"><code>toAsync</code></a> — lift a plain Iterable instead ·
+    <a href="asyncVariants.html">async variants</a> — the *Async naming convention ·
+    <a href="concurrent.html"><code>concurrent</code></a> — apply before toStream() for real parallelism ·
+    <a href="concurrentPool.html"><code>concurrentPool</code></a> — completion-order variant
+  </div>
+
+  <nav class="tut-nav">
+    <a href="../../101/index.html">← FxDart 101</a>
+    <a href="concurrent.html">Próximo: concurrent →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

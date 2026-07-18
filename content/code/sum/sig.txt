@@ -1,0 +1,4 @@
+num sum(Iterable&lt;num&gt; iterable)
+Future&lt;num&gt; sumAsync(FxAsyncIterable&lt;num&gt; iterable)
+num Fx&lt;num&gt;.sum()          // chain (sync)
+Future&lt;num&gt; FxAsync&lt;num&gt;.sum()  // chain (async)

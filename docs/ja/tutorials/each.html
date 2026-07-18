@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>each — FxDart 101</title>
+  <meta name="description" content="FxDart each tutorial: run a function for its side effects over every element of a lazy chain, sync and async.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/each.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/each.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/each.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/each.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/each.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/each.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/each.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/each.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/each.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">ホーム</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/each.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/each.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/each.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/each.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/each.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/each.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/each.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 1 · はじめに › <strong>each</strong></p>
+  <h1><code>each</code></h1>
+  <p class="hero-sub">Runs a function once per element, purely for its side effects.</p>
+
+  <div class="signature">void each&lt;A&gt;(void Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;void&gt; eachAsync&lt;A&gt;(FutureOr&lt;void&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+void Fx.each(void Function(T a) f)        // chain
+Future&lt;void&gt; FxAsync.each(FutureOr&lt;void&gt; Function(T a) f)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>each</code> is a terminal operator, like <code>toArray</code> —
+    calling it pulls every value through the whole chain. The difference is
+    what it does with those values: instead of collecting them into a
+    <code>List</code>, it just runs <code>f</code> for each one and returns
+    <code>void</code>. Use it when you're printing, logging, writing to a
+    database, or otherwise producing an effect, and you don't need the
+    values back.
+  </p>
+  <p>
+    It's the FxTS-flavored twin of Dart's own <code>Iterable.forEach</code> —
+    the same idea, given a name consistent with the rest of the FxTS API so
+    it composes naturally with the rest of the chain vocabulary.
+  </p>
+  <p>
+    <code>eachAsync</code> (or <code>.each()</code> on an
+    <code>FxAsync</code> chain) awaits <code>f</code> for every element,
+    strictly in the order the elements arrive — even if some individual
+    calls would finish faster than others, <code>each</code> always
+    processes one at a time in sequence. If you want overlap, add
+    <code>.concurrent(n)</code> upstream before <code>.each()</code>.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form: run f for side effects, get nothing back.
+  each((a) => print('data-first: $a'), [1, 2, 3]);
+
+  // Chain form:
+  fx(['a', 'b', 'c']).each((a) => print('chain: $a'));
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, strictly in order</h2>
+  <p>
+    Even though each element sleeps for a <em>different</em> length of
+    time, <code>eachAsync</code> still processes them 1, 2, 3 — never out
+    of order:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // eachAsync awaits f for every element, strictly in order — even though
+  // each delay is a different length, they always print as 1, 2, 3.
+  await fx([1, 2, 3]).toAsync().each((a) async {
+    await sleep(Duration(milliseconds: 50 * (4 - a)));
+    print('processed $a');
+  });
+
+  print('done');
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>each</code> to print a receipt line for every
+    order and keep a running total.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final orders = [12.5, 30.0, 7.25];
+
+  // TODO: use each to print a receipt line for every order.
+  var total = 0.0;
+  fx(orders).each((price) {
+    total += price;
+    print('charged \$$price');
+  });
+
+  print('total: \$$total');
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="toArray.html"><code>toArray</code></a> — terminal op that collects a List instead ·
+    <a href="consume.html"><code>consume</code></a> — terminal op that discards results and can stop early ·
+    <a href="peek.html"><code>peek</code></a> — same idea, but lazy (not terminal) ·
+    <a href="fx.html"><code>fx</code></a> — the chain that each terminates
+  </div>
+
+  <nav class="tut-nav">
+    <a href="toArray.html">← 前: toArray</a>
+    <a href="consume.html">次: consume →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

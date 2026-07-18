@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>findIndex — FxDart 101</title>
+  <meta name="description" content="FxDart findIndex tutorial: get the position of the first match, -1 when nothing matches, lazy and short-circuiting.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/findIndex.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/findIndex.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/findIndex.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/findIndex.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/findIndex.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/findIndex.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/findIndex.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/findIndex.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/findIndex.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Início</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/findIndex.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/findIndex.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/findIndex.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/findIndex.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/findIndex.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/findIndex.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/findIndex.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 8 · Acesso &amp; predicados › <strong>findIndex</strong></p>
+  <h1><code>findIndex</code></h1>
+  <p class="hero-sub">Returns the index of the first element for which a predicate is true, or <code>-1</code>.</p>
+
+  <div class="signature">int findIndex&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;int&gt; findIndexAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+int Fx.findIndex(bool Function(T a) f)              // chain
+Future&lt;int&gt; FxAsync.findIndex(FutureOr&lt;bool&gt; Function(T a) f)  // chain</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>findIndex</code> is <code>find</code>'s sibling: same lazy,
+    short-circuiting scan, but it reports <em>where</em> the match was
+    instead of the match itself. Note the different "nothing found"
+    sentinel — this one is <code>-1</code>, an <code>int</code>, matching
+    JavaScript's <code>Array.prototype.findIndex</code>. That's a deliberate
+    contrast with <code>head</code>/<code>find</code>/<code>nth</code>,
+    which all use <code>null</code>: an index has a natural "impossible"
+    value, so FxDart keeps the FxTS convention here instead of inventing an
+    <code>int?</code> return type.
+  </p>
+  <p>
+    Internally it pairs each element with its index (via <code>zipWithIndex</code>)
+    and stops at the first one that passes <code>f</code>.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final nums = [4, 8, 15, 16, 23, 42];
+  print(findIndex((a) => a > 15, nums));      // 3
+  print(fx(nums).findIndex((a) => a > 100));  // -1
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Short-circuiting &amp; async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  var checked = 0;
+  final index = findIndex((a) {
+    checked++;
+    return a == 5;
+  }, range(1000000));
+  print(index);               // 5
+  print('checked $checked');  // checked 6
+
+  final asyncIndex = await fx(['x', 'y', 'z'])
+      .toAsync()
+      .findIndex((v) => delay(Duration(milliseconds: 30), v == 'z'));
+  print(asyncIndex); // 2
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>findIndex</code> to find bob's position in the queue, or <code>-1</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final queue = ['alice', 'bob', 'carol'];
+
+  // TODO: use findIndex to find bob's position, or -1
+  final position = -1;
+
+  print(position);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="find.html"><code>find</code></a> — same search, returns the value ·
+    <a href="includes.html"><code>includes</code></a> — just "is it there?" ·
+    <a href="nth.html"><code>nth</code></a> — the inverse: index in, value out ·
+    <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — what powers this under the hood
+  </div>
+
+  <nav class="tut-nav">
+    <a href="find.html">← Anterior: find</a>
+    <a href="includes.html">Próximo: includes →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

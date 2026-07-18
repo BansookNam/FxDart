@@ -1,0 +1,50 @@
+---
+slug: some
+title: some — FxDart 101
+description: FxDart some tutorial: check that at least one element satisfies a predicate, short-circuiting on the first hit, sync and async.
+heading: <code>some</code>
+section: 8
+crumb: some
+prev: every.html
+prevLabel: every
+next: predicates.html
+nextLabel: predicates
+---
+  <p class="hero-sub">True when at least one element satisfies a predicate — false for an empty iterable.</p>
+
+  {{signature}}
+
+  <h2>Lecture</h2>
+  <p>
+    <code>some</code> is <code>every</code>'s mirror image: it scans left to
+    right and short-circuits the moment it finds a match, returning
+    <code>true</code> right away. If it never finds one — including on an
+    empty iterable, which is the opposite vacuous case from
+    <code>every</code> — it returns <code>false</code> only after checking
+    everything.
+  </p>
+  <p>
+    Unlike <code>every</code>, <code>Fx</code> <em>does</em> define its own
+    <code>.some()</code> chain method (it isn't already covered by
+    <code>Iterable</code>, since Dart's own <code>Iterable</code> has no
+    built-in <code>some</code> — the closest thing, <code>any</code>, does
+    the same job under a different name).
+  </p>
+
+  <h2>Demo 1 · Basics &amp; short-circuiting</h2>
+  {{playground:0}}
+
+  <h2>Demo 2 · Async</h2>
+  {{playground:1}}
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>some</code> to check if anything in the cart costs more than 10.</p>
+  {{playground:2}}
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="every.html"><code>every</code></a> — the "all of them" counterpart ·
+    <a href="includes.html"><code>includes</code></a> — a specialization of <code>some</code> ·
+    <a href="find.html"><code>find</code></a> — get the matching element, not just a bool ·
+    <a href="predicates.html"><code>predicates</code></a> — ready-made predicates to pair with <code>some</code>
+  </div>

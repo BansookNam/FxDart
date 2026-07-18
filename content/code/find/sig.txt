@@ -1,0 +1,4 @@
+A? find&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;A?&gt; findAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+T? Fx.find(bool Function(T a) f)              // chain
+Future&lt;T?&gt; FxAsync.find(FutureOr&lt;bool&gt; Function(T a) f)  // chain

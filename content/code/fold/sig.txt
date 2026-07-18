@@ -1,0 +1,4 @@
+Acc fold&lt;A, Acc&gt;(Acc seed, Acc Function(Acc acc, A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;Acc&gt; foldAsync&lt;A, Acc&gt;(FutureOr&lt;Acc&gt; seed, FutureOr&lt;Acc&gt; Function(Acc acc, A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Acc Fx.fold&lt;Acc&gt;(Acc initialValue, Acc Function(Acc acc, T a) combine)      // chain (sync, inherited from Iterable)
+Future&lt;Acc&gt; FxAsync.fold&lt;Acc&gt;(FutureOr&lt;Acc&gt; seed, FutureOr&lt;Acc&gt; Function(Acc acc, T a) f)  // chain (async)

@@ -4,9 +4,15 @@ codecov
 # GitHub Pages site — lives on the web, not in the package
 docs/
 
+# Docs sources: English content and its translations. These build docs/ and
+# are irrelevant to package consumers.
+content/
+i18n/
+
 # Repo tooling / CI, irrelevant to package consumers
 .github/
 .gstack/
+tool/
 tools/
 deploy.sh
 DEPLOY.md

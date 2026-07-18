@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>omit — FxDart 101</title>
+  <meta name="description" content="FxDart omit tutorial: return a copy of a Map without the given keys, leaving the original untouched.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/omit.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/omit.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/omit.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/omit.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/omit.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/omit.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/omit.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/omit.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/omit.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">홈</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/omit.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/omit.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/omit.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/omit.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/omit.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/omit.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/omit.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 9 · 객체(Map) 함수 › <strong>omit</strong></p>
+  <h1><code>omit</code></h1>
+  <p class="hero-sub">Returns a copy of a <code>Map</code> without the given keys.</p>
+
+  <div class="signature">Map&lt;K, V&gt; omit&lt;K, V&gt;(Iterable&lt;K&gt; keysToOmit, Map&lt;K, V&gt; map)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>omit</code> builds a brand-new <code>Map</code> containing every
+    entry of the original <em>except</em> the keys you list — the source
+    map is never mutated. Keys in <code>keysToOmit</code> that don't
+    actually exist in the map are simply ignored; there's no error for
+    "extra" keys to remove.
+  </p>
+  <p>
+    It's a common redaction/serialization tool: strip a password hash before
+    logging a user object, drop an internal field before sending a response,
+    and so on. Pair it with <code>map()</code> to redact a whole list of
+    maps at once.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final user = {'id': 1, 'name': 'kim', 'password': 'secret'};
+  print(omit(['password'], user)); // {id: 1, name: kim}
+  print(user); // {id: 1, name: kim, password: secret} — original untouched
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Redacting a whole list</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final users = [
+    {'id': 1, 'name': 'kim', 'ssn': '111-11'},
+    {'id': 2, 'name': 'lee', 'ssn': '222-22'},
+  ];
+
+  final redacted = fx(users).map((u) => omit(['ssn'], u)).toArray();
+  print(redacted); // [{id: 1, name: kim}, {id: 2, name: lee}]
+
+  // Omitting a key that doesn't exist is a no-op:
+  print(omit(['nickname'], users[0])); // {id: 1, name: kim, ssn: 111-11}
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>omit</code> to drop the <code>'debug'</code> key from <code>config</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final config = {'host': 'localhost', 'port': 8080, 'debug': true};
+
+  // TODO: use omit to drop the 'debug' key
+  final publicConfig = config;
+
+  print(publicConfig);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="pick.html"><code>pick</code></a> — the inverse: keep only some keys ·
+    <a href="omitBy.html"><code>omitBy</code></a> — drop by predicate instead of key list ·
+    <a href="compactObject.html"><code>compactObject</code></a> — drop null-valued keys ·
+    <a href="fromEntries.html"><code>fromEntries</code></a> — build a Map from scratch
+  </div>
+
+  <nav class="tut-nav">
+    <a href="fromEntries.html">← 이전: fromEntries</a>
+    <a href="pick.html">다음: pick →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

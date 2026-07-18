@@ -1,0 +1,9 @@
+[
+  { "code": "en",      "name": "English",    "path": "",      "dir": "ltr" },
+  { "code": "ko",      "name": "한국어",      "path": "ko",    "dir": "ltr" },
+  { "code": "zh-Hans", "name": "简体中文",     "path": "zh",    "dir": "ltr" },
+  { "code": "ja",      "name": "日本語",       "path": "ja",    "dir": "ltr" },
+  { "code": "es",      "name": "Español",    "path": "es",    "dir": "ltr" },
+  { "code": "pt-BR",   "name": "Português",  "path": "pt-br", "dir": "ltr" },
+  { "code": "ru",      "name": "Русский",    "path": "ru",    "dir": "ltr" }
+]

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FxDart 入门 —— 课程 &amp; API 教程</title>
+  <meta name="description" content="一门循序渐进的 FxDart 课程：讲解、实时演示，以及每个函数配套的浏览器内 playground。">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/101/index.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/101/index.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/101/index.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/101/index.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/101/index.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/101/index.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/101/index.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/101/index.html">
+  <link rel="stylesheet" href="../../css/site.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">首页</a>
+      <a href="../../101/index.html" class="active">FxDart 入门</a>
+      <a href="#api">API 教程</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="语言">
+      <span class="lang-label">语言</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/101/index.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/101/index.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/101/index.html" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/101/index.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/101/index.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/101/index.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/101/index.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <h1>FxDart 入门</h1>
+  <p class="hero-sub">
+    一门重实践的课程。每一课都是一段简短讲解，配有实时演示和
+    playground —— 代码由真正的 Dart 编译器编译，并在你的浏览器中运行。
+    你可以按顺序学完各个章节，也可以直接跳到下面的任意函数。
+  </p>
+
+  <div class="callout">
+    <strong>初次接触？</strong> 建议按
+    <a href="../tutorials/fx.html"><code>fx</code></a> →
+    <a href="../tutorials/map.html"><code>map</code></a> →
+    <a href="../tutorials/filter.html"><code>filter</code></a> →
+    <a href="../tutorials/take.html"><code>take</code></a> →
+    <a href="../tutorials/toArray.html"><code>toArray</code></a> 的顺序开始，
+    然后进入
+    <a href="../tutorials/concurrent.html"><code>concurrent</code></a>。
+  </div>
+
+  <h2 id="api">章节 1 · 快速上手</h2>
+  <p class="dim">管道模型：惰性构建，由终结操作符触发执行。</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/fx.html">fx</a></li>
+    <li><a href="../tutorials/pipe.html">pipe</a></li>
+    <li><a href="../tutorials/pipe1.html">pipe1</a></li>
+    <li><a href="../tutorials/toArray.html">toArray</a></li>
+    <li><a href="../tutorials/each.html">each</a></li>
+    <li><a href="../tutorials/consume.html">consume</a></li>
+  </ul>
+
+  <h2>章节 2 · 生成序列</h2>
+  <p class="dim">可以作为管道起点的数据源。</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/range.html">range</a></li>
+    <li><a href="../tutorials/repeat.html">repeat</a></li>
+    <li><a href="../tutorials/cycle.html">cycle</a></li>
+    <li><a href="../tutorials/entries.html">entries</a></li>
+    <li><a href="../tutorials/keys.html">keys</a></li>
+    <li><a href="../tutorials/values.html">values</a></li>
+  </ul>
+
+  <h2>章节 3 · 转换</h2>
+  <p class="dim">惰性地重塑每个元素。</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/map.html">map</a></li>
+    <li><a href="../tutorials/mapEffect.html">mapEffect</a></li>
+    <li><a href="../tutorials/flatMap.html">flatMap</a></li>
+    <li><a href="../tutorials/flat.html">flat</a></li>
+    <li><a href="../tutorials/scan.html">scan</a></li>
+    <li><a href="../tutorials/peek.html">peek</a></li>
+    <li><a href="../tutorials/pluck.html">pluck</a></li>
+  </ul>
+
+  <h2>章节 4 · 过滤 &amp; 去重</h2>
+  <p class="dim">只保留你需要的部分。</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/filter.html">filter</a></li>
+    <li><a href="../tutorials/reject.html">reject</a></li>
+    <li><a href="../tutorials/compact.html">compact</a></li>
+    <li><a href="../tutorials/uniq.html">uniq</a></li>
+    <li><a href="../tutorials/uniqBy.html">uniqBy</a></li>
+    <li><a href="../tutorials/difference.html">difference</a></li>
+    <li><a href="../tutorials/differenceBy.html">differenceBy</a></li>
+    <li><a href="../tutorials/intersection.html">intersection</a></li>
+    <li><a href="../tutorials/intersectionBy.html">intersectionBy</a></li>
+    <li><a href="../tutorials/compress.html">compress</a></li>
+  </ul>
+
+  <h2>章节 5 · 切片</h2>
+  <p class="dim">滑动窗口、前缀、后缀与分块。</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/take.html">take</a></li>
+    <li><a href="../tutorials/takeRight.html">takeRight</a></li>
+    <li><a href="../tutorials/takeWhile.html">takeWhile</a></li>
+    <li><a href="../tutorials/takeUntilInclusive.html">takeUntilInclusive</a></li>
+    <li><a href="../tutorials/drop.html">drop</a></li>
+    <li><a href="../tutorials/dropRight.html">dropRight</a></li>
+    <li><a href="../tutorials/dropWhile.html">dropWhile</a></li>
+    <li><a href="../tutorials/dropUntil.html">dropUntil</a></li>
+    <li><a href="../tutorials/slice.html">slice</a></li>
+    <li><a href="../tutorials/chunk.html">chunk</a></li>
+    <li><a href="../tutorials/split.html">split</a></li>
+  </ul>
+
+  <h2>章节 6 · 组合</h2>
+  <p class="dim">多个序列进，一个序列出。</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/append.html">append</a></li>
+    <li><a href="../tutorials/prepend.html">prepend</a></li>
+    <li><a href="../tutorials/concat.html">concat</a></li>
+    <li><a href="../tutorials/zip.html">zip</a></li>
+    <li><a href="../tutorials/zipWith.html">zipWith</a></li>
+    <li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li>
+    <li><a href="../tutorials/transpose.html">transpose</a></li>
+    <li><a href="../tutorials/reverse.html">reverse</a></li>
+    <li><a href="../tutorials/fork.html">fork</a></li>
+  </ul>
+
+  <h2>章节 7 · 聚合</h2>
+  <p class="dim">拉动整条管道并产出结果的终结操作符。</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/reduce.html">reduce</a></li>
+    <li><a href="../tutorials/fold.html">fold</a></li>
+    <li><a href="../tutorials/reduceLazy.html">reduceLazy</a></li>
+    <li><a href="../tutorials/sum.html">sum</a></li>
+    <li><a href="../tutorials/average.html">average</a></li>
+    <li><a href="../tutorials/min.html">min</a></li>
+    <li><a href="../tutorials/max.html">max</a></li>
+    <li><a href="../tutorials/size.html">size</a></li>
+    <li><a href="../tutorials/join.html">join</a></li>
+    <li><a href="../tutorials/groupBy.html">groupBy</a></li>
+    <li><a href="../tutorials/indexBy.html">indexBy</a></li>
+    <li><a href="../tutorials/countBy.html">countBy</a></li>
+    <li><a href="../tutorials/sort.html">sort</a></li>
+    <li><a href="../tutorials/sortBy.html">sortBy</a></li>
+    <li><a href="../tutorials/partition.html">partition</a></li>
+  </ul>
+
+  <h2>章节 8 · 取值 &amp; 判定</h2>
+  <p class="dim">取出单个值，以及对元素做判定。</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/head.html">head</a></li>
+    <li><a href="../tutorials/last.html">last</a></li>
+    <li><a href="../tutorials/nth.html">nth</a></li>
+    <li><a href="../tutorials/find.html">find</a></li>
+    <li><a href="../tutorials/findIndex.html">findIndex</a></li>
+    <li><a href="../tutorials/includes.html">includes</a></li>
+    <li><a href="../tutorials/isEmpty.html">isEmpty</a></li>
+    <li><a href="../tutorials/every.html">every</a></li>
+    <li><a href="../tutorials/some.html">some</a></li>
+    <li><a href="../tutorials/predicates.html">predicates (isNull, isString, …)</a></li>
+  </ul>
+
+  <h2>章节 9 · 对象（Map）函数</h2>
+  <p class="dim">FxTS 的对象工具函数，移植到 Dart 的 Map 上。</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/fromEntries.html">fromEntries</a></li>
+    <li><a href="../tutorials/omit.html">omit</a></li>
+    <li><a href="../tutorials/pick.html">pick</a></li>
+    <li><a href="../tutorials/omitBy.html">omitBy</a></li>
+    <li><a href="../tutorials/pickBy.html">pickBy</a></li>
+    <li><a href="../tutorials/prop.html">prop</a></li>
+    <li><a href="../tutorials/props.html">props</a></li>
+    <li><a href="../tutorials/evolve.html">evolve</a></li>
+    <li><a href="../tutorials/compactObject.html">compactObject</a></li>
+    <li><a href="../tutorials/resolveProps.html">resolveProps</a></li>
+    <li><a href="../tutorials/isMatch.html">isMatch</a></li>
+    <li><a href="../tutorials/matches.html">matches</a></li>
+  </ul>
+
+  <h2>章节 10 · 函数工具</h2>
+  <p class="dim">组合子与辅助函数。</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/identity.html">identity</a></li>
+    <li><a href="../tutorials/always.html">always</a></li>
+    <li><a href="../tutorials/tap.html">tap</a></li>
+    <li><a href="../tutorials/apply.html">apply</a></li>
+    <li><a href="../tutorials/juxt.html">juxt</a></li>
+    <li><a href="../tutorials/memoize.html">memoize</a></li>
+    <li><a href="../tutorials/negate.html">negate</a></li>
+    <li><a href="../tutorials/not.html">not</a></li>
+    <li><a href="../tutorials/when.html">when</a></li>
+    <li><a href="../tutorials/unless.html">unless</a></li>
+    <li><a href="../tutorials/throwError.html">throwError</a></li>
+    <li><a href="../tutorials/throwIf.html">throwIf</a></li>
+    <li><a href="../tutorials/cases.html">cases</a></li>
+    <li><a href="../tutorials/add.html">add</a></li>
+    <li><a href="../tutorials/comparisons.html">gt · gte · lt · lte</a></li>
+    <li><a href="../tutorials/delay.html">delay &amp; sleep</a></li>
+    <li><a href="../tutorials/unicodeToArray.html">unicodeToArray</a></li>
+    <li><a href="../tutorials/curried.html">curried &amp; uncurried</a></li>
+  </ul>
+
+  <h2>章节 11 · 异步 &amp; 并发</h2>
+  <p class="dim">FxAsyncIterable 模型 —— FxDart 的看家本领。</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/toAsync.html">toAsync</a></li>
+    <li><a href="../tutorials/asyncVariants.html">async variants (mapAsync, …)</a></li>
+    <li><a href="../tutorials/streams.html">Stream bridges</a></li>
+    <li><a href="../tutorials/concurrent.html">concurrent</a></li>
+    <li><a href="../tutorials/concurrentPool.html">concurrentPool</a></li>
+  </ul>
+
+  <h2>章节 12 · 实用工具</h2>
+  <p class="dim">限流与随机。</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/debounce.html">debounce</a></li>
+    <li><a href="../tutorials/throttle.html">throttle</a></li>
+    <li><a href="../tutorials/shuffle.html">shuffle</a></li>
+    <li><a href="../tutorials/createSeededRandom.html">createSeededRandom</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>FxDart 是 <a href="https://github.com/marpple/FxTS">FxTS</a> 的移植版本。特别感谢 <strong>Indong Yoo</strong>（Marpple CTO）与 FxTS 团队，本库的设计思路、语义和测试套件均源于他们的工作。</p>
+  <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
+</footer>
+</body>
+</html>

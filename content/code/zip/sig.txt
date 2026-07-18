@@ -1,0 +1,5 @@
+Iterable&lt;(A, B)&gt; zip&lt;A, B&gt;(Iterable&lt;A&gt; iterable1, Iterable&lt;B&gt; iterable2)
+Iterable&lt;(A, B, C)&gt; zip3&lt;A, B, C&gt;(Iterable&lt;A&gt; iterable1, Iterable&lt;B&gt; iterable2, Iterable&lt;C&gt; iterable3)
+FxAsyncIterable&lt;(A, B)&gt; zipAsync&lt;A, B&gt;(FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;B&gt; iterable2)
+Fx&lt;(T, U)&gt; Fx.zip&lt;U&gt;(Iterable&lt;U&gt; other)        // chain
+FxAsync&lt;(T, U)&gt; FxAsync.zip&lt;U&gt;(FxAsyncIterable&lt;U&gt; other)

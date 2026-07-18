@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>indexBy — FxDart 101</title>
+  <meta name="description" content="FxDart indexBy tutorial: index every element by a computed key into a Map, last one wins, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/indexBy.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/indexBy.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/indexBy.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/indexBy.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/indexBy.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/indexBy.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/indexBy.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/indexBy.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/indexBy.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Inicio</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/indexBy.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/indexBy.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/indexBy.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/indexBy.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/indexBy.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/indexBy.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/indexBy.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>indexBy</strong></p>
+  <h1><code>indexBy</code></h1>
+  <p class="hero-sub">Indexes every element by a computed key into a <code>Map&lt;K, A&gt;</code> — last duplicate wins.</p>
+
+  <div class="signature">Map&lt;K, A&gt; indexBy&lt;A, K&gt;(K Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;Map&lt;K, A&gt;&gt; indexByAsync&lt;A, K&gt;(FutureOr&lt;K&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Map&lt;K, T&gt; Fx.indexBy&lt;K&gt;(K Function(T a) f)          // chain (sync)
+Future&lt;Map&lt;K, T&gt;&gt; FxAsync.indexBy&lt;K&gt;(FutureOr&lt;K&gt; Function(T a) f)  // chain (async)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>indexBy</code> is <code><a href="groupBy.html">groupBy</a></code>'s
+    sibling: same idea — pull the whole pipeline, compute a key for each
+    element — but instead of collecting a <em>list</em> per key, it keeps
+    exactly <strong>one</strong> value per key: <code>Map&lt;K, A&gt;</code>
+    rather than <code>Map&lt;K, List&lt;A&gt;&gt;</code>.
+  </p>
+  <p>
+    That means duplicates don't accumulate — they overwrite. If two elements
+    produce the same key, whichever one is processed <strong>last</strong>
+    (i.e. appears later in the iterable) is the one left in the map. This is
+    the natural behavior of repeatedly doing <code>result[key(a)] = a</code>
+    while walking forward, and it matches FxTS. Reach for
+    <code>indexBy</code> specifically when you know keys should be unique
+    (like a database ID) and you want direct <code>O(1)</code> lookup instead
+    of a list you'd have to search.
+  </p>
+  <p>
+    If you actually expect duplicate keys and want to keep every value, use
+    <code>groupBy</code> instead — it never discards anything.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; last-wins</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final users = [
+    {'id': 1, 'name': 'ann'},
+    {'id': 2, 'name': 'bob'},
+    {'id': 1, 'name': 'ann-updated'}, // duplicate id
+  ];
+
+  // Data-first form: last duplicate wins, earlier ones are overwritten.
+  final byId = indexBy((u) => u['id'], users);
+  print(byId);
+  // {1: {id: 1, name: ann-updated}, 2: {id: 2, name: bob}}
+
+  // Chain form:
+  final byParity = fx([1, 2, 3, 4]).indexBy((a) => a.isEven ? 'even' : 'odd');
+  print(byParity); // {odd: 3, even: 4} -- last odd/even value wins
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // indexByAsync / .toAsync().indexBy(...) still keeps only the last value
+  // seen for each key, in pipeline order.
+  final latestByUser = await fx(['ann:1', 'bob:2', 'ann:3'])
+      .toAsync()
+      .map((s) => delay(const Duration(milliseconds: 100), s))
+      .indexBy((s) => s.split(':')[0]);
+
+  print(latestByUser); // {ann: ann:3, bob: bob:2}
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: index the users <strong>by their id</strong>, so you can look one up directly.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final users = [
+    {'id': 'u1', 'name': 'ann'},
+    {'id': 'u2', 'name': 'bob'},
+    {'id': 'u3', 'name': 'cid'},
+  ];
+
+  // TODO: index the users BY THEIR id, so you can look one up directly.
+  final byId = fx(users).groupBy((u) => u['name']);
+
+  print(byId);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="groupBy.html"><code>groupBy</code></a> — keeps every duplicate instead of overwriting ·
+    <a href="countBy.html"><code>countBy</code></a> — tally instead of keeping the value ·
+    <a href="fromEntries.html"><code>fromEntries</code></a> — build a Map from key/value pairs directly
+  </div>
+
+  <nav class="tut-nav">
+    <a href="groupBy.html">← Anterior: groupBy</a>
+    <a href="countBy.html">Siguiente: countBy →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

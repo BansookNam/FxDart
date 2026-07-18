@@ -1,0 +1,2 @@
+Future&lt;T&gt; delay&lt;T&gt;(Duration wait, T value)
+Future&lt;void&gt; sleep(Duration wait)

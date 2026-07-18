@@ -1,0 +1,4 @@
+A? head&lt;A&gt;(Iterable&lt;A&gt; iterable)
+Future&lt;A?&gt; headAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+T? Fx.head()               // chain
+Future&lt;T?&gt; FxAsync.head()  // chain

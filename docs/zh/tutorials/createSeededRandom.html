@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>createSeededRandom — FxDart 101</title>
+  <meta name="description" content="FxDart createSeededRandom tutorial: a deterministic seeded PRNG for reproducible shuffles and tests, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/createSeededRandom.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/createSeededRandom.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/createSeededRandom.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/createSeededRandom.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/createSeededRandom.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/createSeededRandom.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/createSeededRandom.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/createSeededRandom.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/createSeededRandom.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">首页</a>
+      <a href="../../101/index.html">FxDart 入门</a>
+      <a href="../../101/index.html#api">API 教程</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="语言">
+      <span class="lang-label">语言</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/createSeededRandom.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/createSeededRandom.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/createSeededRandom.html" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/createSeededRandom.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/createSeededRandom.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/createSeededRandom.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/createSeededRandom.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">本页尚未翻译，因此以英文显示。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">参与翻译</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 入门</a> › 章节 12 · 实用工具 › <strong>createSeededRandom</strong></p>
+  <h1><code>createSeededRandom</code></h1>
+  <p class="hero-sub">A deterministic seeded random generator — the engine behind reproducible shuffles.</p>
+
+  <div class="signature">double Function() createSeededRandom(int seed)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>createSeededRandom(seed)</code> returns a zero-argument function
+    that produces pseudo-random doubles in <code>[0, 1)</code>. The sequence
+    is fully determined by the seed: two generators built from the same seed
+    yield exactly the same numbers, in the same order, on every platform.
+  </p>
+  <p>
+    It's a port of FxTS's internal <code>seededRandom</code> (a
+    Mulberry32-style PRNG) — in FxTS it's private, but FxDart exposes it
+    because deterministic randomness is broadly useful: reproducible tests,
+    stable demo data, property-based fuzzing with replayable failures, or any
+    place where "random, but the same every run" is what you actually want.
+    This is what <a href="shuffle.html"><code>shuffle</code></a> uses under
+    the hood when you pass it a seed.
+  </p>
+  <p>
+    Unlike <code>dart:math</code>'s <code>Random(seed)</code>, the sequence
+    is part of the library's contract with FxTS — a seeded
+    <code>shuffle</code> in FxDart and FxTS produces the same order for the
+    same seed.
+  </p>
+
+  <h2>Demo 1 · Same seed, same sequence</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final a = createSeededRandom(42);
+  final b = createSeededRandom(42);
+  final c = createSeededRandom(7);
+
+  print([a(), a(), a()]); // deterministic triple
+  print([b(), b(), b()]); // identical to a's
+  print([c(), c(), c()]); // different seed, different triple
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Reproducible picks and shuffles</h2>
+  <p>
+    Turn the generator into whatever random shape you need — here, dice
+    rolls and a seeded <code>shuffle</code>:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final random = createSeededRandom(2024);
+  int roll() => (random() * 6).floor() + 1;
+
+  print([for (var i = 0; i < 5; i++) roll()]); // same rolls every run
+
+  // shuffle(iterable, seed) uses createSeededRandom internally:
+  print(shuffle([1, 2, 3, 4, 5], 2024)); // same order every run
+  print(shuffle([1, 2, 3, 4, 5], 2024)); // ...see?
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: deal two identical "random" hands by building both from the
+    same seed.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final deck = ['A', 'K', 'Q', 'J', '10', '9', '8', '7'];
+
+  // TODO: shuffle the deck twice with the same seed and take 3 cards each
+  final hand1 = fx(shuffle(deck, 99)).take(3).toArray();
+  final hand2 = fx(shuffle(deck, 99)).take(3).toArray();
+
+  print(hand1);
+  print(hand2); // identical to hand1
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="shuffle.html"><code>shuffle</code></a> — seeded shuffling built on this generator ·
+    <a href="cycle.html"><code>cycle</code></a> &amp; <a href="repeat.html"><code>repeat</code></a> — deterministic infinite sources
+  </div>
+
+  <nav class="tut-nav">
+    <a href="shuffle.html">← 上一节： shuffle</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart 是 <a href="https://github.com/marpple/FxTS">FxTS</a> 的移植版本。特别感谢 <strong>Indong Yoo</strong>（Marpple CTO）与 FxTS 团队，本库的设计思路、语义和测试套件均源于他们的工作。</p>
+  <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 运行","pgReset":"重置","pgCompiling":"编译中…","pgCompileError":"编译错误","pgError":"错误","pgLoading":"正在加载运行时…","pgRunning":"运行中…","pgNoOutput":"（无输出）","pgLoadFailed":"无法加载 FxDart 库"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

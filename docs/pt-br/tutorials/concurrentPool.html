@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>concurrentPool — FxDart 101</title>
+  <meta name="description" content="FxDart concurrentPool tutorial: a fixed-size pool of in-flight requests that yields results in completion order, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/concurrentPool.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/concurrentPool.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/concurrentPool.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/concurrentPool.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/concurrentPool.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/concurrentPool.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/concurrentPool.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/concurrentPool.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/concurrentPool.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Início</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/concurrentPool.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/concurrentPool.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/concurrentPool.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/concurrentPool.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/concurrentPool.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/concurrentPool.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/concurrentPool.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 11 · Async &amp; concorrência › <strong>concurrentPool</strong></p>
+  <h1><code>concurrentPool</code></h1>
+  <p class="hero-sub">Like concurrent, but yields results in completion order — whichever finishes first comes out first.</p>
+
+  <div class="signature">FxAsyncIterable&lt;A&gt; concurrentPoolAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
+FxAsync&lt;T&gt; FxAsync.concurrentPool(int length)        // chain</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>concurrentPool(n)</code> keeps up to <code>n</code> requests in
+    flight against the upstream source, exactly like <code>concurrent(n)</code>
+    — but it hands results back to you in the order they <strong>complete</strong>,
+    not the order they started in. Think of it as a worker pool: as soon as
+    one slot frees up, the next pending item is launched into it, and
+    whichever finishes first is yielded first. This matches FxTS's
+    <code>concurrentPool</code> and is the right tool when you don't care
+    which result came from which input — you just want to react to results as
+    soon as each one is ready (e.g. updating a progress list as each fetch
+    lands), rather than blocking on the slowest one to preserve order.
+  </p>
+  <p>
+    Unlike <code>concurrent</code>, which is driven by the downstream demand
+    marker, <code>concurrentPool</code> <strong>eagerly keeps its pool
+    full</strong>: from the first pull onward it holds up to <code>n</code>
+    requests in flight no matter how many consumers are waiting. Even a
+    one-pull-at-a-time terminal like <code>.toArray()</code> or
+    <code>.each()</code> gets the full overlap — and sees results in the
+    order they finish.
+  </p>
+
+  <h2>Demo 1 · Completion order</h2>
+  <p>Item 1 is slowest (300ms) and item 2 is fastest (100ms) — the result
+    comes out fastest-first, straight from <code>.toArray()</code>:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final delays = [300, 100, 200]; // item1 is slowest, item2 is fastest
+
+  final sw = Stopwatch()..start();
+  final results = await fx([1, 2, 3])
+      .toAsync()
+      .map((i) => delay(Duration(milliseconds: delays[i - 1]), 'item$i'))
+      .concurrentPool(3)
+      .toArray();
+
+  print(results); // [item2, item3, item1] — completion order
+  print('took ${sw.elapsedMilliseconds}ms'); // ~300ms (the slowest one)
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Contrast with concurrent</h2>
+  <p>Same delays, same pool size of 3 — the only difference is which order
+    the results land in:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final delays = [300, 100, 200]; // item1 is slowest, item2 is fastest
+
+  Future<FxAsync<String>> makeChain() async => fx([1, 2, 3])
+      .toAsync()
+      .map((i) => delay(Duration(milliseconds: delays[i - 1]), 'item$i'));
+
+  // concurrent(3): still 3 in flight at once, but the *result* order always
+  // matches the source order.
+  final orderedIt = (await makeChain()).concurrent(3).iterator;
+  final ordered =
+      (await Future.wait([orderedIt.next(), orderedIt.next(), orderedIt.next()]))
+          .map((r) => r.value)
+          .toList();
+  print(ordered); // [item1, item2, item3] — source order
+
+  // concurrentPool(3): same 3-in-flight budget, but the *result* order
+  // matches whichever finishes first.
+  final poolIt = (await makeChain()).concurrentPool(3).iterator;
+  final pooled =
+      (await Future.wait([poolIt.next(), poolIt.next(), poolIt.next()]))
+          .map((r) => r.value)
+          .toList();
+  print(pooled); // [item2, item3, item1] — completion order
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: this pool size of 1 processes items one at a time, in launch
+    order. Bump it to 3 so all three race at once, and watch the printed
+    order switch to completion order.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final delays = [250, 50, 150]; // item2 is fastest, item1 is slowest
+
+  // TODO: this pool size of 1 makes items run one at a time (in launch
+  // order). Change it to 3 so all three race at once, and watch the
+  // printed order switch to completion order.
+  final poolSize = 1;
+
+  final it = fx([1, 2, 3])
+      .toAsync()
+      .map((i) => delay(Duration(milliseconds: delays[i - 1]), 'item$i'))
+      .concurrentPool(poolSize)
+      .iterator;
+
+  final sw = Stopwatch()..start();
+  final results = await Future.wait([it.next(), it.next(), it.next()]);
+  print(results.map((r) => r.value).toList()); // [item1, item2, item3]
+  print('poolSize=$poolSize took ${sw.elapsedMilliseconds}ms'); // ~450ms
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="concurrent.html"><code>concurrent</code></a> — order-preserving variant ·
+    <a href="toAsync.html"><code>toAsync</code></a> — the pull-based model this relies on ·
+    <a href="streams.html">Stream bridges</a> — apply concurrentPool before toStream() ·
+    <a href="debounce.html"><code>debounce</code></a> — rate-limiting for callbacks
+  </div>
+
+  <nav class="tut-nav">
+    <a href="../../101/index.html">← FxDart 101</a>
+    <a href="debounce.html">Próximo: debounce →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>includes — FxDart 101</title>
+  <meta name="description" content="FxDart includes tutorial: check membership in an iterable with ==, short-circuiting, sync and async.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/includes.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/includes.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/includes.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/includes.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/includes.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/includes.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/includes.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/includes.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/includes.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Início</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/includes.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/includes.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/includes.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/includes.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/includes.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/includes.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/includes.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 8 · Acesso &amp; predicados › <strong>includes</strong></p>
+  <h1><code>includes</code></h1>
+  <p class="hero-sub">Returns true when an iterable contains a value, compared with <code>==</code>.</p>
+
+  <div class="signature">bool includes&lt;A&gt;(A a, Iterable&lt;A&gt; iterable)
+Future&lt;bool&gt; includesAsync&lt;A&gt;(A a, FxAsyncIterable&lt;A&gt; iterable)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>includes</code> is a thin, FxTS-shaped wrapper: on the sync side
+    it's literally <code>iterable.contains(a)</code>, so there's no separate
+    chain method — <code>Fx</code> already inherits <code>.contains()</code>
+    from <code>Iterable</code>, and it behaves identically. The async
+    version, <code>includesAsync</code>, is built on top of
+    <a href="some.html"><code>someAsync</code></a> (<code>b == a</code> as
+    the predicate), which means it inherits the same short-circuiting: it
+    stops pulling from the source the moment it finds a match.
+  </p>
+  <p>
+    Equality is checked with Dart's <code>==</code>, so it respects any
+    <code>operator ==</code> override on your own classes — it isn't limited
+    to primitives.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(includes(3, [1, 2, 3])); // true
+  print(includes(9, [1, 2, 3])); // false
+
+  // Chain form is Iterable's own .contains — same semantics:
+  print(fx(['a', 'b', 'c']).contains('b')); // true
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, and proof it short-circuits</h2>
+  <p>Only 2 of 5 elements are pulled before <code>includesAsync</code> stops:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  var checked = 0;
+  final found = await includesAsync(
+      2, fx([1, 2, 3, 4, 5]).toAsync().peek((_) => checked++));
+  print(found);               // true
+  print('checked $checked');  // checked 2 — stops once found
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>includes</code> to check whether <code>requestId</code> is allowed.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final allowedIds = [101, 102, 103];
+
+  // TODO: use includes to check whether requestId is allowed
+  const requestId = 102;
+  final allowed = false;
+
+  print(allowed);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="some.html"><code>some</code></a> — what <code>includesAsync</code> is built from ·
+    <a href="find.html"><code>find</code></a> — get the matching value, not just a bool ·
+    <a href="findIndex.html"><code>findIndex</code></a> — get the position instead ·
+    <a href="isEmpty.html"><code>isEmpty</code></a> — the other value-based check nearby
+  </div>
+
+  <nav class="tut-nav">
+    <a href="findIndex.html">← Anterior: findIndex</a>
+    <a href="isEmpty.html">Próximo: isEmpty →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

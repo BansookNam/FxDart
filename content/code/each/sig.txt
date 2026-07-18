@@ -1,0 +1,4 @@
+void each&lt;A&gt;(void Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;void&gt; eachAsync&lt;A&gt;(FutureOr&lt;void&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+void Fx.each(void Function(T a) f)        // chain
+Future&lt;void&gt; FxAsync.each(FutureOr&lt;void&gt; Function(T a) f)

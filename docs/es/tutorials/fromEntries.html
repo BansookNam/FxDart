@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>fromEntries — FxDart 101</title>
+  <meta name="description" content="FxDart fromEntries tutorial: build a Map from (key, value) record entries, the inverse of entries().">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/fromEntries.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/fromEntries.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/fromEntries.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/fromEntries.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/fromEntries.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/fromEntries.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/fromEntries.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/fromEntries.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/fromEntries.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Inicio</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/fromEntries.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/fromEntries.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/fromEntries.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/fromEntries.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/fromEntries.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/fromEntries.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/fromEntries.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 9 · Funciones de objeto (Map) › <strong>fromEntries</strong></p>
+  <h1><code>fromEntries</code></h1>
+  <p class="hero-sub">Builds a <code>Map</code> from an iterable of <code>(key, value)</code> records.</p>
+
+  <div class="signature">Map&lt;K, V&gt; fromEntries&lt;K, V&gt;(Iterable&lt;(K, V)&gt; entries)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    This section ports FxTS's object utilities, and the first thing to
+    understand is the mapping: TypeScript's plain objects become Dart
+    <code>Map</code>s throughout, and TS's <code>[key, value]</code> entry
+    tuples become Dart <code>(K, V)</code> records. <code>fromEntries</code>
+    is the constructor side of that: give it any iterable of records and it
+    folds them into a <code>Map</code>, last-write-wins on duplicate keys —
+    exactly like building the map by hand with a loop.
+  </p>
+  <p>
+    It's the natural partner of <a href="entries.html"><code>entries</code></a>
+    (which does the reverse: <code>Map</code> → records) and pairs nicely
+    with <a href="zip.html"><code>zip</code></a>, which turns two parallel
+    lists into exactly the record shape <code>fromEntries</code> wants.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final map = fromEntries([('a', 1), ('b', 2), ('c', 3)]);
+  print(map); // {a: 1, b: 2, c: 3}
+
+  final keys = ['x', 'y', 'z'];
+  final values = [10, 20, 30];
+  print(fromEntries(zip(keys, values))); // {x: 10, y: 20, z: 30}
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Duplicate keys, and round-tripping with <code>entries</code></h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final map = fromEntries([('a', 1), ('a', 2), ('b', 3)]);
+  print(map); // {a: 2, b: 3} — later entries win when keys repeat
+
+  final source = {'name': 'kim', 'age': 32, 'city': 'seoul'};
+  final onlyStrings =
+      fromEntries(filter((e) => e.$2 is String, entries(source)));
+  print(onlyStrings); // {name: kim, city: seoul}
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>fromEntries</code> to turn <code>pairs</code> into a <code>Map</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final pairs = [('id', 101), ('active', 1)];
+
+  // TODO: use fromEntries to turn `pairs` into a Map
+  final Map<String, int> record = {};
+
+  print(record);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="entries.html"><code>entries</code></a> — the reverse direction ·
+    <a href="zip.html"><code>zip</code></a> — build entries from two parallel lists ·
+    <a href="omit.html"><code>omit</code></a> — drop keys from the resulting Map ·
+    <a href="pick.html"><code>pick</code></a> — keep only some keys
+  </div>
+
+  <nav class="tut-nav">
+    <a href="predicates.html">← Anterior: predicates</a>
+    <a href="omit.html">Siguiente: omit →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

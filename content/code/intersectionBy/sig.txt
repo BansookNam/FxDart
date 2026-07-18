@@ -1,0 +1,2 @@
+Iterable&lt;A&gt; intersectionBy&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable1, Iterable&lt;A&gt; iterable2)
+FxAsyncIterable&lt;A&gt; intersectionByAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;A&gt; iterable2)

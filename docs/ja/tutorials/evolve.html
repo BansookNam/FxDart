@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>evolve — FxDart 101</title>
+  <meta name="description" content="FxDart evolve tutorial: transform selected Map values by key, leaving the rest untouched.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/evolve.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/evolve.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/evolve.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/evolve.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/evolve.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/evolve.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/evolve.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/evolve.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/evolve.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">ホーム</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/evolve.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/evolve.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/evolve.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/evolve.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/evolve.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/evolve.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/evolve.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 9 · オブジェクト（Map）関数 › <strong>evolve</strong></p>
+  <h1><code>evolve</code></h1>
+  <p class="hero-sub">Runs selected values through per-key transformation functions, leaving the rest of the <code>Map</code> as-is.</p>
+
+  <div class="signature">Map&lt;K, Object?&gt; evolve&lt;K&gt;(
+    Map&lt;K, Object? Function(Object? value)&gt; transformations,
+    Map&lt;K, Object?&gt; map)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>evolve</code> takes a "recipe" map — key to transformation
+    function — and a data map, and produces a new map where every key that
+    appears in the recipe has its value passed through the matching
+    function; every other key is copied through unchanged.
+  </p>
+  <p>
+    Notice the signature is deliberately loose: both maps are typed with
+    <code>Object?</code> values, mirroring FxTS's dynamically-typed
+    original. That means your transformation functions receive
+    <code>Object?</code> and must cast (<code>v as String</code>,
+    <code>v as int</code>, …) before doing anything type-specific — a
+    small tax for the flexibility of applying different transformations to
+    different value types within a single map. If you know the shape of
+    your data ahead of time and don't need per-key heterogeneity, a plain
+    <code>{...map, 'key': f(map['key'])}</code> spread is often more
+    idiomatic Dart; reach for <code>evolve</code> when the recipe itself is
+    data (e.g. built once and reused across many maps).
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final user = {'name': 'kim', 'age': 32, 'city': 'seoul'};
+
+  final updated = evolve({
+    'name': (v) => (v as String).toUpperCase(),
+    'age': (v) => (v as int) + 1,
+  }, user);
+
+  print(updated); // {name: KIM, age: 33, city: seoul}
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Parsing raw string fields</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final rawRows = [
+    {'price': '9.99', 'qty': '3'},
+    {'price': '4.50', 'qty': '2'},
+  ];
+
+  final parsed = fx(rawRows)
+      .map((r) => evolve({
+            'price': (v) => double.parse(v as String),
+            'qty': (v) => int.parse(v as String),
+          }, r))
+      .toArray();
+
+  print(parsed); // [{price: 9.99, qty: 3}, {price: 4.5, qty: 2}]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>evolve</code> to double the <code>'price'</code> field and leave <code>'title'</code> untouched.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final product = {'title': 'widget', 'price': 10};
+
+  // TODO: use evolve to double the 'price' and leave 'title' untouched
+  final discounted = product;
+
+  print(discounted);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="prop.html"><code>prop</code></a> — read a single value out ·
+    <a href="omitBy.html"><code>omitBy</code></a> — drop entries instead of transforming them ·
+    <a href="compactObject.html"><code>compactObject</code></a> — a specialized cleanup pass ·
+    <a href="resolveProps.html"><code>resolveProps</code></a> — the async cousin, awaiting instead of transforming
+  </div>
+
+  <nav class="tut-nav">
+    <a href="props.html">← 前: props</a>
+    <a href="compactObject.html">次: compactObject →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

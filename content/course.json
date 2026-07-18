@@ -1,0 +1,139 @@
+{
+  "1": [
+    {"href": "fx.html", "label": "fx"},
+    {"href": "pipe.html", "label": "pipe"},
+    {"href": "pipe1.html", "label": "pipe1"},
+    {"href": "toArray.html", "label": "toArray"},
+    {"href": "each.html", "label": "each"},
+    {"href": "consume.html", "label": "consume"}
+  ],
+  "2": [
+    {"href": "range.html", "label": "range"},
+    {"href": "repeat.html", "label": "repeat"},
+    {"href": "cycle.html", "label": "cycle"},
+    {"href": "entries.html", "label": "entries"},
+    {"href": "keys.html", "label": "keys"},
+    {"href": "values.html", "label": "values"}
+  ],
+  "3": [
+    {"href": "map.html", "label": "map"},
+    {"href": "mapEffect.html", "label": "mapEffect"},
+    {"href": "flatMap.html", "label": "flatMap"},
+    {"href": "flat.html", "label": "flat"},
+    {"href": "scan.html", "label": "scan"},
+    {"href": "peek.html", "label": "peek"},
+    {"href": "pluck.html", "label": "pluck"}
+  ],
+  "4": [
+    {"href": "filter.html", "label": "filter"},
+    {"href": "reject.html", "label": "reject"},
+    {"href": "compact.html", "label": "compact"},
+    {"href": "uniq.html", "label": "uniq"},
+    {"href": "uniqBy.html", "label": "uniqBy"},
+    {"href": "difference.html", "label": "difference"},
+    {"href": "differenceBy.html", "label": "differenceBy"},
+    {"href": "intersection.html", "label": "intersection"},
+    {"href": "intersectionBy.html", "label": "intersectionBy"},
+    {"href": "compress.html", "label": "compress"}
+  ],
+  "5": [
+    {"href": "take.html", "label": "take"},
+    {"href": "takeRight.html", "label": "takeRight"},
+    {"href": "takeWhile.html", "label": "takeWhile"},
+    {"href": "takeUntilInclusive.html", "label": "takeUntilInclusive"},
+    {"href": "drop.html", "label": "drop"},
+    {"href": "dropRight.html", "label": "dropRight"},
+    {"href": "dropWhile.html", "label": "dropWhile"},
+    {"href": "dropUntil.html", "label": "dropUntil"},
+    {"href": "slice.html", "label": "slice"},
+    {"href": "chunk.html", "label": "chunk"},
+    {"href": "split.html", "label": "split"}
+  ],
+  "6": [
+    {"href": "append.html", "label": "append"},
+    {"href": "prepend.html", "label": "prepend"},
+    {"href": "concat.html", "label": "concat"},
+    {"href": "zip.html", "label": "zip"},
+    {"href": "zipWith.html", "label": "zipWith"},
+    {"href": "zipWithIndex.html", "label": "zipWithIndex"},
+    {"href": "transpose.html", "label": "transpose"},
+    {"href": "reverse.html", "label": "reverse"},
+    {"href": "fork.html", "label": "fork"}
+  ],
+  "7": [
+    {"href": "reduce.html", "label": "reduce"},
+    {"href": "fold.html", "label": "fold"},
+    {"href": "reduceLazy.html", "label": "reduceLazy"},
+    {"href": "sum.html", "label": "sum"},
+    {"href": "average.html", "label": "average"},
+    {"href": "min.html", "label": "min"},
+    {"href": "max.html", "label": "max"},
+    {"href": "size.html", "label": "size"},
+    {"href": "join.html", "label": "join"},
+    {"href": "groupBy.html", "label": "groupBy"},
+    {"href": "indexBy.html", "label": "indexBy"},
+    {"href": "countBy.html", "label": "countBy"},
+    {"href": "sort.html", "label": "sort"},
+    {"href": "sortBy.html", "label": "sortBy"},
+    {"href": "partition.html", "label": "partition"}
+  ],
+  "8": [
+    {"href": "head.html", "label": "head"},
+    {"href": "last.html", "label": "last"},
+    {"href": "nth.html", "label": "nth"},
+    {"href": "find.html", "label": "find"},
+    {"href": "findIndex.html", "label": "findIndex"},
+    {"href": "includes.html", "label": "includes"},
+    {"href": "isEmpty.html", "label": "isEmpty"},
+    {"href": "every.html", "label": "every"},
+    {"href": "some.html", "label": "some"},
+    {"href": "predicates.html", "label": "predicates (isNull, isString, …)"}
+  ],
+  "9": [
+    {"href": "fromEntries.html", "label": "fromEntries"},
+    {"href": "omit.html", "label": "omit"},
+    {"href": "pick.html", "label": "pick"},
+    {"href": "omitBy.html", "label": "omitBy"},
+    {"href": "pickBy.html", "label": "pickBy"},
+    {"href": "prop.html", "label": "prop"},
+    {"href": "props.html", "label": "props"},
+    {"href": "evolve.html", "label": "evolve"},
+    {"href": "compactObject.html", "label": "compactObject"},
+    {"href": "resolveProps.html", "label": "resolveProps"},
+    {"href": "isMatch.html", "label": "isMatch"},
+    {"href": "matches.html", "label": "matches"}
+  ],
+  "10": [
+    {"href": "identity.html", "label": "identity"},
+    {"href": "always.html", "label": "always"},
+    {"href": "tap.html", "label": "tap"},
+    {"href": "apply.html", "label": "apply"},
+    {"href": "juxt.html", "label": "juxt"},
+    {"href": "memoize.html", "label": "memoize"},
+    {"href": "negate.html", "label": "negate"},
+    {"href": "not.html", "label": "not"},
+    {"href": "when.html", "label": "when"},
+    {"href": "unless.html", "label": "unless"},
+    {"href": "throwError.html", "label": "throwError"},
+    {"href": "throwIf.html", "label": "throwIf"},
+    {"href": "cases.html", "label": "cases"},
+    {"href": "add.html", "label": "add"},
+    {"href": "comparisons.html", "label": "gt · gte · lt · lte"},
+    {"href": "delay.html", "label": "delay &amp; sleep"},
+    {"href": "unicodeToArray.html", "label": "unicodeToArray"},
+    {"href": "curried.html", "label": "curried &amp; uncurried"}
+  ],
+  "11": [
+    {"href": "toAsync.html", "label": "toAsync"},
+    {"href": "asyncVariants.html", "label": "async variants (mapAsync, …)"},
+    {"href": "streams.html", "label": "Stream bridges"},
+    {"href": "concurrent.html", "label": "concurrent"},
+    {"href": "concurrentPool.html", "label": "concurrentPool"}
+  ],
+  "12": [
+    {"href": "debounce.html", "label": "debounce"},
+    {"href": "throttle.html", "label": "throttle"},
+    {"href": "shuffle.html", "label": "shuffle"},
+    {"href": "createSeededRandom.html", "label": "createSeededRandom"}
+  ]
+}

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>min — FxDart 101</title>
+  <meta name="description" content="FxDart min tutorial: the smallest number in a pipeline, +infinity when empty, NaN-poisoned, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/min.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/min.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/min.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/min.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/min.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/min.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/min.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/min.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/min.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Início</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/min.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/min.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/min.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/min.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/min.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/min.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/min.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 7 · Agregando › <strong>min</strong></p>
+  <h1><code>min</code></h1>
+  <p class="hero-sub">The smallest number in the pipeline — with FxTS's exact quirks on empty and <code>NaN</code> input.</p>
+
+  <div class="signature">num min(Iterable&lt;num&gt; iterable)
+Future&lt;num&gt; minAsync(FxAsyncIterable&lt;num&gt; iterable)
+num Fx&lt;num&gt;.min()          // chain (sync)
+Future&lt;num&gt; FxAsync&lt;num&gt;.min()  // chain (async)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>min</code> is a terminal, numeric-only fold — internally it's
+    <code>fold(double.infinity, ..., iterable)</code>, comparing each element
+    against a running minimum that starts at <code>+infinity</code>.
+  </p>
+  <p>
+    Two behaviors are worth memorizing, because they surprise people coming
+    from a "safe" API and are ported <strong>faithfully from FxTS</strong>:
+  </p>
+  <ul>
+    <li>
+      An <strong>empty</strong> iterable returns <code>double.infinity</code>
+      — not <code>null</code>, not an error. That's simply what the fold seed
+      is when nothing ever beats it.
+    </li>
+    <li>
+      A single <code>NaN</code> anywhere in the iterable
+      <strong>poisons</strong> the whole result to <code>NaN</code> — every
+      comparison against <code>NaN</code> is false, so once it's the running
+      minimum (or shows up as a candidate), it stays <code>NaN</code> forever.
+    </li>
+  </ul>
+  <p>
+    If you need "smallest, or <code>null</code> if empty" semantics instead,
+    check <code>result.isInfinite</code> yourself, or reach for
+    <code><a href="find.html">find</a></code> /
+    <code><a href="reduce.html">reduce</a></code> with your own comparator.
+  </p>
+
+  <h2>Demo 1 · Basics, empty, and NaN</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form:
+  print(min([5, 2, 8, 1, 9])); // 1
+
+  // Chain form:
+  print(fx([5, 2, 8, 1, 9]).min()); // 1
+
+  // FxTS semantics: empty input returns +infinity (the fold seed), not null:
+  print(min(<num>[])); // Infinity
+
+  // A single NaN poisons the whole result, just like FxTS:
+  print(min([1, 2, double.nan, 4])); // NaN
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final cheapest = await fx([30, 12, 45, 9, 60])
+      .toAsync()
+      .map((price) => delay(const Duration(milliseconds: 100), price))
+      .min();
+
+  print(cheapest); // 9
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: find the <strong>cheapest</strong> price among the products.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final products = [
+    {'name': 'mouse', 'price': 25},
+    {'name': 'keyboard', 'price': 60},
+    {'name': 'monitor', 'price': 220},
+  ];
+
+  // TODO: find the CHEAPEST price among the products.
+  final cheapest = fx(products).map((p) => p['price'] as num).sum();
+
+  print(cheapest);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="max.html"><code>max</code></a> — the mirror image ·
+    <a href="sum.html"><code>sum</code></a> · <a href="average.html"><code>average</code></a> — the other numeric terminals ·
+    <a href="find.html"><code>find</code></a> — for a null-safe "smallest matching" search
+  </div>
+
+  <nav class="tut-nav">
+    <a href="average.html">← Anterior: average</a>
+    <a href="max.html">Próximo: max →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

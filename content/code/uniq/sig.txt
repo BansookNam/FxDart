@@ -1,0 +1,4 @@
+Iterable&lt;A&gt; uniq&lt;A&gt;(Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; uniqAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.uniq()        // chain
+FxAsync&lt;T&gt; FxAsync.uniq()

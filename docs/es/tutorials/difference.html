@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>difference — FxDart 101</title>
+  <meta name="description" content="FxDart difference tutorial: elements of one iterable that don't occur in another, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/difference.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/difference.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/difference.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/difference.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/difference.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/difference.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/difference.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/difference.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/difference.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Inicio</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/difference.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/difference.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/difference.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/difference.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/difference.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/difference.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/difference.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 4 · Filtrado &amp; deduplicación › <strong>difference</strong></p>
+  <h1><code>difference</code></h1>
+  <p class="hero-sub">Returns the elements of the second iterable that do not occur in the first — argument order matters.</p>
+
+  <div class="signature">Iterable&lt;A&gt; difference&lt;A&gt;(Iterable&lt;A&gt; iterable1, Iterable&lt;A&gt; iterable2)
+FxAsyncIterable&lt;A&gt; differenceAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;A&gt; iterable2)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    Read the signature carefully: <code>difference(iterable1, iterable2)</code>
+    walks <strong><code>iterable2</code></strong> and yields each of its
+    elements that is <em>not</em> found in <code>iterable1</code>
+    (deduplicated, like <code>uniq</code>). <code>iterable1</code> is only
+    ever used as a membership set to test against — none of its own
+    elements can appear in the output, and its own duplicates don't matter.
+    This order is not symmetric: swapping the arguments produces a
+    completely different (and generally different-length) result. A useful
+    way to remember it: think of <code>iterable1</code> as "the exclusion
+    list" and <code>iterable2</code> as "the list you're filtering."
+  </p>
+  <p>
+    Internally it's <code>differenceBy((a) =&gt; a, iterable1, iterable2)</code> —
+    see <a href="differenceBy.html"><code>differenceBy</code></a> if you
+    need to compare by a computed key instead of value equality.
+  </p>
+  <p>
+    There's no chain method for <code>difference</code>; it only exists as
+    a data-first function (and its async counterpart). On the async side,
+    the concurrency marker from <code>.concurrent(n)</code> applies to
+    <strong><code>iterable2</code></strong> — the exclusion set in
+    <code>iterable1</code> is always drained up front before results start
+    flowing.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; argument order</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form. IMPORTANT: the argument order is NOT symmetric --
+  // difference(iterable1, iterable2) returns the elements OF iterable2
+  // that do NOT occur in iterable1 (duplicates in iterable2 collapse too).
+  final owned = [1, 2, 3];
+  final wishlist = [2, 3, 4, 4, 5];
+
+  print(toArray(difference(owned, wishlist)));
+  // [4, 5] -- wishlist items you don't already own
+
+  // Swap the arguments and the result is completely different:
+  print(toArray(difference(wishlist, owned)));
+  // [1] -- owned items not on the wishlist
+
+  // No chain method exists for difference -- call it data-first.
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with concurrency</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  // The concurrency marker applies to iterable2 (the source of the
+  // results) -- iterable1 (the exclusion set) is drained up front.
+  final owned = toAsync([1, 2, 3]);
+  final wishlist = fx([2, 3, 4, 5])
+      .toAsync()
+      .map((a) => delay(Duration(milliseconds: 100), a))
+      .concurrent(4);
+
+  final newItems = await fxAsync(differenceAsync(owned, wishlist)).toArray();
+
+  print(newItems); // [4, 5]
+  print('took ${sw.elapsedMilliseconds}ms'); // ~100ms
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>difference</code> to find the tasks in
+    <code>allTasks</code> that are not yet in <code>completed</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final completed = ['task1', 'task3'];
+  final allTasks = ['task1', 'task2', 'task3', 'task4'];
+
+  // TODO: use difference to find allTasks not yet in completed.
+  final remaining = toArray(allTasks);
+
+  print(remaining);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="differenceBy.html"><code>differenceBy</code></a> — the same, by a computed key ·
+    <a href="intersection.html"><code>intersection</code></a> — keep the shared elements instead ·
+    <a href="uniq.html"><code>uniq</code></a> — dedupe a single iterable ·
+    <a href="../tutorials/includes.html"><code>includes</code></a> — test membership in a single iterable
+  </div>
+
+  <nav class="tut-nav">
+    <a href="uniqBy.html">← Anterior: uniqBy</a>
+    <a href="differenceBy.html">Siguiente: differenceBy →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+Iterable&lt;A&gt; peek&lt;A&gt;(void Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; peekAsync&lt;A&gt;(FutureOr&lt;void&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.peek(void Function(T a) f)        // chain
+FxAsync&lt;T&gt; FxAsync.peek(FutureOr&lt;void&gt; Function(T a) f)

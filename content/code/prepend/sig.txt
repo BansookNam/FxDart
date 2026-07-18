@@ -1,0 +1,4 @@
+Iterable&lt;A&gt; prepend&lt;A&gt;(A a, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; prependAsync&lt;A&gt;(FutureOr&lt;A&gt; a, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.prepend(T a)        // chain
+FxAsync&lt;T&gt; FxAsync.prepend(FutureOr&lt;T&gt; a)

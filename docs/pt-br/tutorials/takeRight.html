@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>takeRight — FxDart 101</title>
+  <meta name="description" content="FxDart takeRight tutorial: keep only the last n values of a finite iterable, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/takeRight.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/takeRight.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/takeRight.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/takeRight.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/takeRight.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/takeRight.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/takeRight.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/takeRight.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/takeRight.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Início</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/takeRight.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/takeRight.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/takeRight.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/takeRight.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/takeRight.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/takeRight.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/takeRight.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 5 · Fatiamento › <strong>takeRight</strong></p>
+  <h1><code>takeRight</code></h1>
+  <p class="hero-sub">Returns a lazy iterable of the last <code>length</code> values from a source.</p>
+
+  <div class="signature">Iterable&lt;A&gt; takeRight&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; takeRightAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.takeRight(int count)        // chain
+FxAsync&lt;T&gt; FxAsync.takeRight(int count)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>takeRight</code> is <code>take</code>'s mirror image: instead of
+    the first <code>length</code> values, you get the last ones. There's a
+    catch, though — to know what the "last" values are, <code>takeRight</code>
+    has to see every element first. It <strong>materializes</strong> the
+    whole source into a list internally before yielding anything, so unlike
+    most FxDart operators it does not work on infinite sequences.
+  </p>
+  <p>
+    The async version has the same constraint: <code>takeRightAsync</code>
+    drains the entire upstream (awaiting every element) before it can hand
+    back the tail. Reach for it only when you know the source is finite and
+    small enough to buffer.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(takeRight(3, [1, 2, 3, 4, 5, 6])); // (4, 5, 6)
+
+  // Chain form:
+  final result = fx([10, 20, 30, 40]).takeRight(2).toArray();
+  print(result); // [30, 40]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async (must buffer the whole source first)</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // takeRight must see the whole source before it can know the last N —
+  // it materializes it first, so it only works on finite async sources.
+  final result = await fx([1, 2, 3, 4, 5])
+      .toAsync()
+      .map((a) => delay(Duration(milliseconds: 50), a * a))
+      .takeRight(2)
+      .toArray();
+
+  print(result); // [16, 25]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: keep only the last 3 scores.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final scores = [55, 61, 70, 82, 90, 95];
+
+  // TODO: keep only the last 3 scores
+  final recent = fx(scores).toArray();
+
+  print(recent);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="take.html"><code>take</code></a> — first n instead of last n ·
+    <a href="dropRight.html"><code>dropRight</code></a> — drop the last n ·
+    <a href="reverse.html"><code>reverse</code></a> — also materializes the source ·
+    <a href="slice.html"><code>slice</code></a> — arbitrary index window
+  </div>
+
+  <nav class="tut-nav">
+    <a href="take.html">← Anterior: take</a>
+    <a href="takeWhile.html">Próximo: takeWhile →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

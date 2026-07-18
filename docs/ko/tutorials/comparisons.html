@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>gt · gte · lt · lte — FxDart 101</title>
+  <meta name="description" content="FxDart comparison tutorial: data-first gt, gte, lt, lte, and how to curry them into unary predicates, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/comparisons.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/comparisons.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/comparisons.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/comparisons.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/comparisons.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/comparisons.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/comparisons.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/comparisons.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/comparisons.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">홈</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/comparisons.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/comparisons.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/comparisons.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/comparisons.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/comparisons.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/comparisons.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/comparisons.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 10 · 함수 유틸리티 › <strong>gt · gte · lt · lte</strong></p>
+  <h1><code>gt</code> · <code>gte</code> · <code>lt</code> · <code>lte</code></h1>
+  <p class="hero-sub">Data-first comparisons, as function values instead of operators.</p>
+
+  <div class="signature">bool gt(Object? a, Object? b)   // a &gt; b
+bool gte(Object? a, Object? b)  // a &gt;= b
+bool lt(Object? a, Object? b)   // a &lt; b
+bool lte(Object? a, Object? b)  // a &lt;= b</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>gt</code>, <code>gte</code>, <code>lt</code>, and <code>lte</code>
+    are the four ordering operators packaged as <strong>data-first</strong>
+    functions: <code>gt(a, b) == (a &gt; b)</code>, with the first argument on
+    the left, exactly like the operator. That makes them drop-in comparators
+    wherever an API wants a function instead of an infix operator.
+  </p>
+  <p>
+    Under the hood they require both values to be mutually
+    <code>Comparable</code> and — with one exception — the exact same runtime
+    type: <code>num</code> vs <code>num</code> and <code>String</code> vs
+    <code>String</code> are allowed to mix (so <code>int</code> can compare
+    against <code>double</code>), but anything else with mismatched types
+    throws an <code>ArgumentError</code> rather than silently coercing.
+  </p>
+  <p>
+    None of the four are curried — there's no <code>gt(5)</code> partial
+    application. For a reusable unary predicate (say, for <code>filter</code>),
+    write a small closure that fixes one side:
+    <code>(b) =&gt; gt(b, 5)</code>.
+  </p>
+
+  <h2>Demo 1 · Basics, and the type-mismatch error</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(gt(5, 3));    // true
+  print(gte(5, 5));   // true
+  print(lt('a', 'b')); // true
+  print(lte(2, 2));   // true
+
+  try {
+    gt(5, '3');
+  } catch (e) {
+    print('caught: ${e.runtimeType}'); // caught: ArgumentError
+  }
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Currying into a filter predicate</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+bool Function(num) greaterThan(num n) => (b) => gt(b, n);
+
+void main() {
+  print(fx([1, 5, 10, 15]).filter(greaterThan(6)).toArray()); // [10, 15]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: keep only the ages that are <code>gte</code> 18 (adults).</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final ages = [15, 22, 8, 30, 17];
+
+  // TODO: keep only the ages that are gte 18 (adults)
+  final adults = fx(ages).filter((a) => gte(a, 18)).toArray();
+
+  print(adults); // [22, 30]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="add.html"><code>add</code></a> — the arithmetic counterpart to these comparisons ·
+    <a href="sort.html"><code>sort</code></a> / <a href="sortBy.html"><code>sortBy</code></a> — build a comparator from lt/gt ·
+    <a href="min.html"><code>min</code></a> / <a href="max.html"><code>max</code></a> — aggregate versions of these comparisons ·
+    <a href="negate.html"><code>negate</code></a> — flip a curried comparison predicate
+  </div>
+
+  <nav class="tut-nav">
+    <a href="add.html">← 이전: add</a>
+    <a href="delay.html">다음: delay &amp; sleep →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

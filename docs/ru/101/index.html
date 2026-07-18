@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FxDart 101 — курс &amp; руководства по API</title>
+  <meta name="description" content="Пошаговый курс по FxDart: лекции, живые демо и playground в браузере для каждой функции.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/101/index.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/101/index.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/101/index.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/101/index.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/101/index.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/101/index.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/101/index.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/101/index.html">
+  <link rel="stylesheet" href="../../css/site.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Главная</a>
+      <a href="../../101/index.html" class="active">FxDart 101</a>
+      <a href="#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/101/index.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/101/index.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/101/index.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/101/index.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/101/index.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/101/index.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/101/index.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <h1>FxDart 101</h1>
+  <p class="hero-sub">
+    Практический курс. Каждый урок — это короткая лекция с живыми демо и
+    playground: код компилируется настоящим компилятором Dart и выполняется
+    в вашем браузере. Проходите разделы по порядку или переходите сразу к нужной функции ниже.
+  </p>
+
+  <div class="callout">
+    <strong>Впервые здесь?</strong> Начните с
+    <a href="../tutorials/fx.html"><code>fx</code></a> →
+    <a href="../tutorials/map.html"><code>map</code></a> →
+    <a href="../tutorials/filter.html"><code>filter</code></a> →
+    <a href="../tutorials/take.html"><code>take</code></a> →
+    <a href="../tutorials/toArray.html"><code>toArray</code></a>,
+    затем переходите к
+    <a href="../tutorials/concurrent.html"><code>concurrent</code></a>.
+  </div>
+
+  <h2 id="api">Раздел 1 · Начало работы</h2>
+  <p class="dim">Модель конвейера: строим лениво, запускаем терминальным оператором.</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/fx.html">fx</a></li>
+    <li><a href="../tutorials/pipe.html">pipe</a></li>
+    <li><a href="../tutorials/pipe1.html">pipe1</a></li>
+    <li><a href="../tutorials/toArray.html">toArray</a></li>
+    <li><a href="../tutorials/each.html">each</a></li>
+    <li><a href="../tutorials/consume.html">consume</a></li>
+  </ul>
+
+  <h2>Раздел 2 · Генерация последовательностей</h2>
+  <p class="dim">Источники, с которых начинается конвейер.</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/range.html">range</a></li>
+    <li><a href="../tutorials/repeat.html">repeat</a></li>
+    <li><a href="../tutorials/cycle.html">cycle</a></li>
+    <li><a href="../tutorials/entries.html">entries</a></li>
+    <li><a href="../tutorials/keys.html">keys</a></li>
+    <li><a href="../tutorials/values.html">values</a></li>
+  </ul>
+
+  <h2>Раздел 3 · Преобразование</h2>
+  <p class="dim">Меняем форму каждого элемента — лениво.</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/map.html">map</a></li>
+    <li><a href="../tutorials/mapEffect.html">mapEffect</a></li>
+    <li><a href="../tutorials/flatMap.html">flatMap</a></li>
+    <li><a href="../tutorials/flat.html">flat</a></li>
+    <li><a href="../tutorials/scan.html">scan</a></li>
+    <li><a href="../tutorials/peek.html">peek</a></li>
+    <li><a href="../tutorials/pluck.html">pluck</a></li>
+  </ul>
+
+  <h2>Раздел 4 · Фильтрация &amp; дедупликация</h2>
+  <p class="dim">Оставляем только нужное.</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/filter.html">filter</a></li>
+    <li><a href="../tutorials/reject.html">reject</a></li>
+    <li><a href="../tutorials/compact.html">compact</a></li>
+    <li><a href="../tutorials/uniq.html">uniq</a></li>
+    <li><a href="../tutorials/uniqBy.html">uniqBy</a></li>
+    <li><a href="../tutorials/difference.html">difference</a></li>
+    <li><a href="../tutorials/differenceBy.html">differenceBy</a></li>
+    <li><a href="../tutorials/intersection.html">intersection</a></li>
+    <li><a href="../tutorials/intersectionBy.html">intersectionBy</a></li>
+    <li><a href="../tutorials/compress.html">compress</a></li>
+  </ul>
+
+  <h2>Раздел 5 · Срезы</h2>
+  <p class="dim">Окна, префиксы, суффиксы и блоки.</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/take.html">take</a></li>
+    <li><a href="../tutorials/takeRight.html">takeRight</a></li>
+    <li><a href="../tutorials/takeWhile.html">takeWhile</a></li>
+    <li><a href="../tutorials/takeUntilInclusive.html">takeUntilInclusive</a></li>
+    <li><a href="../tutorials/drop.html">drop</a></li>
+    <li><a href="../tutorials/dropRight.html">dropRight</a></li>
+    <li><a href="../tutorials/dropWhile.html">dropWhile</a></li>
+    <li><a href="../tutorials/dropUntil.html">dropUntil</a></li>
+    <li><a href="../tutorials/slice.html">slice</a></li>
+    <li><a href="../tutorials/chunk.html">chunk</a></li>
+    <li><a href="../tutorials/split.html">split</a></li>
+  </ul>
+
+  <h2>Раздел 6 · Объединение</h2>
+  <p class="dim">На входе несколько последовательностей, на выходе одна.</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/append.html">append</a></li>
+    <li><a href="../tutorials/prepend.html">prepend</a></li>
+    <li><a href="../tutorials/concat.html">concat</a></li>
+    <li><a href="../tutorials/zip.html">zip</a></li>
+    <li><a href="../tutorials/zipWith.html">zipWith</a></li>
+    <li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li>
+    <li><a href="../tutorials/transpose.html">transpose</a></li>
+    <li><a href="../tutorials/reverse.html">reverse</a></li>
+    <li><a href="../tutorials/fork.html">fork</a></li>
+  </ul>
+
+  <h2>Раздел 7 · Агрегация</h2>
+  <p class="dim">Терминальные операторы: тянут конвейер и выдают значение.</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/reduce.html">reduce</a></li>
+    <li><a href="../tutorials/fold.html">fold</a></li>
+    <li><a href="../tutorials/reduceLazy.html">reduceLazy</a></li>
+    <li><a href="../tutorials/sum.html">sum</a></li>
+    <li><a href="../tutorials/average.html">average</a></li>
+    <li><a href="../tutorials/min.html">min</a></li>
+    <li><a href="../tutorials/max.html">max</a></li>
+    <li><a href="../tutorials/size.html">size</a></li>
+    <li><a href="../tutorials/join.html">join</a></li>
+    <li><a href="../tutorials/groupBy.html">groupBy</a></li>
+    <li><a href="../tutorials/indexBy.html">indexBy</a></li>
+    <li><a href="../tutorials/countBy.html">countBy</a></li>
+    <li><a href="../tutorials/sort.html">sort</a></li>
+    <li><a href="../tutorials/sortBy.html">sortBy</a></li>
+    <li><a href="../tutorials/partition.html">partition</a></li>
+  </ul>
+
+  <h2>Раздел 8 · Доступ &amp; предикаты</h2>
+  <p class="dim">Получаем отдельные значения и проверяем элементы.</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/head.html">head</a></li>
+    <li><a href="../tutorials/last.html">last</a></li>
+    <li><a href="../tutorials/nth.html">nth</a></li>
+    <li><a href="../tutorials/find.html">find</a></li>
+    <li><a href="../tutorials/findIndex.html">findIndex</a></li>
+    <li><a href="../tutorials/includes.html">includes</a></li>
+    <li><a href="../tutorials/isEmpty.html">isEmpty</a></li>
+    <li><a href="../tutorials/every.html">every</a></li>
+    <li><a href="../tutorials/some.html">some</a></li>
+    <li><a href="../tutorials/predicates.html">predicates (isNull, isString, …)</a></li>
+  </ul>
+
+  <h2>Раздел 9 · Функции для объектов (Map)</h2>
+  <p class="dim">Утилиты FxTS для объектов, портированные на Map в Dart.</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/fromEntries.html">fromEntries</a></li>
+    <li><a href="../tutorials/omit.html">omit</a></li>
+    <li><a href="../tutorials/pick.html">pick</a></li>
+    <li><a href="../tutorials/omitBy.html">omitBy</a></li>
+    <li><a href="../tutorials/pickBy.html">pickBy</a></li>
+    <li><a href="../tutorials/prop.html">prop</a></li>
+    <li><a href="../tutorials/props.html">props</a></li>
+    <li><a href="../tutorials/evolve.html">evolve</a></li>
+    <li><a href="../tutorials/compactObject.html">compactObject</a></li>
+    <li><a href="../tutorials/resolveProps.html">resolveProps</a></li>
+    <li><a href="../tutorials/isMatch.html">isMatch</a></li>
+    <li><a href="../tutorials/matches.html">matches</a></li>
+  </ul>
+
+  <h2>Раздел 10 · Утилиты для функций</h2>
+  <p class="dim">Комбинаторы и вспомогательные функции.</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/identity.html">identity</a></li>
+    <li><a href="../tutorials/always.html">always</a></li>
+    <li><a href="../tutorials/tap.html">tap</a></li>
+    <li><a href="../tutorials/apply.html">apply</a></li>
+    <li><a href="../tutorials/juxt.html">juxt</a></li>
+    <li><a href="../tutorials/memoize.html">memoize</a></li>
+    <li><a href="../tutorials/negate.html">negate</a></li>
+    <li><a href="../tutorials/not.html">not</a></li>
+    <li><a href="../tutorials/when.html">when</a></li>
+    <li><a href="../tutorials/unless.html">unless</a></li>
+    <li><a href="../tutorials/throwError.html">throwError</a></li>
+    <li><a href="../tutorials/throwIf.html">throwIf</a></li>
+    <li><a href="../tutorials/cases.html">cases</a></li>
+    <li><a href="../tutorials/add.html">add</a></li>
+    <li><a href="../tutorials/comparisons.html">gt · gte · lt · lte</a></li>
+    <li><a href="../tutorials/delay.html">delay &amp; sleep</a></li>
+    <li><a href="../tutorials/unicodeToArray.html">unicodeToArray</a></li>
+    <li><a href="../tutorials/curried.html">curried &amp; uncurried</a></li>
+  </ul>
+
+  <h2>Раздел 11 · Асинхронность &amp; конкурентность</h2>
+  <p class="dim">Модель FxAsyncIterable — главное преимущество FxDart.</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/toAsync.html">toAsync</a></li>
+    <li><a href="../tutorials/asyncVariants.html">async variants (mapAsync, …)</a></li>
+    <li><a href="../tutorials/streams.html">Stream bridges</a></li>
+    <li><a href="../tutorials/concurrent.html">concurrent</a></li>
+    <li><a href="../tutorials/concurrentPool.html">concurrentPool</a></li>
+  </ul>
+
+  <h2>Раздел 12 · Util</h2>
+  <p class="dim">Ограничение частоты и случайность.</p>
+  <ul class="fn-list">
+    <li><a href="../tutorials/debounce.html">debounce</a></li>
+    <li><a href="../tutorials/throttle.html">throttle</a></li>
+    <li><a href="../tutorials/shuffle.html">shuffle</a></li>
+    <li><a href="../tutorials/createSeededRandom.html">createSeededRandom</a></li>
+  </ul>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+</body>
+</html>

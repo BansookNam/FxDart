@@ -1,0 +1,4 @@
+Iterable&lt;A&gt; takeWhile&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; takeWhileAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.takeWhile(bool Function(T value) test)        // chain
+FxAsync&lt;T&gt; FxAsync.takeWhile(FutureOr&lt;bool&gt; Function(T a) f)

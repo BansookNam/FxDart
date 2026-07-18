@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FxDart — Programação funcional para Dart</title>
+  <meta name="description" content="FxDart é uma biblioteca de programação funcional para Dart, portada do FxTS: avaliação preguiçosa, iteração assíncrona concorrente e composição em pipeline.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html" class="active">Início</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="hero-logo"><img src="assets/logo-web.png" width="960" height="294"
+      alt="FxDart"></p>
+  <h1>Programação funcional para Dart,<br>com laziness e concorrência embutidas.</h1>
+  <p class="hero-sub">
+    FxDart é um port em Dart do <a href="https://github.com/marpple/FxTS">FxTS</a> —
+    uma biblioteca para compor <strong>pipelines preguiçosos</strong> sobre dados síncronos e assíncronos,
+    onde transformar seis requisições sequenciais de 1 segundo em um lote concorrente de 2 segundos
+    é uma única chamada de método.
+  </p>
+
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final result = fx([1, 2, 3, 4, 5])
+      .map((a) => a + 10)
+      .filter((a) => a % 2 == 0)
+      .toArray();
+
+  print(result); // [12, 14]
+}
+</textarea>
+  </div>
+  <p class="dim">▲ Isto está ao vivo — edite o código e pressione <strong>Executar</strong>.
+    Ele compila com o compilador Dart de verdade e executa no seu navegador.</p>
+
+  <h2>O que é FxDart?</h2>
+  <p>
+    FxDart traz o modelo de programação do FxTS para Dart: um kit de ~120 funções
+    pequenas e componíveis para transformar coleções e dados assíncronos.
+    Três ideias o definem:
+  </p>
+  <ul>
+    <li><strong>Avaliação preguiçosa</strong> — operadores como <code>map</code>,
+      <code>filter</code> e <code>take</code> montam um pipeline, mas não fazem
+      trabalho algum até que um operador terminal (<code>toArray</code>, <code>each</code>,
+      <code>reduce</code>…) puxe valores por ele. Processar um range de um milhão
+      de elementos com <code>.take(3)</code> calcula exatamente 3 resultados.</li>
+    <li><strong>Um modelo para sync e async</strong> — os mesmos nomes de operadores
+      funcionam sobre <code>Iterable</code>s comuns e sobre <code>FxAsyncIterable</code>,
+      a sequência assíncrona baseada em pull do FxDart (com pontes para <code>Stream</code> nos
+      dois sentidos).</li>
+    <li><strong>Concorrência declarativa</strong> — <code>concurrent(n)</code>
+      pede ao pipeline <em>upstream</em> que avalie <code>n</code> itens por
+      vez, mantendo os resultados em ordem. É o recurso mais marcante do FxTS,
+      portado fielmente para Dart.</li>
+  </ul>
+
+  <h2>Por que precisamos disso?</h2>
+  <p>
+    Dart já tem <code>Iterable</code> e <code>Stream</code>. O FxDart conquista
+    seu espaço onde eles se esgotam:
+  </p>
+  <table>
+    <tr><th>Problema</th><th>Dart puro</th><th>FxDart</th></tr>
+    <tr>
+      <td>Limitar chamadas de API concorrentes a <em>n</em>, mantendo a ordem</td>
+      <td>Filas manuais, <code>Completer</code>s, controle minucioso</td>
+      <td><code>.map(fetch).concurrent(3)</code></td>
+    </tr>
+    <tr>
+      <td>Pipelines de transformação assíncronos</td>
+      <td><code>Stream</code> é baseado em push; misturar <code>await</code>, backpressure e laziness fica intrincado</td>
+      <td>Cadeia baseada em pull — cada valor só é calculado quando pedido</td>
+    </tr>
+    <tr>
+      <td>Manipulação de dados (group, index, count, partition, zip, chunk…)</td>
+      <td>Loops escritos à mão toda vez</td>
+      <td>Uma função nomeada e bem testada por conceito</td>
+    </tr>
+    <tr>
+      <td>Transformações de várias etapas legíveis</td>
+      <td>Chamadas aninhadas ou variáveis intermediárias</td>
+      <td>Cadeias <code>fx()</code> da esquerda para a direita, totalmente tipadas</td>
+    </tr>
+  </table>
+
+  <h2>Prós &amp; Contras</h2>
+  <div class="proscons">
+    <div class="box pros">
+      <h3>✓ Prós</h3>
+      <ul>
+        <li><strong>Laziness de graça</strong> — pipelines fazem short-circuit; só os valores pedidos são calculados.</li>
+        <li><strong>Concorrência que preserva a ordem</strong> com um único operador: <code>concurrent(n)</code> / <code>concurrentPool(n)</code> na ordem de conclusão.</li>
+        <li><strong>Cadeias totalmente tipadas</strong> — <code>fx()</code> mantém a inferência de ponta a ponta; operadores síncronos são funções comuns sobre <code>Iterable</code>s nativos, então tudo interopera com Dart comum.</li>
+        <li><strong>Funções pequenas e focadas</strong> — ~120 operadores cobrindo transform / filter / slice / combine / aggregate / object / util.</li>
+        <li><strong>Semântica testada em produção</strong> — comportamento portado do FxTS junto com mais de 850 de seus testes.</li>
+        <li><strong>Zero dependências</strong> — Dart puro.</li>
+      </ul>
+    </div>
+    <div class="box cons">
+      <h3>✗ Contras</h3>
+      <ul>
+        <li><strong>Sem currying data-last</strong> — Dart não tem sobrecarga de funções, então o estilo <code>pipe</code> curried do FxTS vira cadeias; o <code>pipe()</code> dinâmico perde os tipos estáticos.</li>
+        <li><strong>Uma segunda abstração assíncrona</strong> — <code>FxAsyncIterable</code> existe porque <code>Stream</code> não consegue expressar o canal de retorno da concorrência; a ponte é fácil, mas é mais um conceito a aprender.</li>
+        <li><strong>Curva de aprendizado</strong> — pensar em pipelines preguiçosos é diferente de loops imperativos.</li>
+        <li><strong>Nem sempre o mais rápido</strong> — em hot loops minúsculos, um <code>for</code> escrito à mão pode superar a composição de operadores; o FxDart otimiza para clareza e trabalho I/O-bound.</li>
+        <li><strong>Algumas APIs do TS não portam literalmente</strong> — elas ganham grafias nativas do Dart: <code>curry</code> vira o getter de extensão tipado <a href="tutorials/curried.html"><code>.curried</code></a>, com os nomes antigos mantidos como stubs deprecados para migração.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Uma amostra de concorrência</h2>
+  <p>Seis requisições falsas de 300&nbsp;ms cada — sequencialmente ~1,8&nbsp;s, com
+    <code>concurrent(3)</code> cerca de 0,6&nbsp;s. Tente mudar o número:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  final users = await fx([1, 2, 3, 4, 5, 6])
+      .toAsync()
+      .map((id) => delay(Duration(milliseconds: 300), 'user$id'))
+      .concurrent(3) // ← try 1 (sequential) or 6 (all at once)
+      .toArray();
+
+  print(users);
+  print('took ${sw.elapsedMilliseconds}ms');
+}
+</textarea>
+  </div>
+
+  <h2>Comece a aprender</h2>
+  <div class="grid">
+    <a class="card" href="101/index.html">
+      <h3>FxDart 101 →</h3>
+      <p>Um curso guiado: aulas, demos ao vivo e um playground para cada função.</p>
+    </a>
+    <a class="card" href="tutorials/map.html">
+      <h3>Primeira aula: map →</h3>
+      <p>Comece pelo operador mais fundamental.</p>
+    </a>
+    <a class="card" href="https://github.com/bansooknam/fxDart">
+      <h3>Instalar →</h3>
+      <p>Coloque o fxdart no seu pubspec e explore o código-fonte.</p>
+    </a>
+  </div>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

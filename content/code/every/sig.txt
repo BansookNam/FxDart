@@ -1,0 +1,3 @@
+bool every&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;bool&gt; everyAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Future&lt;bool&gt; FxAsync.every(FutureOr&lt;bool&gt; Function(T a) f)  // chain (async)

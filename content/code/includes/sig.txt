@@ -1,0 +1,2 @@
+bool includes&lt;A&gt;(A a, Iterable&lt;A&gt; iterable)
+Future&lt;bool&gt; includesAsync&lt;A&gt;(A a, FxAsyncIterable&lt;A&gt; iterable)

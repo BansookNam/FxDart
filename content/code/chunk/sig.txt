@@ -1,0 +1,4 @@
+Iterable&lt;List&lt;A&gt;&gt; chunk&lt;A&gt;(int size, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;List&lt;A&gt;&gt; chunkAsync&lt;A&gt;(int size, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;List&lt;T&gt;&gt; Fx.chunk(int size)        // chain
+FxAsync&lt;List&lt;T&gt;&gt; FxAsync.chunk(int size)

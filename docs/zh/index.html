@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FxDart —— 面向 Dart 的函数式编程库</title>
+  <meta name="description" content="FxDart 是从 FxTS 移植而来的 Dart 函数式编程库：惰性求值、并发异步迭代，以及管道式组合。">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html" class="active">首页</a>
+      <a href="../101/index.html">FxDart 入门</a>
+      <a href="../101/index.html#api">API 教程</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="语言">
+      <span class="lang-label">语言</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="hero-logo"><img src="assets/logo-web.png" width="960" height="294"
+      alt="FxDart"></p>
+  <h1>面向 Dart 的函数式编程，<br>惰性与并发开箱即用。</h1>
+  <p class="hero-sub">
+    FxDart 是 <a href="https://github.com/marpple/FxTS">FxTS</a> 的 Dart 移植版本 ——
+    一个用于在同步与异步数据上组合<strong>惰性管道</strong>的库，
+    把六个各耗时 1 秒的串行请求变成 2 秒完成的并发批处理，
+    只需一次方法调用。
+  </p>
+
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final result = fx([1, 2, 3, 4, 5])
+      .map((a) => a + 10)
+      .filter((a) => a % 2 == 0)
+      .toArray();
+
+  print(result); // [12, 14]
+}
+</textarea>
+  </div>
+  <p class="dim">▲ 这是可运行的 —— 修改代码并按下 <strong>运行</strong>。
+    它会用真正的 Dart 编译器编译，并在你的浏览器中执行。</p>
+
+  <h2>FxDart 是什么？</h2>
+  <p>
+    FxDart 把 FxTS 的编程模型带到了 Dart：一套约 120 个小而可组合的函数，
+    用于变换集合与异步数据。它由三个核心理念定义：
+  </p>
+  <ul>
+    <li><strong>惰性求值</strong> —— <code>map</code>、<code>filter</code>、
+      <code>take</code> 这类操作符只构建管道，在终结操作符
+      （<code>toArray</code>、<code>each</code>、<code>reduce</code>……）
+      拉取数据之前不做任何工作。对一个百万元素的范围调用
+      <code>.take(3)</code>，只会计算 3 个结果。</li>
+    <li><strong>同步与异步共用一套模型</strong> —— 同样的操作符名称既适用于普通的
+      <code>Iterable</code>，也适用于 <code>FxAsyncIterable</code>，
+      即 FxDart 基于拉取的异步序列（并提供双向的 <code>Stream</code>
+      桥接）。</li>
+    <li><strong>声明式并发</strong> —— <code>concurrent(n)</code>
+      要求<em>上游</em>管道每次求值 <code>n</code> 个元素，
+      同时保持结果有序。这是 FxTS 的标志性特性，
+      已忠实移植到 Dart。</li>
+  </ul>
+
+  <h2>为什么需要它？</h2>
+  <p>
+    Dart 已经有 <code>Iterable</code> 和 <code>Stream</code>。FxDart 的价值，
+    体现在它们力所不及的地方：
+  </p>
+  <table>
+    <tr><th>问题</th><th>原生 Dart</th><th>FxDart</th></tr>
+    <tr>
+      <td>把并发 API 调用限制为 <em>n</em> 个，并保持顺序</td>
+      <td>手写队列、<code>Completer</code>，以及繁琐的状态管理</td>
+      <td><code>.map(fetch).concurrent(3)</code></td>
+    </tr>
+    <tr>
+      <td>异步变换管道</td>
+      <td><code>Stream</code> 是基于推送的；把 <code>await</code>、背压和惰性混在一起会变得复杂</td>
+      <td>基于拉取的链式调用 —— 每个值只在被请求时才计算</td>
+    </tr>
+    <tr>
+      <td>数据整理（分组、索引、计数、分区、zip、分块……）</td>
+      <td>每次都要手写循环</td>
+      <td>每个概念对应一个经过充分测试的具名函数</td>
+    </tr>
+    <tr>
+      <td>可读的多步变换</td>
+      <td>嵌套调用或中间变量</td>
+      <td>从左到右的 <code>fx()</code> 链式调用，类型完备</td>
+    </tr>
+  </table>
+
+  <h2>优点 &amp; 缺点</h2>
+  <div class="proscons">
+    <div class="box pros">
+      <h3>✓ 优点</h3>
+      <ul>
+        <li><strong>免费获得惰性</strong> —— 管道会短路；只计算被请求的值。</li>
+        <li><strong>保序的并发</strong>，一个操作符即可实现：<code>concurrent(n)</code> / 按完成顺序输出的 <code>concurrentPool(n)</code>。</li>
+        <li><strong>类型完备的链式调用</strong> —— <code>fx()</code> 让类型推断贯穿始终；同步操作符就是作用于原生 <code>Iterable</code> 的普通函数，因此一切都能与常规 Dart 代码互操作。</li>
+        <li><strong>小而专注的函数</strong> —— 约 120 个操作符，覆盖变换 / 过滤 / 切片 / 组合 / 聚合 / 对象 / 工具。</li>
+        <li><strong>久经考验的语义</strong> —— 行为从 FxTS 移植而来，同时带来了它 850+ 个测试。</li>
+        <li><strong>零依赖</strong> —— 纯 Dart 实现。</li>
+      </ul>
+    </div>
+    <div class="box cons">
+      <h3>✗ 缺点</h3>
+      <ul>
+        <li><strong>没有 data-last 柯里化</strong> —— Dart 不支持函数重载，因此 FxTS 柯里化的 <code>pipe</code> 风格在这里变成了链式调用；动态的 <code>pipe()</code> 会丢失静态类型。</li>
+        <li><strong>多了一层异步抽象</strong> —— <code>FxAsyncIterable</code> 之所以存在，是因为 <code>Stream</code> 无法表达并发的反向通道；桥接很容易，但终究是一个需要额外学习的概念。</li>
+        <li><strong>学习曲线</strong> —— 用惰性管道思考，与写命令式循环并不相同。</li>
+        <li><strong>并非总是最快</strong> —— 对于极小的热点循环，手写 <code>for</code> 可能胜过操作符组合；FxDart 的优化目标是清晰度与 I/O 密集型场景。</li>
+        <li><strong>部分 TS API 无法逐字移植</strong> —— 它们改用了更符合 Dart 习惯的写法：<code>curry</code> 变成了带类型的 <a href="tutorials/curried.html"><code>.curried</code></a> 扩展 getter，旧名称则作为已废弃的桩函数保留，便于迁移。</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>并发初体验</h2>
+  <p>六个各耗时 300&nbsp;ms 的模拟请求 —— 串行约需 1.8&nbsp;s，使用
+    <code>concurrent(3)</code> 约需 0.6&nbsp;s。试着改改这个数字：</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  final users = await fx([1, 2, 3, 4, 5, 6])
+      .toAsync()
+      .map((id) => delay(Duration(milliseconds: 300), 'user$id'))
+      .concurrent(3) // ← try 1 (sequential) or 6 (all at once)
+      .toArray();
+
+  print(users);
+  print('took ${sw.elapsedMilliseconds}ms');
+}
+</textarea>
+  </div>
+
+  <h2>开始学习</h2>
+  <div class="grid">
+    <a class="card" href="101/index.html">
+      <h3>FxDart 入门 →</h3>
+      <p>一门循序渐进的课程：讲解、实时演示，以及每个函数配套的 playground。</p>
+    </a>
+    <a class="card" href="tutorials/map.html">
+      <h3>第一课：map →</h3>
+      <p>从最基础的操作符开始。</p>
+    </a>
+    <a class="card" href="https://github.com/bansooknam/fxDart">
+      <h3>安装 →</h3>
+      <p>把 fxdart 加入你的 pubspec，并浏览源码。</p>
+    </a>
+  </div>
+</main>
+<footer class="site-footer">
+  <p>FxDart 是 <a href="https://github.com/marpple/FxTS">FxTS</a> 的移植版本。特别感谢 <strong>Indong Yoo</strong>（Marpple CTO）与 FxTS 团队，本库的设计思路、语义和测试套件均源于他们的工作。</p>
+  <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 运行","pgReset":"重置","pgCompiling":"编译中…","pgCompileError":"编译错误","pgError":"错误","pgLoading":"正在加载运行时…","pgRunning":"运行中…","pgNoOutput":"（无输出）","pgLoadFailed":"无法加载 FxDart 库"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

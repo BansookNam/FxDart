@@ -1,0 +1,4 @@
+double average(Iterable&lt;num&gt; iterable)
+Future&lt;double&gt; averageAsync(FxAsyncIterable&lt;num&gt; iterable)
+double Fx&lt;num&gt;.average()          // chain (sync)
+Future&lt;double&gt; FxAsync&lt;num&gt;.average()  // chain (async)

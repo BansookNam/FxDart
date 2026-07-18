@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>pipe — FxDart 101</title>
+  <meta name="description" content="FxDart pipe tutorial: left-to-right function composition over a value, dynamically typed — and why fx() chains are the typed alternative.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/pipe.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/pipe.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/pipe.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/pipe.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/pipe.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/pipe.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/pipe.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/pipe.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/pipe.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">Início</a>
+      <a href="../../101/index.html">FxDart 101</a>
+      <a href="../../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/pipe.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/pipe.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/pipe.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/pipe.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/pipe.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/pipe.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/pipe.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 1 · Primeiros passos › <strong>pipe</strong></p>
+  <h1><code>pipe</code></h1>
+  <p class="hero-sub">Runs a value through a list of functions, left to right — dynamically typed.</p>
+
+  <div class="signature">dynamic pipe(dynamic a, List&lt;Function&gt; fns)
+dynamic Function(dynamic a) pipeLazy(List&lt;Function&gt; fns)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    In FxTS, <code>pipe(x, f, g, h)</code> is a curried, fully-typed
+    pipeline: TypeScript has enough overloads and generics tricks to infer
+    the type flowing out of each step. <strong>Dart cannot do this.</strong>
+    There is no variadic-generic overload trick available, so FxDart's
+    <code>pipe</code> is honest about the trade-off: it takes a plain
+    <code>List&lt;Function&gt;</code> and threads a <code>dynamic</code>
+    value through each one in order. Each function receives whatever the
+    previous one returned, with no static type checking in between.
+  </p>
+  <p>
+    That means <code>pipe</code> still works, and still reads nicely for a
+    short, throwaway transformation — but a step that expects the wrong
+    type will only fail at <em>run time</em>, and the whole pipeline's
+    result type is just <code>dynamic</code>. If a step in the list
+    returns a <code>Future</code>, <code>pipe</code> automatically awaits
+    it before feeding the value to the next step, so sync and async
+    functions can sit in the same list.
+  </p>
+  <p>
+    For anything you'll keep and maintain, prefer the <code>fx()</code>
+    chain instead: <code>fx(x).map(f).filter(g)</code> is fully typed, gets
+    autocomplete, and catches mismatched types at compile time — it's the
+    typed alternative to exactly this kind of pipeline. Reach for
+    <code>pipe</code> when the steps are dynamic by nature (e.g. built from
+    a runtime list of functions) or when you're prototyping quickly.
+    <code>pipeLazy</code> is the same idea, deferred: it returns a function
+    you can call later instead of running immediately.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <p>A short pipeline built from FxDart's data-first functions:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // pipe is dynamically typed: fns is a List<Function>, each step receives
+  // whatever `dynamic` the previous step returned.
+  final result = pipe([1, 2, 3, 4, 5], [
+    (Iterable<int> a) => map((n) => n + 10, a),
+    (Iterable<int> a) => filter((n) => n % 2 == 0, a),
+    toArray,
+  ]);
+
+  print(result); // [12, 14]
+  print(result.runtimeType); // List<dynamic> — pipe() erased the element type
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · The honest downside</h2>
+  <p>
+    A step that expects the wrong type compiles fine and only blows up when
+    it actually runs — this is exactly what <code>fx()</code> chains are
+    designed to prevent:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // The honest downside of dynamic typing: a step that doesn't match what
+  // the previous step produced is only caught at RUN time, not compile time.
+  try {
+    pipe(5, [
+      (int n) => n + 1,
+      (String s) => s.toUpperCase(), // wrong type — compiles fine!
+    ]);
+  } catch (e) {
+    print('runtime error: ${e.runtimeType}');
+  }
+
+  // The typed alternative: fx() chains catch this at compile time instead.
+  final safe = fx([1, 2, 3]).map((n) => n + 1).toArray();
+  print(safe); // [2, 3, 4]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: pipe a list of numbers through a filter step and a sum step.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // TODO: pipe [10, 15, 20, 25] through a step that keeps values > 12, then
+  // a step that sums them, using top-level `filter` and `sum`.
+  final total = pipe([10, 15, 20, 25], [
+    (Iterable<int> a) => filter((n) => n > 12, a),
+    sum,
+  ]);
+
+  print(total); // 60
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="fx.html"><code>fx</code></a> — the typed chain alternative ·
+    <a href="pipe1.html"><code>pipe1</code></a> — a single pipe step, sync/async aware ·
+    <a href="toArray.html"><code>toArray</code></a> — common final step in a pipe
+  </div>
+
+  <nav class="tut-nav">
+    <a href="fx.html">← Anterior: fx</a>
+    <a href="pipe1.html">Próximo: pipe1 →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

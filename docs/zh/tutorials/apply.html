@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>apply — FxDart 101</title>
+  <meta name="description" content="FxDart apply tutorial: invoke a function with arguments collected in a List, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/apply.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/apply.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/apply.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/apply.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/apply.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/apply.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/apply.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/apply.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/apply.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../../index.html">首页</a>
+      <a href="../../101/index.html">FxDart 入门</a>
+      <a href="../../101/index.html#api">API 教程</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="语言">
+      <span class="lang-label">语言</span>
+      <ul>
+        <li><a href="https://bansooknam.github.io/FxDart/tutorials/apply.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ko/tutorials/apply.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/zh/tutorials/apply.html" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">简体中文</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ja/tutorials/apply.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/es/tutorials/apply.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/pt-br/tutorials/apply.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="https://bansooknam.github.io/FxDart/ru/tutorials/apply.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">本页尚未翻译，因此以英文显示。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">参与翻译</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 入门</a> › 章节 10 · 函数工具 › <strong>apply</strong></p>
+  <h1><code>apply</code></h1>
+  <p class="hero-sub">Calls a function with a List of arguments as its positional parameters.</p>
+
+  <div class="signature">R apply&lt;R&gt;(Function f, List&lt;Object?&gt; args)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>apply</code> exists for the moments when the arguments to a call
+    aren't sitting in separate variables — they're already collected in a
+    <code>List</code> (parsed from input, gathered from a config, produced by
+    <a href="juxt.html"><code>juxt</code></a>) and you need to invoke an
+    arbitrary function with them. Under the hood it's a thin wrapper over
+    Dart's own <code>Function.apply</code>, with the result cast to <code>R</code>.
+  </p>
+  <p>
+    Because <code>f</code> is typed as the bare <code>Function</code>,
+    <code>apply</code> is inherently dynamic — Dart can't check the argument
+    count or types against <code>f</code>'s signature at compile time, only at
+    runtime. Reach for it only when you genuinely have a dynamic arg list;
+    for anything else, call the function directly.
+  </p>
+  <p>
+    A related but separate concern is <em>currying</em> — pre-filling some
+    arguments of a function ahead of time. FxTS has a fully generic
+    <code>curry</code>; Dart's type system has no equivalent for arbitrary
+    arities, so FxDart ships only a
+    <code>@Deprecated</code> two-argument <code>curry</code> stub as a
+    migration aid. Prefer writing the closure yourself:
+    <code>(b) => f(a, b)</code>.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+int add3(int a, int b, int c) => a + b + c;
+
+void main() {
+  print(apply<int>(add3, [1, 2, 3])); // 6
+
+  // deprecated curry stub — prefer a closure like (b) => f(a, b)
+  // ignore: deprecated_member_use
+  final addCurried = curry((int a, int b) => a + b);
+  print(addCurried(2)(3)); // 5
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Dispatching dynamic calls</h2>
+  <p>
+    A small command dispatcher, where each handler has a different arity and
+    the arguments arrive as a runtime <code>List</code>:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final handlers = <String, Function>{
+    'sum': (int a, int b) => a + b,
+    'shout': (String s) => s.toUpperCase(),
+  };
+
+  final calls = [
+    ('sum', [1, 2]),
+    ('shout', ['hi']),
+  ];
+
+  for (final (name, args) in calls) {
+    print(apply(handlers[name]!, args));
+  }
+  // 3
+  // HI
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: call <code>greet</code> below using <code>apply</code> with the
+    argument list <code>['Kim', 'Hello']</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+String greet(String name, String greeting) => '$greeting, $name!';
+
+void main() {
+  // TODO: call greet with these args using apply
+  final message = apply<String>(greet, ['Kim', 'Hello']);
+
+  print(message); // Hello, Kim!
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="juxt.html"><code>juxt</code></a> — often the source of a dynamic arg list ·
+    <a href="tap.html"><code>tap</code></a> — run a side effect without changing the value ·
+    <a href="cases.html"><code>cases</code></a> — dispatch on predicates instead of a name ·
+    <a href="pipe.html"><code>pipe</code></a> — dynamic composition, same trade-off as apply
+  </div>
+
+  <nav class="tut-nav">
+    <a href="tap.html">← 上一节： tap</a>
+    <a href="juxt.html">下一节： juxt →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart 是 <a href="https://github.com/marpple/FxTS">FxTS</a> 的移植版本。特别感谢 <strong>Indong Yoo</strong>（Marpple CTO）与 FxTS 团队，本库的设计思路、语义和测试套件均源于他们的工作。</p>
+  <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 运行","pgReset":"重置","pgCompiling":"编译中…","pgCompileError":"编译错误","pgError":"错误","pgLoading":"正在加载运行时…","pgRunning":"运行中…","pgNoOutput":"（无输出）","pgLoadFailed":"无法加载 FxDart 库"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+Iterable&lt;A&gt; reverse&lt;A&gt;(Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; reverseAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.reverse()        // chain
+FxAsync&lt;T&gt; FxAsync.reverse()

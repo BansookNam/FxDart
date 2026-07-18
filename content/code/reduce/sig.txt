@@ -1,0 +1,4 @@
+A reduce&lt;A&gt;(A Function(A acc, A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;A&gt; reduceAsync&lt;A&gt;(FutureOr&lt;A&gt; Function(A acc, A a) f, FxAsyncIterable&lt;A&gt; iterable)
+T Fx.reduce(T Function(T acc, T a) combine)              // chain (sync, inherited from Iterable)
+Future&lt;T&gt; FxAsync.reduce(FutureOr&lt;T&gt; Function(T acc, T a) f)  // chain (async)

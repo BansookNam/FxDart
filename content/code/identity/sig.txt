@@ -1,0 +1,1 @@
+T identity&lt;T&gt;(T a) => a;

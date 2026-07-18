@@ -1,0 +1,1 @@
+R apply&lt;R&gt;(Function f, List&lt;Object?&gt; args)
