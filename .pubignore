@@ -1,0 +1,20 @@
+# Codecov uploader binary (8 MB) — downloaded on demand, never published
+codecov
+
+# GitHub Pages site — lives on the web, not in the package
+docs/
+
+# Repo tooling / CI, irrelevant to package consumers
+.github/
+.gstack/
+tools/
+deploy.sh
+DEPLOY.md
+CODECOV.md
+
+# Build & local artifacts (normally covered by .gitignore, which
+# .pubignore overrides once present)
+coverage/
+.dart_tool/
+.DS_Store
+*.log
