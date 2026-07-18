@@ -2624,11 +2624,12 @@ R Function(T value) cases<T, R>(List<(bool Function(T), R Function(T))> pairs,
 List<String> unicodeToArray(String s) =>
     [for (final rune in s.runes) String.fromCharCode(rune)];
 
-/// TODO(port): TypeScript's `curry` relies on reflection over a function's
-/// arity plus recursive conditional types (`Curry<...>`), neither of which
-/// exists in Dart. This stub only curries binary functions and is untyped.
-/// Prefer writing closures directly: `(b) => f(a, b)`.
-@Deprecated('Dart cannot express generic currying; write a closure instead')
+/// TypeScript's `curry` relies on reflection over a function's arity plus
+/// recursive conditional types (`Curry<...>`), neither of which exists in
+/// Dart. This stub only curries binary functions and is untyped. The typed,
+/// Dart-native replacement is the `.curried` extension getter (arities 2–5)
+/// — see `WHY_CURRIED.md`.
+@Deprecated('Use the .curried extension getter instead (see WHY_CURRIED.md)')
 Function curry(Function f) => (Object? a) => (Object? b) => f(a, b);
 
 // ---- lib/src/strict/predicates.dart ----
