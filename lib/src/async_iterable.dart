@@ -279,61 +279,62 @@ FxAsyncIterable<A> concurrentPoolAsync<A>(
     final iterator = iterable.iterator;
     var inFlight = 0;
     var sourceDone = false;
-    var finished = false;
+    var failed = false;
     final ready = <Settled<IterResult<A>>>[];
     final settlementQueue = <Completer<IterResult<A>>>[];
-    var pendingConsumers = 0;
+
+    bool exhausted() => sourceDone && inFlight == 0 && ready.isEmpty;
 
     void drain() {
       while (ready.isNotEmpty && settlementQueue.isNotEmpty) {
         final item = ready.removeAt(0);
         final completer = settlementQueue.removeAt(0);
-        pendingConsumers--;
         switch (item) {
           case Fulfilled(value: final value):
             completer.complete(value);
-            if (value.done) finished = true;
           case Rejected(error: final error, stackTrace: final stackTrace):
-            finished = true;
             completer.completeError(error, stackTrace);
         }
       }
-      if (finished) {
+      if (exhausted()) {
         while (settlementQueue.isNotEmpty) {
           settlementQueue.removeAt(0).complete(IterResult<A>.done());
-          pendingConsumers--;
         }
       }
     }
 
-    void fill() {
-      while (!sourceDone &&
-          !finished &&
-          inFlight < length &&
-          inFlight < pendingConsumers) {
+    late void Function() fill;
+    fill = () {
+      // Eagerly keep the pool full (like FxTS): up to [length] fetches stay
+      // in flight regardless of how many consumers are currently waiting, so
+      // even a one-pull-at-a-time terminal like toArray overlaps the work.
+      while (!sourceDone && !failed && inFlight < length) {
         inFlight++;
         iterator.next(Concurrent.of(length)).then((result) {
           inFlight--;
-          if (result.done) sourceDone = true;
-          ready.add(Fulfilled(result));
+          if (result.done) {
+            sourceDone = true;
+          } else {
+            ready.add(Fulfilled(result));
+          }
           drain();
           fill();
         }, onError: (Object e, StackTrace st) {
           inFlight--;
+          failed = true;
           sourceDone = true;
           ready.add(Rejected<IterResult<A>>(e, st));
           drain();
         });
       }
-    }
+    };
 
     return DelegateAsyncIterator((_) {
-      if (finished && ready.isEmpty) {
+      if (exhausted()) {
         return Future.value(IterResult<A>.done());
       }
       final completer = Completer<IterResult<A>>();
       settlementQueue.add(completer);
-      pendingConsumers++;
       drain();
       fill();
       return completer.future;

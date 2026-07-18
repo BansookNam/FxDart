@@ -85,8 +85,25 @@ void main() {
       } catch (e) {
         caught = e;
       }
+      // Eager pool of 2: 1 (@50) and 3 (@100) complete before the error
+      // future (started @100, fails immediately); 2 (@200) is still in
+      // flight when the error surfaces — completion order.
       expect(caught, isA<StateError>());
-      expect(acc, equals([1, 2, 3]));
+      expect(acc, equals([1, 3]));
+    });
+
+    test('eagerly overlaps work even with a one-pull-at-a-time consumer',
+        () async {
+      // toArray awaits each pull before the next; the pool must still keep
+      // itself full so total time is ~ceil(6/3)*100ms, not 6*100ms.
+      final sw = Stopwatch()..start();
+      final acc = await toArrayAsync(concurrentPoolAsync(3, toAsync(() sync* {
+        for (var i = 1; i <= 6; i++) {
+          yield delay(const Duration(milliseconds: 100), i);
+        }
+      }())));
+      expect(acc..sort(), equals([1, 2, 3, 4, 5, 6]));
+      expect(sw.elapsedMilliseconds, lessThan(450));
     });
   });
 }

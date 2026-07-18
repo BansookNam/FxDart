@@ -22,7 +22,9 @@
   var libPromise = null;
   function getLib() {
     if (!libPromise) {
-      libPromise = fetch(ROOT + 'assets/fxdart_single.dart').then(function (r) {
+      // no-cache: always revalidate so a redeployed library bundle (or a
+      // stale partial cache entry) can never be silently mismatched.
+      libPromise = fetch(ROOT + 'assets/fxdart_single.dart', { cache: 'no-cache' }).then(function (r) {
         if (!r.ok) throw new Error('Could not load fxdart library (' + r.status + ')');
         return r.text();
       });

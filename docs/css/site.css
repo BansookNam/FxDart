@@ -172,8 +172,14 @@ th { background: var(--bg-soft); }
 .pg-err { color: #ff8589; }
 .pg-dim { color: #767d9e; font-style: italic; }
 
-/* CodeMirror theming */
-.CodeMirror {
+/* CodeMirror theming
+   NOTE ON SPECIFICITY: codemirror.min.css is loaded from the CDN *after*
+   this file, and it sets `.CodeMirror { background: white; color: black }`.
+   A bare `.CodeMirror` rule here has equal specificity and therefore loses,
+   which left the editor white-on-pastel in dark mode. Every rule that has to
+   beat the CDN is written as `.CodeMirror.cm-s-fxdart` (0,2,0) so it wins
+   regardless of link order. Don't "simplify" these back to `.CodeMirror`. */
+.CodeMirror.cm-s-fxdart {
   height: auto;
   background: var(--code-bg);
   color: var(--text);
@@ -183,25 +189,59 @@ th { background: var(--bg-soft); }
   padding: 0.4rem 0;
 }
 .cm-s-fxdart .CodeMirror-gutters { background: var(--code-bg); border-right: 1px solid var(--border); }
-.cm-s-fxdart .CodeMirror-linenumber { color: var(--text-dim); opacity: 0.6; }
-.cm-s-fxdart .cm-keyword { color: #c678dd; }
-.cm-s-fxdart .cm-def { color: #61afef; }
-.cm-s-fxdart .cm-variable { color: var(--text); }
-.cm-s-fxdart .cm-variable-2 { color: #e5c07b; }
-.cm-s-fxdart .cm-type { color: #e5c07b; }
-.cm-s-fxdart .cm-string { color: #98c379; }
-.cm-s-fxdart .cm-number { color: #d19a66; }
-.cm-s-fxdart .cm-comment { color: #7f848e; font-style: italic; }
-.cm-s-fxdart .cm-operator { color: #56b6c2; }
+/* No opacity here: dimming --text-dim any further drops line numbers below
+   the 4.5:1 contrast floor against --code-bg. */
+.cm-s-fxdart .CodeMirror-linenumber { color: var(--text-dim); }
 .cm-s-fxdart .CodeMirror-cursor { border-left: 2px solid var(--accent); }
+/* CDN ships `.CodeMirror-focused .CodeMirror-selected { background: #d9d9d9 }`
+   — a light grey selection that vanishes against the dark editor. */
+.cm-s-fxdart .CodeMirror-selected,
+.cm-s-fxdart.CodeMirror-focused .CodeMirror-selected { background: #33395c; }
+.cm-s-fxdart .CodeMirror-activeline-background { background: rgba(255, 255, 255, 0.035); }
+.cm-s-fxdart .CodeMirror-matchingbracket {
+  color: var(--accent-strong) !important; border-bottom: 1px solid var(--accent-strong);
+}
+
+.cm-s-fxdart .cm-keyword { color: #c99bf0; }
+.cm-s-fxdart .cm-def { color: #7cc0ff; }
+.cm-s-fxdart .cm-variable { color: var(--text); }
+.cm-s-fxdart .cm-variable-2 { color: #ecc98a; }
+.cm-s-fxdart .cm-variable-3 { color: #ecc98a; }
+.cm-s-fxdart .cm-type { color: #ecc98a; }
+.cm-s-fxdart .cm-string { color: #a5d68a; }
+.cm-s-fxdart .cm-string-2 { color: #a5d68a; }
+.cm-s-fxdart .cm-number { color: #e0a878; }
+.cm-s-fxdart .cm-atom { color: #e0a878; }
+.cm-s-fxdart .cm-comment { color: #99a0b8; font-style: italic; }
+.cm-s-fxdart .cm-operator { color: #63c9d6; }
+/* cm-builtin was previously unstyled, so it fell through to the CDN default
+   and rendered as low-contrast mud: fx, map, filter, toArray, print. */
+.cm-s-fxdart .cm-builtin { color: #7cc0ff; }
+.cm-s-fxdart .cm-property { color: #7cc0ff; }
+.cm-s-fxdart .cm-meta { color: #63c9d6; }
+.cm-s-fxdart .cm-qualifier { color: #ecc98a; }
+.cm-s-fxdart .cm-punctuation,
+.cm-s-fxdart .cm-bracket { color: var(--text); }
+.cm-s-fxdart .cm-error { color: #ff8589; }
+
 @media (prefers-color-scheme: light) {
-  .cm-s-fxdart .cm-keyword { color: #a626a4; }
-  .cm-s-fxdart .cm-def { color: #4078f2; }
-  .cm-s-fxdart .cm-string { color: #50a14f; }
-  .cm-s-fxdart .cm-number { color: #b76b01; }
-  .cm-s-fxdart .cm-comment { color: #a0a1a7; }
-  .cm-s-fxdart .cm-operator { color: #0184bc; }
-  .cm-s-fxdart .cm-type, .cm-s-fxdart .cm-variable-2 { color: #c18401; }
+  .cm-s-fxdart .CodeMirror-selected,
+  .cm-s-fxdart.CodeMirror-focused .CodeMirror-selected { background: #d5d9ee; }
+  .cm-s-fxdart .CodeMirror-activeline-background { background: rgba(0, 0, 0, 0.03); }
+  /* Darker than the usual One Light palette on purpose: --code-bg (#f2f3f9)
+     is lighter than the editor these colors were designed for, so the stock
+     values land at 3.0-3.8:1. Every value below is >= 4.5:1 on that bg. */
+  .cm-s-fxdart .cm-keyword { color: #9425a0; }
+  .cm-s-fxdart .cm-def { color: #2f5fd0; }
+  .cm-s-fxdart .cm-string, .cm-s-fxdart .cm-string-2 { color: #2c7230; }
+  .cm-s-fxdart .cm-number, .cm-s-fxdart .cm-atom { color: #8a5000; }
+  .cm-s-fxdart .cm-comment { color: #5f6672; }
+  .cm-s-fxdart .cm-operator, .cm-s-fxdart .cm-meta { color: #00637f; }
+  .cm-s-fxdart .cm-type,
+  .cm-s-fxdart .cm-variable-2,
+  .cm-s-fxdart .cm-variable-3,
+  .cm-s-fxdart .cm-qualifier { color: #7a5200; }
+  .cm-s-fxdart .cm-builtin, .cm-s-fxdart .cm-property { color: #2f5fd0; }
 }
 
 /* tutorial nav */

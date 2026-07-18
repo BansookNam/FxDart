@@ -6,6 +6,10 @@ programming model, rebuilt on Dart's type system.
 
 [![Version](https://img.shields.io/pub/v/fxdart.svg?style=flat-square)](https://pub.dev/packages/fxdart)
 
+**📚 Interactive docs: [FxDart 101](https://bansooknam.github.io/fxDart/)** — a
+guided course with a live in-browser playground for every function (served from
+this repo's `docs/` folder via GitHub Pages).
+
 ## Why fxdart?
 
 - **Lazy evaluation** — operators build a pipeline and do no work until a terminal

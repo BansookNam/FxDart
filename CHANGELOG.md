@@ -1,3 +1,11 @@
+## 0.1.1
+
+* `concurrentPool` now eagerly keeps its pool full (FxTS behavior): even
+  one-pull-at-a-time consumers like `toArray()` get full overlap and
+  completion-order results.
+* Docs site (GitHub Pages) with a live in-browser playground for every
+  function, under `docs/`.
+
 ## 0.1.0
 
 * Complete rewrite: port of [FxTS](https://fxts.dev) to Dart.
