@@ -29,10 +29,7 @@ this repo's `docs/` folder via GitHub Pages).
 
 ## Install
 
-```yaml
-dependencies:
-  fxdart: ^0.1.0
-```
+See the [installation guide](https://pub.dev/packages/fxdart/install) on pub.dev for the latest version.
 
 ## Usage
 

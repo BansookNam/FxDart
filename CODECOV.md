@@ -45,5 +45,3 @@ Step 5 — Confirm the badge renders
 The badge image is served by Codecov and only turns from grey unknown to a percentage after the first successful upload is processed. Give it a minute after the run, then hard-refresh https://github.com/BansookNam/FxDart. Expect it to read roughly 92%, matching the local run.
 
 One judgement call worth flagging
-
-nav's README claims 100% line coverage and embeds a sunburst graph. FxDart is at 92.3%, so I deliberately did not copy that framing — I wrote a neutral "coverage is measured on every push" line instead. If you'd rather match nav's style, I can add the sunburst image once the first upload lands (the graph URL 404s until Codecov has data). And if you want to actually chase 100%, the 96 uncovered lines are identifiable from coverage/lcov.info — I can break down where they are.

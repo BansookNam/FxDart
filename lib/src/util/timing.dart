@@ -61,45 +61,52 @@ class Throttled<T> {
 
   void call(T arg) {
     final now = DateTime.now();
-    if (_lastCallTime == null) {
-      var leadingFired = false;
+    final last = _lastCallTime;
+
+    // A new window opens whenever nothing has run within the last [_wait].
+    // The window start is recorded regardless of [_leading]; otherwise a
+    // trailing-only throttle could never tell windows apart and would
+    // degenerate into a debounce.
+    if (last == null || now.difference(last) >= _wait) {
+      // A pending timer can only survive here if it is due at this exact
+      // instant; drop it so it cannot fire alongside the new window.
+      _timer?.cancel();
+      _timer = null;
+      _lastCallTime = now;
       if (_leading) {
-        _func(arg);
-        _lastCallTime = now;
-        leadingFired = true;
-      }
-      _lastArg = arg;
-      _hasPendingArg = !leadingFired;
-      if (_trailing) {
-        _timer = Timer(_wait, () {
-          if (_hasPendingArg) {
-            _func(_lastArg as T);
-          }
-          _lastCallTime = null;
-          _lastArg = null;
-          _hasPendingArg = false;
-          _timer = null;
-        });
-      } else if (!_trailing && !_leading) {
-        _lastCallTime = null;
-      }
-      return;
-    }
-    // Subsequent calls: remember the latest argument, keep the timer.
-    _lastArg = arg;
-    _hasPendingArg = true;
-    if (_trailing && _timer == null) {
-      final remaining = _wait - now.difference(_lastCallTime!);
-      _timer = Timer(remaining.isNegative ? Duration.zero : remaining, () {
-        if (_hasPendingArg) {
-          _func(_lastArg as T);
-          _lastCallTime = DateTime.now();
-        }
         _lastArg = null;
         _hasPendingArg = false;
-        _timer = null;
-      });
+        _func(arg);
+        return;
+      }
+      // No leading edge: this call is itself the pending trailing invocation.
+      _lastArg = arg;
+      _hasPendingArg = _trailing;
+      if (_trailing) _scheduleTrailing(_wait);
+      return;
     }
+
+    // Within the window: remember the newest argument for the trailing edge
+    // without extending the deadline (this is what separates throttle from
+    // debounce).
+    _lastArg = arg;
+    _hasPendingArg = _trailing;
+    if (_trailing && _timer == null) {
+      _scheduleTrailing(_wait - now.difference(last));
+    }
+  }
+
+  void _scheduleTrailing(Duration remaining) {
+    _timer = Timer(remaining, () {
+      _timer = null;
+      if (_hasPendingArg) {
+        // The trailing invocation opens the next window.
+        _lastCallTime = DateTime.now();
+        _func(_lastArg as T);
+      }
+      _lastArg = null;
+      _hasPendingArg = false;
+    });
   }
 
   /// Cancels any pending trailing invocation.

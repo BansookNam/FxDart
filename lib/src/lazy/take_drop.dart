@@ -372,21 +372,14 @@ FxAsyncIterable<String> splitAsync(
     var acc = '';
     var chr = '';
     var sourceDone = false;
-    var tailEmitted = false;
     return SerialAsyncIterator((concurrent) async {
-      if (sourceDone) {
-        if (tailEmitted) return const IterResult<String>.done();
-        tailEmitted = true;
-        if (sep != '' && chr == sep) return const IterResult.value('');
-        if (sep != '' && acc.isNotEmpty) return IterResult.value(acc);
-        return const IterResult<String>.done();
-      }
+      // Reaching the source's end always emits the tail (if any) in the same
+      // call, so every later call is simply done.
+      if (sourceDone) return const IterResult<String>.done();
       while (true) {
         final result = await iterator.next(concurrent);
         if (result.done) {
           sourceDone = true;
-          if (tailEmitted) return const IterResult<String>.done();
-          tailEmitted = true;
           if (sep != '' && chr == sep) return const IterResult.value('');
           if (sep != '' && acc.isNotEmpty) return IterResult.value(acc);
           return const IterResult<String>.done();

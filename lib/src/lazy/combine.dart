@@ -307,6 +307,17 @@ FxAsyncIterable<T> forkAsync<T>(FxAsyncIterable<T> iterable) {
       }
     }
 
+    // Issues parallel pulls to cover this fork's unmet demand — what lets a
+    // downstream `concurrent(n)` evaluate the shared source n-wide. Buffered
+    // items still ahead of `i` plus the pulls already in flight each settle
+    // one queued completer, so only the shortfall is pulled.
+    void pullToMeetDemand(Concurrent? concurrent) {
+      while (!s.done &&
+          settlementQueue.length > (s.buffer.length - i) + s.pullsInFlight) {
+        s.pull(concurrent);
+      }
+    }
+
     void Function()? listener;
 
     return DelegateAsyncIterator((concurrent) {
@@ -322,23 +333,15 @@ FxAsyncIterable<T> forkAsync<T>(FxAsyncIterable<T> iterable) {
       if (listener == null) {
         listener = () {
           serve();
-          // Re-pull while this fork still has unserved demand.
-          while (!s.done &&
-              settlementQueue.length >
-                  (s.buffer.length - i) + s.pullsInFlight) {
-            s.pull(concurrent);
-          }
+          // Demand is already covered when the pulls below are issued, so
+          // this is a safety net for a shortfall appearing as pulls settle.
+          pullToMeetDemand(concurrent);
         };
         s.listeners.add(listener!);
       }
       final completer = Completer<IterResult<T>>();
       settlementQueue.add(completer);
-      // Issue parallel pulls to cover unmet demand — this is what lets a
-      // downstream `concurrent(n)` evaluate the shared source n-wide.
-      while (!s.done &&
-          settlementQueue.length > (s.buffer.length - i) + s.pullsInFlight) {
-        s.pull(concurrent);
-      }
+      pullToMeetDemand(concurrent);
       return completer.future;
     });
   });
