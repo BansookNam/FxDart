@@ -1,3 +1,5 @@
+<img src="https://raw.githubusercontent.com/BansookNam/FxDart/main/docs/assets/logo-web.png" alt="FxDart" width="380">
+
 # fxdart
 
 A functional programming library for Dart, ported from **[FxTS](https://github.com/marpple/FxTS)**.
@@ -6,7 +8,7 @@ programming model, rebuilt on Dart's type system.
 
 [![Version](https://img.shields.io/pub/v/fxdart.svg?style=flat-square)](https://pub.dev/packages/fxdart)
 
-**📚 Interactive docs: [FxDart 101](https://bansooknam.github.io/fxDart/)** — a
+**📚 Interactive docs: [FxDart 101](https://bansooknam.github.io/FxDart/)** — a
 guided course with a live in-browser playground for every function (served from
 this repo's `docs/` folder via GitHub Pages).
 

@@ -65,6 +65,12 @@ a { color: var(--accent-strong); }
 p, li { color: var(--text); }
 .dim { color: var(--text-dim); }
 .hero-sub { font-size: 1.15rem; color: var(--text-dim); max-width: 46rem; }
+.hero-logo { margin: 1rem 0 0; }
+.hero-logo img { display: block; width: 100%; max-width: 400px; height: auto; }
+/* the wordmark is dark navy on a light rim; lift it slightly on dark backgrounds */
+@media (prefers-color-scheme: dark) {
+  .hero-logo img { filter: brightness(1.18) saturate(1.05); }
+}
 
 /* code */
 code {
