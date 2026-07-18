@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>pickBy — FxDart 101</title>
+  <meta name="description" content="FxDart pickBy tutorial: keep only Map entries matching a (key, value) predicate.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 9 · Object (Map) functions › <strong>pickBy</strong></p>
+  <h1><code>pickBy</code></h1>
+  <p class="hero-sub">Returns a copy of a <code>Map</code> with only the entries matching a predicate.</p>
+
+  <div class="signature">Map&lt;K, V&gt; pickBy&lt;K, V&gt;(bool Function((K, V) entry) f, Map&lt;K, V&gt; map)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>pickBy</code> is <code>omitBy</code>'s mirror, and shares its
+    calling convention: the predicate receives one <code>(K, V)</code>
+    record per entry, so use <code>e.$1</code> for the key and
+    <code>e.$2</code> for the value. Only entries where the predicate
+    returns <code>true</code> survive into the result.
+  </p>
+  <p>
+    A common use: filtering a map of config values or feature flags down to
+    "the ones that matter right now" — active flags, keys with a given
+    prefix, values above a threshold — without hand-writing an
+    entry-by-entry loop.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final scores = {'alice': 92, 'bob': 41, 'carol': 78};
+  print(pickBy((e) => e.$2 >= 60, scores)); // {alice: 92, carol: 78}
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Filtering by key</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final env = {'API_KEY': 'x', 'API_URL': 'y', 'DEBUG': 'true'};
+
+  final apiOnly = pickBy((e) => e.$1.startsWith('API_'), env);
+  print(apiOnly); // {API_KEY: x, API_URL: y}
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>pickBy</code> to keep only entries whose value is <code>true</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final flags = {'featureA': true, 'featureB': false, 'featureC': true};
+
+  // TODO: use pickBy to keep only entries whose value is true
+  final enabledOnly = flags;
+
+  print(enabledOnly);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="omitBy.html"><code>omitBy</code></a> — the inverse: drop by predicate ·
+    <a href="pick.html"><code>pick</code></a> — keep by a fixed key list ·
+    <a href="matches.html"><code>matches</code></a> — a ready-made predicate for shape matching ·
+    <a href="compactObject.html"><code>compactObject</code></a> — a specialized "drop nulls" pickBy
+  </div>
+
+  <nav class="tut-nav">
+    <a href="omitBy.html">← Prev: omitBy</a>
+    <a href="prop.html">Next: prop →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

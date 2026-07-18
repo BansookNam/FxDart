@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>toArray — FxDart 101</title>
+  <meta name="description" content="FxDart toArray tutorial: the terminal operator that materializes a lazy chain into a List, sync and async.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 1 · Getting started › <strong>toArray</strong></p>
+  <h1><code>toArray</code></h1>
+  <p class="hero-sub">Materializes a lazy iterable — pulling every value and collecting them into a List.</p>
+
+  <div class="signature">List&lt;A&gt; toArray&lt;A&gt;(Iterable&lt;A&gt; iterable)
+Future&lt;List&lt;A&gt;&gt; toArrayAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+List&lt;T&gt; Fx.toArray()        // chain
+Future&lt;List&lt;T&gt;&gt; FxAsync.toArray()</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>toArray</code> is the workhorse <strong>terminal operator</strong>:
+    it's what actually runs a chain that was, until this point, nothing but
+    a plan. Calling <code>.toArray()</code> pulls every remaining value out
+    of the iterable, in order, and collects them into a real
+    <code>List&lt;T&gt;</code>. Everything upstream — every <code>.map()</code>,
+    <code>.filter()</code>, <code>.take()</code> — only runs because
+    <code>toArray</code> asked for values.
+  </p>
+  <p>
+    That also means <code>toArray</code> is exactly the operator you must
+    <em>not</em> call directly on an infinite or unbounded source
+    (<code>range</code> with no end, <code>cycle</code>, <code>repeat</code>
+    with a huge count) — it will try to pull forever. Bound it first with
+    <code>take(n)</code>, then call <code>toArray</code> on the bounded
+    result.
+  </p>
+  <p>
+    The async version, <code>toArrayAsync</code> (or <code>.toArray()</code>
+    on an <code>FxAsync</code> chain), awaits each element as it's pulled
+    and returns a <code>Future&lt;List&lt;T&gt;&gt;</code>. Combined with
+    <code>.concurrent(n)</code> upstream, the individual awaits can overlap
+    even though the final list still comes back in the original order.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; laziness</h2>
+  <p>Note how <code>map</code> only actually runs for the 3 values that
+    <code>take(3)</code> allows through — out of a million:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form:
+  print(toArray(map((a) => a * 2, [1, 2, 3]))); // [2, 4, 6]
+
+  // Chain form: toArray() is the terminal op that finally pulls values.
+  var calls = 0;
+  final result = fx(range(1000000))
+      .map((a) {
+        calls++;
+        return a;
+      })
+      .take(3)
+      .toArray();
+
+  print(result);       // [0, 1, 2]
+  print('calls: $calls'); // 3 — toArray only pulled what take(3) allowed
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with concurrency</h2>
+  <p>
+    <code>.toArray()</code> on an <code>FxAsync</code> chain awaits every
+    element and hands back the whole list at once; add
+    <code>.concurrent(n)</code> upstream to overlap the individual waits:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  // toArrayAsync / .toArray() awaits every element, then hands back a List.
+  final result = await fx([1, 2, 3, 4])
+      .toAsync()
+      .map((a) => delay(const Duration(milliseconds: 100), a * 10))
+      .concurrent(4)
+      .toArray();
+
+  print(result); // [10, 20, 30, 40]
+  print(sw.elapsedMilliseconds < 300); // true — ran concurrently
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: materialize the first 4 squares of a huge range into a List.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // TODO: materialize the first 4 squares of range(100) into a List.
+  final squares = fx(range(100)).map((a) => a * a).take(4).toArray();
+
+  print(squares); // [0, 1, 4, 9]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="each.html"><code>each</code></a> — terminal op for side effects instead of a List ·
+    <a href="consume.html"><code>consume</code></a> — terminal op that discards results entirely ·
+    <a href="fx.html"><code>fx</code></a> — the chain that toArray terminates ·
+    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
+  </div>
+
+  <nav class="tut-nav">
+    <a href="pipe1.html">← Prev: pipe1</a>
+    <a href="each.html">Next: each →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

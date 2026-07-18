@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>takeRight — FxDart 101</title>
+  <meta name="description" content="FxDart takeRight tutorial: keep only the last n values of a finite iterable, with a live playground.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 5 · Slicing › <strong>takeRight</strong></p>
+  <h1><code>takeRight</code></h1>
+  <p class="hero-sub">Returns a lazy iterable of the last <code>length</code> values from a source.</p>
+
+  <div class="signature">Iterable&lt;A&gt; takeRight&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; takeRightAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.takeRight(int count)        // chain
+FxAsync&lt;T&gt; FxAsync.takeRight(int count)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>takeRight</code> is <code>take</code>'s mirror image: instead of
+    the first <code>length</code> values, you get the last ones. There's a
+    catch, though — to know what the "last" values are, <code>takeRight</code>
+    has to see every element first. It <strong>materializes</strong> the
+    whole source into a list internally before yielding anything, so unlike
+    most FxDart operators it does not work on infinite sequences.
+  </p>
+  <p>
+    The async version has the same constraint: <code>takeRightAsync</code>
+    drains the entire upstream (awaiting every element) before it can hand
+    back the tail. Reach for it only when you know the source is finite and
+    small enough to buffer.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(takeRight(3, [1, 2, 3, 4, 5, 6])); // (4, 5, 6)
+
+  // Chain form:
+  final result = fx([10, 20, 30, 40]).takeRight(2).toArray();
+  print(result); // [30, 40]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async (must buffer the whole source first)</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // takeRight must see the whole source before it can know the last N —
+  // it materializes it first, so it only works on finite async sources.
+  final result = await fx([1, 2, 3, 4, 5])
+      .toAsync()
+      .map((a) => delay(Duration(milliseconds: 50), a * a))
+      .takeRight(2)
+      .toArray();
+
+  print(result); // [16, 25]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: keep only the last 3 scores.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final scores = [55, 61, 70, 82, 90, 95];
+
+  // TODO: keep only the last 3 scores
+  final recent = fx(scores).toArray();
+
+  print(recent);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="take.html"><code>take</code></a> — first n instead of last n ·
+    <a href="dropRight.html"><code>dropRight</code></a> — drop the last n ·
+    <a href="reverse.html"><code>reverse</code></a> — also materializes the source ·
+    <a href="slice.html"><code>slice</code></a> — arbitrary index window
+  </div>
+
+  <nav class="tut-nav">
+    <a href="take.html">← Previous: take</a>
+    <a href="takeWhile.html">Next: takeWhile →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

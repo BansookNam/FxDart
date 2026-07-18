@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>apply — FxDart 101</title>
+  <meta name="description" content="FxDart apply tutorial: invoke a function with arguments collected in a List, with a live playground.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 10 · Function utilities › <strong>apply</strong></p>
+  <h1><code>apply</code></h1>
+  <p class="hero-sub">Calls a function with a List of arguments as its positional parameters.</p>
+
+  <div class="signature">R apply&lt;R&gt;(Function f, List&lt;Object?&gt; args)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>apply</code> exists for the moments when the arguments to a call
+    aren't sitting in separate variables — they're already collected in a
+    <code>List</code> (parsed from input, gathered from a config, produced by
+    <a href="juxt.html"><code>juxt</code></a>) and you need to invoke an
+    arbitrary function with them. Under the hood it's a thin wrapper over
+    Dart's own <code>Function.apply</code>, with the result cast to <code>R</code>.
+  </p>
+  <p>
+    Because <code>f</code> is typed as the bare <code>Function</code>,
+    <code>apply</code> is inherently dynamic — Dart can't check the argument
+    count or types against <code>f</code>'s signature at compile time, only at
+    runtime. Reach for it only when you genuinely have a dynamic arg list;
+    for anything else, call the function directly.
+  </p>
+  <p>
+    A related but separate concern is <em>currying</em> — pre-filling some
+    arguments of a function ahead of time. FxTS has a fully generic
+    <code>curry</code>; Dart's type system has no equivalent for arbitrary
+    arities, so FxDart ships only a
+    <code>@Deprecated</code> two-argument <code>curry</code> stub as a
+    migration aid. Prefer writing the closure yourself:
+    <code>(b) => f(a, b)</code>.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+int add3(int a, int b, int c) => a + b + c;
+
+void main() {
+  print(apply<int>(add3, [1, 2, 3])); // 6
+
+  // deprecated curry stub — prefer a closure like (b) => f(a, b)
+  // ignore: deprecated_member_use
+  final addCurried = curry((int a, int b) => a + b);
+  print(addCurried(2)(3)); // 5
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Dispatching dynamic calls</h2>
+  <p>
+    A small command dispatcher, where each handler has a different arity and
+    the arguments arrive as a runtime <code>List</code>:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final handlers = <String, Function>{
+    'sum': (int a, int b) => a + b,
+    'shout': (String s) => s.toUpperCase(),
+  };
+
+  final calls = [
+    ('sum', [1, 2]),
+    ('shout', ['hi']),
+  ];
+
+  for (final (name, args) in calls) {
+    print(apply(handlers[name]!, args));
+  }
+  // 3
+  // HI
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: call <code>greet</code> below using <code>apply</code> with the
+    argument list <code>['Kim', 'Hello']</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+String greet(String name, String greeting) => '$greeting, $name!';
+
+void main() {
+  // TODO: call greet with these args using apply
+  final message = apply<String>(greet, ['Kim', 'Hello']);
+
+  print(message); // Hello, Kim!
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="juxt.html"><code>juxt</code></a> — often the source of a dynamic arg list ·
+    <a href="tap.html"><code>tap</code></a> — run a side effect without changing the value ·
+    <a href="cases.html"><code>cases</code></a> — dispatch on predicates instead of a name ·
+    <a href="pipe.html"><code>pipe</code></a> — dynamic composition, same trade-off as apply
+  </div>
+
+  <nav class="tut-nav">
+    <a href="tap.html">← Previous: tap</a>
+    <a href="juxt.html">Next: juxt →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

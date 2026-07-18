@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>add — FxDart 101</title>
+  <meta name="description" content="FxDart add tutorial: a generic + as a function value, usable as a reducer, with a live playground.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 10 · Function utilities › <strong>add</strong></p>
+  <h1><code>add</code></h1>
+  <p class="hero-sub">Adds two values of the same type, as a function you can pass around.</p>
+
+  <div class="signature">T add&lt;T extends Object&gt;(T a, T b) => (a as dynamic) + b as T;</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>add(a, b)</code> is <code>+</code> packaged as a function value.
+    Since it dispatches to <code>+</code> dynamically, it works for anything
+    that supports the operator — <code>num</code>, <code>String</code>
+    concatenation, even <code>List</code> concatenation — mirroring FxTS's
+    <code>add</code>, which accepts both numbers and strings.
+  </p>
+  <p>
+    Its real value shows up wherever an API wants a binary
+    <code>(T, T) -&gt; T</code> function rather than an inline
+    <code>(a, b) =&gt; a + b</code> — most naturally as the combining
+    function for <code>reduce</code>/<code>fold</code>. It's a binary
+    function though, so to use it as a unary <code>map</code> callback
+    (adding a fixed amount to every element) you close over one side
+    yourself: <code>(b) =&gt; add(n, b)</code>.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(add(2, 3));         // 5
+  print(add('foo', 'bar')); // foobar
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · As a reducer, and closed over for map</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // add as a reducer
+  print(fx([1, 2, 3, 4]).reduce(add)); // 10
+
+  // add closed over for use as a unary map callback
+  int Function(int) plus(int n) => (b) => add(n, b);
+  print(fx([1, 2, 3]).map(plus(10)).toArray()); // [11, 12, 13]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>fold</code> + <code>add</code> to concatenate all
+    the parts into one string.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final parts = ['foo', 'bar', 'baz'];
+
+  // TODO: use fold + add to concatenate all the parts into one string
+  final joined = fold('', add, parts);
+
+  print(joined); // foobarbaz
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="reduce.html"><code>reduce</code></a> / <a href="fold.html"><code>fold</code></a> — the usual home for add as a combiner ·
+    <a href="sum.html"><code>sum</code></a> — a ready-made sum for Iterable&lt;num&gt; ·
+    <a href="comparisons.html"><code>gt · gte · lt · lte</code></a> — the comparison counterparts to add ·
+    <a href="apply.html"><code>apply</code></a> — call any function with a dynamic argument list
+  </div>
+
+  <nav class="tut-nav">
+    <a href="cases.html">← Previous: cases</a>
+    <a href="comparisons.html">Next: gt · gte · lt · lte →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

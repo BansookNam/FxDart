@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>unicodeToArray — FxDart 101</title>
+  <meta name="description" content="FxDart unicodeToArray tutorial: split a string into user-perceived characters, correctly handling surrogate pairs like emoji.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 10 · Function utilities › <strong>unicodeToArray</strong></p>
+  <h1><code>unicodeToArray</code></h1>
+  <p class="hero-sub">Splits a string into user-perceived characters, correctly handling surrogate pairs.</p>
+
+  <div class="signature">List&lt;String&gt; unicodeToArray(String s)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    Dart <code>String</code>s are sequences of UTF-16 <em>code units</em>, not
+    characters. Calling <code>s.split('')</code> splits by code unit — fine
+    for plain ASCII/Latin text, but wrong for anything outside the Basic
+    Multilingual Plane, like most emoji: those are represented as a
+    <strong>surrogate pair</strong> (two code units), so a naive split tears
+    a single emoji into two broken halves.
+  </p>
+  <p>
+    <code>unicodeToArray</code> fixes that by iterating the string's
+    <code>.runes</code> — Unicode code points — and turning each one back
+    into its own single-character <code>String</code>. The result is the list
+    of characters a person actually sees when reading the string, matching
+    FxTS's <code>unicodeToArray</code>, which splits by code point rather than
+    UTF-16 unit.
+  </p>
+
+  <h2>Demo 1 · Naive split vs. unicodeToArray</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final s = 'a👍b';
+  print(s.split('').length);     // 4 — naive split breaks the emoji apart
+  print(unicodeToArray(s));      // [a, 👍, b]
+  print(unicodeToArray(s).length); // 3 — correct character count
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Reversing and counting correctly</h2>
+  <p>
+    Building on <code>unicodeToArray</code>, a naive-split reverse would
+    mangle the emoji; this one doesn't:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+String reverseUnicode(String s) => unicodeToArray(s).reversed.join();
+
+void main() {
+  print(reverseUnicode('a👍b')); // b👍a
+
+  final counts = countBy(identity, unicodeToArray('aabb👍👍'));
+  print(counts); // {a: 2, b: 2, 👍: 2}
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: count how many user-perceived characters are in this string
+    (it contains an emoji).</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final s = 'go🚀go';
+
+  // TODO: count how many user-perceived characters are in `s`
+  final count = unicodeToArray(s).length;
+
+  print(count); // 5
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="split.html"><code>split</code></a> — split on a plain char iterable ·
+    <a href="reverse.html"><code>reverse</code></a> — reverse an Iterable, same surrogate-pair care applies to strings ·
+    <a href="countBy.html"><code>countBy</code></a> — used above to tally characters ·
+    <a href="identity.html"><code>identity</code></a> — used above as the counting key
+  </div>
+
+  <nav class="tut-nav">
+    <a href="delay.html">← Previous: delay &amp; sleep</a>
+    <a href="toAsync.html">Next: toAsync →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

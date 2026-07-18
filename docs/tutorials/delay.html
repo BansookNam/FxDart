@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>delay &amp; sleep — FxDart 101</title>
+  <meta name="description" content="FxDart delay and sleep tutorial: the two building blocks every async demo on this site is built from, with a live playground.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 10 · Function utilities › <strong>delay &amp; sleep</strong></p>
+  <h1><code>delay</code> &amp; <code>sleep</code></h1>
+  <p class="hero-sub">Wait for a bit, then produce a value (delay) — or just wait (sleep).</p>
+
+  <div class="signature">Future&lt;T&gt; delay&lt;T&gt;(Duration wait, T value)
+Future&lt;void&gt; sleep(Duration wait)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>delay(wait, value)</code> returns a <code>Future</code> that
+    completes with <code>value</code> after <code>wait</code> has elapsed.
+    <code>sleep(wait)</code> is the same idea with nothing to return — it
+    just completes after the duration. Both are thin wrappers over
+    <code>Future.delayed</code>, and both are exactly what you'd reach for to
+    simulate a slow operation: a network call, a database query, anything
+    that takes time and eventually produces (or doesn't produce) a result.
+  </p>
+  <p>
+    These two functions are the backbone of nearly every async demo across
+    this whole tutorial site. Whenever you see <code>mapAsync</code>,
+    <code>concurrent</code>, <code>debounce</code>, or <code>throttle</code>
+    demonstrated with a <code>Stopwatch</code> proving something ran in
+    parallel or was rate-limited, it's <code>delay</code> or <code>sleep</code>
+    doing the actual waiting under the hood.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+  final v = await delay(Duration(milliseconds: 150), 'done');
+  print(v); // done
+  print(sw.elapsedMilliseconds >= 150); // true
+
+  await sleep(Duration(milliseconds: 50));
+  print('after sleep'); // after sleep
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Simulating concurrent work</h2>
+  <p>
+    Three "requests" each take 150ms, but run concurrently — the whole batch
+    still finishes in well under 450ms:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  final result = await fx([1, 2, 3])
+      .toAsync()
+      .map((n) => delay(Duration(milliseconds: 150), n * 10))
+      .concurrent(3)
+      .toArray();
+
+  print(result); // [10, 20, 30]
+  print('took < 300ms: ${sw.elapsedMilliseconds < 300}'); // true
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>delay</code> to simulate a 100ms "fetch" that
+    returns <code>'pong'</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // TODO: use delay to simulate a 100ms fetch that returns 'pong'
+  final response = await delay(Duration(milliseconds: 100), 'pong');
+
+  print(response); // pong
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="memoize.html"><code>memoize</code></a> — caches a delayed Future so it only waits once ·
+    <a href="concurrent.html"><code>concurrent</code></a> — run multiple delays in parallel ·
+    <a href="debounce.html"><code>debounce</code></a> / <a href="throttle.html"><code>throttle</code></a> — rate-limiting built on top of waiting ·
+    <a href="toAsync.html"><code>toAsync</code></a> — turn a plain Iterable into an async pipeline
+  </div>
+
+  <nav class="tut-nav">
+    <a href="comparisons.html">← Previous: gt · gte · lt · lte</a>
+    <a href="unicodeToArray.html">Next: unicodeToArray →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

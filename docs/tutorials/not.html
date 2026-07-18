@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>not — FxDart 101</title>
+  <meta name="description" content="FxDart not tutorial: boolean negation as a function value you can pass around, with a live playground.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 10 · Function utilities › <strong>not</strong></p>
+  <h1><code>not</code></h1>
+  <p class="hero-sub">Boolean negation as a function you can pass around.</p>
+
+  <div class="signature">bool not(bool a) => !a;</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>not</code> does exactly what <code>!a</code> does — it just does it
+    as a first-class function, so it can be passed where a
+    <code>bool Function(bool)</code> is expected instead of you writing
+    <code>(b) =&gt; !b</code> yourself. FxTS's <code>not</code> works on
+    JavaScript "truthy" values of any type; Dart has no implicit truthiness,
+    so the Dart port only accepts an actual <code>bool</code>.
+  </p>
+  <p>
+    Because its signature is <code>bool -&gt; bool</code>, <code>not</code>
+    doubles as a predicate itself wherever the element type is already
+    <code>bool</code> — see <code>some</code>/<code>every</code> in Demo 2.
+    For negating an arbitrary predicate over some other type, use
+    <a href="negate.html"><code>negate</code></a> instead.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(not(true));  // false
+  print(not(false)); // true
+
+  print(fx([true, false, true]).map(not).toArray()); // [false, true, false]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · As a predicate over booleans</h2>
+  <p>
+    <code>not</code> is itself a <code>bool Function(bool)</code>, so it
+    plugs straight into <code>some</code>/<code>every</code> without wrapping:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final flags = [true, true, false];
+
+  print(fx(flags).some(not));  // true - at least one flag is off
+  print(fx(flags).every(not)); // false - not all flags are off
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>not</code> to build the list of "still pending"
+    flags from a list of "done" flags.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final done = [true, false, false, true];
+
+  // TODO: use `not` to build the "still pending" flags
+  final pending = fx(done).map(not).toArray();
+
+  print(pending); // [false, true, true, false]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="negate.html"><code>negate</code></a> — negate a whole predicate function, not just a bool ·
+    <a href="some.html"><code>some</code></a> / <a href="every.html"><code>every</code></a> — used with not above ·
+    <a href="when.html"><code>when</code></a> — conditional transform ·
+    <a href="unless.html"><code>unless</code></a> — the inverse-condition sibling of when
+  </div>
+
+  <nav class="tut-nav">
+    <a href="negate.html">← Previous: negate</a>
+    <a href="when.html">Next: when →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

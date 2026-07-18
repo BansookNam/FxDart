@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>slice — FxDart 101</title>
+  <meta name="description" content="FxDart slice tutorial: pull an index window [start, end) out of an iterable, with a live playground.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 5 · Slicing › <strong>slice</strong></p>
+  <h1><code>slice</code></h1>
+  <p class="hero-sub">Returns the values between index <code>start</code> (inclusive) and <code>end</code> (exclusive).</p>
+
+  <div class="signature">Iterable&lt;A&gt; slice&lt;A&gt;(int start, Iterable&lt;A&gt; iterable, [int? end])
+FxAsyncIterable&lt;A&gt; sliceAsync&lt;A&gt;(int start, FxAsyncIterable&lt;A&gt; iterable, [int? end])
+Fx&lt;T&gt; Fx.slice(int start, [int? end])        // chain
+FxAsync&lt;T&gt; FxAsync.slice(int start, [int? end])</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>slice</code> is a general index window: it yields the elements
+    whose position falls in <code>[start, end)</code>, and omitting
+    <code>end</code> means "to the end of the source". It's a single
+    operator that subsumes both <code>drop</code> (via <code>start</code>)
+    and <code>take</code> (via <code>end</code>) at once.
+  </p>
+  <p>
+    Watch the argument order in the data-first form — unlike most FxDart
+    functions, the <code>iterable</code> sits in the <strong>middle</strong>:
+    <code>slice(start, iterable, [end])</code>, mirroring FxTS. The chain
+    form doesn't have this quirk, since the iterable is the receiver:
+    <code>fx(iterable).slice(start, end)</code>. Under the hood
+    <code>slice</code> is still just walking the source once and counting
+    indices, so it stays lazy and works fine on an infinite source as long
+    as you supply an <code>end</code>.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; argument order</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Note the argument order: the iterable sits in the MIDDLE.
+  print(slice(2, [10, 20, 30, 40, 50], 4)); // (30, 40)
+
+  // Omit `end` to take everything from `start` onward:
+  print(slice(2, [10, 20, 30, 40, 50])); // (30, 40, 50)
+
+  // Chain form takes only start/end (the receiver is the iterable):
+  final result = fx([10, 20, 30, 40, 50]).slice(1, 3).toArray();
+  print(result); // [20, 30]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final result = await fx([10, 20, 30, 40, 50])
+      .toAsync()
+      .map((a) => delay(Duration(milliseconds: 50), a))
+      .slice(1, 4)
+      .toArray();
+
+  print(result); // [20, 30, 40]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>slice</code> to grab the window from index 2 up to
+    (not including) index 5.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final letters = ['a', 'b', 'c', 'd', 'e', 'f'];
+
+  // TODO: use slice to grab the window from index 2 up to (not including) 5
+  final window = fx(letters).toArray();
+
+  print(window);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="drop.html"><code>drop</code></a> — just the start-index half of slice ·
+    <a href="take.html"><code>take</code></a> — just the count/end half of slice ·
+    <a href="chunk.html"><code>chunk</code></a> — fixed-size windows across the whole source
+  </div>
+
+  <nav class="tut-nav">
+    <a href="dropUntil.html">← Previous: dropUntil</a>
+    <a href="chunk.html">Next: chunk →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

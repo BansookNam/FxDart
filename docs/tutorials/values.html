@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>values — FxDart 101</title>
+  <meta name="description" content="FxDart values tutorial: a lazy Iterable of a Map's values, ready to feed into a chain.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 2 · Generating sequences › <strong>values</strong></p>
+  <h1><code>values</code></h1>
+  <p class="hero-sub">The values of a Map, as a plain lazy Iterable — ready to wrap in fx() and chain.</p>
+
+  <div class="signature">Iterable&lt;V&gt; values&lt;K, V&gt;(Map&lt;K, V&gt; map)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>values(map)</code> is <code>keys</code>'s twin: a thin wrapper
+    around Dart's <code>map.values</code>, given a name consistent with the
+    rest of the object-function vocabulary so it reads naturally as
+    <code>fx(values(map))</code> next to <code>fx(keys(map))</code> and
+    <code>fx(entries(map))</code>. Like <code>map.values</code> itself,
+    it's already a lazy view — no extra buffering happens.
+  </p>
+  <p>
+    Because it hands back a plain <code>Iterable&lt;V&gt;</code>, every
+    chain operator you've learned so far applies directly — including the
+    numeric terminals (<code>sum()</code>, <code>average()</code>,
+    <code>min()</code>, <code>max()</code>) when <code>V</code> is a
+    <code>num</code>. This makes <code>values</code> the natural entry
+    point for aggregating a Map's data: total up prices, average scores,
+    find the newest timestamp, and so on.
+  </p>
+  <p>
+    This is also the last stop before <code>map</code> itself — the next
+    lesson, and the operator you'll reach for constantly from here on to
+    reshape whatever <code>values</code>, <code>entries</code>, or any
+    other source hands you.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final ages = {'kim': 32, 'lee': 27, 'park': 41};
+
+  print(toArray(values(ages))); // [32, 27, 41]
+
+  // Chain form + the Fx<num> numeric terminals:
+  final oldest = fx(values(ages)).max();
+  print(oldest); // 41
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Aggregating a Map's values</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // values() gives a plain lazy Iterable<V>, so it composes with the same
+  // chain operators as any other sequence — here, total revenue in stock.
+  final stock = {'apples': 4, 'bananas': 0, 'cherries': 12};
+  final prices = {'apples': 1.5, 'bananas': 0.5, 'cherries': 2.0};
+
+  final unitsInStock = fx(values(stock)).filter((n) => n > 0).toArray();
+  print(unitsInStock); // [4, 12]
+
+  final total = fx(entries(prices))
+      .map((e) => e.$2 * (stock[e.$1] ?? 0))
+      .sum();
+  print(total); // 30.0
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>values</code> to compute the average score.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final scores = {'kim': 88, 'lee': 42, 'park': 95};
+
+  // TODO: use values() to compute the average score.
+  final avg = fx(values(scores)).average();
+
+  print(avg); // 75.0
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="keys.html"><code>keys</code></a> — the keys of a Map ·
+    <a href="entries.html"><code>entries</code></a> — keys and values paired together ·
+    <a href="map.html"><code>map</code></a> — reshape every value in a chain ·
+    <a href="sum.html"><code>sum · average · min · max</code></a> — the numeric terminals used above
+  </div>
+
+  <nav class="tut-nav">
+    <a href="keys.html">← Prev: keys</a>
+    <a href="map.html">Next: map →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

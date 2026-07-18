@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>reject — FxDart 101</title>
+  <meta name="description" content="FxDart reject tutorial: the exact opposite of filter, with a live playground.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 4 · Filtering &amp; deduplication › <strong>reject</strong></p>
+  <h1><code>reject</code></h1>
+  <p class="hero-sub">Keeps every element a predicate returns false for — the mirror image of filter.</p>
+
+  <div class="signature">Iterable&lt;A&gt; reject&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; rejectAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.reject(bool Function(T a) f)        // chain
+FxAsync&lt;T&gt; FxAsync.reject(FutureOr&lt;bool&gt; Function(T a) f)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>reject</code> is implemented as
+    <code>filter((a) =&gt; !f(a), iterable)</code> — it exists purely for
+    readability. <code>list.reject(isInvalid)</code> reads more naturally
+    than <code>list.filter((a) =&gt; !isInvalid(a))</code>, especially once
+    the predicate already has a clear, positive name. Pick whichever of
+    <code>filter</code>/<code>reject</code> lets you avoid writing a
+    negation at the call site.
+  </p>
+  <p>
+    Everything about <code>filter</code>'s behavior carries over unchanged:
+    it's lazy, and the async form inherits <code>filterAsync</code>'s
+    dedicated concurrent path, so <code>.concurrent(n)</code> genuinely
+    evaluates <code>n</code> predicates in parallel while still returning
+    results in original order.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form: reject keeps everything filter would drop.
+  print(toArray(reject((a) => a % 2 == 0, [0, 1, 2, 3, 4, 5, 6])));
+  // [1, 3, 5]
+
+  // Chain form:
+  final result = fx(['ok', 'error', 'ok', 'timeout'])
+      .reject((s) => s == 'ok')
+      .toArray();
+  print(result); // [error, timeout]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with concurrency</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  // rejectAsync delegates to filterAsync's concurrent predicate evaluation.
+  final result = await fx([1, 2, 3, 4, 5, 6])
+      .toAsync()
+      .reject((a) async {
+        await delay(Duration(milliseconds: 150), null);
+        return a.isEven;
+      })
+      .concurrent(3)
+      .toArray();
+
+  print(result); // [1, 3, 5]
+  print('took ${sw.elapsedMilliseconds}ms'); // ~300ms, not ~900ms
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>reject</code> to drop the <code>'info: ok'</code>
+    lines, keeping only the errors.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final logs = ['info: ok', 'error: disk full', 'info: ok', 'error: timeout'];
+
+  // TODO: use reject to drop the 'info: ok' lines, keeping only the errors.
+  final errors = fx(logs).toArray();
+
+  print(errors);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="filter.html"><code>filter</code></a> — the function reject delegates to ·
+    <a href="compact.html"><code>compact</code></a> — reject nulls specifically ·
+    <a href="uniq.html"><code>uniq</code></a> — remove duplicates ·
+    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
+  </div>
+
+  <nav class="tut-nav">
+    <a href="filter.html">← Previous: filter</a>
+    <a href="compact.html">Next: compact →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>fromEntries — FxDart 101</title>
+  <meta name="description" content="FxDart fromEntries tutorial: build a Map from (key, value) record entries, the inverse of entries().">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 9 · Object (Map) functions › <strong>fromEntries</strong></p>
+  <h1><code>fromEntries</code></h1>
+  <p class="hero-sub">Builds a <code>Map</code> from an iterable of <code>(key, value)</code> records.</p>
+
+  <div class="signature">Map&lt;K, V&gt; fromEntries&lt;K, V&gt;(Iterable&lt;(K, V)&gt; entries)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    This section ports FxTS's object utilities, and the first thing to
+    understand is the mapping: TypeScript's plain objects become Dart
+    <code>Map</code>s throughout, and TS's <code>[key, value]</code> entry
+    tuples become Dart <code>(K, V)</code> records. <code>fromEntries</code>
+    is the constructor side of that: give it any iterable of records and it
+    folds them into a <code>Map</code>, last-write-wins on duplicate keys —
+    exactly like building the map by hand with a loop.
+  </p>
+  <p>
+    It's the natural partner of <a href="entries.html"><code>entries</code></a>
+    (which does the reverse: <code>Map</code> → records) and pairs nicely
+    with <a href="zip.html"><code>zip</code></a>, which turns two parallel
+    lists into exactly the record shape <code>fromEntries</code> wants.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final map = fromEntries([('a', 1), ('b', 2), ('c', 3)]);
+  print(map); // {a: 1, b: 2, c: 3}
+
+  final keys = ['x', 'y', 'z'];
+  final values = [10, 20, 30];
+  print(fromEntries(zip(keys, values))); // {x: 10, y: 20, z: 30}
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Duplicate keys, and round-tripping with <code>entries</code></h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final map = fromEntries([('a', 1), ('a', 2), ('b', 3)]);
+  print(map); // {a: 2, b: 3} — later entries win when keys repeat
+
+  final source = {'name': 'kim', 'age': 32, 'city': 'seoul'};
+  final onlyStrings =
+      fromEntries(filter((e) => e.$2 is String, entries(source)));
+  print(onlyStrings); // {name: kim, city: seoul}
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>fromEntries</code> to turn <code>pairs</code> into a <code>Map</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final pairs = [('id', 101), ('active', 1)];
+
+  // TODO: use fromEntries to turn `pairs` into a Map
+  final Map<String, int> record = {};
+
+  print(record);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="entries.html"><code>entries</code></a> — the reverse direction ·
+    <a href="zip.html"><code>zip</code></a> — build entries from two parallel lists ·
+    <a href="omit.html"><code>omit</code></a> — drop keys from the resulting Map ·
+    <a href="pick.html"><code>pick</code></a> — keep only some keys
+  </div>
+
+  <nav class="tut-nav">
+    <a href="predicates.html">← Prev: predicates</a>
+    <a href="omit.html">Next: omit →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

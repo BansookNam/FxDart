@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>omit — FxDart 101</title>
+  <meta name="description" content="FxDart omit tutorial: return a copy of a Map without the given keys, leaving the original untouched.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 9 · Object (Map) functions › <strong>omit</strong></p>
+  <h1><code>omit</code></h1>
+  <p class="hero-sub">Returns a copy of a <code>Map</code> without the given keys.</p>
+
+  <div class="signature">Map&lt;K, V&gt; omit&lt;K, V&gt;(Iterable&lt;K&gt; keysToOmit, Map&lt;K, V&gt; map)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>omit</code> builds a brand-new <code>Map</code> containing every
+    entry of the original <em>except</em> the keys you list — the source
+    map is never mutated. Keys in <code>keysToOmit</code> that don't
+    actually exist in the map are simply ignored; there's no error for
+    "extra" keys to remove.
+  </p>
+  <p>
+    It's a common redaction/serialization tool: strip a password hash before
+    logging a user object, drop an internal field before sending a response,
+    and so on. Pair it with <code>map()</code> to redact a whole list of
+    maps at once.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final user = {'id': 1, 'name': 'kim', 'password': 'secret'};
+  print(omit(['password'], user)); // {id: 1, name: kim}
+  print(user); // {id: 1, name: kim, password: secret} — original untouched
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Redacting a whole list</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final users = [
+    {'id': 1, 'name': 'kim', 'ssn': '111-11'},
+    {'id': 2, 'name': 'lee', 'ssn': '222-22'},
+  ];
+
+  final redacted = fx(users).map((u) => omit(['ssn'], u)).toArray();
+  print(redacted); // [{id: 1, name: kim}, {id: 2, name: lee}]
+
+  // Omitting a key that doesn't exist is a no-op:
+  print(omit(['nickname'], users[0])); // {id: 1, name: kim, ssn: 111-11}
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>omit</code> to drop the <code>'debug'</code> key from <code>config</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final config = {'host': 'localhost', 'port': 8080, 'debug': true};
+
+  // TODO: use omit to drop the 'debug' key
+  final publicConfig = config;
+
+  print(publicConfig);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="pick.html"><code>pick</code></a> — the inverse: keep only some keys ·
+    <a href="omitBy.html"><code>omitBy</code></a> — drop by predicate instead of key list ·
+    <a href="compactObject.html"><code>compactObject</code></a> — drop null-valued keys ·
+    <a href="fromEntries.html"><code>fromEntries</code></a> — build a Map from scratch
+  </div>
+
+  <nav class="tut-nav">
+    <a href="fromEntries.html">← Prev: fromEntries</a>
+    <a href="pick.html">Next: pick →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

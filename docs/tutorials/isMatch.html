@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>isMatch — FxDart 101</title>
+  <meta name="description" content="FxDart isMatch tutorial: deep partial matching against a Map or list pattern.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 9 · Object (Map) functions › <strong>isMatch</strong></p>
+  <h1><code>isMatch</code></h1>
+  <p class="hero-sub">Deep partial match: does <code>target</code> contain everything described by <code>pattern</code>?</p>
+
+  <div class="signature">bool isMatch(Object? target, Object? pattern)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>isMatch</code> recurses through <code>pattern</code> and checks
+    that <code>target</code> "contains" it, with different rules per shape:
+  </p>
+  <p>
+    <strong>Maps</strong> match partially — every key in <code>pattern</code>
+    must exist in <code>target</code> with a recursively-matching value, but
+    <code>target</code> is free to have <em>extra</em> keys the pattern
+    doesn't mention. <strong>Lists/iterables</strong> match pairwise from
+    the front, and here's the twist worth remembering: the pattern only has
+    to be a <strong>prefix</strong> of the target. <code>[1, 2, 3]</code>
+    matches the pattern <code>[1, 2]</code>, but <em>not</em> the pattern
+    <code>[1, 2, 3, 4]</code> — the pattern can't be longer than the target.
+    Anything else (numbers, strings, booleans, …) is compared with plain
+    <code>==</code>.
+  </p>
+  <p>
+    Because the rules nest, you get deep matching almost for free: a
+    pattern like <code>{'address': {'city': 'seoul'}}</code> matches a user
+    map with a much larger, deeply nested <code>address</code> value, as
+    long as <code>city</code> is <code>'seoul'</code> somewhere inside it.
+  </p>
+
+  <h2>Demo 1 · Map matching</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final user = {
+    'id': 1,
+    'name': 'kim',
+    'address': {'city': 'seoul', 'zip': '100'}
+  };
+
+  print(isMatch(user, {'name': 'kim'})); // true — extra keys ignored
+  print(isMatch(user, {
+    'address': {'city': 'seoul'}
+  })); // true — nested partial match
+  print(isMatch(user, {'name': 'lee'})); // false
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · List prefix matching, and filtering with it</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  print(isMatch([1, 2, 3], [1, 2]));       // true — pattern is a prefix
+  print(isMatch([1, 2, 3], [1, 2, 3, 4])); // false — pattern longer than target
+  print(isMatch([1, 2, 3], [1, 9]));       // false — element mismatch
+
+  final events = [
+    {'type': 'click', 'x': 1},
+    {'type': 'scroll', 'y': 5},
+    {'type': 'click', 'x': 9},
+  ];
+  print(filter((e) => isMatch(e, {'type': 'click'}), events).toList());
+  // [{type: click, x: 1}, {type: click, x: 9}]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>isMatch</code> to check whether <code>order</code> matches <code>{'status': 'shipped'}</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final order = {'id': 42, 'status': 'shipped', 'total': 99.5};
+
+  // TODO: use isMatch to check whether `order` matches {'status': 'shipped'}
+  final isShipped = false;
+
+  print(isShipped);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="matches.html"><code>matches</code></a> — the curried, filter-ready version of this ·
+    <a href="pickBy.html"><code>pickBy</code></a> — often paired for shape-based filtering ·
+    <a href="find.html"><code>find</code></a> — locate the first matching element ·
+    <a href="omitBy.html"><code>omitBy</code></a> — drop entries by predicate
+  </div>
+
+  <nav class="tut-nav">
+    <a href="resolveProps.html">← Prev: resolveProps</a>
+    <a href="matches.html">Next: matches →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

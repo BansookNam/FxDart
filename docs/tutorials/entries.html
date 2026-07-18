@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>entries — FxDart 101</title>
+  <meta name="description" content="FxDart entries tutorial: turn a Map's (key, value) pairs into a lazy iterable of records, ready to chain.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 2 · Generating sequences › <strong>entries</strong></p>
+  <h1><code>entries</code></h1>
+  <p class="hero-sub">Yields a Map's (key, value) pairs as records — the entry point for chaining over a Map.</p>
+
+  <div class="signature">Iterable&lt;(K, V)&gt; entries&lt;K, V&gt;(Map&lt;K, V&gt; map)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    A Dart <code>Map</code> isn't an <code>Iterable</code> the way a
+    <code>List</code> is, so there's no <code>fx(someMap)</code> directly.
+    <code>entries</code> is the bridge: it yields each key/value pair of the
+    map as a <code>(K, V)</code> record, giving you a plain lazy
+    <code>Iterable</code> you <em>can</em> wrap with <code>fx()</code> and
+    chain like anything else. This mirrors FxTS's <code>entries</code>,
+    which does the same for a JS object.
+  </p>
+  <p>
+    Because the pairs are Dart records, you can destructure them directly
+    in a <code>for</code> loop — <code>for (final (key, value) in
+    entries(map))</code> — or access the positional fields
+    <code>.$1</code> (key) and <code>.$2</code> (value) inside a
+    <code>map</code>/<code>filter</code> callback when destructuring isn't
+    convenient.
+  </p>
+  <p>
+    <code>entries</code> is lazy like everything else here, but a
+    <code>Map</code>'s entries aren't infinite, so there's rarely a reason
+    to bound it with <code>take</code> — it's more about turning a Map into
+    something chainable than about controlling how much gets pulled.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final ages = {'kim': 32, 'lee': 27, 'park': 41};
+
+  // entries() yields (key, value) records — destructure them directly.
+  for (final (name, age) in entries(ages)) {
+    print('$name is $age');
+  }
+
+  print(toArray(entries(ages))); // [(kim, 32), (lee, 27), (park, 41)]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Chaining over a Map</h2>
+  <p>Wrap <code>entries(map)</code> with <code>fx()</code> to filter and
+    reshape a Map's contents:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // A Map isn't an Iterable itself, so wrap entries(map) with fx() to chain
+  // FxDart operators over its (key, value) pairs.
+  final inventory = {'apples': 4, 'bananas': 0, 'cherries': 12};
+
+  final inStock = fx(entries(inventory))
+      .filter((e) => e.$2 > 0)
+      .map((e) => '${e.$1}: ${e.$2}')
+      .toArray();
+
+  print(inStock); // [apples: 4, cherries: 12]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: turn a Map of scores into "name: PASS/FAIL" strings.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final scores = {'kim': 88, 'lee': 42, 'park': 95};
+
+  // TODO: turn entries(scores) into a list of "name: PASS/FAIL" strings,
+  // where >= 60 is a PASS.
+  final report = fx(entries(scores))
+      .map((e) => '${e.$1}: ${e.$2 >= 60 ? 'PASS' : 'FAIL'}')
+      .toArray();
+
+  report.forEach(print);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="keys.html"><code>keys</code></a> — just the keys of a Map ·
+    <a href="values.html"><code>values</code></a> — just the values of a Map ·
+    <a href="fromEntries.html"><code>fromEntries</code></a> — the inverse: build a Map back from pairs ·
+    <a href="fx.html"><code>fx</code></a> — the chain entries results feed into
+  </div>
+
+  <nav class="tut-nav">
+    <a href="cycle.html">← Prev: cycle</a>
+    <a href="keys.html">Next: keys →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

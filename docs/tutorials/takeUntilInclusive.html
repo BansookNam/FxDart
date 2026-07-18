@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>takeUntilInclusive — FxDart 101</title>
+  <meta name="description" content="FxDart takeUntilInclusive tutorial: take values up to and including the first match, with a live playground.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 5 · Slicing › <strong>takeUntilInclusive</strong></p>
+  <h1><code>takeUntilInclusive</code></h1>
+  <p class="hero-sub">Yields values until the predicate matches — the matching element is included.</p>
+
+  <div class="signature">Iterable&lt;A&gt; takeUntilInclusive&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; takeUntilInclusiveAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.takeUntilInclusive(bool Function(T a) f)        // chain
+FxAsync&lt;T&gt; FxAsync.takeUntilInclusive(FutureOr&lt;bool&gt; Function(T a) f)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>takeUntilInclusive</code> is <code>takeWhile</code>'s close cousin,
+    with one deliberate difference: it yields the element that made the
+    predicate true, then stops. <code>takeWhile</code> stops
+    <em>before</em> the failing element; <code>takeUntilInclusive</code>
+    stops <em>after</em> the matching one. Reach for it whenever the
+    matching element itself is part of the answer — "read the log up to and
+    including the first error", "collect steps up to and including the
+    terminator".
+  </p>
+  <p>
+    FxTS originally named this <code>takeUntil</code>; FxDart keeps
+    <code>takeUntil</code> (and <code>takeUntilAsync</code>) around as a
+    <code>@Deprecated</code> alias for source parity, but new code should
+    call <code>takeUntilInclusive</code> directly.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Unlike takeWhile, the matching element IS included:
+  print(takeUntilInclusive((a) => a == 3, [1, 2, 3, 4, 5])); // (1, 2, 3)
+
+  final result =
+      fx(['a', 'b', 'STOP', 'c']).takeUntilInclusive((a) => a == 'STOP').toArray();
+  print(result); // [a, b, STOP]
+
+  // Deprecated alias kept for FxTS parity:
+  // ignore: deprecated_member_use
+  print(takeUntil((a) => a == 3, [1, 2, 3, 4])); // (1, 2, 3)
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final result = await fx([1, 2, 3, 4, 5])
+      .toAsync()
+      .map((a) => delay(Duration(milliseconds: 50), a))
+      .takeUntilInclusive((a) => a == 3)
+      .toArray();
+
+  print(result); // [1, 2, 3]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: take the log lines up to and including the first
+    <code>'ERROR'</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final log = ['start', 'step1', 'step2', 'ERROR', 'step3'];
+
+  // TODO: take the log lines up to and including the first 'ERROR'
+  final untilError = fx(log).toArray();
+
+  print(untilError);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="takeWhile.html"><code>takeWhile</code></a> — stops before the match, excludes it ·
+    <a href="dropUntil.html"><code>dropUntil</code></a> — the drop-side counterpart ·
+    <a href="take.html"><code>take</code></a> — take by count
+  </div>
+
+  <nav class="tut-nav">
+    <a href="takeWhile.html">← Previous: takeWhile</a>
+    <a href="drop.html">Next: drop →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

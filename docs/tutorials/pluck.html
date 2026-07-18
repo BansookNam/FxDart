@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>pluck — FxDart 101</title>
+  <meta name="description" content="FxDart pluck tutorial: pull one field out of a list of maps, with a live playground.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 3 · Transforming › <strong>pluck</strong></p>
+  <h1><code>pluck</code></h1>
+  <p class="hero-sub">Extracts the value under one key from every map in an iterable — a one-liner for the common "get me just this field" query.</p>
+
+  <div class="signature">Iterable&lt;V?&gt; pluck&lt;K, V&gt;(K key, Iterable&lt;Map&lt;K, V&gt;&gt; iterable)
+FxAsyncIterable&lt;V?&gt; pluckAsync&lt;K, V&gt;(K key, FxAsyncIterable&lt;Map&lt;K, V&gt;&gt; iterable)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>pluck</code> is a tiny, named specialization of
+    <code>map</code> — literally <code>map((a) =&gt; a[key], iterable)</code>
+    under the hood. It exists because "grab one field from a list of
+    records" is common enough to deserve its own name, and reads better at
+    a call site than a one-off lambda.
+  </p>
+  <p>
+    Notice the return type is <code>Iterable&lt;V?&gt;</code>, not
+    <code>Iterable&lt;V&gt;</code>: a <code>Map</code> lookup can never
+    guarantee the key is present, so a missing key becomes <code>null</code>
+    in the result rather than throwing. If you need to drop those nulls
+    afterward, chain into <a href="compact.html"><code>compact</code></a>.
+  </p>
+  <p>
+    There is <strong>no chain method</strong> for <code>pluck</code> on
+    <code>Fx</code>/<code>FxAsync</code> — only the data-first top-level
+    function exists. Call it directly on your source, or wrap the result
+    with <code>fx(...)</code>/<code>fxAsync(...)</code> to keep chaining
+    afterward.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; missing keys</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final people = [
+    {'name': 'kim', 'age': 32},
+    {'name': 'lee', 'age': 27},
+  ];
+
+  // Data-first form. Note the result type: Iterable<Object?> here because
+  // the maps mix String and int values -- pluck can't know a key is always
+  // present, so missing keys become null rather than throwing.
+  print(toArray(pluck('name', people))); // [kim, lee]
+
+  final missing = [
+    {'name': 'kim'},
+    <String, String>{},
+  ];
+  print(toArray(pluck('name', missing))); // [kim, null]
+
+  // No chain method exists for pluck -- use the data-first form inside
+  // a chain via `.to(...)`, or call it directly on the source list.
+  final ages = pluck('age', people);
+  print(toArray(ages)); // [32, 27]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with concurrency</h2>
+  <p>
+    <code>pluckAsync</code> is built directly on <code>mapAsync</code>, so
+    fetch the records concurrently first, then pluck what you need:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  // Fetch each profile concurrently, then pluck the id out of each one.
+  // No chain method exists for pluck, so wrap the data-first result with
+  // fxAsync(...) to keep chaining.
+  final userIds = [1, 2, 3];
+  final fetched = fx(userIds)
+      .toAsync()
+      .map((id) => delay(Duration(milliseconds: 150), {'id': id, 'name': 'user$id'}))
+      .concurrent(3);
+
+  final ids = await fxAsync(pluckAsync('id', fetched)).toArray();
+
+  print(ids); // [1, 2, 3]
+  print('took ${sw.elapsedMilliseconds}ms'); // ~150ms, not ~450ms
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>pluck</code> to get a list of just the product
+    titles.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final products = [
+    {'title': 'Keyboard', 'price': 49},
+    {'title': 'Mouse', 'price': 19},
+    {'title': 'Monitor', 'price': 199},
+  ];
+
+  // TODO: use pluck to get a list of just the titles.
+  final titles = toArray(map((p) => p, products));
+
+  print(titles);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="map.html"><code>map</code></a> — the general form pluck specializes ·
+    <a href="compact.html"><code>compact</code></a> — drop the nulls pluck can produce ·
+    <a href="../tutorials/prop.html"><code>prop</code></a> — pluck's single-map cousin ·
+    <a href="filter.html"><code>filter</code></a> — keep matching elements
+  </div>
+
+  <nav class="tut-nav">
+    <a href="peek.html">← Previous: peek</a>
+    <a href="filter.html">Next: filter →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

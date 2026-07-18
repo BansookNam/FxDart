@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>pick — FxDart 101</title>
+  <meta name="description" content="FxDart pick tutorial: return a copy of a Map with only the given keys, missing keys simply absent.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 9 · Object (Map) functions › <strong>pick</strong></p>
+  <h1><code>pick</code></h1>
+  <p class="hero-sub">Returns a copy of a <code>Map</code> with only the given keys.</p>
+
+  <div class="signature">Map&lt;K, V&gt; pick&lt;K, V&gt;(Iterable&lt;K&gt; keysToPick, Map&lt;K, V&gt; map)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>pick</code> is <code>omit</code>'s mirror: instead of listing what
+    to remove, you list what to keep. Requested keys that aren't present in
+    the source map are simply absent from the result — <code>pick</code>
+    does not insert them with a <code>null</code> placeholder, so the
+    result's key set can be smaller than <code>keysToPick</code>.
+  </p>
+  <p>
+    Reach for it whenever you want a narrow "view" of a larger map: a public
+    API response derived from an internal record, a summary row derived
+    from a full one, and so on.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final user = {'id': 1, 'name': 'kim', 'password': 'secret', 'age': 32};
+  print(pick(['id', 'name'], user)); // {id: 1, name: kim}
+
+  // Keys that don't exist are simply skipped, not filled with null:
+  print(pick(['id', 'nickname'], user)); // {id: 1}
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Slimming a whole list</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final rows = [
+    {'id': 1, 'name': 'kim', 'temp': 'x'},
+    {'id': 2, 'name': 'lee', 'temp': 'y'},
+  ];
+
+  final slim = fx(rows).map((r) => pick(['id', 'name'], r)).toArray();
+  print(slim); // [{id: 1, name: kim}, {id: 2, name: lee}]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>pick</code> to keep only <code>'id'</code> and <code>'email'</code> from <code>profile</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final profile = {'id': 7, 'email': 'a@b.com', 'passwordHash': 'xyz'};
+
+  // TODO: use pick to keep only 'id' and 'email'
+  final publicProfile = profile;
+
+  print(publicProfile);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="omit.html"><code>omit</code></a> — the inverse: drop only some keys ·
+    <a href="pickBy.html"><code>pickBy</code></a> — keep by predicate instead of key list ·
+    <a href="props.html"><code>props</code></a> — pull several values out as a List ·
+    <a href="prop.html"><code>prop</code></a> — pull a single value out
+  </div>
+
+  <nav class="tut-nav">
+    <a href="omit.html">← Prev: omit</a>
+    <a href="omitBy.html">Next: omitBy →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

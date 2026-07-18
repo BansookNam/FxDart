@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>matches — FxDart 101</title>
+  <meta name="description" content="FxDart matches tutorial: the curried, filter-ready predicate form of isMatch.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 9 · Object (Map) functions › <strong>matches</strong></p>
+  <h1><code>matches</code></h1>
+  <p class="hero-sub">Curried <code>isMatch</code>: bind a pattern once, get back a reusable predicate.</p>
+
+  <div class="signature">bool Function(Object? target) matches(Object? pattern)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>isMatch(target, pattern)</code> needs both arguments up front,
+    which makes it awkward to hand to <code>filter</code>, <code>find</code>,
+    <code>every</code>, or anywhere else that wants a single-argument
+    <code>bool Function(A)</code>. <code>matches(pattern)</code> closes over
+    the pattern and returns exactly that shape:
+    <code>matches(pattern)(target) == isMatch(target, pattern)</code>. Build
+    the predicate once, reuse it across a whole pipeline.
+  </p>
+  <p>
+    This is FxDart's version of currying for a two-argument function where
+    Dart can't infer a general curry — see the deprecated top-level
+    <code>curry</code> if you're curious why a generic version doesn't
+    exist — but a purpose-built curried form like this one works great.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final isClick = matches({'type': 'click'});
+
+  print(isClick({'type': 'click', 'x': 1})); // true
+  print(isClick({'type': 'scroll'}));        // false
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Dropping straight into filter/find</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final events = [
+    {'type': 'click', 'x': 1},
+    {'type': 'scroll', 'y': 5},
+    {'type': 'click', 'x': 9},
+  ];
+
+  print(filter(matches({'type': 'click'}), events).toList());
+  // [{type: click, x: 1}, {type: click, x: 9}]
+
+  print(find(matches({'type': 'scroll'}), events));
+  // {type: scroll, y: 5}
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>matches</code> to build a predicate for <code>{'active': true}</code> and filter <code>users</code> with it.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final users = [
+    {'name': 'kim', 'active': true},
+    {'name': 'lee', 'active': false},
+  ];
+
+  // TODO: use matches to build a predicate for {'active': true} and filter with it
+  final activeUsers = users;
+
+  print(activeUsers);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="isMatch.html"><code>isMatch</code></a> — the two-argument function this curries ·
+    <a href="filter.html"><code>filter</code></a> — the most common place to plug this in ·
+    <a href="find.html"><code>find</code></a> — grab just the first match ·
+    <a href="predicates.html"><code>predicates</code></a> — more ready-made, filter-friendly checks
+  </div>
+
+  <nav class="tut-nav">
+    <a href="isMatch.html">← Prev: isMatch</a>
+    <a href="identity.html">Next: identity →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

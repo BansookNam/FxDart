@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<!-- FxDart playground execution frame.
+     Runs DDC library-bundle output from the DartPad compile service
+     (compileNewDDC) using the matching ddc_module_loader + dart_sdk_new
+     artifacts, mirroring DartPad's own frame bootstrap. Print output and
+     errors are relayed to the parent page via postMessage. -->
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="js/require.js"></script>
+  <script>
+    function post(type, message) {
+      parent.postMessage({ sender: 'fx-frame', type: type, message: message }, '*');
+    }
+
+    // Dart's print() routes here when defined.
+    window.dartPrint = function (msg) { post('stdout', String(msg)); };
+
+    window.addEventListener('error', function (e) {
+      post('stderr', String(e.message || e.error || e));
+    });
+    window.addEventListener('unhandledrejection', function (e) {
+      post('stderr', 'Uncaught async error: ' + String(e.reason));
+    });
+    var consoleError = console.error.bind(console);
+    console.error = function () {
+      post('stderr', Array.prototype.map.call(arguments, String).join(' '));
+      consoleError.apply(null, arguments);
+    };
+
+    require.config({
+      baseUrl: 'https://stable.api.dartpad.dev/artifacts/',
+      waitSeconds: 120,
+      onNodeCreated: function (node) { node.setAttribute('crossorigin', 'anonymous'); }
+    });
+    require.onError = function (err) { post('stderr', String(err)); };
+
+    window.addEventListener('message', function (e) {
+      var data = e.data || {};
+      if (data.command !== 'execute') return;
+      // Load the DDC module loader (defines window.dartDevEmbedder), then the
+      // SDK bundle, then evaluate the compiled user bundle and run its main.
+      require(['ddc_module_loader'], function () {
+        require(['dart_sdk_new'], function () {
+          try {
+            (0, eval)(data.js); // defines package:dartpad_sample/* libraries
+            post('started', '');
+            dartDevEmbedder.runMain('package:dartpad_sample/bootstrap.dart', {});
+            post('done', '');
+          } catch (err) {
+            post('stderr', String(err));
+          }
+        });
+      });
+    });
+
+    window.addEventListener('load', function () { post('ready', ''); });
+  </script>
+</head>
+<body></body>
+</html>

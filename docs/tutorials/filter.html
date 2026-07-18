@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>filter — FxDart 101</title>
+  <meta name="description" content="FxDart filter tutorial: keep only the elements a predicate accepts, sync and async, with a live playground.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 4 · Filtering &amp; deduplication › <strong>filter</strong></p>
+  <h1><code>filter</code></h1>
+  <p class="hero-sub">Returns a lazy iterable of the elements a predicate returns true for.</p>
+
+  <div class="signature">Iterable&lt;A&gt; filter&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; filterAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.filter(bool Function(T a) f)        // chain (alias: where)
+FxAsync&lt;T&gt; FxAsync.filter(FutureOr&lt;bool&gt; Function(T a) f)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>filter</code> is the other fundamental transformer alongside
+    <code>map</code>: it keeps every element for which the predicate
+    returns <code>true</code> and drops the rest, lazily. Nothing runs
+    until a terminal operator pulls values through, and since <code>Fx</code>
+    extends <code>Iterable</code>, <code>.where(...)</code> works too — it's
+    just an alias for <code>.filter(...)</code> on the chain.
+  </p>
+  <p>
+    Because it's lazy, combining <code>filter</code> with <code>take</code>
+    only evaluates as many predicate calls as needed to satisfy the
+    <code>take</code> — see Demo 1.
+  </p>
+  <p>
+    <code>filterAsync</code> has its own dedicated concurrent implementation
+    (rather than reusing <code>mapAsync</code>'s): when you attach
+    <code>.concurrent(n)</code>, <code>n</code> predicates are evaluated in
+    parallel, but the elements that pass are still released downstream in
+    their original order — concurrency changes throughput, never the
+    result.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; laziness</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form:
+  print(toArray(filter((a) => a % 2 == 0, [0, 1, 2, 3, 4, 5, 6])));
+  // [0, 2, 4, 6]
+
+  // Chain form, with proof of laziness -- the predicate only runs for the
+  // elements actually pulled before take(3) is satisfied:
+  var calls = 0;
+  final result = fx(range(1000000))
+      .filter((a) {
+        calls++;
+        return a % 2 == 0;
+      })
+      .take(3)
+      .toArray();
+
+  print(result);                    // [0, 2, 4]
+  print('filter ran $calls times'); // 5 -- not 1000000
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with concurrency</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  // filterAsync has its own dedicated concurrent path: predicates for
+  // several elements run in parallel, but passing values are still
+  // released downstream in the original order.
+  final result = await fx([1, 2, 3, 4, 5, 6])
+      .toAsync()
+      .filter((a) async {
+        await delay(Duration(milliseconds: 150), null);
+        return a.isEven;
+      })
+      .concurrent(3)
+      .toArray();
+
+  print(result); // [2, 4, 6]
+  print('took ${sw.elapsedMilliseconds}ms'); // ~300ms, not ~900ms
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>filter</code> to keep only ages 18 and over.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final ages = [12, 19, 25, 8, 40, 17];
+
+  // TODO: use filter to keep only ages 18 and over.
+  final adults = fx(ages).toArray();
+
+  print(adults);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="reject.html"><code>reject</code></a> — the opposite of filter ·
+    <a href="compact.html"><code>compact</code></a> — filter out nulls ·
+    <a href="map.html"><code>map</code></a> — transform instead of keep/drop ·
+    <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
+  </div>
+
+  <nav class="tut-nav">
+    <a href="pluck.html">← Previous: pluck</a>
+    <a href="reject.html">Next: reject →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

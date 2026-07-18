@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>compact — FxDart 101</title>
+  <meta name="description" content="FxDart compact tutorial: drop nulls and narrow the element type, with a live playground.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 4 · Filtering &amp; deduplication › <strong>compact</strong></p>
+  <h1><code>compact</code></h1>
+  <p class="hero-sub">Filters out null and narrows the element type from <code>T?</code> to <code>T</code> at the same time.</p>
+
+  <div class="signature">Iterable&lt;A&gt; compact&lt;A&gt;(Iterable&lt;A?&gt; iterable)
+FxAsyncIterable&lt;A&gt; compactAsync&lt;A&gt;(FxAsyncIterable&lt;A?&gt; iterable)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>compact</code> takes an <code>Iterable&lt;A?&gt;</code> and
+    returns an <code>Iterable&lt;A&gt;</code> — every <code>null</code> is
+    dropped, and the type checker knows it: nothing downstream needs a
+    null check anymore. This is the FxDart equivalent of FxTS's
+    <code>compact</code>, which drops all six JS falsy values
+    (<code>undefined</code>, <code>null</code>, <code>0</code>,
+    <code>''</code>, <code>NaN</code>, <code>false</code>). Dart has no
+    single "falsy" concept, so the port only removes <code>null</code> —
+    a deliberate, narrower behavior that's easy to reason about.
+  </p>
+  <p>
+    It shows up constantly after <a href="pluck.html"><code>pluck</code></a>
+    or any lookup that returns <code>T?</code>: <code>compact(pluck(key, records))</code>
+    gives you a clean, non-nullable list in one step.
+  </p>
+  <p>
+    There is <strong>no chain method</strong> for <code>compact</code> —
+    only the data-first top-level function and its async counterpart exist.
+    Call it directly, or wrap the result with <code>fx(...)</code> /
+    <code>fxAsync(...)</code> to keep chaining.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; type narrowing</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final List<int?> withGaps = [1, null, 2, null, 3];
+
+  // Data-first form. The input element type is int?; the output is
+  // Iterable<int> -- compact narrows the type, not just the values.
+  final Iterable<int> tightened = compact(withGaps);
+  print(toArray(tightened)); // [1, 2, 3]
+
+  // No chain method exists for compact -- call it directly, or wrap with
+  // fx(...) to keep chaining afterward.
+  final result = fx(compact(withGaps)).map((a) => a * 10).toArray();
+  print(result); // [10, 20, 30]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with concurrency</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  // Fetch concurrently -- some "lookups" miss and resolve to null -- then
+  // compact drops the misses and narrows the type to non-nullable.
+  final ids = [1, 2, 3, 4];
+  final fetched = fx(ids)
+      .toAsync()
+      .map((id) => delay(Duration(milliseconds: 150), id.isEven ? null : id))
+      .concurrent(4);
+
+  final found = await fxAsync(compactAsync(fetched)).toArray();
+
+  print(found); // [1, 3]
+  print('took ${sw.elapsedMilliseconds}ms'); // ~150ms
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>compact</code> to drop the nulls from
+    <code>answers</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final List<String?> answers = ['yes', null, 'no', null, 'maybe'];
+
+  // TODO: use compact to drop the nulls from answers.
+  final cleaned = toArray(map((a) => a, answers));
+
+  print(cleaned);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="pluck.html"><code>pluck</code></a> — a common source of nullable values ·
+    <a href="reject.html"><code>reject</code></a> — drop by arbitrary predicate ·
+    <a href="../tutorials/compactObject.html"><code>compactObject</code></a> — the Map-keyed equivalent ·
+    <a href="uniq.html"><code>uniq</code></a> — remove duplicates
+  </div>
+
+  <nav class="tut-nav">
+    <a href="reject.html">← Previous: reject</a>
+    <a href="uniq.html">Next: uniq →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

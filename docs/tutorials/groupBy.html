@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>groupBy — FxDart 101</title>
+  <meta name="description" content="FxDart groupBy tutorial: bucket every element by a computed key into a Map of Lists, with a live playground.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 7 · Aggregating › <strong>groupBy</strong></p>
+  <h1><code>groupBy</code></h1>
+  <p class="hero-sub">Buckets every element into a <code>Map&lt;K, List&lt;A&gt;&gt;</code> by a computed key.</p>
+
+  <div class="signature">Map&lt;K, List&lt;A&gt;&gt; groupBy&lt;A, K&gt;(K Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;Map&lt;K, List&lt;A&gt;&gt;&gt; groupByAsync&lt;A, K&gt;(FutureOr&lt;K&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Map&lt;K, List&lt;T&gt;&gt; Fx.groupBy&lt;K&gt;(K Function(T a) f)          // chain (sync)
+Future&lt;Map&lt;K, List&lt;T&gt;&gt;&gt; FxAsync.groupBy&lt;K&gt;(FutureOr&lt;K&gt; Function(T a) f)  // chain (async)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>groupBy</code> is a terminal operator that pulls the whole
+    pipeline and sorts each value into a bucket, keyed by whatever
+    <code>f</code> returns for it. Every element is kept — nothing is
+    dropped, unlike <code><a href="filter.html">filter</a></code> — it's
+    just reorganized into buckets.
+  </p>
+  <p>
+    FxTS's version returns a plain JS object; since Dart has no anonymous
+    object literal with arbitrary computed keys, FxDart returns a
+    <code>Map&lt;K, List&lt;A&gt;&gt;</code> instead — one of the standard
+    TS-object-to-Dart-Map conversions used throughout this section
+    (<code><a href="indexBy.html">indexBy</a></code> and
+    <code><a href="countBy.html">countBy</a></code> do the same).
+  </p>
+  <p>
+    Order matters within each bucket: elements land in each list in the same
+    relative order they appeared in the source. And because it's a terminal,
+    this works exactly the same whether the upstream pipeline is a plain
+    list or a chain of lazy <code>map</code>/<code>filter</code> steps — you
+    just pay the cost once, when <code>groupBy</code> pulls it.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final words = ['apple', 'banana', 'avocado', 'blueberry', 'cherry'];
+
+  // Data-first form: key selector, then the iterable.
+  final byFirstLetter = groupBy((w) => w[0], words);
+  print(byFirstLetter);
+  // {a: [apple, avocado], b: [banana, blueberry], c: [cherry]}
+
+  // Chain form:
+  final byParity = fx([1, 2, 3, 4, 5, 6]).groupBy((a) => a.isEven ? 'even' : 'odd');
+  print(byParity); // {odd: [1, 3, 5], even: [2, 4, 6]}
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final users = ['ann', 'al', 'bob', 'bea', 'cid'];
+
+  // groupByAsync / .toAsync().groupBy(...) pulls the pipeline, awaiting the
+  // key selector for each element.
+  final byFirstLetter = await fx(users)
+      .toAsync()
+      .groupBy((u) => delay(const Duration(milliseconds: 100), u[0]));
+
+  print(byFirstLetter); // {a: [ann, al], b: [bob, bea], c: [cid]}
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: group the words <strong>by their length</strong>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final words = ['fig', 'kiwi', 'fx', 'plum', 'go', 'date'];
+
+  // TODO: group the words BY THEIR LENGTH.
+  final grouped = fx(words).groupBy((w) => w[0]);
+
+  print(grouped);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="indexBy.html"><code>indexBy</code></a> — one value per key instead of a list ·
+    <a href="countBy.html"><code>countBy</code></a> — count per key instead of collecting ·
+    <a href="partition.html"><code>partition</code></a> — grouping into exactly two buckets
+  </div>
+
+  <nav class="tut-nav">
+    <a href="join.html">← join</a>
+    <a href="indexBy.html">Next: indexBy →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

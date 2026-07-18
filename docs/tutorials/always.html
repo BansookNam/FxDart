@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>always — FxDart 101</title>
+  <meta name="description" content="FxDart always tutorial: build a function that ignores its argument and always returns a fixed value, with a live playground.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 10 · Function utilities › <strong>always</strong></p>
+  <h1><code>always</code></h1>
+  <p class="hero-sub">Returns a function that always returns the same fixed value, ignoring its argument.</p>
+
+  <div class="signature">T Function([Object? _]) always&lt;T&gt;(T a) => ([Object? _]) => a;</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>always(a)</code> closes over <code>a</code> and hands back a
+    function that discards whatever it's called with and returns <code>a</code>
+    every time. The optional parameter is the trick that makes it fit
+    anywhere a <em>unary</em> callback is expected — a mapper, an
+    <code>orElse</code> handler, a fallback branch — without you writing
+    <code>(_) => a</code> by hand each time.
+  </p>
+  <p>
+    It's the constant counterpart to <a href="identity.html"><code>identity</code></a>:
+    <code>identity</code> passes the input through, <code>always</code>
+    throws it away. Both are plain synchronous functions with no async
+    variant or chain form.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <p>Note the optional argument — <code>greet(123)</code> still returns
+    <code>'hi'</code>, which is what lets it act as a <code>map</code> callback:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final greet = always('hi');
+  print(greet());    // hi
+  print(greet(123)); // hi (ignores the argument)
+
+  // realistic: reset every element of a list to a fixed value
+  print(fx([1, 2, 3]).map(always(0)).toArray()); // [0, 0, 0]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Constant fallback in a dispatch table</h2>
+  <p>
+    <code>always</code> is a natural fit for <code>orElse</code> in
+    <a href="cases.html"><code>cases</code></a> — a fixed default that
+    doesn't need to look at the unmatched value:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final classify = cases<int, String>([
+    ((n) => n < 0, (n) => 'negative'),
+    ((n) => n == 0, (n) => 'zero'),
+  ], orElse: always('positive'));
+
+  print(fx([-2, 0, 7]).map(classify).toArray()); // [negative, zero, positive]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>always</code> to replace every score in this list
+    with the string <code>'graded'</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final scores = [55, 91, 68];
+
+  // TODO: use `always` to replace every score with 'graded'
+  final labels = fx(scores).map((s) => 'graded').toArray();
+
+  print(labels); // [graded, graded, graded]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="identity.html"><code>identity</code></a> — pass the argument through instead ·
+    <a href="cases.html"><code>cases</code></a> — dispatch table that often pairs with always as orElse ·
+    <a href="when.html"><code>when</code></a> — conditional transform, value-in value-out ·
+    <a href="memoize.html"><code>memoize</code></a> — cache a computed value instead of a constant one
+  </div>
+
+  <nav class="tut-nav">
+    <a href="identity.html">← Previous: identity</a>
+    <a href="tap.html">Next: tap →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

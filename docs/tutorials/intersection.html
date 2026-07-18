@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>intersection — FxDart 101</title>
+  <meta name="description" content="FxDart intersection tutorial: elements of one iterable also found in another, with a live playground.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 4 · Filtering &amp; deduplication › <strong>intersection</strong></p>
+  <h1><code>intersection</code></h1>
+  <p class="hero-sub"><code>difference</code>'s opposite: elements of the second iterable that ARE also found in the first.</p>
+
+  <div class="signature">Iterable&lt;A&gt; intersection&lt;A&gt;(Iterable&lt;A&gt; iterable1, Iterable&lt;A&gt; iterable2)
+FxAsyncIterable&lt;A&gt; intersectionAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;A&gt; iterable2)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>intersection(iterable1, iterable2)</code> shares
+    <code>difference</code>'s argument-order convention: the result walks
+    <strong><code>iterable2</code></strong>, and keeps each element (in
+    <code>iterable2</code>'s order, deduplicated) that <em>is</em> found in
+    <code>iterable1</code>. <code>iterable1</code> is only ever used as a
+    membership set — swap the two arguments and you get the same
+    <em>values</em> in a set-theory sense, but the actual order (and which
+    collection's duplicates get collapsed) is different, since the source
+    of the yielded elements changes. See Demo 1.
+  </p>
+  <p>
+    Under the hood it's
+    <code>intersectionBy((a) =&gt; a, iterable1, iterable2)</code> — reach
+    for <a href="intersectionBy.html"><code>intersectionBy</code></a>
+    directly when you need to match by a computed key across two lists of
+    full records rather than by value equality.
+  </p>
+  <p>
+    There's no chain method; call the data-first function. On the async
+    side, the concurrency marker from <code>.concurrent(n)</code> applies to
+    <code>iterable2</code> — <code>iterable1</code> is drained up front to
+    build the membership set.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; argument order</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form. Same argument-order rule as difference: the result
+  // comes FROM iterable2, in iterable2's order, keeping only elements ALSO
+  // found in iterable1.
+  final inStock = {'mouse', 'keyboard', 'monitor'};
+  final wishlist = ['monitor', 'mouse', 'headphones', 'mouse'];
+
+  print(toArray(intersection(inStock, wishlist)));
+  // [monitor, mouse] -- wishlist's order, deduped, filtered to in-stock items
+
+  // Swap the arguments: now the ORDER comes from inStock instead.
+  print(toArray(intersection(wishlist, inStock)));
+  // [mouse, monitor] -- inStock's own iteration order this time
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with concurrency</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  // The concurrency marker applies to iterable2, as with differenceAsync.
+  final inStock = toAsync([2, 3, 4]);
+  final wishlist = fx([1, 2, 4, 5])
+      .toAsync()
+      .map((a) => delay(Duration(milliseconds: 100), a))
+      .concurrent(4);
+
+  final available = await fxAsync(intersectionAsync(inStock, wishlist)).toArray();
+
+  print(available); // [2, 4]
+  print('took ${sw.elapsedMilliseconds}ms'); // ~100ms
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>intersection</code> to find which of the
+    candidate's skills are actually required.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final requiredSkills = ['dart', 'sql'];
+  final candidateSkills = ['dart', 'python', 'sql', 'sql'];
+
+  // TODO: use intersection to find which of the candidate's skills are
+  // actually required.
+  final matched = toArray(candidateSkills);
+
+  print(matched);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="difference.html"><code>difference</code></a> — the exclusion counterpart ·
+    <a href="intersectionBy.html"><code>intersectionBy</code></a> — match by a computed key instead ·
+    <a href="uniq.html"><code>uniq</code></a> — dedupe a single iterable ·
+    <a href="../tutorials/includes.html"><code>includes</code></a> — test membership of a single value
+  </div>
+
+  <nav class="tut-nav">
+    <a href="differenceBy.html">← Previous: differenceBy</a>
+    <a href="intersectionBy.html">Next: intersectionBy →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

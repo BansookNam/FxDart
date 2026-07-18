@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>compress — FxDart 101</title>
+  <meta name="description" content="FxDart compress tutorial: filter an iterable by a parallel list of booleans, with a live playground.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 4 · Filtering &amp; deduplication › <strong>compress</strong></p>
+  <h1><code>compress</code></h1>
+  <p class="hero-sub">Keeps the elements of an iterable wherever a parallel list of booleans is true.</p>
+
+  <div class="signature">Iterable&lt;B&gt; compress&lt;B&gt;(List&lt;bool&gt; selectors, Iterable&lt;B&gt; iterable)
+FxAsyncIterable&lt;B&gt; compressAsync&lt;B&gt;(List&lt;bool&gt; selectors, FxAsyncIterable&lt;B&gt; iterable)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>compress</code> is a positional mask: element <code>i</code> of
+    <code>iterable</code> survives only if <code>selectors[i]</code> is
+    <code>true</code>. It's built directly out of two functions you already
+    know — <code>map((r) =&gt; r.$2, filter((r) =&gt; r.$1, zip(selectors, iterable)))</code> —
+    zip the mask with the data, filter to the true pairs, then unwrap. That
+    also means it inherits <code>zip</code>'s behavior on mismatched
+    lengths: iteration stops as soon as the <em>shorter</em> of
+    <code>selectors</code> or <code>iterable</code> runs out, so a short
+    selector list silently truncates the result. Reach for it when you
+    already have (or can cheaply compute) a boolean mask up front — for
+    example, "which quiz answers were correct" — rather than recomputing a
+    predicate per element the way <code>filter</code> would.
+  </p>
+  <p>
+    There's no chain method; call the data-first function or its async
+    counterpart directly, or wrap the result with <code>fx(...)</code> /
+    <code>fxAsync(...)</code> to keep chaining.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; length mismatch</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form: keeps iterable[i] wherever selectors[i] is true.
+  print(toArray(compress([true, false, true, false], ['a', 'b', 'c', 'd'])));
+  // [a, c]
+
+  // If selectors is shorter than iterable, extra iterable elements are
+  // dropped (zip -- which compress is built on -- stops at the shorter one):
+  print(toArray(compress([true, false], ['a', 'b', 'c', 'd'])));
+  // [a]
+
+  // No chain method exists for compress -- call it directly.
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with concurrency</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  // Fetch each candidate concurrently, then keep only the ones whose
+  // matching selector says "keep".
+  final names = ['alice', 'bob', 'carol', 'dave'];
+  final fetched = fx(names)
+      .toAsync()
+      .map((n) => delay(Duration(milliseconds: 100), n))
+      .concurrent(4);
+
+  final selected =
+      await fxAsync(compressAsync([true, false, true, false], fetched))
+          .toArray();
+
+  print(selected); // [alice, carol]
+  print('took ${sw.elapsedMilliseconds}ms'); // ~100ms
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>compress</code> to keep only the correct
+    answers.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final answers = ['red', 'green', 'blue', 'yellow'];
+  final isCorrect = [false, true, true, false];
+
+  // TODO: use compress to keep only the correct answers.
+  final correctAnswers = toArray(answers);
+
+  print(correctAnswers);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="filter.html"><code>filter</code></a> — filter by a predicate instead of a precomputed mask ·
+    <a href="../tutorials/zip.html"><code>zip</code></a> — the function compress is built on ·
+    <a href="differenceBy.html"><code>differenceBy</code></a> — filter by membership against another iterable ·
+    <a href="../tutorials/partition.html"><code>partition</code></a> — split into kept/rejected in one pass
+  </div>
+
+  <nav class="tut-nav">
+    <a href="intersectionBy.html">← Previous: intersectionBy</a>
+    <a href="../tutorials/take.html">Next: take →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

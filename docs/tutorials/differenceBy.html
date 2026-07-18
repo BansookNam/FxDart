@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>differenceBy — FxDart 101</title>
+  <meta name="description" content="FxDart differenceBy tutorial: exclude elements by a computed key found in another iterable, with a live playground.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 4 · Filtering &amp; deduplication › <strong>differenceBy</strong></p>
+  <h1><code>differenceBy</code></h1>
+  <p class="hero-sub"><code>difference</code>, comparing by a computed key instead of value equality.</p>
+
+  <div class="signature">Iterable&lt;A&gt; differenceBy&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable1, Iterable&lt;A&gt; iterable2)
+FxAsyncIterable&lt;A&gt; differenceByAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;A&gt; iterable2)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>differenceBy(f, iterable1, iterable2)</code> follows the exact
+    same argument-order rule as <a href="difference.html"><code>difference</code></a>:
+    the result comes <strong>from <code>iterable2</code></strong>, keeping
+    only the elements whose <code>f</code>-key does <em>not</em> appear
+    among <code>iterable1</code>'s <code>f</code>-keys (with duplicates in
+    the result collapsed). The <code>f</code> function is applied to
+    <em>both</em> iterables, so — unlike <code>differenceBy</code> in some
+    languages — both arguments must share the same element type
+    <code>A</code>; only the derived key type <code>B</code> is what's being
+    compared.
+  </p>
+  <p>
+    This is the shape you reach for when the "exclusion list" and the
+    "source list" are full records rather than bare values: a list of
+    blocked user objects and a list of user objects, matched by
+    <code>id</code>; or an unavailable-products list and a product catalog,
+    matched by <code>sku</code>.
+  </p>
+  <p>
+    <code>difference</code> itself is just
+    <code>differenceBy((a) =&gt; a, iterable1, iterable2)</code>. There's no
+    chain method for either — call the data-first function directly. On the
+    async side, the concurrency marker applies to <code>iterable2</code>,
+    same as <code>differenceAsync</code>.
+  </p>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form. Same argument order rule as difference: the result
+  // comes FROM iterable2, filtered by f-keys seen in iterable1. Both
+  // iterables share the same element type -- f is applied to both sides.
+  final blocked = [
+    {'id': 2},
+    {'id': 4},
+  ];
+  final users = [
+    {'id': 1, 'name': 'kim'},
+    {'id': 2, 'name': 'lee'},
+    {'id': 3, 'name': 'park'},
+  ];
+
+  final allowed = differenceBy((u) => u['id'], blocked, users);
+  print(toArray(allowed));
+  // [{id: 1, name: kim}, {id: 3, name: park}]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async, with concurrency</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final sw = Stopwatch()..start();
+
+  // The concurrency marker applies to iterable2, as with differenceAsync.
+  final blocked = toAsync([
+    {'id': 2},
+  ]);
+  final users = fx([
+    {'id': 1, 'name': 'kim'},
+    {'id': 2, 'name': 'lee'},
+    {'id': 3, 'name': 'park'},
+  ]).toAsync().map((u) => delay(Duration(milliseconds: 100), u)).concurrent(3);
+
+  final allowed =
+      await fxAsync(differenceByAsync((u) => u['id'], blocked, users)).toArray();
+
+  print(allowed); // [{id: 1, name: kim}, {id: 3, name: park}]
+  print('took ${sw.elapsedMilliseconds}ms'); // ~100ms
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>differenceBy</code> (keyed on <code>'sku'</code>)
+    to find products that are still available.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final unavailable = [
+    {'sku': 'A1'},
+  ];
+  final products = [
+    {'sku': 'A1', 'title': 'Keyboard'},
+    {'sku': 'B2', 'title': 'Mouse'},
+  ];
+
+  // TODO: use differenceBy (keyed on 'sku') to find products that are
+  // still available.
+  final available = toArray(products);
+
+  print(available);
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="difference.html"><code>difference</code></a> — the value-equality version ·
+    <a href="intersectionBy.html"><code>intersectionBy</code></a> — keep by a shared computed key instead ·
+    <a href="uniqBy.html"><code>uniqBy</code></a> — dedupe a single iterable by key ·
+    <a href="compress.html"><code>compress</code></a> — filter by a parallel boolean mask
+  </div>
+
+  <nav class="tut-nav">
+    <a href="difference.html">← Previous: difference</a>
+    <a href="intersection.html">Next: intersection →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

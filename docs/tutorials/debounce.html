@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>debounce — FxDart 101</title>
+  <meta name="description" content="FxDart debounce tutorial: delay a function call until things go quiet, with leading edge and cancel(), plus a live playground.">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 12 · Util › <strong>debounce</strong></p>
+  <h1><code>debounce</code></h1>
+  <p class="hero-sub">Delays a function call until wait has passed since the last call — only the trailing call in a burst survives.</p>
+
+  <div class="signature">Debounced&lt;T&gt; debounce&lt;T&gt;(void Function(T arg) func, Duration wait, {bool leading = false})
+
+class Debounced&lt;T&gt; {
+  void call(T arg);   // Debounced is callable: debounced(arg)
+  void cancel();
+}</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>debounce</code> wraps a callback so that repeated calls in quick
+    succession collapse into a single call. Every call restarts a timer of
+    length <code>wait</code>; the wrapped <code>func</code> only actually
+    fires once <code>wait</code> has passed <em>without</em> another call —
+    and it fires with whatever argument was passed in that last call. This is
+    the classic "wait for the user to stop typing before searching" pattern.
+  </p>
+  <p>
+    In JS, FxTS attaches a <code>.cancel()</code> method directly onto the
+    returned function. Dart functions can't carry extra members, so FxDart
+    returns a <code>Debounced&lt;T&gt;</code> instead — a class with a
+    <code>call(T arg)</code> method, which Dart lets you invoke with plain
+    function-call syntax (<code>debounced(arg)</code>) thanks to the
+    <code>call()</code> convention, plus an explicit <code>.cancel()</code> to
+    drop any pending invocation.
+  </p>
+  <p>
+    By default (<code>leading: false</code>), only the <strong>trailing</strong>
+    edge fires — the last call in a burst, after things go quiet. Pass
+    <code>leading: true</code> and the <strong>first</strong> call in a burst
+    fires immediately instead, with every call before the next quiet period
+    suppressed.
+  </p>
+
+  <h2>Demo 1 · Trailing edge (the default)</h2>
+  <p>Three rapid calls collapse into one — only the last argument survives:</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final calls = <String>[];
+  final debounced =
+      debounce<String>((s) => calls.add(s), const Duration(milliseconds: 100));
+
+  // Simulates rapid typing: only the trailing call survives.
+  debounced('a');
+  debounced('b');
+  debounced('c');
+  print(calls); // [] — nothing has fired yet
+
+  await sleep(const Duration(milliseconds: 150));
+  print(calls); // [c] — only the last call, 100ms after it stopped
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Leading edge and cancel()</h2>
+  <p>
+    <code>leading: true</code> fires immediately and suppresses the rest of
+    the burst; <code>.cancel()</code> drops a pending trailing call entirely:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // leading: true fires on the *first* call of a burst instead of the last.
+  final leadingCalls = <String>[];
+  final leadingDebounced = debounce<String>(
+      (s) => leadingCalls.add(s), const Duration(milliseconds: 100),
+      leading: true);
+  leadingDebounced('x'); // fires right away
+  print(leadingCalls); // [x]
+  leadingDebounced('y');
+  leadingDebounced('z'); // both suppressed — still inside the same burst
+  print(leadingCalls); // [x]
+  await sleep(const Duration(milliseconds: 150));
+
+  // .cancel() drops a pending trailing call before it fires.
+  final cancelCalls = <String>[];
+  final cancelDebounced = debounce<String>(
+      (s) => cancelCalls.add(s), const Duration(milliseconds: 100));
+  cancelDebounced('should never appear');
+  cancelDebounced.cancel();
+  await sleep(const Duration(milliseconds: 150));
+  print(cancelCalls); // []
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: wrap <code>save</code> in <code>debounce</code> (100ms wait)
+    so only the final value survives the burst of calls below.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final saved = <int>[];
+
+  // TODO: wrap the save function in debounce() with a 100ms wait so that
+  // only the final value ('3') gets saved after the rapid calls settle.
+  void save(int value) => saved.add(value);
+
+  save(1);
+  save(2);
+  save(3);
+
+  await sleep(const Duration(milliseconds: 150));
+  print(saved); // currently [1, 2, 3] — should be [3]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="throttle.html"><code>throttle</code></a> — fires on a schedule instead of after quiet ·
+    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — building timing demos ·
+    <a href="concurrent.html"><code>concurrent</code></a> — rate-limiting for async pipelines ·
+    <a href="shuffle.html"><code>shuffle</code></a> — seeded randomness
+  </div>
+
+  <nav class="tut-nav">
+    <a href="../101/index.html">← FxDart 101</a>
+    <a href="throttle.html">Next: throttle →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a> by Indong Yoo (CTO, Marpple) and the FxTS team.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>
