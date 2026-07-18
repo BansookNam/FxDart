@@ -1,3 +1,10 @@
+## 0.1.2
+
+* `.curried` / `.uncurried` extension getters (arity 2–5): a fully typed,
+  Dart-native replacement for FxTS `curry`, resolved statically per arity.
+  Design rationale in [WHY_CURRIED.md](WHY_CURRIED.md). The untyped `curry`
+  stub's deprecation now points at `.curried`.
+
 ## 0.1.1
 
 * `concurrentPool` now eagerly keeps its pool full (FxTS behavior): even

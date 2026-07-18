@@ -104,7 +104,7 @@ express it.
 | **Aggregate** | `reduce`, `fold`, `reduceLazy`, `toArray`, `sum`, `average`, `min`, `max`, `size`, `join`, `groupBy`, `indexBy`, `countBy`, `sort`, `sortBy`, `toSorted`, `partition`, `each`, `consume` |
 | **Access** | `head`, `last`, `nth`, `find`, `findIndex`, `includes`, `isEmpty`, `every`, `some` |
 | **Object (Map)** | `omit`, `pick`, `omitBy`, `pickBy`, `prop`, `props`, `evolve`, `fromEntries`, `compactObject`, `resolveProps`, `isMatch`, `matches` |
-| **Function** | `pipe`, `pipe1`, `pipeLazy`, `identity`, `always`, `tap`, `apply`, `juxt`, `memoize`, `negate`, `not`, `when`, `unless`, `throwError`, `throwIf`, `cases`, `add`, `gt`, `gte`, `lt`, `lte`, `delay`, `sleep`, `unicodeToArray` |
+| **Function** | `pipe`, `pipe1`, `pipeLazy`, `identity`, `always`, `tap`, `apply`, `juxt`, `memoize`, `negate`, `not`, `when`, `unless`, `throwError`, `throwIf`, `cases`, `add`, `gt`, `gte`, `lt`, `lte`, `delay`, `sleep`, `unicodeToArray`, `.curried`/`.uncurried` (extension getters, arity 2–5) |
 | **Predicates** | `isNull`, `isNotNull`, `isNil`, `isBoolean`, `isNumber`, `isString`, `isDate`, `isList`, `isMap` |
 | **Async** | every lazy/aggregate operator has an `*Async` twin (`mapAsync`, `toArrayAsync`, ...), plus `toAsync`, `fromStream`, `concurrentAsync`, `concurrentPoolAsync`, `asyncEmpty` |
 | **Util** | `debounce`, `throttle`, `shuffle`, `createSeededRandom` |
@@ -125,9 +125,22 @@ APIs deliberately deviate:
 | `undefined` | `null` (`head`/`find`/`nth` return `T?`) |
 | `AsyncIterable` / `for await` | `FxAsyncIterable` + `toStream()` / `fromStream()` bridges |
 | variadic `zip`/`juxt`/`cases` | fixed arities (`zip`/`zip3`) or list/record parameters |
-| `curry` | deprecated stub — write closures instead |
+| `curry(f)` | `.curried` / `.uncurried` extension getters — see [WHY_CURRIED.md](WHY_CURRIED.md) |
 
-Unportable APIs are kept as `@Deprecated` stubs with `//TODO(port)` notes
+FxTS's `curry` needs arity reflection and recursive conditional types, which
+Dart lacks — so fxdart curries through per-arity extensions instead, resolved
+statically and fully typed:
+
+```dart
+int add(int a, int b) => a + b;
+final addOne = add.curried(1); // int Function(int)
+fx([1, 2, 3]).map(addOne).toArray(); // [2, 3, 4]
+```
+
+[WHY_CURRIED.md](WHY_CURRIED.md) tells the full design story: why the direct
+port is impossible, how static extension resolution stands in for overloading,
+why the getter is named `curried`, and how the same port-the-meaning
+philosophy resolves the other unportable APIs. Those keep `@Deprecated` stubs
 (`curry`, `isUndefined`, `isArray`, `isObject`, `takeUntil`) so migrating code
 gets analyzer guidance instead of silent breakage.
 

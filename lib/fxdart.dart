@@ -32,6 +32,7 @@ export 'src/lazy/zip.dart';
 export 'src/pipe.dart';
 export 'src/strict/access.dart';
 export 'src/strict/aggregate.dart';
+export 'src/strict/curried.dart';
 export 'src/strict/func.dart';
 export 'src/strict/object.dart';
 export 'src/strict/predicates.dart';
