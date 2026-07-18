@@ -3,7 +3,7 @@ slug: index
 title: FxDart — Programação funcional para Dart
 description: FxDart é uma biblioteca de programação funcional para Dart, portada do FxTS: avaliação preguiçosa, iteração assíncrona concorrente e composição em pipeline.
 ---
-  <p class="hero-logo"><img src="assets/logo-web.png" width="960" height="294"
+  <p class="hero-logo"><img src="{{root}}assets/logo-web.png" width="960" height="294"
       alt="FxDart"></p>
   <h1>Programação funcional para Dart,<br>com laziness e concorrência embutidas.</h1>
   <p class="hero-sub">

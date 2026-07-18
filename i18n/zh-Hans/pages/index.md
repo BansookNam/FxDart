@@ -3,7 +3,7 @@ slug: index
 title: FxDart —— 面向 Dart 的函数式编程库
 description: FxDart 是从 FxTS 移植而来的 Dart 函数式编程库：惰性求值、并发异步迭代，以及管道式组合。
 ---
-  <p class="hero-logo"><img src="assets/logo-web.png" width="960" height="294"
+  <p class="hero-logo"><img src="{{root}}assets/logo-web.png" width="960" height="294"
       alt="FxDart"></p>
   <h1>面向 Dart 的函数式编程，<br>惰性与并发开箱即用。</h1>
   <p class="hero-sub">

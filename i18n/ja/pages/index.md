@@ -3,7 +3,7 @@ slug: index
 title: FxDart — Dart のための関数型プログラミング
 description: FxDart は FxTS から移植された Dart 向けの関数型プログラミングライブラリです。遅延評価、並行非同期イテレーション、パイプライン形式の合成を提供します。
 ---
-  <p class="hero-logo"><img src="assets/logo-web.png" width="960" height="294"
+  <p class="hero-logo"><img src="{{root}}assets/logo-web.png" width="960" height="294"
       alt="FxDart"></p>
   <h1>遅延評価と並行処理を備えた、<br>Dart のための関数型プログラミング。</h1>
   <p class="hero-sub">

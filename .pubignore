@@ -15,6 +15,7 @@ i18n/
 tool/
 tools/
 deploy.sh
+run.sh
 DEPLOY.md
 CODECOV.md
 

@@ -306,14 +306,19 @@ Map<String, String> _sources(Locale locale) =>
       return Map<String, String>.from(jsonDecode(f.readAsStringSync()));
     });
 
-final _placeholders = RegExp(r'\{\{(?:signature|playground:\d+)\}\}');
+final _placeholders = RegExp(r'\{\{(?:root|signature|playground:\d+)\}\}');
 
 bool _sameOrder(List<String?> a, List<String?> b) =>
     a.length == b.length && List.generate(a.length, (i) => a[i] == b[i]).every((x) => x);
 
-/// Substitutes the locale-invariant code blocks back into the prose.
-String _injectCode(String body, String slug) {
+/// Substitutes the locale-invariant code blocks back into the prose, and
+/// resolves {{root}} to the site root. Shared assets live once at the site root
+/// (docs/assets/), not per locale, so a bare `assets/x.png` in a translated page
+/// would resolve to the non-existent `docs/<locale>/assets/`.
+String _injectCode(String body, String slug, int depth) {
   final dir = '$root/content/code/$slug';
+
+  body = body.replaceAll('{{root}}', _rel(depth));
 
   body = body.replaceAll('{{signature}}', () {
     final f = File('$dir/sig.txt');
@@ -391,7 +396,10 @@ String _header(
   int depth,
   String active,
 ) {
-  final p = _rel(depth);
+  // Site-root-relative: shared assets (one css/ and js/ for every locale).
+  // Locale-root-relative: navigation, so a reader stays in their language
+  // instead of being dropped onto the English page by the Home link.
+  final p = _rel(depth - locale.depth);
   String cls(String name) => active == name ? ' class="active"' : '';
   final apiHref = active == '101' ? '#api' : '${p}101/index.html#api';
 
@@ -406,10 +414,17 @@ String _header(
       <a href="$repoUrl">GitHub</a>
       <a href="$fxtsUrl">FxTS</a>
     </nav>
-${_switcher(locale, locales, chrome, pagePath)}  </div>
+${_switcher(locale, locales, chrome, pagePath, depth)}  </div>
 </header>
 ''';
 }
+
+/// Where the switcher should point for `to`, as a path relative to the current
+/// page. Relative rather than absolute so the site works unchanged from a local
+/// preview server, a project subpath (/FxDart/), or a custom domain — only the
+/// hreflang/canonical tags need to be absolute, and those are built separately.
+String _switcherHref(int depth, Locale to, String pagePath) =>
+    '${_rel(depth)}${to.isBase ? '' : '${to.path}/'}$pagePath';
 
 /// Plain links, not a <select> — works without JS, and crawlers follow it.
 String _switcher(
@@ -417,6 +432,7 @@ String _switcher(
   List<Locale> locales,
   Map<String, String> chrome,
   String pagePath,
+  int depth,
 ) {
   final b = StringBuffer()
     ..writeln('    <nav class="lang-switcher" aria-label="${chrome['langLabel']}">')
@@ -426,7 +442,7 @@ String _switcher(
     final current = l.code == locale.code;
     // `lang` on the link tells the browser to render each endonym with the
     // right font stack; `hreflang` tells crawlers what they will land on.
-    b.writeln('        <li><a href="${_url(l, pagePath)}" hreflang="${l.code}" lang="${l.code}"'
+    b.writeln('        <li><a href="${_switcherHref(depth, l, pagePath)}" hreflang="${l.code}" lang="${l.code}"'
         '${current ? ' aria-current="page"' : ''}>${l.name}</a></li>');
   }
   b
@@ -491,7 +507,7 @@ String _renderLanding(
     ..write(_header(locale, locales, chrome, 'index.html', depth, 'home'))
     ..writeln('<main>')
     ..write(_banner(chrome, page))
-    ..writeln(_injectCode(page.body, '_index'))
+    ..writeln(_injectCode(page.body, '_index', depth))
     ..writeln('</main>')
     ..write(_footer(chrome))
     ..write(_scripts(locale, chrome, depth));
@@ -512,7 +528,7 @@ String _render101(
     ..write(_header(locale, locales, chrome, '101/index.html', depth, '101'))
     ..writeln('<main>')
     ..write(_banner(chrome, page))
-    ..writeln(page.body);
+    ..writeln(page.body.replaceAll('{{root}}', _rel(depth)));
 
   final keys = (course as Map).keys.toList()
     ..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
@@ -561,7 +577,7 @@ String _renderTutorial(
         '${chrome['sectionWord']} $section · ${sections['section$section']} › '
         '<strong>${page.get('crumb')}</strong></p>')
     ..writeln('  <h1>${page.get('heading')}</h1>')
-    ..writeln(_injectCode(page.body, slug))
+    ..writeln(_injectCode(page.body, slug, depth))
     ..writeln('')
     ..writeln('  <nav class="tut-nav">');
   // Section-opening pages have no predecessor and link back to the course.

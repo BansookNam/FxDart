@@ -3,7 +3,7 @@ slug: index
 title: FxDart — Dart를 위한 함수형 프로그래밍
 description: FxDart는 FxTS를 포팅한 Dart 함수형 프로그래밍 라이브러리입니다. 지연 평가, 동시성 비동기 순회, 파이프라인 방식의 조합을 지원합니다.
 ---
-  <p class="hero-logo"><img src="assets/logo-web.png" width="960" height="294"
+  <p class="hero-logo"><img src="{{root}}assets/logo-web.png" width="960" height="294"
       alt="FxDart"></p>
   <h1>지연 평가와 동시성을 기본으로 갖춘,<br>Dart를 위한 함수형 프로그래밍.</h1>
   <p class="hero-sub">

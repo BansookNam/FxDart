@@ -17,7 +17,19 @@ The site builds in 7 languages (English at the root, plus `ko`, `zh-Hans`,
 `ja`, `es`, `pt-BR`, `ru` under their own prefixes). See
 [`i18n/README.md`](i18n/README.md) for the translation workflow.
 
-## One command
+## Previewing locally
+
+```bash
+./run.sh              # build, serve, print a URL per locale
+./run.sh -o           # ...and open the browser
+./run.sh -p 4000      # pick a port (auto-advances if busy)
+./run.sh -s           # skip the build, serve what's already in docs/
+```
+
+Links are relative throughout, so the local preview behaves exactly like the
+deployed site — including the language switcher.
+
+## Deploying
 
 ```bash
 ./deploy.sh

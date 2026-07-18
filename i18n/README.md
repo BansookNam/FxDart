@@ -49,6 +49,9 @@ dart run tool/build_docs.dart          # regenerate docs/
 dart run tool/build_docs.dart --record # mark it current as of today's English
 ```
 
+To see your work in a browser, `./run.sh` builds the site and serves it with a
+URL printed for every locale.
+
 **You do not have to translate everything.** Any file you don't provide falls
 back to English automatically, with a banner telling the reader so and a
 `rel="canonical"` pointing at the English page (so the untranslated copy never
@@ -69,7 +72,9 @@ dart run tool/build_docs.dart --status
    prose too — readers type them.
 2. **Keep every `{{…}}` placeholder** exactly as it appears, in the same order.
    The build fails if a placeholder is dropped or renumbered, because that would
-   silently delete a code sample.
+   silently delete a code sample. `{{root}}` is the site root — shared assets
+   live once at `docs/assets/`, not per locale, so `{{root}}assets/logo-web.png`
+   is the only way to reference one that resolves from every language.
 3. **Keep the HTML structure identical** — same tags, nesting, `class`, `href`,
    and `id` values. Translate text nodes only.
 4. **Keep the front matter fences and the `slug:` value.** Translate `title:`
