@@ -1285,21 +1285,14 @@ FxAsyncIterable<String> splitAsync(
     var acc = '';
     var chr = '';
     var sourceDone = false;
-    var tailEmitted = false;
     return SerialAsyncIterator((concurrent) async {
-      if (sourceDone) {
-        if (tailEmitted) return const IterResult<String>.done();
-        tailEmitted = true;
-        if (sep != '' && chr == sep) return const IterResult.value('');
-        if (sep != '' && acc.isNotEmpty) return IterResult.value(acc);
-        return const IterResult<String>.done();
-      }
+      // Reaching the source's end always emits the tail (if any) in the same
+      // call, so every later call is simply done.
+      if (sourceDone) return const IterResult<String>.done();
       while (true) {
         final result = await iterator.next(concurrent);
         if (result.done) {
           sourceDone = true;
-          if (tailEmitted) return const IterResult<String>.done();
-          tailEmitted = true;
           if (sep != '' && chr == sep) return const IterResult.value('');
           if (sep != '' && acc.isNotEmpty) return IterResult.value(acc);
           return const IterResult<String>.done();
@@ -1776,6 +1769,17 @@ FxAsyncIterable<T> forkAsync<T>(FxAsyncIterable<T> iterable) {
       }
     }
 
+    // Issues parallel pulls to cover this fork's unmet demand — what lets a
+    // downstream `concurrent(n)` evaluate the shared source n-wide. Buffered
+    // items still ahead of `i` plus the pulls already in flight each settle
+    // one queued completer, so only the shortfall is pulled.
+    void pullToMeetDemand(Concurrent? concurrent) {
+      while (!s.done &&
+          settlementQueue.length > (s.buffer.length - i) + s.pullsInFlight) {
+        s.pull(concurrent);
+      }
+    }
+
     void Function()? listener;
 
     return DelegateAsyncIterator((concurrent) {
@@ -1791,23 +1795,15 @@ FxAsyncIterable<T> forkAsync<T>(FxAsyncIterable<T> iterable) {
       if (listener == null) {
         listener = () {
           serve();
-          // Re-pull while this fork still has unserved demand.
-          while (!s.done &&
-              settlementQueue.length >
-                  (s.buffer.length - i) + s.pullsInFlight) {
-            s.pull(concurrent);
-          }
+          // Demand is already covered when the pulls below are issued, so
+          // this is a safety net for a shortfall appearing as pulls settle.
+          pullToMeetDemand(concurrent);
         };
         s.listeners.add(listener!);
       }
       final completer = Completer<IterResult<T>>();
       settlementQueue.add(completer);
-      // Issue parallel pulls to cover unmet demand — this is what lets a
-      // downstream `concurrent(n)` evaluate the shared source n-wide.
-      while (!s.done &&
-          settlementQueue.length > (s.buffer.length - i) + s.pullsInFlight) {
-        s.pull(concurrent);
-      }
+      pullToMeetDemand(concurrent);
       return completer.future;
     });
   });
@@ -2812,45 +2808,52 @@ class Throttled<T> {
 
   void call(T arg) {
     final now = DateTime.now();
-    if (_lastCallTime == null) {
-      var leadingFired = false;
+    final last = _lastCallTime;
+
+    // A new window opens whenever nothing has run within the last [_wait].
+    // The window start is recorded regardless of [_leading]; otherwise a
+    // trailing-only throttle could never tell windows apart and would
+    // degenerate into a debounce.
+    if (last == null || now.difference(last) >= _wait) {
+      // A pending timer can only survive here if it is due at this exact
+      // instant; drop it so it cannot fire alongside the new window.
+      _timer?.cancel();
+      _timer = null;
+      _lastCallTime = now;
       if (_leading) {
-        _func(arg);
-        _lastCallTime = now;
-        leadingFired = true;
-      }
-      _lastArg = arg;
-      _hasPendingArg = !leadingFired;
-      if (_trailing) {
-        _timer = Timer(_wait, () {
-          if (_hasPendingArg) {
-            _func(_lastArg as T);
-          }
-          _lastCallTime = null;
-          _lastArg = null;
-          _hasPendingArg = false;
-          _timer = null;
-        });
-      } else if (!_trailing && !_leading) {
-        _lastCallTime = null;
-      }
-      return;
-    }
-    // Subsequent calls: remember the latest argument, keep the timer.
-    _lastArg = arg;
-    _hasPendingArg = true;
-    if (_trailing && _timer == null) {
-      final remaining = _wait - now.difference(_lastCallTime!);
-      _timer = Timer(remaining.isNegative ? Duration.zero : remaining, () {
-        if (_hasPendingArg) {
-          _func(_lastArg as T);
-          _lastCallTime = DateTime.now();
-        }
         _lastArg = null;
         _hasPendingArg = false;
-        _timer = null;
-      });
+        _func(arg);
+        return;
+      }
+      // No leading edge: this call is itself the pending trailing invocation.
+      _lastArg = arg;
+      _hasPendingArg = _trailing;
+      if (_trailing) _scheduleTrailing(_wait);
+      return;
     }
+
+    // Within the window: remember the newest argument for the trailing edge
+    // without extending the deadline (this is what separates throttle from
+    // debounce).
+    _lastArg = arg;
+    _hasPendingArg = _trailing;
+    if (_trailing && _timer == null) {
+      _scheduleTrailing(_wait - now.difference(last));
+    }
+  }
+
+  void _scheduleTrailing(Duration remaining) {
+    _timer = Timer(remaining, () {
+      _timer = null;
+      if (_hasPendingArg) {
+        // The trailing invocation opens the next window.
+        _lastCallTime = DateTime.now();
+        _func(_lastArg as T);
+      }
+      _lastArg = null;
+      _hasPendingArg = false;
+    });
   }
 
   /// Cancels any pending trailing invocation.
