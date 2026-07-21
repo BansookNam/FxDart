@@ -9,9 +9,11 @@ programming model, rebuilt on Dart's type system.
 [![Version](https://img.shields.io/pub/v/fxdart.svg?style=flat-square)](https://pub.dev/packages/fxdart)
 [![codecov](https://codecov.io/gh/BansookNam/FxDart/branch/main/graph/badge.svg)](https://codecov.io/gh/BansookNam/FxDart)
 
-**📚 Interactive docs: [FxDart 101](https://bansooknam.github.io/FxDart/)** — a
-guided course with a live in-browser playground for every function (served from
-this repo's `docs/` folder via GitHub Pages).
+<a href="https://bansooknam.github.io/FxDart/">
+  <img src="https://img.shields.io/badge/%F0%9F%93%9A%20FxDart%20101-Launch%20Interactive%20Docs%20%E2%86%92-6C63FF?style=for-the-badge&labelColor=2D2A6E" alt="Launch FxDart 101 — Interactive Docs" height="56">
+</a>
+
+<b>👆 Click above</b> for a guided course with a live in-browser playground for every function.
 
 ## Why fxdart?
 
