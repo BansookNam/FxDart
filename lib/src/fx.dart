@@ -192,6 +192,8 @@ class Fx<T> extends Iterable<T> {
 
   num sumBy(num Function(T a) f) => s.sumBy(f, _inner);
 
+  double averageBy(num Function(T a) f) => s.averageBy(f, _inner);
+
   (List<T>, List<T>) partition(bool Function(T a) f) => s.partition(f, _inner);
 
   int size() => s.size(_inner);
@@ -350,6 +352,9 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   Future<T?> maxBy(Object? Function(T a) f) => s.maxByAsync(f, _inner);
 
   Future<num> sumBy(FutureOr<num> Function(T a) f) => s.sumByAsync(f, _inner);
+
+  Future<double> averageBy(FutureOr<num> Function(T a) f) =>
+      s.averageByAsync(f, _inner);
 
   Future<(List<T>, List<T>)> partition(FutureOr<bool> Function(T a) f) =>
       s.partitionAsync(f, _inner);

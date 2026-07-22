@@ -177,6 +177,34 @@ Future<double> averageAsync(FxAsyncIterable<num> iterable) async {
   return size == 0 ? double.nan : total / size;
 }
 
+/// Averages the key [f] of every element — `map` + [average] in one step.
+///
+/// Empty input returns `double.nan` (the [average] contract).
+///
+/// Dart-native addition completing the by-key family
+/// ([sumBy] / [maxBy] / [minBy]).
+double averageBy<A>(num Function(A a) f, Iterable<A> iterable) {
+  var total = 0.0;
+  var count = 0;
+  for (final a in iterable) {
+    total += f(a);
+    count++;
+  }
+  return count == 0 ? double.nan : total / count;
+}
+
+/// Async counterpart of [averageBy].
+Future<double> averageByAsync<A>(
+    FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  var total = 0.0;
+  var count = 0;
+  await eachAsync((A a) async {
+    total += await f(a);
+    count++;
+  }, iterable);
+  return count == 0 ? double.nan : total / count;
+}
+
 num _minOf(num acc, num a) => a.isNaN || acc.isNaN
     ? double.nan
     : a < acc

@@ -1,3 +1,12 @@
+## 0.5.0
+
+### Added
+
+* **`averageBy`** (+ `averageByAsync`, and `.averageBy()` on the `fx()` and
+  async chains). The mean of a key over every element — one walk tracking a
+  running total and count. Empty input returns `NaN` (the `average`
+  contract). Completes the by-key family (`sumBy` / `maxBy` / `minBy`).
+
 ## 0.4.0
 
 ### Added
