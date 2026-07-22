@@ -1,0 +1,25 @@
+# Scoped analyzer config for the playground snippets under content/code/.
+#
+# Snippets keep full analysis — real errors here ship straight into the docs
+# playground, so the IDE should flag them (this caught a genuine type-inference
+# bug in reduce/0.dart). But four diagnostics are false positives by design
+# and are disabled for this directory only:
+#
+# - file_names: snippets are numbered assets (`content/code/<op>/<n>.dart`)
+#   ordered by tool/build_docs.dart, not library code.
+# - unused_import / unused_local_variable: the `2.dart` files are TODO
+#   exercises — the import and the setup variables are scaffolding that the
+#   reader's solution is supposed to use.
+# - prefer_function_declarations_over_variables: assigning closures to
+#   variables is the very thing the curried/uncurried lesson teaches.
+include: ../analysis_options.yaml
+
+analyzer:
+  errors:
+    unused_import: ignore
+    unused_local_variable: ignore
+
+linter:
+  rules:
+    file_names: false
+    prefer_function_declarations_over_variables: false
