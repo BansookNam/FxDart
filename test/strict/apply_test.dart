@@ -13,7 +13,7 @@ void main() {
     });
 
     test('should be able to be used in the pipeline', () {
-      final args = fx(range(1, 6)).toArray();
+      final args = fx(range(1, 6)).toList();
       final res = apply<num>(max5, args);
       expect(res, equals(5));
     });

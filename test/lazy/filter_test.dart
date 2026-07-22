@@ -16,7 +16,7 @@ void main() {
 
       test('should be able to handle an error', () {
         expect(
-          () => toArray(filter<int>((a) => throw 'err', range(1, 10))),
+          () => toList(filter<int>((a) => throw 'err', range(1, 10))),
           throwsA(equals('err')),
         );
       });
@@ -29,14 +29,14 @@ void main() {
           4
         ], [
           (v) => filter((int a) => a % 2 == 0, v),
-          (v) => toArray(v),
+          (v) => toList(v),
         ]);
 
         expect(res, equals([2, 4]));
       });
 
       test('should be able to be used as a chaining method in the `fx`', () {
-        final res = fx([1, 2, 3, 4]).filter((a) => a % 2 == 0).toArray();
+        final res = fx([1, 2, 3, 4]).filter((a) => a % 2 == 0).toList();
 
         expect(res, equals([2, 4]));
       });
@@ -56,7 +56,7 @@ void main() {
 
       test('should be able to handle an error', () async {
         await expectLater(
-          toArrayAsync(
+          toListAsync(
               filterAsync<int>((a) => throw 'err', toAsync(range(1, 10)))),
           throwsA(equals('err')),
         );
@@ -66,7 +66,7 @@ void main() {
           'should be able to handle an error when the callback is asynchronous',
           () async {
         await expectLater(
-          toArrayAsync(filterAsync<int>(
+          toListAsync(filterAsync<int>(
               (a) => Future<bool>.error(Exception('err')),
               toAsync(range(1, 10)))),
           throwsException,
@@ -82,7 +82,7 @@ void main() {
                 return a % 2 == 0;
               })
               .concurrent(5)
-              .toArray(),
+              .toList(),
           throwsA(equals('err')),
         );
       });
@@ -92,7 +92,7 @@ void main() {
         final res = await fxAsync(toAsync(range(1, 21)))
             .filter((a) => delay(const Duration(milliseconds: 100), a % 2 == 0))
             .concurrent(10)
-            .toArray();
+            .toList();
         sw.stop();
 
         expect(res, equals([2, 4, 6, 8, 10, 12, 14, 16, 18, 20]));
@@ -120,7 +120,7 @@ void main() {
         final res = await fxAsync(toAsync(range(1, 20)))
             .filter((a) => delay(const Duration(milliseconds: 20), false))
             .concurrent(2)
-            .toArray();
+            .toList();
         expect(res, equals([]));
       });
 
@@ -129,7 +129,7 @@ void main() {
         final res = await fxAsync(toAsync(range(1, 20)))
             .filter((a) => delay(const Duration(milliseconds: 20), true))
             .concurrent(2)
-            .toArray();
+            .toList();
 
         expect(
             res,
@@ -163,7 +163,7 @@ void main() {
             .take(10)
             .filter((a) => delay(const Duration(milliseconds: 50), a % 2 == 0))
             .concurrent(5)
-            .toArray();
+            .toList();
 
         expect(res, equals([2, 4, 6, 8, 10]));
       });
@@ -175,7 +175,7 @@ void main() {
             .filter((a) => delay(const Duration(milliseconds: 50), a % 2 == 0))
             .take(10)
             .concurrent(10)
-            .toArray();
+            .toList();
 
         expect(res, equals([2, 4, 6, 8, 10, 12, 14, 16, 18, 20]));
       });
@@ -186,7 +186,7 @@ void main() {
             .map((a) => delay(const Duration(milliseconds: 50), a + 10))
             .filter((a) => a % 2 == 0)
             .concurrent(10)
-            .toArray();
+            .toList();
 
         expect(res, equals([12, 14, 16, 18, 20, 22, 24, 26, 28, 30]));
       });
@@ -199,7 +199,7 @@ void main() {
             .filter((a) => a > 0)
             .concurrent(5)
             .take(8)
-            .toArray();
+            .toList();
 
         expect(res, equals([...range(1, 9)]));
       });
@@ -215,7 +215,7 @@ void main() {
                 return a > 20;
               })
               .concurrent(2)
-              .toArray(),
+              .toList(),
           throwsException,
         );
       });
@@ -230,13 +230,13 @@ void main() {
               })
               .filter((a) => a % 2 == 0)
               .concurrent(4)
-              .toArray(),
+              .toList(),
           throwsException,
         );
       });
 
       test('should be able to be used in the pipeline', () async {
-        final res = await toArrayAsync(
+        final res = await toListAsync(
             filterAsync((a) => a % 2 == 0, toAsync([1, 2, 3, 4])));
 
         expect(res, equals([2, 4]));
@@ -246,7 +246,7 @@ void main() {
           () async {
         final res = await fxAsync(toAsync([1, 2, 3, 4]))
             .filter((a) => a % 2 == 0)
-            .toArray();
+            .toList();
 
         expect(res, equals([2, 4]));
       });

@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import '../async_iterable.dart';
-import '../strict/aggregate.dart' show toArrayAsync;
+import '../strict/aggregate.dart' show toListAsync;
 
 /// Mulberry32-style seeded PRNG — port of FxTS `_internal/seededRandom.ts`
 /// so seeded shuffles are reproducible.
@@ -42,5 +42,5 @@ Future<List<T>> shuffleAsync<T>(FxAsyncIterable<T> iterable,
     [int? seed]) async {
   final random =
       seed != null ? createSeededRandom(seed) : math.Random().nextDouble;
-  return _shuffleList(await toArrayAsync(iterable), random);
+  return _shuffleList(await toListAsync(iterable), random);
 }

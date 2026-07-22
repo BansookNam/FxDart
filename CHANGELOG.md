@@ -1,4 +1,70 @@
-# 0.2.1
+## 0.2.2
+
+### Renamed for Dart idiom
+
+* **`toArray` → `toList`**, **`toArrayAsync` → `toListAsync`** *(breaking)*.
+  Dart has no "array" type — these have always returned a `List`, so they now
+  carry the Dart-standard name. Applies to the top-level functions and the
+  `fx()` / async chain terminals. The old names are **removed outright** (not
+  aliased): replace `toArray()` → `toList()` and `toArrayAsync()` →
+  `toListAsync()`.
+
+### Dart-idiomatic aliases added (both spellings supported)
+
+Every FxTS operator whose Dart `Iterable`/collection counterpart has a different
+established name now exposes **both** names — the FxTS name for parity and the
+Dart-idiomatic name as a first-class alias. Nothing is removed (that was
+`toArray`'s special case above); existing code keeps working, and the FxDart 101
+course teaches the Dart-idiomatic spelling. Aliases exist at every level: the
+top-level functions (+ their `*Async` twins), the `fx()` chain, and the async
+`FxAsync` chain. On the sync chain several Dart names come for free because
+`Fx extends Iterable` (Dart 3): `firstOrNull`, `lastOrNull`, `elementAtOrNull`,
+`any`, `forEach`, `length`, `indexed`, `nonNulls`, `contains`.
+
+*Type-name aliases — the FxTS name claims a type Dart doesn't have:*
+
+| FxTS name | Dart-idiomatic alias |
+|---|---|
+| `unicodeToArray` | `unicodeToList` |
+| `isBoolean` | `isBool` |
+| `isNumber` | `isNum` |
+| `isDate` | `isDateTime` |
+
+*Standard-library vocabulary aliases:*
+
+| FxTS name | Dart-idiomatic alias |
+|---|---|
+| `head` | `firstOrNull` |
+| `last` | `lastOrNull` |
+| `nth` | `elementAtOrNull` |
+| `find` | `firstWhereOrNull` |
+| `findIndex` | `indexWhere` |
+| `some` | `any` |
+| `size` | `count` (or `.length` on the chain) |
+| `each` | `forEach` |
+| `filter` | `where` |
+| `reject` | `whereNot` |
+| `flatMap` | `expand` |
+| `flat` | `flattened` |
+| `drop` / `dropWhile` | `skip` / `skipWhile` |
+| `uniq` / `uniqBy` | `distinct` / `distinctBy` |
+| `zipWithIndex` | `indexed` |
+| `compact` | `nonNulls` |
+| `toSorted` | `sorted` |
+| `takeRight` | `takeLast` |
+
+`includes` keeps only its FxTS spelling at the top level — a top-level `contains`
+would collide with `package:test`'s matcher; use the inherited `.contains()` on
+the chain for the Dart idiom. See `test/dart_aliases_test.dart` for the
+both-spellings contract.
+
+*Left as-is* — already Dart-idiomatic or intentionally FP with no stdlib
+counterpart: `map`, `take`, `takeWhile`, `reduce`, `fold`, `join`,
+`sum`/`min`/`max`/`average`, `every`, `isEmpty`, `isNull`/`isNotNull`,
+`isString`/`isList`/`isMap`, and the combinator/`pipe` family (`identity`,
+`tap`, `memoize`, `curried`, `pipe`, …).
+
+## 0.2.1
 * READEME.md update
 
 ## 0.2.0

@@ -8,21 +8,21 @@ void main() {
     group('sync', () {
       test('should return value that is reduced given elements successively',
           () {
-        expect(toArray(scan((int a, int b) => a * b, 1, [1, 2, 3, 4])),
+        expect(toList(scan((int a, int b) => a * b, 1, [1, 2, 3, 4])),
             equals([1, 1, 2, 6, 24]));
-        expect(toArray(scan((String a, String b) => a + b, 'a', ['b', 'c'])),
+        expect(toList(scan((String a, String b) => a + b, 'a', ['b', 'c'])),
             equals(['a', 'ab', 'abc']));
       });
 
       test('should reduce given elements successively without seed', () {
-        expect(toArray(scan1((int a, int b) => a * b, [1, 2, 3, 4])),
+        expect(toList(scan1((int a, int b) => a * b, [1, 2, 3, 4])),
             equals([1, 2, 6, 24]));
-        expect(toArray(scan1((String a, String b) => a + b, ['a', 'b', 'c'])),
+        expect(toList(scan1((String a, String b) => a + b, ['a', 'b', 'c'])),
             equals(['a', 'ab', 'abc']));
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = toArray(scan1((int a, int b) => a * b, [1, 2, 3, 4]));
+        final res = toList(scan1((int a, int b) => a * b, [1, 2, 3, 4]));
         expect(res, equals([1, 2, 6, 24]));
       });
     });
@@ -31,11 +31,11 @@ void main() {
       test('should return value that is reduced given elements successively',
           () async {
         expect(
-            await toArrayAsync(
+            await toListAsync(
                 scanAsync((int a, int b) => a * b, 1, toAsync([1, 2, 3, 4]))),
             equals([1, 1, 2, 6, 24]));
         expect(
-            await toArrayAsync(scanAsync(
+            await toListAsync(scanAsync(
                 (String a, String b) => a + b, 'a', toAsync(['b', 'c']))),
             equals(['a', 'ab', 'abc']));
       });
@@ -43,22 +43,22 @@ void main() {
       test('should reduce given elements successively when seed is a Future',
           () async {
         expect(
-            await toArrayAsync(scanAsync((int a, int b) => a * b,
+            await toListAsync(scanAsync((int a, int b) => a * b,
                 Future.value(1), toAsync([1, 2, 3, 4]))),
             equals([1, 1, 2, 6, 24]));
         expect(
-            await toArrayAsync(scanAsync((String a, String b) => a + b,
+            await toListAsync(scanAsync((String a, String b) => a + b,
                 Future.value('a'), toAsync(['b', 'c']))),
             equals(['a', 'ab', 'abc']));
       });
 
       test('should reduce given elements successively without seed', () async {
         expect(
-            await toArrayAsync(
+            await toListAsync(
                 scan1Async((int a, int b) => a * b, toAsync([1, 2, 3, 4]))),
             equals([1, 2, 6, 24]));
         expect(
-            await toArrayAsync(scan1Async(
+            await toListAsync(scan1Async(
                 (String a, String b) => a + b, toAsync(['a', 'b', 'c']))),
             equals(['a', 'ab', 'abc']));
       });
@@ -73,7 +73,7 @@ void main() {
 
       test('should be handled concurrently', () async {
         final sw = Stopwatch()..start();
-        final res = await toArrayAsync(concurrentAsync(
+        final res = await toListAsync(concurrentAsync(
             3,
             scanAsync(
                 (int a, int b) => a * b,
@@ -88,7 +88,7 @@ void main() {
 
       test('should be able to handle an error when working concurrent',
           () async {
-        final future = toArrayAsync(concurrentAsync(
+        final future = toListAsync(concurrentAsync(
             2,
             scan1Async((int a, int b) {
               if (a * b == 24) {

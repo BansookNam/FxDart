@@ -9,7 +9,7 @@ void main() {
       test(
           "should be merged values of each 'Iterable' with value at the corresponding position",
           () {
-        final res = toArray(transpose<Object>([
+        final res = toList(transpose<Object>([
           [1, 'a'],
           [2, 'b'],
           [3, 'c'],
@@ -23,7 +23,7 @@ void main() {
               ['a', 'b', 'c', 'd'],
             ]));
         expect(
-            toArray(transpose(res)),
+            toList(transpose(res)),
             equals([
               [1, 'a'],
               [2, 'b'],
@@ -33,7 +33,7 @@ void main() {
       });
 
       test('should be transposed if the iterables have different size', () {
-        final res = toArray(transpose([
+        final res = toList(transpose([
           [1, 2],
           [3],
           <int>[],
@@ -57,7 +57,7 @@ void main() {
           [2, 6],
           [3, 7],
           [4, 8, 9],
-        ])).take(2).map((row) => sum(row)).toArray();
+        ])).take(2).map((row) => sum(row)).toList();
 
         expect(res, equals([10, 26]));
       });
@@ -67,13 +67,13 @@ void main() {
           ['a', 1],
           ['b', 2],
           ['c', 3],
-        ])).map((value) => join('-', value)).toArray();
+        ])).map((value) => join('-', value)).toList();
 
         expect(res, equals(['a-b-c', '1-2-3']));
       });
 
       test('should transpose two rows into pairs', () {
-        final res = toArray(transpose([
+        final res = toList(transpose([
           [1, 2, 3, 4],
           [5, 6, 7, 8],
         ]));
@@ -93,7 +93,7 @@ void main() {
       test(
           "should be merged values of each 'AsyncIterable' with value at the corresponding position",
           () async {
-        final res = await toArrayAsync(transposeAsync([
+        final res = await toListAsync(transposeAsync([
           toAsync([1, 5]),
           toAsync([2, 6]),
           toAsync([3, 7]),
@@ -110,7 +110,7 @@ void main() {
 
       test('should be transposed if the iterables have different size',
           () async {
-        final res = await toArrayAsync(transposeAsync([
+        final res = await toListAsync(transposeAsync([
           toAsync([1, 2]),
           toAsync([3]),
           toAsync(<int>[]),
@@ -129,7 +129,7 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () async {
-        final res = await toArrayAsync(transposeAsync([
+        final res = await toListAsync(transposeAsync([
           toAsync([1, 2, 3, 4]),
           toAsync([5, 6, 7, 8]),
         ]));
@@ -145,7 +145,7 @@ void main() {
       });
 
       test('should be transposed sequentially', () async {
-        final res = await toArrayAsync(transposeAsync([
+        final res = await toListAsync(transposeAsync([
           toAsync([1, 2, 3, 4]),
           mapAsync((int a) => delay(const Duration(milliseconds: 50), a),
               toAsync([5, 6, 7, 8])),
@@ -169,7 +169,7 @@ void main() {
         ]))
             .map((l) => delay(const Duration(milliseconds: 100), l))
             .concurrent(4)
-            .toArray();
+            .toList();
 
         expect(
             res,

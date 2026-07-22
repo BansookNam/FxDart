@@ -80,7 +80,7 @@ void main() {
 
         final entriesResult = fx(entries(usersByRole))
             .map((e) => (role: e.$1, userName: e.$2.name, userId: e.$2.id))
-            .toArray();
+            .toList();
 
         expect(
             entriesResult,
@@ -113,7 +113,7 @@ void main() {
                   taskTitle: e.$2.title,
                   isHighPriority: e.$1 == 'high',
                 ))
-            .toArray();
+            .toList();
 
         expect(
             result,

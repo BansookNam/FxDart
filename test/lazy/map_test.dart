@@ -25,7 +25,7 @@ void main() {
           (v) => map((a) => a, v),
           (v) => map((a) => '$a', v),
           (v) => map((a) => a, v),
-          (v) => toArray(v),
+          (v) => toList(v),
         ]);
 
         expect(res, equals(['1', '2', '3', '4']));
@@ -36,7 +36,7 @@ void main() {
             .map((a) => a)
             .map((a) => '$a')
             .map((a) => a)
-            .toArray();
+            .toList();
 
         expect(res, equals(['1', '2', '3', '4']));
       });
@@ -56,13 +56,13 @@ void main() {
 
       test('should be mapped by the async callback', () async {
         final res =
-            await toArrayAsync(mapAsync(add10Async, toAsync(range(1, 6))));
+            await toListAsync(mapAsync(add10Async, toAsync(range(1, 6))));
         expect(res, equals([11, 12, 13, 14, 15]));
       });
 
       test('should be able to handle an error when asynchronous', () async {
         await expectLater(
-          toArrayAsync(mapAsync<int, int>(
+          toListAsync(mapAsync<int, int>(
               (a) => throw Exception('err'), toAsync(range(1, 10)))),
           throwsException,
         );
@@ -71,7 +71,7 @@ void main() {
       test('should be able to handle an error when asynchronous Future.error',
           () async {
         await expectLater(
-          toArrayAsync(mapAsync<int, int>(
+          toListAsync(mapAsync<int, int>(
               (a) => Future<int>.error(Exception('err')),
               toAsync(range(1, 10)))),
           throwsException,
@@ -83,7 +83,7 @@ void main() {
             .map((a) => Future.value(a))
             .map((a) => '$a')
             .map((a) => a)
-            .toArray();
+            .toList();
 
         expect(res, equals(['1', '2', '3', '4']));
       });
@@ -99,7 +99,7 @@ void main() {
         final res = await fxAsync(toAsync([1, 2, 3, 4]))
             .map((a) => Future.value(a))
             .map((a) => '$a')
-            .toArray();
+            .toList();
 
         expect(res, equals(['1', '2', '3', '4']));
       });

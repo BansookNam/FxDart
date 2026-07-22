@@ -12,13 +12,13 @@ void main() {
   group('chunk', () {
     group('sync', () {
       test('should be chunked by the given number - number', () {
-        final res = toArray(chunk(3, range(1, 12)));
-        expect(toArray(chunk(0, range(1, 12))), equals([]));
+        final res = toList(chunk(3, range(1, 12)));
+        expect(toList(chunk(0, range(1, 12))), equals([]));
         expect(res, equals(expected));
       });
 
       test('should be chunked by the given number - string', () {
-        final res = toArray(chunk(3, 'abcdefghijklmnopqrstuvwxyz'.split('')));
+        final res = toList(chunk(3, 'abcdefghijklmnopqrstuvwxyz'.split('')));
         expect(
             res,
             equals([
@@ -37,20 +37,20 @@ void main() {
       test('should be able to be used in the pipeline', () {
         final res = pipe(range(1, 12), [
           (v) => chunk(3, v),
-          (v) => toArray(v),
+          (v) => toList(v),
         ]);
         expect(res, equals(expected));
       });
 
       test('should be able to be used as a chaining method in the `fx`', () {
         expect(
-            fx([1, 2, 3, 4]).chunk(2).toArray(),
+            fx([1, 2, 3, 4]).chunk(2).toList(),
             equals([
               [1, 2],
               [3, 4],
             ]));
         expect(
-            fx([1, 2, 3, 4, 5]).chunk(2).toArray(),
+            fx([1, 2, 3, 4, 5]).chunk(2).toList(),
             equals([
               [1, 2],
               [3, 4],
@@ -61,12 +61,12 @@ void main() {
 
     group('async', () {
       test('should be chunked by the given number - number (empty)', () async {
-        final res = await toArrayAsync(chunkAsync(0, toAsync(range(1, 12))));
+        final res = await toListAsync(chunkAsync(0, toAsync(range(1, 12))));
         expect(res, equals([]));
       });
 
       test('should be chunked by the given number - number', () async {
-        final res = await toArrayAsync(chunkAsync(3, toAsync(range(1, 12))));
+        final res = await toListAsync(chunkAsync(3, toAsync(range(1, 12))));
         expect(res, equals(expected));
       });
 
@@ -76,7 +76,7 @@ void main() {
             .map((a) => delay(const Duration(milliseconds: 100), a))
             .concurrent(2)
             .chunk(3)
-            .toArray();
+            .toList();
         sw.stop();
 
         expect(res, equals(expected));
@@ -90,7 +90,7 @@ void main() {
             .filter((a) => a % 2 == 0)
             .concurrent(2)
             .chunk(3)
-            .toArray();
+            .toList();
         expect(
             res,
             equals([
@@ -107,7 +107,7 @@ void main() {
             .filter((a) => a % 2 == 0)
             .chunk(3)
             .concurrent(2)
-            .toArray();
+            .toList();
         expect(
             res,
             equals([
@@ -130,7 +130,7 @@ void main() {
               })
               .chunk(3)
               .concurrent(2)
-              .toArray(),
+              .toList(),
           throwsException,
         );
       });
@@ -144,26 +144,26 @@ void main() {
               .chunk(3)
               .map<List<int>>((a) => throw Exception('err'))
               .concurrent(2)
-              .toArray(),
+              .toList(),
           throwsException,
         );
       });
 
       test('should be able to be used in the pipeline', () async {
-        final res = await fxAsync(toAsync(range(1, 12))).chunk(3).toArray();
+        final res = await fxAsync(toAsync(range(1, 12))).chunk(3).toList();
         expect(res, equals(expected));
       });
 
       test('should be able to be used as a chaining method in the `fx`',
           () async {
         expect(
-            await fx([1, 2, 3, 4]).toAsync().chunk(2).toArray(),
+            await fx([1, 2, 3, 4]).toAsync().chunk(2).toList(),
             equals([
               [1, 2],
               [3, 4],
             ]));
         expect(
-            await fx([1, 2, 3, 4, 5]).toAsync().chunk(2).toArray(),
+            await fx([1, 2, 3, 4, 5]).toAsync().chunk(2).toList(),
             equals([
               [1, 2],
               [3, 4],

@@ -10,7 +10,7 @@ void main() {
         }
       }()));
 
-      final acc = await toArrayAsync(res);
+      final acc = await toListAsync(res);
       expect(acc, equals([1, 2, 3]));
     });
 
@@ -94,10 +94,10 @@ void main() {
 
     test('eagerly overlaps work even with a one-pull-at-a-time consumer',
         () async {
-      // toArray awaits each pull before the next; the pool must still keep
+      // toList awaits each pull before the next; the pool must still keep
       // itself full so total time is ~ceil(6/3)*100ms, not 6*100ms.
       final sw = Stopwatch()..start();
-      final acc = await toArrayAsync(concurrentPoolAsync(3, toAsync(() sync* {
+      final acc = await toListAsync(concurrentPoolAsync(3, toAsync(() sync* {
         for (var i = 1; i <= 6; i++) {
           yield delay(const Duration(milliseconds: 100), i);
         }

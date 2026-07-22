@@ -13,10 +13,10 @@ void main() {
         }
         expect(res, equals([1, 2]));
 
-        final res1 = toArray(takeWhile((a) => a > 10, [1, 2, 3, 4]));
+        final res1 = toList(takeWhile((a) => a > 10, [1, 2, 3, 4]));
         expect(res1, equals([]));
 
-        final res2 = toArray(takeWhile((a) => a > 0, [1, 2, 3, 4]));
+        final res2 = toList(takeWhile((a) => a > 0, [1, 2, 3, 4]));
         expect(res2, equals([1, 2, 3, 4]));
       });
 
@@ -25,7 +25,7 @@ void main() {
           (v) => map((int a) => a + 10, v),
           (v) => filter((int a) => a % 2 == 0, v),
           (v) => takeWhile((int a) => a < 20, v),
-          (v) => toArray(v),
+          (v) => toList(v),
         ]);
 
         expect(res, equals([12, 14, 16, 18]));
@@ -36,7 +36,7 @@ void main() {
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
             .takeWhile((a) => a < 20)
-            .toArray();
+            .toList();
 
         expect(res, equals([12, 14, 16, 18]));
       });
@@ -55,11 +55,11 @@ void main() {
         }
         expect(res, equals([1, 2]));
 
-        final res1 = await toArrayAsync(
+        final res1 = await toListAsync(
             takeWhileAsync((a) => a > 10, toAsync([1, 2, 3, 4])));
         expect(res1, equals([]));
 
-        final res2 = await toArrayAsync(
+        final res2 = await toListAsync(
             takeWhileAsync((a) => a > 0, toAsync([1, 2, 3, 4])));
         expect(res2, equals([1, 2, 3, 4]));
       });
@@ -67,15 +67,15 @@ void main() {
       test(
           'should be able to take the element while the async callback result is truthy',
           () async {
-        final res = await toArrayAsync(
+        final res = await toListAsync(
             takeWhileAsync((a) async => a < 3, toAsync([1, 2, 3, 4])));
         expect(res, equals([1, 2]));
 
-        final res1 = await toArrayAsync(
+        final res1 = await toListAsync(
             takeWhileAsync((a) async => a > 10, toAsync([1, 2, 3, 4])));
         expect(res1, equals([]));
 
-        final res2 = await toArrayAsync(
+        final res2 = await toListAsync(
             takeWhileAsync((a) async => a > 0, toAsync([1, 2, 3, 4])));
         expect(res2, equals([1, 2, 3, 4]));
       });
@@ -85,7 +85,7 @@ void main() {
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
             .takeWhile((a) => a < 20)
-            .toArray();
+            .toList();
 
         expect(res, equals([12, 14, 16, 18]));
       });
@@ -97,7 +97,7 @@ void main() {
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
             .takeWhile((a) => a < 20)
-            .toArray();
+            .toList();
 
         expect(res, equals([12, 14, 16, 18]));
       });
@@ -132,7 +132,7 @@ void main() {
             .filter((a) => a % 2 == 0)
             .takeWhile((a) => a < 22)
             .concurrent(2)
-            .toArray();
+            .toList();
         sw.stop();
 
         expect(res, equals([12, 14, 16, 18, 20]));

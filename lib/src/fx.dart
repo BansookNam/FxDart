@@ -19,7 +19,7 @@ import 'strict/aggregate.dart' as s;
 /// fx([1, 2, 3, 4, 5])
 ///     .map((a) => a + 10)
 ///     .filter((a) => a % 2 == 0)
-///     .toArray(); // [12, 14]
+///     .toList(); // [12, 14]
 /// ```
 Fx<T> fx<T>(Iterable<T> iterable) => Fx(iterable);
 
@@ -62,6 +62,9 @@ class Fx<T> extends Iterable<T> {
   /// Flattens nested iterables [depth] levels. Untyped — see top-level `flat`.
   Fx<dynamic> flat([int depth = 1]) => Fx(l.flat(_inner, depth));
 
+  /// Dart-idiomatic alias of [flat].
+  Fx<dynamic> flattened([int depth = 1]) => flat(depth);
+
   /// All elements [f] returns true for.
   Fx<T> filter(bool Function(T a) f) => Fx(l.filter(f, _inner));
 
@@ -71,10 +74,16 @@ class Fx<T> extends Iterable<T> {
   /// The opposite of [filter].
   Fx<T> reject(bool Function(T a) f) => Fx(l.reject(f, _inner));
 
+  /// Dart-idiomatic alias of [reject].
+  Fx<T> whereNot(bool Function(T a) f) => reject(f);
+
   @override
   Fx<T> take(int count) => Fx(l.take(count, _inner));
 
   Fx<T> takeRight(int count) => Fx(l.takeRight(count, _inner));
+
+  /// Dart-idiomatic alias of [takeRight].
+  Fx<T> takeLast(int count) => takeRight(count);
 
   @override
   Fx<T> takeWhile(bool Function(T value) test) => Fx(l.takeWhile(test, _inner));
@@ -111,7 +120,13 @@ class Fx<T> extends Iterable<T> {
 
   Fx<T> uniq() => Fx(l.uniq(_inner));
 
+  /// Dart-idiomatic alias of [uniq].
+  Fx<T> distinct() => uniq();
+
   Fx<T> uniqBy<B>(B Function(T a) f) => Fx(l.uniqBy(f, _inner));
+
+  /// Dart-idiomatic alias of [uniqBy].
+  Fx<T> distinctBy<B>(B Function(T a) f) => uniqBy(f);
 
   Fx<(T, U)> zip<U>(Iterable<U> other) => Fx(l.zip(_inner, other));
 
@@ -142,7 +157,9 @@ class Fx<T> extends Iterable<T> {
 
   // --- terminal operators -------------------------------------------------
 
-  List<T> toArray() => s.toArray(_inner);
+  /// Materializes the pipeline into a [List] (Dart's `Iterable.toList`).
+  @override
+  List<T> toList({bool growable = true}) => _inner.toList(growable: growable);
 
   void each(void Function(T a) f) => s.each(f, _inner);
 
@@ -159,7 +176,13 @@ class Fx<T> extends Iterable<T> {
 
   T? find(bool Function(T a) f) => s.find(f, _inner);
 
+  /// Dart-idiomatic alias of [find] (cf. `package:collection`).
+  T? firstWhereOrNull(bool Function(T a) f) => find(f);
+
   int findIndex(bool Function(T a) f) => s.findIndex(f, _inner);
+
+  /// Dart-idiomatic alias of [findIndex] (cf. `List.indexWhere`).
+  int indexWhere(bool Function(T a) f) => findIndex(f);
 
   T? head() => s.head(_inner);
 
@@ -278,7 +301,8 @@ class FxAsync<T> implements FxAsyncIterable<T> {
 
   // --- terminal operators -------------------------------------------------
 
-  Future<List<T>> toArray() => s.toArrayAsync(_inner);
+  /// Materializes the async pipeline into a [List].
+  Future<List<T>> toList() => s.toListAsync(_inner);
 
   Future<void> each(FutureOr<void> Function(T a) f) => s.eachAsync(f, _inner);
 
@@ -323,6 +347,61 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   Future<List<T>> sortBy(Object? Function(T a) f) => s.sortByAsync(f, _inner);
 
   Future<int> size() => s.sizeAsync(_inner);
+
+  // --- Dart-idiomatic aliases -------------------------------------------
+  // FxAsync does not extend Iterable, so the Dart names are provided as
+  // explicit aliases here. Both spellings are supported; the 101 teaches these.
+
+  /// Alias of [filter].
+  FxAsync<T> where(FutureOr<bool> Function(T a) f) => filter(f);
+
+  /// Alias of [reject].
+  FxAsync<T> whereNot(FutureOr<bool> Function(T a) f) => reject(f);
+
+  /// Alias of [flatMap].
+  FxAsync<R> expand<R>(FutureOr<Iterable<R>> Function(T a) f) => flatMap(f);
+
+  /// Alias of [flat].
+  FxAsync<dynamic> flattened([int depth = 1]) => flat(depth);
+
+  /// Alias of [drop].
+  FxAsync<T> skip(int count) => drop(count);
+
+  /// Alias of [dropWhile].
+  FxAsync<T> skipWhile(FutureOr<bool> Function(T a) f) => dropWhile(f);
+
+  /// Alias of [takeRight].
+  FxAsync<T> takeLast(int count) => takeRight(count);
+
+  /// Alias of [uniq].
+  FxAsync<T> distinct() => uniq();
+
+  /// Alias of [uniqBy].
+  FxAsync<T> distinctBy<B>(FutureOr<B> Function(T a) f) => uniqBy(f);
+
+  /// Alias of [zipWithIndex].
+  FxAsync<(int, T)> indexed() => zipWithIndex();
+
+  /// Alias of [each].
+  Future<void> forEach(FutureOr<void> Function(T a) f) => each(f);
+
+  /// Alias of [some].
+  Future<bool> any(FutureOr<bool> Function(T a) f) => some(f);
+
+  /// Alias of [find].
+  Future<T?> firstWhereOrNull(FutureOr<bool> Function(T a) f) => find(f);
+
+  /// Alias of [findIndex].
+  Future<int> indexWhere(FutureOr<bool> Function(T a) f) => findIndex(f);
+
+  /// Alias of [head].
+  Future<T?> firstOrNull() => head();
+
+  /// Alias of [last].
+  Future<T?> lastOrNull() => last();
+
+  /// Alias of [size].
+  Future<int> count() => size();
 }
 
 /// Numeric terminals for [FxAsync] chains (generic covariance makes these

@@ -25,7 +25,7 @@ void main() {
       test(
           'should apply `f` to each same positioned pair [AsyncIterable/Iterable]',
           () async {
-        final res = await toArrayAsync(zipWithAsync(
+        final res = await toListAsync(zipWithAsync(
             (String a, int b) => {a: b}, toAsync(iter1), toAsync(iter2)));
         expect(res, equals(then));
       });
@@ -33,7 +33,7 @@ void main() {
       test(
           'should apply `f` to each same positioned pair [AsyncIterable/AsyncIterable] with async callback',
           () async {
-        final res = await toArrayAsync(zipWithAsync(
+        final res = await toListAsync(zipWithAsync(
             (String a, int b) async => {a: b}, toAsync(iter1), toAsync(iter2)));
         expect(res, equals(then));
       });

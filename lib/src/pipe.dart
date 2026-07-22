@@ -29,7 +29,7 @@ dynamic _applyStep(dynamic acc, Function f) {
 /// pipe([1, 2, 3, 4, 5], [
 ///   (Iterable<int> a) => map((n) => n + 10, a),
 ///   (Iterable<int> a) => filter((n) => n % 2 == 0, a),
-///   toArray,
+///   toList,
 /// ]); // [12, 14]
 /// ```
 dynamic pipe(dynamic a, List<Function> fns) {

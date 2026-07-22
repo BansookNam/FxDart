@@ -157,9 +157,12 @@ R Function(T value) cases<T, R>(List<(bool Function(T), R Function(T))> pairs,
 
 /// Splits a string into a list of user-perceived characters, handling
 /// surrogate pairs — the same behavior as FxTS `unicodeToArray`, which
-/// splits by code point.
-List<String> unicodeToArray(String s) =>
+/// splits by code point. Named `unicodeToList` for Dart idiom (returns a List).
+List<String> unicodeToList(String s) =>
     [for (final rune in s.runes) String.fromCharCode(rune)];
+
+/// FxTS-named alias of [unicodeToList].
+List<String> unicodeToArray(String s) => unicodeToList(s);
 
 /// TypeScript's `curry` relies on reflection over a function's arity plus
 /// recursive conditional types (`Curry<...>`), neither of which exists in

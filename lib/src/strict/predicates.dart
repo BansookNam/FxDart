@@ -20,17 +20,26 @@ bool isNil(Object? a) => a == null;
 @Deprecated('Dart has no undefined; use isNull instead')
 bool isUndefined(Object? a) => a == null;
 
-/// True when [a] is a [bool]. Port of FxTS `isBoolean`.
-bool isBoolean(Object? a) => a is bool;
+/// True when [a] is a [bool]. Port of FxTS `isBoolean` (Dart type: `bool`).
+bool isBool(Object? a) => a is bool;
 
-/// True when [a] is a [num]. Port of FxTS `isNumber`.
-bool isNumber(Object? a) => a is num;
+/// FxTS-named alias of [isBool].
+bool isBoolean(Object? a) => isBool(a);
+
+/// True when [a] is a [num]. Port of FxTS `isNumber` (Dart type: `num`).
+bool isNum(Object? a) => a is num;
+
+/// FxTS-named alias of [isNum].
+bool isNumber(Object? a) => isNum(a);
 
 /// True when [a] is a [String]. Port of FxTS `isString`.
 bool isString(Object? a) => a is String;
 
-/// True when [a] is a [DateTime]. Port of FxTS `isDate`.
-bool isDate(Object? a) => a is DateTime;
+/// True when [a] is a [DateTime]. Port of FxTS `isDate` (Dart type: `DateTime`).
+bool isDateTime(Object? a) => a is DateTime;
+
+/// FxTS-named alias of [isDateTime].
+bool isDate(Object? a) => isDateTime(a);
 
 /// True when [a] is a [List]. Port of FxTS `isArray`.
 bool isList(Object? a) => a is List;

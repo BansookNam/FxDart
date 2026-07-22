@@ -17,13 +17,13 @@ void main() {
           {'x': 3},
         ]);
         expect(
-            toArray(iter),
+            toList(iter),
             equals([
               {'x': 1},
             ]));
 
         expect(
-            toArray(intersectionBy(
+            toList(intersectionBy(
                 (String a) => a, 'abcd'.split(''), 'cdefgc'.split(''))),
             equals(['c', 'd']));
       });
@@ -32,7 +32,7 @@ void main() {
     group('async', () {
       test('should return all elements in iterable2 contained in iterable1',
           () async {
-        final res = await toArrayAsync(intersectionByAsync(
+        final res = await toListAsync(intersectionByAsync(
             (Map<String, int> a) => a['x'],
             toAsync([
               {'x': 1},
@@ -50,13 +50,13 @@ void main() {
             ]));
 
         expect(
-            await toArrayAsync(intersectionByAsync((String a) => a,
+            await toListAsync(intersectionByAsync((String a) => a,
                 toAsync('abcd'.split('')), toAsync('cdefgc'.split('')))),
             equals(['c', 'd']));
       });
 
       test('should support an async callback', () async {
-        final res = await toArrayAsync(intersectionByAsync(
+        final res = await toListAsync(intersectionByAsync(
             (int a) async => a % 10, toAsync([1, 2]), toAsync([11, 13, 21])));
         expect(res, equals([11, 21]));
       });

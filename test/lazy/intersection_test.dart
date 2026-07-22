@@ -8,14 +8,14 @@ void main() {
     group('sync', () {
       test('should return all elements in iterable2 contained in iterable1',
           () {
-        expect(toArray(intersection([1, 2, 3, 4], [3, 4, 4, 5, 6])),
+        expect(toList(intersection([1, 2, 3, 4], [3, 4, 4, 5, 6])),
             equals([3, 4]));
-        expect(toArray(intersection('abcd'.split(''), 'cdefgc'.split(''))),
+        expect(toList(intersection('abcd'.split(''), 'cdefgc'.split(''))),
             equals(['c', 'd']));
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = toArray(intersection([2, 4, 5, 6], [1, 2, 3, 4]));
+        final res = toList(intersection([2, 4, 5, 6], [1, 2, 3, 4]));
         expect(res, equals([2, 4]));
       });
     });
@@ -24,24 +24,24 @@ void main() {
       test('should return all elements in iterable2 contained in iterable1',
           () async {
         expect(
-            await toArrayAsync(intersectionAsync(
+            await toListAsync(intersectionAsync(
                 toAsync([1, 2, 3, 4]), toAsync([3, 4, 4, 5, 6, 3]))),
             equals([3, 4]));
         expect(
-            await toArrayAsync(intersectionAsync(
+            await toListAsync(intersectionAsync(
                 toAsync('abcd'.split('')), toAsync('cdefg'.split('')))),
             equals(['c', 'd']));
       });
 
       test('should be able to be used in the pipeline', () async {
-        final res = await toArrayAsync(
+        final res = await toListAsync(
             intersectionAsync(toAsync([2, 4, 5, 6]), toAsync([1, 2, 3, 4])));
         expect(res, equals([2, 4]));
       });
 
       test('should be handled concurrently', () async {
         final sw = Stopwatch()..start();
-        final res = await toArrayAsync(concurrentAsync(
+        final res = await toListAsync(concurrentAsync(
             3,
             intersectionAsync(
                 toAsync([3, 4, 5]),

@@ -44,7 +44,7 @@ void main() {
         final res2 = await pipe(toAsync([1, 2, 3, 4, 5]), [
           (FxAsyncIterable<int> n) => mapAsync((int a) => a + 5, n),
           (FxAsyncIterable<int> n) => filterAsync((int a) => a % 2 == 0, n),
-          (FxAsyncIterable<int> n) => toArrayAsync(n),
+          (FxAsyncIterable<int> n) => toListAsync(n),
           (List<int> n) => fold(0, (int a, int b) => a + b, n),
         ]);
 
@@ -59,7 +59,7 @@ void main() {
           3
         ], [
           (List<int> v) => Future.value(v),
-          (List<int> v) => toArray(map((int a) => a + 1, v)),
+          (List<int> v) => toList(map((int a) => a + 1, v)),
         ]);
 
         expect(res, isA<Future<dynamic>>());
@@ -122,7 +122,7 @@ void main() {
         final f = pipeLazy([
           (Iterable<int> n) => map((int a) => a + 5, n),
           (Iterable<int> n) => filter((int a) => a % 2 == 0, n),
-          (Iterable<int> n) => toArray(n),
+          (Iterable<int> n) => toList(n),
         ]);
         expect(f([1, 2, 3, 4, 5]), equals([6, 8, 10]));
         expect(await f(Future.value([1, 2, 3, 4, 5])), equals([6, 8, 10]));

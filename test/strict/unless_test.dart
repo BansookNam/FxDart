@@ -6,7 +6,7 @@ void main() {
   group('unless', () {
     test('do process function if predicate returns false', () {
       var count = 0;
-      final result = unless<Object>(isNumber, (input) {
+      final result = unless<Object>(isNum, (input) {
         count += 1;
         return int.parse(input as String);
       }, '0');
@@ -16,7 +16,7 @@ void main() {
 
     test('skip process function if predicate returns true', () {
       var count = 0;
-      final result = unless<Object>(isNumber, (input) {
+      final result = unless<Object>(isNum, (input) {
         count += 1;
         return input;
       }, 0);

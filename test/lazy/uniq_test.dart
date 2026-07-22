@@ -15,7 +15,7 @@ void main() {
       });
 
       test('should keep distinct (identity-unequal) map objects', () {
-        final res = toArray(uniq([
+        final res = toList(uniq([
           {'v': 1},
           {'v': 1},
           {'v': 1},
@@ -38,7 +38,7 @@ void main() {
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
             .uniq()
-            .toArray();
+            .toList();
         expect(res, equals([12, 14]));
       });
     });
@@ -46,10 +46,10 @@ void main() {
     group('async', () {
       test('should be removed duplicate values', () async {
         final res1 =
-            await toArrayAsync(uniqAsync(toAsync('marpple'.split(''))));
+            await toListAsync(uniqAsync(toAsync('marpple'.split(''))));
         expect(res1, equals(['m', 'a', 'r', 'p', 'l', 'e']));
 
-        final res2 = await toArrayAsync(uniqAsync(toAsync([1, 2, 3, 4])));
+        final res2 = await toListAsync(uniqAsync(toAsync([1, 2, 3, 4])));
         expect(res2, equals([1, 2, 3, 4]));
       });
 
@@ -59,7 +59,7 @@ void main() {
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
             .uniq()
-            .toArray();
+            .toList();
         expect(res, equals([12, 14]));
       });
 

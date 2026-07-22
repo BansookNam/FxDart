@@ -86,7 +86,7 @@ void main() {
               filter(matches({'age': 30}), us),
           (Iterable<Map<String, Object>> us) =>
               map((Map<String, Object> u) => u['name'], us),
-          (Iterable<Object?> names) => toArray(names),
+          (Iterable<Object?> names) => toList(names),
         ]);
         expect(result, equals(['John', 'Bob']));
       });
@@ -95,7 +95,7 @@ void main() {
         final result = fx(users)
             .filter(matches({'active': true}))
             .map((u) => u['id'])
-            .toArray();
+            .toList();
         expect(result, equals([1, 3]));
       });
     });
@@ -174,7 +174,7 @@ void main() {
           },
         ];
 
-        final result = toArray(filter(
+        final result = toList(filter(
             matches({
               'user': {
                 'profile': {'age': 30}
@@ -201,7 +201,7 @@ void main() {
           },
         ];
 
-        final result = toArray(filter(
+        final result = toList(filter(
             matches({
               'tags': ['a', 'b']
             }),
@@ -235,7 +235,7 @@ void main() {
           },
         ];
 
-        final result = toArray(filter(
+        final result = toList(filter(
             matches({
               'items': [
                 {'x': 1},

@@ -34,7 +34,7 @@ void main() {
           (v) => compact(v),
           (v) => map((int a) => a + 10, v),
           (v) => filter((int a) => a % 2 == 0, v),
-          (v) => toArray(v),
+          (v) => toList(v),
         ]);
 
         expect(res, equals([14, 18]));
@@ -55,7 +55,7 @@ void main() {
       });
 
       test("should be excluded 'null' - string", () async {
-        final res = await toArrayAsync(
+        final res = await toListAsync(
             compactAsync(toAsync<String?>(['', 'a', null, 'b', null])));
         expect(res, equals(['', 'a', 'b']));
       });
@@ -65,7 +65,7 @@ void main() {
                 compactAsync(toAsync<int?>([1, null, 3, 4, 5, null, 7, 8])))
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
-            .toArray();
+            .toList();
 
         expect(res, equals([14, 18]));
       });

@@ -11,7 +11,7 @@ int add(int a, int b) => a + b;
 final addOne = add.curried(1); // int Function(int) — fully typed
 addOne(2); // 3
 
-fx([1, 2, 3]).map(multiply.curried(10)).toArray(); // [10, 20, 30]
+fx([1, 2, 3]).map(multiply.curried(10)).toList(); // [10, 20, 30]
 ```
 
 ## The problem: FxTS `curry` cannot be ported

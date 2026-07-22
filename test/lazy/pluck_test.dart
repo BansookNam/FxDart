@@ -22,7 +22,7 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = toArray(filter((int? a) => a! > 21, pluck('age', given)));
+        final res = toList(filter((int? a) => a! > 21, pluck('age', given)));
         expect(res, equals([22, 23, 24]));
       });
     });
@@ -31,12 +31,12 @@ void main() {
       test(
           'should return Iterable by plucking the same named property off all objects in the Iterable supplied',
           () async {
-        final acc = await toArrayAsync(pluckAsync('age', toAsync(given)));
+        final acc = await toListAsync(pluckAsync('age', toAsync(given)));
         expect(acc, equals([21, 22, 23, 24]));
       });
 
       test('should be able to be used in the pipeline', () async {
-        final res = await toArrayAsync(filterAsync(
+        final res = await toListAsync(filterAsync(
             (int? a) => a! > 21, pluckAsync('age', toAsync(given))));
         expect(res, equals([22, 23, 24]));
       });

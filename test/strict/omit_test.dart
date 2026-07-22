@@ -18,7 +18,7 @@ void main() {
           'c': true
         }, [
           (Map<String, Object> m) => omit(['a', 'b'], m),
-          (Map<String, Object> m) => toArray(entries(m)),
+          (Map<String, Object> m) => toList(entries(m)),
         ]);
         expect(res, equals([('c', true)]));
       });

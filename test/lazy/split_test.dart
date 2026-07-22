@@ -26,7 +26,7 @@ void main() {
       });
 
       test('should be splited by separator(unicode)', () {
-        final iter = split(',', unicodeToArray('👍,😀,🙇‍♂️,🤩,🎉'));
+        final iter = split(',', unicodeToList('👍,😀,🙇‍♂️,🤩,🎉'));
         expect([...iter], equals(['👍', '😀', '🙇‍♂️', '🤩', '🎉']));
       });
 
@@ -35,7 +35,7 @@ void main() {
           (v) => split(',', v),
           (v) => map((String a) => int.parse(a), v),
           (v) => filter((int a) => a % 2 == 0, v),
-          (v) => toArray(v),
+          (v) => toList(v),
         ]);
 
         expect(res, equals([2, 4, 6, 8, 10]));
@@ -44,13 +44,13 @@ void main() {
 
     group('async', () {
       test('should return an empty array', () async {
-        final res = await toArrayAsync(splitAsync('', toAsync(''.split(''))));
+        final res = await toListAsync(splitAsync('', toAsync(''.split(''))));
         expect(res, equals([]));
       });
 
       test('should be splited by empty string', () async {
         final res =
-            await toArrayAsync(splitAsync('', toAsync('abcdefg'.split(''))));
+            await toListAsync(splitAsync('', toAsync('abcdefg'.split(''))));
         expect(res, equals(['a', 'b', 'c', 'd', 'e', 'f', 'g']));
       });
 
@@ -67,14 +67,14 @@ void main() {
 
       test('should be appended empty string if there is a separator at the end',
           () async {
-        final res = await toArrayAsync(
+        final res = await toListAsync(
             splitAsync(',', toAsync('a,b,c,d,e,f,g,'.split(''))));
         expect(res, equals(['a', 'b', 'c', 'd', 'e', 'f', 'g', '']));
       });
 
       test('should be splited by separator(unicode)', () async {
-        final res = await toArrayAsync(
-            splitAsync(',', toAsync(unicodeToArray('👍,😀,🙇‍♂️,🤩,🎉'))));
+        final res = await toListAsync(
+            splitAsync(',', toAsync(unicodeToList('👍,😀,🙇‍♂️,🤩,🎉'))));
         expect(res, equals(['👍', '😀', '🙇‍♂️', '🤩', '🎉']));
       });
 
@@ -83,7 +83,7 @@ void main() {
                 splitAsync(',', toAsync('1,2,3,4,5,6,7,8,9,10'.split(''))))
             .map((a) => int.parse(a))
             .filter((a) => a % 2 == 0)
-            .toArray();
+            .toList();
 
         expect(res, equals([2, 4, 6, 8, 10]));
       });
@@ -103,7 +103,7 @@ void main() {
 
         final res = await fxAsync(splitAsync(',', toAsync(source())))
             .concurrent(5)
-            .toArray();
+            .toList();
 
         expect(res, equals(['1', '2', '3', '4', '5']));
       });
@@ -116,7 +116,7 @@ void main() {
             .map((a) => int.parse(a))
             .filter((a) => a % 2 == 0)
             .concurrent(5)
-            .toArray();
+            .toList();
         sw.stop();
 
         expect(res, equals([2, 4, 6, 8, 10]));

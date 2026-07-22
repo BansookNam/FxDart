@@ -17,14 +17,14 @@ void main() {
           {'x': 3},
         ]);
         expect(
-            toArray(iter),
+            toList(iter),
             equals([
               {'x': 2},
               {'x': 3},
             ]));
 
         expect(
-            toArray(differenceBy(
+            toList(differenceBy(
                 (String a) => a, 'abcd'.split(''), 'cdefg'.split(''))),
             equals(['e', 'f', 'g']));
       });
@@ -33,7 +33,7 @@ void main() {
     group('async', () {
       test('should return all elements in iterable2 not contained in iterable1',
           () async {
-        final res = await toArrayAsync(differenceByAsync(
+        final res = await toListAsync(differenceByAsync(
             (Map<String, int> a) => a['x'],
             toAsync([
               {'x': 1},
@@ -52,13 +52,13 @@ void main() {
             ]));
 
         expect(
-            await toArrayAsync(differenceByAsync((String a) => a,
+            await toListAsync(differenceByAsync((String a) => a,
                 toAsync('abcd'.split('')), toAsync('cdefg'.split('')))),
             equals(['e', 'f', 'g']));
       });
 
       test('should support an async callback', () async {
-        final res = await toArrayAsync(differenceByAsync(
+        final res = await toListAsync(differenceByAsync(
             (int a) async => a % 10, toAsync([1, 2]), toAsync([11, 13, 21])));
         expect(res, equals([13]));
       });

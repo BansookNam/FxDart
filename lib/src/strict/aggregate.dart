@@ -4,13 +4,14 @@ import '../async_iterable.dart';
 
 /// Materializes any iterable into a [List].
 ///
-/// Port of FxTS `toArray` (sync).
-List<A> toArray<A>(Iterable<A> iterable) => List.of(iterable);
+/// Port of FxTS `toArray` (sync); named `toList` to match Dart's
+/// `Iterable.toList` (Dart has no "array" type — this always returns a [List]).
+List<A> toList<A>(Iterable<A> iterable) => List.of(iterable);
 
 /// Materializes an [FxAsyncIterable] into a [List].
 ///
-/// Port of FxTS `toArray` (async).
-Future<List<A>> toArrayAsync<A>(FxAsyncIterable<A> iterable) async {
+/// Port of FxTS `toArray` (async); named `toListAsync` for Dart idiom.
+Future<List<A>> toListAsync<A>(FxAsyncIterable<A> iterable) async {
   final result = <A>[];
   final iterator = iterable.iterator;
   while (true) {
@@ -214,7 +215,7 @@ String join<A>(String sep, Iterable<A> iterable) => iterable.join(sep);
 
 /// Async counterpart of [join].
 Future<String> joinAsync<A>(String sep, FxAsyncIterable<A> iterable) async =>
-    (await toArrayAsync(iterable)).join(sep);
+    (await toListAsync(iterable)).join(sep);
 
 /// Splits values into groups keyed by [f].
 ///
@@ -286,7 +287,7 @@ List<A> sort<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
 /// Async counterpart of [sort].
 Future<List<A>> sortAsync<A>(
         int Function(A a, A b) f, FxAsyncIterable<A> iterable) async =>
-    (await toArrayAsync(iterable))..sort(f);
+    (await toListAsync(iterable))..sort(f);
 
 /// Alias of [sort]; FxTS added `toSorted` as the non-mutating variant, which
 /// the Dart [sort] already is.

@@ -41,7 +41,7 @@ void main() {
         final res = await fxAsync(toAsync(range(5)))
             .map((a) =>
                 tap((v) => delay(const Duration(milliseconds: 10), v), a))
-            .toArray();
+            .toList();
         expect(res, equals([0, 1, 2, 3, 4]));
       });
     });

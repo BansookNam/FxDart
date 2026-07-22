@@ -18,7 +18,7 @@ Iterable<B> map<A, B>(B Function(A a) f, Iterable<A> iterable) sync* {
 /// Async counterpart of [map]. The callback may return a [Future].
 ///
 /// ```dart
-/// await toArrayAsync(mapAsync((a) async => a + 10, toAsync([1, 2, 3])));
+/// await toListAsync(mapAsync((a) async => a + 10, toAsync([1, 2, 3])));
 /// // [11, 12, 13]
 /// ```
 FxAsyncIterable<B> mapAsync<A, B>(

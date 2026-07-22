@@ -9,7 +9,7 @@ void main() {
             ((n) => gt(15, n), (n) => n + 20),
             ((n) => gt(25, n), (n) => n + 10),
           ]))
-          .toArray();
+          .toList();
       expect(res, equals([30, 30, 30]));
     });
 
@@ -21,7 +21,7 @@ void main() {
           .map(cases<Map<String, String>, String>([
             ((n) => n.containsKey('b'), (n) => n['b']!),
           ], orElse: (n) => n['a']!))
-          .toArray();
+          .toList();
       expect(res, equals(['B', 'A']));
 
       final upper = cases<Object, String>([
@@ -36,7 +36,7 @@ void main() {
           .map(cases<int, Object>([
             ((n) => lt(0, n), always('positive')),
           ]))
-          .toArray();
+          .toList();
       expect(res, equals(['positive', -5]));
     });
 

@@ -21,7 +21,7 @@ void main() {
         ], [
           (v) => flatMap((String s) => s.split(' '), v),
           (v) => map((String a) => a.toUpperCase(), v),
-          (v) => toArray(v),
+          (v) => toList(v),
         ]);
 
         expect(res, equals(['IT', 'IS', 'A', 'GOOD', 'DAY']));
@@ -31,7 +31,7 @@ void main() {
         final res = fx(['It is', 'a good', 'day'])
             .flatMap((s) => s.split(' '))
             .map((a) => a.toUpperCase())
-            .toArray();
+            .toList();
 
         expect(res, equals(['IT', 'IS', 'A', 'GOOD', 'DAY']));
       });
@@ -54,7 +54,7 @@ void main() {
         final res = await fxAsync(toAsync(['It is', 'a good', 'day']))
             .flatMap((s) => s.split(' '))
             .map((a) => a.toUpperCase())
-            .toArray();
+            .toList();
 
         expect(res, equals(['IT', 'IS', 'A', 'GOOD', 'DAY']));
       });
@@ -64,7 +64,7 @@ void main() {
         final res = await fxAsync(toAsync(['It is', 'a good', 'day']))
             .flatMap((s) => Future.value(s.split(' ')))
             .map((a) => a.toUpperCase())
-            .toArray();
+            .toList();
 
         expect(res, equals(['IT', 'IS', 'A', 'GOOD', 'DAY']));
       });

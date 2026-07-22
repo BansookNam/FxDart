@@ -18,7 +18,7 @@ void main() {
           'c': true
         }, [
           (Map<String, Object> m) => pick(['a', 'b'], m),
-          (Map<String, Object> m) => toArray(entries(m)),
+          (Map<String, Object> m) => toList(entries(m)),
         ]);
         expect(res, equals([('a', 1), ('b', '2')]));
       });

@@ -93,7 +93,7 @@ void main() {
         final result = fromEntries(fx(entries(groupBy((t) => t.status, tasks)))
             .map((e) =>
                 (e.$1, fold(0, (int sum, item) => sum + item.priority, e.$2)))
-            .toArray());
+            .toList());
 
         expect(
             result,
@@ -118,7 +118,7 @@ void main() {
                   total: fold(0, (int sum, item) => sum + item.value, e.$2),
                   count: e.$2.length,
                 ))
-            .toArray();
+            .toList();
 
         expect(
             result,

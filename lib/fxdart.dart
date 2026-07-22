@@ -24,6 +24,7 @@ export 'src/async_iterable.dart'
         concurrentAsync,
         concurrentPoolAsync;
 export 'src/fx.dart' show fx, fxAsync, fxStream, Fx, FxAsync, FxNum, FxAsyncNum;
+export 'src/dart_aliases.dart';
 export 'src/lazy/combine.dart';
 export 'src/lazy/filter.dart';
 export 'src/lazy/map.dart';

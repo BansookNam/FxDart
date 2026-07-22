@@ -11,12 +11,12 @@ void main() {
         }
         expect(res, equals([4]));
 
-        expect(toArray(takeRight(0, [1, 2, 3, 4])), equals([]));
-        expect(toArray(takeRight(1, [1, 2, 3, 4])), equals([4]));
-        expect(toArray(takeRight(2, [1, 2, 3, 4])), equals([3, 4]));
-        expect(toArray(takeRight(3, [1, 2, 3, 4])), equals([2, 3, 4]));
-        expect(toArray(takeRight(4, [1, 2, 3, 4])), equals([1, 2, 3, 4]));
-        expect(toArray(takeRight(5, [1, 2, 3, 4])), equals([1, 2, 3, 4]));
+        expect(toList(takeRight(0, [1, 2, 3, 4])), equals([]));
+        expect(toList(takeRight(1, [1, 2, 3, 4])), equals([4]));
+        expect(toList(takeRight(2, [1, 2, 3, 4])), equals([3, 4]));
+        expect(toList(takeRight(3, [1, 2, 3, 4])), equals([2, 3, 4]));
+        expect(toList(takeRight(4, [1, 2, 3, 4])), equals([1, 2, 3, 4]));
+        expect(toList(takeRight(5, [1, 2, 3, 4])), equals([1, 2, 3, 4]));
       });
 
       test('should be able to be used in the pipeline', () {
@@ -31,7 +31,7 @@ void main() {
           (v) => map((int a) => a + 10, v),
           (v) => filter((int a) => a % 2 == 0, v),
           (v) => takeRight(2, v),
-          (v) => toArray(v),
+          (v) => toList(v),
         ]);
 
         expect(res1, equals([14, 16]));
@@ -60,17 +60,17 @@ void main() {
         }
         expect(res, equals([4]));
 
-        expect(await toArrayAsync(takeRightAsync(0, toAsync([1, 2, 3, 4]))),
+        expect(await toListAsync(takeRightAsync(0, toAsync([1, 2, 3, 4]))),
             equals([]));
-        expect(await toArrayAsync(takeRightAsync(1, toAsync([1, 2, 3, 4]))),
+        expect(await toListAsync(takeRightAsync(1, toAsync([1, 2, 3, 4]))),
             equals([4]));
-        expect(await toArrayAsync(takeRightAsync(2, toAsync([1, 2, 3, 4]))),
+        expect(await toListAsync(takeRightAsync(2, toAsync([1, 2, 3, 4]))),
             equals([3, 4]));
-        expect(await toArrayAsync(takeRightAsync(3, toAsync([1, 2, 3, 4]))),
+        expect(await toListAsync(takeRightAsync(3, toAsync([1, 2, 3, 4]))),
             equals([2, 3, 4]));
-        expect(await toArrayAsync(takeRightAsync(4, toAsync([1, 2, 3, 4]))),
+        expect(await toListAsync(takeRightAsync(4, toAsync([1, 2, 3, 4]))),
             equals([1, 2, 3, 4]));
-        expect(await toArrayAsync(takeRightAsync(5, toAsync([1, 2, 3, 4]))),
+        expect(await toListAsync(takeRightAsync(5, toAsync([1, 2, 3, 4]))),
             equals([1, 2, 3, 4]));
       });
 
@@ -79,7 +79,7 @@ void main() {
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
             .takeRight(2)
-            .toArray();
+            .toList();
 
         expect(res1, equals([14, 16]));
       });
@@ -91,7 +91,7 @@ void main() {
             .filter((a) => a % 2 == 0)
             .takeRight(3)
             .concurrent(3)
-            .toArray();
+            .toList();
         sw.stop();
 
         expect(res, equals([6, 8, 10]));

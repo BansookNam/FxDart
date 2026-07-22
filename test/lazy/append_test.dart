@@ -7,40 +7,40 @@ void main() {
   group('append', () {
     group('sync', () {
       test('should be contained the contents of the given element', () {
-        expect(toArray(append('c', ['a', 'b'])), equals(['a', 'b', 'c']));
+        expect(toList(append('c', ['a', 'b'])), equals(['a', 'b', 'c']));
       });
 
       test('should be contained the contents of the given element - string',
           () {
-        expect(toArray(append('c', 'ab'.split(''))), equals(['a', 'b', 'c']));
+        expect(toList(append('c', 'ab'.split(''))), equals(['a', 'b', 'c']));
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = fx(range(1, 4)).append(4).append(5).append(6).toArray();
+        final res = fx(range(1, 4)).append(4).append(5).append(6).toList();
         expect(res, equals([1, 2, 3, 4, 5, 6]));
       });
 
       test('should be able to be used chaining method in the `fx`', () {
-        final res = fx(range(1, 4)).append(4).append(5).toArray();
+        final res = fx(range(1, 4)).append(4).append(5).toList();
         expect(res, equals([1, 2, 3, 4, 5]));
       });
     });
 
     group('async', () {
       test('should be contained the contents of the given element', () async {
-        final res = await toArrayAsync(appendAsync('c', toAsync(['a', 'b'])));
+        final res = await toListAsync(appendAsync('c', toAsync(['a', 'b'])));
         expect(res, equals(['a', 'b', 'c']));
       });
 
       test('should be able to append a Future element', () async {
-        final res = await toArrayAsync(appendAsync(
+        final res = await toListAsync(appendAsync(
             delay(const Duration(milliseconds: 100), 4), toAsync([1, 2, 3])));
         expect(res, equals([1, 2, 3, 4]));
       });
 
       test('should be able to be used chaining method in the `fx`', () async {
         final res =
-            await fx(range(1, 4)).toAsync().append(4).append(5).toArray();
+            await fx(range(1, 4)).toAsync().append(4).append(5).toList();
         expect(res, equals([1, 2, 3, 4, 5]));
       });
 
@@ -57,7 +57,7 @@ void main() {
         it = appendAsync(chain(4), it);
         it = appendAsync(chain(5), it);
         it = appendAsync(chain(6), it);
-        expect(await toArrayAsync(it), equals([1, 2, 3, 4, 5, 6]));
+        expect(await toListAsync(it), equals([1, 2, 3, 4, 5, 6]));
       });
 
       test('should be appended concurrently', () async {
@@ -69,7 +69,7 @@ void main() {
             .append(Future.value(5))
             .append(6)
             .concurrent(3)
-            .toArray();
+            .toList();
         expect(res, equals([1, 2, 3, 4, 5, 6]));
         // sequential would be ~300ms; concurrent(3) is ~100ms
         expect(sw.elapsedMilliseconds, lessThan(250));

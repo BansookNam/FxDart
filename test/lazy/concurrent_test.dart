@@ -11,7 +11,7 @@ void main() {
       }()));
 
       final sw = Stopwatch()..start();
-      final acc = await toArrayAsync(res);
+      final acc = await toListAsync(res);
       expect(acc, equals([1, 2, 3, 4]));
       // sequential is ~600ms; concurrent(2) is ~300ms
       expect(sw.elapsedMilliseconds, lessThan(500));
@@ -40,7 +40,7 @@ void main() {
           .toAsync()
           .map((a) => delay(const Duration(milliseconds: 100), a))
           .concurrent(2)
-          .toArray();
+          .toList();
       expect(arr, equals([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]));
       // sequential is ~1000ms; concurrent(2) is ~500ms
       expect(sw.elapsedMilliseconds, lessThan(900));

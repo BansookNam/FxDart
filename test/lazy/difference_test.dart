@@ -8,14 +8,14 @@ void main() {
     group('sync', () {
       test('should return all elements in iterable2 not contained in iterable1',
           () {
-        expect(toArray(difference([1, 2, 3, 4], [3, 4, 5, 6, 5, 3])),
+        expect(toList(difference([1, 2, 3, 4], [3, 4, 5, 6, 5, 3])),
             equals([5, 6]));
-        expect(toArray(difference('abcd'.split(''), 'cdefg'.split(''))),
+        expect(toList(difference('abcd'.split(''), 'cdefg'.split(''))),
             equals(['e', 'f', 'g']));
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = toArray(difference([2, 4, 5, 6], [1, 2, 3, 4]));
+        final res = toList(difference([2, 4, 5, 6], [1, 2, 3, 4]));
         expect(res, equals([1, 3]));
       });
     });
@@ -24,24 +24,24 @@ void main() {
       test('should return all elements in iterable2 not contained in iterable1',
           () async {
         expect(
-            await toArrayAsync(differenceAsync(
+            await toListAsync(differenceAsync(
                 toAsync([1, 2, 3, 4]), toAsync([3, 4, 5, 6, 5, 3]))),
             equals([5, 6]));
         expect(
-            await toArrayAsync(differenceAsync(
+            await toListAsync(differenceAsync(
                 toAsync('abcd'.split('')), toAsync('cdefg'.split('')))),
             equals(['e', 'f', 'g']));
       });
 
       test('should be able to be used in the pipeline', () async {
-        final res = await toArrayAsync(
+        final res = await toListAsync(
             differenceAsync(toAsync([2, 4, 5, 6]), toAsync([1, 2, 3, 4])));
         expect(res, equals([1, 3]));
       });
 
       test('should be handled concurrently', () async {
         final sw = Stopwatch()..start();
-        final res = await toArrayAsync(concurrentAsync(
+        final res = await toListAsync(concurrentAsync(
             3,
             differenceAsync(
                 toAsync([3, 4, 5]),

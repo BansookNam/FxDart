@@ -48,29 +48,29 @@ void main() {
     });
   });
 
-  group('isBoolean', () {
+  group('isBool', () {
     test('given non boolean then should return false', () {
       for (final s in <Object?>[null, 1, '1', _returnNull, [], {}]) {
-        expect(isBoolean(s), isFalse, reason: 'value: $s');
+        expect(isBool(s), isFalse, reason: 'value: $s');
       }
     });
 
     test('given boolean then should return true', () {
-      expect(isBoolean(true), isTrue);
-      expect(isBoolean(false), isTrue);
+      expect(isBool(true), isTrue);
+      expect(isBool(false), isTrue);
     });
   });
 
-  group('isNumber', () {
+  group('isNum', () {
     test('given non number then should return false', () {
       for (final s in <Object?>[null, true, '1', _returnNull, [], {}]) {
-        expect(isNumber(s), isFalse, reason: 'value: $s');
+        expect(isNum(s), isFalse, reason: 'value: $s');
       }
     });
 
     test('given number then should return true', () {
-      expect(isNumber(2), isTrue);
-      expect(isNumber(2.5), isTrue);
+      expect(isNum(2), isTrue);
+      expect(isNum(2.5), isTrue);
     });
   });
 
@@ -87,7 +87,7 @@ void main() {
     });
   });
 
-  group('isDate', () {
+  group('isDateTime', () {
     test('given non DateTime then should return false', () {
       for (final v in <Object?>[
         null,
@@ -98,12 +98,12 @@ void main() {
         {},
         [],
       ]) {
-        expect(isDate(v), isFalse, reason: 'value: $v');
+        expect(isDateTime(v), isFalse, reason: 'value: $v');
       }
     });
 
     test('given DateTime then should return true', () {
-      expect(isDate(DateTime.now()), isTrue);
+      expect(isDateTime(DateTime.now()), isTrue);
     });
   });
 

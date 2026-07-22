@@ -34,18 +34,18 @@ void main() {
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
             .uniqBy((a) => a)
-            .toArray();
+            .toList();
         expect(res, equals([12, 14]));
       });
     });
 
     group('async', () {
       test('should be removed duplicate values by the callback', () async {
-        final res1 = await toArrayAsync(
+        final res1 = await toListAsync(
             uniqByAsync((String a) => a, toAsync('marpple'.split(''))));
         expect(res1, equals(['m', 'a', 'r', 'p', 'l', 'e']));
 
-        final res2 = await toArrayAsync(uniqByAsync(
+        final res2 = await toListAsync(uniqByAsync(
             (Map<String, int> a) => a['age'],
             toAsync([
               {'age': 21},
@@ -62,7 +62,7 @@ void main() {
               {'age': 23},
             ]));
 
-        final res3 = await toArrayAsync(
+        final res3 = await toListAsync(
             uniqByAsync((int a) => a, toAsync([1, 2, 3, 4])));
         expect(res3, equals([1, 2, 3, 4]));
       });
@@ -73,7 +73,7 @@ void main() {
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
             .uniqBy((a) => a)
-            .toArray();
+            .toList();
         expect(res, equals([12, 14]));
       });
 

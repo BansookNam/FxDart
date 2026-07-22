@@ -42,7 +42,7 @@ void main() {
     group('async', () {
       test('should zip three async iterables', () async {
         expect(
-          await toArrayAsync(
+          await toListAsync(
               zip3Async(toAsync([1, 2]), toAsync(['a', 'b']), toAsync([true, false]))),
           equals([(1, 'a', true), (2, 'b', false)]),
         );
@@ -50,7 +50,7 @@ void main() {
 
       test('should stop at the shortest iterable', () async {
         expect(
-          await toArrayAsync(zip3Async(
+          await toListAsync(zip3Async(
               toAsync([1, 2, 3]), toAsync(['a', 'b']), toAsync([true, false, true]))),
           equals([(1, 'a', true), (2, 'b', false)]),
         );
@@ -58,17 +58,17 @@ void main() {
 
       test('should return empty when any iterable is empty', () async {
         expect(
-          await toArrayAsync(
+          await toListAsync(
               zip3Async(toAsync(<int>[]), toAsync(['a']), toAsync([true]))),
           equals([]),
         );
         expect(
-          await toArrayAsync(
+          await toListAsync(
               zip3Async(toAsync([1]), toAsync(<String>[]), toAsync([true]))),
           equals([]),
         );
         expect(
-          await toArrayAsync(
+          await toListAsync(
               zip3Async(toAsync([1]), toAsync(['a']), toAsync(<bool>[]))),
           equals([]),
         );
@@ -80,7 +80,7 @@ void main() {
           [
             (FxAsyncIterable<(int, String, bool)> a) =>
                 mapAsync((r) => '${r.$1}${r.$2}${r.$3}', a),
-            (FxAsyncIterable<String> a) => toArrayAsync(a),
+            (FxAsyncIterable<String> a) => toListAsync(a),
           ],
         );
         expect(res, equals(['1atrue', '2bfalse']));

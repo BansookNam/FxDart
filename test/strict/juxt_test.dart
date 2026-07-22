@@ -19,10 +19,10 @@ void main() {
     test('should be able to be used in the pipeline', () {
       List<(Object?, Object?)> entriesOf(Map<String, int> obj) {
         final r = juxt<Map<String, int>, List<Object?>>([
-          (m) => toArray(keys(m)),
-          (m) => toArray(values(m)),
+          (m) => toList(keys(m)),
+          (m) => toList(values(m)),
         ])(obj);
-        return toArray(zip(r[0], r[1]));
+        return toList(zip(r[0], r[1]));
       }
 
       final res = entriesOf({'a': 1, 'b': 2});

@@ -21,7 +21,7 @@ void main() {
     group('async', () {
       test('should be returned as a tuple (index, value)', () async {
         final items = ['a', 'b', 'c', 'd'];
-        final res = await toArrayAsync(zipWithIndexAsync(toAsync(items)));
+        final res = await toListAsync(zipWithIndexAsync(toAsync(items)));
         expect(res, equals([(0, 'a'), (1, 'b'), (2, 'c'), (3, 'd')]));
       });
 

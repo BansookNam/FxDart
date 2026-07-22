@@ -11,14 +11,14 @@ void main() {
         final input = [1, 2, 3, 4];
         final result = shuffle(input);
         expect(result.length, equals(4));
-        expect(toArray(result)..sort(), equals([1, 2, 3, 4]));
+        expect(toList(result)..sort(), equals([1, 2, 3, 4]));
       });
 
       test('should return the given string chars in shuffled order', () {
         final input = 'abcd'.split('');
         final result = shuffle(input);
         expect(result.length, equals(4));
-        expect(toArray(result)..sort(), equals(['a', 'b', 'c', 'd']));
+        expect(toList(result)..sort(), equals(['a', 'b', 'c', 'd']));
       });
 
       test('should handle empty array', () {
@@ -46,10 +46,10 @@ void main() {
           6
         ], [
           (List<int> a) => shuffle(a),
-          (List<int> a) => toArray(a),
+          (List<int> a) => toList(a),
         ]) as List;
         expect(res.length, equals(6));
-        expect(toArray(res)..sort(), equals([1, 2, 3, 4, 5, 6]));
+        expect(toList(res)..sort(), equals([1, 2, 3, 4, 5, 6]));
       });
 
       test(
@@ -102,7 +102,7 @@ void main() {
         final result = shuffle(input, 42);
 
         expect(result.length, equals(5));
-        expect(toArray(result)..sort(), equals([1, 2, 3, 4, 5]));
+        expect(toList(result)..sort(), equals([1, 2, 3, 4, 5]));
       });
 
       test('should work with seed 0', () {
@@ -116,16 +116,16 @@ void main() {
 
         final res1 = pipe(input, [
           (List<int> arr) => shuffle(arr, seed),
-          (List<int> arr) => toArray(arr),
+          (List<int> arr) => toList(arr),
         ]) as List;
         final res2 = pipe(input, [
           (List<int> arr) => shuffle(arr, seed),
-          (List<int> arr) => toArray(arr),
+          (List<int> arr) => toList(arr),
         ]) as List;
 
         expect(res1, equals(res2));
         expect(res1.length, equals(6));
-        expect(toArray(res1)..sort(), equals([1, 2, 3, 4, 5, 6]));
+        expect(toList(res1)..sort(), equals([1, 2, 3, 4, 5, 6]));
       });
     });
 
@@ -133,13 +133,13 @@ void main() {
       test('should return the given list elements in shuffled order', () async {
         final result = await shuffleAsync(toAsync([1, 2, 3, 4]));
         expect(result.length, equals(4));
-        expect(toArray(result)..sort(), equals([1, 2, 3, 4]));
+        expect(toList(result)..sort(), equals([1, 2, 3, 4]));
       });
 
       test('should return the given string chars in shuffled order', () async {
         final result = await shuffleAsync(toAsync('abcd'.split('')));
         expect(result.length, equals(4));
-        expect(toArray(result)..sort(), equals(['a', 'b', 'c', 'd']));
+        expect(toList(result)..sort(), equals(['a', 'b', 'c', 'd']));
       });
 
       test('should handle empty async array', () async {
@@ -157,10 +157,10 @@ void main() {
         ], [
           (List<int> a) => toAsync(a),
           (FxAsyncIterable<int> a) => shuffleAsync(a),
-          (List<int> a) => toArray(a),
+          (List<int> a) => toList(a),
         ]) as List;
         expect(res.length, equals(6));
-        expect(toArray(res)..sort(), equals([1, 2, 3, 4, 5, 6]));
+        expect(toList(res)..sort(), equals([1, 2, 3, 4, 5, 6]));
       });
 
       test(
@@ -213,7 +213,7 @@ void main() {
         final result = await shuffleAsync(toAsync(input), 42);
 
         expect(result.length, equals(5));
-        expect(toArray(result)..sort(), equals([1, 2, 3, 4, 5]));
+        expect(toList(result)..sort(), equals([1, 2, 3, 4, 5]));
       });
 
       test('should be able to be used with seed in pipeline', () async {
@@ -223,17 +223,17 @@ void main() {
         final res1 = await pipe(input, [
           (List<int> a) => toAsync(a),
           (FxAsyncIterable<int> a) => shuffleAsync(a, seed),
-          (List<int> a) => toArray(a),
+          (List<int> a) => toList(a),
         ]) as List;
         final res2 = await pipe(input, [
           (List<int> a) => toAsync(a),
           (FxAsyncIterable<int> a) => shuffleAsync(a, seed),
-          (List<int> a) => toArray(a),
+          (List<int> a) => toList(a),
         ]) as List;
 
         expect(res1, equals(res2));
         expect(res1.length, equals(6));
-        expect(toArray(res1)..sort(), equals([1, 2, 3, 4, 5, 6]));
+        expect(toList(res1)..sort(), equals([1, 2, 3, 4, 5, 6]));
       });
     });
   });

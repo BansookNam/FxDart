@@ -10,7 +10,7 @@ void main() {
           acc.add(a);
         }
         expect(acc, equals([3, 4, 5]));
-        expect(toArray(drop(0, [1, 2, 3, 4, 5])), equals([1, 2, 3, 4, 5]));
+        expect(toList(drop(0, [1, 2, 3, 4, 5])), equals([1, 2, 3, 4, 5]));
       });
 
       test('should be able to be used in the pipeline', () {
@@ -27,7 +27,7 @@ void main() {
           (v) => map((int a) => a + 10, v),
           (v) => filter((int a) => a % 2 == 0, v),
           (v) => drop(2, v),
-          (v) => toArray(v),
+          (v) => toList(v),
         ]);
 
         expect(res, equals([16, 18]));
@@ -38,7 +38,7 @@ void main() {
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
             .drop(2)
-            .toArray();
+            .toList();
 
         expect(res, equals([16, 18]));
       });
@@ -55,7 +55,7 @@ void main() {
         }
         expect(acc, equals([3, 4, 5]));
 
-        expect(await toArrayAsync(dropAsync(0, toAsync([1, 2, 3, 4, 5]))),
+        expect(await toListAsync(dropAsync(0, toAsync([1, 2, 3, 4, 5]))),
             equals([1, 2, 3, 4, 5]));
       });
 
@@ -64,7 +64,7 @@ void main() {
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
             .drop(2)
-            .toArray();
+            .toList();
 
         expect(res, equals([16, 18]));
       });
@@ -75,7 +75,7 @@ void main() {
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
             .drop(2)
-            .toArray();
+            .toList();
 
         expect(res, equals([16, 18]));
       });
@@ -87,7 +87,7 @@ void main() {
             .filter((a) => a % 2 == 0)
             .drop(2)
             .concurrent(3)
-            .toArray();
+            .toList();
         sw.stop();
 
         expect(res, equals([6, 8, 10]));
@@ -100,7 +100,7 @@ void main() {
           fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
               .filter((a) => throw Exception('err'))
               .drop(2)
-              .toArray(),
+              .toList(),
           throwsException,
         );
       });
@@ -115,7 +115,7 @@ void main() {
               })
               .drop(2)
               .concurrent(3)
-              .toArray(),
+              .toList(),
           throwsException,
         );
       });
@@ -131,7 +131,7 @@ void main() {
               })
               .drop(2)
               .concurrent(3)
-              .toArray(),
+              .toList(),
           throwsException,
         );
       });

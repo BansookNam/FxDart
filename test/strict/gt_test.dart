@@ -7,38 +7,38 @@ void main() {
       test(
           'given array then should return array with values the pivot is greater than',
           () {
-        final result = fx([4, 5, 6]).filter((x) => gt(5, x)).toArray();
+        final result = fx([4, 5, 6]).filter((x) => gt(5, x)).toList();
         expect(result, equals([4]));
       });
 
       test('given array then should return empty array', () {
-        final result = fx([5, 6, 7]).filter((x) => gt(5, x)).toArray();
+        final result = fx([5, 6, 7]).filter((x) => gt(5, x)).toList();
         expect(result, equals(<int>[]));
       });
 
       test('given string array then should return [a, b]', () {
         final result =
-            fx(['a', 'b', 'c', 'd', 'e']).filter((x) => gt('c', x)).toArray();
+            fx(['a', 'b', 'c', 'd', 'e']).filter((x) => gt('c', x)).toList();
         expect(result, equals(['a', 'b']));
       });
 
       test('given string array then should return empty array', () {
         final result =
-            fx(['a', 'b', 'c', 'd']).filter((x) => gt('a', x)).toArray();
+            fx(['a', 'b', 'c', 'd']).filter((x) => gt('a', x)).toList();
         expect(result, equals(<String>[]));
       });
 
       test('given date array then should return date array', () {
         final result = fx([DateTime(2022, 5, 10), DateTime(2022, 4, 9)])
             .filter((x) => gt(DateTime(2022, 4, 10), x))
-            .toArray();
+            .toList();
         expect(result, equals([DateTime(2022, 4, 9)]));
       });
 
       test('given date array then should return empty array', () {
         final result = fx([DateTime(2021, 5, 10), DateTime(2021, 4, 9)])
             .filter((x) => gt(DateTime(2020, 10, 12), x))
-            .toArray();
+            .toList();
         expect(result, equals(<DateTime>[]));
       });
     });

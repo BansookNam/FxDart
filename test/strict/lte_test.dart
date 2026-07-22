@@ -5,23 +5,23 @@ void main() {
   group('lte(less than or equal to)', () {
     group('currying (closures)', () {
       test('given array then should return values the pivot is lte', () {
-        final result = fx([4, 5, 6]).filter((x) => lte(5, x)).toArray();
+        final result = fx([4, 5, 6]).filter((x) => lte(5, x)).toList();
         expect(result, equals([5, 6]));
       });
 
       test('given array then should return empty array', () {
-        final result = fx([6, 7]).filter((x) => lte(8, x)).toArray();
+        final result = fx([6, 7]).filter((x) => lte(8, x)).toList();
         expect(result, equals(<int>[]));
       });
 
       test('given string array then should return [d, e]', () {
         final result =
-            fx(['a', 'b', 'c', 'd', 'e']).filter((x) => lte('d', x)).toArray();
+            fx(['a', 'b', 'c', 'd', 'e']).filter((x) => lte('d', x)).toList();
         expect(result, equals(['d', 'e']));
       });
 
       test('given string array then should return empty array', () {
-        final result = fx(['b', 'c', 'd']).filter((x) => lte('e', x)).toArray();
+        final result = fx(['b', 'c', 'd']).filter((x) => lte('e', x)).toList();
         expect(result, equals(<String>[]));
       });
 
@@ -30,14 +30,14 @@ void main() {
           DateTime(2022, 3, 10),
           DateTime(2022, 4, 9),
           DateTime(2022, 4, 10),
-        ]).filter((x) => lte(DateTime(2022, 4, 8), x)).toArray();
+        ]).filter((x) => lte(DateTime(2022, 4, 8), x)).toList();
         expect(result, equals([DateTime(2022, 4, 9), DateTime(2022, 4, 10)]));
       });
 
       test('given date array then should return empty array', () {
         final result = fx([DateTime(2021, 5, 10), DateTime(2021, 4, 9)])
             .filter((x) => lte(DateTime.now(), x))
-            .toArray();
+            .toList();
         expect(result, equals(<DateTime>[]));
       });
     });

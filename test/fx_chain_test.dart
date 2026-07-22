@@ -6,7 +6,7 @@ import 'package:test/test.dart' hide isEmpty, isNull, isNotNull, isList, isMap;
 void main() {
   group('Fx chain', () {
     test('to should apply a converter to the whole chain', () {
-      final res = fx([1, 2, 3]).to((it) => it.toArray().length);
+      final res = fx([1, 2, 3]).to((it) => it.toList().length);
       expect(res, equals(3));
     });
 
@@ -15,68 +15,68 @@ void main() {
       final res = fx([1, 2, 3]).mapEffect((a) {
         seen.add(a);
         return a * 2;
-      }).toArray();
+      }).toList();
       expect(res, equals([2, 4, 6]));
       expect(seen, equals([1, 2, 3]));
     });
 
     test('expand should behave like flatMap', () {
       expect(
-        fx([1, 2, 3]).expand((a) => [a, a]).toArray(),
+        fx([1, 2, 3]).expand((a) => [a, a]).toList(),
         equals([1, 1, 2, 2, 3, 3]),
       );
     });
 
     test('where should behave like filter', () {
-      expect(fx([1, 2, 3, 4]).where((a) => a.isEven).toArray(), equals([2, 4]));
+      expect(fx([1, 2, 3, 4]).where((a) => a.isEven).toList(), equals([2, 4]));
     });
 
     test('reject should drop matching elements', () {
-      expect(fx([1, 2, 3, 4]).reject((a) => a.isEven).toArray(), equals([1, 3]));
+      expect(fx([1, 2, 3, 4]).reject((a) => a.isEven).toList(), equals([1, 3]));
     });
 
     test('takeRight should keep the last n elements', () {
-      expect(fx([1, 2, 3, 4, 5]).takeRight(2).toArray(), equals([4, 5]));
+      expect(fx([1, 2, 3, 4, 5]).takeRight(2).toList(), equals([4, 5]));
     });
 
     test('skip should behave like drop', () {
-      expect(fx([1, 2, 3, 4]).skip(2).toArray(), equals([3, 4]));
+      expect(fx([1, 2, 3, 4]).skip(2).toList(), equals([3, 4]));
     });
 
     test('dropRight should drop the last n elements', () {
-      expect(fx([1, 2, 3, 4, 5]).dropRight(2).toArray(), equals([1, 2, 3]));
+      expect(fx([1, 2, 3, 4, 5]).dropRight(2).toList(), equals([1, 2, 3]));
     });
 
     test('dropWhile should drop the leading matches', () {
-      expect(fx([1, 2, 3, 1]).dropWhile((a) => a < 3).toArray(), equals([3, 1]));
+      expect(fx([1, 2, 3, 1]).dropWhile((a) => a < 3).toList(), equals([3, 1]));
     });
 
     test('skipWhile should behave like dropWhile', () {
       expect(
-          fx([1, 2, 3, 1]).skipWhile((a) => a < 3).toArray(), equals([3, 1]));
+          fx([1, 2, 3, 1]).skipWhile((a) => a < 3).toList(), equals([3, 1]));
     });
 
     test('dropUntil should drop through the first match', () {
-      expect(fx([1, 2, 3, 4]).dropUntil((a) => a == 2).toArray(), equals([3, 4]));
+      expect(fx([1, 2, 3, 4]).dropUntil((a) => a == 2).toList(), equals([3, 4]));
     });
 
     test('zipWithIndex should pair each element with its index', () {
       expect(
-        fx(['a', 'b']).zipWithIndex().toArray(),
+        fx(['a', 'b']).zipWithIndex().toList(),
         equals([(0, 'a'), (1, 'b')]),
       );
     });
 
     test('scan should emit the seed then the running accumulator', () {
       expect(
-        fx([1, 2, 3]).scan<int>((acc, a) => acc + a, 0).toArray(),
+        fx([1, 2, 3]).scan<int>((acc, a) => acc + a, 0).toList(),
         equals([0, 1, 3, 6]),
       );
     });
 
     test('sort should sort with the comparator', () {
       expect(
-        fx([3, 1, 2]).sort((a, b) => a.compareTo(b)).toArray(),
+        fx([3, 1, 2]).sort((a, b) => a.compareTo(b)).toList(),
         equals([1, 2, 3]),
       );
     });
@@ -86,7 +86,7 @@ void main() {
         fx([
           {'n': 3},
           {'n': 1},
-        ]).sortBy((a) => a['n']).toArray(),
+        ]).sortBy((a) => a['n']).toList(),
         equals([
           {'n': 1},
           {'n': 3},
@@ -121,7 +121,7 @@ void main() {
     test('fxStream should wrap a Stream', () async {
       final res = await fxStream(Stream.fromIterable([1, 2, 3]))
           .map((a) => a * 2)
-          .toArray();
+          .toList();
       expect(res, equals([2, 4, 6]));
     });
 
@@ -135,14 +135,14 @@ void main() {
       final res = await fxAsync(toAsync([1, 2, 3])).mapEffect((a) {
         seen.add(a);
         return a * 2;
-      }).toArray();
+      }).toList();
       expect(res, equals([2, 4, 6]));
       expect(seen, equals([1, 2, 3]));
     });
 
     test('zipWithIndex should pair each element with its index', () async {
       expect(
-        await fxAsync(toAsync(['a', 'b'])).zipWithIndex().toArray(),
+        await fxAsync(toAsync(['a', 'b'])).zipWithIndex().toList(),
         equals([(0, 'a'), (1, 'b')]),
       );
     });
@@ -151,7 +151,7 @@ void main() {
       expect(
         await fxAsync(toAsync([1, 2, 3]))
             .scan<int>((acc, a) => acc + a, 0)
-            .toArray(),
+            .toList(),
         equals([0, 1, 3, 6]),
       );
     });

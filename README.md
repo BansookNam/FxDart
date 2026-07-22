@@ -46,30 +46,30 @@ import 'package:fxdart/fxdart.dart';
 fx([1, 2, 3, 4, 5])
     .map((a) => a + 10)
     .filter((a) => a % 2 == 0)
-    .toArray(); // [12, 14]
+    .toList(); // [12, 14]
 
 // Equivalent with top-level functions:
-toArray(filter((a) => a % 2 == 0, map((a) => a + 10, [1, 2, 3, 4, 5])));
+toList(filter((a) => a % 2 == 0, map((a) => a + 10, [1, 2, 3, 4, 5])));
 
 // Laziness: only 3 squares are ever computed.
-fx(range(1, 1000000)).map((a) => a * a).take(3).toArray(); // [1, 4, 9]
+fx(range(1, 1000000)).map((a) => a * a).take(3).toList(); // [1, 4, 9]
 ```
 
 ### Async pipelines
 
 Async operators work on `FxAsyncIterable<T>` — a pull-based protocol ported from
 FxTS's `AsyncIterable` handling. Lift values in with `toAsync` / `fromStream`
-(or `.toAsync()` on a chain), and out with `.toArray()` / `.toStream()`:
+(or `.toAsync()` on a chain), and out with `.toList()` / `.toStream()`:
 
 ```dart
 await fx([1, 2, 3, 4])
     .toAsync()
     .map((a) async => a + 10) // callbacks may be async
     .filter((a) => a % 2 == 0)
-    .toArray(); // [12, 14]
+    .toList(); // [12, 14]
 
 // Streams bridge both ways.
-await fxStream(Stream.fromIterable([1, 2, 3])).map((a) => a * 2).toArray();
+await fxStream(Stream.fromIterable([1, 2, 3])).map((a) => a * 2).toList();
 ```
 
 ### Concurrency
@@ -84,7 +84,7 @@ await fx([1, 2, 3, 4, 5, 6])
     .toAsync()
     .map((id) => fetchUser(id))
     .concurrent(3)
-    .toArray();
+    .toList();
 ```
 
 `concurrentPool(n)` is the completion-order variant (faster first results, no
@@ -101,12 +101,12 @@ express it.
 | **Filter (lazy)** | `filter`, `reject`, `compact`, `uniq`, `uniqBy`, `difference(By)`, `intersection(By)`, `compress` |
 | **Slice (lazy)** | `take`, `takeRight`, `takeWhile`, `takeUntilInclusive`, `drop`, `dropRight`, `dropWhile`, `dropUntil`, `slice`, `chunk`, `split` |
 | **Combine (lazy)** | `append`, `prepend`, `concat`, `zip`, `zip3`, `zipWith`, `zipWithIndex`, `transpose`, `reverse`, `fork` |
-| **Aggregate** | `reduce`, `fold`, `reduceLazy`, `toArray`, `sum`, `average`, `min`, `max`, `size`, `join`, `groupBy`, `indexBy`, `countBy`, `sort`, `sortBy`, `toSorted`, `partition`, `each`, `consume` |
+| **Aggregate** | `reduce`, `fold`, `reduceLazy`, `toList`, `sum`, `average`, `min`, `max`, `size`, `join`, `groupBy`, `indexBy`, `countBy`, `sort`, `sortBy`, `toSorted`, `partition`, `each`, `consume` |
 | **Access** | `head`, `last`, `nth`, `find`, `findIndex`, `includes`, `isEmpty`, `every`, `some` |
 | **Object (Map)** | `omit`, `pick`, `omitBy`, `pickBy`, `prop`, `props`, `evolve`, `fromEntries`, `compactObject`, `resolveProps`, `isMatch`, `matches` |
 | **Function** | `pipe`, `pipe1`, `pipeLazy`, `identity`, `always`, `tap`, `apply`, `juxt`, `memoize`, `negate`, `not`, `when`, `unless`, `throwError`, `throwIf`, `cases`, `add`, `gt`, `gte`, `lt`, `lte`, `delay`, `sleep`, `unicodeToArray`, `.curried`/`.uncurried` (extension getters, arity 2–5) |
 | **Predicates** | `isNull`, `isNotNull`, `isNil`, `isBoolean`, `isNumber`, `isString`, `isDate`, `isList`, `isMap` |
-| **Async** | every lazy/aggregate operator has an `*Async` twin (`mapAsync`, `toArrayAsync`, ...), plus `toAsync`, `fromStream`, `concurrentAsync`, `concurrentPoolAsync`, `asyncEmpty` |
+| **Async** | every lazy/aggregate operator has an `*Async` twin (`mapAsync`, `toListAsync`, ...), plus `toAsync`, `fromStream`, `concurrentAsync`, `concurrentPoolAsync`, `asyncEmpty` |
 | **Util** | `debounce`, `throttle`, `shuffle`, `createSeededRandom` |
 | **Chains** | `fx()` (sync, extends `Iterable`), `fxAsync()`, `fxStream()`; `Fx<num>`/`FxAsync<num>` gain `sum`/`average`/`min`/`max` |
 
@@ -123,6 +123,7 @@ APIs deliberately deviate:
 | tuples (`zip`, `entries`, `partition`) | Dart records: `(A, B)` |
 | TS objects (`omit`, `pick`, `evolve`, ...) | `Map`-based equivalents |
 | `undefined` | `null` (`head`/`find`/`nth` return `T?`) |
+| `toArray` / `toArrayAsync` | `toList` / `toListAsync` (Dart has no array type) |
 | `AsyncIterable` / `for await` | `FxAsyncIterable` + `toStream()` / `fromStream()` bridges |
 | variadic `zip`/`juxt`/`cases` | fixed arities (`zip`/`zip3`) or list/record parameters |
 | `curry(f)` | `.curried` / `.uncurried` extension getters — see [WHY_CURRIED.md](WHY_CURRIED.md) |
@@ -134,7 +135,7 @@ statically and fully typed:
 ```dart
 int add(int a, int b) => a + b;
 final addOne = add.curried(1); // int Function(int)
-fx([1, 2, 3]).map(addOne).toArray(); // [2, 3, 4]
+fx([1, 2, 3]).map(addOne).toList(); // [2, 3, 4]
 ```
 
 [WHY_CURRIED.md](WHY_CURRIED.md) tells the full design story: why the direct

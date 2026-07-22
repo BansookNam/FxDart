@@ -28,7 +28,7 @@ void main() {
           (v) => map((int a) => a + 10, v),
           (v) => filter((int a) => a % 2 == 1, v),
           (v) => dropUntil((int a) => a > 13, v),
-          (v) => toArray(v),
+          (v) => toList(v),
         ]);
 
         expect(res, equals([11]));
@@ -54,7 +54,7 @@ void main() {
           'should be dropped elements until the value applied to async callback returns truly',
           () async {
         final arr = [1, 2, 3, 4, 5, 1, 2];
-        final acc = await toArrayAsync(
+        final acc = await toListAsync(
             dropUntilAsync((a) async => a > 3, toAsync(arr)));
         expect(acc, equals([5, 1, 2]));
       });
@@ -64,7 +64,7 @@ void main() {
             .map((a) => a + 10)
             .filter((a) => a % 2 == 1)
             .dropUntil((a) => a > 13)
-            .toArray();
+            .toList();
 
         expect(res, equals([11]));
       });
@@ -74,7 +74,7 @@ void main() {
           fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])).dropUntil((a) {
             if (a > 5) throw Exception('err');
             return false;
-          }).toArray(),
+          }).toList(),
           throwsException,
         );
       });
@@ -86,7 +86,7 @@ void main() {
             .filter((a) => a % 2 == 1)
             .dropUntil((a) => a > 13)
             .concurrent(3)
-            .toArray();
+            .toList();
         sw.stop();
 
         expect(res, equals([11]));
@@ -111,7 +111,7 @@ void main() {
         final res = await fxAsync(toAsync(source()))
             .dropUntil((a) => a > 12)
             .concurrent(5)
-            .toArray();
+            .toList();
         expect(res, equals([8, 9]));
       });
 
@@ -124,7 +124,7 @@ void main() {
                 return false;
               })
               .concurrent(3)
-              .toArray(),
+              .toList(),
           throwsException,
         );
       });
@@ -139,7 +139,7 @@ void main() {
                 return false;
               })
               .concurrent(3)
-              .toArray(),
+              .toList(),
           throwsException,
         );
       });

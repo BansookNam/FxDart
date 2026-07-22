@@ -49,7 +49,7 @@ abstract interface class FxAsyncIterator<T> {
 /// Pull-based async iterable — the async counterpart of [Iterable].
 ///
 /// Obtain one from [toAsync], [fromStream], or any `*Async` operator.
-/// Consume it with `toArrayAsync`, `eachAsync`, `reduceAsync`, the
+/// Consume it with `toListAsync`, `eachAsync`, `reduceAsync`, the
 /// [FxAsync] chain, or convert it to a [Stream] with [toStream].
 abstract interface class FxAsyncIterable<T> {
   FxAsyncIterator<T> get iterator;
@@ -104,7 +104,7 @@ FxAsyncIterable<T> asyncEmpty<T>() => DelegateAsyncIterable(
 /// what makes `concurrent(n)` physically parallel at the source.
 ///
 /// ```dart
-/// await toArrayAsync(mapAsync((a) => a + 10, toAsync([1, 2, 3]))); // [11, 12, 13]
+/// await toListAsync(mapAsync((a) => a + 10, toAsync([1, 2, 3]))); // [11, 12, 13]
 /// ```
 FxAsyncIterable<T> toAsync<T>(Iterable<FutureOr<T>> iterable) {
   return DelegateAsyncIterable(() {
@@ -307,7 +307,7 @@ FxAsyncIterable<A> concurrentPoolAsync<A>(
     fill = () {
       // Eagerly keep the pool full (like FxTS): up to [length] fetches stay
       // in flight regardless of how many consumers are currently waiting, so
-      // even a one-pull-at-a-time terminal like toArray overlaps the work.
+      // even a one-pull-at-a-time terminal like toList overlaps the work.
       while (!sourceDone && !failed && inFlight < length) {
         inFlight++;
         iterator.next(Concurrent.of(length)).then((result) {

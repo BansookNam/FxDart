@@ -9,15 +9,15 @@ void main() {
       test(
           "should be merged values of each 'Iterable' with value at the corresponding position",
           () {
-        final res = toArray(zip([1, 2, 3, 4], [5, 6, 7, 8]));
+        final res = toList(zip([1, 2, 3, 4], [5, 6, 7, 8]));
         expect(res, equals([(1, 5), (2, 6), (3, 7), (4, 8)]));
       });
 
       test('should be zipped if the iterables have different size', () {
-        final res1 = toArray(zip([1, 2, 3, 4], [5, 6, 7, 8, 9]));
+        final res1 = toList(zip([1, 2, 3, 4], [5, 6, 7, 8, 9]));
         expect(res1, equals([(1, 5), (2, 6), (3, 7), (4, 8)]));
 
-        final res2 = toArray(zip([1, 2, 3, 4, 5], [6, 7, 8, 9]));
+        final res2 = toList(zip([1, 2, 3, 4, 5], [6, 7, 8, 9]));
         expect(res2, equals([(1, 6), (2, 7), (3, 8), (4, 9)]));
       });
 
@@ -25,7 +25,7 @@ void main() {
         final res = fx([1, 2, 3, 4])
             .zip([5, 6, 7, 8])
             .map((r) => [r.$1 + r.$2])
-            .toArray();
+            .toList();
         expect(
             res,
             equals([
@@ -40,7 +40,7 @@ void main() {
         final res = fx(['a', 'b', 'c', 'd'])
             .zip([1, 2, 3, 4])
             .map((r) => {r.$1: r.$2})
-            .toArray();
+            .toList();
         expect(
             res,
             equals([
@@ -52,10 +52,10 @@ void main() {
       });
 
       test('should be able to be used as a chaining method in the `fx`', () {
-        final res1 = fx([1, 2, 3]).zip(['5', '6', '7', '8']).toArray();
+        final res1 = fx([1, 2, 3]).zip(['5', '6', '7', '8']).toList();
         expect(res1, equals([(1, '5'), (2, '6'), (3, '7')]));
 
-        final res2 = fx([1, 2, 3, 4]).zip(['5', '6', '7']).toArray();
+        final res2 = fx([1, 2, 3, 4]).zip(['5', '6', '7']).toList();
         expect(res2, equals([(1, '5'), (2, '6'), (3, '7')]));
       });
     });
@@ -64,17 +64,17 @@ void main() {
       test(
           "should be merged values of each 'AsyncIterable' with value at the corresponding position",
           () async {
-        final res = await toArrayAsync(
+        final res = await toListAsync(
             zipAsync(toAsync([1, 2, 3, 4]), toAsync([5, 6, 7, 8])));
         expect(res, equals([(1, 5), (2, 6), (3, 7), (4, 8)]));
       });
 
       test('should be zipped if the iterables have different size', () async {
-        final res1 = await toArrayAsync(
+        final res1 = await toListAsync(
             zipAsync(toAsync([1, 2, 3, 4]), toAsync([5, 6, 7, 8, 9])));
         expect(res1, equals([(1, 5), (2, 6), (3, 7), (4, 8)]));
 
-        final res2 = await toArrayAsync(
+        final res2 = await toListAsync(
             zipAsync(toAsync([1, 2, 3, 4, 5]), toAsync([6, 7, 8, 9])));
         expect(res2, equals([(1, 6), (2, 7), (3, 8), (4, 9)]));
       });
@@ -84,7 +84,7 @@ void main() {
             .toAsync()
             .zip(toAsync([5, 6, 7, 8]))
             .map((r) => [r.$1 + r.$2])
-            .toArray();
+            .toList();
         expect(
             res,
             equals([
@@ -100,13 +100,13 @@ void main() {
         final res1 = await fx([1, 2, 3])
             .toAsync()
             .zip(toAsync(['5', '6', '7', '8']))
-            .toArray();
+            .toList();
         expect(res1, equals([(1, '5'), (2, '6'), (3, '7')]));
 
         final res2 = await fx([1, 2, 3, 4])
             .toAsync()
             .zip(toAsync(['5', '6', '7']))
-            .toArray();
+            .toList();
         expect(res2, equals([(1, '5'), (2, '6'), (3, '7')]));
       });
 
@@ -116,7 +116,7 @@ void main() {
             .toAsync()
             .zip(toAsync([1, 2, 3, 4]))
             .map((r) => {r.$1: r.$2})
-            .toArray();
+            .toList();
         expect(
             res,
             equals([
@@ -130,7 +130,7 @@ void main() {
       test('should be zipped sequentially', () async {
         final res = await fxAsync(mapAsync(
             (int a) => delay(const Duration(milliseconds: 50), a),
-            toAsync([5, 6, 7, 8]))).zip(toAsync([1, 2, 3, 4])).toArray();
+            toAsync([5, 6, 7, 8]))).zip(toAsync([1, 2, 3, 4])).toList();
         expect(res, equals([(5, 1), (6, 2), (7, 3), (8, 4)]));
       });
 
@@ -141,7 +141,7 @@ void main() {
             .zip(toAsync([1, 2, 3, 4]))
             .map((r) => delay(const Duration(milliseconds: 100), r))
             .concurrent(4)
-            .toArray();
+            .toList();
         expect(res, equals([(5, 1), (6, 2), (7, 3), (8, 4)]));
         // sequential is ~400ms; concurrent(4) is ~100ms
         expect(sw.elapsedMilliseconds, lessThan(300));
@@ -154,7 +154,7 @@ void main() {
                 toAsync([5, 6, 7, 8])))
             .zip(toAsync([1, 2, 3, 4]))
             .concurrent(4)
-            .toArray();
+            .toList();
         expect(res, equals([(5, 1), (6, 2), (7, 3), (8, 4)]));
         // sequential is ~400ms; concurrent(4) should be ~100ms
         expect(sw.elapsedMilliseconds, lessThan(300));

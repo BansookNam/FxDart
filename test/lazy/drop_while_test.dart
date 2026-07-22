@@ -28,7 +28,7 @@ void main() {
           (v) => map((int a) => a + 10, v),
           (v) => filter((int a) => a % 2 == 0, v),
           (v) => dropWhile((int a) => a < 16, v),
-          (v) => toArray(v),
+          (v) => toList(v),
         ]);
 
         expect(res, equals([16, 18]));
@@ -55,7 +55,7 @@ void main() {
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
             .dropWhile((a) => a < 16)
-            .toArray();
+            .toList();
 
         expect(res, equals([16, 18]));
       });
@@ -65,7 +65,7 @@ void main() {
           fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])).dropWhile((a) {
             if (a > 5) throw Exception('err');
             return true;
-          }).toArray(),
+          }).toList(),
           throwsException,
         );
       });
@@ -77,7 +77,7 @@ void main() {
             .filter((a) => a % 2 == 0)
             .dropWhile((a) => a < 6)
             .concurrent(3)
-            .toArray();
+            .toList();
         sw.stop();
 
         expect(res, equals([6, 8, 10]));
@@ -102,7 +102,7 @@ void main() {
         final res = await fxAsync(toAsync(source()))
             .dropWhile((a) => a < 7)
             .concurrent(5)
-            .toArray();
+            .toList();
         expect(res, equals([7, 8, 1, 10]));
       });
 
@@ -115,7 +115,7 @@ void main() {
                 return true;
               })
               .concurrent(3)
-              .toArray(),
+              .toList(),
           throwsException,
         );
       });
@@ -130,7 +130,7 @@ void main() {
                 return true;
               })
               .concurrent(3)
-              .toArray(),
+              .toList(),
           throwsException,
         );
       });

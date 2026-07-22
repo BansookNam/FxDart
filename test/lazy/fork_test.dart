@@ -30,8 +30,8 @@ void main() {
       test('should be forked iterable (string chars)', () {
         final arr = 'abc'.split('');
 
-        expect(toArray(fork(arr)), equals(['a', 'b', 'c']));
-        expect(toArray(fork(arr)), equals(['a', 'b', 'c']));
+        expect(toList(fork(arr)), equals(['a', 'b', 'c']));
+        expect(toList(fork(arr)), equals(['a', 'b', 'c']));
       });
 
       test('should walk a shared lazy source only once', () {
@@ -45,9 +45,9 @@ void main() {
         final iter2 = fork(arr);
         final iter3 = map((int a) => '$a', fork(arr));
 
-        expect(toArray(iter1), equals([11, 12, 13]));
-        expect(toArray(iter2), equals([11, 12, 13]));
-        expect(toArray(iter3), equals(['11', '12', '13']));
+        expect(toList(iter1), equals([11, 12, 13]));
+        expect(toList(iter2), equals([11, 12, 13]));
+        expect(toList(iter3), equals(['11', '12', '13']));
         expect(evaluations, equals(3));
       });
 
@@ -125,8 +125,8 @@ void main() {
       test('should be forked iterable (string chars)', () async {
         final arr = toAsync('abc'.split(''));
 
-        expect(await toArrayAsync(forkAsync(arr)), equals(['a', 'b', 'c']));
-        expect(await toArrayAsync(forkAsync(arr)), equals(['a', 'b', 'c']));
+        expect(await toListAsync(forkAsync(arr)), equals(['a', 'b', 'c']));
+        expect(await toListAsync(forkAsync(arr)), equals(['a', 'b', 'c']));
       });
 
       test('should walk a shared lazy source only once', () async {
@@ -136,8 +136,8 @@ void main() {
           return a + 10;
         }, toAsync([1, 2, 3]));
 
-        expect(await toArrayAsync(forkAsync(arr)), equals([11, 12, 13]));
-        expect(await toArrayAsync(forkAsync(arr)), equals([11, 12, 13]));
+        expect(await toListAsync(forkAsync(arr)), equals([11, 12, 13]));
+        expect(await toListAsync(forkAsync(arr)), equals([11, 12, 13]));
         expect(evaluations, equals(3));
       });
 
@@ -169,12 +169,12 @@ void main() {
         final forked1 = forkAsync(iter);
         final forked2 = forkAsync(iter);
 
-        final arr1 = await toArrayAsync(concurrentAsync(5, forked1));
+        final arr1 = await toListAsync(concurrentAsync(5, forked1));
         expect(arr1, equals([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]));
 
         // The second fork replays the shared buffer without re-evaluating.
         final sw = Stopwatch()..start();
-        final arr2 = await toArrayAsync(concurrentAsync(5, forked2));
+        final arr2 = await toListAsync(concurrentAsync(5, forked2));
         expect(arr2, equals([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]));
         expect(sw.elapsedMilliseconds, lessThan(200));
       });
@@ -186,7 +186,7 @@ void main() {
 
         final forked = forkAsync(iter);
         final sw = Stopwatch()..start();
-        final arr = await toArrayAsync(concurrentAsync(5, forked));
+        final arr = await toListAsync(concurrentAsync(5, forked));
         expect(arr, equals([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]));
         // sequential is ~1000ms; concurrent(5) should be ~200ms
         expect(sw.elapsedMilliseconds, lessThan(700));

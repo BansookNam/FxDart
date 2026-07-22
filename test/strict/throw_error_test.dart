@@ -7,7 +7,7 @@ void main() {
     test('throw in a pipeline via unless', () {
       try {
         unless<Object>(
-            isNumber, throwError((input) => Exception('input is $input')), '0');
+            isNum, throwError((input) => Exception('input is $input')), '0');
         fail('should have thrown');
       } on Exception catch (error) {
         expect(error.toString(), contains('input is 0'));

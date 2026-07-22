@@ -42,7 +42,7 @@ void main() {
         ], [
           (v) => flat(v),
           (v) => map((a) => (a as int) + 10, v),
-          (v) => toArray(v),
+          (v) => toList(v),
         ]);
 
         expect(res, equals([11, 12, 13, 14, 15]));
@@ -54,7 +54,7 @@ void main() {
           2,
           3,
           [4, 5]
-        ]).flat().map((a) => (a as int) + 10).toArray();
+        ]).flat().map((a) => (a as int) + 10).toList();
 
         expect(res, equals([11, 12, 13, 14, 15]));
       });
@@ -77,7 +77,7 @@ void main() {
         }
         expect(acc, equals([1, 2, 3, 4, 5, 6, 7]));
 
-        final res = await toArrayAsync(flatAsync(
+        final res = await toListAsync(flatAsync(
             toAsync<dynamic>([
               [1, 2],
               3,
@@ -99,7 +99,7 @@ void main() {
           2,
           3,
           [4, 5]
-        ]))).map((a) => (a as int) + 10).toArray();
+        ]))).map((a) => (a as int) + 10).toList();
 
         expect(res, equals([11, 12, 13, 14, 15]));
       });
@@ -111,7 +111,7 @@ void main() {
           2,
           3,
           [4, 5]
-        ])).flat().map((a) => (a as int) + 10).toArray();
+        ])).flat().map((a) => (a as int) + 10).toList();
 
         expect(res, equals([11, 12, 13, 14, 15]));
       });
@@ -318,7 +318,7 @@ void main() {
                 .map((a) => delay(const Duration(milliseconds: 30), a))
                 .flat(depth)
                 .concurrent(size)
-                .toArray();
+                .toList();
 
             expect(res, equals(expected));
           });
@@ -331,7 +331,7 @@ void main() {
             .chunk(2)
             .flat()
             .concurrent(3)
-            .toArray();
+            .toList();
 
         expect(res, equals([1, 2, 3, 4, 5, 6]));
       });
@@ -349,7 +349,7 @@ void main() {
             .filter((a) => (a as int) % 2 == 0)
             .take(2)
             .concurrent(4)
-            .toArray();
+            .toList();
 
         expect(res, equals([2, 4]));
       });
@@ -365,7 +365,7 @@ void main() {
               .map((a) => delay(const Duration(milliseconds: 50), a))
               .flat()
               .concurrent(2)
-              .toArray(),
+              .toList(),
           throwsException,
         );
       });
@@ -384,7 +384,7 @@ void main() {
               })
               .flat()
               .concurrent(4)
-              .toArray(),
+              .toList(),
           throwsException,
         );
       });

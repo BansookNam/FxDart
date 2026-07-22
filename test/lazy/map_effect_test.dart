@@ -33,14 +33,14 @@ void main() {
     group('async', () {
       test('should apply the function to each element', () async {
         expect(
-          await toArrayAsync(mapEffectAsync((a) => a * 2, toAsync([1, 2, 3]))),
+          await toListAsync(mapEffectAsync((a) => a * 2, toAsync([1, 2, 3]))),
           equals([2, 4, 6]),
         );
       });
 
       test('should support an asynchronous function', () async {
         final seen = <int>[];
-        final res = await toArrayAsync(mapEffectAsync((int a) async {
+        final res = await toListAsync(mapEffectAsync((int a) async {
           seen.add(a);
           return a;
         }, toAsync([1, 2, 3])));

@@ -18,7 +18,7 @@ void main() {
     test('curried function should be usable within a pipeline', () {
       // ignore: deprecated_member_use
       final multiply = curry((int a, int b) => a * b);
-      final res = fx([1, 2, 3]).map((a) => multiply(10)(a) as int).toArray();
+      final res = fx([1, 2, 3]).map((a) => multiply(10)(a) as int).toList();
       expect(res, equals([10, 20, 30]));
     });
   });

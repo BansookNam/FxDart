@@ -27,7 +27,7 @@ void main() {
 
     test('partial application should be usable within a pipeline', () {
       int multiply(int a, int b) => a * b;
-      final res = fx([1, 2, 3]).map(multiply.curried(10)).toArray();
+      final res = fx([1, 2, 3]).map(multiply.curried(10)).toList();
       expect(res, equals([10, 20, 30]));
     });
 

@@ -17,10 +17,10 @@ void main() {
         expect(res, equals([1, 2]));
 
         final res1 =
-            toArray(takeUntilInclusive((a) => a % 2 == 0, [1, 2, 3, 4]));
+            toList(takeUntilInclusive((a) => a % 2 == 0, [1, 2, 3, 4]));
         expect(res1, equals([1, 2]));
 
-        final res2 = toArray(takeUntilInclusive((a) => a > 5, [1, 2, 3, 4]));
+        final res2 = toList(takeUntilInclusive((a) => a > 5, [1, 2, 3, 4]));
         expect(res2, equals([1, 2, 3, 4]));
       });
 
@@ -34,7 +34,7 @@ void main() {
           (v) => map((int a) => a + 10, v),
           (v) => filter((int a) => a % 2 == 0, v),
           (v) => takeUntilInclusive((int a) => a > 12, v),
-          (v) => toArray(v),
+          (v) => toList(v),
         ]);
 
         expect(res, equals([12, 14]));
@@ -45,7 +45,7 @@ void main() {
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
             .takeUntilInclusive((a) => a > 12)
-            .toArray();
+            .toList();
 
         expect(res, equals([12, 14]));
       });
@@ -66,11 +66,11 @@ void main() {
         }
         expect(res, equals([1, 2]));
 
-        final res1 = await toArrayAsync(
+        final res1 = await toListAsync(
             takeUntilInclusiveAsync((a) => a % 2 == 0, toAsync([1, 2, 3, 4])));
         expect(res1, equals([1, 2]));
 
-        final res2 = await toArrayAsync(
+        final res2 = await toListAsync(
             takeUntilInclusiveAsync((a) => a > 5, toAsync([1, 2, 3, 4])));
         expect(res2, equals([1, 2, 3, 4]));
       });
@@ -78,11 +78,11 @@ void main() {
       test(
           'should be able to take the element until the async callback result is truthy',
           () async {
-        final res1 = await toArrayAsync(takeUntilInclusiveAsync(
+        final res1 = await toListAsync(takeUntilInclusiveAsync(
             (a) async => a % 2 == 0, toAsync([1, 2, 3, 4])));
         expect(res1, equals([1, 2]));
 
-        final res2 = await toArrayAsync(
+        final res2 = await toListAsync(
             takeUntilInclusiveAsync((a) async => a > 5, toAsync([1, 2, 3, 4])));
         expect(res2, equals([1, 2, 3, 4]));
       });
@@ -92,7 +92,7 @@ void main() {
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
             .takeUntilInclusive((a) => a > 12)
-            .toArray();
+            .toList();
 
         expect(res, equals([12, 14]));
       });
@@ -103,7 +103,7 @@ void main() {
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
             .takeUntilInclusive((a) => a > 12)
-            .toArray();
+            .toList();
 
         expect(res, equals([12, 14]));
       });
@@ -115,7 +115,7 @@ void main() {
             .peek((a) => peeked++)
             .map((a) => delay(const Duration(milliseconds: 50), a))
             .takeUntilInclusive((a) => a < 3)
-            .toArray();
+            .toList();
 
         expect(peeked, equals(3));
         expect(res, equals([3, 3, 1]));
@@ -127,7 +127,7 @@ void main() {
         final res = await fxAsync(toAsync(range(1, 20)))
             .takeUntilInclusive((a) => a > 12)
             .concurrent(4)
-            .toArray();
+            .toList();
 
         expect(res, equals([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]));
       });
@@ -159,7 +159,7 @@ void main() {
             .filter((a) => a % 2 == 0)
             .takeUntilInclusive((a) => a > 20)
             .concurrent(2)
-            .toArray();
+            .toList();
         expect(res, equals([12, 14, 16, 18, 20, 22]));
       });
 
@@ -173,7 +173,7 @@ void main() {
                 return false;
               })
               .concurrent(5)
-              .toArray(),
+              .toList(),
           throwsException,
         );
       });
@@ -194,7 +194,7 @@ void main() {
         final res = await fxAsync(toAsync(source()))
             .takeUntilInclusive((a) => a > 8)
             .concurrent(5)
-            .toArray();
+            .toList();
         expect(res, equals([1, 2, 3, 4, 5, 6, 7, 8, 9]));
       });
     });

@@ -18,19 +18,19 @@ void main() {
   group('fromStream', () {
     test('should convert a single-subscription stream', () async {
       expect(
-        await toArrayAsync(fromStream(Stream.fromIterable([1, 2, 3]))),
+        await toListAsync(fromStream(Stream.fromIterable([1, 2, 3]))),
         equals([1, 2, 3]),
       );
     });
 
     test('should convert an empty stream', () async {
-      expect(await toArrayAsync(fromStream(const Stream<int>.empty())),
+      expect(await toListAsync(fromStream(const Stream<int>.empty())),
           equals([]));
     });
 
     test('should convert a broadcast stream', () async {
       final controller = StreamController<int>.broadcast();
-      final future = toArrayAsync(fromStream(controller.stream));
+      final future = toListAsync(fromStream(controller.stream));
       // Give the iterator a turn to subscribe before emitting.
       await Future<void>.delayed(Duration.zero);
       controller
@@ -42,7 +42,7 @@ void main() {
 
     test('should propagate a stream error', () {
       expect(
-        toArrayAsync(fromStream(Stream<int>.error(StateError('boom')))),
+        toListAsync(fromStream(Stream<int>.error(StateError('boom')))),
         throwsStateError,
       );
     });
@@ -51,7 +51,7 @@ void main() {
       final res = await pipe(Stream.fromIterable([1, 2, 3]), [
         (Stream<int> s) => fromStream(s),
         (FxAsyncIterable<int> a) => filterAsync((n) => n.isOdd, a),
-        (FxAsyncIterable<int> a) => toArrayAsync(a),
+        (FxAsyncIterable<int> a) => toListAsync(a),
       ]);
       expect(res, equals([1, 3]));
     });
@@ -67,7 +67,7 @@ void main() {
     });
 
     test('should round-trip through fromStream', () async {
-      final res = await toArrayAsync(fromStream(toAsync([1, 2, 3]).toStream()));
+      final res = await toListAsync(fromStream(toAsync([1, 2, 3]).toStream()));
       expect(res, equals([1, 2, 3]));
     });
   });

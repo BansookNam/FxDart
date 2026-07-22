@@ -15,7 +15,7 @@ void main() {
 
       test('should be able to be used in the pipeline', () {
         var sum = 0;
-        final res = toArray(map(
+        final res = toList(map(
             (int a) => a + 10,
             peek((int a) => sum = sum + a,
                 map((int a) => a + 10, [1, 2, 3, 4]))));
@@ -29,7 +29,7 @@ void main() {
             .map((a) => a + 10)
             .peek((a) => sum = sum + a)
             .map((a) => a + 10)
-            .toArray();
+            .toList();
 
         expect(sum, equals(50));
         expect(res, equals([21, 22, 23, 24]));
@@ -47,7 +47,7 @@ void main() {
                   res.add(a);
                 })
                 .map((a) => a + 10)
-                .toArray(),
+                .toList(),
             throwsStateError);
         expect(res, equals([11, 12]));
       });
@@ -68,7 +68,7 @@ void main() {
             .map((a) => a + 10)
             .peek((a) => sum = sum + a)
             .map((a) => a + 10)
-            .toArray();
+            .toList();
         expect(sum, equals(50));
         expect(res, equals([21, 22, 23, 24]));
       });
@@ -85,7 +85,7 @@ void main() {
               res.add(a);
             })
             .map((a) => a + 10)
-            .toArray();
+            .toList();
 
         await expectLater(future, throwsStateError);
         expect(res, equals([11, 12]));

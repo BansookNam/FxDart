@@ -15,7 +15,7 @@ void main() {
       test('should be able to handle an error', () {
         expect(
           () =>
-              toArray(reject<int>((a) => throw Exception('err'), range(1, 10))),
+              toList(reject<int>((a) => throw Exception('err'), range(1, 10))),
           throwsException,
         );
       });
@@ -28,13 +28,13 @@ void main() {
           4
         ], [
           (v) => reject((int a) => a % 2 == 0, v),
-          (v) => toArray(v),
+          (v) => toList(v),
         ]);
 
         expect(res1, equals([1, 3]));
 
         final res2 =
-            toArray(reject<int?>((a) => a != null, [1, 2, null, 3, null, 4]));
+            toList(reject<int?>((a) => a != null, [1, 2, null, 3, null, 4]));
 
         expect(res2, equals([null, null]));
       });
@@ -54,7 +54,7 @@ void main() {
 
       test('should be able to handle an error', () async {
         await expectLater(
-          toArrayAsync(rejectAsync<int>(
+          toListAsync(rejectAsync<int>(
               (a) => throw Exception('err'), toAsync(range(1, 10)))),
           throwsException,
         );
@@ -64,7 +64,7 @@ void main() {
           'should be able to handle an error when the callback is asynchronous',
           () async {
         await expectLater(
-          toArrayAsync(rejectAsync<int>(
+          toListAsync(rejectAsync<int>(
               (a) => Future<bool>.error(Exception('err')),
               toAsync(range(1, 10)))),
           throwsException,
@@ -74,7 +74,7 @@ void main() {
       test('should be able to be used in the pipeline', () async {
         final res = await fxAsync(toAsync([1, 2, 3, 4]))
             .reject((a) => a % 2 == 0)
-            .toArray();
+            .toList();
 
         expect(res, equals([1, 3]));
       });

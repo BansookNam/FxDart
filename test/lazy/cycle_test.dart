@@ -17,7 +17,7 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = fx([1, 2, 3, 4]).cycle().map((a) => '$a').take(5).toArray();
+        final res = fx([1, 2, 3, 4]).cycle().map((a) => '$a').take(5).toList();
         expect(res, equals(['1', '2', '3', '4', '1']));
       });
     });
@@ -43,7 +43,7 @@ void main() {
             .cycle()
             .map((a) => '$a')
             .take(5)
-            .toArray();
+            .toList();
         expect(res, equals(['1', '2', '3', '4', '1']));
       });
 
@@ -56,7 +56,7 @@ void main() {
         }())))
             .concurrent(2)
             .take(6)
-            .toArray();
+            .toList();
         expect(res, equals([1, 2, 3, 4, 5, 6]));
         // sequential would be ~600ms; concurrent(2) is ~300ms
         expect(sw.elapsedMilliseconds, lessThan(500));

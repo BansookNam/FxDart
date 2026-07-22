@@ -33,7 +33,7 @@ void main() {
     test('should be able to be used in the pipeline', () async {
       final syncRes = pipe(obj, [
         (Map<String, String> m) => props(['a', 'b'], m),
-        (List<String?> vs) => toArray(vs),
+        (List<String?> vs) => toList(vs),
       ]);
       expect(syncRes, equals(['v1', 'v2']));
 

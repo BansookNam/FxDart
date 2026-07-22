@@ -11,7 +11,7 @@ void main() {
         }
         expect(acc, equals([1, 2, 3]));
 
-        expect(toArray(dropRight(0, [1, 2, 3, 4, 5])), equals([1, 2, 3, 4, 5]));
+        expect(toList(dropRight(0, [1, 2, 3, 4, 5])), equals([1, 2, 3, 4, 5]));
       });
 
       test('should be discarded string by length', () {
@@ -36,7 +36,7 @@ void main() {
           (v) => map((int a) => a + 10, v),
           (v) => filter((int a) => a % 2 == 0, v),
           (v) => dropRight(2, v),
-          (v) => toArray(v),
+          (v) => toList(v),
         ]);
 
         expect(res, equals([12, 14]));
@@ -54,7 +54,7 @@ void main() {
         }
         expect(acc, equals([1, 2, 3]));
 
-        expect(await toArrayAsync(dropRightAsync(0, toAsync([1, 2, 3, 4, 5]))),
+        expect(await toListAsync(dropRightAsync(0, toAsync([1, 2, 3, 4, 5]))),
             equals([1, 2, 3, 4, 5]));
       });
 
@@ -63,7 +63,7 @@ void main() {
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
             .dropRight(2)
-            .toArray();
+            .toList();
 
         expect(res, equals([12, 14]));
       });
@@ -75,7 +75,7 @@ void main() {
             .filter((a) => a % 2 == 0)
             .dropRight(2)
             .concurrent(3)
-            .toArray();
+            .toList();
         sw.stop();
 
         expect(res, equals([2, 4, 6]));
@@ -88,7 +88,7 @@ void main() {
           fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
               .filter((a) => throw Exception('err'))
               .dropRight(2)
-              .toArray(),
+              .toList(),
           throwsException,
         );
       });
@@ -103,7 +103,7 @@ void main() {
               })
               .dropRight(2)
               .concurrent(3)
-              .toArray(),
+              .toList(),
           throwsException,
         );
       });
@@ -119,7 +119,7 @@ void main() {
               })
               .dropRight(2)
               .concurrent(3)
-              .toArray(),
+              .toList(),
           throwsException,
         );
       });

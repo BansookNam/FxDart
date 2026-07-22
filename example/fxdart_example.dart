@@ -5,16 +5,16 @@ Future<void> main() async {
   final evens = fx([1, 2, 3, 4, 5])
       .map((a) => a + 10)
       .filter((a) => a % 2 == 0)
-      .toArray();
+      .toList();
   print(evens); // [12, 14]
 
   // Everything stays lazy until a terminal operator runs.
   final firstThreeSquares =
-      fx(range(1, 100)).map((a) => a * a).take(3).toArray();
+      fx(range(1, 100)).map((a) => a * a).take(3).toList();
   print(firstThreeSquares); // [1, 4, 9]
 
   // Top-level data-first functions compose too.
-  print(toArray(chunk(2, range(5)))); // [[0, 1], [2, 3], [4]]
+  print(toList(chunk(2, range(5)))); // [[0, 1], [2, 3], [4]]
   print(groupBy((int a) => a % 2 == 0 ? 'even' : 'odd', [1, 2, 3, 4]));
   // {odd: [1, 3], even: [2, 4]}
 
@@ -24,7 +24,7 @@ Future<void> main() async {
       .toAsync()
       .map((a) async => a + 10)
       .filter((a) => a % 2 == 0)
-      .toArray();
+      .toList();
   print(asyncResult); // [12, 14]
 
   // concurrent(n) evaluates the upstream chain n items at a time —
@@ -34,12 +34,12 @@ Future<void> main() async {
       .toAsync()
       .map((id) => delay(const Duration(milliseconds: 200), 'user$id'))
       .concurrent(3)
-      .toArray();
+      .toList();
   print('$fetched in ${stopwatch.elapsedMilliseconds}ms');
 
   // Streams bridge in and out.
   final doubled = await fxStream(Stream.fromIterable([1, 2, 3]))
       .map((a) => a * 2)
-      .toArray();
+      .toList();
   print(doubled); // [2, 4, 6]
 }

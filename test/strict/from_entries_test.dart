@@ -49,7 +49,7 @@ void main() {
           ('c', 'hello'),
           ('d', {'d1': 1, 'd2': 3}),
         ];
-        final res = fromEntries(await toArrayAsync(toAsync(arr)));
+        final res = fromEntries(await toListAsync(toAsync(arr)));
         expect(
             res,
             equals({
