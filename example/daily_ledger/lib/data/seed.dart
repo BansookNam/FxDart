@@ -10,55 +10,148 @@ import '../models/models.dart';
 const seedValue = 20260723;
 
 List<Category> seedCategories() => const [
-      Category(id: 'salary', name: 'Salary', iconCodePoint: 0xe25c, colorSeed: 0xFF2E7D32, kind: CategoryKind.money),
-      Category(id: 'groceries', name: 'Groceries', iconCodePoint: 0xe395, colorSeed: 0xFF00897B, kind: CategoryKind.money),
-      Category(id: 'dining', name: 'Dining', iconCodePoint: 0xe532, colorSeed: 0xFFF4511E, kind: CategoryKind.money),
-      Category(id: 'transport', name: 'Transport', iconCodePoint: 0xe1d5, colorSeed: 0xFF3949AB, kind: CategoryKind.money),
-      Category(id: 'housing', name: 'Housing', iconCodePoint: 0xe318, colorSeed: 0xFF6D4C41, kind: CategoryKind.money),
-      Category(id: 'utilities', name: 'Utilities', iconCodePoint: 0xe1ab, colorSeed: 0xFFFB8C00, kind: CategoryKind.money),
-      Category(id: 'fun', name: 'Entertainment', iconCodePoint: 0xe40f, colorSeed: 0xFF8E24AA, kind: CategoryKind.money),
-      Category(id: 'health', name: 'Health', iconCodePoint: 0xe3c8, colorSeed: 0xFFE53935, kind: CategoryKind.money),
-      Category(id: 'chores', name: 'Chores', iconCodePoint: 0xe156, colorSeed: 0xFF546E7A, kind: CategoryKind.task),
-      Category(id: 'work', name: 'Work', iconCodePoint: 0xe6f0, colorSeed: 0xFF1E88E5, kind: CategoryKind.task),
-      Category(id: 'personal', name: 'Personal', iconCodePoint: 0xe491, colorSeed: 0xFF00ACC1, kind: CategoryKind.task),
-    ];
+  Category(
+    id: 'salary',
+    name: 'Salary',
+    iconCodePoint: 0xe25c,
+    colorSeed: 0xFF2E7D32,
+    kind: CategoryKind.money,
+  ),
+  Category(
+    id: 'groceries',
+    name: 'Groceries',
+    iconCodePoint: 0xe395,
+    colorSeed: 0xFF00897B,
+    kind: CategoryKind.money,
+  ),
+  Category(
+    id: 'dining',
+    name: 'Dining',
+    iconCodePoint: 0xe532,
+    colorSeed: 0xFFF4511E,
+    kind: CategoryKind.money,
+  ),
+  Category(
+    id: 'transport',
+    name: 'Transport',
+    iconCodePoint: 0xe1d5,
+    colorSeed: 0xFF3949AB,
+    kind: CategoryKind.money,
+  ),
+  Category(
+    id: 'housing',
+    name: 'Housing',
+    iconCodePoint: 0xe318,
+    colorSeed: 0xFF6D4C41,
+    kind: CategoryKind.money,
+  ),
+  Category(
+    id: 'utilities',
+    name: 'Utilities',
+    iconCodePoint: 0xe1ab,
+    colorSeed: 0xFFFB8C00,
+    kind: CategoryKind.money,
+  ),
+  Category(
+    id: 'fun',
+    name: 'Entertainment',
+    iconCodePoint: 0xe40f,
+    colorSeed: 0xFF8E24AA,
+    kind: CategoryKind.money,
+  ),
+  Category(
+    id: 'health',
+    name: 'Health',
+    iconCodePoint: 0xe3c8,
+    colorSeed: 0xFFE53935,
+    kind: CategoryKind.money,
+  ),
+  Category(
+    id: 'chores',
+    name: 'Chores',
+    iconCodePoint: 0xe156,
+    colorSeed: 0xFF546E7A,
+    kind: CategoryKind.task,
+  ),
+  Category(
+    id: 'work',
+    name: 'Work',
+    iconCodePoint: 0xe6f0,
+    colorSeed: 0xFF1E88E5,
+    kind: CategoryKind.task,
+  ),
+  Category(
+    id: 'personal',
+    name: 'Personal',
+    iconCodePoint: 0xe491,
+    colorSeed: 0xFF00ACC1,
+    kind: CategoryKind.task,
+  ),
+];
 
 /// Default monthly budgets per money category (Round 1 feature).
 Map<String, double> seedBudgets() => {
-      'groceries': 450,
-      'dining': 300,
-      'transport': 120,
-      'fun': 150,
-      'utilities': 160,
-      'health': 250,
-      'housing': 1200,
-    };
+  'groceries': 450,
+  'dining': 300,
+  'transport': 120,
+  'fun': 150,
+  'utilities': 160,
+  'health': 250,
+  'housing': 1200,
+};
 
 List<RecurringRule> seedRules(DateTime today) => [
-      RecurringRule(
-        id: 'rule-rent',
-        period: RecurrencePeriod.monthly,
-        anchorDate: DateTime(today.year, today.month, 1),
-      ),
-      RecurringRule(
-        id: 'rule-gym',
-        period: RecurrencePeriod.weekly,
-        anchorDate: today.subtract(Duration(days: today.weekday - 1)),
-      ),
-    ];
+  RecurringRule(
+    id: 'rule-rent',
+    period: RecurrencePeriod.monthly,
+    anchorDate: DateTime(today.year, today.month, 1),
+  ),
+  RecurringRule(
+    id: 'rule-gym',
+    period: RecurrencePeriod.weekly,
+    anchorDate: today.subtract(Duration(days: today.weekday - 1)),
+  ),
+];
 
-const _groceryTitles = ['Supermarket run', 'Farmers market', 'Corner store', 'Bulk store haul'];
-const _diningTitles = ['Lunch out', 'Coffee & pastry', 'Dinner with friends', 'Takeout pizza', 'Brunch'];
-const _funTitles = ['Movie night', 'Concert tickets', 'Game on sale', 'Museum visit'];
-const _taskTitles = ['Water the plants', 'Call the bank', 'Book dentist', 'Clean the desk', 'Review budget', 'Back up laptop', 'Reply to landlord', 'Plan weekend trip'];
+const _groceryTitles = [
+  'Supermarket run',
+  'Farmers market',
+  'Corner store',
+  'Bulk store haul',
+];
+const _diningTitles = [
+  'Lunch out',
+  'Coffee & pastry',
+  'Dinner with friends',
+  'Takeout pizza',
+  'Brunch',
+];
+const _funTitles = [
+  'Movie night',
+  'Concert tickets',
+  'Game on sale',
+  'Museum visit',
+];
+const _taskTitles = [
+  'Water the plants',
+  'Call the bank',
+  'Book dentist',
+  'Clean the desk',
+  'Review budget',
+  'Back up laptop',
+  'Reply to landlord',
+  'Plan weekend trip',
+];
 
 /// Generates ~6 months of history plus a couple of weeks of upcoming
 /// bills/tasks. Fully deterministic for a given [today].
 List<Entry> seedEntries(DateTime today) {
   final rand = createSeededRandom(seedValue);
   final day0 = DateTime(today.year, today.month, today.day);
-  double amount(num base, num spread) => ((base + rand() * spread) * 100).roundToDouble() / 100;
-  String pickTitle(List<String> titles) => titles[(rand() * titles.length).floor()];
+  double amount(num base, num spread) =>
+      ((base + rand() * spread) * 100).roundToDouble() / 100;
+  String pickTitle(List<String> titles) =>
+      titles[(rand() * titles.length).floor()];
 
   // Daily spending & tasks, laid out over the past 180 days with flatMap.
   final daily = fx(range(0, 180)).flatMap((back) {
@@ -113,7 +206,11 @@ List<Entry> seedEntries(DateTime today) {
           categoryId: rand() < 0.5 ? 'chores' : 'personal',
           tags: const ['todo'],
           date: day,
-          dueDate: DateTime(day.year, day.month, day.day + (rand() * 10).floor()),
+          dueDate: DateTime(
+            day.year,
+            day.month,
+            day.day + (rand() * 10).floor(),
+          ),
           done: rand() < 0.7,
         ),
     ];

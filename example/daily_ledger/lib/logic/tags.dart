@@ -7,12 +7,11 @@ import 'package:fxdart/fxdart.dart';
 import '../models/models.dart';
 import 'summaries.dart';
 
-List<String> _tagsOfMonth(List<Entry> entries, DateTime month) =>
-    fx(entries)
-        .filter((e) => sameMonth(e.date, month))
-        .flatMap((e) => e.tags)
-        .uniq()
-        .toList();
+List<String> _tagsOfMonth(List<Entry> entries, DateTime month) => fx(entries)
+    .filter((e) => sameMonth(e.date, month))
+    .flatMap((e) => e.tags)
+    .uniq()
+    .toList();
 
 class TagMonthComparison {
   /// Tags used in this month *and* the previous one — `intersection`.
@@ -31,7 +30,10 @@ class TagMonthComparison {
 /// directions of `difference`.
 TagMonthComparison compareTagMonths(List<Entry> entries, DateTime month) {
   final thisMonth = _tagsOfMonth(entries, month);
-  final lastMonth = _tagsOfMonth(entries, DateTime(month.year, month.month - 1));
+  final lastMonth = _tagsOfMonth(
+    entries,
+    DateTime(month.year, month.month - 1),
+  );
   return TagMonthComparison(
     intersection(lastMonth, thisMonth).toList(),
     difference(lastMonth, thisMonth).toList(),
@@ -51,11 +53,13 @@ List<Entry> tagEntries(List<Entry> entries, String tag, DateTime month) =>
 /// amount) → `pluck('amount')` → `compact` drops the nulls → `sum`.
 double tagSpend(List<Entry> entries, String tag, DateTime month) {
   final maps = fx(tagEntries(entries, tag, month))
-      .map((e) => <String, double?>{
-            'amount': e.type == EntryType.expense || e.type == EntryType.bill
-                ? e.amount
-                : null,
-          })
+      .map(
+        (e) => <String, double?>{
+          'amount': e.type == EntryType.expense || e.type == EntryType.bill
+              ? e.amount
+              : null,
+        },
+      )
       .toList();
   return sum(compact(pluck<String, double?>('amount', maps))).toDouble();
 }

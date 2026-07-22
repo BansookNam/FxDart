@@ -7,6 +7,7 @@ import '../logic/summaries.dart';
 import '../logic/tags.dart';
 import 'app_shell.dart';
 import 'format.dart';
+import 'theme.dart';
 import 'widgets.dart';
 
 class InsightsScreen extends StatefulWidget {
@@ -53,52 +54,63 @@ class _InsightsScreenState extends State<InsightsScreen> {
             child: _Heatmap(data: heatmap),
           ),
           const SizedBox(height: 16),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: SectionCard(
-                  title: 'Tags (all time)',
-                  subtitle: 'flatMap(tags) → countBy — tap one to explore',
-                  child: tags.isEmpty
-                      ? const EmptyHint('No tags yet')
-                      : Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            for (final (tag, count) in tags)
-                              FilterChip(
-                                label: Text('#$tag · $count'),
-                                selected: _selectedTag == tag,
-                                onSelected: (on) => setState(
-                                    () => _selectedTag = on ? tag : null),
+          Builder(
+            builder: (context) {
+              final tagsCard = SectionCard(
+                title: 'Tags (all time)',
+                subtitle: 'flatMap(tags) → countBy — tap one to explore',
+                child: tags.isEmpty
+                    ? const EmptyHint('No tags yet')
+                    : Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          for (final (tag, count) in tags)
+                            FilterChip(
+                              label: Text('#$tag · $count'),
+                              selected: _selectedTag == tag,
+                              onSelected: (on) => setState(
+                                () => _selectedTag = on ? tag : null,
                               ),
-                          ],
-                        ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: SectionCard(
-                  title: 'Possible duplicates',
-                  subtitle: 'what uniqBy(title+amount+day) would drop',
-                  child: dupes.isEmpty
-                      ? const EmptyHint('No suspicious duplicates')
-                      : Column(
-                          children: [
-                            for (final e in dupes.take(8))
-                              ListTile(
-                                dense: true,
-                                contentPadding: EdgeInsets.zero,
-                                title: Text(e.title),
-                                subtitle: Text(shortDate(e.date)),
-                                trailing: Text(money(e.amount ?? 0)),
+                            ),
+                        ],
+                      ),
+              );
+              final dupesCard = SectionCard(
+                title: 'Possible duplicates',
+                subtitle: 'what uniqBy(title+amount+day) would drop',
+                child: dupes.isEmpty
+                    ? const EmptyHint('No suspicious duplicates')
+                    : Column(
+                        children: [
+                          for (final e in dupes.take(8))
+                            ListTile(
+                              dense: true,
+                              contentPadding: EdgeInsets.zero,
+                              title: Text(e.title),
+                              subtitle: Text(shortDate(e.date)),
+                              trailing: Text(
+                                money(e.amount ?? 0),
+                                style: tabularStyle,
                               ),
-                          ],
-                        ),
-                ),
-              ),
-            ],
+                            ),
+                        ],
+                      ),
+              );
+              if (isNarrow(context)) {
+                return Column(
+                  children: [tagsCard, const SizedBox(height: 16), dupesCard],
+                );
+              }
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: tagsCard),
+                  const SizedBox(width: 16),
+                  Expanded(child: dupesCard),
+                ],
+              );
+            },
           ),
           if (_selectedTag != null) ...[
             const SizedBox(height: 16),
@@ -125,18 +137,25 @@ class _InsightsScreenState extends State<InsightsScreen> {
                           contentPadding: EdgeInsets.zero,
                           leading: Icon(
                             categoryIcon(state.categoryById(e.categoryId)),
-                            color: categoryColor(state.categoryById(e.categoryId)),
+                            color: categoryColor(
+                              state.categoryById(e.categoryId),
+                            ),
                             size: 20,
                           ),
                           title: Text(e.title),
-                          subtitle: Text('due ${shortDate(e.dueDate ?? e.date)}'),
+                          subtitle: Text(
+                            'due ${shortDate(e.dueDate ?? e.date)}',
+                          ),
                           trailing: e.amount == null
                               ? null
-                              : Text(money(e.amount!),
+                              : Text(
+                                  money(e.amount!),
                                   style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .outline)),
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.outline,
+                                  ),
+                                ),
                         ),
                     ],
                   ),
@@ -152,19 +171,25 @@ class _TrendTable extends StatelessWidget {
   final DateTime thisMonth;
   const _TrendTable({required this.trend, required this.thisMonth});
 
-  Widget _delta(BuildContext context, double value, {required bool downIsGood}) {
+  Widget _delta(
+    BuildContext context,
+    double value, {
+    required bool downIsGood,
+  }) {
     if (value.abs() < 0.005) return const Text('—');
     final good = downIsGood ? value < 0 : value > 0;
+    final color = good
+        ? LedgerColors.of(context).income
+        : Theme.of(context).colorScheme.error;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
           value > 0 ? Icons.arrow_upward : Icons.arrow_downward,
           size: 14,
-          color: good ? Colors.green : Colors.red,
+          color: color,
         ),
-        Text(money(value.abs()),
-            style: TextStyle(color: good ? Colors.green : Colors.red)),
+        Text(money(value.abs()), style: tabularStyle.copyWith(color: color)),
       ],
     );
   }
@@ -185,22 +210,27 @@ class _TrendTable extends StatelessWidget {
         ],
         rows: [
           for (final p in trend)
-            DataRow(cells: [
-              DataCell(Text(sameMonth(p.month, thisMonth)
-                  ? '${shortMonthLabel(p.month)} · in progress'
-                  : shortMonthLabel(p.month))),
-              DataCell(Text(money(p.current.income))),
-              DataCell(_delta(context, p.incomeDelta, downIsGood: false)),
-              DataCell(Text(money(p.current.expense))),
-              DataCell(_delta(context, p.expenseDelta, downIsGood: true)),
-              DataCell(Text(signedMoney(p.current.net))),
-            ]),
+            DataRow(
+              cells: [
+                DataCell(
+                  Text(
+                    sameMonth(p.month, thisMonth)
+                        ? '${shortMonthLabel(p.month)} · in progress'
+                        : shortMonthLabel(p.month),
+                  ),
+                ),
+                DataCell(Text(money(p.current.income), style: tabularStyle)),
+                DataCell(_delta(context, p.incomeDelta, downIsGood: false)),
+                DataCell(Text(money(p.current.expense), style: tabularStyle)),
+                DataCell(_delta(context, p.expenseDelta, downIsGood: true)),
+                DataCell(Text(signedMoney(p.current.net), style: tabularStyle)),
+              ],
+            ),
         ],
       ),
     );
   }
 }
-
 
 class _Heatmap extends StatelessWidget {
   final HeatmapData data;
@@ -217,9 +247,13 @@ class _Heatmap extends StatelessWidget {
             for (final d in const ['S', 'M', 'T', 'W', 'T', 'F', 'S'])
               Expanded(
                 child: Center(
-                  child: Text(d,
-                      style: TextStyle(
-                          fontSize: 11, color: theme.colorScheme.outline)),
+                  child: Text(
+                    d,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: theme.colorScheme.outline,
+                    ),
+                  ),
                 ),
               ),
           ],
@@ -250,11 +284,47 @@ class _Heatmap extends StatelessWidget {
                 ),
             ],
           ),
+        // Legend: what the color ramp means and where it tops out.
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                '\$0',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.outline,
+                ),
+              ),
+              const SizedBox(width: 4),
+              for (final t in const [0.0, 0.25, 0.5, 0.75, 1.0])
+                Container(
+                  width: 14,
+                  height: 14,
+                  margin: const EdgeInsets.symmetric(horizontal: 1),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    color: Color.lerp(
+                      theme.colorScheme.surfaceContainerHighest,
+                      theme.colorScheme.primary,
+                      t,
+                    ),
+                  ),
+                ),
+              const SizedBox(width: 4),
+              Text(
+                '${money(data.maxDaySpend)} / day',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.outline,
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
 }
-
 
 class _TagExplorer extends StatelessWidget {
   final String tag;
@@ -269,25 +339,25 @@ class _TagExplorer extends StatelessWidget {
     final spent = tagSpend(state.entries, tag, state.month);
 
     Widget tagRow(String label, List<String> tags) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                  width: 150,
-                  child: Text(label, style: theme.textTheme.bodySmall)),
-              Expanded(
-                child: Text(
-                  tags.isEmpty ? '—' : tags.map((t) => '#$t').join('  '),
-                  style: TextStyle(
-                      color: tags.contains(tag)
-                          ? theme.colorScheme.primary
-                          : null),
-                ),
-              ),
-            ],
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 150,
+            child: Text(label, style: theme.textTheme.bodySmall),
           ),
-        );
+          Expanded(
+            child: Text(
+              tags.isEmpty ? '—' : tags.map((t) => '#$t').join('  '),
+              style: TextStyle(
+                color: tags.contains(tag) ? theme.colorScheme.primary : null,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -316,8 +386,9 @@ class _TagExplorer extends StatelessWidget {
               ),
               title: Text(e.title),
               subtitle: Text('${shortDate(e.date)} · ${e.type.label}'),
-              trailing:
-                  e.amount == null ? null : Text(signedMoney(e.signedAmount)),
+              trailing: e.amount == null
+                  ? null
+                  : Text(signedMoney(e.signedAmount)),
             ),
       ],
     );

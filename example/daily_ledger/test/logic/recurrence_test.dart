@@ -10,7 +10,11 @@ void main() {
         period: RecurrencePeriod.weekly,
         anchorDate: DateTime(2026, 7, 6), // a Monday
       );
-      final dates = occurrences(rule, DateTime(2026, 7, 23), DateTime(2026, 8, 10));
+      final dates = occurrences(
+        rule,
+        DateTime(2026, 7, 23),
+        DateTime(2026, 8, 10),
+      );
       expect(dates, [
         DateTime(2026, 7, 27),
         DateTime(2026, 8, 3),
@@ -24,7 +28,11 @@ void main() {
         period: RecurrencePeriod.monthly,
         anchorDate: DateTime(2026, 7, 1),
       );
-      final dates = occurrences(rule, DateTime(2026, 7, 23), DateTime(2026, 10, 1));
+      final dates = occurrences(
+        rule,
+        DateTime(2026, 7, 23),
+        DateTime(2026, 10, 1),
+      );
       expect(dates, [
         DateTime(2026, 8, 1),
         DateTime(2026, 9, 1),
@@ -53,7 +61,11 @@ void main() {
 
     test('projects ghost entries from the latest real entry', () {
       final ghosts = projectRule(
-          rule, [rent], DateTime(2026, 7, 23), DateTime(2026, 9, 30));
+        rule,
+        [rent],
+        DateTime(2026, 7, 23),
+        DateTime(2026, 9, 30),
+      );
       expect(ghosts.length, 2);
       expect(ghosts.first.date, DateTime(2026, 8, 1));
       expect(ghosts.first.amount, 1150);
@@ -62,15 +74,29 @@ void main() {
     });
 
     test('rule without a template projects nothing', () {
-      expect(projectRule(rule, const [], DateTime(2026, 7, 23),
-          DateTime(2026, 12, 31)), isEmpty);
+      expect(
+        projectRule(
+          rule,
+          const [],
+          DateTime(2026, 7, 23),
+          DateTime(2026, 12, 31),
+        ),
+        isEmpty,
+      );
     });
 
     test('projectAll skips dates that already have a materialized entry', () {
       final augustRent = rent.copyWith(
-          id: 'rent-aug', date: DateTime(2026, 8, 1), dueDate: DateTime(2026, 8, 1));
-      final ghosts = projectAll([rule], [rent, augustRent],
-          DateTime(2026, 7, 23), DateTime(2026, 9, 30));
+        id: 'rent-aug',
+        date: DateTime(2026, 8, 1),
+        dueDate: DateTime(2026, 8, 1),
+      );
+      final ghosts = projectAll(
+        [rule],
+        [rent, augustRent],
+        DateTime(2026, 7, 23),
+        DateTime(2026, 9, 30),
+      );
       expect(ghosts.map((e) => e.date), [DateTime(2026, 9, 1)]);
     });
   });

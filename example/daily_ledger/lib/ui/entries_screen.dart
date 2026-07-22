@@ -10,6 +10,7 @@ import '../models/models.dart';
 import 'app_shell.dart';
 import 'entry_form.dart';
 import 'format.dart';
+import 'theme.dart';
 import 'widgets.dart';
 
 class EntriesScreen extends StatefulWidget {
@@ -41,9 +42,9 @@ class _EntriesScreenState extends State<EntriesScreen> {
     final searched = searchEntries(state.entries, _query);
     // Counts reflect the search too, so chip badges match the visible list.
     final counts = typeCounts(searched, state.month);
-    final filtered = fx(searched)
-        .filter((e) => _typeFilter == null || e.type == _typeFilter)
-        .toList();
+    final filtered = fx(
+      searched,
+    ).filter((e) => _typeFilter == null || e.type == _typeFilter).toList();
     final grouped = entriesByDayDesc(filtered, state.month);
     // Exactly what the list below shows (month-scoped), for WYSIWYG export.
     final visible = fx(grouped).flatMap((g) => g.$2).toList();
@@ -68,15 +69,20 @@ class _EntriesScreenState extends State<EntriesScreen> {
               const SizedBox(width: 12),
               OutlinedButton.icon(
                 onPressed: () async {
-                  final csv = entriesToCsv(visible,
-                      categories: state.categoryIndex);
+                  final csv = entriesToCsv(
+                    visible,
+                    categories: state.categoryIndex,
+                  );
                   await Clipboard.setData(ClipboardData(text: csv));
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text(
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
                           'Copied the ${visible.length} visible entries as CSV '
-                          '(sortBy \u2192 map \u2192 pick \u2192 join)'),
-                    ));
+                          '(sortBy \u2192 map \u2192 pick \u2192 join)',
+                        ),
+                      ),
+                    );
                   }
                 },
                 icon: const Icon(Icons.copy_all, size: 18),
@@ -99,9 +105,11 @@ class _EntriesScreenState extends State<EntriesScreen> {
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: ChoiceChip(
-                    label: Text(type == null
-                        ? 'All'
-                        : '${type.label} (${counts[type] ?? 0})'),
+                    label: Text(
+                      type == null
+                          ? 'All'
+                          : '${type.label} (${counts[type] ?? 0})',
+                    ),
                     selected: _typeFilter == type,
                     onSelected: (_) => setState(() => _typeFilter = type),
                   ),
@@ -144,8 +152,9 @@ class _DayGroup extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Text(
             isToday ? 'Today · ${dayLabel(day)}' : dayLabel(day),
-            style: theme.textTheme.titleSmall
-                ?.copyWith(color: theme.colorScheme.primary),
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: theme.colorScheme.primary,
+            ),
           ),
         ),
         Card(
@@ -162,33 +171,39 @@ class _DayGroup extends StatelessWidget {
                   title: Text(
                     e.title,
                     style: e.done
-                        ? const TextStyle(decoration: TextDecoration.lineThrough)
+                        ? const TextStyle(
+                            decoration: TextDecoration.lineThrough,
+                          )
                         : null,
                   ),
-                  subtitle: Text([
-                    e.type.label,
-                    if (e.tags.isNotEmpty) e.tags.map((t) => '#$t').join(' '),
-                    if (e.dueDate != null) 'due ${shortDate(e.dueDate!)}',
-                  ].join(' · ')),
+                  subtitle: Text(
+                    [
+                      e.type.label,
+                      if (e.tags.isNotEmpty) e.tags.map((t) => '#$t').join(' '),
+                      if (e.dueDate != null) 'due ${shortDate(e.dueDate!)}',
+                    ].join(' · '),
+                  ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (e.amount != null)
                         Text(
                           signedMoney(e.signedAmount),
-                          style: TextStyle(
+                          style: tabularStyle.copyWith(
                             fontWeight: FontWeight.w600,
                             color: e.signedAmount >= 0
-                                ? Colors.green.shade700
+                                ? LedgerColors.of(context).income
                                 : theme.colorScheme.onSurface,
                           ),
                         ),
                       if (e.type == EntryType.task || e.type == EntryType.bill)
                         IconButton(
                           tooltip: e.done ? 'Reopen' : 'Mark done',
-                          icon: Icon(e.done
-                              ? Icons.check_circle
-                              : Icons.radio_button_unchecked),
+                          icon: Icon(
+                            e.done
+                                ? Icons.check_circle
+                                : Icons.radio_button_unchecked,
+                          ),
                           onPressed: () => state.toggleDone(e),
                         ),
                       IconButton(
@@ -202,13 +217,15 @@ class _DayGroup extends StatelessWidget {
                         onPressed: () async {
                           await state.deleteEntry(e.id);
                           if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text('Deleted "${e.title}"'),
-                              action: SnackBarAction(
-                                label: 'Undo',
-                                onPressed: () => state.upsertEntry(e),
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Deleted "${e.title}"'),
+                                action: SnackBarAction(
+                                  label: 'Undo',
+                                  onPressed: () => state.upsertEntry(e),
+                                ),
                               ),
-                            ));
+                            );
                           }
                         },
                       ),

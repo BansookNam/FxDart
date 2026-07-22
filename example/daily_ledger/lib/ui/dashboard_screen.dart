@@ -8,6 +8,7 @@ import '../logic/summaries.dart';
 import '../models/models.dart';
 import 'app_shell.dart';
 import 'format.dart';
+import 'theme.dart';
 import 'widgets.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -38,55 +39,72 @@ class DashboardScreen extends StatelessWidget {
             child: _QuickStats(stats: stats),
           ),
           const SizedBox(height: 16),
-          LayoutBuilder(builder: (context, constraints) {
-            final wide = constraints.maxWidth > 720;
-            final cards = [
-              SectionCard(
-                title: 'Running balance',
-                subtitle: 'sortBy(date) → scan(sum) — ${monthLabel(state.month)}',
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    BalanceSparkline(points: balance),
-                    if (balance.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 6),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('starts ${signedMoney(balance.first.balance)}',
-                                style: Theme.of(context).textTheme.bodySmall),
-                            Text('ends ${signedMoney(balance.last.balance)}',
-                                style: Theme.of(context).textTheme.bodySmall),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              SectionCard(
-                title: 'Top spending categories',
-                subtitle: 'groupBy → sortBy → take(5)',
-                child: _CategoryBreakdown(breakdown: breakdown),
-              ),
-            ];
-            return wide
-                ? Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final wide = constraints.maxWidth > 720;
+              final cards = [
+                SectionCard(
+                  title: 'Running balance',
+                  subtitle:
+                      'sortBy(date) → scan(sum) — ${monthLabel(state.month)}',
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Expanded(child: cards[0]),
-                      const SizedBox(width: 16),
-                      Expanded(child: cards[1]),
+                      BalanceSparkline(points: balance),
+                      if (balance.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'starts ${signedMoney(balance.first.balance)}',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                              Text(
+                                'ends ${signedMoney(balance.last.balance)}',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ],
+                          ),
+                        ),
                     ],
-                  )
-                : Column(children: [cards[0], const SizedBox(height: 16), cards[1]]);
-          }),
+                  ),
+                ),
+                SectionCard(
+                  title: 'Top spending categories',
+                  subtitle: 'groupBy → sortBy → take(5)',
+                  child: _CategoryBreakdown(breakdown: breakdown),
+                ),
+              ];
+              return wide
+                  ? Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(child: cards[0]),
+                        const SizedBox(width: 16),
+                        Expanded(child: cards[1]),
+                      ],
+                    )
+                  : Column(
+                      children: [
+                        cards[0],
+                        const SizedBox(height: 16),
+                        cards[1],
+                      ],
+                    );
+            },
+          ),
           const SizedBox(height: 16),
           SectionCard(
             title: 'Budgets',
             subtitle: 'groupBy → fold per category; suggestions via evolve',
             child: _BudgetList(
-              statuses: budgetStatuses(state.entries, state.budgets, state.month),
+              statuses: budgetStatuses(
+                state.entries,
+                state.budgets,
+                state.month,
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -122,9 +140,12 @@ class _QuickStats extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label,
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(color: theme.colorScheme.outline)),
+              Text(
+                label,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.outline,
+                ),
+              ),
               Text(value, style: theme.textTheme.titleMedium),
             ],
           ),
@@ -154,10 +175,11 @@ class _RecentActivity extends StatelessWidget {
             ),
             title: Text(e.title),
             subtitle: Text(
-                '${dayKey(e.date) == dayKey(state.today) ? 'Today' : shortDate(e.date)} · ${e.type.label}'),
+              '${dayKey(e.date) == dayKey(state.today) ? 'Today' : shortDate(e.date)} · ${e.type.label}',
+            ),
             trailing: e.amount == null
                 ? null
-                : Text(signedMoney(e.signedAmount)),
+                : Text(signedMoney(e.signedAmount), style: tabularStyle),
           ),
       ],
     );
@@ -170,9 +192,11 @@ class _BudgetList extends StatelessWidget {
 
   Future<void> _editBudget(BuildContext context, BudgetStatus status) async {
     final state = LedgerScope.of(context);
-    final name = state.categoryById(status.categoryId)?.name ?? status.categoryId;
-    final controller =
-        TextEditingController(text: status.budget.toStringAsFixed(0));
+    final name =
+        state.categoryById(status.categoryId)?.name ?? status.categoryId;
+    final controller = TextEditingController(
+      text: status.budget.toStringAsFixed(0),
+    );
     final value = await showDialog<double>(
       context: context,
       builder: (context) => AlertDialog(
@@ -182,7 +206,9 @@ class _BudgetList extends StatelessWidget {
           autofocus: true,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           decoration: const InputDecoration(
-              prefixText: '\$ ', border: OutlineInputBorder()),
+            prefixText: '\$ ',
+            border: OutlineInputBorder(),
+          ),
           onSubmitted: (v) => Navigator.of(context).pop(double.tryParse(v)),
         ),
         actions: [
@@ -218,9 +244,11 @@ class _BudgetList extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Row(
               children: [
-                Icon(categoryIcon(state.categoryById(b.categoryId)),
-                    size: 18,
-                    color: categoryColor(state.categoryById(b.categoryId))),
+                Icon(
+                  categoryIcon(state.categoryById(b.categoryId)),
+                  size: 18,
+                  color: categoryColor(state.categoryById(b.categoryId)),
+                ),
                 const SizedBox(width: 8),
                 SizedBox(
                   width: 110,
@@ -235,12 +263,13 @@ class _BudgetList extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: b.ratio.clamp(0.0, 1.0),
                       minHeight: 8,
-                      backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                      backgroundColor:
+                          theme.colorScheme.surfaceContainerHighest,
                       color: b.over
                           ? theme.colorScheme.error
                           : b.ratio > 0.85
-                              ? Colors.orange
-                              : categoryColor(state.categoryById(b.categoryId)),
+                          ? LedgerColors.of(context).warning
+                          : categoryColor(state.categoryById(b.categoryId)),
                     ),
                   ),
                 ),
@@ -253,10 +282,11 @@ class _BudgetList extends StatelessWidget {
                         : '${money(b.spent)} / ${money(b.budget)}',
                     textAlign: TextAlign.right,
                     style: b.over
-                        ? TextStyle(
+                        ? tabularStyle.copyWith(
                             color: theme.colorScheme.error,
-                            fontWeight: FontWeight.w600)
-                        : null,
+                            fontWeight: FontWeight.w600,
+                          )
+                        : tabularStyle,
                   ),
                 ),
                 IconButton(
@@ -276,11 +306,14 @@ class _BudgetList extends StatelessWidget {
             onPressed: () {
               final suggested = suggestedBudgets(state.entries, state.month);
               state.setBudgets(suggested);
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
                     'Applied ${suggested.length} suggested budgets '
-                    '(3-month average + 10%, rounded up)'),
-              ));
+                    '(3-month average + 10%, rounded up)',
+                  ),
+                ),
+              );
             },
           ),
         ),
@@ -295,10 +328,15 @@ class _SummaryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = LedgerColors.of(context);
     final items = [
-      ('Income', summary.income, Colors.green),
-      ('Spending', summary.expense, Colors.deepOrange),
-      ('Net', summary.net, summary.net >= 0 ? Colors.teal : Colors.red),
+      ('Income', summary.income, colors.income),
+      ('Spending', summary.expense, colors.spending),
+      (
+        'Net',
+        summary.net,
+        summary.net >= 0 ? colors.income : Theme.of(context).colorScheme.error,
+      ),
     ];
     return Row(
       children: [
@@ -315,10 +353,9 @@ class _SummaryRow extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       label == 'Net' ? signedMoney(value) : money(value),
-                      style: Theme.of(context)
-                          .textTheme
-                          .headlineSmall
-                          ?.copyWith(color: color, fontWeight: FontWeight.w600),
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(color: color, fontWeight: FontWeight.w600)
+                          .tabular,
                     ),
                   ],
                 ),
@@ -346,14 +383,17 @@ class _CategoryBreakdown extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Row(
               children: [
-                Icon(categoryIcon(state.categoryById(item.categoryId)),
-                    size: 18,
-                    color: categoryColor(state.categoryById(item.categoryId))),
+                Icon(
+                  categoryIcon(state.categoryById(item.categoryId)),
+                  size: 18,
+                  color: categoryColor(state.categoryById(item.categoryId)),
+                ),
                 const SizedBox(width: 8),
                 SizedBox(
                   width: 110,
                   child: Text(
-                    state.categoryById(item.categoryId)?.name ?? item.categoryId,
+                    state.categoryById(item.categoryId)?.name ??
+                        item.categoryId,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -363,8 +403,9 @@ class _CategoryBreakdown extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: item.total / maxTotal,
                       minHeight: 8,
-                      backgroundColor:
-                          Theme.of(context).colorScheme.surfaceContainerHighest,
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
                       color: categoryColor(state.categoryById(item.categoryId)),
                     ),
                   ),
@@ -372,7 +413,11 @@ class _CategoryBreakdown extends StatelessWidget {
                 const SizedBox(width: 8),
                 SizedBox(
                   width: 90,
-                  child: Text(money(item.total), textAlign: TextAlign.right),
+                  child: Text(
+                    money(item.total),
+                    textAlign: TextAlign.right,
+                    style: tabularStyle,
+                  ),
                 ),
               ],
             ),
@@ -394,39 +439,54 @@ class _DueLists extends StatelessWidget {
       return const EmptyHint('Nothing due — enjoy the calm');
     }
     Widget tile(Entry e, {required bool late}) => ListTile(
-          dense: true,
-          contentPadding: EdgeInsets.zero,
-          leading: Icon(typeIcon(e.type),
-              color: late ? Colors.red : Theme.of(context).colorScheme.outline),
-          title: Text(e.title),
-          subtitle: Text(
-              '${e.type.label} · due ${shortDate(e.dueDate!)}'
-              '${e.amount != null ? ' · ${money(e.amount!)}' : ''}'),
-          trailing: TextButton(
-            onPressed: () => state.toggleDone(e),
-            child: Text(e.type == EntryType.bill ? 'Mark paid' : 'Done'),
-          ),
-        );
+      dense: true,
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(
+        typeIcon(e.type),
+        color: late
+            ? Theme.of(context).colorScheme.error
+            : Theme.of(context).colorScheme.outline,
+      ),
+      title: Text(e.title),
+      subtitle: Text(
+        '${e.type.label} · due ${shortDate(e.dueDate!)}'
+        '${e.amount != null ? ' · ${money(e.amount!)}' : ''}',
+      ),
+      trailing: TextButton(
+        onPressed: () => state.toggleDone(e),
+        child: Text(e.type == EntryType.bill ? 'Mark paid' : 'Done'),
+      ),
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (overdue.isNotEmpty) ...[
-          Text('Overdue (${overdue.length})',
-              style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600)),
+          Text(
+            'Overdue (${overdue.length})',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.error,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           for (final e in overdue) tile(e, late: true),
           const SizedBox(height: 8),
         ],
         if (upcoming.isNotEmpty) ...[
-          Text('Upcoming (${upcoming.length})',
-              style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(
+            'Upcoming (${upcoming.length})',
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
           for (final e in upcoming.take(6)) tile(e, late: false),
           if (upcoming.length > 6)
             Padding(
               padding: const EdgeInsets.only(top: 4),
-              child: Text('+ ${upcoming.length - 6} more in the Entries tab',
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.outline,
-                      fontSize: 12)),
+              child: Text(
+                '+ ${upcoming.length - 6} more in the Entries tab',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.outline,
+                  fontSize: 12,
+                ),
+              ),
             ),
         ],
       ],

@@ -2,16 +2,19 @@ import 'package:daily_ledger/logic/heatmap.dart';
 import 'package:daily_ledger/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Entry spend(String id, double amount, DateTime date,
-        {EntryType type = EntryType.expense}) =>
-    Entry(
-      id: id,
-      title: id,
-      type: type,
-      amount: amount,
-      categoryId: 'dining',
-      date: date,
-    );
+Entry spend(
+  String id,
+  double amount,
+  DateTime date, {
+  EntryType type = EntryType.expense,
+}) => Entry(
+  id: id,
+  title: id,
+  type: type,
+  amount: amount,
+  categoryId: 'dining',
+  date: date,
+);
 
 void main() {
   final july = DateTime(2026, 7);

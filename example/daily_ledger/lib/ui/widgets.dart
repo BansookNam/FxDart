@@ -29,9 +29,12 @@ class SectionCard extends StatelessWidget {
             if (subtitle != null)
               Padding(
                 padding: const EdgeInsets.only(top: 2),
-                child: Text(subtitle!,
-                    style: theme.textTheme.bodySmall
-                        ?.copyWith(color: theme.colorScheme.outline)),
+                child: Text(
+                  subtitle!,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.outline,
+                  ),
+                ),
               ),
             const SizedBox(height: 12),
             child,
@@ -48,12 +51,14 @@ class EmptyHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 24),
-        child: Center(
-          child: Text(message,
-              style: TextStyle(color: Theme.of(context).colorScheme.outline)),
-        ),
-      );
+    padding: const EdgeInsets.symmetric(vertical: 24),
+    child: Center(
+      child: Text(
+        message,
+        style: TextStyle(color: Theme.of(context).colorScheme.outline),
+      ),
+    ),
+  );
 }
 
 /// Sparkline of the running balance (`scan` output) as a CustomPaint.
@@ -69,7 +74,10 @@ class BalanceSparkline extends StatelessWidget {
       width: double.infinity,
       child: CustomPaint(
         painter: _SparklinePainter(
-          values: [for (final p in points) p.balance],
+          // The memoized pipeline returns the SAME list instance across
+          // rebuilds, so shouldRepaint can compare identity instead of
+          // allocating (and repainting) every frame.
+          points: points,
           color: Theme.of(context).colorScheme.primary,
         ),
       ),
@@ -78,12 +86,13 @@ class BalanceSparkline extends StatelessWidget {
 }
 
 class _SparklinePainter extends CustomPainter {
-  final List<double> values;
+  final List<BalancePoint> points;
   final Color color;
-  _SparklinePainter({required this.values, required this.color});
+  _SparklinePainter({required this.points, required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
+    final values = [for (final p in points) p.balance];
     var lo = values.first, hi = values.first;
     for (final v in values) {
       if (v < lo) lo = v;
@@ -91,9 +100,9 @@ class _SparklinePainter extends CustomPainter {
     }
     if (hi == lo) hi = lo + 1;
     Offset at(int i) => Offset(
-          i * size.width / (values.length - 1),
-          size.height - (values[i] - lo) / (hi - lo) * size.height,
-        );
+      i * size.width / (values.length - 1),
+      size.height - (values[i] - lo) / (hi - lo) * size.height,
+    );
 
     final line = Path()..moveTo(at(0).dx, at(0).dy);
     for (var i = 1; i < values.length; i++) {
@@ -105,30 +114,33 @@ class _SparklinePainter extends CustomPainter {
       ..close();
 
     canvas.drawPath(
-        fill,
-        Paint()
-          ..style = PaintingStyle.fill
-          ..color = color.withValues(alpha: 0.12));
+      fill,
+      Paint()
+        ..style = PaintingStyle.fill
+        ..color = color.withValues(alpha: 0.12),
+    );
     canvas.drawPath(
-        line,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2
-          ..color = color);
+      line,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2
+        ..color = color,
+    );
 
     // Zero line, when the balance crosses it.
     if (lo < 0 && hi > 0) {
       final y = size.height - (0 - lo) / (hi - lo) * size.height;
       canvas.drawLine(
-          Offset(0, y),
-          Offset(size.width, y),
-          Paint()
-            ..strokeWidth = 1
-            ..color = color.withValues(alpha: 0.35));
+        Offset(0, y),
+        Offset(size.width, y),
+        Paint()
+          ..strokeWidth = 1
+          ..color = color.withValues(alpha: 0.35),
+      );
     }
   }
 
   @override
   bool shouldRepaint(_SparklinePainter old) =>
-      old.values != values || old.color != color;
+      !identical(old.points, points) || old.color != color;
 }

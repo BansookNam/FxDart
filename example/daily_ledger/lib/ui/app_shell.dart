@@ -3,6 +3,7 @@ import 'package:fxdart/fxdart.dart'
     show Throttled, throttle, pipe, filter, map, sum;
 
 import '../logic/summaries.dart' show sameMonth;
+import '../main.dart' show DailyLedgerApp;
 import '../models/models.dart';
 import '../state/ledger_state.dart';
 import 'calendar_screen.dart';
@@ -11,11 +12,21 @@ import 'entries_screen.dart';
 import 'format.dart';
 import 'insights_screen.dart';
 
+/// Below this width the rail becomes a bottom bar and side-by-side cards
+/// stack — one breakpoint shared by every screen.
+const narrowBreakpoint = 700.0;
+
+bool isNarrow(BuildContext context) =>
+    MediaQuery.sizeOf(context).width < narrowBreakpoint;
+
 /// Exposes [LedgerState] to the tree — a plain [InheritedNotifier], no
 /// state-management package (per the plan: the star is the data layer).
 class LedgerScope extends InheritedNotifier<LedgerState> {
-  const LedgerScope({super.key, required LedgerState state, required super.child})
-      : super(notifier: state);
+  const LedgerScope({
+    super.key,
+    required LedgerState state,
+    required super.child,
+  }) : super(notifier: state);
 
   static LedgerState of(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<LedgerScope>()!.notifier!;
@@ -45,17 +56,91 @@ class _AppShellState extends State<AppShell> {
     super.dispose();
   }
 
+  /// Reseeding wipes every user edit — destructive, so it confirms first.
+  Future<void> _confirmReseed(LedgerState state) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset demo data?'),
+        content: const Text(
+          'This replaces the whole ledger with fresh seeded fixtures. '
+          'Entries and budgets you added or edited will be lost.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Reset'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) _throttledReseed(state);
+  }
+
   static const _tabs = [
-    (icon: Icons.dashboard_outlined, selected: Icons.dashboard, label: 'Dashboard'),
-    (icon: Icons.calendar_month_outlined, selected: Icons.calendar_month, label: 'Calendar'),
+    (
+      icon: Icons.dashboard_outlined,
+      selected: Icons.dashboard,
+      label: 'Dashboard',
+    ),
+    (
+      icon: Icons.calendar_month_outlined,
+      selected: Icons.calendar_month,
+      label: 'Calendar',
+    ),
     (icon: Icons.list_alt_outlined, selected: Icons.list_alt, label: 'Entries'),
-    (icon: Icons.insights_outlined, selected: Icons.insights, label: 'Insights'),
+    (
+      icon: Icons.insights_outlined,
+      selected: Icons.insights,
+      label: 'Insights',
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
     final state = LedgerScope.of(context);
     if (state.isLoading) return _LoadingScreen(loaded: state.loadedBoxes);
+    final narrow = isNarrow(context);
+
+    final content = Column(
+      children: [
+        _MonthBar(state: state, onReseed: () => _confirmReseed(state)),
+        const Divider(height: 1),
+        Expanded(
+          child: IndexedStack(
+            index: _tab,
+            children: const [
+              DashboardScreen(),
+              CalendarScreen(),
+              EntriesScreen(),
+              InsightsScreen(),
+            ],
+          ),
+        ),
+      ],
+    );
+
+    if (narrow) {
+      return Scaffold(
+        body: content,
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: _tab,
+          onDestinationSelected: (i) => setState(() => _tab = i),
+          destinations: [
+            for (final t in _tabs)
+              NavigationDestination(
+                icon: Icon(t.icon),
+                selectedIcon: Icon(t.selected),
+                label: t.label,
+              ),
+          ],
+        ),
+      );
+    }
 
     return Scaffold(
       body: Row(
@@ -68,19 +153,6 @@ class _AppShellState extends State<AppShell> {
               padding: EdgeInsets.symmetric(vertical: 12),
               child: Icon(Icons.account_balance_wallet, size: 32),
             ),
-            trailing: Expanded(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: IconButton(
-                    tooltip: 'Reset demo data',
-                    icon: const Icon(Icons.restart_alt),
-                    onPressed: () => _throttledReseed(state),
-                  ),
-                ),
-              ),
-            ),
             destinations: [
               for (final t in _tabs)
                 NavigationRailDestination(
@@ -91,25 +163,7 @@ class _AppShellState extends State<AppShell> {
             ],
           ),
           const VerticalDivider(width: 1),
-          Expanded(
-            child: Column(
-              children: [
-                _MonthBar(state: state),
-                const Divider(height: 1),
-                Expanded(
-                  child: IndexedStack(
-                    index: _tab,
-                    children: const [
-                      DashboardScreen(),
-                      CalendarScreen(),
-                      EntriesScreen(),
-                      InsightsScreen(),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+          Expanded(child: content),
         ],
       ),
     );
@@ -118,20 +172,27 @@ class _AppShellState extends State<AppShell> {
 
 class _MonthBar extends StatelessWidget {
   final LedgerState state;
-  const _MonthBar({required this.state});
+  final VoidCallback onReseed;
+  const _MonthBar({required this.state, required this.onReseed});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final narrow = isNarrow(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          Text('Daily Ledger', style: theme.textTheme.titleLarge),
-          const SizedBox(width: 12),
-          Text('an fxdart showcase',
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: theme.colorScheme.outline)),
+          if (!narrow) ...[
+            Text('Daily Ledger', style: theme.textTheme.titleLarge),
+            const SizedBox(width: 12),
+            Text(
+              'an fxdart showcase',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.outline,
+              ),
+            ),
+          ],
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.chevron_left),
@@ -139,10 +200,12 @@ class _MonthBar extends StatelessWidget {
             onPressed: () => state.goToMonth(-1),
           ),
           SizedBox(
-            width: 150,
-            child: Text(monthLabel(state.month),
-                textAlign: TextAlign.center,
-                style: theme.textTheme.titleMedium),
+            width: narrow ? 110 : 150,
+            child: Text(
+              narrow ? shortMonthLabel(state.month) : monthLabel(state.month),
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleMedium,
+            ),
           ),
           IconButton(
             icon: const Icon(Icons.chevron_right),
@@ -152,6 +215,32 @@ class _MonthBar extends StatelessWidget {
           TextButton(
             onPressed: () => state.setMonth(state.today),
             child: const Text('Today'),
+          ),
+          const Spacer(),
+          ValueListenableBuilder(
+            valueListenable: DailyLedgerApp.themeMode,
+            builder: (context, mode, _) => IconButton(
+              tooltip: switch (mode) {
+                ThemeMode.system => 'Theme: follow system',
+                ThemeMode.light => 'Theme: light',
+                ThemeMode.dark => 'Theme: dark',
+              },
+              icon: Icon(switch (mode) {
+                ThemeMode.system => Icons.brightness_auto,
+                ThemeMode.light => Icons.light_mode,
+                ThemeMode.dark => Icons.dark_mode,
+              }),
+              onPressed: () => DailyLedgerApp.themeMode.value = switch (mode) {
+                ThemeMode.system => ThemeMode.light,
+                ThemeMode.light => ThemeMode.dark,
+                ThemeMode.dark => ThemeMode.system,
+              },
+            ),
+          ),
+          IconButton(
+            tooltip: 'Reset demo data',
+            icon: const Icon(Icons.restart_alt),
+            onPressed: onReseed,
           ),
           IconButton(
             tooltip: 'About this demo (runs a live pipe)',
@@ -167,12 +256,16 @@ class _MonthBar extends StatelessWidget {
     // The dynamic `pipe` exists for FxTS parity (Dart can't type variadic
     // composition) — everywhere else this app uses the typed fx() chain.
     // Here it runs for real on the live ledger:
-    final net = pipe(state.entries, [
-      (List<Entry> es) =>
-          filter((Entry e) => e.type.isMoney && sameMonth(e.date, state.month), es),
-      (Iterable<Entry> es) => map((Entry e) => e.signedAmount, es),
-      (Iterable<double> ns) => sum(ns),
-    ]) as num;
+    final net =
+        pipe(state.entries, [
+              (List<Entry> es) => filter(
+                (Entry e) => e.type.isMoney && sameMonth(e.date, state.month),
+                es,
+              ),
+              (Iterable<Entry> es) => map((Entry e) => e.signedAmount, es),
+              (Iterable<double> ns) => sum(ns),
+            ])
+            as num;
 
     showDialog<void>(
       context: context,
@@ -185,10 +278,11 @@ class _MonthBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                  'Every number in this app is an fxdart pipeline over one '
-                  'List<Entry>. Storage (hive_ce) only shelves data; all '
-                  'grouping, summing and windowing happens in logic/ — each '
-                  'card names the operators it uses in its subtitle.'),
+                'Every number in this app is an fxdart pipeline over one '
+                'List<Entry>. Storage (hive_ce) only shelves data; all '
+                'grouping, summing and windowing happens in logic/ — each '
+                'card names the operators it uses in its subtitle.',
+              ),
               const SizedBox(height: 12),
               const Text('Live demo of the dynamic pipe (FxTS parity API):'),
               const SizedBox(height: 8),
@@ -210,8 +304,10 @@ class _MonthBar extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              Text('= net for ${monthLabel(state.month)}: '
-                  '${net.toStringAsFixed(2)}'),
+              Text(
+                '= net for ${monthLabel(state.month)}: '
+                '${net.toStringAsFixed(2)}',
+              ),
             ],
           ),
         ),
@@ -239,7 +335,9 @@ class _LoadingScreen extends StatelessWidget {
           children: [
             const CircularProgressIndicator(),
             const SizedBox(height: 16),
-            const Text('Loading 4 boxes with toAsync().map(read).concurrent(3) …'),
+            const Text(
+              'Loading 4 boxes with toAsync().map(read).concurrent(3) …',
+            ),
             const SizedBox(height: 8),
             Text(
               loaded.isEmpty ? ' ' : loaded.join(' · '),

@@ -91,8 +91,12 @@ class LedgerRepository {
 
   /// Wipes and reseeds the demo data.
   Future<void> reseed(DateTime today) async {
-    await Future.wait(
-        [_entries.clear(), _categories.clear(), _rules.clear(), _budgets.clear()]);
+    await Future.wait([
+      _entries.clear(),
+      _categories.clear(),
+      _rules.clear(),
+      _budgets.clear(),
+    ]);
     final entries = seedEntries(today);
     await _entries.putAll({for (final e in entries) e.id: e});
     await _categories.putAll({for (final c in seedCategories()) c.id: c});

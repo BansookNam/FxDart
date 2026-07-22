@@ -22,16 +22,19 @@ final MonthSummary Function(DateTime) Function(List<Entry>) cachedMonthSummary =
     memoize((entries) => memoize((month) => monthSummary(entries, month)));
 
 final List<CategoryTotal> Function(DateTime) Function(List<Entry>)
-    cachedBreakdown =
-    memoize((entries) => memoize((month) => categoryBreakdown(entries, month)));
+cachedBreakdown = memoize(
+  (entries) => memoize((month) => categoryBreakdown(entries, month)),
+);
 
 final List<BalancePoint> Function(DateTime) Function(List<Entry>)
-    cachedBalance =
-    memoize((entries) => memoize((month) => runningBalance(entries, month)));
+cachedBalance = memoize(
+  (entries) => memoize((month) => runningBalance(entries, month)),
+);
 
 final HeatmapData Function(DateTime) Function(List<Entry>) cachedHeatmap =
     memoize((entries) => memoize((month) => spendingHeatmap(entries, month)));
 
 final List<(String, String)> Function(DateTime) Function(List<Entry>)
-    cachedQuickStats =
-    memoize((entries) => memoize((month) => quickStats(entries, month)));
+cachedQuickStats = memoize(
+  (entries) => memoize((month) => quickStats(entries, month)),
+);

@@ -138,10 +138,16 @@ Open items to resolve at deploy time (deliberately deferred):
   `docs/ledger/`, or teach the tool/`deploy.sh` a copy step.
 - Decide renderer (`canvaskit` vs `skwasm`) and check bundle size for Pages.
 
-## Iteration protocol — 4 rounds
+## Iteration protocol — 4 rounds (+ 5 extended rounds)
 
 After M5, run **4 rounds** of this loop. Each round is one commit series and
 gets a log section appended at the bottom of this file.
+
+**Extended rounds 5–9:** a second series of 5 rounds, guided by the
+ui-ux-pro-max design-system skill (trust-blue finance palette, dark mode,
+density/responsive rules) and explicitly allowed to **grow fxdart itself**:
+when a feedback exposes a missing operator, the round adds it to the library
+(sync + async + chain methods + tests + tutorial) and then uses it in the app.
 
 1. **Evaluate — 10 feedbacks.** Play the deployed/local app end-to-end and
    write exactly 10 numbered feedback items. Rubric — each item is tagged:
@@ -174,6 +180,7 @@ Track which fxdart operators the app demonstrates; grow it every round.
 | ✅ round 2 | fork, pick, fromEntries, prepend, max |
 | ✅ round 3 | memoize, juxt, throttle, takeRight, reverse, head |
 | ✅ round 4 | intersection, difference (both directions), pluck, compact, pipe |
+| ✅ round 5 | maxBy, minBy — **new operators added to fxdart 0.3.0 this round** |
 | ⏸ intentionally uncovered | omit, slice, cycle, tap, scan1, repeat — no natural fit in this app; forcing them would violate the "readable over clever" principle |
 
 ## Round log
@@ -372,6 +379,61 @@ directions; `tagSpend` is the `pluck`/`compact` chain; the About dialog uses
 Insights; About dialog; Undo delete; `cachedQuickStats`; README rewrite.
 Tests: 49 passing (`tags_test.dart`). `flutter analyze` clean;
 `flutter build web` compiles.
+
+### Round 5 — done (extended series; ui-ux-pro-max design round)
+
+**Feedbacks (10):**
+1. `UX` — Hard-coded Material palette colors (`green.shade700`, `deepOrange`,
+   `teal`, `orange`, raw `red`) scattered across 5 widgets; several fail
+   contrast on dark surfaces. → fixed: `ui/theme.dart` with a `LedgerColors`
+   ThemeExtension (income / spending / warning) — no widget names a raw
+   palette color anymore.
+2. `UX` — Light-only app; the design system (finance dashboard) calls for a
+   dark mode. → fixed: light + dark themes off one trust-blue seed
+   (#1E40AF), 3-way toggle (system → light → dark) in the top bar.
+3. `UX` — Money digits rendered proportionally, so amount columns wiggled.
+   → fixed: `tabularFigures` FontFeature on every money Text.
+4. `UX` — Not responsive: NavigationRail plus fixed side-by-side Rows broke
+   under ~700px. → fixed: shared `narrowBreakpoint` — bottom NavigationBar,
+   calendar and insights stack, month bar compacts.
+5. `PERF` — `_SparklinePainter.shouldRepaint` compared a list allocated fresh
+   every build (`old.values != values` was always true) → repainted every
+   rebuild. → fixed: painter takes the memoized points list, compares with
+   `identical`.
+6. `FX` — "Biggest expense" was `sortBy(-amount) → head`: an O(n log n) sort
+   for a maximum. fxdart had no answer to this shape. → **added `maxBy` /
+   `minBy` to fxdart 0.3.0** (sync + async + `fx()`/`FxAsync` chain methods,
+   15 tests, two 101 tutorials wired into section 7 + course.json) and used
+   `maxBy` for both "Biggest expense" and "Busiest day".
+7. `CORRECT` — "Avg daily spend" divided by days with *any* entry, so a
+   task-only day inflated the denominator and understated the average.
+   → fixed: divides by distinct *spending* days (test updated to pin it).
+8. `UX` — "Reset demo data" wiped every user edit with zero confirmation
+   (the throttle only guarded double-clicks). → fixed: confirmation dialog.
+9. `DX` — `stats.dart` had a private `_money` that had already drifted from
+   the UI formatter (no thousands separators). → fixed: one shared formatter
+   in `logic/format.dart`, re-exported by `ui/format.dart`.
+10. `UX` — Heatmap had no legend (chart rule: never rely on color alone).
+    → fixed: 5-step color ramp legend with the max-per-day dollar label.
+
+**Features suggested (3):**
+- J. **Design tokens + dark mode** — ThemeExtension, seed palette, tabular
+  numerals. ← *chosen*
+- K. **Adaptive layout** — one breakpoint, bottom nav + stacked cards on
+  narrow viewports. ← *chosen*
+- L. **CSV import** (round-trip with the round-2 export) — `split`, `zip`
+  with the header, `compact` for bad rows. Deferred to Round 6.
+
+**Strategy:** design-system first (ui-ux-pro-max: trust-blue #1E40AF seed,
+profit-green income, dark OLED variant, density 7), then the FX/CORRECT
+fixes. Library addition pipeline-first: `maxBy` is one `fold`-shaped walk
+keeping the best element; ties keep the first, empty returns null (the
+`head`/`last` contract), keys compare exactly like `sortBy`.
+
+**Implemented:** all of the above. New `ui/theme.dart`, `logic/format.dart`;
+fxdart 0.3.0 with `maxBy`/`minBy` (+`maxByAsync`/`minByAsync`); library 986
+tests passing, app 49 passing, `flutter analyze` clean, docs site rebuilt
+with the two new tutorial pages.
 
 ## Final state (after 4 rounds)
 

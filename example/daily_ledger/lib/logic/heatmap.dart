@@ -20,8 +20,7 @@ class HeatmapData {
   const HeatmapData(this.weeks, this.maxDaySpend, this.totalSpend);
 
   /// 0..1 intensity for a cell.
-  double intensity(double spent) =>
-      maxDaySpend <= 0 ? 0 : spent / maxDaySpend;
+  double intensity(double spent) => maxDaySpend <= 0 ? 0 : spent / maxDaySpend;
 }
 
 /// Pipeline: one lazy `filter` source → `fork` #1 feeds
@@ -30,22 +29,31 @@ class HeatmapData {
 /// over the per-day index.
 HeatmapData spendingHeatmap(List<Entry> entries, DateTime month) {
   final monthSpending = filter(
-      (Entry e) =>
-          (e.type == EntryType.expense || e.type == EntryType.bill) &&
-          sameMonth(e.date, month),
-      entries); // lazy — not walked yet
+    (Entry e) =>
+        (e.type == EntryType.expense || e.type == EntryType.bill) &&
+        sameMonth(e.date, month),
+    entries,
+  ); // lazy — not walked yet
 
   final perDay = {
-    for (final kv in groupBy((Entry e) => dayKey(e.date), fork(monthSpending)).entries)
-      kv.key: fold(0.0, (double acc, Entry e) => acc + (e.amount ?? 0), kv.value),
+    for (final kv in groupBy(
+      (Entry e) => dayKey(e.date),
+      fork(monthSpending),
+    ).entries)
+      kv.key: fold(
+        0.0,
+        (double acc, Entry e) => acc + (e.amount ?? 0),
+        kv.value,
+      ),
   };
-  final total =
-      sum(map((Entry e) => e.amount ?? 0, fork(monthSpending))).toDouble();
+  final total = sum(
+    map((Entry e) => e.amount ?? 0, fork(monthSpending)),
+  ).toDouble();
 
   final weeks = fx(monthGrid(month))
-      .map((week) => [
-            for (final day in week) (day, perDay[dayKey(day)] ?? 0.0),
-          ])
+      .map(
+        (week) => [for (final day in week) (day, perDay[dayKey(day)] ?? 0.0)],
+      )
       .toList();
   final maxDay = perDay.isEmpty ? 0.0 : fx(perDay.values).max().toDouble();
   return HeatmapData(weeks, maxDay, total);

@@ -3,21 +3,23 @@ import 'package:daily_ledger/logic/stats.dart';
 import 'package:daily_ledger/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Entry entry(String id, DateTime date,
-        {EntryType type = EntryType.expense,
-        double? amount,
-        DateTime? due,
-        bool done = false}) =>
-    Entry(
-      id: id,
-      title: id,
-      type: type,
-      amount: amount,
-      categoryId: 'dining',
-      date: date,
-      dueDate: due,
-      done: done,
-    );
+Entry entry(
+  String id,
+  DateTime date, {
+  EntryType type = EntryType.expense,
+  double? amount,
+  DateTime? due,
+  bool done = false,
+}) => Entry(
+  id: id,
+  title: id,
+  type: type,
+  amount: amount,
+  categoryId: 'dining',
+  date: date,
+  dueDate: due,
+  done: done,
+);
 
 void main() {
   final july = DateTime(2026, 7);
@@ -27,31 +29,41 @@ void main() {
       final entries = [
         entry('coffee', DateTime(2026, 7, 3), amount: 5),
         entry('laptop', DateTime(2026, 7, 3), amount: 900),
-        entry('salary', DateTime(2026, 7, 25),
-            type: EntryType.income, amount: 3200),
-        entry('todo', DateTime(2026, 7, 10),
-            type: EntryType.task, due: DateTime(2026, 7, 30)),
+        entry(
+          'salary',
+          DateTime(2026, 7, 25),
+          type: EntryType.income,
+          amount: 3200,
+        ),
+        entry(
+          'todo',
+          DateTime(2026, 7, 10),
+          type: EntryType.task,
+          due: DateTime(2026, 7, 30),
+        ),
       ];
       final stats = Map.fromEntries(
-          quickStats(entries, july).map((s) => MapEntry(s.$1, s.$2)));
+        quickStats(entries, july).map((s) => MapEntry(s.$1, s.$2)),
+      );
       expect(stats['Biggest expense'], 'laptop · \$900.00');
       expect(stats['Busiest day'], 'Day 3 · 2 entries');
-      // Spend 905 over 3 distinct entry days.
-      expect(stats['Avg daily spend'], '\$301.67');
+      // Spend 905 over 1 distinct SPENDING day — the salary and task days
+      // must not inflate the denominator (Round 5 correctness fix).
+      expect(stats['Avg daily spend'], '\$905.00');
       expect(stats['Open due items'], '1');
     });
 
     test('empty month degrades to placeholders', () {
       final stats = quickStats(const [], july);
-      expect(stats.map((s) => s.$2),
-          containsAll(['—', 'none']));
+      expect(stats.map((s) => s.$2), containsAll(['—', 'none']));
     });
   });
 
   group('recentActivity', () {
     test('returns newest N entries, newest first', () {
       final entries = [
-        for (var d = 1; d <= 12; d++) entry('e$d', DateTime(2026, 7, d), amount: 1),
+        for (var d = 1; d <= 12; d++)
+          entry('e$d', DateTime(2026, 7, d), amount: 1),
       ];
       final recent = recentActivity(entries, count: 3);
       expect(recent.map((e) => e.id), ['e12', 'e11', 'e10']);

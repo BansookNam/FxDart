@@ -2,27 +2,23 @@ import 'package:flutter/material.dart';
 
 import '../models/models.dart';
 
-/// `1234.5` → `$1,234.50` (own tiny formatter; no intl dependency).
-String money(double value) {
-  final sign = value < 0 ? '-' : '';
-  final cents = (value.abs() * 100).round();
-  final whole = cents ~/ 100;
-  final frac = (cents % 100).toString().padLeft(2, '0');
-  final digits = whole.toString();
-  final buf = StringBuffer();
-  for (var i = 0; i < digits.length; i++) {
-    if (i > 0 && (digits.length - i) % 3 == 0) buf.write(',');
-    buf.write(digits[i]);
-  }
-  return '$sign\$$buf.$frac';
-}
-
-/// Signed variant with an explicit plus for income.
-String signedMoney(double value) => value > 0 ? '+${money(value)}' : money(value);
+// money()/signedMoney() live in logic/format.dart (pure, shared with the
+// stats pipelines); re-exported here so UI files keep one import.
+export '../logic/format.dart' show money, signedMoney;
 
 const _monthNames = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 const _weekdayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -61,8 +57,8 @@ Color categoryColor(Category? c) =>
     c == null ? Colors.blueGrey : Color(c.colorSeed);
 
 IconData typeIcon(EntryType type) => switch (type) {
-      EntryType.expense => Icons.remove_circle_outline,
-      EntryType.income => Icons.add_circle_outline,
-      EntryType.task => Icons.check_circle_outline,
-      EntryType.bill => Icons.receipt_long,
-    };
+  EntryType.expense => Icons.remove_circle_outline,
+  EntryType.income => Icons.add_circle_outline,
+  EntryType.task => Icons.check_circle_outline,
+  EntryType.bill => Icons.receipt_long,
+};

@@ -11,18 +11,17 @@ Entry entry(
   required DateTime date,
   DateTime? due,
   bool done = false,
-}) =>
-    Entry(
-      id: id,
-      title: id,
-      type: type,
-      amount: amount,
-      categoryId: category,
-      tags: tags,
-      date: date,
-      dueDate: due,
-      done: done,
-    );
+}) => Entry(
+  id: id,
+  title: id,
+  type: type,
+  amount: amount,
+  categoryId: category,
+  tags: tags,
+  date: date,
+  dueDate: due,
+  done: done,
+);
 
 void main() {
   final july = DateTime(2026, 7);
@@ -30,11 +29,25 @@ void main() {
   group('monthSummary', () {
     test('sums income and expenses separately, ignoring other months', () {
       final entries = [
-        entry('a', type: EntryType.income, amount: 1000, date: DateTime(2026, 7, 25)),
+        entry(
+          'a',
+          type: EntryType.income,
+          amount: 1000,
+          date: DateTime(2026, 7, 25),
+        ),
         entry('b', amount: 100, date: DateTime(2026, 7, 3)),
-        entry('c', type: EntryType.bill, amount: 50, date: DateTime(2026, 7, 10)),
+        entry(
+          'c',
+          type: EntryType.bill,
+          amount: 50,
+          date: DateTime(2026, 7, 10),
+        ),
         entry('d', amount: 999, date: DateTime(2026, 6, 30)), // other month
-        entry('e', type: EntryType.task, date: DateTime(2026, 7, 5)), // no money
+        entry(
+          'e',
+          type: EntryType.task,
+          date: DateTime(2026, 7, 5),
+        ), // no money
       ];
       final s = monthSummary(entries, july);
       expect(s.income, 1000);
@@ -55,10 +68,25 @@ void main() {
       final entries = [
         entry('a', amount: 10, category: 'dining', date: DateTime(2026, 7, 1)),
         entry('b', amount: 30, category: 'dining', date: DateTime(2026, 7, 2)),
-        entry('c', amount: 25, category: 'transport', date: DateTime(2026, 7, 3)),
-        entry('d', amount: 100, category: 'housing', date: DateTime(2026, 7, 4)),
-        entry('e', type: EntryType.income, amount: 500, category: 'salary',
-            date: DateTime(2026, 7, 5)), // income excluded
+        entry(
+          'c',
+          amount: 25,
+          category: 'transport',
+          date: DateTime(2026, 7, 3),
+        ),
+        entry(
+          'd',
+          amount: 100,
+          category: 'housing',
+          date: DateTime(2026, 7, 4),
+        ),
+        entry(
+          'e',
+          type: EntryType.income,
+          amount: 500,
+          category: 'salary',
+          date: DateTime(2026, 7, 5),
+        ), // income excluded
       ];
       final top = categoryBreakdown(entries, july, limit: 2);
       expect(top.map((c) => c.categoryId), ['housing', 'dining']);
@@ -71,7 +99,12 @@ void main() {
     test('scan accumulates in date order regardless of input order', () {
       final entries = [
         entry('late', amount: 30, date: DateTime(2026, 7, 20)),
-        entry('early', type: EntryType.income, amount: 100, date: DateTime(2026, 7, 1)),
+        entry(
+          'early',
+          type: EntryType.income,
+          amount: 100,
+          date: DateTime(2026, 7, 1),
+        ),
       ];
       final points = runningBalance(entries, july);
       expect(points.map((p) => p.balance), [100, 70]);
@@ -86,15 +119,33 @@ void main() {
     final today = DateTime(2026, 7, 23);
     test('splits open dued entries into overdue and upcoming, sorted', () {
       final entries = [
-        entry('overdue', type: EntryType.bill, amount: 1,
-            date: DateTime(2026, 7, 1), due: DateTime(2026, 7, 20)),
-        entry('up1', type: EntryType.task, date: DateTime(2026, 7, 1),
-            due: DateTime(2026, 7, 25)),
-        entry('doneOne', type: EntryType.task, date: DateTime(2026, 7, 1),
-            due: DateTime(2026, 7, 1), done: true),
+        entry(
+          'overdue',
+          type: EntryType.bill,
+          amount: 1,
+          date: DateTime(2026, 7, 1),
+          due: DateTime(2026, 7, 20),
+        ),
+        entry(
+          'up1',
+          type: EntryType.task,
+          date: DateTime(2026, 7, 1),
+          due: DateTime(2026, 7, 25),
+        ),
+        entry(
+          'doneOne',
+          type: EntryType.task,
+          date: DateTime(2026, 7, 1),
+          due: DateTime(2026, 7, 1),
+          done: true,
+        ),
         entry('noDue', type: EntryType.task, date: DateTime(2026, 7, 1)),
-        entry('dueToday', type: EntryType.task, date: DateTime(2026, 7, 1),
-            due: DateTime(2026, 7, 23)),
+        entry(
+          'dueToday',
+          type: EntryType.task,
+          date: DateTime(2026, 7, 1),
+          due: DateTime(2026, 7, 23),
+        ),
       ];
       final (overdue, upcoming) = duePartition(entries, today);
       expect(overdue.map((e) => e.id), ['overdue']);
@@ -133,9 +184,21 @@ void main() {
   group('possibleDuplicates', () {
     test('finds same title+amount+day pairs', () {
       final entries = [
-        entry('a', amount: 12, date: DateTime(2026, 7, 3)).copyWith(title: 'Coffee'),
-        entry('b', amount: 12, date: DateTime(2026, 7, 3)).copyWith(title: 'Coffee'),
-        entry('c', amount: 12, date: DateTime(2026, 7, 4)).copyWith(title: 'Coffee'),
+        entry(
+          'a',
+          amount: 12,
+          date: DateTime(2026, 7, 3),
+        ).copyWith(title: 'Coffee'),
+        entry(
+          'b',
+          amount: 12,
+          date: DateTime(2026, 7, 3),
+        ).copyWith(title: 'Coffee'),
+        entry(
+          'c',
+          amount: 12,
+          date: DateTime(2026, 7, 4),
+        ).copyWith(title: 'Coffee'),
       ];
       final dupes = possibleDuplicates(entries);
       expect(dupes.length, 1);
@@ -145,8 +208,16 @@ void main() {
 
   group('searchEntries', () {
     final entries = [
-      entry('a', tags: ['food'], date: DateTime(2026, 7, 1)).copyWith(title: 'Supermarket'),
-      entry('b', tags: ['commute'], date: DateTime(2026, 7, 2)).copyWith(title: 'Bus fare'),
+      entry(
+        'a',
+        tags: ['food'],
+        date: DateTime(2026, 7, 1),
+      ).copyWith(title: 'Supermarket'),
+      entry(
+        'b',
+        tags: ['commute'],
+        date: DateTime(2026, 7, 2),
+      ).copyWith(title: 'Bus fare'),
     ];
     test('matches title case-insensitively', () {
       expect(searchEntries(entries, 'super').single.id, 'a');

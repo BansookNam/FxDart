@@ -2,17 +2,21 @@ import 'package:daily_ledger/logic/tags.dart';
 import 'package:daily_ledger/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Entry entry(String id, DateTime date, List<String> tags,
-        {EntryType type = EntryType.expense, double? amount = 10}) =>
-    Entry(
-      id: id,
-      title: id,
-      type: type,
-      amount: amount,
-      categoryId: 'dining',
-      date: date,
-      tags: tags,
-    );
+Entry entry(
+  String id,
+  DateTime date,
+  List<String> tags, {
+  EntryType type = EntryType.expense,
+  double? amount = 10,
+}) => Entry(
+  id: id,
+  title: id,
+  type: type,
+  amount: amount,
+  categoryId: 'dining',
+  date: date,
+  tags: tags,
+);
 
 void main() {
   final july = DateTime(2026, 7);
@@ -21,8 +25,13 @@ void main() {
     entry('b', DateTime(2026, 7, 8), ['food']),
     entry('c', DateTime(2026, 7, 10), ['travel']),
     entry('d', DateTime(2026, 6, 5), ['food', 'commute']),
-    entry('t', DateTime(2026, 7, 12), ['food'],
-        type: EntryType.task, amount: null),
+    entry(
+      't',
+      DateTime(2026, 7, 12),
+      ['food'],
+      type: EntryType.task,
+      amount: null,
+    ),
   ];
 
   test('compareTagMonths: intersection, fresh, dropped', () {

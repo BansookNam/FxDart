@@ -41,10 +41,14 @@ class LedgerState extends ChangeNotifier {
     if (_repo.isEmpty) {
       await _repo.reseed(today);
     }
-    _setData(await _repo.loadAll(onLoaded: (box) {
-      loadedBoxes.add(box);
-      notifyListeners();
-    }));
+    _setData(
+      await _repo.loadAll(
+        onLoaded: (box) {
+          loadedBoxes.add(box);
+          notifyListeners();
+        },
+      ),
+    );
   }
 
   Future<void> reseed() async {
@@ -77,8 +81,9 @@ class LedgerState extends ChangeNotifier {
     await _repo.deleteEntry(id);
     final data = _data;
     if (data != null) {
-      _setData(data.copyWith(
-          entries: data.entries.where((e) => e.id != id).toList()));
+      _setData(
+        data.copyWith(entries: data.entries.where((e) => e.id != id).toList()),
+      );
     }
   }
 

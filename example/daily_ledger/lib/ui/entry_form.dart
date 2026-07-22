@@ -6,7 +6,10 @@ import 'format.dart';
 
 /// Add/edit dialog for an [Entry].
 Future<void> showEntryForm(BuildContext context, {Entry? existing}) =>
-    showDialog(context: context, builder: (_) => _EntryDialog(existing: existing));
+    showDialog(
+      context: context,
+      builder: (_) => _EntryDialog(existing: existing),
+    );
 
 class _EntryDialog extends StatefulWidget {
   final Entry? existing;
@@ -19,10 +22,12 @@ class _EntryDialog extends StatefulWidget {
 class _EntryDialogState extends State<_EntryDialog> {
   final _formKey = GlobalKey<FormState>();
   late final _title = TextEditingController(text: widget.existing?.title);
-  late final _amount =
-      TextEditingController(text: widget.existing?.amount?.toStringAsFixed(2));
-  late final _tags =
-      TextEditingController(text: widget.existing?.tags.join(', '));
+  late final _amount = TextEditingController(
+    text: widget.existing?.amount?.toStringAsFixed(2),
+  );
+  late final _tags = TextEditingController(
+    text: widget.existing?.tags.join(', '),
+  );
   late EntryType _type = widget.existing?.type ?? EntryType.expense;
   late String? _categoryId = widget.existing?.categoryId;
   late DateTime _date = widget.existing?.date ?? DateTime.now();
@@ -43,9 +48,11 @@ class _EntryDialogState extends State<_EntryDialog> {
   Widget build(BuildContext context) {
     final state = LedgerScope.of(context);
     final categories = state.categories
-        .where((c) => _type == EntryType.task
-            ? c.kind == CategoryKind.task
-            : c.kind == CategoryKind.money)
+        .where(
+          (c) => _type == EntryType.task
+              ? c.kind == CategoryKind.task
+              : c.kind == CategoryKind.money,
+        )
         .toList();
     if (_categoryId == null || !categories.any((c) => c.id == _categoryId)) {
       _categoryId = categories.isEmpty ? null : categories.first.id;
@@ -75,7 +82,9 @@ class _EntryDialogState extends State<_EntryDialog> {
                   controller: _title,
                   autofocus: true,
                   decoration: const InputDecoration(
-                      labelText: 'Title', border: OutlineInputBorder()),
+                    labelText: 'Title',
+                    border: OutlineInputBorder(),
+                  ),
                   validator: (v) =>
                       (v == null || v.trim().isEmpty) ? 'Required' : null,
                 ),
@@ -84,11 +93,13 @@ class _EntryDialogState extends State<_EntryDialog> {
                   TextFormField(
                     controller: _amount,
                     decoration: const InputDecoration(
-                        labelText: 'Amount',
-                        prefixText: '\$ ',
-                        border: OutlineInputBorder()),
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
+                      labelText: 'Amount',
+                      prefixText: '\$ ',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     validator: (v) {
                       final parsed = double.tryParse(v ?? '');
                       if (parsed == null) return 'Enter a number';
@@ -106,16 +117,24 @@ class _EntryDialogState extends State<_EntryDialog> {
                   key: ValueKey(_type),
                   initialValue: _categoryId,
                   decoration: const InputDecoration(
-                      labelText: 'Category', border: OutlineInputBorder()),
+                    labelText: 'Category',
+                    border: OutlineInputBorder(),
+                  ),
                   items: [
                     for (final c in categories)
                       DropdownMenuItem(
                         value: c.id,
-                        child: Row(children: [
-                          Icon(categoryIcon(c), size: 18, color: categoryColor(c)),
-                          const SizedBox(width: 8),
-                          Text(c.name),
-                        ]),
+                        child: Row(
+                          children: [
+                            Icon(
+                              categoryIcon(c),
+                              size: 18,
+                              color: categoryColor(c),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(c.name),
+                          ],
+                        ),
                       ),
                   ],
                   onChanged: (v) => setState(() => _categoryId = v),
@@ -124,8 +143,9 @@ class _EntryDialogState extends State<_EntryDialog> {
                 TextFormField(
                   controller: _tags,
                   decoration: const InputDecoration(
-                      labelText: 'Tags (comma-separated)',
-                      border: OutlineInputBorder()),
+                    labelText: 'Tags (comma-separated)',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -150,9 +170,11 @@ class _EntryDialogState extends State<_EntryDialog> {
                       Expanded(
                         child: OutlinedButton.icon(
                           icon: const Icon(Icons.flag, size: 18),
-                          label: Text(_dueDate == null
-                              ? 'Due date'
-                              : 'Due: ${shortDate(_dueDate!)}'),
+                          label: Text(
+                            _dueDate == null
+                                ? 'Due date'
+                                : 'Due: ${shortDate(_dueDate!)}',
+                          ),
                           onPressed: () async {
                             final picked = await showDatePicker(
                               context: context,
@@ -160,7 +182,9 @@ class _EntryDialogState extends State<_EntryDialog> {
                               firstDate: DateTime(2020),
                               lastDate: DateTime(2030),
                             );
-                            if (picked != null) setState(() => _dueDate = picked);
+                            if (picked != null) {
+                              setState(() => _dueDate = picked);
+                            }
                           },
                         ),
                       ),
@@ -179,9 +203,12 @@ class _EntryDialogState extends State<_EntryDialog> {
         ),
         FilledButton(
           onPressed: () {
-            if (!_formKey.currentState!.validate() || _categoryId == null) return;
+            if (!_formKey.currentState!.validate() || _categoryId == null) {
+              return;
+            }
             final entry = Entry(
-              id: widget.existing?.id ??
+              id:
+                  widget.existing?.id ??
                   'user-${DateTime.now().microsecondsSinceEpoch}',
               title: _title.text.trim(),
               type: _type,
