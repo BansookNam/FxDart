@@ -1,3 +1,6 @@
+# 0.2.1
+* READEME.md update
+
 ## 0.2.0
 
 * Comprehensive docs site overhaul: tutorials for `curried`/`uncurried` and
