@@ -7,8 +7,8 @@ section: 7
 crumb: average
 prev: sumBy.html
 prevLabel: sumBy
-next: min.html
-nextLabel: min
+next: averageBy.html
+nextLabel: averageBy
 ---
   <p class="hero-sub">파이프라인이 만들어 내는 모든 숫자의 평균 — 하나도 없으면 <code>NaN</code>입니다.</p>
 

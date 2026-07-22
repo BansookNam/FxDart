@@ -5,8 +5,8 @@ description: FxDart min tutorial: the smallest number in a pipeline, +infinity w
 heading: <code>min</code>
 section: 7
 crumb: min
-prev: average.html
-prevLabel: average
+prev: averageBy.html
+prevLabel: averageBy
 next: max.html
 nextLabel: max
 ---

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>averageBy — FxDart 101</title>
+  <meta name="description" content="FxDart averageBy tutorial: the mean of a key over every element — map + average in one step — with a live playground.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/averageBy.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/averageBy.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/averageBy.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/averageBy.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/averageBy.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/averageBy.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/averageBy.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/averageBy.html">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../101/index.html#api">API Tutorials</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Language">
+      <span class="lang-label">Language</span>
+      <ul>
+        <li><a href="../tutorials/averageBy.html" hreflang="en" lang="en" aria-current="page">English</a></li>
+        <li><a href="../ko/tutorials/averageBy.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../zh/tutorials/averageBy.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../ja/tutorials/averageBy.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../es/tutorials/averageBy.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../pt-br/tutorials/averageBy.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../ru/tutorials/averageBy.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 7 · Aggregating › <strong>averageBy</strong></p>
+  <h1><code>averageBy</code></h1>
+  <p class="hero-sub">The mean of a key over every element — <code>map</code> + <code>average</code> in one step, <code>NaN</code> when empty.</p>
+
+  <div class="signature">double averageBy&lt;A&gt;(num Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;double&gt; averageByAsync&lt;A&gt;(FutureOr&lt;num&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+double Fx&lt;T&gt;.averageBy(num Function(T a) f)          // chain (sync)
+Future&lt;double&gt; FxAsync&lt;T&gt;.averageBy(FutureOr&lt;num&gt; Function(T a) f)  // chain (async)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>averageBy</code> completes the by-key family
+    (<code><a href="sumBy.html">sumBy</a></code> ·
+    <code><a href="maxBy.html">maxBy</a></code> ·
+    <code><a href="minBy.html">minBy</a></code>): it extracts a numeric key
+    from each element and averages the keys, in one walk that tracks a
+    running total and count.
+  </p>
+  <p>
+    The contract is <code><a href="average.html">average</a></code>'s: an
+    empty pipeline returns <code>double.nan</code> (it is computing
+    <code>0 / 0</code>), never <code>0</code> — check
+    <code>result.isNaN</code> when the input can be empty. The result is
+    always a <code>double</code>.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; the empty case</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final runs = [
+    (day: 'Mon', km: 5.0),
+    (day: 'Wed', km: 8.0),
+    (day: 'Fri', km: 5.0),
+  ];
+
+  // Data-first form: map + average in one step.
+  print(averageBy((({String day, double km}) r) => r.km, runs)); // 6.0
+
+  // Chain form — no .map((r) => r.km) stage needed:
+  print(fx(runs).averageBy((r) => r.km)); // 6.0
+
+  // Empty input averages to NaN (0/0), exactly like average:
+  print(averageBy((int n) => n, <int>[]).isNaN); // true
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async keys</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // The async key extractor is awaited per element:
+  final avg = await fx(['2', '4', '6'])
+      .toAsync()
+      .averageBy((s) => delay(const Duration(milliseconds: 100), int.parse(s)));
+
+  print(avg); // 4.0
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: average only the read books' page counts with one call.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final books = [
+    (title: 'A', pages: 120, read: true),
+    (title: 'B', pages: 900, read: false),
+    (title: 'C', pages: 240, read: true),
+  ];
+
+  // TODO: average page count of only the books you have READ,
+  // using ONE averageBy call after the filter (no map stage).
+  final avg = fx(books).filter((b) => b.read).size();
+
+  print(avg); // should print: 180.0
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="average.html"><code>average</code></a> — when the pipeline already holds numbers ·
+    <a href="sumBy.html"><code>sumBy</code></a> — the numerator's cousin ·
+    <a href="maxBy.html"><code>maxBy</code></a> · <a href="minBy.html"><code>minBy</code></a> — the rest of the family
+  </div>
+
+  <nav class="tut-nav">
+    <a href="average.html">← Previous: average</a>
+    <a href="min.html">Next: min →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a>. Great thanks to <strong>Indong Yoo</strong> (CTO, Marpple) and the FxTS team for the ideas, semantics, and test suite this library is built on.</p>
+  <p>Playground compiles via the DartPad compile service. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Run","pgReset":"Reset","pgCompiling":"Compiling…","pgCompileError":"Compile error","pgError":"Error","pgLoading":"Loading runtime…","pgRunning":"Running…","pgNoOutput":"(no output)","pgLoadFailed":"Could not load the FxDart library"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

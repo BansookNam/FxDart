@@ -7,8 +7,8 @@ section: 7
 crumb: average
 prev: sumBy.html
 prevLabel: sumBy
-next: min.html
-nextLabel: min
+next: averageBy.html
+nextLabel: averageBy
 ---
   <p class="hero-sub">La media de todos los números que produce el pipeline — <code>NaN</code> cuando no hay ninguno.</p>
 

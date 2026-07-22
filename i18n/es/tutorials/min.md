@@ -5,8 +5,8 @@ description: Tutorial de min en FxDart: el número más pequeño de un pipeline,
 heading: <code>min</code>
 section: 7
 crumb: min
-prev: average.html
-prevLabel: average
+prev: averageBy.html
+prevLabel: averageBy
 next: max.html
 nextLabel: max
 ---

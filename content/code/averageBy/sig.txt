@@ -1,0 +1,4 @@
+double averageBy&lt;A&gt;(num Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;double&gt; averageByAsync&lt;A&gt;(FutureOr&lt;num&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+double Fx&lt;T&gt;.averageBy(num Function(T a) f)          // chain (sync)
+Future&lt;double&gt; FxAsync&lt;T&gt;.averageBy(FutureOr&lt;num&gt; Function(T a) f)  // chain (async)

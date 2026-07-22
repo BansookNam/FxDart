@@ -5,8 +5,8 @@ description: FxDart min 튜토리얼 — 파이프라인에서 가장 작은 숫
 heading: <code>min</code>
 section: 7
 crumb: min
-prev: average.html
-prevLabel: average
+prev: averageBy.html
+prevLabel: averageBy
 next: max.html
 nextLabel: max
 ---

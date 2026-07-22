@@ -7,8 +7,8 @@ section: 7
 crumb: average
 prev: sumBy.html
 prevLabel: sumBy
-next: min.html
-nextLabel: min
+next: averageBy.html
+nextLabel: averageBy
 ---
   <p class="hero-sub">The mean of every number the pipeline produces — <code>NaN</code> when there are none.</p>
 

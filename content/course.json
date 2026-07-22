@@ -67,6 +67,7 @@
     {"href": "sum.html", "label": "sum"},
     {"href": "sumBy.html", "label": "sumBy"},
     {"href": "average.html", "label": "average"},
+    {"href": "averageBy.html", "label": "averageBy"},
     {"href": "min.html", "label": "min"},
     {"href": "max.html", "label": "max"},
     {"href": "maxBy.html", "label": "maxBy"},
