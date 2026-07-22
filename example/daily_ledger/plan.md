@@ -183,6 +183,7 @@ Track which fxdart operators the app demonstrates; grow it every round.
 | ✅ round 5 | maxBy, minBy — **new operators added to fxdart 0.3.0 this round** |
 | ✅ round 6 | sumBy — **new operator added to fxdart 0.4.0 this round** (replaces every fold/map+sum tail) |
 | ✅ round 7 | find, join (in app code), zip+fromEntries per CSV row, compact as an Either-splitter |
+| ✅ round 8 | concat (forecast), averageBy — **new operator added to fxdart 0.5.0 this round** |
 | ⏸ intentionally uncovered | omit, slice, cycle, tap, scan1, repeat — no natural fit in this app; forcing them would violate the "readable over clever" principle |
 
 ## Round log
@@ -538,6 +539,56 @@ tests, app 49 tests, `flutter analyze` clean.
 `ui/import_dialog.dart`; Import CSV button on Entries. App 57 tests
 (new `import_test.dart` with 8), `flutter analyze` clean, web build
 compiles.
+
+### Round 8 — done (cashflow forecast + weekday profile)
+
+**Feedbacks (10):**
+1. `FX` — `concat` was exported but demoed nowhere. → the forecast pipeline
+   is built on it: real and ghost entries meet in one `concat` and flow
+   through the same `sortBy → scan` — no branches for past vs future.
+2. `FX` — the by-key family lacked `averageBy`. → **added to fxdart 0.5.0**
+   (sync + async + chain, 6 tests, tutorial between `average` and `min`);
+   the weekday profile is its showcase.
+3. `PERF` — the Insights projection and the new pipelines needed caching.
+   → `cachedWeekdayProfile` (entries → month) and `cachedForecast`, a
+   **triple-nested memoize** (entries → rules → `(month, today)` record —
+   records key by value, so a new day naturally misses).
+4. `CORRECT` — forecast horizon: the last day of the viewed month,
+   inclusive (`DateTime(y, m+1, 0)`), pinned by a test with a rule anchored
+   on the 30th.
+5. `CORRECT` — dates where the recurring entry already materialized must
+   not double-count in the forecast (projectAll's exclusion, now covered
+   by a forecast-level test).
+6. `UX` — Insights had month totals but no "shape of the week". → weekday
+   profile card: average *day total* per weekday (not the month sum — the
+   dialog explains the difference), peak weekday highlighted.
+7. `UX` — the forecast needed a visual history/future boundary. →
+   `BalanceSparkline` gained `projectedFrom`: solid history, faded
+   projection, a dot at the handover; legend line beneath.
+8. `PERF` — the import dialog reparsed the whole paste on every keystroke.
+   → the same fxdart `debounce(250ms)` that guards the entries search now
+   guards the preview.
+9. `UX` — both new cards ship with formula + "?" live dialogs (Round 6
+   consistency).
+10. `CORRECT` — for a past month the forecast must degenerate to the plain
+    running balance (ghosts empty, same pipeline) — tested.
+
+**Features suggested (3):**
+- N. **Cashflow forecast** ← *chosen*
+- O. **Weekday profile** ← *chosen*
+- P. **Budget "what-if" slider** — evolve a budgets map under a scaling
+  factor and preview over/under states. Left on the table.
+
+**Strategy:** pipeline-first as always. Forecast: `concat(actual, ghosts) →
+sortBy(date) → scan`, `projectedFrom` = `findIndex(date > today)`.
+Weekday: two-stage `groupBy(day) → sumBy` then `groupBy(weekday) →
+averageBy(day total)`.
+
+**Implemented:** all of the above. fxdart 0.5.0 (`averageBy`); new
+`logic/forecast.dart`, `logic/weekday.dart`; forecast card on Dashboard,
+weekday card on Insights. Library 998 tests, app 63 tests (new
+`forecast_test.dart`, `weekday_test.dart`), `flutter analyze` clean, web
+build compiles.
 
 ## Final state (after 4 rounds)
 

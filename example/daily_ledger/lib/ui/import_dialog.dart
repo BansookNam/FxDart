@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fxdart/fxdart.dart' show Debounced, debounce;
 
 import '../logic/export.dart' show csvColumns;
 import '../logic/import.dart';
@@ -21,8 +22,16 @@ class _ImportDialog extends StatefulWidget {
 class _ImportDialogState extends State<_ImportDialog> {
   final _controller = TextEditingController();
 
+  /// Reparsing a large paste on every keystroke is wasteful — the same
+  /// fxdart `debounce` that guards the entries search guards the preview.
+  late final Debounced<String> _debouncedParse = debounce(
+    (_) => setState(() {}),
+    const Duration(milliseconds: 250),
+  );
+
   @override
   void dispose() {
+    _debouncedParse.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -122,7 +131,7 @@ class _ImportDialogState extends State<_ImportDialog> {
                     '${csvColumns.join(',')}',
                 border: const OutlineInputBorder(),
               ),
-              onChanged: (_) => setState(() {}),
+              onChanged: _debouncedParse.call,
             ),
             const SizedBox(height: 8),
             if (preview != null) ...[

@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:fxdart/fxdart.dart' show maxBy;
 
 import '../logic/cached.dart';
 import '../logic/heatmap.dart';
 import '../logic/recurrence.dart';
 import '../logic/summaries.dart';
 import '../logic/tags.dart';
+import '../logic/weekday.dart';
 import 'app_shell.dart';
 import 'format.dart';
 import 'theme.dart';
 import 'widgets.dart';
+
+const _weekdayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+String weekdayName(int weekday) => _weekdayNames[weekday - 1];
+
+WeekdayStat? maxByStat(List<WeekdayStat> profile) =>
+    maxBy((w) => w.avgSpend, profile.where((w) => w.dayCount > 0));
 
 class InsightsScreen extends StatefulWidget {
   const InsightsScreen({super.key});
@@ -120,6 +129,46 @@ class _InsightsScreenState extends State<InsightsScreen> {
               );
             },
             child: _Heatmap(data: heatmap),
+          ),
+          const SizedBox(height: 16),
+          SectionCard(
+            title: 'Weekday profile — ${monthLabel(state.month)}',
+            subtitle:
+                'groupBy(day) → sumBy, then groupBy(weekday) → averageBy(day total)',
+            explain: () {
+              final profile = cachedWeekdayProfile(state.entries)(state.month);
+              final top = maxByStat(profile);
+              return PipelineExplanation(
+                title: 'Weekday profile',
+                formula:
+                    'filter(month & spending)\n'
+                    '→ groupBy(day) → sumBy(amount)      // day totals\n'
+                    '→ groupBy(weekday) → averageBy(total)',
+                steps: [
+                  PipelineStep(
+                    'groupBy(day) → sumBy',
+                    'first collapse entries into one total per calendar day',
+                    '${profile.fold(0, (int n, w) => n + w.dayCount)} spending days',
+                  ),
+                  PipelineStep(
+                    'groupBy(day.weekday)',
+                    'bucket those day totals by weekday',
+                    '${profile.where((w) => w.dayCount > 0).length} of 7 weekdays',
+                  ),
+                  PipelineStep(
+                    'averageBy(day total)',
+                    'the mean of a key in one walk — an average day of '
+                        'that weekday, not a month total',
+                    top == null
+                        ? '—'
+                        : '${weekdayName(top.weekday)} peaks at ${money(top.avgSpend)}',
+                  ),
+                ],
+              );
+            },
+            child: _WeekdayProfile(
+              profile: cachedWeekdayProfile(state.entries)(state.month),
+            ),
           ),
           const SizedBox(height: 16),
           Builder(
@@ -583,6 +632,62 @@ class _TagExplorer extends StatelessWidget {
                   ? null
                   : Text(signedMoney(e.signedAmount)),
             ),
+      ],
+    );
+  }
+}
+
+class _WeekdayProfile extends StatelessWidget {
+  final List<WeekdayStat> profile;
+  const _WeekdayProfile({required this.profile});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final top = maxByStat(profile);
+    if (top == null) return const EmptyHint('No spending this month');
+    return Column(
+      children: [
+        for (final w in profile)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 3),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 40,
+                  child: Text(
+                    weekdayName(w.weekday),
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ),
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: top.avgSpend <= 0 ? 0 : w.avgSpend / top.avgSpend,
+                      minHeight: 10,
+                      backgroundColor:
+                          theme.colorScheme.surfaceContainerHighest,
+                      color: w.weekday == top.weekday
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.primary.withValues(alpha: 0.55),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                SizedBox(
+                  width: 130,
+                  child: Text(
+                    w.dayCount == 0
+                        ? '—'
+                        : '${money(w.avgSpend)} avg · ${w.dayCount}d',
+                    textAlign: TextAlign.right,
+                    style: tabularStyle.copyWith(fontSize: 12),
+                  ),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }

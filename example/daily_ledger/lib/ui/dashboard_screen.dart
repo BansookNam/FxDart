@@ -26,6 +26,10 @@ class DashboardScreen extends StatelessWidget {
     final balance = cachedBalance(state.entries)(state.month);
     final (overdue, upcoming) = duePartition(state.entries, state.today);
     final stats = cachedQuickStats(state.entries)(state.month);
+    final forecast = cachedForecast(state.entries)(state.rules)((
+      state.month,
+      dayKey(state.today),
+    ));
 
     // Live counts for the "?" dialogs — closures run at click time, so the
     // numbers always match what the cards render.
@@ -225,6 +229,77 @@ class DashboardScreen extends StatelessWidget {
                       ],
                     );
             },
+          ),
+          const SizedBox(height: 16),
+          SectionCard(
+            title: 'Cashflow forecast',
+            subtitle:
+                'concat(actual, projected) → sortBy(date) → scan — through '
+                '${monthLabel(state.month)}',
+            explain: () => PipelineExplanation(
+              title: 'Cashflow forecast',
+              formula:
+                  'actual = filter(month & money)\n'
+                  'ghosts = projectAll(rules, today → month end)\n'
+                  'concat(actual, ghosts) → sortBy(date) → scan(sum)',
+              steps: [
+                PipelineStep(
+                  'filter(month & money)',
+                  'what actually happened so far',
+                  '${forecast.points.length - forecast.ghostCount} entries',
+                ),
+                PipelineStep(
+                  'projectAll → filter(month)',
+                  'recurring rules projected through the month\'s last day; '
+                      'already-materialized dates are excluded',
+                  '${forecast.ghostCount} projected',
+                ),
+                PipelineStep(
+                  'concat → sortBy(date) → scan',
+                  'real and ghost entries flow through ONE running-sum '
+                      'pipeline — no branches for past vs future',
+                  '${forecast.points.length} points',
+                ),
+              ],
+              result: forecast.points.isEmpty
+                  ? 'no money flow this month'
+                  : 'ends ${forecast.hasProjection ? '~' : ''}'
+                        '${signedMoney(forecast.endBalance)}'
+                        '${forecast.ghostCount > 0 ? ' (projected net ${signedMoney(forecast.projectedNet)})' : ''}',
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                BalanceSparkline(
+                  points: forecast.points,
+                  projectedFrom: forecast.projectedFrom,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        forecast.hasProjection
+                            ? 'solid = so far · faded = projected'
+                            : 'no projected entries in this month',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                      ),
+                      if (forecast.points.isNotEmpty)
+                        Text(
+                          'ends ${forecast.hasProjection ? '~' : ''}'
+                          '${signedMoney(forecast.endBalance)}',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(fontWeight: FontWeight.w600)
+                              .tabular,
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
           SectionCard(

@@ -15,9 +15,11 @@ import 'package:fxdart/fxdart.dart';
 
 import '../models/models.dart';
 import 'calendar.dart';
+import 'forecast.dart';
 import 'heatmap.dart';
 import 'stats.dart';
 import 'summaries.dart';
+import 'weekday.dart';
 
 final MonthSummary Function(DateTime) Function(List<Entry>) cachedMonthSummary =
     memoize((entries) => memoize((month) => monthSummary(entries, month)));
@@ -47,4 +49,22 @@ final Map<DateTime, List<Entry>> Function(List<Entry>) cachedEntriesByDay =
 
 final Map<DateTime, int> Function(List<Entry>) cachedDueCountByDay = memoize(
   dueCountByDay,
+);
+
+final List<WeekdayStat> Function(DateTime) Function(List<Entry>)
+cachedWeekdayProfile = memoize(
+  (entries) => memoize((month) => weekdayProfile(entries, month)),
+);
+
+// Triple-nested memoize (Round 8): entries → rules → (month, today) record.
+// Records key the inner cache by value, so a new day naturally misses.
+final Forecast Function((DateTime, DateTime)) Function(List<RecurringRule>)
+Function(List<Entry>)
+cachedForecast = memoize(
+  (entries) => memoize(
+    (rules) => memoize(
+      ((DateTime, DateTime) key) =>
+          monthForecast(entries, rules, key.$1, key.$2),
+    ),
+  ),
 );

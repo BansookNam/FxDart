@@ -248,9 +248,12 @@ class EmptyHint extends StatelessWidget {
 }
 
 /// Sparkline of the running balance (`scan` output) as a CustomPaint.
+/// When [projectedFrom] is set, points from that index on render as the
+/// faded "future" segment (the cashflow forecast).
 class BalanceSparkline extends StatelessWidget {
   final List<BalancePoint> points;
-  const BalanceSparkline({super.key, required this.points});
+  final int? projectedFrom;
+  const BalanceSparkline({super.key, required this.points, this.projectedFrom});
 
   @override
   Widget build(BuildContext context) {
@@ -264,6 +267,7 @@ class BalanceSparkline extends StatelessWidget {
           // rebuilds, so shouldRepaint can compare identity instead of
           // allocating (and repainting) every frame.
           points: points,
+          projectedFrom: projectedFrom,
           color: Theme.of(context).colorScheme.primary,
         ),
       ),
@@ -273,8 +277,13 @@ class BalanceSparkline extends StatelessWidget {
 
 class _SparklinePainter extends CustomPainter {
   final List<BalancePoint> points;
+  final int? projectedFrom;
   final Color color;
-  _SparklinePainter({required this.points, required this.color});
+  _SparklinePainter({
+    required this.points,
+    required this.color,
+    this.projectedFrom,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -290,11 +299,18 @@ class _SparklinePainter extends CustomPainter {
       size.height - (values[i] - lo) / (hi - lo) * size.height,
     );
 
+    // The history/future boundary (clamped so both segments stay drawable).
+    final split = (projectedFrom ?? values.length).clamp(1, values.length);
+
     final line = Path()..moveTo(at(0).dx, at(0).dy);
-    for (var i = 1; i < values.length; i++) {
+    for (var i = 1; i < split; i++) {
       line.lineTo(at(i).dx, at(i).dy);
     }
-    final fill = Path.from(line)
+    final fullLine = Path.from(line);
+    for (var i = split; i < values.length; i++) {
+      fullLine.lineTo(at(i).dx, at(i).dy);
+    }
+    final fill = Path.from(fullLine)
       ..lineTo(size.width, size.height)
       ..lineTo(0, size.height)
       ..close();
@@ -312,6 +328,21 @@ class _SparklinePainter extends CustomPainter {
         ..strokeWidth = 2
         ..color = color,
     );
+    if (split < values.length) {
+      final projected = Path()..moveTo(at(split - 1).dx, at(split - 1).dy);
+      for (var i = split; i < values.length; i++) {
+        projected.lineTo(at(i).dx, at(i).dy);
+      }
+      canvas.drawPath(
+        projected,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2
+          ..color = color.withValues(alpha: 0.4),
+      );
+      // Boundary marker: where history hands over to projection.
+      canvas.drawCircle(at(split - 1), 3, Paint()..color = color);
+    }
 
     // Zero line, when the balance crosses it.
     if (lo < 0 && hi > 0) {
@@ -328,5 +359,7 @@ class _SparklinePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_SparklinePainter old) =>
-      !identical(old.points, points) || old.color != color;
+      !identical(old.points, points) ||
+      old.projectedFrom != projectedFrom ||
+      old.color != color;
 }
