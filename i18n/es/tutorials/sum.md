@@ -7,8 +7,8 @@ section: 7
 crumb: sum
 prev: reduceLazy.html
 prevLabel: reduceLazy
-next: average.html
-nextLabel: average
+next: sumBy.html
+nextLabel: sumBy
 ---
   <p class="hero-sub">Suma todos los números que produce un pipeline perezoso.</p>
 

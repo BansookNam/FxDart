@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>sumBy — FxDart 101</title>
+  <meta name="description" content="FxDart sumBy tutorial: sum a key of every element — map + sum in one step — with a live playground.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/sumBy.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/sumBy.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/sumBy.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/sumBy.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/sumBy.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/sumBy.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/sumBy.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/sumBy.html">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../101/index.html#api">API Tutorials</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Language">
+      <span class="lang-label">Language</span>
+      <ul>
+        <li><a href="../tutorials/sumBy.html" hreflang="en" lang="en" aria-current="page">English</a></li>
+        <li><a href="../ko/tutorials/sumBy.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../zh/tutorials/sumBy.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../ja/tutorials/sumBy.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../es/tutorials/sumBy.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../pt-br/tutorials/sumBy.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../ru/tutorials/sumBy.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 7 · Aggregating › <strong>sumBy</strong></p>
+  <h1><code>sumBy</code></h1>
+  <p class="hero-sub">Sum a key of every element — <code>map</code> + <code>sum</code> in one step, <code>0</code> when empty.</p>
+
+  <div class="signature">num sumBy&lt;A&gt;(num Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;num&gt; sumByAsync&lt;A&gt;(FutureOr&lt;num&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+num Fx&lt;T&gt;.sumBy(num Function(T a) f)          // chain (sync)
+Future&lt;num&gt; FxAsync&lt;T&gt;.sumBy(FutureOr&lt;num&gt; Function(T a) f)  // chain (async)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>sumBy</code> collapses the most common two-stage tail in data
+    pipelines — <code>.map((x) =&gt; x.field).sum()</code> — into a single
+    terminal. It folds a running total while extracting the key, so nothing
+    intermediate is materialized and the intent ("total this field") is one
+    call instead of a projection plus an aggregation.
+  </p>
+  <p>
+    The contract is <code><a href="sum.html">sum</a></code>'s: an empty
+    pipeline totals to <code>0</code>, and int keys keep int arithmetic
+    while any double key promotes the total to <code>double</code>.
+  </p>
+  <p>
+    This is a Dart-native addition (FxTS ships only the numeric
+    <code>sum</code>), in the same family as
+    <code><a href="maxBy.html">maxBy</a></code> /
+    <code><a href="minBy.html">minBy</a></code> — Kotlin spells it
+    <code>sumOf</code>.
+  </p>
+
+  <h2>Demo 1 · Basics &amp; the empty case</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final cart = [
+    (name: 'Bread', price: 3.50),
+    (name: 'Milk', price: 2.20),
+    (name: 'Cheese', price: 8.00),
+  ];
+
+  // Data-first form: map + sum in one step.
+  print(sumBy((({String name, double price}) i) => i.price, cart)); // 13.7
+
+  // Chain form — no .map((i) => i.price) stage needed:
+  print(fx(cart).sumBy((i) => i.price)); // 13.7
+
+  // Empty input sums to 0, exactly like sum:
+  print(sumBy((int n) => n, <int>[])); // 0
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async keys</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // The async key extractor is awaited per element:
+  final total = await fx(['4', '20', '18'])
+      .toAsync()
+      .sumBy((s) => delay(const Duration(milliseconds: 100), int.parse(s)));
+
+  print(total); // 42
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: total the long words' lengths with one call.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final words = ['tiny', 'gigantic', 'ok', 'medium'];
+
+  // TODO: total the lengths of only the words longer than 3 characters,
+  // using ONE sumBy call after the filter (no map stage).
+  final total = fx(words).filter((w) => w.length > 3).size();
+
+  print(total); // should print: 18
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="sum.html"><code>sum</code></a> — when the pipeline already holds numbers ·
+    <a href="maxBy.html"><code>maxBy</code></a> · <a href="minBy.html"><code>minBy</code></a> — the same by-key family ·
+    <a href="fold.html"><code>fold</code></a> — the general shape this specializes
+  </div>
+
+  <nav class="tut-nav">
+    <a href="sum.html">← Previous: sum</a>
+    <a href="average.html">Next: average →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a>. Great thanks to <strong>Indong Yoo</strong> (CTO, Marpple) and the FxTS team for the ideas, semantics, and test suite this library is built on.</p>
+  <p>Playground compiles via the DartPad compile service. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Run","pgReset":"Reset","pgCompiling":"Compiling…","pgCompileError":"Compile error","pgError":"Error","pgLoading":"Loading runtime…","pgRunning":"Running…","pgNoOutput":"(no output)","pgLoadFailed":"Could not load the FxDart library"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

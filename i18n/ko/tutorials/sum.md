@@ -7,8 +7,8 @@ section: 7
 crumb: sum
 prev: reduceLazy.html
 prevLabel: reduceLazy
-next: average.html
-nextLabel: average
+next: sumBy.html
+nextLabel: sumBy
 ---
   <p class="hero-sub">지연 파이프라인이 만들어 내는 모든 숫자를 더합니다.</p>
 

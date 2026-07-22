@@ -1,0 +1,4 @@
+num sumBy&lt;A&gt;(num Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;num&gt; sumByAsync&lt;A&gt;(FutureOr&lt;num&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+num Fx&lt;T&gt;.sumBy(num Function(T a) f)          // chain (sync)
+Future&lt;num&gt; FxAsync&lt;T&gt;.sumBy(FutureOr&lt;num&gt; Function(T a) f)  // chain (async)

@@ -65,6 +65,7 @@
     {"href": "fold.html", "label": "fold"},
     {"href": "reduceLazy.html", "label": "reduceLazy"},
     {"href": "sum.html", "label": "sum"},
+    {"href": "sumBy.html", "label": "sumBy"},
     {"href": "average.html", "label": "average"},
     {"href": "min.html", "label": "min"},
     {"href": "max.html", "label": "max"},

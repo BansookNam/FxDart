@@ -5,8 +5,8 @@ description: FxDart average 튜토리얼 — 파이프라인이 만들어 내는
 heading: <code>average</code>
 section: 7
 crumb: average
-prev: sum.html
-prevLabel: sum
+prev: sumBy.html
+prevLabel: sumBy
 next: min.html
 nextLabel: min
 ---
