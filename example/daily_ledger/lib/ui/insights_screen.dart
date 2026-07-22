@@ -43,14 +43,82 @@ class _InsightsScreenState extends State<InsightsScreen> {
             title: 'Month over month',
             subtitle:
                 'range → map(monthSummary) → zip(shifted) — 6 months up to ${monthLabel(state.month)}',
+            explain: () => PipelineExplanation(
+              title: 'Month over month',
+              formula:
+                  'range(6) → map(monthSummary)\n'
+                  '→ drop(1) → zip(self) → map(Δ)',
+              steps: [
+                PipelineStep(
+                  'range(6, -1, -1) → map(month)',
+                  'the 6 months ending at the viewed month',
+                  trend.isEmpty
+                      ? '—'
+                      : '${shortMonthLabel(trend.first.month)} … ${shortMonthLabel(trend.last.month)}',
+                ),
+                PipelineStep(
+                  'map(monthSummary)',
+                  'income/expense totals per month (filter → partition → sumBy each)',
+                  '6 summaries',
+                ),
+                PipelineStep(
+                  'drop(1) → zip(self)',
+                  'pair every month with its predecessor — zipping a list '
+                      'against itself shifted by one',
+                  '${trend.length} pairs',
+                ),
+              ],
+              result: trend.isEmpty
+                  ? 'not enough history'
+                  : '${shortMonthLabel(state.month)} net: ${signedMoney(trend.last.current.net)} '
+                        '(Δ spending ${signedMoney(-trend.last.expenseDelta)})',
+            ),
             child: _TrendTable(trend: trend, thisMonth: state.month),
           ),
           const SizedBox(height: 16),
           SectionCard(
             title: 'Spending heatmap — ${monthLabel(state.month)}',
             subtitle:
-                'one filter, two fork()s: groupBy→fold per day + sum total '
+                'one filter, two fork()s: groupBy→sumBy per day + sumBy total '
                 '(${money(heatmap.totalSpend)} this month) — walked once',
+            explain: () {
+              final spendingDays = heatmap.weeks
+                  .expand((w) => w)
+                  .where((c) => c.$2 > 0)
+                  .length;
+              return PipelineExplanation(
+                title: 'Spending heatmap',
+                formula:
+                    'source = filter(month & spending)   // lazy\n'
+                    'fork #1 → groupBy(day) → sumBy(amount)\n'
+                    'fork #2 → sumBy(amount)',
+                steps: [
+                  PipelineStep(
+                    'filter(month & spending)',
+                    'lazy source — not walked until a fork pulls it',
+                    'shared by both forks',
+                  ),
+                  PipelineStep(
+                    'fork → groupBy(day) → sumBy',
+                    'per-day totals for the cell colors',
+                    '$spendingDays days with spending',
+                  ),
+                  PipelineStep(
+                    'fork → sumBy(amount)',
+                    'the month total — same walk, second consumer',
+                    money(heatmap.totalSpend),
+                  ),
+                  PipelineStep(
+                    'monthGrid → map(perDay)',
+                    'cells normalize against the busiest day',
+                    'max ${money(heatmap.maxDaySpend)} / day',
+                  ),
+                ],
+                result:
+                    'fork shares one iterator+buffer: the source is walked once '
+                    'even with two consumers',
+              );
+            },
             child: _Heatmap(data: heatmap),
           ),
           const SizedBox(height: 16),
@@ -59,6 +127,31 @@ class _InsightsScreenState extends State<InsightsScreen> {
               final tagsCard = SectionCard(
                 title: 'Tags (all time)',
                 subtitle: 'flatMap(tags) → countBy — tap one to explore',
+                explain: () => PipelineExplanation(
+                  title: 'Tags (all time)',
+                  formula:
+                      'flatMap(entry.tags) → countBy(tag) → sortBy(-count)',
+                  steps: [
+                    PipelineStep(
+                      'flatMap(tags)',
+                      'flatten every entry\'s tag list into one stream',
+                      '${state.entries.expand((e) => e.tags).length} tag usages',
+                    ),
+                    PipelineStep(
+                      'countBy(tag)',
+                      'frequency per unique tag',
+                      '${tags.length} unique tags',
+                    ),
+                    PipelineStep(
+                      'sortBy(-count)',
+                      'most used first',
+                      tags.isEmpty
+                          ? '—'
+                          : 'top: #${tags.first.$1} × ${tags.first.$2}',
+                    ),
+                  ],
+                  result: 'counts run over ALL months — hence the card title',
+                ),
                 child: tags.isEmpty
                     ? const EmptyHint('No tags yet')
                     : Wrap(
@@ -79,6 +172,35 @@ class _InsightsScreenState extends State<InsightsScreen> {
               final dupesCard = SectionCard(
                 title: 'Possible duplicates',
                 subtitle: 'what uniqBy(title+amount+day) would drop',
+                explain: () {
+                  final moneyCount = state.entries
+                      .where((e) => e.type.isMoney)
+                      .length;
+                  return PipelineExplanation(
+                    title: 'Possible duplicates',
+                    formula:
+                        'money = filter(isMoney)\n'
+                        'firstSeen = uniqBy(title|amount|day)\n'
+                        'duplicates = difference(firstSeen, money)',
+                    steps: [
+                      PipelineStep(
+                        'filter(isMoney)',
+                        'only money entries',
+                        '$moneyCount entries',
+                      ),
+                      PipelineStep(
+                        'uniqBy(title|amount|day)',
+                        'keeps the FIRST of each key',
+                        '${moneyCount - dupes.length} kept',
+                      ),
+                      PipelineStep(
+                        'difference(firstSeen, money)',
+                        'everything uniqBy dropped — exactly the duplicates',
+                        '${dupes.length} suspects',
+                      ),
+                    ],
+                  );
+                },
                 child: dupes.isEmpty
                     ? const EmptyHint('No suspicious duplicates')
                     : Column(
@@ -119,6 +241,50 @@ class _InsightsScreenState extends State<InsightsScreen> {
               subtitle:
                   'intersection / difference over month tag sets; total via '
                   'compact(pluck(amount))',
+              explain: () {
+                final comparison = compareTagMonths(state.entries, state.month);
+                final entriesForTag = tagEntries(
+                  state.entries,
+                  _selectedTag!,
+                  state.month,
+                );
+                final spent = tagSpend(
+                  state.entries,
+                  _selectedTag!,
+                  state.month,
+                );
+                return PipelineExplanation(
+                  title: 'Tag explorer — #$_selectedTag',
+                  formula:
+                      'sets  = flatMap(tags) → uniq, per month\n'
+                      'shared = intersection(last, this)\n'
+                      'fresh/gone = difference, both directions\n'
+                      'spend = compact(pluck(amount)) → sum',
+                  steps: [
+                    PipelineStep(
+                      'flatMap → uniq × 2',
+                      'the tag SETS of this month and last month',
+                      '${comparison.shared.length + comparison.fresh.length} this month',
+                    ),
+                    PipelineStep(
+                      'intersection(last, this)',
+                      'tags used in both months',
+                      '${comparison.shared.length} shared',
+                    ),
+                    PipelineStep(
+                      'difference (both ways)',
+                      'new this month / vanished this month',
+                      '${comparison.fresh.length} new · ${comparison.dropped.length} gone',
+                    ),
+                    PipelineStep(
+                      'compact(pluck(amount)) → sum',
+                      'non-spending entries pluck to null, compact drops '
+                          'them, sum totals the rest',
+                      '${entriesForTag.length} entries · ${money(spent)}',
+                    ),
+                  ],
+                );
+              },
               child: _TagExplorer(tag: _selectedTag!),
             ),
           ],
@@ -127,6 +293,33 @@ class _InsightsScreenState extends State<InsightsScreen> {
             title: 'Projected recurring entries (next 2 months)',
             subtitle:
                 'infinite range → map(occurrence) → dropWhile → takeWhile, per rule',
+            explain: () => PipelineExplanation(
+              title: 'Projected recurring entries',
+              formula:
+                  'per rule: range(∞) → map(i → date)\n'
+                  '→ dropWhile(< today) → takeWhile(≤ horizon)\n'
+                  'all: flatMap(rules) → filter(not materialized)',
+              steps: [
+                PipelineStep(
+                  'range(100000) → map(occurrence)',
+                  'a lazy, effectively infinite stream of fire dates per rule',
+                  '${state.rules.length} rules',
+                ),
+                PipelineStep(
+                  'dropWhile → takeWhile',
+                  'laziness does the bounding: only dates inside the '
+                      '2-month window are ever computed',
+                  'window: today → +2 months',
+                ),
+                PipelineStep(
+                  'flatMap(rules) → filter',
+                  'ghosts whose date already has a real entry are dropped',
+                  '${projected.length} projected entries',
+                ),
+              ],
+              result:
+                  'the pipeline never materializes occurrences beyond the horizon',
+            ),
             child: projected.isEmpty
                 ? const EmptyHint('No recurring rules with a template entry')
                 : Column(

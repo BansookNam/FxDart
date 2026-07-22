@@ -24,9 +24,9 @@ List<List<DateTime>> monthGrid(DateTime month) {
 Map<DateTime, List<Entry>> entriesByDay(List<Entry> entries) =>
     fx(entries).groupBy((e) => dayKey(e.date));
 
-/// Net money flow for one day cell. Pipeline: `map` (signed) → `sum`.
+/// Net money flow for one day cell. Pipeline: `sumBy` (signed amount).
 double dayNet(List<Entry> dayEntries) =>
-    fx(dayEntries).map((e) => e.signedAmount).sum().toDouble();
+    fx(dayEntries).sumBy((e) => e.signedAmount).toDouble();
 
 /// Open (not-done) due items counted per day — built **once** per frame and
 /// read by all 42 cells, instead of scanning all entries per cell.

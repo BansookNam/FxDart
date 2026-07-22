@@ -18,14 +18,14 @@ class MonthSummary {
 }
 
 /// Income vs expense totals for one month.
-/// Pipeline: `filter` (month + money) → `partition` (income?) → `sum` each half.
+/// Pipeline: `filter` (month + money) → `partition` (income?) → `sumBy` each half.
 MonthSummary monthSummary(List<Entry> entries, DateTime month) {
   final (income, spending) = fx(entries)
       .filter((e) => e.type.isMoney && sameMonth(e.date, month))
       .partition((e) => e.type == EntryType.income);
   return MonthSummary(
-    income: fx(income).map((e) => e.amount ?? 0.0).sum().toDouble(),
-    expense: fx(spending).map((e) => e.amount ?? 0.0).sum().toDouble(),
+    income: fx(income).sumBy((e) => e.amount ?? 0.0).toDouble(),
+    expense: fx(spending).sumBy((e) => e.amount ?? 0.0).toDouble(),
   );
 }
 
@@ -37,7 +37,7 @@ class CategoryTotal {
 }
 
 /// Top-[limit] spending categories for a month.
-/// Pipeline: `filter` → `groupBy` (category) → `map` to totals →
+/// Pipeline: `filter` → `groupBy` (category) → `map` to `sumBy` totals →
 /// `sortBy` (descending via negated key) → `take`.
 List<CategoryTotal> categoryBreakdown(
   List<Entry> entries,
@@ -55,7 +55,7 @@ List<CategoryTotal> categoryBreakdown(
       .map(
         (kv) => CategoryTotal(
           kv.key,
-          fx(kv.value).map((e) => e.amount ?? 0.0).sum().toDouble(),
+          fx(kv.value).sumBy((e) => e.amount ?? 0.0).toDouble(),
           kv.value.length,
         ),
       )

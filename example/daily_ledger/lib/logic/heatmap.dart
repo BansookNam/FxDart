@@ -24,7 +24,7 @@ class HeatmapData {
 }
 
 /// Pipeline: one lazy `filter` source → `fork` #1 feeds
-/// `groupBy` → `fold` (per-day totals), `fork` #2 feeds `map` → `sum`
+/// `groupBy` → `sumBy` (per-day totals), `fork` #2 feeds `sumBy`
 /// (month total) — then the `monthGrid` (`range` → `chunk(7)`) is mapped
 /// over the per-day index.
 HeatmapData spendingHeatmap(List<Entry> entries, DateTime month) {
@@ -40,14 +40,11 @@ HeatmapData spendingHeatmap(List<Entry> entries, DateTime month) {
       (Entry e) => dayKey(e.date),
       fork(monthSpending),
     ).entries)
-      kv.key: fold(
-        0.0,
-        (double acc, Entry e) => acc + (e.amount ?? 0),
-        kv.value,
-      ),
+      kv.key: sumBy((Entry e) => e.amount ?? 0, kv.value).toDouble(),
   };
-  final total = sum(
-    map((Entry e) => e.amount ?? 0, fork(monthSpending)),
+  final total = sumBy(
+    (Entry e) => e.amount ?? 0,
+    fork(monthSpending),
   ).toDouble();
 
   final weeks = fx(monthGrid(month))

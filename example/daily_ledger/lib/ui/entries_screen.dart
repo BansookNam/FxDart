@@ -117,7 +117,75 @@ class _EntriesScreenState extends State<EntriesScreen> {
             ],
           ),
         ),
-        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+          child: Row(
+            children: [
+              Flexible(
+                child: Text(
+                  'debounce(250ms) → filter(query) → filter(type) → '
+                  'groupBy(day) → sortBy(day desc)',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 4),
+              PipelineHelpButton(
+                explain: () => PipelineExplanation(
+                  title: 'Entries list',
+                  formula:
+                      'debounce(250ms, query)\n'
+                      '→ filter(title|tag contains query)\n'
+                      '→ filter(type == chip)\n'
+                      '→ groupBy(day) → sortBy(day desc)',
+                  steps: [
+                    PipelineStep(
+                      'debounce(250ms)',
+                      'keystrokes only reach the pipeline after 250ms of quiet',
+                      _query.isEmpty ? 'no query' : 'query: "$_query"',
+                    ),
+                    PipelineStep(
+                      'filter(query)',
+                      'case-insensitive match on title and tags',
+                      '${searched.length} of ${state.entries.length} entries',
+                    ),
+                    PipelineStep(
+                      'filter(type)',
+                      _typeFilter == null
+                          ? 'chip "All" — nothing filtered here'
+                          : 'chip "${_typeFilter!.label}" only',
+                      '${filtered.length} entries',
+                    ),
+                    PipelineStep(
+                      'filter(month) → groupBy(day) → sortBy',
+                      'this month\'s survivors, one card per day, newest day first',
+                      '${visible.length} entries in ${grouped.length} days',
+                    ),
+                    PipelineStep(
+                      'countBy(type)',
+                      'chip badges — counted over the searched list, so '
+                          'badges always match what you see',
+                      counts.entries
+                              .map((kv) => '${kv.key.label} ${kv.value}')
+                              .join(' · ')
+                              .isEmpty
+                          ? 'no entries'
+                          : counts.entries
+                                .map((kv) => '${kv.key.label} ${kv.value}')
+                                .join(' · '),
+                    ),
+                  ],
+                  result:
+                      'Export CSV copies exactly these ${visible.length} rows '
+                      '(sortBy → map → pick → join)',
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 4),
         Expanded(
           child: grouped.isEmpty
               ? const EmptyHint('No entries match — try clearing the search')

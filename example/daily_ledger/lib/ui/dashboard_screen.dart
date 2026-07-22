@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fxdart/fxdart.dart' show fx;
 
 import '../logic/budgets.dart';
 import '../logic/cached.dart';
@@ -26,16 +27,76 @@ class DashboardScreen extends StatelessWidget {
     final (overdue, upcoming) = duePartition(state.entries, state.today);
     final stats = cachedQuickStats(state.entries)(state.month);
 
+    // Live counts for the "?" dialogs — closures run at click time, so the
+    // numbers always match what the cards render.
+    int monthMoneyCount() => fx(
+      state.entries,
+    ).filter((e) => e.type.isMoney && sameMonth(e.date, state.month)).size();
+    int monthSpendingCount() => fx(state.entries)
+        .filter(
+          (e) =>
+              (e.type == EntryType.expense || e.type == EntryType.bill) &&
+              sameMonth(e.date, state.month),
+        )
+        .size();
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SummaryRow(summary: summary),
+          _SummaryRow(
+            summary: summary,
+            explain: () => PipelineExplanation(
+              title: 'Month summary',
+              formula:
+                  'filter(month & money) → partition(income) → sumBy(amount)',
+              steps: [
+                PipelineStep(
+                  'filter(month & money)',
+                  'keep this month\'s money entries (expenses, income, bills)',
+                  '${monthMoneyCount()} of ${state.entries.length} entries',
+                ),
+                PipelineStep(
+                  'partition(type == income)',
+                  'split into (income, spending) in one walk',
+                  '${monthMoneyCount() - monthSpendingCount()} income · '
+                      '${monthSpendingCount()} spending',
+                ),
+                PipelineStep(
+                  'sumBy(amount)',
+                  'total each half',
+                  '${money(summary.income)} / ${money(summary.expense)}',
+                ),
+              ],
+              result: 'net = income − spending = ${signedMoney(summary.net)}',
+            ),
+          ),
           const SizedBox(height: 16),
           SectionCard(
             title: 'Quick stats',
             subtitle: 'juxt: one list of stat functions, one application',
+            explain: () => PipelineExplanation(
+              title: 'Quick stats',
+              formula:
+                  'juxt([biggestExpense, busiestDay, avgDaily, openDue])'
+                  '(monthEntries)',
+              steps: [
+                PipelineStep(
+                  'filter(month)',
+                  'the one slice every stat function receives',
+                  '${fx(state.entries).filter((e) => sameMonth(e.date, state.month)).size()} entries',
+                ),
+                for (final (label, value) in stats)
+                  PipelineStep(
+                    'juxt → $label',
+                    'one lambda in the juxt list',
+                    value,
+                  ),
+              ],
+              result:
+                  'juxt applies all ${stats.length} functions in a single call',
+            ),
             child: _QuickStats(stats: stats),
           ),
           const SizedBox(height: 16),
@@ -47,6 +108,34 @@ class DashboardScreen extends StatelessWidget {
                   title: 'Running balance',
                   subtitle:
                       'sortBy(date) → scan(sum) — ${monthLabel(state.month)}',
+                  explain: () => PipelineExplanation(
+                    title: 'Running balance',
+                    formula:
+                        'filter(month & money) → sortBy(date) '
+                        '→ scan(acc + signedAmount)',
+                    steps: [
+                      PipelineStep(
+                        'filter(month & money)',
+                        'keep this month\'s money entries',
+                        '${monthMoneyCount()} entries',
+                      ),
+                      PipelineStep(
+                        'sortBy(date)',
+                        'order them oldest → newest',
+                        'chronological',
+                      ),
+                      PipelineStep(
+                        'scan(acc + signedAmount)',
+                        'emit the running total after every entry — the '
+                            'sparkline is this list, drawn',
+                        '${balance.length} points',
+                      ),
+                    ],
+                    result: balance.isEmpty
+                        ? 'no money entries this month'
+                        : 'starts ${signedMoney(balance.first.balance)} → '
+                              'ends ${signedMoney(balance.last.balance)}',
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -73,7 +162,49 @@ class DashboardScreen extends StatelessWidget {
                 ),
                 SectionCard(
                   title: 'Top spending categories',
-                  subtitle: 'groupBy → sortBy → take(5)',
+                  subtitle: 'groupBy → sumBy → sortBy → take(5)',
+                  explain: () {
+                    final groups = fx(state.entries)
+                        .filter(
+                          (e) =>
+                              (e.type == EntryType.expense ||
+                                  e.type == EntryType.bill) &&
+                              sameMonth(e.date, state.month),
+                        )
+                        .groupBy((e) => e.categoryId);
+                    return PipelineExplanation(
+                      title: 'Top spending categories',
+                      formula:
+                          'filter(month & spending) → groupBy(category) '
+                          '→ sumBy(amount) → sortBy(-total) → take(5)',
+                      steps: [
+                        PipelineStep(
+                          'filter(month & spending)',
+                          'expenses and bills of this month',
+                          '${monthSpendingCount()} entries',
+                        ),
+                        PipelineStep(
+                          'groupBy(categoryId)',
+                          'one bucket per category',
+                          '${groups.length} groups',
+                        ),
+                        PipelineStep(
+                          'map(sumBy(amount))',
+                          'total each bucket',
+                          'one total per group',
+                        ),
+                        PipelineStep(
+                          'sortBy(-total) → take(5)',
+                          'biggest first, keep five',
+                          '${breakdown.length} rows shown',
+                        ),
+                      ],
+                      result: breakdown.isEmpty
+                          ? 'no spending this month'
+                          : 'top: ${state.categoryById(breakdown.first.categoryId)?.name ?? breakdown.first.categoryId} '
+                                'at ${money(breakdown.first.total)}',
+                    );
+                  },
                   child: _CategoryBreakdown(breakdown: breakdown),
                 ),
               ];
@@ -98,7 +229,42 @@ class DashboardScreen extends StatelessWidget {
           const SizedBox(height: 16),
           SectionCard(
             title: 'Budgets',
-            subtitle: 'groupBy → fold per category; suggestions via evolve',
+            subtitle: 'groupBy → sumBy per category; suggestions via evolve',
+            explain: () {
+              final statuses = budgetStatuses(
+                state.entries,
+                state.budgets,
+                state.month,
+              );
+              final over = statuses.where((b) => b.over).length;
+              return PipelineExplanation(
+                title: 'Budgets',
+                formula:
+                    'spent = filter → groupBy(category) → sumBy(amount)\n'
+                    'rows  = budgets → map(join spent) → sortBy(-ratio)',
+                steps: [
+                  PipelineStep(
+                    'filter → groupBy → sumBy',
+                    'this month\'s spending, totaled per category',
+                    '${spentByCategory(state.entries, state.month).length} categories spent in',
+                  ),
+                  PipelineStep(
+                    'map(budget ⋈ spent)',
+                    'pair each budget with its spent total',
+                    '${statuses.length} budget rows',
+                  ),
+                  PipelineStep(
+                    'sortBy(-ratio)',
+                    'most-stressed budget first',
+                    over == 0 ? 'none over budget' : '$over over budget',
+                  ),
+                ],
+                result: statuses.isEmpty
+                    ? 'no budgets set'
+                    : 'most stressed: ${state.categoryById(statuses.first.categoryId)?.name ?? statuses.first.categoryId} '
+                          'at ${(statuses.first.ratio * 100).round()}%',
+              );
+            },
             child: _BudgetList(
               statuses: budgetStatuses(
                 state.entries,
@@ -111,12 +277,59 @@ class DashboardScreen extends StatelessWidget {
           SectionCard(
             title: 'Due & overdue',
             subtitle: 'filter(open) → sortBy(dueDate) → partition(overdue)',
+            explain: () => PipelineExplanation(
+              title: 'Due & overdue',
+              formula:
+                  'filter(open & hasDue) → sortBy(dueDate) → partition(before today)',
+              steps: [
+                PipelineStep(
+                  'filter(!done && dueDate != null)',
+                  'open tasks and unpaid bills, any month',
+                  '${overdue.length + upcoming.length} items',
+                ),
+                PipelineStep(
+                  'sortBy(dueDate)',
+                  'soonest due first',
+                  'chronological',
+                ),
+                PipelineStep(
+                  'partition(due < today)',
+                  'overdue on the left, upcoming on the right — one walk',
+                  '${overdue.length} overdue · ${upcoming.length} upcoming',
+                ),
+              ],
+              result: 'due-ness compares against today, not the viewed month',
+            ),
             child: _DueLists(overdue: overdue, upcoming: upcoming),
           ),
           const SizedBox(height: 16),
           SectionCard(
             title: 'Recent activity',
             subtitle: 'sortBy(date) → takeRight(8) → reverse',
+            explain: () {
+              final recent = recentActivity(state.entries);
+              return PipelineExplanation(
+                title: 'Recent activity',
+                formula: 'sortBy(date) → takeRight(8) → reverse',
+                steps: [
+                  PipelineStep(
+                    'sortBy(date)',
+                    'whole ledger, oldest first',
+                    '${state.entries.length} entries',
+                  ),
+                  PipelineStep(
+                    'takeRight(8)',
+                    'keep only the newest tail',
+                    '${recent.length} entries',
+                  ),
+                  PipelineStep(
+                    'reverse',
+                    'newest at the top',
+                    recent.isEmpty ? '—' : 'top: "${recent.first.title}"',
+                  ),
+                ],
+              );
+            },
             child: _RecentActivity(entries: recentActivity(state.entries)),
           ),
         ],
@@ -324,10 +537,12 @@ class _BudgetList extends StatelessWidget {
 
 class _SummaryRow extends StatelessWidget {
   final MonthSummary summary;
-  const _SummaryRow({required this.summary});
+  final PipelineExplanation Function() explain;
+  const _SummaryRow({required this.summary, required this.explain});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final colors = LedgerColors.of(context);
     final items = [
       ('Income', summary.income, colors.income),
@@ -338,30 +553,57 @@ class _SummaryRow extends StatelessWidget {
         summary.net >= 0 ? colors.income : Theme.of(context).colorScheme.error,
       ),
     ];
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (final (label, value, color) in items)
-          Expanded(
-            child: Card(
-              margin: EdgeInsets.only(right: label == 'Net' ? 0 : 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(label, style: Theme.of(context).textTheme.bodySmall),
-                    const SizedBox(height: 4),
-                    Text(
-                      label == 'Net' ? signedMoney(value) : money(value),
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(color: color, fontWeight: FontWeight.w600)
-                          .tabular,
-                    ),
-                  ],
+        Row(
+          children: [
+            Flexible(
+              child: Text(
+                'filter(month & money) → partition(income) → sumBy',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.outline,
                 ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-          ),
+            const SizedBox(width: 4),
+            PipelineHelpButton(explain: explain),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            for (final (label, value, color) in items)
+              Expanded(
+                child: Card(
+                  margin: EdgeInsets.only(right: label == 'Net' ? 0 : 16),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          label,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          label == 'Net' ? signedMoney(value) : money(value),
+                          style: Theme.of(context).textTheme.headlineSmall
+                              ?.copyWith(
+                                color: color,
+                                fontWeight: FontWeight.w600,
+                              )
+                              .tabular,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ],
     );
   }

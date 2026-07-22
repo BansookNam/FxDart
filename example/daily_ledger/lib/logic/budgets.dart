@@ -23,7 +23,7 @@ bool _isSpending(Entry e) =>
     e.type == EntryType.expense || e.type == EntryType.bill;
 
 /// Total spent per category in [month].
-/// Pipeline: `filter` → `groupBy` (category) → `fold` each group →
+/// Pipeline: `filter` → `groupBy` (category) → `sumBy` each group →
 /// `fromEntries` reassembles the map.
 Map<String, double> spentByCategory(List<Entry> entries, DateTime month) {
   final groups = fx(entries)
@@ -31,10 +31,7 @@ Map<String, double> spentByCategory(List<Entry> entries, DateTime month) {
       .groupBy((e) => e.categoryId);
   return fromEntries(
     fx(groups.entries).map(
-      (kv) => (
-        kv.key,
-        fold(0.0, (double acc, Entry e) => acc + (e.amount ?? 0), kv.value),
-      ),
+      (kv) => (kv.key, sumBy((Entry e) => e.amount ?? 0, kv.value).toDouble()),
     ),
   );
 }

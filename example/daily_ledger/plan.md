@@ -181,6 +181,7 @@ Track which fxdart operators the app demonstrates; grow it every round.
 | ✅ round 3 | memoize, juxt, throttle, takeRight, reverse, head |
 | ✅ round 4 | intersection, difference (both directions), pluck, compact, pipe |
 | ✅ round 5 | maxBy, minBy — **new operators added to fxdart 0.3.0 this round** |
+| ✅ round 6 | sumBy — **new operator added to fxdart 0.4.0 this round** (replaces every fold/map+sum tail) |
 | ⏸ intentionally uncovered | omit, slice, cycle, tap, scan1, repeat — no natural fit in this app; forcing them would violate the "readable over clever" principle |
 
 ## Round log
@@ -434,6 +435,59 @@ keeping the best element; ties keep the first, empty returns null (the
 fxdart 0.3.0 with `maxBy`/`minBy` (+`maxByAsync`/`minByAsync`); library 986
 tests passing, app 49 passing, `flutter analyze` clean, docs site rebuilt
 with the two new tutorial pages.
+
+### Round 6 — done (live pipeline explainers + sumBy)
+
+*Mid-round steer from the user:* the formula subtitles (e.g. "sortBy(date) →
+scan(sum)") should exist **everywhere** an fxdart flow runs, each with a
+circled "?" CTA that opens a dialog explaining the flow **with the actual
+data on screen**. That became this round's headline feature.
+
+**Feedbacks (10):**
+1. `FX` — budgets/heatmap/summaries all ended in `fold(0, acc + f(x))` or
+   `map(f) → sum` tails. → **added `sumBy` to fxdart 0.4.0** (sync + async +
+   chain, 6 tests, tutorial spliced between `sum` and `average`) and swept
+   all five call sites (`monthSummary`, `categoryBreakdown`,
+   `spentByCategory`, `spendingHeatmap`, `dayNet`).
+2. `UX` — pipeline formulas were static captions; nothing explained them.
+   → `PipelineExplanation` + `PipelineHelpButton` + `showPipelineDialog` in
+   widgets.dart: a numbered step walker — operator (monospace) · what it
+   does · the **live value** it produced.
+3. `UX` — the explain data had to match the screen at all times. → the "?"
+   takes a *builder* closure invoked at click time, so every number is
+   computed from the state that rendered the current frame.
+4. `UX` — dashboard summary row (filter → partition → sumBy) had no formula
+   at all. → caption + "?" added above the three cards.
+5. `UX` — the whole Entries screen (debounce → filter → filter → groupBy →
+   sortBy, plus countBy badges and the pick/join export) showed no formulas.
+   → caption + "?" between the chips and the list; the dialog also explains
+   why badge counts always match the visible list and what Export copies.
+6. `UX` — calendar day panel computed `sumBy(signedAmount)` invisibly.
+   → subtitle now shows the formula with the live net; "?" walks both steps.
+7. `UX` — insights cards (trend/heatmap/tags/dupes/tag explorer/projection)
+   each got a "?" — the heatmap dialog explains the fork sharing story, the
+   projection dialog the laziness-does-the-bounding story.
+8. `DX` — every SectionCard gained an optional `explain` parameter; the "?"
+   renders at the right of the formula line (title line when no subtitle),
+   mirroring the top-bar About affordance.
+9. `DX` — subtitles that said `fold` were updated to say `sumBy` so the
+   taught formula is the code that runs (readable-over-clever rule).
+10. `PERF` — explain closures cost nothing until clicked; dialogs recompute
+    only on open (modal, so no live-update needed while visible).
+
+**Features suggested (3):**
+- M. **Live pipeline explainer dialogs** (user-requested). ← *chosen*
+- L. **CSV import** — still on the table, now Round 7.
+- N. **Cashflow forecast** — actual balance `scan` ⧺ projected recurring
+  entries through the same scan. Round 7/8 candidate.
+
+**Strategy:** one reusable widget trio (model / button / dialog), then wire
+every card through closures over the same pipeline outputs the cards render —
+no second data path, so dialog numbers can never drift from the screen.
+
+**Implemented:** all of the above. fxdart 0.4.0 (`sumBy`); dialogs on 13
+spots across all four screens + 3 brand-new formula placements. Library 992
+tests, app 49 tests, `flutter analyze` clean.
 
 ## Final state (after 4 rounds)
 

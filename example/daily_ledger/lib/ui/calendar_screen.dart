@@ -38,6 +38,35 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final gridCard = SectionCard(
       title: monthLabel(state.month),
       subtitle: 'range(42) → map → chunk(7); cells read a groupBy index',
+      explain: () {
+        final daysWithEntries = grid
+            .expand((w) => w)
+            .where((d) => byDay.containsKey(dayKey(d)));
+        return PipelineExplanation(
+          title: 'Calendar month grid',
+          formula:
+              'grid  = range(42) → map(offset → date) → chunk(7)\n'
+              'cells = entriesByDay groupBy(day) · dueCountByDay countBy(due day)',
+          steps: [
+            PipelineStep(
+              'range(42) → map → chunk(7)',
+              'six 7-day weeks covering ${monthLabel(state.month)}',
+              '${grid.length} weeks × 7 cells',
+            ),
+            PipelineStep(
+              'groupBy(dayKey(date))',
+              'index every entry by its calendar day — built once, '
+                  'each cell reads its own bucket in O(1)',
+              '${daysWithEntries.length} visible days have entries',
+            ),
+            PipelineStep(
+              'filter(open) → countBy(dueDate)',
+              'open due items per day, for the red badges',
+              '${dueByDay.values.fold(0, (a, b) => a + b)} open items',
+            ),
+          ],
+        );
+      },
       child: Column(
         children: [
           Row(
@@ -98,7 +127,26 @@ class _CalendarScreenState extends State<CalendarScreen> {
       title: selected == null ? 'Pick a day' : dayLabel(selected),
       subtitle: selected == null
           ? 'Tap a cell to see its entries'
-          : '${selectedEntries.length} entries · net ${signedMoney(dayNet(selectedEntries))}',
+          : 'entriesByDay[day] → sumBy(signedAmount) = ${signedMoney(dayNet(selectedEntries))}',
+      explain: selected == null
+          ? null
+          : () => PipelineExplanation(
+              title: 'Day panel — ${dayLabel(selected)}',
+              formula: 'entriesByDay[day] → sumBy(signedAmount)',
+              steps: [
+                PipelineStep(
+                  'entriesByDay[${dayKey(selected).day}]',
+                  'read this day\'s bucket from the groupBy index',
+                  '${selectedEntries.length} entries',
+                ),
+                PipelineStep(
+                  'sumBy(signedAmount)',
+                  'income counts +, spending counts −, tasks count 0',
+                  signedMoney(dayNet(selectedEntries)),
+                ),
+              ],
+              result: 'the same number shown in the day\'s calendar cell',
+            ),
       child: selectedEntries.isEmpty
           ? const EmptyHint('No entries on this day')
           : Column(
