@@ -62,8 +62,8 @@ FxAsync&lt;T&gt; Fx.toAsync&lt;T&gt;()        // chain, on a sync Fx</div>
   </p>
   <p>
     <code>FxAsyncIterable</code> is <strong>pull-based</strong>: nothing runs
-    until a terminal (<code>toArrayAsync</code>, <code>eachAsync</code>, the
-    <code>FxAsync</code> chain's <code>.toArray()</code>, …) calls
+    until a terminal (<code>toListAsync</code>, <code>eachAsync</code>, the
+    <code>FxAsync</code> chain's <code>.toList()</code>, …) calls
     <code>next()</code> on it, one step at a time — exactly like a plain
     <code>Iterable</code>, just asynchronous. This is a deliberate departure
     from Dart's <code>Stream</code>, which is <em>push</em>-based: once a
@@ -94,7 +94,7 @@ import 'package:fxdart/fxdart.dart';
 Future<void> main() async {
   // toAsync() lifts a plain Iterable of values into an FxAsyncIterable.
   final justValues = toAsync([1, 2, 3]);
-  print(await toArrayAsync(justValues)); // [1, 2, 3]
+  print(await toListAsync(justValues)); // [1, 2, 3]
 
   // It also accepts an Iterable<FutureOr<T>> — any Future elements are
   // awaited as they're pulled.
@@ -103,10 +103,10 @@ Future<void> main() async {
     20,
     delay(const Duration(milliseconds: 50), 30),
   ]);
-  print(await toArrayAsync(mixedFutures)); // [10, 20, 30]
+  print(await toListAsync(mixedFutures)); // [10, 20, 30]
 
   // Chain form: fx(iterable).toAsync()
-  final chained = await fx([1, 2, 3]).toAsync().map((a) => a * 2).toArray();
+  final chained = await fx([1, 2, 3]).toAsync().map((a) => a * 2).toList();
   print(chained); // [2, 4, 6]
 }
 </textarea>
@@ -130,14 +130,14 @@ Future<void> main() async {
 
   // These three Futures are created right here, eagerly — Dart starts a
   // Future's work the moment it's constructed, not when it's awaited.
-  // By the time toAsync/toArrayAsync touch them, all three are already
+  // By the time toAsync/toListAsync touch them, all three are already
   // racing in parallel, so the total time is ~200ms, not ~600ms.
   final alreadyStarted = toAsync([
     delay(const Duration(milliseconds: 200), 'a'),
     delay(const Duration(milliseconds: 200), 'b'),
     delay(const Duration(milliseconds: 200), 'c'),
   ]);
-  print(await toArrayAsync(alreadyStarted)); // [a, b, c]
+  print(await toListAsync(alreadyStarted)); // [a, b, c]
   print('eager futures: ${sw.elapsedMilliseconds}ms'); // ~200ms
 
   // Contrast: mapAsync creates one Future per element, lazily, only when
@@ -146,7 +146,7 @@ Future<void> main() async {
   final lazyPerPull = await fx(['x', 'y', 'z'])
       .toAsync()
       .map((a) => delay(const Duration(milliseconds: 200), a))
-      .toArray();
+      .toList();
   print(lazyPerPull); // [x, y, z]
   print('lazy pulls: ${sw.elapsedMilliseconds}ms'); // ~600ms
 }
@@ -164,8 +164,8 @@ Future<void> main() async {
   final scores = [88, 42, 95, 61];
 
   // TODO: lift `scores` into an async pipeline with toAsync(), keep only
-  // the passing scores (>= 60), and collect them with toArrayAsync.
-  final passing = await toArrayAsync(toAsync(scores));
+  // the passing scores (>= 60), and collect them with toListAsync.
+  final passing = await toListAsync(toAsync(scores));
 
   print(passing); // currently [88, 42, 95, 61] — should be [88, 95]
 }

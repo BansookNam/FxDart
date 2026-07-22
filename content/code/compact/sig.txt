@@ -1,2 +1,4 @@
-Iterable&lt;A&gt; compact&lt;A&gt;(Iterable&lt;A?&gt; iterable)
-FxAsyncIterable&lt;A&gt; compactAsync&lt;A&gt;(FxAsyncIterable&lt;A?&gt; iterable)
+Iterable&lt;A&gt; nonNulls&lt;A&gt;(Iterable&lt;A?&gt; iterable)
+FxAsyncIterable&lt;A&gt; nonNullsAsync&lt;A&gt;(FxAsyncIterable&lt;A?&gt; iterable)
+Iterable&lt;A&gt; Iterable.nonNulls        // inherited getter (no parens); sync chain only
+Iterable&lt;A&gt; compact&lt;A&gt;(Iterable&lt;A?&gt; iterable)   // FxTS alias

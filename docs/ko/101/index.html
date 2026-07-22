@@ -41,6 +41,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <h1>FxDart 101</h1>
   <p class="hero-sub">
     직접 해 보며 익히는 코스입니다. 모든 강의는 라이브 데모와 플레이그라운드를 갖춘
@@ -54,7 +55,7 @@
     <a href="../tutorials/map.html"><code>map</code></a> →
     <a href="../tutorials/filter.html"><code>filter</code></a> →
     <a href="../tutorials/take.html"><code>take</code></a> →
-    <a href="../tutorials/toArray.html"><code>toArray</code></a> 순서로 시작한 다음,
+    <a href="../tutorials/toList.html"><code>toList</code></a> 순서로 시작한 다음,
     이어서
     <a href="../tutorials/concurrent.html"><code>concurrent</code></a>로 넘어가세요.
   </div>
@@ -65,8 +66,8 @@
     <li><a href="../tutorials/fx.html">fx</a></li>
     <li><a href="../tutorials/pipe.html">pipe</a></li>
     <li><a href="../tutorials/pipe1.html">pipe1</a></li>
-    <li><a href="../tutorials/toArray.html">toArray</a></li>
-    <li><a href="../tutorials/each.html">each</a></li>
+    <li><a href="../tutorials/toList.html">toList</a></li>
+    <li><a href="../tutorials/each.html">forEach</a></li>
     <li><a href="../tutorials/consume.html">consume</a></li>
   </ul>
 
@@ -86,8 +87,8 @@
   <ul class="fn-list">
     <li><a href="../tutorials/map.html">map</a></li>
     <li><a href="../tutorials/mapEffect.html">mapEffect</a></li>
-    <li><a href="../tutorials/flatMap.html">flatMap</a></li>
-    <li><a href="../tutorials/flat.html">flat</a></li>
+    <li><a href="../tutorials/flatMap.html">expand</a></li>
+    <li><a href="../tutorials/flat.html">flattened</a></li>
     <li><a href="../tutorials/scan.html">scan</a></li>
     <li><a href="../tutorials/peek.html">peek</a></li>
     <li><a href="../tutorials/pluck.html">pluck</a></li>
@@ -96,11 +97,11 @@
   <h2>섹션 4 · 필터링 &amp; 중복 제거</h2>
   <p class="dim">필요한 것만 남깁니다.</p>
   <ul class="fn-list">
-    <li><a href="../tutorials/filter.html">filter</a></li>
-    <li><a href="../tutorials/reject.html">reject</a></li>
-    <li><a href="../tutorials/compact.html">compact</a></li>
-    <li><a href="../tutorials/uniq.html">uniq</a></li>
-    <li><a href="../tutorials/uniqBy.html">uniqBy</a></li>
+    <li><a href="../tutorials/filter.html">where</a></li>
+    <li><a href="../tutorials/reject.html">whereNot</a></li>
+    <li><a href="../tutorials/compact.html">nonNulls</a></li>
+    <li><a href="../tutorials/uniq.html">distinct</a></li>
+    <li><a href="../tutorials/uniqBy.html">distinctBy</a></li>
     <li><a href="../tutorials/difference.html">difference</a></li>
     <li><a href="../tutorials/differenceBy.html">differenceBy</a></li>
     <li><a href="../tutorials/intersection.html">intersection</a></li>
@@ -112,12 +113,12 @@
   <p class="dim">윈도우, 앞부분, 뒷부분, 그리고 청크.</p>
   <ul class="fn-list">
     <li><a href="../tutorials/take.html">take</a></li>
-    <li><a href="../tutorials/takeRight.html">takeRight</a></li>
+    <li><a href="../tutorials/takeRight.html">takeLast</a></li>
     <li><a href="../tutorials/takeWhile.html">takeWhile</a></li>
     <li><a href="../tutorials/takeUntilInclusive.html">takeUntilInclusive</a></li>
-    <li><a href="../tutorials/drop.html">drop</a></li>
+    <li><a href="../tutorials/drop.html">skip</a></li>
     <li><a href="../tutorials/dropRight.html">dropRight</a></li>
-    <li><a href="../tutorials/dropWhile.html">dropWhile</a></li>
+    <li><a href="../tutorials/dropWhile.html">skipWhile</a></li>
     <li><a href="../tutorials/dropUntil.html">dropUntil</a></li>
     <li><a href="../tutorials/slice.html">slice</a></li>
     <li><a href="../tutorials/chunk.html">chunk</a></li>
@@ -132,7 +133,7 @@
     <li><a href="../tutorials/concat.html">concat</a></li>
     <li><a href="../tutorials/zip.html">zip</a></li>
     <li><a href="../tutorials/zipWith.html">zipWith</a></li>
-    <li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li>
+    <li><a href="../tutorials/zipWithIndex.html">indexed</a></li>
     <li><a href="../tutorials/transpose.html">transpose</a></li>
     <li><a href="../tutorials/reverse.html">reverse</a></li>
     <li><a href="../tutorials/fork.html">fork</a></li>
@@ -148,7 +149,7 @@
     <li><a href="../tutorials/average.html">average</a></li>
     <li><a href="../tutorials/min.html">min</a></li>
     <li><a href="../tutorials/max.html">max</a></li>
-    <li><a href="../tutorials/size.html">size</a></li>
+    <li><a href="../tutorials/size.html">count</a></li>
     <li><a href="../tutorials/join.html">join</a></li>
     <li><a href="../tutorials/groupBy.html">groupBy</a></li>
     <li><a href="../tutorials/indexBy.html">indexBy</a></li>
@@ -161,15 +162,15 @@
   <h2>섹션 8 · 접근 &amp; 술어</h2>
   <p class="dim">단일 값을 꺼내고 요소를 검사합니다.</p>
   <ul class="fn-list">
-    <li><a href="../tutorials/head.html">head</a></li>
-    <li><a href="../tutorials/last.html">last</a></li>
-    <li><a href="../tutorials/nth.html">nth</a></li>
-    <li><a href="../tutorials/find.html">find</a></li>
-    <li><a href="../tutorials/findIndex.html">findIndex</a></li>
-    <li><a href="../tutorials/includes.html">includes</a></li>
+    <li><a href="../tutorials/head.html">firstOrNull</a></li>
+    <li><a href="../tutorials/last.html">lastOrNull</a></li>
+    <li><a href="../tutorials/nth.html">elementAtOrNull</a></li>
+    <li><a href="../tutorials/find.html">firstWhereOrNull</a></li>
+    <li><a href="../tutorials/findIndex.html">indexWhere</a></li>
+    <li><a href="../tutorials/includes.html">contains</a></li>
     <li><a href="../tutorials/isEmpty.html">isEmpty</a></li>
     <li><a href="../tutorials/every.html">every</a></li>
-    <li><a href="../tutorials/some.html">some</a></li>
+    <li><a href="../tutorials/some.html">any</a></li>
     <li><a href="../tutorials/predicates.html">predicates (isNull, isString, …)</a></li>
   </ul>
 
@@ -209,7 +210,7 @@
     <li><a href="../tutorials/add.html">add</a></li>
     <li><a href="../tutorials/comparisons.html">gt · gte · lt · lte</a></li>
     <li><a href="../tutorials/delay.html">delay &amp; sleep</a></li>
-    <li><a href="../tutorials/unicodeToArray.html">unicodeToArray</a></li>
+    <li><a href="../tutorials/unicodeToList.html">unicodeToList</a></li>
     <li><a href="../tutorials/curried.html">curried &amp; uncurried</a></li>
   </ul>
 

@@ -1,10 +1,10 @@
 ---
 slug: dropWhile
-title: dropWhile — FxDart 101
-description: FxDart dropWhile tutorial: skip values while a predicate holds, then yield the rest, with a live playground.
-heading: <code>dropWhile</code>
+title: skipWhile — FxDart 101
+description: FxDart skipWhile tutorial: skip values while a predicate holds, then yield the rest, with a live playground.
+heading: <code>skipWhile</code>
 section: 5
-crumb: dropWhile
+crumb: skipWhile
 prev: dropRight.html
 prevLabel: dropRight
 next: dropUntil.html
@@ -16,18 +16,19 @@ nextLabel: dropUntil
 
   <h2>Lecture</h2>
   <p>
-    <code>dropWhile</code> is <code>takeWhile</code>'s mirror: it skips
+    <code>skipWhile</code> is <code>takeWhile</code>'s mirror: it skips
     elements as long as the predicate holds, then — the moment it hits one
     that fails — switches into "yield everything" mode for good. That
-    switch-over is permanent: once <code>dropWhile</code> starts passing
+    switch-over is permanent: once <code>skipWhile</code> starts passing
     values through, it never goes back to dropping, even if a later element
     would also have matched.
   </p>
   <p>
     Reach for it to strip a variable-length prefix you can't count in
     advance — leading whitespace-like tokens, header rows, a warm-up period
-    in a metrics stream. On the <code>Fx</code> chain it's also available as
-    <code>skipWhile</code>, matching <code>Iterable.skipWhile</code>.
+    in a metrics stream. <code>skipWhile</code> is the Dart-idiomatic name,
+    matching <code>Iterable.skipWhile</code>; fxdart also accepts the FxTS
+    spelling <code>dropWhile</code> — they're the same operator.
   </p>
 
   <h2>Demo 1 · Basics</h2>
@@ -39,7 +40,7 @@ nextLabel: dropUntil
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: drop temperatures while they stay below 25, then keep the
+  <p>Exercise: skip temperatures while they stay below 25, then keep the
     rest.</p>
   {{playground:2}}
 

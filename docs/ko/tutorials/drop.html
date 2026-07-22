@@ -42,14 +42,16 @@
   </div>
 </header>
 <main>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 5 · 잘라내기 › <strong>drop</strong></p>
-  <h1><code>drop</code></h1>
+  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 5 · 잘라내기 › <strong>skip</strong></p>
+  <h1><code>skip</code></h1>
   <p class="hero-sub">앞쪽 <code>length</code>개의 값을 건너뛰는 지연 이터러블을 반환합니다.</p>
 
-  <div class="signature">Iterable&lt;A&gt; drop&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
-FxAsyncIterable&lt;A&gt; dropAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;T&gt; Fx.drop(int count)        // chain — also aliased as Fx.skip
-FxAsync&lt;T&gt; FxAsync.drop(int count)</div>
+  <div class="signature">Iterable&lt;A&gt; skip&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; skipAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.skip(int count)        // chain
+FxAsync&lt;T&gt; FxAsync.skip(int count)
+Iterable&lt;A&gt; drop&lt;A&gt;(...)        // FxTS alias</div>
 
   <h2>강의</h2>
   <p>
@@ -72,10 +74,11 @@ FxAsync&lt;T&gt; FxAsync.drop(int count)</div>
 import 'package:fxdart/fxdart.dart';
 
 void main() {
-  print(drop(2, [1, 2, 3, 4, 5])); // (3, 4, 5)
+  print(skip(2, [1, 2, 3, 4, 5])); // (3, 4, 5)
+  // FxTS alias: drop(2, [1, 2, 3, 4, 5]) is identical.
 
-  // Chain form (also aliased as .skip, matching Iterable):
-  final result = fx([1, 2, 3, 4, 5]).drop(2).toArray();
+  // Chain form (matches Iterable.skip):
+  final result = fx([1, 2, 3, 4, 5]).skip(2).toList();
   print(result); // [3, 4, 5]
 }
 </textarea>
@@ -93,8 +96,8 @@ Future<void> main() async {
       .toAsync()
       .map((a) => delay(Duration(milliseconds: 100), a))
       .concurrent(3)
-      .drop(2)
-      .toArray();
+      .skip(2) // FxTS alias: .drop(2)
+      .toList();
 
   print(result); // [2, 3, 4, 5]
   print('took ${sw.elapsedMilliseconds}ms');
@@ -111,8 +114,8 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final lines = ['# header', '# more header', 'data1', 'data2', 'data3'];
 
-  // TODO: drop the first 2 header lines
-  final data = fx(lines).toArray();
+  // TODO: skip the first 2 header lines
+  final data = fx(lines).toList();
 
   print(data);
 }

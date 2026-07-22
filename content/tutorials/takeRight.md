@@ -1,10 +1,10 @@
 ---
 slug: takeRight
-title: takeRight — FxDart 101
-description: FxDart takeRight tutorial: keep only the last n values of a finite iterable, with a live playground.
-heading: <code>takeRight</code>
+title: takeLast — FxDart 101
+description: FxDart takeLast tutorial: keep only the last n values of a finite iterable, with a live playground.
+heading: <code>takeLast</code>
 section: 5
-crumb: takeRight
+crumb: takeLast
 prev: take.html
 prevLabel: take
 next: takeWhile.html
@@ -16,15 +16,17 @@ nextLabel: takeWhile
 
   <h2>Lecture</h2>
   <p>
-    <code>takeRight</code> is <code>take</code>'s mirror image: instead of
+    <code>takeLast</code> is <code>take</code>'s mirror image: instead of
     the first <code>length</code> values, you get the last ones. There's a
-    catch, though — to know what the "last" values are, <code>takeRight</code>
+    catch, though — to know what the "last" values are, <code>takeLast</code>
     has to see every element first. It <strong>materializes</strong> the
     whole source into a list internally before yielding anything, so unlike
     most FxDart operators it does not work on infinite sequences.
+    <code>takeLast</code> is the Dart-idiomatic name; fxdart also accepts the
+    FxTS spelling <code>takeRight</code> — they're the same operator.
   </p>
   <p>
-    The async version has the same constraint: <code>takeRightAsync</code>
+    The async version has the same constraint: <code>takeLastAsync</code>
     drains the entire upstream (awaiting every element) before it can hand
     back the tail. Reach for it only when you know the source is finite and
     small enough to buffer.

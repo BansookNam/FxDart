@@ -42,14 +42,16 @@
   </div>
 </header>
 <main>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>size</strong></p>
-  <h1><code>size</code></h1>
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>count</strong></p>
+  <h1><code>count</code></h1>
   <p class="hero-sub">Cuenta cuántos elementos produce un pipeline perezoso.</p>
 
-  <div class="signature">int size&lt;A&gt;(Iterable&lt;A&gt; iterable)
-Future&lt;int&gt; sizeAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
-int Fx.size()          // chain (sync)
-Future&lt;int&gt; FxAsync.size()  // chain (async)</div>
+  <div class="signature">int count&lt;A&gt;(Iterable&lt;A&gt; iterable)
+Future&lt;int&gt; countAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+int Fx.length              // sync chain: inherited Iterable getter, no parens
+Future&lt;int&gt; FxAsync.count()  // async chain method
+int size&lt;A&gt;(Iterable&lt;A&gt; iterable)  // FxTS alias</div>
 
   <h2>Lección</h2>
   <p>
@@ -74,7 +76,7 @@ Future&lt;int&gt; FxAsync.size()  // chain (async)</div>
     Si ya tienes una <code>List</code> concreta, su <code>.length</code> es
     gratis: recurre a <code>size</code> precisamente cuando quieras contar la
     salida de una cadena perezosa sin materializarla antes en una
-    <code>List</code> con <code><a href="../101/index.html">toArray</a></code>.
+    <code>List</code> con <code><a href="../101/index.html">toList</a></code>.
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>
@@ -84,11 +86,14 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   // Data-first form: counts elements by pulling the whole pipeline.
-  print(size(range(1000000).where((a) => a % 7 == 0))); // 142858
+  print(count(range(1000000).where((a) => a % 7 == 0))); // 142858
 
-  // Chain form:
-  final count = fx([1, 2, 3, 4, 5, 6]).filter((a) => a.isEven).size();
-  print(count); // 3
+  // Sync chain: count is Dart's inherited .length getter — no parens.
+  final n = fx([1, 2, 3, 4, 5, 6]).filter((a) => a.isEven).length;
+  print(n); // 3
+
+  // FxTS alias: size — the same operator.
+  print(size([1, 2, 3])); // 3
 }
 </textarea>
   </div>
@@ -99,13 +104,14 @@ void main() {
 import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
-  // sizeAsync / .toAsync().size() still has to pull every element to count them.
-  final count = await fx(['a', 'bb', 'ccc', 'd'])
+  // Async chain: .count() is a method — with parens — and still has to pull
+  // every element to count them.
+  final n = await fx(['a', 'bb', 'ccc', 'd'])
       .toAsync()
       .filter((s) => delay(const Duration(milliseconds: 100), s.length > 1))
-      .size();
+      .count();
 
-  print(count); // 2
+  print(n); // 2
 }
 </textarea>
   </div>
@@ -120,9 +126,10 @@ void main() {
   final inventory = [3, 0, 7, 0, 5, 0, 9];
 
   // TODO: count how many entries are OUT OF STOCK (value == 0).
-  final count = fx(inventory).size();
+  // Hint: on the sync chain, count is the inherited .length getter — no parens.
+  final n = fx(inventory).length;
 
-  print(count);
+  print(n);
 }
 </textarea>
   </div>
@@ -131,7 +138,7 @@ void main() {
     <strong>Relacionado:</strong>
     <a href="average.html"><code>average</code></a> — usa internamente un conteo similar a size ·
     <a href="isEmpty.html"><code>isEmpty</code></a> — una comprobación más barata cuando solo necesitas saber «¿hay alguno?» ·
-    <a href="../101/index.html">toArray</a> — materializa en lugar de solo contar
+    <a href="../101/index.html">toList</a> — materializa en lugar de solo contar
   </div>
 
   <nav class="tut-nav">

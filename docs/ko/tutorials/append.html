@@ -73,7 +73,7 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   print(append(4, [1, 2, 3])); // (1, 2, 3, 4)
 
-  final result = fx(['a', 'b']).append('c').toArray();
+  final result = fx(['a', 'b']).append('c').toList();
   print(result); // [a, b, c]
 }
 </textarea>
@@ -89,7 +89,7 @@ Future<void> main() async {
   final result = await fx([1, 2, 3])
       .toAsync()
       .append(delay(Duration(milliseconds: 50), 4))
-      .toArray();
+      .toList();
 
   print(result); // [1, 2, 3, 4]
 }
@@ -106,7 +106,7 @@ void main() {
   final steps = ['mix', 'bake'];
 
   // TODO: append 'cool' to the end of the steps
-  final allSteps = fx(steps).toArray();
+  final allSteps = fx(steps).toList();
 
   print(allSteps);
 }

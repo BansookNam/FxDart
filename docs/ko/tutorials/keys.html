@@ -80,10 +80,10 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final ages = {'kim': 32, 'lee': 27, 'park': 41};
 
-  print(toArray(keys(ages))); // [kim, lee, park]
+  print(toList(keys(ages))); // [kim, lee, park]
 
   // Chain form:
-  final loud = fx(keys(ages)).map((k) => k.toUpperCase()).toArray();
+  final loud = fx(keys(ages)).map((k) => k.toUpperCase()).toList();
   print(loud); // [KIM, LEE, PARK]
 }
 </textarea>
@@ -99,7 +99,7 @@ void main() {
   // chain operators apply — here, count how many item names start with 'a'.
   final prices = {'apple': 1.5, 'banana': 0.5, 'avocado': 2.0, 'kiwi': 1.2};
 
-  final aKeys = fx(keys(prices)).filter((k) => k.startsWith('a')).toArray();
+  final aKeys = fx(keys(prices)).filter((k) => k.startsWith('a')).toList();
   print(aKeys); // [apple, avocado]
   print('count: ${aKeys.length}'); // count: 2
 }
@@ -118,7 +118,7 @@ void main() {
 
   // TODO: use keys() and sort() to get an alphabetically sorted list of
   // the inventory's item names.
-  final names = fx(keys(inventory)).sort((a, b) => a.compareTo(b)).toArray();
+  final names = fx(keys(inventory)).sort((a, b) => a.compareTo(b)).toList();
 
   print(names); // [apples, bananas, cherries]
 }

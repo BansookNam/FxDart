@@ -1,10 +1,10 @@
 ---
 slug: some
-title: some — FxDart 101
-description: FxDart some tutorial: check that at least one element satisfies a predicate, short-circuiting on the first hit, sync and async.
-heading: <code>some</code>
+title: any — FxDart 101
+description: FxDart any tutorial: check that at least one element satisfies a predicate, short-circuiting on the first hit, sync and async.
+heading: <code>any</code>
 section: 8
-crumb: some
+crumb: any
 prev: every.html
 prevLabel: every
 next: predicates.html
@@ -16,7 +16,9 @@ nextLabel: predicates
 
   <h2>Lecture</h2>
   <p>
-    <code>some</code> is <code>every</code>'s mirror image: it scans left to
+    <code>any</code> is the Dart-idiomatic name; fxdart also accepts the
+    FxTS spelling <code>some</code> — they're the same operator. It's
+    <code>every</code>'s mirror image: it scans left to
     right and short-circuits the moment it finds a match, returning
     <code>true</code> right away. If it never finds one — including on an
     empty iterable, which is the opposite vacuous case from
@@ -24,11 +26,11 @@ nextLabel: predicates
     everything.
   </p>
   <p>
-    Unlike <code>every</code>, <code>Fx</code> <em>does</em> define its own
-    <code>.some()</code> chain method (it isn't already covered by
-    <code>Iterable</code>, since Dart's own <code>Iterable</code> has no
-    built-in <code>some</code> — the closest thing, <code>any</code>, does
-    the same job under a different name).
+    On a sync chain, <code>.any(f)</code> comes straight from Dart's
+    <code>Iterable</code> — <code>Fx</code> inherits it — so it needs no
+    special definition. The async chain and the data-first
+    <code>any(f, iterable)</code> form are supplied by fxdart, and the FxTS
+    spelling <code>some</code> still works in every position.
   </p>
 
   <h2>Demo 1 · Basics &amp; short-circuiting</h2>
@@ -38,13 +40,13 @@ nextLabel: predicates
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>some</code> to check if anything in the cart costs more than 10.</p>
+  <p>Exercise: use <code>any</code> to check if anything in the cart costs more than 10.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Related:</strong>
     <a href="every.html"><code>every</code></a> — the "all of them" counterpart ·
-    <a href="includes.html"><code>includes</code></a> — a specialization of <code>some</code> ·
+    <a href="includes.html"><code>includes</code></a> — a specialization of <code>any</code> ·
     <a href="find.html"><code>find</code></a> — get the matching element, not just a bool ·
-    <a href="predicates.html"><code>predicates</code></a> — ready-made predicates to pair with <code>some</code>
+    <a href="predicates.html"><code>predicates</code></a> — ready-made predicates to pair with <code>any</code>
   </div>

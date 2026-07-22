@@ -26,7 +26,7 @@ description: FxDart — библиотека функционального пр
   <ul>
     <li><strong>Ленивые вычисления</strong> — операторы вроде <code>map</code>,
       <code>filter</code> и <code>take</code> лишь строят конвейер и не делают работы,
-      пока терминальный оператор (<code>toArray</code>, <code>each</code>,
+      пока терминальный оператор (<code>toList</code>, <code>each</code>,
       <code>reduce</code>…) не протянет через него значения. Обработка диапазона
       из миллиона элементов с <code>.take(3)</code> вычислит ровно 3 результата.</li>
     <li><strong>Единая модель для sync и async</strong> — одни и те же имена операторов

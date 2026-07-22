@@ -42,6 +42,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 1 · Primeros pasos › <strong>fx</strong></p>
   <h1><code>fx</code></h1>
   <p class="hero-sub">Envuelve una secuencia en un pipeline perezoso y encadenable: el corazón tipado de FxDart.</p>
@@ -59,7 +60,7 @@ FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)</div>
     colgando de él. Cada una de esas llamadas devuelve un <em>nuevo</em>
     <code>Fx</code> que envuelve un poco más de cómputo perezoso. Nada se
     ejecuta todavía. <code>Fx</code> solo empieza a trabajar cuando llamas a un
-    <strong>operador terminal</strong> — <code>toArray()</code>,
+    <strong>operador terminal</strong> — <code>toList()</code>,
     <code>each()</code>, <code>consume()</code>, <code>reduce()</code> y
     compañía —, que tira de los valores a través de toda la cadena, uno a uno,
     desde el terminal hasta la fuente.
@@ -93,7 +94,7 @@ FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)</div>
 
   <h2>Demo 1 · Nada se ejecuta hasta el operador terminal</h2>
   <p>Fíjate en que <code>calls</code> se queda en 0 justo después de construir la cadena, y
-    salta en cuanto <code>toArray()</code> tira de verdad de los 5 valores:</p>
+    salta en cuanto <code>toList()</code> tira de verdad de los 5 valores:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -110,10 +111,10 @@ void main() {
 
   print('calls before terminal op: $calls'); // 0 — still just a plan
 
-  final result = chain.toArray();
+  final result = chain.toList();
 
   print(result);                 // [30, 40, 50]
-  print('calls after toArray: $calls'); // 5
+  print('calls after toList: $calls'); // 5
 }
 </textarea>
   </div>
@@ -138,7 +139,7 @@ Future<void> main() async {
   // fxStream wraps a Dart Stream directly.
   final doubled = await fxStream(Stream.fromIterable([1, 2, 3]))
       .map((a) => a * 2)
-      .toArray();
+      .toList();
   print('fxStream doubled: $doubled'); // [2, 4, 6]
 }
 </textarea>
@@ -155,12 +156,12 @@ void main() {
   final scores = [55, 72, 88, 40, 91, 63];
 
   // TODO: build a lazy chain that keeps scores >= 60, doubles them as bonus
-  // points, and takes only the first 2 — then run it with toArray().
+  // points, and takes only the first 2 — then run it with toList().
   final bonus = fx(scores)
       .filter((s) => s >= 60)
       .map((s) => s * 2)
       .take(2)
-      .toArray();
+      .toList();
 
   print(bonus); // [144, 176]
 }
@@ -170,7 +171,7 @@ void main() {
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="pipe.html"><code>pipe</code></a> — la alternativa de tipado dinámico ·
-    <a href="toArray.html"><code>toArray</code></a> — el operador terminal más habitual ·
+    <a href="toList.html"><code>toList</code></a> — el operador terminal más habitual ·
     <a href="each.html"><code>each</code></a> — operador terminal para efectos secundarios ·
     <a href="consume.html"><code>consume</code></a> — operador terminal que descarta los resultados
   </div>

@@ -42,14 +42,16 @@
   </div>
 </header>
 <main>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 4 · Filtrado &amp; deduplicación › <strong>filter</strong></p>
-  <h1><code>filter</code></h1>
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 4 · Filtrado &amp; deduplicación › <strong>where</strong></p>
+  <h1><code>where</code></h1>
   <p class="hero-sub">Devuelve un iterable perezoso con los elementos para los que el predicado devuelve true.</p>
 
-  <div class="signature">Iterable&lt;A&gt; filter&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
-FxAsyncIterable&lt;A&gt; filterAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;T&gt; Fx.filter(bool Function(T a) f)        // chain (alias: where)
-FxAsync&lt;T&gt; FxAsync.filter(FutureOr&lt;bool&gt; Function(T a) f)</div>
+  <div class="signature">Iterable&lt;A&gt; where&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; whereAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.where(bool Function(T a) f)        // chain
+FxAsync&lt;T&gt; FxAsync.where(FutureOr&lt;bool&gt; Function(T a) f)
+Iterable&lt;A&gt; filter&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)   // FxTS alias</div>
 
   <h2>Lección</h2>
   <p>
@@ -81,22 +83,23 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   // Data-first form:
-  print(toArray(filter((a) => a % 2 == 0, [0, 1, 2, 3, 4, 5, 6])));
+  print(toList(where((a) => a % 2 == 0, [0, 1, 2, 3, 4, 5, 6])));
   // [0, 2, 4, 6]
+  // FxTS alias: filter((a) => a % 2 == 0, ...) does the same thing.
 
   // Chain form, with proof of laziness -- the predicate only runs for the
   // elements actually pulled before take(3) is satisfied:
   var calls = 0;
   final result = fx(range(1000000))
-      .filter((a) {
+      .where((a) {
         calls++;
         return a % 2 == 0;
       })
       .take(3)
-      .toArray();
+      .toList();
 
-  print(result);                    // [0, 2, 4]
-  print('filter ran $calls times'); // 5 -- not 1000000
+  print(result);                   // [0, 2, 4]
+  print('where ran $calls times'); // 5 -- not 1000000
 }
 </textarea>
   </div>
@@ -109,17 +112,17 @@ import 'package:fxdart/fxdart.dart';
 Future<void> main() async {
   final sw = Stopwatch()..start();
 
-  // filterAsync has its own dedicated concurrent path: predicates for
+  // whereAsync has its own dedicated concurrent path: predicates for
   // several elements run in parallel, but passing values are still
   // released downstream in the original order.
   final result = await fx([1, 2, 3, 4, 5, 6])
       .toAsync()
-      .filter((a) async {
+      .where((a) async {
         await delay(Duration(milliseconds: 150), null);
         return a.isEven;
       })
       .concurrent(3)
-      .toArray();
+      .toList();
 
   print(result); // [2, 4, 6]
   print('took ${sw.elapsedMilliseconds}ms'); // ~300ms, not ~900ms
@@ -136,8 +139,8 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final ages = [12, 19, 25, 8, 40, 17];
 
-  // TODO: use filter to keep only ages 18 and over.
-  final adults = fx(ages).toArray();
+  // TODO: use where to keep only ages 18 and over.
+  final adults = fx(ages).toList();
 
   print(adults);
 }

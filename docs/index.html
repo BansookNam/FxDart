@@ -60,7 +60,7 @@ void main() {
   final result = fx([1, 2, 3, 4, 5])
       .map((a) => a + 10)
       .filter((a) => a % 2 == 0)
-      .toArray();
+      .toList();
 
   print(result); // [12, 14]
 }
@@ -78,7 +78,7 @@ void main() {
   <ul>
     <li><strong>Lazy evaluation</strong> — operators like <code>map</code>,
       <code>filter</code>, and <code>take</code> build a pipeline but do no work
-      until a terminal operator (<code>toArray</code>, <code>each</code>,
+      until a terminal operator (<code>toList</code>, <code>each</code>,
       <code>reduce</code>…) pulls values through it. Processing a million-element
       range with <code>.take(3)</code> computes exactly 3 results.</li>
     <li><strong>One model for sync and async</strong> — the same operator names
@@ -159,7 +159,7 @@ Future<void> main() async {
       .toAsync()
       .map((id) => delay(Duration(milliseconds: 300), 'user$id'))
       .concurrent(3) // ← try 1 (sequential) or 6 (all at once)
-      .toArray();
+      .toList();
 
   print(users);
   print('took ${sw.elapsedMilliseconds}ms');

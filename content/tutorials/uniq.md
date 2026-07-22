@@ -1,10 +1,10 @@
 ---
 slug: uniq
-title: uniq — FxDart 101
-description: FxDart uniq tutorial: remove duplicate values while preserving first-seen order, with a live playground.
-heading: <code>uniq</code>
+title: distinct — FxDart 101
+description: FxDart distinct tutorial: remove duplicate values while preserving first-seen order, with a live playground.
+heading: <code>distinct</code>
 section: 4
-crumb: uniq
+crumb: distinct
 prev: compact.html
 prevLabel: compact
 next: uniqBy.html
@@ -16,9 +16,11 @@ nextLabel: uniqBy
 
   <h2>Lecture</h2>
   <p>
-    <code>uniq</code> walks the iterable once, keeping a <code>Set</code> of
+    <code>distinct</code> walks the iterable once, keeping a <code>Set</code> of
     values already seen, and yields each element only the first time it
-    shows up. It's implemented as <code>uniqBy((a) =&gt; a, iterable)</code> —
+    shows up. <code>distinct</code> is the Dart-idiomatic name; fxdart also
+    accepts the FxTS spelling <code>uniq</code> — they're the same operator.
+    It's implemented as <code>uniqBy((a) =&gt; a, iterable)</code> —
     the identity key — so if you ever need to dedupe by something other than
     equality of the whole value, reach for
     <a href="uniqBy.html"><code>uniqBy</code></a> instead.
@@ -30,10 +32,10 @@ nextLabel: uniqBy
     last.
   </p>
   <p>
-    On the async side, <code>uniqAsync</code> is safe to combine with
+    On the async side, <code>distinctAsync</code> is safe to combine with
     <code>.concurrent(n)</code> as long as the concurrency lives in an
     upstream fetch stage: fetch with <code>.map(...).concurrent(n)</code>
-    first, then apply <code>.uniq()</code> to the already-resolved,
+    first, then apply <code>.distinct()</code> to the already-resolved,
     in-order results, as in Demo 2.
   </p>
 
@@ -44,7 +46,7 @@ nextLabel: uniqBy
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>uniq</code> to remove duplicate tags, preserving
+  <p>Exercise: use <code>distinct</code> to remove duplicate tags, preserving
     first-seen order.</p>
   {{playground:2}}
 

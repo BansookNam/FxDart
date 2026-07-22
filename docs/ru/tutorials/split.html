@@ -92,7 +92,7 @@ void main() {
 import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
-  final result = await toArrayAsync(
+  final result = await toListAsync(
     splitAsync(',', toAsync('x,y,z'.split(''))),
   );
 
@@ -112,7 +112,7 @@ void main() {
   const csv = 'red|green|blue';
 
   // TODO: use split to break csv into color names on '|'
-  final colors = toArray(csv.split(''));
+  final colors = toList(csv.split(''));
 
   print(colors);
 }
@@ -122,7 +122,7 @@ void main() {
   <div class="callout">
     <strong>Related:</strong>
     <a href="chunk.html"><code>chunk</code></a> — group by fixed size instead of separator ·
-    <a href="unicodeToArray.html"><code>unicodeToArray</code></a> — get a proper character array (grapheme-aware) ·
+    <a href="unicodeToList.html"><code>unicodeToList</code></a> — get a proper character array (grapheme-aware) ·
     <a href="join.html"><code>join</code></a> — the inverse operation
   </div>
 

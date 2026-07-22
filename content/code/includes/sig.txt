@@ -1,2 +1,3 @@
-bool includes&lt;A&gt;(A a, Iterable&lt;A&gt; iterable)
-Future&lt;bool&gt; includesAsync&lt;A&gt;(A a, FxAsyncIterable&lt;A&gt; iterable)
+bool Fx.contains(Object? a)              // chain — inherited from Iterable (Dart idiom)
+bool includes&lt;A&gt;(A a, Iterable&lt;A&gt; iterable)  // top-level: no `contains` (collides with package:test)
+Future&lt;bool&gt; includesAsync&lt;A&gt;(A a, FxAsyncIterable&lt;A&gt; iterable)  // top-level async

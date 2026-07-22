@@ -6,5 +6,5 @@ void main() {
   print(greet(123)); // hi (ignores the argument)
 
   // realistic: reset every element of a list to a fixed value
-  print(fx([1, 2, 3]).map(always(0)).toArray()); // [0, 0, 0]
+  print(fx([1, 2, 3]).map(always(0)).toList()); // [0, 0, 0]
 }

@@ -7,11 +7,11 @@ void main() {
   final owned = [1, 2, 3];
   final wishlist = [2, 3, 4, 4, 5];
 
-  print(toArray(difference(owned, wishlist)));
+  print(toList(difference(owned, wishlist)));
   // [4, 5] -- wishlist items you don't already own
 
   // Swap the arguments and the result is completely different:
-  print(toArray(difference(wishlist, owned)));
+  print(toList(difference(wishlist, owned)));
   // [1] -- owned items not on the wishlist
 
   // No chain method exists for difference -- call it data-first.

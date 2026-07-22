@@ -30,7 +30,7 @@ nextLabel: partition
     않습니다. 체인 형태의 미묘한 점도 똑같습니다 — 동기
     <code>Fx</code> 체인에서 <code>.sortBy(f)</code>는 또 다른
     <code>Fx&lt;T&gt;</code>를 반환하므로 실체화하려면 여전히
-    <code><a href="../101/index.html">.toArray()</a></code>가 필요하고,
+    <code><a href="../101/index.html">.toList()</a></code>가 필요하고,
     <code>FxAsync</code> 체인에서 <code>.sortBy(f)</code>는 이미
     <code>Future&lt;List&lt;T&gt;&gt;</code>를 반환하는 종결 연산자입니다.
   </p>

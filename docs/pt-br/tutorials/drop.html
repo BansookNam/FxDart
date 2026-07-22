@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>drop — FxDart 101</title>
-  <meta name="description" content="FxDart drop tutorial: skip the first n values of a lazy pipeline, with a live playground.">
+  <title>skip — FxDart 101</title>
+  <meta name="description" content="FxDart skip tutorial: skip the first n values of a lazy pipeline, with a live playground.">
   <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/drop.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/drop.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/drop.html">
@@ -44,28 +44,29 @@
 </header>
 <main>
   <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 5 · Fatiamento › <strong>drop</strong></p>
-  <h1><code>drop</code></h1>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 5 · Fatiamento › <strong>skip</strong></p>
+  <h1><code>skip</code></h1>
   <p class="hero-sub">Returns a lazy iterable that skips the first <code>length</code> values.</p>
 
-  <div class="signature">Iterable&lt;A&gt; drop&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
-FxAsyncIterable&lt;A&gt; dropAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;T&gt; Fx.drop(int count)        // chain — also aliased as Fx.skip
-FxAsync&lt;T&gt; FxAsync.drop(int count)</div>
+  <div class="signature">Iterable&lt;A&gt; skip&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; skipAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.skip(int count)        // chain
+FxAsync&lt;T&gt; FxAsync.skip(int count)
+Iterable&lt;A&gt; drop&lt;A&gt;(...)        // FxTS alias</div>
 
   <h2>Lecture</h2>
   <p>
-    <code>drop</code> is <code>take</code>'s opposite: it discards the first
+    <code>skip</code> is <code>take</code>'s opposite: it discards the first
     <code>length</code> values and yields everything after them. It's still
     lazy — nothing is skipped until the pipeline is actually pulled — and it
     works fine on infinite sources, since it only needs to count off a fixed
     number of elements before passing the rest straight through.
   </p>
   <p>
-    On the <code>Fx</code> chain, <code>drop</code> is also available as
-    <code>skip</code>, matching Dart's own <code>Iterable.skip</code> naming
-    (FxDart's <code>Fx</code> already extends <code>Iterable</code>, so both
-    spellings resolve to the same operator).
+    <code>skip</code> is the Dart-idiomatic name, matching Dart's own
+    <code>Iterable.skip</code> (FxDart's <code>Fx</code> already extends
+    <code>Iterable</code>); fxdart also accepts the FxTS spelling
+    <code>drop</code> — they're the same operator.
   </p>
 
   <h2>Demo 1 · Basics</h2>
@@ -74,10 +75,11 @@ FxAsync&lt;T&gt; FxAsync.drop(int count)</div>
 import 'package:fxdart/fxdart.dart';
 
 void main() {
-  print(drop(2, [1, 2, 3, 4, 5])); // (3, 4, 5)
+  print(skip(2, [1, 2, 3, 4, 5])); // (3, 4, 5)
+  // FxTS alias: drop(2, [1, 2, 3, 4, 5]) is identical.
 
-  // Chain form (also aliased as .skip, matching Iterable):
-  final result = fx([1, 2, 3, 4, 5]).drop(2).toArray();
+  // Chain form (matches Iterable.skip):
+  final result = fx([1, 2, 3, 4, 5]).skip(2).toList();
   print(result); // [3, 4, 5]
 }
 </textarea>
@@ -95,8 +97,8 @@ Future<void> main() async {
       .toAsync()
       .map((a) => delay(Duration(milliseconds: 100), a))
       .concurrent(3)
-      .drop(2)
-      .toArray();
+      .skip(2) // FxTS alias: .drop(2)
+      .toList();
 
   print(result); // [2, 3, 4, 5]
   print('took ${sw.elapsedMilliseconds}ms');
@@ -105,7 +107,7 @@ Future<void> main() async {
   </div>
 
   <h2>Try it yourself</h2>
-  <p>Exercise: drop the first 2 header lines.</p>
+  <p>Exercise: skip the first 2 header lines.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -113,8 +115,8 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final lines = ['# header', '# more header', 'data1', 'data2', 'data3'];
 
-  // TODO: drop the first 2 header lines
-  final data = fx(lines).toArray();
+  // TODO: skip the first 2 header lines
+  final data = fx(lines).toList();
 
   print(data);
 }

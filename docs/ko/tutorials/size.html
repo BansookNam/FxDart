@@ -42,14 +42,16 @@
   </div>
 </header>
 <main>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 7 · 집계 › <strong>size</strong></p>
-  <h1><code>size</code></h1>
+  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 7 · 집계 › <strong>count</strong></p>
+  <h1><code>count</code></h1>
   <p class="hero-sub">지연 파이프라인이 만들어내는 원소가 몇 개인지 셉니다.</p>
 
-  <div class="signature">int size&lt;A&gt;(Iterable&lt;A&gt; iterable)
-Future&lt;int&gt; sizeAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
-int Fx.size()          // chain (sync)
-Future&lt;int&gt; FxAsync.size()  // chain (async)</div>
+  <div class="signature">int count&lt;A&gt;(Iterable&lt;A&gt; iterable)
+Future&lt;int&gt; countAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+int Fx.length              // sync chain: inherited Iterable getter, no parens
+Future&lt;int&gt; FxAsync.count()  // async chain method
+int size&lt;A&gt;(Iterable&lt;A&gt; iterable)  // FxTS alias</div>
 
   <h2>강의</h2>
   <p>
@@ -73,7 +75,7 @@ Future&lt;int&gt; FxAsync.size()  // chain (async)</div>
     이미 구체적인 <code>List</code>를 들고 있다면 <code>.length</code>가
     공짜입니다 — <code>size</code>는 지연 체인의 결과를 먼저
     <code>List</code>로 구체화하지 않고서 개수만 세고 싶을 때, 즉
-    <code><a href="../101/index.html">toArray</a></code>를 부르고 싶지 않을 때
+    <code><a href="../101/index.html">toList</a></code>를 부르고 싶지 않을 때
     꺼내 쓰는 도구입니다.
   </p>
 
@@ -84,11 +86,14 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   // Data-first form: counts elements by pulling the whole pipeline.
-  print(size(range(1000000).where((a) => a % 7 == 0))); // 142858
+  print(count(range(1000000).where((a) => a % 7 == 0))); // 142858
 
-  // Chain form:
-  final count = fx([1, 2, 3, 4, 5, 6]).filter((a) => a.isEven).size();
-  print(count); // 3
+  // Sync chain: count is Dart's inherited .length getter — no parens.
+  final n = fx([1, 2, 3, 4, 5, 6]).filter((a) => a.isEven).length;
+  print(n); // 3
+
+  // FxTS alias: size — the same operator.
+  print(size([1, 2, 3])); // 3
 }
 </textarea>
   </div>
@@ -99,13 +104,14 @@ void main() {
 import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
-  // sizeAsync / .toAsync().size() still has to pull every element to count them.
-  final count = await fx(['a', 'bb', 'ccc', 'd'])
+  // Async chain: .count() is a method — with parens — and still has to pull
+  // every element to count them.
+  final n = await fx(['a', 'bb', 'ccc', 'd'])
       .toAsync()
       .filter((s) => delay(const Duration(milliseconds: 100), s.length > 1))
-      .size();
+      .count();
 
-  print(count); // 2
+  print(n); // 2
 }
 </textarea>
   </div>
@@ -120,9 +126,10 @@ void main() {
   final inventory = [3, 0, 7, 0, 5, 0, 9];
 
   // TODO: count how many entries are OUT OF STOCK (value == 0).
-  final count = fx(inventory).size();
+  // Hint: on the sync chain, count is the inherited .length getter — no parens.
+  final n = fx(inventory).length;
 
-  print(count);
+  print(n);
 }
 </textarea>
   </div>
@@ -131,7 +138,7 @@ void main() {
     <strong>관련 함수:</strong>
     <a href="average.html"><code>average</code></a> — 내부적으로 size와 같은 방식으로 개수를 셉니다 ·
     <a href="isEmpty.html"><code>isEmpty</code></a> — "하나라도 있나?"만 알면 될 때 더 저렴한 검사 ·
-    <a href="../101/index.html">toArray</a> — 세는 대신 구체화하기
+    <a href="../101/index.html">toList</a> — 세는 대신 구체화하기
   </div>
 
   <nav class="tut-nav">

@@ -8,5 +8,5 @@ void main() {
     print('$name is $age');
   }
 
-  print(toArray(entries(ages))); // [(kim, 32), (lee, 27), (park, 41)]
+  print(toList(entries(ages))); // [(kim, 32), (lee, 27), (park, 41)]
 }

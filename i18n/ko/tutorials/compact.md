@@ -2,9 +2,9 @@
 slug: compact
 title: compact — FxDart 101
 description: FxDart compact 튜토리얼: null을 걸러 내면서 원소 타입까지 좁혀 주는 방법을 라이브 플레이그라운드와 함께 익힙니다.
-heading: <code>compact</code>
+heading: <code>nonNulls</code>
 section: 4
-crumb: compact
+crumb: nonNulls
 prev: reject.html
 prevLabel: reject
 next: uniq.html

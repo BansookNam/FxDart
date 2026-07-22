@@ -2,9 +2,9 @@
 slug: includes
 title: includes — FxDart 101
 description: Tutorial de includes en FxDart: comprueba la pertenencia en un iterable usando ==, con cortocircuito, en versión síncrona y asíncrona.
-heading: <code>includes</code>
+heading: <code>contains</code>
 section: 8
-crumb: includes
+crumb: contains
 prev: findIndex.html
 prevLabel: findIndex
 next: isEmpty.html

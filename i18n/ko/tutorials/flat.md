@@ -2,9 +2,9 @@
 slug: flat
 title: flat — FxDart 101
 description: FxDart flat 튜토리얼: 중첩된 이터러블을 원하는 깊이만큼 평탄화하는 방법을 라이브 플레이그라운드와 함께 익힙니다.
-heading: <code>flat</code>
+heading: <code>flattened</code>
 section: 3
-crumb: flat
+crumb: flattened
 prev: flatMap.html
 prevLabel: flatMap
 next: scan.html

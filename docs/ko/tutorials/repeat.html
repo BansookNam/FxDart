@@ -77,8 +77,8 @@
 import 'package:fxdart/fxdart.dart';
 
 void main() {
-  print(toArray(repeat(3, 'x')));  // [x, x, x]
-  print(toArray(repeat(0, 'x')));  // [] — n=0 yields nothing
+  print(toList(repeat(3, 'x')));  // [x, x, x]
+  print(toList(repeat(0, 'x')));  // [] — n=0 yields nothing
   print(fx(repeat(4, '-')).join()); // ----
 }
 </textarea>
@@ -98,7 +98,7 @@ void main() {
   // repeat yields the SAME value n times — pair it with zip/zipWithIndex
   // to stamp a constant onto a variable-length sequence.
   final names = ['kim', 'lee', 'park'];
-  final labeled = fx(names).zip(repeat(names.length, 'pending')).toArray();
+  final labeled = fx(names).zip(repeat(names.length, 'pending')).toList();
 
   print(labeled); // [(kim, pending), (lee, pending), (park, pending)]
 }
@@ -114,7 +114,7 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   // TODO: build a 5-item List<int> of the value 7 using repeat.
-  final sevens = fx(repeat(5, 7)).toArray();
+  final sevens = fx(repeat(5, 7)).toList();
 
   print(sevens); // [7, 7, 7, 7, 7]
 }

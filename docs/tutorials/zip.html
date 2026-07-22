@@ -85,7 +85,7 @@ void main() {
   // Three-way variant:
   print(zip3(['a', 'b'], [1, 2], [true, false])); // ((a, 1, true), (b, 2, false))
 
-  final result = fx(['x', 'y']).zip([10, 20]).toArray();
+  final result = fx(['x', 'y']).zip([10, 20]).toList();
   print(result); // [(x, 10), (y, 20)]
 }
 </textarea>
@@ -106,7 +106,7 @@ Future<void> main() async {
   final ages =
       fx([10, 20, 30]).toAsync().map((a) => delay(Duration(milliseconds: 100), a));
 
-  final result = await toArrayAsync(zipAsync(names, ages));
+  final result = await toListAsync(zipAsync(names, ages));
   print(result); // [(n1, 10), (n2, 20), (n3, 30)]
   print('took ${sw.elapsedMilliseconds}ms'); // ~300ms, not 600ms
 }
@@ -125,7 +125,7 @@ void main() {
   final ages = [32, 27, 41];
 
   // TODO: zip names and ages together into (name, age) records
-  final people = fx(names).toArray();
+  final people = fx(names).toList();
 
   print(people);
 }

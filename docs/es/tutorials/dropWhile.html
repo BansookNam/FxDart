@@ -42,14 +42,16 @@
   </div>
 </header>
 <main>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 5 · Segmentación › <strong>dropWhile</strong></p>
-  <h1><code>dropWhile</code></h1>
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 5 · Segmentación › <strong>skipWhile</strong></p>
+  <h1><code>skipWhile</code></h1>
   <p class="hero-sub">Omite valores mientras un predicado devuelva true y luego emite todo lo demás, coincida o no.</p>
 
-  <div class="signature">Iterable&lt;A&gt; dropWhile&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
-FxAsyncIterable&lt;A&gt; dropWhileAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;T&gt; Fx.dropWhile(bool Function(T a) f)        // chain — also aliased as Fx.skipWhile
-FxAsync&lt;T&gt; FxAsync.dropWhile(FutureOr&lt;bool&gt; Function(T a) f)</div>
+  <div class="signature">Iterable&lt;A&gt; skipWhile&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; skipWhileAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.skipWhile(bool Function(T a) f)        // chain
+FxAsync&lt;T&gt; FxAsync.skipWhile(FutureOr&lt;bool&gt; Function(T a) f)
+Iterable&lt;A&gt; dropWhile&lt;A&gt;(...)        // FxTS alias</div>
 
   <h2>Lección</h2>
   <p>
@@ -79,9 +81,10 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   // Stops dropping at the first element that fails the test, then yields
   // everything else — even later elements that would have matched:
-  print(dropWhile((a) => a < 3, [1, 2, 3, 4, 1, 2])); // (3, 4, 1, 2)
+  print(skipWhile((a) => a < 3, [1, 2, 3, 4, 1, 2])); // (3, 4, 1, 2)
+  // FxTS alias: dropWhile((a) => a < 3, [...]) is identical.
 
-  final result = fx([2, 4, 6, 7, 8]).dropWhile((a) => a.isEven).toArray();
+  final result = fx([2, 4, 6, 7, 8]).skipWhile((a) => a.isEven).toList();
   print(result); // [7, 8]
 }
 </textarea>
@@ -96,8 +99,8 @@ Future<void> main() async {
   final result = await fx([1, 2, 3, 8, 4])
       .toAsync()
       .map((a) => delay(Duration(milliseconds: 50), a))
-      .dropWhile((a) => a < 5)
-      .toArray();
+      .skipWhile((a) => a < 5) // FxTS alias: .dropWhile((a) => a < 5)
+      .toList();
 
   print(result); // [8, 4]
 }
@@ -114,8 +117,8 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final temps = [18, 19, 21, 30, 22, 17];
 
-  // TODO: drop temperatures while they stay below 25, keep the rest
-  final rest = fx(temps).toArray();
+  // TODO: skip temperatures while they stay below 25, keep the rest
+  final rest = fx(temps).toList();
 
   print(rest);
 }

@@ -2,9 +2,9 @@
 slug: takeRight
 title: takeRight — FxDart 101
 description: Tutorial de takeRight en FxDart: quédate solo con los últimos n valores de un iterable finito, con un playground en vivo.
-heading: <code>takeRight</code>
+heading: <code>takeLast</code>
 section: 5
-crumb: takeRight
+crumb: takeLast
 prev: take.html
 prevLabel: take
 next: takeWhile.html

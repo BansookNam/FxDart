@@ -50,7 +50,7 @@
 
   <div class="signature">List&lt;A&gt; sortBy&lt;A&gt;(Object? Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;List&lt;A&gt;&gt; sortByAsync&lt;A&gt;(Object? Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;T&gt; Fx.sortBy(Object? Function(T a) f)                    // chain (sync) — still lazy, call .toArray()
+Fx&lt;T&gt; Fx.sortBy(Object? Function(T a) f)                    // chain (sync) — still lazy, call .toList()
 Future&lt;List&lt;T&gt;&gt; FxAsync.sortBy(Object? Function(T a) f)     // chain (async) — already a terminal</div>
 
   <h2>Lecture</h2>
@@ -69,7 +69,7 @@ Future&lt;List&lt;T&gt;&gt; FxAsync.sortBy(Object? Function(T a) f)     // chain
     input. And the same chain-form nuance applies too — on the sync
     <code>Fx</code> chain, <code>.sortBy(f)</code> returns another
     <code>Fx&lt;T&gt;</code>, so you still need
-    <code><a href="../101/index.html">.toArray()</a></code> to materialize
+    <code><a href="../101/index.html">.toList()</a></code> to materialize
     it, while on the <code>FxAsync</code> chain, <code>.sortBy(f)</code> is
     already a terminal returning <code>Future&lt;List&lt;T&gt;&gt;</code>.
   </p>
@@ -97,7 +97,7 @@ void main() {
   print(byAge.map((p) => p['name']).toList()); // [lee, kim, park]
 
   // Chain form:
-  final byName = fx(people).sortBy((p) => p['name']).toArray();
+  final byName = fx(people).sortBy((p) => p['name']).toList();
   print(byName.map((p) => p['name']).toList()); // [kim, lee, park]
 }
 </textarea>

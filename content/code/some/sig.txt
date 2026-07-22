@@ -1,4 +1,5 @@
-bool some&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
-Future&lt;bool&gt; someAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
-bool Fx.some(bool Function(T a) f)                     // chain
-Future&lt;bool&gt; FxAsync.some(FutureOr&lt;bool&gt; Function(T a) f)  // chain
+bool any&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;bool&gt; anyAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+bool Fx.any(bool Function(T a) f)                     // chain (inherited from Iterable)
+Future&lt;bool&gt; FxAsync.any(FutureOr&lt;bool&gt; Function(T a) f)  // chain
+bool some&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)  // FxTS alias

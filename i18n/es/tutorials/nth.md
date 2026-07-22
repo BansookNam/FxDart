@@ -2,9 +2,9 @@
 slug: nth
 title: nth — FxDart 101
 description: Tutorial de nth en FxDart: obtén con seguridad el elemento de un índice, con null si queda fuera de rango, y un playground en vivo.
-heading: <code>nth</code>
+heading: <code>elementAtOrNull</code>
 section: 8
-crumb: nth
+crumb: elementAtOrNull
 prev: last.html
 prevLabel: last
 next: find.html

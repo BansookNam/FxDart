@@ -2,9 +2,9 @@
 slug: uniqBy
 title: uniqBy — FxDart 101
 description: FxDart uniqBy 튜토리얼: 계산된 키를 기준으로 중복을 제거하는 방법을 라이브 플레이그라운드와 함께 익힙니다.
-heading: <code>uniqBy</code>
+heading: <code>distinctBy</code>
 section: 4
-crumb: uniqBy
+crumb: distinctBy
 prev: uniq.html
 prevLabel: uniq
 next: difference.html

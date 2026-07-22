@@ -32,7 +32,7 @@ nextLabel: createSeededRandom
   </p>
   <p>
     <code>shuffleAsync</code> is the <code>*Async</code> twin: it materializes
-    an <code>FxAsyncIterable</code> first (via <code>toArrayAsync</code>
+    an <code>FxAsyncIterable</code> first (via <code>toListAsync</code>
     internally) and then shuffles the result, so a seeded async shuffle
     produces the identical order to its sync counterpart given the same seed.
   </p>

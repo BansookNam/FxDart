@@ -88,7 +88,7 @@ void main() {
     print('$name is $age');
   }
 
-  print(toArray(entries(ages))); // [(kim, 32), (lee, 27), (park, 41)]
+  print(toList(entries(ages))); // [(kim, 32), (lee, 27), (park, 41)]
 }
 </textarea>
   </div>
@@ -108,7 +108,7 @@ void main() {
   final inStock = fx(entries(inventory))
       .filter((e) => e.$2 > 0)
       .map((e) => '${e.$1}: ${e.$2}')
-      .toArray();
+      .toList();
 
   print(inStock); // [apples: 4, cherries: 12]
 }
@@ -128,7 +128,7 @@ void main() {
   // where >= 60 is a PASS.
   final report = fx(entries(scores))
       .map((e) => '${e.$1}: ${e.$2 >= 60 ? 'PASS' : 'FAIL'}')
-      .toArray();
+      .toList();
 
   report.forEach(print);
 }

@@ -58,7 +58,7 @@ Future&lt;void&gt; FxAsync.consume([int? n])</div>
     <code>mapEffect</code> steps are upstream for their side effects — but
     discards every value instead of collecting or forwarding it. Reach for
     it when the whole point of a pipeline is its side effects, and building
-    a <code>List</code> with <code>toArray</code> would just be wasted
+    a <code>List</code> with <code>toList</code> would just be wasted
     allocation.
   </p>
   <p>
@@ -152,7 +152,7 @@ void main() {
   <div class="callout">
     <strong>Related:</strong>
     <a href="each.html"><code>each</code></a> — terminal op that also runs f, without the n-limit shortcut ·
-    <a href="toArray.html"><code>toArray</code></a> — terminal op that collects results instead ·
+    <a href="toList.html"><code>toList</code></a> — terminal op that collects results instead ·
     <a href="cycle.html"><code>cycle</code></a> — an infinite source consume is often paired with ·
     <a href="peek.html"><code>peek</code></a> — the lazy side-effect step consume typically forces
   </div>

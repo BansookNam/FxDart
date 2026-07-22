@@ -5,7 +5,7 @@ void main() {
   final isCorrect = [false, true, true, false];
 
   // TODO: use compress to keep only the correct answers.
-  final correctAnswers = toArray(answers);
+  final correctAnswers = toList(answers);
 
   print(correctAnswers);
 }

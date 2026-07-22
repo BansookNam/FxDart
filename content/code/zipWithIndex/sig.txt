@@ -1,4 +1,5 @@
-Iterable&lt;(int, A)&gt; zipWithIndex&lt;A&gt;(Iterable&lt;A&gt; iterable)
-FxAsyncIterable&lt;(int, A)&gt; zipWithIndexAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;(int, T)&gt; Fx.zipWithIndex()        // chain
-FxAsync&lt;(int, T)&gt; FxAsync.zipWithIndex()
+Iterable&lt;(int, A)&gt; indexed&lt;A&gt;(Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;(int, A)&gt; indexedAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+Iterable&lt;(int, T)&gt; Fx.indexed         // sync chain: inherited Iterable getter, no parens
+FxAsync&lt;(int, T)&gt; FxAsync.indexed()   // async chain
+Iterable&lt;(int, A)&gt; zipWithIndex&lt;A&gt;(Iterable&lt;A&gt; iterable)  // FxTS alias

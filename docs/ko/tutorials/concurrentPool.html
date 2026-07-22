@@ -42,6 +42,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 11 · 비동기 &amp; 동시성 › <strong>concurrentPool</strong></p>
   <h1><code>concurrentPool</code></h1>
   <p class="hero-sub">concurrent와 같지만 결과를 완료 순서대로 내보냅니다 — 먼저 끝난 것이 먼저 나옵니다.</p>
@@ -65,14 +66,14 @@ FxAsync&lt;T&gt; FxAsync.concurrentPool(int length)        // chain</div>
     하류의 요구 마커에 의해 구동되는 <code>concurrent</code>와 달리,
     <code>concurrentPool</code>은 <strong>적극적으로 풀을 가득 채웁니다</strong>.
     첫 pull부터 소비자가 몇 개를 기다리든 상관없이 최대 <code>n</code>개의
-    요청을 계속 진행 상태로 유지합니다. 그래서 <code>.toArray()</code>나
+    요청을 계속 진행 상태로 유지합니다. 그래서 <code>.toList()</code>나
     <code>.each()</code>처럼 한 번에 하나씩만 당겨 가는 종결 연산자도 온전한
     중첩 실행 효과를 얻으며, 결과는 끝나는 순서대로 보게 됩니다.
   </p>
 
   <h2>데모 1 · 완료 순서</h2>
   <p>항목 1이 가장 느리고(300ms) 항목 2가 가장 빠릅니다(100ms). 결과는
-    <code>.toArray()</code>에서 곧바로 빠른 것부터 나옵니다.</p>
+    <code>.toList()</code>에서 곧바로 빠른 것부터 나옵니다.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -85,7 +86,7 @@ Future<void> main() async {
       .toAsync()
       .map((i) => delay(Duration(milliseconds: delays[i - 1]), 'item$i'))
       .concurrentPool(3)
-      .toArray();
+      .toList();
 
   print(results); // [item2, item3, item1] — completion order
   print('took ${sw.elapsedMilliseconds}ms'); // ~300ms (the slowest one)

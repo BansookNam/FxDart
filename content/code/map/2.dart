@@ -8,7 +8,7 @@ void main() {
   ];
 
   // TODO: map each person to '<NAME IN UPPERCASE> (<age>)'
-  final labels = fx(people).map((p) => '$p').toArray();
+  final labels = fx(people).map((p) => '$p').toList();
 
   labels.forEach(print);
 }

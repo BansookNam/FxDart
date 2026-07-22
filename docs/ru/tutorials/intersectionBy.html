@@ -96,7 +96,7 @@ void main() {
   ];
 
   final featuredProducts = intersectionBy((p) => p['sku'], featured, catalog);
-  print(toArray(featuredProducts));
+  print(toList(featuredProducts));
   // [{sku: A1, title: Keyboard}, {sku: B2, title: Mouse}]
 }
 </textarea>
@@ -121,7 +121,7 @@ Future<void> main() async {
 
   final featuredProducts = await fxAsync(
           intersectionByAsync((p) => p['sku'], featured, catalog))
-      .toArray();
+      .toList();
 
   print(featuredProducts); // [{sku: A1, title: Keyboard}]
   print('took ${sw.elapsedMilliseconds}ms'); // ~100ms
@@ -147,7 +147,7 @@ void main() {
 
   // TODO: use intersectionBy (keyed on 'sku') to find products that are
   // on sale.
-  final saleProducts = toArray(products);
+  final saleProducts = toList(products);
 
   print(saleProducts);
 }

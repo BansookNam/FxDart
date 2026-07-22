@@ -42,13 +42,14 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>sortBy</strong></p>
   <h1><code>sortBy</code></h1>
   <p class="hero-sub">Ordena de forma ascendente por una clave que extraes, en lugar de escribir un comparador a mano.</p>
 
   <div class="signature">List&lt;A&gt; sortBy&lt;A&gt;(Object? Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;List&lt;A&gt;&gt; sortByAsync&lt;A&gt;(Object? Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;T&gt; Fx.sortBy(Object? Function(T a) f)                    // chain (sync) — still lazy, call .toArray()
+Fx&lt;T&gt; Fx.sortBy(Object? Function(T a) f)                    // chain (sync) — still lazy, call .toList()
 Future&lt;List&lt;T&gt;&gt; FxAsync.sortBy(Object? Function(T a) f)     // chain (async) — already a terminal</div>
 
   <h2>Lección</h2>
@@ -67,7 +68,7 @@ Future&lt;List&lt;T&gt;&gt; FxAsync.sortBy(Object? Function(T a) f)     // chain
     la entrada. Y el mismo matiz de la forma de cadena también se aplica: en la
     cadena síncrona <code>Fx</code>, <code>.sortBy(f)</code> devuelve otro
     <code>Fx&lt;T&gt;</code>, así que sigues necesitando
-    <code><a href="../101/index.html">.toArray()</a></code> para materializarlo,
+    <code><a href="../101/index.html">.toList()</a></code> para materializarlo,
     mientras que en la cadena <code>FxAsync</code>, <code>.sortBy(f)</code> ya
     es un terminal que devuelve <code>Future&lt;List&lt;T&gt;&gt;</code>.
   </p>
@@ -95,7 +96,7 @@ void main() {
   print(byAge.map((p) => p['name']).toList()); // [lee, kim, park]
 
   // Chain form:
-  final byName = fx(people).sortBy((p) => p['name']).toArray();
+  final byName = fx(people).sortBy((p) => p['name']).toList();
   print(byName.map((p) => p['name']).toList()); // [kim, lee, park]
 }
 </textarea>

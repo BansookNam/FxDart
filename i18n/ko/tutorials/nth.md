@@ -2,9 +2,9 @@
 slug: nth
 title: nth — FxDart 101
 description: FxDart nth 튜토리얼: 특정 인덱스의 원소를 안전하게 꺼내고 범위를 벗어나면 null을 얻는 방법을 라이브 플레이그라운드와 함께 알아봅니다.
-heading: <code>nth</code>
+heading: <code>elementAtOrNull</code>
 section: 8
-crumb: nth
+crumb: elementAtOrNull
 prev: last.html
 prevLabel: last
 next: find.html

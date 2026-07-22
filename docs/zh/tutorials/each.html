@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>each — FxDart 101</title>
-  <meta name="description" content="FxDart each tutorial: run a function for its side effects over every element of a lazy chain, sync and async.">
+  <title>forEach — FxDart 101</title>
+  <meta name="description" content="FxDart forEach tutorial: run a function for its side effects over every element of a lazy chain, sync and async.">
   <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/each.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/each.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/each.html">
@@ -44,18 +44,21 @@
 </header>
 <main>
   <p class="i18n-banner">本页尚未翻译，因此以英文显示。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">参与翻译</a></p>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 入门</a> › 章节 1 · 快速上手 › <strong>each</strong></p>
-  <h1><code>each</code></h1>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 入门</a> › 章节 1 · 快速上手 › <strong>forEach</strong></p>
+  <h1><code>forEach</code></h1>
   <p class="hero-sub">Runs a function once per element, purely for its side effects.</p>
 
-  <div class="signature">void each&lt;A&gt;(void Function(A a) f, Iterable&lt;A&gt; iterable)
-Future&lt;void&gt; eachAsync&lt;A&gt;(FutureOr&lt;void&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
-void Fx.each(void Function(T a) f)        // chain
-Future&lt;void&gt; FxAsync.each(FutureOr&lt;void&gt; Function(T a) f)</div>
+  <div class="signature">void forEach&lt;A&gt;(void Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;void&gt; forEachAsync&lt;A&gt;(FutureOr&lt;void&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+void Fx.forEach(void Function(T a) f)        // chain (inherited from Iterable)
+Future&lt;void&gt; FxAsync.forEach(FutureOr&lt;void&gt; Function(T a) f)  // chain
+void each&lt;A&gt;(void Function(A a) f, Iterable&lt;A&gt; iterable)  // FxTS alias</div>
 
   <h2>Lecture</h2>
   <p>
-    <code>each</code> is a terminal operator, like <code>toArray</code> —
+    <code>forEach</code> is the Dart-idiomatic name; fxdart also accepts the
+    FxTS spelling <code>each</code> — they're the same operator. It's a
+    terminal operator, like <code>toList</code> —
     calling it pulls every value through the whole chain. The difference is
     what it does with those values: instead of collecting them into a
     <code>List</code>, it just runs <code>f</code> for each one and returns
@@ -64,17 +67,18 @@ Future&lt;void&gt; FxAsync.each(FutureOr&lt;void&gt; Function(T a) f)</div>
     values back.
   </p>
   <p>
-    It's the FxTS-flavored twin of Dart's own <code>Iterable.forEach</code> —
-    the same idea, given a name consistent with the rest of the FxTS API so
-    it composes naturally with the rest of the chain vocabulary.
+    On a sync chain, <code>.forEach(f)</code> is Dart's own
+    <code>Iterable.forEach</code>, inherited by <code>Fx</code>; the async
+    chain and the data-first <code>forEach(f, iterable)</code> form are
+    supplied by fxdart so the operator reads the same everywhere.
   </p>
   <p>
-    <code>eachAsync</code> (or <code>.each()</code> on an
+    <code>forEachAsync</code> (or <code>.forEach()</code> on an
     <code>FxAsync</code> chain) awaits <code>f</code> for every element,
     strictly in the order the elements arrive — even if some individual
-    calls would finish faster than others, <code>each</code> always
+    calls would finish faster than others, <code>forEach</code> always
     processes one at a time in sequence. If you want overlap, add
-    <code>.concurrent(n)</code> upstream before <code>.each()</code>.
+    <code>.concurrent(n)</code> upstream before <code>.forEach()</code>.
   </p>
 
   <h2>Demo 1 · Basics</h2>
@@ -84,10 +88,10 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   // Data-first form: run f for side effects, get nothing back.
-  each((a) => print('data-first: $a'), [1, 2, 3]);
+  forEach((a) => print('data-first: $a'), [1, 2, 3]);
 
-  // Chain form:
-  fx(['a', 'b', 'c']).each((a) => print('chain: $a'));
+  // Chain form (inherited from Iterable). FxTS alias: each is the same op.
+  fx(['a', 'b', 'c']).forEach((a) => print('chain: $a'));
 }
 </textarea>
   </div>
@@ -95,7 +99,7 @@ void main() {
   <h2>Demo 2 · Async, strictly in order</h2>
   <p>
     Even though each element sleeps for a <em>different</em> length of
-    time, <code>eachAsync</code> still processes them 1, 2, 3 — never out
+    time, <code>forEachAsync</code> still processes them 1, 2, 3 — never out
     of order:
   </p>
   <div class="playground">
@@ -103,9 +107,9 @@ void main() {
 import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
-  // eachAsync awaits f for every element, strictly in order — even though
+  // forEachAsync awaits f for every element, strictly in order — even though
   // each delay is a different length, they always print as 1, 2, 3.
-  await fx([1, 2, 3]).toAsync().each((a) async {
+  await fx([1, 2, 3]).toAsync().forEach((a) async {
     await sleep(Duration(milliseconds: 50 * (4 - a)));
     print('processed $a');
   });
@@ -116,7 +120,7 @@ Future<void> main() async {
   </div>
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>each</code> to print a receipt line for every
+  <p>Exercise: use <code>forEach</code> to print a receipt line for every
     order and keep a running total.</p>
   <div class="playground">
 <textarea>
@@ -125,9 +129,9 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final orders = [12.5, 30.0, 7.25];
 
-  // TODO: use each to print a receipt line for every order.
+  // TODO: use forEach to print a receipt line for every order.
   var total = 0.0;
-  fx(orders).each((price) {
+  fx(orders).forEach((price) {
     total += price;
     print('charged \$$price');
   });
@@ -139,14 +143,14 @@ void main() {
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="toArray.html"><code>toArray</code></a> — terminal op that collects a List instead ·
+    <a href="toList.html"><code>toList</code></a> — terminal op that collects a List instead ·
     <a href="consume.html"><code>consume</code></a> — terminal op that discards results and can stop early ·
     <a href="peek.html"><code>peek</code></a> — same idea, but lazy (not terminal) ·
-    <a href="fx.html"><code>fx</code></a> — the chain that each terminates
+    <a href="fx.html"><code>fx</code></a> — the chain that forEach terminates
   </div>
 
   <nav class="tut-nav">
-    <a href="toArray.html">← 上一节： toArray</a>
+    <a href="toList.html">← 上一节： toList</a>
     <a href="consume.html">下一节： consume →</a>
   </nav>
 </main>

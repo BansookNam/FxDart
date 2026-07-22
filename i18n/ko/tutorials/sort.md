@@ -37,7 +37,7 @@ nextLabel: sortBy
     또 다른 <code>Fx&lt;T&gt;</code>를 반환합니다 —
     <code>List&lt;T&gt;</code>가 아닙니다. <code>Fx</code>가 계속 체이닝할 수 있도록 내부의 정렬된
     리스트를 감싸기 때문입니다. 여전히
-    <code><a href="../101/index.html">.toArray()</a></code> 같은 종결
+    <code><a href="../101/index.html">.toList()</a></code> 같은 종결
     연산자를 거쳐야 구체적인 <code>List</code>를 얻을 수 있습니다.
     <strong>비동기</strong> 체인에는 이런
     사정이 없습니다. <code>FxAsync.sort(f)</code>는 그 자체가 종결

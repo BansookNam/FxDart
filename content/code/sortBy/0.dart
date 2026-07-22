@@ -13,6 +13,6 @@ void main() {
   print(byAge.map((p) => p['name']).toList()); // [lee, kim, park]
 
   // Chain form:
-  final byName = fx(people).sortBy((p) => p['name']).toArray();
+  final byName = fx(people).sortBy((p) => p['name']).toList();
   print(byName.map((p) => p['name']).toList()); // [kim, lee, park]
 }

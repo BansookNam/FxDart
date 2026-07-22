@@ -5,7 +5,7 @@ Future<void> main() async {
       .toAsync()
       .map((a) => delay(Duration(milliseconds: 50), a))
       .slice(1, 4)
-      .toArray();
+      .toList();
 
   print(result); // [20, 30, 40]
 }

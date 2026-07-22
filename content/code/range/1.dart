@@ -10,7 +10,7 @@ void main() {
         return a * a;
       })
       .take(4)
-      .toArray();
+      .toList();
 
   print(result);          // [0, 1, 4, 9]
   print('calls: $calls'); // 4 — not 1000000

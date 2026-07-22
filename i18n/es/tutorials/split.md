@@ -47,6 +47,6 @@ nextLabel: append
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="chunk.html"><code>chunk</code></a> — agrupa por tamaño fijo en lugar de por separador ·
-    <a href="unicodeToArray.html"><code>unicodeToArray</code></a> — obtén un array de caracteres correcto (consciente de los grafemas) ·
+    <a href="unicodeToList.html"><code>unicodeToList</code></a> — obtén un array de caracteres correcto (consciente de los grafemas) ·
     <a href="join.html"><code>join</code></a> — la operación inversa
   </div>

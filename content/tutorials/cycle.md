@@ -21,7 +21,7 @@ nextLabel: entries
     buffer forever. Unlike everything else in this section,
     <code>cycle</code> never runs out on its own — you must always pair it
     with something that decides when to stop, almost always
-    <code>.take(n)</code>. Calling <code>toArray()</code> or
+    <code>.take(n)</code>. Calling <code>toList()</code> or
     <code>consume()</code> directly on a bare <code>cycle(...)</code>
     without a bound in between will hang.
   </p>

@@ -14,7 +14,7 @@ Future<void> main() async {
   ]).toAsync().map((u) => delay(Duration(milliseconds: 100), u)).concurrent(3);
 
   final allowed =
-      await fxAsync(differenceByAsync((u) => u['id'], blocked, users)).toArray();
+      await fxAsync(differenceByAsync((u) => u['id'], blocked, users)).toList();
 
   print(allowed); // [{id: 1, name: kim}, {id: 3, name: park}]
   print('took ${sw.elapsedMilliseconds}ms'); // ~100ms

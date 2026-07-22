@@ -49,7 +49,7 @@
   <div class="signature">List&lt;A&gt; sort&lt;A&gt;(int Function(A a, A b) f, Iterable&lt;A&gt; iterable)
 List&lt;A&gt; toSorted&lt;A&gt;(int Function(A a, A b) f, Iterable&lt;A&gt; iterable)   // alias of sort
 Future&lt;List&lt;A&gt;&gt; sortAsync&lt;A&gt;(int Function(A a, A b) f, FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;T&gt; Fx.sort(int Function(T a, T b) f)                    // chain (sync) — still lazy, call .toArray()
+Fx&lt;T&gt; Fx.sort(int Function(T a, T b) f)                    // chain (sync) — still lazy, call .toList()
 Future&lt;List&lt;T&gt;&gt; FxAsync.sort(int Function(T a, T b) f)     // chain (async) — already a terminal</div>
 
   <h2>Lecture</h2>
@@ -72,7 +72,7 @@ Future&lt;List&lt;T&gt;&gt; FxAsync.sort(int Function(T a, T b) f)     // chain 
     returns another <code>Fx&lt;T&gt;</code> — not a <code>List&lt;T&gt;</code> —
     because <code>Fx</code> wraps its underlying sorted list to stay
     chainable. You still need a terminal like
-    <code><a href="../101/index.html">.toArray()</a></code> to get a
+    <code><a href="../101/index.html">.toList()</a></code> to get a
     concrete <code>List</code> out of it. The <strong>async</strong> chain
     doesn't have that wrinkle: <code>FxAsync.sort(f)</code> is already a
     terminal that returns <code>Future&lt;List&lt;T&gt;&gt;</code> directly,
@@ -103,8 +103,8 @@ void main() {
   print(toSorted<int>((a, b) => b.compareTo(a), original)); // [9, 8, 5, 2, 1]
 
   // Chain form: .sort(f) returns another Fx (still lazy on paper), so pull
-  // it with .toArray() to get a concrete List:
-  final chained = fx(original).sort((a, b) => a.compareTo(b)).toArray();
+  // it with .toList() to get a concrete List:
+  final chained = fx(original).sort((a, b) => a.compareTo(b)).toList();
   print(chained); // [1, 2, 5, 8, 9]
 }
 </textarea>
@@ -117,7 +117,7 @@ import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
   // On the async chain, .sort(f) is already a terminal that returns
-  // Future<List<T>> directly (no extra .toArray() needed).
+  // Future<List<T>> directly (no extra .toList() needed).
   final result = await fx([5, 2, 8, 1, 9])
       .toAsync()
       .map((a) => delay(const Duration(milliseconds: 100), a))

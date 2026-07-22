@@ -1,7 +1,7 @@
 ---
 slug: predicates
 title: predicates — FxDart 101
-description: FxDart의 타입 술어 모음 - isNull, isBoolean, isNumber, isString, isDate, isList, isMap 등을 filter에 그대로 넘길 수 있는 tear-off 함수로 제공합니다.
+description: FxDart의 타입 술어 모음 - isNull, isBool, isNum, isString, isDateTime, isList, isMap 등을 filter에 그대로 넘길 수 있는 tear-off 함수로 제공합니다.
 heading: <code>predicates</code>
 section: 8
 crumb: predicates

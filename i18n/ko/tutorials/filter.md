@@ -2,9 +2,9 @@
 slug: filter
 title: filter — FxDart 101
 description: FxDart filter 튜토리얼: 술어가 통과시킨 원소만 남기는 방법을 동기와 비동기 양쪽에서 라이브 플레이그라운드와 함께 익힙니다.
-heading: <code>filter</code>
+heading: <code>where</code>
 section: 4
-crumb: filter
+crumb: where
 prev: pluck.html
 prevLabel: pluck
 next: reject.html

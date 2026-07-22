@@ -2,9 +2,9 @@
 slug: dropWhile
 title: dropWhile — FxDart 101
 description: Tutorial de dropWhile en FxDart: omite valores mientras se cumpla un predicado y luego emite el resto, con un playground en vivo.
-heading: <code>dropWhile</code>
+heading: <code>skipWhile</code>
 section: 5
-crumb: dropWhile
+crumb: skipWhile
 prev: dropRight.html
 prevLabel: dropRight
 next: dropUntil.html

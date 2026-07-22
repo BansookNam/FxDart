@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>includes — FxDart 101</title>
-  <meta name="description" content="FxDart includes tutorial: check membership in an iterable with ==, short-circuiting, sync and async.">
+  <title>contains — FxDart 101</title>
+  <meta name="description" content="FxDart contains tutorial: check membership in an iterable with ==, short-circuiting, sync and async.">
   <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/includes.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/includes.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/includes.html">
@@ -44,19 +44,24 @@
 </header>
 <main>
   <p class="i18n-banner">本页尚未翻译，因此以英文显示。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">参与翻译</a></p>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 入门</a> › 章节 8 · 取值 &amp; 判定 › <strong>includes</strong></p>
-  <h1><code>includes</code></h1>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 入门</a> › 章节 8 · 取值 &amp; 判定 › <strong>contains</strong></p>
+  <h1><code>contains</code></h1>
   <p class="hero-sub">Returns true when an iterable contains a value, compared with <code>==</code>.</p>
 
-  <div class="signature">bool includes&lt;A&gt;(A a, Iterable&lt;A&gt; iterable)
-Future&lt;bool&gt; includesAsync&lt;A&gt;(A a, FxAsyncIterable&lt;A&gt; iterable)</div>
+  <div class="signature">bool Fx.contains(Object? a)              // chain — inherited from Iterable (Dart idiom)
+bool includes&lt;A&gt;(A a, Iterable&lt;A&gt; iterable)  // top-level: no `contains` (collides with package:test)
+Future&lt;bool&gt; includesAsync&lt;A&gt;(A a, FxAsyncIterable&lt;A&gt; iterable)  // top-level async</div>
 
   <h2>Lecture</h2>
   <p>
-    <code>includes</code> is a thin, FxTS-shaped wrapper: on the sync side
-    it's literally <code>iterable.contains(a)</code>, so there's no separate
-    chain method — <code>Fx</code> already inherits <code>.contains()</code>
-    from <code>Iterable</code>, and it behaves identically. The async
+    <code>contains</code> is the Dart-idiomatic name for membership testing,
+    and on a chain you already have it: <code>Fx</code> inherits
+    <code>.contains()</code> from <code>Iterable</code>, so
+    <code>fx(xs).contains(a)</code> just works. There is no top-level
+    <code>contains</code> function, though — the name collides with
+    <code>package:test</code>'s matcher — so the data-first form keeps its
+    FxTS spelling <code>includes(a, iterable)</code>, which is literally
+    <code>iterable.contains(a)</code>. The async
     version, <code>includesAsync</code>, is built on top of
     <a href="some.html"><code>someAsync</code></a> (<code>b == a</code> as
     the predicate), which means it inherits the same short-circuiting: it
@@ -74,10 +79,13 @@ Future&lt;bool&gt; includesAsync&lt;A&gt;(A a, FxAsyncIterable&lt;A&gt; iterable
 import 'package:fxdart/fxdart.dart';
 
 void main() {
-  print(includes(3, [1, 2, 3])); // true
-  print(includes(9, [1, 2, 3])); // false
+  // Chain form: Fx inherits Dart's own .contains — the idiomatic name.
+  print(fx([1, 2, 3]).contains(3)); // true
+  print(fx([1, 2, 3]).contains(9)); // false
 
-  // Chain form is Iterable's own .contains — same semantics:
+  // Data-first form keeps the FxTS name `includes` — there's no top-level
+  // `contains` (it collides with package:test's matcher):
+  print(includes(3, [1, 2, 3]));         // true
   print(fx(['a', 'b', 'c']).contains('b')); // true
 }
 </textarea>
@@ -100,7 +108,7 @@ Future<void> main() async {
   </div>
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>includes</code> to check whether <code>requestId</code> is allowed.</p>
+  <p>Exercise: use <code>contains</code> to check whether <code>requestId</code> is allowed.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -108,7 +116,7 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final allowedIds = [101, 102, 103];
 
-  // TODO: use includes to check whether requestId is allowed
+  // TODO: use contains to check whether requestId is allowed
   const requestId = 102;
   final allowed = false;
 

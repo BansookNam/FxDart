@@ -1,10 +1,10 @@
 ---
 slug: find
-title: find — FxDart 101
-description: FxDart find tutorial: get the first element matching a predicate, lazy and short-circuiting, null when nothing matches.
-heading: <code>find</code>
+title: firstWhereOrNull — FxDart 101
+description: FxDart firstWhereOrNull tutorial: get the first element matching a predicate, lazy and short-circuiting, null when nothing matches.
+heading: <code>firstWhereOrNull</code>
 section: 8
-crumb: find
+crumb: firstWhereOrNull
 prev: nth.html
 prevLabel: nth
 next: findIndex.html
@@ -16,7 +16,9 @@ nextLabel: findIndex
 
   <h2>Lecture</h2>
   <p>
-    <code>find</code> is what <code>head</code> and <code>filter</code>
+    <code>firstWhereOrNull</code> is the Dart-idiomatic name; fxdart also
+    accepts the FxTS spelling <code>find</code> — they're the same operator.
+    It's what <code>head</code> and <code>filter</code>
     look like fused together — in fact it's implemented as exactly that:
     <code>head(filter(f, iterable))</code>. That fusion is what makes it
     lazy and short-circuiting: it pulls elements one at a time, testing each
@@ -37,7 +39,7 @@ nextLabel: findIndex
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>find</code> to get the first item with <code>qty &gt; 0</code>, or <code>null</code>.</p>
+  <p>Exercise: use <code>firstWhereOrNull</code> to get the first item with <code>qty &gt; 0</code>, or <code>null</code>.</p>
   {{playground:2}}
 
   <div class="callout">

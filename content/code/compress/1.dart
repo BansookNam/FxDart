@@ -13,7 +13,7 @@ Future<void> main() async {
 
   final selected =
       await fxAsync(compressAsync([true, false, true, false], fetched))
-          .toArray();
+          .toList();
 
   print(selected); // [alice, carol]
   print('took ${sw.elapsedMilliseconds}ms'); // ~100ms

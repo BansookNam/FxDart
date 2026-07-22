@@ -7,8 +7,8 @@ section: 10
 crumb: delay &amp; sleep
 prev: comparisons.html
 prevLabel: gt · gte · lt · lte
-next: unicodeToArray.html
-nextLabel: unicodeToArray
+next: unicodeToList.html
+nextLabel: unicodeToList
 ---
   <p class="hero-sub">Wait for a bit, then produce a value (delay) — or just wait (sleep).</p>
 

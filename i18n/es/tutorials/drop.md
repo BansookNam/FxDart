@@ -2,9 +2,9 @@
 slug: drop
 title: drop — FxDart 101
 description: Tutorial de drop en FxDart: omite los primeros n valores de un pipeline perezoso, con un playground en vivo.
-heading: <code>drop</code>
+heading: <code>skip</code>
 section: 5
-crumb: drop
+crumb: skip
 prev: takeUntilInclusive.html
 prevLabel: takeUntilInclusive
 next: dropRight.html

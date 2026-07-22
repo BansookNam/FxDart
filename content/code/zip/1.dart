@@ -10,7 +10,7 @@ Future<void> main() async {
   final ages =
       fx([10, 20, 30]).toAsync().map((a) => delay(Duration(milliseconds: 100), a));
 
-  final result = await toArrayAsync(zipAsync(names, ages));
+  final result = await toListAsync(zipAsync(names, ages));
   print(result); // [(n1, 10), (n2, 20), (n3, 30)]
   print('took ${sw.elapsedMilliseconds}ms'); // ~300ms, not 600ms
 }

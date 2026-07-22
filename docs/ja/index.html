@@ -42,6 +42,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">この翻訳は最新ではない可能性があります — 翻訳後に英語版のページが更新されています。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
   <p class="hero-logo"><img src="../assets/logo-web.png" width="960" height="294"
       alt="FxDart"></p>
   <h1>遅延評価と並行処理を備えた、<br>Dart のための関数型プログラミング。</h1>
@@ -60,7 +61,7 @@ void main() {
   final result = fx([1, 2, 3, 4, 5])
       .map((a) => a + 10)
       .filter((a) => a % 2 == 0)
-      .toArray();
+      .toList();
 
   print(result); // [12, 14]
 }
@@ -78,7 +79,7 @@ void main() {
   <ul>
     <li><strong>遅延評価</strong> — <code>map</code>、<code>filter</code>、
       <code>take</code> といった演算子はパイプラインを組み立てるだけで、
-      終端演算子（<code>toArray</code>、<code>each</code>、
+      終端演算子（<code>toList</code>、<code>each</code>、
       <code>reduce</code> など）が値を引き出すまで何も処理しません。100万要素の
       range を <code>.take(3)</code> で処理すると、計算されるのはちょうど3件です。</li>
     <li><strong>同期と非同期で同一のモデル</strong> — 同じ演算子名が素の
@@ -159,7 +160,7 @@ Future<void> main() async {
       .toAsync()
       .map((id) => delay(Duration(milliseconds: 300), 'user$id'))
       .concurrent(3) // ← try 1 (sequential) or 6 (all at once)
-      .toArray();
+      .toList();
 
   print(users);
   print('took ${sw.elapsedMilliseconds}ms');

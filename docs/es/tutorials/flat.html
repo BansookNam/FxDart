@@ -42,14 +42,16 @@
   </div>
 </header>
 <main>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 3 · Transformar › <strong>flat</strong></p>
-  <h1><code>flat</code></h1>
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 3 · Transformar › <strong>flattened</strong></p>
+  <h1><code>flattened</code></h1>
   <p class="hero-sub">Aplana iterables anidados hasta la profundidad indicada — las cadenas se dejan intactas.</p>
 
-  <div class="signature">Iterable&lt;dynamic&gt; flat(Iterable&lt;dynamic&gt; iterable, [int depth = 1])
-FxAsyncIterable&lt;dynamic&gt; flatAsync(FxAsyncIterable&lt;dynamic&gt; iterable, [int depth = 1])
-Fx&lt;dynamic&gt; Fx.flat([int depth = 1])        // chain
-FxAsync&lt;dynamic&gt; FxAsync.flat([int depth = 1])</div>
+  <div class="signature">Iterable&lt;dynamic&gt; flattened(Iterable&lt;dynamic&gt; iterable, [int depth = 1])
+FxAsyncIterable&lt;dynamic&gt; flattenedAsync(FxAsyncIterable&lt;dynamic&gt; iterable, [int depth = 1])
+Fx&lt;dynamic&gt; Fx.flattened([int depth = 1])        // chain
+FxAsync&lt;dynamic&gt; FxAsync.flattened([int depth = 1])
+Iterable&lt;dynamic&gt; flat(...)        // FxTS alias</div>
 
   <h2>Lección</h2>
   <p>
@@ -93,11 +95,12 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   // Data-first form. Returns Iterable<dynamic> -- Dart has no type for
   // "however deep this nesting goes", so the depth is decided at runtime.
-  print(toArray(flat([1, [2, 3], [4, [5]]])));       // [1, 2, 3, 4, [5]]
-  print(toArray(flat([1, [2, [3]]], 2)));             // [1, 2, 3]
+  print(toList(flattened([1, [2, 3], [4, [5]]])));   // [1, 2, 3, 4, [5]]
+  print(toList(flattened([1, [2, [3]]], 2)));        // [1, 2, 3]
+  // FxTS alias: flat([1, [2, 3]]) is identical.
 
   // Chain form:
-  final chained = fx([1, 2, [3, 4]]).flat().toArray();
+  final chained = fx([1, 2, [3, 4]]).flattened().toList();
   print(chained); // [1, 2, 3, 4]
 }
 </textarea>
@@ -115,14 +118,14 @@ import 'package:fxdart/fxdart.dart';
 Future<void> main() async {
   final sw = Stopwatch()..start();
 
-  // Each fetch (concurrent) resolves to a small nested list; flat()
+  // Each fetch (concurrent) resolves to a small nested list; flattened()
   // flattens the already-resolved, purely synchronous nesting.
   final result = await fx([1, 2, 3])
       .toAsync()
       .map((id) => delay(Duration(milliseconds: 100), [id, [id * 10]]))
       .concurrent(3)
-      .flat()
-      .toArray();
+      .flattened() // FxTS alias: .flat()
+      .toList();
 
   print(result); // [1, [10], 2, [20], 3, [30]] -- dynamic, see Lecture
   print('took ${sw.elapsedMilliseconds}ms'); // ~100ms
@@ -143,8 +146,8 @@ void main() {
     [77, [95, 60]],
   ];
 
-  // TODO: use flat() to flatten scoreGroups by one level.
-  final scores = fx(scoreGroups).toArray();
+  // TODO: use flattened() to flatten scoreGroups by one level.
+  final scores = fx(scoreGroups).toList();
 
   print(scores);
 }

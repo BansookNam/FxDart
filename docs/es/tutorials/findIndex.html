@@ -42,14 +42,16 @@
   </div>
 </header>
 <main>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 8 · Acceso &amp; predicados › <strong>findIndex</strong></p>
-  <h1><code>findIndex</code></h1>
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 8 · Acceso &amp; predicados › <strong>indexWhere</strong></p>
+  <h1><code>indexWhere</code></h1>
   <p class="hero-sub">Devuelve el índice del primer elemento para el que el predicado es cierto, o <code>-1</code>.</p>
 
-  <div class="signature">int findIndex&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
-Future&lt;int&gt; findIndexAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
-int Fx.findIndex(bool Function(T a) f)              // chain
-Future&lt;int&gt; FxAsync.findIndex(FutureOr&lt;bool&gt; Function(T a) f)  // chain</div>
+  <div class="signature">int indexWhere&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;int&gt; indexWhereAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+int Fx.indexWhere(bool Function(T a) f)              // chain
+Future&lt;int&gt; FxAsync.indexWhere(FutureOr&lt;bool&gt; Function(T a) f)  // chain
+int findIndex&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)  // FxTS alias</div>
 
   <h2>Lección</h2>
   <p>
@@ -76,8 +78,9 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   final nums = [4, 8, 15, 16, 23, 42];
-  print(findIndex((a) => a > 15, nums));      // 3
-  print(fx(nums).findIndex((a) => a > 100));  // -1
+  print(indexWhere((a) => a > 15, nums));      // 3
+  // FxTS alias: findIndex is the same operator.
+  print(fx(nums).indexWhere((a) => a > 100));  // -1
 }
 </textarea>
   </div>
@@ -89,7 +92,7 @@ import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
   var checked = 0;
-  final index = findIndex((a) {
+  final index = indexWhere((a) {
     checked++;
     return a == 5;
   }, range(1000000));
@@ -98,7 +101,7 @@ Future<void> main() async {
 
   final asyncIndex = await fx(['x', 'y', 'z'])
       .toAsync()
-      .findIndex((v) => delay(Duration(milliseconds: 30), v == 'z'));
+      .indexWhere((v) => delay(Duration(milliseconds: 30), v == 'z'));
   print(asyncIndex); // 2
 }
 </textarea>
@@ -113,7 +116,7 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final queue = ['alice', 'bob', 'carol'];
 
-  // TODO: use findIndex to find bob's position, or -1
+  // TODO: use indexWhere to find bob's position, or -1
   final position = -1;
 
   print(position);

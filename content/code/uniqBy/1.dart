@@ -15,8 +15,9 @@ Future<void> main() async {
       .map((o) => delay(Duration(milliseconds: 100), o))
       .concurrent(3);
 
+  // FxTS alias: uniqByAsync((o) => o['customer'], fetched) does the same thing.
   final firstPerCustomer =
-      await fxAsync(uniqByAsync((o) => o['customer'], fetched)).toArray();
+      await fxAsync(distinctByAsync((o) => o['customer'], fetched)).toList();
 
   print(firstPerCustomer); // [{customer: a, amount: 10}, {customer: b, amount: 20}]
   print('took ${sw.elapsedMilliseconds}ms'); // ~100ms

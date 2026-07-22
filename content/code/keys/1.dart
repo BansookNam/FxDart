@@ -5,7 +5,7 @@ void main() {
   // chain operators apply — here, count how many item names start with 'a'.
   final prices = {'apple': 1.5, 'banana': 0.5, 'avocado': 2.0, 'kiwi': 1.2};
 
-  final aKeys = fx(keys(prices)).filter((k) => k.startsWith('a')).toArray();
+  final aKeys = fx(keys(prices)).filter((k) => k.startsWith('a')).toList();
   print(aKeys); // [apple, avocado]
   print('count: ${aKeys.length}'); // count: 2
 }

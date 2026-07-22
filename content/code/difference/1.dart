@@ -11,7 +11,7 @@ Future<void> main() async {
       .map((a) => delay(Duration(milliseconds: 100), a))
       .concurrent(4);
 
-  final newItems = await fxAsync(differenceAsync(owned, wishlist)).toArray();
+  final newItems = await fxAsync(differenceAsync(owned, wishlist)).toList();
 
   print(newItems); // [4, 5]
   print('took ${sw.elapsedMilliseconds}ms'); // ~100ms

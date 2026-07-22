@@ -2,9 +2,9 @@
 slug: find
 title: find — FxDart 101
 description: Tutorial de find en FxDart: obtén el primer elemento que cumple un predicado, de forma perezosa y con cortocircuito, y null si no hay ninguno.
-heading: <code>find</code>
+heading: <code>firstWhereOrNull</code>
 section: 8
-crumb: find
+crumb: firstWhereOrNull
 prev: nth.html
 prevLabel: nth
 next: findIndex.html

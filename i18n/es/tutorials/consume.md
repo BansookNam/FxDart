@@ -21,7 +21,7 @@ nextLabel: range
     <code>peek</code> o <code>mapEffect</code> que haya aguas arriba — pero
     descarta cada valor en lugar de recopilarlo o reenviarlo. Recurre a él
     cuando todo el sentido de un pipeline son sus efectos secundarios y
-    construir una <code>List</code> con <code>toArray</code> sería tan solo
+    construir una <code>List</code> con <code>toList</code> sería tan solo
     reservar memoria para nada.
   </p>
   <p>
@@ -59,7 +59,7 @@ nextLabel: range
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="each.html"><code>each</code></a> — operador terminal que también ejecuta f, sin el atajo del límite n ·
-    <a href="toArray.html"><code>toArray</code></a> — operador terminal que en cambio recopila los resultados ·
+    <a href="toList.html"><code>toList</code></a> — operador terminal que en cambio recopila los resultados ·
     <a href="cycle.html"><code>cycle</code></a> — una fuente infinita que suele acompañar a consume ·
     <a href="peek.html"><code>peek</code></a> — el paso perezoso de efecto secundario que consume normalmente fuerza
   </div>

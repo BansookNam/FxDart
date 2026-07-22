@@ -6,7 +6,7 @@ void main() {
   final result = pipe([1, 2, 3, 4, 5], [
     (Iterable<int> a) => map((n) => n + 10, a),
     (Iterable<int> a) => filter((n) => n % 2 == 0, a),
-    toArray,
+    toList,
   ]);
 
   print(result); // [12, 14]

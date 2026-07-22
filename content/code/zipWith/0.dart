@@ -5,5 +5,5 @@ void main() {
   // (x1, y2, z3)
 
   final result = zipWith((a, b) => a + b, [1, 2, 3], [10, 20, 30]);
-  print(toArray(result)); // [11, 22, 33]
+  print(toList(result)); // [11, 22, 33]
 }

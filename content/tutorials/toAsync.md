@@ -23,8 +23,8 @@ nextLabel: async variants
   </p>
   <p>
     <code>FxAsyncIterable</code> is <strong>pull-based</strong>: nothing runs
-    until a terminal (<code>toArrayAsync</code>, <code>eachAsync</code>, the
-    <code>FxAsync</code> chain's <code>.toArray()</code>, …) calls
+    until a terminal (<code>toListAsync</code>, <code>eachAsync</code>, the
+    <code>FxAsync</code> chain's <code>.toList()</code>, …) calls
     <code>next()</code> on it, one step at a time — exactly like a plain
     <code>Iterable</code>, just asynchronous. This is a deliberate departure
     from Dart's <code>Stream</code>, which is <em>push</em>-based: once a

@@ -2,9 +2,9 @@
 slug: flat
 title: flat — FxDart 101
 description: Tutorial de flat en FxDart: aplana iterables anidados hasta la profundidad que indiques, con un playground en vivo.
-heading: <code>flat</code>
+heading: <code>flattened</code>
 section: 3
-crumb: flat
+crumb: flattened
 prev: flatMap.html
 prevLabel: flatMap
 next: scan.html

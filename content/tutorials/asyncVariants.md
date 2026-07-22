@@ -23,7 +23,7 @@ nextLabel: streams
     returns <code>FutureOr&lt;R&gt;</code> instead of <code>R</code>. You've
     already met a few: <code>map</code>/<code>mapAsync</code>,
     <code>filter</code>/<code>filterAsync</code>,
-    <code>toArray</code>/<code>toArrayAsync</code>,
+    <code>toList</code>/<code>toListAsync</code>,
     <code>reduce</code>/<code>reduceAsync</code>, <code>fold</code>/<code>foldAsync</code>,
     <code>each</code>/<code>eachAsync</code>, <code>find</code>/<code>findAsync</code> —
     the pattern holds for essentially every function in the library.

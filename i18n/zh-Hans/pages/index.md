@@ -25,7 +25,7 @@ description: FxDart 是从 FxTS 移植而来的 Dart 函数式编程库：惰性
   <ul>
     <li><strong>惰性求值</strong> —— <code>map</code>、<code>filter</code>、
       <code>take</code> 这类操作符只构建管道，在终结操作符
-      （<code>toArray</code>、<code>each</code>、<code>reduce</code>……）
+      （<code>toList</code>、<code>each</code>、<code>reduce</code>……）
       拉取数据之前不做任何工作。对一个百万元素的范围调用
       <code>.take(3)</code>，只会计算 3 个结果。</li>
     <li><strong>同步与异步共用一套模型</strong> —— 同样的操作符名称既适用于普通的

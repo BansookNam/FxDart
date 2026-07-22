@@ -1,10 +1,10 @@
 ---
-slug: unicodeToArray
-title: unicodeToArray — FxDart 101
-description: FxDart unicodeToArray tutorial: split a string into user-perceived characters, correctly handling surrogate pairs like emoji.
-heading: <code>unicodeToArray</code>
+slug: unicodeToList
+title: unicodeToList — FxDart 101
+description: FxDart unicodeToList tutorial: split a string into user-perceived characters, correctly handling surrogate pairs like emoji.
+heading: <code>unicodeToList</code>
 section: 10
-crumb: unicodeToArray
+crumb: unicodeToList
 prev: delay.html
 prevLabel: delay &amp; sleep
 next: curried.html
@@ -24,20 +24,20 @@ nextLabel: curried &amp; uncurried
     a single emoji into two broken halves.
   </p>
   <p>
-    <code>unicodeToArray</code> fixes that by iterating the string's
+    <code>unicodeToList</code> fixes that by iterating the string's
     <code>.runes</code> — Unicode code points — and turning each one back
     into its own single-character <code>String</code>. The result is the list
     of characters a person actually sees when reading the string, matching
-    FxTS's <code>unicodeToArray</code>, which splits by code point rather than
+    FxTS's <code>unicodeToList</code>, which splits by code point rather than
     UTF-16 unit.
   </p>
 
-  <h2>Demo 1 · Naive split vs. unicodeToArray</h2>
+  <h2>Demo 1 · Naive split vs. unicodeToList</h2>
   {{playground:0}}
 
   <h2>Demo 2 · Reversing and counting correctly</h2>
   <p>
-    Building on <code>unicodeToArray</code>, a naive-split reverse would
+    Building on <code>unicodeToList</code>, a naive-split reverse would
     mangle the emoji; this one doesn't:
   </p>
   {{playground:1}}

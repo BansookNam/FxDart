@@ -2,9 +2,9 @@
 slug: uniq
 title: uniq — FxDart 101
 description: FxDart uniq 튜토리얼: 처음 등장한 순서를 유지하면서 중복 값을 제거하는 방법을 라이브 플레이그라운드와 함께 익힙니다.
-heading: <code>uniq</code>
+heading: <code>distinct</code>
 section: 4
-crumb: uniq
+crumb: distinct
 prev: compact.html
 prevLabel: compact
 next: uniqBy.html

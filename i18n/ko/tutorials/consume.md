@@ -19,7 +19,7 @@ nextLabel: range
     <code>consume</code>은 가장 단순한 종결 연산자입니다. 체인을 통해 값을
     끌어당기면서 상류에 있는 <code>peek</code>이나 <code>mapEffect</code>
     단계의 부수 효과를 실행하지만, 값을 수집하거나 전달하지 않고 전부
-    버립니다. 파이프라인의 목적 자체가 부수 효과이고 <code>toArray</code>로
+    버립니다. 파이프라인의 목적 자체가 부수 효과이고 <code>toList</code>로
     <code>List</code>를 만드는 것이 그저 낭비되는 할당일 뿐일 때 쓰면
     됩니다.
   </p>
@@ -56,7 +56,7 @@ nextLabel: range
   <div class="callout">
     <strong>관련 함수:</strong>
     <a href="each.html"><code>each</code></a> — 마찬가지로 f를 실행하는 종결 연산자, 다만 n 제한은 없음 ·
-    <a href="toArray.html"><code>toArray</code></a> — 대신 결과를 수집하는 종결 연산자 ·
+    <a href="toList.html"><code>toList</code></a> — 대신 결과를 수집하는 종결 연산자 ·
     <a href="cycle.html"><code>cycle</code></a> — consume과 자주 짝을 이루는 무한 소스 ·
     <a href="peek.html"><code>peek</code></a> — consume이 주로 강제 실행시키는 지연 부수 효과 단계
   </div>

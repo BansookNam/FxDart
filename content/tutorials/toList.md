@@ -1,10 +1,10 @@
 ---
-slug: toArray
-title: toArray — FxDart 101
-description: FxDart toArray tutorial: the terminal operator that materializes a lazy chain into a List, sync and async.
-heading: <code>toArray</code>
+slug: toList
+title: toList — FxDart 101
+description: FxDart toList tutorial: the terminal operator that materializes a lazy chain into a List, sync and async.
+heading: <code>toList</code>
 section: 1
-crumb: toArray
+crumb: toList
 prev: pipe1.html
 prevLabel: pipe1
 next: each.html
@@ -16,24 +16,24 @@ nextLabel: each
 
   <h2>Lecture</h2>
   <p>
-    <code>toArray</code> is the workhorse <strong>terminal operator</strong>:
+    <code>toList</code> is the workhorse <strong>terminal operator</strong>:
     it's what actually runs a chain that was, until this point, nothing but
-    a plan. Calling <code>.toArray()</code> pulls every remaining value out
+    a plan. Calling <code>.toList()</code> pulls every remaining value out
     of the iterable, in order, and collects them into a real
     <code>List&lt;T&gt;</code>. Everything upstream — every <code>.map()</code>,
     <code>.filter()</code>, <code>.take()</code> — only runs because
-    <code>toArray</code> asked for values.
+    <code>toList</code> asked for values.
   </p>
   <p>
-    That also means <code>toArray</code> is exactly the operator you must
+    That also means <code>toList</code> is exactly the operator you must
     <em>not</em> call directly on an infinite or unbounded source
     (<code>range</code> with no end, <code>cycle</code>, <code>repeat</code>
     with a huge count) — it will try to pull forever. Bound it first with
-    <code>take(n)</code>, then call <code>toArray</code> on the bounded
+    <code>take(n)</code>, then call <code>toList</code> on the bounded
     result.
   </p>
   <p>
-    The async version, <code>toArrayAsync</code> (or <code>.toArray()</code>
+    The async version, <code>toListAsync</code> (or <code>.toList()</code>
     on an <code>FxAsync</code> chain), awaits each element as it's pulled
     and returns a <code>Future&lt;List&lt;T&gt;&gt;</code>. Combined with
     <code>.concurrent(n)</code> upstream, the individual awaits can overlap
@@ -47,7 +47,7 @@ nextLabel: each
 
   <h2>Demo 2 · Async, with concurrency</h2>
   <p>
-    <code>.toArray()</code> on an <code>FxAsync</code> chain awaits every
+    <code>.toList()</code> on an <code>FxAsync</code> chain awaits every
     element and hands back the whole list at once; add
     <code>.concurrent(n)</code> upstream to overlap the individual waits:
   </p>
@@ -61,6 +61,6 @@ nextLabel: each
     <strong>Related:</strong>
     <a href="each.html"><code>each</code></a> — terminal op for side effects instead of a List ·
     <a href="consume.html"><code>consume</code></a> — terminal op that discards results entirely ·
-    <a href="fx.html"><code>fx</code></a> — the chain that toArray terminates ·
+    <a href="fx.html"><code>fx</code></a> — the chain that toList terminates ·
     <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
   </div>

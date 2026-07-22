@@ -42,6 +42,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 11 · Async &amp; concurrencia › <strong>async variants</strong></p>
   <h1>The <code>*Async</code> naming convention</h1>
   <p class="hero-sub">Cada operador perezoso y de agregación tiene un gemelo que trabaja sobre FxAsyncIterable: mismo comportamiento, con un callback apto para async.</p>
@@ -49,7 +50,7 @@
   <div class="signature">Iterable&lt;B&gt; map&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;B&gt; mapAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 
-Future&lt;List&lt;A&gt;&gt; toArrayAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+Future&lt;List&lt;A&gt;&gt; toListAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
 Future&lt;A&gt; reduceAsync&lt;A&gt;(FutureOr&lt;A&gt; Function(A acc, A a) f, FxAsyncIterable&lt;A&gt; iterable)
 
 Fx&lt;R&gt; Fx.map&lt;R&gt;(R Function(T a) f)             // sync chain
@@ -67,7 +68,7 @@ FxAsync&lt;R&gt; FxAsync.map&lt;R&gt;(FutureOr&lt;R&gt; Function(T a) f)  // asy
     <code>FutureOr&lt;R&gt;</code> en lugar de <code>R</code>. Ya has visto
     algunos: <code>map</code>/<code>mapAsync</code>,
     <code>filter</code>/<code>filterAsync</code>,
-    <code>toArray</code>/<code>toArrayAsync</code>,
+    <code>toList</code>/<code>toListAsync</code>,
     <code>reduce</code>/<code>reduceAsync</code>, <code>fold</code>/<code>foldAsync</code>,
     <code>each</code>/<code>eachAsync</code>, <code>find</code>/<code>findAsync</code>:
     el patrón se cumple prácticamente para todas las funciones de la librería.
@@ -92,11 +93,11 @@ import 'package:fxdart/fxdart.dart';
 Future<void> main() async {
   // Every sync op has a data-first *Async twin that works on
   // FxAsyncIterable instead of Iterable.
-  final doubled = await toArrayAsync(
+  final doubled = await toListAsync(
       mapAsync((a) => a * 2, toAsync([1, 2, 3])));
   print(doubled); // [2, 4, 6]
 
-  final evens = await toArrayAsync(
+  final evens = await toListAsync(
       filterAsync((a) async => a.isEven, toAsync([1, 2, 3, 4, 5, 6])));
   print(evens); // [2, 4, 6]
 
@@ -119,17 +120,17 @@ Future<void> main() async {
   final input = [1, 2, 3, 4, 5, 6];
 
   // Data-first: every step names its *Async twin explicitly.
-  final dataFirst = await toArrayAsync(filterAsync(
+  final dataFirst = await toListAsync(filterAsync(
       (a) async => a > 30, mapAsync((a) => a * 10, toAsync(input))));
   print(dataFirst); // [40, 50, 60]
 
   // Chain form: .toAsync() flips the chain into async mode once, then every
-  // method keeps its plain name — map, filter, toArray — no *Async suffix.
+  // method keeps its plain name — map, filter, toList — no *Async suffix.
   final chained = await fx(input)
       .toAsync()
       .map((a) => a * 10)
       .filter((a) => a > 30)
-      .toArray();
+      .toList();
   print(chained); // [40, 50, 60]
 
   print(dataFirst.toString() == chained.toString()); // true
@@ -148,8 +149,8 @@ Future<void> main() async {
   final names = ['ann', 'bo', 'cara', 'di'];
 
   // TODO: use the *Async twin of `map` (data-first, on toAsync(names)) to
-  // uppercase every name, then toArrayAsync to collect the result.
-  final shouted = await toArrayAsync(toAsync(names));
+  // uppercase every name, then toListAsync to collect the result.
+  final shouted = await toListAsync(toAsync(names));
 
   print(shouted); // currently [ann, bo, cara, di] — should be uppercase
 }

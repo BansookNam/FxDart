@@ -2,9 +2,9 @@
 slug: findIndex
 title: findIndex — FxDart 101
 description: Tutorial de findIndex en FxDart: obtén la posición de la primera coincidencia, o -1 si no hay ninguna, de forma perezosa y con cortocircuito.
-heading: <code>findIndex</code>
+heading: <code>indexWhere</code>
 section: 8
-crumb: findIndex
+crumb: indexWhere
 prev: find.html
 prevLabel: find
 next: includes.html

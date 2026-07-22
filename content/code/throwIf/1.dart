@@ -7,7 +7,7 @@ void main() {
     final validated = fx(ages)
         .map((a) =>
             throwIf<int>((n) => n < 18, (n) => ArgumentError('too young: $n'), a))
-        .toArray();
+        .toList();
     print(validated);
   } catch (e) {
     print('caught: $e'); // caught: Invalid argument(s): too young: 17

@@ -65,5 +65,5 @@ nextLabel: pipe1
     <strong>Related:</strong>
     <a href="fx.html"><code>fx</code></a> — the typed chain alternative ·
     <a href="pipe1.html"><code>pipe1</code></a> — a single pipe step, sync/async aware ·
-    <a href="toArray.html"><code>toArray</code></a> — common final step in a pipe
+    <a href="toList.html"><code>toList</code></a> — common final step in a pipe
   </div>

@@ -2,11 +2,11 @@
 slug: each
 title: each — FxDart 101
 description: FxDart each 튜토리얼: 지연 체인의 모든 원소에 대해 부수 효과를 위한 함수를 실행합니다. 동기와 비동기 모두 다룹니다.
-heading: <code>each</code>
+heading: <code>forEach</code>
 section: 1
-crumb: each
-prev: toArray.html
-prevLabel: toArray
+crumb: forEach
+prev: toList.html
+prevLabel: toList
 next: consume.html
 nextLabel: consume
 ---
@@ -16,7 +16,7 @@ nextLabel: consume
 
   <h2>강의</h2>
   <p>
-    <code>each</code>는 <code>toArray</code>와 마찬가지로 종결 연산자입니다 —
+    <code>each</code>는 <code>toList</code>와 마찬가지로 종결 연산자입니다 —
     호출하는 순간 체인 전체를 통해 모든 값을 끌어당깁니다. 차이는 그 값들을
     가지고 무엇을 하느냐입니다. <code>List</code>로 모으는 대신 값마다
     <code>f</code>를 실행하고 <code>void</code>를 반환합니다. 출력이나 로깅,
@@ -55,7 +55,7 @@ nextLabel: consume
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="toArray.html"><code>toArray</code></a> — 대신 List로 모으는 종결 연산자 ·
+    <a href="toList.html"><code>toList</code></a> — 대신 List로 모으는 종결 연산자 ·
     <a href="consume.html"><code>consume</code></a> — 결과를 버리고 중간에 멈출 수도 있는 종결 연산자 ·
     <a href="peek.html"><code>peek</code></a> — 발상은 같지만 지연 평가(종결 연산자가 아님) ·
     <a href="fx.html"><code>fx</code></a> — each가 마무리하는 그 체인

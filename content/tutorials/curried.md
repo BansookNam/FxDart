@@ -5,8 +5,8 @@ description: FxDart curried tutorial: fully typed currying via extension getters
 heading: <code>.curried</code> &amp; <code>.uncurried</code>
 section: 10
 crumb: curried &amp; uncurried
-prev: unicodeToArray.html
-prevLabel: unicodeToArray
+prev: unicodeToList.html
+prevLabel: unicodeToList
 next: toAsync.html
 nextLabel: toAsync
 ---

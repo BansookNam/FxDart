@@ -2,9 +2,9 @@
 slug: some
 title: some — FxDart 101
 description: Tutorial de some en FxDart: comprueba que al menos un elemento cumple un predicado, cortocircuitando en el primer acierto, en versión síncrona y asíncrona.
-heading: <code>some</code>
+heading: <code>any</code>
 section: 8
-crumb: some
+crumb: any
 prev: every.html
 prevLabel: every
 next: predicates.html

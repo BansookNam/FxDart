@@ -5,7 +5,7 @@ void main() {
 
   // TODO: use mapEffect to log 'billing $<dollars>' for each amount while
   // converting cents to dollars (a double).
-  final dollars = fx(centsAmounts).map((c) => c / 100).toArray();
+  final dollars = fx(centsAmounts).map((c) => c / 100).toList();
 
   print(dollars);
 }

@@ -42,6 +42,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">此翻译可能已过时——英文页面在翻译之后已发生变更。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">参与翻译</a></p>
   <p class="hero-logo"><img src="../assets/logo-web.png" width="960" height="294"
       alt="FxDart"></p>
   <h1>面向 Dart 的函数式编程，<br>惰性与并发开箱即用。</h1>
@@ -60,7 +61,7 @@ void main() {
   final result = fx([1, 2, 3, 4, 5])
       .map((a) => a + 10)
       .filter((a) => a % 2 == 0)
-      .toArray();
+      .toList();
 
   print(result); // [12, 14]
 }
@@ -77,7 +78,7 @@ void main() {
   <ul>
     <li><strong>惰性求值</strong> —— <code>map</code>、<code>filter</code>、
       <code>take</code> 这类操作符只构建管道，在终结操作符
-      （<code>toArray</code>、<code>each</code>、<code>reduce</code>……）
+      （<code>toList</code>、<code>each</code>、<code>reduce</code>……）
       拉取数据之前不做任何工作。对一个百万元素的范围调用
       <code>.take(3)</code>，只会计算 3 个结果。</li>
     <li><strong>同步与异步共用一套模型</strong> —— 同样的操作符名称既适用于普通的
@@ -158,7 +159,7 @@ Future<void> main() async {
       .toAsync()
       .map((id) => delay(Duration(milliseconds: 300), 'user$id'))
       .concurrent(3) // ← try 1 (sequential) or 6 (all at once)
-      .toArray();
+      .toList();
 
   print(users);
   print('took ${sw.elapsedMilliseconds}ms');

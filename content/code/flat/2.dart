@@ -6,8 +6,8 @@ void main() {
     [77, [95, 60]],
   ];
 
-  // TODO: use flat() to flatten scoreGroups by one level.
-  final scores = fx(scoreGroups).toArray();
+  // TODO: use flattened() to flatten scoreGroups by one level.
+  final scores = fx(scoreGroups).toList();
 
   print(scores);
 }

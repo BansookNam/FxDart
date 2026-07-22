@@ -42,14 +42,16 @@
   </div>
 </header>
 <main>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 6 · Combinar › <strong>zipWithIndex</strong></p>
-  <h1><code>zipWithIndex</code></h1>
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 6 · Combinar › <strong>indexed</strong></p>
+  <h1><code>indexed</code></h1>
   <p class="hero-sub">Empareja cada elemento con su índice (empezando en 0): <code>(index, value)</code>.</p>
 
-  <div class="signature">Iterable&lt;(int, A)&gt; zipWithIndex&lt;A&gt;(Iterable&lt;A&gt; iterable)
-FxAsyncIterable&lt;(int, A)&gt; zipWithIndexAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;(int, T)&gt; Fx.zipWithIndex()        // chain
-FxAsync&lt;(int, T)&gt; FxAsync.zipWithIndex()</div>
+  <div class="signature">Iterable&lt;(int, A)&gt; indexed&lt;A&gt;(Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;(int, A)&gt; indexedAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+Iterable&lt;(int, T)&gt; Fx.indexed         // sync chain: inherited Iterable getter, no parens
+FxAsync&lt;(int, T)&gt; FxAsync.indexed()   // async chain
+Iterable&lt;(int, A)&gt; zipWithIndex&lt;A&gt;(Iterable&lt;A&gt; iterable)  // FxTS alias</div>
 
   <h2>Lección</h2>
   <p>
@@ -71,10 +73,14 @@ FxAsync&lt;(int, T)&gt; FxAsync.zipWithIndex()</div>
 import 'package:fxdart/fxdart.dart';
 
 void main() {
-  print(zipWithIndex(['a', 'b', 'c'])); // ((0, a), (1, b), (2, c))
+  print(indexed(['a', 'b', 'c'])); // ((0, a), (1, b), (2, c))
 
-  final result = fx(['x', 'y', 'z']).zipWithIndex().toArray();
+  // Sync chain: .indexed is the inherited Iterable getter — no parens.
+  final result = fx(['x', 'y', 'z']).indexed.toList();
   print(result); // [(0, x), (1, y), (2, z)]
+
+  // FxTS alias: zipWithIndex — the same operator.
+  print(zipWithIndex(['a', 'b', 'c'])); // ((0, a), (1, b), (2, c))
 }
 </textarea>
   </div>
@@ -85,11 +91,12 @@ void main() {
 import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
+  // Async chain: .indexed() is a method — with parens.
   final result = await fx(['a', 'b', 'c'])
       .toAsync()
       .map((a) => delay(Duration(milliseconds: 50), a))
-      .zipWithIndex()
-      .toArray();
+      .indexed()
+      .toList();
 
   print(result); // [(0, a), (1, b), (2, c)]
 }
@@ -106,7 +113,8 @@ void main() {
   final runners = ['ana', 'boo', 'cid'];
 
   // TODO: pair each runner with their (0-based) finishing position
-  final placements = fx(runners).toArray();
+  // Hint: .indexed is the inherited getter — no parens.
+  final placements = fx(runners).toList();
 
   print(placements);
 }

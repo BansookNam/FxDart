@@ -2,11 +2,11 @@
 slug: each
 title: each — FxDart 101
 description: Tutorial de each en FxDart: ejecuta una función por sus efectos secundarios sobre cada elemento de una cadena perezosa, en modo síncrono y asíncrono.
-heading: <code>each</code>
+heading: <code>forEach</code>
 section: 1
-crumb: each
-prev: toArray.html
-prevLabel: toArray
+crumb: forEach
+prev: toList.html
+prevLabel: toList
 next: consume.html
 nextLabel: consume
 ---
@@ -16,7 +16,7 @@ nextLabel: consume
 
   <h2>Lección</h2>
   <p>
-    <code>each</code> es un operador terminal, igual que <code>toArray</code>:
+    <code>each</code> es un operador terminal, igual que <code>toList</code>:
     al llamarlo tira de todos los valores a través de la cadena entera. La
     diferencia está en qué hace con esos valores: en lugar de recogerlos en
     una <code>List</code>, se limita a ejecutar <code>f</code> con cada uno y
@@ -56,7 +56,7 @@ nextLabel: consume
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="toArray.html"><code>toArray</code></a> — operador terminal que en su lugar recoge una List ·
+    <a href="toList.html"><code>toList</code></a> — operador terminal que en su lugar recoge una List ·
     <a href="consume.html"><code>consume</code></a> — operador terminal que descarta los resultados y puede parar antes ·
     <a href="peek.html"><code>peek</code></a> — la misma idea, pero perezoso (no terminal) ·
     <a href="fx.html"><code>fx</code></a> — la cadena que each termina

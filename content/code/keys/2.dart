@@ -5,7 +5,7 @@ void main() {
 
   // TODO: use keys() and sort() to get an alphabetically sorted list of
   // the inventory's item names.
-  final names = fx(keys(inventory)).sort((a, b) => a.compareTo(b)).toArray();
+  final names = fx(keys(inventory)).sort((a, b) => a.compareTo(b)).toList();
 
   print(names); // [apples, bananas, cherries]
 }

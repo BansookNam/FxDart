@@ -8,7 +8,7 @@ Future<void> main() async {
       .cycle()
       .map((a) => delay(const Duration(milliseconds: 50), a.toUpperCase()))
       .take(5)
-      .toArray();
+      .toList();
 
   print(result); // [X, Y, X, Y, X]
 }

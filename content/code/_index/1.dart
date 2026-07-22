@@ -7,7 +7,7 @@ Future<void> main() async {
       .toAsync()
       .map((id) => delay(Duration(milliseconds: 300), 'user$id'))
       .concurrent(3) // ← try 1 (sequential) or 6 (all at once)
-      .toArray();
+      .toList();
 
   print(users);
   print('took ${sw.elapsedMilliseconds}ms');

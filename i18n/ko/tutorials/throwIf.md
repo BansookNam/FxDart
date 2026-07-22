@@ -36,7 +36,7 @@ nextLabel: cases
   <h2>데모 2 · 파이프라인 검증하기</h2>
   <p>
     각 나이는 map을 거치면서 검증되고, 첫 번째 위반이 발생하는 즉시
-    <code>toArray()</code> 호출 전체가 중단됩니다.
+    <code>toList()</code> 호출 전체가 중단됩니다.
   </p>
   {{playground:1}}
 

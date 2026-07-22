@@ -2,9 +2,9 @@
 slug: size
 title: size — FxDart 101
 description: Tutorial de size en FxDart: cuenta los elementos que produce un pipeline, con playground en vivo.
-heading: <code>size</code>
+heading: <code>count</code>
 section: 7
-crumb: size
+crumb: count
 prev: max.html
 prevLabel: max
 next: join.html
@@ -37,7 +37,7 @@ nextLabel: join
     Si ya tienes una <code>List</code> concreta, su <code>.length</code> es
     gratis: recurre a <code>size</code> precisamente cuando quieras contar la
     salida de una cadena perezosa sin materializarla antes en una
-    <code>List</code> con <code><a href="../101/index.html">toArray</a></code>.
+    <code>List</code> con <code><a href="../101/index.html">toList</a></code>.
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>
@@ -54,5 +54,5 @@ nextLabel: join
     <strong>Relacionado:</strong>
     <a href="average.html"><code>average</code></a> — usa internamente un conteo similar a size ·
     <a href="isEmpty.html"><code>isEmpty</code></a> — una comprobación más barata cuando solo necesitas saber «¿hay alguno?» ·
-    <a href="../101/index.html">toArray</a> — materializa en lugar de solo contar
+    <a href="../101/index.html">toList</a> — materializa en lugar de solo contar
   </div>

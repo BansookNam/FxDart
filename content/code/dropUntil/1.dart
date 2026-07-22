@@ -5,7 +5,7 @@ Future<void> main() async {
       .toAsync()
       .map((a) => delay(Duration(milliseconds: 50), a))
       .dropUntil((a) => a == 3)
-      .toArray();
+      .toList();
 
   print(result); // [4, 5]
 }

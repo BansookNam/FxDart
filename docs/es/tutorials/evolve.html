@@ -106,7 +106,7 @@ void main() {
             'price': (v) => double.parse(v as String),
             'qty': (v) => int.parse(v as String),
           }, r))
-      .toArray();
+      .toList();
 
   print(parsed); // [{price: 9.99, qty: 3}, {price: 4.5, qty: 2}]
 }

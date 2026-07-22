@@ -2,9 +2,9 @@
 slug: flatMap
 title: flatMap — FxDart 101
 description: FxDart flatMap 튜토리얼: 각 원소를 이터러블로 매핑한 뒤 한 단계 평탄화합니다. 라이브 플레이그라운드 포함.
-heading: <code>flatMap</code>
+heading: <code>expand</code>
 section: 3
-crumb: flatMap
+crumb: expand
 prev: mapEffect.html
 prevLabel: mapEffect
 next: flat.html

@@ -4,7 +4,7 @@ void main() {
   final done = [true, false, false, true];
 
   // TODO: use `not` to build the "still pending" flags
-  final pending = fx(done).map(not).toArray();
+  final pending = fx(done).map(not).toList();
 
   print(pending); // [false, true, true, false]
 }

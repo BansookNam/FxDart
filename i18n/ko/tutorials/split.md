@@ -48,6 +48,6 @@ nextLabel: append
   <div class="callout">
     <strong>관련 함수:</strong>
     <a href="chunk.html"><code>chunk</code></a> — 구분자 대신 고정 크기로 묶기 ·
-    <a href="unicodeToArray.html"><code>unicodeToArray</code></a> — 사람이 인식하는 문자 단위로 제대로 된 문자 배열 얻기 ·
+    <a href="unicodeToList.html"><code>unicodeToList</code></a> — 사람이 인식하는 문자 단위로 제대로 된 문자 배열 얻기 ·
     <a href="join.html"><code>join</code></a> — 반대 연산
   </div>

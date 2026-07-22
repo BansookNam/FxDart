@@ -8,7 +8,7 @@ void main() {
   final inStock = fx(entries(inventory))
       .filter((e) => e.$2 > 0)
       .map((e) => '${e.$1}: ${e.$2}')
-      .toArray();
+      .toList();
 
   print(inStock); // [apples: 4, cherries: 12]
 }

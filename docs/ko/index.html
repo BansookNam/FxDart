@@ -42,6 +42,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="hero-logo"><img src="../assets/logo-web.png" width="960" height="294"
       alt="FxDart"></p>
   <h1>지연 평가와 동시성을 기본으로 갖춘,<br>Dart를 위한 함수형 프로그래밍.</h1>
@@ -60,7 +61,7 @@ void main() {
   final result = fx([1, 2, 3, 4, 5])
       .map((a) => a + 10)
       .filter((a) => a % 2 == 0)
-      .toArray();
+      .toList();
 
   print(result); // [12, 14]
 }
@@ -78,7 +79,7 @@ void main() {
   <ul>
     <li><strong>지연 평가</strong> — <code>map</code>,
       <code>filter</code>, <code>take</code> 같은 연산자는 파이프라인을 구성할 뿐
-      실제 작업은 하지 않습니다. 종결 연산자(<code>toArray</code>, <code>each</code>,
+      실제 작업은 하지 않습니다. 종결 연산자(<code>toList</code>, <code>each</code>,
       <code>reduce</code>…)가 값을 끌어당길 때 비로소 계산이 일어납니다. 100만 개짜리
       범위를 <code>.take(3)</code>으로 처리하면 정확히 3개만 계산됩니다.</li>
     <li><strong>동기와 비동기를 아우르는 하나의 모델</strong> — 동일한 연산자 이름이
@@ -159,7 +160,7 @@ Future<void> main() async {
       .toAsync()
       .map((id) => delay(Duration(milliseconds: 300), 'user$id'))
       .concurrent(3) // ← try 1 (sequential) or 6 (all at once)
-      .toArray();
+      .toList();
 
   print(users);
   print('took ${sw.elapsedMilliseconds}ms');

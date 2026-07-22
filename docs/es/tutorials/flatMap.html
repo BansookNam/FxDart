@@ -42,14 +42,16 @@
   </div>
 </header>
 <main>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 3 · Transformar › <strong>flatMap</strong></p>
-  <h1><code>flatMap</code></h1>
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 3 · Transformar › <strong>expand</strong></p>
+  <h1><code>expand</code></h1>
   <p class="hero-sub">Transforma cada elemento en un iterable y luego aplana los resultados un nivel — el mismo contrato que <code>Iterable.expand</code>.</p>
 
-  <div class="signature">Iterable&lt;B&gt; flatMap&lt;A, B&gt;(Iterable&lt;B&gt; Function(A a) f, Iterable&lt;A&gt; iterable)
-FxAsyncIterable&lt;B&gt; flatMapAsync&lt;A, B&gt;(FutureOr&lt;Iterable&lt;B&gt;&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;R&gt; Fx.flatMap&lt;R&gt;(Iterable&lt;R&gt; Function(T a) f)        // chain
-FxAsync&lt;R&gt; FxAsync.flatMap&lt;R&gt;(FutureOr&lt;Iterable&lt;R&gt;&gt; Function(T a) f)</div>
+  <div class="signature">Iterable&lt;B&gt; expand&lt;A, B&gt;(Iterable&lt;B&gt; Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;B&gt; expandAsync&lt;A, B&gt;(FutureOr&lt;Iterable&lt;B&gt;&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;R&gt; Fx.expand&lt;R&gt;(Iterable&lt;R&gt; Function(T a) f)        // chain
+FxAsync&lt;R&gt; FxAsync.expand&lt;R&gt;(FutureOr&lt;Iterable&lt;R&gt;&gt; Function(T a) f)
+Iterable&lt;B&gt; flatMap&lt;A, B&gt;(...)        // FxTS alias</div>
 
   <h2>Lección</h2>
   <p>
@@ -92,13 +94,14 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   // Data-first form: f MUST return an Iterable<B> -- same contract as
   // Iterable.expand.
-  print(toArray(flatMap((a) => [a, a * 10], [1, 2, 3])));
+  print(toList(expand((a) => [a, a * 10], [1, 2, 3])));
   // [1, 10, 2, 20, 3, 30]
+  // FxTS alias: flatMap((a) => [a, a * 10], [1, 2, 3]) is identical.
 
   // Chain form: split words into individual characters.
   final letters = fx(['ab', 'cd'])
-      .flatMap((word) => word.split(''))
-      .toArray();
+      .expand((word) => word.split(''))
+      .toList();
   print(letters); // [a, b, c, d]
 }
 </textarea>
@@ -116,16 +119,16 @@ import 'package:fxdart/fxdart.dart';
 Future<void> main() async {
   final sw = Stopwatch()..start();
 
-  // Fetch (the slow part) concurrently first, THEN flatten. flatMap itself
+  // Fetch (the slow part) concurrently first, THEN flatten. expand itself
   // pulls its upstream serially, so put the concurrency in the async step
-  // that produces each list, not inside flatMap's own callback.
+  // that produces each list, not inside expand's own callback.
   final userIds = [1, 2, 3];
   final orderIds = await fx(userIds)
       .toAsync()
       .map((id) => delay(Duration(milliseconds: 150), [id * 100, id * 100 + 1]))
       .concurrent(3)
-      .flatMap((list) => list)
-      .toArray();
+      .expand((list) => list) // FxTS alias: .flatMap((list) => list)
+      .toList();
 
   print(orderIds); // [100, 101, 200, 201, 300, 301]
   print('took ${sw.elapsedMilliseconds}ms'); // ~150ms, not ~450ms
@@ -143,9 +146,9 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final sentences = ['fx is lazy', 'dart is typed'];
 
-  // TODO: use flatMap to split each sentence into words, producing one flat
+  // TODO: use expand to split each sentence into words, producing one flat
   // list of words.
-  final words = fx(sentences).map((s) => s).toArray();
+  final words = fx(sentences).map((s) => s).toList();
 
   print(words);
 }

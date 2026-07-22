@@ -7,7 +7,7 @@ void main() {
     {'item': 'potion', 'qty': 12},
   ];
 
-  // TODO: use find to get the first item with qty > 0, or null
+  // TODO: use firstWhereOrNull to get the first item with qty > 0, or null
   final Map<String, Object>? inStock = null;
 
   print(inStock);

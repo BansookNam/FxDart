@@ -42,6 +42,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 10 · Utilidades de funciones › <strong>delay &amp; sleep</strong></p>
   <h1><code>delay</code> &amp; <code>sleep</code></h1>
   <p class="hero-sub">Espera un poco y produce un valor (delay) — o simplemente espera (sleep).</p>
@@ -102,7 +103,7 @@ Future<void> main() async {
       .toAsync()
       .map((n) => delay(Duration(milliseconds: 150), n * 10))
       .concurrent(3)
-      .toArray();
+      .toList();
 
   print(result); // [10, 20, 30]
   print('took < 300ms: ${sw.elapsedMilliseconds < 300}'); // true
@@ -136,7 +137,7 @@ Future<void> main() async {
 
   <nav class="tut-nav">
     <a href="comparisons.html">← Anterior: gt · gte · lt · lte</a>
-    <a href="unicodeToArray.html">Siguiente: unicodeToArray →</a>
+    <a href="unicodeToList.html">Siguiente: unicodeToList →</a>
   </nav>
 </main>
 <footer class="site-footer">

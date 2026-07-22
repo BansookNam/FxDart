@@ -42,6 +42,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">Esta tradução pode estar desatualizada — a página em inglês mudou depois que ela foi escrita. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
   <p class="hero-logo"><img src="../assets/logo-web.png" width="960" height="294"
       alt="FxDart"></p>
   <h1>Programação funcional para Dart,<br>com laziness e concorrência embutidas.</h1>
@@ -60,7 +61,7 @@ void main() {
   final result = fx([1, 2, 3, 4, 5])
       .map((a) => a + 10)
       .filter((a) => a % 2 == 0)
-      .toArray();
+      .toList();
 
   print(result); // [12, 14]
 }
@@ -78,7 +79,7 @@ void main() {
   <ul>
     <li><strong>Avaliação preguiçosa</strong> — operadores como <code>map</code>,
       <code>filter</code> e <code>take</code> montam um pipeline, mas não fazem
-      trabalho algum até que um operador terminal (<code>toArray</code>, <code>each</code>,
+      trabalho algum até que um operador terminal (<code>toList</code>, <code>each</code>,
       <code>reduce</code>…) puxe valores por ele. Processar um range de um milhão
       de elementos com <code>.take(3)</code> calcula exatamente 3 resultados.</li>
     <li><strong>Um modelo para sync e async</strong> — os mesmos nomes de operadores
@@ -159,7 +160,7 @@ Future<void> main() async {
       .toAsync()
       .map((id) => delay(Duration(milliseconds: 300), 'user$id'))
       .concurrent(3) // ← try 1 (sequential) or 6 (all at once)
-      .toArray();
+      .toList();
 
   print(users);
   print('took ${sw.elapsedMilliseconds}ms');

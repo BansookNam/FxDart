@@ -5,7 +5,7 @@ void main() {
   final ages = [32, 27, 41];
 
   // TODO: zip names and ages together into (name, age) records
-  final people = fx(names).toArray();
+  final people = fx(names).toList();
 
   print(people);
 }

@@ -1,2 +1,4 @@
-A? nth&lt;A&gt;(int index, Iterable&lt;A&gt; iterable)
-Future&lt;A?&gt; nthAsync&lt;A&gt;(int index, FxAsyncIterable&lt;A&gt; iterable)
+A? elementAtOrNull&lt;A&gt;(int index, Iterable&lt;A&gt; iterable)
+Future&lt;A?&gt; elementAtOrNullAsync&lt;A&gt;(int index, FxAsyncIterable&lt;A&gt; iterable)
+T? Fx.elementAtOrNull(int index)  // sync chain: inherited Iterable method
+A? nth&lt;A&gt;(int index, Iterable&lt;A&gt; iterable)  // FxTS alias

@@ -42,14 +42,16 @@
   </div>
 </header>
 <main>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 6 · 결합 › <strong>zipWithIndex</strong></p>
-  <h1><code>zipWithIndex</code></h1>
+  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 6 · 결합 › <strong>indexed</strong></p>
+  <h1><code>indexed</code></h1>
   <p class="hero-sub">각 요소를 (0부터 시작하는) 인덱스와 짝지어 <code>(index, value)</code>로 만듭니다.</p>
 
-  <div class="signature">Iterable&lt;(int, A)&gt; zipWithIndex&lt;A&gt;(Iterable&lt;A&gt; iterable)
-FxAsyncIterable&lt;(int, A)&gt; zipWithIndexAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;(int, T)&gt; Fx.zipWithIndex()        // chain
-FxAsync&lt;(int, T)&gt; FxAsync.zipWithIndex()</div>
+  <div class="signature">Iterable&lt;(int, A)&gt; indexed&lt;A&gt;(Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;(int, A)&gt; indexedAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+Iterable&lt;(int, T)&gt; Fx.indexed         // sync chain: inherited Iterable getter, no parens
+FxAsync&lt;(int, T)&gt; FxAsync.indexed()   // async chain
+Iterable&lt;(int, A)&gt; zipWithIndex&lt;A&gt;(Iterable&lt;A&gt; iterable)  // FxTS alias</div>
 
   <h2>강의</h2>
   <p>
@@ -73,10 +75,14 @@ FxAsync&lt;(int, T)&gt; FxAsync.zipWithIndex()</div>
 import 'package:fxdart/fxdart.dart';
 
 void main() {
-  print(zipWithIndex(['a', 'b', 'c'])); // ((0, a), (1, b), (2, c))
+  print(indexed(['a', 'b', 'c'])); // ((0, a), (1, b), (2, c))
 
-  final result = fx(['x', 'y', 'z']).zipWithIndex().toArray();
+  // Sync chain: .indexed is the inherited Iterable getter — no parens.
+  final result = fx(['x', 'y', 'z']).indexed.toList();
   print(result); // [(0, x), (1, y), (2, z)]
+
+  // FxTS alias: zipWithIndex — the same operator.
+  print(zipWithIndex(['a', 'b', 'c'])); // ((0, a), (1, b), (2, c))
 }
 </textarea>
   </div>
@@ -87,11 +93,12 @@ void main() {
 import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
+  // Async chain: .indexed() is a method — with parens.
   final result = await fx(['a', 'b', 'c'])
       .toAsync()
       .map((a) => delay(Duration(milliseconds: 50), a))
-      .zipWithIndex()
-      .toArray();
+      .indexed()
+      .toList();
 
   print(result); // [(0, a), (1, b), (2, c)]
 }
@@ -108,7 +115,8 @@ void main() {
   final runners = ['ana', 'boo', 'cid'];
 
   // TODO: pair each runner with their (0-based) finishing position
-  final placements = fx(runners).toArray();
+  // Hint: .indexed is the inherited getter — no parens.
+  final placements = fx(runners).toList();
 
   print(placements);
 }

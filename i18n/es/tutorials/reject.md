@@ -2,9 +2,9 @@
 slug: reject
 title: reject — FxDart 101
 description: Tutorial de reject en FxDart: exactamente lo contrario de filter, con un playground en vivo.
-heading: <code>reject</code>
+heading: <code>whereNot</code>
 section: 4
-crumb: reject
+crumb: whereNot
 prev: filter.html
 prevLabel: filter
 next: compact.html

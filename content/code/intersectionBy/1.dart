@@ -14,7 +14,7 @@ Future<void> main() async {
 
   final featuredProducts = await fxAsync(
           intersectionByAsync((p) => p['sku'], featured, catalog))
-      .toArray();
+      .toList();
 
   print(featuredProducts); // [{sku: A1, title: Keyboard}]
   print('took ${sw.elapsedMilliseconds}ms'); // ~100ms

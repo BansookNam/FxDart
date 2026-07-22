@@ -65,5 +65,5 @@ nextLabel: pipe1
     <strong>관련 항목:</strong>
     <a href="fx.html"><code>fx</code></a> — 타입이 유지되는 체인 대안 ·
     <a href="pipe1.html"><code>pipe1</code></a> — 동기/비동기를 모두 다루는 단일 파이프 단계 ·
-    <a href="toArray.html"><code>toArray</code></a> — 파이프의 흔한 마지막 단계
+    <a href="toList.html"><code>toList</code></a> — 파이프의 흔한 마지막 단계
   </div>

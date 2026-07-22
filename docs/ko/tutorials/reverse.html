@@ -76,7 +76,7 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   print(reverse([1, 2, 3, 4])); // (4, 3, 2, 1)
 
-  final result = fx(['a', 'b', 'c']).reverse().toArray();
+  final result = fx(['a', 'b', 'c']).reverse().toList();
   print(result); // [c, b, a]
 }
 </textarea>
@@ -94,7 +94,7 @@ Future<void> main() async {
       .toAsync()
       .map((a) => delay(Duration(milliseconds: 50), a * 10))
       .reverse()
-      .toArray();
+      .toList();
 
   print(result); // [40, 30, 20, 10]
 }
@@ -111,7 +111,7 @@ void main() {
   final history = ['visited home', 'visited cart', 'visited checkout'];
 
   // TODO: reverse the history so the most recent visit comes first
-  final mostRecentFirst = fx(history).toArray();
+  final mostRecentFirst = fx(history).toList();
 
   print(mostRecentFirst);
 }

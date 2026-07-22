@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>toArray — FxDart 101</title>
-  <meta name="description" content="FxDart toArray tutorial: the terminal operator that materializes a lazy chain into a List, sync and async.">
-  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/toArray.html">
-  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/toArray.html">
-  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/toArray.html">
-  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/toArray.html">
-  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/toArray.html">
-  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/toArray.html">
-  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/toArray.html">
-  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/toArray.html">
+  <title>toList — FxDart 101</title>
+  <meta name="description" content="FxDart toList tutorial: the terminal operator that materializes a lazy chain into a List, sync and async.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/toList.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/toList.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/toList.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/toList.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/toList.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/toList.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/toList.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/toList.html">
   <link rel="stylesheet" href="../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
 </head>
@@ -30,47 +30,47 @@
     <nav class="lang-switcher" aria-label="Language">
       <span class="lang-label">Language</span>
       <ul>
-        <li><a href="../tutorials/toArray.html" hreflang="en" lang="en" aria-current="page">English</a></li>
-        <li><a href="../ko/tutorials/toArray.html" hreflang="ko" lang="ko">한국어</a></li>
-        <li><a href="../zh/tutorials/toArray.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
-        <li><a href="../ja/tutorials/toArray.html" hreflang="ja" lang="ja">日本語</a></li>
-        <li><a href="../es/tutorials/toArray.html" hreflang="es" lang="es">Español</a></li>
-        <li><a href="../pt-br/tutorials/toArray.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
-        <li><a href="../ru/tutorials/toArray.html" hreflang="ru" lang="ru">Русский</a></li>
+        <li><a href="../tutorials/toList.html" hreflang="en" lang="en" aria-current="page">English</a></li>
+        <li><a href="../ko/tutorials/toList.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../zh/tutorials/toList.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../ja/tutorials/toList.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../es/tutorials/toList.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../pt-br/tutorials/toList.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../ru/tutorials/toList.html" hreflang="ru" lang="ru">Русский</a></li>
       </ul>
     </nav>
   </div>
 </header>
 <main>
-  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 1 · Getting started › <strong>toArray</strong></p>
-  <h1><code>toArray</code></h1>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 1 · Getting started › <strong>toList</strong></p>
+  <h1><code>toList</code></h1>
   <p class="hero-sub">Materializes a lazy iterable — pulling every value and collecting them into a List.</p>
 
-  <div class="signature">List&lt;A&gt; toArray&lt;A&gt;(Iterable&lt;A&gt; iterable)
-Future&lt;List&lt;A&gt;&gt; toArrayAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
-List&lt;T&gt; Fx.toArray()        // chain
-Future&lt;List&lt;T&gt;&gt; FxAsync.toArray()</div>
+  <div class="signature">List&lt;A&gt; toList&lt;A&gt;(Iterable&lt;A&gt; iterable)
+Future&lt;List&lt;A&gt;&gt; toListAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+List&lt;T&gt; Fx.toList()        // chain
+Future&lt;List&lt;T&gt;&gt; FxAsync.toList()</div>
 
   <h2>Lecture</h2>
   <p>
-    <code>toArray</code> is the workhorse <strong>terminal operator</strong>:
+    <code>toList</code> is the workhorse <strong>terminal operator</strong>:
     it's what actually runs a chain that was, until this point, nothing but
-    a plan. Calling <code>.toArray()</code> pulls every remaining value out
+    a plan. Calling <code>.toList()</code> pulls every remaining value out
     of the iterable, in order, and collects them into a real
     <code>List&lt;T&gt;</code>. Everything upstream — every <code>.map()</code>,
     <code>.filter()</code>, <code>.take()</code> — only runs because
-    <code>toArray</code> asked for values.
+    <code>toList</code> asked for values.
   </p>
   <p>
-    That also means <code>toArray</code> is exactly the operator you must
+    That also means <code>toList</code> is exactly the operator you must
     <em>not</em> call directly on an infinite or unbounded source
     (<code>range</code> with no end, <code>cycle</code>, <code>repeat</code>
     with a huge count) — it will try to pull forever. Bound it first with
-    <code>take(n)</code>, then call <code>toArray</code> on the bounded
+    <code>take(n)</code>, then call <code>toList</code> on the bounded
     result.
   </p>
   <p>
-    The async version, <code>toArrayAsync</code> (or <code>.toArray()</code>
+    The async version, <code>toListAsync</code> (or <code>.toList()</code>
     on an <code>FxAsync</code> chain), awaits each element as it's pulled
     and returns a <code>Future&lt;List&lt;T&gt;&gt;</code>. Combined with
     <code>.concurrent(n)</code> upstream, the individual awaits can overlap
@@ -86,9 +86,9 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   // Data-first form:
-  print(toArray(map((a) => a * 2, [1, 2, 3]))); // [2, 4, 6]
+  print(toList(map((a) => a * 2, [1, 2, 3]))); // [2, 4, 6]
 
-  // Chain form: toArray() is the terminal op that finally pulls values.
+  // Chain form: toList() is the terminal op that finally pulls values.
   var calls = 0;
   final result = fx(range(1000000))
       .map((a) {
@@ -96,17 +96,17 @@ void main() {
         return a;
       })
       .take(3)
-      .toArray();
+      .toList();
 
   print(result);       // [0, 1, 2]
-  print('calls: $calls'); // 3 — toArray only pulled what take(3) allowed
+  print('calls: $calls'); // 3 — toList only pulled what take(3) allowed
 }
 </textarea>
   </div>
 
   <h2>Demo 2 · Async, with concurrency</h2>
   <p>
-    <code>.toArray()</code> on an <code>FxAsync</code> chain awaits every
+    <code>.toList()</code> on an <code>FxAsync</code> chain awaits every
     element and hands back the whole list at once; add
     <code>.concurrent(n)</code> upstream to overlap the individual waits:
   </p>
@@ -117,12 +117,12 @@ import 'package:fxdart/fxdart.dart';
 Future<void> main() async {
   final sw = Stopwatch()..start();
 
-  // toArrayAsync / .toArray() awaits every element, then hands back a List.
+  // toListAsync / .toList() awaits every element, then hands back a List.
   final result = await fx([1, 2, 3, 4])
       .toAsync()
       .map((a) => delay(const Duration(milliseconds: 100), a * 10))
       .concurrent(4)
-      .toArray();
+      .toList();
 
   print(result); // [10, 20, 30, 40]
   print(sw.elapsedMilliseconds < 300); // true — ran concurrently
@@ -138,7 +138,7 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   // TODO: materialize the first 4 squares of range(100) into a List.
-  final squares = fx(range(100)).map((a) => a * a).take(4).toArray();
+  final squares = fx(range(100)).map((a) => a * a).take(4).toList();
 
   print(squares); // [0, 1, 4, 9]
 }
@@ -149,7 +149,7 @@ void main() {
     <strong>Related:</strong>
     <a href="each.html"><code>each</code></a> — terminal op for side effects instead of a List ·
     <a href="consume.html"><code>consume</code></a> — terminal op that discards results entirely ·
-    <a href="fx.html"><code>fx</code></a> — the chain that toArray terminates ·
+    <a href="fx.html"><code>fx</code></a> — the chain that toList terminates ·
     <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
   </div>
 

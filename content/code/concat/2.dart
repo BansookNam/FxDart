@@ -5,7 +5,7 @@ void main() {
   final evening = ['dinner', 'sleep'];
 
   // TODO: concatenate morning and evening into one schedule
-  final schedule = fx(morning).toArray();
+  final schedule = fx(morning).toList();
 
   print(schedule);
 }

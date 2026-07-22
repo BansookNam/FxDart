@@ -15,6 +15,6 @@ void main() {
   ];
 
   final allowed = differenceBy((u) => u['id'], blocked, users);
-  print(toArray(allowed));
+  print(toList(allowed));
   // [{id: 1, name: kim}, {id: 3, name: park}]
 }

@@ -1,4 +1,5 @@
-A? head&lt;A&gt;(Iterable&lt;A&gt; iterable)
-Future&lt;A?&gt; headAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
-T? Fx.head()               // chain
-Future&lt;T?&gt; FxAsync.head()  // chain
+A? firstOrNull&lt;A&gt;(Iterable&lt;A&gt; iterable)
+Future&lt;A?&gt; firstOrNullAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+T? Fx.firstOrNull                // sync chain: inherited Iterable getter, no parens
+Future&lt;T?&gt; FxAsync.firstOrNull()  // async chain method
+A? head&lt;A&gt;(Iterable&lt;A&gt; iterable)  // FxTS alias

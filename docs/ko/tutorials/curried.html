@@ -42,6 +42,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 10 · 함수 유틸리티 › <strong>curried &amp; uncurried</strong></p>
   <h1><code>.curried</code> &amp; <code>.uncurried</code></h1>
   <p class="hero-sub">확장 게터로 제공하는 완전한 타입의 커링 — FxTS <code>curry</code>를 대신하는 Dart다운 방식입니다.</p>
@@ -110,9 +111,9 @@ int multiply(int a, int b) => a * b;
 String echoTimes(String s, int times) => s * times;
 
 void main() {
-  print(fx([1, 2, 3]).map(multiply.curried(10)).toArray()); // [10, 20, 30]
+  print(fx([1, 2, 3]).map(multiply.curried(10)).toList()); // [10, 20, 30]
 
-  print(fx([1, 2, 3]).map(echoTimes.curried('na')).toArray());
+  print(fx([1, 2, 3]).map(echoTimes.curried('na')).toList());
   // [na, nana, nanana]
 }
 </textarea>
@@ -157,7 +158,7 @@ void main() {
   // TODO: derive clampTo100 from clamp with .curried
   final clampTo100 = clamp.curried(100);
 
-  print(fx([50, 99, 150, 300]).map(clampTo100).toArray());
+  print(fx([50, 99, 150, 300]).map(clampTo100).toList());
   // [50, 99, 100, 100]
 }
 </textarea>
@@ -180,7 +181,7 @@ void main() {
   </div>
 
   <nav class="tut-nav">
-    <a href="unicodeToArray.html">← 이전: unicodeToArray</a>
+    <a href="unicodeToList.html">← 이전: unicodeToList</a>
     <a href="toAsync.html">다음: toAsync →</a>
   </nav>
 </main>

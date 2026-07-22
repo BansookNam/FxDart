@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>size — FxDart 101</title>
-  <meta name="description" content="FxDart size tutorial: count the elements a pipeline produces, with a live playground.">
+  <title>count — FxDart 101</title>
+  <meta name="description" content="FxDart count: count the elements a pipeline produces, with a live playground.">
   <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/size.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/size.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/size.html">
@@ -44,38 +44,47 @@
 </header>
 <main>
   <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 7 · Агрегация › <strong>size</strong></p>
-  <h1><code>size</code></h1>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 7 · Агрегация › <strong>count</strong></p>
+  <h1><code>count</code></h1>
   <p class="hero-sub">Counts how many elements a lazy pipeline produces.</p>
 
-  <div class="signature">int size&lt;A&gt;(Iterable&lt;A&gt; iterable)
-Future&lt;int&gt; sizeAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
-int Fx.size()          // chain (sync)
-Future&lt;int&gt; FxAsync.size()  // chain (async)</div>
+  <div class="signature">int count&lt;A&gt;(Iterable&lt;A&gt; iterable)
+Future&lt;int&gt; countAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+int Fx.length              // sync chain: inherited Iterable getter, no parens
+Future&lt;int&gt; FxAsync.count()  // async chain method
+int size&lt;A&gt;(Iterable&lt;A&gt; iterable)  // FxTS alias</div>
 
   <h2>Lecture</h2>
   <p>
-    <code>size</code> is a terminal operator that counts elements by walking
+    <code>count</code> is a terminal operator that counts elements by walking
     through all of them — there's no shortcut, because the upstream pipeline
     might be a lazily-computed <code>map</code>/<code>filter</code> chain with
     no fixed length until it's actually pulled. That means calling
-    <code>size</code> on a <code>filter</code>ed million-element
+    <code>count</code> on a <code>filter</code>ed million-element
     <code>range</code> really does iterate all million values; it just
-    doesn't build a <code>List</code> to do it.
+    doesn't build a <code>List</code> to do it. <code>count</code> is the
+    Dart-idiomatic name; fxdart also accepts the FxTS spelling
+    <code>size</code> — they're the same operator.
   </p>
   <p>
     It works on any element type — unlike the numeric terminals
     (<code><a href="sum.html">sum</a></code>,
     <code><a href="min.html">min</a></code>,
     <code><a href="max.html">max</a></code>,
-    <code><a href="average.html">average</a></code>), <code>size</code>
+    <code><a href="average.html">average</a></code>), <code>count</code>
     doesn't care what's inside the iterable, only how many there are.
   </p>
   <p>
-    If you already have a concrete <code>List</code>, its <code>.length</code>
-    is free — reach for <code>size</code> specifically when you're counting
-    the output of a lazy chain without wanting to materialize it into a
-    <code>List</code> first via <code><a href="../101/index.html">toArray</a></code>.
+    On the sync chain, <code>count</code> <em>is</em> Dart's inherited
+    <code>Iterable.length</code> getter (no parens) — since <code>Fx</code> is
+    an <code>Iterable</code>, <code>fx(pipeline).length</code> walks the chain
+    and returns the total. Use the top-level <code>count(iterable)</code>, or
+    <code>.count()</code> on the <em>async</em> chain, when you'd rather write
+    it as a named operator. If you already have a concrete <code>List</code>,
+    its <code>.length</code> is free — reach for <code>count</code>
+    specifically when you're counting the output of a lazy chain without
+    wanting to materialize it into a <code>List</code> first via
+    <code><a href="../101/index.html">toList</a></code>.
   </p>
 
   <h2>Demo 1 · Basics</h2>
@@ -85,11 +94,14 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   // Data-first form: counts elements by pulling the whole pipeline.
-  print(size(range(1000000).where((a) => a % 7 == 0))); // 142858
+  print(count(range(1000000).where((a) => a % 7 == 0))); // 142858
 
-  // Chain form:
-  final count = fx([1, 2, 3, 4, 5, 6]).filter((a) => a.isEven).size();
-  print(count); // 3
+  // Sync chain: count is Dart's inherited .length getter — no parens.
+  final n = fx([1, 2, 3, 4, 5, 6]).filter((a) => a.isEven).length;
+  print(n); // 3
+
+  // FxTS alias: size — the same operator.
+  print(size([1, 2, 3])); // 3
 }
 </textarea>
   </div>
@@ -100,13 +112,14 @@ void main() {
 import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
-  // sizeAsync / .toAsync().size() still has to pull every element to count them.
-  final count = await fx(['a', 'bb', 'ccc', 'd'])
+  // Async chain: .count() is a method — with parens — and still has to pull
+  // every element to count them.
+  final n = await fx(['a', 'bb', 'ccc', 'd'])
       .toAsync()
       .filter((s) => delay(const Duration(milliseconds: 100), s.length > 1))
-      .size();
+      .count();
 
-  print(count); // 2
+  print(n); // 2
 }
 </textarea>
   </div>
@@ -121,18 +134,19 @@ void main() {
   final inventory = [3, 0, 7, 0, 5, 0, 9];
 
   // TODO: count how many entries are OUT OF STOCK (value == 0).
-  final count = fx(inventory).size();
+  // Hint: on the sync chain, count is the inherited .length getter — no parens.
+  final n = fx(inventory).length;
 
-  print(count);
+  print(n);
 }
 </textarea>
   </div>
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="average.html"><code>average</code></a> — uses a size-like count internally ·
+    <a href="average.html"><code>average</code></a> — uses a count-like tally internally ·
     <a href="isEmpty.html"><code>isEmpty</code></a> — a cheaper check when you only need to know "any at all?" ·
-    <a href="../101/index.html">toArray</a> — materialize instead of just counting
+    <a href="../101/index.html">toList</a> — materialize instead of just counting
   </div>
 
   <nav class="tut-nav">

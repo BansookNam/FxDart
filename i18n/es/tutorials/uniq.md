@@ -2,9 +2,9 @@
 slug: uniq
 title: uniq — FxDart 101
 description: Tutorial de uniq en FxDart: elimina valores duplicados conservando el orden de primera aparición, con un playground en vivo.
-heading: <code>uniq</code>
+heading: <code>distinct</code>
 section: 4
-crumb: uniq
+crumb: distinct
 prev: compact.html
 prevLabel: compact
 next: uniqBy.html

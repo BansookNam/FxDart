@@ -1,4 +1,5 @@
-Iterable&lt;A&gt; takeRight&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
-FxAsyncIterable&lt;A&gt; takeRightAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;T&gt; Fx.takeRight(int count)        // chain
-FxAsync&lt;T&gt; FxAsync.takeRight(int count)
+Iterable&lt;A&gt; takeLast&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; takeLastAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.takeLast(int count)        // chain
+FxAsync&lt;T&gt; FxAsync.takeLast(int count)
+Iterable&lt;A&gt; takeRight&lt;A&gt;(...)        // FxTS alias

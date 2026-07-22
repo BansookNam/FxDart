@@ -1,4 +1,5 @@
-Iterable&lt;A&gt; filter&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
-FxAsyncIterable&lt;A&gt; filterAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;T&gt; Fx.filter(bool Function(T a) f)        // chain (alias: where)
-FxAsync&lt;T&gt; FxAsync.filter(FutureOr&lt;bool&gt; Function(T a) f)
+Iterable&lt;A&gt; where&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; whereAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.where(bool Function(T a) f)        // chain
+FxAsync&lt;T&gt; FxAsync.where(FutureOr&lt;bool&gt; Function(T a) f)
+Iterable&lt;A&gt; filter&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)   // FxTS alias

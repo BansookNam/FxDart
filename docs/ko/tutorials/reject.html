@@ -42,14 +42,16 @@
   </div>
 </header>
 <main>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 4 · 필터링 &amp; 중복 제거 › <strong>reject</strong></p>
-  <h1><code>reject</code></h1>
+  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 4 · 필터링 &amp; 중복 제거 › <strong>whereNot</strong></p>
+  <h1><code>whereNot</code></h1>
   <p class="hero-sub">술어가 false를 반환하는 원소만 남깁니다 — filter를 거울에 비춘 함수입니다.</p>
 
-  <div class="signature">Iterable&lt;A&gt; reject&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
-FxAsyncIterable&lt;A&gt; rejectAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;T&gt; Fx.reject(bool Function(T a) f)        // chain
-FxAsync&lt;T&gt; FxAsync.reject(FutureOr&lt;bool&gt; Function(T a) f)</div>
+  <div class="signature">Iterable&lt;A&gt; whereNot&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; whereNotAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.whereNot(bool Function(T a) f)        // chain
+FxAsync&lt;T&gt; FxAsync.whereNot(FutureOr&lt;bool&gt; Function(T a) f)
+Iterable&lt;A&gt; reject&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)   // FxTS alias</div>
 
   <h2>강의</h2>
   <p>
@@ -74,14 +76,15 @@ FxAsync&lt;T&gt; FxAsync.reject(FutureOr&lt;bool&gt; Function(T a) f)</div>
 import 'package:fxdart/fxdart.dart';
 
 void main() {
-  // Data-first form: reject keeps everything filter would drop.
-  print(toArray(reject((a) => a % 2 == 0, [0, 1, 2, 3, 4, 5, 6])));
+  // Data-first form: whereNot keeps everything where would drop.
+  print(toList(whereNot((a) => a % 2 == 0, [0, 1, 2, 3, 4, 5, 6])));
   // [1, 3, 5]
+  // FxTS alias: reject((a) => a % 2 == 0, ...) does the same thing.
 
   // Chain form:
   final result = fx(['ok', 'error', 'ok', 'timeout'])
-      .reject((s) => s == 'ok')
-      .toArray();
+      .whereNot((s) => s == 'ok')
+      .toList();
   print(result); // [error, timeout]
 }
 </textarea>
@@ -95,15 +98,15 @@ import 'package:fxdart/fxdart.dart';
 Future<void> main() async {
   final sw = Stopwatch()..start();
 
-  // rejectAsync delegates to filterAsync's concurrent predicate evaluation.
+  // whereNotAsync delegates to whereAsync's concurrent predicate evaluation.
   final result = await fx([1, 2, 3, 4, 5, 6])
       .toAsync()
-      .reject((a) async {
+      .whereNot((a) async {
         await delay(Duration(milliseconds: 150), null);
         return a.isEven;
       })
       .concurrent(3)
-      .toArray();
+      .toList();
 
   print(result); // [1, 3, 5]
   print('took ${sw.elapsedMilliseconds}ms'); // ~300ms, not ~900ms
@@ -121,8 +124,8 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final logs = ['info: ok', 'error: disk full', 'info: ok', 'error: timeout'];
 
-  // TODO: use reject to drop the 'info: ok' lines, keeping only the errors.
-  final errors = fx(logs).toArray();
+  // TODO: use whereNot to drop the 'info: ok' lines, keeping only the errors.
+  final errors = fx(logs).toList();
 
   print(errors);
 }

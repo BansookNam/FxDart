@@ -58,7 +58,7 @@ FxAsync&lt;R&gt; FxAsync.map&lt;R&gt;(FutureOr&lt;R&gt; Function(T a) f)</div>
     <code>map</code> is the most fundamental transformer: it applies a function
     to every element. In FxDart it is <strong>lazy</strong> — calling
     <code>map</code> does no work at all. The function runs only when a terminal
-    operator (<code>toArray</code>, <code>each</code>, <code>reduce</code>, …)
+    operator (<code>toList</code>, <code>each</code>, <code>reduce</code>, …)
     pulls values through the pipeline. That means you can <code>map</code> over
     an enormous — even infinite — sequence, as long as you only pull what you
     need.
@@ -77,7 +77,7 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   // Data-first form:
-  print(toArray(map((a) => a * 2, [1, 2, 3]))); // [2, 4, 6]
+  print(toList(map((a) => a * 2, [1, 2, 3]))); // [2, 4, 6]
 
   // Chain form, with proof of laziness:
   var calls = 0;
@@ -87,7 +87,7 @@ void main() {
         return a * a;
       })
       .take(3)
-      .toArray();
+      .toList();
 
   print(result);            // [0, 1, 4]
   print('map ran $calls times'); // 3 — not 1000000!
@@ -113,7 +113,7 @@ Future<void> main() async {
       .toAsync()
       .map((a) => delay(Duration(milliseconds: 200), a * 10))
       .concurrent(3) // remove this line to see ~1200ms
-      .toArray();
+      .toList();
 
   print(result); // [10, 20, 30, 40, 50, 60]
   print('took ${sw.elapsedMilliseconds}ms');
@@ -136,7 +136,7 @@ void main() {
   ];
 
   // TODO: map each person to '<NAME IN UPPERCASE> (<age>)'
-  final labels = fx(people).map((p) => '$p').toArray();
+  final labels = fx(people).map((p) => '$p').toList();
 
   labels.forEach(print);
 }

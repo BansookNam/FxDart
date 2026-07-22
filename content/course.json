@@ -3,8 +3,8 @@
     {"href": "fx.html", "label": "fx"},
     {"href": "pipe.html", "label": "pipe"},
     {"href": "pipe1.html", "label": "pipe1"},
-    {"href": "toArray.html", "label": "toArray"},
-    {"href": "each.html", "label": "each"},
+    {"href": "toList.html", "label": "toList"},
+    {"href": "each.html", "label": "forEach"},
     {"href": "consume.html", "label": "consume"}
   ],
   "2": [
@@ -18,18 +18,18 @@
   "3": [
     {"href": "map.html", "label": "map"},
     {"href": "mapEffect.html", "label": "mapEffect"},
-    {"href": "flatMap.html", "label": "flatMap"},
-    {"href": "flat.html", "label": "flat"},
+    {"href": "flatMap.html", "label": "expand"},
+    {"href": "flat.html", "label": "flattened"},
     {"href": "scan.html", "label": "scan"},
     {"href": "peek.html", "label": "peek"},
     {"href": "pluck.html", "label": "pluck"}
   ],
   "4": [
-    {"href": "filter.html", "label": "filter"},
-    {"href": "reject.html", "label": "reject"},
-    {"href": "compact.html", "label": "compact"},
-    {"href": "uniq.html", "label": "uniq"},
-    {"href": "uniqBy.html", "label": "uniqBy"},
+    {"href": "filter.html", "label": "where"},
+    {"href": "reject.html", "label": "whereNot"},
+    {"href": "compact.html", "label": "nonNulls"},
+    {"href": "uniq.html", "label": "distinct"},
+    {"href": "uniqBy.html", "label": "distinctBy"},
     {"href": "difference.html", "label": "difference"},
     {"href": "differenceBy.html", "label": "differenceBy"},
     {"href": "intersection.html", "label": "intersection"},
@@ -38,12 +38,12 @@
   ],
   "5": [
     {"href": "take.html", "label": "take"},
-    {"href": "takeRight.html", "label": "takeRight"},
+    {"href": "takeRight.html", "label": "takeLast"},
     {"href": "takeWhile.html", "label": "takeWhile"},
     {"href": "takeUntilInclusive.html", "label": "takeUntilInclusive"},
-    {"href": "drop.html", "label": "drop"},
+    {"href": "drop.html", "label": "skip"},
     {"href": "dropRight.html", "label": "dropRight"},
-    {"href": "dropWhile.html", "label": "dropWhile"},
+    {"href": "dropWhile.html", "label": "skipWhile"},
     {"href": "dropUntil.html", "label": "dropUntil"},
     {"href": "slice.html", "label": "slice"},
     {"href": "chunk.html", "label": "chunk"},
@@ -55,7 +55,7 @@
     {"href": "concat.html", "label": "concat"},
     {"href": "zip.html", "label": "zip"},
     {"href": "zipWith.html", "label": "zipWith"},
-    {"href": "zipWithIndex.html", "label": "zipWithIndex"},
+    {"href": "zipWithIndex.html", "label": "indexed"},
     {"href": "transpose.html", "label": "transpose"},
     {"href": "reverse.html", "label": "reverse"},
     {"href": "fork.html", "label": "fork"}
@@ -68,7 +68,7 @@
     {"href": "average.html", "label": "average"},
     {"href": "min.html", "label": "min"},
     {"href": "max.html", "label": "max"},
-    {"href": "size.html", "label": "size"},
+    {"href": "size.html", "label": "count"},
     {"href": "join.html", "label": "join"},
     {"href": "groupBy.html", "label": "groupBy"},
     {"href": "indexBy.html", "label": "indexBy"},
@@ -78,15 +78,15 @@
     {"href": "partition.html", "label": "partition"}
   ],
   "8": [
-    {"href": "head.html", "label": "head"},
-    {"href": "last.html", "label": "last"},
-    {"href": "nth.html", "label": "nth"},
-    {"href": "find.html", "label": "find"},
-    {"href": "findIndex.html", "label": "findIndex"},
-    {"href": "includes.html", "label": "includes"},
+    {"href": "head.html", "label": "firstOrNull"},
+    {"href": "last.html", "label": "lastOrNull"},
+    {"href": "nth.html", "label": "elementAtOrNull"},
+    {"href": "find.html", "label": "firstWhereOrNull"},
+    {"href": "findIndex.html", "label": "indexWhere"},
+    {"href": "includes.html", "label": "contains"},
     {"href": "isEmpty.html", "label": "isEmpty"},
     {"href": "every.html", "label": "every"},
-    {"href": "some.html", "label": "some"},
+    {"href": "some.html", "label": "any"},
     {"href": "predicates.html", "label": "predicates (isNull, isString, …)"}
   ],
   "9": [
@@ -120,7 +120,7 @@
     {"href": "add.html", "label": "add"},
     {"href": "comparisons.html", "label": "gt · gte · lt · lte"},
     {"href": "delay.html", "label": "delay &amp; sleep"},
-    {"href": "unicodeToArray.html", "label": "unicodeToArray"},
+    {"href": "unicodeToList.html", "label": "unicodeToList"},
     {"href": "curried.html", "label": "curried &amp; uncurried"}
   ],
   "11": [

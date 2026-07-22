@@ -1,10 +1,10 @@
 ---
 slug: flat
-title: flat — FxDart 101
-description: FxDart flat tutorial: flatten nested iterables by a given depth, with a live playground.
-heading: <code>flat</code>
+title: flattened — FxDart 101
+description: FxDart flattened tutorial: flatten nested iterables by a given depth, with a live playground.
+heading: <code>flattened</code>
 section: 3
-crumb: flat
+crumb: flattened
 prev: flatMap.html
 prevLabel: flatMap
 next: scan.html
@@ -16,12 +16,14 @@ nextLabel: scan
 
   <h2>Lecture</h2>
   <p>
-    <code>flat</code> walks a nested structure of iterables and splices
+    <code>flattened</code> walks a nested structure of iterables and splices
     inner elements into the outer sequence, up to <code>depth</code> levels
     deep (default <code>1</code>). Anything that is an <code>Iterable</code>
     counts as "flattenable" <em>except</em> <code>String</code> — so
-    <code>flat(['ab', ['cd']])</code> keeps <code>'ab'</code> intact instead
-    of exploding it into characters.
+    <code>flattened(['ab', ['cd']])</code> keeps <code>'ab'</code> intact instead
+    of exploding it into characters. <code>flattened</code> is the
+    Dart-idiomatic name; fxdart also accepts the FxTS spelling <code>flat</code>
+    — they're the same operator.
   </p>
   <p>
     <strong>Why <code>Iterable&lt;dynamic&gt;</code>, and why that's okay:</strong>
@@ -37,12 +39,12 @@ nextLabel: scan
     flatten for exactly-one-level-deep, uniformly-shaped data.
   </p>
   <p>
-    Like <code>flat</code> in FxTS, <code>flatAsync</code> only recurses
+    Like <code>flat</code> in FxTS, <code>flattenedAsync</code> only recurses
     into nesting that is already a <em>synchronous</em> <code>Iterable</code>
     by the time it arrives — it does not await a <code>Future</code> buried
     inside a nested collection. Combine it with an upstream
     <code>.map(...).concurrent(n)</code> stage to fetch nested lists in
-    parallel, then let <code>.flat()</code> splice the already-resolved
+    parallel, then let <code>.flattened()</code> splice the already-resolved
     results together.
   </p>
 
@@ -57,7 +59,7 @@ nextLabel: scan
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>flat()</code> to flatten <code>scoreGroups</code>
+  <p>Exercise: use <code>flattened()</code> to flatten <code>scoreGroups</code>
     by one level.</p>
   {{playground:2}}
 

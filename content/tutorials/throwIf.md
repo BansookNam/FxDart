@@ -36,7 +36,7 @@ nextLabel: cases
   <h2>Demo 2 · Validating a pipeline</h2>
   <p>
     Each age is validated as it's mapped; the first violation aborts the
-    whole <code>toArray()</code> call:
+    whole <code>toList()</code> call:
   </p>
   {{playground:1}}
 

@@ -28,14 +28,14 @@ nextLabel: debounce
     하류의 요구 마커에 의해 구동되는 <code>concurrent</code>와 달리,
     <code>concurrentPool</code>은 <strong>적극적으로 풀을 가득 채웁니다</strong>.
     첫 pull부터 소비자가 몇 개를 기다리든 상관없이 최대 <code>n</code>개의
-    요청을 계속 진행 상태로 유지합니다. 그래서 <code>.toArray()</code>나
+    요청을 계속 진행 상태로 유지합니다. 그래서 <code>.toList()</code>나
     <code>.each()</code>처럼 한 번에 하나씩만 당겨 가는 종결 연산자도 온전한
     중첩 실행 효과를 얻으며, 결과는 끝나는 순서대로 보게 됩니다.
   </p>
 
   <h2>데모 1 · 완료 순서</h2>
   <p>항목 1이 가장 느리고(300ms) 항목 2가 가장 빠릅니다(100ms). 결과는
-    <code>.toArray()</code>에서 곧바로 빠른 것부터 나옵니다.</p>
+    <code>.toList()</code>에서 곧바로 빠른 것부터 나옵니다.</p>
   {{playground:0}}
 
   <h2>데모 2 · concurrent와의 비교</h2>

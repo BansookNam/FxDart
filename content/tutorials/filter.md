@@ -1,10 +1,10 @@
 ---
 slug: filter
-title: filter — FxDart 101
-description: FxDart filter tutorial: keep only the elements a predicate accepts, sync and async, with a live playground.
-heading: <code>filter</code>
+title: where — FxDart 101
+description: FxDart where tutorial: keep only the elements a predicate accepts, sync and async, with a live playground.
+heading: <code>where</code>
 section: 4
-crumb: filter
+crumb: where
 prev: pluck.html
 prevLabel: pluck
 next: reject.html
@@ -16,20 +16,20 @@ nextLabel: reject
 
   <h2>Lecture</h2>
   <p>
-    <code>filter</code> is the other fundamental transformer alongside
+    <code>where</code> is the other fundamental transformer alongside
     <code>map</code>: it keeps every element for which the predicate
     returns <code>true</code> and drops the rest, lazily. Nothing runs
-    until a terminal operator pulls values through, and since <code>Fx</code>
-    extends <code>Iterable</code>, <code>.where(...)</code> works too — it's
-    just an alias for <code>.filter(...)</code> on the chain.
+    until a terminal operator pulls values through. <code>where</code> is
+    the Dart-idiomatic name; fxdart also accepts the FxTS spelling
+    <code>filter</code> — they're the same operator.
   </p>
   <p>
-    Because it's lazy, combining <code>filter</code> with <code>take</code>
+    Because it's lazy, combining <code>where</code> with <code>take</code>
     only evaluates as many predicate calls as needed to satisfy the
     <code>take</code> — see Demo 1.
   </p>
   <p>
-    <code>filterAsync</code> has its own dedicated concurrent implementation
+    <code>whereAsync</code> has its own dedicated concurrent implementation
     (rather than reusing <code>mapAsync</code>'s): when you attach
     <code>.concurrent(n)</code>, <code>n</code> predicates are evaluated in
     parallel, but the elements that pass are still released downstream in
@@ -44,7 +44,7 @@ nextLabel: reject
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>filter</code> to keep only ages 18 and over.</p>
+  <p>Exercise: use <code>where</code> to keep only ages 18 and over.</p>
   {{playground:2}}
 
   <div class="callout">

@@ -21,7 +21,7 @@ nextLabel: entries
     반복합니다. 이 섹션의 다른 함수들과 달리 <code>cycle</code>은 스스로
     끝나는 법이 없습니다 — 언제 멈출지 결정하는 무언가와 반드시 짝지어야
     하며, 대개는 <code>.take(n)</code>입니다. 중간에 아무 제한도 두지 않고
-    <code>cycle(...)</code>에 곧바로 <code>toArray()</code>나
+    <code>cycle(...)</code>에 곧바로 <code>toList()</code>나
     <code>consume()</code>을 호출하면 영영 끝나지 않습니다.
   </p>
   <p>

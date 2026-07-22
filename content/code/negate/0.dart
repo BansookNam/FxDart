@@ -7,5 +7,5 @@ void main() {
   print(isOdd(3)); // true
   print(isOdd(4)); // false
 
-  print(fx([1, 2, 3, 4, 5]).filter(negate(isEven)).toArray()); // [1, 3, 5]
+  print(fx([1, 2, 3, 4, 5]).filter(negate(isEven)).toList()); // [1, 3, 5]
 }

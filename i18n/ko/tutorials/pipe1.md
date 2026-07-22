@@ -7,8 +7,8 @@ section: 1
 crumb: pipe1
 prev: pipe.html
 prevLabel: pipe
-next: toArray.html
-nextLabel: toArray
+next: toList.html
+nextLabel: toList
 ---
   <p class="hero-sub">값에 함수 하나를 적용합니다. 값이 Future라면 먼저 await합니다.</p>
 

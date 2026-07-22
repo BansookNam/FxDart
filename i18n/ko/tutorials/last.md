@@ -2,9 +2,9 @@
 slug: last
 title: last — FxDart 101
 description: FxDart last 튜토리얼: 이터러블의 마지막 원소를 얻습니다. 비어 있으면 null을 반환하며, 체인 게터에 얽힌 함정도 함께 짚습니다.
-heading: <code>last</code>
+heading: <code>lastOrNull</code>
 section: 8
-crumb: last
+crumb: lastOrNull
 prev: head.html
 prevLabel: head
 next: nth.html

@@ -10,7 +10,7 @@ void main() {
     yield 99;
   }
 
-  final result = fx(concat([1, 2], second())).take(2).toArray();
+  final result = fx(concat([1, 2], second())).take(2).toList();
   print(result); // [1, 2]
   print('second touched: $secondTouched'); // false
 }

@@ -78,7 +78,7 @@ void main() {
   print(dropUntil((a) => a == 3, [1, 2, 3, 4, 5])); // (4, 5)
 
   final result =
-      fx(['a', 'b', 'STOP', 'c', 'd']).dropUntil((a) => a == 'STOP').toArray();
+      fx(['a', 'b', 'STOP', 'c', 'd']).dropUntil((a) => a == 'STOP').toList();
   print(result); // [c, d]
 }
 </textarea>
@@ -94,7 +94,7 @@ Future<void> main() async {
       .toAsync()
       .map((a) => delay(Duration(milliseconds: 50), a))
       .dropUntil((a) => a == 3)
-      .toArray();
+      .toList();
 
   print(result); // [4, 5]
 }
@@ -111,7 +111,7 @@ void main() {
   final log = ['start', 'step1', 'READY', 'step2', 'step3'];
 
   // TODO: drop everything up to and including 'READY'
-  final afterReady = fx(log).toArray();
+  final afterReady = fx(log).toList();
 
   print(afterReady);
 }

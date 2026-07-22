@@ -26,7 +26,7 @@ description: FxDart は FxTS から移植された Dart 向けの関数型プロ
   <ul>
     <li><strong>遅延評価</strong> — <code>map</code>、<code>filter</code>、
       <code>take</code> といった演算子はパイプラインを組み立てるだけで、
-      終端演算子（<code>toArray</code>、<code>each</code>、
+      終端演算子（<code>toList</code>、<code>each</code>、
       <code>reduce</code> など）が値を引き出すまで何も処理しません。100万要素の
       range を <code>.take(3)</code> で処理すると、計算されるのはちょうど3件です。</li>
     <li><strong>同期と非同期で同一のモデル</strong> — 同じ演算子名が素の

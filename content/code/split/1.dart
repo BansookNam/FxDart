@@ -1,7 +1,7 @@
 import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
-  final result = await toArrayAsync(
+  final result = await toListAsync(
     splitAsync(',', toAsync('x,y,z'.split(''))),
   );
 

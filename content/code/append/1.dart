@@ -5,7 +5,7 @@ Future<void> main() async {
   final result = await fx([1, 2, 3])
       .toAsync()
       .append(delay(Duration(milliseconds: 50), 4))
-      .toArray();
+      .toList();
 
   print(result); // [1, 2, 3, 4]
 }

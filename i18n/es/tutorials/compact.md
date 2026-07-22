@@ -2,9 +2,9 @@
 slug: compact
 title: compact — FxDart 101
 description: Tutorial de compact en FxDart: descarta los null y estrecha el tipo del elemento, con un playground en vivo.
-heading: <code>compact</code>
+heading: <code>nonNulls</code>
 section: 4
-crumb: compact
+crumb: nonNulls
 prev: reject.html
 prevLabel: reject
 next: uniq.html

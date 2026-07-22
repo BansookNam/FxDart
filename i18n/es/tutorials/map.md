@@ -17,7 +17,7 @@ nextLabel: mapEffect
     <code>map</code> es el transformador más fundamental: aplica una función
     a cada elemento. En FxDart es <strong>perezoso</strong> — llamar a
     <code>map</code> no hace absolutamente nada de trabajo. La función solo se
-    ejecuta cuando un operador terminal (<code>toArray</code>,
+    ejecuta cuando un operador terminal (<code>toList</code>,
     <code>each</code>, <code>reduce</code>, …) tira de los valores a través
     del pipeline. Eso significa que puedes hacer <code>map</code> sobre una
     secuencia enorme — incluso infinita — mientras solo pidas lo que

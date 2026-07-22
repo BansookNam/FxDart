@@ -2,9 +2,9 @@
 slug: dropWhile
 title: dropWhile — FxDart 101
 description: FxDart dropWhile 튜토리얼: 술어가 참인 동안 값을 건너뛰고 그 뒤를 모두 내보내는 방법을 라이브 플레이그라운드와 함께 익힙니다.
-heading: <code>dropWhile</code>
+heading: <code>skipWhile</code>
 section: 5
-crumb: dropWhile
+crumb: skipWhile
 prev: dropRight.html
 prevLabel: dropRight
 next: dropUntil.html

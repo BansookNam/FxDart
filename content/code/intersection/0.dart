@@ -7,10 +7,10 @@ void main() {
   final inStock = {'mouse', 'keyboard', 'monitor'};
   final wishlist = ['monitor', 'mouse', 'headphones', 'mouse'];
 
-  print(toArray(intersection(inStock, wishlist)));
+  print(toList(intersection(inStock, wishlist)));
   // [monitor, mouse] -- wishlist's order, deduped, filtered to in-stock items
 
   // Swap the arguments: now the ORDER comes from inStock instead.
-  print(toArray(intersection(wishlist, inStock)));
+  print(toList(intersection(wishlist, inStock)));
   // [mouse, monitor] -- inStock's own iteration order this time
 }

@@ -1,10 +1,10 @@
 ---
 slug: findIndex
-title: findIndex — FxDart 101
-description: FxDart findIndex tutorial: get the position of the first match, -1 when nothing matches, lazy and short-circuiting.
-heading: <code>findIndex</code>
+title: indexWhere — FxDart 101
+description: FxDart indexWhere tutorial: get the position of the first match, -1 when nothing matches, lazy and short-circuiting.
+heading: <code>indexWhere</code>
 section: 8
-crumb: findIndex
+crumb: indexWhere
 prev: find.html
 prevLabel: find
 next: includes.html
@@ -16,7 +16,10 @@ nextLabel: includes
 
   <h2>Lecture</h2>
   <p>
-    <code>findIndex</code> is <code>find</code>'s sibling: same lazy,
+    <code>indexWhere</code> is the Dart-idiomatic name (cf.
+    <code>List.indexWhere</code>); fxdart also accepts the FxTS spelling
+    <code>findIndex</code> — they're the same operator. It's
+    <code>find</code>'s sibling: same lazy,
     short-circuiting scan, but it reports <em>where</em> the match was
     instead of the match itself. Note the different "nothing found"
     sentinel — this one is <code>-1</code>, an <code>int</code>, matching
@@ -38,7 +41,7 @@ nextLabel: includes
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>findIndex</code> to find bob's position in the queue, or <code>-1</code>.</p>
+  <p>Exercise: use <code>indexWhere</code> to find bob's position in the queue, or <code>-1</code>.</p>
   {{playground:2}}
 
   <div class="callout">

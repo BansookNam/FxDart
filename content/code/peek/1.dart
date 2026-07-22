@@ -13,7 +13,7 @@ Future<void> main() async {
         logged.add(a);
       })
       .concurrent(3)
-      .toArray();
+      .toList();
 
   print(result); // [1, 2, 3]
   print(logged.length); // 3

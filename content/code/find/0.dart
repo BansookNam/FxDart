@@ -7,8 +7,9 @@ void main() {
     {'name': 'park', 'age': 45},
   ];
 
-  final adult = find((u) => (u['age'] as int) >= 18, users);
+  final adult = firstWhereOrNull((u) => (u['age'] as int) >= 18, users);
   print(adult); // {name: lee, age: 32}
 
-  print(fx(users).find((u) => u['name'] == 'nobody')); // null
+  // FxTS alias: find is the same operator.
+  print(fx(users).firstWhereOrNull((u) => u['name'] == 'nobody')); // null
 }

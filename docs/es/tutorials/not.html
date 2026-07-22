@@ -74,7 +74,7 @@ void main() {
   print(not(true));  // false
   print(not(false)); // true
 
-  print(fx([true, false, true]).map(not).toArray()); // [false, true, false]
+  print(fx([true, false, true]).map(not).toList()); // [false, true, false]
 }
 </textarea>
   </div>
@@ -108,7 +108,7 @@ void main() {
   final done = [true, false, false, true];
 
   // TODO: use `not` to build the "still pending" flags
-  final pending = fx(done).map(not).toArray();
+  final pending = fx(done).map(not).toList();
 
   print(pending); // [false, true, true, false]
 }

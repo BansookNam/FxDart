@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>reject — FxDart 101</title>
-  <meta name="description" content="FxDart reject tutorial: the exact opposite of filter, with a live playground.">
+  <title>whereNot — FxDart 101</title>
+  <meta name="description" content="FxDart whereNot tutorial: keep every element a predicate rejects — the mirror image of where, with a live playground.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/reject.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/reject.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/reject.html">
@@ -42,28 +42,31 @@
   </div>
 </header>
 <main>
-  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 4 · Filtering &amp; deduplication › <strong>reject</strong></p>
-  <h1><code>reject</code></h1>
-  <p class="hero-sub">Keeps every element a predicate returns false for — the mirror image of filter.</p>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 4 · Filtering &amp; deduplication › <strong>whereNot</strong></p>
+  <h1><code>whereNot</code></h1>
+  <p class="hero-sub">Keeps every element a predicate returns false for — the mirror image of where.</p>
 
-  <div class="signature">Iterable&lt;A&gt; reject&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
-FxAsyncIterable&lt;A&gt; rejectAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;T&gt; Fx.reject(bool Function(T a) f)        // chain
-FxAsync&lt;T&gt; FxAsync.reject(FutureOr&lt;bool&gt; Function(T a) f)</div>
+  <div class="signature">Iterable&lt;A&gt; whereNot&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; whereNotAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.whereNot(bool Function(T a) f)        // chain
+FxAsync&lt;T&gt; FxAsync.whereNot(FutureOr&lt;bool&gt; Function(T a) f)
+Iterable&lt;A&gt; reject&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)   // FxTS alias</div>
 
   <h2>Lecture</h2>
   <p>
-    <code>reject</code> is implemented as
-    <code>filter((a) =&gt; !f(a), iterable)</code> — it exists purely for
-    readability. <code>list.reject(isInvalid)</code> reads more naturally
-    than <code>list.filter((a) =&gt; !isInvalid(a))</code>, especially once
-    the predicate already has a clear, positive name. Pick whichever of
-    <code>filter</code>/<code>reject</code> lets you avoid writing a
+    <code>whereNot</code> is implemented as
+    <code>where((a) =&gt; !f(a), iterable)</code> — it exists purely for
+    readability. <code>list.whereNot(isInvalid)</code> reads more naturally
+    than <code>list.where((a) =&gt; !isInvalid(a))</code>, especially once
+    the predicate already has a clear, positive name. <code>whereNot</code>
+    is the Dart-idiomatic name; fxdart also accepts the FxTS spelling
+    <code>reject</code> — they're the same operator. Pick whichever of
+    <code>where</code>/<code>whereNot</code> lets you avoid writing a
     negation at the call site.
   </p>
   <p>
-    Everything about <code>filter</code>'s behavior carries over unchanged:
-    it's lazy, and the async form inherits <code>filterAsync</code>'s
+    Everything about <code>where</code>'s behavior carries over unchanged:
+    it's lazy, and the async form inherits <code>whereAsync</code>'s
     dedicated concurrent path, so <code>.concurrent(n)</code> genuinely
     evaluates <code>n</code> predicates in parallel while still returning
     results in original order.
@@ -75,14 +78,15 @@ FxAsync&lt;T&gt; FxAsync.reject(FutureOr&lt;bool&gt; Function(T a) f)</div>
 import 'package:fxdart/fxdart.dart';
 
 void main() {
-  // Data-first form: reject keeps everything filter would drop.
-  print(toArray(reject((a) => a % 2 == 0, [0, 1, 2, 3, 4, 5, 6])));
+  // Data-first form: whereNot keeps everything where would drop.
+  print(toList(whereNot((a) => a % 2 == 0, [0, 1, 2, 3, 4, 5, 6])));
   // [1, 3, 5]
+  // FxTS alias: reject((a) => a % 2 == 0, ...) does the same thing.
 
   // Chain form:
   final result = fx(['ok', 'error', 'ok', 'timeout'])
-      .reject((s) => s == 'ok')
-      .toArray();
+      .whereNot((s) => s == 'ok')
+      .toList();
   print(result); // [error, timeout]
 }
 </textarea>
@@ -96,15 +100,15 @@ import 'package:fxdart/fxdart.dart';
 Future<void> main() async {
   final sw = Stopwatch()..start();
 
-  // rejectAsync delegates to filterAsync's concurrent predicate evaluation.
+  // whereNotAsync delegates to whereAsync's concurrent predicate evaluation.
   final result = await fx([1, 2, 3, 4, 5, 6])
       .toAsync()
-      .reject((a) async {
+      .whereNot((a) async {
         await delay(Duration(milliseconds: 150), null);
         return a.isEven;
       })
       .concurrent(3)
-      .toArray();
+      .toList();
 
   print(result); // [1, 3, 5]
   print('took ${sw.elapsedMilliseconds}ms'); // ~300ms, not ~900ms
@@ -113,7 +117,7 @@ Future<void> main() async {
   </div>
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>reject</code> to drop the <code>'info: ok'</code>
+  <p>Exercise: use <code>whereNot</code> to drop the <code>'info: ok'</code>
     lines, keeping only the errors.</p>
   <div class="playground">
 <textarea>
@@ -122,8 +126,8 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final logs = ['info: ok', 'error: disk full', 'info: ok', 'error: timeout'];
 
-  // TODO: use reject to drop the 'info: ok' lines, keeping only the errors.
-  final errors = fx(logs).toArray();
+  // TODO: use whereNot to drop the 'info: ok' lines, keeping only the errors.
+  final errors = fx(logs).toList();
 
   print(errors);
 }

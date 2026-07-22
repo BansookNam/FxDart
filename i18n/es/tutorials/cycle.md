@@ -21,7 +21,7 @@ nextLabel: entries
     después recorre ese búfer en bucle para siempre. A diferencia de todo lo
     demás en esta sección, <code>cycle</code> nunca se agota por su cuenta —
     siempre tienes que combinarlo con algo que decida cuándo parar, casi
-    siempre <code>.take(n)</code>. Llamar a <code>toArray()</code> o a
+    siempre <code>.take(n)</code>. Llamar a <code>toList()</code> o a
     <code>consume()</code> directamente sobre un <code>cycle(...)</code> pelado
     sin un límite en medio se quedará colgado.
   </p>

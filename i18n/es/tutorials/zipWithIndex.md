@@ -2,9 +2,9 @@
 slug: zipWithIndex
 title: zipWithIndex — FxDart 101
 description: Tutorial de zipWithIndex en FxDart: empareja cada elemento con su índice (empezando en 0), con playground en vivo.
-heading: <code>zipWithIndex</code>
+heading: <code>indexed</code>
 section: 6
-crumb: zipWithIndex
+crumb: indexed
 prev: zipWith.html
 prevLabel: zipWith
 next: transpose.html

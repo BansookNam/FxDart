@@ -8,7 +8,7 @@ void main() {
   ];
 
   // TODO: use pluck to get a list of just the titles.
-  final titles = toArray(map((p) => p, products));
+  final titles = toList(map((p) => p, products));
 
   print(titles);
 }

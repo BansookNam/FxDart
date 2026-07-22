@@ -92,7 +92,7 @@ void main() {
   final result = pipe([1, 2, 3, 4, 5], [
     (Iterable<int> a) => map((n) => n + 10, a),
     (Iterable<int> a) => filter((n) => n % 2 == 0, a),
-    toArray,
+    toList,
   ]);
 
   print(result); // [12, 14]
@@ -124,7 +124,7 @@ void main() {
   }
 
   // The typed alternative: fx() chains catch this at compile time instead.
-  final safe = fx([1, 2, 3]).map((n) => n + 1).toArray();
+  final safe = fx([1, 2, 3]).map((n) => n + 1).toList();
   print(safe); // [2, 3, 4]
 }
 </textarea>
@@ -153,7 +153,7 @@ void main() {
     <strong>Related:</strong>
     <a href="fx.html"><code>fx</code></a> — the typed chain alternative ·
     <a href="pipe1.html"><code>pipe1</code></a> — a single pipe step, sync/async aware ·
-    <a href="toArray.html"><code>toArray</code></a> — common final step in a pipe
+    <a href="toList.html"><code>toList</code></a> — common final step in a pipe
   </div>
 
   <nav class="tut-nav">

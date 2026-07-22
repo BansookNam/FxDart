@@ -1,10 +1,10 @@
 ---
 slug: zipWithIndex
-title: zipWithIndex — FxDart 101
-description: FxDart zipWithIndex tutorial: pair each element with its 0-based index, with a live playground.
-heading: <code>zipWithIndex</code>
+title: indexed — FxDart 101
+description: FxDart indexed: pair each element with its 0-based index, with a live playground.
+heading: <code>indexed</code>
 section: 6
-crumb: zipWithIndex
+crumb: indexed
 prev: zipWith.html
 prevLabel: zipWith
 next: transpose.html
@@ -16,14 +16,17 @@ nextLabel: transpose
 
   <h2>Lecture</h2>
   <p>
-    <code>zipWithIndex</code> is <code>zip</code> against an implicit
+    <code>indexed</code> is <code>zip</code> against an implicit
     counter: each element comes out paired as <code>(index, value)</code>,
     counting up from <code>0</code>. It's the lazy-pipeline answer to a
     manual <code>for (var i = 0; i &lt; list.length; i++)</code> loop — no
     counter variable to manage, and it composes with the rest of the chain.
+    <code>indexed</code> is the Dart-idiomatic name (it mirrors
+    <code>Iterable.indexed</code>); fxdart also accepts the FxTS spelling
+    <code>zipWithIndex</code> — they're the same operator.
   </p>
   <p>
-    Because it only needs to track a running counter, <code>zipWithIndex</code>
+    Because it only needs to track a running counter, <code>indexed</code>
     stays lazy and works over an infinite source just as well as a finite
     one; the async form counts the same way as elements resolve.
   </p>

@@ -6,6 +6,6 @@ void main() {
   // TODO: derive clampTo100 from clamp with .curried
   final clampTo100 = clamp.curried(100);
 
-  print(fx([50, 99, 150, 300]).map(clampTo100).toArray());
+  print(fx([50, 99, 150, 300]).map(clampTo100).toList());
   // [50, 99, 100, 100]
 }

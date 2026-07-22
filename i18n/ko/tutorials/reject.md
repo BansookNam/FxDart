@@ -2,9 +2,9 @@
 slug: reject
 title: reject — FxDart 101
 description: FxDart reject 튜토리얼: filter와 정확히 반대로 동작하는 연산자를 라이브 플레이그라운드와 함께 익힙니다.
-heading: <code>reject</code>
+heading: <code>whereNot</code>
 section: 4
-crumb: reject
+crumb: whereNot
 prev: filter.html
 prevLabel: filter
 next: compact.html

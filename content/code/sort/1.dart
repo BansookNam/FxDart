@@ -2,7 +2,7 @@ import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
   // On the async chain, .sort(f) is already a terminal that returns
-  // Future<List<T>> directly (no extra .toArray() needed).
+  // Future<List<T>> directly (no extra .toList() needed).
   final result = await fx([5, 2, 8, 1, 9])
       .toAsync()
       .map((a) => delay(const Duration(milliseconds: 100), a))

@@ -2,9 +2,9 @@
 slug: uniqBy
 title: uniqBy — FxDart 101
 description: Tutorial de uniqBy en FxDart: elimina duplicados según una clave calculada, con un playground en vivo.
-heading: <code>uniqBy</code>
+heading: <code>distinctBy</code>
 section: 4
-crumb: uniqBy
+crumb: distinctBy
 prev: uniq.html
 prevLabel: uniq
 next: difference.html

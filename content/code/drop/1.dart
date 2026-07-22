@@ -7,8 +7,8 @@ Future<void> main() async {
       .toAsync()
       .map((a) => delay(Duration(milliseconds: 100), a))
       .concurrent(3)
-      .drop(2)
-      .toArray();
+      .skip(2) // FxTS alias: .drop(2)
+      .toList();
 
   print(result); // [2, 3, 4, 5]
   print('took ${sw.elapsedMilliseconds}ms');

@@ -6,7 +6,7 @@ void main() {
   // TODO: use `unless` to fill in 'general' for any empty tag
   final filled = fx(tags)
       .map((t) => unless((s) => s.isNotEmpty, (_) => 'general', t))
-      .toArray();
+      .toList();
 
   print(filled); // [news, general, sports, general]
 }

@@ -11,7 +11,7 @@ Future<void> main() async {
       .toAsync()
       .map((i) => delay(Duration(milliseconds: delays[i - 1]), 'item$i'))
       .concurrent(3)
-      .toArray();
+      .toList();
 
   print(result); // [item1, item2, item3] — source order, not completion order
   print('took ${sw.elapsedMilliseconds}ms'); // ~300ms (the slowest one)

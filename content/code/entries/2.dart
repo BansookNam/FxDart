@@ -7,7 +7,7 @@ void main() {
   // where >= 60 is a PASS.
   final report = fx(entries(scores))
       .map((e) => '${e.$1}: ${e.$2 >= 60 ? 'PASS' : 'FAIL'}')
-      .toArray();
+      .toList();
 
   report.forEach(print);
 }

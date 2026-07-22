@@ -30,14 +30,14 @@ nextLabel: debounce
     marker, <code>concurrentPool</code> <strong>eagerly keeps its pool
     full</strong>: from the first pull onward it holds up to <code>n</code>
     requests in flight no matter how many consumers are waiting. Even a
-    one-pull-at-a-time terminal like <code>.toArray()</code> or
+    one-pull-at-a-time terminal like <code>.toList()</code> or
     <code>.each()</code> gets the full overlap — and sees results in the
     order they finish.
   </p>
 
   <h2>Demo 1 · Completion order</h2>
   <p>Item 1 is slowest (300ms) and item 2 is fastest (100ms) — the result
-    comes out fastest-first, straight from <code>.toArray()</code>:</p>
+    comes out fastest-first, straight from <code>.toList()</code>:</p>
   {{playground:0}}
 
   <h2>Demo 2 · Contrast with concurrent</h2>

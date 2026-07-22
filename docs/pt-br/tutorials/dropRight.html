@@ -76,7 +76,7 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   print(dropRight(2, [1, 2, 3, 4, 5])); // (1, 2, 3)
 
-  final result = fx([10, 20, 30, 40]).dropRight(1).toArray();
+  final result = fx([10, 20, 30, 40]).dropRight(1).toList();
   print(result); // [10, 20, 30]
 }
 </textarea>
@@ -92,7 +92,7 @@ Future<void> main() async {
       .toAsync()
       .map((a) => delay(Duration(milliseconds: 50), a * 10))
       .dropRight(2)
-      .toArray();
+      .toList();
 
   print(result); // [10, 20, 30]
 }
@@ -109,7 +109,7 @@ void main() {
   final lines = ['data1', 'data2', 'data3', '# footer', '# more footer'];
 
   // TODO: drop the last 2 footer lines
-  final data = fx(lines).toArray();
+  final data = fx(lines).toList();
 
   print(data);
 }

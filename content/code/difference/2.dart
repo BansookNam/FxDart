@@ -5,7 +5,7 @@ void main() {
   final allTasks = ['task1', 'task2', 'task3', 'task4'];
 
   // TODO: use difference to find allTasks not yet in completed.
-  final remaining = toArray(allTasks);
+  final remaining = toList(allTasks);
 
   print(remaining);
 }

@@ -1031,16 +1031,6 @@
     <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/throwIf.html"/>
   </url>
   <url>
-    <loc>https://bansooknam.github.io/FxDart/tutorials/toArray.html</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/toArray.html"/>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/toArray.html"/>
-    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/toArray.html"/>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/toArray.html"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/toArray.html"/>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/toArray.html"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/toArray.html"/>
-  </url>
-  <url>
     <loc>https://bansooknam.github.io/FxDart/tutorials/toAsync.html</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/toAsync.html"/>
     <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/toAsync.html"/>
@@ -1049,6 +1039,16 @@
     <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/toAsync.html"/>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/toAsync.html"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/toAsync.html"/>
+  </url>
+  <url>
+    <loc>https://bansooknam.github.io/FxDart/tutorials/toList.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/toList.html"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/toList.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/toList.html"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/toList.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/toList.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/toList.html"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/toList.html"/>
   </url>
   <url>
     <loc>https://bansooknam.github.io/FxDart/tutorials/transpose.html</loc>
@@ -1061,14 +1061,14 @@
     <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/transpose.html"/>
   </url>
   <url>
-    <loc>https://bansooknam.github.io/FxDart/tutorials/unicodeToArray.html</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/unicodeToArray.html"/>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/unicodeToArray.html"/>
-    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/unicodeToArray.html"/>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/unicodeToArray.html"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/unicodeToArray.html"/>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/unicodeToArray.html"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/unicodeToArray.html"/>
+    <loc>https://bansooknam.github.io/FxDart/tutorials/unicodeToList.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/unicodeToList.html"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/unicodeToList.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/unicodeToList.html"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/unicodeToList.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/unicodeToList.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/unicodeToList.html"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/unicodeToList.html"/>
   </url>
   <url>
     <loc>https://bansooknam.github.io/FxDart/tutorials/uniq.html</loc>
@@ -2181,16 +2181,6 @@
     <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/throwIf.html"/>
   </url>
   <url>
-    <loc>https://bansooknam.github.io/FxDart/ko/tutorials/toArray.html</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/toArray.html"/>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/toArray.html"/>
-    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/toArray.html"/>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/toArray.html"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/toArray.html"/>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/toArray.html"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/toArray.html"/>
-  </url>
-  <url>
     <loc>https://bansooknam.github.io/FxDart/ko/tutorials/toAsync.html</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/toAsync.html"/>
     <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/toAsync.html"/>
@@ -2199,6 +2189,16 @@
     <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/toAsync.html"/>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/toAsync.html"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/toAsync.html"/>
+  </url>
+  <url>
+    <loc>https://bansooknam.github.io/FxDart/ko/tutorials/toList.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/toList.html"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/toList.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/toList.html"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/toList.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/toList.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/toList.html"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/toList.html"/>
   </url>
   <url>
     <loc>https://bansooknam.github.io/FxDart/ko/tutorials/transpose.html</loc>
@@ -2211,14 +2211,14 @@
     <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/transpose.html"/>
   </url>
   <url>
-    <loc>https://bansooknam.github.io/FxDart/ko/tutorials/unicodeToArray.html</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/unicodeToArray.html"/>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/unicodeToArray.html"/>
-    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/unicodeToArray.html"/>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/unicodeToArray.html"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/unicodeToArray.html"/>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/unicodeToArray.html"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/unicodeToArray.html"/>
+    <loc>https://bansooknam.github.io/FxDart/ko/tutorials/unicodeToList.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/unicodeToList.html"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/unicodeToList.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/unicodeToList.html"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/unicodeToList.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/unicodeToList.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/unicodeToList.html"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/unicodeToList.html"/>
   </url>
   <url>
     <loc>https://bansooknam.github.io/FxDart/ko/tutorials/uniq.html</loc>
@@ -3371,16 +3371,6 @@
     <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/throwIf.html"/>
   </url>
   <url>
-    <loc>https://bansooknam.github.io/FxDart/es/tutorials/toArray.html</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/toArray.html"/>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/toArray.html"/>
-    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/toArray.html"/>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/toArray.html"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/toArray.html"/>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/toArray.html"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/toArray.html"/>
-  </url>
-  <url>
     <loc>https://bansooknam.github.io/FxDart/es/tutorials/toAsync.html</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/toAsync.html"/>
     <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/toAsync.html"/>
@@ -3389,6 +3379,16 @@
     <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/toAsync.html"/>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/toAsync.html"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/toAsync.html"/>
+  </url>
+  <url>
+    <loc>https://bansooknam.github.io/FxDart/es/tutorials/toList.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/toList.html"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/toList.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/toList.html"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/toList.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/toList.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/toList.html"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/toList.html"/>
   </url>
   <url>
     <loc>https://bansooknam.github.io/FxDart/es/tutorials/transpose.html</loc>
@@ -3401,14 +3401,14 @@
     <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/transpose.html"/>
   </url>
   <url>
-    <loc>https://bansooknam.github.io/FxDart/es/tutorials/unicodeToArray.html</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/unicodeToArray.html"/>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/unicodeToArray.html"/>
-    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/unicodeToArray.html"/>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/unicodeToArray.html"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/unicodeToArray.html"/>
-    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/unicodeToArray.html"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/unicodeToArray.html"/>
+    <loc>https://bansooknam.github.io/FxDart/es/tutorials/unicodeToList.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/unicodeToList.html"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/unicodeToList.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/unicodeToList.html"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/unicodeToList.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/unicodeToList.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/unicodeToList.html"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/unicodeToList.html"/>
   </url>
   <url>
     <loc>https://bansooknam.github.io/FxDart/es/tutorials/uniq.html</loc>

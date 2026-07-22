@@ -2,9 +2,9 @@
 slug: filter
 title: filter — FxDart 101
 description: Tutorial de filter en FxDart: conserva solo los elementos que acepta un predicado, en versión síncrona y asíncrona, con un playground en vivo.
-heading: <code>filter</code>
+heading: <code>where</code>
 section: 4
-crumb: filter
+crumb: where
 prev: pluck.html
 prevLabel: pluck
 next: reject.html

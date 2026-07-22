@@ -26,7 +26,7 @@ description: FxDart es una librería de programación funcional para Dart, porta
   <ul>
     <li><strong>Evaluación perezosa</strong>: operadores como <code>map</code>,
       <code>filter</code> y <code>take</code> construyen un pipeline pero no hacen nada
-      hasta que un operador terminal (<code>toArray</code>, <code>each</code>,
+      hasta que un operador terminal (<code>toList</code>, <code>each</code>,
       <code>reduce</code>…) tira de los valores. Procesar un rango de un millón de elementos
       con <code>.take(3)</code> calcula exactamente 3 resultados.</li>
     <li><strong>Un solo modelo para sync y async</strong>: los mismos nombres de operadores

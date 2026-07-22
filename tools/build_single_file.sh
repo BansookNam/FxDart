@@ -28,6 +28,7 @@ FILES=(
   "lib/src/strict/func.dart"
   "lib/src/strict/curried.dart"
   "lib/src/strict/predicates.dart"
+  "lib/src/dart_aliases.dart"
   "lib/src/util/timing.dart"
   "lib/src/util/shuffle.dart"
 )
@@ -217,9 +218,9 @@ FxAsyncIterable<T> _$cycleAsync<T>(FxAsyncIterable<T> iterable) =>
     cycleAsync(iterable);
 
 // strict/aggregate.dart
-List<A> _$toArray<A>(Iterable<A> iterable) => toArray(iterable);
-Future<List<A>> _$toArrayAsync<A>(FxAsyncIterable<A> iterable) =>
-    toArrayAsync(iterable);
+List<A> _$toList<A>(Iterable<A> iterable) => toList(iterable);
+Future<List<A>> _$toListAsync<A>(FxAsyncIterable<A> iterable) =>
+    toListAsync(iterable);
 void _$each<A>(void Function(A a) f, Iterable<A> iterable) => each(f, iterable);
 Future<void> _$eachAsync<A>(
         FutureOr<void> Function(A a) f, FxAsyncIterable<A> iterable) =>

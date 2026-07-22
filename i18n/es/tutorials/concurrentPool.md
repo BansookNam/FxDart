@@ -32,13 +32,13 @@ nextLabel: debounce
     su pool lleno de forma ansiosa</strong>: desde el primer pull conserva hasta
     <code>n</code> peticiones en vuelo, haya los consumidores que haya
     esperando. Incluso un operador terminal que tira de uno en uno como
-    <code>.toArray()</code> o <code>.each()</code> obtiene todo el solapamiento
+    <code>.toList()</code> o <code>.each()</code> obtiene todo el solapamiento
     — y ve los resultados en el orden en que terminan.
   </p>
 
   <h2>Demo 1 · Orden de finalización</h2>
   <p>El elemento 1 es el más lento (300ms) y el 2 el más rápido (100ms) — el
-    resultado sale con el más rápido primero, directamente desde <code>.toArray()</code>:</p>
+    resultado sale con el más rápido primero, directamente desde <code>.toList()</code>:</p>
   {{playground:0}}
 
   <h2>Demo 2 · Contraste con concurrent</h2>

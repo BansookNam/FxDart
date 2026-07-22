@@ -12,8 +12,8 @@ void main() {
 
   print('calls before terminal op: $calls'); // 0 — still just a plan
 
-  final result = chain.toArray();
+  final result = chain.toList();
 
   print(result);                 // [30, 40, 50]
-  print('calls after toArray: $calls'); // 5
+  print('calls after toList: $calls'); // 5
 }

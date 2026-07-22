@@ -42,6 +42,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 2 · 시퀀스 생성 › <strong>cycle</strong></p>
   <h1><code>cycle</code></h1>
   <p class="hero-sub">시퀀스를 내보낸 뒤 그것을 계속 반복합니다 — 무한히. 항상 take처럼 개수를 제한하는 연산과 함께 쓰세요.</p>
@@ -58,7 +59,7 @@ FxAsync&lt;T&gt; FxAsync.cycle()</div>
     반복합니다. 이 섹션의 다른 함수들과 달리 <code>cycle</code>은 스스로
     끝나는 법이 없습니다 — 언제 멈출지 결정하는 무언가와 반드시 짝지어야
     하며, 대개는 <code>.take(n)</code>입니다. 중간에 아무 제한도 두지 않고
-    <code>cycle(...)</code>에 곧바로 <code>toArray()</code>나
+    <code>cycle(...)</code>에 곧바로 <code>toList()</code>나
     <code>consume()</code>을 호출하면 영영 끝나지 않습니다.
   </p>
   <p>
@@ -83,14 +84,14 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   // cycle repeats its source FOREVER — always pair it with take (or some
   // other bound) or the pipeline will never finish.
-  final result = fx([1, 2, 3]).cycle().take(7).toArray();
+  final result = fx([1, 2, 3]).cycle().take(7).toList();
   print(result); // [1, 2, 3, 1, 2, 3, 1]
 
   // Data-first form is the same:
-  print(toArray(take(5, cycle(['a', 'b'])))); // [a, b, a, b, a]
+  print(toList(take(5, cycle(['a', 'b'])))); // [a, b, a, b, a]
 
   // An empty source cycles to nothing, rather than hanging:
-  print(toArray(take(3, cycle(<int>[])))); // []
+  print(toList(take(3, cycle(<int>[])))); // []
 }
 </textarea>
   </div>
@@ -108,7 +109,7 @@ Future<void> main() async {
       .cycle()
       .map((a) => delay(const Duration(milliseconds: 50), a.toUpperCase()))
       .take(5)
-      .toArray();
+      .toList();
 
   print(result); // [X, Y, X, Y, X]
 }
@@ -125,7 +126,7 @@ void main() {
   // TODO: cycle through these traffic-light colors and take the first 8.
   final colors = ['red', 'yellow', 'green'];
 
-  final sequence = fx(colors).cycle().take(8).toArray();
+  final sequence = fx(colors).cycle().take(8).toList();
 
   print(sequence); // [red, yellow, green, red, yellow, green, red, yellow]
 }

@@ -13,7 +13,7 @@ Future<void> main() async {
       .toAsync()
       .map((a) => delay(const Duration(milliseconds: 200), a))
       .concurrent(n)
-      .toArray();
+      .toList();
 
   print(result); // [1, 2, 3, 4, 5, 6]
   print('n=$n took ${sw.elapsedMilliseconds}ms');

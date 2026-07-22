@@ -54,7 +54,7 @@ abstract interface class FxAsyncIterator<T> {
 /// Pull-based async iterable — the async counterpart of [Iterable].
 ///
 /// Obtain one from [toAsync], [fromStream], or any `*Async` operator.
-/// Consume it with `toArrayAsync`, `eachAsync`, `reduceAsync`, the
+/// Consume it with `toListAsync`, `eachAsync`, `reduceAsync`, the
 /// [FxAsync] chain, or convert it to a [Stream] with [toStream].
 abstract interface class FxAsyncIterable<T> {
   FxAsyncIterator<T> get iterator;
@@ -109,7 +109,7 @@ FxAsyncIterable<T> asyncEmpty<T>() => DelegateAsyncIterable(
 /// what makes `concurrent(n)` physically parallel at the source.
 ///
 /// ```dart
-/// await toArrayAsync(mapAsync((a) => a + 10, toAsync([1, 2, 3]))); // [11, 12, 13]
+/// await toListAsync(mapAsync((a) => a + 10, toAsync([1, 2, 3]))); // [11, 12, 13]
 /// ```
 FxAsyncIterable<T> toAsync<T>(Iterable<FutureOr<T>> iterable) {
   return DelegateAsyncIterable(() {
@@ -312,7 +312,7 @@ FxAsyncIterable<A> concurrentPoolAsync<A>(
     fill = () {
       // Eagerly keep the pool full (like FxTS): up to [length] fetches stay
       // in flight regardless of how many consumers are currently waiting, so
-      // even a one-pull-at-a-time terminal like toArray overlaps the work.
+      // even a one-pull-at-a-time terminal like toList overlaps the work.
       while (!sourceDone && !failed && inFlight < length) {
         inFlight++;
         iterator.next(Concurrent.of(length)).then((result) {
@@ -398,7 +398,7 @@ dynamic _applyStep(dynamic acc, Function f) {
 /// pipe([1, 2, 3, 4, 5], [
 ///   (Iterable<int> a) => map((n) => n + 10, a),
 ///   (Iterable<int> a) => filter((n) => n % 2 == 0, a),
-///   toArray,
+///   toList,
 /// ]); // [12, 14]
 /// ```
 dynamic pipe(dynamic a, List<Function> fns) {
@@ -433,7 +433,7 @@ Iterable<B> map<A, B>(B Function(A a) f, Iterable<A> iterable) sync* {
 /// Async counterpart of [map]. The callback may return a [Future].
 ///
 /// ```dart
-/// await toArrayAsync(mapAsync((a) async => a + 10, toAsync([1, 2, 3])));
+/// await toListAsync(mapAsync((a) async => a + 10, toAsync([1, 2, 3])));
 /// // [11, 12, 13]
 /// ```
 FxAsyncIterable<B> mapAsync<A, B>(
@@ -1835,13 +1835,14 @@ Iterable<V> values<K, V>(Map<K, V> map) => map.values;
 
 /// Materializes any iterable into a [List].
 ///
-/// Port of FxTS `toArray` (sync).
-List<A> toArray<A>(Iterable<A> iterable) => List.of(iterable);
+/// Port of FxTS `toArray` (sync); named `toList` to match Dart's
+/// `Iterable.toList` (Dart has no "array" type — this always returns a [List]).
+List<A> toList<A>(Iterable<A> iterable) => List.of(iterable);
 
 /// Materializes an [FxAsyncIterable] into a [List].
 ///
-/// Port of FxTS `toArray` (async).
-Future<List<A>> toArrayAsync<A>(FxAsyncIterable<A> iterable) async {
+/// Port of FxTS `toArray` (async); named `toListAsync` for Dart idiom.
+Future<List<A>> toListAsync<A>(FxAsyncIterable<A> iterable) async {
   final result = <A>[];
   final iterator = iterable.iterator;
   while (true) {
@@ -2045,7 +2046,7 @@ String join<A>(String sep, Iterable<A> iterable) => iterable.join(sep);
 
 /// Async counterpart of [join].
 Future<String> joinAsync<A>(String sep, FxAsyncIterable<A> iterable) async =>
-    (await toArrayAsync(iterable)).join(sep);
+    (await toListAsync(iterable)).join(sep);
 
 /// Splits values into groups keyed by [f].
 ///
@@ -2117,7 +2118,7 @@ List<A> sort<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
 /// Async counterpart of [sort].
 Future<List<A>> sortAsync<A>(
         int Function(A a, A b) f, FxAsyncIterable<A> iterable) async =>
-    (await toArrayAsync(iterable))..sort(f);
+    (await toListAsync(iterable))..sort(f);
 
 /// Alias of [sort]; FxTS added `toSorted` as the non-mutating variant, which
 /// the Dart [sort] already is.
@@ -2616,9 +2617,12 @@ R Function(T value) cases<T, R>(List<(bool Function(T), R Function(T))> pairs,
 
 /// Splits a string into a list of user-perceived characters, handling
 /// surrogate pairs — the same behavior as FxTS `unicodeToArray`, which
-/// splits by code point.
-List<String> unicodeToArray(String s) =>
+/// splits by code point. Named `unicodeToList` for Dart idiom (returns a List).
+List<String> unicodeToList(String s) =>
     [for (final rune in s.runes) String.fromCharCode(rune)];
+
+/// FxTS-named alias of [unicodeToList].
+List<String> unicodeToArray(String s) => unicodeToList(s);
 
 /// TypeScript's `curry` relies on reflection over a function's arity plus
 /// recursive conditional types (`Curry<...>`), neither of which exists in
@@ -2716,17 +2720,26 @@ bool isNil(Object? a) => a == null;
 @Deprecated('Dart has no undefined; use isNull instead')
 bool isUndefined(Object? a) => a == null;
 
-/// True when [a] is a [bool]. Port of FxTS `isBoolean`.
-bool isBoolean(Object? a) => a is bool;
+/// True when [a] is a [bool]. Port of FxTS `isBoolean` (Dart type: `bool`).
+bool isBool(Object? a) => a is bool;
 
-/// True when [a] is a [num]. Port of FxTS `isNumber`.
-bool isNumber(Object? a) => a is num;
+/// FxTS-named alias of [isBool].
+bool isBoolean(Object? a) => isBool(a);
+
+/// True when [a] is a [num]. Port of FxTS `isNumber` (Dart type: `num`).
+bool isNum(Object? a) => a is num;
+
+/// FxTS-named alias of [isNum].
+bool isNumber(Object? a) => isNum(a);
 
 /// True when [a] is a [String]. Port of FxTS `isString`.
 bool isString(Object? a) => a is String;
 
-/// True when [a] is a [DateTime]. Port of FxTS `isDate`.
-bool isDate(Object? a) => a is DateTime;
+/// True when [a] is a [DateTime]. Port of FxTS `isDate` (Dart type: `DateTime`).
+bool isDateTime(Object? a) => a is DateTime;
+
+/// FxTS-named alias of [isDateTime].
+bool isDate(Object? a) => isDateTime(a);
 
 /// True when [a] is a [List]. Port of FxTS `isArray`.
 bool isList(Object? a) => a is List;
@@ -2744,6 +2757,126 @@ bool isMap(Object? a) => a is Map;
 /// alias of [isMap].
 @Deprecated('Use isMap instead')
 bool isObject(Object? a) => a is Map;
+
+// ---- lib/src/dart_aliases.dart ----
+/// Dart-idiomatic aliases for the FxTS-named operators.
+///
+/// fxdart is a port of FxTS, so the primary names follow FxTS. Where Dart's own
+/// `Iterable`/collection libraries have an established name for the same
+/// operation, that name is provided here as a first-class alias — both spellings
+/// are supported, and the FxDart 101 course teaches the Dart-idiomatic one.
+///
+/// (The lone exception is `toArray`, which was *removed* in favour of `toList`
+/// rather than aliased — it claimed a type Dart doesn't have.)
+
+
+
+// --- lazy/filter.dart ---
+Iterable<A> where<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    filter(f, iterable);
+FxAsyncIterable<A> whereAsync<A>(
+        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    filterAsync(f, iterable);
+
+Iterable<A> whereNot<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    reject(f, iterable);
+FxAsyncIterable<A> whereNotAsync<A>(
+        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    rejectAsync(f, iterable);
+
+Iterable<A> nonNulls<A>(Iterable<A?> iterable) => compact(iterable);
+FxAsyncIterable<A> nonNullsAsync<A>(FxAsyncIterable<A?> iterable) =>
+    compactAsync(iterable);
+
+Iterable<A> distinct<A>(Iterable<A> iterable) => uniq(iterable);
+FxAsyncIterable<A> distinctAsync<A>(FxAsyncIterable<A> iterable) =>
+    uniqAsync(iterable);
+
+Iterable<A> distinctBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    uniqBy(f, iterable);
+FxAsyncIterable<A> distinctByAsync<A, B>(
+        FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    uniqByAsync(f, iterable);
+
+// --- lazy/map.dart ---
+Iterable<B> expand<A, B>(Iterable<B> Function(A a) f, Iterable<A> iterable) =>
+    flatMap(f, iterable);
+FxAsyncIterable<B> expandAsync<A, B>(
+        FutureOr<Iterable<B>> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    flatMapAsync(f, iterable);
+
+Iterable<dynamic> flattened(Iterable<dynamic> iterable, [int depth = 1]) =>
+    flat(iterable, depth);
+FxAsyncIterable<dynamic> flattenedAsync(FxAsyncIterable<dynamic> iterable,
+        [int depth = 1]) =>
+    flatAsync(iterable, depth);
+
+// --- lazy/take_drop.dart ---
+Iterable<A> takeLast<A>(int length, Iterable<A> iterable) =>
+    takeRight(length, iterable);
+FxAsyncIterable<A> takeLastAsync<A>(int length, FxAsyncIterable<A> iterable) =>
+    takeRightAsync(length, iterable);
+
+Iterable<A> skip<A>(int length, Iterable<A> iterable) => drop(length, iterable);
+FxAsyncIterable<A> skipAsync<A>(int length, FxAsyncIterable<A> iterable) =>
+    dropAsync(length, iterable);
+
+Iterable<A> skipWhile<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    dropWhile(f, iterable);
+FxAsyncIterable<A> skipWhileAsync<A>(
+        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    dropWhileAsync(f, iterable);
+
+// --- lazy/zip.dart ---
+Iterable<(int, A)> indexed<A>(Iterable<A> iterable) => zipWithIndex(iterable);
+FxAsyncIterable<(int, A)> indexedAsync<A>(FxAsyncIterable<A> iterable) =>
+    zipWithIndexAsync(iterable);
+
+// --- strict/access.dart ---
+A? firstOrNull<A>(Iterable<A> iterable) => head(iterable);
+Future<A?> firstOrNullAsync<A>(FxAsyncIterable<A> iterable) =>
+    headAsync(iterable);
+
+A? lastOrNull<A>(Iterable<A> iterable) => last(iterable);
+Future<A?> lastOrNullAsync<A>(FxAsyncIterable<A> iterable) => lastAsync(iterable);
+
+A? elementAtOrNull<A>(int index, Iterable<A> iterable) => nth(index, iterable);
+Future<A?> elementAtOrNullAsync<A>(int index, FxAsyncIterable<A> iterable) =>
+    nthAsync(index, iterable);
+
+A? firstWhereOrNull<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    find(f, iterable);
+Future<A?> firstWhereOrNullAsync<A>(
+        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    findAsync(f, iterable);
+
+int indexWhere<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    findIndex(f, iterable);
+Future<int> indexWhereAsync<A>(
+        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    findIndexAsync(f, iterable);
+
+// Note: no top-level `contains` alias — it collides with `package:test`'s
+// matcher, and Dart's idiom is the inherited `.contains()` on the chain anyway.
+// The FxTS-named top-level `includes` remains.
+
+bool any<A>(bool Function(A a) f, Iterable<A> iterable) => some(f, iterable);
+Future<bool> anyAsync<A>(
+        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    someAsync(f, iterable);
+
+// --- strict/aggregate.dart ---
+void forEach<A>(void Function(A a) f, Iterable<A> iterable) =>
+    each(f, iterable);
+Future<void> forEachAsync<A>(
+        FutureOr<void> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    eachAsync(f, iterable);
+
+int count<A>(Iterable<A> iterable) => size(iterable);
+Future<int> countAsync<A>(FxAsyncIterable<A> iterable) => sizeAsync(iterable);
+
+List<A> sorted<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
+    toSorted(f, iterable);
 
 // ---- lib/src/util/timing.dart ----
 
@@ -2915,7 +3048,7 @@ Future<List<T>> shuffleAsync<T>(FxAsyncIterable<T> iterable,
     [int? seed]) async {
   final random =
       seed != null ? createSeededRandom(seed) : math.Random().nextDouble;
-  return _shuffleList(await toArrayAsync(iterable), random);
+  return _shuffleList(await toListAsync(iterable), random);
 }
 
 // ---- lib/src/fx.dart (transformed: l./s./async_. -> _$NAME) ----
@@ -2930,7 +3063,7 @@ Future<List<T>> shuffleAsync<T>(FxAsyncIterable<T> iterable,
 /// fx([1, 2, 3, 4, 5])
 ///     .map((a) => a + 10)
 ///     .filter((a) => a % 2 == 0)
-///     .toArray(); // [12, 14]
+///     .toList(); // [12, 14]
 /// ```
 Fx<T> fx<T>(Iterable<T> iterable) => Fx(iterable);
 
@@ -2973,6 +3106,9 @@ class Fx<T> extends Iterable<T> {
   /// Flattens nested iterables [depth] levels. Untyped — see top-level `flat`.
   Fx<dynamic> flat([int depth = 1]) => Fx(_$flat(_inner, depth));
 
+  /// Dart-idiomatic alias of [flat].
+  Fx<dynamic> flattened([int depth = 1]) => flat(depth);
+
   /// All elements [f] returns true for.
   Fx<T> filter(bool Function(T a) f) => Fx(_$filter(f, _inner));
 
@@ -2982,10 +3118,16 @@ class Fx<T> extends Iterable<T> {
   /// The opposite of [filter].
   Fx<T> reject(bool Function(T a) f) => Fx(_$reject(f, _inner));
 
+  /// Dart-idiomatic alias of [reject].
+  Fx<T> whereNot(bool Function(T a) f) => reject(f);
+
   @override
   Fx<T> take(int count) => Fx(_$take(count, _inner));
 
   Fx<T> takeRight(int count) => Fx(_$takeRight(count, _inner));
+
+  /// Dart-idiomatic alias of [takeRight].
+  Fx<T> takeLast(int count) => takeRight(count);
 
   @override
   Fx<T> takeWhile(bool Function(T value) test) => Fx(_$takeWhile(test, _inner));
@@ -3022,7 +3164,13 @@ class Fx<T> extends Iterable<T> {
 
   Fx<T> uniq() => Fx(_$uniq(_inner));
 
+  /// Dart-idiomatic alias of [uniq].
+  Fx<T> distinct() => uniq();
+
   Fx<T> uniqBy<B>(B Function(T a) f) => Fx(_$uniqBy(f, _inner));
+
+  /// Dart-idiomatic alias of [uniqBy].
+  Fx<T> distinctBy<B>(B Function(T a) f) => uniqBy(f);
 
   Fx<(T, U)> zip<U>(Iterable<U> other) => Fx(_$zip(_inner, other));
 
@@ -3053,7 +3201,9 @@ class Fx<T> extends Iterable<T> {
 
   // --- terminal operators -------------------------------------------------
 
-  List<T> toArray() => _$toArray(_inner);
+  /// Materializes the pipeline into a [List] (Dart's `Iterable.toList`).
+  @override
+  List<T> toList({bool growable = true}) => _inner.toList(growable: growable);
 
   void each(void Function(T a) f) => _$each(f, _inner);
 
@@ -3070,7 +3220,13 @@ class Fx<T> extends Iterable<T> {
 
   T? find(bool Function(T a) f) => _$find(f, _inner);
 
+  /// Dart-idiomatic alias of [find] (cf. `package:collection`).
+  T? firstWhereOrNull(bool Function(T a) f) => find(f);
+
   int findIndex(bool Function(T a) f) => _$findIndex(f, _inner);
+
+  /// Dart-idiomatic alias of [findIndex] (cf. `List.indexWhere`).
+  int indexWhere(bool Function(T a) f) => findIndex(f);
 
   T? head() => _$head(_inner);
 
@@ -3189,7 +3345,8 @@ class FxAsync<T> implements FxAsyncIterable<T> {
 
   // --- terminal operators -------------------------------------------------
 
-  Future<List<T>> toArray() => _$toArrayAsync(_inner);
+  /// Materializes the async pipeline into a [List].
+  Future<List<T>> toList() => _$toListAsync(_inner);
 
   Future<void> each(FutureOr<void> Function(T a) f) => _$eachAsync(f, _inner);
 
@@ -3234,6 +3391,61 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   Future<List<T>> sortBy(Object? Function(T a) f) => _$sortByAsync(f, _inner);
 
   Future<int> size() => _$sizeAsync(_inner);
+
+  // --- Dart-idiomatic aliases -------------------------------------------
+  // FxAsync does not extend Iterable, so the Dart names are provided as
+  // explicit aliases here. Both spellings are supported; the 101 teaches these.
+
+  /// Alias of [filter].
+  FxAsync<T> where(FutureOr<bool> Function(T a) f) => filter(f);
+
+  /// Alias of [reject].
+  FxAsync<T> whereNot(FutureOr<bool> Function(T a) f) => reject(f);
+
+  /// Alias of [flatMap].
+  FxAsync<R> expand<R>(FutureOr<Iterable<R>> Function(T a) f) => flatMap(f);
+
+  /// Alias of [flat].
+  FxAsync<dynamic> flattened([int depth = 1]) => flat(depth);
+
+  /// Alias of [drop].
+  FxAsync<T> skip(int count) => drop(count);
+
+  /// Alias of [dropWhile].
+  FxAsync<T> skipWhile(FutureOr<bool> Function(T a) f) => dropWhile(f);
+
+  /// Alias of [takeRight].
+  FxAsync<T> takeLast(int count) => takeRight(count);
+
+  /// Alias of [uniq].
+  FxAsync<T> distinct() => uniq();
+
+  /// Alias of [uniqBy].
+  FxAsync<T> distinctBy<B>(FutureOr<B> Function(T a) f) => uniqBy(f);
+
+  /// Alias of [zipWithIndex].
+  FxAsync<(int, T)> indexed() => zipWithIndex();
+
+  /// Alias of [each].
+  Future<void> forEach(FutureOr<void> Function(T a) f) => each(f);
+
+  /// Alias of [some].
+  Future<bool> any(FutureOr<bool> Function(T a) f) => some(f);
+
+  /// Alias of [find].
+  Future<T?> firstWhereOrNull(FutureOr<bool> Function(T a) f) => find(f);
+
+  /// Alias of [findIndex].
+  Future<int> indexWhere(FutureOr<bool> Function(T a) f) => findIndex(f);
+
+  /// Alias of [head].
+  Future<T?> firstOrNull() => head();
+
+  /// Alias of [last].
+  Future<T?> lastOrNull() => last();
+
+  /// Alias of [size].
+  Future<int> count() => size();
 }
 
 /// Numeric terminals for [FxAsync] chains (generic covariance makes these
@@ -3384,9 +3596,9 @@ FxAsyncIterable<T> _$cycleAsync<T>(FxAsyncIterable<T> iterable) =>
     cycleAsync(iterable);
 
 // strict/aggregate.dart
-List<A> _$toArray<A>(Iterable<A> iterable) => toArray(iterable);
-Future<List<A>> _$toArrayAsync<A>(FxAsyncIterable<A> iterable) =>
-    toArrayAsync(iterable);
+List<A> _$toList<A>(Iterable<A> iterable) => toList(iterable);
+Future<List<A>> _$toListAsync<A>(FxAsyncIterable<A> iterable) =>
+    toListAsync(iterable);
 void _$each<A>(void Function(A a) f, Iterable<A> iterable) => each(f, iterable);
 Future<void> _$eachAsync<A>(
         FutureOr<void> Function(A a) f, FxAsyncIterable<A> iterable) =>

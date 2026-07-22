@@ -221,7 +221,7 @@ th { background: var(--bg-soft); }
 .cm-s-fxdart .cm-comment { color: #99a0b8; font-style: italic; }
 .cm-s-fxdart .cm-operator { color: #63c9d6; }
 /* cm-builtin was previously unstyled, so it fell through to the CDN default
-   and rendered as low-contrast mud: fx, map, filter, toArray, print. */
+   and rendered as low-contrast mud: fx, map, filter, toList, print. */
 .cm-s-fxdart .cm-builtin { color: #7cc0ff; }
 .cm-s-fxdart .cm-property { color: #7cc0ff; }
 .cm-s-fxdart .cm-meta { color: #63c9d6; }

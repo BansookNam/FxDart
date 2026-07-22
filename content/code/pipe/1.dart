@@ -13,6 +13,6 @@ void main() {
   }
 
   // The typed alternative: fx() chains catch this at compile time instead.
-  final safe = fx([1, 2, 3]).map((n) => n + 1).toArray();
+  final safe = fx([1, 2, 3]).map((n) => n + 1).toList();
   print(safe); // [2, 3, 4]
 }

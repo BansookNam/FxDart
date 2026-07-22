@@ -10,6 +10,6 @@ Future<void> main() async {
   // fxStream wraps a Dart Stream directly.
   final doubled = await fxStream(Stream.fromIterable([1, 2, 3]))
       .map((a) => a * 2)
-      .toArray();
+      .toList();
   print('fxStream doubled: $doubled'); // [2, 4, 6]
 }

@@ -6,7 +6,7 @@ void main() {
   final stock = {'apples': 4, 'bananas': 0, 'cherries': 12};
   final prices = {'apples': 1.5, 'bananas': 0.5, 'cherries': 2.0};
 
-  final unitsInStock = fx(values(stock)).filter((n) => n > 0).toArray();
+  final unitsInStock = fx(values(stock)).filter((n) => n > 0).toList();
   print(unitsInStock); // [4, 12]
 
   final total = fx(entries(prices))

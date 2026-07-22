@@ -30,7 +30,7 @@ nextLabel: partition
     la entrada. Y el mismo matiz de la forma de cadena también se aplica: en la
     cadena síncrona <code>Fx</code>, <code>.sortBy(f)</code> devuelve otro
     <code>Fx&lt;T&gt;</code>, así que sigues necesitando
-    <code><a href="../101/index.html">.toArray()</a></code> para materializarlo,
+    <code><a href="../101/index.html">.toList()</a></code> para materializarlo,
     mientras que en la cadena <code>FxAsync</code>, <code>.sortBy(f)</code> ya
     es un terminal que devuelve <code>Future&lt;List&lt;T&gt;&gt;</code>.
   </p>

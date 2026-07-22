@@ -79,7 +79,7 @@ void main() {
   print(greet(123)); // hi (ignores the argument)
 
   // realistic: reset every element of a list to a fixed value
-  print(fx([1, 2, 3]).map(always(0)).toArray()); // [0, 0, 0]
+  print(fx([1, 2, 3]).map(always(0)).toList()); // [0, 0, 0]
 }
 </textarea>
   </div>
@@ -100,7 +100,7 @@ void main() {
     ((n) => n == 0, (n) => 'zero'),
   ], orElse: always('positive'));
 
-  print(fx([-2, 0, 7]).map(classify).toArray()); // [negative, zero, positive]
+  print(fx([-2, 0, 7]).map(classify).toList()); // [negative, zero, positive]
 }
 </textarea>
   </div>
@@ -116,7 +116,7 @@ void main() {
   final scores = [55, 91, 68];
 
   // TODO: use `always` to replace every score with 'graded'
-  final labels = fx(scores).map((s) => 'graded').toArray();
+  final labels = fx(scores).map((s) => 'graded').toList();
 
   print(labels); // [graded, graded, graded]
 }

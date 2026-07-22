@@ -2,9 +2,9 @@
 slug: find
 title: find — FxDart 101
 description: FxDart find 튜토리얼: 술어와 일치하는 첫 원소를 지연 평가와 단축 평가로 찾고, 없으면 null을 받는 방법을 익힙니다.
-heading: <code>find</code>
+heading: <code>firstWhereOrNull</code>
 section: 8
-crumb: find
+crumb: firstWhereOrNull
 prev: nth.html
 prevLabel: nth
 next: findIndex.html

@@ -2,9 +2,9 @@
 slug: findIndex
 title: findIndex — FxDart 101
 description: FxDart findIndex 튜토리얼: 지연 평가와 단축 평가로 첫 일치 원소의 위치를 찾고, 없으면 -1을 받는 방법을 익힙니다.
-heading: <code>findIndex</code>
+heading: <code>indexWhere</code>
 section: 8
-crumb: findIndex
+crumb: indexWhere
 prev: find.html
 prevLabel: find
 next: includes.html

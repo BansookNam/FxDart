@@ -2,9 +2,9 @@
 slug: includes
 title: includes — FxDart 101
 description: FxDart includes 튜토리얼 — 이터러블에 값이 들어 있는지 == 로 확인하는 방법과 단축 평가, 동기·비동기 사용법을 살펴봅니다.
-heading: <code>includes</code>
+heading: <code>contains</code>
 section: 8
-crumb: includes
+crumb: contains
 prev: findIndex.html
 prevLabel: findIndex
 next: isEmpty.html

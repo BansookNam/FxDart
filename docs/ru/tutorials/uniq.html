@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>uniq — FxDart 101</title>
-  <meta name="description" content="FxDart uniq tutorial: remove duplicate values while preserving first-seen order, with a live playground.">
+  <title>distinct — FxDart 101</title>
+  <meta name="description" content="FxDart distinct tutorial: remove duplicate values while preserving first-seen order, with a live playground.">
   <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/uniq.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/uniq.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/uniq.html">
@@ -44,20 +44,23 @@
 </header>
 <main>
   <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 4 · Фильтрация &amp; дедупликация › <strong>uniq</strong></p>
-  <h1><code>uniq</code></h1>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 4 · Фильтрация &amp; дедупликация › <strong>distinct</strong></p>
+  <h1><code>distinct</code></h1>
   <p class="hero-sub">Removes duplicate values, keeping the first occurrence of each and preserving order.</p>
 
-  <div class="signature">Iterable&lt;A&gt; uniq&lt;A&gt;(Iterable&lt;A&gt; iterable)
-FxAsyncIterable&lt;A&gt; uniqAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;T&gt; Fx.uniq()        // chain
-FxAsync&lt;T&gt; FxAsync.uniq()</div>
+  <div class="signature">Iterable&lt;A&gt; distinct&lt;A&gt;(Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; distinctAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.distinct()        // chain
+FxAsync&lt;T&gt; FxAsync.distinct()
+Iterable&lt;A&gt; uniq&lt;A&gt;(Iterable&lt;A&gt; iterable)   // FxTS alias</div>
 
   <h2>Lecture</h2>
   <p>
-    <code>uniq</code> walks the iterable once, keeping a <code>Set</code> of
+    <code>distinct</code> walks the iterable once, keeping a <code>Set</code> of
     values already seen, and yields each element only the first time it
-    shows up. It's implemented as <code>uniqBy((a) =&gt; a, iterable)</code> —
+    shows up. <code>distinct</code> is the Dart-idiomatic name; fxdart also
+    accepts the FxTS spelling <code>uniq</code> — they're the same operator.
+    It's implemented as <code>uniqBy((a) =&gt; a, iterable)</code> —
     the identity key — so if you ever need to dedupe by something other than
     equality of the whole value, reach for
     <a href="uniqBy.html"><code>uniqBy</code></a> instead.
@@ -69,10 +72,10 @@ FxAsync&lt;T&gt; FxAsync.uniq()</div>
     last.
   </p>
   <p>
-    On the async side, <code>uniqAsync</code> is safe to combine with
+    On the async side, <code>distinctAsync</code> is safe to combine with
     <code>.concurrent(n)</code> as long as the concurrency lives in an
     upstream fetch stage: fetch with <code>.map(...).concurrent(n)</code>
-    first, then apply <code>.uniq()</code> to the already-resolved,
+    first, then apply <code>.distinct()</code> to the already-resolved,
     in-order results, as in Demo 2.
   </p>
 
@@ -83,10 +86,11 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   // Data-first form:
-  print(toArray(uniq([1, 2, 2, 3, 1, 4]))); // [1, 2, 3, 4]
+  print(toList(distinct([1, 2, 2, 3, 1, 4]))); // [1, 2, 3, 4]
+  // FxTS alias: uniq([1, 2, 2, 3, 1, 4]) does the same thing.
 
   // Chain form:
-  final result = fx(['a', 'b', 'a', 'c', 'b']).uniq().toArray();
+  final result = fx(['a', 'b', 'a', 'c', 'b']).distinct().toList();
   print(result); // [a, b, c]
 }
 </textarea>
@@ -104,8 +108,8 @@ Future<void> main() async {
       .toAsync()
       .map((a) => delay(Duration(milliseconds: 100), a))
       .concurrent(3)
-      .uniq()
-      .toArray();
+      .distinct()
+      .toList();
 
   print(result); // [1, 2, 3, 4] -- correct even with concurrent fetching
   print('took ${sw.elapsedMilliseconds}ms'); // ~200ms (2 batches of 3)
@@ -114,7 +118,7 @@ Future<void> main() async {
   </div>
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>uniq</code> to remove duplicate tags, preserving
+  <p>Exercise: use <code>distinct</code> to remove duplicate tags, preserving
     first-seen order.</p>
   <div class="playground">
 <textarea>
@@ -123,8 +127,8 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final tags = ['red', 'blue', 'green', 'red', 'blue'];
 
-  // TODO: use uniq to remove duplicate tags, preserving first-seen order.
-  final result = fx(tags).toArray();
+  // TODO: use distinct to remove duplicate tags, preserving first-seen order.
+  final result = fx(tags).toList();
 
   print(result);
 }

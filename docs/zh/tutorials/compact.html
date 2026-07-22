@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>compact — FxDart 101</title>
-  <meta name="description" content="FxDart compact tutorial: drop nulls and narrow the element type, with a live playground.">
+  <title>nonNulls — FxDart 101</title>
+  <meta name="description" content="FxDart nonNulls tutorial: drop nulls and narrow the element type, with a live playground.">
   <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/compact.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/compact.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/compact.html">
@@ -44,35 +44,41 @@
 </header>
 <main>
   <p class="i18n-banner">本页尚未翻译，因此以英文显示。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">参与翻译</a></p>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 入门</a> › 章节 4 · 过滤 &amp; 去重 › <strong>compact</strong></p>
-  <h1><code>compact</code></h1>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 入门</a> › 章节 4 · 过滤 &amp; 去重 › <strong>nonNulls</strong></p>
+  <h1><code>nonNulls</code></h1>
   <p class="hero-sub">Filters out null and narrows the element type from <code>T?</code> to <code>T</code> at the same time.</p>
 
-  <div class="signature">Iterable&lt;A&gt; compact&lt;A&gt;(Iterable&lt;A?&gt; iterable)
-FxAsyncIterable&lt;A&gt; compactAsync&lt;A&gt;(FxAsyncIterable&lt;A?&gt; iterable)</div>
+  <div class="signature">Iterable&lt;A&gt; nonNulls&lt;A&gt;(Iterable&lt;A?&gt; iterable)
+FxAsyncIterable&lt;A&gt; nonNullsAsync&lt;A&gt;(FxAsyncIterable&lt;A?&gt; iterable)
+Iterable&lt;A&gt; Iterable.nonNulls        // inherited getter (no parens); sync chain only
+Iterable&lt;A&gt; compact&lt;A&gt;(Iterable&lt;A?&gt; iterable)   // FxTS alias</div>
 
   <h2>Lecture</h2>
   <p>
-    <code>compact</code> takes an <code>Iterable&lt;A?&gt;</code> and
+    <code>nonNulls</code> takes an <code>Iterable&lt;A?&gt;</code> and
     returns an <code>Iterable&lt;A&gt;</code> — every <code>null</code> is
     dropped, and the type checker knows it: nothing downstream needs a
-    null check anymore. This is the FxDart equivalent of FxTS's
-    <code>compact</code>, which drops all six JS falsy values
+    null check anymore. <code>nonNulls</code> is the Dart-idiomatic name;
+    fxdart also accepts the FxTS spelling <code>compact</code> — they're the
+    same operator. FxTS's <code>compact</code> drops all six JS falsy values
     (<code>undefined</code>, <code>null</code>, <code>0</code>,
-    <code>''</code>, <code>NaN</code>, <code>false</code>). Dart has no
+    <code>''</code>, <code>NaN</code>, <code>false</code>); Dart has no
     single "falsy" concept, so the port only removes <code>null</code> —
     a deliberate, narrower behavior that's easy to reason about.
   </p>
   <p>
     It shows up constantly after <a href="pluck.html"><code>pluck</code></a>
-    or any lookup that returns <code>T?</code>: <code>compact(pluck(key, records))</code>
+    or any lookup that returns <code>T?</code>: <code>nonNulls(pluck(key, records))</code>
     gives you a clean, non-nullable list in one step.
   </p>
   <p>
-    There is <strong>no chain method</strong> for <code>compact</code> —
-    only the data-first top-level function and its async counterpart exist.
-    Call it directly, or wrap the result with <code>fx(...)</code> /
-    <code>fxAsync(...)</code> to keep chaining.
+    On the sync chain, <code>.nonNulls</code> is an <strong>inherited
+    <code>Iterable</code> getter</strong> — write it with no parens
+    (<code>fx(xs).nonNulls</code>), and because it returns a plain
+    <code>Iterable&lt;A&gt;</code>, wrap it in <code>fx(...)</code> to keep
+    chaining. There is no async getter, so on an async pipeline use the
+    top-level <code>nonNullsAsync(...)</code> (or its FxTS alias
+    <code>compactAsync</code>) and wrap with <code>fxAsync(...)</code>.
   </p>
 
   <h2>Demo 1 · Basics &amp; type narrowing</h2>
@@ -84,13 +90,14 @@ void main() {
   final List<int?> withGaps = [1, null, 2, null, 3];
 
   // Data-first form. The input element type is int?; the output is
-  // Iterable<int> -- compact narrows the type, not just the values.
-  final Iterable<int> tightened = compact(withGaps);
-  print(toArray(tightened)); // [1, 2, 3]
+  // Iterable<int> -- nonNulls narrows the type, not just the values.
+  final Iterable<int> tightened = nonNulls(withGaps);
+  print(toList(tightened)); // [1, 2, 3]
+  // FxTS alias: compact(withGaps) does the same thing.
 
-  // No chain method exists for compact -- call it directly, or wrap with
-  // fx(...) to keep chaining afterward.
-  final result = fx(compact(withGaps)).map((a) => a * 10).toArray();
+  // On the sync chain, .nonNulls is an inherited Iterable getter (no parens).
+  // It returns a plain Iterable<int>, so wrap with fx(...) to keep chaining.
+  final result = fx(fx(withGaps).nonNulls).map((a) => a * 10).toList();
   print(result); // [10, 20, 30]
 }
 </textarea>
@@ -105,14 +112,16 @@ Future<void> main() async {
   final sw = Stopwatch()..start();
 
   // Fetch concurrently -- some "lookups" miss and resolve to null -- then
-  // compact drops the misses and narrows the type to non-nullable.
+  // nonNullsAsync drops the misses and narrows the type to non-nullable.
   final ids = [1, 2, 3, 4];
   final fetched = fx(ids)
       .toAsync()
       .map((id) => delay(Duration(milliseconds: 150), id.isEven ? null : id))
       .concurrent(4);
 
-  final found = await fxAsync(compactAsync(fetched)).toArray();
+  // There is no async .nonNulls getter, so use the top-level form here.
+  // FxTS alias: compactAsync(fetched) does the same thing.
+  final found = await fxAsync(nonNullsAsync(fetched)).toList();
 
   print(found); // [1, 3]
   print('took ${sw.elapsedMilliseconds}ms'); // ~150ms
@@ -121,7 +130,7 @@ Future<void> main() async {
   </div>
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>compact</code> to drop the nulls from
+  <p>Exercise: use <code>nonNulls</code> to drop the nulls from
     <code>answers</code>.</p>
   <div class="playground">
 <textarea>
@@ -130,8 +139,8 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final List<String?> answers = ['yes', null, 'no', null, 'maybe'];
 
-  // TODO: use compact to drop the nulls from answers.
-  final cleaned = toArray(map((a) => a, answers));
+  // TODO: use nonNulls to drop the nulls from answers.
+  final cleaned = toList(map((a) => a, answers));
 
   print(cleaned);
 }

@@ -6,7 +6,7 @@ void main() {
   final letters = ['a', 'b', 'c', 'e', 'd'];
 
   // TODO: use negate(isVowel) to keep only the consonants
-  final consonants = fx(letters).filter(negate(isVowel)).toArray();
+  final consonants = fx(letters).filter(negate(isVowel)).toList();
 
   print(consonants); // [b, c, d]
 }

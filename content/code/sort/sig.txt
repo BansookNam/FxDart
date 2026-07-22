@@ -1,5 +1,5 @@
 List&lt;A&gt; sort&lt;A&gt;(int Function(A a, A b) f, Iterable&lt;A&gt; iterable)
 List&lt;A&gt; toSorted&lt;A&gt;(int Function(A a, A b) f, Iterable&lt;A&gt; iterable)   // alias of sort
 Future&lt;List&lt;A&gt;&gt; sortAsync&lt;A&gt;(int Function(A a, A b) f, FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;T&gt; Fx.sort(int Function(T a, T b) f)                    // chain (sync) — still lazy, call .toArray()
+Fx&lt;T&gt; Fx.sort(int Function(T a, T b) f)                    // chain (sync) — still lazy, call .toList()
 Future&lt;List&lt;T&gt;&gt; FxAsync.sort(int Function(T a, T b) f)     // chain (async) — already a terminal

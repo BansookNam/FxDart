@@ -2,9 +2,9 @@
 slug: zipWithIndex
 title: zipWithIndex — FxDart 101
 description: FxDart zipWithIndex 튜토리얼: 각 요소를 0부터 시작하는 인덱스와 짝지어 주며, 라이브 플레이그라운드가 함께 제공됩니다.
-heading: <code>zipWithIndex</code>
+heading: <code>indexed</code>
 section: 6
-crumb: zipWithIndex
+crumb: indexed
 prev: zipWith.html
 prevLabel: zipWith
 next: transpose.html

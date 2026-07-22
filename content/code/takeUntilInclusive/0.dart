@@ -5,7 +5,7 @@ void main() {
   print(takeUntilInclusive((a) => a == 3, [1, 2, 3, 4, 5])); // (1, 2, 3)
 
   final result =
-      fx(['a', 'b', 'STOP', 'c']).takeUntilInclusive((a) => a == 'STOP').toArray();
+      fx(['a', 'b', 'STOP', 'c']).takeUntilInclusive((a) => a == 'STOP').toList();
   print(result); // [a, b, STOP]
 
   // Deprecated alias kept for FxTS parity:

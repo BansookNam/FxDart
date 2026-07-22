@@ -21,7 +21,7 @@ nextLabel: pipe
     colgando de él. Cada una de esas llamadas devuelve un <em>nuevo</em>
     <code>Fx</code> que envuelve un poco más de cómputo perezoso. Nada se
     ejecuta todavía. <code>Fx</code> solo empieza a trabajar cuando llamas a un
-    <strong>operador terminal</strong> — <code>toArray()</code>,
+    <strong>operador terminal</strong> — <code>toList()</code>,
     <code>each()</code>, <code>consume()</code>, <code>reduce()</code> y
     compañía —, que tira de los valores a través de toda la cadena, uno a uno,
     desde el terminal hasta la fuente.
@@ -55,7 +55,7 @@ nextLabel: pipe
 
   <h2>Demo 1 · Nada se ejecuta hasta el operador terminal</h2>
   <p>Fíjate en que <code>calls</code> se queda en 0 justo después de construir la cadena, y
-    salta en cuanto <code>toArray()</code> tira de verdad de los 5 valores:</p>
+    salta en cuanto <code>toList()</code> tira de verdad de los 5 valores:</p>
   {{playground:0}}
 
   <h2>Demo 2 · fxAsync y fxStream</h2>
@@ -74,7 +74,7 @@ nextLabel: pipe
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="pipe.html"><code>pipe</code></a> — la alternativa de tipado dinámico ·
-    <a href="toArray.html"><code>toArray</code></a> — el operador terminal más habitual ·
+    <a href="toList.html"><code>toList</code></a> — el operador terminal más habitual ·
     <a href="each.html"><code>each</code></a> — operador terminal para efectos secundarios ·
     <a href="consume.html"><code>consume</code></a> — operador terminal que descarta los resultados
   </div>

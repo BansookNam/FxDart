@@ -1,10 +1,10 @@
 ---
 slug: uniqBy
-title: uniqBy — FxDart 101
-description: FxDart uniqBy tutorial: remove duplicates by a computed key, with a live playground.
-heading: <code>uniqBy</code>
+title: distinctBy — FxDart 101
+description: FxDart distinctBy tutorial: remove duplicates by a computed key, with a live playground.
+heading: <code>distinctBy</code>
 section: 4
-crumb: uniqBy
+crumb: distinctBy
 prev: uniq.html
 prevLabel: uniq
 next: difference.html
@@ -16,12 +16,14 @@ nextLabel: difference
 
   <h2>Lecture</h2>
   <p>
-    <code>uniqBy</code> is <code>uniq</code>'s general form: instead of
+    <code>distinctBy</code> is <code>uniq</code>'s general form: instead of
     comparing whole elements, it runs each element through <code>f</code>
-    and keeps only the first element to produce each distinct key. It's the
+    and keeps only the first element to produce each distinct key.
+    <code>distinctBy</code> is the Dart-idiomatic name; fxdart also accepts
+    the FxTS spelling <code>uniqBy</code> — they're the same operator. It's the
     tool for "one row per customer," "one event per type," or dedupe by any
     field or computed value — <code>uniq</code> itself is just
-    <code>uniqBy((a) =&gt; a, iterable)</code>.
+    <code>distinctBy((a) =&gt; a, iterable)</code>.
   </p>
   <p>
     As with <code>uniq</code>, it's lazy and order-preserving: the first
@@ -31,7 +33,7 @@ nextLabel: difference
   <p>
     The same async rule applies here as with <code>uniq</code>: put the
     concurrency in an upstream fetch (<code>.map(...).concurrent(n)</code>),
-    then apply <code>uniqBy</code>/<code>uniqByAsync</code> to the
+    then apply <code>distinctBy</code>/<code>distinctByAsync</code> to the
     already-resolved, in-order stream.
   </p>
 
@@ -42,7 +44,7 @@ nextLabel: difference
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>uniqBy</code> to keep only the first event of each
+  <p>Exercise: use <code>distinctBy</code> to keep only the first event of each
     <code>'type'</code>.</p>
   {{playground:2}}
 

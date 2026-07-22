@@ -24,7 +24,7 @@ nextLabel: streams
     <code>FutureOr&lt;R&gt;</code> en lugar de <code>R</code>. Ya has visto
     algunos: <code>map</code>/<code>mapAsync</code>,
     <code>filter</code>/<code>filterAsync</code>,
-    <code>toArray</code>/<code>toArrayAsync</code>,
+    <code>toList</code>/<code>toListAsync</code>,
     <code>reduce</code>/<code>reduceAsync</code>, <code>fold</code>/<code>foldAsync</code>,
     <code>each</code>/<code>eachAsync</code>, <code>find</code>/<code>findAsync</code>:
     el patrón se cumple prácticamente para todas las funciones de la librería.

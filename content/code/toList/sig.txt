@@ -1,0 +1,4 @@
+List&lt;A&gt; toList&lt;A&gt;(Iterable&lt;A&gt; iterable)
+Future&lt;List&lt;A&gt;&gt; toListAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+List&lt;T&gt; Fx.toList()        // chain
+Future&lt;List&lt;T&gt;&gt; FxAsync.toList()

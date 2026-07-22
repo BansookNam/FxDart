@@ -34,7 +34,7 @@ nextLabel: sortBy
     devuelve otro <code>Fx&lt;T&gt;</code> — no una <code>List&lt;T&gt;</code> —
     porque <code>Fx</code> envuelve la lista ordenada subyacente para seguir
     siendo encadenable. Sigues necesitando un terminal como
-    <code><a href="../101/index.html">.toArray()</a></code> para obtener una
+    <code><a href="../101/index.html">.toList()</a></code> para obtener una
     <code>List</code> concreta. La cadena <strong>asíncrona</strong> no tiene
     esa peculiaridad: <code>FxAsync.sort(f)</code> ya es un
     terminal que devuelve <code>Future&lt;List&lt;T&gt;&gt;</code> directamente,

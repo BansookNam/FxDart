@@ -2,9 +2,9 @@
 slug: some
 title: some — FxDart 101
 description: FxDart some 튜토리얼: 원소 중 하나라도 술어를 만족하는지 검사하고 첫 번째로 맞는 값에서 단축 평가하는 방법을 동기와 비동기 모두에서 다룹니다.
-heading: <code>some</code>
+heading: <code>any</code>
 section: 8
-crumb: some
+crumb: any
 prev: every.html
 prevLabel: every
 next: predicates.html

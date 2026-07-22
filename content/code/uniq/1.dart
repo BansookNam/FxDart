@@ -7,8 +7,8 @@ Future<void> main() async {
       .toAsync()
       .map((a) => delay(Duration(milliseconds: 100), a))
       .concurrent(3)
-      .uniq()
-      .toArray();
+      .distinct()
+      .toList();
 
   print(result); // [1, 2, 3, 4] -- correct even with concurrent fetching
   print('took ${sw.elapsedMilliseconds}ms'); // ~200ms (2 batches of 3)

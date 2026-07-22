@@ -2,9 +2,9 @@
 slug: head
 title: head — FxDart 101
 description: Tutorial de head en FxDart: obtén el primer elemento de un iterable de forma segura, devolviendo null en lugar de lanzar una excepción, con playground en vivo.
-heading: <code>head</code>
+heading: <code>firstOrNull</code>
 section: 8
-crumb: head
+crumb: firstOrNull
 prev: partition.html
 prevLabel: partition
 next: last.html

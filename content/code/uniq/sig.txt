@@ -1,4 +1,5 @@
-Iterable&lt;A&gt; uniq&lt;A&gt;(Iterable&lt;A&gt; iterable)
-FxAsyncIterable&lt;A&gt; uniqAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;T&gt; Fx.uniq()        // chain
-FxAsync&lt;T&gt; FxAsync.uniq()
+Iterable&lt;A&gt; distinct&lt;A&gt;(Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; distinctAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.distinct()        // chain
+FxAsync&lt;T&gt; FxAsync.distinct()
+Iterable&lt;A&gt; uniq&lt;A&gt;(Iterable&lt;A&gt; iterable)   // FxTS alias

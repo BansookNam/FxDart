@@ -1,10 +1,10 @@
 ---
 slug: includes
-title: includes — FxDart 101
-description: FxDart includes tutorial: check membership in an iterable with ==, short-circuiting, sync and async.
-heading: <code>includes</code>
+title: contains — FxDart 101
+description: FxDart contains tutorial: check membership in an iterable with ==, short-circuiting, sync and async.
+heading: <code>contains</code>
 section: 8
-crumb: includes
+crumb: contains
 prev: findIndex.html
 prevLabel: findIndex
 next: isEmpty.html
@@ -16,10 +16,14 @@ nextLabel: isEmpty
 
   <h2>Lecture</h2>
   <p>
-    <code>includes</code> is a thin, FxTS-shaped wrapper: on the sync side
-    it's literally <code>iterable.contains(a)</code>, so there's no separate
-    chain method — <code>Fx</code> already inherits <code>.contains()</code>
-    from <code>Iterable</code>, and it behaves identically. The async
+    <code>contains</code> is the Dart-idiomatic name for membership testing,
+    and on a chain you already have it: <code>Fx</code> inherits
+    <code>.contains()</code> from <code>Iterable</code>, so
+    <code>fx(xs).contains(a)</code> just works. There is no top-level
+    <code>contains</code> function, though — the name collides with
+    <code>package:test</code>'s matcher — so the data-first form keeps its
+    FxTS spelling <code>includes(a, iterable)</code>, which is literally
+    <code>iterable.contains(a)</code>. The async
     version, <code>includesAsync</code>, is built on top of
     <a href="some.html"><code>someAsync</code></a> (<code>b == a</code> as
     the predicate), which means it inherits the same short-circuiting: it
@@ -39,7 +43,7 @@ nextLabel: isEmpty
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>includes</code> to check whether <code>requestId</code> is allowed.</p>
+  <p>Exercise: use <code>contains</code> to check whether <code>requestId</code> is allowed.</p>
   {{playground:2}}
 
   <div class="callout">

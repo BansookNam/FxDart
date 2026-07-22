@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>unicodeToList — FxDart 101</title>
+  <meta name="description" content="Tutorial de unicodeToList en FxDart: divide una cadena en los caracteres que percibe el usuario, tratando correctamente los pares subrogados como los emoji.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/unicodeToList.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/unicodeToList.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/unicodeToList.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/unicodeToList.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/unicodeToList.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/unicodeToList.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/unicodeToList.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/unicodeToList.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../tutorials/unicodeToList.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/unicodeToList.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/unicodeToList.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/unicodeToList.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/unicodeToList.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/tutorials/unicodeToList.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/unicodeToList.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 10 · Utilidades de funciones › <strong>unicodeToList</strong></p>
+  <h1><code>unicodeToList</code></h1>
+  <p class="hero-sub">Divide una cadena en los caracteres que percibe el usuario, tratando correctamente los pares subrogados.</p>
+
+  <div class="signature">List&lt;String&gt; unicodeToList(String s)</div>
+
+  <h2>Lección</h2>
+  <p>
+    En Dart, un <code>String</code> es una secuencia de <em>unidades de código</em>
+    UTF-16, no de caracteres. Llamar a <code>s.split('')</code> divide por unidad
+    de código — algo correcto para texto ASCII/latino sencillo, pero erróneo para
+    cualquier cosa fuera del Plano Multilingüe Básico, como la mayoría de los
+    emoji: estos se representan con un <strong>par subrogado</strong> (dos
+    unidades de código), así que una división ingenua parte un mismo emoji en dos
+    mitades rotas.
+  </p>
+  <p>
+    <code>unicodeToList</code> lo resuelve iterando los <code>.runes</code> de la
+    cadena — los puntos de código Unicode — y convirtiendo cada uno de vuelta en
+    su propio <code>String</code> de un solo carácter. El resultado es la lista de
+    caracteres que una persona ve realmente al leer la cadena, igual que el
+    <code>unicodeToList</code> de FxTS, que divide por punto de código y no por
+    unidad UTF-16.
+  </p>
+
+  <h2>Demo 1 · División ingenua frente a unicodeToList</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final s = 'a👍b';
+  print(s.split('').length);     // 4 — naive split breaks the emoji apart
+  print(unicodeToList(s));      // [a, 👍, b]
+  print(unicodeToList(s).length); // 3 — correct character count
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Invertir y contar correctamente</h2>
+  <p>
+    Partiendo de <code>unicodeToList</code>: una inversión con división ingenua
+    destrozaría el emoji; esta no:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+String reverseUnicode(String s) => unicodeToList(s).reversed.join();
+
+void main() {
+  print(reverseUnicode('a👍b')); // b👍a
+
+  final counts = countBy(identity, unicodeToList('aabb👍👍'));
+  print(counts); // {a: 2, b: 2, 👍: 2}
+}
+</textarea>
+  </div>
+
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: cuenta cuántos caracteres percibidos por el usuario hay en esta
+    cadena (contiene un emoji).</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final s = 'go🚀go';
+
+  // TODO: count how many user-perceived characters are in `s`
+  final count = unicodeToList(s).length;
+
+  print(count); // 5
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Relacionado:</strong>
+    <a href="split.html"><code>split</code></a> — divide con un iterable de caracteres normal ·
+    <a href="reverse.html"><code>reverse</code></a> — invierte un Iterable; con cadenas hay que cuidar igual los pares subrogados ·
+    <a href="countBy.html"><code>countBy</code></a> — usado arriba para contabilizar caracteres ·
+    <a href="identity.html"><code>identity</code></a> — usado arriba como clave de conteo
+  </div>
+
+  <nav class="tut-nav">
+    <a href="delay.html">← Anterior: delay &amp; sleep</a>
+    <a href="curried.html">Siguiente: curried &amp; uncurried →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

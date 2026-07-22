@@ -42,6 +42,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 11 · Async &amp; concurrencia › <strong>concurrentPool</strong></p>
   <h1><code>concurrentPool</code></h1>
   <p class="hero-sub">Como concurrent, pero emite los resultados por orden de finalización — el primero que acaba es el primero que sale.</p>
@@ -69,13 +70,13 @@ FxAsync&lt;T&gt; FxAsync.concurrentPool(int length)        // chain</div>
     su pool lleno de forma ansiosa</strong>: desde el primer pull conserva hasta
     <code>n</code> peticiones en vuelo, haya los consumidores que haya
     esperando. Incluso un operador terminal que tira de uno en uno como
-    <code>.toArray()</code> o <code>.each()</code> obtiene todo el solapamiento
+    <code>.toList()</code> o <code>.each()</code> obtiene todo el solapamiento
     — y ve los resultados en el orden en que terminan.
   </p>
 
   <h2>Demo 1 · Orden de finalización</h2>
   <p>El elemento 1 es el más lento (300ms) y el 2 el más rápido (100ms) — el
-    resultado sale con el más rápido primero, directamente desde <code>.toArray()</code>:</p>
+    resultado sale con el más rápido primero, directamente desde <code>.toList()</code>:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -88,7 +89,7 @@ Future<void> main() async {
       .toAsync()
       .map((i) => delay(Duration(milliseconds: delays[i - 1]), 'item$i'))
       .concurrentPool(3)
-      .toArray();
+      .toList();
 
   print(results); // [item2, item3, item1] — completion order
   print('took ${sw.elapsedMilliseconds}ms'); // ~300ms (the slowest one)

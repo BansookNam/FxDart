@@ -1,11 +1,12 @@
 import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
+  // Async chain: .lastOrNull() is a method — with parens — and null-safe.
   final result = await fx([1, 2, 3])
       .toAsync()
       .map((a) => delay(Duration(milliseconds: 50), a * 10))
-      .last();
+      .lastOrNull();
   print(result); // 30
 
-  print(await fxAsync(asyncEmpty<int>()).last()); // null
+  print(await fxAsync(asyncEmpty<int>()).lastOrNull()); // null
 }

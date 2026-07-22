@@ -1,9 +1,10 @@
 import 'package:fxdart/fxdart.dart';
 
 void main() {
-  print(drop(2, [1, 2, 3, 4, 5])); // (3, 4, 5)
+  print(skip(2, [1, 2, 3, 4, 5])); // (3, 4, 5)
+  // FxTS alias: drop(2, [1, 2, 3, 4, 5]) is identical.
 
-  // Chain form (also aliased as .skip, matching Iterable):
-  final result = fx([1, 2, 3, 4, 5]).drop(2).toArray();
+  // Chain form (matches Iterable.skip):
+  final result = fx([1, 2, 3, 4, 5]).skip(2).toList();
   print(result); // [3, 4, 5]
 }

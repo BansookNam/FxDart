@@ -13,7 +13,7 @@ void main() {
   print(toSorted<int>((a, b) => b.compareTo(a), original)); // [9, 8, 5, 2, 1]
 
   // Chain form: .sort(f) returns another Fx (still lazy on paper), so pull
-  // it with .toArray() to get a concrete List:
-  final chained = fx(original).sort((a, b) => a.compareTo(b)).toArray();
+  // it with .toList() to get a concrete List:
+  final chained = fx(original).sort((a, b) => a.compareTo(b)).toList();
   print(chained); // [1, 2, 5, 8, 9]
 }

@@ -26,7 +26,7 @@ description: FxDart is a functional programming library for Dart, ported from Fx
   <ul>
     <li><strong>Lazy evaluation</strong> — operators like <code>map</code>,
       <code>filter</code>, and <code>take</code> build a pipeline but do no work
-      until a terminal operator (<code>toArray</code>, <code>each</code>,
+      until a terminal operator (<code>toList</code>, <code>each</code>,
       <code>reduce</code>…) pulls values through it. Processing a million-element
       range with <code>.take(3)</code> computes exactly 3 results.</li>
     <li><strong>One model for sync and async</strong> — the same operator names

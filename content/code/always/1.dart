@@ -6,5 +6,5 @@ void main() {
     ((n) => n == 0, (n) => 'zero'),
   ], orElse: always('positive'));
 
-  print(fx([-2, 0, 7]).map(classify).toArray()); // [negative, zero, positive]
+  print(fx([-2, 0, 7]).map(classify).toList()); // [negative, zero, positive]
 }

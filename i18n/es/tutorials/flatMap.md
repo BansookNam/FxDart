@@ -2,9 +2,9 @@
 slug: flatMap
 title: flatMap — FxDart 101
 description: Tutorial de flatMap en FxDart: transforma cada elemento en un iterable y aplana un nivel, con un playground en vivo.
-heading: <code>flatMap</code>
+heading: <code>expand</code>
 section: 3
-crumb: flatMap
+crumb: expand
 prev: mapEffect.html
 prevLabel: mapEffect
 next: flat.html

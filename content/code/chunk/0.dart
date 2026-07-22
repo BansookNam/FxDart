@@ -5,6 +5,6 @@ void main() {
   print(chunk(3, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]));
   // ([1, 2, 3], [4, 5, 6], [7, 8, 9], [10])
 
-  final result = fx([1, 2, 3, 4, 5]).chunk(2).toArray();
+  final result = fx([1, 2, 3, 4, 5]).chunk(2).toList();
   print(result); // [[1, 2], [3, 4], [5]]
 }

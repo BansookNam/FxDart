@@ -1,4 +1,4 @@
 List&lt;A&gt; sortBy&lt;A&gt;(Object? Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;List&lt;A&gt;&gt; sortByAsync&lt;A&gt;(Object? Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;T&gt; Fx.sortBy(Object? Function(T a) f)                    // chain (sync) — still lazy, call .toArray()
+Fx&lt;T&gt; Fx.sortBy(Object? Function(T a) f)                    // chain (sync) — still lazy, call .toList()
 Future&lt;List&lt;T&gt;&gt; FxAsync.sortBy(Object? Function(T a) f)     // chain (async) — already a terminal

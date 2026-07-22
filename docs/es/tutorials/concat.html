@@ -86,7 +86,7 @@ void main() {
     yield 99;
   }
 
-  final result = fx(concat([1, 2], second())).take(2).toArray();
+  final result = fx(concat([1, 2], second())).take(2).toList();
   print(result); // [1, 2]
   print('second touched: $secondTouched'); // false
 }
@@ -102,7 +102,7 @@ Future<void> main() async {
   final left = fx([1, 2]).toAsync().map((a) => delay(Duration(milliseconds: 50), a));
   final right = fx([3, 4]).toAsync().map((a) => delay(Duration(milliseconds: 50), a));
 
-  final result = await left.concat(right).toArray();
+  final result = await left.concat(right).toList();
   print(result); // [1, 2, 3, 4]
 }
 </textarea>
@@ -120,7 +120,7 @@ void main() {
   final evening = ['dinner', 'sleep'];
 
   // TODO: concatenate morning and evening into one schedule
-  final schedule = fx(morning).toArray();
+  final schedule = fx(morning).toList();
 
   print(schedule);
 }

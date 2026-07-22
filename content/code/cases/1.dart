@@ -7,5 +7,5 @@ void main() {
     ((n) => n >= 70, (n) => 'C'),
   ], orElse: (n) => 'F');
 
-  print(fx([95, 83, 61, 72]).map(grade).toArray()); // [A, B, F, C]
+  print(fx([95, 83, 61, 72]).map(grade).toList()); // [A, B, F, C]
 }

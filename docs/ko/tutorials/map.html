@@ -42,6 +42,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 3 · 변환 › <strong>map</strong></p>
   <h1><code>map</code></h1>
   <p class="hero-sub">각 원소를 함수에 통과시켜 만든 값들의 지연 이터러블을 반환합니다.</p>
@@ -56,7 +57,7 @@ FxAsync&lt;R&gt; FxAsync.map&lt;R&gt;(FutureOr&lt;R&gt; Function(T a) f)</div>
     <code>map</code>은 가장 기본이 되는 변환 연산자입니다. 모든 원소에
     함수를 적용하죠. FxDart에서는 <strong>지연 평가</strong>됩니다 —
     <code>map</code>을 호출하는 것만으로는 아무 일도 일어나지 않습니다.
-    종결 연산자(<code>toArray</code>, <code>each</code>,
+    종결 연산자(<code>toList</code>, <code>each</code>,
     <code>reduce</code> …)가 파이프라인에서 값을 끌어당길 때 비로소 함수가
     실행됩니다. 덕분에 필요한 만큼만 끌어당긴다면 엄청나게 큰 —
     심지어 무한한 — 시퀀스에도 <code>map</code>을 걸 수 있습니다.
@@ -76,7 +77,7 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   // Data-first form:
-  print(toArray(map((a) => a * 2, [1, 2, 3]))); // [2, 4, 6]
+  print(toList(map((a) => a * 2, [1, 2, 3]))); // [2, 4, 6]
 
   // Chain form, with proof of laziness:
   var calls = 0;
@@ -86,7 +87,7 @@ void main() {
         return a * a;
       })
       .take(3)
-      .toArray();
+      .toList();
 
   print(result);            // [0, 1, 4]
   print('map ran $calls times'); // 3 — not 1000000!
@@ -112,7 +113,7 @@ Future<void> main() async {
       .toAsync()
       .map((a) => delay(Duration(milliseconds: 200), a * 10))
       .concurrent(3) // remove this line to see ~1200ms
-      .toArray();
+      .toList();
 
   print(result); // [10, 20, 30, 40, 50, 60]
   print('took ${sw.elapsedMilliseconds}ms');
@@ -135,7 +136,7 @@ void main() {
   ];
 
   // TODO: map each person to '<NAME IN UPPERCASE> (<age>)'
-  final labels = fx(people).map((p) => '$p').toArray();
+  final labels = fx(people).map((p) => '$p').toList();
 
   labels.forEach(print);
 }

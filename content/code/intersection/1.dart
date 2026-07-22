@@ -10,7 +10,7 @@ Future<void> main() async {
       .map((a) => delay(Duration(milliseconds: 100), a))
       .concurrent(4);
 
-  final available = await fxAsync(intersectionAsync(inStock, wishlist)).toArray();
+  final available = await fxAsync(intersectionAsync(inStock, wishlist)).toList();
 
   print(available); // [2, 4]
   print('took ${sw.elapsedMilliseconds}ms'); // ~100ms

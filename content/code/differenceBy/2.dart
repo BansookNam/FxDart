@@ -11,7 +11,7 @@ void main() {
 
   // TODO: use differenceBy (keyed on 'sku') to find products that are
   // still available.
-  final available = toArray(products);
+  final available = toList(products);
 
   print(available);
 }

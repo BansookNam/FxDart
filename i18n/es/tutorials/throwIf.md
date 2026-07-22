@@ -37,7 +37,7 @@ nextLabel: cases
   <h2>Demo 2 · Validar un pipeline</h2>
   <p>
     Cada edad se valida conforme se mapea; la primera infracción aborta la
-    llamada entera a <code>toArray()</code>:
+    llamada entera a <code>toList()</code>:
   </p>
   {{playground:1}}
 

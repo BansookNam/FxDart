@@ -2,9 +2,9 @@
 slug: drop
 title: drop — FxDart 101
 description: FxDart drop 튜토리얼: 지연 파이프라인에서 앞쪽 n개의 값을 건너뛰는 방법을 라이브 플레이그라운드와 함께 익힙니다.
-heading: <code>drop</code>
+heading: <code>skip</code>
 section: 5
-crumb: drop
+crumb: skip
 prev: takeUntilInclusive.html
 prevLabel: takeUntilInclusive
 next: dropRight.html

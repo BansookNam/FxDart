@@ -42,18 +42,20 @@
   </div>
 </header>
 <main>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 1 · Primeros pasos › <strong>each</strong></p>
-  <h1><code>each</code></h1>
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 1 · Primeros pasos › <strong>forEach</strong></p>
+  <h1><code>forEach</code></h1>
   <p class="hero-sub">Ejecuta una función una vez por elemento, únicamente por sus efectos secundarios.</p>
 
-  <div class="signature">void each&lt;A&gt;(void Function(A a) f, Iterable&lt;A&gt; iterable)
-Future&lt;void&gt; eachAsync&lt;A&gt;(FutureOr&lt;void&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
-void Fx.each(void Function(T a) f)        // chain
-Future&lt;void&gt; FxAsync.each(FutureOr&lt;void&gt; Function(T a) f)</div>
+  <div class="signature">void forEach&lt;A&gt;(void Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;void&gt; forEachAsync&lt;A&gt;(FutureOr&lt;void&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+void Fx.forEach(void Function(T a) f)        // chain (inherited from Iterable)
+Future&lt;void&gt; FxAsync.forEach(FutureOr&lt;void&gt; Function(T a) f)  // chain
+void each&lt;A&gt;(void Function(A a) f, Iterable&lt;A&gt; iterable)  // FxTS alias</div>
 
   <h2>Lección</h2>
   <p>
-    <code>each</code> es un operador terminal, igual que <code>toArray</code>:
+    <code>each</code> es un operador terminal, igual que <code>toList</code>:
     al llamarlo tira de todos los valores a través de la cadena entera. La
     diferencia está en qué hace con esos valores: en lugar de recogerlos en
     una <code>List</code>, se limita a ejecutar <code>f</code> con cada uno y
@@ -82,10 +84,10 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   // Data-first form: run f for side effects, get nothing back.
-  each((a) => print('data-first: $a'), [1, 2, 3]);
+  forEach((a) => print('data-first: $a'), [1, 2, 3]);
 
-  // Chain form:
-  fx(['a', 'b', 'c']).each((a) => print('chain: $a'));
+  // Chain form (inherited from Iterable). FxTS alias: each is the same op.
+  fx(['a', 'b', 'c']).forEach((a) => print('chain: $a'));
 }
 </textarea>
   </div>
@@ -101,9 +103,9 @@ void main() {
 import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
-  // eachAsync awaits f for every element, strictly in order — even though
+  // forEachAsync awaits f for every element, strictly in order — even though
   // each delay is a different length, they always print as 1, 2, 3.
-  await fx([1, 2, 3]).toAsync().each((a) async {
+  await fx([1, 2, 3]).toAsync().forEach((a) async {
     await sleep(Duration(milliseconds: 50 * (4 - a)));
     print('processed $a');
   });
@@ -123,9 +125,9 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final orders = [12.5, 30.0, 7.25];
 
-  // TODO: use each to print a receipt line for every order.
+  // TODO: use forEach to print a receipt line for every order.
   var total = 0.0;
-  fx(orders).each((price) {
+  fx(orders).forEach((price) {
     total += price;
     print('charged \$$price');
   });
@@ -137,14 +139,14 @@ void main() {
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="toArray.html"><code>toArray</code></a> — operador terminal que en su lugar recoge una List ·
+    <a href="toList.html"><code>toList</code></a> — operador terminal que en su lugar recoge una List ·
     <a href="consume.html"><code>consume</code></a> — operador terminal que descarta los resultados y puede parar antes ·
     <a href="peek.html"><code>peek</code></a> — la misma idea, pero perezoso (no terminal) ·
     <a href="fx.html"><code>fx</code></a> — la cadena que each termina
   </div>
 
   <nav class="tut-nav">
-    <a href="toArray.html">← Anterior: toArray</a>
+    <a href="toList.html">← Anterior: toList</a>
     <a href="consume.html">Siguiente: consume →</a>
   </nav>
 </main>

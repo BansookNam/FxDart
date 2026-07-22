@@ -15,6 +15,6 @@ void main() {
   ];
 
   final featuredProducts = intersectionBy((p) => p['sku'], featured, catalog);
-  print(toArray(featuredProducts));
+  print(toList(featuredProducts));
   // [{sku: A1, title: Keyboard}, {sku: B2, title: Mouse}]
 }

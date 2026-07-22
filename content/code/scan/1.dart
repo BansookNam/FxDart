@@ -11,7 +11,7 @@ Future<void> main() async {
       .map((a) => delay(Duration(milliseconds: 100), a))
       .concurrent(3)
       .scan((acc, a) => acc + a, 0)
-      .toArray();
+      .toList();
 
   print(runningTotals); // [0, 10, 30, 60]
   print('took ${sw.elapsedMilliseconds}ms'); // ~100ms

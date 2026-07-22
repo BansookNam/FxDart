@@ -109,9 +109,9 @@ int multiply(int a, int b) => a * b;
 String echoTimes(String s, int times) => s * times;
 
 void main() {
-  print(fx([1, 2, 3]).map(multiply.curried(10)).toArray()); // [10, 20, 30]
+  print(fx([1, 2, 3]).map(multiply.curried(10)).toList()); // [10, 20, 30]
 
-  print(fx([1, 2, 3]).map(echoTimes.curried('na')).toArray());
+  print(fx([1, 2, 3]).map(echoTimes.curried('na')).toList());
   // [na, nana, nanana]
 }
 </textarea>
@@ -156,7 +156,7 @@ void main() {
   // TODO: derive clampTo100 from clamp with .curried
   final clampTo100 = clamp.curried(100);
 
-  print(fx([50, 99, 150, 300]).map(clampTo100).toArray());
+  print(fx([50, 99, 150, 300]).map(clampTo100).toList());
   // [50, 99, 100, 100]
 }
 </textarea>
@@ -178,7 +178,7 @@ void main() {
   </div>
 
   <nav class="tut-nav">
-    <a href="unicodeToArray.html">← Previous: unicodeToArray</a>
+    <a href="unicodeToList.html">← Previous: unicodeToList</a>
     <a href="toAsync.html">Next: toAsync →</a>
   </nav>
 </main>

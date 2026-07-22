@@ -2,9 +2,9 @@
 slug: takeRight
 title: takeRight — FxDart 101
 description: FxDart takeRight 튜토리얼 — 유한한 이터러블에서 뒤의 n개 값만 남깁니다. 라이브 플레이그라운드 포함.
-heading: <code>takeRight</code>
+heading: <code>takeLast</code>
 section: 5
-crumb: takeRight
+crumb: takeLast
 prev: take.html
 prevLabel: take
 next: takeWhile.html

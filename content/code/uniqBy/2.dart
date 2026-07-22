@@ -7,8 +7,8 @@ void main() {
     {'type': 'scroll', 'id': 3},
   ];
 
-  // TODO: use uniqBy to keep only the first event of each 'type'.
-  final result = fx(events).toArray();
+  // TODO: use distinctBy to keep only the first event of each 'type'.
+  final result = fx(events).toList();
 
   print(result);
 }

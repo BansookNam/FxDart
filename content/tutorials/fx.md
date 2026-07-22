@@ -21,7 +21,7 @@ nextLabel: pipe
     hung off it. Every one of those calls returns a <em>new</em>
     <code>Fx</code> wrapping a bit more lazy computation. None of it runs
     yet. <code>Fx</code> only starts doing work when you call a
-    <strong>terminal operator</strong> — <code>toArray()</code>,
+    <strong>terminal operator</strong> — <code>toList()</code>,
     <code>each()</code>, <code>consume()</code>, <code>reduce()</code>, and
     friends — which pulls values through the whole chain, one at a time,
     from the terminal all the way back to the source.
@@ -55,7 +55,7 @@ nextLabel: pipe
 
   <h2>Demo 1 · Nothing runs until the terminal op</h2>
   <p>Watch <code>calls</code> stay at 0 right after building the chain, then
-    jump once <code>toArray()</code> actually pulls the 5 values:</p>
+    jump once <code>toList()</code> actually pulls the 5 values:</p>
   {{playground:0}}
 
   <h2>Demo 2 · fxAsync and fxStream</h2>
@@ -74,7 +74,7 @@ nextLabel: pipe
   <div class="callout">
     <strong>Related:</strong>
     <a href="pipe.html"><code>pipe</code></a> — the dynamically-typed alternative ·
-    <a href="toArray.html"><code>toArray</code></a> — the most common terminal op ·
+    <a href="toList.html"><code>toList</code></a> — the most common terminal op ·
     <a href="each.html"><code>each</code></a> — terminal op for side effects ·
     <a href="consume.html"><code>consume</code></a> — terminal op that discards results
   </div>

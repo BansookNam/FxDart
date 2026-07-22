@@ -82,10 +82,10 @@
 import 'package:fxdart/fxdart.dart';
 
 void main() {
-  print(toArray(range(4)));        // [0, 1, 2, 3] — one arg counts 0..start
-  print(toArray(range(1, 4)));     // [1, 2, 3]
-  print(toArray(range(4, 1, -1))); // [4, 3, 2] — negative step counts down
-  print(toArray(range(0, 10, 3))); // [0, 3, 6, 9]
+  print(toList(range(4)));        // [0, 1, 2, 3] — one arg counts 0..start
+  print(toList(range(1, 4)));     // [1, 2, 3]
+  print(toList(range(4, 1, -1))); // [4, 3, 2] — negative step counts down
+  print(toList(range(0, 10, 3))); // [0, 3, 6, 9]
 }
 </textarea>
   </div>
@@ -110,7 +110,7 @@ void main() {
         return a * a;
       })
       .take(4)
-      .toArray();
+      .toList();
 
   print(result);          // [0, 1, 4, 9]
   print('calls: $calls'); // 4 — not 1000000
@@ -127,7 +127,7 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   // TODO: use range to build the even numbers from 2 to 10 inclusive.
-  final evens = fx(range(2, 11, 2)).toArray();
+  final evens = fx(range(2, 11, 2)).toList();
 
   print(evens); // [2, 4, 6, 8, 10]
 }

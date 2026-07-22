@@ -1,8 +1,12 @@
 import 'package:fxdart/fxdart.dart';
 
 void main() {
-  print(head([10, 20, 30])); // 10
-  print(head(<int>[]));      // null
+  print(firstOrNull([10, 20, 30])); // 10
+  print(firstOrNull(<int>[]));      // null
 
-  print(fx(['a', 'b', 'c']).head()); // a
+  // Sync chain: .firstOrNull is the inherited Iterable getter — no parens.
+  print(fx(['a', 'b', 'c']).firstOrNull); // a
+
+  // FxTS alias: head — the same operator.
+  print(head([10, 20, 30])); // 10
 }

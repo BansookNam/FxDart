@@ -1,10 +1,10 @@
 ---
-slug: unicodeToArray
-title: unicodeToArray — FxDart 101
-description: Tutorial de unicodeToArray en FxDart: divide una cadena en los caracteres que percibe el usuario, tratando correctamente los pares subrogados como los emoji.
-heading: <code>unicodeToArray</code>
+slug: unicodeToList
+title: unicodeToList — FxDart 101
+description: Tutorial de unicodeToList en FxDart: divide una cadena en los caracteres que percibe el usuario, tratando correctamente los pares subrogados como los emoji.
+heading: <code>unicodeToList</code>
 section: 10
-crumb: unicodeToArray
+crumb: unicodeToList
 prev: delay.html
 prevLabel: delay &amp; sleep
 next: curried.html
@@ -25,20 +25,20 @@ nextLabel: curried &amp; uncurried
     mitades rotas.
   </p>
   <p>
-    <code>unicodeToArray</code> lo resuelve iterando los <code>.runes</code> de la
+    <code>unicodeToList</code> lo resuelve iterando los <code>.runes</code> de la
     cadena — los puntos de código Unicode — y convirtiendo cada uno de vuelta en
     su propio <code>String</code> de un solo carácter. El resultado es la lista de
     caracteres que una persona ve realmente al leer la cadena, igual que el
-    <code>unicodeToArray</code> de FxTS, que divide por punto de código y no por
+    <code>unicodeToList</code> de FxTS, que divide por punto de código y no por
     unidad UTF-16.
   </p>
 
-  <h2>Demo 1 · División ingenua frente a unicodeToArray</h2>
+  <h2>Demo 1 · División ingenua frente a unicodeToList</h2>
   {{playground:0}}
 
   <h2>Demo 2 · Invertir y contar correctamente</h2>
   <p>
-    Partiendo de <code>unicodeToArray</code>: una inversión con división ingenua
+    Partiendo de <code>unicodeToList</code>: una inversión con división ingenua
     destrozaría el emoji; esta no:
   </p>
   {{playground:1}}

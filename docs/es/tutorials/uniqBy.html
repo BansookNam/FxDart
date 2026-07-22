@@ -42,14 +42,16 @@
   </div>
 </header>
 <main>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 4 · Filtrado &amp; deduplicación › <strong>uniqBy</strong></p>
-  <h1><code>uniqBy</code></h1>
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 4 · Filtrado &amp; deduplicación › <strong>distinctBy</strong></p>
+  <h1><code>distinctBy</code></h1>
   <p class="hero-sub">Elimina duplicados según lo que determine una función de clave, en lugar de por igualdad de valores.</p>
 
-  <div class="signature">Iterable&lt;A&gt; uniqBy&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable)
-FxAsyncIterable&lt;A&gt; uniqByAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;T&gt; Fx.uniqBy&lt;B&gt;(B Function(T a) f)        // chain
-FxAsync&lt;T&gt; FxAsync.uniqBy&lt;B&gt;(FutureOr&lt;B&gt; Function(T a) f)</div>
+  <div class="signature">Iterable&lt;A&gt; distinctBy&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; distinctByAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.distinctBy&lt;B&gt;(B Function(T a) f)        // chain
+FxAsync&lt;T&gt; FxAsync.distinctBy&lt;B&gt;(FutureOr&lt;B&gt; Function(T a) f)
+Iterable&lt;A&gt; uniqBy&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable)   // FxTS alias</div>
 
   <h2>Lección</h2>
   <p>
@@ -86,12 +88,13 @@ void main() {
   ];
 
   // Data-first form: keep the first person seen from each department.
-  final firstPerDept = uniqBy((p) => p['dept'], people);
-  print(toArray(firstPerDept));
+  final firstPerDept = distinctBy((p) => p['dept'], people);
+  print(toList(firstPerDept));
   // [{name: kim, dept: eng}, {name: park, dept: sales}]
+  // FxTS alias: uniqBy((p) => p['dept'], people) does the same thing.
 
   // Chain form: dedupe numbers by their remainder mod 3.
-  final result = fx([1, 4, 2, 7, 9]).uniqBy((a) => a % 3).toArray();
+  final result = fx([1, 4, 2, 7, 9]).distinctBy((a) => a % 3).toList();
   print(result); // [1, 2, 9]
 }
 </textarea>
@@ -117,8 +120,9 @@ Future<void> main() async {
       .map((o) => delay(Duration(milliseconds: 100), o))
       .concurrent(3);
 
+  // FxTS alias: uniqByAsync((o) => o['customer'], fetched) does the same thing.
   final firstPerCustomer =
-      await fxAsync(uniqByAsync((o) => o['customer'], fetched)).toArray();
+      await fxAsync(distinctByAsync((o) => o['customer'], fetched)).toList();
 
   print(firstPerCustomer); // [{customer: a, amount: 10}, {customer: b, amount: 20}]
   print('took ${sw.elapsedMilliseconds}ms'); // ~100ms
@@ -140,8 +144,8 @@ void main() {
     {'type': 'scroll', 'id': 3},
   ];
 
-  // TODO: use uniqBy to keep only the first event of each 'type'.
-  final result = fx(events).toArray();
+  // TODO: use distinctBy to keep only the first event of each 'type'.
+  final result = fx(events).toList();
 
   print(result);
 }

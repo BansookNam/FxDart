@@ -42,14 +42,16 @@
   </div>
 </header>
 <main>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 8 · 접근 &amp; 술어 › <strong>head</strong></p>
-  <h1><code>head</code></h1>
+  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 8 · 접근 &amp; 술어 › <strong>firstOrNull</strong></p>
+  <h1><code>firstOrNull</code></h1>
   <p class="hero-sub">이터러블의 첫 원소를 반환하며, 비어 있으면 <code>null</code>을 반환합니다.</p>
 
-  <div class="signature">A? head&lt;A&gt;(Iterable&lt;A&gt; iterable)
-Future&lt;A?&gt; headAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
-T? Fx.head()               // chain
-Future&lt;T?&gt; FxAsync.head()  // chain</div>
+  <div class="signature">A? firstOrNull&lt;A&gt;(Iterable&lt;A&gt; iterable)
+Future&lt;A?&gt; firstOrNullAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+T? Fx.firstOrNull                // sync chain: inherited Iterable getter, no parens
+Future&lt;T?&gt; FxAsync.firstOrNull()  // async chain method
+A? head&lt;A&gt;(Iterable&lt;A&gt; iterable)  // FxTS alias</div>
 
   <h2>강의</h2>
   <p>
@@ -80,10 +82,14 @@ Future&lt;T?&gt; FxAsync.head()  // chain</div>
 import 'package:fxdart/fxdart.dart';
 
 void main() {
-  print(head([10, 20, 30])); // 10
-  print(head(<int>[]));      // null
+  print(firstOrNull([10, 20, 30])); // 10
+  print(firstOrNull(<int>[]));      // null
 
-  print(fx(['a', 'b', 'c']).head()); // a
+  // Sync chain: .firstOrNull is the inherited Iterable getter — no parens.
+  print(fx(['a', 'b', 'c']).firstOrNull); // a
+
+  // FxTS alias: head — the same operator.
+  print(head([10, 20, 30])); // 10
 }
 </textarea>
   </div>
@@ -100,14 +106,16 @@ import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
   var pulled = 0;
-  final first = fx(range(1000000)).peek((_) => pulled++).head();
+  // Sync chain: .firstOrNull is the inherited getter — no parens.
+  final first = fx(range(1000000)).peek((_) => pulled++).firstOrNull;
   print(first);            // 0
   print('pulled $pulled'); // pulled 1
 
+  // Async chain: .firstOrNull() is a method — with parens.
   final firstReady = await fx(['slow', 'never awaited'])
       .toAsync()
       .map((v) => delay(Duration(milliseconds: 50), v))
-      .head();
+      .firstOrNull();
   print(firstReady); // slow — only the first delay() ever fires
 }
 </textarea>
@@ -123,7 +131,7 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final scores = <int>[88, 73, 95];
 
-  // TODO: use head(scores) to print the first score, falling back to 0
+  // TODO: use firstOrNull(scores) to print the first score, falling back to 0
   // if the list is empty.
   final firstScore = 0;
 

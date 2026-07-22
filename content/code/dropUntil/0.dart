@@ -5,6 +5,6 @@ void main() {
   print(dropUntil((a) => a == 3, [1, 2, 3, 4, 5])); // (4, 5)
 
   final result =
-      fx(['a', 'b', 'STOP', 'c', 'd']).dropUntil((a) => a == 'STOP').toArray();
+      fx(['a', 'b', 'STOP', 'c', 'd']).dropUntil((a) => a == 'STOP').toList();
   print(result); // [c, d]
 }

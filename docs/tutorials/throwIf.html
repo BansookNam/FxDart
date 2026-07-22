@@ -84,7 +84,7 @@ void main() {
   <h2>Demo 2 · Validating a pipeline</h2>
   <p>
     Each age is validated as it's mapped; the first violation aborts the
-    whole <code>toArray()</code> call:
+    whole <code>toList()</code> call:
   </p>
   <div class="playground">
 <textarea>
@@ -97,7 +97,7 @@ void main() {
     final validated = fx(ages)
         .map((a) =>
             throwIf<int>((n) => n < 18, (n) => ArgumentError('too young: $n'), a))
-        .toArray();
+        .toList();
     print(validated);
   } catch (e) {
     print('caught: $e'); // caught: Invalid argument(s): too young: 17

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>head — FxDart 101</title>
-  <meta name="description" content="FxDart head tutorial: grab the first element of an iterable safely, returning null instead of throwing, with a live playground.">
+  <title>firstOrNull — FxDart 101</title>
+  <meta name="description" content="FxDart firstOrNull: grab the first element of an iterable safely, returning null instead of throwing, with a live playground.">
   <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/head.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/head.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/head.html">
@@ -44,34 +44,39 @@
 </header>
 <main>
   <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 8 · アクセス &amp; 述語 › <strong>head</strong></p>
-  <h1><code>head</code></h1>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 8 · アクセス &amp; 述語 › <strong>firstOrNull</strong></p>
+  <h1><code>firstOrNull</code></h1>
   <p class="hero-sub">Returns the first element of an iterable, or <code>null</code> when it's empty.</p>
 
-  <div class="signature">A? head&lt;A&gt;(Iterable&lt;A&gt; iterable)
-Future&lt;A?&gt; headAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
-T? Fx.head()               // chain
-Future&lt;T?&gt; FxAsync.head()  // chain</div>
+  <div class="signature">A? firstOrNull&lt;A&gt;(Iterable&lt;A&gt; iterable)
+Future&lt;A?&gt; firstOrNullAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+T? Fx.firstOrNull                // sync chain: inherited Iterable getter, no parens
+Future&lt;T?&gt; FxAsync.firstOrNull()  // async chain method
+A? head&lt;A&gt;(Iterable&lt;A&gt; iterable)  // FxTS alias</div>
 
   <h2>Lecture</h2>
   <p>
-    <code>head</code> pulls exactly one element off the front of an iterable
-    and hands it back — or <code>null</code> if there isn't one. This is
-    FxDart's answer to FxTS's <code>head</code>, which returns
-    <code>undefined</code> on an empty array; Dart has no <code>undefined</code>,
-    so every "might not exist" result in this corner of the API collapses to
-    <code>null</code>. That means the natural way to consume it is
-    <code>head(list) ?? fallback</code>.
+    <code>firstOrNull</code> pulls exactly one element off the front of an
+    iterable and hands it back — or <code>null</code> if there isn't one.
+    <code>firstOrNull</code> is the Dart-idiomatic name (it mirrors
+    <code>Iterable.firstOrNull</code>); fxdart also accepts the FxTS spelling
+    <code>head</code> — they're the same operator. FxTS's <code>head</code>
+    returns <code>undefined</code> on an empty array; Dart has no
+    <code>undefined</code>, so every "might not exist" result in this corner
+    of the API collapses to <code>null</code>. That means the natural way to
+    consume it is <code>firstOrNull(list) ?? fallback</code>.
   </p>
   <p>
-    Because <code>head</code> only calls <code>moveNext()</code> once, it
-    costs nothing to call on a huge — even infinite — lazy pipeline: nothing
-    upstream of it runs beyond the single element it needs.
+    Because <code>firstOrNull</code> only calls <code>moveNext()</code> once,
+    it costs nothing to call on a huge — even infinite — lazy pipeline:
+    nothing upstream of it runs beyond the single element it needs.
   </p>
   <p>
-    It comes in data-first form (<code>head(iterable)</code>), an async form
-    for <code>FxAsyncIterable</code>, and as a chain method
-    (<code>fx(iterable).head()</code>) on both the sync and async chains.
+    It comes in data-first form (<code>firstOrNull(iterable)</code>) and an
+    async form for <code>FxAsyncIterable</code>. On the sync chain,
+    <code>fx(iterable).firstOrNull</code> is the inherited
+    <code>Iterable</code> getter — no parens; on the async chain it's a
+    method, <code>.firstOrNull()</code>.
   </p>
 
   <h2>Demo 1 · Basics</h2>
@@ -81,10 +86,14 @@ Future&lt;T?&gt; FxAsync.head()  // chain</div>
 import 'package:fxdart/fxdart.dart';
 
 void main() {
-  print(head([10, 20, 30])); // 10
-  print(head(<int>[]));      // null
+  print(firstOrNull([10, 20, 30])); // 10
+  print(firstOrNull(<int>[]));      // null
 
-  print(fx(['a', 'b', 'c']).head()); // a
+  // Sync chain: .firstOrNull is the inherited Iterable getter — no parens.
+  print(fx(['a', 'b', 'c']).firstOrNull); // a
+
+  // FxTS alias: head — the same operator.
+  print(head([10, 20, 30])); // 10
 }
 </textarea>
   </div>
@@ -101,21 +110,23 @@ import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
   var pulled = 0;
-  final first = fx(range(1000000)).peek((_) => pulled++).head();
+  // Sync chain: .firstOrNull is the inherited getter — no parens.
+  final first = fx(range(1000000)).peek((_) => pulled++).firstOrNull;
   print(first);            // 0
   print('pulled $pulled'); // pulled 1
 
+  // Async chain: .firstOrNull() is a method — with parens.
   final firstReady = await fx(['slow', 'never awaited'])
       .toAsync()
       .map((v) => delay(Duration(milliseconds: 50), v))
-      .head();
+      .firstOrNull();
   print(firstReady); // slow — only the first delay() ever fires
 }
 </textarea>
   </div>
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>head</code> so this prints the first score, or
+  <p>Exercise: use <code>firstOrNull</code> so this prints the first score, or
     <code>0</code> when the list is empty.</p>
   <div class="playground">
 <textarea>
@@ -124,7 +135,7 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final scores = <int>[88, 73, 95];
 
-  // TODO: use head(scores) to print the first score, falling back to 0
+  // TODO: use firstOrNull(scores) to print the first score, falling back to 0
   // if the list is empty.
   final firstScore = 0;
 

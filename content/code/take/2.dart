@@ -4,7 +4,7 @@ void main() {
   final queue = ['alice', 'bob', 'carol', 'dave', 'erin'];
 
   // TODO: take only the first 3 names from the queue
-  final firstThree = fx(queue).toArray();
+  final firstThree = fx(queue).toList();
 
   print(firstThree);
 }

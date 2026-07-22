@@ -42,6 +42,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 12 · Util › <strong>shuffle</strong></p>
   <h1><code>shuffle</code></h1>
   <p class="hero-sub">Devuelve una nueva lista con los elementos barajados — pasa una semilla para obtener un resultado reproducible.</p>
@@ -71,7 +72,7 @@ Future&lt;List&lt;T&gt;&gt; shuffleAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; itera
   <p>
     <code>shuffleAsync</code> es el gemelo <code>*Async</code>: primero
     materializa el <code>FxAsyncIterable</code> (internamente con
-    <code>toArrayAsync</code>) y luego baraja el resultado, así que un barajado
+    <code>toListAsync</code>) y luego baraja el resultado, así que un barajado
     asíncrono con semilla produce exactamente el mismo orden que su equivalente
     síncrono con la misma semilla.
   </p>

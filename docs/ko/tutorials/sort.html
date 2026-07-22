@@ -42,6 +42,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 7 · 집계 › <strong>sort</strong></p>
   <h1><code>sort</code></h1>
   <p class="hero-sub">비교자로 정렬한 완전히 새로운 리스트를 반환합니다 — 입력은 절대 변경하지 않습니다.</p>
@@ -49,7 +50,7 @@
   <div class="signature">List&lt;A&gt; sort&lt;A&gt;(int Function(A a, A b) f, Iterable&lt;A&gt; iterable)
 List&lt;A&gt; toSorted&lt;A&gt;(int Function(A a, A b) f, Iterable&lt;A&gt; iterable)   // alias of sort
 Future&lt;List&lt;A&gt;&gt; sortAsync&lt;A&gt;(int Function(A a, A b) f, FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;T&gt; Fx.sort(int Function(T a, T b) f)                    // chain (sync) — still lazy, call .toArray()
+Fx&lt;T&gt; Fx.sort(int Function(T a, T b) f)                    // chain (sync) — still lazy, call .toList()
 Future&lt;List&lt;T&gt;&gt; FxAsync.sort(int Function(T a, T b) f)     // chain (async) — already a terminal</div>
 
   <h2>강의</h2>
@@ -75,7 +76,7 @@ Future&lt;List&lt;T&gt;&gt; FxAsync.sort(int Function(T a, T b) f)     // chain 
     또 다른 <code>Fx&lt;T&gt;</code>를 반환합니다 —
     <code>List&lt;T&gt;</code>가 아닙니다. <code>Fx</code>가 계속 체이닝할 수 있도록 내부의 정렬된
     리스트를 감싸기 때문입니다. 여전히
-    <code><a href="../101/index.html">.toArray()</a></code> 같은 종결
+    <code><a href="../101/index.html">.toList()</a></code> 같은 종결
     연산자를 거쳐야 구체적인 <code>List</code>를 얻을 수 있습니다.
     <strong>비동기</strong> 체인에는 이런
     사정이 없습니다. <code>FxAsync.sort(f)</code>는 그 자체가 종결
@@ -106,8 +107,8 @@ void main() {
   print(toSorted<int>((a, b) => b.compareTo(a), original)); // [9, 8, 5, 2, 1]
 
   // Chain form: .sort(f) returns another Fx (still lazy on paper), so pull
-  // it with .toArray() to get a concrete List:
-  final chained = fx(original).sort((a, b) => a.compareTo(b)).toArray();
+  // it with .toList() to get a concrete List:
+  final chained = fx(original).sort((a, b) => a.compareTo(b)).toList();
   print(chained); // [1, 2, 5, 8, 9]
 }
 </textarea>
@@ -120,7 +121,7 @@ import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
   // On the async chain, .sort(f) is already a terminal that returns
-  // Future<List<T>> directly (no extra .toArray() needed).
+  // Future<List<T>> directly (no extra .toList() needed).
   final result = await fx([5, 2, 8, 1, 9])
       .toAsync()
       .map((a) => delay(const Duration(milliseconds: 100), a))

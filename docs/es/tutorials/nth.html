@@ -42,12 +42,15 @@
   </div>
 </header>
 <main>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 8 · Acceso &amp; predicados › <strong>nth</strong></p>
-  <h1><code>nth</code></h1>
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 8 · Acceso &amp; predicados › <strong>elementAtOrNull</strong></p>
+  <h1><code>elementAtOrNull</code></h1>
   <p class="hero-sub">Devuelve el elemento que está en un índice dado, o <code>null</code> si el índice queda fuera de rango.</p>
 
-  <div class="signature">A? nth&lt;A&gt;(int index, Iterable&lt;A&gt; iterable)
-Future&lt;A?&gt; nthAsync&lt;A&gt;(int index, FxAsyncIterable&lt;A&gt; iterable)</div>
+  <div class="signature">A? elementAtOrNull&lt;A&gt;(int index, Iterable&lt;A&gt; iterable)
+Future&lt;A?&gt; elementAtOrNullAsync&lt;A&gt;(int index, FxAsyncIterable&lt;A&gt; iterable)
+T? Fx.elementAtOrNull(int index)  // sync chain: inherited Iterable method
+A? nth&lt;A&gt;(int index, Iterable&lt;A&gt; iterable)  // FxTS alias</div>
 
   <h2>Lección</h2>
   <p>
@@ -74,10 +77,16 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   final letters = ['a', 'b', 'c', 'd'];
-  print(nth(0, letters));  // a
-  print(nth(2, letters));  // c
-  print(nth(10, letters)); // null
-  print(nth(-1, letters)); // null (negative indices are simply out of range)
+  print(elementAtOrNull(0, letters));  // a
+  print(elementAtOrNull(2, letters));  // c
+  print(elementAtOrNull(10, letters)); // null
+  print(elementAtOrNull(-1, letters)); // null (negative indices are simply out of range)
+
+  // Sync chain: .elementAtOrNull(i) is the inherited Iterable method.
+  print(fx(letters).elementAtOrNull(2)); // c
+
+  // FxTS alias: nth — the same operator.
+  print(nth(2, letters)); // c
 }
 </textarea>
   </div>
@@ -91,11 +100,11 @@ import 'package:fxdart/fxdart.dart';
 Future<void> main() async {
   var pulled = 0;
   final source = fx(range(1000000)).peek((_) => pulled++);
-  final value = nth(3, source);
+  final value = elementAtOrNull(3, source);
   print(value);             // 3
   print('pulled $pulled');  // pulled 4
 
-  final asyncValue = await nthAsync(
+  final asyncValue = await elementAtOrNullAsync(
       1, fx([10, 20, 30]).toAsync().map((a) => delay(Duration(milliseconds: 30), a)));
   print(asyncValue); // 20
 }
@@ -111,7 +120,7 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final podium = ['gold', 'silver', 'bronze'];
 
-  // TODO: use nth(1, podium) to print the silver medalist, or 'unclaimed'
+  // TODO: use elementAtOrNull(1, podium) to print the silver medalist, or 'unclaimed'
   final silver = 'unclaimed';
 
   print(silver);

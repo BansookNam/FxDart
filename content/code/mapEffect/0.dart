@@ -8,11 +8,11 @@ void main() {
     return a * 2;
   }, [1, 2, 3]);
 
-  print(toArray(result)); // [2, 4, 6]
+  print(toList(result)); // [2, 4, 6]
   print(logged); // [processing 1, processing 2, processing 3]
 
   // Chain form:
   final chained =
-      fx([10, 20, 30]).mapEffect((a) => a ~/ 10).toArray();
+      fx([10, 20, 30]).mapEffect((a) => a ~/ 10).toList();
   print(chained); // [1, 2, 3]
 }

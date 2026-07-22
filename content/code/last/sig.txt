@@ -1,3 +1,5 @@
-A? last&lt;A&gt;(Iterable&lt;A&gt; iterable)
-Future&lt;A?&gt; lastAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
-Future&lt;T?&gt; FxAsync.last()  // chain (async only)
+A? lastOrNull&lt;A&gt;(Iterable&lt;A&gt; iterable)
+Future&lt;A?&gt; lastOrNullAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+T? Fx.lastOrNull                 // sync chain: inherited Iterable getter, no parens
+Future&lt;T?&gt; FxAsync.lastOrNull()  // async chain method
+A? last&lt;A&gt;(Iterable&lt;A&gt; iterable)  // FxTS alias

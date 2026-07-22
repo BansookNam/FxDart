@@ -32,7 +32,7 @@ nextLabel: createSeededRandom
   </p>
   <p>
     <code>shuffleAsync</code>는 <code>*Async</code> 짝입니다. 내부적으로
-    <code>toArrayAsync</code>를 통해 <code>FxAsyncIterable</code>을 먼저
+    <code>toListAsync</code>를 통해 <code>FxAsyncIterable</code>을 먼저
     구체화한 다음 그 결과를 섞기 때문에, 같은 시드를 주면 시드 기반 비동기
     셔플은 동기 버전과 완전히 동일한 순서를 만들어냅니다.
   </p>

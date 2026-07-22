@@ -42,6 +42,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 10 · Utilidades de funciones › <strong>throwIf</strong></p>
   <h1><code>throwIf</code></h1>
   <p class="hero-sub">Lanza cuando se cumple un predicado; en caso contrario devuelve el valor sin cambios.</p>
@@ -85,7 +86,7 @@ void main() {
   <h2>Demo 2 · Validar un pipeline</h2>
   <p>
     Cada edad se valida conforme se mapea; la primera infracción aborta la
-    llamada entera a <code>toArray()</code>:
+    llamada entera a <code>toList()</code>:
   </p>
   <div class="playground">
 <textarea>
@@ -98,7 +99,7 @@ void main() {
     final validated = fx(ages)
         .map((a) =>
             throwIf<int>((n) => n < 18, (n) => ArgumentError('too young: $n'), a))
-        .toArray();
+        .toList();
     print(validated);
   } catch (e) {
     print('caught: $e'); // caught: Invalid argument(s): too young: 17

@@ -42,6 +42,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 5 · 잘라내기 › <strong>split</strong></p>
   <h1><code>split</code></h1>
   <p class="hero-sub">한 글자짜리 문자열들의 이터러블을 구분자 문자 기준으로 나눕니다.</p>
@@ -91,7 +92,7 @@ void main() {
 import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
-  final result = await toArrayAsync(
+  final result = await toListAsync(
     splitAsync(',', toAsync('x,y,z'.split(''))),
   );
 
@@ -111,7 +112,7 @@ void main() {
   const csv = 'red|green|blue';
 
   // TODO: use split to break csv into color names on '|'
-  final colors = toArray(csv.split(''));
+  final colors = toList(csv.split(''));
 
   print(colors);
 }
@@ -121,7 +122,7 @@ void main() {
   <div class="callout">
     <strong>관련 함수:</strong>
     <a href="chunk.html"><code>chunk</code></a> — 구분자 대신 고정 크기로 묶기 ·
-    <a href="unicodeToArray.html"><code>unicodeToArray</code></a> — 사람이 인식하는 문자 단위로 제대로 된 문자 배열 얻기 ·
+    <a href="unicodeToList.html"><code>unicodeToList</code></a> — 사람이 인식하는 문자 단위로 제대로 된 문자 배열 얻기 ·
     <a href="join.html"><code>join</code></a> — 반대 연산
   </div>
 

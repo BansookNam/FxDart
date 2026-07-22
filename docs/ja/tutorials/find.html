@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>find — FxDart 101</title>
-  <meta name="description" content="FxDart find tutorial: get the first element matching a predicate, lazy and short-circuiting, null when nothing matches.">
+  <title>firstWhereOrNull — FxDart 101</title>
+  <meta name="description" content="FxDart firstWhereOrNull tutorial: get the first element matching a predicate, lazy and short-circuiting, null when nothing matches.">
   <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/find.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/find.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/find.html">
@@ -44,18 +44,21 @@
 </header>
 <main>
   <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 8 · アクセス &amp; 述語 › <strong>find</strong></p>
-  <h1><code>find</code></h1>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 8 · アクセス &amp; 述語 › <strong>firstWhereOrNull</strong></p>
+  <h1><code>firstWhereOrNull</code></h1>
   <p class="hero-sub">Returns the first element for which a predicate is true, or <code>null</code>.</p>
 
-  <div class="signature">A? find&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
-Future&lt;A?&gt; findAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
-T? Fx.find(bool Function(T a) f)              // chain
-Future&lt;T?&gt; FxAsync.find(FutureOr&lt;bool&gt; Function(T a) f)  // chain</div>
+  <div class="signature">A? firstWhereOrNull&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;A?&gt; firstWhereOrNullAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+T? Fx.firstWhereOrNull(bool Function(T a) f)              // chain
+Future&lt;T?&gt; FxAsync.firstWhereOrNull(FutureOr&lt;bool&gt; Function(T a) f)  // chain
+A? find&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)  // FxTS alias</div>
 
   <h2>Lecture</h2>
   <p>
-    <code>find</code> is what <code>head</code> and <code>filter</code>
+    <code>firstWhereOrNull</code> is the Dart-idiomatic name; fxdart also
+    accepts the FxTS spelling <code>find</code> — they're the same operator.
+    It's what <code>head</code> and <code>filter</code>
     look like fused together — in fact it's implemented as exactly that:
     <code>head(filter(f, iterable))</code>. That fusion is what makes it
     lazy and short-circuiting: it pulls elements one at a time, testing each
@@ -80,10 +83,11 @@ void main() {
     {'name': 'park', 'age': 45},
   ];
 
-  final adult = find((u) => (u['age'] as int) >= 18, users);
+  final adult = firstWhereOrNull((u) => (u['age'] as int) >= 18, users);
   print(adult); // {name: lee, age: 32}
 
-  print(fx(users).find((u) => u['name'] == 'nobody')); // null
+  // FxTS alias: find is the same operator.
+  print(fx(users).firstWhereOrNull((u) => u['name'] == 'nobody')); // null
 }
 </textarea>
   </div>
@@ -96,7 +100,7 @@ import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
   var checked = 0;
-  final match = fx(range(1000000)).find((a) {
+  final match = fx(range(1000000)).firstWhereOrNull((a) {
     checked++;
     return a == 5;
   });
@@ -105,14 +109,14 @@ Future<void> main() async {
 
   final firstOnline = await fx(['a', 'b', 'c'])
       .toAsync()
-      .find((name) => delay(Duration(milliseconds: 30), name == 'b'));
+      .firstWhereOrNull((name) => delay(Duration(milliseconds: 30), name == 'b'));
   print(firstOnline); // b
 }
 </textarea>
   </div>
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>find</code> to get the first item with <code>qty &gt; 0</code>, or <code>null</code>.</p>
+  <p>Exercise: use <code>firstWhereOrNull</code> to get the first item with <code>qty &gt; 0</code>, or <code>null</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -124,7 +128,7 @@ void main() {
     {'item': 'potion', 'qty': 12},
   ];
 
-  // TODO: use find to get the first item with qty > 0, or null
+  // TODO: use firstWhereOrNull to get the first item with qty > 0, or null
   final Map<String, Object>? inStock = null;
 
   print(inStock);

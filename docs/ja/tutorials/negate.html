@@ -78,7 +78,7 @@ void main() {
   print(isOdd(3)); // true
   print(isOdd(4)); // false
 
-  print(fx([1, 2, 3, 4, 5]).filter(negate(isEven)).toArray()); // [1, 3, 5]
+  print(fx([1, 2, 3, 4, 5]).filter(negate(isEven)).toList()); // [1, 3, 5]
 }
 </textarea>
   </div>
@@ -94,7 +94,7 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   final words = ['', 'a', '', 'bcd'];
-  final nonEmpty = fx(words).filter(negate(isEmpty)).toArray();
+  final nonEmpty = fx(words).filter(negate(isEmpty)).toList();
   print(nonEmpty); // [a, bcd]
 }
 </textarea>
@@ -112,7 +112,7 @@ void main() {
   final letters = ['a', 'b', 'c', 'e', 'd'];
 
   // TODO: use negate(isVowel) to keep only the consonants
-  final consonants = fx(letters).filter(negate(isVowel)).toArray();
+  final consonants = fx(letters).filter(negate(isVowel)).toList();
 
   print(consonants); // [b, c, d]
 }

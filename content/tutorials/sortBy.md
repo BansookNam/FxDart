@@ -30,7 +30,7 @@ nextLabel: partition
     input. And the same chain-form nuance applies too — on the sync
     <code>Fx</code> chain, <code>.sortBy(f)</code> returns another
     <code>Fx&lt;T&gt;</code>, so you still need
-    <code><a href="../101/index.html">.toArray()</a></code> to materialize
+    <code><a href="../101/index.html">.toList()</a></code> to materialize
     it, while on the <code>FxAsync</code> chain, <code>.sortBy(f)</code> is
     already a terminal returning <code>Future&lt;List&lt;T&gt;&gt;</code>.
   </p>

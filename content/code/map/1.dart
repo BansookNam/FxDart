@@ -7,7 +7,7 @@ Future<void> main() async {
       .toAsync()
       .map((a) => delay(Duration(milliseconds: 200), a * 10))
       .concurrent(3) // remove this line to see ~1200ms
-      .toArray();
+      .toList();
 
   print(result); // [10, 20, 30, 40, 50, 60]
   print('took ${sw.elapsedMilliseconds}ms');

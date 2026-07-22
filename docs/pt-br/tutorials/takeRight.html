@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>takeRight — FxDart 101</title>
-  <meta name="description" content="FxDart takeRight tutorial: keep only the last n values of a finite iterable, with a live playground.">
+  <title>takeLast — FxDart 101</title>
+  <meta name="description" content="FxDart takeLast tutorial: keep only the last n values of a finite iterable, with a live playground.">
   <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/takeRight.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/takeRight.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/takeRight.html">
@@ -44,26 +44,29 @@
 </header>
 <main>
   <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 5 · Fatiamento › <strong>takeRight</strong></p>
-  <h1><code>takeRight</code></h1>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 5 · Fatiamento › <strong>takeLast</strong></p>
+  <h1><code>takeLast</code></h1>
   <p class="hero-sub">Returns a lazy iterable of the last <code>length</code> values from a source.</p>
 
-  <div class="signature">Iterable&lt;A&gt; takeRight&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
-FxAsyncIterable&lt;A&gt; takeRightAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;T&gt; Fx.takeRight(int count)        // chain
-FxAsync&lt;T&gt; FxAsync.takeRight(int count)</div>
+  <div class="signature">Iterable&lt;A&gt; takeLast&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; takeLastAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.takeLast(int count)        // chain
+FxAsync&lt;T&gt; FxAsync.takeLast(int count)
+Iterable&lt;A&gt; takeRight&lt;A&gt;(...)        // FxTS alias</div>
 
   <h2>Lecture</h2>
   <p>
-    <code>takeRight</code> is <code>take</code>'s mirror image: instead of
+    <code>takeLast</code> is <code>take</code>'s mirror image: instead of
     the first <code>length</code> values, you get the last ones. There's a
-    catch, though — to know what the "last" values are, <code>takeRight</code>
+    catch, though — to know what the "last" values are, <code>takeLast</code>
     has to see every element first. It <strong>materializes</strong> the
     whole source into a list internally before yielding anything, so unlike
     most FxDart operators it does not work on infinite sequences.
+    <code>takeLast</code> is the Dart-idiomatic name; fxdart also accepts the
+    FxTS spelling <code>takeRight</code> — they're the same operator.
   </p>
   <p>
-    The async version has the same constraint: <code>takeRightAsync</code>
+    The async version has the same constraint: <code>takeLastAsync</code>
     drains the entire upstream (awaiting every element) before it can hand
     back the tail. Reach for it only when you know the source is finite and
     small enough to buffer.
@@ -75,10 +78,11 @@ FxAsync&lt;T&gt; FxAsync.takeRight(int count)</div>
 import 'package:fxdart/fxdart.dart';
 
 void main() {
-  print(takeRight(3, [1, 2, 3, 4, 5, 6])); // (4, 5, 6)
+  print(takeLast(3, [1, 2, 3, 4, 5, 6])); // (4, 5, 6)
+  // FxTS alias: takeRight(3, [1, 2, 3, 4, 5, 6]) is identical.
 
   // Chain form:
-  final result = fx([10, 20, 30, 40]).takeRight(2).toArray();
+  final result = fx([10, 20, 30, 40]).takeLast(2).toList();
   print(result); // [30, 40]
 }
 </textarea>
@@ -90,13 +94,13 @@ void main() {
 import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
-  // takeRight must see the whole source before it can know the last N —
+  // takeLast must see the whole source before it can know the last N —
   // it materializes it first, so it only works on finite async sources.
   final result = await fx([1, 2, 3, 4, 5])
       .toAsync()
       .map((a) => delay(Duration(milliseconds: 50), a * a))
-      .takeRight(2)
-      .toArray();
+      .takeLast(2) // FxTS alias: .takeRight(2)
+      .toList();
 
   print(result); // [16, 25]
 }
@@ -113,7 +117,7 @@ void main() {
   final scores = [55, 61, 70, 82, 90, 95];
 
   // TODO: keep only the last 3 scores
-  final recent = fx(scores).toArray();
+  final recent = fx(scores).toList();
 
   print(recent);
 }

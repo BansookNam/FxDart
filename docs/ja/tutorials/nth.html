@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>nth — FxDart 101</title>
-  <meta name="description" content="FxDart nth tutorial: safely pull the element at an index, null on out-of-range, with a live playground.">
+  <title>elementAtOrNull — FxDart 101</title>
+  <meta name="description" content="FxDart elementAtOrNull: safely pull the element at an index, null on out-of-range, with a live playground.">
   <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/nth.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/nth.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/nth.html">
@@ -44,28 +44,34 @@
 </header>
 <main>
   <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 8 · アクセス &amp; 述語 › <strong>nth</strong></p>
-  <h1><code>nth</code></h1>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 8 · アクセス &amp; 述語 › <strong>elementAtOrNull</strong></p>
+  <h1><code>elementAtOrNull</code></h1>
   <p class="hero-sub">Returns the element at a given index, or <code>null</code> when the index is out of range.</p>
 
-  <div class="signature">A? nth&lt;A&gt;(int index, Iterable&lt;A&gt; iterable)
-Future&lt;A?&gt; nthAsync&lt;A&gt;(int index, FxAsyncIterable&lt;A&gt; iterable)</div>
+  <div class="signature">A? elementAtOrNull&lt;A&gt;(int index, Iterable&lt;A&gt; iterable)
+Future&lt;A?&gt; elementAtOrNullAsync&lt;A&gt;(int index, FxAsyncIterable&lt;A&gt; iterable)
+T? Fx.elementAtOrNull(int index)  // sync chain: inherited Iterable method
+A? nth&lt;A&gt;(int index, Iterable&lt;A&gt; iterable)  // FxTS alias</div>
 
   <h2>Lecture</h2>
   <p>
-    <code>nth</code> walks the iterable and stops as soon as it reaches
-    <code>index</code>, so it only ever pulls <code>index + 1</code>
+    <code>elementAtOrNull</code> walks the iterable and stops as soon as it
+    reaches <code>index</code>, so it only ever pulls <code>index + 1</code>
     elements — cheap even on a huge lazy sequence, and much cheaper than
     materializing the whole thing just to index into a <code>List</code>.
-    A negative index, or one past the end, simply yields <code>null</code>;
-    unlike some languages' array indexing, there's no wraparound-from-the-end
-    behavior here — the index has to be a valid, non-negative position.
+    <code>elementAtOrNull</code> is the Dart-idiomatic name (it mirrors
+    <code>Iterable.elementAtOrNull</code>); fxdart also accepts the FxTS
+    spelling <code>nth</code> — they're the same operator. A negative index,
+    or one past the end, simply yields <code>null</code>; unlike some
+    languages' array indexing, there's no wraparound-from-the-end behavior
+    here — the index has to be a valid, non-negative position.
   </p>
   <p>
-    There's no chain method for <code>nth</code> — call the top-level
-    function (or its async twin) directly on any <code>Iterable</code> or
+    On the sync chain, <code>fx(iterable).elementAtOrNull(index)</code> is the
+    inherited <code>Iterable</code> method — call it directly on any
     <code>Fx</code> chain, since <code>Fx</code> <em>is</em> an
-    <code>Iterable</code>.
+    <code>Iterable</code>. For an <code>FxAsyncIterable</code>, use the
+    top-level <code>elementAtOrNullAsync(index, iterable)</code>.
   </p>
 
   <h2>Demo 1 · Basics</h2>
@@ -75,10 +81,16 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   final letters = ['a', 'b', 'c', 'd'];
-  print(nth(0, letters));  // a
-  print(nth(2, letters));  // c
-  print(nth(10, letters)); // null
-  print(nth(-1, letters)); // null (negative indices are simply out of range)
+  print(elementAtOrNull(0, letters));  // a
+  print(elementAtOrNull(2, letters));  // c
+  print(elementAtOrNull(10, letters)); // null
+  print(elementAtOrNull(-1, letters)); // null (negative indices are simply out of range)
+
+  // Sync chain: .elementAtOrNull(i) is the inherited Iterable method.
+  print(fx(letters).elementAtOrNull(2)); // c
+
+  // FxTS alias: nth — the same operator.
+  print(nth(2, letters)); // c
 }
 </textarea>
   </div>
@@ -92,11 +104,11 @@ import 'package:fxdart/fxdart.dart';
 Future<void> main() async {
   var pulled = 0;
   final source = fx(range(1000000)).peek((_) => pulled++);
-  final value = nth(3, source);
+  final value = elementAtOrNull(3, source);
   print(value);             // 3
   print('pulled $pulled');  // pulled 4
 
-  final asyncValue = await nthAsync(
+  final asyncValue = await elementAtOrNullAsync(
       1, fx([10, 20, 30]).toAsync().map((a) => delay(Duration(milliseconds: 30), a)));
   print(asyncValue); // 20
 }
@@ -104,7 +116,7 @@ Future<void> main() async {
   </div>
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>nth</code> to print the silver medalist (index 1), or <code>'unclaimed'</code>.</p>
+  <p>Exercise: use <code>elementAtOrNull</code> to print the silver medalist (index 1), or <code>'unclaimed'</code>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -112,7 +124,7 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final podium = ['gold', 'silver', 'bronze'];
 
-  // TODO: use nth(1, podium) to print the silver medalist, or 'unclaimed'
+  // TODO: use elementAtOrNull(1, podium) to print the silver medalist, or 'unclaimed'
   final silver = 'unclaimed';
 
   print(silver);
@@ -122,7 +134,7 @@ void main() {
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="head.html"><code>head</code></a> — shorthand for <code>nth(0, ...)</code> ·
+    <a href="head.html"><code>head</code></a> — shorthand for <code>elementAtOrNull(0, ...)</code> ·
     <a href="last.html"><code>last</code></a> — the final element ·
     <a href="find.html"><code>find</code></a> — locate by predicate instead of index ·
     <a href="slice.html"><code>slice</code></a> — pull a whole range

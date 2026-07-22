@@ -2,9 +2,9 @@
 slug: last
 title: last — FxDart 101
 description: Tutorial de last en FxDart: obtén el último elemento de un iterable, seguro frente a entradas vacías, y cuidado con la trampa del getter en la cadena.
-heading: <code>last</code>
+heading: <code>lastOrNull</code>
 section: 8
-crumb: last
+crumb: lastOrNull
 prev: head.html
 prevLabel: head
 next: nth.html

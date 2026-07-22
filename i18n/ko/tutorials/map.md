@@ -17,7 +17,7 @@ nextLabel: mapEffect
     <code>map</code>은 가장 기본이 되는 변환 연산자입니다. 모든 원소에
     함수를 적용하죠. FxDart에서는 <strong>지연 평가</strong>됩니다 —
     <code>map</code>을 호출하는 것만으로는 아무 일도 일어나지 않습니다.
-    종결 연산자(<code>toArray</code>, <code>each</code>,
+    종결 연산자(<code>toList</code>, <code>each</code>,
     <code>reduce</code> …)가 파이프라인에서 값을 끌어당길 때 비로소 함수가
     실행됩니다. 덕분에 필요한 만큼만 끌어당긴다면 엄청나게 큰 —
     심지어 무한한 — 시퀀스에도 <code>map</code>을 걸 수 있습니다.

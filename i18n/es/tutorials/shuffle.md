@@ -34,7 +34,7 @@ nextLabel: createSeededRandom
   <p>
     <code>shuffleAsync</code> es el gemelo <code>*Async</code>: primero
     materializa el <code>FxAsyncIterable</code> (internamente con
-    <code>toArrayAsync</code>) y luego baraja el resultado, así que un barajado
+    <code>toListAsync</code>) y luego baraja el resultado, así que un barajado
     asíncrono con semilla produce exactamente el mismo orden que su equivalente
     síncrono con la misma semilla.
   </p>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>unicodeToList — FxDart 101</title>
+  <meta name="description" content="FxDart unicodeToList 튜토리얼: 이모지 같은 서로게이트 페어까지 올바르게 처리하면서 문자열을 사람이 인식하는 문자 단위로 나눕니다.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/unicodeToList.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/unicodeToList.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/unicodeToList.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/unicodeToList.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/unicodeToList.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/unicodeToList.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/unicodeToList.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/unicodeToList.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../tutorials/unicodeToList.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/unicodeToList.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/tutorials/unicodeToList.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/unicodeToList.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/unicodeToList.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/unicodeToList.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/unicodeToList.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 10 · 함수 유틸리티 › <strong>unicodeToList</strong></p>
+  <h1><code>unicodeToList</code></h1>
+  <p class="hero-sub">서로게이트 페어를 올바르게 처리하면서 문자열을 사람이 인식하는 문자 단위로 나눕니다.</p>
+
+  <div class="signature">List&lt;String&gt; unicodeToList(String s)</div>
+
+  <h2>강의</h2>
+  <p>
+    Dart의 <code>String</code>은 문자가 아니라 UTF-16 <em>코드 유닛</em>의
+    나열입니다. <code>s.split('')</code>은 코드 유닛 단위로 자르기 때문에
+    평범한 ASCII/라틴 문자에는 문제가 없지만, 기본 다국어 평면(BMP)을 벗어난
+    문자, 예컨대 대부분의 이모지에서는 결과가 어긋납니다. 그런 문자는
+    <strong>서로게이트 페어</strong>(코드 유닛 두 개)로 표현되므로, 단순한
+    split은 이모지 하나를 깨진 반쪽 두 개로 찢어 놓습니다.
+  </p>
+  <p>
+    <code>unicodeToList</code>는 문자열의 <code>.runes</code>, 즉 유니코드
+    코드 포인트를 순회하면서 각각을 다시 한 글자짜리 <code>String</code>으로
+    되돌려 이 문제를 해결합니다. 결과는 사람이 문자열을 읽을 때 실제로 보는
+    문자들의 목록이며, UTF-16 유닛이 아니라 코드 포인트 단위로 나누는 FxTS의
+    <code>unicodeToList</code>와 동일하게 동작합니다.
+  </p>
+
+  <h2>데모 1 · 단순 split과 unicodeToList 비교</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final s = 'a👍b';
+  print(s.split('').length);     // 4 — naive split breaks the emoji apart
+  print(unicodeToList(s));      // [a, 👍, b]
+  print(unicodeToList(s).length); // 3 — correct character count
+}
+</textarea>
+  </div>
+
+  <h2>데모 2 · 뒤집기와 개수 세기를 제대로 하기</h2>
+  <p>
+    <code>unicodeToList</code>를 바탕으로 하면, 단순 split으로 뒤집었을 때
+    망가지던 이모지가 그대로 유지됩니다:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+String reverseUnicode(String s) => unicodeToList(s).reversed.join();
+
+void main() {
+  print(reverseUnicode('a👍b')); // b👍a
+
+  final counts = countBy(identity, unicodeToList('aabb👍👍'));
+  print(counts); // {a: 2, b: 2, 👍: 2}
+}
+</textarea>
+  </div>
+
+  <h2>직접 해 보기</h2>
+  <p>연습: 이 문자열에 사람이 인식하는 문자가 몇 개인지 세어 보세요
+    (이모지가 포함되어 있습니다).</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final s = 'go🚀go';
+
+  // TODO: count how many user-perceived characters are in `s`
+  final count = unicodeToList(s).length;
+
+  print(count); // 5
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>관련 함수:</strong>
+    <a href="split.html"><code>split</code></a> — 평범한 문자 이터러블 기준으로 나누기 ·
+    <a href="reverse.html"><code>reverse</code></a> — Iterable 뒤집기, 문자열에는 동일한 서로게이트 페어 주의가 필요합니다 ·
+    <a href="countBy.html"><code>countBy</code></a> — 위에서 문자 개수를 집계할 때 사용 ·
+    <a href="identity.html"><code>identity</code></a> — 위에서 집계 키로 사용
+  </div>
+
+  <nav class="tut-nav">
+    <a href="delay.html">← 이전: delay &amp; sleep</a>
+    <a href="curried.html">다음: curried &amp; uncurried →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

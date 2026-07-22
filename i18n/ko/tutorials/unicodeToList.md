@@ -1,10 +1,10 @@
 ---
-slug: unicodeToArray
-title: unicodeToArray — FxDart 101
-description: FxDart unicodeToArray 튜토리얼: 이모지 같은 서로게이트 페어까지 올바르게 처리하면서 문자열을 사람이 인식하는 문자 단위로 나눕니다.
-heading: <code>unicodeToArray</code>
+slug: unicodeToList
+title: unicodeToList — FxDart 101
+description: FxDart unicodeToList 튜토리얼: 이모지 같은 서로게이트 페어까지 올바르게 처리하면서 문자열을 사람이 인식하는 문자 단위로 나눕니다.
+heading: <code>unicodeToList</code>
 section: 10
-crumb: unicodeToArray
+crumb: unicodeToList
 prev: delay.html
 prevLabel: delay &amp; sleep
 next: curried.html
@@ -24,19 +24,19 @@ nextLabel: curried &amp; uncurried
     split은 이모지 하나를 깨진 반쪽 두 개로 찢어 놓습니다.
   </p>
   <p>
-    <code>unicodeToArray</code>는 문자열의 <code>.runes</code>, 즉 유니코드
+    <code>unicodeToList</code>는 문자열의 <code>.runes</code>, 즉 유니코드
     코드 포인트를 순회하면서 각각을 다시 한 글자짜리 <code>String</code>으로
     되돌려 이 문제를 해결합니다. 결과는 사람이 문자열을 읽을 때 실제로 보는
     문자들의 목록이며, UTF-16 유닛이 아니라 코드 포인트 단위로 나누는 FxTS의
-    <code>unicodeToArray</code>와 동일하게 동작합니다.
+    <code>unicodeToList</code>와 동일하게 동작합니다.
   </p>
 
-  <h2>데모 1 · 단순 split과 unicodeToArray 비교</h2>
+  <h2>데모 1 · 단순 split과 unicodeToList 비교</h2>
   {{playground:0}}
 
   <h2>데모 2 · 뒤집기와 개수 세기를 제대로 하기</h2>
   <p>
-    <code>unicodeToArray</code>를 바탕으로 하면, 단순 split으로 뒤집었을 때
+    <code>unicodeToList</code>를 바탕으로 하면, 단순 split으로 뒤집었을 때
     망가지던 이모지가 그대로 유지됩니다:
   </p>
   {{playground:1}}

@@ -1,7 +1,7 @@
 ---
 slug: predicates
 title: predicates — FxDart 101
-description: FxDart type predicates: isNull, isBoolean, isNumber, isString, isDate, isList, isMap, and friends, as filter-friendly tear-offs.
+description: FxDart type predicates: isNull, isBool, isNum, isString, isDateTime, isList, isMap, and friends, as filter-friendly tear-offs.
 heading: <code>predicates</code>
 section: 8
 crumb: predicates

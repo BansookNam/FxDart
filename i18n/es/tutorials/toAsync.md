@@ -24,8 +24,8 @@ nextLabel: async variants
   </p>
   <p>
     <code>FxAsyncIterable</code> está <strong>basado en pull</strong>: nada se
-    ejecuta hasta que un terminal (<code>toArrayAsync</code>,
-    <code>eachAsync</code>, el <code>.toArray()</code> de la cadena
+    ejecuta hasta que un terminal (<code>toListAsync</code>,
+    <code>eachAsync</code>, el <code>.toList()</code> de la cadena
     <code>FxAsync</code>, …) llama a <code>next()</code> sobre él, un paso
     cada vez — exactamente igual que un <code>Iterable</code> normal, solo que
     asíncrono. Es un alejamiento deliberado del <code>Stream</code> de

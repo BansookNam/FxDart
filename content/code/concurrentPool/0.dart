@@ -8,7 +8,7 @@ Future<void> main() async {
       .toAsync()
       .map((i) => delay(Duration(milliseconds: delays[i - 1]), 'item$i'))
       .concurrentPool(3)
-      .toArray();
+      .toList();
 
   print(results); // [item2, item3, item1] — completion order
   print('took ${sw.elapsedMilliseconds}ms'); // ~300ms (the slowest one)

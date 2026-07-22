@@ -7,8 +7,8 @@ section: 10
 crumb: delay &amp; sleep
 prev: comparisons.html
 prevLabel: gt · gte · lt · lte
-next: unicodeToArray.html
-nextLabel: unicodeToArray
+next: unicodeToList.html
+nextLabel: unicodeToList
 ---
   <p class="hero-sub">잠시 기다렸다가 값을 내놓거나(delay), 그냥 기다리기만 합니다(sleep).</p>
 

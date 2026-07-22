@@ -23,8 +23,8 @@ nextLabel: async variants
   </p>
   <p>
     <code>FxAsyncIterable</code>은 <strong>pull 기반</strong>입니다. 종결
-    연산자(<code>toArrayAsync</code>, <code>eachAsync</code>,
-    <code>FxAsync</code> 체인의 <code>.toArray()</code> 등)가
+    연산자(<code>toListAsync</code>, <code>eachAsync</code>,
+    <code>FxAsync</code> 체인의 <code>.toList()</code> 등)가
     <code>next()</code>를 호출하기 전까지는 아무것도 실행되지 않고, 한 번에 한
     단계씩만 진행됩니다 — 평범한 <code>Iterable</code>과 똑같되 비동기라는
     점만 다릅니다. 이는 Dart의 <code>Stream</code>과 의도적으로 갈라지는

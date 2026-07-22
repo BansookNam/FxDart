@@ -1,4 +1,5 @@
-Iterable&lt;A&gt; drop&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
-FxAsyncIterable&lt;A&gt; dropAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
-Fx&lt;T&gt; Fx.drop(int count)        // chain — also aliased as Fx.skip
-FxAsync&lt;T&gt; FxAsync.drop(int count)
+Iterable&lt;A&gt; skip&lt;A&gt;(int length, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; skipAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.skip(int count)        // chain
+FxAsync&lt;T&gt; FxAsync.skip(int count)
+Iterable&lt;A&gt; drop&lt;A&gt;(...)        // FxTS alias

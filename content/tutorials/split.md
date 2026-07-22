@@ -47,6 +47,6 @@ nextLabel: append
   <div class="callout">
     <strong>Related:</strong>
     <a href="chunk.html"><code>chunk</code></a> — group by fixed size instead of separator ·
-    <a href="unicodeToArray.html"><code>unicodeToArray</code></a> — get a proper character array (grapheme-aware) ·
+    <a href="unicodeToList.html"><code>unicodeToList</code></a> — get a proper character array (grapheme-aware) ·
     <a href="join.html"><code>join</code></a> — the inverse operation
   </div>

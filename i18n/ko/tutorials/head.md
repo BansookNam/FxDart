@@ -2,9 +2,9 @@
 slug: head
 title: head — FxDart 101
 description: FxDart head 튜토리얼: 예외를 던지는 대신 null을 반환하며 이터러블의 첫 원소를 안전하게 가져오는 방법을 라이브 플레이그라운드와 함께 배웁니다.
-heading: <code>head</code>
+heading: <code>firstOrNull</code>
 section: 8
-crumb: head
+crumb: firstOrNull
 prev: partition.html
 prevLabel: partition
 next: last.html

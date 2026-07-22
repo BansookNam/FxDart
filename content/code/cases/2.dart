@@ -9,5 +9,5 @@ void main() {
     ((n) => n < 30, (n) => 'medium'),
   ], orElse: (n) => 'large');
 
-  print(fx(sizes).map(label).toArray()); // [small, medium, large]
+  print(fx(sizes).map(label).toList()); // [small, medium, large]
 }

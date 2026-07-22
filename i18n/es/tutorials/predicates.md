@@ -1,7 +1,7 @@
 ---
 slug: predicates
 title: predicates — FxDart 101
-description: Predicados de tipo de FxDart: isNull, isBoolean, isNumber, isString, isDate, isList, isMap y compañía, listos para usar con filter.
+description: Predicados de tipo de FxDart: isNull, isBool, isNum, isString, isDateTime, isList, isMap y compañía, listos para usar con filter.
 heading: <code>predicates</code>
 section: 8
 crumb: predicates

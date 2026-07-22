@@ -24,7 +24,7 @@ nextLabel: streams
     <code>FxAsyncIterable</code>용 <code>*Async</code> 짝입니다. 이미 몇 가지는
     만나 보셨습니다. <code>map</code>/<code>mapAsync</code>,
     <code>filter</code>/<code>filterAsync</code>,
-    <code>toArray</code>/<code>toArrayAsync</code>,
+    <code>toList</code>/<code>toListAsync</code>,
     <code>reduce</code>/<code>reduceAsync</code>, <code>fold</code>/<code>foldAsync</code>,
     <code>each</code>/<code>eachAsync</code>, <code>find</code>/<code>findAsync</code> —
     라이브러리의 사실상 모든 함수가 이 규칙을 따릅니다.

@@ -42,6 +42,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">Возможно, этот перевод устарел — английская страница изменилась после его создания. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
   <p class="hero-logo"><img src="../assets/logo-web.png" width="960" height="294"
       alt="FxDart"></p>
   <h1>Функциональное программирование для Dart,<br>с ленивостью и конкурентностью из коробки.</h1>
@@ -60,7 +61,7 @@ void main() {
   final result = fx([1, 2, 3, 4, 5])
       .map((a) => a + 10)
       .filter((a) => a % 2 == 0)
-      .toArray();
+      .toList();
 
   print(result); // [12, 14]
 }
@@ -78,7 +79,7 @@ void main() {
   <ul>
     <li><strong>Ленивые вычисления</strong> — операторы вроде <code>map</code>,
       <code>filter</code> и <code>take</code> лишь строят конвейер и не делают работы,
-      пока терминальный оператор (<code>toArray</code>, <code>each</code>,
+      пока терминальный оператор (<code>toList</code>, <code>each</code>,
       <code>reduce</code>…) не протянет через него значения. Обработка диапазона
       из миллиона элементов с <code>.take(3)</code> вычислит ровно 3 результата.</li>
     <li><strong>Единая модель для sync и async</strong> — одни и те же имена операторов
@@ -159,7 +160,7 @@ Future<void> main() async {
       .toAsync()
       .map((id) => delay(Duration(milliseconds: 300), 'user$id'))
       .concurrent(3) // ← try 1 (sequential) or 6 (all at once)
-      .toArray();
+      .toList();
 
   print(users);
   print('took ${sw.elapsedMilliseconds}ms');

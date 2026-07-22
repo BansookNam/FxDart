@@ -14,7 +14,7 @@ Future<void> main() async {
         return a * a;
       })
       .concurrent(4)
-      .toArray();
+      .toList();
 
   print(result); // [1, 4, 9, 16]
   print(saved.length); // 4

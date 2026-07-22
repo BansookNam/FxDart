@@ -7,8 +7,8 @@ section: 1
 crumb: pipe1
 prev: pipe.html
 prevLabel: pipe
-next: toArray.html
-nextLabel: toArray
+next: toList.html
+nextLabel: toList
 ---
   <p class="hero-sub">Applies one function to a value, awaiting it first if the value is a Future.</p>
 

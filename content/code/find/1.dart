@@ -2,7 +2,7 @@ import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
   var checked = 0;
-  final match = fx(range(1000000)).find((a) {
+  final match = fx(range(1000000)).firstWhereOrNull((a) {
     checked++;
     return a == 5;
   });
@@ -11,6 +11,6 @@ Future<void> main() async {
 
   final firstOnline = await fx(['a', 'b', 'c'])
       .toAsync()
-      .find((name) => delay(Duration(milliseconds: 30), name == 'b'));
+      .firstWhereOrNull((name) => delay(Duration(milliseconds: 30), name == 'b'));
   print(firstOnline); // b
 }

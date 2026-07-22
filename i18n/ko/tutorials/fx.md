@@ -21,7 +21,7 @@ nextLabel: pipe
     달려 있는 객체입니다. 이 호출들은 하나같이 지연 계산을 조금씩 더 얹은
     <em>새로운</em> <code>Fx</code>를 반환할 뿐, 아직 아무것도 실행하지
     않습니다. <code>Fx</code>가 실제로 일을 시작하는 시점은
-    <strong>종결 연산자</strong>를 호출할 때입니다 — <code>toArray()</code>,
+    <strong>종결 연산자</strong>를 호출할 때입니다 — <code>toList()</code>,
     <code>each()</code>, <code>consume()</code>, <code>reduce()</code> 등이
     체인 전체를 통해 값을 하나씩, 종결 지점에서 소스까지 거슬러 끌어당깁니다.
   </p>
@@ -53,7 +53,7 @@ nextLabel: pipe
 
   <h2>데모 1 · 종결 연산자 전까지는 아무것도 실행되지 않습니다</h2>
   <p>체인을 만든 직후에는 <code>calls</code>가 0에 머물러 있다가,
-    <code>toArray()</code>가 실제로 값 5개를 끌어당기는 순간 올라가는 것을 보세요.</p>
+    <code>toList()</code>가 실제로 값 5개를 끌어당기는 순간 올라가는 것을 보세요.</p>
   {{playground:0}}
 
   <h2>데모 2 · fxAsync와 fxStream</h2>
@@ -73,7 +73,7 @@ nextLabel: pipe
   <div class="callout">
     <strong>관련 함수:</strong>
     <a href="pipe.html"><code>pipe</code></a> — 동적 타입 방식의 대안입니다 ·
-    <a href="toArray.html"><code>toArray</code></a> — 가장 흔히 쓰는 종결 연산자입니다 ·
+    <a href="toList.html"><code>toList</code></a> — 가장 흔히 쓰는 종결 연산자입니다 ·
     <a href="each.html"><code>each</code></a> — 부수 효과를 위한 종결 연산자입니다 ·
     <a href="consume.html"><code>consume</code></a> — 결과를 버리는 종결 연산자입니다
   </div>

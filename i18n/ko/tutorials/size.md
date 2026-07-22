@@ -2,9 +2,9 @@
 slug: size
 title: size — FxDart 101
 description: FxDart size 튜토리얼: 파이프라인이 만들어내는 원소의 개수를 세는 방법을 라이브 플레이그라운드와 함께 다룹니다.
-heading: <code>size</code>
+heading: <code>count</code>
 section: 7
-crumb: size
+crumb: count
 prev: max.html
 prevLabel: max
 next: join.html
@@ -36,7 +36,7 @@ nextLabel: join
     이미 구체적인 <code>List</code>를 들고 있다면 <code>.length</code>가
     공짜입니다 — <code>size</code>는 지연 체인의 결과를 먼저
     <code>List</code>로 구체화하지 않고서 개수만 세고 싶을 때, 즉
-    <code><a href="../101/index.html">toArray</a></code>를 부르고 싶지 않을 때
+    <code><a href="../101/index.html">toList</a></code>를 부르고 싶지 않을 때
     꺼내 쓰는 도구입니다.
   </p>
 
@@ -54,5 +54,5 @@ nextLabel: join
     <strong>관련 함수:</strong>
     <a href="average.html"><code>average</code></a> — 내부적으로 size와 같은 방식으로 개수를 셉니다 ·
     <a href="isEmpty.html"><code>isEmpty</code></a> — "하나라도 있나?"만 알면 될 때 더 저렴한 검사 ·
-    <a href="../101/index.html">toArray</a> — 세는 대신 구체화하기
+    <a href="../101/index.html">toList</a> — 세는 대신 구체화하기
   </div>
