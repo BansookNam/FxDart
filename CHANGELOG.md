@@ -1,3 +1,16 @@
+## 0.3.0
+
+### Added
+
+* **`maxBy` / `minBy`** (+ `maxByAsync` / `minByAsync`, and `.maxBy()` /
+  `.minBy()` on the `fx()` and async chains). Returns the *element* with the
+  largest/smallest key in one O(n) walk — the answer to the
+  `sortBy(key).head()` anti-pattern, which sorts the whole pipeline to read
+  one value. Keys compare like `sortBy` (`Comparable.compare`), ties keep the
+  first element encountered, empty input returns `null` (like `head`/`last`).
+  Dart-native addition — FxTS ships only the numeric `min`/`max`; the name
+  follows Kotlin's `maxByOrNull` shape.
+
 ## 0.2.2
 
 ### Renamed for Dart idiom

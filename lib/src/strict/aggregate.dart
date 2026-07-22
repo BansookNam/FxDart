@@ -190,6 +190,72 @@ num max(Iterable<num> iterable) => fold(-double.infinity, _maxOf, iterable);
 Future<num> maxAsync(FxAsyncIterable<num> iterable) =>
     foldAsync(-double.infinity, _maxOf, iterable);
 
+/// Returns the element whose key [f] is smallest, or `null` when empty.
+///
+/// Keys are compared like [sortBy] compares them ([Comparable.compare]);
+/// on ties the **first** encountered element wins. One O(n) walk — no sort.
+///
+/// Dart-native addition (FxTS has only numeric `min`); named after Kotlin's
+/// `minByOrNull` shape, nullable like [head]/[last].
+A? minBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
+  A? best;
+  var seen = false;
+  for (final a in iterable) {
+    if (!seen || _compareBy(f, a, best as A) < 0) {
+      best = a;
+      seen = true;
+    }
+  }
+  return best;
+}
+
+/// Async counterpart of [minBy].
+Future<A?> minByAsync<A>(
+    Object? Function(A a) f, FxAsyncIterable<A> iterable) async {
+  A? best;
+  var seen = false;
+  await eachAsync((A a) {
+    if (!seen || _compareBy(f, a, best as A) < 0) {
+      best = a;
+      seen = true;
+    }
+  }, iterable);
+  return best;
+}
+
+/// Returns the element whose key [f] is largest, or `null` when empty.
+///
+/// Keys are compared like [sortBy] compares them ([Comparable.compare]);
+/// on ties the **first** encountered element wins. One O(n) walk — no sort.
+///
+/// Dart-native addition (FxTS has only numeric `max`); named after Kotlin's
+/// `maxByOrNull` shape, nullable like [head]/[last].
+A? maxBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
+  A? best;
+  var seen = false;
+  for (final a in iterable) {
+    if (!seen || _compareBy(f, a, best as A) > 0) {
+      best = a;
+      seen = true;
+    }
+  }
+  return best;
+}
+
+/// Async counterpart of [maxBy].
+Future<A?> maxByAsync<A>(
+    Object? Function(A a) f, FxAsyncIterable<A> iterable) async {
+  A? best;
+  var seen = false;
+  await eachAsync((A a) {
+    if (!seen || _compareBy(f, a, best as A) > 0) {
+      best = a;
+      seen = true;
+    }
+  }, iterable);
+  return best;
+}
+
 /// Returns the number of elements.
 ///
 /// Port of FxTS `size`.
