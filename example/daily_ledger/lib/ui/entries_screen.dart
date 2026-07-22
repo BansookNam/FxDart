@@ -24,6 +24,7 @@ class EntriesScreen extends StatefulWidget {
 class _EntriesScreenState extends State<EntriesScreen> {
   EntryType? _typeFilter;
   String _query = '';
+  final _searchController = TextEditingController();
 
   /// fxdart's `debounce`: keystrokes only reach setState after 250ms of quiet.
   late final Debounced<String> _debouncedSearch = debounce(
@@ -31,9 +32,16 @@ class _EntriesScreenState extends State<EntriesScreen> {
     const Duration(milliseconds: 250),
   );
 
+  void _clearSearch() {
+    _debouncedSearch.cancel();
+    _searchController.clear();
+    setState(() => _query = '');
+  }
+
   @override
   void dispose() {
     _debouncedSearch.cancel();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -58,11 +66,19 @@ class _EntriesScreenState extends State<EntriesScreen> {
             children: [
               Expanded(
                 child: TextField(
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.search),
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.search),
                     hintText: 'Search title or tag (debounced 250ms)…',
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                     isDense: true,
+                    suffixIcon: _query.isEmpty
+                        ? null
+                        : IconButton(
+                            tooltip: 'Clear search',
+                            icon: const Icon(Icons.close, size: 18),
+                            onPressed: _clearSearch,
+                          ),
                   ),
                   onChanged: _debouncedSearch.call,
                 ),

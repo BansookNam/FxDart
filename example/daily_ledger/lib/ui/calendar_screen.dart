@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fxdart/fxdart.dart' show fx, FxNum;
 
 import '../logic/cached.dart';
 import '../logic/calendar.dart';
@@ -40,9 +41,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
       title: monthLabel(state.month),
       subtitle: 'range(42) → map → chunk(7); cells read a groupBy index',
       explain: () {
-        final daysWithEntries = grid
-            .expand((w) => w)
-            .where((d) => byDay.containsKey(dayKey(d)));
+        final daysWithEntries = fx(
+          grid,
+        ).flatMap((w) => w).filter((d) => byDay.containsKey(dayKey(d)));
         return PipelineExplanation(
           title: 'Calendar month grid',
           formula:
@@ -63,7 +64,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             PipelineStep(
               'filter(open) → countBy(dueDate)',
               'open due items per day, for the red badges',
-              '${dueByDay.values.fold(0, (a, b) => a + b)} open items',
+              '${fx(dueByDay.values).sum()} open items',
             ),
           ],
         );

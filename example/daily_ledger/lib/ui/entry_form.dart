@@ -158,8 +158,8 @@ class _EntryDialogState extends State<_EntryDialog> {
                           final picked = await showDatePicker(
                             context: context,
                             initialDate: _date,
-                            firstDate: DateTime(2020),
-                            lastDate: DateTime(2030),
+                            firstDate: DateTime(DateTime.now().year - 10),
+                            lastDate: DateTime(DateTime.now().year + 10),
                           );
                           if (picked != null) setState(() => _date = picked);
                         },
@@ -179,8 +179,8 @@ class _EntryDialogState extends State<_EntryDialog> {
                             final picked = await showDatePicker(
                               context: context,
                               initialDate: _dueDate ?? _date,
-                              firstDate: DateTime(2020),
-                              lastDate: DateTime(2030),
+                              firstDate: DateTime(DateTime.now().year - 10),
+                              lastDate: DateTime(DateTime.now().year + 10),
                             );
                             if (picked != null) {
                               setState(() => _dueDate = picked);

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fxdart/fxdart.dart' show maxBy;
+import 'package:fxdart/fxdart.dart' show fx, maxBy;
 
 import '../logic/cached.dart';
+import '../logic/calendar.dart' show dayKey;
 import '../logic/heatmap.dart';
-import '../logic/recurrence.dart';
 import '../logic/summaries.dart';
 import '../logic/tags.dart';
 import '../logic/weekday.dart';
@@ -32,16 +32,19 @@ class _InsightsScreenState extends State<InsightsScreen> {
   @override
   Widget build(BuildContext context) {
     final state = LedgerScope.of(context);
-    final trend = monthlyTrend(state.entries, state.month);
+    final trend = cachedTrend(state.entries)(state.month);
     final heatmap = cachedHeatmap(state.entries)(state.month);
-    final tags = tagStats(state.entries);
-    final dupes = possibleDuplicates(state.entries);
-    final projected = projectAll(
-      state.rules,
-      state.entries,
-      state.today,
-      DateTime(state.today.year, state.today.month + 2, state.today.day),
-    );
+    final tags = cachedTagStats(state.entries);
+    final dupes = cachedDuplicates(state.entries);
+    final projectionFrom = dayKey(state.today);
+    final projected = cachedProjected(state.entries)(state.rules)((
+      projectionFrom,
+      DateTime(
+        projectionFrom.year,
+        projectionFrom.month + 2,
+        projectionFrom.day,
+      ),
+    ));
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -91,10 +94,9 @@ class _InsightsScreenState extends State<InsightsScreen> {
                 'one filter, two fork()s: groupBy→sumBy per day + sumBy total '
                 '(${money(heatmap.totalSpend)} this month) — walked once',
             explain: () {
-              final spendingDays = heatmap.weeks
-                  .expand((w) => w)
-                  .where((c) => c.$2 > 0)
-                  .length;
+              final spendingDays = fx(
+                heatmap.weeks,
+              ).flatMap((w) => w).filter((c) => c.$2 > 0).size();
               return PipelineExplanation(
                 title: 'Spending heatmap',
                 formula:
@@ -148,7 +150,7 @@ class _InsightsScreenState extends State<InsightsScreen> {
                   PipelineStep(
                     'groupBy(day) → sumBy',
                     'first collapse entries into one total per calendar day',
-                    '${profile.fold(0, (int n, w) => n + w.dayCount)} spending days',
+                    '${fx(profile).sumBy((w) => w.dayCount)} spending days',
                   ),
                   PipelineStep(
                     'groupBy(day.weekday)',
@@ -184,7 +186,7 @@ class _InsightsScreenState extends State<InsightsScreen> {
                     PipelineStep(
                       'flatMap(tags)',
                       'flatten every entry\'s tag list into one stream',
-                      '${state.entries.expand((e) => e.tags).length} tag usages',
+                      '${fx(state.entries).flatMap((e) => e.tags).size()} tag usages',
                     ),
                     PipelineStep(
                       'countBy(tag)',

@@ -281,7 +281,9 @@ class _MonthBar extends StatelessWidget {
                 'Every number in this app is an fxdart pipeline over one '
                 'List<Entry>. Storage (hive_ce) only shelves data; all '
                 'grouping, summing and windowing happens in logic/ — each '
-                'card names the operators it uses in its subtitle.',
+                'card names the operators it uses in its subtitle, and the '
+                '? beside any formula walks that pipeline step by step with '
+                'the live numbers on screen.',
               ),
               const SizedBox(height: 12),
               const Text('Live demo of the dynamic pipe (FxTS parity API):'),

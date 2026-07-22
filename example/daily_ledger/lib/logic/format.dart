@@ -4,8 +4,9 @@ library;
 
 /// `1234.5` → `$1,234.50` (own tiny formatter; no intl dependency).
 String money(double value) {
-  final sign = value < 0 ? '-' : '';
   final cents = (value.abs() * 100).round();
+  // Sign follows the ROUNDED value: -0.004 must print $0.00, not -$0.00.
+  final sign = value < 0 && cents > 0 ? '-' : '';
   final whole = cents ~/ 100;
   final frac = (cents % 100).toString().padLeft(2, '0');
   final digits = whole.toString();
@@ -17,6 +18,10 @@ String money(double value) {
   return '$sign\$$buf.$frac';
 }
 
-/// Signed variant with an explicit plus for income.
-String signedMoney(double value) =>
-    value > 0 ? '+${money(value)}' : money(value);
+/// Signed variant with an explicit plus for income. Values that round to
+/// zero carry no sign at all.
+String signedMoney(double value) {
+  final rounded = (value * 100).round();
+  if (rounded == 0) return money(0);
+  return rounded > 0 ? '+${money(value)}' : money(value);
+}

@@ -184,6 +184,7 @@ Track which fxdart operators the app demonstrates; grow it every round.
 | ✅ round 6 | sumBy — **new operator added to fxdart 0.4.0 this round** (replaces every fold/map+sum tail) |
 | ✅ round 7 | find, join (in app code), zip+fromEntries per CSV row, compact as an Either-splitter |
 | ✅ round 8 | concat (forecast), averageBy — **new operator added to fxdart 0.5.0 this round** |
+| ✅ round 9 | polish: cached the last per-rebuild pipelines; fxdart-consistency sweep in the ? dialogs |
 | ⏸ intentionally uncovered | omit, slice, cycle, tap, scan1, repeat — no natural fit in this app; forcing them would violate the "readable over clever" principle |
 
 ## Round log
@@ -590,11 +591,58 @@ weekday card on Insights. Library 998 tests, app 63 tests (new
 `forecast_test.dart`, `weekday_test.dart`), `flutter analyze` clean, web
 build compiles.
 
-## Final state (after 4 rounds)
+### Round 9 — done (polish & closeout)
 
-- 4 screens · 12 pipeline-named cards · 8 `logic/` modules, all pure and
-  unit-tested (49 tests) · zero state-management or data deps beyond
-  `hive_ce` + `fxdart`.
-- 45+ distinct fxdart operators demonstrated in context (see coverage table).
+**Feedbacks (10):**
+1. `CORRECT` — `money(-0.004)` printed `-$0.00` (sign computed before
+   rounding). → sign now follows the rounded cents; `signedMoney` values
+   that round to zero carry no sign. New `format_test.dart` pins it.
+2. `CORRECT` — entry-form date pickers were hard-coded to 2020–2030, while
+   seed data is generated relative to *today* — the form would break in
+   2031. → ±10 years around today.
+3. `PERF` — the last per-rebuild Insights pipelines (`monthlyTrend` = 12
+   month summaries, `tagStats`, `possibleDuplicates`, `projectAll`) were
+   uncached. → all four joined the memoize family (`cachedTrend`,
+   `cachedTagStats`, `cachedDuplicates`, `cachedProjected`).
+4. `FX` — a few "?" dialog closures used Dart's `.expand`/`.fold` where the
+   showcase should speak fxdart. → swept to `flatMap`/`sumBy`/`sum`/`size`.
+5. `UX` — the search field had no clear affordance once a query was typed.
+   → suffix ✕ button (cancels the pending debounce too).
+6. `DX` — README still described the pre-round-5 app. → rewritten: explainer
+   dialogs, forecast, weekday profile, import, and the four operators the
+   rounds added to fxdart itself.
+7. `UX` — the About dialog didn't mention the "?" affordance. → it does now.
+8. `DX` — plan.md "final state" section was stuck at round 4. → updated
+   below.
+9. `CORRECT` — verified the Insights projection window follows *today* (not
+   the viewed month) on purpose — same rationale as due-ness (Round 2 #7).
+10. `DX` — coverage closeout: `omit`, `slice`, `cycle`, `tap`, `scan1`,
+    `repeat`, `append`, `takeUntil`, `dropRight`, `zipWith`, `union` remain
+    intentionally uncovered — no natural fit; forcing them would violate
+    principle #3.
+
+**Features suggested (3):**
+- Q. **README/About refresh** ← *chosen* (documentation-as-feature)
+- P. **Budget what-if slider** — still on the table for a future series.
+- S. **GitHub Pages deployment** — remains the deliberately deferred next
+  step (renderer choice + build_docs/deploy.sh clobber check).
+
+**Implemented:** all of the above. App 67 tests, `flutter analyze` clean,
+web build compiles.
+
+## Final state (after 9 rounds)
+
+- 4 screens · 15+ pipeline-named cards, **every formula carrying a "?" that
+  explains the pipeline with the live on-screen data** · 13 `logic/`
+  modules, all pure and unit-tested (67 tests) · zero state-management or
+  data deps beyond `hive_ce` + `fxdart`.
+- 50+ distinct fxdart operators demonstrated in context (see coverage
+  table) — including **four operators the example fed back into the
+  library**: `maxBy`/`minBy` (0.3.0), `sumBy` (0.4.0), `averageBy` (0.5.0),
+  each shipped with async variants, chain methods, tests, and 101
+  tutorials.
+- Design system (rounds 5+): trust-blue seed, `LedgerColors` semantic
+  tokens, light/dark themes, tabular numerals, adaptive layout under 700px.
 - Deployment to `docs/ledger/` on GitHub Pages remains the deliberately
-  deferred next step (renderer choice + build_docs/deploy.sh clobber check).
+  deferred next step (renderer choice + build_docs/deploy.sh clobber
+  check).

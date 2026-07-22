@@ -17,6 +17,7 @@ import '../models/models.dart';
 import 'calendar.dart';
 import 'forecast.dart';
 import 'heatmap.dart';
+import 'recurrence.dart';
 import 'stats.dart';
 import 'summaries.dart';
 import 'weekday.dart';
@@ -54,6 +55,30 @@ final Map<DateTime, int> Function(List<Entry>) cachedDueCountByDay = memoize(
 final List<WeekdayStat> Function(DateTime) Function(List<Entry>)
 cachedWeekdayProfile = memoize(
   (entries) => memoize((month) => weekdayProfile(entries, month)),
+);
+
+// Round 9: the remaining per-rebuild Insights pipelines join the family.
+final List<MonthTrendPoint> Function(DateTime) Function(List<Entry>)
+cachedTrend = memoize(
+  (entries) => memoize((month) => monthlyTrend(entries, month)),
+);
+
+final List<(String, int)> Function(List<Entry>) cachedTagStats = memoize(
+  tagStats,
+);
+
+final List<Entry> Function(List<Entry>) cachedDuplicates = memoize(
+  possibleDuplicates,
+);
+
+final List<Entry> Function((DateTime, DateTime)) Function(List<RecurringRule>)
+Function(List<Entry>)
+cachedProjected = memoize(
+  (entries) => memoize(
+    (rules) => memoize(
+      ((DateTime, DateTime) key) => projectAll(rules, entries, key.$1, key.$2),
+    ),
+  ),
 );
 
 // Triple-nested memoize (Round 8): entries → rules → (month, today) record.
