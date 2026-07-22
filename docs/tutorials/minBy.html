@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>minBy — FxDart 101</title>
+  <meta name="description" content="FxDart minBy tutorial: the element with the smallest key in one walk — no sort, null when empty — with a live playground.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/minBy.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/minBy.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/minBy.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/minBy.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/minBy.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/minBy.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/minBy.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/minBy.html">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../101/index.html#api">API Tutorials</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Language">
+      <span class="lang-label">Language</span>
+      <ul>
+        <li><a href="../tutorials/minBy.html" hreflang="en" lang="en" aria-current="page">English</a></li>
+        <li><a href="../ko/tutorials/minBy.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../zh/tutorials/minBy.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../ja/tutorials/minBy.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../es/tutorials/minBy.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../pt-br/tutorials/minBy.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../ru/tutorials/minBy.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 7 · Aggregating › <strong>minBy</strong></p>
+  <h1><code>minBy</code></h1>
+  <p class="hero-sub">The element whose key is smallest — one walk, no sort, <code>null</code> when empty.</p>
+
+  <div class="signature">A? minBy&lt;A&gt;(Object? Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;A?&gt; minByAsync&lt;A&gt;(Object? Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+T? Fx&lt;T&gt;.minBy(Object? Function(T a) f)          // chain (sync)
+Future&lt;T?&gt; FxAsync&lt;T&gt;.minBy(Object? Function(T a) f)  // chain (async)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>minBy</code> is the mirror of
+    <code><a href="maxBy.html">maxBy</a></code>: it returns the
+    <em>element</em> with the smallest key after a single O(n) walk,
+    where <code>sortBy(key).head()</code> would sort the whole pipeline
+    just to read one value.
+  </p>
+  <p>
+    The contract matches <code>maxBy</code> exactly: keys compare like
+    <code><a href="sortBy.html">sortBy</a></code>
+    (<code>Comparable.compare</code>), ties keep the <strong>first</strong>
+    element encountered, and an empty pipeline returns <code>null</code> —
+    not <code>infinity</code>, which is what the numeric
+    <code><a href="min.html">min</a></code> does, because there is no
+    "zero element" to fall back to.
+  </p>
+
+  <h2>Demo 1 · Basics, empty case &amp; ties</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final words = ['banana', 'fig', 'apple'];
+
+  // Data-first form: the element with the smallest key, in one O(n) walk.
+  print(minBy((String w) => w.length, words)); // fig
+
+  // Chain form:
+  print(fx(words).minBy((w) => w.length)); // fig
+
+  // Empty input returns null (like head/last), not a sentinel:
+  print(minBy((int n) => n, <int>[])); // null
+
+  // Ties keep the FIRST element encountered:
+  print(minBy((String w) => w.length, ['aa', 'bb'])); // aa
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // Works over the async chain too — still one walk, no sort:
+  final shortest = await fx(['10', '200', '3'])
+      .toAsync()
+      .map((s) => delay(const Duration(milliseconds: 100), s))
+      .minBy((s) => s.length);
+
+  print(shortest); // 3
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: find the fastest runner with one call.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final runners = [
+    (name: 'Ana', seconds: 62.1),
+    (name: 'Ben', seconds: 58.4),
+    (name: 'Cho', seconds: 60.0),
+  ];
+
+  // TODO: find the fastest runner (smallest seconds) with one minBy call.
+  final fastest = fx(runners).head();
+
+  print(fastest?.name); // should print: Ben
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="maxBy.html"><code>maxBy</code></a> — the mirror image ·
+    <a href="min.html"><code>min</code></a> — when you want the key itself, not the element ·
+    <a href="head.html"><code>head</code></a> — the same nullable contract
+  </div>
+
+  <nav class="tut-nav">
+    <a href="maxBy.html">← Previous: maxBy</a>
+    <a href="size.html">Next: count →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a>. Great thanks to <strong>Indong Yoo</strong> (CTO, Marpple) and the FxTS team for the ideas, semantics, and test suite this library is built on.</p>
+  <p>Playground compiles via the DartPad compile service. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Run","pgReset":"Reset","pgCompiling":"Compiling…","pgCompileError":"Compile error","pgError":"Error","pgLoading":"Loading runtime…","pgRunning":"Running…","pgNoOutput":"(no output)","pgLoadFailed":"Could not load the FxDart library"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

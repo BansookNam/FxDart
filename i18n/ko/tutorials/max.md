@@ -7,8 +7,8 @@ section: 7
 crumb: max
 prev: min.html
 prevLabel: min
-next: size.html
-nextLabel: size
+next: maxBy.html
+nextLabel: maxBy
 ---
   <p class="hero-sub">파이프라인에서 가장 큰 숫자 — <code>min</code>을 그대로 뒤집은 함수입니다.</p>
 

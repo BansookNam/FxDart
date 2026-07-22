@@ -1,0 +1,4 @@
+A? maxBy&lt;A&gt;(Object? Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;A?&gt; maxByAsync&lt;A&gt;(Object? Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+T? Fx&lt;T&gt;.maxBy(Object? Function(T a) f)          // chain (sync)
+Future&lt;T?&gt; FxAsync&lt;T&gt;.maxBy(Object? Function(T a) f)  // chain (async)

@@ -7,8 +7,8 @@ section: 7
 crumb: max
 prev: min.html
 prevLabel: min
-next: size.html
-nextLabel: size
+next: maxBy.html
+nextLabel: maxBy
 ---
   <p class="hero-sub">The largest number in the pipeline — the mirror image of <code>min</code>.</p>
 

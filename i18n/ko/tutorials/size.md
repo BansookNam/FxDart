@@ -5,8 +5,8 @@ description: FxDart size 튜토리얼: 파이프라인이 만들어내는 원소
 heading: <code>count</code>
 section: 7
 crumb: count
-prev: max.html
-prevLabel: max
+prev: minBy.html
+prevLabel: minBy
 next: join.html
 nextLabel: join
 ---

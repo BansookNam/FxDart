@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>maxBy — FxDart 101</title>
+  <meta name="description" content="FxDart maxBy tutorial: the element with the largest key in one walk — no sort, null when empty — with a live playground.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/maxBy.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/maxBy.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/maxBy.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/maxBy.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/maxBy.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/maxBy.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/maxBy.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/maxBy.html">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../101/index.html#api">API Tutorials</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Language">
+      <span class="lang-label">Language</span>
+      <ul>
+        <li><a href="../tutorials/maxBy.html" hreflang="en" lang="en" aria-current="page">English</a></li>
+        <li><a href="../ko/tutorials/maxBy.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../zh/tutorials/maxBy.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../ja/tutorials/maxBy.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../es/tutorials/maxBy.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../pt-br/tutorials/maxBy.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../ru/tutorials/maxBy.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 7 · Aggregating › <strong>maxBy</strong></p>
+  <h1><code>maxBy</code></h1>
+  <p class="hero-sub">The element whose key is largest — one walk, no sort, <code>null</code> when empty.</p>
+
+  <div class="signature">A? maxBy&lt;A&gt;(Object? Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;A?&gt; maxByAsync&lt;A&gt;(Object? Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+T? Fx&lt;T&gt;.maxBy(Object? Function(T a) f)          // chain (sync)
+Future&lt;T?&gt; FxAsync&lt;T&gt;.maxBy(Object? Function(T a) f)  // chain (async)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>maxBy</code> answers "which <em>element</em> has the biggest
+    key?" — not "what is the biggest number?" (that's
+    <code><a href="max.html">max</a></code>). It walks the pipeline
+    <strong>once</strong>, keeping the current best element, so it is O(n)
+    where the tempting <code>sortBy(key).head()</code> shape pays
+    O(n&nbsp;log&nbsp;n) and materializes a sorted list it never needs.
+  </p>
+  <p>
+    Keys are compared exactly like
+    <code><a href="sortBy.html">sortBy</a></code> compares them
+    (<code>Comparable.compare</code>), and on ties the <strong>first</strong>
+    element encountered wins — so <code>maxBy</code> over a date-sorted list
+    gives you the earliest of the equally-largest.
+  </p>
+  <p>
+    Empty input returns <code>null</code>, like
+    <code><a href="head.html">head</a></code> and
+    <code><a href="last.html">last</a></code> — Dart's nullable types replace
+    FxTS's <code>undefined</code> here. This is a Dart-native addition
+    (FxTS only ships the numeric <code>max</code>); the name follows
+    Kotlin's <code>maxByOrNull</code> shape.
+  </p>
+
+  <h2>Demo 1 · Basics, empty case &amp; ties</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final words = ['fig', 'banana', 'apple'];
+
+  // Data-first form: the element with the largest key, in one O(n) walk.
+  print(maxBy((String w) => w.length, words)); // banana
+
+  // Chain form:
+  print(fx(words).maxBy((w) => w.length)); // banana
+
+  // Empty input returns null (like head/last), not a sentinel:
+  print(maxBy((int n) => n, <int>[])); // null
+
+  // Ties keep the FIRST element encountered:
+  print(maxBy((String w) => w.length, ['aa', 'bb'])); // aa
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // Works over the async chain too — still one walk, no sort:
+  final longest = await fx(['10', '200', '3'])
+      .toAsync()
+      .map((s) => delay(const Duration(milliseconds: 100), s))
+      .maxBy((s) => s.length);
+
+  print(longest); // 200
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: find the biggest expense <strong>without sorting</strong>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final expenses = [
+    (title: 'Coffee', amount: 4.50),
+    (title: 'Rent', amount: 1200.0),
+    (title: 'Groceries', amount: 82.30),
+  ];
+
+  // TODO: find the biggest expense WITHOUT sorting — one maxBy call.
+  final biggest = fx(expenses).head();
+
+  print(biggest?.title); // should print: Rent
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="minBy.html"><code>minBy</code></a> — the mirror image ·
+    <a href="max.html"><code>max</code></a> — when you want the key itself, not the element ·
+    <a href="sortBy.html"><code>sortBy</code></a> — when you need the full ordering anyway
+  </div>
+
+  <nav class="tut-nav">
+    <a href="max.html">← Previous: max</a>
+    <a href="minBy.html">Next: minBy →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a>. Great thanks to <strong>Indong Yoo</strong> (CTO, Marpple) and the FxTS team for the ideas, semantics, and test suite this library is built on.</p>
+  <p>Playground compiles via the DartPad compile service. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Run","pgReset":"Reset","pgCompiling":"Compiling…","pgCompileError":"Compile error","pgError":"Error","pgLoading":"Loading runtime…","pgRunning":"Running…","pgNoOutput":"(no output)","pgLoadFailed":"Could not load the FxDart library"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

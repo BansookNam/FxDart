@@ -7,8 +7,8 @@ section: 7
 crumb: max
 prev: min.html
 prevLabel: min
-next: size.html
-nextLabel: size
+next: maxBy.html
+nextLabel: maxBy
 ---
   <p class="hero-sub">El número más grande del pipeline: la imagen especular de <code>min</code>.</p>
 

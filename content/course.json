@@ -68,6 +68,8 @@
     {"href": "average.html", "label": "average"},
     {"href": "min.html", "label": "min"},
     {"href": "max.html", "label": "max"},
+    {"href": "maxBy.html", "label": "maxBy"},
+    {"href": "minBy.html", "label": "minBy"},
     {"href": "size.html", "label": "count"},
     {"href": "join.html", "label": "join"},
     {"href": "groupBy.html", "label": "groupBy"},
