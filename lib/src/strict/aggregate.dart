@@ -130,6 +130,21 @@ Acc Function(Iterable<A>) reduceLazy<A, Acc>(
 /// Port of FxTS `sum`.
 num sum(Iterable<num> iterable) => fold<num, num>(0, (a, b) => a + b, iterable);
 
+/// Sums the key [f] of every element — `map` + [sum] in one step, so a
+/// pipeline that only needs a field total doesn't spell out the projection.
+///
+/// Empty input returns `0` (the [sum] contract).
+///
+/// Dart-native addition (FxTS has only the numeric `sum`); named after
+/// [maxBy]/[minBy] — Kotlin spells it `sumOf`.
+num sumBy<A>(num Function(A a) f, Iterable<A> iterable) =>
+    fold<A, num>(0, (acc, a) => acc + f(a), iterable);
+
+/// Async counterpart of [sumBy].
+Future<num> sumByAsync<A>(
+        FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    foldAsync<A, num>(0, (acc, a) async => acc + await f(a), iterable);
+
 /// Async counterpart of [sum].
 Future<num> sumAsync(FxAsyncIterable<num> iterable) =>
     foldAsync<num, num>(0, (a, b) => a + b, iterable);

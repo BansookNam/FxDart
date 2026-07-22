@@ -1,3 +1,13 @@
+## 0.4.0
+
+### Added
+
+* **`sumBy`** (+ `sumByAsync`, and `.sumBy()` on the `fx()` and async
+  chains). Sums a key of every element — `map` + `sum` in one terminal, so
+  "total this field" is one call. Empty input returns `0` (the `sum`
+  contract); the async variant awaits the key extractor per element.
+  Dart-native addition in the `maxBy`/`minBy` family (Kotlin's `sumOf`).
+
 ## 0.3.0
 
 ### Added
