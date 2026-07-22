@@ -62,13 +62,15 @@ List<Entry> projectAll(
   DateTime from,
   DateTime horizon,
 ) {
+  // A Set: `contains` per ghost must be O(1), not a list scan (Round 7).
   final materialized = fx(existing)
       .filter((e) => e.recurringRuleId != null)
       .map(
         (e) =>
             '${e.recurringRuleId}@${e.date.year}-${e.date.month}-${e.date.day}',
       )
-      .toList();
+      .toList()
+      .toSet();
   return fx(rules)
       .flatMap((rule) => projectRule(rule, existing, from, horizon))
       .filter(

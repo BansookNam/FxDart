@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../logic/cached.dart';
 import '../logic/calendar.dart';
 import '../models/models.dart';
 import 'app_shell.dart';
@@ -22,8 +23,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final state = LedgerScope.of(context);
     // range(42) → map(day) → chunk(7): the grid *is* the pipeline output.
     final grid = monthGrid(state.month);
-    final byDay = entriesByDay(state.entries);
-    final dueByDay = dueCountByDay(state.entries);
+    final byDay = cachedEntriesByDay(state.entries);
+    final dueByDay = cachedDueCountByDay(state.entries);
     // A selection from a previously viewed month is stale — ignore it.
     final selected =
         _selected != null &&

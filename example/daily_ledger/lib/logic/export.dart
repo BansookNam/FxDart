@@ -48,9 +48,8 @@ String entriesToCsv(
         };
         return pick(csvColumns, full);
       })
-      .map(
-        (row) => fx(csvColumns).map((c) => _escape(row[c])).toList().join(','),
-      );
+      .map((row) => join(',', map((c) => _escape(row[c]), csvColumns)));
 
-  return fx(rows).prepend(csvColumns.join(',')).toList().join('\n');
+  // fxdart's own `join` finishes the pipeline — no List materialization.
+  return join('\n', prepend(csvColumns.join(','), rows));
 }

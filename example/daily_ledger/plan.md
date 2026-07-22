@@ -182,6 +182,7 @@ Track which fxdart operators the app demonstrates; grow it every round.
 | ✅ round 4 | intersection, difference (both directions), pluck, compact, pipe |
 | ✅ round 5 | maxBy, minBy — **new operators added to fxdart 0.3.0 this round** |
 | ✅ round 6 | sumBy — **new operator added to fxdart 0.4.0 this round** (replaces every fold/map+sum tail) |
+| ✅ round 7 | find, join (in app code), zip+fromEntries per CSV row, compact as an Either-splitter |
 | ⏸ intentionally uncovered | omit, slice, cycle, tap, scan1, repeat — no natural fit in this app; forcing them would violate the "readable over clever" principle |
 
 ## Round log
@@ -488,6 +489,55 @@ no second data path, so dialog numbers can never drift from the screen.
 **Implemented:** all of the above. fxdart 0.4.0 (`sumBy`); dialogs on 13
 spots across all four screens + 3 brand-new formula placements. Library 992
 tests, app 49 tests, `flutter analyze` clean.
+
+### Round 7 — done (CSV import round-trip)
+
+**Feedbacks (10):**
+1. `UX` — data could leave the app (Export CSV) but never come back.
+   → CSV import feature (chosen; deferred since Round 4).
+2. `FX` — `export.dart` hand-joined rows with Dart's `List.join` while
+   fxdart ships `join`. → export now ends in
+   `join('\n', prepend(header, rows))` — no List materialization.
+3. `PERF` — Calendar rebuilt its `groupBy`/`countBy` indexes on every
+   rebuild. → `cachedEntriesByDay` / `cachedDueCountByDay` join the memoize
+   family (single-arg `memoize(entriesByDay)` — the simplest member yet).
+4. `PERF` — `projectAll` did `List.contains` per ghost entry
+   (O(ghosts × materialized)). → Set lookup.
+5. `CORRECT` — import must round-trip export exactly: quoted commas,
+   doubled-quote escapes, `|`-joined tags, yes/no done. → dedicated
+   `splitCsvLine` + a round-trip test (`export → import` preserves every
+   exported field).
+6. `UX` — bad rows must not silently vanish. → line-precise issues
+   (1-based, header-aware) shown in the preview before anything commits.
+7. `UX` — importing the same file twice duplicates silently. → preview
+   counts rows matching the `possibleDuplicates` key against existing
+   entries and points at the Insights card.
+8. `DX` — importing N rows one-by-one would notify N times. → repository
+   `putEntries` + `LedgerState.upsertEntries`: one Hive write, one notify.
+9. `CORRECT` — CSV has no id column; imported rows need fresh, unique,
+   *deterministic* ids. → `'$idPrefix-L<line>'`, pure and pinned by tests.
+10. `FX` — the import pipeline is itself a showcase: `split('\n')` →
+    `zipWithIndex` → `map(parse)` → **`compact` ×2 as an Either-splitter**
+    (a row parses to `(Entry?, ImportIssue?)`; compact separates the
+    streams); per row `zip(header, cells)` → `fromEntries`; `find` picks
+    the EntryType. The import dialog carries its own formula + "?" with
+    live counts, consistent with Round 6.
+
+**Features suggested (3):**
+- L. **CSV import** ← *chosen*
+- N. **Cashflow forecast** — actual `scan` balance extended through
+  projected recurring entries. → Round 8.
+- O. **Weekday profile** — average spend per weekday, `groupBy(weekday)` →
+  `sumBy`/`average`. Round 8/9 candidate.
+
+**Strategy:** pipeline-first: parse returns a pure `ImportPreview`
+(entries, issues, duplicateCount) so the dialog is dumb; ids injected via
+`idPrefix` to keep the function deterministic and testable.
+
+**Implemented:** all of the above. New `logic/import.dart`,
+`ui/import_dialog.dart`; Import CSV button on Entries. App 57 tests
+(new `import_test.dart` with 8), `flutter analyze` clean, web build
+compiles.
 
 ## Final state (after 4 rounds)
 

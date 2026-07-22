@@ -77,6 +77,17 @@ class LedgerState extends ChangeNotifier {
     }
   }
 
+  /// Bulk upsert (CSV import): one Hive write, one notify — not N.
+  Future<void> upsertEntries(List<Entry> entries) async {
+    await _repo.putEntries(entries);
+    final data = _data;
+    if (data != null) {
+      final ids = {for (final e in entries) e.id};
+      final kept = data.entries.where((e) => !ids.contains(e.id)).toList();
+      _setData(data.copyWith(entries: kept..addAll(entries)));
+    }
+  }
+
   Future<void> deleteEntry(String id) async {
     await _repo.deleteEntry(id);
     final data = _data;

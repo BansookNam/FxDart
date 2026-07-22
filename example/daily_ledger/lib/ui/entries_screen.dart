@@ -10,6 +10,7 @@ import '../models/models.dart';
 import 'app_shell.dart';
 import 'entry_form.dart';
 import 'format.dart';
+import 'import_dialog.dart';
 import 'theme.dart';
 import 'widgets.dart';
 
@@ -87,6 +88,12 @@ class _EntriesScreenState extends State<EntriesScreen> {
                 },
                 icon: const Icon(Icons.copy_all, size: 18),
                 label: const Text('Export CSV'),
+              ),
+              const SizedBox(width: 12),
+              OutlinedButton.icon(
+                onPressed: () => showImportDialog(context),
+                icon: const Icon(Icons.upload_file, size: 18),
+                label: const Text('Import CSV'),
               ),
               const SizedBox(width: 12),
               FilledButton.icon(

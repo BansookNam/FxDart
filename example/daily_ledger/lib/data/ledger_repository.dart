@@ -79,6 +79,9 @@ class LedgerRepository {
 
   Future<void> putEntry(Entry entry) => _entries.put(entry.id, entry);
 
+  Future<void> putEntries(List<Entry> entries) =>
+      _entries.putAll({for (final e in entries) e.id: e});
+
   Future<void> deleteEntry(String id) => _entries.delete(id);
 
   Future<void> putBudget(String categoryId, double amount) =>

@@ -14,6 +14,7 @@ library;
 import 'package:fxdart/fxdart.dart';
 
 import '../models/models.dart';
+import 'calendar.dart';
 import 'heatmap.dart';
 import 'stats.dart';
 import 'summaries.dart';
@@ -37,4 +38,13 @@ final HeatmapData Function(DateTime) Function(List<Entry>) cachedHeatmap =
 final List<(String, String)> Function(DateTime) Function(List<Entry>)
 cachedQuickStats = memoize(
   (entries) => memoize((month) => quickStats(entries, month)),
+);
+
+// The calendar indexes take no month argument, so a single memoize keyed by
+// the entries list instance is the whole cache (Round 7).
+final Map<DateTime, List<Entry>> Function(List<Entry>) cachedEntriesByDay =
+    memoize(entriesByDay);
+
+final Map<DateTime, int> Function(List<Entry>) cachedDueCountByDay = memoize(
+  dueCountByDay,
 );
