@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>maxBy — FxDart 101</title>
-  <meta name="description" content="FxDart maxBy tutorial: the element with the largest key in one walk — no sort, null when empty — with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/maxBy.html">
+  <meta name="description" content="FxDart maxBy 튜토리얼 — 키가 가장 큰 원소를 단 한 번의 순회로 찾습니다. 정렬 없이, 비어 있으면 null. 라이브 플레이그라운드 포함.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/maxBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/maxBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/maxBy.html">
@@ -43,42 +42,42 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 7 · 집계 › <strong>maxBy</strong></p>
   <h1><code>maxBy</code></h1>
-  <p class="hero-sub">The element whose key is largest — one walk, no sort, <code>null</code> when empty.</p>
+  <p class="hero-sub">키가 가장 큰 원소 — 한 번의 순회, 정렬 없이, 비어 있으면 <code>null</code>입니다.</p>
 
   <div class="signature">A? maxBy&lt;A&gt;(Object? Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;A?&gt; maxByAsync&lt;A&gt;(Object? Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 T? Fx&lt;T&gt;.maxBy(Object? Function(T a) f)          // chain (sync)
 Future&lt;T?&gt; FxAsync&lt;T&gt;.maxBy(Object? Function(T a) f)  // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>maxBy</code> answers "which <em>element</em> has the biggest
-    key?" — not "what is the biggest number?" (that's
-    <code><a href="max.html">max</a></code>). It walks the pipeline
-    <strong>once</strong>, keeping the current best element, so it is O(n)
-    where the tempting <code>sortBy(key).head()</code> shape pays
-    O(n&nbsp;log&nbsp;n) and materializes a sorted list it never needs.
+    <code>maxBy</code>는 "어떤 <em>원소</em>가 가장 큰 키를 갖는가?"에
+    답합니다 — "가장 큰 숫자가 무엇인가?"가 아닙니다(그건
+    <code><a href="max.html">max</a></code>입니다). 파이프라인을
+    <strong>한 번</strong> 순회하면서 현재까지의 최선 원소를 유지하므로
+    O(n)입니다. 반면 솔깃한 <code>sortBy(key).head()</code> 형태는
+    O(n&nbsp;log&nbsp;n)을 치르고, 결코 필요하지도 않은 정렬된 리스트를
+    실체화합니다.
   </p>
   <p>
-    Keys are compared exactly like
-    <code><a href="sortBy.html">sortBy</a></code> compares them
-    (<code>Comparable.compare</code>), and on ties the <strong>first</strong>
-    element encountered wins — so <code>maxBy</code> over a date-sorted list
-    gives you the earliest of the equally-largest.
+    키는 <code><a href="sortBy.html">sortBy</a></code>가 비교하는
+    방식(<code>Comparable.compare</code>)과 정확히 동일하게 비교되며,
+    동점일 때는 먼저 만난 <strong>첫</strong> 원소가 이깁니다 — 그래서
+    날짜순으로 정렬된 리스트에 <code>maxBy</code>를 적용하면 가장 큰
+    값들 중 가장 이른 것을 얻습니다.
   </p>
   <p>
-    Empty input returns <code>null</code>, like
-    <code><a href="head.html">head</a></code> and
-    <code><a href="last.html">last</a></code> — Dart's nullable types replace
-    FxTS's <code>undefined</code> here. This is a Dart-native addition
-    (FxTS only ships the numeric <code>max</code>); the name follows
-    Kotlin's <code>maxByOrNull</code> shape.
+    빈 입력은 <code><a href="head.html">head</a></code>,
+    <code><a href="last.html">last</a></code>처럼 <code>null</code>을
+    반환합니다 — 여기서는 Dart의 널 허용 타입이 FxTS의
+    <code>undefined</code>를 대신합니다. 이것은 Dart 고유의 추가
+    기능이며(FxTS는 숫자용 <code>max</code>만 제공합니다), 이름은
+    Kotlin의 <code>maxByOrNull</code> 형태를 따릅니다.
   </p>
 
-  <h2>Demo 1 · Basics, empty case &amp; ties</h2>
+  <h2>데모 1 · 기본 사용법, 빈 경우 &amp; 동점</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -103,7 +102,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>데모 2 · 비동기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -120,8 +119,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: find the biggest expense <strong>without sorting</strong>.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: <strong>정렬 없이</strong> 가장 큰 지출을 찾아보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -142,10 +141,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="minBy.html"><code>minBy</code></a> — the mirror image ·
-    <a href="max.html"><code>max</code></a> — when you want the key itself, not the element ·
-    <a href="sortBy.html"><code>sortBy</code></a> — when you need the full ordering anyway
+    <strong>관련 함수:</strong>
+    <a href="minBy.html"><code>minBy</code></a> — 거울상 ·
+    <a href="max.html"><code>max</code></a> — 원소가 아니라 키 자체가 필요할 때 ·
+    <a href="sortBy.html"><code>sortBy</code></a> — 어차피 전체 정렬이 필요할 때
   </div>
 
   <nav class="tut-nav">

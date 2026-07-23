@@ -13,23 +13,29 @@ import 'dart:math' as math;
 ///
 /// Port of FxTS `Concurrent` (`Lazy/concurrent.ts`).
 class Concurrent {
+  /// How many upstream items to evaluate at once.
   final int length;
 
+  /// Creates a marker requesting [length]-way concurrent evaluation.
   const Concurrent(this.length);
 
+  /// Alias for the default constructor, mirroring FxTS's `Concurrent.of`.
   static Concurrent of(int length) => Concurrent(length);
 }
 
 /// The result of one pull from an [FxAsyncIterator] — a port of the JS
 /// `IteratorResult` (`{done, value}`).
 class IterResult<T> {
+  /// Whether the iterator is exhausted. When true, [value] is absent.
   final bool done;
   final T? _value;
 
+  /// A terminal result — the iterator has no more values.
   const IterResult.done()
       : done = true,
         _value = null;
 
+  /// A result carrying the next [value].
   const IterResult.value(T value)
       : done = false,
         _value = value;
@@ -48,6 +54,8 @@ class IterResult<T> {
 /// `n` items at once by passing a [Concurrent] marker through `next()`.
 /// This protocol is a faithful port of the JS `AsyncIterator` as FxTS uses it.
 abstract interface class FxAsyncIterator<T> {
+  /// Pulls the next result. Passing a [Concurrent] marker asks the upstream
+  /// chain to evaluate that many items at once, in order.
   Future<IterResult<T>> next([Concurrent? concurrent]);
 }
 
@@ -57,6 +65,7 @@ abstract interface class FxAsyncIterator<T> {
 /// Consume it with `toListAsync`, `eachAsync`, `reduceAsync`, the
 /// [FxAsync] chain, or convert it to a [Stream] with [toStream].
 abstract interface class FxAsyncIterable<T> {
+  /// A fresh [FxAsyncIterator] positioned at the start of this iterable.
   FxAsyncIterator<T> get iterator;
 }
 
@@ -64,6 +73,7 @@ abstract interface class FxAsyncIterable<T> {
 class DelegateAsyncIterable<T> implements FxAsyncIterable<T> {
   final FxAsyncIterator<T> Function() _make;
 
+  /// Wraps a factory invoked once per [iterator] access.
   const DelegateAsyncIterable(this._make);
 
   @override
@@ -74,6 +84,7 @@ class DelegateAsyncIterable<T> implements FxAsyncIterable<T> {
 class DelegateAsyncIterator<T> implements FxAsyncIterator<T> {
   final Future<IterResult<T>> Function(Concurrent? concurrent) _next;
 
+  /// Wraps a `next` closure as an [FxAsyncIterator].
   const DelegateAsyncIterator(this._next);
 
   @override
@@ -87,6 +98,7 @@ class SerialAsyncIterator<T> implements FxAsyncIterator<T> {
   final Future<IterResult<T>> Function(Concurrent? concurrent) _inner;
   Future<void> _prev = Future.value();
 
+  /// Wraps [_inner], chaining each pull after the previous one settles.
   SerialAsyncIterator(this._inner);
 
   @override
@@ -142,6 +154,7 @@ FxAsyncIterable<T> fromStream<T>(Stream<T> stream) {
   });
 }
 
+/// Bridges the pull-based async protocol back to a push-based [Stream].
 extension FxAsyncIterableToStream<T> on FxAsyncIterable<T> {
   /// Drives this async iterable sequentially and emits its values as a
   /// [Stream]. The [Concurrent] back-channel is not used; apply
@@ -162,17 +175,29 @@ sealed class Settled<T> {
   const Settled();
 }
 
+/// A [Future] that completed with a [value].
 class Fulfilled<T> extends Settled<T> {
+  /// The value the future completed with.
   final T value;
+
+  /// Wraps a successful [value].
   const Fulfilled(this.value);
 }
 
+/// A [Future] that completed with an [error].
 class Rejected<T> extends Settled<T> {
+  /// The error the future completed with.
   final Object error;
+
+  /// The stack trace captured when the future failed.
   final StackTrace stackTrace;
+
+  /// Wraps a failure ([error] plus its [stackTrace]).
   const Rejected(this.error, this.stackTrace);
 }
 
+/// Awaits every future in [futures], capturing each outcome as a [Settled] so
+/// one rejection never fails the whole batch. Port of `Promise.allSettled`.
 Future<List<Settled<T>>> settleAll<T>(Iterable<Future<T>> futures) {
   return Future.wait(futures.map((f) => f
       .then<Settled<T>>((v) => Fulfilled(v))
@@ -2760,23 +2785,27 @@ Function curry(Function f) => (Object? a) => (Object? b) => f(a, b);
 ///
 /// Dart-native replacement for FxTS `curry` (see `WHY_CURRIED.md`).
 extension Curry2<A, B, R> on R Function(A, B) {
+  /// The curried form: `f.curried(a)(b) == f(a, b)`.
   R Function(B) Function(A) get curried => (a) => (b) => this(a, b);
 }
 
 /// Curries a ternary function: `f.curried(a)(b)(c) == f(a, b, c)`.
 extension Curry3<A, B, C, R> on R Function(A, B, C) {
+  /// The curried form: `f.curried(a)(b)(c) == f(a, b, c)`.
   R Function(C) Function(B) Function(A) get curried =>
       (a) => (b) => (c) => this(a, b, c);
 }
 
 /// Curries a 4-ary function.
 extension Curry4<A, B, C, D, R> on R Function(A, B, C, D) {
+  /// The curried form: `f.curried(a)(b)(c)(d) == f(a, b, c, d)`.
   R Function(D) Function(C) Function(B) Function(A) get curried =>
       (a) => (b) => (c) => (d) => this(a, b, c, d);
 }
 
 /// Curries a 5-ary function.
 extension Curry5<A, B, C, D, E, R> on R Function(A, B, C, D, E) {
+  /// The curried form: `f.curried(a)(b)(c)(d)(e) == f(a, b, c, d, e)`.
   R Function(E) Function(D) Function(C) Function(B) Function(A) get curried =>
       (a) => (b) => (c) => (d) => (e) => this(a, b, c, d, e);
 }
@@ -2786,23 +2815,27 @@ extension Curry5<A, B, C, D, E, R> on R Function(A, B, C, D, E) {
 /// When the chain is nested deeper, the *deepest* matching arity wins; apply
 /// an extension explicitly (`Uncurry2(f).uncurried`) to flatten fewer levels.
 extension Uncurry2<A, B, R> on R Function(B) Function(A) {
+  /// The flattened form: `f.uncurried(a, b) == f(a)(b)`.
   R Function(A, B) get uncurried => (a, b) => this(a)(b);
 }
 
 /// Uncurries a 3-level function chain.
 extension Uncurry3<A, B, C, R> on R Function(C) Function(B) Function(A) {
+  /// The flattened form: `f.uncurried(a, b, c) == f(a)(b)(c)`.
   R Function(A, B, C) get uncurried => (a, b, c) => this(a)(b)(c);
 }
 
 /// Uncurries a 4-level function chain.
 extension Uncurry4<A, B, C, D, R>
     on R Function(D) Function(C) Function(B) Function(A) {
+  /// The flattened form: `f.uncurried(a, b, c, d) == f(a)(b)(c)(d)`.
   R Function(A, B, C, D) get uncurried => (a, b, c, d) => this(a)(b)(c)(d);
 }
 
 /// Uncurries a 5-level function chain.
 extension Uncurry5<A, B, C, D, E, R>
     on R Function(E) Function(D) Function(C) Function(B) Function(A) {
+  /// The flattened form: `f.uncurried(a, b, c, d, e) == f(a)(b)(c)(d)(e)`.
   R Function(A, B, C, D, E) get uncurried =>
       (a, b, c, d, e) => this(a)(b)(c)(d)(e);
 }
@@ -2881,86 +2914,134 @@ bool isObject(Object? a) => a is Map;
 
 
 // --- lazy/filter.dart ---
+/// Dart-idiomatic alias for [filter].
 Iterable<A> where<A>(bool Function(A a) f, Iterable<A> iterable) =>
     filter(f, iterable);
+
+/// Dart-idiomatic alias for [filterAsync].
 FxAsyncIterable<A> whereAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
     filterAsync(f, iterable);
 
+/// Dart-idiomatic alias for [reject] (keeps items where `f` is false).
 Iterable<A> whereNot<A>(bool Function(A a) f, Iterable<A> iterable) =>
     reject(f, iterable);
+
+/// Dart-idiomatic alias for [rejectAsync].
 FxAsyncIterable<A> whereNotAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
     rejectAsync(f, iterable);
 
+/// Dart-idiomatic alias for [compact] (drops `null`s).
 Iterable<A> nonNulls<A>(Iterable<A?> iterable) => compact(iterable);
+
+/// Dart-idiomatic alias for [compactAsync].
 FxAsyncIterable<A> nonNullsAsync<A>(FxAsyncIterable<A?> iterable) =>
     compactAsync(iterable);
 
+/// Dart-idiomatic alias for [uniq].
 Iterable<A> distinct<A>(Iterable<A> iterable) => uniq(iterable);
+
+/// Dart-idiomatic alias for [uniqAsync].
 FxAsyncIterable<A> distinctAsync<A>(FxAsyncIterable<A> iterable) =>
     uniqAsync(iterable);
 
+/// Dart-idiomatic alias for [uniqBy].
 Iterable<A> distinctBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
     uniqBy(f, iterable);
+
+/// Dart-idiomatic alias for [uniqByAsync].
 FxAsyncIterable<A> distinctByAsync<A, B>(
         FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
     uniqByAsync(f, iterable);
 
 // --- lazy/map.dart ---
+/// Dart-idiomatic alias for [flatMap] (matches `Iterable.expand`).
 Iterable<B> expand<A, B>(Iterable<B> Function(A a) f, Iterable<A> iterable) =>
     flatMap(f, iterable);
+
+/// Dart-idiomatic alias for [flatMapAsync].
 FxAsyncIterable<B> expandAsync<A, B>(
         FutureOr<Iterable<B>> Function(A a) f, FxAsyncIterable<A> iterable) =>
     flatMapAsync(f, iterable);
 
+/// Dart-idiomatic alias for [flat] (flattens [depth] levels, default 1).
 Iterable<dynamic> flattened(Iterable<dynamic> iterable, [int depth = 1]) =>
     flat(iterable, depth);
+
+/// Dart-idiomatic alias for [flatAsync].
 FxAsyncIterable<dynamic> flattenedAsync(FxAsyncIterable<dynamic> iterable,
         [int depth = 1]) =>
     flatAsync(iterable, depth);
 
 // --- lazy/take_drop.dart ---
+/// Dart-idiomatic alias for [takeRight] (the last [length] items).
 Iterable<A> takeLast<A>(int length, Iterable<A> iterable) =>
     takeRight(length, iterable);
+
+/// Dart-idiomatic alias for [takeRightAsync].
 FxAsyncIterable<A> takeLastAsync<A>(int length, FxAsyncIterable<A> iterable) =>
     takeRightAsync(length, iterable);
 
+/// Dart-idiomatic alias for [drop] (matches `Iterable.skip`).
 Iterable<A> skip<A>(int length, Iterable<A> iterable) => drop(length, iterable);
+
+/// Dart-idiomatic alias for [dropAsync].
 FxAsyncIterable<A> skipAsync<A>(int length, FxAsyncIterable<A> iterable) =>
     dropAsync(length, iterable);
 
+/// Dart-idiomatic alias for [dropWhile] (matches `Iterable.skipWhile`).
 Iterable<A> skipWhile<A>(bool Function(A a) f, Iterable<A> iterable) =>
     dropWhile(f, iterable);
+
+/// Dart-idiomatic alias for [dropWhileAsync].
 FxAsyncIterable<A> skipWhileAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
     dropWhileAsync(f, iterable);
 
 // --- lazy/zip.dart ---
+/// Dart-idiomatic alias for [zipWithIndex] (each item paired with its index).
 Iterable<(int, A)> indexed<A>(Iterable<A> iterable) => zipWithIndex(iterable);
+
+/// Dart-idiomatic alias for [zipWithIndexAsync].
 FxAsyncIterable<(int, A)> indexedAsync<A>(FxAsyncIterable<A> iterable) =>
     zipWithIndexAsync(iterable);
 
 // --- strict/access.dart ---
+/// Dart-idiomatic alias for [head] (first item, or `null` if empty).
 A? firstOrNull<A>(Iterable<A> iterable) => head(iterable);
+
+/// Dart-idiomatic alias for [headAsync].
 Future<A?> firstOrNullAsync<A>(FxAsyncIterable<A> iterable) =>
     headAsync(iterable);
 
+/// Dart-idiomatic alias for [last] (last item, or `null` if empty).
 A? lastOrNull<A>(Iterable<A> iterable) => last(iterable);
+
+/// Dart-idiomatic alias for [lastAsync].
 Future<A?> lastOrNullAsync<A>(FxAsyncIterable<A> iterable) => lastAsync(iterable);
 
+/// Dart-idiomatic alias for [nth] (item at [index], or `null`).
 A? elementAtOrNull<A>(int index, Iterable<A> iterable) => nth(index, iterable);
+
+/// Dart-idiomatic alias for [nthAsync].
 Future<A?> elementAtOrNullAsync<A>(int index, FxAsyncIterable<A> iterable) =>
     nthAsync(index, iterable);
 
+/// Dart-idiomatic alias for [find] (first match, or `null`).
 A? firstWhereOrNull<A>(bool Function(A a) f, Iterable<A> iterable) =>
     find(f, iterable);
+
+/// Dart-idiomatic alias for [findAsync].
 Future<A?> firstWhereOrNullAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
     findAsync(f, iterable);
 
+/// Dart-idiomatic alias for [findIndex] (index of first match, or -1).
 int indexWhere<A>(bool Function(A a) f, Iterable<A> iterable) =>
     findIndex(f, iterable);
+
+/// Dart-idiomatic alias for [findIndexAsync].
 Future<int> indexWhereAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
     findIndexAsync(f, iterable);
@@ -2969,21 +3050,31 @@ Future<int> indexWhereAsync<A>(
 // matcher, and Dart's idiom is the inherited `.contains()` on the chain anyway.
 // The FxTS-named top-level `includes` remains.
 
+/// Dart-idiomatic alias for [some] (true if any item matches).
 bool any<A>(bool Function(A a) f, Iterable<A> iterable) => some(f, iterable);
+
+/// Dart-idiomatic alias for [someAsync].
 Future<bool> anyAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
     someAsync(f, iterable);
 
 // --- strict/aggregate.dart ---
+/// Dart-idiomatic alias for [each] (matches `Iterable.forEach`).
 void forEach<A>(void Function(A a) f, Iterable<A> iterable) =>
     each(f, iterable);
+
+/// Dart-idiomatic alias for [eachAsync].
 Future<void> forEachAsync<A>(
         FutureOr<void> Function(A a) f, FxAsyncIterable<A> iterable) =>
     eachAsync(f, iterable);
 
+/// Dart-idiomatic alias for [size] (element count).
 int count<A>(Iterable<A> iterable) => size(iterable);
+
+/// Dart-idiomatic alias for [sizeAsync].
 Future<int> countAsync<A>(FxAsyncIterable<A> iterable) => sizeAsync(iterable);
 
+/// Dart-idiomatic alias for [toSorted] (a new sorted [List]).
 List<A> sorted<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
     toSorted(f, iterable);
 
@@ -3002,6 +3093,9 @@ class Debounced<T> {
   Debounced._(this._func, this._wait, {required bool leading})
       : _leading = leading;
 
+  /// Registers a call with [arg], (re)starting the wait window. The wrapped
+  /// function runs on the trailing edge (or immediately, once per idle
+  /// window, when constructed with `leading: true`).
   void call(T arg) {
     final callNow = _leading && _timer == null;
     _timer?.cancel();
@@ -3048,6 +3142,9 @@ class Throttled<T> {
       : _leading = leading,
         _trailing = trailing;
 
+  /// Registers a call with [arg]. The wrapped function runs at most once per
+  /// [wait] window — on the leading edge, the trailing edge, or both, per the
+  /// flags passed to [throttle].
   void call(T arg) {
     final now = DateTime.now();
     final last = _lastCallTime;
@@ -3189,6 +3286,7 @@ FxAsync<T> fxStream<T>(Stream<T> stream) => FxAsync(fromStream(stream));
 class Fx<T> extends Iterable<T> {
   final Iterable<T> _inner;
 
+  /// Wraps [_inner] without consuming it; the chain stays lazy.
   const Fx(this._inner);
 
   @override
@@ -3233,6 +3331,7 @@ class Fx<T> extends Iterable<T> {
   @override
   Fx<T> take(int count) => Fx(_$take(count, _inner));
 
+  /// The last [count] elements.
   Fx<T> takeRight(int count) => Fx(_$takeRight(count, _inner));
 
   /// Dart-idiomatic alias of [takeRight].
@@ -3245,6 +3344,7 @@ class Fx<T> extends Iterable<T> {
   Fx<T> takeUntilInclusive(bool Function(T a) f) =>
       Fx(_$takeUntilInclusive(f, _inner));
 
+  /// Deprecated spelling of [takeUntilInclusive].
   @Deprecated('Use takeUntilInclusive instead')
   Fx<T> takeUntil(bool Function(T a) f) => takeUntilInclusive(f);
 
@@ -3254,8 +3354,10 @@ class Fx<T> extends Iterable<T> {
   @override
   Fx<T> skip(int count) => drop(count);
 
+  /// Drops the last [count] values.
   Fx<T> dropRight(int count) => Fx(_$dropRight(count, _inner));
 
+  /// Drops leading values while [f] holds, then yields the rest.
   Fx<T> dropWhile(bool Function(T a) f) => Fx(_$dropWhile(f, _inner));
 
   @override
@@ -3264,42 +3366,57 @@ class Fx<T> extends Iterable<T> {
   /// Skips values until [f] matches (dropping the match), yields the rest.
   Fx<T> dropUntil(bool Function(T a) f) => Fx(_$dropUntil(f, _inner));
 
+  /// The half-open index range `[start, end)` (to the end when [end] is null).
   Fx<T> slice(int start, [int? end]) => Fx(_$slice(start, _inner, end));
 
+  /// Groups consecutive values into lists of up to [size].
   Fx<List<T>> chunk(int size) => Fx(_$chunk(size, _inner));
 
   /// Applies [f] to each value without changing it.
   Fx<T> peek(void Function(T a) f) => Fx(_$peek(f, _inner));
 
+  /// Distinct values, keeping the first occurrence of each.
   Fx<T> uniq() => Fx(_$uniq(_inner));
 
   /// Dart-idiomatic alias of [uniq].
   Fx<T> distinct() => uniq();
 
+  /// Distinct by the key [f] returns, keeping the first of each key.
   Fx<T> uniqBy<B>(B Function(T a) f) => Fx(_$uniqBy(f, _inner));
 
   /// Dart-idiomatic alias of [uniqBy].
   Fx<T> distinctBy<B>(B Function(T a) f) => uniqBy(f);
 
+  /// Pairs each value with the value at the same position in [other],
+  /// stopping at the shorter side.
   Fx<(T, U)> zip<U>(Iterable<U> other) => Fx(_$zip(_inner, other));
 
+  /// Pairs each value with its index.
   Fx<(int, T)> zipWithIndex() => Fx(_$zipWithIndex(_inner));
 
+  /// Yields the chain, then [a].
   Fx<T> append(T a) => Fx(_$append(a, _inner));
 
+  /// Yields [a], then the chain.
   Fx<T> prepend(T a) => Fx(_$prepend(a, _inner));
 
+  /// Yields this chain followed by [other].
   Fx<T> concat(Iterable<T> other) => Fx(_$concat(_inner, other));
 
+  /// Emits [seed], then each running accumulation as [f] folds in each value.
   Fx<B> scan<B>(B Function(B acc, T a) f, B seed) =>
       Fx(_$scan(f, seed, _inner));
 
+  /// The values in reverse order (materializes the source).
   Fx<T> reverse() => Fx(_$reverse(_inner));
 
+  /// Repeats the source endlessly.
   Fx<T> cycle() => Fx(_$cycle(_inner));
 
+  /// A new chain sorted by the comparator [f].
   Fx<T> sort(int Function(T a, T b) f) => Fx(_$sort(f, _inner));
 
+  /// A new chain sorted by the key [f] returns for each value.
   Fx<T> sortBy(Object? Function(T a) f) => Fx(_$sortBy(f, _inner));
 
   // --- conversion ---------------------------------------------------------
@@ -3314,50 +3431,71 @@ class Fx<T> extends Iterable<T> {
   @override
   List<T> toList({bool growable = true}) => _inner.toList(growable: growable);
 
+  /// Runs [f] for every value, forcing the pipeline.
   void each(void Function(T a) f) => _$each(f, _inner);
 
   /// Consumes up to [n] values (all when omitted), forcing side effects.
   void consume([int? n]) => _$consume(_inner, n);
 
+  /// Groups values into lists keyed by [f].
   Map<K, List<T>> groupBy<K>(K Function(T a) f) => _$groupBy(f, _inner);
 
+  /// Maps the key [f] returns to its value (later values win on collisions).
   Map<K, T> indexBy<K>(K Function(T a) f) => _$indexBy(f, _inner);
 
+  /// Counts how many values fall under each key [f] returns.
   Map<K, int> countBy<K>(K Function(T a) f) => _$countBy(f, _inner);
 
+  /// Whether [f] holds for at least one value.
   bool some(bool Function(T a) f) => _$some(f, _inner);
 
+  /// The first value [f] matches, or `null`.
   T? find(bool Function(T a) f) => _$find(f, _inner);
 
   /// Dart-idiomatic alias of [find] (cf. `package:collection`).
   T? firstWhereOrNull(bool Function(T a) f) => find(f);
 
+  /// The index of the first value [f] matches, or -1.
   int findIndex(bool Function(T a) f) => _$findIndex(f, _inner);
 
   /// Dart-idiomatic alias of [findIndex] (cf. `List.indexWhere`).
   int indexWhere(bool Function(T a) f) => findIndex(f);
 
+  /// The first value, or `null` if empty.
   T? head() => _$head(_inner);
 
+  /// The value with the smallest key [f], or `null` if empty.
   T? minBy(Object? Function(T a) f) => _$minBy(f, _inner);
 
+  /// The value with the largest key [f], or `null` if empty.
   T? maxBy(Object? Function(T a) f) => _$maxBy(f, _inner);
 
+  /// The sum of [f] over every value.
   num sumBy(num Function(T a) f) => _$sumBy(f, _inner);
 
+  /// The mean of [f] over every value.
   double averageBy(num Function(T a) f) => _$averageBy(f, _inner);
 
+  /// Splits into `(matches, non-matches)` by [f].
   (List<T>, List<T>) partition(bool Function(T a) f) => _$partition(f, _inner);
 
+  /// The number of values.
   int size() => _$size(_inner);
 }
 
 /// Numeric terminals for [Fx] chains (generic covariance makes these apply
 /// to `Fx<int>` and `Fx<double>` as well).
 extension FxNum on Fx<num> {
+  /// The sum of every value.
   num sum() => _$sum(this);
+
+  /// The arithmetic mean of every value.
   double average() => _$average(this);
+
+  /// The smallest value.
   num min() => _$min(this);
+
+  /// The largest value.
   num max() => _$max(this);
 }
 
@@ -3365,6 +3503,7 @@ extension FxNum on Fx<num> {
 class FxAsync<T> implements FxAsyncIterable<T> {
   final FxAsyncIterable<T> _inner;
 
+  /// Wraps [_inner] without consuming it; the chain stays lazy.
   const FxAsync(this._inner);
 
   @override
@@ -3375,75 +3514,104 @@ class FxAsync<T> implements FxAsyncIterable<T> {
 
   // --- lazy operators -----------------------------------------------------
 
+  /// Lazily transforms each value with [f] (which may be async).
   FxAsync<R> map<R>(FutureOr<R> Function(T a) f) =>
       FxAsync(_$mapAsync(f, _inner));
 
+  /// Identical to [map]; intended for side effects by convention.
   FxAsync<R> mapEffect<R>(FutureOr<R> Function(T a) f) => map(f);
 
+  /// Maps each value to an iterable via [f] and flattens the results.
   FxAsync<R> flatMap<R>(FutureOr<Iterable<R>> Function(T a) f) =>
       FxAsync(_$flatMapAsync(f, _inner));
 
+  /// Flattens nested iterables [depth] levels.
   FxAsync<dynamic> flat([int depth = 1]) => FxAsync(_$flatAsync(_inner, depth));
 
+  /// All values [f] returns true for ([f] may be async).
   FxAsync<T> filter(FutureOr<bool> Function(T a) f) =>
       FxAsync(_$filterAsync(f, _inner));
 
+  /// The opposite of [filter].
   FxAsync<T> reject(FutureOr<bool> Function(T a) f) =>
       FxAsync(_$rejectAsync(f, _inner));
 
+  /// The first [count] values.
   FxAsync<T> take(int count) => FxAsync(_$takeAsync(count, _inner));
 
+  /// The last [count] values.
   FxAsync<T> takeRight(int count) => FxAsync(_$takeRightAsync(count, _inner));
 
+  /// Leading values while [f] holds.
   FxAsync<T> takeWhile(FutureOr<bool> Function(T a) f) =>
       FxAsync(_$takeWhileAsync(f, _inner));
 
+  /// Yields values until [f] matches, including the matching value.
   FxAsync<T> takeUntilInclusive(FutureOr<bool> Function(T a) f) =>
       FxAsync(_$takeUntilInclusiveAsync(f, _inner));
 
+  /// Deprecated spelling of [takeUntilInclusive].
   @Deprecated('Use takeUntilInclusive instead')
   FxAsync<T> takeUntil(FutureOr<bool> Function(T a) f) => takeUntilInclusive(f);
 
+  /// Skips the first [count] values.
   FxAsync<T> drop(int count) => FxAsync(_$dropAsync(count, _inner));
 
+  /// Drops the last [count] values.
   FxAsync<T> dropRight(int count) => FxAsync(_$dropRightAsync(count, _inner));
 
+  /// Drops leading values while [f] holds, then yields the rest.
   FxAsync<T> dropWhile(FutureOr<bool> Function(T a) f) =>
       FxAsync(_$dropWhileAsync(f, _inner));
 
+  /// Skips values until [f] matches (dropping the match), yields the rest.
   FxAsync<T> dropUntil(FutureOr<bool> Function(T a) f) =>
       FxAsync(_$dropUntilAsync(f, _inner));
 
+  /// The half-open index range `[start, end)` (to the end when [end] is null).
   FxAsync<T> slice(int start, [int? end]) =>
       FxAsync(_$sliceAsync(start, _inner, end));
 
+  /// Groups consecutive values into lists of up to [size].
   FxAsync<List<T>> chunk(int size) => FxAsync(_$chunkAsync(size, _inner));
 
+  /// Applies [f] to each value without changing it.
   FxAsync<T> peek(FutureOr<void> Function(T a) f) =>
       FxAsync(_$peekAsync(f, _inner));
 
+  /// Distinct values, keeping the first occurrence of each.
   FxAsync<T> uniq() => FxAsync(_$uniqAsync(_inner));
 
+  /// Distinct by the key [f] returns, keeping the first of each key.
   FxAsync<T> uniqBy<B>(FutureOr<B> Function(T a) f) =>
       FxAsync(_$uniqByAsync(f, _inner));
 
+  /// Pairs each value with the value at the same position in [other],
+  /// stopping at the shorter side.
   FxAsync<(T, U)> zip<U>(FxAsyncIterable<U> other) =>
       FxAsync(_$zipAsync(_inner, other));
 
+  /// Pairs each value with its index.
   FxAsync<(int, T)> zipWithIndex() => FxAsync(_$zipWithIndexAsync(_inner));
 
+  /// Yields the chain, then [a].
   FxAsync<T> append(FutureOr<T> a) => FxAsync(_$appendAsync(a, _inner));
 
+  /// Yields [a], then the chain.
   FxAsync<T> prepend(FutureOr<T> a) => FxAsync(_$prependAsync(a, _inner));
 
+  /// Yields this chain followed by [other].
   FxAsync<T> concat(FxAsyncIterable<T> other) =>
       FxAsync(_$concatAsync(_inner, other));
 
+  /// Emits [seed], then each running accumulation as [f] folds in each value.
   FxAsync<B> scan<B>(FutureOr<B> Function(B acc, T a) f, FutureOr<B> seed) =>
       FxAsync(_$scanAsync(f, seed, _inner));
 
+  /// The values in reverse order (materializes the source).
   FxAsync<T> reverse() => FxAsync(_$reverseAsync(_inner));
 
+  /// Repeats the source endlessly.
   FxAsync<T> cycle() => FxAsync(_$cycleAsync(_inner));
 
   /// Evaluates the upstream chain up to [length] items at a time.
@@ -3465,57 +3633,79 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Materializes the async pipeline into a [List].
   Future<List<T>> toList() => _$toListAsync(_inner);
 
+  /// Runs [f] for every value, forcing the pipeline.
   Future<void> each(FutureOr<void> Function(T a) f) => _$eachAsync(f, _inner);
 
+  /// Consumes up to [n] values (all when omitted), forcing side effects.
   Future<void> consume([int? n]) => _$consumeAsync(_inner, n);
 
+  /// Folds every value with [f], seeding from the first value.
   Future<T> reduce(FutureOr<T> Function(T acc, T a) f) =>
       _$reduceAsync(f, _inner);
 
+  /// Folds every value with [f], starting from [seed].
   Future<Acc> fold<Acc>(
           FutureOr<Acc> seed, FutureOr<Acc> Function(Acc acc, T a) f) =>
       _$foldAsync(seed, f, _inner);
 
+  /// Groups values into lists keyed by [f].
   Future<Map<K, List<T>>> groupBy<K>(FutureOr<K> Function(T a) f) =>
       _$groupByAsync(f, _inner);
 
+  /// Maps the key [f] returns to its value (later values win on collisions).
   Future<Map<K, T>> indexBy<K>(FutureOr<K> Function(T a) f) =>
       _$indexByAsync(f, _inner);
 
+  /// Counts how many values fall under each key [f] returns.
   Future<Map<K, int>> countBy<K>(FutureOr<K> Function(T a) f) =>
       _$countByAsync(f, _inner);
 
+  /// Whether [f] holds for at least one value.
   Future<bool> some(FutureOr<bool> Function(T a) f) => _$someAsync(f, _inner);
 
+  /// Whether [f] holds for every value.
   Future<bool> every(FutureOr<bool> Function(T a) f) => _$everyAsync(f, _inner);
 
+  /// Joins the values into a string separated by [sep].
   Future<String> join([String sep = ',']) => _$joinAsync(sep, _inner);
 
+  /// The first value [f] matches, or `null`.
   Future<T?> find(FutureOr<bool> Function(T a) f) => _$findAsync(f, _inner);
 
+  /// The index of the first value [f] matches, or -1.
   Future<int> findIndex(FutureOr<bool> Function(T a) f) =>
       _$findIndexAsync(f, _inner);
 
+  /// The first value, or `null` if empty.
   Future<T?> head() => _$headAsync(_inner);
 
+  /// The last value, or `null` if empty.
   Future<T?> last() => _$lastAsync(_inner);
 
+  /// The value with the smallest key [f], or `null` if empty.
   Future<T?> minBy(Object? Function(T a) f) => _$minByAsync(f, _inner);
 
+  /// The value with the largest key [f], or `null` if empty.
   Future<T?> maxBy(Object? Function(T a) f) => _$maxByAsync(f, _inner);
 
+  /// The sum of [f] over every value.
   Future<num> sumBy(FutureOr<num> Function(T a) f) => _$sumByAsync(f, _inner);
 
+  /// The mean of [f] over every value.
   Future<double> averageBy(FutureOr<num> Function(T a) f) =>
       _$averageByAsync(f, _inner);
 
+  /// Splits into `(matches, non-matches)` by [f].
   Future<(List<T>, List<T>)> partition(FutureOr<bool> Function(T a) f) =>
       _$partitionAsync(f, _inner);
 
+  /// A new list sorted by the comparator [f].
   Future<List<T>> sort(int Function(T a, T b) f) => _$sortAsync(f, _inner);
 
+  /// A new list sorted by the key [f] returns for each value.
   Future<List<T>> sortBy(Object? Function(T a) f) => _$sortByAsync(f, _inner);
 
+  /// The number of values.
   Future<int> size() => _$sizeAsync(_inner);
 
   // --- Dart-idiomatic aliases -------------------------------------------
@@ -3577,9 +3767,16 @@ class FxAsync<T> implements FxAsyncIterable<T> {
 /// Numeric terminals for [FxAsync] chains (generic covariance makes these
 /// apply to `FxAsync<int>` and `FxAsync<double>` as well).
 extension FxAsyncNum on FxAsync<num> {
+  /// The sum of every value.
   Future<num> sum() => _$sumAsync(this);
+
+  /// The arithmetic mean of every value.
   Future<double> average() => _$averageAsync(this);
+
+  /// The smallest value.
   Future<num> min() => _$minAsync(this);
+
+  /// The largest value.
   Future<num> max() => _$maxAsync(this);
 }
 

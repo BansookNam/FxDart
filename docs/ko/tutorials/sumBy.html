@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>sumBy — FxDart 101</title>
-  <meta name="description" content="FxDart sumBy tutorial: sum a key of every element — map + sum in one step — with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/sumBy.html">
+  <meta name="description" content="FxDart sumBy 튜토리얼 — 모든 원소의 키를 더합니다. map + sum을 한 단계로. 라이브 플레이그라운드 포함.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/sumBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/sumBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/sumBy.html">
@@ -43,38 +42,37 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 7 · 집계 › <strong>sumBy</strong></p>
   <h1><code>sumBy</code></h1>
-  <p class="hero-sub">Sum a key of every element — <code>map</code> + <code>sum</code> in one step, <code>0</code> when empty.</p>
+  <p class="hero-sub">모든 원소의 키를 더합니다 — <code>map</code> + <code>sum</code>을 한 단계로, 비어 있으면 <code>0</code>입니다.</p>
 
   <div class="signature">num sumBy&lt;A&gt;(num Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;num&gt; sumByAsync&lt;A&gt;(FutureOr&lt;num&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 num Fx&lt;T&gt;.sumBy(num Function(T a) f)          // chain (sync)
 Future&lt;num&gt; FxAsync&lt;T&gt;.sumBy(FutureOr&lt;num&gt; Function(T a) f)  // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    <code>sumBy</code> collapses the most common two-stage tail in data
-    pipelines — <code>.map((x) =&gt; x.field).sum()</code> — into a single
-    terminal. It folds a running total while extracting the key, so nothing
-    intermediate is materialized and the intent ("total this field") is one
-    call instead of a projection plus an aggregation.
+    <code>sumBy</code>는 데이터 파이프라인에서 가장 흔한 두 단계 꼬리 —
+    <code>.map((x) =&gt; x.field).sum()</code> — 를 하나의 종결 연산으로
+    합칩니다. 키를 뽑아내면서 누적 합을 함께 fold하므로 중간 결과가
+    실체화되지 않고, 의도("이 필드를 합산한다")가 투영 + 집계 두 단계가
+    아니라 한 번의 호출로 표현됩니다.
   </p>
   <p>
-    The contract is <code><a href="sum.html">sum</a></code>'s: an empty
-    pipeline totals to <code>0</code>, and int keys keep int arithmetic
-    while any double key promotes the total to <code>double</code>.
+    동작 규약은 <code><a href="sum.html">sum</a></code>과 같습니다. 빈
+    파이프라인의 합은 <code>0</code>이고, <code>int</code> 키는 정수
+    연산을 유지하지만 <code>double</code> 키가 하나라도 있으면 합이
+    <code>double</code>로 승격됩니다.
   </p>
   <p>
-    This is a Dart-native addition (FxTS ships only the numeric
-    <code>sum</code>), in the same family as
-    <code><a href="maxBy.html">maxBy</a></code> /
-    <code><a href="minBy.html">minBy</a></code> — Kotlin spells it
-    <code>sumOf</code>.
+    이것은 Dart 고유의 추가 기능입니다(FxTS는 숫자용 <code>sum</code>만
+    제공합니다). <code><a href="maxBy.html">maxBy</a></code> /
+    <code><a href="minBy.html">minBy</a></code>와 같은 계열이며,
+    Kotlin에서는 <code>sumOf</code>라고 부릅니다.
   </p>
 
-  <h2>Demo 1 · Basics &amp; the empty case</h2>
+  <h2>데모 1 · 기본 사용법 &amp; 빈 경우</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -98,7 +96,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async keys</h2>
+  <h2>데모 2 · 비동기 키</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -114,8 +112,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: total the long words' lengths with one call.</p>
+  <h2>직접 해 보기</h2>
+  <p>연습: 긴 단어들의 길이를 한 번의 호출로 합산해 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -133,10 +131,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="sum.html"><code>sum</code></a> — when the pipeline already holds numbers ·
-    <a href="maxBy.html"><code>maxBy</code></a> · <a href="minBy.html"><code>minBy</code></a> — the same by-key family ·
-    <a href="fold.html"><code>fold</code></a> — the general shape this specializes
+    <strong>관련 함수:</strong>
+    <a href="sum.html"><code>sum</code></a> — 파이프라인이 이미 숫자를 담고 있을 때 ·
+    <a href="maxBy.html"><code>maxBy</code></a> · <a href="minBy.html"><code>minBy</code></a> — 같은 by-key 계열 ·
+    <a href="fold.html"><code>fold</code></a> — 이 함수가 특수화한 일반형
   </div>
 
   <nav class="tut-nav">
