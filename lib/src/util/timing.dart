@@ -13,6 +13,9 @@ class Debounced<T> {
   Debounced._(this._func, this._wait, {required bool leading})
       : _leading = leading;
 
+  /// Registers a call with [arg], (re)starting the wait window. The wrapped
+  /// function runs on the trailing edge (or immediately, once per idle
+  /// window, when constructed with `leading: true`).
   void call(T arg) {
     final callNow = _leading && _timer == null;
     _timer?.cancel();
@@ -59,6 +62,9 @@ class Throttled<T> {
       : _leading = leading,
         _trailing = trailing;
 
+  /// Registers a call with [arg]. The wrapped function runs at most once per
+  /// [wait] window — on the leading edge, the trailing edge, or both, per the
+  /// flags passed to [throttle].
   void call(T arg) {
     final now = DateTime.now();
     final last = _lastCallTime;

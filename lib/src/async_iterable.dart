@@ -8,23 +8,29 @@ import 'dart:async';
 ///
 /// Port of FxTS `Concurrent` (`Lazy/concurrent.ts`).
 class Concurrent {
+  /// How many upstream items to evaluate at once.
   final int length;
 
+  /// Creates a marker requesting [length]-way concurrent evaluation.
   const Concurrent(this.length);
 
+  /// Alias for the default constructor, mirroring FxTS's `Concurrent.of`.
   static Concurrent of(int length) => Concurrent(length);
 }
 
 /// The result of one pull from an [FxAsyncIterator] — a port of the JS
 /// `IteratorResult` (`{done, value}`).
 class IterResult<T> {
+  /// Whether the iterator is exhausted. When true, [value] is absent.
   final bool done;
   final T? _value;
 
+  /// A terminal result — the iterator has no more values.
   const IterResult.done()
       : done = true,
         _value = null;
 
+  /// A result carrying the next [value].
   const IterResult.value(T value)
       : done = false,
         _value = value;
@@ -43,6 +49,8 @@ class IterResult<T> {
 /// `n` items at once by passing a [Concurrent] marker through `next()`.
 /// This protocol is a faithful port of the JS `AsyncIterator` as FxTS uses it.
 abstract interface class FxAsyncIterator<T> {
+  /// Pulls the next result. Passing a [Concurrent] marker asks the upstream
+  /// chain to evaluate that many items at once, in order.
   Future<IterResult<T>> next([Concurrent? concurrent]);
 }
 
@@ -52,6 +60,7 @@ abstract interface class FxAsyncIterator<T> {
 /// Consume it with `toListAsync`, `eachAsync`, `reduceAsync`, the
 /// [FxAsync] chain, or convert it to a [Stream] with [toStream].
 abstract interface class FxAsyncIterable<T> {
+  /// A fresh [FxAsyncIterator] positioned at the start of this iterable.
   FxAsyncIterator<T> get iterator;
 }
 
@@ -59,6 +68,7 @@ abstract interface class FxAsyncIterable<T> {
 class DelegateAsyncIterable<T> implements FxAsyncIterable<T> {
   final FxAsyncIterator<T> Function() _make;
 
+  /// Wraps a factory invoked once per [iterator] access.
   const DelegateAsyncIterable(this._make);
 
   @override
@@ -69,6 +79,7 @@ class DelegateAsyncIterable<T> implements FxAsyncIterable<T> {
 class DelegateAsyncIterator<T> implements FxAsyncIterator<T> {
   final Future<IterResult<T>> Function(Concurrent? concurrent) _next;
 
+  /// Wraps a `next` closure as an [FxAsyncIterator].
   const DelegateAsyncIterator(this._next);
 
   @override
@@ -82,6 +93,7 @@ class SerialAsyncIterator<T> implements FxAsyncIterator<T> {
   final Future<IterResult<T>> Function(Concurrent? concurrent) _inner;
   Future<void> _prev = Future.value();
 
+  /// Wraps [_inner], chaining each pull after the previous one settles.
   SerialAsyncIterator(this._inner);
 
   @override
@@ -137,6 +149,7 @@ FxAsyncIterable<T> fromStream<T>(Stream<T> stream) {
   });
 }
 
+/// Bridges the pull-based async protocol back to a push-based [Stream].
 extension FxAsyncIterableToStream<T> on FxAsyncIterable<T> {
   /// Drives this async iterable sequentially and emits its values as a
   /// [Stream]. The [Concurrent] back-channel is not used; apply
@@ -157,17 +170,29 @@ sealed class Settled<T> {
   const Settled();
 }
 
+/// A [Future] that completed with a [value].
 class Fulfilled<T> extends Settled<T> {
+  /// The value the future completed with.
   final T value;
+
+  /// Wraps a successful [value].
   const Fulfilled(this.value);
 }
 
+/// A [Future] that completed with an [error].
 class Rejected<T> extends Settled<T> {
+  /// The error the future completed with.
   final Object error;
+
+  /// The stack trace captured when the future failed.
   final StackTrace stackTrace;
+
+  /// Wraps a failure ([error] plus its [stackTrace]).
   const Rejected(this.error, this.stackTrace);
 }
 
+/// Awaits every future in [futures], capturing each outcome as a [Settled] so
+/// one rejection never fails the whole batch. Port of `Promise.allSettled`.
 Future<List<Settled<T>>> settleAll<T>(Iterable<Future<T>> futures) {
   return Future.wait(futures.map((f) => f
       .then<Settled<T>>((v) => Fulfilled(v))

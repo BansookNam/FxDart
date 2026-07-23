@@ -1,3 +1,17 @@
+## 0.5.2
+
+### Docs
+
+* Documented the full public API — every `fx()` / async chain method, the
+  Dart-idiomatic aliases, the async iterator protocol types (`Concurrent`,
+  `IterResult`, …), and the `.curried` / `.uncurried` extensions now carry
+  dartdoc comments. Coverage went from 65.7 % to ~100 % of the exported API.
+
+### Packaging
+
+* Moved the runnable Dart example to `example/fxdart_example.dart` so pub.dev
+  recognises it (was nested under `example/dart_example/`).
+
 ## 0.5.1
 
 ### Docs
