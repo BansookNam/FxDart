@@ -1,3 +1,10 @@
+## 0.5.1
+
+### Docs
+
+* List the by-key aggregates (`sumBy`, `averageBy`, `minBy`, `maxBy`) in the
+  README operator table.
+
 ## 0.5.0
 
 ### Added

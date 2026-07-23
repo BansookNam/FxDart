@@ -105,7 +105,7 @@ express it.
 | **Filter (lazy)** | `filter`, `reject`, `compact`, `uniq`, `uniqBy`, `difference(By)`, `intersection(By)`, `compress` |
 | **Slice (lazy)** | `take`, `takeRight`, `takeWhile`, `takeUntilInclusive`, `drop`, `dropRight`, `dropWhile`, `dropUntil`, `slice`, `chunk`, `split` |
 | **Combine (lazy)** | `append`, `prepend`, `concat`, `zip`, `zip3`, `zipWith`, `zipWithIndex`, `transpose`, `reverse`, `fork` |
-| **Aggregate** | `reduce`, `fold`, `reduceLazy`, `toList`, `sum`, `average`, `min`, `max`, `size`, `join`, `groupBy`, `indexBy`, `countBy`, `sort`, `sortBy`, `toSorted`, `partition`, `each`, `consume` |
+| **Aggregate** | `reduce`, `fold`, `reduceLazy`, `toList`, `sum`, `sumBy`, `average`, `averageBy`, `min`, `minBy`, `max`, `maxBy`, `size`, `join`, `groupBy`, `indexBy`, `countBy`, `sort`, `sortBy`, `toSorted`, `partition`, `each`, `consume` |
 | **Access** | `head`, `last`, `nth`, `find`, `findIndex`, `includes`, `isEmpty`, `every`, `some` |
 | **Object (Map)** | `omit`, `pick`, `omitBy`, `pickBy`, `prop`, `props`, `evolve`, `fromEntries`, `compactObject`, `resolveProps`, `isMatch`, `matches` |
 | **Function** | `pipe`, `pipe1`, `pipeLazy`, `identity`, `always`, `tap`, `apply`, `juxt`, `memoize`, `negate`, `not`, `when`, `unless`, `throwError`, `throwIf`, `cases`, `add`, `gt`, `gte`, `lt`, `lte`, `delay`, `sleep`, `unicodeToArray`, `.curried`/`.uncurried` (extension getters, arity 2–5) |
