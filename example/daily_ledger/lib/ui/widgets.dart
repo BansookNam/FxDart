@@ -1,6 +1,123 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../logic/summaries.dart';
+
+/// Base URL of the FxDart 101 tutorials — each function has its own lecture at
+/// `<base><fn>.html`. Absolute (not relative to `Uri.base`) so the links reach
+/// the live docs even when the demo runs on localhost.
+const _tutorialBase = 'https://bansooknam.github.io/FxDart/tutorials/';
+
+/// FxDart function names that have a 101 lecture page. An identifier appearing
+/// in a pipeline formula/op that matches one of these is rendered as a link to
+/// its tutorial; everything else (args, `monthGrid`, `→`, …) stays plain text.
+/// Kept in sync with `docs/tutorials/*.html`.
+const _linkableFns = <String>{
+  'add', 'always', 'append', 'apply', 'average', 'averageBy', 'chunk',
+  'compact', 'compactObject', 'compress', 'concat', 'concurrent',
+  'concurrentPool', 'consume', 'countBy', 'createSeededRandom', 'cycle',
+  'debounce', 'delay', 'difference', 'differenceBy', 'drop', 'dropRight',
+  'dropUntil', 'dropWhile', 'each', 'entries', 'every', 'evolve', 'filter',
+  'find', 'findIndex', 'flat', 'flatMap', 'fold', 'fork', 'fromEntries', 'fx',
+  'groupBy', 'head', 'identity', 'includes', 'indexBy', 'intersection',
+  'intersectionBy', 'isEmpty', 'isMatch', 'join', 'juxt', 'keys', 'last',
+  'map', 'mapEffect', 'matches', 'max', 'maxBy', 'memoize', 'min', 'minBy',
+  'negate', 'not', 'nth', 'omit', 'omitBy', 'partition', 'peek', 'pick',
+  'pickBy', 'pipe', 'pipe1', 'pluck', 'prepend', 'prop', 'props', 'range',
+  'reduce', 'reduceLazy', 'reject', 'repeat', 'resolveProps', 'reverse',
+  'scan', 'shuffle', 'size', 'slice', 'some', 'sort', 'sortBy', 'split', 'sum',
+  'sumBy', 'take', 'takeRight', 'takeUntilInclusive', 'takeWhile', 'tap',
+  'throttle', 'throwError', 'throwIf', 'toAsync', 'toList', 'transpose',
+  'unicodeToArray', 'unicodeToList', 'uniq', 'uniqBy', 'unless', 'values',
+  'when', 'zip', 'zipWith', 'zipWithIndex',
+};
+
+/// Matches an FxDart-style identifier (letters, digits, underscores).
+final _identifier = RegExp(r'[A-Za-z_][A-Za-z0-9_]*');
+
+Future<void> _openTutorial(String fn) => launchUrl(
+  Uri.parse('$_tutorialBase$fn.html'),
+  webOnlyWindowName: '_blank',
+);
+
+/// Renders a pipeline op/formula string as monospace text where every FxDart
+/// function name is a link to its 101 lecture (opens in a new tab). Owns the
+/// tap recognisers so they are disposed with the widget.
+class LinkedPipelineText extends StatefulWidget {
+  final String text;
+  final double fontSize;
+
+  /// Colour for the non-link parts. Links always use the primary colour.
+  final Color? baseColor;
+  const LinkedPipelineText(
+    this.text, {
+    super.key,
+    this.fontSize = 13,
+    this.baseColor,
+  });
+
+  @override
+  State<LinkedPipelineText> createState() => _LinkedPipelineTextState();
+}
+
+class _LinkedPipelineTextState extends State<LinkedPipelineText> {
+  final List<TapGestureRecognizer> _recognizers = [];
+
+  void _clearRecognizers() {
+    for (final r in _recognizers) {
+      r.dispose();
+    }
+    _recognizers.clear();
+  }
+
+  @override
+  void dispose() {
+    _clearRecognizers();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _clearRecognizers();
+    final theme = Theme.of(context);
+    final base = TextStyle(
+      fontFamily: 'monospace',
+      fontSize: widget.fontSize,
+      color: widget.baseColor,
+    );
+    final link = base.copyWith(
+      color: theme.colorScheme.primary,
+      decoration: TextDecoration.underline,
+      decorationColor: theme.colorScheme.primary.withValues(alpha: 0.5),
+    );
+
+    final spans = <InlineSpan>[];
+    var cursor = 0;
+    for (final m in _identifier.allMatches(widget.text)) {
+      if (m.start > cursor) {
+        spans.add(TextSpan(text: widget.text.substring(cursor, m.start)));
+      }
+      final word = m[0]!;
+      if (_linkableFns.contains(word)) {
+        final recognizer = TapGestureRecognizer()
+          ..onTap = () => _openTutorial(word);
+        _recognizers.add(recognizer);
+        spans.add(
+          TextSpan(text: word, style: link, recognizer: recognizer),
+        );
+      } else {
+        spans.add(TextSpan(text: word));
+      }
+      cursor = m.end;
+    }
+    if (cursor < widget.text.length) {
+      spans.add(TextSpan(text: widget.text.substring(cursor)));
+    }
+
+    return Text.rich(TextSpan(style: base, children: spans));
+  }
+}
 
 /// One step of a pipeline explanation: the operator, what it does here, and
 /// the **live** value it produced for the data currently on screen.
@@ -68,10 +185,7 @@ Future<void> showPipelineDialog(BuildContext context, PipelineExplanation e) {
                   color: theme.colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(
-                  e.formula,
-                  style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
-                ),
+                child: LinkedPipelineText(e.formula),
               ),
               const SizedBox(height: 12),
               for (final (i, step) in e.steps.indexed) ...[
@@ -98,13 +212,9 @@ Future<void> showPipelineDialog(BuildContext context, PipelineExplanation e) {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
-                                child: Text(
+                                child: LinkedPipelineText(
                                   step.op,
-                                  style: TextStyle(
-                                    fontFamily: 'monospace',
-                                    fontSize: 13,
-                                    color: theme.colorScheme.primary,
-                                  ),
+                                  baseColor: theme.colorScheme.onSurfaceVariant,
                                 ),
                               ),
                               const SizedBox(width: 8),
