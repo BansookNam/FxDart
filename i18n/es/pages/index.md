@@ -13,6 +13,13 @@ description: FxDart es una librería de programación funcional para Dart, porta
     es una sola llamada.
   </p>
 
+  <p>
+    <a class="demo-cta" href="{{root}}DailyLedger/">
+      <span class="demo-cta-emoji">📒</span>
+      Míralo en acción: Daily Ledger — una app completa hecha con FxDart&nbsp;→
+    </a>
+  </p>
+
   {{playground:0}}
   <p class="dim">▲ Esto está vivo: edita el código y pulsa <strong>Ejecutar</strong>.
     Se compila con el compilador real de Dart y se ejecuta en tu navegador.</p>

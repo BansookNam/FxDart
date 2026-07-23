@@ -13,6 +13,13 @@ description: FxDart は FxTS から移植された Dart 向けの関数型プロ
     必要なのはメソッド呼び出し1つだけです。
   </p>
 
+  <p>
+    <a class="demo-cta" href="{{root}}DailyLedger/">
+      <span class="demo-cta-emoji">📒</span>
+      実際のアプリで確認: Daily Ledger — FxDart で作られたフル機能アプリ&nbsp;→
+    </a>
+  </p>
+
   {{playground:0}}
   <p class="dim">▲ これは実際に動きます。コードを編集して <strong>Run</strong> を押してください。
     本物の Dart コンパイラでコンパイルされ、ブラウザ上で実行されます。</p>

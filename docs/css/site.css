@@ -128,6 +128,21 @@ th { background: var(--bg-soft); }
 }
 .fn-list a:hover { border-color: var(--accent); color: var(--accent-strong); }
 
+/* big call-to-action button (e.g. the Daily Ledger demo app) */
+.demo-cta {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  margin: 1.4rem 0 0.4rem;
+  padding: 0.85rem 1.6rem;
+  background: linear-gradient(135deg, #00b894, #006b54);
+  color: #fff; text-decoration: none;
+  font-size: 1.05rem; font-weight: 700; line-height: 1.3;
+  border-radius: 999px;
+  box-shadow: 0 4px 18px rgba(0, 184, 148, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.demo-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0, 184, 148, 0.5); }
+.demo-cta .demo-cta-emoji { font-size: 1.3rem; }
+
 /* pros / cons */
 .proscons { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 @media (max-width: 640px) { .proscons { grid-template-columns: 1fr; } }

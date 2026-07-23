@@ -13,6 +13,13 @@ description: FxDart — библиотека функционального пр
     это один вызов метода.
   </p>
 
+  <p>
+    <a class="demo-cta" href="{{root}}DailyLedger/">
+      <span class="demo-cta-emoji">📒</span>
+      Посмотрите в деле: Daily Ledger — полноценное приложение на FxDart&nbsp;→
+    </a>
+  </p>
+
   {{playground:0}}
   <p class="dim">▲ Это живой пример — измените код и нажмите <strong>Запустить</strong>.
     Он компилируется настоящим компилятором Dart и выполняется в вашем браузере.</p>
