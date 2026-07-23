@@ -37,6 +37,39 @@ programming model, rebuilt on Dart's type system.
 
 See the [installation guide](https://pub.dev/packages/fxdart/install) on pub.dev for the latest version.
 
+## AI agent skills
+
+fxdart ships an [Agent Skill](https://agentskills.io) (`skills/fxdart-pipelines/`)
+that teaches AI coding assistants — Claude Code, Codex, Devin, Antigravity,
+OpenCode, pi, and anything reading `.agents/skills/` — when and how to use
+fxdart for collections, concurrent Futures, Streams, and complex flow logic.
+
+Install it with the community [`skills`](https://pub.dev/packages/skills) CLI
+(auto-detects your IDE/agent):
+
+```sh
+dart pub global activate skills
+skills get fxdart
+```
+
+Or with fxdart's built-in zero-dependency installer:
+
+```sh
+# From a project that depends on fxdart:
+dart run fxdart:install_skills              # auto-detects agent dirs in the project
+dart run fxdart:install_skills claude codex # or name agents explicitly
+dart run fxdart:install_skills all --global # per-user dirs (~/.claude/skills, ~/.agents/skills, ...)
+
+# Or standalone:
+dart pub global activate fxdart
+fxdart_skills --global claude
+```
+
+Supported agents: `claude` (`.claude/skills/`), `codex` / `antigravity` /
+`generic` (`.agents/skills/`), `devin` (`.devin/skills/`), `opencode`
+(`.opencode/skills/`), `pi` (`.pi/skills/`, global `~/.pi/agent/skills/`).
+`--list` shows install status; `--remove` uninstalls.
+
 ## Usage
 
 ### Sync pipelines

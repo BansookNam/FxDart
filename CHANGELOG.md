@@ -1,3 +1,18 @@
+## 0.5.3
+
+### Added
+
+* **AI agent skill** (`skills/fxdart-pipelines/`) following the
+  [Agent Skills](https://agentskills.io) spec — teaches coding assistants
+  when to reach for fxdart (collections, bounded-concurrency Futures,
+  Streams, complex flow logic) and the patterns/pitfalls that matter.
+  Compatible with the community `skills` CLI (`skills get fxdart`).
+* **`dart run fxdart:install_skills`** (also `fxdart_skills` via
+  `dart pub global activate fxdart`) — zero-dependency installer that copies
+  the bundled skills into Claude Code, Codex, Devin, Antigravity, OpenCode,
+  pi, or generic `.agents/skills/` directories, project-local or `--global`,
+  with `--list` and `--remove`.
+
 ## 0.5.2
 
 ### Docs

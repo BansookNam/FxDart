@@ -1,7 +1,10 @@
 name: fxdart
 description: A functional programming library for Dart, ported from FxTS. Lazy evaluation, concurrent async iteration, and pipeline-style composition.
-version: 0.5.2
+version: 0.5.3
 homepage: https://github.com/bansooknam/fxDart
+
+executables:
+  fxdart_skills: install_skills
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
