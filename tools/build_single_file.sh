@@ -243,6 +243,26 @@ num _$min(Iterable<num> iterable) => min(iterable);
 Future<num> _$minAsync(FxAsyncIterable<num> iterable) => minAsync(iterable);
 num _$max(Iterable<num> iterable) => max(iterable);
 Future<num> _$maxAsync(FxAsyncIterable<num> iterable) => maxAsync(iterable);
+A? _$minBy<A>(Object? Function(A a) f, Iterable<A> iterable) =>
+    minBy(f, iterable);
+Future<A?> _$minByAsync<A>(
+        Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
+    minByAsync(f, iterable);
+A? _$maxBy<A>(Object? Function(A a) f, Iterable<A> iterable) =>
+    maxBy(f, iterable);
+Future<A?> _$maxByAsync<A>(
+        Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
+    maxByAsync(f, iterable);
+num _$sumBy<A>(num Function(A a) f, Iterable<A> iterable) =>
+    sumBy(f, iterable);
+Future<num> _$sumByAsync<A>(
+        FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    sumByAsync(f, iterable);
+double _$averageBy<A>(num Function(A a) f, Iterable<A> iterable) =>
+    averageBy(f, iterable);
+Future<double> _$averageByAsync<A>(
+        FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    averageByAsync(f, iterable);
 int _$size<A>(Iterable<A> iterable) => size(iterable);
 Future<int> _$sizeAsync<A>(FxAsyncIterable<A> iterable) => sizeAsync(iterable);
 Future<String> _$joinAsync<A>(String sep, FxAsyncIterable<A> iterable) =>

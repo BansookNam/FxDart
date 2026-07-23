@@ -1961,6 +1961,21 @@ Acc Function(Iterable<A>) reduceLazy<A, Acc>(
 /// Port of FxTS `sum`.
 num sum(Iterable<num> iterable) => fold<num, num>(0, (a, b) => a + b, iterable);
 
+/// Sums the key [f] of every element — `map` + [sum] in one step, so a
+/// pipeline that only needs a field total doesn't spell out the projection.
+///
+/// Empty input returns `0` (the [sum] contract).
+///
+/// Dart-native addition (FxTS has only the numeric `sum`); named after
+/// [maxBy]/[minBy] — Kotlin spells it `sumOf`.
+num sumBy<A>(num Function(A a) f, Iterable<A> iterable) =>
+    fold<A, num>(0, (acc, a) => acc + f(a), iterable);
+
+/// Async counterpart of [sumBy].
+Future<num> sumByAsync<A>(
+        FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    foldAsync<A, num>(0, (acc, a) async => acc + await f(a), iterable);
+
 /// Async counterpart of [sum].
 Future<num> sumAsync(FxAsyncIterable<num> iterable) =>
     foldAsync<num, num>(0, (a, b) => a + b, iterable);
@@ -1993,6 +2008,34 @@ Future<double> averageAsync(FxAsyncIterable<num> iterable) async {
   return size == 0 ? double.nan : total / size;
 }
 
+/// Averages the key [f] of every element — `map` + [average] in one step.
+///
+/// Empty input returns `double.nan` (the [average] contract).
+///
+/// Dart-native addition completing the by-key family
+/// ([sumBy] / [maxBy] / [minBy]).
+double averageBy<A>(num Function(A a) f, Iterable<A> iterable) {
+  var total = 0.0;
+  var count = 0;
+  for (final a in iterable) {
+    total += f(a);
+    count++;
+  }
+  return count == 0 ? double.nan : total / count;
+}
+
+/// Async counterpart of [averageBy].
+Future<double> averageByAsync<A>(
+    FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  var total = 0.0;
+  var count = 0;
+  await eachAsync((A a) async {
+    total += await f(a);
+    count++;
+  }, iterable);
+  return count == 0 ? double.nan : total / count;
+}
+
 num _minOf(num acc, num a) => a.isNaN || acc.isNaN
     ? double.nan
     : a < acc
@@ -2020,6 +2063,72 @@ num max(Iterable<num> iterable) => fold(-double.infinity, _maxOf, iterable);
 /// Async counterpart of [max].
 Future<num> maxAsync(FxAsyncIterable<num> iterable) =>
     foldAsync(-double.infinity, _maxOf, iterable);
+
+/// Returns the element whose key [f] is smallest, or `null` when empty.
+///
+/// Keys are compared like [sortBy] compares them ([Comparable.compare]);
+/// on ties the **first** encountered element wins. One O(n) walk — no sort.
+///
+/// Dart-native addition (FxTS has only numeric `min`); named after Kotlin's
+/// `minByOrNull` shape, nullable like [head]/[last].
+A? minBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
+  A? best;
+  var seen = false;
+  for (final a in iterable) {
+    if (!seen || _compareBy(f, a, best as A) < 0) {
+      best = a;
+      seen = true;
+    }
+  }
+  return best;
+}
+
+/// Async counterpart of [minBy].
+Future<A?> minByAsync<A>(
+    Object? Function(A a) f, FxAsyncIterable<A> iterable) async {
+  A? best;
+  var seen = false;
+  await eachAsync((A a) {
+    if (!seen || _compareBy(f, a, best as A) < 0) {
+      best = a;
+      seen = true;
+    }
+  }, iterable);
+  return best;
+}
+
+/// Returns the element whose key [f] is largest, or `null` when empty.
+///
+/// Keys are compared like [sortBy] compares them ([Comparable.compare]);
+/// on ties the **first** encountered element wins. One O(n) walk — no sort.
+///
+/// Dart-native addition (FxTS has only numeric `max`); named after Kotlin's
+/// `maxByOrNull` shape, nullable like [head]/[last].
+A? maxBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
+  A? best;
+  var seen = false;
+  for (final a in iterable) {
+    if (!seen || _compareBy(f, a, best as A) > 0) {
+      best = a;
+      seen = true;
+    }
+  }
+  return best;
+}
+
+/// Async counterpart of [maxBy].
+Future<A?> maxByAsync<A>(
+    Object? Function(A a) f, FxAsyncIterable<A> iterable) async {
+  A? best;
+  var seen = false;
+  await eachAsync((A a) {
+    if (!seen || _compareBy(f, a, best as A) > 0) {
+      best = a;
+      seen = true;
+    }
+  }, iterable);
+  return best;
+}
 
 /// Returns the number of elements.
 ///
@@ -3230,6 +3339,14 @@ class Fx<T> extends Iterable<T> {
 
   T? head() => _$head(_inner);
 
+  T? minBy(Object? Function(T a) f) => _$minBy(f, _inner);
+
+  T? maxBy(Object? Function(T a) f) => _$maxBy(f, _inner);
+
+  num sumBy(num Function(T a) f) => _$sumBy(f, _inner);
+
+  double averageBy(num Function(T a) f) => _$averageBy(f, _inner);
+
   (List<T>, List<T>) partition(bool Function(T a) f) => _$partition(f, _inner);
 
   int size() => _$size(_inner);
@@ -3382,6 +3499,15 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   Future<T?> head() => _$headAsync(_inner);
 
   Future<T?> last() => _$lastAsync(_inner);
+
+  Future<T?> minBy(Object? Function(T a) f) => _$minByAsync(f, _inner);
+
+  Future<T?> maxBy(Object? Function(T a) f) => _$maxByAsync(f, _inner);
+
+  Future<num> sumBy(FutureOr<num> Function(T a) f) => _$sumByAsync(f, _inner);
+
+  Future<double> averageBy(FutureOr<num> Function(T a) f) =>
+      _$averageByAsync(f, _inner);
 
   Future<(List<T>, List<T>)> partition(FutureOr<bool> Function(T a) f) =>
       _$partitionAsync(f, _inner);
@@ -3621,6 +3747,26 @@ num _$min(Iterable<num> iterable) => min(iterable);
 Future<num> _$minAsync(FxAsyncIterable<num> iterable) => minAsync(iterable);
 num _$max(Iterable<num> iterable) => max(iterable);
 Future<num> _$maxAsync(FxAsyncIterable<num> iterable) => maxAsync(iterable);
+A? _$minBy<A>(Object? Function(A a) f, Iterable<A> iterable) =>
+    minBy(f, iterable);
+Future<A?> _$minByAsync<A>(
+        Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
+    minByAsync(f, iterable);
+A? _$maxBy<A>(Object? Function(A a) f, Iterable<A> iterable) =>
+    maxBy(f, iterable);
+Future<A?> _$maxByAsync<A>(
+        Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
+    maxByAsync(f, iterable);
+num _$sumBy<A>(num Function(A a) f, Iterable<A> iterable) =>
+    sumBy(f, iterable);
+Future<num> _$sumByAsync<A>(
+        FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    sumByAsync(f, iterable);
+double _$averageBy<A>(num Function(A a) f, Iterable<A> iterable) =>
+    averageBy(f, iterable);
+Future<double> _$averageByAsync<A>(
+        FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    averageByAsync(f, iterable);
 int _$size<A>(Iterable<A> iterable) => size(iterable);
 Future<int> _$sizeAsync<A>(FxAsyncIterable<A> iterable) => sizeAsync(iterable);
 Future<String> _$joinAsync<A>(String sep, FxAsyncIterable<A> iterable) =>
