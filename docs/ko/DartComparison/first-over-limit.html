@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>First sensor reading over the limit — Dart vs FxDart</title>
   <meta name="description" content="Find the first temperature above a threshold — skipWhile + firstOrNull in plain Dart vs dropWhile + head in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/first-over-limit.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/first-over-limit.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/first-over-limit.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/first-over-limit.html">
@@ -44,29 +43,28 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #6 · <strong>First sensor reading over the limit</strong></p>
   <h1>First sensor reading over the limit</h1>
-  <p class="cmp-meta"><span class="badge verdict-native">Native is fine</span></p>
+  <p class="cmp-meta"><span class="badge verdict-native">네이티브로 충분</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/head.html">head</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    A temperature sensor logs a reading every ten minutes. Find the
-    <strong>first</strong> reading over the <strong>75.0 C</strong> limit and
-    print its time and value — or a fallback line if none crossed it. The
-    data is in the code below; both versions must print the line shown under
-    <em>Expected output</em>.
+    온도 센서가 10분마다 측정값을 기록합니다. <strong>75.0 C</strong>
+    한계를 넘는 <strong>첫 번째</strong> 측정값을 찾아 시각과 값을
+    출력하세요 — 넘은 값이 없다면 대체 문구를 출력합니다. 데이터는
+    아래 코드에 있으며, 두 버전 모두 <em>예상 출력</em> 아래에
+    표시된 줄을 출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">First over 75.0 C: 09:40 at 76.3 C</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -137,20 +135,22 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    They don't — and here plain Dart is the honest pick. Core
-    <code>skipWhile</code> plus <code>firstOrNull</code> (from
-    <code>package:collection</code>) is a clean, lazy one-liner that says
-    exactly what it means, with the same nullable result to handle. FxDart's
-    <code>dropWhile → head</code> is the same idea under FxTS names — worth
-    using if the rest of your file is already FxDart chains, but nobody
-    should add a library for this line. When native Dart wins, we say so.
+    둘은 다르지 않습니다 — 그리고 여기서는 순수 Dart가 정직한
+    선택입니다. 핵심 <code>skipWhile</code>과
+    <code>package:collection</code>의 <code>firstOrNull</code>을 조합한
+    코드는 뜻을 그대로 말하는 깔끔한 지연 평가 한 줄이며, null 가능
+    결과 처리도 동일합니다. FxDart의 <code>dropWhile → head</code>는
+    같은 아이디어를 FxTS 이름으로 표현한 것일 뿐입니다 — 파일의
+    나머지가 이미 FxDart 체인이라면 쓸 만하지만, 이 한 줄만을 위해
+    라이브러리를 추가해야 할 사람은 없을 것입니다. 순수 Dart가 이길
+    때는, 그렇다고 솔직히 말합니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="average-basket.html">← 이전: Average order value over $100</a>
-    <a href="top-log-level.html">다음: Most frequent log level →</a>
+    <a href="average-basket.html">← 이전: 100달러 초과 주문의 평균값</a>
+    <a href="top-log-level.html">다음: 가장 많이 발생한 로그 레벨 →</a>
   </nav>
 </main>
 <footer class="site-footer">

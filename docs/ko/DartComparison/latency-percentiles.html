@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>p50/p95 latency per endpoint — Dart vs FxDart</title>
-  <meta name="description" content="Percentile table from raw request logs — groupBy + sortBy + nth per endpoint vs a row-accumulating loop with in-place sorts.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/latency-percentiles.html">
+  <title>엔드포인트별 p50/p95 지연 시간 — Dart vs FxDart</title>
+  <meta name="description" content="원본 요청 로그로부터 백분위수 표를 만듭니다 — 엔드포인트별 groupBy + sortBy + nth와 제자리 정렬을 쓰는 행 누적 루프를 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/latency-percentiles.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/latency-percentiles.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/latency-percentiles.html">
@@ -44,23 +43,22 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #39 · <strong>p50/p95 latency per endpoint</strong></p>
-  <h1>p50/p95 latency per endpoint</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #39 · <strong>엔드포인트별 p50/p95 지연 시간</strong></p>
+  <h1>엔드포인트별 p50/p95 지연 시간</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/nth.html">nth</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    From raw request logs (data in the code), drop failed requests and
-    compute <strong>p50 and p95 latency per endpoint</strong>: sort each
-    endpoint's latencies and take the value at index
-    <code>round((n-1) * q / 100)</code>. Print a table sorted by worst p95
-    first, then call out the worst endpoint. Both versions must print the
-    table under <em>Expected output</em>.
+    원본 요청 로그(데이터는 코드에 있음)에서 실패한 요청을 제외하고,
+    <strong>엔드포인트별 p50 및 p95 지연 시간</strong>을 계산하세요: 각
+    엔드포인트의 지연 시간을 정렬한 뒤 인덱스
+    <code>round((n-1) * q / 100)</code>의 값을 취합니다. p95가 가장 나쁜
+    순서로 정렬된 표를 출력하고, 가장 나쁜 엔드포인트를 별도로 알려주세요.
+    두 버전 모두 <em>예상 출력</em> 아래에 표시된 표를 출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">Latency percentiles (successful requests only)
   /orders  p50 133 ms  p95 620 ms  (5 reqs)
   /search  p50 210 ms  p95 480 ms  (4 reqs)
@@ -68,10 +66,10 @@
 Worst p95: /orders at 620 ms</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -183,24 +181,23 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    A percentile is "sort, then index" — in FxDart that is literally
-    <code><a href="../tutorials/sortBy.html">sortBy</a></code> + <code><a href="../tutorials/nth.html">nth</a></code>, applied inside a
-    <code><a href="../tutorials/groupBy.html">groupBy</a></code> → <code><a href="../tutorials/map.html">map</a></code> pipeline that turns each
-    endpoint group into a stats row; ranking the table and finding the worst
-    endpoint reuse the same rows with <code><a href="../tutorials/sortBy.html">sortBy</a></code> and
-    <code><a href="../tutorials/maxBy.html">maxBy</a></code>. The native version does the same math but through a
-    mutable row list filled in a <code>for</code> loop, an in-place
-    <code>..sort()</code>, raw index access, and a <code>reduce</code>
-    comparator for the maximum. Both are correct; the fxdart side keeps
-    "group → summarize → rank" as three visible strokes instead of one loop
-    doing all three at once.
+    백분위수는 "정렬한 다음 인덱싱"입니다 — FxDart에서는 이것이 그대로
+    <code><a href="../tutorials/sortBy.html">sortBy</a></code> + <code><a href="../tutorials/nth.html">nth</a></code>이며, 각 엔드포인트 그룹을 통계
+    행으로 바꾸는 <code><a href="../tutorials/groupBy.html">groupBy</a></code> → <code><a href="../tutorials/map.html">map</a></code> 파이프라인 안에
+    적용됩니다. 표를 순위별로 나열하고 가장 나쁜 엔드포인트를 찾는 부분도
+    같은 행들을 <code><a href="../tutorials/sortBy.html">sortBy</a></code>와 <code><a href="../tutorials/maxBy.html">maxBy</a></code>로 재사용합니다.
+    네이티브 버전은 같은 계산을 하지만 <code>for</code> 루프로 채우는
+    가변 행 리스트, 제자리 <code>..sort()</code>, 원시 인덱스 접근, 최댓값을
+    위한 <code>reduce</code> 비교자를 거칩니다. 둘 다 정확하지만, fxdart
+    쪽은 "그룹화 → 요약 → 순위화"를 한 루프가 한꺼번에 처리하는 대신 눈에
+    보이는 세 번의 붓질로 유지합니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="alert-digest.html">← 이전: Log alert digest by service and severity</a>
-    <a href="ledger-diff.html">다음: Diff two ledger snapshots →</a>
+    <a href="alert-digest.html">← 이전: 서비스와 심각도별 로그 알림 다이제스트</a>
+    <a href="ledger-diff.html">다음: 두 가계부 스냅샷 비교 →</a>
   </nav>
 </main>
 <footer class="site-footer">

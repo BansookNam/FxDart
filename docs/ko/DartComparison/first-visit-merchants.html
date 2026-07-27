@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Merchants in first-visit order — Dart vs FxDart</title>
   <meta name="description" content="Order-preserving dedupe — a seen-set loop in plain Dart vs map + uniq in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/first-visit-merchants.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/first-visit-merchants.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/first-visit-merchants.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/first-visit-merchants.html">
@@ -44,28 +43,28 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #4 · <strong>Merchants in first-visit order</strong></p>
   <h1>Merchants in first-visit order</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/uniq.html">uniq</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    From a month of transactions, list each merchant <strong>once</strong>,
-    in the order it was <strong>first visited</strong> — repeat visits must
-    not move a merchant later in the list. The data is in the code below;
-    both versions must print the line shown under <em>Expected output</em>.
+    한 달치 거래 내역에서 각 판매자를 <strong>한 번씩만</strong>,
+    <strong>처음 방문한</strong> 순서대로 나열하세요 — 재방문이 있어도
+    그 판매자를 목록 뒤쪽으로 옮기면 안 됩니다. 데이터는 아래 코드에
+    있으며, 두 버전 모두 <em>예상 출력</em> 아래에 표시된 줄을
+    출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">Cafe Aroma, Metro Card, Green Grocer, Noodle Bar</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 class Tx {
@@ -133,22 +132,22 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    The tempting native one-liner is <code>toSet().toList()</code> — and it
-    would even print the right thing, because Dart's default set happens to
-    be insertion-ordered. But the <code>Iterable.toSet</code> contract
-    promises no order at all, so code whose <em>requirement</em> is
-    first-visit order shouldn't lean on it; the honest native version is a
-    seen-set loop with two collections and an <code>if</code>. FxDart's
-    <code><a href="../tutorials/uniq.html">uniq</a></code> makes the guarantee part of the name: it lazily keeps
-    the first occurrence of each element, by contract, as one chain step
-    after <code><a href="../tutorials/map.html">map</a></code>.
+    솔깃한 네이티브 한 줄짜리 해법은 <code>toSet().toList()</code>이고,
+    실제로도 맞는 결과를 출력합니다. Dart의 기본 세트가 삽입 순서를
+    유지하기 때문입니다. 하지만 <code>Iterable.toSet</code>의 계약은
+    순서를 전혀 보장하지 않으므로, <em>요구사항</em>이 첫 방문
+    순서인 코드가 여기에 기대서는 안 됩니다. 정직한 네이티브 버전은
+    두 개의 컬렉션과 <code>if</code> 하나를 쓰는 seen-set 루프입니다.
+    FxDart의 <code><a href="../tutorials/uniq.html">uniq</a></code>는 그 보장 자체를 이름에 담고 있습니다:
+    각 원소의 첫 등장을 계약에 따라 지연 평가로 유지하며,
+    <code><a href="../tutorials/map.html">map</a></code> 뒤에 체인 한 단계로 붙습니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="top-expenses.html">← 이전: Top 3 largest expenses</a>
-    <a href="average-basket.html">다음: Average order value over $100 →</a>
+    <a href="top-expenses.html">← 이전: 가장 큰 지출 상위 3건</a>
+    <a href="average-basket.html">다음: 100달러 초과 주문의 평균값 →</a>
   </nav>
 </main>
 <footer class="site-footer">

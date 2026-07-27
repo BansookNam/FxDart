@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Running account balance — Dart vs FxDart</title>
-  <meta name="description" content="Balance after every transaction — a mutable accumulator loop in plain Dart vs scan + map in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/running-balance.html">
+  <title>계좌 잔액 추이 — Dart vs FxDart</title>
+  <meta name="description" content="매 거래 후의 잔액 — 순수 Dart의 가변 누산 루프 대 FxDart의 scan + map.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/running-balance.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/running-balance.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/running-balance.html">
@@ -44,22 +43,22 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #2 · <strong>Running account balance</strong></p>
-  <h1>Running account balance</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #2 · <strong>계좌 잔액 추이</strong></p>
+  <h1>계좌 잔액 추이</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    An account opens July with a <strong>$250.00</strong> balance and sees six
-    signed transactions — salary in, rent and groceries out. Print one
-    currency line per step: the opening balance first, then the balance
-    <strong>after each transaction</strong>. The data is in the code below;
-    both versions must print the lines shown under <em>Expected output</em>.
+    한 계좌가 7월에 <strong>$250.00</strong> 잔액으로 열리고, 부호가
+    있는 거래 여섯 건을 겪습니다 — 급여 입금, 임대료와 식료품비 출금.
+    통화 형식으로 한 단계마다 한 줄씩 출력하세요: 먼저 개시 잔액,
+    그다음 <strong>각 거래 후의 잔액</strong>. 데이터는 아래 코드에
+    있으며, 두 버전 모두 <em>예상 출력</em> 아래에 표시된 줄을 출력해야
+    합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">Opening balance $250.00
 Salary          $2850.00
 Rent            $1700.00
@@ -69,10 +68,10 @@ Electric Co     $1624.96
 Cafe Aroma      $1615.16</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 class Tx {
@@ -143,23 +142,23 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    Core Dart has <code>fold</code>, which collapses the list to the
-    <em>final</em> balance — but this task needs every intermediate one, and
-    there is no <code><a href="../tutorials/scan.html">scan</a></code>. So the native version falls back to a
-    mutable <code>balance</code> variable threaded through a loop, and the
-    formatting is interleaved with the accumulation. FxDart's
-    <code><a href="../tutorials/scan.html">scan</a></code> yields each accumulated state as a value (the seed
-    first — which lands the opening-balance line for free), and
-    <code><a href="../tutorials/map.html">map</a></code> formats afterwards as a separate, swappable step.
-    Running state as a pipeline stage instead of a mutation is exactly the
-    vocabulary Dart is missing here.
+    순수 Dart에는 <code>fold</code>가 있지만, 이는 리스트를
+    <em>최종</em> 잔액 하나로 축약할 뿐입니다 — 이 작업은 중간 단계
+    잔액이 모두 필요한데, <code><a href="../tutorials/scan.html">scan</a></code>이 없습니다. 그래서 네이티브
+    버전은 가변 <code>balance</code> 변수를 루프에 꿰어 넣는 방식으로
+    돌아가고, 포맷팅이 누산 과정과 뒤섞입니다. FxDart의
+    <code><a href="../tutorials/scan.html">scan</a></code>은 누적된 각 상태를 값으로 내보내며(시드가 먼저
+    나오므로 개시 잔액 줄이 공짜로 딸려 옵니다), <code><a href="../tutorials/map.html">map</a></code>은
+    그 뒤에 별개의, 교체 가능한 단계로 포맷팅합니다. 누적 상태를
+    변이가 아니라 파이프라인 단계로 다루는 것, 바로 이것이 여기서
+    Dart에 없는 어휘입니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="food-spending.html">← 이전: Food spending this month</a>
-    <a href="top-expenses.html">다음: Top 3 largest expenses →</a>
+    <a href="food-spending.html">← 이전: 이번 달 식비 합계</a>
+    <a href="top-expenses.html">다음: 가장 큰 지출 상위 3건 →</a>
   </nav>
 </main>
 <footer class="site-footer">

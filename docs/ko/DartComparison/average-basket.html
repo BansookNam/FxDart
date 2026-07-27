@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Average order value over $100 — Dart vs FxDart</title>
-  <meta name="description" content="Mean total of large orders — where/map/average with package:collection vs filter + averageBy in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/average-basket.html">
+  <title>100달러 초과 주문의 평균값 — Dart vs FxDart</title>
+  <meta name="description" content="고액 주문의 평균 총액을 구합니다 — package:collection을 사용한 where/map/average와 FxDart의 filter + averageBy를 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/average-basket.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/average-basket.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/average-basket.html">
@@ -44,28 +43,27 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #5 · <strong>Average order value over $100</strong></p>
-  <h1>Average order value over $100</h1>
-  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #5 · <strong>100달러 초과 주문의 평균값</strong></p>
+  <h1>100달러 초과 주문의 평균값</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/averageBy.html">averageBy</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    From a batch of shop orders, take only those totalling <strong>over
-    $100</strong> and print their <strong>average value</strong> as a
-    currency amount. The data is in the code below; both versions must print
-    the line shown under <em>Expected output</em>.
+    한 무더기의 상점 주문 중에서 총액이 <strong>100달러를 초과하는</strong>
+    것만 골라 그 <strong>평균값</strong>을 통화 형식으로 출력하세요. 데이터는
+    아래 코드에 있으며, 두 버전 모두 <em>예상 출력</em> 아래에 표시된 줄을
+    출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">Average large-order value: $203.81</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -134,16 +132,17 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    Honestly: they don't, much — a tie. Core Dart alone would need a
-    fold-and-count (or a sum divided by a length, walking the data twice),
-    but <code>package:collection</code>'s <code>.average</code> closes that
-    gap, leaving <code>where → map → average</code> against
-    <code>filter → averageBy</code>. FxDart saves the intermediate
-    <code>map</code> by taking the key function directly, and
-    <code><a href="../tutorials/averageBy.html">averageBy</a></code> is one word instead of an extension property on a
-    projected iterable — vocabulary, not victory. Both read fine.
+    솔직히 말하면: 별로 차이가 없습니다 — 무승부입니다. 순수 Dart 코어만
+    쓴다면 fold-and-count(또는 데이터를 두 번 순회하며 합을 길이로 나누는
+    방식)가 필요하겠지만, <code>package:collection</code>의
+    <code>.average</code>가 그 간극을 메워줘서 결국
+    <code>where → map → average</code>와 <code>filter → averageBy</code>의
+    비교가 됩니다. FxDart는 키 함수를 직접 받음으로써 중간의 <code>map</code>
+    단계를 생략하고, <code><a href="../tutorials/averageBy.html">averageBy</a></code>는 투영된 iterable에 대한 확장
+    프로퍼티 대신 한 단어로 표현됩니다 — 승리라기보다는 어휘의 차이입니다.
+    둘 다 읽기에 무리가 없습니다.
   </p>
 
   <nav class="tut-nav">

@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>All tags across posts, sorted — Dart vs FxDart</title>
-  <meta name="description" content="Flatten post tags into one sorted, distinct list — expand + toSet + sort in plain Dart vs flatMap + uniq + sort in FxDart. An honest tie.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/unique-tags.html">
+  <title>모든 게시물의 태그를 정렬해 모으기 — Dart vs FxDart</title>
+  <meta name="description" content="게시물 태그를 하나의 정렬된 중복 없는 리스트로 평탄화합니다 — 순수 Dart의 expand + toSet + sort와 FxDart의 flatMap + uniq + sort를 비교합니다. 정직한 무승부입니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/unique-tags.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/unique-tags.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/unique-tags.html">
@@ -44,29 +43,28 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #14 · <strong>All tags across posts, sorted</strong></p>
-  <h1>All tags across posts, sorted</h1>
-  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #14 · <strong>모든 게시물의 태그를 정렬해 모으기</strong></p>
+  <h1>모든 게시물의 태그를 정렬해 모으기</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/sort.html">sort</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    Each blog post carries a list of tags. Build the site's tag index: flatten
-    every post's tags into one sequence, drop duplicates, sort
-    alphabetically, and print them as a single comma-separated line. The data
-    is in the code below; both versions must print the line shown under
-    <em>Expected output</em>.
+    각 블로그 게시물은 태그 리스트를 가지고 있습니다. 사이트의 태그
+    색인을 만드세요: 모든 게시물의 태그를 하나의 시퀀스로 평탄화하고,
+    중복을 제거하고, 알파벳순으로 정렬한 뒤, 쉼표로 구분된 한 줄로
+    출력합니다. 데이터는 아래 코드에 있으며, 두 버전 모두 <em>예상
+    출력</em> 아래에 표시된 줄을 출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">async, concurrency, dart, fp, iterables, recipes, streams</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 class Post {
@@ -123,21 +121,23 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    They barely do. <code>expand</code> is Dart's <code><a href="../tutorials/flatMap.html">flatMap</a></code>,
-    <code>toSet()</code> deduplicates, and a cascade <code>..sort()</code>
-    finishes the job — that one-liner is honest, idiomatic Dart and there is
-    nothing wrong with it. FxDart spells the same three steps as named chain
-    links (<code>flatMap → uniq → sort</code>), which reads slightly more
-    like the requirement and keeps the order-preserving <code><a href="../tutorials/uniq.html">uniq</a></code>
-    explicit rather than a side effect of choosing a <code>Set</code>. Pick
-    whichever your codebase already speaks — this one is a tie.
+    거의 차이가 없습니다. <code>expand</code>는 Dart판
+    <code><a href="../tutorials/flatMap.html">flatMap</a></code>이고, <code>toSet()</code>이 중복을 제거하며,
+    캐스케이드 <code>..sort()</code>가 마무리합니다 — 그 한 줄짜리
+    코드는 정직하고 관용적인 Dart이며 흠잡을 데가 없습니다. FxDart는
+    같은 세 단계를 이름 붙은 체인 링크(<code>flatMap → uniq →
+    sort</code>)로 표현하는데, 이는 요구사항을 조금 더 그대로 읽히게
+    하고, 순서를 보존하는 <code><a href="../tutorials/uniq.html">uniq</a></code>를 <code>Set</code>을
+    선택한 부수 효과가 아니라 명시적인 단계로 드러냅니다. 여러분의
+    코드베이스가 이미 쓰고 있는 쪽을 고르세요 — 이번 예제는
+    무승부입니다.
   </p>
 
   <nav class="tut-nav">
     <a href="date-window-spend.html">← 이전: Spending inside a date window</a>
-    <a href="refunds-vs-charges.html">다음: Refunds vs charges, both formatted →</a>
+    <a href="refunds-vs-charges.html">다음: 환불과 청구, 둘 다 포맷팅 →</a>
   </nav>
 </main>
 <footer class="site-footer">

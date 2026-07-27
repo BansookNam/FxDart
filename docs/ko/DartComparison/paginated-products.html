@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Paginated product listing — Dart vs FxDart</title>
-  <meta name="description" content="Filter, sort by price, and slice out page 2 — Dart already has skip/take, so this one is a genuine tie.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/paginated-products.html">
+  <title>페이지네이션된 상품 목록 — Dart vs FxDart</title>
+  <meta name="description" content="필터링하고 가격순으로 정렬한 뒤 2페이지를 잘라냅니다 — Dart에는 이미 skip/take가 있으므로 이번에는 진짜 무승부입니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/paginated-products.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/paginated-products.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/paginated-products.html">
@@ -44,32 +43,30 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #22 · <strong>Paginated product listing</strong></p>
-  <h1>Paginated product listing</h1>
-  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #22 · <strong>페이지네이션된 상품 목록</strong></p>
+  <h1>페이지네이션된 상품 목록</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/take.html">take</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    A small shop catalog: name, price, in-stock flag. Show
-    <strong>page 2</strong> of the in-stock products, sorted by price
-    ascending, three per page — one line per product. The data is in the
-    code below; both versions must print the lines shown under
-    <em>Expected output</em>.
+    작은 상점의 카탈로그: 이름, 가격, 재고 여부. 재고가 있는 상품을
+    가격 오름차순으로 정렬하고, 페이지당 세 개씩 <strong>2페이지</strong>를
+    보여주세요 — 상품 하나에 한 줄씩. 데이터는 아래 코드에 있으며, 두
+    버전 모두 <em>예상 출력</em> 아래에 표시된 줄을 출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">Page 2 of in-stock products:
 Milk Frother — $24.90
 Cold Brew Jar — $27.80
 Scale — $42.00</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 class Product {
@@ -151,21 +148,23 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    They barely do — this is a tie, and it is worth saying plainly.
-    Pagination is exactly the shape Dart's <code>Iterable</code> already
-    covers: <code>skip</code> and <code><a href="../tutorials/take.html">take</a></code> read just as well as
-    FxDart's <code><a href="../tutorials/drop.html">drop</a></code> and <code><a href="../tutorials/take.html">take</a></code>, and both stay lazy.
-    The only native wrinkle is sorting by a key — core Dart needs a
-    comparator (<code>package:collection</code>'s <code>sortedBy</code>
-    closes even that). Pick FxDart here only if the rest of the codebase
-    already speaks its vocabulary; plain Dart loses nothing on this task.
+    거의 차이가 없습니다 — 이건 무승부이며, 이 점은 분명히 말할 가치가
+    있습니다. 페이지네이션은 Dart의 <code>Iterable</code>이 이미 잘
+    다루는 형태 그대로입니다: <code>skip</code>과 <code><a href="../tutorials/take.html">take</a></code>는
+    FxDart의 <code><a href="../tutorials/drop.html">drop</a></code>, <code><a href="../tutorials/take.html">take</a></code>만큼이나 읽기 좋고,
+    둘 다 지연 평가를 유지합니다. 네이티브 쪽의 유일한 걸림돌은 키
+    기준 정렬입니다 — 순수 Dart는 비교자가 필요합니다
+    (<code>package:collection</code>의 <code>sortedBy</code>가 이마저도
+    해결해 줍니다). 나머지 코드베이스가 이미 FxDart의 어휘를 쓰고
+    있을 때만 여기서 FxDart를 고르세요. 이 작업에서 순수 Dart는
+    아무것도 잃지 않습니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="monthly-category-report.html">← 이전: Monthly category report, sorted by spend</a>
-    <a href="weekly-sensor-averages.html">다음: Weekly averages from daily readings →</a>
+    <a href="monthly-category-report.html">← 이전: 지출액순으로 정렬한 월간 카테고리 리포트</a>
+    <a href="weekly-sensor-averages.html">다음: 일별 측정값으로 구하는 주간 평균 →</a>
   </nav>
 </main>
 <footer class="site-footer">

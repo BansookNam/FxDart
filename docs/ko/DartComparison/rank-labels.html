@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Rank labels for a leaderboard — Dart vs FxDart</title>
-  <meta name="description" content="Number a sorted leaderboard 1..n — Dart 3 indexed records vs zipWithIndex + map in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/rank-labels.html">
+  <title>리더보드 순위 라벨 — Dart vs FxDart</title>
+  <meta name="description" content="정렬된 리더보드에 1부터 n까지 번호를 매깁니다 — Dart 3의 indexed 레코드와 FxDart의 zipWithIndex + map을 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/rank-labels.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/rank-labels.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/rank-labels.html">
@@ -44,21 +43,20 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #9 · <strong>Rank labels for a leaderboard</strong></p>
-  <h1>Rank labels for a leaderboard</h1>
-  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #9 · <strong>리더보드 순위 라벨</strong></p>
+  <h1>리더보드 순위 라벨</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    A leaderboard is already sorted by score, highest first. Print one rank
-    label per player — <strong>1-based position, name, score</strong>. The
-    data is in the code below; both versions must print the lines shown
-    under <em>Expected output</em>.
+    리더보드는 이미 점수 내림차순으로 정렬되어 있습니다. 선수마다 순위
+    라벨을 하나씩 출력하세요 — <strong>1부터 시작하는 순위, 이름,
+    점수</strong>. 데이터는 아래 코드에 있으며, 두 버전 모두 <em>예상
+    출력</em> 아래에 표시된 줄을 출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">1. Hana (982 pts)
 2. Dan (951 pts)
 3. Ava (917 pts)
@@ -67,10 +65,10 @@
 6. Ben (799 pts)</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 class Player {
@@ -133,22 +131,22 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    Only in name. Dart 3's <code>indexed</code> yields exactly the
-    <code>(index, element)</code> records that FxDart's
-    <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> does, so the two <code><a href="../tutorials/map.html">map</a></code> callbacks
-    are character-for-character identical — a clean tie, and a good example
-    of Dart's core library catching up (before records and
-    <code>indexed</code>, the native side was a manual counter). Use
-    <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> when you're already inside an <code><a href="../tutorials/fx.html">fx</a></code>
-    chain — it also exists on async chains — and <code>indexed</code>
-    everywhere else.
+    이름만 다를 뿐입니다. Dart 3의 <code>indexed</code>는 FxDart의
+    <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code>와 정확히 같은 <code>(index, element)</code>
+    레코드를 만들어내므로, 두 <code><a href="../tutorials/map.html">map</a></code> 콜백은 글자 하나까지
+    동일합니다 — 깔끔한 무승부이며, Dart 코어 라이브러리가 따라잡고
+    있음을 보여주는 좋은 예입니다(레코드와 <code>indexed</code>가
+    나오기 전에는 네이티브 쪽이 수동 카운터였습니다). 이미
+    <code><a href="../tutorials/fx.html">fx</a></code> 체인 안에 있다면 <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code>를
+    쓰세요 — 이는 비동기 체인에도 존재합니다 — 그 외의 모든 곳에서는
+    <code>indexed</code>를 쓰세요.
   </p>
 
   <nav class="tut-nav">
-    <a href="paginate-users.html">← 이전: Batch users into pages of 10</a>
-    <a href="sequential-configs.html">다음: Load three remote configs in order →</a>
+    <a href="paginate-users.html">← 이전: 사용자를 10명씩 페이지로 나누기</a>
+    <a href="sequential-configs.html">다음: 원격 설정 세 개를 순서대로 불러오기 →</a>
   </nav>
 </main>
 <footer class="site-footer">

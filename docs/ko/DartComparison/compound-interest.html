@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Compound interest table — Dart vs FxDart</title>
-  <meta name="description" content="A year-by-year balance table at 5% — a mutating accumulator loop in plain Dart vs range + scan + map in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/compound-interest.html">
+  <title>복리 이자 테이블 — Dart vs FxDart</title>
+  <meta name="description" content="연 5%의 연도별 잔액 테이블입니다 — 순수 Dart의 가변 누산 루프와 FxDart의 range + scan + map을 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/compound-interest.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/compound-interest.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/compound-interest.html">
@@ -44,22 +43,20 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #16 · <strong>Compound interest table</strong></p>
-  <h1>Compound interest table</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #16 · <strong>복리 이자 테이블</strong></p>
+  <h1>복리 이자 테이블</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    Print a year-by-year balance table for <strong>$1000 at 5%</strong>
-    compound interest over six years — one line per year, starting from the
-    year-0 opening balance, each amount formatted to two decimals. The
-    constants are in the code below; both versions must print the lines
-    shown under <em>Expected output</em>.
+    <strong>1000달러, 연 5%</strong> 복리로 6년간 불어나는 연도별 잔액
+    테이블을 출력하세요 — 0년차 시작 잔액부터 한 줄씩, 각 금액은 소수점
+    둘째 자리까지 표시합니다. 상수는 아래 코드에 있으며, 두 버전 모두
+    <em>예상 출력</em> 아래에 표시된 줄을 출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">year 0: $1000.00
 year 1: $1050.00
 year 2: $1102.50
@@ -69,10 +66,10 @@ year 5: $1276.28
 year 6: $1340.10</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 const principal = 1000.0;
@@ -113,23 +110,23 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    A running balance is a <em>running fold</em>, and core Dart has no word
-    for it: <code>fold</code> gives only the final value, so the native
-    version falls back to a loop that seeds a list with the year-0 line,
-    mutates <code>balance</code>, and appends — the compounding rule, the
-    iteration, and the formatting all share one body. FxDart's
-    <code><a href="../tutorials/scan.html">scan</a></code> turns each intermediate balance into a value in the
-    pipeline: the seed is the year-0 row, the compounding rule is one pure
-    function, and formatting is a separate <code><a href="../tutorials/map.html">map</a></code> step. Want the
-    year the balance first passes $1200? Chain a filter — the loop version
-    has to grow another flag instead.
+    누적 잔액은 <em>누적 fold</em>이며, 순수 Dart 코어에는 이를 가리키는
+    단어가 없습니다: <code>fold</code>는 최종값만 내놓으므로, 네이티브
+    버전은 0년차 줄로 리스트를 초기화하고 <code>balance</code>를 변경하며
+    값을 추가하는 루프로 돌아갑니다 — 복리 계산 규칙, 반복, 형식 지정이
+    모두 하나의 본문 안에 뒤섞여 있습니다. FxDart의 <code><a href="../tutorials/scan.html">scan</a></code>은
+    중간 잔액 각각을 파이프라인의 값으로 만들어줍니다: 시드는 0년차
+    행이고, 복리 계산 규칙은 하나의 순수 함수이며, 형식 지정은 별도의
+    <code><a href="../tutorials/map.html">map</a></code> 단계입니다. 잔액이 처음으로 1200달러를 넘는 연도를
+    알고 싶다면? 필터 하나를 체인에 이으면 됩니다 — 루프 버전은 대신
+    플래그를 하나 더 늘려야 합니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="refunds-vs-charges.html">← 이전: Refunds vs charges, both formatted</a>
-    <a href="sensor-anomalies.html">다음: Pair sensors with readings, keep anomalies →</a>
+    <a href="refunds-vs-charges.html">← 이전: 환불과 청구, 둘 다 포맷팅</a>
+    <a href="sensor-anomalies.html">다음: 센서와 측정값 짝짓고 이상치 찾기 →</a>
   </nav>
 </main>
 <footer class="site-footer">

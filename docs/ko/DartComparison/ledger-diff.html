@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Diff two ledger snapshots — Dart vs FxDart</title>
-  <meta name="description" content="Added, removed, and unchanged entries between two snapshots — differenceBy and intersectionBy by id vs hand-built id sets and where filters.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/ledger-diff.html">
+  <title>두 가계부 스냅샷 비교 — Dart vs FxDart</title>
+  <meta name="description" content="두 스냅샷 사이의 추가/삭제/불변 항목을 찾습니다 — id 기준 differenceBy와 intersectionBy를 직접 만든 id 집합과 where 필터 조합과 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/ledger-diff.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/ledger-diff.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/ledger-diff.html">
@@ -44,23 +43,22 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #40 · <strong>Diff two ledger snapshots</strong></p>
-  <h1>Diff two ledger snapshots</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #40 · <strong>두 가계부 스냅샷 비교</strong></p>
+  <h1>두 가계부 스냅샷 비교</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/differenceBy.html">differenceBy</a></li><li><a href="../tutorials/intersectionBy.html">intersectionBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concat.html">concat</a></li><li><a href="../tutorials/size.html">size</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    Two snapshots of the same ledger (data in the code): a sync happened in
-    between, and entries were added and removed. Print a diff keyed by
-    entry id — <code>+</code> lines for added entries, <code>-</code> lines
-    for removed ones (each section sorted by id), the count of unchanged
-    entries, and the net change in total amount. Both versions must print
-    the diff under <em>Expected output</em>.
+    같은 가계부의 두 스냅샷(데이터는 코드에 있음): 그 사이에 동기화가
+    일어나면서 항목이 추가되거나 삭제되었습니다. 항목 id를 기준으로 diff를
+    출력하세요 — 추가된 항목은 <code>+</code> 줄, 삭제된 항목은
+    <code>-</code> 줄로 표시하고(각 구간은 id로 정렬), 변경되지 않은 항목의
+    개수와 총액의 순변화량도 출력하세요. 두 버전 모두 <em>예상 출력</em>
+    아래에 표시된 diff를 출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">Ledger diff (5 -&gt; 5 entries)
 + t6 Noodle Bar $18.90
 + t7 Pharmacy $22.40
@@ -70,10 +68,10 @@
 Net change: -$3.70</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -191,24 +189,24 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    Diffing is set algebra over a key, and FxDart ships the vocabulary:
-    <code><a href="../tutorials/differenceBy.html">differenceBy</a></code> called both ways gives added and removed,
-    <code><a href="../tutorials/intersectionBy.html">intersectionBy</a></code> gives the unchanged entries — three
-    declarations that read like the definition of a diff. The
-    <code><a href="../tutorials/sortBy.html">sortBy</a></code> → <code><a href="../tutorials/map.html">map</a></code> → <code><a href="../tutorials/concat.html">concat</a></code> pipeline
-    then renders both sections in one expression. Native Dart has set
-    operations only for <code>Set</code> itself, not for "by this key of
-    these objects", so the honest version manually projects id sets and
-    writes a negated <code>contains</code> filter per direction — easy to
-    get backwards, and the intent ("what's in B but not A?") lives in the
-    predicate's polarity rather than in a function name.
+    diff를 만드는 일은 키를 기준으로 한 집합 연산이며, FxDart는 그
+    어휘를 그대로 제공합니다: <code><a href="../tutorials/differenceBy.html">differenceBy</a></code>를 양방향으로
+    호출하면 추가분과 삭제분이 나오고, <code><a href="../tutorials/intersectionBy.html">intersectionBy</a></code>는
+    변경되지 않은 항목을 줍니다 — 세 줄의 선언이 diff의 정의 그 자체처럼
+    읽힙니다. 이어지는 <code><a href="../tutorials/sortBy.html">sortBy</a></code> → <code><a href="../tutorials/map.html">map</a></code> →
+    <code><a href="../tutorials/concat.html">concat</a></code> 파이프라인은 두 구간을 하나의 식으로 렌더링합니다.
+    순수 Dart는 <code>Set</code> 자체에 대한 집합 연산만 제공할 뿐 "이
+    객체들을 이 키 기준으로"라는 연산은 없으므로, 정직한 버전은 id 집합을
+    직접 투영하고 방향마다 부정된 <code>contains</code> 필터를 작성해야
+    합니다 — 방향을 거꾸로 하기 쉽고, "B에는 있는데 A에는 없는 것은?"이라는
+    의도가 함수 이름이 아니라 술어의 극성(polarity)에 숨어 있게 됩니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="latency-percentiles.html">← 이전: p50/p95 latency per endpoint</a>
-    <a href="concurrent-profile-fetch.html">다음: Fetch 10 profiles, 3 at a time →</a>
+    <a href="latency-percentiles.html">← 이전: 엔드포인트별 p50/p95 지연 시간</a>
+    <a href="concurrent-profile-fetch.html">다음: 프로필 10개를 세 개씩 가져오기 →</a>
   </nav>
 </main>
 <footer class="site-footer">

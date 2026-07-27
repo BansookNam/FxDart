@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Detect duplicated transactions — Dart vs FxDart</title>
   <meta name="description" content="Flag charges with the same merchant, amount, and day — putIfAbsent plus nested loops in plain Dart vs groupBy + filter + flatMap in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/duplicate-transactions.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/duplicate-transactions.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/duplicate-transactions.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/duplicate-transactions.html">
@@ -44,24 +43,23 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #29 · <strong>Detect duplicated transactions</strong></p>
   <h1>Detect duplicated transactions</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    A charge that appears twice with the same <strong>merchant, amount,
-    and day</strong> is probably a double-swipe. Find every such group in
-    July's transactions and list <em>each transaction involved</em> so
-    the user can review them — but do not flag the same merchant and
-    amount on <em>different</em> days (a repeat coffee is not a
-    duplicate). The data is in the code below; both versions must print
-    the lines shown under <em>Expected output</em>.
+    같은 <strong>판매자, 금액, 날짜</strong>로 두 번 나타나는 청구는
+    이중 결제일 가능성이 높습니다. 7월 거래 내역에서 그런 그룹을
+    모두 찾아 사용자가 검토할 수 있도록 <em>관련된 거래 각각</em>을
+    나열하세요 — 단, 같은 판매자와 금액이라도 <em>날짜가 다르면</em>
+    중복으로 표시하지 마세요(같은 커피를 반복 구매한 것은 중복이
+    아닙니다). 데이터는 아래 코드에 있으며, 두 버전 모두
+    <em>예상 출력</em> 아래에 표시된 줄을 출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">Possible duplicate charges:
 2026-07-08  Noodle Bar  $18.90
 2026-07-08  Noodle Bar  $18.90
@@ -69,10 +67,10 @@
 2026-07-21  StreamFlix  $9.99</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 class Tx {
@@ -160,22 +158,22 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    The algorithm is group–keep–flatten, and FxDart writes it as exactly
-    those three words: <code><a href="../tutorials/groupBy.html">groupBy</a></code> the merchant|amount|day key,
-    <code><a href="../tutorials/filter.html">filter</a></code> the groups with more than one member,
-    <code><a href="../tutorials/flatMap.html">flatMap</a></code> the survivors back into individual transactions
-    (<code><a href="../tutorials/map.html">map</a></code> + <code><a href="../tutorials/join.html">join</a></code> format them). Native Dart has
-    none of the three as vocabulary: grouping becomes a
-    <code>putIfAbsent</code> loop, keeping-and-flattening becomes nested
-    <code>for</code> loops with an <code>if</code> between them. Both are
-    correct; only one still looks like the sentence that specified it.
+    이 알고리즘은 그룹화–유지–평탄화이고, FxDart는 그 세 단어를
+    그대로 코드로 씁니다: 판매자|금액|날짜 키로 <code><a href="../tutorials/groupBy.html">groupBy</a></code>하고,
+    구성원이 둘 이상인 그룹만 <code><a href="../tutorials/filter.html">filter</a></code>하고, 살아남은
+    그룹을 다시 개별 거래로 <code><a href="../tutorials/flatMap.html">flatMap</a></code>합니다
+    (<code><a href="../tutorials/map.html">map</a></code> + <code><a href="../tutorials/join.html">join</a></code>으로 형식을 맞춥니다). 순수
+    Dart에는 이 세 단어에 해당하는 어휘가 없습니다: 그룹화는
+    <code>putIfAbsent</code> 루프가 되고, 유지-후-평탄화는 그 사이에
+    <code>if</code>가 낀 중첩 <code>for</code> 루프가 됩니다. 둘 다
+    맞는 코드지만, 명세를 그대로 옮긴 문장처럼 보이는 쪽은 하나뿐입니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="no-spend-streak.html">← 이전: Longest streak of no-spend days</a>
-    <a href="concurrent-enrichment.html">다음: Enrich top merchants concurrently →</a>
+    <a href="no-spend-streak.html">← 이전: 지출 없는 날의 최장 연속 기록</a>
+    <a href="concurrent-enrichment.html">다음: 상위 판매자를 동시에 보강하기 →</a>
   </nav>
 </main>
 <footer class="site-footer">

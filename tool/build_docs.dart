@@ -299,12 +299,17 @@ Page _loadPage(String relPath, Locale locale) {
           '  found:    $actual');
     }
 
-    // Only `title` and `description` are prose. Everything else is structure —
-    // function names and link targets — and a translated `next:` would quietly
-    // break the tutorial chain for that language only.
+    // `title`, `description`, and `heading` are prose. Everything else is
+    // structure — function names and link targets — and a translated `next:`
+    // would quietly break the tutorial chain for that language only.
+    // (Tutorial `heading` values happen to be `<code>fnName</code>` snippets,
+    // so they naturally match English anyway; comparison-page `heading`
+    // values are plain sentences that genuinely need translating.)
     final enMeta = _frontMatter(english);
     for (final key in enMeta.keys.toList()..addAll(meta.keys)) {
-      if (key == 'title' || key == 'description') continue;
+      if (key == 'title' || key == 'description' || key == 'heading') {
+        continue;
+      }
       if (enMeta[key] != meta[key]) {
         throw StateError('i18n/${locale.code}/$relPath: front matter `$key` '
             'must match English exactly (it is structure, not prose)\n'

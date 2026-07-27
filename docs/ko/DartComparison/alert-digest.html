@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Log alert digest by service and severity — Dart vs FxDart</title>
-  <meta name="description" content="WARN and ERROR logs rendered as an indented digest — nested grouping via groupBy + flatMap + uniq vs three nested loops and a seen-set.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/alert-digest.html">
+  <title>서비스와 심각도별 로그 알림 다이제스트 — Dart vs FxDart</title>
+  <meta name="description" content="WARN과 ERROR 로그를 들여쓰기된 다이제스트로 표현합니다 — groupBy + flatMap + uniq를 이용한 중첩 그룹화와 세 겹의 중첩 루프 및 seen 집합을 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/alert-digest.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/alert-digest.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/alert-digest.html">
@@ -44,23 +43,22 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #38 · <strong>Log alert digest by service and severity</strong></p>
-  <h1>Log alert digest by service and severity</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #38 · <strong>서비스와 심각도별 로그 알림 다이제스트</strong></p>
+  <h1>서비스와 심각도별 로그 알림 다이제스트</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/countBy.html">countBy</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    From a stream of service logs (data in the code), keep only
-    <code>WARN</code> and <code>ERROR</code> lines and render an indented
-    digest: services sorted by alert count, under each service the severity
-    with its count, under each severity the <em>distinct</em> messages. The
-    header line carries the overall ERROR/WARN totals. Both versions must
-    print the digest under <em>Expected output</em>.
+    서비스 로그 스트림(데이터는 코드 안에 있음)에서 <code>WARN</code>과
+    <code>ERROR</code> 줄만 남겨 들여쓰기된 다이제스트로 표현하세요: 서비스는
+    알림 개수로 정렬하고, 각 서비스 아래에는 심각도와 그 개수를, 각 심각도
+    아래에는 <em>서로 다른</em> 메시지를 나열합니다. 헤더 줄에는 전체
+    ERROR/WARN 합계가 표시됩니다. 두 버전 모두 <em>예상 출력</em> 아래에
+    표시된 다이제스트를 출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">Alert digest — ERROR 4, WARN 5
 api (4)
   ERROR x2
@@ -80,10 +78,10 @@ billing (2)
     - retrying charge</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -199,24 +197,24 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    An indented digest is a tree flattened to lines, and
-    <code><a href="../tutorials/flatMap.html">flatMap</a></code> is exactly that flattening: the outer
-    <code><a href="../tutorials/groupBy.html">groupBy</a></code> + <code><a href="../tutorials/sortBy.html">sortBy</a></code> + <code><a href="../tutorials/flatMap.html">flatMap</a></code> emits
-    a header plus its children per service, the inner <code><a href="../tutorials/flatMap.html">flatMap</a></code>
-    does the same per severity, and <code><a href="../tutorials/uniq.html">uniq</a></code> handles the repeated
-    messages where they occur. <code><a href="../tutorials/countBy.html">countBy</a></code> gives the header totals
-    in one word. The native version is three nested <code>for</code> loops
-    writing into one shared <code>body</code> list, plus a hand-rolled
-    counting map and a <code>seen</code>-set for dedupe — the tree shape is
-    real in both versions, but only one of them lets you read it off the
-    indentation of the code itself.
+    들여쓰기된 다이제스트는 트리를 줄 단위로 평탄화한 것이며,
+    <code><a href="../tutorials/flatMap.html">flatMap</a></code>은 정확히 그 평탄화 작업입니다: 바깥쪽의
+    <code><a href="../tutorials/groupBy.html">groupBy</a></code> + <code><a href="../tutorials/sortBy.html">sortBy</a></code> + <code><a href="../tutorials/flatMap.html">flatMap</a></code>이
+    서비스마다 헤더와 그 하위 항목을 내보내고, 안쪽의 <code><a href="../tutorials/flatMap.html">flatMap</a></code>이
+    심각도마다 같은 일을 하며, <code><a href="../tutorials/uniq.html">uniq</a></code>가 중복되는 메시지를
+    그때그때 처리합니다. <code><a href="../tutorials/countBy.html">countBy</a></code>는 헤더의 합계를 한 단어로
+    구해줍니다. 네이티브 버전은 공유 <code>body</code> 리스트에 써넣는 세
+    겹의 중첩 <code>for</code> 루프에, 직접 작성한 카운팅 맵과 중복 제거용
+    <code>seen</code> 집합까지 더해집니다 — 트리 구조는 두 버전 모두에
+    실제로 존재하지만, 그것을 코드의 들여쓰기만으로 읽어낼 수 있는 쪽은
+    하나뿐입니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="restock-plan.html">← 이전: Inventory restock plan</a>
-    <a href="latency-percentiles.html">다음: p50/p95 latency per endpoint →</a>
+    <a href="restock-plan.html">← 이전: 재고 재주문 계획</a>
+    <a href="latency-percentiles.html">다음: 엔드포인트별 p50/p95 지연 시간 →</a>
   </nav>
 </main>
 <footer class="site-footer">

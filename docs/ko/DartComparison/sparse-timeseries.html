@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Fill gaps in a sparse time series — Dart vs FxDart</title>
-  <meta name="description" content="Days with no transactions become 0.00, then weekly rows with totals — range + groupBy + chunk as one flow vs a counting loop and slices.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/sparse-timeseries.html">
+  <title>희소한 시계열의 빈틈 채우기 — Dart vs FxDart</title>
+  <meta name="description" content="거래가 없는 날은 0.00이 되고, 이어서 합계가 있는 주간 행이 만들어집니다 — 하나의 흐름으로서의 range + groupBy + chunk 대 카운팅 루프와 슬라이스.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/sparse-timeseries.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/sparse-timeseries.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/sparse-timeseries.html">
@@ -44,31 +43,31 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #35 · <strong>Fill gaps in a sparse time series</strong></p>
-  <h1>Fill gaps in a sparse time series</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #35 · <strong>희소한 시계열의 빈틈 채우기</strong></p>
+  <h1>희소한 시계열의 빈틈 채우기</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    Transactions for July 1–14 (data in the code) exist only on some days.
-    Build the <strong>dense</strong> daily series — days with no
-    transactions count as <code>0.00</code> — then print it as two weekly
-    rows, each with its 7 daily values and a week total. Both versions must
-    print the block under <em>Expected output</em>.
+    7월 1일부터 14일까지의 거래(데이터는 코드에 있음)는 일부 날짜에만
+    존재합니다. <strong>빈틈 없는</strong> 일별 시계열을 만드세요 —
+    거래가 없는 날은 <code>0.00</code>으로 집계합니다 — 그런 다음
+    이를 2개의 주간 행으로 출력하세요, 각 행은 7개의 일별 값과 주간
+    합계를 가집니다. 두 버전 모두 <em>예상 출력</em> 아래의 블록을
+    출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">Daily spend, July 1-14 (0.00 = no transactions)
 Jul 01-07: 16.70 0.00 30.00 0.00 0.00 8.75 0.00  | week total 55.45
 Jul 08-14: 22.10 0.00 0.00 19.60 0.00 9.90 0.00  | week total 51.60</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -165,25 +164,26 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    Gap-filling means driving the pipeline from the <em>calendar</em>, not
-    from the data: <code>range(1, 15)</code> generates every day,
-    <code><a href="../tutorials/groupBy.html">groupBy</a></code> answers "what happened that day", and
-    <code><a href="../tutorials/sumBy.html">sumBy</a></code> over a possibly-empty group yields the 0.00 for quiet
-    days for free. The weekly rollup is then <code>chunk(7)</code> +
-    <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> — reshaping the dense series without a single
-    index calculation beyond the row label. Native Dart gets the dense
-    series with a counting <code>for</code> and the rollup with
-    <code>slices</code>/<code>indexed</code> from
-    <code>package:collection</code> — workable, but the sum-of-a-group step
-    is a seeded <code>fold</code> both times, and the two phases don't
-    compose into one visible flow.
+    빈틈 채우기는 파이프라인을 데이터가 아니라 <em>달력</em>이 이끌게
+    한다는 뜻입니다: <code>range(1, 15)</code>가 모든 날짜를 생성하고,
+    <code><a href="../tutorials/groupBy.html">groupBy</a></code>가 "그날 무슨 일이 있었는지"에 답하며,
+    <code><a href="../tutorials/sumBy.html">sumBy</a></code>는 비어 있을 수도 있는 그룹에 대해서도 조용한
+    날의 0.00을 공짜로 만들어냅니다. 주간 집계는 그다음
+    <code>chunk(7)</code> + <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code>로 이루어집니다 —
+    행 레이블 이상의 어떤 인덱스 계산도 없이 조밀한 시계열을
+    재구성합니다. 네이티브 Dart는 카운팅 <code>for</code> 루프로
+    조밀한 시계열을 얻고, <code>package:collection</code>의
+    <code>slices</code>/<code>indexed</code>로 집계를 얻습니다 —
+    동작은 하지만, 그룹 합산 단계는 두 번 다 시드가 있는
+    <code>fold</code>이고, 두 단계가 하나의 눈에 보이는 흐름으로
+    합쳐지지 않습니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="anomaly-context.html">← 이전: Anomalies with surrounding context</a>
-    <a href="multi-currency-report.html">다음: Multi-currency expense report →</a>
+    <a href="anomaly-context.html">← 이전: 주변 맥락과 함께 보는 이상치</a>
+    <a href="multi-currency-report.html">다음: 다중 통화 지출 리포트 →</a>
   </nav>
 </main>
 <footer class="site-footer">

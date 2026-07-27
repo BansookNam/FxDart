@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Category with highest average expense — Dart vs FxDart</title>
-  <meta name="description" content="Group expenses and find the priciest category per transaction — collection groupBy + maxBy nested calls in plain Dart vs one FxDart chain.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/top-category-average.html">
+  <title>거래당 평균 지출이 가장 높은 카테고리 — Dart vs FxDart</title>
+  <meta name="description" content="지출을 그룹화해 거래당 가장 비싼 카테고리를 찾습니다 — 순수 Dart에서 collection의 groupBy + maxBy 중첩 호출과 하나의 FxDart 체인을 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/top-category-average.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/top-category-average.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/top-category-average.html">
@@ -44,29 +43,28 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #18 · <strong>Category with highest average expense</strong></p>
-  <h1>Category with highest average expense</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #18 · <strong>거래당 평균 지출이 가장 높은 카테고리</strong></p>
+  <h1>거래당 평균 지출이 가장 높은 카테고리</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    Given a month of expenses — each with a date, category, and amount —
-    find the category with the <strong>highest average amount per
-    transaction</strong>, and print it with the average formatted to two
-    decimals. The data is in the code below; both versions must print the
-    line shown under <em>Expected output</em>.
+    날짜, 카테고리, 금액을 가진 한 달치 지출 내역이 주어질 때,
+    <strong>거래당 평균 금액이 가장 높은 카테고리</strong>를 찾아, 그
+    평균을 소수점 둘째 자리까지 포맷하여 출력하세요. 데이터는 아래
+    코드에 있으며, 두 버전 모두 <em>예상 출력</em> 아래에 표시된 줄을
+    출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">Highest average spend: Travel ($111.00 per transaction)</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -143,23 +141,24 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    Core Dart has neither <code><a href="../tutorials/groupBy.html">groupBy</a></code> nor <code><a href="../tutorials/maxBy.html">maxBy</a></code>;
-    <code>package:collection</code> supplies both — but as top-level
-    functions, not chain steps. The native version therefore reads
-    inside-out: <code>maxBy(</code>… wrapping a <code><a href="../tutorials/map.html">map</a></code> over
-    entries of a <code>groupBy(</code>… — three idioms (function call,
-    method chain, function call) for one three-step thought. FxDart keeps
-    the reading order equal to the data flow: <code><a href="../tutorials/groupBy.html">groupBy</a></code> the
-    transactions, <code><a href="../tutorials/map.html">map</a></code> each group to
-    <code>(category, average)</code>, <code><a href="../tutorials/maxBy.html">maxBy</a></code> the average. Same
-    algorithm, but the sentence runs left to right.
+    코어 Dart에는 <code><a href="../tutorials/groupBy.html">groupBy</a></code>도 <code><a href="../tutorials/maxBy.html">maxBy</a></code>도 없습니다.
+    <code>package:collection</code>이 둘 다 제공하지만, 체인의 한
+    단계가 아니라 최상위 함수로 제공합니다. 그래서 네이티브 버전은
+    안에서 바깥으로 읽어야 합니다: <code>groupBy(</code>… 의 엔트리들에
+    대한 <code><a href="../tutorials/map.html">map</a></code>을 <code>maxBy(</code>…로 감싸는 식이죠 — 세
+    단계짜리 생각 하나를 위해 세 가지 형식(함수 호출, 메서드 체인, 함수
+    호출)을 오가야 합니다. FxDart는 읽는 순서를 데이터 흐름과 똑같이
+    유지합니다: 거래를 <code><a href="../tutorials/groupBy.html">groupBy</a></code>로 묶고, 각 그룹을
+    <code><a href="../tutorials/map.html">map</a></code>으로 <code>(category, average)</code>로 바꾸고,
+    평균을 <code><a href="../tutorials/maxBy.html">maxBy</a></code>로 고릅니다. 알고리즘은 같지만, 문장은
+    왼쪽에서 오른쪽으로 흐릅니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="sensor-anomalies.html">← 이전: Pair sensors with readings, keep anomalies</a>
-    <a href="valid-emails.html">다음: First 5 valid emails, normalized →</a>
+    <a href="sensor-anomalies.html">← 이전: 센서와 측정값 짝짓고 이상치 찾기</a>
+    <a href="valid-emails.html">다음: 정규화한 유효 이메일 상위 5개 →</a>
   </nav>
 </main>
 <footer class="site-footer">

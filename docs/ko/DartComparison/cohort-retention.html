@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Cohort retention table — Dart vs FxDart</title>
-  <meta name="description" content="Signup-month cohorts vs later activity — nested groupBy/dropWhile/filter pipelines vs nested for loops with accumulator lists.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/cohort-retention.html">
+  <title>코호트 리텐션 테이블 — Dart vs FxDart</title>
+  <meta name="description" content="가입월 기준 코호트와 이후 활동을 비교합니다 — 중첩된 groupBy/dropWhile/filter 파이프라인과 누산 리스트를 사용하는 중첩 for 루프를 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/cohort-retention.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/cohort-retention.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/cohort-retention.html">
@@ -44,32 +43,31 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #32 · <strong>Cohort retention table</strong></p>
-  <h1>Cohort retention table</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #32 · <strong>코호트 리텐션 테이블</strong></p>
+  <h1>코호트 리텐션 테이블</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/size.html">size</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    Each user (data in the code) has a signup month and the list of months
-    they were active. Group users into <strong>cohorts by signup
-    month</strong> and, for every <em>later</em> month, print what percentage
-    of the cohort was still active — one row per cohort, oldest first. Both
-    versions must print the table shown under <em>Expected output</em>.
+    각 사용자(데이터는 코드 안에 있음)는 가입월과 활동한 월의 목록을 갖고
+    있습니다. 사용자를 <strong>가입월 기준 코호트</strong>로 묶고, 그
+    이후의 각 월에 대해 코호트 중 몇 퍼센트가 여전히 활동 중이었는지
+    출력하세요 — 코호트당 한 줄씩, 오래된 순서로 정렬합니다. 두 버전 모두
+    <em>예상 출력</em> 아래에 표시된 테이블을 출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">Cohort retention by signup month
 2026-04 (4 users): 2026-05 50% | 2026-06 50% | 2026-07 25%
 2026-05 (3 users): 2026-06 33% | 2026-07 67%
 2026-06 (2 users): 2026-07 50%</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -156,23 +154,23 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    A retention table is a pipeline inside a pipeline: cohorts on the
-    outside, months on the inside. In FxDart both layers are expressions —
-    <code><a href="../tutorials/groupBy.html">groupBy</a></code> → <code><a href="../tutorials/sortBy.html">sortBy</a></code> → <code><a href="../tutorials/map.html">map</a></code> over
-    cohorts, and inside each row <code><a href="../tutorials/dropWhile.html">dropWhile</a></code> skips months up to
-    the signup month before <code><a href="../tutorials/filter.html">filter</a></code> + <code><a href="../tutorials/size.html">size</a></code> count the
-    still-active users. The native version needs a mutable accumulator list
-    per layer (<code>rows</code>, <code>cells</code>) and two nested
-    <code>for</code> loops to stitch them together; the actual retention
-    logic is the same, but it is spread across loop bodies instead of being
-    the visible spine of the code.
+    리텐션 테이블은 파이프라인 속의 파이프라인입니다: 바깥쪽은 코호트,
+    안쪽은 월입니다. FxDart에서는 두 계층 모두 표현식입니다 — 코호트에
+    대해서는 <code><a href="../tutorials/groupBy.html">groupBy</a></code> → <code><a href="../tutorials/sortBy.html">sortBy</a></code> → <code><a href="../tutorials/map.html">map</a></code>이
+    적용되고, 각 행 안에서는 <code><a href="../tutorials/dropWhile.html">dropWhile</a></code>이 가입월까지의 달을
+    건너뛴 뒤 <code><a href="../tutorials/filter.html">filter</a></code> + <code><a href="../tutorials/size.html">size</a></code>가 여전히 활동 중인
+    사용자 수를 셉니다. 네이티브 버전은 계층마다 가변 누산 리스트
+    (<code>rows</code>, <code>cells</code>)가 필요하고, 이를 엮기 위해 두
+    겹의 중첩 <code>for</code> 루프가 필요합니다. 실제 리텐션 로직은
+    동일하지만, 코드의 눈에 보이는 뼈대가 되는 대신 루프 본문 곳곳에
+    흩어져 있습니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="monthly-ledger-report.html">← 이전: Full monthly ledger report</a>
-    <a href="price-drop-detection.html">다음: Price drops between two snapshots →</a>
+    <a href="monthly-ledger-report.html">← 이전: 전체 월간 가계부 리포트</a>
+    <a href="price-drop-detection.html">다음: 두 스냅숏 사이의 가격 하락 →</a>
   </nav>
 </main>
 <footer class="site-footer">

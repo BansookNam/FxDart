@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Longest streak of no-spend days — Dart vs FxDart</title>
-  <meta name="description" content="Longest run of July days with no transaction — loop with streak/longest counters in plain Dart vs range + scan + max in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/no-spend-streak.html">
+  <title>지출 없는 날의 최장 연속 기록 — Dart vs FxDart</title>
+  <meta name="description" content="지출이 전혀 없었던 7월 날짜의 최장 연속 구간을 찾습니다 — 순수 Dart의 streak/longest 카운터 루프와 FxDart의 range + scan + max를 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/no-spend-streak.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/no-spend-streak.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/no-spend-streak.html">
@@ -44,31 +43,29 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #28 · <strong>Longest streak of no-spend days</strong></p>
-  <h1>Longest streak of no-spend days</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #28 · <strong>지출 없는 날의 최장 연속 기록</strong></p>
+  <h1>지출 없는 날의 최장 연속 기록</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/max.html">max</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    From one month of ledger transactions, find the <strong>longest streak
-    of consecutive July days with no spending at all</strong> (July 2026
-    has 31 days). Print a calendar strip marking each no-spend day with
-    <code>#</code>, then the streak length. The data is in the code below;
-    both versions must print the lines shown under
-    <em>Expected output</em>.
+    한 달치 가계부 거래 내역에서 <strong>지출이 전혀 없었던 7월 날짜의
+    최장 연속 구간</strong>을 찾으세요(2026년 7월은 31일까지 있습니다).
+    지출이 없는 날마다 <code>#</code>로 표시한 달력 스트립을 출력한 다음
+    연속 일수를 출력하세요. 데이터는 아래 코드에 있으며, 두 버전 모두
+    <em>예상 출력</em> 아래에 표시된 줄을 출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">July (# = no-spend day): ···###··######··#####·#####··##
 Longest no-spend streak: 6 days</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 class Tx {
@@ -154,19 +151,19 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    A streak is a running value, and that is <code><a href="../tutorials/scan.html">scan</a></code>'s exact
-    job: fold's every intermediate state, kept. The pipeline reads as the
-    definition — the days (<code><a href="../tutorials/range.html">range</a></code>), <code><a href="../tutorials/map.html">map</a></code>ped to
-    spent-or-not, <code><a href="../tutorials/scan.html">scan</a></code>ned into a running streak that resets
-    on a spend day, and <code><a href="../tutorials/max.html">max</a></code> picks the peak. The native loop
-    computes the same thing with two mutable counters and an
-    <code>if</code> — you verify it by mentally replaying iterations,
-    and the streak logic is fused to the strip-building beside it. In the
-    FxDart version the strip (<code><a href="../tutorials/map.html">map</a></code> + <code><a href="../tutorials/join.html">join</a></code>) and
-    the streak are two independent, separately readable pipelines over
-    the same <code><a href="../tutorials/range.html">range</a></code>.
+    연속 기록은 누적되는 값이며, 그것이 바로 <code><a href="../tutorials/scan.html">scan</a></code>이 하는
+    일입니다: fold의 모든 중간 상태를 그대로 보존합니다. 파이프라인은
+    정의 그 자체처럼 읽힙니다 — 날짜들(<code><a href="../tutorials/range.html">range</a></code>)을 지출
+    여부로 <code><a href="../tutorials/map.html">map</a></code>하고, 지출이 있는 날에 리셋되는 연속 카운트로
+    <code><a href="../tutorials/scan.html">scan</a></code>한 다음, <code><a href="../tutorials/max.html">max</a></code>가 정점을 골라냅니다.
+    네이티브 루프는 두 개의 가변 카운터와 <code>if</code> 문으로 같은
+    것을 계산합니다 — 이를 검증하려면 반복을 머릿속으로 재생해야 하고,
+    연속 기록 로직은 옆에 있는 스트립 생성 로직과 뒤엉켜 있습니다.
+    FxDart 버전에서는 스트립(<code><a href="../tutorials/map.html">map</a></code> + <code><a href="../tutorials/join.html">join</a></code>)과
+    연속 기록이 같은 <code><a href="../tutorials/range.html">range</a></code> 위에서 동작하는 서로 독립적이고
+    따로 읽을 수 있는 두 개의 파이프라인입니다.
   </p>
 
   <nav class="tut-nav">

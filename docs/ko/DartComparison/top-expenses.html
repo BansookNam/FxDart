@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Top 3 largest expenses — Dart vs FxDart</title>
-  <meta name="description" content="Largest three transactions of the month — sortedBy + take from package:collection vs sortBy + take in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/top-expenses.html">
+  <title>가장 큰 지출 상위 3건 — Dart vs FxDart</title>
+  <meta name="description" content="이번 달 거래 중 금액이 가장 큰 세 건 — package:collection의 sortedBy + take와 FxDart의 sortBy + take를 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/top-expenses.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/top-expenses.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/top-expenses.html">
@@ -44,29 +43,28 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #3 · <strong>Top 3 largest expenses</strong></p>
-  <h1>Top 3 largest expenses</h1>
-  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #3 · <strong>가장 큰 지출 상위 3건</strong></p>
+  <h1>가장 큰 지출 상위 3건</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    From a month of expenses, print the <strong>three largest</strong> —
-    merchant and amount, biggest first. The data is in the code below; both
-    versions must print the lines shown under <em>Expected output</em>.
+    한 달치 지출 중 <strong>가장 큰 세 건</strong>을 판매자와 금액으로,
+    큰 금액부터 순서대로 출력하세요. 데이터는 아래 코드에 있으며, 두
+    버전 모두 <em>예상 출력</em> 아래에 표시된 줄들을 출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">Airline Ticket  $289.99
 New Headphones  $129.00
 Electric Co     $60.34</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -136,22 +134,21 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    They barely do — this one is a tie. Both sides sort on a negated key to
-    get descending order and take the first three;
-    <code>package:collection</code>'s <code>sortedBy</code> is every bit as
-    direct as FxDart's <code><a href="../tutorials/sortBy.html">sortBy</a></code> (core <code>List.sort</code> alone
-    would mutate in place and need an explicit comparator, but
-    <code>collection</code> is a standard dependency). The only real
-    difference is where the vocabulary lives: an extension method from a
-    package vs a step in a chain that also offers <code><a href="../tutorials/scan.html">scan</a></code>,
-    <code><a href="../tutorials/chunk.html">chunk</a></code>, and async variants. Pick either with a clear
-    conscience.
+    거의 차이가 없습니다 — 이번 예제는 무승부입니다. 양쪽 모두 부호를
+    반전한 키로 정렬해 내림차순을 얻고 앞의 세 개를 취합니다.
+    <code>package:collection</code>의 <code>sortedBy</code>는 FxDart의
+    <code><a href="../tutorials/sortBy.html">sortBy</a></code>만큼이나 직관적입니다(코어 <code>List.sort</code>
+    만 쓰면 제자리에서 변형되고 명시적인 비교자가 필요하지만,
+    <code>collection</code>은 표준적인 의존성입니다). 실질적인 차이는
+    그 어휘가 어디에 있느냐뿐입니다 — 패키지의 확장 메서드냐, 아니면
+    <code><a href="../tutorials/scan.html">scan</a></code>, <code><a href="../tutorials/chunk.html">chunk</a></code>, 비동기 변형까지 함께 제공하는
+    체인의 한 단계냐. 어느 쪽을 골라도 떳떳합니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="running-balance.html">← 이전: Running account balance</a>
+    <a href="running-balance.html">← 이전: 계좌 잔액 추이</a>
     <a href="first-visit-merchants.html">다음: Merchants in first-visit order →</a>
   </nav>
 </main>

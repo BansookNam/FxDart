@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Weekly averages from daily readings — Dart vs FxDart</title>
-  <meta name="description" content="Fold 21 daily readings into 3 weekly averages — index arithmetic and sublist in plain Dart vs chunk + averageBy + zipWithIndex in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/weekly-sensor-averages.html">
+  <title>일별 측정값으로 구하는 주간 평균 — Dart vs FxDart</title>
+  <meta name="description" content="21개의 일별 측정값을 3개의 주간 평균으로 접습니다 — 순수 Dart의 인덱스 연산과 sublist, FxDart의 chunk + averageBy + zipWithIndex를 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/weekly-sensor-averages.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/weekly-sensor-averages.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/weekly-sensor-averages.html">
@@ -44,30 +43,29 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #23 · <strong>Weekly averages from daily readings</strong></p>
-  <h1>Weekly averages from daily readings</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #23 · <strong>일별 측정값으로 구하는 주간 평균</strong></p>
+  <h1>일별 측정값으로 구하는 주간 평균</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/averageBy.html">averageBy</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    A temperature sensor logged one reading per day for three full weeks
-    (21 values). Report the <strong>average per 7-day week</strong>, one
-    line per week, numbered from 1. The data is in the code below; both
-    versions must print the lines shown under <em>Expected output</em>.
+    온도 센서가 3주 동안(21개 값) 하루에 하나씩 측정값을 기록했습니다.
+    <strong>7일 단위 주간 평균</strong>을 1부터 번호를 매겨 한 줄씩
+    보고하세요. 데이터는 아래 코드에 있으며, 두 버전 모두 <em>예상
+    출력</em> 아래에 표시된 줄들을 출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">Week 1: 21.3°C
 Week 2: 25.0°C
 Week 3: 20.5°C</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 // Daily noon temperatures (°C), three full weeks starting Mon 2026-07-06.
@@ -116,20 +114,20 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    "Split into groups of 7" has no core-Dart spelling, so the native
-    version runs a counting loop and carves each week out with
-    <code>sublist(w * 7, w * 7 + 7)</code> — index arithmetic that the
-    reader must re-verify, and that breaks if the tail week is short.
-    FxDart's <code>chunk(7)</code> says the grouping in one word (and
-    handles a short tail), <code><a href="../tutorials/averageBy.html">averageBy</a></code> replaces the
-    reduce-then-divide dance, and <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> brings the week
-    number into the pipeline instead of borrowing the loop counter.
+    "7개씩 묶기"는 코어 Dart에 표현할 방법이 없어서, 네이티브 버전은
+    카운팅 루프를 돌며 <code>sublist(w * 7, w * 7 + 7)</code>로 매주를
+    잘라냅니다 — 읽는 사람이 다시 검증해야 하는 인덱스 연산이고, 마지막
+    주가 짧으면 깨지기도 합니다. FxDart의 <code>chunk(7)</code>은
+    그룹화를 한 단어로 표현하며(짧은 마지막 그룹도 알아서 처리합니다),
+    <code><a href="../tutorials/averageBy.html">averageBy</a></code>가 reduce 후 나누는 과정을 대신하고,
+    <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code>는 루프 카운터를 빌리는 대신 주 번호를
+    파이프라인 안으로 가져옵니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="paginated-products.html">← 이전: Paginated product listing</a>
+    <a href="paginated-products.html">← 이전: 페이지네이션된 상품 목록</a>
     <a href="consecutive-over-limit.html">다음: Three consecutive readings over the limit →</a>
   </nav>
 </main>

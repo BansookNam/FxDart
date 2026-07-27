@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Batch users into pages of 10 — Dart vs FxDart</title>
-  <meta name="description" content="Split a user list into fixed-size pages — slices from package:collection vs chunk + map in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/paginate-users.html">
+  <title>사용자를 10명씩 페이지로 나누기 — Dart vs FxDart</title>
+  <meta name="description" content="사용자 목록을 고정 크기 페이지로 나눕니다 — package:collection의 slices와 FxDart의 chunk + map을 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/paginate-users.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/paginate-users.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/paginate-users.html">
@@ -44,29 +43,28 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #8 · <strong>Batch users into pages of 10</strong></p>
-  <h1>Batch users into pages of 10</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #8 · <strong>사용자를 10명씩 페이지로 나누기</strong></p>
+  <h1>사용자를 10명씩 페이지로 나누기</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    Split twelve users into <strong>pages of 10</strong> (the last page may
-    be short) and print each page on one line with its number, size, and
-    names. The data is in the code below; both versions must print the lines
-    shown under <em>Expected output</em>.
+    사용자 열두 명을 <strong>10명씩 페이지</strong>로 나누고(마지막
+    페이지는 더 짧을 수 있습니다) 각 페이지를 번호, 크기, 이름과 함께
+    한 줄로 출력하세요. 데이터는 아래 코드에 있으며, 두 버전 모두
+    <em>예상 출력</em> 아래에 표시된 줄을 출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">Page 1, 10 users: Ava, Ben, Cara, Dan, Elle, Finn, Gus, Hana, Ivan, June
 Page 2, 2 users: Kai, Lena</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -114,22 +112,23 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    Core Dart has no chunking at all — without help this is an index loop
-    over <code>sublist</code> with a <code>min</code> guard for the short
-    last page. <code>package:collection</code>'s <code>slices</code> fixes
-    that, and if you already depend on it the two panels are nearly twins.
-    FxDart's edge is that <code><a href="../tutorials/chunk.html">chunk</a></code> needs no extra dependency, is
-    lazy (pages materialize as you consume them), and the very same step
-    works on async chains — batching requests before a
-    <code><a href="../tutorials/concurrent.html">concurrent</a></code> stage is the classic use. A modest win, but a
-    real one.
+    순수 Dart에는 청크 분할 기능이 아예 없습니다 — 도움 없이는
+    <code>sublist</code>를 도는 인덱스 루프에, 짧은 마지막 페이지를
+    위한 <code>min</code> 가드까지 필요합니다. <code>package:collection</code>의
+    <code>slices</code>가 이를 해결해 주며, 이미 이 패키지를 쓰고
+    있다면 두 코드는 거의 쌍둥이입니다. FxDart의 강점은
+    <code><a href="../tutorials/chunk.html">chunk</a></code>가 추가 의존성이 필요 없고, 지연 평가되며(페이지는
+    소비할 때 만들어집니다), 바로 같은 단계가 비동기 체인에서도
+    동작한다는 점입니다 — <code><a href="../tutorials/concurrent.html">concurrent</a></code> 단계 앞에서 요청을
+    배치로 묶는 것이 대표적인 용례입니다. 크지는 않지만 실질적인
+    이점입니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="top-log-level.html">← 이전: Most frequent log level</a>
-    <a href="rank-labels.html">다음: Rank labels for a leaderboard →</a>
+    <a href="top-log-level.html">← 이전: 가장 많이 발생한 로그 레벨</a>
+    <a href="rank-labels.html">다음: 리더보드 순위 라벨 →</a>
   </nav>
 </main>
 <footer class="site-footer">

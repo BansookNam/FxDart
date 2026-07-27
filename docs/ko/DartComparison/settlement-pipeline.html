@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>End-of-day settlement pipeline — Dart vs FxDart</title>
-  <meta name="description" content="Validate, group by merchant, post 2 at a time, then report — one chain crossing sync to async, vs groupListsBy plus a worker pool.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/settlement-pipeline.html">
+  <title>일일 정산 마감 파이프라인 — Dart vs FxDart</title>
+  <meta name="description" content="검증하고, 판매자별로 묶고, 2건씩 게시한 다음 보고합니다 — 동기에서 비동기로 넘어가는 체인 하나 대 groupListsBy와 워커 풀.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/settlement-pipeline.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/settlement-pipeline.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/settlement-pipeline.html">
@@ -44,31 +43,32 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #48 · <strong>End-of-day settlement pipeline</strong></p>
-  <h1>End-of-day settlement pipeline</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #48 · <strong>일일 정산 마감 파이프라인</strong></p>
+  <h1>일일 정산 마감 파이프라인</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-async">async</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/reject.html">reject</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/partition.html">partition</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    Close out the day. From ten card transactions (in the code below):
-    discard <code>failed</code> ones, group the rest by merchant, and net
-    each merchant's total (refunds negative). Post each merchant's
-    settlement to the bank gateway — at most <strong>two postings in
-    flight</strong>, results in merchant order — then print the report: one
-    line per merchant, a payout/collection split (one merchant's refunds
-    exceed its captures), the grand total, and the max-in-flight proof.
+    하루를 마감하세요. 카드 거래 10건(아래 코드)에서:
+    <code>failed</code> 거래는 버리고, 나머지를 판매자별로 묶은 뒤,
+    각 판매자의 합계를 정산하세요(환불은 음수). 각 판매자의 정산
+    내역을 은행 게이트웨이에 게시하되 — 동시 진행 중인 게시는
+    <strong>최대 두 건</strong>, 결과는 판매자 순서대로 — 그런 다음
+    보고서를 출력하세요: 판매자별 한 줄, 지급/수금 구분(한 판매자는
+    환불이 결제액을 초과함), 총합계, 그리고 최대 동시 진행 건수
+    증명.
   </p>
   <p>
-    This is the whole library in one pipeline. Sync prep:
-    <code><a href="../tutorials/reject.html">reject</a></code> → <code><a href="../tutorials/groupBy.html">groupBy</a></code> → <code><a href="../tutorials/sumBy.html">sumBy</a></code> per
-    group → <code><a href="../tutorials/sortBy.html">sortBy</a></code>. Cross into async with <code><a href="../tutorials/toAsync.html">toAsync</a></code>,
-    post under <code>concurrent(2)</code>. Report with
-    <code><a href="../tutorials/partition.html">partition</a></code> and <code><a href="../tutorials/sumBy.html">sumBy</a></code> again.
+    이것은 라이브러리 전체가 한 파이프라인에 담긴 예제입니다. 동기
+    준비 단계: <code><a href="../tutorials/reject.html">reject</a></code> → <code><a href="../tutorials/groupBy.html">groupBy</a></code> → 그룹별
+    <code><a href="../tutorials/sumBy.html">sumBy</a></code> → <code><a href="../tutorials/sortBy.html">sortBy</a></code>. <code><a href="../tutorials/toAsync.html">toAsync</a></code>로
+    비동기 경계를 넘어, <code>concurrent(2)</code> 아래에서
+    게시합니다. 보고서는 <code><a href="../tutorials/partition.html">partition</a></code>과 <code><a href="../tutorials/sumBy.html">sumBy</a></code>를
+    다시 사용합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">2026-07-27 close — 3 merchants, 2 postings at a time:
   BookNook: 3 txns, net $-6.01
   Cafe Luna: 4 txns, net $32.00
@@ -78,10 +78,10 @@ settled: $244.89
 max postings in flight: 2</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -242,26 +242,26 @@ Future<void> main() async {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    Each half of this task has appeared in a smaller example; the point
-    here is what happens when they meet. Native Dart does the prep well
-    enough with <code>package:collection</code>
-    (<code>groupListsBy</code>, <code>sortedBy</code>) — though netting
-    each group is a <code>fold</code> with an explicit seed, and the
-    payout split is two <code>where</code> passes. Then the async boundary
-    hits, and the shape breaks: the bounded posting needs the worker pool,
-    a separate named function with slots and a cursor, and the pipeline you
-    were reading becomes plumbing you must trace. The FxDart version is one
-    uninterrupted chain from raw transactions to posted settlements —
-    fourteen lines where the policy (what is valid, how to group, how hard
-    to hit the gateway) is the visible text, and the mechanics are the
-    library's problem.
+    이 작업의 각 절반은 더 작은 예제에서 이미 등장했습니다; 여기서
+    중요한 것은 그 둘이 만났을 때 무슨 일이 벌어지는가입니다. 네이티브
+    Dart는 <code>package:collection</code>(<code>groupListsBy</code>,
+    <code>sortedBy</code>)으로 준비 단계를 충분히 잘 처리합니다 —
+    다만 그룹별 합계를 내는 것은 명시적 시드를 가진 <code>fold</code>
+    이고, 지급 구분은 <code>where</code>를 두 번 통과시키는 것입니다.
+    그런 다음 비동기 경계에 부딪히면 구조가 무너집니다: 제한된 게시는
+    워커 풀이 필요하고, 슬롯과 커서를 가진 별도의 이름 붙은 함수가
+    되어, 읽고 있던 파이프라인이 추적해야 하는 배관으로 바뀝니다.
+    FxDart 버전은 원본 거래부터 게시된 정산 내역까지 끊김 없는 체인
+    하나입니다 — 열네 줄로, 정책(무엇이 유효한지, 어떻게 묶는지,
+    게이트웨이를 얼마나 세게 두드릴지)이 눈에 보이는 텍스트이고,
+    메커니즘은 라이브러리의 몫입니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="paged-feeds-dedupe.html">← 이전: Two paged feeds, concatenated and deduped</a>
-    <a href="live-search.html">다음: Live search over a keystroke stream →</a>
+    <a href="paged-feeds-dedupe.html">← 이전: 두 페이징된 피드를 이어붙이고 중복 제거하기</a>
+    <a href="live-search.html">다음: 키 입력 스트림 위의 실시간 검색 →</a>
   </nav>
 </main>
 <footer class="site-footer">

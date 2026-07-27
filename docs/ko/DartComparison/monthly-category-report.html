@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Monthly category report, sorted by spend — Dart vs FxDart</title>
-  <meta name="description" content="Filter a ledger to one month, total each category, and rank them — loop plus mutable map in plain Dart vs filter + groupBy + sortBy in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/monthly-category-report.html">
+  <title>지출액순으로 정렬한 월간 카테고리 리포트 — Dart vs FxDart</title>
+  <meta name="description" content="가계부를 한 달로 필터링하고 카테고리별로 합산해 순위를 매깁니다 — 순수 Dart의 루프와 가변 맵을 FxDart의 filter + groupBy + sortBy와 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/monthly-category-report.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/monthly-category-report.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/monthly-category-report.html">
@@ -44,32 +43,31 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #21 · <strong>Monthly category report, sorted by spend</strong></p>
-  <h1>Monthly category report, sorted by spend</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #21 · <strong>지출액순으로 정렬한 월간 카테고리 리포트</strong></p>
+  <h1>지출액순으로 정렬한 월간 카테고리 리포트</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    From a ledger that spills over from June into July 2026, build the July
-    spending report: keep only July transactions, total each category, and
-    print one line per category — <strong>biggest spend first</strong>. The
-    data is in the code below; both versions must print the lines shown
-    under <em>Expected output</em>.
+    6월에서 7월로 넘어가는 가계부에서 2026년 7월 지출 리포트를 만드세요:
+    7월 거래만 남기고, 카테고리별로 합산하여, 카테고리당 한 줄씩
+    <strong>지출액이 큰 순서대로</strong> 출력하세요. 데이터는 아래 코드에
+    있으며, 두 버전 모두 <em>예상 출력</em> 아래에 표시된 줄을 출력해야
+    합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">Food: $74.60
 Bills: $60.34
 Fun: $23.25
 Transport: $14.15</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 class Tx {
@@ -151,22 +149,23 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    Native Dart has no <code><a href="../tutorials/groupBy.html">groupBy</a></code>, so the loop does the grouping
-    and the totalling at once inside a mutable map — compact, but the four
-    requirements (July only, per category, totalled, ranked) are tangled
-    into one body. The FxDart chain keeps them as four visible steps:
-    <code><a href="../tutorials/filter.html">filter</a></code> the month, <code><a href="../tutorials/groupBy.html">groupBy</a></code> category,
-    <code><a href="../tutorials/map.html">map</a></code> each group to its total, <code><a href="../tutorials/sortBy.html">sortBy</a></code> descending
-    — and <code><a href="../tutorials/join.html">join</a></code> formats the report. Adding a requirement
-    (say, a minimum total) is one more chain step; in the loop it is
-    another branch inside an already-busy body.
+    순수 Dart에는 <code><a href="../tutorials/groupBy.html">groupBy</a></code>가 없으므로, 루프가 가변 맵 안에서
+    그룹화와 합산을 동시에 처리합니다 — 코드는 간결하지만 네 가지
+    요구사항(7월만, 카테고리별, 합산, 순위)이 하나의 본문 안에 뒤섞여
+    있습니다. FxDart 체인은 이를 눈에 보이는 네 단계로 유지합니다:
+    <code><a href="../tutorials/filter.html">filter</a></code>로 해당 월을 거르고, <code><a href="../tutorials/groupBy.html">groupBy</a></code>로
+    카테고리를 나누고, <code><a href="../tutorials/map.html">map</a></code>으로 각 그룹을 합계로 바꾸고,
+    <code><a href="../tutorials/sortBy.html">sortBy</a></code>로 내림차순 정렬한 다음 — <code><a href="../tutorials/join.html">join</a></code>이
+    리포트 형식을 만듭니다. 요구사항을 하나 더 추가하는 일(예: 최소
+    합계 조건)은 체인에 한 단계를 더하는 것으로 끝나지만, 루프에서는
+    이미 복잡한 본문 안에 또 하나의 분기를 더하는 일이 됩니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="bounded-concurrency.html">← 이전: Fetch profiles, two at a time</a>
-    <a href="paginated-products.html">다음: Paginated product listing →</a>
+    <a href="bounded-concurrency.html">← 이전: 두 개씩 프로필 가져오기</a>
+    <a href="paginated-products.html">다음: 페이지네이션된 상품 목록 →</a>
   </nav>
 </main>
 <footer class="site-footer">

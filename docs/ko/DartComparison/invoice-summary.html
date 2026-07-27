@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Line items to invoice summary — Dart vs FxDart</title>
   <meta name="description" content="Turn order line items into per-category totals plus a grand total — two loop-and-fold idioms in plain Dart vs groupBy + sumBy + sortBy in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/invoice-summary.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/invoice-summary.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/invoice-summary.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/invoice-summary.html">
@@ -44,23 +43,21 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #27 · <strong>Line items to invoice summary</strong></p>
   <h1>Line items to invoice summary</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    An order's line items each have a product, category, quantity, and
-    unit price. Print the invoice summary: one line per category with its
-    total (quantity × unit price, summed), <strong>largest category
-    first</strong>, then a grand total. The data is in the code below;
-    both versions must print the lines shown under
-    <em>Expected output</em>.
+    주문의 각 라인 항목은 상품, 카테고리, 수량, 단가를 가집니다.
+    청구서 요약을 출력하세요: 카테고리별로 한 줄씩 합계(수량 ×
+    단가의 합)를 <strong>가장 큰 카테고리부터</strong> 나열한 뒤,
+    총합을 출력합니다. 데이터는 아래 코드에 있으며, 두 버전 모두
+    <em>예상 출력</em> 아래에 표시된 줄을 출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">Invoice by category:
 Electronics: $124.87
 Office: $75.80
@@ -68,10 +65,10 @@ Pantry: $29.50
 Total: $230.17</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 class Line {
@@ -152,23 +149,24 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    The same amount, <code>qty * unitPrice</code>, is summed twice — per
-    category and overall — and the two versions treat that differently.
-    Native Dart spells it as two unrelated idioms: a mutating
-    <code>for</code> loop into a map for the categories, then a
-    <code>fold</code> with an explicit seed for the grand total. FxDart
-    says "sum of a field" the same way both times — <code><a href="../tutorials/sumBy.html">sumBy</a></code> —
-    once per <code><a href="../tutorials/groupBy.html">groupBy</a></code> group and once over all items, with
-    <code><a href="../tutorials/sortBy.html">sortBy</a></code> ranking the rows. When the invoice grows a
-    discount rule, one vocabulary changes in one place per pipeline; the
-    native version changes a loop body <em>and</em> a fold.
+    같은 값 <code>qty * unitPrice</code>가 카테고리별로 한 번,
+    전체로 한 번, 총 두 번 합산되는데, 두 버전은 이를 다르게
+    다룹니다. 순수 Dart는 이를 서로 무관한 두 가지 관용구로 씁니다:
+    카테고리를 위한, 맵에 값을 채워 넣는 변형 <code>for</code> 루프와,
+    총합을 위한 명시적 초기값을 가진 <code>fold</code>입니다.
+    FxDart는 "필드의 합"을 두 번 다 같은 방식으로 말합니다 —
+    <code><a href="../tutorials/sumBy.html">sumBy</a></code> — 한 번은 <code><a href="../tutorials/groupBy.html">groupBy</a></code> 그룹마다, 한
+    번은 전체 항목에 대해, 그리고 <code><a href="../tutorials/sortBy.html">sortBy</a></code>가 행의 순서를
+    매깁니다. 청구서에 할인 규칙이 추가되면, FxDart는 파이프라인당
+    한 곳의 어휘만 바뀌지만, 네이티브 버전은 루프 본문<em>과</em>
+    fold를 모두 바꿔야 합니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="leaderboard-ties.html">← 이전: Leaderboard with tied ranks</a>
-    <a href="no-spend-streak.html">다음: Longest streak of no-spend days →</a>
+    <a href="leaderboard-ties.html">← 이전: 동점 순위가 있는 리더보드</a>
+    <a href="no-spend-streak.html">다음: 지출 없는 날의 최장 연속 기록 →</a>
   </nav>
 </main>
 <footer class="site-footer">

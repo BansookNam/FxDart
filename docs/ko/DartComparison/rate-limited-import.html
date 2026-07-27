@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Rate-limited batch import — Dart vs FxDart</title>
-  <meta name="description" content="Import 9 transactions in batches of 3, one batch at a time, with a running total — chunk + concurrent(1) + scan vs a sequential loop.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/rate-limited-import.html">
+  <title>속도 제한이 있는 배치 임포트 — Dart vs FxDart</title>
+  <meta name="description" content="거래 9건을 3건씩 배치로, 한 번에 한 배치씩 임포트하며 누적 합계를 계산합니다 — chunk + concurrent(1) + scan과 순차 루프를 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/rate-limited-import.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/rate-limited-import.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/rate-limited-import.html">
@@ -44,31 +43,30 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #45 · <strong>Rate-limited batch import</strong></p>
-  <h1>Rate-limited batch import</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #45 · <strong>속도 제한이 있는 배치 임포트</strong></p>
+  <h1>속도 제한이 있는 배치 임포트</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-async">async</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/delay.html">delay</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    Push nine ledger transactions (in the code below) to an import endpoint
-    that accepts <strong>batches of three, one call at a time</strong> —
-    strictly sequential, never overlapping. After each batch, record its
-    size, its amount, and the running total imported so far; print the
-    batch summaries in order, then prove the rate limit held via the
-    max-in-flight counter (it must read 1).
+    가계부 거래 9건(아래 코드에 있음)을 <strong>세 건씩 배치로, 한
+    번에 한 번씩 호출</strong>만 받는 임포트 엔드포인트로 보내세요 —
+    엄격하게 순차적이며 절대 겹치지 않습니다. 각 배치가 끝날 때마다
+    배치 크기, 금액, 지금까지 임포트된 누적 합계를 기록하세요. 배치
+    요약을 순서대로 출력한 다음, 최대 동시 진행 카운터(반드시 1이어야
+    합니다)를 통해 속도 제한이 지켜졌음을 증명하세요.
   </p>
   <p>
-    In FxDart the whole policy is the chain: <code>chunk(3)</code> sets the
-    batch size, <code>concurrent(1)</code> sets the pace, and
-    <code><a href="../tutorials/scan.html">scan</a></code> threads the running total through the acknowledgments
-    (<code>drop(1)</code> discards the scan seed). The endpoint itself
-    simulates latency with <code><a href="../tutorials/delay.html">delay</a></code> and sums its batch with
-    <code><a href="../tutorials/sumBy.html">sumBy</a></code>.
+    FxDart에서는 정책 전체가 체인입니다: <code>chunk(3)</code>이 배치
+    크기를 정하고, <code>concurrent(1)</code>이 속도를 정하며,
+    <code><a href="../tutorials/scan.html">scan</a></code>이 응답들을 거치며 누적 합계를 실어 나릅니다
+    (<code>drop(1)</code>은 scan의 초기값을 버립니다). 엔드포인트
+    자체는 <code><a href="../tutorials/delay.html">delay</a></code>로 지연을 시뮬레이션하고
+    <code><a href="../tutorials/sumBy.html">sumBy</a></code>로 배치 합계를 계산합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">importing 9 txns in batches of 3, one at a time:
   batch 1: 3 txns, $172.49 — running total $172.49
   batch 2: 3 txns, $403.65 — running total $576.14
@@ -76,10 +74,10 @@
 max batches in flight: 1</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -182,23 +180,25 @@ Future<void> main() async {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    To be fair: a strictly sequential import is the one concurrency policy a
-    plain <code>for</code> loop handles gracefully, and the native version
-    reads fine — <code>slices</code> from <code>package:collection</code>
-    even covers the batching. The running total, though, is already mutable
-    state threaded by hand (<code>running += amount</code> next to
-    <code>n++</code>), where <code><a href="../tutorials/scan.html">scan</a></code> makes it a declared step.
-    And the loop's simplicity is a dead end: the day the endpoint allows two
-    concurrent batches, the FxDart version changes <code>1</code> to
-    <code>2</code>, while the loop becomes the worker pool from the other
-    async examples. The chain states the policy; the loop encodes it.
+    공정하게 말하자면: 엄격하게 순차적인 임포트는 평범한
+    <code>for</code> 루프가 무리 없이 다루는 몇 안 되는 동시성 정책
+    중 하나이며, 네이티브 버전도 읽기 좋습니다 —
+    <code>package:collection</code>의 <code>slices</code>가 배치 분할까지
+    해결해 줍니다. 다만 누적 합계는 이미 손으로 이어 나가는 가변
+    상태이고(<code>n++</code> 옆에 <code>running += amount</code>),
+    <code><a href="../tutorials/scan.html">scan</a></code>은 이를 선언적인 한 단계로 바꿔줍니다. 그리고 이
+    루프의 단순함은 막다른 길이기도 합니다: 엔드포인트가 언젠가 두
+    배치의 동시 진행을 허용하게 되면, FxDart 버전은 <code>1</code>을
+    <code>2</code>로 바꾸기만 하면 되지만, 루프는 다른 비동기 예제에
+    나온 워커 풀로 변해야 합니다. 체인은 정책을 선언하고, 루프는 정책을
+    코드로 구현합니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="stream-windowed-alerts.html">← 이전: Windowed alerts from a sensor stream</a>
-    <a href="parallel-downloads.html">다음: Parallel downloads, results in order →</a>
+    <a href="stream-windowed-alerts.html">← 이전: 센서 스트림에서 윈도우 단위 경고 감지하기</a>
+    <a href="parallel-downloads.html">다음: 병렬 다운로드, 순서대로 결과 받기 →</a>
   </nav>
 </main>
 <footer class="site-footer">

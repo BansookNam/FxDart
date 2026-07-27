@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Poll a flaky API until first success — Dart vs FxDart</title>
   <meta name="description" content="Retry-until-ready as a lazy pipeline — range + toAsync + map + dropWhile + head vs an imperative polling loop with a break.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/flaky-api-retry.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/flaky-api-retry.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/flaky-api-retry.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/flaky-api-retry.html">
@@ -44,31 +43,31 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #42 · <strong>Poll a flaky API until first success</strong></p>
   <h1>Poll a flaky API until first success</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-async">async</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/peek.html">peek</a></li><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/head.html">head</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    An export job's status endpoint is deterministically flaky: the first
-    four polls answer <code>pending</code>, the fifth answers
-    <code>ready</code>. Poll it up to ten times, keep a log of every poll,
-    stop at the first success, and report which attempt won — plus how many
-    polls were actually made. No randomness: the failure count is fixed in
-    the code below, so both versions print the same thing every run.
+    내보내기 작업의 상태 엔드포인트는 결정적으로 불안정합니다: 처음
+    네 번의 폴링은 <code>pending</code>을 응답하고, 다섯 번째는
+    <code>ready</code>를 응답합니다. 최대 열 번까지 폴링하면서 모든
+    폴링 기록을 로그로 남기고, 첫 성공에서 멈추고, 어느 시도가
+    성공했는지와 실제로 몇 번 폴링했는지를 보고하세요. 무작위성은
+    없습니다: 실패 횟수는 아래 코드에 고정되어 있으므로, 두 버전
+    모두 실행할 때마다 같은 결과를 출력합니다.
   </p>
   <p>
-    The FxDart version writes the retry as data: <code>range(1, 11)</code>
-    is the poll schedule, <code><a href="../tutorials/map.html">map</a></code> is the transport,
-    <code><a href="../tutorials/peek.html">peek</a></code> records the log, and <code><a href="../tutorials/dropWhile.html">dropWhile</a></code> +
-    <code><a href="../tutorials/head.html">head</a></code> is the success policy. Because the chain is lazy and
-    pulled one value at a time, <code><a href="../tutorials/head.html">head</a></code> stops the polling — only
-    five requests are ever made.
+    FxDart 버전은 재시도를 데이터로 씁니다: <code>range(1, 11)</code>이
+    폴링 일정이고, <code><a href="../tutorials/map.html">map</a></code>이 전송이고, <code><a href="../tutorials/peek.html">peek</a></code>이
+    로그를 기록하고, <code><a href="../tutorials/dropWhile.html">dropWhile</a></code> + <code><a href="../tutorials/head.html">head</a></code>가 성공
+    정책입니다. 체인이 지연 평가되고 값을 한 번에 하나씩만 끌어오기
+    때문에, <code><a href="../tutorials/head.html">head</a></code>가 폴링을 멈추게 합니다 — 실제로는 다섯
+    번의 요청만 이루어집니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">polling export-2026-07 (up to 10 attempts):
   poll 1: pending
   poll 2: pending
@@ -78,10 +77,10 @@
 ready on attempt 5; polls actually made: 5</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 const jobId = 'export-2026-07';
@@ -147,23 +146,23 @@ Future<void> main() async {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    Honestly: the native <code>for</code> loop with a <code>break</code> is
-    short, and nobody would call it wrong. The difference is where the
-    pieces live. In the loop, the attempt budget, the logging, and the
-    success test are all tangled into control flow — change one and you
-    re-read the whole body. In the pipeline each concern is its own named
-    step, so swapping the policy (first success → third success, add a
-    transform, widen the budget) means editing one line. And the laziness
-    guarantee — no polls after the winner — is structural in FxDart, while
-    in the loop it depends on the <code>break</code> being in the right
-    place.
+    솔직히 말하면: <code>break</code>를 쓴 네이티브 <code>for</code>
+    루프는 짧고, 이걸 틀렸다고 할 사람은 없습니다. 차이는 각 부분이
+    어디에 사는가입니다. 루프 안에서는 시도 횟수 예산, 로깅, 성공
+    판정이 모두 제어 흐름 속에 뒤엉켜 있어서, 하나를 바꾸려면 본문
+    전체를 다시 읽어야 합니다. 파이프라인에서는 각 관심사가 이름
+    붙은 자기만의 단계이므로, 정책을 바꾸는 일(첫 성공 → 세 번째
+    성공, 변환 추가, 예산 확장)은 한 줄만 고치면 됩니다. 그리고
+    "승자 이후에는 폴링하지 않는다"는 지연 평가 보장은 FxDart에서
+    구조적으로 성립하는 반면, 루프에서는 <code>break</code>가 올바른
+    위치에 있는지에 달려 있습니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="concurrent-profile-fetch.html">← 이전: Fetch 10 profiles, 3 at a time</a>
-    <a href="price-lookup-fallback.html">다음: Concurrent price lookup with fallback →</a>
+    <a href="concurrent-profile-fetch.html">← 이전: 프로필 10개를 세 개씩 가져오기</a>
+    <a href="price-lookup-fallback.html">다음: 폴백이 있는 동시 가격 조회 →</a>
   </nav>
 </main>
 <footer class="site-footer">

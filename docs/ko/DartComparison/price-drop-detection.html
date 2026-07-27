@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Price drops between two snapshots — Dart vs FxDart</title>
-  <meta name="description" content="Compare two price-list snapshots and report what got cheaper — indexBy + filter + sortBy + head + sumBy vs a map literal and where/fold chains.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/price-drop-detection.html">
+  <title>두 스냅숏 사이의 가격 하락 — Dart vs FxDart</title>
+  <meta name="description" content="두 가격표 스냅숏을 비교해 저렴해진 항목을 보고합니다 — indexBy + filter + sortBy + head + sumBy와, 맵 리터럴 및 where/fold 체인을 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/price-drop-detection.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/price-drop-detection.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/price-drop-detection.html">
@@ -44,23 +43,22 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #33 · <strong>Price drops between two snapshots</strong></p>
-  <h1>Price drops between two snapshots</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #33 · <strong>두 스냅숏 사이의 가격 하락</strong></p>
+  <h1>두 스냅숏 사이의 가격 하락</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/indexBy.html">indexBy</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/head.html">head</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    Two snapshots of a shop's price list (data in the code): June and July.
-    Some items got cheaper, some more expensive, one was discontinued and
-    one is new. Report every item that <strong>dropped in price</strong> —
-    old price, new price, and the drop — sorted by biggest drop first, plus
-    a callout for the single biggest drop and the total savings. Both
-    versions must print the report under <em>Expected output</em>.
+    상점 가격표의 두 스냅숏(데이터는 코드 안에 있습니다): 6월과 7월.
+    일부 항목은 저렴해졌고, 일부는 비싸졌으며, 하나는 단종되었고
+    하나는 새로 추가되었습니다. <strong>가격이 하락한</strong> 모든
+    항목을 — 이전 가격, 새 가격, 하락 폭과 함께 — 하락 폭이 큰 순서로
+    정렬해 보고하고, 가장 큰 하락 하나와 총 절감액을 따로 강조하세요.
+    두 버전 모두 <em>예상 출력</em> 아래의 보고서를 출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">Price drops, June -&gt; July
   Hand Grinder    $49.90 -&gt; $44.00  (-$5.90)
   Espresso Beans  $18.00 -&gt; $14.50  (-$3.50)
@@ -69,10 +67,10 @@ Biggest drop: Hand Grinder (-$5.90)
 Total savings if bought now: $9.90</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -189,24 +187,25 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    The whole task is one flow: index June by SKU, keep July items that got
-    cheaper, pair each with its drop, sort by drop. FxDart has a named step
-    for each move — <code><a href="../tutorials/indexBy.html">indexBy</a></code> for the lookup table,
-    <code><a href="../tutorials/filter.html">filter</a></code> → <code><a href="../tutorials/map.html">map</a></code> → <code><a href="../tutorials/sortBy.html">sortBy</a></code> for the
-    pipeline, then <code><a href="../tutorials/head.html">head</a></code> and <code><a href="../tutorials/sumBy.html">sumBy</a></code> reuse the same
-    result list for the summary lines. Native Dart can express it — a map
-    literal for the index, <code>where</code>/<code><a href="../tutorials/map.html">map</a></code>/
-    <code>sortedBy</code> for the chain — but the vocabulary is scattered:
-    <code>fold</code> with a seed instead of <code><a href="../tutorials/sumBy.html">sumBy</a></code>,
-    <code>sortedBy&lt;num&gt;</code> with a negated key, and no name at all
-    for "build me a lookup by key".
+    이 작업 전체는 하나의 흐름입니다: 6월 데이터를 SKU로 색인하고,
+    7월 항목 중 저렴해진 것만 남기고, 각각을 하락 폭과 짝지은 뒤,
+    하락 폭으로 정렬합니다. FxDart는 각 동작마다 이름 붙은 단계를
+    제공합니다 — 조회 테이블을 위한 <code><a href="../tutorials/indexBy.html">indexBy</a></code>, 파이프라인을
+    위한 <code><a href="../tutorials/filter.html">filter</a></code> → <code><a href="../tutorials/map.html">map</a></code> → <code><a href="../tutorials/sortBy.html">sortBy</a></code>,
+    그리고 <code><a href="../tutorials/head.html">head</a></code>와 <code><a href="../tutorials/sumBy.html">sumBy</a></code>가 같은 결과 리스트를
+    재사용해 요약 줄을 만듭니다. 순수 Dart도 이를 표현할 수 있습니다 —
+    색인을 위한 맵 리터럴, 체인을 위한 <code>where</code>/<code><a href="../tutorials/map.html">map</a></code>/
+    <code>sortedBy</code> — 하지만 그 어휘는 흩어져 있습니다:
+    <code><a href="../tutorials/sumBy.html">sumBy</a></code> 대신 초기값을 가진 <code>fold</code>, 부호를
+    반전한 키를 쓰는 <code>sortedBy&lt;num&gt;</code>, 그리고 "키로
+    조회 테이블을 만들어줘"에 해당하는 이름은 아예 없습니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="cohort-retention.html">← 이전: Cohort retention table</a>
-    <a href="anomaly-context.html">다음: Anomalies with surrounding context →</a>
+    <a href="cohort-retention.html">← 이전: 코호트 리텐션 테이블</a>
+    <a href="anomaly-context.html">다음: 주변 맥락과 함께 보는 이상치 →</a>
   </nav>
 </main>
 <footer class="site-footer">

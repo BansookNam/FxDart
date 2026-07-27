@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Spending inside a date window — Dart vs FxDart</title>
   <meta name="description" content="Sum a slice of a date-sorted ledger — skipWhile/takeWhile/fold in plain Dart vs dropWhile + takeWhile + sumBy in FxDart. Native holds up well.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/date-window-spend.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/date-window-spend.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/date-window-spend.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/date-window-spend.html">
@@ -44,30 +43,29 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #13 · <strong>Spending inside a date window</strong></p>
   <h1>Spending inside a date window</h1>
-  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/takeWhile.html">takeWhile</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    A ledger export is already <strong>sorted by date</strong>. Total the
-    spending between <strong>2026-07-08 and 2026-07-21</strong> inclusive —
-    without scanning the whole list: skip entries before the window, take
-    entries while still inside it, and sum what remains. The data is in the
-    code below; both versions must print the line shown under
-    <em>Expected output</em>.
+    가계부 내보내기 데이터가 이미 <strong>날짜순으로 정렬</strong>되어
+    있습니다. <strong>2026-07-08부터 2026-07-21까지</strong>(양 끝
+    포함) 지출을 리스트 전체를 훑지 않고 합산하세요: 구간 이전
+    항목은 건너뛰고, 구간 안에 있는 동안만 가져와서, 남은 것을
+    합산합니다. 데이터는 아래 코드에 있으며, 두 버전 모두
+    <em>예상 출력</em> 아래에 표시된 줄을 출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">Spent 2026-07-08 to 2026-07-21: $104.04</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 class Tx {
@@ -142,21 +140,23 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    Barely. Dart ships <code>skipWhile</code> and <code><a href="../tutorials/takeWhile.html">takeWhile</a></code> on
-    every <code>Iterable</code>, and both are lazy — the plain-Dart version
-    exploits the sort order exactly the way the FxDart one does, and reads
-    just as well. The only real difference is the last step:
-    <code><a href="../tutorials/sumBy.html">sumBy</a></code> names the intent, where <code>fold</code> spells out
-    the seed and the combine. That is a one-word win, not a structural one —
-    call it a tie. If your codebase already chains with <code><a href="../tutorials/fx.html">fx</a></code>,
-    use it here for consistency; if not, plain Dart is fine.
+    거의 차이가 없습니다. Dart는 모든 <code>Iterable</code>에
+    <code>skipWhile</code>과 <code><a href="../tutorials/takeWhile.html">takeWhile</a></code>을 기본 제공하며
+    둘 다 지연 평가됩니다 — 순수 Dart 버전도 FxDart 버전과 정확히
+    같은 방식으로 정렬 순서를 활용하고, 읽기도 마찬가지로 좋습니다.
+    실질적인 차이는 마지막 단계뿐입니다: <code><a href="../tutorials/sumBy.html">sumBy</a></code>는 의도를
+    이름으로 말해주는 반면, <code>fold</code>는 초기값과 결합 함수를
+    그대로 드러냅니다. 이건 한 단어짜리 승리이지, 구조적인 승리는
+    아닙니다 — 무승부라고 부르는 게 맞습니다. 코드베이스가 이미
+    <code><a href="../tutorials/fx.html">fx</a></code>로 체이닝하고 있다면 일관성을 위해 여기서도
+    쓰세요; 그렇지 않다면 순수 Dart로 충분합니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="recent-errors.html">← 이전: Recent error messages, deduped</a>
-    <a href="unique-tags.html">다음: All tags across posts, sorted →</a>
+    <a href="recent-errors.html">← 이전: 최근 오류 메시지, 중복 제거</a>
+    <a href="unique-tags.html">다음: 모든 게시물의 태그를 정렬해 모으기 →</a>
   </nav>
 </main>
 <footer class="site-footer">

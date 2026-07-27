@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Recent error messages, deduped — Dart vs FxDart</title>
-  <meta name="description" content="The three most recent distinct errors from a newest-first log — a seen-Set loop with a break in plain Dart vs filter + uniqBy + take in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/recent-errors.html">
+  <title>최근 오류 메시지, 중복 제거 — Dart vs FxDart</title>
+  <meta name="description" content="최신순 로그에서 가장 최근의 서로 다른 오류 3개를 추출합니다 — 순수 Dart의 seen-Set 루프와 break 대 FxDart의 filter + uniqBy + take를 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/recent-errors.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/recent-errors.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/recent-errors.html">
@@ -44,31 +43,30 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #12 · <strong>Recent error messages, deduped</strong></p>
-  <h1>Recent error messages, deduped</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #12 · <strong>최근 오류 메시지, 중복 제거</strong></p>
+  <h1>최근 오류 메시지, 중복 제거</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/uniqBy.html">uniqBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    A log store returns entries newest first. Show the <strong>three most
-    recent distinct error messages</strong>: keep only <code>ERROR</code>
-    entries, drop repeats of a message already shown, and stop after three.
-    The data is in the code below; both versions must print the lines shown
-    under <em>Expected output</em>.
+    로그 저장소는 항목을 최신순으로 반환합니다. <strong>가장 최근의 서로
+    다른 오류 메시지 세 개</strong>를 표시하세요: <code>ERROR</code> 항목만
+    남기고, 이미 표시한 메시지의 반복은 제거하고, 세 개가 되면 멈춥니다.
+    데이터는 아래 코드에 있으며, 두 버전 모두 <em>예상 출력</em> 아래에
+    표시된 줄을 출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">09:41 payment gateway timeout
 09:31 inventory service 503
 09:17 invalid session token</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 class Log {
@@ -149,22 +147,22 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    Dart has no "distinct by key" — deduping by message means managing a
-    <code>Set</code> yourself, so the native version becomes a loop with
-    three concerns braided together: the level check, the
-    <code>seen.add</code> trick, and a counted <code>break</code>. Each is
-    fine alone; together they force you to read the whole loop to see what
-    it keeps. FxDart states the three rules as three chain steps —
-    <code><a href="../tutorials/filter.html">filter</a></code>, <code><a href="../tutorials/uniqBy.html">uniqBy</a></code>, <code><a href="../tutorials/take.html">take</a></code> — and
-    because the chain is lazy, it also stops scanning the log the moment the
-    third distinct error is found, exactly like the hand-written
-    <code>break</code>.
+    Dart에는 "키 기준 distinct"가 없습니다 — 메시지 기준으로 중복을
+    제거하려면 <code>Set</code>을 직접 관리해야 하므로, 네이티브 버전은
+    세 가지 관심사가 얽힌 루프가 됩니다: 레벨 확인, <code>seen.add</code>
+    트릭, 그리고 개수를 세는 <code>break</code>. 각각은 그 자체로는
+    단순하지만, 함께 있으면 무엇을 남기는지 알기 위해 루프 전체를 읽어야
+    합니다. FxDart는 이 세 가지 규칙을 체인의 세 단계 —
+    <code><a href="../tutorials/filter.html">filter</a></code>, <code><a href="../tutorials/uniqBy.html">uniqBy</a></code>, <code><a href="../tutorials/take.html">take</a></code> — 로
+    표현하며, 체인이 지연 평가되므로 세 번째 서로 다른 오류를 찾는 즉시
+    로그 스캔을 멈춥니다. 손으로 작성한 <code>break</code>와 정확히
+    동일하게 동작합니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="top-merchants.html">← 이전: Top 5 merchants by total spend</a>
+    <a href="top-merchants.html">← 이전: 총지출 기준 상위 5개 판매자</a>
     <a href="date-window-spend.html">다음: Spending inside a date window →</a>
   </nav>
 </main>

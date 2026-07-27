@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Refunds vs charges, both formatted — Dart vs FxDart</title>
-  <meta name="description" content="Split a ledger into refunds and charges and print both sides — two where passes in plain Dart vs one partition in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/refunds-vs-charges.html">
+  <title>환불과 청구, 둘 다 포맷팅 — Dart vs FxDart</title>
+  <meta name="description" content="원장을 환불과 청구로 나누어 두 쪽 모두 출력합니다 — 순수 Dart의 where 두 번 대 FxDart의 partition 한 번을 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/refunds-vs-charges.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/refunds-vs-charges.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/refunds-vs-charges.html">
@@ -44,30 +43,29 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #15 · <strong>Refunds vs charges, both formatted</strong></p>
-  <h1>Refunds vs charges, both formatted</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #15 · <strong>환불과 청구, 둘 다 포맷팅</strong></p>
+  <h1>환불과 청구, 둘 다 포맷팅</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/partition.html">partition</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    A ledger mixes charges and refunds (negative amounts). Split it into the
-    two groups, format every transaction as
-    <code>merchant $amount</code>, and print one line per group —
-    refunds first. The data is in the code below; both versions must print
-    the lines shown under <em>Expected output</em>.
+    원장에는 청구와 환불(음수 금액)이 섞여 있습니다. 이를 두 그룹으로
+    나누고, 모든 거래를 <code>merchant $amount</code> 형식으로 포맷팅한
+    뒤, 그룹당 한 줄씩 출력하세요 — 환불이 먼저입니다. 데이터는 아래
+    코드에 있으며, 두 버전 모두 <em>예상 출력</em> 아래에 표시된 줄을
+    출력해야 합니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">refunds: Web Store $89.99, Airline $120.00, Book Nook $27.99
 charges: Cafe Aroma $12.50, Web Store $89.99, Noodle Bar $18.90, Airline $240.00, Green Grocer $43.20</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 class Tx {
@@ -135,23 +133,23 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    Dart has no <code><a href="../tutorials/partition.html">partition</a></code> — when you need <em>both</em> halves,
-    <code>where</code> only gives you one, so the native version filters
-    twice: once with the predicate, once with its negation, written out by
-    hand (<code>&lt; 0</code> and <code>&gt;= 0</code>). That is two passes
-    over the data and two predicates to keep in sync — if the refund rule
-    ever changes, nothing forces the second line to follow. FxDart's
-    <code><a href="../tutorials/partition.html">partition</a></code> makes the split one declaration: a single
-    predicate, a single pass, and a record destructure that names both
-    halves. The <code><a href="../tutorials/map.html">map</a></code> + <code><a href="../tutorials/join.html">join</a></code> formatting afterwards
-    is the same in both.
+    Dart에는 <code><a href="../tutorials/partition.html">partition</a></code>이 없습니다 — <em>두 쪽 다</em> 필요할
+    때 <code>where</code>는 한쪽만 주므로, 네이티브 버전은 데이터를 두 번
+    훑습니다: 한 번은 조건으로, 한 번은 그 부정으로, 손수 작성합니다
+    (<code>&lt; 0</code>과 <code>&gt;= 0</code>). 이는 데이터를 두 번
+    순회하고 두 조건을 서로 맞춰 유지해야 한다는 뜻입니다 — 환불 규칙이
+    바뀌면 두 번째 줄이 따라 바뀐다는 보장이 없습니다. FxDart의
+    <code><a href="../tutorials/partition.html">partition</a></code>은 이 분리를 하나의 선언으로 만듭니다: 조건
+    하나, 순회 한 번, 그리고 양쪽 모두를 이름 붙여 구조 분해하는 레코드.
+    이후의 <code><a href="../tutorials/map.html">map</a></code> + <code><a href="../tutorials/join.html">join</a></code> 포맷팅은 두 버전이
+    동일합니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="unique-tags.html">← 이전: All tags across posts, sorted</a>
-    <a href="compound-interest.html">다음: Compound interest table →</a>
+    <a href="unique-tags.html">← 이전: 모든 게시물의 태그를 정렬해 모으기</a>
+    <a href="compound-interest.html">다음: 복리 이자 테이블 →</a>
   </nav>
 </main>
 <footer class="site-footer">

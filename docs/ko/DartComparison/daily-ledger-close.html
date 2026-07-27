@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Finale — DailyLedger monthly close — Dart vs FxDart</title>
   <meta name="description" content="The finale: load ledger entries 3 at a time, then compute the July summary and category breakdown — the real DailyLedger app shapes, both ways.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/daily-ledger-close.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/daily-ledger-close.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/daily-ledger-close.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/daily-ledger-close.html">
@@ -44,35 +43,34 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #50 · <strong>Finale — DailyLedger monthly close</strong></p>
   <h1>Finale — DailyLedger monthly close</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-async">async</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/partition.html">partition</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>요구사항</h2>
   <p>
-    Close the month for a personal ledger. Ten entries live in a store
-    (fixed data in the code below); load each by id — at most
-    <strong>three loads in flight</strong>, proven by the max-in-flight
-    counter — then compute the July&nbsp;2026 close: keep only July entries
-    (one straggler is from June), split income from spending, total each
-    side, and print the net plus the top three spending categories with
-    entry counts.
+    개인 가계부의 월말 마감을 처리하세요. 열 개의 항목이 저장소에
+    있고(아래 코드에 고정 데이터로 있습니다), id로 각 항목을
+    불러오되 — 최대 <strong>세 개까지만 동시에 로드</strong>합니다,
+    이는 최대 동시 실행 수 카운터로 증명됩니다 — 그런 다음
+    2026년&nbsp;7월 마감을 계산합니다: 7월 항목만 남기고(하나는 6월에
+    낀 예외입니다), 수입과 지출을 나누어 각각 합산한 뒤, 순액과 항목
+    수를 포함한 상위 세 지출 카테고리를 출력합니다.
   </p>
   <p>
-    The shapes here are lifted from a real app: the <code>Entry</code>
-    model, the income/spending split (<code><a href="../tutorials/filter.html">filter</a></code> →
-    <code><a href="../tutorials/partition.html">partition</a></code> → <code><a href="../tutorials/sumBy.html">sumBy</a></code> each half), and the
-    category breakdown (<code><a href="../tutorials/groupBy.html">groupBy</a></code> → per-group <code><a href="../tutorials/sumBy.html">sumBy</a></code>
-    → <code><a href="../tutorials/sortBy.html">sortBy</a></code> descending → <code>take(3)</code>) mirror
-    DailyLedger's <code>monthSummary</code> and
-    <code>categoryBreakdown</code> pipelines, with the async load phase
-    (<code><a href="../tutorials/toAsync.html">toAsync</a></code> → <code><a href="../tutorials/map.html">map</a></code> → <code>concurrent(3)</code>)
-    in front.
+    여기 쓰인 형태들은 실제 앱에서 그대로 가져온 것입니다:
+    <code>Entry</code> 모델, 수입/지출 분리(<code><a href="../tutorials/filter.html">filter</a></code> →
+    <code><a href="../tutorials/partition.html">partition</a></code> → 각 절반에 <code><a href="../tutorials/sumBy.html">sumBy</a></code>), 카테고리
+    분석(<code><a href="../tutorials/groupBy.html">groupBy</a></code> → 그룹별 <code><a href="../tutorials/sumBy.html">sumBy</a></code> →
+    내림차순 <code><a href="../tutorials/sortBy.html">sortBy</a></code> → <code>take(3)</code>)은 DailyLedger의
+    <code>monthSummary</code>와 <code>categoryBreakdown</code>
+    파이프라인을 그대로 옮긴 것이며, 앞단의 비동기 로드 단계
+    (<code><a href="../tutorials/toAsync.html">toAsync</a></code> → <code><a href="../tutorials/map.html">map</a></code> → <code>concurrent(3)</code>)도
+    마찬가지입니다.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>예상 출력</summary>
     <pre class="code">July 2026 close — 10 entries loaded, 3 at a time (max in flight: 3)
 income  $3600.00
 expense $1478.15
@@ -83,10 +81,10 @@ top spending categories:
   utilities: $106.30 (2 entries)</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>나란히 보기</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>네이티브 Dart</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -254,28 +252,29 @@ Future<void> main() async {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>차이가 나는 이유</h2>
   <p>
-    Fifty examples in, this is the pattern they all add up to: plain Dart
-    needs three dialects for one feature — <code>package:collection</code>
-    helpers for grouping, <code>fold</code> with explicit seeds for the
-    totals, and a hand-rolled worker pool the moment the load phase needs a
-    concurrency bound. Each piece is fine; together they make the business
-    logic the hardest thing on the screen to find. The FxDart version is
-    the same vocabulary from the load phase to the report — and because
-    every stage is a pure pipeline, each one can be lifted out and unit
-    tested as <em>entries in, view data out</em>.
+    쉰 개의 예제를 지나오며 결국 모두가 하나로 수렴하는 패턴이
+    이것입니다: 순수 Dart는 기능 하나에 세 가지 방언이 필요합니다 —
+    그룹화를 위한 <code>package:collection</code> 헬퍼, 합계를 위한
+    명시적 초기값이 있는 <code>fold</code>, 그리고 로드 단계에
+    동시성 제한이 필요해지는 순간 직접 짜야 하는 워커 풀. 각 조각은
+    그 자체로는 문제없지만, 합쳐지면 비즈니스 로직이 화면에서 가장
+    찾기 어려운 것이 되어 버립니다. FxDart 버전은 로드 단계부터
+    리포트까지 같은 어휘로 이어지며, 모든 단계가 순수한 파이프라인이기
+    때문에 각각을 떼어내어 <em>항목이 들어가고 뷰 데이터가 나온다</em>는
+    형태로 단위 테스트할 수 있습니다.
   </p>
   <p>
-    These pipelines are not a demo confection: they are how
-    <a href="../../DailyLedger/">the DailyLedger demo app</a> actually
-    computes its dashboard — same model, same operators, running live in
-    your browser. If the fifty comparisons showed you the words, DailyLedger
-    is the sentence they were building toward.
+    이 파이프라인들은 데모용으로 꾸며낸 것이 아닙니다: 실제로
+    <a href="../../DailyLedger/">DailyLedger 데모 앱</a>이 대시보드를
+    계산하는 방식 그대로입니다 — 같은 모델, 같은 연산자가 여러분의
+    브라우저에서 실시간으로 동작합니다. 쉰 개의 비교가 단어들을
+    보여줬다면, DailyLedger는 그 단어들이 만들어 가던 문장입니다.
   </p>
 
   <nav class="tut-nav">
-    <a href="live-search.html">← 이전: Live search over a keystroke stream</a>
+    <a href="live-search.html">← 이전: 키 입력 스트림 위의 실시간 검색</a>
   </nav>
 </main>
 <footer class="site-footer">
