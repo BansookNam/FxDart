@@ -1,0 +1,7 @@
+Ledger diff (5 -> 5 entries)
++ t6 Noodle Bar $18.90
++ t7 Pharmacy $22.40
+- t3 Metro card $30.00
+- t4 Cinema $15.00
+= 3 unchanged entries
+Net change: -$3.70

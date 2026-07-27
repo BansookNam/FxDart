@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Category with highest average expense — Dart vs FxDart</title>
+  <meta name="description" content="Group expenses and find the priciest category per transaction — collection groupBy + maxBy nested calls in plain Dart vs one FxDart chain.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/top-category-average.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/top-category-average.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/top-category-average.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/top-category-average.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/top-category-average.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/top-category-average.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/top-category-average.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/top-category-average.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/top-category-average.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Início</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../DartComparison/top-category-average.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/top-category-average.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/DartComparison/top-category-average.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/top-category-average.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/top-category-average.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/top-category-average.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="../../ru/DartComparison/top-category-average.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #18 · <strong>Category with highest average expense</strong></p>
+  <h1>Category with highest average expense</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Given a month of expenses — each with a date, category, and amount —
+    find the category with the <strong>highest average amount per
+    transaction</strong>, and print it with the average formatted to two
+    decimals. The data is in the code below; both versions must print the
+    line shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">Highest average spend: Travel ($111.00 per transaction)</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+import 'package:collection/collection.dart';
+
+class Tx {
+  final String date;
+  final String category;
+  final double amount;
+  const Tx(this.date, this.category, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-02', 'Food', 12.50),
+  Tx('2026-07-04', 'Travel', 132.40),
+  Tx('2026-07-06', 'Food', 43.20),
+  Tx('2026-07-09', 'Utilities', 60.34),
+  Tx('2026-07-11', 'Food', 18.90),
+  Tx('2026-07-14', 'Travel', 89.60),
+  Tx('2026-07-17', 'Utilities', 41.66),
+  Tx('2026-07-21', 'Food', 9.80),
+];
+
+double meanSpend(List<Tx> ts) =>
+    ts.fold(0.0, (sum, t) => sum + t.amount) / ts.length;
+
+void main() {
+  final byCategory = groupBy(txns, (Tx t) => t.category);
+  final averages =
+      byCategory.entries.map((kv) => (kv.key, meanSpend(kv.value)));
+  final top = maxBy(averages, (c) => c.$2)!;
+  print('Highest average spend: ${top.$1} '
+      '(\$${top.$2.toStringAsFixed(2)} per transaction)');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Tx {
+  final String date;
+  final String category;
+  final double amount;
+  const Tx(this.date, this.category, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-02', 'Food', 12.50),
+  Tx('2026-07-04', 'Travel', 132.40),
+  Tx('2026-07-06', 'Food', 43.20),
+  Tx('2026-07-09', 'Utilities', 60.34),
+  Tx('2026-07-11', 'Food', 18.90),
+  Tx('2026-07-14', 'Travel', 89.60),
+  Tx('2026-07-17', 'Utilities', 41.66),
+  Tx('2026-07-21', 'Food', 9.80),
+];
+
+double meanSpend(List<Tx> ts) =>
+    ts.fold(0.0, (sum, t) => sum + t.amount) / ts.length;
+
+void main() {
+  final byCategory = fx(txns).groupBy((t) => t.category);
+  final top = fx(byCategory.entries)
+      .map((kv) => (kv.key, meanSpend(kv.value)))
+      .maxBy((c) => c.$2)!;
+  print('Highest average spend: ${top.$1} '
+      '(\$${top.$2.toStringAsFixed(2)} per transaction)');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Core Dart has neither <code><a href="../tutorials/groupBy.html">groupBy</a></code> nor <code><a href="../tutorials/maxBy.html">maxBy</a></code>;
+    <code>package:collection</code> supplies both — but as top-level
+    functions, not chain steps. The native version therefore reads
+    inside-out: <code>maxBy(</code>… wrapping a <code><a href="../tutorials/map.html">map</a></code> over
+    entries of a <code>groupBy(</code>… — three idioms (function call,
+    method chain, function call) for one three-step thought. FxDart keeps
+    the reading order equal to the data flow: <code><a href="../tutorials/groupBy.html">groupBy</a></code> the
+    transactions, <code><a href="../tutorials/map.html">map</a></code> each group to
+    <code>(category, average)</code>, <code><a href="../tutorials/maxBy.html">maxBy</a></code> the average. Same
+    algorithm, but the sentence runs left to right.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="sensor-anomalies.html">← Anterior: Pair sensors with readings, keep anomalies</a>
+    <a href="valid-emails.html">Próximo: First 5 valid emails, normalized →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+boiler sensor, windows of 4 readings:
+  0s-3s  avg 69.50  peak 70.5
+  4s-7s  avg 75.75  peak 77.0
+  8s-11s  avg 69.88  peak 72.0
+ALERT 4s-7s: average 75.75 is above the 75.00 limit

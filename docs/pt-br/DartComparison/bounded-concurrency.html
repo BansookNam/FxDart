@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fetch profiles, two at a time — Dart vs FxDart</title>
+  <meta name="description" content="Bounded, in-order concurrency — a hand-rolled worker pool in plain Dart vs toAsync + map + concurrent in FxDart.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/bounded-concurrency.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/bounded-concurrency.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/bounded-concurrency.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/bounded-concurrency.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/bounded-concurrency.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/bounded-concurrency.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/bounded-concurrency.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/bounded-concurrency.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/bounded-concurrency.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Início</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../DartComparison/bounded-concurrency.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/bounded-concurrency.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/DartComparison/bounded-concurrency.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/bounded-concurrency.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/bounded-concurrency.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/bounded-concurrency.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="../../ru/DartComparison/bounded-concurrency.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #20 · <strong>Fetch profiles, two at a time</strong></p>
+  <h1>Fetch profiles, two at a time</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Fetch six user profiles from a (simulated) API, but never more than
+    <strong>two requests in flight at once</strong> — the API rate-limits.
+    Results must come back <strong>in the original order</strong>. To prove
+    the limit held, the fake fetch counts how many requests overlap and both
+    versions print the maximum observed.
+  </p>
+  <p>
+    This is the task plain Dart has no primitive for.
+    <code>Future.wait</code> runs <em>everything</em> at once;
+    batching into pairs wastes time waiting for the slower of each pair;
+    doing it right means writing a worker pool by hand — index bookkeeping,
+    a shared cursor, pre-sized result slots. FxDart's
+    <code>.concurrent(2)</code> is that worker pool, as one word: as each
+    request finishes the next one starts, and order is preserved.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">user#1, user#2, user#3, user#4, user#5, user#6
+max requests in flight: 2</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+const userIds = [1, 2, 3, 4, 5, 6];
+
+int inFlight = 0;
+int maxInFlight = 0;
+
+Future<String> fetchProfile(int id) async {
+  inFlight++;
+  if (inFlight > maxInFlight) maxInFlight = inFlight;
+  await Future.delayed(const Duration(milliseconds: 20));
+  inFlight--;
+  return 'user#$id';
+}
+
+/// A hand-rolled worker pool: [limit] workers pull from a shared cursor,
+/// writing into pre-sized slots so the output keeps the input order.
+Future<List<String>> fetchAll(List<int> ids, int limit) async {
+  final results = List<String?>.filled(ids.length, null);
+  var next = 0;
+  Future<void> worker() async {
+    while (next < ids.length) {
+      final i = next++;
+      results[i] = await fetchProfile(ids[i]);
+    }
+  }
+
+  await Future.wait([for (var i = 0; i < limit; i++) worker()]);
+  return results.cast<String>();
+}
+
+Future<void> main() async {
+  final profiles = await fetchAll(userIds, 2);
+  print(profiles.join(', '));
+  print('max requests in flight: $maxInFlight');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+const userIds = [1, 2, 3, 4, 5, 6];
+
+int inFlight = 0;
+int maxInFlight = 0;
+
+Future<String> fetchProfile(int id) async {
+  inFlight++;
+  if (inFlight > maxInFlight) maxInFlight = inFlight;
+  await Future.delayed(const Duration(milliseconds: 20));
+  inFlight--;
+  return 'user#$id';
+}
+
+Future<void> main() async {
+  final profiles = await fx(userIds)
+      .toAsync()
+      .map(fetchProfile)
+      .concurrent(2)
+      .toList();
+  print(profiles.join(', '));
+  print('max requests in flight: $maxInFlight');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    The two versions print the same thing — the difference is what you had
+    to write and what you now have to maintain. The native worker pool is
+    real production boilerplate (and easy to get subtly wrong: off-by-one on
+    the shared cursor, forgetting to pre-size the results list, losing
+    ordering). In the FxDart version the concurrency policy is a single
+    chain step, so changing the limit — or removing it — touches one number
+    instead of the function's whole shape.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="valid-emails.html">← Anterior: First 5 valid emails, normalized</a>
+    <a href="monthly-category-report.html">Próximo: Monthly category report, sorted by spend →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

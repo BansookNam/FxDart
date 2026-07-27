@@ -1,0 +1,4 @@
+Food: $74.60
+Bills: $60.34
+Fun: $23.25
+Transport: $14.15

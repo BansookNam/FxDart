@@ -20,6 +20,13 @@ description: FxDart 是从 FxTS 移植而来的 Dart 函数式编程库：惰性
     </a>
   </p>
 
+  <p>
+    <a class="demo-cta cta-compare" href="DartComparison/">
+      <span class="demo-cta-emoji">⚖️</span>
+      Dart vs FxDart —— 50 个真实任务，并排对比&nbsp;→
+    </a>
+  </p>
+
   {{playground:0}}
   <p class="dim">▲ 这是可运行的 —— 修改代码并按下 <strong>运行</strong>。
     它会用真正的 Dart 编译器编译，并在你的浏览器中执行。</p>

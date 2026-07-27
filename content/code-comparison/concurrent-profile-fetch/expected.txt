@@ -1,0 +1,12 @@
+fetched 10 profiles, 3 at a time:
+  user#1 Ada <ada@example.com>
+  user#2 Bram <bram@example.com>
+  user#4 Dana <dana@example.com>
+  user#5 Eli <eli@example.com>
+  user#6 Fay <fay@example.com>
+  user#7 Gus <gus@example.com>
+  user#9 Ines <ines@example.com>
+  user#10 Jun <jun@example.com>
+  user#11 Kira <kira@example.com>
+  user#12 Liam <liam@example.com>
+max requests in flight: 3

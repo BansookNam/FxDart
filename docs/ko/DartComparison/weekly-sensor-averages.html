@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Weekly averages from daily readings — Dart vs FxDart</title>
+  <meta name="description" content="Fold 21 daily readings into 3 weekly averages — index arithmetic and sublist in plain Dart vs chunk + averageBy + zipWithIndex in FxDart.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/weekly-sensor-averages.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/weekly-sensor-averages.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/weekly-sensor-averages.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/weekly-sensor-averages.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/weekly-sensor-averages.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/weekly-sensor-averages.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/weekly-sensor-averages.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/weekly-sensor-averages.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/weekly-sensor-averages.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../DartComparison/weekly-sensor-averages.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/weekly-sensor-averages.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/DartComparison/weekly-sensor-averages.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/weekly-sensor-averages.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/weekly-sensor-averages.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/weekly-sensor-averages.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/DartComparison/weekly-sensor-averages.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #23 · <strong>Weekly averages from daily readings</strong></p>
+  <h1>Weekly averages from daily readings</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/averageBy.html">averageBy</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    A temperature sensor logged one reading per day for three full weeks
+    (21 values). Report the <strong>average per 7-day week</strong>, one
+    line per week, numbered from 1. The data is in the code below; both
+    versions must print the lines shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">Week 1: 21.3°C
+Week 2: 25.0°C
+Week 3: 20.5°C</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+// Daily noon temperatures (°C), three full weeks starting Mon 2026-07-06.
+const readings = [
+  20.1, 21.4, 19.8, 22.0, 23.3, 21.7, 20.5, // week 1
+  24.0, 25.2, 26.1, 25.8, 24.4, 23.9, 25.6, // week 2
+  22.8, 21.9, 20.7, 19.5, 18.9, 19.2, 20.3, // week 3
+];
+
+void main() {
+  final lines = <String>[];
+  for (var w = 0; w * 7 < readings.length; w++) {
+    final week = readings.sublist(w * 7, w * 7 + 7);
+    final avg = week.reduce((a, b) => a + b) / week.length;
+    lines.add('Week ${w + 1}: ${avg.toStringAsFixed(1)}°C');
+  }
+  print(lines.join('\n'));
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+// Daily noon temperatures (°C), three full weeks starting Mon 2026-07-06.
+const readings = [
+  20.1, 21.4, 19.8, 22.0, 23.3, 21.7, 20.5, // week 1
+  24.0, 25.2, 26.1, 25.8, 24.4, 23.9, 25.6, // week 2
+  22.8, 21.9, 20.7, 19.5, 18.9, 19.2, 20.3, // week 3
+];
+
+void main() {
+  final report = fx(readings)
+      .chunk(7)
+      .map((week) => fx(week).averageBy((t) => t))
+      .zipWithIndex()
+      .map((e) => 'Week ${e.$1 + 1}: ${e.$2.toStringAsFixed(1)}°C')
+      .join('\n');
+  print(report);
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    "Split into groups of 7" has no core-Dart spelling, so the native
+    version runs a counting loop and carves each week out with
+    <code>sublist(w * 7, w * 7 + 7)</code> — index arithmetic that the
+    reader must re-verify, and that breaks if the tail week is short.
+    FxDart's <code>chunk(7)</code> says the grouping in one word (and
+    handles a short tail), <code><a href="../tutorials/averageBy.html">averageBy</a></code> replaces the
+    reduce-then-divide dance, and <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> brings the week
+    number into the pipeline instead of borrowing the loop counter.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="paginated-products.html">← 이전: Paginated product listing</a>
+    <a href="consecutive-over-limit.html">다음: Three consecutive readings over the limit →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

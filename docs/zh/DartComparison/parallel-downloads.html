@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parallel downloads, results in order — Dart vs FxDart</title>
+  <meta name="description" content="Six downloads with different speeds, 3 at a time — concurrent keeps request order even when completions interleave, vs pool bookkeeping.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/parallel-downloads.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/parallel-downloads.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/parallel-downloads.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/parallel-downloads.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/parallel-downloads.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/parallel-downloads.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/parallel-downloads.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/parallel-downloads.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/parallel-downloads.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">首页</a>
+      <a href="../101/index.html">FxDart 入门</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API 教程</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="语言">
+      <span class="lang-label">语言</span>
+      <ul>
+        <li><a href="../../DartComparison/parallel-downloads.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/parallel-downloads.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/DartComparison/parallel-downloads.html" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/parallel-downloads.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/parallel-downloads.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/parallel-downloads.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/DartComparison/parallel-downloads.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">本页尚未翻译，因此以英文显示。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">参与翻译</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #46 · <strong>Parallel downloads, results in order</strong></p>
+  <h1>Parallel downloads, results in order</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/join.html">join</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Download six files — each with a fixed size and a fixed (simulated)
+    transfer time, in the code below — with at most <strong>three
+    downloads in flight</strong>, and list the results numbered
+    <strong>in request order</strong>. The delays are chosen so completions
+    interleave: the 30&nbsp;ms <code>video.mp4</code> is requested first
+    but the 10&nbsp;ms <code>notes.txt</code> finishes first. Both versions
+    print which file finished first and the maximum observed concurrency —
+    proving the work really overlapped, out of order, while the listing
+    stayed in order.
+  </p>
+  <p>
+    That reorder-under-the-hood, order-on-the-surface guarantee is exactly
+    what <code>concurrent(3)</code> does: it evaluates up to three upstream
+    items at once and still yields results in source order. The chain
+    numbers them with <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> and assembles the report
+    with <code><a href="../tutorials/join.html">join</a></code>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">downloaded 6 files, 3 at a time, in request order:
+  1. video.mp4 (900 KB)
+  2. notes.txt (2 KB)
+  3. slides.pdf (340 KB)
+  4. photo.jpg (180 KB)
+  5. data.csv (55 KB)
+  6. theme.zip (260 KB)
+first to finish: notes.txt
+total size: 1737 KB
+max downloads in flight: 3</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+class FileSpec {
+  final String name;
+  final int kb;
+  final int ms; // fixed simulated transfer time
+  const FileSpec(this.name, this.kb, this.ms);
+}
+
+const files = [
+  FileSpec('video.mp4', 900, 30), FileSpec('notes.txt', 2, 10),
+  FileSpec('slides.pdf', 340, 20), FileSpec('photo.jpg', 180, 30),
+  FileSpec('data.csv', 55, 30), FileSpec('theme.zip', 260, 30),
+];
+
+int inFlight = 0;
+int maxInFlight = 0;
+final finished = <String>[];
+
+Future<String> download(FileSpec f) async {
+  inFlight++;
+  if (inFlight > maxInFlight) maxInFlight = inFlight;
+  await Future.delayed(Duration(milliseconds: f.ms));
+  inFlight--;
+  finished.add(f.name);
+  return '${f.name} (${f.kb} KB)';
+}
+
+/// Worker pool: [limit] workers share a cursor; pre-sized slots keep the
+/// results in request order even though completions interleave.
+Future<List<String>> downloadAll(List<FileSpec> all, int limit) async {
+  final results = List<String?>.filled(all.length, null);
+  var next = 0;
+  Future<void> worker() async {
+    while (next < all.length) {
+      final i = next++;
+      results[i] = await download(all[i]);
+    }
+  }
+
+  await Future.wait([for (var i = 0; i < limit; i++) worker()]);
+  return results.cast<String>();
+}
+
+Future<void> main() async {
+  final results = await downloadAll(files, 3);
+  print('downloaded ${files.length} files, 3 at a time, in request order:');
+  for (var i = 0; i < results.length; i++) {
+    print('  ${i + 1}. ${results[i]}');
+  }
+  print('first to finish: ${finished.first}');
+  print('total size: ${files.fold(0, (sum, f) => sum + f.kb)} KB');
+  print('max downloads in flight: $maxInFlight');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class FileSpec {
+  final String name;
+  final int kb;
+  final int ms; // fixed simulated transfer time
+  const FileSpec(this.name, this.kb, this.ms);
+}
+
+const files = [
+  FileSpec('video.mp4', 900, 30), FileSpec('notes.txt', 2, 10),
+  FileSpec('slides.pdf', 340, 20), FileSpec('photo.jpg', 180, 30),
+  FileSpec('data.csv', 55, 30), FileSpec('theme.zip', 260, 30),
+];
+
+int inFlight = 0;
+int maxInFlight = 0;
+final finished = <String>[];
+
+Future<String> download(FileSpec f) async {
+  inFlight++;
+  if (inFlight > maxInFlight) maxInFlight = inFlight;
+  await Future.delayed(Duration(milliseconds: f.ms));
+  inFlight--;
+  finished.add(f.name);
+  return '${f.name} (${f.kb} KB)';
+}
+
+Future<void> main() async {
+  final listing = await fx(files)
+      .toAsync()
+      .map(download)
+      .concurrent(3)
+      .zipWithIndex()
+      .map((e) => '  ${e.$1 + 1}. ${e.$2}')
+      .join('\n');
+  print('downloaded ${files.length} files, 3 at a time, in request order:');
+  print(listing);
+  print('first to finish: ${finished.first}');
+  print('total size: ${fx(files).sumBy((f) => f.kb)} KB');
+  print('max downloads in flight: $maxInFlight');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    <code>Future.wait</code> preserves order but downloads everything at
+    once — no limit. Adding the limit is what forces the native worker
+    pool, and preserving order under that pool is precisely the subtle
+    part: the pre-sized <code>results</code> list indexed by a shared
+    cursor. Get the slot bookkeeping wrong and results come back shuffled —
+    a bug that only shows when completion order happens to differ from
+    request order, which is timing-dependent and easy to miss in tests. In
+    FxDart the ordering guarantee is the operator's contract, not your
+    code: <code>concurrent(3)</code> cannot return items out of order, no
+    matter how the timings fall.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="rate-limited-import.html">← 上一节： Rate-limited batch import</a>
+    <a href="paged-feeds-dedupe.html">下一节： Two paged feeds, concatenated and deduped →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart 是 <a href="https://github.com/marpple/FxTS">FxTS</a> 的移植版本。特别感谢 <strong>Indong Yoo</strong>（Marpple CTO）与 FxTS 团队，本库的设计思路、语义和测试套件均源于他们的工作。</p>
+  <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 运行","pgReset":"重置","pgCompiling":"编译中…","pgCompileError":"编译错误","pgError":"错误","pgLoading":"正在加载运行时…","pgRunning":"运行中…","pgNoOutput":"（无输出）","pgLoadFailed":"无法加载 FxDart 库"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

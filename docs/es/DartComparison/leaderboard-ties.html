@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leaderboard with tied ranks — Dart vs FxDart</title>
+  <meta name="description" content="Rank players so equal scores share a rank — mutable rank/prevScore state in plain Dart vs sortBy + groupBy + zipWithIndex in FxDart.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/leaderboard-ties.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/leaderboard-ties.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/leaderboard-ties.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/leaderboard-ties.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/leaderboard-ties.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/leaderboard-ties.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/leaderboard-ties.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/leaderboard-ties.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/leaderboard-ties.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../DartComparison/leaderboard-ties.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/leaderboard-ties.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/DartComparison/leaderboard-ties.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/leaderboard-ties.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/leaderboard-ties.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/leaderboard-ties.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/DartComparison/leaderboard-ties.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #26 · <strong>Leaderboard with tied ranks</strong></p>
+  <h1>Leaderboard with tied ranks</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/entries.html">entries</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Print a leaderboard from six players' scores, highest first, where
+    <strong>equal scores share a rank</strong> — dense ranking, so two
+    players on 87 points are both #2 and the next score down is #3.
+    The data is in the code below; both versions must print the lines
+    shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">#1 Leo — 92 pts
+#2 Mina — 87 pts
+#2 Anton — 87 pts
+#3 Sofia — 75 pts
+#3 Kai — 75 pts
+#4 Bea — 60 pts</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+class Player {
+  final String name;
+  final int score;
+  const Player(this.name, this.score);
+}
+
+const players = [
+  Player('Mina', 87),
+  Player('Leo', 92),
+  Player('Sofia', 75),
+  Player('Anton', 87),
+  Player('Bea', 60),
+  Player('Kai', 75),
+];
+
+void main() {
+  final sorted = [...players]..sort((a, b) => b.score.compareTo(a.score));
+  final lines = <String>[];
+  var rank = 0;
+  int? prevScore;
+  for (final p in sorted) {
+    if (p.score != prevScore) {
+      rank++; // dense ranking: next distinct score takes the next rank
+      prevScore = p.score;
+    }
+    lines.add('#$rank ${p.name} — ${p.score} pts');
+  }
+  print(lines.join('\n'));
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Player {
+  final String name;
+  final int score;
+  const Player(this.name, this.score);
+}
+
+const players = [
+  Player('Mina', 87),
+  Player('Leo', 92),
+  Player('Sofia', 75),
+  Player('Anton', 87),
+  Player('Bea', 60),
+  Player('Kai', 75),
+];
+
+void main() {
+  // Sort descending, group equal scores, then number the groups:
+  // every player in group i gets rank i + 1 (dense ranking).
+  final byScore = fx(players).sortBy((p) => -p.score).groupBy((p) => p.score);
+  final lines = fx(entries(byScore))
+      .zipWithIndex()
+      .flatMap((g) {
+        final (i, (score, group)) = g;
+        return group.map((p) => '#${i + 1} ${p.name} — $score pts');
+      })
+      .toList();
+  print(lines.join('\n'));
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Tied ranks force the native loop to carry two pieces of mutable state
+    — the current <code>rank</code> and the previous score — and the tie
+    rule lives in an <code>if</code> whose correctness you check by
+    replaying the loop in your head. The FxDart version states the
+    structure instead: <code><a href="../tutorials/sortBy.html">sortBy</a></code> descending,
+    <code><a href="../tutorials/groupBy.html">groupBy</a></code> score (one group per rank), walk the groups with
+    <code><a href="../tutorials/entries.html">entries</a></code> + <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> (group index = rank),
+    and <code><a href="../tutorials/flatMap.html">flatMap</a></code> each group back into player lines. "Equal
+    scores share a rank" stops being emergent loop behavior and becomes
+    the pipeline's shape.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="budget-alerts.html">← Anterior: Categories over their monthly budget</a>
+    <a href="invoice-summary.html">Siguiente: Line items to invoice summary →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recent error messages, deduped — Dart vs FxDart</title>
+  <meta name="description" content="The three most recent distinct errors from a newest-first log — a seen-Set loop with a break in plain Dart vs filter + uniqBy + take in FxDart.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/recent-errors.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/recent-errors.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/recent-errors.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/recent-errors.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/recent-errors.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/recent-errors.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/recent-errors.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/recent-errors.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/recent-errors.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Главная</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="../../DartComparison/recent-errors.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/recent-errors.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/DartComparison/recent-errors.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/recent-errors.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/recent-errors.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/recent-errors.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/DartComparison/recent-errors.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #12 · <strong>Recent error messages, deduped</strong></p>
+  <h1>Recent error messages, deduped</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/uniqBy.html">uniqBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    A log store returns entries newest first. Show the <strong>three most
+    recent distinct error messages</strong>: keep only <code>ERROR</code>
+    entries, drop repeats of a message already shown, and stop after three.
+    The data is in the code below; both versions must print the lines shown
+    under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">09:41 payment gateway timeout
+09:31 inventory service 503
+09:17 invalid session token</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+class Log {
+  final String time;
+  final String level;
+  final String message;
+  const Log(this.time, this.level, this.message);
+}
+
+// Newest first, as a log store would return them.
+const logs = [
+  Log('09:41', 'ERROR', 'payment gateway timeout'),
+  Log('09:40', 'INFO', 'checkout started'),
+  Log('09:38', 'ERROR', 'payment gateway timeout'),
+  Log('09:35', 'WARN', 'retrying request'),
+  Log('09:31', 'ERROR', 'inventory service 503'),
+  Log('09:28', 'INFO', 'cache warmed'),
+  Log('09:22', 'ERROR', 'payment gateway timeout'),
+  Log('09:17', 'ERROR', 'invalid session token'),
+  Log('09:12', 'ERROR', 'disk quota exceeded'),
+  Log('09:05', 'INFO', 'server started'),
+];
+
+void main() {
+  final seen = <String>{};
+  final recent = <Log>[];
+  for (final l in logs) {
+    if (l.level != 'ERROR') continue;
+    if (!seen.add(l.message)) continue;
+    recent.add(l);
+    if (recent.length == 3) break;
+  }
+  for (final l in recent) {
+    print('${l.time} ${l.message}');
+  }
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Log {
+  final String time;
+  final String level;
+  final String message;
+  const Log(this.time, this.level, this.message);
+}
+
+// Newest first, as a log store would return them.
+const logs = [
+  Log('09:41', 'ERROR', 'payment gateway timeout'),
+  Log('09:40', 'INFO', 'checkout started'),
+  Log('09:38', 'ERROR', 'payment gateway timeout'),
+  Log('09:35', 'WARN', 'retrying request'),
+  Log('09:31', 'ERROR', 'inventory service 503'),
+  Log('09:28', 'INFO', 'cache warmed'),
+  Log('09:22', 'ERROR', 'payment gateway timeout'),
+  Log('09:17', 'ERROR', 'invalid session token'),
+  Log('09:12', 'ERROR', 'disk quota exceeded'),
+  Log('09:05', 'INFO', 'server started'),
+];
+
+void main() {
+  final recent = fx(logs)
+      .filter((l) => l.level == 'ERROR')
+      .uniqBy((l) => l.message)
+      .take(3);
+  for (final l in recent) {
+    print('${l.time} ${l.message}');
+  }
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Dart has no "distinct by key" — deduping by message means managing a
+    <code>Set</code> yourself, so the native version becomes a loop with
+    three concerns braided together: the level check, the
+    <code>seen.add</code> trick, and a counted <code>break</code>. Each is
+    fine alone; together they force you to read the whole loop to see what
+    it keeps. FxDart states the three rules as three chain steps —
+    <code><a href="../tutorials/filter.html">filter</a></code>, <code><a href="../tutorials/uniqBy.html">uniqBy</a></code>, <code><a href="../tutorials/take.html">take</a></code> — and
+    because the chain is lazy, it also stops scanning the log the moment the
+    third distinct error is found, exactly like the hand-written
+    <code>break</code>.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="top-merchants.html">← Назад: Top 5 merchants by total spend</a>
+    <a href="date-window-spend.html">Далее: Spending inside a date window →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

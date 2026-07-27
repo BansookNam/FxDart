@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Top 3 largest expenses — Dart vs FxDart</title>
+  <meta name="description" content="Largest three transactions of the month — sortedBy + take from package:collection vs sortBy + take in FxDart.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/top-expenses.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/top-expenses.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/top-expenses.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/top-expenses.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/top-expenses.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/top-expenses.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/top-expenses.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/top-expenses.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/top-expenses.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../DartComparison/top-expenses.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/top-expenses.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/DartComparison/top-expenses.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/top-expenses.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/top-expenses.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/top-expenses.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/DartComparison/top-expenses.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #3 · <strong>Top 3 largest expenses</strong></p>
+  <h1>Top 3 largest expenses</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    From a month of expenses, print the <strong>three largest</strong> —
+    merchant and amount, biggest first. The data is in the code below; both
+    versions must print the lines shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">Airline Ticket  $289.99
+New Headphones  $129.00
+Electric Co     $60.34</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+import 'package:collection/collection.dart';
+
+class Tx {
+  final String date;
+  final String merchant;
+  final double amount;
+  const Tx(this.date, this.merchant, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-02', 'Cafe Aroma', 12.50),
+  Tx('2026-07-03', 'Metro Card', 34.00),
+  Tx('2026-07-05', 'Green Grocer', 43.20),
+  Tx('2026-07-08', 'Airline Ticket', 289.99),
+  Tx('2026-07-11', 'Noodle Bar', 18.90),
+  Tx('2026-07-15', 'Electric Co', 60.34),
+  Tx('2026-07-19', 'New Headphones', 129.00),
+  Tx('2026-07-23', 'Taxi', 11.40),
+];
+
+void main() {
+  // package:collection's sortedBy returns a new sorted list; negate the
+  // key to sort largest-first.
+  final top = txns.sortedBy<num>((t) => -t.amount).take(3);
+  for (final t in top) {
+    print('${t.merchant.padRight(15)} \$${t.amount.toStringAsFixed(2)}');
+  }
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Tx {
+  final String date;
+  final String merchant;
+  final double amount;
+  const Tx(this.date, this.merchant, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-02', 'Cafe Aroma', 12.50),
+  Tx('2026-07-03', 'Metro Card', 34.00),
+  Tx('2026-07-05', 'Green Grocer', 43.20),
+  Tx('2026-07-08', 'Airline Ticket', 289.99),
+  Tx('2026-07-11', 'Noodle Bar', 18.90),
+  Tx('2026-07-15', 'Electric Co', 60.34),
+  Tx('2026-07-19', 'New Headphones', 129.00),
+  Tx('2026-07-23', 'Taxi', 11.40),
+];
+
+void main() {
+  // sortBy is ascending — negate the key to sort largest-first.
+  final top = fx(txns).sortBy((t) => -t.amount).take(3).toList();
+  for (final t in top) {
+    print('${t.merchant.padRight(15)} \$${t.amount.toStringAsFixed(2)}');
+  }
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    They barely do — this one is a tie. Both sides sort on a negated key to
+    get descending order and take the first three;
+    <code>package:collection</code>'s <code>sortedBy</code> is every bit as
+    direct as FxDart's <code><a href="../tutorials/sortBy.html">sortBy</a></code> (core <code>List.sort</code> alone
+    would mutate in place and need an explicit comparator, but
+    <code>collection</code> is a standard dependency). The only real
+    difference is where the vocabulary lives: an extension method from a
+    package vs a step in a chain that also offers <code><a href="../tutorials/scan.html">scan</a></code>,
+    <code><a href="../tutorials/chunk.html">chunk</a></code>, and async variants. Pick either with a clear
+    conscience.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="running-balance.html">← Anterior: Running account balance</a>
+    <a href="first-visit-merchants.html">Siguiente: Merchants in first-visit order →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

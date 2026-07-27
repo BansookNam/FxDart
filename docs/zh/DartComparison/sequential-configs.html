@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Load three remote configs in order — Dart vs FxDart</title>
+  <meta name="description" content="Sequential async fetches — a plain await-in-loop in Dart vs toAsync + map in FxDart, one word away from bounded concurrency.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/sequential-configs.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/sequential-configs.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/sequential-configs.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/sequential-configs.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/sequential-configs.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/sequential-configs.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/sequential-configs.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/sequential-configs.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/sequential-configs.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">首页</a>
+      <a href="../101/index.html">FxDart 入门</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API 教程</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="语言">
+      <span class="lang-label">语言</span>
+      <ul>
+        <li><a href="../../DartComparison/sequential-configs.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/sequential-configs.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/DartComparison/sequential-configs.html" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/sequential-configs.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/sequential-configs.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/sequential-configs.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/DartComparison/sequential-configs.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">本页尚未翻译，因此以英文显示。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">参与翻译</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #10 · <strong>Load three remote configs in order</strong></p>
+  <h1>Load three remote configs in order</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Load three remote config sections — <code>features</code>,
+    <code>limits</code>, <code>theme</code> — from a (simulated) API,
+    <strong>one at a time, in order</strong>, then print each loaded value.
+    The fake fetch takes a fixed 15 ms; both versions must print the lines
+    shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">features -&gt; {darkMode: true, beta: false}
+limits -&gt; {maxUpload: 25, rateLimit: 120}
+theme -&gt; {accent: teal, density: compact}</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+const configNames = ['features', 'limits', 'theme'];
+
+const configValues = {
+  'features': '{darkMode: true, beta: false}',
+  'limits': '{maxUpload: 25, rateLimit: 120}',
+  'theme': '{accent: teal, density: compact}',
+};
+
+Future<String> fetchConfig(String name) async {
+  await Future.delayed(const Duration(milliseconds: 15)); // fake network
+  return '$name -> ${configValues[name]}';
+}
+
+Future<void> main() async {
+  // A plain loop awaits each fetch before starting the next.
+  final loaded = <String>[];
+  for (final name in configNames) {
+    loaded.add(await fetchConfig(name));
+  }
+  print(loaded.join('\n'));
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+const configNames = ['features', 'limits', 'theme'];
+
+const configValues = {
+  'features': '{darkMode: true, beta: false}',
+  'limits': '{maxUpload: 25, rateLimit: 120}',
+  'theme': '{accent: teal, density: compact}',
+};
+
+Future<String> fetchConfig(String name) async {
+  await Future.delayed(const Duration(milliseconds: 15)); // fake network
+  return '$name -> ${configValues[name]}';
+}
+
+Future<void> main() async {
+  // Serial by default; adding .concurrent(n) later is a one-line change.
+  final loaded = await fx(configNames)
+      .toAsync()
+      .map(fetchConfig)
+      .toList();
+  print(loaded.join('\n'));
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    For three sequential awaits, the native <code>for</code> loop is
+    perfectly fine — nobody needs a library to write it, and if the story
+    ended here this would be a tie. The FxDart win is what the code becomes
+    next: <code>toAsync().map(fetchConfig)</code> is a lazy async pipeline
+    that is serial <em>by default</em>, and the day you have thirty configs
+    instead of three, appending <code>.concurrent(8)</code> turns the same
+    chain into a bounded worker pool — order preserved, nothing else
+    touched. The native loop has no such dial; it gets rewritten. See
+    <a href="bounded-concurrency.html">Fetch profiles, two at a time</a> for
+    that ending.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="rank-labels.html">← 上一节： Rank labels for a leaderboard</a>
+    <a href="top-merchants.html">下一节： Top 5 merchants by total spend →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart 是 <a href="https://github.com/marpple/FxTS">FxTS</a> 的移植版本。特别感谢 <strong>Indong Yoo</strong>（Marpple CTO）与 FxTS 团队，本库的设计思路、语义和测试套件均源于他们的工作。</p>
+  <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 运行","pgReset":"重置","pgCompiling":"编译中…","pgCompileError":"编译错误","pgError":"错误","pgLoading":"正在加载运行时…","pgRunning":"运行中…","pgNoOutput":"（无输出）","pgLoadFailed":"无法加载 FxDart 库"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

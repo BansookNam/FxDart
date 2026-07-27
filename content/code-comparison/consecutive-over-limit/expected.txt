@@ -1,0 +1,3 @@
+Ventilation alerts (3h over 1000 ppm):
+11:00–13:00
+15:00–17:00

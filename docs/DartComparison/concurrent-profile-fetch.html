@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fetch 10 profiles, 3 at a time — Dart vs FxDart</title>
+  <meta name="description" content="Sync prep flowing straight into bounded concurrency — filter and sort, then toAsync + map + concurrent(3), vs a hand-rolled worker pool.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/concurrent-profile-fetch.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/concurrent-profile-fetch.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/concurrent-profile-fetch.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/concurrent-profile-fetch.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/concurrent-profile-fetch.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/concurrent-profile-fetch.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/concurrent-profile-fetch.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/concurrent-profile-fetch.html">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API Tutorials</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Language">
+      <span class="lang-label">Language</span>
+      <ul>
+        <li><a href="../DartComparison/concurrent-profile-fetch.html" hreflang="en" lang="en" aria-current="page">English</a></li>
+        <li><a href="../ko/DartComparison/concurrent-profile-fetch.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../zh/DartComparison/concurrent-profile-fetch.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../ja/DartComparison/concurrent-profile-fetch.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../es/DartComparison/concurrent-profile-fetch.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../pt-br/DartComparison/concurrent-profile-fetch.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../ru/DartComparison/concurrent-profile-fetch.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../DartComparison/index.html">Dart vs FxDart</a> › #41 · <strong>Fetch 10 profiles, 3 at a time</strong></p>
+  <h1>Fetch 10 profiles, 3 at a time</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    From a directory of twelve accounts, take the <strong>active</strong>
+    ones, order them by id, and fetch each profile from a (simulated) API —
+    never more than <strong>three requests in flight</strong>, results in the
+    original order. The fake fetch counts overlapping requests and both
+    versions print the maximum observed, proving the limit held. The data is
+    in the code below.
+  </p>
+  <p>
+    This is the flagship shape of the whole async section: a sync pipeline
+    (<code><a href="../tutorials/filter.html">filter</a></code> → <code><a href="../tutorials/sortBy.html">sortBy</a></code>) that crosses into async with
+    <code><a href="../tutorials/toAsync.html">toAsync</a></code> and keeps going — <code><a href="../tutorials/map.html">map</a></code> the fetch,
+    <code>concurrent(3)</code> to bound it, one more <code><a href="../tutorials/map.html">map</a></code> to
+    format, <code><a href="../tutorials/join.html">join</a></code> to finish. One chain from list to report.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">fetched 10 profiles, 3 at a time:
+  user#1 Ada &lt;ada@example.com&gt;
+  user#2 Bram &lt;bram@example.com&gt;
+  user#4 Dana &lt;dana@example.com&gt;
+  user#5 Eli &lt;eli@example.com&gt;
+  user#6 Fay &lt;fay@example.com&gt;
+  user#7 Gus &lt;gus@example.com&gt;
+  user#9 Ines &lt;ines@example.com&gt;
+  user#10 Jun &lt;jun@example.com&gt;
+  user#11 Kira &lt;kira@example.com&gt;
+  user#12 Liam &lt;liam@example.com&gt;
+max requests in flight: 3</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+import 'package:collection/collection.dart';
+
+class User {
+  final int id;
+  final String name;
+  final bool active;
+  const User(this.id, this.name, this.active);
+}
+
+const users = [
+  User(4, 'Dana', true), User(1, 'Ada', true), User(9, 'Ines', true),
+  User(3, 'Chidi', false), User(7, 'Gus', true), User(2, 'Bram', true),
+  User(11, 'Kira', true), User(6, 'Fay', true), User(8, 'Hana', false),
+  User(12, 'Liam', true), User(5, 'Eli', true), User(10, 'Jun', true),
+];
+
+int inFlight = 0;
+int maxInFlight = 0;
+
+Future<String> fetchProfile(User u) async {
+  inFlight++;
+  if (inFlight > maxInFlight) maxInFlight = inFlight;
+  await Future.delayed(Duration(milliseconds: 10 + u.id % 3 * 5));
+  inFlight--;
+  return 'user#${u.id} ${u.name} <${u.name.toLowerCase()}@example.com>';
+}
+
+/// A hand-rolled worker pool: [limit] workers pull from a shared cursor,
+/// writing into pre-sized slots so the output keeps the input order.
+Future<List<String>> fetchAll(List<User> targets, int limit) async {
+  final results = List<String?>.filled(targets.length, null);
+  var next = 0;
+  Future<void> worker() async {
+    while (next < targets.length) {
+      final i = next++;
+      results[i] = await fetchProfile(targets[i]);
+    }
+  }
+
+  await Future.wait([for (var i = 0; i < limit; i++) worker()]);
+  return results.cast<String>();
+}
+
+Future<void> main() async {
+  final targets = users.where((u) => u.active).sortedBy<num>((u) => u.id);
+  final profiles = await fetchAll(targets, 3);
+  print('fetched 10 profiles, 3 at a time:');
+  print(profiles.map((p) => '  $p').join('\n'));
+  print('max requests in flight: $maxInFlight');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class User {
+  final int id;
+  final String name;
+  final bool active;
+  const User(this.id, this.name, this.active);
+}
+
+const users = [
+  User(4, 'Dana', true), User(1, 'Ada', true), User(9, 'Ines', true),
+  User(3, 'Chidi', false), User(7, 'Gus', true), User(2, 'Bram', true),
+  User(11, 'Kira', true), User(6, 'Fay', true), User(8, 'Hana', false),
+  User(12, 'Liam', true), User(5, 'Eli', true), User(10, 'Jun', true),
+];
+
+int inFlight = 0;
+int maxInFlight = 0;
+
+Future<String> fetchProfile(User u) async {
+  inFlight++;
+  if (inFlight > maxInFlight) maxInFlight = inFlight;
+  await Future.delayed(Duration(milliseconds: 10 + u.id % 3 * 5));
+  inFlight--;
+  return 'user#${u.id} ${u.name} <${u.name.toLowerCase()}@example.com>';
+}
+
+Future<void> main() async {
+  final report = await fx(users)
+      .filter((u) => u.active)
+      .sortBy((u) => u.id)
+      .toAsync()
+      .map(fetchProfile)
+      .concurrent(3)
+      .map((p) => '  $p')
+      .join('\n');
+  print('fetched 10 profiles, 3 at a time:');
+  print(report);
+  print('max requests in flight: $maxInFlight');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Plain Dart handles the sync half fine (<code>where</code> +
+    <code>sortedBy</code>), but at the async boundary the vocabulary runs
+    out: bounding concurrency while preserving order means a hand-rolled
+    worker pool — shared cursor, pre-sized result slots, a
+    <code>Future.wait</code> over the workers. That pool is real production
+    boilerplate, and it splits the task into two dialects: a fluent chain
+    for prep, then imperative plumbing for the fetch. In the FxDart version
+    the policy stays declarative end to end — <code>concurrent(3)</code> is
+    the entire worker pool, and changing the limit (or dropping it) touches
+    one number instead of the function's shape.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="ledger-diff.html">← Previous: Diff two ledger snapshots</a>
+    <a href="flaky-api-retry.html">Next: Poll a flaky API until first success →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a>. Great thanks to <strong>Indong Yoo</strong> (CTO, Marpple) and the FxTS team for the ideas, semantics, and test suite this library is built on.</p>
+  <p>Playground compiles via the DartPad compile service. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Run","pgReset":"Reset","pgCompiling":"Compiling…","pgCompileError":"Compile error","pgError":"Error","pgLoading":"Loading runtime…","pgRunning":"Running…","pgNoOutput":"(no output)","pgLoadFailed":"Could not load the FxDart library"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

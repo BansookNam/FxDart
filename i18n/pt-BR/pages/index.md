@@ -20,6 +20,13 @@ description: FxDart é uma biblioteca de programação funcional para Dart, port
     </a>
   </p>
 
+  <p>
+    <a class="demo-cta cta-compare" href="DartComparison/">
+      <span class="demo-cta-emoji">⚖️</span>
+      Dart vs FxDart — 50 tarefas reais, lado a lado&nbsp;→
+    </a>
+  </p>
+
   {{playground:0}}
   <p class="dim">▲ Isto está ao vivo — edite o código e pressione <strong>Executar</strong>.
     Ele compila com o compilador Dart de verdade e executa no seu navegador.</p>

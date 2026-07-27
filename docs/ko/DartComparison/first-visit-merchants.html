@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Merchants in first-visit order — Dart vs FxDart</title>
+  <meta name="description" content="Order-preserving dedupe — a seen-set loop in plain Dart vs map + uniq in FxDart.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/first-visit-merchants.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/first-visit-merchants.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/first-visit-merchants.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/first-visit-merchants.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/first-visit-merchants.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/first-visit-merchants.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/first-visit-merchants.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/first-visit-merchants.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/first-visit-merchants.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../DartComparison/first-visit-merchants.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/first-visit-merchants.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/DartComparison/first-visit-merchants.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/first-visit-merchants.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/first-visit-merchants.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/first-visit-merchants.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/DartComparison/first-visit-merchants.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #4 · <strong>Merchants in first-visit order</strong></p>
+  <h1>Merchants in first-visit order</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/uniq.html">uniq</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    From a month of transactions, list each merchant <strong>once</strong>,
+    in the order it was <strong>first visited</strong> — repeat visits must
+    not move a merchant later in the list. The data is in the code below;
+    both versions must print the line shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">Cafe Aroma, Metro Card, Green Grocer, Noodle Bar</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+class Tx {
+  final String date;
+  final String merchant;
+  final double amount;
+  const Tx(this.date, this.merchant, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-02', 'Cafe Aroma', 12.50),
+  Tx('2026-07-03', 'Metro Card', 2.75),
+  Tx('2026-07-05', 'Green Grocer', 43.20),
+  Tx('2026-07-07', 'Cafe Aroma', 9.80),
+  Tx('2026-07-11', 'Noodle Bar', 18.90),
+  Tx('2026-07-14', 'Metro Card', 2.75),
+  Tx('2026-07-19', 'Cafe Aroma', 11.20),
+  Tx('2026-07-23', 'Green Grocer', 27.65),
+];
+
+void main() {
+  // Iterable.toSet() happens to preserve insertion order today, but its
+  // contract doesn't promise it — a seen-set loop states the intent.
+  final seen = <String>{};
+  final merchants = <String>[];
+  for (final t in txns) {
+    if (seen.add(t.merchant)) merchants.add(t.merchant);
+  }
+  print(merchants.join(', '));
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Tx {
+  final String date;
+  final String merchant;
+  final double amount;
+  const Tx(this.date, this.merchant, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-02', 'Cafe Aroma', 12.50),
+  Tx('2026-07-03', 'Metro Card', 2.75),
+  Tx('2026-07-05', 'Green Grocer', 43.20),
+  Tx('2026-07-07', 'Cafe Aroma', 9.80),
+  Tx('2026-07-11', 'Noodle Bar', 18.90),
+  Tx('2026-07-14', 'Metro Card', 2.75),
+  Tx('2026-07-19', 'Cafe Aroma', 11.20),
+  Tx('2026-07-23', 'Green Grocer', 27.65),
+];
+
+void main() {
+  // uniq keeps the FIRST occurrence of each merchant, by contract.
+  final merchants = fx(txns).map((t) => t.merchant).uniq().toList();
+  print(merchants.join(', '));
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    The tempting native one-liner is <code>toSet().toList()</code> — and it
+    would even print the right thing, because Dart's default set happens to
+    be insertion-ordered. But the <code>Iterable.toSet</code> contract
+    promises no order at all, so code whose <em>requirement</em> is
+    first-visit order shouldn't lean on it; the honest native version is a
+    seen-set loop with two collections and an <code>if</code>. FxDart's
+    <code><a href="../tutorials/uniq.html">uniq</a></code> makes the guarantee part of the name: it lazily keeps
+    the first occurrence of each element, by contract, as one chain step
+    after <code><a href="../tutorials/map.html">map</a></code>.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="top-expenses.html">← 이전: Top 3 largest expenses</a>
+    <a href="average-basket.html">다음: Average order value over $100 →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+features -> {darkMode: true, beta: false}
+limits -> {maxUpload: 25, rateLimit: 120}
+theme -> {accent: teal, density: compact}

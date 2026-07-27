@@ -1,0 +1,6 @@
+live search over the keystroke stream:
+  'da' -> 5 hits (top: dart language tour)
+  'dar' -> 5 hits (top: dart language tour)
+  'dart' -> 5 hits (top: dart language tour)
+  'darts' -> 1 hit (top: darts scoring rules)
+backend searches: 4

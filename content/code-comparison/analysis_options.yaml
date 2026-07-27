@@ -1,0 +1,12 @@
+# Scoped analyzer config for the Dart-vs-FxDart comparison code.
+#
+# Unlike content/code/ (whose exercise snippets legitimately leave imports
+# and variables unused), these files are complete programs shipped as the
+# comparison's evidence — full analysis, no exemptions. The only relaxation
+# is file_names: every example directory holds a `native.dart` and a
+# `fxdart.dart`, named for the panel they fill, not for their library name.
+include: ../analysis_options.yaml
+
+linter:
+  rules:
+    file_names: false

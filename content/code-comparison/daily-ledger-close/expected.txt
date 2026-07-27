@@ -1,0 +1,8 @@
+July 2026 close — 10 entries loaded, 3 at a time (max in flight: 3)
+income  $3600.00
+expense $1478.15
+net     $2121.85
+top spending categories:
+  housing: $1150.00 (1 entry)
+  food: $206.35 (3 entries)
+  utilities: $106.30 (2 entries)

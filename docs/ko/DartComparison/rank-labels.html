@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rank labels for a leaderboard — Dart vs FxDart</title>
+  <meta name="description" content="Number a sorted leaderboard 1..n — Dart 3 indexed records vs zipWithIndex + map in FxDart.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/rank-labels.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/rank-labels.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/rank-labels.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/rank-labels.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/rank-labels.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/rank-labels.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/rank-labels.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/rank-labels.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/rank-labels.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../DartComparison/rank-labels.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/rank-labels.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/DartComparison/rank-labels.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/rank-labels.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/rank-labels.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/rank-labels.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/DartComparison/rank-labels.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #9 · <strong>Rank labels for a leaderboard</strong></p>
+  <h1>Rank labels for a leaderboard</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    A leaderboard is already sorted by score, highest first. Print one rank
+    label per player — <strong>1-based position, name, score</strong>. The
+    data is in the code below; both versions must print the lines shown
+    under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">1. Hana (982 pts)
+2. Dan (951 pts)
+3. Ava (917 pts)
+4. Finn (862 pts)
+5. Cara (840 pts)
+6. Ben (799 pts)</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+class Player {
+  final String name;
+  final int score;
+  const Player(this.name, this.score);
+}
+
+// Already sorted by score, highest first.
+const leaderboard = [
+  Player('Hana', 982),
+  Player('Dan', 951),
+  Player('Ava', 917),
+  Player('Finn', 862),
+  Player('Cara', 840),
+  Player('Ben', 799),
+];
+
+void main() {
+  // Dart 3's .indexed yields the same (index, element) records.
+  final labels = leaderboard.indexed
+      .map((e) => '${e.$1 + 1}. ${e.$2.name} (${e.$2.score} pts)')
+      .toList();
+  print(labels.join('\n'));
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Player {
+  final String name;
+  final int score;
+  const Player(this.name, this.score);
+}
+
+// Already sorted by score, highest first.
+const leaderboard = [
+  Player('Hana', 982),
+  Player('Dan', 951),
+  Player('Ava', 917),
+  Player('Finn', 862),
+  Player('Cara', 840),
+  Player('Ben', 799),
+];
+
+void main() {
+  final labels = fx(leaderboard)
+      .zipWithIndex()
+      .map((e) => '${e.$1 + 1}. ${e.$2.name} (${e.$2.score} pts)')
+      .toList();
+  print(labels.join('\n'));
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Only in name. Dart 3's <code>indexed</code> yields exactly the
+    <code>(index, element)</code> records that FxDart's
+    <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> does, so the two <code><a href="../tutorials/map.html">map</a></code> callbacks
+    are character-for-character identical — a clean tie, and a good example
+    of Dart's core library catching up (before records and
+    <code>indexed</code>, the native side was a manual counter). Use
+    <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> when you're already inside an <code><a href="../tutorials/fx.html">fx</a></code>
+    chain — it also exists on async chains — and <code>indexed</code>
+    everywhere else.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="paginate-users.html">← 이전: Batch users into pages of 10</a>
+    <a href="sequential-configs.html">다음: Load three remote configs in order →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

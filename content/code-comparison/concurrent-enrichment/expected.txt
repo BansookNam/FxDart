@@ -1,0 +1,4 @@
+Green Grocer — $118.65 (Groceries)
+Electric Co — $60.34 (Utilities)
+Noodle Bar — $54.70 (Dining)
+max lookups in flight: 2

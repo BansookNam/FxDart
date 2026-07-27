@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>End-of-day settlement pipeline — Dart vs FxDart</title>
+  <meta name="description" content="Validate, group by merchant, post 2 at a time, then report — one chain crossing sync to async, vs groupListsBy plus a worker pool.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/settlement-pipeline.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/settlement-pipeline.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/settlement-pipeline.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/settlement-pipeline.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/settlement-pipeline.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/settlement-pipeline.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/settlement-pipeline.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/settlement-pipeline.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/settlement-pipeline.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">ホーム</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="../../DartComparison/settlement-pipeline.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/settlement-pipeline.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/DartComparison/settlement-pipeline.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/settlement-pipeline.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="../../es/DartComparison/settlement-pipeline.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/settlement-pipeline.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/DartComparison/settlement-pipeline.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #48 · <strong>End-of-day settlement pipeline</strong></p>
+  <h1>End-of-day settlement pipeline</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/reject.html">reject</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/partition.html">partition</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Close out the day. From ten card transactions (in the code below):
+    discard <code>failed</code> ones, group the rest by merchant, and net
+    each merchant's total (refunds negative). Post each merchant's
+    settlement to the bank gateway — at most <strong>two postings in
+    flight</strong>, results in merchant order — then print the report: one
+    line per merchant, a payout/collection split (one merchant's refunds
+    exceed its captures), the grand total, and the max-in-flight proof.
+  </p>
+  <p>
+    This is the whole library in one pipeline. Sync prep:
+    <code><a href="../tutorials/reject.html">reject</a></code> → <code><a href="../tutorials/groupBy.html">groupBy</a></code> → <code><a href="../tutorials/sumBy.html">sumBy</a></code> per
+    group → <code><a href="../tutorials/sortBy.html">sortBy</a></code>. Cross into async with <code><a href="../tutorials/toAsync.html">toAsync</a></code>,
+    post under <code>concurrent(2)</code>. Report with
+    <code><a href="../tutorials/partition.html">partition</a></code> and <code><a href="../tutorials/sumBy.html">sumBy</a></code> again.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">2026-07-27 close — 3 merchants, 2 postings at a time:
+  BookNook: 3 txns, net $-6.01
+  Cafe Luna: 4 txns, net $32.00
+  GadgetHub: 2 txns, net $218.90
+payouts: 2, collections due: 1
+settled: $244.89
+max postings in flight: 2</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+import 'package:collection/collection.dart';
+
+class Txn {
+  final String id;
+  final String merchant;
+  final double amount;
+  final String status; // captured | refund | failed
+  const Txn(this.id, this.merchant, this.amount, this.status);
+  double get signed => status == 'refund' ? -amount : amount;
+}
+
+const txns = [
+  Txn('t1', 'Cafe Luna', 12.50, 'captured'),
+  Txn('t2', 'BookNook', 34.00, 'captured'),
+  Txn('t3', 'Cafe Luna', 8.25, 'captured'),
+  Txn('t4', 'GadgetHub', 249.99, 'failed'),
+  Txn('t5', 'BookNook', 60.00, 'refund'),
+  Txn('t6', 'GadgetHub', 89.90, 'captured'),
+  Txn('t7', 'Cafe Luna', 4.75, 'refund'),
+  Txn('t8', 'BookNook', 19.99, 'captured'),
+  Txn('t9', 'GadgetHub', 129.00, 'captured'),
+  Txn('t10', 'Cafe Luna', 16.00, 'captured'),
+];
+
+class Posted {
+  final String merchant;
+  final double net;
+  final int count;
+  const Posted(this.merchant, this.net, this.count);
+}
+
+int inFlight = 0;
+int maxInFlight = 0;
+
+/// Posts one merchant's settlement to the bank gateway.
+Future<Posted> post(String merchant, double net, int count) async {
+  inFlight++;
+  if (inFlight > maxInFlight) maxInFlight = inFlight;
+  await Future.delayed(const Duration(milliseconds: 20));
+  inFlight--;
+  return Posted(merchant, net, count);
+}
+
+/// Worker pool over the merchant batches: 2 workers, ordered slots.
+Future<List<Posted>> postAll(List<(String, double, int)> batches) async {
+  final results = List<Posted?>.filled(batches.length, null);
+  var next = 0;
+  Future<void> worker() async {
+    while (next < batches.length) {
+      final i = next++;
+      final (merchant, net, count) = batches[i];
+      results[i] = await post(merchant, net, count);
+    }
+  }
+
+  await Future.wait([worker(), worker()]);
+  return results.cast<Posted>();
+}
+
+Future<void> main() async {
+  final byMerchant = txns
+      .where((t) => t.status != 'failed')
+      .groupListsBy((t) => t.merchant);
+  final batches = byMerchant.entries
+      .map((kv) => (
+            kv.key,
+            kv.value.fold(0.0, (sum, t) => sum + t.signed),
+            kv.value.length
+          ))
+      .sortedBy((m) => m.$1);
+  final posted = await postAll(batches);
+  print('2026-07-27 close — ${posted.length} merchants, 2 postings at a time:');
+  for (final p in posted) {
+    print('  ${p.merchant}: ${p.count} txns, net \$${p.net.toStringAsFixed(2)}');
+  }
+  final payouts = posted.where((p) => p.net >= 0).length;
+  print('payouts: $payouts, collections due: ${posted.length - payouts}');
+  final total = posted.fold(0.0, (sum, p) => sum + p.net);
+  print('settled: \$${total.toStringAsFixed(2)}');
+  print('max postings in flight: $maxInFlight');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Txn {
+  final String id;
+  final String merchant;
+  final double amount;
+  final String status; // captured | refund | failed
+  const Txn(this.id, this.merchant, this.amount, this.status);
+  double get signed => status == 'refund' ? -amount : amount;
+}
+
+const txns = [
+  Txn('t1', 'Cafe Luna', 12.50, 'captured'),
+  Txn('t2', 'BookNook', 34.00, 'captured'),
+  Txn('t3', 'Cafe Luna', 8.25, 'captured'),
+  Txn('t4', 'GadgetHub', 249.99, 'failed'),
+  Txn('t5', 'BookNook', 60.00, 'refund'),
+  Txn('t6', 'GadgetHub', 89.90, 'captured'),
+  Txn('t7', 'Cafe Luna', 4.75, 'refund'),
+  Txn('t8', 'BookNook', 19.99, 'captured'),
+  Txn('t9', 'GadgetHub', 129.00, 'captured'),
+  Txn('t10', 'Cafe Luna', 16.00, 'captured'),
+];
+
+class Posted {
+  final String merchant;
+  final double net;
+  final int count;
+  const Posted(this.merchant, this.net, this.count);
+}
+
+int inFlight = 0;
+int maxInFlight = 0;
+
+/// Posts one merchant's settlement to the bank gateway.
+Future<Posted> post(String merchant, double net, int count) async {
+  inFlight++;
+  if (inFlight > maxInFlight) maxInFlight = inFlight;
+  await Future.delayed(const Duration(milliseconds: 20));
+  inFlight--;
+  return Posted(merchant, net, count);
+}
+
+Future<void> main() async {
+  final byMerchant = fx(txns)
+      .reject((t) => t.status == 'failed')
+      .groupBy((t) => t.merchant);
+  final posted = await fx(byMerchant.entries)
+      .map((kv) =>
+          (kv.key, fx(kv.value).sumBy((t) => t.signed).toDouble(), kv.value.length))
+      .sortBy((m) => m.$1)
+      .toAsync()
+      .map((m) => post(m.$1, m.$2, m.$3))
+      .concurrent(2)
+      .toList();
+  print('2026-07-27 close — ${posted.length} merchants, 2 postings at a time:');
+  for (final p in posted) {
+    print('  ${p.merchant}: ${p.count} txns, net \$${p.net.toStringAsFixed(2)}');
+  }
+  final (payouts, collections) = fx(posted).partition((p) => p.net >= 0);
+  print('payouts: ${payouts.length}, collections due: ${collections.length}');
+  final total = fx(posted).sumBy((p) => p.net);
+  print('settled: \$${total.toStringAsFixed(2)}');
+  print('max postings in flight: $maxInFlight');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Each half of this task has appeared in a smaller example; the point
+    here is what happens when they meet. Native Dart does the prep well
+    enough with <code>package:collection</code>
+    (<code>groupListsBy</code>, <code>sortedBy</code>) — though netting
+    each group is a <code>fold</code> with an explicit seed, and the
+    payout split is two <code>where</code> passes. Then the async boundary
+    hits, and the shape breaks: the bounded posting needs the worker pool,
+    a separate named function with slots and a cursor, and the pipeline you
+    were reading becomes plumbing you must trace. The FxDart version is one
+    uninterrupted chain from raw transactions to posted settlements —
+    fourteen lines where the policy (what is valid, how to group, how hard
+    to hit the gateway) is the visible text, and the mechanics are the
+    library's problem.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="paged-feeds-dedupe.html">← 前: Two paged feeds, concatenated and deduped</a>
+    <a href="live-search.html">次: Live search over a keystroke stream →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

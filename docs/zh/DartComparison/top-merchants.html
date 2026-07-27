@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Top 5 merchants by total spend — Dart vs FxDart</title>
+  <meta name="description" content="Group a ledger by merchant and rank the totals — groupListsBy + sortedBy in plain Dart vs a groupBy → sortBy → take chain in FxDart.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/top-merchants.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/top-merchants.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/top-merchants.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/top-merchants.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/top-merchants.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/top-merchants.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/top-merchants.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/top-merchants.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/top-merchants.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">首页</a>
+      <a href="../101/index.html">FxDart 入门</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API 教程</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="语言">
+      <span class="lang-label">语言</span>
+      <ul>
+        <li><a href="../../DartComparison/top-merchants.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/top-merchants.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/DartComparison/top-merchants.html" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/top-merchants.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/top-merchants.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/top-merchants.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/DartComparison/top-merchants.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">本页尚未翻译，因此以英文显示。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">参与翻译</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #11 · <strong>Top 5 merchants by total spend</strong></p>
+  <h1>Top 5 merchants by total spend</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Given a month of ledger transactions — each with a date, merchant, and
+    amount — find the <strong>five merchants you spent the most at</strong>:
+    group by merchant, total each group, sort the totals descending, and
+    print the top five. The data is in the code below; both versions must
+    print the lines shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">Green Grocer: $81.95
+Electric Co: $60.34
+Noodle Bar: $40.00
+Cafe Aroma: $36.50
+Book Nook: $27.99</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+import 'package:collection/collection.dart';
+
+class Tx {
+  final String date;
+  final String merchant;
+  final double amount;
+  const Tx(this.date, this.merchant, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-02', 'Cafe Aroma', 12.50),
+  Tx('2026-07-03', 'Metro', 2.75),
+  Tx('2026-07-05', 'Green Grocer', 43.20),
+  Tx('2026-07-07', 'Cinema', 15.00),
+  Tx('2026-07-09', 'Noodle Bar', 18.90),
+  Tx('2026-07-11', 'Cafe Aroma', 9.80),
+  Tx('2026-07-14', 'Electric Co', 60.34),
+  Tx('2026-07-16', 'Book Nook', 27.99),
+  Tx('2026-07-18', 'Metro', 3.25),
+  Tx('2026-07-21', 'Noodle Bar', 21.10),
+  Tx('2026-07-24', 'Green Grocer', 38.75),
+  Tx('2026-07-26', 'Cafe Aroma', 14.20),
+];
+
+double total(List<Tx> ts) => ts.fold(0.0, (sum, t) => sum + t.amount);
+
+void main() {
+  final byMerchant = txns.groupListsBy((t) => t.merchant);
+  final top = byMerchant.entries
+      .sortedBy<num>((kv) => -total(kv.value))
+      .take(5);
+  for (final kv in top) {
+    print('${kv.key}: \$${total(kv.value).toStringAsFixed(2)}');
+  }
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Tx {
+  final String date;
+  final String merchant;
+  final double amount;
+  const Tx(this.date, this.merchant, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-02', 'Cafe Aroma', 12.50),
+  Tx('2026-07-03', 'Metro', 2.75),
+  Tx('2026-07-05', 'Green Grocer', 43.20),
+  Tx('2026-07-07', 'Cinema', 15.00),
+  Tx('2026-07-09', 'Noodle Bar', 18.90),
+  Tx('2026-07-11', 'Cafe Aroma', 9.80),
+  Tx('2026-07-14', 'Electric Co', 60.34),
+  Tx('2026-07-16', 'Book Nook', 27.99),
+  Tx('2026-07-18', 'Metro', 3.25),
+  Tx('2026-07-21', 'Noodle Bar', 21.10),
+  Tx('2026-07-24', 'Green Grocer', 38.75),
+  Tx('2026-07-26', 'Cafe Aroma', 14.20),
+];
+
+double total(List<Tx> ts) => ts.fold(0.0, (sum, t) => sum + t.amount);
+
+void main() {
+  final byMerchant = fx(txns).groupBy((t) => t.merchant);
+  final top = fx(byMerchant.entries)
+      .sortBy((kv) => -total(kv.value))
+      .take(5);
+  for (final kv in top) {
+    print('${kv.key}: \$${total(kv.value).toStringAsFixed(2)}');
+  }
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Core Dart has no <code><a href="../tutorials/groupBy.html">groupBy</a></code> at all — the native version has to
+    pull in <code>package:collection</code> for <code>groupListsBy</code>,
+    then switch idioms mid-task: an extension method to group, another
+    (<code>sortedBy</code>, with an explicit <code>&lt;num&gt;</code> type
+    argument and a negated key to get descending order) to rank. FxDart keeps
+    the whole task in one vocabulary: <code><a href="../tutorials/groupBy.html">groupBy</a></code> produces the map,
+    and <code>fx(map.entries)</code> continues the chain with
+    <code><a href="../tutorials/sortBy.html">sortBy</a></code> and <code><a href="../tutorials/take.html">take</a></code>. Same shape of solution — but
+    one library, one pipeline, no type-argument ceremony.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="sequential-configs.html">← 上一节： Load three remote configs in order</a>
+    <a href="recent-errors.html">下一节： Recent error messages, deduped →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart 是 <a href="https://github.com/marpple/FxTS">FxTS</a> 的移植版本。特别感谢 <strong>Indong Yoo</strong>（Marpple CTO）与 FxTS 团队，本库的设计思路、语义和测试套件均源于他们的工作。</p>
+  <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 运行","pgReset":"重置","pgCompiling":"编译中…","pgCompileError":"编译错误","pgError":"错误","pgLoading":"正在加载运行时…","pgRunning":"运行中…","pgNoOutput":"（无输出）","pgLoadFailed":"无法加载 FxDart 库"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

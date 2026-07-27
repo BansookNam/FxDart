@@ -60,6 +60,27 @@ void main(List<String> args) {
           _renderTutorial(locale, locales, chrome, page, sections);
       pages.add(_PageRef(locale, 'tutorials/$slug.html', page.translated));
     }
+
+    // Dart vs FxDart comparison.
+    final cmpIndex = _loadPage('pages/comparison.md', locale);
+    final cmpPages = [
+      for (final file in _comparisonFiles())
+        _loadPage('comparison/${file.split('/').last}', locale),
+    ]..sort((a, b) =>
+        int.parse(a.get('order')).compareTo(int.parse(b.get('order'))));
+    written[_out(locale, 'DartComparison/index.html')] =
+        _renderComparisonIndex(locale, locales, chrome, cmpIndex, cmpPages);
+    pages.add(
+        _PageRef(locale, 'DartComparison/index.html', cmpIndex.translated));
+    for (var i = 0; i < cmpPages.length; i++) {
+      final page = cmpPages[i];
+      final path = 'DartComparison/${page.get('slug')}.html';
+      written[_out(locale, path)] = _renderComparison(
+          locale, locales, chrome, page,
+          prev: i > 0 ? cmpPages[i - 1] : null,
+          next: i < cmpPages.length - 1 ? cmpPages[i + 1] : null);
+      pages.add(_PageRef(locale, path, page.translated));
+    }
   }
 
   written['docs/sitemap.xml'] = _renderSitemap(pages, locales);
@@ -99,7 +120,9 @@ void main(List<String> args) {
 List<String> _translatable() => [
       'pages/index.md',
       'pages/101.md',
+      'pages/comparison.md',
       for (final f in _tutorialFiles()) 'tutorials/${f.split('/').last}',
+      for (final f in _comparisonFiles()) 'comparison/${f.split('/').last}',
     ];
 
 /// Records the current English hash for every existing translation. Run this
@@ -202,6 +225,14 @@ Map<String, String> _loadSections(Locale locale) {
 }
 
 List<String> _tutorialFiles() => (Directory('$root/content/tutorials')
+        .listSync()
+        .whereType<File>()
+        .map((f) => f.path)
+        .where((p) => p.endsWith('.md'))
+        .toList()
+      ..sort());
+
+List<String> _comparisonFiles() => (Directory('$root/content/comparison')
         .listSync()
         .whereType<File>()
         .map((f) => f.path)
@@ -317,7 +348,8 @@ Map<String, String> _sources(Locale locale) =>
       return Map<String, String>.from(jsonDecode(f.readAsStringSync()));
     });
 
-final _placeholders = RegExp(r'\{\{(?:root|signature|playground:\d+)\}\}');
+final _placeholders =
+    RegExp(r'\{\{(?:root|signature|playground:\d+|comparison|output)\}\}');
 
 bool _sameOrder(List<String?> a, List<String?> b) =>
     a.length == b.length && List.generate(a.length, (i) => a[i] == b[i]).every((x) => x);
@@ -433,6 +465,7 @@ String _header(
     <nav>
       <a href="${p}index.html"${cls('home')}>${chrome['navHome']}</a>
       <a href="${p}101/index.html"${cls('101')}>${chrome['nav101']}</a>
+      <a href="${p}DartComparison/index.html"${cls('compare')}>${chrome['navCompare']}</a>
       <a href="$apiHref">${chrome['navApi']}</a>
       <a href="$repoUrl">GitHub</a>
       <a href="$fxtsUrl">FxTS</a>
@@ -613,6 +646,283 @@ String _renderTutorial(
   if (page.meta.containsKey('next')) {
     b.writeln('    <a href="${page.get('next')}">'
         '${chrome['nextPrefix']}${page.get('nextLabel')} →</a>');
+  }
+  b
+    ..writeln('  </nav>')
+    ..writeln('</main>')
+    ..write(_footer(chrome))
+    ..write(_scripts(locale, chrome, depth));
+  return b.toString();
+}
+
+// --- Dart vs FxDart comparison ----------------------------------------------
+
+const _verdictKeys = {
+  'fxdart': 'cmpVerdictFxdart',
+  'tie': 'cmpVerdictTie',
+  'native': 'cmpVerdictNative',
+};
+
+String _escapeHtml(String s) =>
+    s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+
+/// The verdict badge (and, for async examples, the async badge). The verdict
+/// is structure, not prose — an unknown value is a typo, not a new category.
+String _cmpBadges(Map<String, String> chrome, Page page) {
+  final verdict = page.get('verdict');
+  final key = _verdictKeys[verdict];
+  if (key == null) {
+    throw StateError('${page.get('slug')}: unknown verdict `$verdict` '
+        '(expected one of: ${_verdictKeys.keys.join(', ')})');
+  }
+  final b = StringBuffer(
+      '<span class="badge verdict-$verdict">${chrome[key]}</span>');
+  if (page.get('async') == 'true') {
+    b.write(' <span class="badge badge-async">${chrome['cmpAsyncBadge']}</span>');
+  }
+  return b.toString();
+}
+
+/// Function chips linking each operator to its 101 tutorial. Every name in
+/// `functions:` must have a tutorial page — a missing one is a build error
+/// rather than a 404 shipped to readers.
+String _cmpChips(Page page) {
+  final b = StringBuffer('<ul class="fn-list cmp-fns">');
+  for (final raw in page.get('functions').split(',')) {
+    final fn = raw.trim();
+    if (fn.isEmpty) continue;
+    if (!File('$root/content/tutorials/$fn.md').existsSync()) {
+      throw StateError('${page.get('slug')}: functions lists `$fn` '
+          'but content/tutorials/$fn.md does not exist');
+    }
+    b.write('<li><a href="../tutorials/$fn.html">$fn</a></li>');
+  }
+  b.write('</ul>');
+  return b.toString();
+}
+
+/// Links bare `<code>name</code>` (or `<code>name()</code>`) prose mentions
+/// to the function's 101 tutorial — but only for names in [allowed]: the
+/// example's `functions:` list plus its optional `alsoLink:` extras. Prose
+/// also name-drops *native* Dart functions (`fold`, `reduce`, `sort`…) that
+/// share fxdart vocabulary; those must stay plain, which is why matching is
+/// whitelist-based rather than "a tutorial exists". Existing anchors pass
+/// through untouched, so hand-written links are never double-wrapped.
+String _autoLinkFunctions(String html, Set<String> allowed) {
+  final anchorOrCode = RegExp(
+      r'<a\b[^>]*>.*?</a>|<code>([A-Za-z][A-Za-z0-9]*)(\(\))?</code>',
+      dotAll: true);
+  return html.replaceAllMapped(anchorOrCode, (m) {
+    final fn = m.group(1);
+    if (fn == null) return m.group(0)!; // an existing anchor — leave it
+    if (!allowed.contains(fn)) return m.group(0)!;
+    final label = '$fn${m.group(2) ?? ''}';
+    return '<code><a href="../tutorials/$fn.html">$label</a></code>';
+  });
+}
+
+/// The prose-linkable function names for a comparison page: its chips plus
+/// `alsoLink:` extras (genuine fxdart mentions outside the chip list). Every
+/// name must have a tutorial — `alsoLink` typos would otherwise ship 404s.
+Set<String> _linkableFunctions(Page page) {
+  final names = {
+    for (final f in page.get('functions').split(',')) f.trim(),
+    for (final f in page.get('alsoLink').split(',')) f.trim(),
+  }..remove('');
+  for (final fn in names) {
+    if (!File('$root/content/tutorials/$fn.md').existsSync()) {
+      throw StateError('${page.get('slug')}: `$fn` (functions/alsoLink) has '
+          'no tutorial at content/tutorials/$fn.md');
+    }
+  }
+  return names;
+}
+
+/// Expands {{root}}, {{comparison}} (the side-by-side dual playground) and
+/// {{output}} (the harness-verified expected output) for a comparison page.
+/// Code and expected output live in `content/code-comparison/<slug>/` and are
+/// locale-invariant, like content/code/.
+String _injectComparisonCode(
+    String body, String slug, int depth, Map<String, String> chrome) {
+  final dir = '$root/content/code-comparison/$slug';
+
+  body = body.replaceAll('{{root}}', _rel(depth));
+
+  body = body.replaceAll('{{comparison}}', () {
+    String panel(String file, String chromeKey, String side) {
+      final f = File('$dir/$file');
+      if (!f.existsSync()) throw StateError('$slug: missing $file');
+      final code = f.readAsStringSync().trimRight();
+      return '''
+    <section class="cmp-panel cmp-$side">
+      <h3>${chrome[chromeKey]}</h3>
+      <div class="playground">
+<textarea>
+$code
+</textarea>
+      </div>
+    </section>''';
+    }
+
+    return '<div class="comparison">\n'
+        '${panel('native.dart', 'cmpNative', 'native')}\n'
+        '${panel('fxdart.dart', 'cmpFxdart', 'fxdart')}\n'
+        '  </div>';
+  }());
+
+  return body.replaceAll('{{output}}', () {
+    final f = File('$dir/expected.txt');
+    if (!f.existsSync()) {
+      throw StateError(
+          '$slug: missing expected.txt — run `dart run tool/check_comparison.dart`');
+    }
+    final out = _escapeHtml(f.readAsStringSync().trimRight());
+    return '<details class="cmp-expected">\n'
+        '    <summary>${chrome['cmpExpected']}</summary>\n'
+        '    <pre class="code">$out</pre>\n'
+        '  </details>';
+  }());
+}
+
+/// The orders of the five examples the TOC recommends to a reader in a hurry.
+const _cmpPicks = [1, 11, 30, 41, 50];
+
+String _renderComparisonIndex(
+  Locale locale,
+  List<Locale> locales,
+  Map<String, String> chrome,
+  Page page,
+  List<Page> examples,
+) {
+  final depth = locale.depth + 1;
+  final b = StringBuffer()
+    ..write(_head(locale, locales, page, 'DartComparison/index.html', depth,
+        playground: false))
+    ..write(_header(
+        locale, locales, chrome, 'DartComparison/index.html', depth, 'compare'))
+    ..writeln('<main>')
+    ..write(_banner(chrome, page))
+    // The TOC intro mixes fxdart vocabulary with native mentions (`where`,
+    // `map`); its links are hand-written in the markdown, not auto-added.
+    ..writeln(page.body.replaceAll('{{root}}', _rel(depth)));
+
+  final picks = [
+    for (final n in _cmpPicks)
+      for (final e in examples)
+        if (e.get('order') == '$n') e,
+  ];
+  if (picks.isNotEmpty) {
+    b
+      ..writeln('')
+      ..writeln('  <p class="cmp-picks"><span>${chrome['cmpPicks']}</span>');
+    b.writeln(picks
+        .map((e) =>
+            '    <a href="${e.get('slug')}.html">#${e.get('order')} ${e.get('heading')}</a>')
+        .join(' ·\n'));
+    b.writeln('  </p>');
+  }
+
+  // Hidden until js/comparison.js wires it up — no JS, no broken UI.
+  b
+    ..writeln('')
+    ..writeln('  <div class="cmp-filter" hidden>')
+    ..writeln('    <button data-filter="all" class="active">'
+        '${chrome['cmpFilterAll']}</button>')
+    ..writeln('    <button data-filter="async">${chrome['cmpAsyncBadge']}</button>')
+    ..writeln('    <button data-filter="fxdart">${chrome['cmpVerdictFxdart']}</button>')
+    ..writeln('    <button data-filter="tie">${chrome['cmpVerdictTie']}</button>')
+    ..writeln('    <button data-filter="native">${chrome['cmpVerdictNative']}</button>')
+    ..writeln('    <input type="search" placeholder="${chrome['cmpFilterFn']}">')
+    ..writeln('  </div>');
+
+  for (var tier = 1; tier <= 4; tier++) {
+    final rows = examples.where((e) => e.get('tier') == '$tier').toList();
+    if (rows.isEmpty) continue;
+    b
+      ..writeln('')
+      ..writeln('  <section class="cmp-tier">')
+      ..writeln('  <h2>${chrome['cmpTier$tier']}</h2>')
+      ..writeln('  <p class="dim">${chrome['cmpTier${tier}Blurb']}</p>')
+      ..writeln('  <ol class="cmp-list">');
+    for (final e in rows) {
+      final fns = e
+          .get('functions')
+          .split(',')
+          .map((s) => s.trim())
+          .where((s) => s.isNotEmpty)
+          .join(' ');
+      b
+        ..writeln('    <li data-verdict="${e.get('verdict')}" '
+            'data-async="${e.get('async')}" data-fns="$fns">')
+        ..writeln('      <a class="cmp-row" href="${e.get('slug')}.html">')
+        ..writeln('        <span class="cmp-num">${e.get('order')}</span>')
+        ..writeln('        <span class="cmp-row-body">')
+        ..writeln('          <strong>${e.get('heading')}</strong> '
+            '${_cmpBadges(chrome, e)}')
+        ..writeln('          <span class="dim">${e.get('description')}</span>')
+        ..writeln('        </span>')
+        ..writeln('      </a>')
+        ..writeln('      ${_cmpChips(e)}')
+        ..writeln('    </li>');
+    }
+    b
+      ..writeln('  </ol>')
+      ..writeln('  </section>');
+  }
+
+  b
+    ..writeln('</main>')
+    ..write(_footer(chrome))
+    ..writeln('<script src="${_rel(depth)}js/comparison.js" defer></script>')
+    ..writeln('</body>')
+    ..writeln('</html>');
+  return b.toString();
+}
+
+String _renderComparison(
+  Locale locale,
+  List<Locale> locales,
+  Map<String, String> chrome,
+  Page page, {
+  Page? prev,
+  Page? next,
+}) {
+  final depth = locale.depth + 1;
+  final slug = page.get('slug');
+  final path = 'DartComparison/$slug.html';
+  final p = _rel(depth);
+
+  final b = StringBuffer()
+    ..write(_head(locale, locales, page, path, depth))
+    ..write(_header(locale, locales, chrome, path, depth, 'compare'))
+    // Two editors side by side need more room than the prose column.
+    ..writeln('<main class="cmp-wide">')
+    ..write(_banner(chrome, page))
+    ..writeln('  <p class="breadcrumb">'
+        '<a href="${p}DartComparison/index.html">${chrome['crumbCompare']}</a> › '
+        '#${page.get('order')} · <strong>${page.get('heading')}</strong></p>')
+    ..writeln('  <h1>${page.get('heading')}</h1>')
+    ..writeln('  <p class="cmp-meta">${_cmpBadges(chrome, page)}</p>')
+    ..writeln('  ${_cmpChips(page)}')
+    // Auto-link before code injection so the regex only ever sees prose,
+    // never the playground code blocks.
+    ..writeln(_injectComparisonCode(
+        _autoLinkFunctions(page.body, _linkableFunctions(page)),
+        slug,
+        depth,
+        chrome))
+    ..writeln('')
+    ..writeln('  <nav class="tut-nav">');
+  if (prev != null) {
+    b.writeln('    <a href="${prev.get('slug')}.html">'
+        '← ${chrome['prevPrefix']}${prev.get('heading')}</a>');
+  } else {
+    b.writeln(
+        '    <a href="${p}DartComparison/index.html">← ${chrome['crumbCompare']}</a>');
+  }
+  if (next != null) {
+    b.writeln('    <a href="${next.get('slug')}.html">'
+        '${chrome['nextPrefix']}${next.get('heading')} →</a>');
   }
   b
     ..writeln('  </nav>')

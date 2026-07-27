@@ -1,0 +1,7 @@
+Restock plan (budget $500.00)
+  Paper Cups      x200  $10.00   running $10.00
+  Espresso Beans  x 12  $216.00  running $226.00
+  Oat Milk        x 24  $91.20   running $317.20
+  Filter Papers   x 10  $64.00   running $381.20
+  Cleaning Tabs   x  8  $76.00   running $457.20
+Ordering 5 of 6 needed items; total $457.20, $42.80 left

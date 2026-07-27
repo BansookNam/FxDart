@@ -1,0 +1,10 @@
+first 8 unique events (primary first, then replica):
+  e1  boot
+  e2  login user 7
+  e3  cache miss
+  e4  queue drained
+  e5  login user 12
+  e6  gc pause 18ms
+  e7  disk 81% full
+  e8  cert renewed
+pages fetched: 4 of 5

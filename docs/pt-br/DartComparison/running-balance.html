@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Running account balance — Dart vs FxDart</title>
+  <meta name="description" content="Balance after every transaction — a mutable accumulator loop in plain Dart vs scan + map in FxDart.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/running-balance.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/running-balance.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/running-balance.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/running-balance.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/running-balance.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/running-balance.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/running-balance.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/running-balance.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/running-balance.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Início</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../DartComparison/running-balance.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/running-balance.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/DartComparison/running-balance.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/running-balance.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/running-balance.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/running-balance.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="../../ru/DartComparison/running-balance.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #2 · <strong>Running account balance</strong></p>
+  <h1>Running account balance</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    An account opens July with a <strong>$250.00</strong> balance and sees six
+    signed transactions — salary in, rent and groceries out. Print one
+    currency line per step: the opening balance first, then the balance
+    <strong>after each transaction</strong>. The data is in the code below;
+    both versions must print the lines shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">Opening balance $250.00
+Salary          $2850.00
+Rent            $1700.00
+Green Grocer    $1656.80
+Refund          $1685.30
+Electric Co     $1624.96
+Cafe Aroma      $1615.16</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+class Tx {
+  final String date;
+  final String label;
+  final double amount; // signed: deposits positive, spending negative
+  const Tx(this.date, this.label, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-01', 'Salary', 2600.00),
+  Tx('2026-07-02', 'Rent', -1150.00),
+  Tx('2026-07-05', 'Green Grocer', -43.20),
+  Tx('2026-07-09', 'Refund', 28.50),
+  Tx('2026-07-14', 'Electric Co', -60.34),
+  Tx('2026-07-21', 'Cafe Aroma', -9.80),
+];
+
+void main() {
+  // No scan in core Dart: fold only returns the final value, so the
+  // running state has to live in a mutable variable.
+  var balance = 250.0;
+  final lines = [
+    '${'Opening balance'.padRight(15)} \$${balance.toStringAsFixed(2)}',
+  ];
+  for (final t in txns) {
+    balance += t.amount;
+    lines.add('${t.label.padRight(15)} \$${balance.toStringAsFixed(2)}');
+  }
+  print(lines.join('\n'));
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Tx {
+  final String date;
+  final String label;
+  final double amount; // signed: deposits positive, spending negative
+  const Tx(this.date, this.label, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-01', 'Salary', 2600.00),
+  Tx('2026-07-02', 'Rent', -1150.00),
+  Tx('2026-07-05', 'Green Grocer', -43.20),
+  Tx('2026-07-09', 'Refund', 28.50),
+  Tx('2026-07-14', 'Electric Co', -60.34),
+  Tx('2026-07-21', 'Cafe Aroma', -9.80),
+];
+
+void main() {
+  // scan emits its seed first — that becomes the opening-balance line.
+  final lines = fx(txns)
+      .scan((acc, t) => (t.label, acc.$2 + t.amount),
+          ('Opening balance', 250.0))
+      .map((e) => '${e.$1.padRight(15)} \$${e.$2.toStringAsFixed(2)}')
+      .toList();
+  print(lines.join('\n'));
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Core Dart has <code>fold</code>, which collapses the list to the
+    <em>final</em> balance — but this task needs every intermediate one, and
+    there is no <code><a href="../tutorials/scan.html">scan</a></code>. So the native version falls back to a
+    mutable <code>balance</code> variable threaded through a loop, and the
+    formatting is interleaved with the accumulation. FxDart's
+    <code><a href="../tutorials/scan.html">scan</a></code> yields each accumulated state as a value (the seed
+    first — which lands the opening-balance line for free), and
+    <code><a href="../tutorials/map.html">map</a></code> formats afterwards as a separate, swappable step.
+    Running state as a pipeline stage instead of a mutation is exactly the
+    vocabulary Dart is missing here.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="food-spending.html">← Anterior: Food spending this month</a>
+    <a href="top-expenses.html">Próximo: Top 3 largest expenses →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

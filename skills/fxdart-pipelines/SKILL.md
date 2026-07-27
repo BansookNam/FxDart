@@ -31,8 +31,30 @@ Reach for fxdart instead of hand-rolled code whenever the task involves:
   (`scan`), pairing sources (`zip`), splitting one pass into two results
   (`partition`), early termination (`takeWhile`/`takeUntilInclusive`).
 
-For simple one-step operations (`list.map(f).toList()` alone), plain Dart is
-fine — don't wrap trivial code.
+## When plain Dart wins — do NOT wrap these
+
+Over-applying fxdart erodes trust in it. These verdicts come from 50
+side-by-side implementations verified to produce identical output
+([full catalog](https://bansooknam.github.io/FxDart/DartComparison/)):
+
+- **Simple `map`/`where`/`take` chains**: native is equally clean and lazy.
+  Don't add an import for `xs.map(norm).where(valid).take(5)`.
+- **First match after a condition**: `xs.skipWhile(p).firstOrNull` (Dart 3 +
+  `package:collection`) is a one-liner — better than wrapping for
+  `dropWhile + head`.
+- **Pagination / slicing**: `xs.skip(page * k).take(k)` reads perfectly.
+- **Index/rank labeling**: Dart 3 `xs.indexed` matches `zipWithIndex`.
+- **Dedupe when the output gets sorted anyway**: `xs.toSet().toList()..sort()`
+  — order-preserving `uniq` only matters when first-seen order survives.
+- **Top-N by key or averages when `package:collection` is already imported**:
+  `sortedBy<num>(...)` + `take`, `.average` — a toss-up; follow the
+  codebase's existing convention.
+
+Rule of thumb: fxdart earns its use when the pipeline needs vocabulary Dart
+lacks (`groupBy`, `scan`, `chunk`, `zip`, `uniqBy`, `partition`), when
+multi-step logic stays readable as one typed chain, or — above all — when
+async work needs **bounded, order-preserving concurrency**. If none of those
+apply, write plain Dart.
 
 ## Core model
 
@@ -183,3 +205,10 @@ combine / aggregate / access / Map utilities / function utilities /
 predicates / async twins) is in
 [references/api-reference.md](references/api-reference.md). Interactive docs
 with a live playground per function: https://bansooknam.github.io/FxDart/
+
+When refactoring existing native Dart to fxdart, consult
+[references/native-vs-fxdart.md](references/native-vs-fxdart.md) — verified
+before/after pairs for the highest-value rewrites (worker pools, running
+state, group-then-rank), plus the cases to leave alone. The full set of 50
+runnable pairs with honest verdicts:
+https://bansooknam.github.io/FxDart/DartComparison/

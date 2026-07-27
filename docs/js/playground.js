@@ -7,6 +7,8 @@
  *   1. The single-file build of fxdart (assets/fxdart_single.dart) is
  *      invisibly prepended to the user's code (their
  *      `import 'package:fxdart/fxdart.dart';` line is commented out).
+ *      Code with no fxdart import — the "native Dart" panels on the
+ *      Dart-vs-FxDart comparison pages — skips the merge entirely.
  *   2. The merged source is sent to the DartPad compile service (compileDDC).
  *   3. The returned JS module is executed in a fresh sandboxed iframe
  *      (frame.html) with the matching dart_sdk.js; print() output streams
@@ -133,8 +135,14 @@
       runBtn.disabled = true;
       status.textContent = t('pgCompiling', 'Compiling\u2026');
 
-      getLib().then(function (lib) {
-        var built = buildSource(lib, getCode());
+      // The "native Dart" panels on comparison pages never import fxdart —
+      // they compile as-is, with no library merge and no line offset.
+      var code = getCode();
+      var needsLib = /^\s*import\s+['"]package:fxdart\//m.test(code);
+      (needsLib
+        ? getLib().then(function (lib) { return buildSource(lib, code); })
+        : Promise.resolve({ source: code, offset: 0 })
+      ).then(function (built) {
         return fetch(COMPILE_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

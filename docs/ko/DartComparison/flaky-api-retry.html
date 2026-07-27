@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Poll a flaky API until first success — Dart vs FxDart</title>
+  <meta name="description" content="Retry-until-ready as a lazy pipeline — range + toAsync + map + dropWhile + head vs an imperative polling loop with a break.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/flaky-api-retry.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/flaky-api-retry.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/flaky-api-retry.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/flaky-api-retry.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/flaky-api-retry.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/flaky-api-retry.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/flaky-api-retry.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/flaky-api-retry.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/flaky-api-retry.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../DartComparison/flaky-api-retry.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/flaky-api-retry.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/DartComparison/flaky-api-retry.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/flaky-api-retry.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/flaky-api-retry.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/flaky-api-retry.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/DartComparison/flaky-api-retry.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #42 · <strong>Poll a flaky API until first success</strong></p>
+  <h1>Poll a flaky API until first success</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/peek.html">peek</a></li><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/head.html">head</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    An export job's status endpoint is deterministically flaky: the first
+    four polls answer <code>pending</code>, the fifth answers
+    <code>ready</code>. Poll it up to ten times, keep a log of every poll,
+    stop at the first success, and report which attempt won — plus how many
+    polls were actually made. No randomness: the failure count is fixed in
+    the code below, so both versions print the same thing every run.
+  </p>
+  <p>
+    The FxDart version writes the retry as data: <code>range(1, 11)</code>
+    is the poll schedule, <code><a href="../tutorials/map.html">map</a></code> is the transport,
+    <code><a href="../tutorials/peek.html">peek</a></code> records the log, and <code><a href="../tutorials/dropWhile.html">dropWhile</a></code> +
+    <code><a href="../tutorials/head.html">head</a></code> is the success policy. Because the chain is lazy and
+    pulled one value at a time, <code><a href="../tutorials/head.html">head</a></code> stops the polling — only
+    five requests are ever made.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">polling export-2026-07 (up to 10 attempts):
+  poll 1: pending
+  poll 2: pending
+  poll 3: pending
+  poll 4: pending
+  poll 5: ready
+ready on attempt 5; polls actually made: 5</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+const jobId = 'export-2026-07';
+int pollsMade = 0;
+
+/// Deterministically flaky: the first four polls answer 'pending',
+/// the fifth answers 'ready'. (A real API would 503; same shape.)
+Future<String> pollJob(String id, int attempt) async {
+  pollsMade++;
+  await Future.delayed(const Duration(milliseconds: 10));
+  return attempt < 5 ? 'pending' : 'ready';
+}
+
+Future<void> main() async {
+  final log = <String>[];
+  (int, String)? winner;
+  for (var attempt = 1; attempt <= 10; attempt++) {
+    final status = await pollJob(jobId, attempt);
+    log.add('  poll $attempt: $status');
+    if (status == 'ready') {
+      winner = (attempt, status);
+      break;
+    }
+  }
+  print('polling $jobId (up to 10 attempts):');
+  log.forEach(print);
+  print('ready on attempt ${winner!.$1}; polls actually made: $pollsMade');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+const jobId = 'export-2026-07';
+int pollsMade = 0;
+
+/// Deterministically flaky: the first four polls answer 'pending',
+/// the fifth answers 'ready'. (A real API would 503; same shape.)
+Future<String> pollJob(String id, int attempt) async {
+  pollsMade++;
+  await Future.delayed(const Duration(milliseconds: 10));
+  return attempt < 5 ? 'pending' : 'ready';
+}
+
+Future<void> main() async {
+  final log = <String>[];
+  final winner = await fx(range(1, 11))
+      .toAsync()
+      .map((attempt) async => (attempt, await pollJob(jobId, attempt)))
+      .peek((r) => log.add('  poll ${r.$1}: ${r.$2}'))
+      .dropWhile((r) => r.$2 != 'ready')
+      .head();
+  print('polling $jobId (up to 10 attempts):');
+  log.forEach(print);
+  print('ready on attempt ${winner!.$1}; polls actually made: $pollsMade');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Honestly: the native <code>for</code> loop with a <code>break</code> is
+    short, and nobody would call it wrong. The difference is where the
+    pieces live. In the loop, the attempt budget, the logging, and the
+    success test are all tangled into control flow — change one and you
+    re-read the whole body. In the pipeline each concern is its own named
+    step, so swapping the policy (first success → third success, add a
+    transform, widen the budget) means editing one line. And the laziness
+    guarantee — no polls after the winner — is structural in FxDart, while
+    in the loop it depends on the <code>break</code> being in the right
+    place.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="concurrent-profile-fetch.html">← 이전: Fetch 10 profiles, 3 at a time</a>
+    <a href="price-lookup-fallback.html">다음: Concurrent price lookup with fallback →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

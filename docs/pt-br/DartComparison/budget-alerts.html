@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Categories over their monthly budget — Dart vs FxDart</title>
+  <meta name="description" content="Total spend per category, keep the ones over budget, rank by overage — mutable-map bookkeeping in plain Dart vs groupBy + filter + sortBy in FxDart.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/budget-alerts.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/budget-alerts.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/budget-alerts.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/budget-alerts.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/budget-alerts.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/budget-alerts.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/budget-alerts.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/budget-alerts.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/budget-alerts.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Início</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../DartComparison/budget-alerts.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/budget-alerts.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/DartComparison/budget-alerts.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/budget-alerts.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/budget-alerts.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/budget-alerts.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="../../ru/DartComparison/budget-alerts.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #25 · <strong>Categories over their monthly budget</strong></p>
+  <h1>Categories over their monthly budget</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Each spending category has a monthly budget. From July's transactions,
+    total each category, keep only the categories that <strong>went over
+    their budget</strong>, and print them worst offender first — spent,
+    budget, and the overage on each line. The data is in the code below;
+    both versions must print the lines shown under
+    <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">Over budget in July:
+Food: $135.75 spent, $120.00 budget (over by $15.75)
+Fun: $34.75 spent, $30.00 budget (over by $4.75)
+Bills: $90.33 spent, $90.00 budget (over by $0.33)</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+class Tx {
+  final String date;
+  final String category;
+  final String merchant;
+  final double amount;
+  const Tx(this.date, this.category, this.merchant, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-02', 'Food', 'Green Grocer', 45.10),
+  Tx('2026-07-04', 'Transport', 'Metro', 12.00),
+  Tx('2026-07-06', 'Fun', 'Cinema', 18.00),
+  Tx('2026-07-09', 'Food', 'Noodle Bar', 38.25),
+  Tx('2026-07-12', 'Bills', 'Electric Co', 60.34),
+  Tx('2026-07-15', 'Transport', 'Taxi', 9.50),
+  Tx('2026-07-18', 'Fun', 'Arcade', 16.75),
+  Tx('2026-07-21', 'Food', 'Cafe Aroma', 52.40),
+  Tx('2026-07-25', 'Bills', 'Water Co', 29.99),
+];
+
+const budgets = {'Food': 120.0, 'Transport': 40.0, 'Fun': 30.0, 'Bills': 90.0};
+
+void main() {
+  final totals = <String, double>{};
+  for (final t in txns) {
+    totals[t.category] = (totals[t.category] ?? 0) + t.amount;
+  }
+  final over = totals.entries
+      .where((e) => e.value > budgets[e.key]!)
+      .toList()
+    ..sort((a, b) => (budgets[a.key]! - a.value)
+        .compareTo(budgets[b.key]! - b.value)); // most over first
+  final alerts = over
+      .map((e) => '${e.key}: \$${e.value.toStringAsFixed(2)} spent, '
+          '\$${budgets[e.key]!.toStringAsFixed(2)} budget '
+          '(over by \$${(e.value - budgets[e.key]!).toStringAsFixed(2)})')
+      .join('\n');
+  print('Over budget in July:');
+  print(alerts);
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Tx {
+  final String date;
+  final String category;
+  final String merchant;
+  final double amount;
+  const Tx(this.date, this.category, this.merchant, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-02', 'Food', 'Green Grocer', 45.10),
+  Tx('2026-07-04', 'Transport', 'Metro', 12.00),
+  Tx('2026-07-06', 'Fun', 'Cinema', 18.00),
+  Tx('2026-07-09', 'Food', 'Noodle Bar', 38.25),
+  Tx('2026-07-12', 'Bills', 'Electric Co', 60.34),
+  Tx('2026-07-15', 'Transport', 'Taxi', 9.50),
+  Tx('2026-07-18', 'Fun', 'Arcade', 16.75),
+  Tx('2026-07-21', 'Food', 'Cafe Aroma', 52.40),
+  Tx('2026-07-25', 'Bills', 'Water Co', 29.99),
+];
+
+const budgets = {'Food': 120.0, 'Transport': 40.0, 'Fun': 30.0, 'Bills': 90.0};
+
+void main() {
+  final byCategory = fx(txns).groupBy((t) => t.category);
+  final alerts = fx(byCategory.entries)
+      .map((kv) => (kv.key, kv.value.fold(0.0, (sum, t) => sum + t.amount)))
+      .filter((row) => row.$2 > budgets[row.$1]!)
+      .sortBy((row) => budgets[row.$1]! - row.$2) // most over first
+      .map((row) => '${row.$1}: \$${row.$2.toStringAsFixed(2)} spent, '
+          '\$${budgets[row.$1]!.toStringAsFixed(2)} budget '
+          '(over by \$${(row.$2 - budgets[row.$1]!).toStringAsFixed(2)})')
+      .join('\n');
+  print('Over budget in July:');
+  print(alerts);
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    The formatting line is identical in both versions — the difference is
+    everything before it. Native Dart does the grouping by hand in a
+    mutable map, then switches idiom twice: a <code>for</code> loop to
+    total, a <code>where</code> to filter, a cascade-<code>sort</code>
+    with a hand-built comparator to rank. The FxDart version is one
+    vocabulary end to end: <code><a href="../tutorials/groupBy.html">groupBy</a></code>, <code><a href="../tutorials/map.html">map</a></code> to
+    totals, <code><a href="../tutorials/filter.html">filter</a></code> against the budget, <code><a href="../tutorials/sortBy.html">sortBy</a></code>
+    the overage, <code><a href="../tutorials/join.html">join</a></code>. Each business rule — over budget,
+    worst first — is one named step you can point at in a code review.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="consecutive-over-limit.html">← Anterior: Three consecutive readings over the limit</a>
+    <a href="leaderboard-ties.html">Próximo: Leaderboard with tied ranks →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

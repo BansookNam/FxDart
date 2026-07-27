@@ -20,6 +20,13 @@ description: FxDart は FxTS から移植された Dart 向けの関数型プロ
     </a>
   </p>
 
+  <p>
+    <a class="demo-cta cta-compare" href="DartComparison/">
+      <span class="demo-cta-emoji">⚖️</span>
+      Dart vs FxDart — 実践課題 50 問を並べて比較&nbsp;→
+    </a>
+  </p>
+
   {{playground:0}}
   <p class="dim">▲ これは実際に動きます。コードを編集して <strong>Run</strong> を押してください。
     本物の Dart コンパイラでコンパイルされ、ブラウザ上で実行されます。</p>

@@ -1,0 +1,13 @@
+July 2026 ledger
+Total spent: $201.99
+
+By category:
+  Bills      $88.44
+  Food       $84.40
+  Fun        $15.00
+  Transport  $14.15
+
+Top merchants:
+  1. Electric Co  $60.34
+  2. Green Grocer $43.20
+  3. Water Works  $28.10

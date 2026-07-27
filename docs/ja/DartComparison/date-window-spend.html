@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spending inside a date window — Dart vs FxDart</title>
+  <meta name="description" content="Sum a slice of a date-sorted ledger — skipWhile/takeWhile/fold in plain Dart vs dropWhile + takeWhile + sumBy in FxDart. Native holds up well.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/date-window-spend.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/date-window-spend.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/date-window-spend.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/date-window-spend.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/date-window-spend.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/date-window-spend.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/date-window-spend.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/date-window-spend.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/date-window-spend.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">ホーム</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="../../DartComparison/date-window-spend.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/date-window-spend.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/DartComparison/date-window-spend.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/date-window-spend.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="../../es/DartComparison/date-window-spend.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/date-window-spend.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/DartComparison/date-window-spend.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #13 · <strong>Spending inside a date window</strong></p>
+  <h1>Spending inside a date window</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/takeWhile.html">takeWhile</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    A ledger export is already <strong>sorted by date</strong>. Total the
+    spending between <strong>2026-07-08 and 2026-07-21</strong> inclusive —
+    without scanning the whole list: skip entries before the window, take
+    entries while still inside it, and sum what remains. The data is in the
+    code below; both versions must print the line shown under
+    <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">Spent 2026-07-08 to 2026-07-21: $104.04</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+class Tx {
+  final String date;
+  final String merchant;
+  final double amount;
+  const Tx(this.date, this.merchant, this.amount);
+}
+
+// Sorted by date, as a ledger export would be.
+const txns = [
+  Tx('2026-07-02', 'Cafe Aroma', 12.50),
+  Tx('2026-07-04', 'Metro', 2.75),
+  Tx('2026-07-08', 'Cinema', 15.00),
+  Tx('2026-07-11', 'Noodle Bar', 18.90),
+  Tx('2026-07-15', 'Electric Co', 60.34),
+  Tx('2026-07-19', 'Cafe Aroma', 9.80),
+  Tx('2026-07-23', 'Green Grocer', 43.20),
+  Tx('2026-07-26', 'Book Nook', 27.99),
+];
+
+const start = '2026-07-08';
+const end = '2026-07-21';
+
+void main() {
+  final total = txns
+      .skipWhile((t) => t.date.compareTo(start) < 0)
+      .takeWhile((t) => t.date.compareTo(end) <= 0)
+      .fold(0.0, (sum, t) => sum + t.amount);
+  print('Spent $start to $end: \$${total.toStringAsFixed(2)}');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Tx {
+  final String date;
+  final String merchant;
+  final double amount;
+  const Tx(this.date, this.merchant, this.amount);
+}
+
+// Sorted by date, as a ledger export would be.
+const txns = [
+  Tx('2026-07-02', 'Cafe Aroma', 12.50),
+  Tx('2026-07-04', 'Metro', 2.75),
+  Tx('2026-07-08', 'Cinema', 15.00),
+  Tx('2026-07-11', 'Noodle Bar', 18.90),
+  Tx('2026-07-15', 'Electric Co', 60.34),
+  Tx('2026-07-19', 'Cafe Aroma', 9.80),
+  Tx('2026-07-23', 'Green Grocer', 43.20),
+  Tx('2026-07-26', 'Book Nook', 27.99),
+];
+
+const start = '2026-07-08';
+const end = '2026-07-21';
+
+void main() {
+  final total = fx(txns)
+      .dropWhile((t) => t.date.compareTo(start) < 0)
+      .takeWhile((t) => t.date.compareTo(end) <= 0)
+      .sumBy((t) => t.amount);
+  print('Spent $start to $end: \$${total.toStringAsFixed(2)}');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Barely. Dart ships <code>skipWhile</code> and <code><a href="../tutorials/takeWhile.html">takeWhile</a></code> on
+    every <code>Iterable</code>, and both are lazy — the plain-Dart version
+    exploits the sort order exactly the way the FxDart one does, and reads
+    just as well. The only real difference is the last step:
+    <code><a href="../tutorials/sumBy.html">sumBy</a></code> names the intent, where <code>fold</code> spells out
+    the seed and the combine. That is a one-word win, not a structural one —
+    call it a tie. If your codebase already chains with <code><a href="../tutorials/fx.html">fx</a></code>,
+    use it here for consistency; if not, plain Dart is fine.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="recent-errors.html">← 前: Recent error messages, deduped</a>
+    <a href="unique-tags.html">次: All tags across posts, sorted →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

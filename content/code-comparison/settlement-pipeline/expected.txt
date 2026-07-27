@@ -1,0 +1,7 @@
+2026-07-27 close — 3 merchants, 2 postings at a time:
+  BookNook: 3 txns, net $-6.01
+  Cafe Luna: 4 txns, net $32.00
+  GadgetHub: 2 txns, net $218.90
+payouts: 2, collections due: 1
+settled: $244.89
+max postings in flight: 2

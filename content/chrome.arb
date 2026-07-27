@@ -11,6 +11,66 @@
   "navApi": "API Tutorials",
   "@navApi": { "description": "Top nav link jumping to the per-function tutorial list." },
 
+  "navCompare": "Dart vs FxDart",
+  "@navCompare": { "description": "Top nav link to the side-by-side comparison examples. 'Dart' and 'FxDart' are product names — translate only 'vs' if the local idiom differs." },
+
+  "crumbCompare": "Dart vs FxDart",
+  "@crumbCompare": { "description": "Comparison section name in breadcrumbs and back-links. Keep consistent with navCompare." },
+
+  "cmpNative": "Native Dart",
+  "@cmpNative": { "description": "Header of the left comparison panel: the implementation in plain Dart with no library." },
+
+  "cmpFxdart": "FxDart",
+  "@cmpFxdart": { "description": "Header of the right comparison panel. Product name — never translated." },
+
+  "cmpExpected": "Expected output",
+  "@cmpExpected": { "description": "Toggle label above the verified output both implementations print." },
+
+  "cmpVerdictFxdart": "FxDart wins",
+  "@cmpVerdictFxdart": { "description": "Verdict badge: the FxDart version is clearly better here. 'FxDart' is the product name." },
+
+  "cmpVerdictTie": "Toss-up",
+  "@cmpVerdictTie": { "description": "Verdict badge: both versions are about equally good; pick by taste." },
+
+  "cmpVerdictNative": "Native is fine",
+  "@cmpVerdictNative": { "description": "Verdict badge: plain Dart handles this well — the example is shown for honest comparison." },
+
+  "cmpAsyncBadge": "async",
+  "@cmpAsyncBadge": { "description": "Small badge marking an example that uses async pipelines. Lowercase code-adjacent term — usually kept as-is." },
+
+  "cmpTier1": "Part 1 · Two functions",
+  "@cmpTier1": { "description": "Heading of the first group of comparison examples (#1–10), each combining two FxDart functions." },
+
+  "cmpTier1Blurb": "Everyday one-liners. Native Dart often keeps up here — watch the verdict badges.",
+  "@cmpTier1Blurb": { "description": "Subtitle under the Part 1 heading." },
+
+  "cmpTier2": "Part 2 · Three functions",
+  "@cmpTier2": { "description": "Heading of the second group of comparison examples (#11–20), each combining three FxDart functions." },
+
+  "cmpTier2Blurb": "Vocabulary native Dart lacks starts to pay off: groupBy, uniqBy, partition, scan.",
+  "@cmpTier2Blurb": { "description": "Subtitle under the Part 2 heading. Function names are never translated." },
+
+  "cmpTier3": "Part 3 · Five functions",
+  "@cmpTier3": { "description": "Heading of the third group of comparison examples (#21–30), each combining five FxDart functions." },
+
+  "cmpTier3Blurb": "Real reports and pipelines — where composition keeps multi-step logic readable.",
+  "@cmpTier3Blurb": { "description": "Subtitle under the Part 3 heading." },
+
+  "cmpTier4": "Part 4 · Six to ten functions",
+  "@cmpTier4": { "description": "Heading of the fourth group of comparison examples (#31–50), combining six to ten FxDart functions, many async." },
+
+  "cmpTier4Blurb": "Full workflows, most with bounded concurrency — the part native Dart cannot express cleanly.",
+  "@cmpTier4Blurb": { "description": "Subtitle under the Part 4 heading." },
+
+  "cmpPicks": "If you only read five, read these:",
+  "@cmpPicks": { "description": "Label before a short curated list of the five most representative comparison examples." },
+
+  "cmpFilterAll": "All",
+  "@cmpFilterAll": { "description": "Filter button showing every comparison example." },
+
+  "cmpFilterFn": "filter by function name…",
+  "@cmpFilterFn": { "description": "Placeholder of the text box that filters comparison examples by FxDart function name. Function names themselves are never translated." },
+
   "langLabel": "Language",
   "@langLabel": { "description": "Label preceding the language switcher." },
 

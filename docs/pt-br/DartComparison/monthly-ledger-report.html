@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Full monthly ledger report — Dart vs FxDart</title>
+  <meta name="description" content="One report string from a ledger — total, category breakdown, top merchants — as three fxdart pipelines vs loops and intermediate maps.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/monthly-ledger-report.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/monthly-ledger-report.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/monthly-ledger-report.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/monthly-ledger-report.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/monthly-ledger-report.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/monthly-ledger-report.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/monthly-ledger-report.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/monthly-ledger-report.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/monthly-ledger-report.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Início</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../DartComparison/monthly-ledger-report.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/monthly-ledger-report.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/DartComparison/monthly-ledger-report.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/monthly-ledger-report.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/monthly-ledger-report.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/monthly-ledger-report.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="../../ru/DartComparison/monthly-ledger-report.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #31 · <strong>Full monthly ledger report</strong></p>
+  <h1>Full monthly ledger report</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    From one month of ledger transactions (data in the code), build a single
+    report string with three sections: the <strong>total spent</strong>
+    (income excluded), a <strong>per-category breakdown</strong> sorted by
+    spend, and the <strong>top 3 merchants</strong> as a numbered list.
+    Both versions must print exactly the report shown under
+    <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">July 2026 ledger
+Total spent: $201.99
+
+By category:
+  Bills      $88.44
+  Food       $84.40
+  Fun        $15.00
+  Transport  $14.15
+
+Top merchants:
+  1. Electric Co  $60.34
+  2. Green Grocer $43.20
+  3. Water Works  $28.10</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+import 'package:collection/collection.dart';
+
+class Tx {
+  final String date;
+  final String category;
+  final String merchant;
+  final double amount;
+  const Tx(this.date, this.category, this.merchant, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-01', 'Income', 'Payroll Inc', 2600.00),
+  Tx('2026-07-02', 'Food', 'Cafe Aroma', 12.50),
+  Tx('2026-07-03', 'Transport', 'Metro', 2.75),
+  Tx('2026-07-05', 'Food', 'Green Grocer', 43.20),
+  Tx('2026-07-08', 'Fun', 'Cinema', 15.00),
+  Tx('2026-07-11', 'Food', 'Noodle Bar', 18.90),
+  Tx('2026-07-15', 'Bills', 'Electric Co', 60.34),
+  Tx('2026-07-19', 'Food', 'Cafe Aroma', 9.80),
+  Tx('2026-07-21', 'Bills', 'Water Works', 28.10),
+  Tx('2026-07-23', 'Transport', 'Taxi', 11.40),
+];
+
+String money(num n) => '\$${n.toStringAsFixed(2)}';
+
+void main() {
+  final spend = txns.where((t) => t.category != 'Income').toList();
+  final total = spend.fold(0.0, (s, t) => s + t.amount);
+
+  final catTotals = spend
+      .groupListsBy((t) => t.category)
+      .entries
+      .map((e) => (e.key, e.value.fold(0.0, (s, t) => s + t.amount)))
+      .sortedBy<num>((c) => -c.$2);
+  final catLines = [
+    for (final c in catTotals) '  ${c.$1.padRight(10)} ${money(c.$2)}',
+  ];
+
+  final merchantTotals = spend
+      .groupListsBy((t) => t.merchant)
+      .entries
+      .map((e) => (e.key, e.value.fold(0.0, (s, t) => s + t.amount)))
+      .sortedBy<num>((m) => -m.$2)
+      .take(3)
+      .toList();
+  final merchantLines = <String>[];
+  for (var i = 0; i < merchantTotals.length; i++) {
+    final m = merchantTotals[i];
+    merchantLines.add('  ${i + 1}. ${m.$1.padRight(13)}${money(m.$2)}');
+  }
+
+  print([
+    'July 2026 ledger',
+    'Total spent: ${money(total)}',
+    '',
+    'By category:',
+    ...catLines,
+    '',
+    'Top merchants:',
+    ...merchantLines,
+  ].join('\n'));
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Tx {
+  final String date;
+  final String category;
+  final String merchant;
+  final double amount;
+  const Tx(this.date, this.category, this.merchant, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-01', 'Income', 'Payroll Inc', 2600.00),
+  Tx('2026-07-02', 'Food', 'Cafe Aroma', 12.50),
+  Tx('2026-07-03', 'Transport', 'Metro', 2.75),
+  Tx('2026-07-05', 'Food', 'Green Grocer', 43.20),
+  Tx('2026-07-08', 'Fun', 'Cinema', 15.00),
+  Tx('2026-07-11', 'Food', 'Noodle Bar', 18.90),
+  Tx('2026-07-15', 'Bills', 'Electric Co', 60.34),
+  Tx('2026-07-19', 'Food', 'Cafe Aroma', 9.80),
+  Tx('2026-07-21', 'Bills', 'Water Works', 28.10),
+  Tx('2026-07-23', 'Transport', 'Taxi', 11.40),
+];
+
+String money(num n) => '\$${n.toStringAsFixed(2)}';
+
+void main() {
+  final spend = fx(txns).filter((t) => t.category != 'Income').toList();
+  final total = fx(spend).sumBy((t) => t.amount);
+
+  final catLines = fx(fx(spend).groupBy((t) => t.category).entries)
+      .map((e) => (e.key, fx(e.value).sumBy((t) => t.amount)))
+      .sortBy((c) => -c.$2)
+      .map((c) => '  ${c.$1.padRight(10)} ${money(c.$2)}');
+
+  final merchantLines = fx(fx(spend).groupBy((t) => t.merchant).entries)
+      .map((e) => (e.key, fx(e.value).sumBy((t) => t.amount)))
+      .sortBy((m) => -m.$2)
+      .take(3)
+      .zipWithIndex()
+      .map((p) => '  ${p.$1 + 1}. ${p.$2.$1.padRight(13)}${money(p.$2.$2)}');
+
+  print(join('\n', [
+    'July 2026 ledger',
+    'Total spent: ${money(total)}',
+    '',
+    'By category:',
+    ...catLines,
+    '',
+    'Top merchants:',
+    ...merchantLines,
+  ]));
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Each report section is the same shape in FxDart: <code><a href="../tutorials/groupBy.html">groupBy</a></code> →
+    <code><a href="../tutorials/sumBy.html">sumBy</a></code> per group → <code><a href="../tutorials/sortBy.html">sortBy</a></code> descending — then
+    <code><a href="../tutorials/take.html">take</a></code> and <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> turn the merchant section
+    into a numbered top-3 without an index variable. The native version has
+    to say each of those steps in a different dialect: <code>fold</code> with
+    a seed for every sum, <code>sortedBy&lt;num&gt;</code> with a negated
+    key, a collection-for for one section and an indexed <code>for</code>
+    loop for the other. The report grows section by section on both sides —
+    but only one side grows by appending pipeline steps rather than
+    accumulating differently-shaped intermediate variables.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="concurrent-enrichment.html">← Anterior: Enrich top merchants concurrently</a>
+    <a href="cohort-retention.html">Próximo: Cohort retention table →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

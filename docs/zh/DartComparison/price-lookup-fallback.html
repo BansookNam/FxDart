@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Concurrent price lookup with fallback — Dart vs FxDart</title>
+  <meta name="description" content="Look up live prices 3 at a time, fall back to catalog prices for missing SKUs — concurrent + a null-coalescing map vs a worker pool.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/price-lookup-fallback.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/price-lookup-fallback.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/price-lookup-fallback.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/price-lookup-fallback.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/price-lookup-fallback.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/price-lookup-fallback.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/price-lookup-fallback.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/price-lookup-fallback.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/price-lookup-fallback.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">首页</a>
+      <a href="../101/index.html">FxDart 入门</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API 教程</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="语言">
+      <span class="lang-label">语言</span>
+      <ul>
+        <li><a href="../../DartComparison/price-lookup-fallback.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/price-lookup-fallback.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/DartComparison/price-lookup-fallback.html" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/price-lookup-fallback.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/price-lookup-fallback.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/price-lookup-fallback.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/DartComparison/price-lookup-fallback.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">本页尚未翻译，因此以英文显示。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">参与翻译</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #43 · <strong>Concurrent price lookup with fallback</strong></p>
+  <h1>Concurrent price lookup with fallback</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/size.html">size</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Price a six-line order. Each SKU is looked up in the live pricing
+    service — at most <strong>three lookups in flight</strong> — but the
+    service is missing some SKUs and returns <code>null</code> for them;
+    those lines fall back to the catalog list price carried on the item.
+    Print each priced line in order (flagging fallbacks), the fallback
+    count, the order total, and the maximum observed concurrency. All data
+    is in the code below.
+  </p>
+  <p>
+    The FxDart chain does the lookup under <code>concurrent(3)</code>, then
+    a second <code><a href="../tutorials/map.html">map</a></code> applies the fallback with plain
+    <code>??</code> — the recovery policy is just another pipeline step
+    downstream of the bounded fetch.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">priced 6 items, 3 lookups at a time:
+  SKU-100 x2 @ $8.49
+  SKU-205 x1 @ $24.50 (catalog fallback)
+  SKU-317 x3 @ $3.99
+  SKU-408 x1 @ $119.00
+  SKU-512 x4 @ $2.80 (catalog fallback)
+  SKU-620 x2 @ $14.20
+fallbacks used: 2
+order total: $212.05
+max lookups in flight: 3</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+class Item {
+  final String sku;
+  final int qty;
+  final double listPrice; // catalog fallback
+  const Item(this.sku, this.qty, this.listPrice);
+}
+
+const items = [
+  Item('SKU-100', 2, 9.99), Item('SKU-205', 1, 24.50),
+  Item('SKU-317', 3, 4.25), Item('SKU-408', 1, 129.00),
+  Item('SKU-512', 4, 2.80), Item('SKU-620', 2, 15.75),
+];
+
+int inFlight = 0;
+int maxInFlight = 0;
+
+/// The live pricing service; some SKUs are missing from it (null).
+Future<double?> lookupPrice(String sku) async {
+  inFlight++;
+  if (inFlight > maxInFlight) maxInFlight = inFlight;
+  await Future.delayed(const Duration(milliseconds: 15));
+  inFlight--;
+  const live = {
+    'SKU-100': 8.49, 'SKU-317': 3.99, 'SKU-408': 119.00, 'SKU-620': 14.20,
+  };
+  return live[sku];
+}
+
+/// Worker pool: [limit] workers share a cursor, results keep input order.
+Future<List<(Item, double, bool)>> priceAll(List<Item> all, int limit) async {
+  final results = List<(Item, double, bool)?>.filled(all.length, null);
+  var next = 0;
+  Future<void> worker() async {
+    while (next < all.length) {
+      final i = next++;
+      final live = await lookupPrice(all[i].sku);
+      results[i] = (all[i], live ?? all[i].listPrice, live == null);
+    }
+  }
+
+  await Future.wait([for (var i = 0; i < limit; i++) worker()]);
+  return results.cast<(Item, double, bool)>();
+}
+
+Future<void> main() async {
+  final priced = await priceAll(items, 3);
+  print('priced ${priced.length} items, 3 lookups at a time:');
+  for (final (it, price, fellBack) in priced) {
+    print('  ${it.sku} x${it.qty} @ \$${price.toStringAsFixed(2)}'
+        '${fellBack ? ' (catalog fallback)' : ''}');
+  }
+  print('fallbacks used: ${priced.where((r) => r.$3).length}');
+  final total = priced.fold(0.0, (sum, r) => sum + r.$2 * r.$1.qty);
+  print('order total: \$${total.toStringAsFixed(2)}');
+  print('max lookups in flight: $maxInFlight');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Item {
+  final String sku;
+  final int qty;
+  final double listPrice; // catalog fallback
+  const Item(this.sku, this.qty, this.listPrice);
+}
+
+const items = [
+  Item('SKU-100', 2, 9.99), Item('SKU-205', 1, 24.50),
+  Item('SKU-317', 3, 4.25), Item('SKU-408', 1, 129.00),
+  Item('SKU-512', 4, 2.80), Item('SKU-620', 2, 15.75),
+];
+
+int inFlight = 0;
+int maxInFlight = 0;
+
+/// The live pricing service; some SKUs are missing from it (null).
+Future<double?> lookupPrice(String sku) async {
+  inFlight++;
+  if (inFlight > maxInFlight) maxInFlight = inFlight;
+  await Future.delayed(const Duration(milliseconds: 15));
+  inFlight--;
+  const live = {
+    'SKU-100': 8.49, 'SKU-317': 3.99, 'SKU-408': 119.00, 'SKU-620': 14.20,
+  };
+  return live[sku];
+}
+
+Future<void> main() async {
+  final priced = await fx(items)
+      .toAsync()
+      .map((it) async => (it, await lookupPrice(it.sku)))
+      .concurrent(3)
+      .map((r) => (r.$1, r.$2 ?? r.$1.listPrice, r.$2 == null))
+      .toList();
+  print('priced ${priced.length} items, 3 lookups at a time:');
+  for (final (it, price, fellBack) in priced) {
+    print('  ${it.sku} x${it.qty} @ \$${price.toStringAsFixed(2)}'
+        '${fellBack ? ' (catalog fallback)' : ''}');
+  }
+  print('fallbacks used: ${fx(priced).filter((r) => r.$3).size()}');
+  final total = fx(priced).sumBy((r) => r.$2 * r.$1.qty);
+  print('order total: \$${total.toStringAsFixed(2)}');
+  print('max lookups in flight: $maxInFlight');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    The fallback itself is easy in both versions — <code>??</code> is Dart.
+    What plain Dart lacks is the step before it: three-at-a-time lookups
+    with results in input order force the worker-pool idiom (shared cursor,
+    pre-sized slots, <code>Future.wait</code>), and the fallback logic ends
+    up buried inside the worker body where it is hardest to see and test.
+    In the FxDart version fetch and recovery are two separate, visible
+    stages of one chain — <code>concurrent(3)</code> owns the limit,
+    the next <code><a href="../tutorials/map.html">map</a></code> owns the policy — and the summary lines
+    (<code><a href="../tutorials/filter.html">filter</a></code> + <code><a href="../tutorials/size.html">size</a></code> for fallbacks,
+    <code><a href="../tutorials/sumBy.html">sumBy</a></code> for the total) reuse the same vocabulary the rest of
+    the site teaches.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="flaky-api-retry.html">← 上一节： Poll a flaky API until first success</a>
+    <a href="stream-windowed-alerts.html">下一节： Windowed alerts from a sensor stream →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart 是 <a href="https://github.com/marpple/FxTS">FxTS</a> 的移植版本。特别感谢 <strong>Indong Yoo</strong>（Marpple CTO）与 FxTS 团队，本库的设计思路、语义和测试套件均源于他们的工作。</p>
+  <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 运行","pgReset":"重置","pgCompiling":"编译中…","pgCompileError":"编译错误","pgError":"错误","pgLoading":"正在加载运行时…","pgRunning":"运行中…","pgNoOutput":"（无输出）","pgLoadFailed":"无法加载 FxDart 库"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

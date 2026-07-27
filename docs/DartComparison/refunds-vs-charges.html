@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Refunds vs charges, both formatted — Dart vs FxDart</title>
+  <meta name="description" content="Split a ledger into refunds and charges and print both sides — two where passes in plain Dart vs one partition in FxDart.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/refunds-vs-charges.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/refunds-vs-charges.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/refunds-vs-charges.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/refunds-vs-charges.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/refunds-vs-charges.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/refunds-vs-charges.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/refunds-vs-charges.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/refunds-vs-charges.html">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API Tutorials</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Language">
+      <span class="lang-label">Language</span>
+      <ul>
+        <li><a href="../DartComparison/refunds-vs-charges.html" hreflang="en" lang="en" aria-current="page">English</a></li>
+        <li><a href="../ko/DartComparison/refunds-vs-charges.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../zh/DartComparison/refunds-vs-charges.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../ja/DartComparison/refunds-vs-charges.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../es/DartComparison/refunds-vs-charges.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../pt-br/DartComparison/refunds-vs-charges.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../ru/DartComparison/refunds-vs-charges.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../DartComparison/index.html">Dart vs FxDart</a> › #15 · <strong>Refunds vs charges, both formatted</strong></p>
+  <h1>Refunds vs charges, both formatted</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/partition.html">partition</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    A ledger mixes charges and refunds (negative amounts). Split it into the
+    two groups, format every transaction as
+    <code>merchant $amount</code>, and print one line per group —
+    refunds first. The data is in the code below; both versions must print
+    the lines shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">refunds: Web Store $89.99, Airline $120.00, Book Nook $27.99
+charges: Cafe Aroma $12.50, Web Store $89.99, Noodle Bar $18.90, Airline $240.00, Green Grocer $43.20</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+class Tx {
+  final String date;
+  final String merchant;
+  final double amount; // negative = refund
+  const Tx(this.date, this.merchant, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-03', 'Cafe Aroma', 12.50),
+  Tx('2026-07-05', 'Web Store', 89.99),
+  Tx('2026-07-09', 'Web Store', -89.99),
+  Tx('2026-07-12', 'Noodle Bar', 18.90),
+  Tx('2026-07-15', 'Airline', 240.00),
+  Tx('2026-07-18', 'Airline', -120.00),
+  Tx('2026-07-21', 'Green Grocer', 43.20),
+  Tx('2026-07-24', 'Book Nook', -27.99),
+];
+
+String fmt(Tx t) => '${t.merchant} \$${t.amount.abs().toStringAsFixed(2)}';
+
+void main() {
+  final refunds = txns.where((t) => t.amount < 0);
+  final charges = txns.where((t) => t.amount >= 0);
+  print('refunds: ${refunds.map(fmt).join(', ')}');
+  print('charges: ${charges.map(fmt).join(', ')}');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Tx {
+  final String date;
+  final String merchant;
+  final double amount; // negative = refund
+  const Tx(this.date, this.merchant, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-03', 'Cafe Aroma', 12.50),
+  Tx('2026-07-05', 'Web Store', 89.99),
+  Tx('2026-07-09', 'Web Store', -89.99),
+  Tx('2026-07-12', 'Noodle Bar', 18.90),
+  Tx('2026-07-15', 'Airline', 240.00),
+  Tx('2026-07-18', 'Airline', -120.00),
+  Tx('2026-07-21', 'Green Grocer', 43.20),
+  Tx('2026-07-24', 'Book Nook', -27.99),
+];
+
+String fmt(Tx t) => '${t.merchant} \$${t.amount.abs().toStringAsFixed(2)}';
+
+void main() {
+  final (refunds, charges) = fx(txns).partition((t) => t.amount < 0);
+  print('refunds: ${fx(refunds).map(fmt).join(', ')}');
+  print('charges: ${fx(charges).map(fmt).join(', ')}');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Dart has no <code><a href="../tutorials/partition.html">partition</a></code> — when you need <em>both</em> halves,
+    <code>where</code> only gives you one, so the native version filters
+    twice: once with the predicate, once with its negation, written out by
+    hand (<code>&lt; 0</code> and <code>&gt;= 0</code>). That is two passes
+    over the data and two predicates to keep in sync — if the refund rule
+    ever changes, nothing forces the second line to follow. FxDart's
+    <code><a href="../tutorials/partition.html">partition</a></code> makes the split one declaration: a single
+    predicate, a single pass, and a record destructure that names both
+    halves. The <code><a href="../tutorials/map.html">map</a></code> + <code><a href="../tutorials/join.html">join</a></code> formatting afterwards
+    is the same in both.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="unique-tags.html">← Previous: All tags across posts, sorted</a>
+    <a href="compound-interest.html">Next: Compound interest table →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a>. Great thanks to <strong>Indong Yoo</strong> (CTO, Marpple) and the FxTS team for the ideas, semantics, and test suite this library is built on.</p>
+  <p>Playground compiles via the DartPad compile service. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Run","pgReset":"Reset","pgCompiling":"Compiling…","pgCompileError":"Compile error","pgError":"Error","pgLoading":"Loading runtime…","pgRunning":"Running…","pgNoOutput":"(no output)","pgLoadFailed":"Could not load the FxDart library"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+Opening balance $250.00
+Salary          $2850.00
+Rent            $1700.00
+Green Grocer    $1656.80
+Refund          $1685.30
+Electric Co     $1624.96
+Cafe Aroma      $1615.16

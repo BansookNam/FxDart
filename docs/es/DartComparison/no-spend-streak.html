@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Longest streak of no-spend days — Dart vs FxDart</title>
+  <meta name="description" content="Longest run of July days with no transaction — loop with streak/longest counters in plain Dart vs range + scan + max in FxDart.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/no-spend-streak.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/no-spend-streak.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/no-spend-streak.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/no-spend-streak.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/no-spend-streak.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/no-spend-streak.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/no-spend-streak.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/no-spend-streak.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/no-spend-streak.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../DartComparison/no-spend-streak.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/no-spend-streak.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/DartComparison/no-spend-streak.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/no-spend-streak.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/no-spend-streak.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/no-spend-streak.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/DartComparison/no-spend-streak.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #28 · <strong>Longest streak of no-spend days</strong></p>
+  <h1>Longest streak of no-spend days</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/max.html">max</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    From one month of ledger transactions, find the <strong>longest streak
+    of consecutive July days with no spending at all</strong> (July 2026
+    has 31 days). Print a calendar strip marking each no-spend day with
+    <code>#</code>, then the streak length. The data is in the code below;
+    both versions must print the lines shown under
+    <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">July (# = no-spend day): ···###··######··#####·#####··##
+Longest no-spend streak: 6 days</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+class Tx {
+  final String date;
+  final String category;
+  final String merchant;
+  final double amount;
+  const Tx(this.date, this.category, this.merchant, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-01', 'Food', 'Green Grocer', 34.20),
+  Tx('2026-07-02', 'Transport', 'Metro', 2.75),
+  Tx('2026-07-03', 'Food', 'Cafe Aroma', 11.80),
+  Tx('2026-07-07', 'Bills', 'Electric Co', 58.40),
+  Tx('2026-07-08', 'Food', 'Noodle Bar', 16.90),
+  Tx('2026-07-15', 'Fun', 'Cinema', 15.00),
+  Tx('2026-07-16', 'Food', 'Green Grocer', 41.35),
+  Tx('2026-07-22', 'Transport', 'Taxi', 12.60),
+  Tx('2026-07-28', 'Food', 'Cafe Aroma', 9.40),
+  Tx('2026-07-29', 'Bills', 'Water Co', 27.15),
+];
+
+void main() {
+  final spendDays = txns.map((t) => int.parse(t.date.substring(8))).toSet();
+  final strip = StringBuffer();
+  var streak = 0;
+  var longest = 0;
+  for (var day = 1; day <= 31; day++) {
+    final spent = spendDays.contains(day);
+    strip.write(spent ? '·' : '#');
+    streak = spent ? 0 : streak + 1;
+    if (streak > longest) longest = streak;
+  }
+  print('July (# = no-spend day): $strip');
+  print('Longest no-spend streak: $longest days');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Tx {
+  final String date;
+  final String category;
+  final String merchant;
+  final double amount;
+  const Tx(this.date, this.category, this.merchant, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-01', 'Food', 'Green Grocer', 34.20),
+  Tx('2026-07-02', 'Transport', 'Metro', 2.75),
+  Tx('2026-07-03', 'Food', 'Cafe Aroma', 11.80),
+  Tx('2026-07-07', 'Bills', 'Electric Co', 58.40),
+  Tx('2026-07-08', 'Food', 'Noodle Bar', 16.90),
+  Tx('2026-07-15', 'Fun', 'Cinema', 15.00),
+  Tx('2026-07-16', 'Food', 'Green Grocer', 41.35),
+  Tx('2026-07-22', 'Transport', 'Taxi', 12.60),
+  Tx('2026-07-28', 'Food', 'Cafe Aroma', 9.40),
+  Tx('2026-07-29', 'Bills', 'Water Co', 27.15),
+];
+
+void main() {
+  final spendDays = txns.map((t) => int.parse(t.date.substring(8))).toSet();
+  final strip = fx(range(1, 32))
+      .map((day) => spendDays.contains(day) ? '·' : '#')
+      .join('');
+  // scan carries the running streak: reset on a spend day, else +1.
+  final longest = fx(range(1, 32))
+      .map((day) => spendDays.contains(day))
+      .scan((streak, spent) => spent ? 0 : streak + 1, 0)
+      .max();
+  print('July (# = no-spend day): $strip');
+  print('Longest no-spend streak: $longest days');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    A streak is a running value, and that is <code><a href="../tutorials/scan.html">scan</a></code>'s exact
+    job: fold's every intermediate state, kept. The pipeline reads as the
+    definition — the days (<code><a href="../tutorials/range.html">range</a></code>), <code><a href="../tutorials/map.html">map</a></code>ped to
+    spent-or-not, <code><a href="../tutorials/scan.html">scan</a></code>ned into a running streak that resets
+    on a spend day, and <code><a href="../tutorials/max.html">max</a></code> picks the peak. The native loop
+    computes the same thing with two mutable counters and an
+    <code>if</code> — you verify it by mentally replaying iterations,
+    and the streak logic is fused to the strip-building beside it. In the
+    FxDart version the strip (<code><a href="../tutorials/map.html">map</a></code> + <code><a href="../tutorials/join.html">join</a></code>) and
+    the streak are two independent, separately readable pipelines over
+    the same <code><a href="../tutorials/range.html">range</a></code>.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="invoice-summary.html">← Anterior: Line items to invoice summary</a>
+    <a href="duplicate-transactions.html">Siguiente: Detect duplicated transactions →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

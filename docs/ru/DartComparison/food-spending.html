@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Food spending this month — Dart vs FxDart</title>
+  <meta name="description" content="Total one category of a ledger — a where/fold chain in plain Dart vs filter + sumBy in FxDart.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/food-spending.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/food-spending.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/food-spending.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/food-spending.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/food-spending.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/food-spending.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/food-spending.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/food-spending.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/food-spending.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Главная</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="../../DartComparison/food-spending.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/food-spending.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/DartComparison/food-spending.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/food-spending.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/food-spending.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/food-spending.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/DartComparison/food-spending.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #1 · <strong>Food spending this month</strong></p>
+  <h1>Food spending this month</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Given a month of ledger transactions — each with a date, category,
+    merchant, and amount — total what was spent in the
+    <strong>Food</strong> category, and print it as a currency amount.
+    The data is in the code below; both versions must print the line shown
+    under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">Food spending: $84.40</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+class Tx {
+  final String date;
+  final String category;
+  final String merchant;
+  final double amount;
+  const Tx(this.date, this.category, this.merchant, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-02', 'Food', 'Cafe Aroma', 12.50),
+  Tx('2026-07-03', 'Transport', 'Metro', 2.75),
+  Tx('2026-07-05', 'Food', 'Green Grocer', 43.20),
+  Tx('2026-07-08', 'Fun', 'Cinema', 15.00),
+  Tx('2026-07-11', 'Food', 'Noodle Bar', 18.90),
+  Tx('2026-07-15', 'Bills', 'Electric Co', 60.34),
+  Tx('2026-07-19', 'Food', 'Cafe Aroma', 9.80),
+  Tx('2026-07-23', 'Transport', 'Taxi', 11.40),
+];
+
+void main() {
+  final total = txns
+      .where((t) => t.category == 'Food')
+      .fold(0.0, (sum, t) => sum + t.amount);
+  print('Food spending: \$${total.toStringAsFixed(2)}');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Tx {
+  final String date;
+  final String category;
+  final String merchant;
+  final double amount;
+  const Tx(this.date, this.category, this.merchant, this.amount);
+}
+
+const txns = [
+  Tx('2026-07-02', 'Food', 'Cafe Aroma', 12.50),
+  Tx('2026-07-03', 'Transport', 'Metro', 2.75),
+  Tx('2026-07-05', 'Food', 'Green Grocer', 43.20),
+  Tx('2026-07-08', 'Fun', 'Cinema', 15.00),
+  Tx('2026-07-11', 'Food', 'Noodle Bar', 18.90),
+  Tx('2026-07-15', 'Bills', 'Electric Co', 60.34),
+  Tx('2026-07-19', 'Food', 'Cafe Aroma', 9.80),
+  Tx('2026-07-23', 'Transport', 'Taxi', 11.40),
+];
+
+void main() {
+  final total = fx(txns)
+      .filter((t) => t.category == 'Food')
+      .sumBy((t) => t.amount);
+  print('Food spending: \$${total.toStringAsFixed(2)}');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Native Dart has no "sum of a field" — you either mutate an accumulator in
+    a <code>for</code> loop or reach for <code>fold</code> with an explicit
+    seed and combine step. FxDart's <code><a href="../tutorials/sumBy.html">sumBy</a></code> says the intent in one
+    word, and the <code>filter → sumBy</code> chain reads in the order the
+    data flows. The gap is small on a two-step task — it widens as steps
+    are added.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="../../DartComparison/index.html">← Dart vs FxDart</a>
+    <a href="running-balance.html">Далее: Running account balance →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

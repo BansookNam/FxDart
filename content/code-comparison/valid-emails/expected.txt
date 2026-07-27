@@ -1,0 +1,5 @@
+ada@example.com
+grace@hopper.dev
+lin@lang.org
+ken@unix.org
+dennis@unix.org

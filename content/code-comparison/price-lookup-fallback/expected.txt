@@ -1,0 +1,10 @@
+priced 6 items, 3 lookups at a time:
+  SKU-100 x2 @ $8.49
+  SKU-205 x1 @ $24.50 (catalog fallback)
+  SKU-317 x3 @ $3.99
+  SKU-408 x1 @ $119.00
+  SKU-512 x4 @ $2.80 (catalog fallback)
+  SKU-620 x2 @ $14.20
+fallbacks used: 2
+order total: $212.05
+max lookups in flight: 3

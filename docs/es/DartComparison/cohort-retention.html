@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cohort retention table — Dart vs FxDart</title>
+  <meta name="description" content="Signup-month cohorts vs later activity — nested groupBy/dropWhile/filter pipelines vs nested for loops with accumulator lists.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/cohort-retention.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/cohort-retention.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/cohort-retention.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/cohort-retention.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/cohort-retention.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/cohort-retention.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/cohort-retention.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/cohort-retention.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/cohort-retention.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../DartComparison/cohort-retention.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/cohort-retention.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/DartComparison/cohort-retention.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/cohort-retention.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/cohort-retention.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/cohort-retention.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/DartComparison/cohort-retention.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #32 · <strong>Cohort retention table</strong></p>
+  <h1>Cohort retention table</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/size.html">size</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Each user (data in the code) has a signup month and the list of months
+    they were active. Group users into <strong>cohorts by signup
+    month</strong> and, for every <em>later</em> month, print what percentage
+    of the cohort was still active — one row per cohort, oldest first. Both
+    versions must print the table shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">Cohort retention by signup month
+2026-04 (4 users): 2026-05 50% | 2026-06 50% | 2026-07 25%
+2026-05 (3 users): 2026-06 33% | 2026-07 67%
+2026-06 (2 users): 2026-07 50%</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+import 'package:collection/collection.dart';
+
+class User {
+  final String name;
+  final String signup; // signup month, 'yyyy-mm'
+  final List<String> active; // months with at least one session
+  const User(this.name, this.signup, this.active);
+}
+
+const months = ['2026-04', '2026-05', '2026-06', '2026-07'];
+
+const users = [
+  User('ana', '2026-04', ['2026-04', '2026-05', '2026-06', '2026-07']),
+  User('ben', '2026-04', ['2026-04', '2026-05']),
+  User('cleo', '2026-04', ['2026-04', '2026-06']),
+  User('dan', '2026-04', ['2026-04']),
+  User('eve', '2026-05', ['2026-05', '2026-06', '2026-07']),
+  User('finn', '2026-05', ['2026-05', '2026-07']),
+  User('gus', '2026-05', ['2026-05']),
+  User('hana', '2026-06', ['2026-06', '2026-07']),
+  User('ivan', '2026-06', ['2026-06']),
+];
+
+void main() {
+  final cohorts = users.groupListsBy((u) => u.signup);
+  final rows = <String>[];
+  for (final key in cohorts.keys.sorted()) {
+    final cohort = cohorts[key]!;
+    final cells = <String>[];
+    for (final m in months.skipWhile((m) => m.compareTo(key) <= 0)) {
+      final active = cohort.where((u) => u.active.contains(m)).length;
+      cells.add('$m ${(100 * active / cohort.length).round()}%');
+    }
+    rows.add('$key (${cohort.length} users): ${cells.join(' | ')}');
+  }
+  print(['Cohort retention by signup month', ...rows].join('\n'));
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class User {
+  final String name;
+  final String signup; // signup month, 'yyyy-mm'
+  final List<String> active; // months with at least one session
+  const User(this.name, this.signup, this.active);
+}
+
+const months = ['2026-04', '2026-05', '2026-06', '2026-07'];
+
+const users = [
+  User('ana', '2026-04', ['2026-04', '2026-05', '2026-06', '2026-07']),
+  User('ben', '2026-04', ['2026-04', '2026-05']),
+  User('cleo', '2026-04', ['2026-04', '2026-06']),
+  User('dan', '2026-04', ['2026-04']),
+  User('eve', '2026-05', ['2026-05', '2026-06', '2026-07']),
+  User('finn', '2026-05', ['2026-05', '2026-07']),
+  User('gus', '2026-05', ['2026-05']),
+  User('hana', '2026-06', ['2026-06', '2026-07']),
+  User('ivan', '2026-06', ['2026-06']),
+];
+
+void main() {
+  final cohorts = fx(users).groupBy((u) => u.signup);
+  final rows = fx(cohorts.entries).sortBy((e) => e.key).map((e) {
+    final cohort = e.value;
+    final cells = fx(months).dropWhile((m) => m.compareTo(e.key) <= 0).map((m) {
+      final active = fx(cohort).filter((u) => u.active.contains(m)).size();
+      return '$m ${(100 * active / cohort.length).round()}%';
+    });
+    return '${e.key} (${cohort.length} users): ${join(' | ', cells)}';
+  });
+  print(join('\n', ['Cohort retention by signup month', ...rows]));
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    A retention table is a pipeline inside a pipeline: cohorts on the
+    outside, months on the inside. In FxDart both layers are expressions —
+    <code><a href="../tutorials/groupBy.html">groupBy</a></code> → <code><a href="../tutorials/sortBy.html">sortBy</a></code> → <code><a href="../tutorials/map.html">map</a></code> over
+    cohorts, and inside each row <code><a href="../tutorials/dropWhile.html">dropWhile</a></code> skips months up to
+    the signup month before <code><a href="../tutorials/filter.html">filter</a></code> + <code><a href="../tutorials/size.html">size</a></code> count the
+    still-active users. The native version needs a mutable accumulator list
+    per layer (<code>rows</code>, <code>cells</code>) and two nested
+    <code>for</code> loops to stitch them together; the actual retention
+    logic is the same, but it is spread across loop bodies instead of being
+    the visible spine of the code.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="monthly-ledger-report.html">← Anterior: Full monthly ledger report</a>
+    <a href="price-drop-detection.html">Siguiente: Price drops between two snapshots →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

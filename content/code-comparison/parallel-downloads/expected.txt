@@ -1,0 +1,10 @@
+downloaded 6 files, 3 at a time, in request order:
+  1. video.mp4 (900 KB)
+  2. notes.txt (2 KB)
+  3. slides.pdf (340 KB)
+  4. photo.jpg (180 KB)
+  5. data.csv (55 KB)
+  6. theme.zip (260 KB)
+first to finish: notes.txt
+total size: 1737 KB
+max downloads in flight: 3

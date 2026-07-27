@@ -20,6 +20,13 @@ description: FxDart — библиотека функционального пр
     </a>
   </p>
 
+  <p>
+    <a class="demo-cta cta-compare" href="DartComparison/">
+      <span class="demo-cta-emoji">⚖️</span>
+      Dart vs FxDart — 50 реальных задач, бок о бок&nbsp;→
+    </a>
+  </p>
+
   {{playground:0}}
   <p class="dim">▲ Это живой пример — измените код и нажмите <strong>Запустить</strong>.
     Он компилируется настоящим компилятором Dart и выполняется в вашем браузере.</p>

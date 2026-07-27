@@ -1,0 +1,17 @@
+Alert digest — ERROR 4, WARN 5
+api (4)
+  ERROR x2
+    - timeout calling billing
+  WARN x2
+    - slow query 1.2s
+    - disk 85% full
+auth (3)
+  ERROR x1
+    - bad signature
+  WARN x2
+    - token near expiry
+billing (2)
+  ERROR x1
+    - invoice 442 failed
+  WARN x1
+    - retrying charge

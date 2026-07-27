@@ -1,0 +1,5 @@
+Latency percentiles (successful requests only)
+  /orders  p50 133 ms  p95 620 ms  (5 reqs)
+  /search  p50 210 ms  p95 480 ms  (4 reqs)
+  /users   p50  88 ms  p95 340 ms  (5 reqs)
+Worst p95: /orders at 620 ms

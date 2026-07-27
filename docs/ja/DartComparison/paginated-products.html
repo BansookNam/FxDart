@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Paginated product listing — Dart vs FxDart</title>
+  <meta name="description" content="Filter, sort by price, and slice out page 2 — Dart already has skip/take, so this one is a genuine tie.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/paginated-products.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/paginated-products.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/paginated-products.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/paginated-products.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/paginated-products.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/paginated-products.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/paginated-products.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/paginated-products.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/paginated-products.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">ホーム</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="../../DartComparison/paginated-products.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/paginated-products.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/DartComparison/paginated-products.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/paginated-products.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="../../es/DartComparison/paginated-products.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/paginated-products.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/DartComparison/paginated-products.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #22 · <strong>Paginated product listing</strong></p>
+  <h1>Paginated product listing</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/take.html">take</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    A small shop catalog: name, price, in-stock flag. Show
+    <strong>page 2</strong> of the in-stock products, sorted by price
+    ascending, three per page — one line per product. The data is in the
+    code below; both versions must print the lines shown under
+    <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">Page 2 of in-stock products:
+Milk Frother — $24.90
+Cold Brew Jar — $27.80
+Scale — $42.00</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+class Product {
+  final String name;
+  final double price;
+  final bool inStock;
+  const Product(this.name, this.price, this.inStock);
+}
+
+const products = [
+  Product('Espresso Kit', 49.00, true),
+  Product('Travel Mug', 19.50, true),
+  Product('Pour-over Set', 34.25, false),
+  Product('Grinder', 89.99, true),
+  Product('Filter Pack', 6.40, true),
+  Product('Milk Frother', 24.90, true),
+  Product('Scale', 42.00, true),
+  Product('Kettle', 58.75, false),
+  Product('Tamper', 15.30, true),
+  Product('Cold Brew Jar', 27.80, true),
+];
+
+void main() {
+  const page = 2;
+  const pageSize = 3;
+  final inStock = products.where((p) => p.inStock).toList()
+    ..sort((a, b) => a.price.compareTo(b.price));
+  final lines = inStock
+      .skip((page - 1) * pageSize)
+      .take(pageSize)
+      .map((p) => '${p.name} — \$${p.price.toStringAsFixed(2)}');
+  print('Page $page of in-stock products:');
+  print(lines.join('\n'));
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Product {
+  final String name;
+  final double price;
+  final bool inStock;
+  const Product(this.name, this.price, this.inStock);
+}
+
+const products = [
+  Product('Espresso Kit', 49.00, true),
+  Product('Travel Mug', 19.50, true),
+  Product('Pour-over Set', 34.25, false),
+  Product('Grinder', 89.99, true),
+  Product('Filter Pack', 6.40, true),
+  Product('Milk Frother', 24.90, true),
+  Product('Scale', 42.00, true),
+  Product('Kettle', 58.75, false),
+  Product('Tamper', 15.30, true),
+  Product('Cold Brew Jar', 27.80, true),
+];
+
+void main() {
+  const page = 2;
+  const pageSize = 3;
+  final lines = fx(products)
+      .filter((p) => p.inStock)
+      .sortBy((p) => p.price)
+      .drop((page - 1) * pageSize)
+      .take(pageSize)
+      .map((p) => '${p.name} — \$${p.price.toStringAsFixed(2)}')
+      .toList();
+  print('Page $page of in-stock products:');
+  print(lines.join('\n'));
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    They barely do — this is a tie, and it is worth saying plainly.
+    Pagination is exactly the shape Dart's <code>Iterable</code> already
+    covers: <code>skip</code> and <code><a href="../tutorials/take.html">take</a></code> read just as well as
+    FxDart's <code><a href="../tutorials/drop.html">drop</a></code> and <code><a href="../tutorials/take.html">take</a></code>, and both stay lazy.
+    The only native wrinkle is sorting by a key — core Dart needs a
+    comparator (<code>package:collection</code>'s <code>sortedBy</code>
+    closes even that). Pick FxDart here only if the rest of the codebase
+    already speaks its vocabulary; plain Dart loses nothing on this task.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="monthly-category-report.html">← 前: Monthly category report, sorted by spend</a>
+    <a href="weekly-sensor-averages.html">次: Weekly averages from daily readings →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

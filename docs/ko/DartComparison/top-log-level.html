@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Most frequent log level — Dart vs FxDart</title>
+  <meta name="description" content="Count log entries per level and pick the biggest — groupListsBy + reduce in plain Dart vs countBy + maxBy in FxDart.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/top-log-level.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/top-log-level.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/top-log-level.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/top-log-level.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/DartComparison/top-log-level.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/DartComparison/top-log-level.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/DartComparison/top-log-level.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/DartComparison/top-log-level.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/top-log-level.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../DartComparison/top-log-level.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/DartComparison/top-log-level.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/DartComparison/top-log-level.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/DartComparison/top-log-level.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/DartComparison/top-log-level.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/DartComparison/top-log-level.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/DartComparison/top-log-level.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #7 · <strong>Most frequent log level</strong></p>
+  <h1>Most frequent log level</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/countBy.html">countBy</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Given a slice of application logs, count how many entries each
+    <strong>level</strong> (INFO / WARN / ERROR) has and print the most
+    frequent one with its count. The data is in the code below; both
+    versions must print the line shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">Most frequent level: WARN (4 of 9)</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-native">
+      <h3>Native Dart</h3>
+      <div class="playground">
+<textarea>
+import 'package:collection/collection.dart';
+
+class LogEntry {
+  final String level;
+  final String message;
+  const LogEntry(this.level, this.message);
+}
+
+const logs = [
+  LogEntry('INFO', 'server started'),
+  LogEntry('WARN', 'disk 80% full'),
+  LogEntry('INFO', 'user login'),
+  LogEntry('ERROR', 'payment timeout'),
+  LogEntry('WARN', 'slow query 1.2s'),
+  LogEntry('WARN', 'retrying webhook'),
+  LogEntry('INFO', 'cache warmed'),
+  LogEntry('WARN', 'disk 85% full'),
+  LogEntry('ERROR', 'payment timeout'),
+];
+
+void main() {
+  // No countBy: group the whole entries into lists, then keep the lengths.
+  final counts = logs
+      .groupListsBy((l) => l.level)
+      .map((level, entries) => MapEntry(level, entries.length));
+  // No maxBy on entries either: reduce with an explicit comparison.
+  final top = counts.entries.reduce((a, b) => b.value > a.value ? b : a);
+  print('Most frequent level: ${top.key} (${top.value} of ${logs.length})');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class LogEntry {
+  final String level;
+  final String message;
+  const LogEntry(this.level, this.message);
+}
+
+const logs = [
+  LogEntry('INFO', 'server started'),
+  LogEntry('WARN', 'disk 80% full'),
+  LogEntry('INFO', 'user login'),
+  LogEntry('ERROR', 'payment timeout'),
+  LogEntry('WARN', 'slow query 1.2s'),
+  LogEntry('WARN', 'retrying webhook'),
+  LogEntry('INFO', 'cache warmed'),
+  LogEntry('WARN', 'disk 85% full'),
+  LogEntry('ERROR', 'payment timeout'),
+];
+
+void main() {
+  // countBy is terminal (returns a Map) — re-enter the chain on entries.
+  final counts = fx(logs).countBy((l) => l.level);
+  final top = fx(counts.entries).maxBy((e) => e.value)!;
+  print('Most frequent level: ${top.key} (${top.value} of ${logs.length})');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Native Dart has no <code><a href="../tutorials/countBy.html">countBy</a></code>: the closest is
+    <code>package:collection</code>'s <code>groupListsBy</code>, which builds
+    a list of <em>every entry</em> per level just so you can take the
+    lengths — or a hand-written <code>Map.update</code> loop. Picking the
+    winner then needs a <code>reduce</code> with an explicit comparison.
+    FxDart names both steps: <code><a href="../tutorials/countBy.html">countBy</a></code> goes straight to the
+    counts (it's terminal — it returns a plain <code>Map</code>), and
+    <code>fx(counts.entries).maxBy(...)</code> re-enters the chain to pick
+    the largest entry. Two named ideas instead of two hand-built ones.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="first-over-limit.html">← 이전: First sensor reading over the limit</a>
+    <a href="paginate-users.html">다음: Batch users into pages of 10 →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

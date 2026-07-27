@@ -1,0 +1,7 @@
+polling export-2026-07 (up to 10 attempts):
+  poll 1: pending
+  poll 2: pending
+  poll 3: pending
+  poll 4: pending
+  poll 5: ready
+ready on attempt 5; polls actually made: 5

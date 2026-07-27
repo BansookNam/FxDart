@@ -1,0 +1,7 @@
+Trip expenses in USD (currencies: EUR, GBP, JPY, USD)
+  Lodging  $240.55
+  Travel   $164.82
+  Food     $37.85
+  Transit  $22.50
+Largest single expense: Travel $130.80 (120.00 EUR)
+Total: $465.72
