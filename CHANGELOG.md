@@ -1,3 +1,10 @@
+## 0.5.4
+
+### Docs
+
+* README: new CTA badge linking to the **Dart vs FxDart** comparison site —
+  50 side-by-side native-Dart vs fxdart examples with an honest verdict on each.
+
 ## 0.5.3
 
 ### Added

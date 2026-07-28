@@ -17,7 +17,11 @@ programming model, rebuilt on Dart's type system.
   <img src="https://img.shields.io/badge/%F0%9F%93%92%20Daily%20Ledger-Try%20the%20Live%20Demo%20App%20%E2%86%92-00B894?style=for-the-badge&labelColor=006B54" alt="Try the Daily Ledger — Live Demo App" height="56">
 </a>
 
-<b>👆 Click above</b> — <b>FxDart 101</b> is a guided course with a live in-browser playground for every function; <b>Daily Ledger</b> is a full app built with fxdart.
+<a href="https://bansooknam.github.io/FxDart/DartComparison/">
+  <img src="https://img.shields.io/badge/%E2%9A%96%EF%B8%8F%20Dart%20vs%20FxDart-50%20Side--by--Side%20Examples%20%E2%86%92-0984E3?style=for-the-badge&labelColor=074B80" alt="Dart vs FxDart — 50 Side-by-Side Examples" height="56">
+</a>
+
+<b>👆 Click above</b> — <b>FxDart 101</b> is a guided course with a live in-browser playground for every function; <b>Daily Ledger</b> is a full app built with fxdart; <b>Dart vs FxDart</b> puts native Dart and fxdart solutions side by side, with an honest verdict on each.
 
 ## Why fxdart?
 
