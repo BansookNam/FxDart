@@ -22,5 +22,7 @@
   "section11": "Async &amp; concurrency",
   "section11Blurb": "The FxAsyncIterable model — FxDart's superpower.",
   "section12": "Util",
-  "section12Blurb": "Rate limiting and randomness."
+  "section12Blurb": "Rate limiting and randomness.",
+  "section13": "Typed errors",
+  "section13Blurb": "New in 0.6 — the Kotlin Arrow approach, ported: <code>either</code>, <code>Raise</code>, <code>bind</code>, <code>ensure</code>, error accumulation with <code>Nel</code>, and pipeline-fused validation. Straight-line code, typed failures, no wrapper tower."
 }

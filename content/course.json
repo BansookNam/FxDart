@@ -139,5 +139,8 @@
     {"href": "throttle.html", "label": "throttle"},
     {"href": "shuffle.html", "label": "shuffle"},
     {"href": "createSeededRandom.html", "label": "createSeededRandom"}
+  ],
+  "13": [
+    {"href": "typedErrors.html", "label": "typed errors — full guide"}
   ]
 }

@@ -1,0 +1,3 @@
+Either&lt;E, A&gt; either&lt;E, A&gt;(A Function(Raise&lt;E&gt; r) block)
+Future&lt;Either&lt;E, A&gt;&gt; eitherAsync&lt;E, A&gt;(FutureOr&lt;A&gt; Function(Raise&lt;E&gt; r) block)
+A? nullable&lt;A&gt;(A Function(SingletonRaise r) block)

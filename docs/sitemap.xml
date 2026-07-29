@@ -1101,6 +1101,16 @@
     <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/transpose.html"/>
   </url>
   <url>
+    <loc>https://bansooknam.github.io/FxDart/tutorials/typedErrors.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/typedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/typedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/typedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/typedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/typedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/typedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/typedErrors.html"/>
+  </url>
+  <url>
     <loc>https://bansooknam.github.io/FxDart/tutorials/unicodeToList.html</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/unicodeToList.html"/>
     <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/unicodeToList.html"/>
@@ -2799,6 +2809,16 @@
     <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/transpose.html"/>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/transpose.html"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/transpose.html"/>
+  </url>
+  <url>
+    <loc>https://bansooknam.github.io/FxDart/ko/tutorials/typedErrors.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/typedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/typedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/typedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/typedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/typedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/typedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/typedErrors.html"/>
   </url>
   <url>
     <loc>https://bansooknam.github.io/FxDart/ko/tutorials/unicodeToList.html</loc>
