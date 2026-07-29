@@ -150,6 +150,9 @@ void main() {
       });
       expect(seen.toString(), contains('fxdart raise signal'));
       expect(seen.toString(), contains('catching'));
+      // The signal carries no eager stack trace of its own (no extra cost
+      // beyond Dart's normal throw).
+      expect((seen! as Error).stackTrace, equals(null));
     });
   });
 
