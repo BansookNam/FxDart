@@ -8,8 +8,10 @@ crumb: naming
 ---
   <p class="hero-sub">
     The feature behind <code>either</code> has famous names in other
-    ecosystems — <em>Monad</em>, <em>Railway-oriented programming</em>. This
-    page explains why FxDart deliberately calls it none of those.
+    ecosystems — <a href="monad.html"><em>Monad</em></a>,
+    <em>Railway-oriented programming</em>. This page explains why FxDart
+    deliberately calls it none of those. (Never met a monad? Start with
+    <a href="monad.html">Monad &amp; comprehension blocks</a>.)
   </p>
 
   <h2>Why not "Monad"?</h2>

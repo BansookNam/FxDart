@@ -8,8 +8,10 @@ crumb: naming
 ---
   <p class="hero-sub">
     <code>either</code> 뒤에 있는 이 기능은 다른 생태계에서 유명한 이름들을
-    갖고 있습니다 — <em>Monad</em>, <em>Railway-oriented programming</em>.
-    이 페이지는 FxDart가 왜 일부러 그 어떤 이름도 쓰지 않는지 설명합니다.
+    갖고 있습니다 — <a href="monad.html"><em>Monad</em></a>,
+    <em>Railway-oriented programming</em>. 이 페이지는 FxDart가 왜 일부러
+    그 어떤 이름도 쓰지 않는지 설명합니다. (모나드가 처음이라면
+    <a href="monad.html">모나드 &amp; 컴프리헨션 블록</a>부터 보세요.)
   </p>
 
   <h2>왜 "Monad"가 아닌가요?</h2>
