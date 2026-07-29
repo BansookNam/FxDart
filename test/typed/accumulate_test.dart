@@ -2,7 +2,7 @@ import 'package:fxdart/fxdart.dart';
 import 'package:test/test.dart';
 
 /// The five-point accumulation contract from PLAN v0.6 §4.3, copied from
-/// Arrow's RaiseAccumulate.
+/// Arrow's AccumulatingRaise.
 void main() {
   group('accumulate', () {
     test('all branches run; errors concatenate in branch order', () {
@@ -35,7 +35,7 @@ void main() {
       expect(result, Right(3));
     });
 
-    test('reading an errored AccValue detonates with the FULL accumulated '
+    test('reading an errored Accumulated detonates with the FULL accumulated '
         'list (lazy detonation)', () {
       final result = either<Nel<String>, int>((r) => r.accumulate((acc) {
             final a = acc.accumulating<int>((r) => r.raise('one'));
@@ -129,10 +129,10 @@ void main() {
     });
   });
 
-  group('RaiseAccumulate.over', () {
+  group('AccumulatingRaise.over', () {
     test('wraps single raises into singleton Nels', () {
       final result = either<Nel<String>, int>((r) {
-        final single = RaiseAccumulate.over(r);
+        final single = AccumulatingRaise.over(r);
         return single.raise('one');
       });
       expect(result.leftOrNull()!.toList(), ['one']);
@@ -140,7 +140,7 @@ void main() {
 
     test('delegates bindNel and mapOrAccumulate', () {
       final result = either<Nel<String>, List<int>>((r) {
-        final single = RaiseAccumulate.over(r);
+        final single = AccumulatingRaise.over(r);
         expect(single.bindNel(Right(1)), 1);
         return single.mapOrAccumulate(
             [1, 2], (r, n) => n.isOdd ? r.raise('odd $n') : n);

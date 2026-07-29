@@ -71,9 +71,9 @@ Future<Either<L, List<R>>> sequenceEitherAsync<L, R>(
 
 /// Transforms every element of [iterable], collecting ALL failures instead
 /// of stopping at the first. The eager, pipeline-level twin of
-/// [RaiseAccumulateOps.mapOrAccumulate].
+/// [AccumulatingRaiseOps.mapOrAccumulate].
 Either<NonEmptyList<E>, List<R>> mapOrAccumulate<E, T, R>(
-        R Function(RaiseAccumulate<E> r, T item) transform,
+        R Function(AccumulatingRaise<E> r, T item) transform,
         Iterable<T> iterable) =>
     either<NonEmptyList<E>, List<R>>(
         (r) => r.mapOrAccumulate(iterable, transform));
@@ -86,12 +86,12 @@ Either<NonEmptyList<E>, List<R>> mapOrAccumulate<E, T, R>(
 /// then folded eagerly in order. Pass [concurrency] to evaluate up to that
 /// many elements at once via the `concurrent(n)` back-channel.
 Future<Either<NonEmptyList<E>, List<R>>> mapOrAccumulateAsync<E, T, R>(
-    FutureOr<R> Function(RaiseAccumulate<E> r, T item) transform,
+    FutureOr<R> Function(AccumulatingRaise<E> r, T item) transform,
     FxAsyncIterable<T> iterable,
     {int? concurrency}) async {
   var mapped = FxAsync(iterable).map((item) =>
       eitherAsync<NonEmptyList<E>, R>(
-          (r) => transform(RaiseAccumulate.over(r), item)));
+          (r) => transform(AccumulatingRaise.over(r), item)));
   if (concurrency != null) mapped = mapped.concurrent(concurrency);
   final errors = <E>[];
   final results = <R>[];
@@ -135,7 +135,7 @@ extension FxAccumulateOps<T> on Fx<T> {
   /// Transforms every element, collecting ALL failures instead of stopping
   /// at the first.
   Either<NonEmptyList<E>, List<R>> mapOrAccumulate<E, R>(
-          R Function(RaiseAccumulate<E> r, T item) transform) =>
+          R Function(AccumulatingRaise<E> r, T item) transform) =>
       either<NonEmptyList<E>, List<R>>(
           (r) => r.mapOrAccumulate(this, transform));
 }
@@ -145,7 +145,7 @@ extension FxAsyncAccumulateOps<T> on FxAsync<T> {
   /// Async twin of [FxAccumulateOps.mapOrAccumulate]; pass [concurrency] to
   /// evaluate up to that many elements at once.
   Future<Either<NonEmptyList<E>, List<R>>> mapOrAccumulate<E, R>(
-          FutureOr<R> Function(RaiseAccumulate<E> r, T item) transform,
+          FutureOr<R> Function(AccumulatingRaise<E> r, T item) transform,
           {int? concurrency}) =>
       mapOrAccumulateAsync(transform, this, concurrency: concurrency);
 }

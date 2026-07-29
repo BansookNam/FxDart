@@ -21,7 +21,7 @@
 * **`NonEmptyList<T>` / `Nel<T>`** — zero-cost extension type (needs SDK
   ≥ 3.3, hence the floor bump), the error carrier for accumulation.
 * **Error accumulation** (the Arrow replacement for `Validated`):
-  `r.accumulate` with lazily-detonating `AccValue`s, `r.mapOrAccumulate`,
+  `r.accumulate` with lazily-detonating `Accumulated`s, `r.mapOrAccumulate`,
   `r.zipOrAccumulate2..5`, `r.bindNel`.
 * **Pipeline integration**: `rights`, `lefts`, `separateEither`,
   `sequenceEither(Async)`, `mapOrAccumulate(Async)` as top-level ops and as

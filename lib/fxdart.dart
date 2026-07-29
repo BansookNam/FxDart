@@ -38,7 +38,7 @@ export 'src/strict/func.dart';
 export 'src/strict/object.dart';
 export 'src/strict/predicates.dart';
 export 'src/typed/accumulate.dart'
-    show AccValue, Accumulate, RaiseAccumulate, RaiseAccumulateOps;
+    show Accumulated, Accumulator, AccumulatingRaise, AccumulatingRaiseOps;
 export 'src/typed/either.dart' show Either, EitherNel, Left, Right;
 export 'src/typed/fx_either.dart';
 export 'src/typed/non_empty_list.dart' show Nel, NonEmptyList;
