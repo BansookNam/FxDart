@@ -21,6 +21,7 @@ import 'playground_source.dart' as pg;
 
 const siteBase = 'https://bansooknam.github.io/FxDart';
 const codemirror = 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16';
+const dartpad = 'https://stable.api.dartpad.dev';
 const repoUrl = 'https://github.com/bansooknam/fxDart';
 const fxtsUrl = 'https://github.com/marpple/FxTS';
 
@@ -466,6 +467,9 @@ String _head(
   b.writeln('  <link rel="stylesheet" href="${p}css/site.css">');
   if (playground) {
     b.writeln('  <link rel="stylesheet" href="$codemirror/codemirror.min.css">');
+    // The DDC runtime comes from here, and it is the long pole on a reader's
+    // first Run — get DNS, TCP and TLS out of the way while the page renders.
+    b.writeln('  <link rel="preconnect" href="$dartpad" crossorigin>');
     // Only needed once a reader edits a snippet, so fetch it at prefetch
     // priority while they read rather than on the click that needs it.
     b.writeln('  <link rel="prefetch" href="$p${_libUrl()}">');

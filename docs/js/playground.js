@@ -54,22 +54,41 @@
   // version we simply do not persist anything — a mismatched pinned SDK would
   // break the playground until the user cleared site data, which is far worse
   // than re-fetching.
+  var VERSION_KEY = 'fxdart-ddc-version';
+
   var versionPromise = null;
   function getVersion() {
     if (!versionPromise) {
       versionPromise = fetch(API + 'version')
         .then(function (r) { return r.ok ? r.json() : {}; })
-        .then(function (j) { return j.dartVersion || ''; })
+        .then(function (j) {
+          var v = j.dartVersion || '';
+          if (v) { try { localStorage.setItem(VERSION_KEY, v); } catch (e) {} }
+          return v;
+        })
         .catch(function () { return ''; });
     }
     return versionPromise;
   }
 
+  // The version this browser confirmed on an earlier visit. Knowing it up
+  // front is what lets a returning reader open the runtime cache immediately
+  // instead of waiting on a round trip that only ever names a bucket. If the
+  // service has since moved on, evictOldCaches drops the stale bucket once the
+  // real version arrives, so the guess costs at most one page load — and that
+  // load is self-consistent, since the precompiled artifacts under pg/ were
+  // built against the same older SDK.
+  function knownVersion() {
+    try { return localStorage.getItem(VERSION_KEY) || ''; } catch (e) { return ''; }
+  }
+
+  function bucket(kind, v) {
+    if (!v || !window.caches) return Promise.resolve(null);
+    return caches.open('fxdart-' + kind + '-' + v).catch(function () { return null; });
+  }
+
   function openCache(kind) {
-    return getVersion().then(function (v) {
-      if (!v || !window.caches) return null;
-      return caches.open('fxdart-' + kind + '-' + v);
-    }).catch(function () { return null; });
+    return getVersion().then(function (v) { return bucket(kind, v); });
   }
 
   // Drop buckets from superseded Dart versions; otherwise a long-lived visitor
@@ -107,13 +126,19 @@
 
   // --- DDC runtime ----------------------------------------------------------
 
+  // Fetching 17MB is the whole cost of a reader's first Run, so nothing may sit
+  // in front of it. The version lookup used to: it resolved the cache bucket,
+  // and the downloads only started once it came back. Now the bucket is opened
+  // from the remembered version (or skipped entirely on a first visit, where
+  // there is nothing to hit anyway) and the version request runs alongside,
+  // needed only to decide where a freshly downloaded artifact gets stored.
   var runtimePromise = null;
   function getRuntime() {
     if (!runtimePromise) {
-      runtimePromise = openCache('rt').then(function (cache) {
+      runtimePromise = bucket('rt', knownVersion()).then(function (cache) {
         return Promise.all([
-          cachedText(cache, ARTIFACTS + 'ddc_module_loader.js'),
-          cachedText(cache, ARTIFACTS + 'dart_sdk_new.js')
+          runtimeSource(cache, ARTIFACTS + 'ddc_module_loader.js'),
+          runtimeSource(cache, ARTIFACTS + 'dart_sdk_new.js')
         ]);
       }).then(function (parts) {
         return { loader: parts[0], sdk: parts[1] };
@@ -121,6 +146,24 @@
       runtimePromise.catch(function () { runtimePromise = null; });
     }
     return runtimePromise;
+  }
+
+  function runtimeSource(cache, url) {
+    function download() {
+      return fetch(url).then(function (r) {
+        if (!r.ok) throw new Error(url + ' → ' + r.status);
+        // Store under the *confirmed* version, off the critical path.
+        var copy = r.clone();
+        openCache('rt').then(function (c) {
+          if (c) c.put(url, copy).catch(function () {});
+        }).catch(function () {});
+        return r.text();
+      });
+    }
+    if (!cache) return download();
+    return cache.match(url).then(function (hit) {
+      return hit ? hit.text() : download();
+    });
   }
 
   // --- fxdart library bundle ------------------------------------------------
