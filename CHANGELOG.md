@@ -1,4 +1,10 @@
-## 0.6.0
+## 0.6.1
+
+### Docs
+
+* README: added typed errors description
+
+# 0.6.0
 
 ### Added — typed errors (the Kotlin Arrow 2.x approach, ported)
 

@@ -36,6 +36,10 @@ programming model, rebuilt on Dart's type system.
 - **One mental model for sync and async** — the same operator names work on
   `Iterable` (sync) and `FxAsyncIterable` (async), with `Stream` bridges in both
   directions.
+- **Typed errors** (new in 0.6) — Kotlin Arrow 2.x's `Raise`/`Either` approach,
+  ported: straight-line `either` blocks instead of `flatMap` pyramids, error
+  accumulation with `NonEmptyList`, and validation fused directly into the
+  concurrent pipelines above.
 
 ## Install
 
@@ -137,6 +141,38 @@ ordering guarantee). This back-channel protocol is why fxdart has its own
 `FxAsyncIterable` instead of building on push-based `Stream`s, which cannot
 express it.
 
+### Typed errors (0.6)
+
+The `either` builder runs a block in a `Raise<E>` scope: each `r.bind` unwraps
+a success or short-circuits the whole block with a **typed** failure — the
+Kotlin Arrow 2.x model, ported (no `TaskEither`/`IO` wrapper tower, no
+`Option`; Dart's `T?` plus the `nullable` builder covers absence):
+
+```dart
+Either<String, int> parsePort(String raw) => either((r) {
+  final n = r.ensureNotNull(int.tryParse(raw), () => '"$raw" is not a number');
+  r.ensure(n > 0 && n < 65536, () => '$n is out of range');
+  return n;
+});
+
+// Validation accumulates EVERY failure into a NonEmptyList, not just the first:
+final user = either<Nel<String>, User>((r) => r.zipOrAccumulate2(
+    (r) => validateName(r, input), (r) => validateAge(r, input), User.new));
+
+// And it fuses with pipelines — fail-slow, 8 records in flight, order kept:
+final result = await fxStream(records)
+    .mapOrAccumulate<String, User>((r, rec) => parseUser(r, rec), concurrency: 8);
+```
+
+Every subject has a detailed tutorial with an in-browser playground:
+[overview](https://bansooknam.github.io/FxDart/tutorials/typedErrors.html) ·
+[`Either`](https://bansooknam.github.io/FxDart/tutorials/either.html) ·
+[`either` & the `Raise` scope](https://bansooknam.github.io/FxDart/tutorials/raise.html) ·
+[`nullable`](https://bansooknam.github.io/FxDart/tutorials/nullable.html) ·
+[`NonEmptyList`](https://bansooknam.github.io/FxDart/tutorials/nonEmptyList.html) ·
+[accumulation](https://bansooknam.github.io/FxDart/tutorials/accumulate.html) ·
+[`Either` × pipelines](https://bansooknam.github.io/FxDart/tutorials/eitherPipelines.html)
+
 ## API overview
 
 | Category | Functions |
@@ -152,6 +188,7 @@ express it.
 | **Function** | `pipe`, `pipe1`, `pipeLazy`, `identity`, `always`, `tap`, `apply`, `juxt`, `memoize`, `negate`, `not`, `when`, `unless`, `throwError`, `throwIf`, `cases`, `add`, `gt`, `gte`, `lt`, `lte`, `delay`, `sleep`, `unicodeToArray`, `.curried`/`.uncurried` (extension getters, arity 2–5) |
 | **Predicates** | `isNull`, `isNotNull`, `isNil`, `isBoolean`, `isNumber`, `isString`, `isDate`, `isList`, `isMap` |
 | **Async** | every lazy/aggregate operator has an `*Async` twin (`mapAsync`, `toListAsync`, ...), plus `toAsync`, `fromStream`, `concurrentAsync`, `concurrentPoolAsync`, `asyncEmpty` |
+| **Typed errors** | `Either` (`Left`/`Right`, `fold`, `map`, `flatMap`, `recover`, `Either.catching`), `either`/`eitherAsync`, `nullable`/`nullableAsync`, `NonEmptyList`/`Nel`, `accumulate`, `zipOrAccumulate2..5`, `mapOrAccumulate`, `bindNel`, `toEitherNel`, `rights`, `lefts`, `separateEither`, `sequenceEither`; chain terminals `rights()`, `lefts()`, `separated()`, `sequence()`, `mapOrAccumulate()` |
 | **Util** | `debounce`, `throttle`, `shuffle`, `createSeededRandom` |
 | **Chains** | `fx()` (sync, extends `Iterable`), `fxAsync()`, `fxStream()`; `Fx<num>`/`FxAsync<num>` gain `sum`/`average`/`min`/`max` |
 
