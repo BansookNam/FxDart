@@ -15,6 +15,7 @@
   <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/latency-percentiles.html">
   <link rel="stylesheet" href="../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="prefetch" href="../assets/fxdart_single.dart?v=2cae938658e29016">
 </head>
 <body>
 <header class="site-header">
@@ -70,7 +71,7 @@ Worst p95: /orders at 620 ms</pre>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
       <h3>Native Dart</h3>
-      <div class="playground">
+      <div class="playground" data-pg="54b7fa92e444db30">
 <textarea>
 import 'package:collection/collection.dart';
 
@@ -126,7 +127,7 @@ void main() {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground">
+      <div class="playground" data-pg="87fa37b7ba17576c">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -205,7 +206,8 @@ void main() {
   <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a>. Great thanks to <strong>Indong Yoo</strong> (CTO, Marpple) and the FxTS team for the ideas, semantics, and test suite this library is built on.</p>
   <p>Playground compiles via the DartPad compile service. © Bansook Nam · MIT License</p>
 </footer>
-<script>window.FXDART_I18N = {"pgRun":"▶ Run","pgReset":"Reset","pgCompiling":"Compiling…","pgCompileError":"Compile error","pgError":"Error","pgLoading":"Loading runtime…","pgRunning":"Running…","pgNoOutput":"(no output)","pgLoadFailed":"Could not load the FxDart library"};</script>
+<script>window.FXDART_I18N = {"pgRun":"▶ Run","pgReset":"Reset","pgCompiling":"Compiling…","pgCompileError":"Compile error","pgError":"Error","pgLoading":"Loading runtime…","pgRunning":"Running…","pgNoOutput":"(no output)","pgLoadFailed":"Could not load the FxDart library"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=2cae938658e29016";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

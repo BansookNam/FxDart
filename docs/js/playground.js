@@ -219,7 +219,27 @@
     });
   }
 
+  // Compiled bundles run about a megabyte each, so both caches are bounded.
+  // Every edit a reader makes produces another one, and a docs site has no
+  // business growing its share of their disk without limit.
+  var memLimit = 6;
+  var diskLimit = 12;
   var memCompile = {};
+  var memOrder = [];
+
+  function remember(key, js) {
+    if (!memCompile[key]) memOrder.push(key);
+    memCompile[key] = js;
+    while (memOrder.length > memLimit) delete memCompile[memOrder.shift()];
+    return js;
+  }
+
+  // Cache.keys() resolves in insertion order, so the oldest entries are first.
+  function trimCache(cache) {
+    cache.keys().then(function (keys) {
+      for (var i = 0; i < keys.length - diskLimit; i++) cache.delete(keys[i]);
+    }).catch(function () {});
+  }
 
   function compile(source) {
     var key = hash(source);
@@ -228,19 +248,18 @@
       var url = ROOT + '__compile/' + key;
       function fresh() {
         return compileRemote(source).then(function (js) {
-          memCompile[key] = js;
           if (cache) {
             cache.put(url, new Response(js, {
               headers: { 'Content-Type': 'text/javascript' }
-            })).catch(function () {});
+            })).then(function () { trimCache(cache); }).catch(function () {});
           }
-          return js;
+          return remember(key, js);
         });
       }
       if (!cache) return fresh();
       return cache.match(url).then(function (hit) {
         if (!hit) return fresh();
-        return hit.text().then(function (js) { memCompile[key] = js; return js; });
+        return hit.text().then(function (js) { return remember(key, js); });
       });
     });
   }
@@ -408,6 +427,10 @@
     function getCode() { return editor ? editor.getValue() : textarea.value; }
 
     var frame = null;
+    // Bumped on every Run so a previous run's deferred callbacks can tell
+    // they have been superseded — otherwise the "(no output)" timer from an
+    // abandoned run fires into the console of the run that replaced it.
+    var runSeq = 0;
 
     function appendOut(text, cls) {
       output.style.display = 'block';
@@ -451,6 +474,7 @@
 
     function run() {
       if (frame) { releaseFrame(frame); frame = null; }
+      var seq = ++runSeq;
       output.style.display = 'block';
       output.textContent = '';
       runBtn.disabled = true;
@@ -476,7 +500,9 @@
           // main() returned; async work may still print afterwards.
           finish();
           setTimeout(function () {
-            if (!gotOutput) appendOut(t('pgNoOutput', '(no output)'), 'pg-dim');
+            if (!gotOutput && seq === runSeq) {
+              appendOut(t('pgNoOutput', '(no output)'), 'pg-dim');
+            }
           }, 3000);
         }
       };
@@ -502,12 +528,16 @@
 
       // Safety: re-enable Run if nothing came back.
       setTimeout(function () {
-        if (runBtn.disabled) { runBtn.disabled = false; status.textContent = ''; }
+        if (seq === runSeq && runBtn.disabled) {
+          runBtn.disabled = false;
+          status.textContent = '';
+        }
       }, 60000);
     }
 
     runBtn.addEventListener('click', run);
     resetBtn.addEventListener('click', function () {
+      runSeq++; // abandon anything still in flight
       if (editor) editor.setValue(initial); else textarea.value = initial;
       output.textContent = '';
       output.style.display = 'none';

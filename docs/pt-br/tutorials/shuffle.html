@@ -16,6 +16,7 @@
   <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/shuffle.html">
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2cae938658e29016">
 </head>
 <body>
 <header class="site-header">
@@ -80,7 +81,7 @@ Future&lt;List&lt;T&gt;&gt; shuffleAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; itera
   <h2>Demo 1 · Seeded determinism</h2>
   <p>Same seed, same order — every time. A different seed gives a different
     (but still reproducible) order:</p>
-  <div class="playground">
+  <div class="playground" data-pg="6961462238b2a47b">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -166,7 +167,8 @@ void main() {
   <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
   <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
 </footer>
-<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=2cae938658e29016";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

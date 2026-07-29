@@ -17,6 +17,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'playground_source.dart' as pg;
+
 const siteBase = 'https://bansooknam.github.io/FxDart';
 const codemirror = 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16';
 const repoUrl = 'https://github.com/bansooknam/fxDart';
@@ -390,9 +392,32 @@ String _injectCode(String body, String slug, int depth) {
   return body.replaceAllMapped(RegExp(r'\{\{playground:(\d+)\}\}'), (m) {
     final f = File('$dir/${m.group(1)}.dart');
     if (!f.existsSync()) throw StateError('$slug: missing code ${m.group(1)}.dart');
-    final code = f.readAsStringSync().trimRight();
-    return '<div class="playground">\n<textarea>\n$code\n</textarea>\n  </div>';
+    final code = pg.snippetCode(f.readAsStringSync());
+    return '<div class="playground"${_pgAttr(code)}>\n'
+        '<textarea>\n$code\n</textarea>\n  </div>';
   });
+}
+
+/// `data-pg` points playground.js at the artifact tool/precompile_playgrounds
+/// built for this exact snippet, letting an unedited Run skip the compile
+/// service entirely. Emitted only when the artifact is actually on disk, so a
+/// site built without precompiling still renders — it just falls back to
+/// compiling over the network, and `--check` stays deterministic for whatever
+/// docs/pg/ currently holds.
+String _pgAttr(String code) {
+  if (!File('$root/${pg.libraryPath}').existsSync()) return '';
+  final id = pg.playgroundId(root, code);
+  return File(pg.artifactPath(root, id)).existsSync() ? ' data-pg="$id"' : '';
+}
+
+/// Site-root-relative URL of the playground's fxdart bundle, fingerprinted so
+/// a redeployed library can never be served from a stale cache entry. GitHub
+/// Pages will not let us set immutable caching headers, but a changing URL
+/// gets the same guarantee.
+String _libUrl() {
+  const path = 'assets/fxdart_single.dart';
+  if (!File('$root/${pg.libraryPath}').existsSync()) return path;
+  return '$path?v=${pg.libHash(root)}';
 }
 
 // --- templates --------------------------------------------------------------
@@ -441,6 +466,9 @@ String _head(
   b.writeln('  <link rel="stylesheet" href="${p}css/site.css">');
   if (playground) {
     b.writeln('  <link rel="stylesheet" href="$codemirror/codemirror.min.css">');
+    // Only needed once a reader edits a snippet, so fetch it at prefetch
+    // priority while they read rather than on the click that needs it.
+    b.writeln('  <link rel="prefetch" href="$p${_libUrl()}">');
   }
   b
     ..writeln('</head>')
@@ -544,7 +572,8 @@ String _scripts(Locale locale, Map<String, String> chrome, int depth) {
   ];
   final map = {for (final k in strings) k: chrome[k] ?? ''};
   return '''
-<script>window.FXDART_I18N = ${jsonEncode(map)};</script>
+<script>window.FXDART_I18N = ${jsonEncode(map)};
+window.FXDART_LIB = ${jsonEncode(_libUrl())};</script>
 <script src="$codemirror/codemirror.min.js"></script>
 <script src="$codemirror/mode/clike/clike.min.js"></script>
 <script src="$codemirror/mode/dart/dart.min.js"></script>
@@ -757,11 +786,11 @@ String _injectComparisonCode(
     String panel(String file, String chromeKey, String side) {
       final f = File('$dir/$file');
       if (!f.existsSync()) throw StateError('$slug: missing $file');
-      final code = f.readAsStringSync().trimRight();
+      final code = pg.snippetCode(f.readAsStringSync());
       return '''
     <section class="cmp-panel cmp-$side">
       <h3>${chrome[chromeKey]}</h3>
-      <div class="playground">
+      <div class="playground"${_pgAttr(code)}>
 <textarea>
 $code
 </textarea>

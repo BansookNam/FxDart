@@ -15,6 +15,7 @@
   <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/DartComparison/latency-percentiles.html">
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2cae938658e29016">
 </head>
 <body>
 <header class="site-header">
@@ -70,7 +71,7 @@ Worst p95: /orders at 620 ms</pre>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
       <h3>네이티브 Dart</h3>
-      <div class="playground">
+      <div class="playground" data-pg="54b7fa92e444db30">
 <textarea>
 import 'package:collection/collection.dart';
 
@@ -126,7 +127,7 @@ void main() {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground">
+      <div class="playground" data-pg="87fa37b7ba17576c">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -204,7 +205,8 @@ void main() {
   <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
-<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};</script>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=2cae938658e29016";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

@@ -40,6 +40,15 @@ if [[ $SKIP_BUILD -eq 0 ]]; then
   step "Analyzing library sources"
   dart analyze lib
 
+  # Must run before build_docs: the generator stamps data-pg only on snippets
+  # that already have an artifact on disk. Rebuilding the bundle above changes
+  # every fxdart snippet's id, so --prune clears the superseded ones.
+  # A compile failure here means a demo on the site is broken — let it stop
+  # the deploy. Use --scope=all to cover every playground, --scope=none to
+  # skip precompiling entirely.
+  step "Precompiling playgrounds (docs/pg/)"
+  dart run tool/precompile_playgrounds.dart --scope="${PG_SCOPE:-first}" --prune
+
   step "Rendering docs/ from content/ + i18n/"
   dart run tool/build_docs.dart
 else
@@ -52,7 +61,8 @@ fi
 # ---------------------------------------------------------------- sanity
 step "Checking docs/ layout"
 for required in docs/index.html docs/101/index.html docs/css/site.css \
-                docs/js/playground.js docs/assets/fxdart_single.dart; do
+                docs/js/playground.js docs/frame.html \
+                docs/assets/fxdart_single.dart; do
   [[ -f "$required" ]] || { echo "missing required page resource: $required" >&2; exit 1; }
 done
 echo "ok — $(find docs -type f | wc -l | tr -d ' ') files under docs/"
