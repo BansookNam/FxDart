@@ -360,7 +360,15 @@
     this.el.setAttribute('sandbox', 'allow-scripts');
     this.el.setAttribute('aria-hidden', 'true');
     this.el.setAttribute('title', 'FxDart playground runtime');
-    this.el.style.display = 'none';
+    // Deliberately rendered rather than `display: none`. Chrome throttles
+    // timers in frames that are both cross-origin and hidden, and `sandbox`
+    // without `allow-same-origin` makes this frame cross-origin by design — so
+    // hiding it the obvious way can stretch a `Future.delayed(300ms)` in a
+    // reader's demo out to a second, making concurrent() look broken when it
+    // is not. One transparent pixel inside the viewport keeps the frame
+    // scheduled normally while staying invisible.
+    this.el.style.cssText = 'position:fixed;right:0;bottom:0;width:1px;' +
+      'height:1px;opacity:0;border:0;pointer-events:none;z-index:-1;';
     frames.push(this);
     this.el.src = ROOT + 'frame.html';
     document.body.appendChild(this.el);
