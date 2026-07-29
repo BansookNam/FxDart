@@ -2,9 +2,9 @@
 
 The site is served by GitHub Pages straight off the default branch — there is
 no build artifact branch. Deploying is building the playground bundle,
-regenerating `docs/`, and pushing.
+precompiling the playgrounds, regenerating `docs/`, and pushing.
 
-`docs/` is **generated output — never edit it by hand.** The sources are:
+Most of `docs/` is **generated output — never edit it by hand.** The sources are:
 
 | Path | What it is |
 | --- | --- |
@@ -12,6 +12,12 @@ regenerating `docs/`, and pushing.
 | `content/code/` | Playground code and type signatures — shared by every locale |
 | `i18n/<locale>/` | Translations; anything absent falls back to English |
 | `tool/build_docs.dart` | The generator that renders the above into `docs/` |
+| `tools/build_single_file.sh` | Concatenates `lib/src/` into `docs/assets/fxdart_single.dart` |
+| `tool/precompile_playgrounds.dart` | Compiles playground snippets into `docs/pg/*.js.gz` |
+
+The exceptions — hand-maintained files that live under `docs/` because that is
+what gets served — are `docs/css/site.css`, `docs/js/*.js`, `docs/frame.html`,
+and `docs/assets/logo*.png`. Edit those directly.
 
 The site builds in 7 languages (English at the root, plus `ko`, `zh-Hans`,
 `ja`, `es`, `pt-BR`, `ru` under their own prefixes). See
@@ -45,6 +51,33 @@ deployed site — including the language switcher.
 Pages takes roughly a minute to rebuild after the push:
 <https://bansooknam.github.io/FxDart/>
 
+### `PG_SCOPE` — how many playgrounds to precompile
+
+Precompiled snippets let an unedited Run skip the DartPad compile service
+entirely (~2.5s → under 100ms). The artifacts are committed, so the choice is a
+trade between how many playgrounds are instant and how much the repo carries.
+
+```bash
+PG_SCOPE=first ./deploy.sh    # default — first demo per tutorial + both comparison panels
+PG_SCOPE=all ./deploy.sh      # every playground on the site
+PG_SCOPE=none ./deploy.sh     # precompile nothing new; keep what is already built
+```
+
+| Scope | Artifacts | Size | Notes |
+| --- | --- | --- | --- |
+| `first` | 224 | ~12 MB | The block a reader is most likely to click first |
+| `all` | 476 | ~28 MB | Every playground instant on the first click |
+| `none` | — | — | Existing artifacts are kept and still used |
+
+Anything not precompiled still works — it compiles over the network on first
+Run, then stays in the reader's browser cache.
+
+Rebuilding `docs/assets/fxdart_single.dart` changes the id of every snippet
+that imports fxdart, so a library change rewrites ~90% of the artifacts and
+adds that much to git history again. Drop to `first` if that churn starts to
+hurt. (The 50 native-Dart comparison panels are keyed without the library hash
+and survive a bundle rebuild untouched.)
+
 ## What the script does
 
 1. Runs `tools/build_single_file.sh`, which regenerates
@@ -52,18 +85,26 @@ Pages takes roughly a minute to rebuild after the push:
    that the browser playground prepends to user code before sending it to the
    DartPad compile service — and analyzes it.
 2. Runs `dart analyze lib`.
-3. Runs `dart run tool/build_docs.dart`, regenerating every page in every
-   locale from `content/` and `i18n/`. (With `-s`, it instead runs
-   `--check`, which fails if `docs/` has drifted from its sources — so a
-   skip-build deploy can never ship stale HTML.)
-4. Checks that the required page resources exist (`docs/index.html`,
+3. Runs `dart run tool/precompile_playgrounds.dart --scope="$PG_SCOPE" --prune`,
+   compiling snippets into `docs/pg/` and dropping artifacts no snippet maps to
+   any more. Incremental — an artifact that already exists costs nothing. A
+   snippet that fails to compile is a broken demo, and stops the deploy.
+4. Runs `dart run tool/build_docs.dart`, regenerating every page in every
+   locale from `content/` and `i18n/`, and stamping `data-pg` on each
+   playground that has an artifact. (With `-s`, it instead runs `--check`,
+   which fails if `docs/` has drifted from its sources — so a skip-build deploy
+   can never ship stale HTML.)
+5. Checks that the required page resources exist (`docs/index.html`,
    `docs/101/index.html`, `docs/css/site.css`, `docs/js/playground.js`,
-   `docs/assets/fxdart_single.dart`).
-5. Prints per-locale translation coverage.
-6. Stages `docs/`, `content/`, `i18n/`, `tool/`, `tools/`, `deploy.sh`, and
+   `docs/frame.html`, `docs/assets/fxdart_single.dart`).
+6. Prints per-locale translation coverage.
+7. Stages `docs/`, `content/`, `i18n/`, `tool/`, `tools/`, `deploy.sh`, and
    `DEPLOY.md` — and nothing else — then commits and pushes to
    `origin/<current branch>`. Output and its sources ship together; committing
    one without the other would make the next `--check` fail.
+
+Step 3 must come before step 4: the generator only stamps `data-pg` on
+snippets whose artifact is already on disk.
 
 Staging is by path on purpose: a docs deploy will **not** pick up in-progress
 changes in `lib/` or `test/`. If a library change belongs in the same push,
@@ -74,10 +115,16 @@ If the build produces no changes, the script stops with
 
 ## Notes
 
-- **Never hand-edit anything under `docs/`.** It is all generated — the HTML
-  from `content/` + `i18n/`, and `fxdart_single.dart` from `lib/src/`. The two
-  exceptions are the static assets `docs/css/site.css` and
-  `docs/js/playground.js`, which are edited directly.
+- **Never hand-edit the generated parts of `docs/`** — the HTML and
+  `sitemap.xml` from `content/` + `i18n/`, `fxdart_single.dart` from `lib/src/`,
+  and `pg/*.js.gz` from the precompiler. The hand-maintained files listed at the
+  top of this page are the ones to edit directly.
+- `tool/playground_source.dart` reimplements the library+snippet merge that
+  `docs/js/playground.js` performs, so that precompiled output is built from
+  exactly the text the browser would have sent. The two must stay
+  byte-identical; if they drift, every page silently falls back to compiling
+  over the network. Verify by capturing a real compile POST body from the
+  browser and comparing it against the Dart merge.
 - The untracked `example/_snip_*.dart` files are scratch snippets from writing
   the tutorials. The script stages by path rather than using `git add -A`, so
   they are deliberately left out of deploy commits.
