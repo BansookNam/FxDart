@@ -42,6 +42,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <h1>FxDart 101</h1>
   <p class="hero-sub">
     직접 해 보며 익히는 코스입니다. 모든 강의는 라이브 데모와 플레이그라운드를 갖춘
@@ -66,6 +67,78 @@
       실제 앱으로 확인하기: Daily Ledger — FxDart로 만든 완성형 앱&nbsp;→
     </a>
   </p>
+
+  <h2 id="typed-errors">타입 있는 에러 — 0.6 신기능</h2>
+  <p>
+    FxDart 0.6은 Kotlin
+    <a href="https://arrow-kt.io" rel="noopener">Arrow&nbsp;2.x</a>의
+    <em>접근 방식</em>을 Dart로 이식했습니다. <code>Raise&lt;E&gt;</code>
+    스코프 안에서는 평범한 일직선 코드가 <strong>타입 있는</strong> 에러로
+    단락(short-circuit)할 수 있습니다. <code>TaskEither</code>도,
+    <code>IO</code>도, <code>flatMap</code>으로 뚫고 지나가야 할 래퍼 타워도
+    없습니다 — Dart 고유의 <code>Future</code>와 <code>throw</code>가 그대로
+    이펙트 시스템이며, <code>Either</code>는 경계에서만 등장합니다.
+  </p>
+
+  <h3><code>either</code>로 단락하기</h3>
+  <pre class="code"><code>Either&lt;String, int&gt; parsePort(String raw) => either((r) {
+  final n = r.ensureNotNull(int.tryParse(raw), () => '"$raw"는 숫자가 아닙니다');
+  r.ensure(n &gt; 0 &amp;&amp; n &lt; 65536, () => '$n은 범위를 벗어났습니다');
+  return n;
+});
+
+switch (parsePort('8080')) {
+  case Right(:final value): print('$value 포트에서 대기 중');
+  case Left(:final value):  print('잘못된 설정: $value');
+}</code></pre>
+  <p>
+    블록 안에서 <code>r.bind(either)</code>는 다른 <code>Either</code>를
+    풀어내고, <code>r.ensure</code>/<code>r.ensureNotNull</code>은
+    <code>require</code> 스타일 검사를 대체하며(null 승격 포함),
+    <code>r.recover</code>/<code>r.withError</code>는 에러를 처리하거나
+    변환합니다. 비동기도 같은 모양의 <code>eitherAsync</code>를 쓰면 되고,
+    nullable 우선의 쌍둥이인 <code>nullable</code>은 <code>Either</code> 대신
+    <code>T?</code>를 돌려줍니다.
+  </p>
+
+  <h3>첫 실패만이 아니라 모든 실패를 모으기</h3>
+  <pre class="code"><code>final user = either&lt;Nel&lt;String&gt;, User&gt;((r) => r.accumulate((acc) {
+  final name = acc.accumulating((r) => validateName(r, input));
+  final age  = acc.accumulating((r) => validateAge(r, input));
+  return User(name.value, age.value); // 모든 에러가 한 번에 보고됩니다
+}));</code></pre>
+  <p>
+    <code>r.accumulate</code>, <code>r.zipOrAccumulate2..5</code>,
+    <code>r.mapOrAccumulate</code>는 모든 분기를 실행한 뒤 에러 전부를
+    <code>NonEmptyList</code>(<code>Nel</code>)로 이어 붙이고 마지막에만
+    실패합니다 — 별도의 <code>Validated</code> 타입을 대체하는 Arrow의
+    방식입니다.
+  </p>
+
+  <h3>파이프라인과의 융합</h3>
+  <pre class="code"><code>// 레코드 500건을 한 번에 8건씩 검증하고, 모든 실패를 순서대로 보존합니다.
+final result = await fxStream(records)
+    .mapOrAccumulate&lt;String, User&gt;((r, rec) async {
+  final parsed = r.ensureNotNull(tryParse(rec), () => '잘못된 레코드: $rec');
+  return await enrich(parsed);
+}, concurrency: 8);</code></pre>
+  <p>
+    <code>rights()</code>, <code>lefts()</code>, <code>separated()</code>,
+    <code>sequence()</code>, <code>mapOrAccumulate()</code>는
+    <code>fx()</code>/비동기 체인의 즉시 실행 터미널입니다 — 실패를 모으는
+    동시성 검증이 FxDart의 다른 기능과 똑같이 <code>concurrent(n)</code>
+    백채널 위에서 동작합니다.
+  </p>
+
+  <div class="callout">
+    <strong>규칙 두 가지.</strong> (1) raise 블록에서 <em>지연</em>
+    파이프라인을 그대로 반환하지 마세요 — <code>toList()</code>로 실체화하거나
+    위의 즉시 실행 터미널을 사용하세요. 지연된 raise는
+    <code>RaiseLeakedError</code>로 요란하게 실패합니다. (2) raise 블록 안에서
+    맨몸 <code>catch</code>를 쓰지 마세요 — 단락 신호를 항상 통과시키는
+    <code>catching</code>/<code>catchingAsync</code>를 사용하세요
+    (<code>on Exception</code>은 이미 안전합니다).
+  </div>
 
   <h2 id="api">섹션 1 · 시작하기</h2>
   <p class="dim">파이프라인 모델: 지연 방식으로 구성하고, 종결 연산자로 실행합니다.</p>
