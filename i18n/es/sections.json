@@ -22,5 +22,7 @@
   "section11": "Async &amp; concurrencia",
   "section11Blurb": "El modelo FxAsyncIterable: el gran punto fuerte de FxDart.",
   "section12": "Util",
-  "section12Blurb": "Limitación de tasa y aleatoriedad."
+  "section12Blurb": "Limitación de tasa y aleatoriedad.",
+  "section13": "Errores tipados",
+  "section13Blurb": "El enfoque de Arrow (Kotlin), portado: <code>either</code>, <code>Raise</code>, <code>bind</code>, <code>ensure</code>, acumulación de errores con <code>Nel</code> y validación fusionada con el pipeline. Código en línea recta, fallos tipados y ni una torre de wrappers."
 }

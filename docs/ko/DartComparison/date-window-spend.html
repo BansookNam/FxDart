@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Spending inside a date window — Dart vs FxDart</title>
-  <meta name="description" content="Sum a slice of a date-sorted ledger — skipWhile/takeWhile/fold in plain Dart vs dropWhile + takeWhile + sumBy in FxDart. Native holds up well.">
+  <title>특정 기간 안의 지출 — Dart vs FxDart</title>
+  <meta name="description" content="날짜순으로 정렬된 가계부의 한 구간을 합산합니다 — 순수 Dart의 skipWhile/takeWhile/fold와 FxDart의 dropWhile + takeWhile + sumBy를 비교합니다. 네이티브 쪽도 충분히 잘 버팁니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/date-window-spend.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/date-window-spend.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/date-window-spend.html">
@@ -43,8 +43,8 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #13 · <strong>Spending inside a date window</strong></p>
-  <h1>Spending inside a date window</h1>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #13 · <strong>특정 기간 안의 지출</strong></p>
+  <h1>특정 기간 안의 지출</h1>
   <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/takeWhile.html">takeWhile</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
   <h2>요구사항</h2>
@@ -148,7 +148,7 @@ void main() {
     같은 방식으로 정렬 순서를 활용하고, 읽기도 마찬가지로 좋습니다.
     실질적인 차이는 마지막 단계뿐입니다: <code><a href="../tutorials/sumBy.html">sumBy</a></code>는 의도를
     이름으로 말해주는 반면, <code>fold</code>는 초기값과 결합 함수를
-    그대로 드러냅니다. 이건 한 단어짜리 승리이지, 구조적인 승리는
+    그대로 드러냅니다. 이는 한 단어짜리 승리일 뿐, 구조적인 승리는
     아닙니다 — 무승부라고 부르는 게 맞습니다. 코드베이스가 이미
     <code><a href="../tutorials/fx.html">fx</a></code>로 체이닝하고 있다면 일관성을 위해 여기서도
     쓰세요; 그렇지 않다면 순수 Dart로 충분합니다.

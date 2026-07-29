@@ -19,7 +19,7 @@ nextLabel: tap
     <code>always(a)</code> captura <code>a</code> y te devuelve una
     función que descarta aquello con lo que la llames y devuelve <code>a</code>
     cada vez. El parámetro opcional es el truco que le permite encajar en
-    cualquier sitio donde se espere una retrollamada <em>unaria</em> — un
+    cualquier sitio donde se espere un callback <em>unario</em> — un
     mapeador, un manejador <code>orElse</code>, una rama de reserva — sin que
     tengas que escribir <code>(_) => a</code> a mano cada vez.
   </p>
@@ -32,7 +32,7 @@ nextLabel: tap
 
   <h2>Demo 1 · Fundamentos</h2>
   <p>Fíjate en el argumento opcional — <code>greet(123)</code> sigue devolviendo
-    <code>'hi'</code>, que es justo lo que le permite actuar como retrollamada de <code>map</code>:</p>
+    <code>'hi'</code>, que es justo lo que le permite actuar como callback de <code>map</code>:</p>
   {{playground:0}}
 
   <h2>Demo 2 · Valor por defecto constante en una tabla de despacho</h2>

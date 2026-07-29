@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Poll a flaky API until first success — Dart vs FxDart</title>
-  <meta name="description" content="Retry-until-ready as a lazy pipeline — range + toAsync + map + dropWhile + head vs an imperative polling loop with a break.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/flaky-api-retry.html">
+  <title>Sondear una API inestable hasta el primer éxito — Dart vs FxDart</title>
+  <meta name="description" content="Reintentar hasta que esté listo, como pipeline perezoso — range + toAsync + map + dropWhile + head frente a un bucle de sondeo imperativo con un break.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/flaky-api-retry.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/flaky-api-retry.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/flaky-api-retry.html">
@@ -44,31 +43,33 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #42 · <strong>Poll a flaky API until first success</strong></p>
-  <h1>Poll a flaky API until first success</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #42 · <strong>Sondear una API inestable hasta el primer éxito</strong></p>
+  <h1>Sondear una API inestable hasta el primer éxito</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/peek.html">peek</a></li><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/head.html">head</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    An export job's status endpoint is deterministically flaky: the first
-    four polls answer <code>pending</code>, the fifth answers
-    <code>ready</code>. Poll it up to ten times, keep a log of every poll,
-    stop at the first success, and report which attempt won — plus how many
-    polls were actually made. No randomness: the failure count is fixed in
-    the code below, so both versions print the same thing every run.
+    El endpoint de estado de un trabajo de exportación es inestable de
+    forma determinista: los cuatro primeros sondeos responden
+    <code>pending</code> y el quinto responde <code>ready</code>. Sondéalo
+    hasta diez veces, guarda un registro de cada sondeo, detente en el
+    primer éxito e informa de qué intento ganó, además de cuántos sondeos
+    se hicieron realmente. Sin aleatoriedad: el número de fallos está
+    fijado en el código de abajo, así que las dos versiones imprimen lo
+    mismo en cada ejecución.
   </p>
   <p>
-    The FxDart version writes the retry as data: <code>range(1, 11)</code>
-    is the poll schedule, <code><a href="../tutorials/map.html">map</a></code> is the transport,
-    <code><a href="../tutorials/peek.html">peek</a></code> records the log, and <code><a href="../tutorials/dropWhile.html">dropWhile</a></code> +
-    <code><a href="../tutorials/head.html">head</a></code> is the success policy. Because the chain is lazy and
-    pulled one value at a time, <code><a href="../tutorials/head.html">head</a></code> stops the polling — only
-    five requests are ever made.
+    La versión con FxDart escribe el reintento como datos:
+    <code>range(1, 11)</code> es el calendario de sondeos,
+    <code><a href="../tutorials/map.html">map</a></code> es el transporte, <code><a href="../tutorials/peek.html">peek</a></code> anota el registro,
+    y <code><a href="../tutorials/dropWhile.html">dropWhile</a></code> + <code><a href="../tutorials/head.html">head</a></code> son la política de éxito.
+    Como la cadena es perezosa y se tira de ella valor a valor,
+    <code><a href="../tutorials/head.html">head</a></code> detiene el sondeo: solo llegan a hacerse cinco
+    peticiones.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">polling export-2026-07 (up to 10 attempts):
   poll 1: pending
   poll 2: pending
@@ -78,10 +79,10 @@
 ready on attempt 5; polls actually made: 5</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 const jobId = 'export-2026-07';
@@ -147,23 +148,24 @@ Future<void> main() async {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Honestly: the native <code>for</code> loop with a <code>break</code> is
-    short, and nobody would call it wrong. The difference is where the
-    pieces live. In the loop, the attempt budget, the logging, and the
-    success test are all tangled into control flow — change one and you
-    re-read the whole body. In the pipeline each concern is its own named
-    step, so swapping the policy (first success → third success, add a
-    transform, widen the budget) means editing one line. And the laziness
-    guarantee — no polls after the winner — is structural in FxDart, while
-    in the loop it depends on the <code>break</code> being in the right
-    place.
+    Con honestidad: el bucle <code>for</code> nativo con un
+    <code>break</code> es corto, y nadie diría que está mal. La diferencia
+    está en dónde vive cada pieza. En el bucle, el presupuesto de intentos,
+    el registro y la prueba de éxito quedan enredados en el flujo de
+    control: cambia uno y tienes que releer el cuerpo entero. En el
+    pipeline, cada preocupación es su propio paso con nombre, así que
+    cambiar la política (primer éxito → tercer éxito, añadir una
+    transformación, ampliar el presupuesto) significa editar una línea. Y la
+    garantía de pereza —ningún sondeo después del ganador— es estructural en
+    FxDart, mientras que en el bucle depende de que el <code>break</code>
+    esté en el sitio correcto.
   </p>
 
   <nav class="tut-nav">
-    <a href="concurrent-profile-fetch.html">← Anterior: Fetch 10 profiles, 3 at a time</a>
-    <a href="price-lookup-fallback.html">Siguiente: Concurrent price lookup with fallback →</a>
+    <a href="concurrent-profile-fetch.html">← Anterior: Obtener 10 perfiles, de tres en tres</a>
+    <a href="price-lookup-fallback.html">Siguiente: Consulta concurrente de precios con fallback →</a>
   </nav>
 </main>
 <footer class="site-footer">

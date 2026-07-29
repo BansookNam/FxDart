@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>All tags across posts, sorted — Dart vs FxDart</title>
-  <meta name="description" content="Flatten post tags into one sorted, distinct list — expand + toSet + sort in plain Dart vs flatMap + uniq + sort in FxDart. An honest tie.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/unique-tags.html">
+  <title>Todas las etiquetas de las entradas, ordenadas — Dart vs FxDart</title>
+  <meta name="description" content="Aplanar las etiquetas de las entradas en una sola lista ordenada y sin repetidos — expand + toSet + sort en Dart nativo frente a flatMap + uniq + sort en FxDart. Un empate honesto.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/unique-tags.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/unique-tags.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/unique-tags.html">
@@ -44,29 +43,29 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #14 · <strong>All tags across posts, sorted</strong></p>
-  <h1>All tags across posts, sorted</h1>
-  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #14 · <strong>Todas las etiquetas de las entradas, ordenadas</strong></p>
+  <h1>Todas las etiquetas de las entradas, ordenadas</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Empate</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/sort.html">sort</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Each blog post carries a list of tags. Build the site's tag index: flatten
-    every post's tags into one sequence, drop duplicates, sort
-    alphabetically, and print them as a single comma-separated line. The data
-    is in the code below; both versions must print the line shown under
-    <em>Expected output</em>.
+    Cada entrada del blog lleva una lista de etiquetas. Construye el índice
+    de etiquetas del sitio: aplana las etiquetas de todas las entradas en una
+    sola secuencia, elimina los duplicados, ordénalas alfabéticamente e
+    imprímelas en una única línea separada por comas. Los datos están en el
+    código de abajo; ambas versiones deben imprimir la línea que aparece bajo
+    <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">async, concurrency, dart, fp, iterables, recipes, streams</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class Post {
@@ -123,21 +122,22 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    They barely do. <code>expand</code> is Dart's <code><a href="../tutorials/flatMap.html">flatMap</a></code>,
-    <code>toSet()</code> deduplicates, and a cascade <code>..sort()</code>
-    finishes the job — that one-liner is honest, idiomatic Dart and there is
-    nothing wrong with it. FxDart spells the same three steps as named chain
-    links (<code>flatMap → uniq → sort</code>), which reads slightly more
-    like the requirement and keeps the order-preserving <code><a href="../tutorials/uniq.html">uniq</a></code>
-    explicit rather than a side effect of choosing a <code>Set</code>. Pick
-    whichever your codebase already speaks — this one is a tie.
+    Apenas difieren. <code>expand</code> es el <code><a href="../tutorials/flatMap.html">flatMap</a></code> de Dart,
+    <code>toSet()</code> elimina duplicados y una cascada
+    <code>..sort()</code> remata el trabajo — esa única línea es Dart honesto
+    e idiomático, y no tiene nada de malo. FxDart deletrea esos mismos tres
+    pasos como eslabones con nombre de una cadena (<code>flatMap → uniq →
+    sort</code>), lo que se lee un poco más como el requisito y deja
+    explícito que <code><a href="../tutorials/uniq.html">uniq</a></code> preserva el orden, en lugar de que sea un
+    efecto secundario de haber elegido un <code>Set</code>. Elige el que ya
+    hable tu base de código — esto es un empate.
   </p>
 
   <nav class="tut-nav">
-    <a href="date-window-spend.html">← Anterior: Spending inside a date window</a>
-    <a href="refunds-vs-charges.html">Siguiente: Refunds vs charges, both formatted →</a>
+    <a href="date-window-spend.html">← Anterior: Gasto dentro de una ventana de fechas</a>
+    <a href="refunds-vs-charges.html">Siguiente: Reembolsos frente a cargos, ambos formateados →</a>
   </nav>
 </main>
 <footer class="site-footer">

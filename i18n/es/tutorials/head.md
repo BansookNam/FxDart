@@ -1,7 +1,7 @@
 ---
 slug: head
-title: head — FxDart 101
-description: Tutorial de head en FxDart: obtén el primer elemento de un iterable de forma segura, devolviendo null en lugar de lanzar una excepción, con playground en vivo.
+title: firstOrNull — FxDart 101
+description: Tutorial de firstOrNull en FxDart: obtén el primer elemento de un iterable de forma segura, devolviendo null en lugar de lanzar una excepción, con playground en vivo.
 heading: <code>firstOrNull</code>
 section: 8
 crumb: firstOrNull
@@ -16,23 +16,27 @@ nextLabel: last
 
   <h2>Lección</h2>
   <p>
-    <code>head</code> toma exactamente un elemento del principio de un iterable
-    y te lo devuelve — o <code>null</code> si no hay ninguno. Es la
-    respuesta de FxDart al <code>head</code> de FxTS, que devuelve
-    <code>undefined</code> con un array vacío; Dart no tiene <code>undefined</code>,
-    así que todo resultado del tipo «puede que no exista» se reduce en esta parte
-    de la API a <code>null</code>. Por eso la forma natural de consumirlo es
-    <code>head(list) ?? fallback</code>.
+    <code>firstOrNull</code> toma exactamente un elemento del principio de un
+    iterable y te lo devuelve — o <code>null</code> si no hay ninguno.
+    <code>firstOrNull</code> es el nombre idiomático en Dart (refleja
+    <code>Iterable.firstOrNull</code>); fxdart también acepta la grafía de FxTS
+    <code>head</code> — son el mismo operador. El <code>head</code> de FxTS
+    devuelve <code>undefined</code> con un array vacío; Dart no tiene
+    <code>undefined</code>, así que en esta parte de la API todo resultado del
+    tipo «puede que no exista» se reduce a <code>null</code>. Por eso la forma
+    natural de consumirlo es <code>firstOrNull(list) ?? fallback</code>.
   </p>
   <p>
-    Como <code>head</code> solo llama a <code>moveNext()</code> una vez,
+    Como <code>firstOrNull</code> solo llama a <code>moveNext()</code> una vez,
     invocarlo sobre un pipeline perezoso enorme — incluso infinito — no cuesta
     nada: aguas arriba no se ejecuta nada más allá del único elemento que necesita.
   </p>
   <p>
-    Viene en forma data-first (<code>head(iterable)</code>), en forma asíncrona
-    para <code>FxAsyncIterable</code> y como método de cadena
-    (<code>fx(iterable).head()</code>) tanto en la cadena síncrona como en la asíncrona.
+    Viene en forma data-first (<code>firstOrNull(iterable)</code>) y en forma
+    asíncrona para <code>FxAsyncIterable</code>. En la cadena síncrona,
+    <code>fx(iterable).firstOrNull</code> es el getter heredado de
+    <code>Iterable</code> — sin paréntesis; en la cadena asíncrona es un
+    método, <code>.firstOrNull()</code>.
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>
@@ -48,7 +52,7 @@ nextLabel: last
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>head</code> para que esto imprima la primera puntuación, o
+  <p>Ejercicio: usa <code>firstOrNull</code> para que esto imprima la primera puntuación, o
     <code>0</code> cuando la lista esté vacía.</p>
   {{playground:2}}
 

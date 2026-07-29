@@ -50,7 +50,7 @@ nextLabel: indexBy
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="indexBy.html"><code>indexBy</code></a> — 리스트 대신 키마다 값 하나만 담습니다 ·
     <a href="countBy.html"><code>countBy</code></a> — 원소를 모으는 대신 키별 개수를 셉니다 ·
     <a href="partition.html"><code>partition</code></a> — 정확히 두 개의 버킷으로 나눕니다

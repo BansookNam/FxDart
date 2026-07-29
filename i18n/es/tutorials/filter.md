@@ -1,7 +1,7 @@
 ---
 slug: filter
-title: filter — FxDart 101
-description: Tutorial de filter en FxDart: conserva solo los elementos que acepta un predicado, en versión síncrona y asíncrona, con un playground en vivo.
+title: where — FxDart 101
+description: Tutorial de where en FxDart: conserva solo los elementos que acepta un predicado, en versión síncrona y asíncrona, con un playground en vivo.
 heading: <code>where</code>
 section: 4
 crumb: where
@@ -16,21 +16,20 @@ nextLabel: reject
 
   <h2>Lección</h2>
   <p>
-    <code>filter</code> es el otro transformador fundamental junto a
+    <code>where</code> es el otro transformador fundamental junto a
     <code>map</code>: conserva todos los elementos para los que el predicado
     devuelve <code>true</code> y descarta el resto, de forma perezosa. No se
-    ejecuta nada hasta que un operador terminal tira de los valores y, como
-    <code>Fx</code> extiende <code>Iterable</code>, <code>.where(...)</code>
-    también funciona — no es más que un alias de <code>.filter(...)</code> en
-    la cadena.
+    ejecuta nada hasta que un operador terminal tira de los valores.
+    <code>where</code> es el nombre idiomático en Dart; fxdart también acepta
+    la grafía <code>filter</code> de FxTS: son el mismo operador.
   </p>
   <p>
-    Al ser perezoso, combinar <code>filter</code> con <code>take</code>
+    Al ser perezoso, combinar <code>where</code> con <code>take</code>
     evalúa solo las llamadas al predicado necesarias para satisfacer el
     <code>take</code> — mira la Demo 1.
   </p>
   <p>
-    <code>filterAsync</code> tiene su propia implementación concurrente
+    <code>whereAsync</code> tiene su propia implementación concurrente
     (en vez de reutilizar la de <code>mapAsync</code>): cuando le añades
     <code>.concurrent(n)</code>, se evalúan <code>n</code> predicados en
     paralelo, pero los elementos que pasan se emiten aguas abajo en su orden
@@ -44,7 +43,7 @@ nextLabel: reject
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>filter</code> para conservar solo las edades de 18 en adelante.</p>
+  <p>Ejercicio: usa <code>where</code> para conservar solo las edades de 18 en adelante.</p>
   {{playground:2}}
 
   <div class="callout">

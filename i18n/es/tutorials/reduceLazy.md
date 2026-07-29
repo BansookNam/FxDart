@@ -45,7 +45,7 @@ nextLabel: sum
   {{playground:0}}
 
   <h2>Demo 2 · Reutilizado sobre listas distintas</h2>
-  <p>La gracia está en definir el "cómo combinar" una sola vez y reutilizarlo en todas partes:</p>
+  <p>La gracia está en definir el «cómo combinar» una sola vez y reutilizarlo en todas partes:</p>
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>

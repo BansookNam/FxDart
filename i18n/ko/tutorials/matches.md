@@ -42,7 +42,7 @@ nextLabel: identity
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="isMatch.html"><code>isMatch</code></a> — 이 함수가 커링하는 두 인자 버전 ·
     <a href="filter.html"><code>filter</code></a> — 가장 자주 끼워 넣게 되는 자리 ·
     <a href="find.html"><code>find</code></a> — 첫 번째로 일치하는 값만 얻기 ·

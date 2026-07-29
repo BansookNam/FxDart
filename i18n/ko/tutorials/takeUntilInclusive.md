@@ -45,7 +45,7 @@ nextLabel: drop
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="takeWhile.html"><code>takeWhile</code></a> — 조건에 맞은 원소 앞에서 멈추며, 그 원소는 제외합니다 ·
     <a href="dropUntil.html"><code>dropUntil</code></a> — drop 쪽 대응 함수 ·
     <a href="take.html"><code>take</code></a> — 개수로 가져오기

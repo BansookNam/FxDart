@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NonEmptyList (Nel) — FxDart 101</title>
-  <meta name="description" content="FxDart NonEmptyList tutorial: a zero-cost extension type for lists that cannot be empty — head and first are total, and it carries accumulated errors.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/nonEmptyList.html">
+  <meta name="description" content="Tutorial de NonEmptyList en FxDart: un extension type de coste cero para listas que no pueden estar vacías — head y first son totales, y transporta los errores acumulados.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/nonEmptyList.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/nonEmptyList.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/nonEmptyList.html">
@@ -44,41 +43,42 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 13 · Typed errors › <strong>NonEmptyList</strong></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 13 · Errores tipados › <strong>NonEmptyList</strong></p>
   <h1><code>NonEmptyList</code> · <code>Nel</code></h1>
   <p class="hero-sub">
-    A list statically guaranteed to hold at least one element — the error
-    carrier of the accumulation API. Zero-cost: an extension type, erased at
-    runtime.
+    Una lista con la garantía estática de contener al menos un elemento — el
+    portador de errores de la API de acumulación. Coste cero: un extension
+    type, borrado en tiempo de ejecución.
   </p>
 
   <div class="signature">extension type NonEmptyList&lt;T&gt; implements Iterable&lt;T&gt;   —   typedef Nel&lt;T&gt; = NonEmptyList&lt;T&gt;
 factory NonEmptyList.of(T head, [Iterable&lt;T&gt; tail = const []])
 static NonEmptyList&lt;T&gt;? orNull&lt;T&gt;(List&lt;T&gt; list)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    "A list of validation errors" has an awkward edge case: what does an
-    <em>empty</em> error list mean? <code>NonEmptyList</code> (alias
-    <code>Nel</code>) removes the question in the type system — if you hold
-    one, there is at least one element, so <code>head</code> is total and
-    cannot throw, unlike <code>List.first</code>. That's exactly what
-    <a href="accumulate.html">accumulation</a> needs:
+    «Una lista de errores de validación» tiene un caso límite incómodo: ¿qué
+    significa una lista de errores <em>vacía</em>? <code>NonEmptyList</code>
+    (alias <code>Nel</code>) elimina la pregunta en el sistema de tipos: si
+    tienes uno en la mano, hay al menos un elemento, así que
+    <code>head</code> es total y no puede lanzar, a diferencia de
+    <code>List.first</code>. Eso es justo lo que necesita la
+    <a href="accumulate.html">acumulación</a>:
     <code>EitherNel&lt;E, A&gt;</code> = <code>Either&lt;Nel&lt;E&gt;, A&gt;</code>,
-    where a <code>Left</code> always carries at least one error.
+    donde un <code>Left</code> siempre lleva al menos un error.
   </p>
   <p>
-    It is Dart's analogue of Arrow's <code>value class NonEmptyList</code>:
-    an <em>extension type</em> over <code>List</code> — zero allocation,
-    erased at runtime, and it <code>implements Iterable</code>, so every
-    fxdart pipeline and <code>for</code> loop takes it directly. The
-    invariant is compile-time discipline: build one only through
-    <code>NonEmptyList.of(head, [tail])</code> or
-    <code>NonEmptyList.orNull(list)</code> (which returns <code>null</code>
-    for an empty list — the emptiness check happens exactly once, at the
-    boundary). A cast like <code>list as Nel&lt;int&gt;</code> would bypass
-    the check at your own risk.
+    Es el análogo en Dart del <code>value class NonEmptyList</code> de Arrow:
+    un <em>extension type</em> sobre <code>List</code> — cero asignaciones de
+    memoria, borrado en tiempo de ejecución y, como
+    <code>implements Iterable</code>, cualquier pipeline de fxdart y
+    cualquier bucle <code>for</code> lo aceptan directamente. La invariante es
+    disciplina en tiempo de compilación: construye uno únicamente mediante
+    <code>NonEmptyList.of(head, [tail])</code> o
+    <code>NonEmptyList.orNull(list)</code> (que devuelve <code>null</code>
+    para una lista vacía — la comprobación de vacuidad ocurre exactamente una
+    vez, en la frontera). Un cast como <code>list as Nel&lt;int&gt;</code>
+    saltaría esa comprobación por tu cuenta y riesgo.
   </p>
 
   <h2>Demo 1 · of, orNull, head &amp; tail</h2>
@@ -105,7 +105,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · map, +, and pipelines</h2>
+  <h2>Demo 2 · map, +, y pipelines</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -131,11 +131,11 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
+  <h2>Pruébalo tú</h2>
   <p>
-    Exercise: finish <code>summarize</code> — with the <code>null</code> case
-    already handled, <code>nel.length</code> and <code>nel.head</code> can't
-    fail.
+    Ejercicio: completa <code>summarize</code> — con el caso <code>null</code>
+    ya tratado, <code>nel.length</code> y <code>nel.head</code> no pueden
+    fallar.
   </p>
   <div class="playground">
 <textarea>
@@ -158,11 +158,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="accumulate.html">accumulation</a> — where <code>Nel</code> carries every failure ·
-    <a href="either.html"><code>Either</code></a> — <code>toEitherNel()</code> lifts a failure into a singleton <code>Nel</code> ·
-    <a href="head.html"><code>firstOrNull</code></a> — the nullable-first access it makes total ·
-    <a href="typedErrors.html">typed errors — full guide</a>
+    <strong>Relacionado:</strong>
+    <a href="accumulate.html">acumulación</a> — donde <code>Nel</code> transporta todos los fallos ·
+    <a href="either.html"><code>Either</code></a> — <code>toEitherNel()</code> eleva un fallo a un <code>Nel</code> de un solo elemento ·
+    <a href="head.html"><code>firstOrNull</code></a> — el acceso nullable-first que vuelve total ·
+    <a href="typedErrors.html">errores tipados — guía completa</a>
   </div>
 
   <nav class="tut-nav">

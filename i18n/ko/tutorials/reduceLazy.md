@@ -50,7 +50,7 @@ nextLabel: sum
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="fold.html"><code>fold</code></a> — 이 함수가 감싸는 시드 있는 리듀서 ·
     <a href="reduce.html"><code>reduce</code></a> — 시드 없는 종결 연산자 ·
     <a href="pipe.html"><code>pipe</code></a> — 이런 함수들을 파이프라인으로 조합 ·

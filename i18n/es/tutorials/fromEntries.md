@@ -21,7 +21,7 @@ nextLabel: omit
     a ser <code>Map</code>s de Dart en todas partes, y las tuplas de entrada
     <code>[key, value]</code> de TS pasan a ser records <code>(K, V)</code> de
     Dart. <code>fromEntries</code> es el lado constructor de eso: dale
-    cualquier iterable de records y los pliega en un <code>Map</code>, y
+    cualquier iterable de records y los pliega en un <code>Map</code>, donde
     en las claves duplicadas gana la última escritura — exactamente igual que
     si construyeras el map a mano con un bucle.
   </p>

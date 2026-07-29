@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Poll a flaky API until first success — Dart vs FxDart</title>
-  <meta name="description" content="Retry-until-ready as a lazy pipeline — range + toAsync + map + dropWhile + head vs an imperative polling loop with a break.">
+  <title>불안정한 API를 첫 성공까지 폴링하기 — Dart vs FxDart</title>
+  <meta name="description" content="준비될 때까지의 재시도를 지연 파이프라인으로 표현합니다 — range + toAsync + map + dropWhile + head와 break를 쓰는 명령형 폴링 루프를 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/flaky-api-retry.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/flaky-api-retry.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/flaky-api-retry.html">
@@ -43,8 +43,8 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #42 · <strong>Poll a flaky API until first success</strong></p>
-  <h1>Poll a flaky API until first success</h1>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #42 · <strong>불안정한 API를 첫 성공까지 폴링하기</strong></p>
+  <h1>불안정한 API를 첫 성공까지 폴링하기</h1>
   <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-async">async</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/peek.html">peek</a></li><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/head.html">head</a></li></ul>
   <h2>요구사항</h2>
@@ -149,8 +149,8 @@ Future<void> main() async {
   <h2>차이가 나는 이유</h2>
   <p>
     솔직히 말하면: <code>break</code>를 쓴 네이티브 <code>for</code>
-    루프는 짧고, 이걸 틀렸다고 할 사람은 없습니다. 차이는 각 부분이
-    어디에 사는가입니다. 루프 안에서는 시도 횟수 예산, 로깅, 성공
+    루프는 짧고, 이를 틀렸다고 할 사람은 없습니다. 차이는 각 부분이
+    어디에 놓이는가입니다. 루프 안에서는 시도 횟수 예산, 로깅, 성공
     판정이 모두 제어 흐름 속에 뒤엉켜 있어서, 하나를 바꾸려면 본문
     전체를 다시 읽어야 합니다. 파이프라인에서는 각 관심사가 이름
     붙은 자기만의 단계이므로, 정책을 바꾸는 일(첫 성공 → 세 번째

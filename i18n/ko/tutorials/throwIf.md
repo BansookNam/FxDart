@@ -46,7 +46,7 @@ nextLabel: cases
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="throwError.html"><code>throwError</code></a> — 조건 없이 항상 던지는 단독 함수 ·
     <a href="when.html"><code>when</code></a> — 예외 대신 다른 값으로 대체 ·
     <a href="cases.html"><code>cases</code></a> — 여러 술어로 분기 ·

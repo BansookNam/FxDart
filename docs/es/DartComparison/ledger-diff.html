@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Diff two ledger snapshots — Dart vs FxDart</title>
-  <meta name="description" content="Added, removed, and unchanged entries between two snapshots — differenceBy and intersectionBy by id vs hand-built id sets and where filters.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/ledger-diff.html">
+  <title>Diff de dos snapshots de un libro de cuentas — Dart vs FxDart</title>
+  <meta name="description" content="Entradas añadidas, eliminadas y sin cambios entre dos snapshots — differenceBy e intersectionBy por id frente a conjuntos de id construidos a mano y filtros where.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/ledger-diff.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/ledger-diff.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/ledger-diff.html">
@@ -44,23 +43,24 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #40 · <strong>Diff two ledger snapshots</strong></p>
-  <h1>Diff two ledger snapshots</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #40 · <strong>Diff de dos snapshots de un libro de cuentas</strong></p>
+  <h1>Diff de dos snapshots de un libro de cuentas</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/differenceBy.html">differenceBy</a></li><li><a href="../tutorials/intersectionBy.html">intersectionBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concat.html">concat</a></li><li><a href="../tutorials/size.html">size</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Two snapshots of the same ledger (data in the code): a sync happened in
-    between, and entries were added and removed. Print a diff keyed by
-    entry id — <code>+</code> lines for added entries, <code>-</code> lines
-    for removed ones (each section sorted by id), the count of unchanged
-    entries, and the net change in total amount. Both versions must print
-    the diff under <em>Expected output</em>.
+    Dos snapshots del mismo libro de cuentas (los datos están en el
+    código): entre uno y otro hubo una sincronización, y se añadieron y
+    eliminaron entradas. Imprime un diff basado en el id de cada
+    entrada —líneas <code>+</code> para las entradas añadidas y
+    <code>-</code> para las eliminadas (cada sección ordenada por id), el
+    número de entradas sin cambios y la variación neta del importe total.
+    Ambas versiones deben imprimir el diff que aparece bajo <em>Salida
+    esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Ledger diff (5 -&gt; 5 entries)
 + t6 Noodle Bar $18.90
 + t7 Pharmacy $22.40
@@ -70,10 +70,10 @@
 Net change: -$3.70</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -191,24 +191,27 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Diffing is set algebra over a key, and FxDart ships the vocabulary:
-    <code><a href="../tutorials/differenceBy.html">differenceBy</a></code> called both ways gives added and removed,
-    <code><a href="../tutorials/intersectionBy.html">intersectionBy</a></code> gives the unchanged entries — three
-    declarations that read like the definition of a diff. The
-    <code><a href="../tutorials/sortBy.html">sortBy</a></code> → <code><a href="../tutorials/map.html">map</a></code> → <code><a href="../tutorials/concat.html">concat</a></code> pipeline
-    then renders both sections in one expression. Native Dart has set
-    operations only for <code>Set</code> itself, not for "by this key of
-    these objects", so the honest version manually projects id sets and
-    writes a negated <code>contains</code> filter per direction — easy to
-    get backwards, and the intent ("what's in B but not A?") lives in the
-    predicate's polarity rather than in a function name.
+    Hacer un diff es álgebra de conjuntos sobre una clave, y FxDart trae
+    ese vocabulario de serie: llamar a <code><a href="../tutorials/differenceBy.html">differenceBy</a></code> en los
+    dos sentidos da lo añadido y lo eliminado, e
+    <code><a href="../tutorials/intersectionBy.html">intersectionBy</a></code> da las entradas sin cambios —tres
+    declaraciones que se leen como la definición misma de un diff. El
+    pipeline <code><a href="../tutorials/sortBy.html">sortBy</a></code> → <code><a href="../tutorials/map.html">map</a></code> → <code><a href="../tutorials/concat.html">concat</a></code>
+    renderiza después las dos secciones en una sola expresión. Dart nativo
+    solo tiene operaciones de conjuntos para el propio <code>Set</code>,
+    no para «por esta clave de estos objetos», así que la versión honesta
+    proyecta a mano los conjuntos de id y escribe un filtro
+    <code>contains</code> negado por cada sentido —fácil de invertir sin
+    querer, y la intención («¿qué hay en B que no esté en A?») acaba
+    viviendo en la polaridad del predicado en lugar de en el nombre de una
+    función.
   </p>
 
   <nav class="tut-nav">
-    <a href="latency-percentiles.html">← Anterior: p50/p95 latency per endpoint</a>
-    <a href="concurrent-profile-fetch.html">Siguiente: Fetch 10 profiles, 3 at a time →</a>
+    <a href="latency-percentiles.html">← Anterior: Latencia p50/p95 por endpoint</a>
+    <a href="concurrent-profile-fetch.html">Siguiente: Obtener 10 perfiles, de tres en tres →</a>
   </nav>
 </main>
 <footer class="site-footer">

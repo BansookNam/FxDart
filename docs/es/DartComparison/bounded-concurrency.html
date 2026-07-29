@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Fetch profiles, two at a time — Dart vs FxDart</title>
-  <meta name="description" content="Bounded, in-order concurrency — a hand-rolled worker pool in plain Dart vs toAsync + map + concurrent in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/bounded-concurrency.html">
+  <title>Obtener perfiles de dos en dos — Dart vs FxDart</title>
+  <meta name="description" content="Concurrencia acotada y en orden — un pool de workers hecho a mano en Dart nativo frente a toAsync + map + concurrent en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/bounded-concurrency.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/bounded-concurrency.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/bounded-concurrency.html">
@@ -44,39 +43,40 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #20 · <strong>Fetch profiles, two at a time</strong></p>
-  <h1>Fetch profiles, two at a time</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #20 · <strong>Obtener perfiles de dos en dos</strong></p>
+  <h1>Obtener perfiles de dos en dos</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Fetch six user profiles from a (simulated) API, but never more than
-    <strong>two requests in flight at once</strong> — the API rate-limits.
-    Results must come back <strong>in the original order</strong>. To prove
-    the limit held, the fake fetch counts how many requests overlap and both
-    versions print the maximum observed.
+    Obtén seis perfiles de usuario de una API (simulada), pero sin superar
+    nunca <strong>dos peticiones en curso a la vez</strong>: la API limita la
+    tasa de peticiones. Los resultados deben volver <strong>en el orden
+    original</strong>. Para demostrar que el límite se respetó, la petición
+    falsa cuenta cuántas peticiones se solapan y ambas versiones imprimen el
+    máximo observado.
   </p>
   <p>
-    This is the task plain Dart has no primitive for.
-    <code>Future.wait</code> runs <em>everything</em> at once;
-    batching into pairs wastes time waiting for the slower of each pair;
-    doing it right means writing a worker pool by hand — index bookkeeping,
-    a shared cursor, pre-sized result slots. FxDart's
-    <code>.concurrent(2)</code> is that worker pool, as one word: as each
-    request finishes the next one starts, and order is preserved.
+    Esta es la tarea para la que Dart nativo no tiene ninguna primitiva.
+    <code>Future.wait</code> lo lanza <em>todo</em> a la vez; agrupar en
+    parejas desperdicia tiempo esperando a la más lenta de cada pareja;
+    hacerlo bien significa escribir un pool de workers a mano —llevar la
+    cuenta de los índices, un cursor compartido, huecos de resultado
+    predimensionados—. El <code>.concurrent(2)</code> de FxDart es ese pool
+    de workers, en una sola palabra: en cuanto termina una petición arranca
+    la siguiente, y el orden se conserva.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">user#1, user#2, user#3, user#4, user#5, user#6
 max requests in flight: 2</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 const userIds = [1, 2, 3, 4, 5, 6];
@@ -149,20 +149,21 @@ Future<void> main() async {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    The two versions print the same thing — the difference is what you had
-    to write and what you now have to maintain. The native worker pool is
-    real production boilerplate (and easy to get subtly wrong: off-by-one on
-    the shared cursor, forgetting to pre-size the results list, losing
-    ordering). In the FxDart version the concurrency policy is a single
-    chain step, so changing the limit — or removing it — touches one number
-    instead of the function's whole shape.
+    Las dos versiones imprimen lo mismo —la diferencia está en lo que has
+    tenido que escribir y en lo que ahora tienes que mantener. El pool de
+    workers nativo es boilerplate de producción de verdad (y es fácil
+    equivocarse sutilmente: un off-by-one en el cursor compartido, olvidar
+    predimensionar la lista de resultados, perder el orden). En la versión
+    de FxDart la política de concurrencia es un único paso de la cadena, así
+    que cambiar el límite —o quitarlo— toca un número en lugar de toda la
+    forma de la función.
   </p>
 
   <nav class="tut-nav">
-    <a href="valid-emails.html">← Anterior: First 5 valid emails, normalized</a>
-    <a href="monthly-category-report.html">Siguiente: Monthly category report, sorted by spend →</a>
+    <a href="valid-emails.html">← Anterior: Los 5 primeros correos válidos, normalizados</a>
+    <a href="monthly-category-report.html">Siguiente: Informe mensual por categorías, ordenado por gasto →</a>
   </nav>
 </main>
 <footer class="site-footer">

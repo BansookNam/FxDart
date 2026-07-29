@@ -27,7 +27,7 @@ nextLabel: compress
   </p>
   <p>
     Es la opción natural para dos listas de registros completos que comparten
-    un campo identificador: una lista de SKUs "destacados" y un catálogo de
+    un campo identificador: una lista de SKUs «destacados» y un catálogo de
     productos, una lista de IDs de usuarios activos y una lista de objetos de
     usuario completos, y así sucesivamente. <code>intersection</code> no es
     más que <code>intersectionBy((a) =&gt; a, iterable1, iterable2)</code>.

@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Recent error messages, deduped — Dart vs FxDart</title>
-  <meta name="description" content="The three most recent distinct errors from a newest-first log — a seen-Set loop with a break in plain Dart vs filter + uniqBy + take in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/recent-errors.html">
+  <title>Mensajes de error recientes, sin duplicados — Dart vs FxDart</title>
+  <meta name="description" content="Los tres errores distintos más recientes de un log ordenado de más nuevo a más antiguo — un bucle con un Set de vistos y un break en Dart nativo frente a filter + uniqBy + take en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/recent-errors.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/recent-errors.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/recent-errors.html">
@@ -44,31 +43,31 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #12 · <strong>Recent error messages, deduped</strong></p>
-  <h1>Recent error messages, deduped</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #12 · <strong>Mensajes de error recientes, sin duplicados</strong></p>
+  <h1>Mensajes de error recientes, sin duplicados</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/uniqBy.html">uniqBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    A log store returns entries newest first. Show the <strong>three most
-    recent distinct error messages</strong>: keep only <code>ERROR</code>
-    entries, drop repeats of a message already shown, and stop after three.
-    The data is in the code below; both versions must print the lines shown
-    under <em>Expected output</em>.
+    Un almacén de logs devuelve las entradas de más nueva a más antigua.
+    Muestra los <strong>tres mensajes de error distintos más
+    recientes</strong>: quédate solo con las entradas <code>ERROR</code>,
+    descarta las repeticiones de un mensaje ya mostrado y detente después
+    de tres. Los datos están en el código de abajo; ambas versiones deben
+    imprimir las líneas que aparecen bajo <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">09:41 payment gateway timeout
 09:31 inventory service 503
 09:17 invalid session token</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class Log {
@@ -149,23 +148,24 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Dart has no "distinct by key" — deduping by message means managing a
-    <code>Set</code> yourself, so the native version becomes a loop with
-    three concerns braided together: the level check, the
-    <code>seen.add</code> trick, and a counted <code>break</code>. Each is
-    fine alone; together they force you to read the whole loop to see what
-    it keeps. FxDart states the three rules as three chain steps —
-    <code><a href="../tutorials/filter.html">filter</a></code>, <code><a href="../tutorials/uniqBy.html">uniqBy</a></code>, <code><a href="../tutorials/take.html">take</a></code> — and
-    because the chain is lazy, it also stops scanning the log the moment the
-    third distinct error is found, exactly like the hand-written
-    <code>break</code>.
+    Dart no tiene un «distinto por clave»: deduplicar por mensaje significa
+    gestionar tú mismo un <code>Set</code>, así que la versión nativa se
+    convierte en un bucle con tres asuntos trenzados: la comprobación del
+    nivel, el truco del <code>seen.add</code> y un <code>break</code> con
+    contador. Cada uno por separado está bien; juntos te obligan a leer el
+    bucle entero para ver qué es lo que conserva. FxDart enuncia las tres
+    reglas como tres pasos de la cadena —<code><a href="../tutorials/filter.html">filter</a></code>,
+    <code><a href="../tutorials/uniqBy.html">uniqBy</a></code>, <code><a href="../tutorials/take.html">take</a></code>— y, como la cadena es perezosa,
+    también deja de recorrer el log en el momento en que encuentra el
+    tercer error distinto, exactamente igual que el <code>break</code>
+    escrito a mano.
   </p>
 
   <nav class="tut-nav">
-    <a href="top-merchants.html">← Anterior: Top 5 merchants by total spend</a>
-    <a href="date-window-spend.html">Siguiente: Spending inside a date window →</a>
+    <a href="top-merchants.html">← Anterior: Los 5 comercios con más gasto total</a>
+    <a href="date-window-spend.html">Siguiente: Gasto dentro de una ventana de fechas →</a>
   </nav>
 </main>
 <footer class="site-footer">

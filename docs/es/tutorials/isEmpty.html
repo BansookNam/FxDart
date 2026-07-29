@@ -56,11 +56,11 @@
     o cadena <code>Fx</code>. Ese getter solo existe en los iterables, y revienta
     (o sencillamente no está disponible) con <code>null</code>. El <code>isEmpty</code>
     de FxTS acepta <em>cualquier</em> valor y responde a una pregunta más amplia:
-    ¿esto es "nada" en un sentido práctico? Devuelve <code>true</code> para
+    ¿esto es «nada» en un sentido práctico? Devuelve <code>true</code> para
     <code>null</code>, un <code>String</code> vacío y un
     <code>Iterable</code>/<code>Map</code>/<code>Set</code> vacío — y
     <code>false</code> para todo lo demás, incluidos números y booleanos,
-    que nunca se consideran "vacíos".
+    que nunca se consideran «vacíos».
   </p>
   <p>
     Como recibe un único argumento <code>Object?</code>, se pasa directamente
@@ -123,8 +123,8 @@ void main() {
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="compact.html"><code>compact</code></a> — descarta los null de un iterable ·
-    <a href="compactObject.html"><code>compactObject</code></a> — descarta los null de un Map ·
+    <a href="compact.html"><code>compact</code></a> — descarta los nulls de un iterable ·
+    <a href="compactObject.html"><code>compactObject</code></a> — descarta los nulls de un Map ·
     <a href="predicates.html"><code>predicates</code></a> — más comprobaciones de tipo listas para filtrar ·
     <a href="includes.html"><code>includes</code></a> — la comprobación de pertenencia vecina
   </div>

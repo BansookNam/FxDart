@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>findIndex — FxDart 101</title>
-  <meta name="description" content="FxDart findIndex 튜토리얼: 지연 평가와 단축 평가로 첫 일치 원소의 위치를 찾고, 없으면 -1을 받는 방법을 익힙니다.">
+  <title>indexWhere — FxDart 101</title>
+  <meta name="description" content="FxDart indexWhere 튜토리얼: 지연 평가와 단락 평가로 첫 일치 원소의 위치를 찾고, 없으면 -1을 받는 방법을 익힙니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/findIndex.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/findIndex.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/findIndex.html">
@@ -55,8 +55,10 @@ int findIndex&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)  // FxT
 
   <h2>강의</h2>
   <p>
-    <code>findIndex</code>는 <code>find</code>의 형제입니다. 지연 평가와
-    단축 평가로 훑는 방식은 똑같지만, 일치한 값 자체가 아니라 그것이
+    <code>indexWhere</code>는 Dart다운 이름이고(<code>List.indexWhere</code>와
+    짝을 이룹니다), fxdart는 FxTS식 표기인 <code>findIndex</code>도 함께
+    받습니다 — 같은 연산자입니다. <code>find</code>의 형제로서 지연 평가와
+    단락 평가로 훑는 방식은 똑같지만, 일치한 값 자체가 아니라 그것이
     <em>어디에</em> 있었는지를 알려 줍니다. "찾지 못했음"을 나타내는 값이
     다르다는 점에 주의하세요 — 여기서는 <code>int</code> 타입의
     <code>-1</code>이며, 자바스크립트의
@@ -85,7 +87,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>데모 2 · 단축 평가와 비동기</h2>
+  <h2>데모 2 · 단락 평가와 비동기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -108,7 +110,7 @@ Future<void> main() async {
   </div>
 
   <h2>직접 해 보기</h2>
-  <p>연습: <code>findIndex</code>로 큐에서 bob의 위치를 찾고, 없으면 <code>-1</code>을 받아 보세요.</p>
+  <p>연습: <code>indexWhere</code>로 큐에서 bob의 위치를 찾고, 없으면 <code>-1</code>을 받아 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -125,7 +127,7 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="find.html"><code>find</code></a> — 같은 탐색, 값을 반환 ·
     <a href="includes.html"><code>includes</code></a> — 그저 "있는가?"만 확인 ·
     <a href="nth.html"><code>nth</code></a> — 그 반대: 인덱스를 넣고 값을 받기 ·

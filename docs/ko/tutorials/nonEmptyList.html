@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NonEmptyList (Nel) — FxDart 101</title>
-  <meta name="description" content="FxDart NonEmptyList tutorial: a zero-cost extension type for lists that cannot be empty — head and first are total, and it carries accumulated errors.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/nonEmptyList.html">
+  <meta name="description" content="FxDart NonEmptyList 튜토리얼: 비어 있을 수 없는 리스트를 위한 제로 비용 확장 타입 — head와 first가 전체 함수(total)라 실패하지 않으며, 누적된 에러를 실어 나릅니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/nonEmptyList.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/nonEmptyList.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/nonEmptyList.html">
@@ -44,44 +43,45 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 13 · 타입 있는 에러 › <strong>NonEmptyList</strong></p>
   <h1><code>NonEmptyList</code> · <code>Nel</code></h1>
   <p class="hero-sub">
-    A list statically guaranteed to hold at least one element — the error
-    carrier of the accumulation API. Zero-cost: an extension type, erased at
-    runtime.
+    원소를 최소 하나는 담고 있다고 정적으로 보장되는 리스트 — 누적 API가
+    에러를 실어 나르는 그릇입니다. 제로 비용입니다: 런타임에 지워지는 확장
+    타입(extension type)입니다.
   </p>
 
   <div class="signature">extension type NonEmptyList&lt;T&gt; implements Iterable&lt;T&gt;   —   typedef Nel&lt;T&gt; = NonEmptyList&lt;T&gt;
 factory NonEmptyList.of(T head, [Iterable&lt;T&gt; tail = const []])
 static NonEmptyList&lt;T&gt;? orNull&lt;T&gt;(List&lt;T&gt; list)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    "A list of validation errors" has an awkward edge case: what does an
-    <em>empty</em> error list mean? <code>NonEmptyList</code> (alias
-    <code>Nel</code>) removes the question in the type system — if you hold
-    one, there is at least one element, so <code>head</code> is total and
-    cannot throw, unlike <code>List.first</code>. That's exactly what
-    <a href="accumulate.html">accumulation</a> needs:
-    <code>EitherNel&lt;E, A&gt;</code> = <code>Either&lt;Nel&lt;E&gt;, A&gt;</code>,
-    where a <code>Left</code> always carries at least one error.
+    "검증 에러의 리스트"에는 어색한 경계 사례가 하나 있습니다.
+    <em>비어 있는</em> 에러 리스트는 대체 무슨 뜻일까요?
+    <code>NonEmptyList</code>(별칭 <code>Nel</code>)는 그 질문 자체를 타입
+    시스템에서 지워 버립니다 — 이 값을 손에 쥐고 있다면 원소가 최소 하나는
+    있으므로, <code>List.first</code>와 달리 <code>head</code>는 전체
+    함수(total)이며 예외를 던질 수 없습니다.
+    <a href="accumulate.html">에러 누적</a>에 필요한 것이 정확히
+    이것입니다: <code>EitherNel&lt;E, A&gt;</code> =
+    <code>Either&lt;Nel&lt;E&gt;, A&gt;</code>, 즉 <code>Left</code>는
+    언제나 최소 하나의 에러를 실어 나릅니다.
   </p>
   <p>
-    It is Dart's analogue of Arrow's <code>value class NonEmptyList</code>:
-    an <em>extension type</em> over <code>List</code> — zero allocation,
-    erased at runtime, and it <code>implements Iterable</code>, so every
-    fxdart pipeline and <code>for</code> loop takes it directly. The
-    invariant is compile-time discipline: build one only through
-    <code>NonEmptyList.of(head, [tail])</code> or
-    <code>NonEmptyList.orNull(list)</code> (which returns <code>null</code>
-    for an empty list — the emptiness check happens exactly once, at the
-    boundary). A cast like <code>list as Nel&lt;int&gt;</code> would bypass
-    the check at your own risk.
+    Arrow의 <code>value class NonEmptyList</code>에 대응하는 Dart 쪽
+    짝입니다. <code>List</code> 위에 얹은 <em>확장 타입</em>이라 할당이 전혀
+    없고 런타임에 지워지며, <code>implements Iterable</code>이므로 모든
+    fxdart 파이프라인과 <code>for</code> 반복문이 이 값을 그대로 받습니다.
+    불변식은 컴파일 타임의 규율로 지켜집니다: 생성은 오직
+    <code>NonEmptyList.of(head, [tail])</code> 또는
+    <code>NonEmptyList.orNull(list)</code>(빈 리스트에는 <code>null</code>을
+    반환합니다 — 비어 있는지 확인하는 일은 경계에서 딱 한 번만 일어납니다)를
+    통해서만 하세요. <code>list as Nel&lt;int&gt;</code> 같은 캐스트는 그
+    검사를 우회하며, 책임은 온전히 사용자 몫입니다.
   </p>
 
-  <h2>Demo 1 · of, orNull, head &amp; tail</h2>
+  <h2>데모 1 · of, orNull, head &amp; tail</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -105,7 +105,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · map, +, and pipelines</h2>
+  <h2>데모 2 · map, +, 그리고 파이프라인</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -131,11 +131,11 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
+  <h2>직접 해 보기</h2>
   <p>
-    Exercise: finish <code>summarize</code> — with the <code>null</code> case
-    already handled, <code>nel.length</code> and <code>nel.head</code> can't
-    fail.
+    연습: <code>summarize</code>를 완성해 보세요 — <code>null</code> 경우가
+    이미 처리되어 있으므로 <code>nel.length</code>와 <code>nel.head</code>는
+    실패할 수 없습니다.
   </p>
   <div class="playground">
 <textarea>
@@ -158,11 +158,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="accumulate.html">accumulation</a> — where <code>Nel</code> carries every failure ·
-    <a href="either.html"><code>Either</code></a> — <code>toEitherNel()</code> lifts a failure into a singleton <code>Nel</code> ·
-    <a href="head.html"><code>firstOrNull</code></a> — the nullable-first access it makes total ·
-    <a href="typedErrors.html">typed errors — full guide</a>
+    <strong>관련 항목:</strong>
+    <a href="accumulate.html">에러 누적</a> — <code>Nel</code>이 모든 실패를 실어 나르는 곳 ·
+    <a href="either.html"><code>Either</code></a> — <code>toEitherNel()</code>은 실패 하나를 원소 하나짜리 <code>Nel</code>로 끌어올립니다 ·
+    <a href="head.html"><code>firstOrNull</code></a> — 이 타입이 전체 함수로 만들어 주는 nullable 우선 접근자 ·
+    <a href="typedErrors.html">타입 있는 에러 — 전체 가이드</a>
   </div>
 
   <nav class="tut-nav">

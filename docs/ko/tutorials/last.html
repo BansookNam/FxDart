@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>last — FxDart 101</title>
-  <meta name="description" content="FxDart last 튜토리얼: 이터러블의 마지막 원소를 얻습니다. 비어 있으면 null을 반환하며, 체인 게터에 얽힌 함정도 함께 짚습니다.">
+  <title>lastOrNull — FxDart 101</title>
+  <meta name="description" content="FxDart lastOrNull: 이터러블의 마지막 원소를 얻습니다. 비어 있으면 null을 반환하며, 체인 게터에 얽힌 함정도 함께 짚습니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/last.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/last.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/last.html">
@@ -55,22 +55,27 @@ A? last&lt;A&gt;(Iterable&lt;A&gt; iterable)  // FxTS alias</div>
 
   <h2>강의</h2>
   <p>
-    <code>last</code>는 이터러블 전체를 훑으면서 가장 마지막에 본 값을
-    돌려줍니다 — 아무것도 못 봤다면 <code>null</code>입니다.
-    <code>head</code>와 달리 지름길이 없습니다. 지연 이터러블은 끝까지
+    <code>lastOrNull</code>은 이터러블 전체를 훑으면서 가장 마지막에 본
+    값을 돌려줍니다 — 아무것도 못 봤다면 <code>null</code>입니다.
+    <code>lastOrNull</code>은 Dart다운 이름이고
+    (<code>Iterable.lastOrNull</code>과 짝을 이룹니다), fxdart는 FxTS식
+    표기인 <code>last</code>도 함께 받아들입니다 — 둘은 같은 연산자입니다.
+    <code>head</code>와 달리 지름길은 없습니다. 지연 이터러블은 끝까지
     끌어당겨 보기 전에는 어디서 끝나는지 알 수 없으므로,
-    <code>last</code>는 모든 원소를 소비해야 합니다. 상류 파이프라인이
+    <code>lastOrNull</code>은 모든 원소를 소비해야 합니다. 상류 파이프라인이
     지연으로 구성돼 있더라도 <code>O(n)</code>인 이유입니다.
   </p>
   <p>
     <strong>동기 체인에서 주의하세요:</strong> <code>Fx</code>는
-    <code>Iterable</code>을 확장하는데 <code>Fx.last()</code> 오버라이드는
-    없습니다 — 그래서 <code>fx(iterable).last</code>는 Dart 자체의
-    <code>Iterable.last</code> <em>게터</em>로 해석되고, 빈 이터러블에서는
+    <code>Iterable</code>을 확장하므로 <code>fx(iterable).lastOrNull</code>은
+    Dart가 물려준 <code>Iterable.lastOrNull</code> <em>게터</em>로
+    해석됩니다(괄호 없음) — 이 게터는 <em>실제로</em> null 안전해서 빈
+    이터러블에서 <code>null</code>을 반환합니다. 함정은 바로 옆에 있는 "OrNull"이 없는
+    <code>.last</code> 게터입니다. <code>fx(&lt;int&gt;[]).last</code>는
     <code>null</code>을 반환하는 대신 <code>StateError</code>를 던집니다.
-    null 안전한 동작은 최상위 <code>last(iterable)</code> 함수(또는 자체
-    오버라이드를 가진 <code>.last()</code>, 즉 <em>비동기</em> 체인 쪽)에만
-    있습니다. 헷갈린다면 최상위 함수를 쓰세요.
+    <code>.lastOrNull</code>이나 최상위 <code>lastOrNull(iterable)</code>
+    함수를 쓰세요. <em>비동기</em> 체인에서 <code>.lastOrNull()</code>은
+    메서드라 괄호가 붙습니다.
   </p>
 
   <h2>데모 1 · 기본, 그리고 체인 게터의 함정</h2>
@@ -99,7 +104,7 @@ void main() {
   </div>
 
   <h2>데모 2 · 비동기 — 여기서는 체인 형태가 null 안전합니다</h2>
-  <p><code>FxAsync</code>는 자체 <code>.last()</code>를 정의하므로, 비동기 체인에서는 위의 게터 함정이 적용되지 않습니다:</p>
+  <p><code>FxAsync</code>는 자체 <code>.lastOrNull()</code> 메서드를 정의하므로, 비동기 체인에서는 위의 게터 함정이 적용되지 않습니다:</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -118,7 +123,7 @@ Future<void> main() async {
   </div>
 
   <h2>직접 해 보기</h2>
-  <p>연습: <code>last</code>를 써서 마지막 로그 줄을 출력하고, 로그가 하나도 없으면 <code>'no logs yet'</code>을 출력해 보세요.</p>
+  <p>연습: <code>lastOrNull</code>을 써서 마지막 로그 줄을 출력하고, 로그가 하나도 없으면 <code>'no logs yet'</code>을 출력해 보세요.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';

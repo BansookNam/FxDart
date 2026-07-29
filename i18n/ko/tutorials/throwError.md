@@ -47,7 +47,7 @@ nextLabel: throwIf
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="throwIf.html"><code>throwIf</code></a> — 별도의 빌더 함수 없이 조건부로 던집니다 ·
     <a href="cases.html"><code>cases</code></a> — throwError가 orElse로 자리 잡는 곳 ·
     <a href="when.html"><code>when</code></a> / <a href="unless.html"><code>unless</code></a> — 예외를 던지지 않는 조건부 변환 ·

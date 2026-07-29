@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Top 3 largest expenses — Dart vs FxDart</title>
-  <meta name="description" content="Largest three transactions of the month — sortedBy + take from package:collection vs sortBy + take in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/top-expenses.html">
+  <title>Los 3 gastos más grandes — Dart vs FxDart</title>
+  <meta name="description" content="Las tres transacciones más grandes del mes — sortedBy + take de package:collection frente a sortBy + take en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/top-expenses.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/top-expenses.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/top-expenses.html">
@@ -44,29 +43,29 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #3 · <strong>Top 3 largest expenses</strong></p>
-  <h1>Top 3 largest expenses</h1>
-  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #3 · <strong>Los 3 gastos más grandes</strong></p>
+  <h1>Los 3 gastos más grandes</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Empate</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    From a month of expenses, print the <strong>three largest</strong> —
-    merchant and amount, biggest first. The data is in the code below; both
-    versions must print the lines shown under <em>Expected output</em>.
+    De un mes de gastos, imprime los <strong>tres más grandes</strong> —
+    comercio e importe, de mayor a menor. Los datos están en el código de
+    abajo; ambas versiones deben imprimir las líneas que aparecen bajo
+    <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Airline Ticket  $289.99
 New Headphones  $129.00
 Electric Co     $60.34</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -136,23 +135,23 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    They barely do — this one is a tie. Both sides sort on a negated key to
-    get descending order and take the first three;
-    <code>package:collection</code>'s <code>sortedBy</code> is every bit as
-    direct as FxDart's <code><a href="../tutorials/sortBy.html">sortBy</a></code> (core <code>List.sort</code> alone
-    would mutate in place and need an explicit comparator, but
-    <code>collection</code> is a standard dependency). The only real
-    difference is where the vocabulary lives: an extension method from a
-    package vs a step in a chain that also offers <code><a href="../tutorials/scan.html">scan</a></code>,
-    <code><a href="../tutorials/chunk.html">chunk</a></code>, and async variants. Pick either with a clear
-    conscience.
+    Apenas difieren — esto es un empate. Ambos lados ordenan por una clave
+    negada para conseguir orden descendente y toman los tres primeros; el
+    <code>sortedBy</code> de <code>package:collection</code> es igual de
+    directo que el <code><a href="../tutorials/sortBy.html">sortBy</a></code> de FxDart (el <code>List.sort</code>
+    del núcleo, por sí solo, mutaría en el sitio y necesitaría un
+    comparador explícito, pero <code>collection</code> es una dependencia
+    estándar). La única diferencia real está en dónde vive el vocabulario:
+    un método de extensión de un paquete frente a un paso de una cadena
+    que además ofrece <code><a href="../tutorials/scan.html">scan</a></code>, <code><a href="../tutorials/chunk.html">chunk</a></code> y variantes
+    asíncronas. Elige cualquiera de los dos con la conciencia tranquila.
   </p>
 
   <nav class="tut-nav">
-    <a href="running-balance.html">← Anterior: Running account balance</a>
-    <a href="first-visit-merchants.html">Siguiente: Merchants in first-visit order →</a>
+    <a href="running-balance.html">← Anterior: Saldo acumulado de una cuenta</a>
+    <a href="first-visit-merchants.html">Siguiente: Comercios en orden de primera visita →</a>
   </nav>
 </main>
 <footer class="site-footer">

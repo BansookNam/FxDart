@@ -44,7 +44,7 @@ nextLabel: maxBy
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="min.html"><code>min</code></a> — 정반대 방향의 짝 ·
     <a href="sum.html"><code>sum</code></a> · <a href="average.html"><code>average</code></a> — 나머지 숫자 종결 연산자 ·
     <a href="sortBy.html"><code>sortBy</code></a> — 극단값만 찾는 대신 순위를 매기고 싶을 때

@@ -1,8 +1,8 @@
 ---
 slug: invoice-summary
-title: Line items to invoice summary — Dart vs FxDart
-description: Turn order line items into per-category totals plus a grand total — two loop-and-fold idioms in plain Dart vs groupBy + sumBy + sortBy in FxDart.
-heading: Line items to invoice summary
+title: 라인 항목에서 청구서 요약까지 — Dart vs FxDart
+description: 주문의 라인 항목을 카테고리별 합계와 총합으로 만듭니다 — 순수 Dart의 루프와 fold라는 두 관용구를 FxDart의 groupBy + sumBy + sortBy와 비교합니다.
+heading: 라인 항목에서 청구서 요약까지
 order: 27
 tier: 3
 functions: map, groupBy, sumBy, sortBy, join
@@ -29,8 +29,8 @@ async: false
     같은 값 <code>qty * unitPrice</code>가 카테고리별로 한 번,
     전체로 한 번, 총 두 번 합산되는데, 두 버전은 이를 다르게
     다룹니다. 순수 Dart는 이를 서로 무관한 두 가지 관용구로 씁니다:
-    카테고리를 위한, 맵에 값을 채워 넣는 변형 <code>for</code> 루프와,
-    총합을 위한 명시적 초기값을 가진 <code>fold</code>입니다.
+    카테고리별 합계를 위해 가변 맵을 갱신해 나가는 <code>for</code>
+    루프와, 총합을 위해 초기값을 명시한 <code>fold</code>입니다.
     FxDart는 "필드의 합"을 두 번 다 같은 방식으로 말합니다 —
     <code>sumBy</code> — 한 번은 <code>groupBy</code> 그룹마다, 한
     번은 전체 항목에 대해, 그리고 <code>sortBy</code>가 행의 순서를

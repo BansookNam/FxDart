@@ -17,7 +17,7 @@ nextLabel: matches
   <h2>Lección</h2>
   <p>
     <code>isMatch</code> recorre <code>pattern</code> de forma recursiva y comprueba
-    que <code>target</code> lo "contiene", con reglas distintas según la forma:
+    que <code>target</code> lo «contiene», con reglas distintas según la forma:
   </p>
   <p>
     Los <strong>Map</strong> coinciden parcialmente: cada clave de <code>pattern</code>

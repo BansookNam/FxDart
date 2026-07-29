@@ -24,7 +24,7 @@ nextLabel: takeRight
     <code>take</code>뿐인 경우도 많습니다.
   </p>
   <p>
-    데이터 우선 함수(<code>take(n, iterable)</code>)와 체인
+    data-first 함수(<code>take(n, iterable)</code>)와 체인
     메서드(<code>fx(iterable).take(n)</code>) 두 가지로 제공됩니다.
     비동기 쪽에서 <code>takeAsync</code>/<code>.take()</code>는 그대로
     통과시키는 역할만 합니다. 상류를 직렬화하지 않으므로, 체인 위쪽의
@@ -50,7 +50,7 @@ nextLabel: takeRight
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="takeRight.html"><code>takeRight</code></a> — 앞의 n개 대신 뒤의 n개 ·
     <a href="takeWhile.html"><code>takeWhile</code></a> — 술어로 가져오기 ·
     <a href="range.html"><code>range</code></a> · <a href="cycle.html"><code>cycle</code></a> — 무한 소스 ·

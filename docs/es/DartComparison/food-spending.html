@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Food spending this month — Dart vs FxDart</title>
-  <meta name="description" content="Total one category of a ledger — a where/fold chain in plain Dart vs filter + sumBy in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/food-spending.html">
+  <title>Gasto en comida este mes — Dart vs FxDart</title>
+  <meta name="description" content="Suma una sola categoría de un libro de cuentas — una cadena where/fold en Dart nativo frente a filter + sumBy en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/food-spending.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/food-spending.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/food-spending.html">
@@ -44,29 +43,28 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #1 · <strong>Food spending this month</strong></p>
-  <h1>Food spending this month</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #1 · <strong>Gasto en comida este mes</strong></p>
+  <h1>Gasto en comida este mes</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Given a month of ledger transactions — each with a date, category,
-    merchant, and amount — total what was spent in the
-    <strong>Food</strong> category, and print it as a currency amount.
-    The data is in the code below; both versions must print the line shown
-    under <em>Expected output</em>.
+    Dado un mes de transacciones del libro de cuentas —cada una con
+    fecha, categoría, comercio e importe—, suma lo que se gastó en la
+    categoría <strong>Food</strong> e imprímelo como un importe
+    monetario. Los datos están en el código de abajo; las dos versiones
+    deben imprimir la línea que aparece bajo <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Food spending: $84.40</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class Tx {
@@ -133,19 +131,20 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Native Dart has no "sum of a field" — you either mutate an accumulator in
-    a <code>for</code> loop or reach for <code>fold</code> with an explicit
-    seed and combine step. FxDart's <code><a href="../tutorials/sumBy.html">sumBy</a></code> says the intent in one
-    word, and the <code>filter → sumBy</code> chain reads in the order the
-    data flows. The gap is small on a two-step task — it widens as steps
-    are added.
+    Dart nativo no tiene una «suma de un campo»: o mutas un acumulador
+    dentro de un bucle <code>for</code>, o recurres a <code>fold</code> con
+    un valor inicial y un paso de combinación explícitos. El
+    <code><a href="../tutorials/sumBy.html">sumBy</a></code> de FxDart dice la intención en una sola palabra, y la
+    cadena <code>filter → sumBy</code> se lee en el mismo orden en que
+    fluyen los datos. La distancia es pequeña en una tarea de dos
+    pasos —se ensancha conforme se añaden pasos.
   </p>
 
   <nav class="tut-nav">
     <a href="../../DartComparison/index.html">← Dart vs FxDart</a>
-    <a href="running-balance.html">Siguiente: Running account balance →</a>
+    <a href="running-balance.html">Siguiente: Saldo acumulado de una cuenta →</a>
   </nav>
 </main>
 <footer class="site-footer">

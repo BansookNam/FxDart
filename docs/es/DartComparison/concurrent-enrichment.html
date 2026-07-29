@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Enrich top merchants concurrently — Dart vs FxDart</title>
-  <meta name="description" content="Pick the top 3 merchants, then look each up over a rate-limited API, 2 at a time — a hand-rolled worker pool in plain Dart vs concurrent(2) in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/concurrent-enrichment.html">
+  <title>Enriquecer los principales comercios de forma concurrente — Dart vs FxDart</title>
+  <meta name="description" content="Elegir los 3 comercios principales y consultar cada uno en una API con límite de tasa, de dos en dos — un pool de workers hecho a mano en Dart nativo frente a concurrent(2) en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/concurrent-enrichment.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/concurrent-enrichment.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/concurrent-enrichment.html">
@@ -44,35 +43,36 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #30 · <strong>Enrich top merchants concurrently</strong></p>
-  <h1>Enrich top merchants concurrently</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #30 · <strong>Enriquecer los principales comercios de forma concurrente</strong></p>
+  <h1>Enriquecer los principales comercios de forma concurrente</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    From July's per-merchant spend totals, take the <strong>top three
-    merchants</strong> and enrich each with its category from a
-    (simulated) merchant-directory API — but the API rate-limits, so
-    never more than <strong>two lookups in flight at once</strong>.
-    Results print in spend order after all lookups finish, and the fake
-    lookup counts overlapping requests so both versions can prove the
-    limit held. The data is in the code below; both versions must print
-    the lines shown under <em>Expected output</em>.
+    A partir de los totales de gasto por comercio de julio, toma los
+    <strong>tres comercios principales</strong> y enriquece cada uno con su
+    categoría desde una API (simulada) de directorio de comercios —pero la
+    API limita la tasa de peticiones, así que nunca puede haber más de
+    <strong>dos consultas en curso a la vez</strong>. Los resultados se
+    imprimen por orden de gasto cuando todas las consultas han terminado, y
+    la consulta falsa cuenta las peticiones que se solapan para que ambas
+    versiones puedan demostrar que el límite se respetó. Los datos están en
+    el código de abajo; ambas versiones deben imprimir las líneas que
+    aparecen bajo <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Green Grocer — $118.65 (Groceries)
 Electric Co — $60.34 (Utilities)
 Noodle Bar — $54.70 (Dining)
 max lookups in flight: 2</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class Merchant {
@@ -197,24 +197,27 @@ Future<void> main() async {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    The task changes character halfway through — synchronous ranking, then
-    rate-limited I/O — and only one version's code changes character with
-    it. In FxDart the seam is a single chain step: <code><a href="../tutorials/sortBy.html">sortBy</a></code> +
-    <code><a href="../tutorials/take.html">take</a></code> pick the merchants, <code><a href="../tutorials/toAsync.html">toAsync</a></code> crosses
-    into async, and <code><a href="../tutorials/map.html">map</a></code> + <code>concurrent(2)</code> run the
-    lookups two at a time, in order. Native Dart has no primitive for
-    "at most two in flight": <code>Future.wait</code> fires everything at
-    once, so the bounded half becomes a hand-rolled worker pool — shared
-    cursor, pre-sized result slots, worker futures — that dwarfs the
-    two-line ranking it serves. Changing the limit, or dropping it, is
-    one number in the chain versus that whole scaffold.
+    La tarea cambia de naturaleza a mitad de camino —primero una
+    clasificación síncrona, luego E/S con límite de tasa— y el código de
+    solo una de las versiones cambia de naturaleza con ella. En FxDart la
+    costura es un único paso de la cadena: <code><a href="../tutorials/sortBy.html">sortBy</a></code> +
+    <code><a href="../tutorials/take.html">take</a></code> eligen los comercios, <code><a href="../tutorials/toAsync.html">toAsync</a></code> cruza al
+    mundo asíncrono, y <code><a href="../tutorials/map.html">map</a></code> + <code>concurrent(2)</code>
+    ejecutan las consultas de dos en dos, en orden. Dart nativo no tiene
+    ninguna primitiva para «como mucho dos en curso»:
+    <code>Future.wait</code> lo dispara todo a la vez, así que la mitad
+    acotada se convierte en un pool de workers hecho a mano —cursor
+    compartido, huecos de resultado predimensionados, futures de worker— que
+    empequeñece la clasificación de dos líneas a la que sirve. Cambiar el
+    límite, o eliminarlo, es un número en la cadena frente a todo ese
+    andamiaje.
   </p>
 
   <nav class="tut-nav">
-    <a href="duplicate-transactions.html">← Anterior: Detect duplicated transactions</a>
-    <a href="monthly-ledger-report.html">Siguiente: Full monthly ledger report →</a>
+    <a href="duplicate-transactions.html">← Anterior: Detectar transacciones duplicadas</a>
+    <a href="monthly-ledger-report.html">Siguiente: Informe mensual completo del libro de cuentas →</a>
   </nav>
 </main>
 <footer class="site-footer">

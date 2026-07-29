@@ -21,7 +21,7 @@ nextLabel: some
     predicado, devolviendo <code>false</code> ahí mismo sin tocar el resto
     del iterable. Si nada falla (incluido el caso en que no hay nada en
     absoluto), devuelve <code>true</code>: un iterable vacío cumple de forma
-    trivial "todos los elementos son X".
+    trivial «todos los elementos son X».
   </p>
   <p>
     En la cadena síncrona no hay un <code>Fx.every</code> propio, y no hace
@@ -44,7 +44,7 @@ nextLabel: some
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="some.html"><code>some</code></a> — la contraparte "al menos uno" ·
+    <a href="some.html"><code>some</code></a> — la contraparte «al menos uno» ·
     <a href="filter.html"><code>filter</code></a> — recoge todas las coincidencias en lugar de un bool ·
     <a href="find.html"><code>find</code></a> — obtén el primer elemento que falla o coincide ·
     <a href="predicates.html"><code>predicates</code></a> — predicados listos para usar junto a <code>every</code>

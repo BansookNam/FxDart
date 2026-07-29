@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Spending inside a date window — Dart vs FxDart</title>
-  <meta name="description" content="Sum a slice of a date-sorted ledger — skipWhile/takeWhile/fold in plain Dart vs dropWhile + takeWhile + sumBy in FxDart. Native holds up well.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/date-window-spend.html">
+  <title>Gasto dentro de una ventana de fechas — Dart vs FxDart</title>
+  <meta name="description" content="Suma un tramo de un libro ordenado por fecha — skipWhile/takeWhile/fold en Dart nativo frente a dropWhile + takeWhile + sumBy en FxDart. Dart nativo aguanta bien.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/date-window-spend.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/date-window-spend.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/date-window-spend.html">
@@ -44,30 +43,30 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #13 · <strong>Spending inside a date window</strong></p>
-  <h1>Spending inside a date window</h1>
-  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #13 · <strong>Gasto dentro de una ventana de fechas</strong></p>
+  <h1>Gasto dentro de una ventana de fechas</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Empate</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/takeWhile.html">takeWhile</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    A ledger export is already <strong>sorted by date</strong>. Total the
-    spending between <strong>2026-07-08 and 2026-07-21</strong> inclusive —
-    without scanning the whole list: skip entries before the window, take
-    entries while still inside it, and sum what remains. The data is in the
-    code below; both versions must print the line shown under
-    <em>Expected output</em>.
+    Una exportación del libro de cuentas ya viene <strong>ordenada por
+    fecha</strong>. Suma el gasto entre el <strong>2026-07-08 y el
+    2026-07-21</strong>, ambos incluidos, sin recorrer la lista entera:
+    salta las entradas anteriores a la ventana, toma entradas mientras
+    sigas dentro de ella y suma lo que quede. Los datos están en el código
+    de abajo; las dos versiones deben imprimir la línea que aparece bajo
+    <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Spent 2026-07-08 to 2026-07-21: $104.04</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class Tx {
@@ -142,21 +141,22 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Barely. Dart ships <code>skipWhile</code> and <code><a href="../tutorials/takeWhile.html">takeWhile</a></code> on
-    every <code>Iterable</code>, and both are lazy — the plain-Dart version
-    exploits the sort order exactly the way the FxDart one does, and reads
-    just as well. The only real difference is the last step:
-    <code><a href="../tutorials/sumBy.html">sumBy</a></code> names the intent, where <code>fold</code> spells out
-    the seed and the combine. That is a one-word win, not a structural one —
-    call it a tie. If your codebase already chains with <code><a href="../tutorials/fx.html">fx</a></code>,
-    use it here for consistency; if not, plain Dart is fine.
+    Apenas. Dart trae <code>skipWhile</code> y <code><a href="../tutorials/takeWhile.html">takeWhile</a></code> en
+    todo <code>Iterable</code>, y ambos son perezosos: la versión en Dart
+    nativo aprovecha el orden exactamente igual que la de FxDart, y se lee
+    igual de bien. La única diferencia real está en el último paso:
+    <code><a href="../tutorials/sumBy.html">sumBy</a></code> nombra la intención, mientras que <code>fold</code>
+    deletrea el valor inicial y la combinación. Eso es ganar por una
+    palabra, no por estructura —llamémoslo empate. Si tu código ya encadena
+    con <code><a href="../tutorials/fx.html">fx</a></code>, úsalo aquí por coherencia; si no, Dart nativo va
+    bien.
   </p>
 
   <nav class="tut-nav">
-    <a href="recent-errors.html">← Anterior: Recent error messages, deduped</a>
-    <a href="unique-tags.html">Siguiente: All tags across posts, sorted →</a>
+    <a href="recent-errors.html">← Anterior: Mensajes de error recientes, sin duplicados</a>
+    <a href="unique-tags.html">Siguiente: Todas las etiquetas de las entradas, ordenadas →</a>
   </nav>
 </main>
 <footer class="site-footer">

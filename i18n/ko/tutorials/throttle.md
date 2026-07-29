@@ -54,7 +54,7 @@ nextLabel: shuffle
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="debounce.html"><code>debounce</code></a> — 고정된 주기가 아니라 잠잠해지기를 기다립니다 ·
     <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — 타이밍 데모를 만드는 재료 ·
     <a href="shuffle.html"><code>shuffle</code></a> — 시드를 지정하는 난수 ·

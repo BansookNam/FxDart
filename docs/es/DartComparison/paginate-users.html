@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Batch users into pages of 10 — Dart vs FxDart</title>
-  <meta name="description" content="Split a user list into fixed-size pages — slices from package:collection vs chunk + map in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/paginate-users.html">
+  <title>Agrupar usuarios en páginas de 10 — Dart vs FxDart</title>
+  <meta name="description" content="Divide una lista de usuarios en páginas de tamaño fijo — slices de package:collection frente a chunk + map en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/paginate-users.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/paginate-users.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/paginate-users.html">
@@ -44,29 +43,29 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #8 · <strong>Batch users into pages of 10</strong></p>
-  <h1>Batch users into pages of 10</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #8 · <strong>Agrupar usuarios en páginas de 10</strong></p>
+  <h1>Agrupar usuarios en páginas de 10</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Split twelve users into <strong>pages of 10</strong> (the last page may
-    be short) and print each page on one line with its number, size, and
-    names. The data is in the code below; both versions must print the lines
-    shown under <em>Expected output</em>.
+    Divide doce usuarios en <strong>páginas de 10</strong> (la última
+    puede quedarse corta) e imprime cada página en una línea con su
+    número, su tamaño y sus nombres. Los datos están en el código de
+    abajo; ambas versiones deben imprimir las líneas que aparecen bajo
+    <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Page 1, 10 users: Ava, Ben, Cara, Dan, Elle, Finn, Gus, Hana, Ivan, June
 Page 2, 2 users: Kai, Lena</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -114,22 +113,23 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Core Dart has no chunking at all — without help this is an index loop
-    over <code>sublist</code> with a <code>min</code> guard for the short
-    last page. <code>package:collection</code>'s <code>slices</code> fixes
-    that, and if you already depend on it the two panels are nearly twins.
-    FxDart's edge is that <code><a href="../tutorials/chunk.html">chunk</a></code> needs no extra dependency, is
-    lazy (pages materialize as you consume them), and the very same step
-    works on async chains — batching requests before a
-    <code><a href="../tutorials/concurrent.html">concurrent</a></code> stage is the classic use. A modest win, but a
-    real one.
+    El núcleo de Dart no ofrece nada para trocear — sin ayuda esto es un
+    bucle por índices sobre <code>sublist</code> con una guarda
+    <code>min</code> para la última página, más corta. El
+    <code>slices</code> de <code>package:collection</code> lo resuelve, y
+    si ya dependes de él los dos paneles son casi gemelos. La ventaja de
+    FxDart es que <code><a href="../tutorials/chunk.html">chunk</a></code> no necesita ninguna dependencia
+    extra, es perezoso (las páginas se materializan a medida que las
+    consumes) y ese mismo paso funciona en cadenas asíncronas — agrupar
+    peticiones antes de una etapa <code><a href="../tutorials/concurrent.html">concurrent</a></code> es el uso
+    clásico. Una victoria modesta, pero real.
   </p>
 
   <nav class="tut-nav">
-    <a href="top-log-level.html">← Anterior: Most frequent log level</a>
-    <a href="rank-labels.html">Siguiente: Rank labels for a leaderboard →</a>
+    <a href="top-log-level.html">← Anterior: Nivel de log más frecuente</a>
+    <a href="rank-labels.html">Siguiente: Etiquetas de puesto para una tabla de clasificación →</a>
   </nav>
 </main>
 <footer class="site-footer">

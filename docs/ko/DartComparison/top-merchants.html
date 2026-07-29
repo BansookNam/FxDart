@@ -155,9 +155,9 @@ void main() {
 
   <h2>차이가 나는 이유</h2>
   <p>
-    코어 Dart에는 <code><a href="../tutorials/groupBy.html">groupBy</a></code>가 아예 없습니다 — 네이티브 버전은
+    순수 Dart에는 <code><a href="../tutorials/groupBy.html">groupBy</a></code>가 아예 없습니다 — 네이티브 버전은
     <code>groupListsBy</code>를 쓰려고 <code>package:collection</code>을
-    끌어와야 하고, 작업 도중에 형식을 바꿔야 합니다: 그룹화에는 확장
+    끌어와야 하고, 작업 도중에 관용구를 바꿔야 합니다: 그룹화에는 확장
     메서드 하나, 순위 매기기에는 또 다른 확장 메서드(<code>sortedBy</code>,
     명시적인 <code>&lt;num&gt;</code> 타입 인자와 내림차순을 얻기 위한
     부호 반전 키가 필요합니다)를 써야 하죠. FxDart는 작업 전체를 하나의

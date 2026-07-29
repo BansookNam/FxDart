@@ -46,7 +46,7 @@ nextLabel: take
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="filter.html"><code>filter</code></a> — 미리 만든 마스크 대신 술어로 거르기 ·
     <a href="../tutorials/zip.html"><code>zip</code></a> — compress가 기반으로 삼는 함수 ·
     <a href="differenceBy.html"><code>differenceBy</code></a> — 다른 이터러블에 포함되는지로 거르기 ·

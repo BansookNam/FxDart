@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Concurrent price lookup with fallback — Dart vs FxDart</title>
-  <meta name="description" content="Look up live prices 3 at a time, fall back to catalog prices for missing SKUs — concurrent + a null-coalescing map vs a worker pool.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/price-lookup-fallback.html">
+  <title>Consulta concurrente de precios con fallback — Dart vs FxDart</title>
+  <meta name="description" content="Consulta precios en vivo de tres en tres y recurre a los precios de catálogo para los SKU que faltan — concurrent + un map con ?? frente a un pool de workers.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/price-lookup-fallback.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/price-lookup-fallback.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/price-lookup-fallback.html">
@@ -44,30 +43,30 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #43 · <strong>Concurrent price lookup with fallback</strong></p>
-  <h1>Concurrent price lookup with fallback</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #43 · <strong>Consulta concurrente de precios con fallback</strong></p>
+  <h1>Consulta concurrente de precios con fallback</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/size.html">size</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Price a six-line order. Each SKU is looked up in the live pricing
-    service — at most <strong>three lookups in flight</strong> — but the
-    service is missing some SKUs and returns <code>null</code> for them;
-    those lines fall back to the catalog list price carried on the item.
-    Print each priced line in order (flagging fallbacks), the fallback
-    count, the order total, and the maximum observed concurrency. All data
-    is in the code below.
+    Calcula el precio de un pedido de seis líneas. Cada SKU se consulta en
+    el servicio de precios en vivo —con un máximo de <strong>tres
+    consultas en vuelo</strong>—, pero al servicio le faltan algunos SKU y
+    devuelve <code>null</code> para ellos; esas líneas recurren al precio
+    de catálogo que lleva el propio artículo. Imprime cada línea con su
+    precio en orden (señalando los fallbacks), el número de fallbacks, el
+    total del pedido y la concurrencia máxima observada. Todos los datos
+    están en el código de abajo.
   </p>
   <p>
-    The FxDart chain does the lookup under <code>concurrent(3)</code>, then
-    a second <code><a href="../tutorials/map.html">map</a></code> applies the fallback with plain
-    <code>??</code> — the recovery policy is just another pipeline step
-    downstream of the bounded fetch.
+    La cadena de FxDart hace la consulta bajo <code>concurrent(3)</code> y
+    después un segundo <code><a href="../tutorials/map.html">map</a></code> aplica el fallback con un simple
+    <code>??</code>: la política de recuperación no es más que otro paso
+    del pipeline, aguas abajo de la petición acotada.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">priced 6 items, 3 lookups at a time:
   SKU-100 x2 @ $8.49
   SKU-205 x1 @ $24.50 (catalog fallback)
@@ -80,10 +79,10 @@ order total: $212.05
 max lookups in flight: 3</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class Item {
@@ -201,24 +200,26 @@ Future<void> main() async {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    The fallback itself is easy in both versions — <code>??</code> is Dart.
-    What plain Dart lacks is the step before it: three-at-a-time lookups
-    with results in input order force the worker-pool idiom (shared cursor,
-    pre-sized slots, <code>Future.wait</code>), and the fallback logic ends
-    up buried inside the worker body where it is hardest to see and test.
-    In the FxDart version fetch and recovery are two separate, visible
-    stages of one chain — <code>concurrent(3)</code> owns the limit,
-    the next <code><a href="../tutorials/map.html">map</a></code> owns the policy — and the summary lines
-    (<code><a href="../tutorials/filter.html">filter</a></code> + <code><a href="../tutorials/size.html">size</a></code> for fallbacks,
-    <code><a href="../tutorials/sumBy.html">sumBy</a></code> for the total) reuse the same vocabulary the rest of
-    the site teaches.
+    El fallback en sí es fácil en ambas versiones —<code>??</code> es
+    Dart—. Lo que le falta a Dart nativo es el paso previo: hacer las
+    consultas de tres en tres con los resultados en el orden de entrada
+    obliga a recurrir al modismo del pool de workers (cursor compartido,
+    huecos predimensionados, <code>Future.wait</code>), y la lógica del
+    fallback acaba enterrada dentro del cuerpo del worker, donde es más
+    difícil de ver y de probar. En la versión con FxDart, la consulta y la
+    recuperación son dos etapas separadas y visibles de una misma cadena
+    —<code>concurrent(3)</code> es dueño del límite, el <code><a href="../tutorials/map.html">map</a></code>
+    siguiente es dueño de la política— y las líneas del resumen
+    (<code><a href="../tutorials/filter.html">filter</a></code> + <code><a href="../tutorials/size.html">size</a></code> para los fallbacks,
+    <code><a href="../tutorials/sumBy.html">sumBy</a></code> para el total) reutilizan el mismo vocabulario que
+    enseña el resto del sitio.
   </p>
 
   <nav class="tut-nav">
-    <a href="flaky-api-retry.html">← Anterior: Poll a flaky API until first success</a>
-    <a href="stream-windowed-alerts.html">Siguiente: Windowed alerts from a sensor stream →</a>
+    <a href="flaky-api-retry.html">← Anterior: Sondear una API inestable hasta el primer éxito</a>
+    <a href="stream-windowed-alerts.html">Siguiente: Alertas por ventanas sobre un stream de sensores →</a>
   </nav>
 </main>
 <footer class="site-footer">

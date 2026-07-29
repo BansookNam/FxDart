@@ -48,7 +48,7 @@ nextLabel: matches
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="matches.html"><code>matches</code></a> — 이 함수를 커링해 filter에 바로 쓸 수 있게 만든 버전 ·
     <a href="pickBy.html"><code>pickBy</code></a> — 모양 기반 필터링에서 자주 함께 쓰는 함수 ·
     <a href="find.html"><code>find</code></a> — 처음으로 일치하는 원소 찾기 ·

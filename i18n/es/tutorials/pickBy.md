@@ -17,7 +17,7 @@ nextLabel: prop
   <h2>Lección</h2>
   <p>
     <code>pickBy</code> es el espejo de <code>omitBy</code> y comparte su
-    convención de llamada: el predicado recibe un registro
+    convención de llamada: el predicado recibe un record
     <code>(K, V)</code> por entrada, así que usa <code>e.$1</code> para la
     clave y <code>e.$2</code> para el valor. Solo sobreviven en el
     resultado las entradas para las que el predicado devuelve
@@ -25,7 +25,7 @@ nextLabel: prop
   </p>
   <p>
     Un uso habitual: reducir un mapa de configuración o de feature flags a
-    "los que importan ahora mismo" — flags activos, claves con un prefijo
+    «los que importan ahora mismo» — flags activos, claves con un prefijo
     determinado, valores por encima de un umbral — sin escribir a mano un
     bucle entrada por entrada.
   </p>
@@ -45,5 +45,5 @@ nextLabel: prop
     <a href="omitBy.html"><code>omitBy</code></a> — el inverso: descarta por predicado ·
     <a href="pick.html"><code>pick</code></a> — conserva según una lista fija de claves ·
     <a href="matches.html"><code>matches</code></a> — un predicado ya hecho para comparar formas ·
-    <a href="compactObject.html"><code>compactObject</code></a> — un pickBy especializado en "descartar nulls"
+    <a href="compactObject.html"><code>compactObject</code></a> — un pickBy especializado en «descartar nulls»
   </div>

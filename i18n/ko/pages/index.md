@@ -87,7 +87,7 @@ description: FxDart는 FxTS를 포팅한 Dart 함수형 프로그래밍 라이�
     <div class="box pros">
       <h3>✓ 장점</h3>
       <ul>
-        <li><strong>거저 얻는 지연 평가</strong> — 파이프라인은 단축 평가되며, 요청된 값만 계산됩니다.</li>
+        <li><strong>거저 얻는 지연 평가</strong> — 파이프라인은 단락 평가되며, 요청된 값만 계산됩니다.</li>
         <li><strong>순서를 보존하는 동시성</strong>을 연산자 하나로: <code>concurrent(n)</code>, 완료 순서가 필요하면 <code>concurrentPool(n)</code>.</li>
         <li><strong>완전한 타입 체인</strong> — <code>fx()</code>는 처음부터 끝까지 타입 추론을 유지합니다. 동기 연산자는 네이티브 <code>Iterable</code>을 다루는 평범한 함수이므로 일반 Dart 코드와 그대로 어울립니다.</li>
         <li><strong>작고 목적이 분명한 함수</strong> — 변환 / 필터 / 슬라이스 / 결합 / 집계 / 객체 / 유틸을 아우르는 약 120개의 연산자.</li>

@@ -60,7 +60,7 @@
   <p>
     Internamente recorre las entradas y hace <code>await</code> sobre cada
     valor uno tras otro, lo que parece que debería ser <em>secuencial</em>. En la
-    práctica, normalmente no es más lento que lanzarlos todos "a la vez": en
+    práctica, normalmente no es más lento que lanzarlos todos «a la vez»: en
     Dart, un <code>Future</code> empieza a ejecutarse en el momento en que se
     <em>crea</em>, no cuando se espera. Así que si construyes el mapa con
     <code>delay(...)</code> o con peticiones que ya están en vuelo como valores
@@ -131,7 +131,7 @@ Future<void> main() async {
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="evolve.html"><code>evolve</code></a> — el primo síncrono, que transforma en lugar de esperar ·
-    <a href="concurrent.html"><code>concurrent</code></a> — la versión con forma de iterable de "ejecutar cosas a la vez" ·
+    <a href="concurrent.html"><code>concurrent</code></a> — la versión con forma de iterable de «ejecutar cosas a la vez» ·
     <a href="delay.html"><code>delay &amp; sleep</code></a> — se usan para construir los futures de la demo ·
     <a href="fromEntries.html"><code>fromEntries</code></a> — construye un Map desde cero
   </div>

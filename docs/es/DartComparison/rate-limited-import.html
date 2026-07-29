@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Rate-limited batch import — Dart vs FxDart</title>
-  <meta name="description" content="Import 9 transactions in batches of 3, one batch at a time, with a running total — chunk + concurrent(1) + scan vs a sequential loop.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/rate-limited-import.html">
+  <title>Importación por lotes con límite de tasa — Dart vs FxDart</title>
+  <meta name="description" content="Importa 9 transacciones en lotes de 3, un lote cada vez, con un total acumulado — chunk + concurrent(1) + scan frente a un bucle secuencial.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/rate-limited-import.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/rate-limited-import.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/rate-limited-import.html">
@@ -44,31 +43,31 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #45 · <strong>Rate-limited batch import</strong></p>
-  <h1>Rate-limited batch import</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #45 · <strong>Importación por lotes con límite de tasa</strong></p>
+  <h1>Importación por lotes con límite de tasa</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/delay.html">delay</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Push nine ledger transactions (in the code below) to an import endpoint
-    that accepts <strong>batches of three, one call at a time</strong> —
-    strictly sequential, never overlapping. After each batch, record its
-    size, its amount, and the running total imported so far; print the
-    batch summaries in order, then prove the rate limit held via the
-    max-in-flight counter (it must read 1).
+    Envía nueve transacciones del libro de cuentas (están en el código de
+    abajo) a un endpoint de importación que acepta <strong>lotes de tres,
+    una llamada cada vez</strong>: estrictamente secuencial, nunca
+    solapadas. Después de cada lote, registra su tamaño, su importe y el
+    total acumulado importado hasta el momento; imprime los resúmenes de
+    lote en orden y luego demuestra que se respetó el límite de tasa
+    mediante el contador de máximo en vuelo (debe marcar 1).
   </p>
   <p>
-    In FxDart the whole policy is the chain: <code>chunk(3)</code> sets the
-    batch size, <code>concurrent(1)</code> sets the pace, and
-    <code><a href="../tutorials/scan.html">scan</a></code> threads the running total through the acknowledgments
-    (<code>drop(1)</code> discards the scan seed). The endpoint itself
-    simulates latency with <code><a href="../tutorials/delay.html">delay</a></code> and sums its batch with
-    <code><a href="../tutorials/sumBy.html">sumBy</a></code>.
+    En FxDart la política entera es la cadena: <code>chunk(3)</code> fija
+    el tamaño del lote, <code>concurrent(1)</code> fija el ritmo y
+    <code><a href="../tutorials/scan.html">scan</a></code> hila el total acumulado a través de las
+    confirmaciones (<code>drop(1)</code> descarta el valor inicial del
+    scan). El propio endpoint simula la latencia con <code><a href="../tutorials/delay.html">delay</a></code> y
+    suma su lote con <code><a href="../tutorials/sumBy.html">sumBy</a></code>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">importing 9 txns in batches of 3, one at a time:
   batch 1: 3 txns, $172.49 — running total $172.49
   batch 2: 3 txns, $403.65 — running total $576.14
@@ -76,10 +75,10 @@
 max batches in flight: 1</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -182,23 +181,25 @@ Future<void> main() async {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    To be fair: a strictly sequential import is the one concurrency policy a
-    plain <code>for</code> loop handles gracefully, and the native version
-    reads fine — <code>slices</code> from <code>package:collection</code>
-    even covers the batching. The running total, though, is already mutable
-    state threaded by hand (<code>running += amount</code> next to
-    <code>n++</code>), where <code><a href="../tutorials/scan.html">scan</a></code> makes it a declared step.
-    And the loop's simplicity is a dead end: the day the endpoint allows two
-    concurrent batches, the FxDart version changes <code>1</code> to
-    <code>2</code>, while the loop becomes the worker pool from the other
-    async examples. The chain states the policy; the loop encodes it.
+    Seamos justos: una importación estrictamente secuencial es la única
+    política de concurrencia que un simple bucle <code>for</code> maneja
+    con elegancia, y la versión nativa se lee bien —<code>slices</code> de
+    <code>package:collection</code> hasta cubre el troceado en lotes—. El
+    total acumulado, en cambio, ya es estado mutable hilado a mano
+    (<code>running += amount</code> junto a <code>n++</code>), mientras que
+    <code><a href="../tutorials/scan.html">scan</a></code> lo convierte en un paso declarado. Y la sencillez del
+    bucle es un callejón sin salida: el día que el endpoint permita dos
+    lotes concurrentes, la versión con FxDart cambia <code>1</code> por
+    <code>2</code>, mientras que el bucle se convierte en el pool de
+    workers de los otros ejemplos asíncronos. La cadena enuncia la
+    política; el bucle la codifica.
   </p>
 
   <nav class="tut-nav">
-    <a href="stream-windowed-alerts.html">← Anterior: Windowed alerts from a sensor stream</a>
-    <a href="parallel-downloads.html">Siguiente: Parallel downloads, results in order →</a>
+    <a href="stream-windowed-alerts.html">← Anterior: Alertas por ventanas sobre un stream de sensores</a>
+    <a href="parallel-downloads.html">Siguiente: Descargas en paralelo, resultados en orden →</a>
   </nav>
 </main>
 <footer class="site-footer">

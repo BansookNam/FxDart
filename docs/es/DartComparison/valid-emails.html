@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>First 5 valid emails, normalized — Dart vs FxDart</title>
-  <meta name="description" content="Trim, lowercase, validate, take five — map/where/take in plain Dart vs map + filter + take in FxDart. Plain Dart is every bit as clean here.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/valid-emails.html">
+  <title>Los 5 primeros correos válidos, normalizados — Dart vs FxDart</title>
+  <meta name="description" content="Recortar, pasar a minúsculas, validar y tomar cinco — map/where/take en Dart nativo frente a map + filter + take en FxDart. Aquí Dart nativo es igual de limpio.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/valid-emails.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/valid-emails.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/valid-emails.html">
@@ -44,23 +43,23 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #19 · <strong>First 5 valid emails, normalized</strong></p>
-  <h1>First 5 valid emails, normalized</h1>
-  <p class="cmp-meta"><span class="badge verdict-native">Native is fine</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #19 · <strong>Los 5 primeros correos válidos, normalizados</strong></p>
+  <h1>Los 5 primeros correos válidos, normalizados</h1>
+  <p class="cmp-meta"><span class="badge verdict-native">Dart nativo basta</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Signup input is messy: stray whitespace, mixed case, and a couple of
-    strings that are not emails at all. Normalize each entry (trim,
-    lowercase), keep only plausible emails (contains <code>@</code> and a
-    dot), and print the <strong>first five</strong>. The data is in the code
-    below; both versions must print the lines shown under
-    <em>Expected output</em>.
+    Los datos de registro llegan sucios: espacios sobrantes, mayúsculas y
+    minúsculas mezcladas y un par de cadenas que ni siquiera son correos.
+    Normaliza cada entrada (recorta, pasa a minúsculas), quédate solo con los
+    correos plausibles (que contengan <code>@</code> y un punto) e imprime
+    los <strong>cinco primeros</strong>. Los datos están en el código de
+    abajo; ambas versiones deben imprimir las líneas que aparecen bajo
+    <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">ada@example.com
 grace@hopper.dev
 lin@lang.org
@@ -68,10 +67,10 @@ ken@unix.org
 dennis@unix.org</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 // Raw signup input: stray whitespace, mixed case, a few invalid entries.
@@ -134,23 +133,23 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    They don't, and that is the point. <code><a href="../tutorials/map.html">map</a></code>, <code>where</code>,
-    and <code><a href="../tutorials/take.html">take</a></code> ship on every Dart <code>Iterable</code>, they are
-    lazy, and the two versions are the same pipeline with <code>where</code>
-    spelled <code><a href="../tutorials/filter.html">filter</a></code>. For a short normalize-validate-truncate
-    chain like this, plain Dart is every bit as clear — reach for it. FxDart
-    earns its keep when the pipeline needs vocabulary Dart lacks
-    (<code><a href="../tutorials/groupBy.html">groupBy</a></code>, <code><a href="../tutorials/scan.html">scan</a></code>, <code><a href="../tutorials/zip.html">zip</a></code>,
-    <code><a href="../tutorials/concurrent.html">concurrent</a></code>…) or when the rest of the file already chains
-    with <code><a href="../tutorials/fx.html">fx</a></code>; adding a dependency for this snippet alone buys
-    nothing.
+    No difieren, y de eso se trata. <code><a href="../tutorials/map.html">map</a></code>, <code>where</code> y
+    <code><a href="../tutorials/take.html">take</a></code> vienen de serie en todo <code>Iterable</code> de Dart,
+    son perezosos, y las dos versiones son el mismo pipeline salvo que
+    <code>where</code> se llama <code><a href="../tutorials/filter.html">filter</a></code>. Para una cadena corta de
+    normalizar-validar-truncar como esta, Dart nativo es igual de claro —
+    recurre a él sin dudarlo. FxDart se gana su sitio cuando el pipeline
+    necesita vocabulario del que Dart carece (<code><a href="../tutorials/groupBy.html">groupBy</a></code>,
+    <code><a href="../tutorials/scan.html">scan</a></code>, <code><a href="../tutorials/zip.html">zip</a></code>, <code><a href="../tutorials/concurrent.html">concurrent</a></code>…) o cuando
+    el resto del archivo ya encadena con <code><a href="../tutorials/fx.html">fx</a></code>; añadir una
+    dependencia solo por este fragmento no aporta nada.
   </p>
 
   <nav class="tut-nav">
-    <a href="top-category-average.html">← Anterior: Category with highest average expense</a>
-    <a href="bounded-concurrency.html">Siguiente: Fetch profiles, two at a time →</a>
+    <a href="top-category-average.html">← Anterior: Categoría con el gasto medio más alto</a>
+    <a href="bounded-concurrency.html">Siguiente: Obtener perfiles de dos en dos →</a>
   </nav>
 </main>
 <footer class="site-footer">

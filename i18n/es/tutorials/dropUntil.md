@@ -26,8 +26,8 @@ nextLabel: slice
   </p>
   <p>
     Úsalo cuando un marcador o centinela debe desaparecer junto con el
-    prefijo que delimita: "todo lo que va después de la línea <code>READY</code>,
-    sin incluir el propio <code>READY</code>".
+    prefijo que delimita: «todo lo que va después de la línea <code>READY</code>,
+    sin incluir el propio <code>READY</code>».
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>

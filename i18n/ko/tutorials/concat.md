@@ -44,7 +44,7 @@ nextLabel: zip
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="append.html"><code>append</code></a> — 뒤에 값 하나만 추가 ·
     <a href="prepend.html"><code>prepend</code></a> — 앞에 값 하나만 추가 ·
     <a href="zip.html"><code>zip</code></a> — 이어 붙이는 대신 원소끼리 짝지어 묶기

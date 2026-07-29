@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>nullable — FxDart 101</title>
-  <meta name="description" content="FxDart nullable tutorial: the nullable and nullableAsync builders — straight-line unwrapping of nullable values, the nullable-first alternative to an Option type.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/nullable.html">
+  <meta name="description" content="Tutorial de nullable en FxDart: los constructores nullable y nullableAsync — desenvoltura en línea recta de valores nullables, la alternativa nullable-first a un tipo Option.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/nullable.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/nullable.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/nullable.html">
@@ -44,39 +43,39 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 13 · Typed errors › <strong>nullable</strong></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 13 · Errores tipados › <strong>nullable</strong></p>
   <h1><code>nullable</code></h1>
   <p class="hero-sub">
-    Runs a block in an info-free raise scope: any short-circuit makes the
-    whole block evaluate to <code>null</code>. The nullable-first alternative
-    to an <code>Option</code> type.
+    Ejecuta un bloque en un ámbito raise sin información: cualquier
+    cortocircuito hace que todo el bloque se evalúe a <code>null</code>. La
+    alternativa nullable-first a un tipo <code>Option</code>.
   </p>
 
   <div class="signature">A? nullable&lt;A&gt;(A Function(SingletonRaise r) block)
 Future&lt;A?&gt; nullableAsync&lt;A&gt;(FutureOr&lt;A&gt; Function(SingletonRaise r) block)
 on SingletonRaise: A bind&lt;A&gt;(A? value) · ensure(bool) · ensureNotNull(A?) · none()</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    When the only failure information you need is <em>absence</em>, an
-    <code>Either</code> is overkill — Dart already has a dedicated absence
-    channel: <code>T?</code>. <code>nullable</code> is the
-    <a href="raise.html"><code>either</code> builder</a>'s info-free twin
-    (the port of Arrow's <code>nullable&nbsp;{&nbsp;}</code>): the scope's
-    <code>r.bind(value)</code> unwraps a nullable, and if it's
-    <code>null</code> the whole block returns <code>null</code>.
+    Cuando la única información de fallo que necesitas es la
+    <em>ausencia</em>, un <code>Either</code> es excesivo — Dart ya tiene un
+    canal dedicado a la ausencia: <code>T?</code>. <code>nullable</code> es el
+    gemelo sin información del
+    <a href="raise.html">constructor <code>either</code></a>
+    (el port de <code>nullable&nbsp;{&nbsp;}</code> de Arrow): el
+    <code>r.bind(value)</code> del ámbito desenvuelve un valor nullable y, si
+    es <code>null</code>, todo el bloque devuelve <code>null</code>.
   </p>
   <p>
-    Compared to chaining <code>?.</code> and <code>??</code>, the win is that
-    <em>any</em> step can bail out — a lookup, a parse, a condition via
-    <code>r.ensure(cond)</code> — without nesting, and intermediate values
-    stay promoted and non-null. This is why FxDart ships no
-    <code>Option</code>/<code>Maybe</code> type: <code>T?</code> plus this
-    builder covers it, with zero wrapping.
+    Frente a encadenar <code>?.</code> y <code>??</code>, la ganancia es que
+    <em>cualquier</em> paso puede abandonar — una búsqueda, un parseo, una
+    condición vía <code>r.ensure(cond)</code> — sin anidamiento, y los valores
+    intermedios siguen promovidos y no nulos. Por eso FxDart no incluye ningún
+    tipo <code>Option</code>/<code>Maybe</code>: <code>T?</code> más este
+    constructor lo cubren, sin ninguna envoltura.
   </p>
 
-  <h2>Demo 1 · bind on tryParse</h2>
+  <h2>Demo 1 · bind sobre tryParse</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -95,7 +94,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · deep lookups without ?. staircases</h2>
+  <h2>Demo 2 · búsquedas profundas sin escaleras de ?.</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -122,12 +121,12 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
+  <h2>Pruébalo tú</h2>
   <p>
-    Exercise: <code>lastSeen['lee']</code> exists but holds <code>null</code>,
-    and <code>'park'</code> is missing entirely — <code>r.bind</code> treats
-    both as absence. Fix <code>describe</code> so both print
-    <code>null</code>.
+    Ejercicio: <code>lastSeen['lee']</code> existe pero contiene
+    <code>null</code>, y <code>'park'</code> falta por completo —
+    <code>r.bind</code> trata ambos casos como ausencia. Arregla
+    <code>describe</code> para que los dos impriman <code>null</code>.
   </p>
   <div class="playground">
 <textarea>
@@ -151,11 +150,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="raise.html"><code>either</code> builder</a> — when the failure needs a reason ·
-    <a href="either.html"><code>Either</code></a> — <code>getOrNull()</code> bridges back to nullable ·
-    <a href="compact.html"><code>nonNulls</code></a> — drop nulls from a pipeline ·
-    <a href="typedErrors.html">typed errors — full guide</a>
+    <strong>Relacionado:</strong>
+    <a href="raise.html">constructor <code>either</code></a> — cuando el fallo necesita un motivo ·
+    <a href="either.html"><code>Either</code></a> — <code>getOrNull()</code> hace de puente de vuelta a los nullables ·
+    <a href="compact.html"><code>nonNulls</code></a> — elimina los nulls de un pipeline ·
+    <a href="typedErrors.html">errores tipados — guía completa</a>
   </div>
 
   <nav class="tut-nav">

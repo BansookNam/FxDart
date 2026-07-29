@@ -48,7 +48,7 @@ nextLabel: every
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="compact.html"><code>compact</code></a> — 이터러블에서 null 제거하기 ·
     <a href="compactObject.html"><code>compactObject</code></a> — Map에서 null 제거하기 ·
     <a href="predicates.html"><code>predicates</code></a> — filter에 바로 쓸 수 있는 타입 검사 모음 ·

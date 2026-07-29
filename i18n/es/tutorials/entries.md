@@ -29,7 +29,7 @@ nextLabel: keys
     en un bucle <code>for</code> — <code>for (final (key, value) in
     entries(map))</code> — o acceder a los campos posicionales
     <code>.$1</code> (clave) y <code>.$2</code> (valor) dentro de una
-    retrollamada de <code>map</code>/<code>filter</code> cuando desestructurar
+    callback de <code>map</code>/<code>filter</code> cuando desestructurar
     no resulte cómodo.
   </p>
   <p>
@@ -48,7 +48,7 @@ nextLabel: keys
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: convierte un Map de notas en cadenas "nombre: PASS/FAIL".</p>
+  <p>Ejercicio: convierte un Map de notas en cadenas «nombre: PASS/FAIL».</p>
   {{playground:2}}
 
   <div class="callout">

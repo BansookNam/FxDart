@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>includes — FxDart 101</title>
-  <meta name="description" content="Tutorial de includes en FxDart: comprueba la pertenencia en un iterable usando ==, con cortocircuito, en versión síncrona y asíncrona.">
+  <title>contains — FxDart 101</title>
+  <meta name="description" content="Tutorial de contains en FxDart: comprueba la pertenencia en un iterable usando ==, con cortocircuito, en versión síncrona y asíncrona.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/includes.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/includes.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/includes.html">
@@ -53,10 +53,14 @@ Future&lt;bool&gt; includesAsync&lt;A&gt;(A a, FxAsyncIterable&lt;A&gt; iterable
 
   <h2>Lección</h2>
   <p>
-    <code>includes</code> es una envoltura fina con la forma de FxTS: en el
-    lado síncrono es literalmente <code>iterable.contains(a)</code>, así que
-    no hay un método de cadena aparte — <code>Fx</code> ya hereda
-    <code>.contains()</code> de <code>Iterable</code> y se comporta igual. La
+    <code>contains</code> es el nombre idiomático en Dart para comprobar la
+    pertenencia, y en una cadena ya lo tienes: <code>Fx</code> hereda
+    <code>.contains()</code> de <code>Iterable</code>, así que
+    <code>fx(xs).contains(a)</code> funciona sin más. Eso sí, no existe una
+    función <code>contains</code> de nivel superior — el nombre choca con el
+    matcher de <code>package:test</code> —, de modo que la forma data-first
+    conserva su grafía de FxTS, <code>includes(a, iterable)</code>, que es
+    literalmente <code>iterable.contains(a)</code>. La
     versión asíncrona, <code>includesAsync</code>, está construida sobre
     <a href="some.html"><code>someAsync</code></a> (con <code>b == a</code>
     como predicado), lo que significa que hereda el mismo cortocircuito: deja
@@ -64,7 +68,7 @@ Future&lt;bool&gt; includesAsync&lt;A&gt;(A a, FxAsyncIterable&lt;A&gt; iterable
   </p>
   <p>
     La igualdad se comprueba con el <code>==</code> de Dart, así que respeta
-    cualquier sobrecarga de <code>operator ==</code> en tus propias clases —
+    cualquier redefinición de <code>operator ==</code> en tus propias clases —
     no se limita a los tipos primitivos.
   </p>
 
@@ -103,7 +107,7 @@ Future<void> main() async {
   </div>
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>includes</code> para comprobar si <code>requestId</code> está permitido.</p>
+  <p>Ejercicio: usa <code>contains</code> para comprobar si <code>requestId</code> está permitido.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';

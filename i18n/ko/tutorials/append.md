@@ -1,7 +1,7 @@
 ---
 slug: append
 title: append — FxDart 101
-description: FxDart append 튜토리얼 - 지연 평가되는 이터러블 끝에 값 하나를 덧붙이는 법을 라이브 플레이그라운드와 함께 다룹니다.
+description: FxDart append 튜토리얼: 지연 평가되는 이터러블 끝에 값 하나를 덧붙이는 법을 라이브 플레이그라운드와 함께 다룹니다.
 heading: <code>append</code>
 section: 6
 crumb: append

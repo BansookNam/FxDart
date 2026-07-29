@@ -19,8 +19,8 @@ nextLabel: throttle
     reinicia un temporizador de duración <code>wait</code>; la función
     <code>func</code> envuelta solo se dispara de verdad cuando pasa
     <code>wait</code> <em>sin</em> otra llamada — y lo hace con el argumento
-    que recibió esa última llamada. Es el patrón clásico de "espera a que el
-    usuario deje de teclear antes de buscar".
+    que recibió esa última llamada. Es el patrón clásico de «espera a que el
+    usuario deje de teclear antes de buscar».
   </p>
   <p>
     En JS, FxTS engancha un método <code>.cancel()</code> directamente a la
@@ -46,8 +46,8 @@ nextLabel: throttle
   <h2>Demo 2 · Flanco de subida y cancel()</h2>
   <p>
     <code>leading: true</code> dispara de inmediato y suprime el resto de la
-    ráfaga; <code>.cancel()</code> descarta por completo una llamada de
-    bajada pendiente:
+    ráfaga; <code>.cancel()</code> descarta por completo una llamada de flanco
+    de bajada pendiente:
   </p>
   {{playground:1}}
 

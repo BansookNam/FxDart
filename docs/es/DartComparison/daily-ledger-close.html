@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Finale — DailyLedger monthly close — Dart vs FxDart</title>
-  <meta name="description" content="The finale: load ledger entries 3 at a time, then compute the July summary and category breakdown — the real DailyLedger app shapes, both ways.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/daily-ledger-close.html">
+  <title>Gran final — cierre mensual de DailyLedger — Dart vs FxDart</title>
+  <meta name="description" content="El gran final: carga las entradas del libro de 3 en 3 y luego calcula el resumen de julio y el desglose por categoría — las formas reales de la app DailyLedger, de las dos maneras.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/daily-ledger-close.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/daily-ledger-close.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/daily-ledger-close.html">
@@ -44,35 +43,35 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #50 · <strong>Finale — DailyLedger monthly close</strong></p>
-  <h1>Finale — DailyLedger monthly close</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #50 · <strong>Gran final — cierre mensual de DailyLedger</strong></p>
+  <h1>Gran final — cierre mensual de DailyLedger</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/partition.html">partition</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Close the month for a personal ledger. Ten entries live in a store
-    (fixed data in the code below); load each by id — at most
-    <strong>three loads in flight</strong>, proven by the max-in-flight
-    counter — then compute the July&nbsp;2026 close: keep only July entries
-    (one straggler is from June), split income from spending, total each
-    side, and print the net plus the top three spending categories with
-    entry counts.
+    Cierra el mes de un libro de cuentas personal. Diez entradas viven en
+    un almacén (datos fijos en el código de abajo); carga cada una por id
+    —como máximo <strong>tres cargas en curso</strong>, tal como demuestra
+    el contador de máximo en curso— y luego calcula el cierre de julio
+    de&nbsp;2026: quédate solo con las entradas de julio (una rezagada es
+    de junio), separa los ingresos de los gastos, suma cada lado e imprime
+    el neto junto con las tres categorías de gasto principales y su número
+    de entradas.
   </p>
   <p>
-    The shapes here are lifted from a real app: the <code>Entry</code>
-    model, the income/spending split (<code><a href="../tutorials/filter.html">filter</a></code> →
-    <code><a href="../tutorials/partition.html">partition</a></code> → <code><a href="../tutorials/sumBy.html">sumBy</a></code> each half), and the
-    category breakdown (<code><a href="../tutorials/groupBy.html">groupBy</a></code> → per-group <code><a href="../tutorials/sumBy.html">sumBy</a></code>
-    → <code><a href="../tutorials/sortBy.html">sortBy</a></code> descending → <code>take(3)</code>) mirror
-    DailyLedger's <code>monthSummary</code> and
-    <code>categoryBreakdown</code> pipelines, with the async load phase
-    (<code><a href="../tutorials/toAsync.html">toAsync</a></code> → <code><a href="../tutorials/map.html">map</a></code> → <code>concurrent(3)</code>)
-    in front.
+    Las formas que ves aquí están sacadas de una app real: el modelo
+    <code>Entry</code>, la separación ingresos/gastos (<code><a href="../tutorials/filter.html">filter</a></code> →
+    <code><a href="../tutorials/partition.html">partition</a></code> → <code><a href="../tutorials/sumBy.html">sumBy</a></code> en cada mitad) y el desglose
+    por categoría (<code><a href="../tutorials/groupBy.html">groupBy</a></code> → <code><a href="../tutorials/sumBy.html">sumBy</a></code> por grupo →
+    <code><a href="../tutorials/sortBy.html">sortBy</a></code> descendente → <code>take(3)</code>) son un calco de
+    los pipelines <code>monthSummary</code> y
+    <code>categoryBreakdown</code> de DailyLedger, con la fase de carga
+    asíncrona (<code><a href="../tutorials/toAsync.html">toAsync</a></code> → <code><a href="../tutorials/map.html">map</a></code> →
+    <code>concurrent(3)</code>) por delante.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">July 2026 close — 10 entries loaded, 3 at a time (max in flight: 3)
 income  $3600.00
 expense $1478.15
@@ -83,10 +82,10 @@ top spending categories:
   utilities: $106.30 (2 entries)</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -254,28 +253,30 @@ Future<void> main() async {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Fifty examples in, this is the pattern they all add up to: plain Dart
-    needs three dialects for one feature — <code>package:collection</code>
-    helpers for grouping, <code>fold</code> with explicit seeds for the
-    totals, and a hand-rolled worker pool the moment the load phase needs a
-    concurrency bound. Each piece is fine; together they make the business
-    logic the hardest thing on the screen to find. The FxDart version is
-    the same vocabulary from the load phase to the report — and because
-    every stage is a pure pipeline, each one can be lifted out and unit
-    tested as <em>entries in, view data out</em>.
+    Cincuenta ejemplos después, este es el patrón al que todos apuntaban:
+    Dart nativo necesita tres dialectos para una sola funcionalidad —los
+    helpers de <code>package:collection</code> para agrupar,
+    <code>fold</code> con valores iniciales explícitos para los totales, y
+    un pool de workers escrito a mano en cuanto la fase de carga necesita un
+    límite de concurrencia—. Cada pieza está bien por separado; juntas
+    convierten la lógica de negocio en lo más difícil de encontrar en la
+    pantalla. La versión con FxDart usa el mismo vocabulario desde la fase
+    de carga hasta el informe, y como cada etapa es un pipeline puro, se
+    puede extraer cualquiera de ellas y probarla de forma unitaria como
+    <em>entran entradas, salen datos de vista</em>.
   </p>
   <p>
-    These pipelines are not a demo confection: they are how
-    <a href="../../DailyLedger/">the DailyLedger demo app</a> actually
-    computes its dashboard — same model, same operators, running live in
-    your browser. If the fifty comparisons showed you the words, DailyLedger
-    is the sentence they were building toward.
+    Estos pipelines no son un adorno de demostración: son exactamente cómo
+    <a href="../../DailyLedger/">la app de demostración DailyLedger</a>
+    calcula su panel —mismo modelo, mismos operadores, funcionando en vivo
+    en tu navegador. Si las cincuenta comparaciones te enseñaron las
+    palabras, DailyLedger es la frase que iban construyendo.
   </p>
 
   <nav class="tut-nav">
-    <a href="live-search.html">← Anterior: Live search over a keystroke stream</a>
+    <a href="live-search.html">← Anterior: Búsqueda en vivo sobre un stream de pulsaciones</a>
   </nav>
 </main>
 <footer class="site-footer">

@@ -29,10 +29,11 @@ async: false
     <code>package:collection</code>의 <code>groupListsBy</code>인데, 이는
     레벨마다 <em>모든 항목</em>의 리스트를 만들어 놓고서 그 길이만
     취하는 방식입니다 — 아니면 직접 작성한 <code>Map.update</code>
-    루프를 쓰거나요. 그런 다음 우승자를 고르려면 명시적인 비교를 담은
-    <code>reduce</code>가 필요합니다. FxDart는 두 단계 모두에 이름을
-    붙입니다: <code>countBy</code>는 곧바로 개수로 이어지고(종단
-    연산이라 순수 <code>Map</code>을 반환합니다), <code>fx(counts.entries).maxBy(...)</code>는
-    체인에 다시 들어가 가장 큰 엔트리를 고릅니다. 직접 만든 두 개가
-    아니라 이름 붙은 두 개의 아이디어입니다.
+    루프를 쓰거나요. 그런 다음 가장 많은 쪽을 고르려면 명시적인 비교를
+    담은 <code>reduce</code>가 필요합니다. FxDart는 두 단계 모두에
+    이름을 붙입니다: <code>countBy</code>는 곧바로 개수로 이어지고(종결
+    연산자라 평범한 <code>Map</code>을 반환합니다),
+    <code>fx(counts.entries).maxBy(...)</code>는 체인에 다시 들어가 가장
+    큰 엔트리를 고릅니다. 직접 만든 두 개가 아니라 이름 붙은 두 개의
+    아이디어입니다.
   </p>

@@ -26,15 +26,16 @@ nextLabel: sort
   </p>
   <p>
     Piensa en los tres como respuestas a preguntas distintas sobre la misma
-    agrupación: <code>groupBy</code> — "dame todos los elementos de esta clave",
-    <code>indexBy</code> — "dame el último elemento de esta clave", y
-    <code>countBy</code> — "¿cuántos elementos tuvieron esta clave?". Si lo
+    agrupación: <code>groupBy</code> — «dame todos los elementos de esta clave»,
+    <code>indexBy</code> — «dame el último elemento de esta clave», y
+    <code>countBy</code> — «¿cuántos elementos tuvieron esta clave?». Si lo
     único que necesitas es el recuento, <code>countBy</code> sale más barato que
     <code>groupBy(...).map((k, v) =&gt; MapEntry(k, v.length))</code>, porque
     nunca reserva las listas intermedias.
   </p>
   <p>
-    Como siempre, es un operador terminal: nada de lo que hay arriba se ejecuta hasta que <code>countBy</code> tira de ello.
+    Como siempre, es un operador terminal: nada de aguas arriba se ejecuta
+    hasta que <code>countBy</code> tira de ello.
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>

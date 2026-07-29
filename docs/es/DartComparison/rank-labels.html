@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Rank labels for a leaderboard — Dart vs FxDart</title>
-  <meta name="description" content="Number a sorted leaderboard 1..n — Dart 3 indexed records vs zipWithIndex + map in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/rank-labels.html">
+  <title>Etiquetas de puesto para una tabla de clasificación — Dart vs FxDart</title>
+  <meta name="description" content="Numera de 1 a n una tabla de clasificación ya ordenada — los records de indexed de Dart 3 frente a zipWithIndex + map en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/rank-labels.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/rank-labels.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/rank-labels.html">
@@ -44,21 +43,21 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #9 · <strong>Rank labels for a leaderboard</strong></p>
-  <h1>Rank labels for a leaderboard</h1>
-  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #9 · <strong>Etiquetas de puesto para una tabla de clasificación</strong></p>
+  <h1>Etiquetas de puesto para una tabla de clasificación</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Empate</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    A leaderboard is already sorted by score, highest first. Print one rank
-    label per player — <strong>1-based position, name, score</strong>. The
-    data is in the code below; both versions must print the lines shown
-    under <em>Expected output</em>.
+    Una tabla de clasificación ya viene ordenada por puntuación, de mayor a
+    menor. Imprime una etiqueta de puesto por jugador —<strong>posición
+    empezando en 1, nombre y puntuación</strong>—. Los datos están en el
+    código de abajo; ambas versiones deben imprimir las líneas que aparecen
+    bajo <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">1. Hana (982 pts)
 2. Dan (951 pts)
 3. Ava (917 pts)
@@ -67,10 +66,10 @@
 6. Ben (799 pts)</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class Player {
@@ -133,22 +132,22 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Only in name. Dart 3's <code>indexed</code> yields exactly the
-    <code>(index, element)</code> records that FxDart's
-    <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> does, so the two <code><a href="../tutorials/map.html">map</a></code> callbacks
-    are character-for-character identical — a clean tie, and a good example
-    of Dart's core library catching up (before records and
-    <code>indexed</code>, the native side was a manual counter). Use
-    <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> when you're already inside an <code><a href="../tutorials/fx.html">fx</a></code>
-    chain — it also exists on async chains — and <code>indexed</code>
-    everywhere else.
+    Solo en el nombre. El <code>indexed</code> de Dart 3 produce
+    exactamente los mismos records <code>(index, element)</code> que
+    produce <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> en FxDart, así que los dos callbacks
+    de <code><a href="../tutorials/map.html">map</a></code> son idénticos carácter por carácter: un empate
+    limpio y un buen ejemplo de la librería básica de Dart poniéndose al
+    día (antes de los records y de <code>indexed</code>, el lado nativo era
+    un contador manual). Usa <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> cuando ya estés
+    dentro de una cadena <code><a href="../tutorials/fx.html">fx</a></code> —también existe en las cadenas
+    asíncronas— e <code>indexed</code> en todo lo demás.
   </p>
 
   <nav class="tut-nav">
-    <a href="paginate-users.html">← Anterior: Batch users into pages of 10</a>
-    <a href="sequential-configs.html">Siguiente: Load three remote configs in order →</a>
+    <a href="paginate-users.html">← Anterior: Agrupar usuarios en páginas de 10</a>
+    <a href="sequential-configs.html">Siguiente: Cargar tres configuraciones remotas en orden →</a>
   </nav>
 </main>
 <footer class="site-footer">

@@ -1,8 +1,8 @@
 ---
 slug: first-visit-merchants
-title: Merchants in first-visit order — Dart vs FxDart
-description: Order-preserving dedupe — a seen-set loop in plain Dart vs map + uniq in FxDart.
-heading: Merchants in first-visit order
+title: 첫 방문 순서로 보는 판매자 목록 — Dart vs FxDart
+description: 순서를 유지하는 중복 제거 — 순수 Dart의 seen-set 루프와 FxDart의 map + uniq를 비교합니다.
+heading: 첫 방문 순서로 보는 판매자 목록
 order: 4
 tier: 1
 functions: map, uniq

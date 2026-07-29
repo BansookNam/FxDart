@@ -61,7 +61,7 @@ nextLabel: fold
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="fold.html"><code>fold</code></a> — 시드가 있는 짝 ·
     <a href="reduceLazy.html"><code>reduceLazy</code></a> — 재사용 가능한 커링된 리듀서 ·
     <a href="sum.html"><code>sum</code></a> — 숫자에 특화된 reduce ·

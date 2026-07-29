@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Category with highest average expense — Dart vs FxDart</title>
-  <meta name="description" content="Group expenses and find the priciest category per transaction — collection groupBy + maxBy nested calls in plain Dart vs one FxDart chain.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/top-category-average.html">
+  <title>Categoría con el gasto medio más alto — Dart vs FxDart</title>
+  <meta name="description" content="Agrupar gastos y encontrar la categoría más cara por transacción — llamadas anidadas a groupBy + maxBy de collection en Dart nativo frente a una sola cadena de FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/top-category-average.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/top-category-average.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/top-category-average.html">
@@ -44,29 +43,28 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #18 · <strong>Category with highest average expense</strong></p>
-  <h1>Category with highest average expense</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #18 · <strong>Categoría con el gasto medio más alto</strong></p>
+  <h1>Categoría con el gasto medio más alto</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Given a month of expenses — each with a date, category, and amount —
-    find the category with the <strong>highest average amount per
-    transaction</strong>, and print it with the average formatted to two
-    decimals. The data is in the code below; both versions must print the
-    line shown under <em>Expected output</em>.
+    Dado un mes de gastos —cada uno con fecha, categoría e importe—,
+    encuentra la categoría con el <strong>importe medio por transacción más
+    alto</strong> e imprímela con la media formateada a dos decimales. Los
+    datos están en el código de abajo; ambas versiones deben imprimir la
+    línea que aparece bajo <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Highest average spend: Travel ($111.00 per transaction)</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -143,23 +141,25 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Core Dart has neither <code><a href="../tutorials/groupBy.html">groupBy</a></code> nor <code><a href="../tutorials/maxBy.html">maxBy</a></code>;
-    <code>package:collection</code> supplies both — but as top-level
-    functions, not chain steps. The native version therefore reads
-    inside-out: <code>maxBy(</code>… wrapping a <code><a href="../tutorials/map.html">map</a></code> over
-    entries of a <code>groupBy(</code>… — three idioms (function call,
-    method chain, function call) for one three-step thought. FxDart keeps
-    the reading order equal to the data flow: <code><a href="../tutorials/groupBy.html">groupBy</a></code> the
-    transactions, <code><a href="../tutorials/map.html">map</a></code> each group to
-    <code>(category, average)</code>, <code><a href="../tutorials/maxBy.html">maxBy</a></code> the average. Same
-    algorithm, but the sentence runs left to right.
+    El núcleo de Dart no tiene ni <code><a href="../tutorials/groupBy.html">groupBy</a></code> ni
+    <code><a href="../tutorials/maxBy.html">maxBy</a></code>; <code>package:collection</code> aporta ambos — pero
+    como funciones de nivel superior, no como pasos de una cadena. La
+    versión nativa se lee por tanto de dentro afuera:
+    <code>maxBy(</code>… envolviendo un <code><a href="../tutorials/map.html">map</a></code> sobre las
+    entradas de un <code>groupBy(</code>… — tres modismos (llamada a
+    función, cadena de métodos, llamada a función) para una sola idea de
+    tres pasos. FxDart mantiene el orden de lectura igual al del flujo de
+    datos: <code><a href="../tutorials/groupBy.html">groupBy</a></code> sobre las transacciones, <code><a href="../tutorials/map.html">map</a></code>
+    de cada grupo a <code>(category, average)</code>, <code><a href="../tutorials/maxBy.html">maxBy</a></code>
+    sobre la media. El mismo algoritmo, pero la frase se lee de izquierda a
+    derecha.
   </p>
 
   <nav class="tut-nav">
-    <a href="sensor-anomalies.html">← Anterior: Pair sensors with readings, keep anomalies</a>
-    <a href="valid-emails.html">Siguiente: First 5 valid emails, normalized →</a>
+    <a href="sensor-anomalies.html">← Anterior: Emparejar sensores con lecturas y quedarse con las anomalías</a>
+    <a href="valid-emails.html">Siguiente: Los 5 primeros correos válidos, normalizados →</a>
   </nav>
 </main>
 <footer class="site-footer">

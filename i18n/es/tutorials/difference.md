@@ -25,8 +25,8 @@ nextLabel: differenceBy
     duplicados dan igual. Este orden no es simétrico: intercambiar los
     argumentos produce un resultado completamente distinto (y por lo general
     de distinta longitud). Una forma útil de recordarlo: piensa en
-    <code>iterable1</code> como "la lista de exclusión" y en
-    <code>iterable2</code> como "la lista que estás filtrando".
+    <code>iterable1</code> como «la lista de exclusión» y en
+    <code>iterable2</code> como «la lista que estás filtrando».
   </p>
   <p>
     Por dentro es <code>differenceBy((a) =&gt; a, iterable1, iterable2)</code> —

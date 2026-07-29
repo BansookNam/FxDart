@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Detect duplicated transactions — Dart vs FxDart</title>
-  <meta name="description" content="Flag charges with the same merchant, amount, and day — putIfAbsent plus nested loops in plain Dart vs groupBy + filter + flatMap in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/duplicate-transactions.html">
+  <title>Detectar transacciones duplicadas — Dart vs FxDart</title>
+  <meta name="description" content="Marca los cargos con el mismo comercio, importe y día — putIfAbsent más bucles anidados en Dart nativo frente a groupBy + filter + flatMap en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/duplicate-transactions.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/duplicate-transactions.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/duplicate-transactions.html">
@@ -44,24 +43,24 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #29 · <strong>Detect duplicated transactions</strong></p>
-  <h1>Detect duplicated transactions</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #29 · <strong>Detectar transacciones duplicadas</strong></p>
+  <h1>Detectar transacciones duplicadas</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    A charge that appears twice with the same <strong>merchant, amount,
-    and day</strong> is probably a double-swipe. Find every such group in
-    July's transactions and list <em>each transaction involved</em> so
-    the user can review them — but do not flag the same merchant and
-    amount on <em>different</em> days (a repeat coffee is not a
-    duplicate). The data is in the code below; both versions must print
-    the lines shown under <em>Expected output</em>.
+    Un cargo que aparece dos veces con el mismo <strong>comercio, importe
+    y día</strong> es, probablemente, un doble pago. Encuentra cada grupo
+    así en las transacciones de julio y lista <em>cada transacción
+    implicada</em> para que el usuario pueda revisarlas, pero no marques el
+    mismo comercio e importe en días <em>distintos</em> (un café que se
+    repite no es un duplicado). Los datos están en el código de abajo; las
+    dos versiones deben imprimir las líneas que aparecen bajo
+    <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Possible duplicate charges:
 2026-07-08  Noodle Bar  $18.90
 2026-07-08  Noodle Bar  $18.90
@@ -69,10 +68,10 @@
 2026-07-21  StreamFlix  $9.99</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class Tx {
@@ -160,22 +159,23 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    The algorithm is group–keep–flatten, and FxDart writes it as exactly
-    those three words: <code><a href="../tutorials/groupBy.html">groupBy</a></code> the merchant|amount|day key,
-    <code><a href="../tutorials/filter.html">filter</a></code> the groups with more than one member,
-    <code><a href="../tutorials/flatMap.html">flatMap</a></code> the survivors back into individual transactions
-    (<code><a href="../tutorials/map.html">map</a></code> + <code><a href="../tutorials/join.html">join</a></code> format them). Native Dart has
-    none of the three as vocabulary: grouping becomes a
-    <code>putIfAbsent</code> loop, keeping-and-flattening becomes nested
-    <code>for</code> loops with an <code>if</code> between them. Both are
-    correct; only one still looks like the sentence that specified it.
+    El algoritmo es agrupar–conservar–aplanar, y FxDart lo escribe
+    exactamente con esas tres palabras: <code><a href="../tutorials/groupBy.html">groupBy</a></code> por la clave
+    comercio|importe|día, <code><a href="../tutorials/filter.html">filter</a></code> de los grupos con más de un
+    miembro, <code><a href="../tutorials/flatMap.html">flatMap</a></code> de los supervivientes de vuelta a
+    transacciones individuales (<code><a href="../tutorials/map.html">map</a></code> + <code><a href="../tutorials/join.html">join</a></code> les dan
+    formato). Dart nativo no tiene ninguna de las tres como vocabulario:
+    agrupar se convierte en un bucle con <code>putIfAbsent</code>, y
+    conservar-y-aplanar, en bucles <code>for</code> anidados con un
+    <code>if</code> entre medias. Ambas son correctas; solo una sigue
+    pareciéndose a la frase que la especificaba.
   </p>
 
   <nav class="tut-nav">
-    <a href="no-spend-streak.html">← Anterior: Longest streak of no-spend days</a>
-    <a href="concurrent-enrichment.html">Siguiente: Enrich top merchants concurrently →</a>
+    <a href="no-spend-streak.html">← Anterior: La racha más larga de días sin gastar</a>
+    <a href="concurrent-enrichment.html">Siguiente: Enriquecer los principales comercios de forma concurrente →</a>
   </nav>
 </main>
 <footer class="site-footer">

@@ -25,7 +25,7 @@ nextLabel: takeUntilInclusive
     경우가 그렇습니다.
   </p>
   <p>
-    지연 평가되며 첫 실패에서 단축 평가되기 때문에, 아주 크거나 무한한
+    지연 평가되며 첫 실패에서 단락하기 때문에, 아주 크거나 무한한
     소스 위에서도 부담이 없습니다. 실제로 조건에 맞는 앞부분만 계산합니다.
   </p>
 
@@ -42,7 +42,7 @@ nextLabel: takeUntilInclusive
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="take.html"><code>take</code></a> — 술어가 아니라 개수로 가져옵니다 ·
     <a href="takeUntilInclusive.html"><code>takeUntilInclusive</code></a> — 조건에 맞은 원소까지 포함하고 멈춥니다 ·
     <a href="dropWhile.html"><code>dropWhile</code></a> — 정반대 동작 ·

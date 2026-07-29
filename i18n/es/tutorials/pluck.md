@@ -10,7 +10,7 @@ prevLabel: peek
 next: filter.html
 nextLabel: filter
 ---
-  <p class="hero-sub">Extrae el valor de una clave concreta de cada mapa de un iterable — una sola línea para la consulta habitual de "dame solo este campo".</p>
+  <p class="hero-sub">Extrae el valor de una clave concreta de cada mapa de un iterable — una sola línea para la consulta habitual de «dame solo este campo».</p>
 
   {{signature}}
 
@@ -18,8 +18,8 @@ nextLabel: filter
   <p>
     <code>pluck</code> es una especialización diminuta y con nombre propio de
     <code>map</code> — por dentro es literalmente
-    <code>map((a) =&gt; a[key], iterable)</code>. Existe porque "sacar un
-    campo de una lista de registros" es lo bastante frecuente como para
+    <code>map((a) =&gt; a[key], iterable)</code>. Existe porque «sacar un
+    campo de una lista de registros» es lo bastante frecuente como para
     merecer su propio nombre, y en el punto de llamada se lee mejor que una
     lambda improvisada.
   </p>

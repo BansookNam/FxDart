@@ -42,7 +42,7 @@ nextLabel: flatMap
   <p>
     <code>mapEffectAsync</code> se ejecuta exactamente sobre el mismo motor que
     <code>mapAsync</code>, así que <code>.concurrent(n)</code> lo paraleliza
-    igual — muy útil para pipelines de "procesar y persistir":
+    igual — muy útil para pipelines de «procesar y persistir»:
   </p>
   {{playground:1}}
 

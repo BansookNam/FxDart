@@ -1,8 +1,8 @@
 ---
 slug: flaky-api-retry
-title: Poll a flaky API until first success — Dart vs FxDart
-description: Retry-until-ready as a lazy pipeline — range + toAsync + map + dropWhile + head vs an imperative polling loop with a break.
-heading: Poll a flaky API until first success
+title: 불안정한 API를 첫 성공까지 폴링하기 — Dart vs FxDart
+description: 준비될 때까지의 재시도를 지연 파이프라인으로 표현합니다 — range + toAsync + map + dropWhile + head와 break를 쓰는 명령형 폴링 루프를 비교합니다.
+heading: 불안정한 API를 첫 성공까지 폴링하기
 order: 42
 tier: 4
 functions: range, toAsync, map, peek, dropWhile, head
@@ -37,8 +37,8 @@ async: true
   <h2>차이가 나는 이유</h2>
   <p>
     솔직히 말하면: <code>break</code>를 쓴 네이티브 <code>for</code>
-    루프는 짧고, 이걸 틀렸다고 할 사람은 없습니다. 차이는 각 부분이
-    어디에 사는가입니다. 루프 안에서는 시도 횟수 예산, 로깅, 성공
+    루프는 짧고, 이를 틀렸다고 할 사람은 없습니다. 차이는 각 부분이
+    어디에 놓이는가입니다. 루프 안에서는 시도 횟수 예산, 로깅, 성공
     판정이 모두 제어 흐름 속에 뒤엉켜 있어서, 하나를 바꾸려면 본문
     전체를 다시 읽어야 합니다. 파이프라인에서는 각 관심사가 이름
     붙은 자기만의 단계이므로, 정책을 바꾸는 일(첫 성공 → 세 번째

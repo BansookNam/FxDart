@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>maxBy — FxDart 101</title>
-  <meta name="description" content="FxDart maxBy tutorial: the element with the largest key in one walk — no sort, null when empty — with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/maxBy.html">
+  <meta name="description" content="Tutorial de maxBy en FxDart: el elemento con la clave más grande en una sola pasada — sin ordenar, null cuando está vacío — con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/maxBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/maxBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/maxBy.html">
@@ -44,42 +43,43 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>maxBy</strong></p>
   <h1><code>maxBy</code></h1>
-  <p class="hero-sub">The element whose key is largest — one walk, no sort, <code>null</code> when empty.</p>
+  <p class="hero-sub">El elemento cuya clave es la más grande — una sola pasada, sin ordenar, <code>null</code> cuando está vacío.</p>
 
   <div class="signature">A? maxBy&lt;A&gt;(Object? Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;A?&gt; maxByAsync&lt;A&gt;(Object? Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 T? Fx&lt;T&gt;.maxBy(Object? Function(T a) f)          // chain (sync)
 Future&lt;T?&gt; FxAsync&lt;T&gt;.maxBy(Object? Function(T a) f)  // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>maxBy</code> answers "which <em>element</em> has the biggest
-    key?" — not "what is the biggest number?" (that's
-    <code><a href="max.html">max</a></code>). It walks the pipeline
-    <strong>once</strong>, keeping the current best element, so it is O(n)
-    where the tempting <code>sortBy(key).head()</code> shape pays
-    O(n&nbsp;log&nbsp;n) and materializes a sorted list it never needs.
+    <code>maxBy</code> responde a «¿qué <em>elemento</em> tiene la clave más
+    grande?», no a «¿cuál es el número más grande?» (eso es
+    <code><a href="max.html">max</a></code>). Recorre el pipeline
+    <strong>una sola vez</strong>, conservando el mejor elemento visto hasta el
+    momento, así que es O(n) mientras que la tentadora forma
+    <code>sortBy(key).head()</code> paga O(n&nbsp;log&nbsp;n) y materializa una
+    lista ordenada que nunca llega a necesitar.
   </p>
   <p>
-    Keys are compared exactly like
-    <code><a href="sortBy.html">sortBy</a></code> compares them
-    (<code>Comparable.compare</code>), and on ties the <strong>first</strong>
-    element encountered wins — so <code>maxBy</code> over a date-sorted list
-    gives you the earliest of the equally-largest.
+    Las claves se comparan exactamente igual que las compara
+    <code><a href="sortBy.html">sortBy</a></code>
+    (<code>Comparable.compare</code>), y en caso de empate gana el
+    <strong>primer</strong> elemento encontrado — así que un <code>maxBy</code>
+    sobre una lista ordenada por fecha te da el más antiguo de entre los
+    igualmente máximos.
   </p>
   <p>
-    Empty input returns <code>null</code>, like
-    <code><a href="head.html">head</a></code> and
-    <code><a href="last.html">last</a></code> — Dart's nullable types replace
-    FxTS's <code>undefined</code> here. This is a Dart-native addition
-    (FxTS only ships the numeric <code>max</code>); the name follows
-    Kotlin's <code>maxByOrNull</code> shape.
+    Una entrada vacía devuelve <code>null</code>, igual que
+    <code><a href="head.html">head</a></code> y
+    <code><a href="last.html">last</a></code> — aquí los tipos anulables de
+    Dart sustituyen al <code>undefined</code> de FxTS. Es un añadido nativo de
+    Dart (FxTS solo trae el <code>max</code> numérico); el nombre sigue la
+    forma de <code>maxByOrNull</code> de Kotlin.
   </p>
 
-  <h2>Demo 1 · Basics, empty case &amp; ties</h2>
+  <h2>Demo 1 · Fundamentos, caso vacío &amp; empates</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -104,7 +104,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -121,8 +121,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: find the biggest expense <strong>without sorting</strong>.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: encuentra el gasto más grande <strong>sin ordenar</strong>.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -143,10 +143,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="minBy.html"><code>minBy</code></a> — the mirror image ·
-    <a href="max.html"><code>max</code></a> — when you want the key itself, not the element ·
-    <a href="sortBy.html"><code>sortBy</code></a> — when you need the full ordering anyway
+    <strong>Relacionado:</strong>
+    <a href="minBy.html"><code>minBy</code></a> — la imagen especular ·
+    <a href="max.html"><code>max</code></a> — cuando quieres la clave en sí, no el elemento ·
+    <a href="sortBy.html"><code>sortBy</code></a> — cuando de todas formas necesitas el orden completo
   </div>
 
   <nav class="tut-nav">

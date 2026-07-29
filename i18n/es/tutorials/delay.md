@@ -39,13 +39,13 @@ nextLabel: unicodeToList
 
   <h2>Demo 2 · Simular trabajo concurrente</h2>
   <p>
-    Tres "peticiones" tardan 150 ms cada una, pero corren de forma
+    Tres «peticiones» tardan 150 ms cada una, pero corren de forma
     concurrente — el lote entero termina bastante por debajo de 450 ms:
   </p>
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>delay</code> para simular un "fetch" de 100 ms que
+  <p>Ejercicio: usa <code>delay</code> para simular un «fetch» de 100 ms que
     devuelve <code>'pong'</code>.</p>
   {{playground:2}}
 

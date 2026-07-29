@@ -1,7 +1,7 @@
 ---
 slug: flat
-title: flat — FxDart 101
-description: Tutorial de flat en FxDart: aplana iterables anidados hasta la profundidad que indiques, con un playground en vivo.
+title: flattened — FxDart 101
+description: Tutorial de flattened en FxDart: aplana iterables anidados hasta la profundidad que indiques, con un playground en vivo.
 heading: <code>flattened</code>
 section: 3
 crumb: flattened
@@ -16,19 +16,21 @@ nextLabel: scan
 
   <h2>Lección</h2>
   <p>
-    <code>flat</code> recorre una estructura anidada de iterables e inserta
-    los elementos interiores en la secuencia exterior, hasta
+    <code>flattened</code> recorre una estructura anidada de iterables e
+    inserta los elementos interiores en la secuencia exterior, hasta
     <code>depth</code> niveles de profundidad (por defecto <code>1</code>).
-    Todo lo que sea un <code>Iterable</code> cuenta como "aplanable"
+    Todo lo que sea un <code>Iterable</code> cuenta como «aplanable»
     <em>excepto</em> <code>String</code> — así que
-    <code>flat(['ab', ['cd']])</code> conserva <code>'ab'</code> entero en
-    vez de descomponerlo en caracteres.
+    <code>flattened(['ab', ['cd']])</code> conserva <code>'ab'</code> entero
+    en vez de descomponerlo en caracteres. <code>flattened</code> es el
+    nombre idiomático en Dart; fxdart también acepta la grafía
+    <code>flat</code> de FxTS: son el mismo operador.
   </p>
   <p>
     <strong>Por qué <code>Iterable&lt;dynamic&gt;</code>, y por qué no pasa nada:</strong>
     el <code>flat</code> de TypeScript tiene un tipo condicional
-    <code>DeepFlat</code> capaz de describir "el tipo del elemento tras
-    aplanar N niveles". El sistema de tipos de Dart no tiene un mecanismo
+    <code>DeepFlat</code> capaz de describir «el tipo del elemento tras
+    aplanar N niveles». El sistema de tipos de Dart no tiene un mecanismo
     equivalente — la forma del anidamiento de la entrada no se conoce hasta
     tiempo de ejecución, así que no hay manera sólida de calcular un tipo de
     elemento estático. En lugar de mentir con un genérico que no se sostiene,
@@ -39,13 +41,13 @@ nextLabel: scan
     aplanado tipado para datos de exactamente un nivel y forma uniforme.
   </p>
   <p>
-    Igual que <code>flat</code> en FxTS, <code>flatAsync</code> solo baja
+    Igual que <code>flat</code> en FxTS, <code>flattenedAsync</code> solo baja
     por el anidamiento que ya sea, de forma <em>síncrona</em>, un
     <code>Iterable</code> en el momento en que llega — no espera a un <code>Future</code>
     escondido dentro de una colección anidada. Combínalo con una etapa previa
     <code>.map(...).concurrent(n)</code> para traer las listas anidadas en
-    paralelo, y deja que <code>.flat()</code> junte después los resultados ya
-    resueltos.
+    paralelo, y deja que <code>.flattened()</code> junte después los resultados
+    ya resueltos.
   </p>
 
   <h2>Demo 1 · Fundamentos &amp; profundidad</h2>
@@ -59,7 +61,7 @@ nextLabel: scan
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>flat()</code> para aplanar <code>scoreGroups</code>
+  <p>Ejercicio: usa <code>flattened()</code> para aplanar <code>scoreGroups</code>
     un nivel.</p>
   {{playground:2}}
 

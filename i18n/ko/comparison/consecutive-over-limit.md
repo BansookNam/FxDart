@@ -1,8 +1,8 @@
 ---
 slug: consecutive-over-limit
-title: Three consecutive readings over the limit — Dart vs FxDart
-description: Find every 3-hour window of CO2 readings all over 1000 ppm — an index loop in plain Dart vs a sliding window built from zip + drop in FxDart.
-heading: Three consecutive readings over the limit
+title: 한계를 세 번 연속 초과한 측정값 — Dart vs FxDart
+description: CO2 측정값이 세 시간 연속으로 1000 ppm을 넘는 구간을 모두 찾습니다 — 순수 Dart의 인덱스 루프와 FxDart의 zip + drop으로 만든 슬라이딩 윈도우를 비교합니다.
+heading: 한계를 세 번 연속 초과한 측정값
 order: 24
 tier: 3
 functions: zip, drop, filter, map, join
@@ -27,7 +27,7 @@ async: false
 
   <h2>차이가 나는 이유</h2>
   <p>
-    핵심 Dart에는 슬라이딩 윈도우가 없으므로, 네이티브 버전은
+    순수 Dart 코어에는 슬라이딩 윈도우가 없으므로, 네이티브 버전은
     <code>i + 2 &lt; length</code> 경계와 세 번의 수동 조회를 가진
     인덱스 루프가 됩니다 — 맞기는 하지만, 그 안의 모든 조각이 읽는
     사람이 직접 확인해야 하는 부기 작업입니다. FxDart 버전은 윈도우

@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>either builder &amp; the Raise scope — FxDart 101</title>
-  <meta name="description" content="FxDart raise tutorial: the either and eitherAsync builders, and the Raise scope vocabulary — bind, ensure, ensureNotNull, recover, withError, raise.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/raise.html">
+  <title>el constructor either &amp; el ámbito Raise — FxDart 101</title>
+  <meta name="description" content="Tutorial de raise en FxDart: los constructores either y eitherAsync, y el vocabulario del ámbito Raise — bind, ensure, ensureNotNull, recover, withError, raise.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/raise.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/raise.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/raise.html">
@@ -44,47 +43,49 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 13 · Typed errors › <strong>either &amp; Raise</strong></p>
-  <h1><code>either</code> &amp; the <code>Raise</code> scope</h1>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 13 · Errores tipados › <strong>either &amp; Raise</strong></p>
+  <h1><code>either</code> &amp; el ámbito <code>Raise</code></h1>
   <p class="hero-sub">
-    Runs a block in a <code>Raise&lt;E&gt;</code> scope: straight-line code
-    that can short-circuit with a typed error. A raised <code>E</code> becomes
-    <code>Left</code>, a normal return becomes <code>Right</code>.
+    Ejecuta un bloque en un ámbito <code>Raise&lt;E&gt;</code>: código en
+    línea recta que puede cortocircuitar con un error tipado. Un <code>E</code>
+    elevado se convierte en <code>Left</code>; un retorno normal, en
+    <code>Right</code>.
   </p>
 
   <div class="signature">Either&lt;E, A&gt; either&lt;E, A&gt;(A Function(Raise&lt;E&gt; r) block)
 Future&lt;Either&lt;E, A&gt;&gt; eitherAsync&lt;E, A&gt;(FutureOr&lt;A&gt; Function(Raise&lt;E&gt; r) block)
 on Raise&lt;E&gt;: bind · bindAll · ensure · ensureNotNull · recover · withError · raise</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    The builder hands your block a scope <code>r</code> — the port of Kotlin
-    Arrow's <code>either&nbsp;{&nbsp;}</code>. Everything hangs off it; type
-    <code>r.</code> and discover the whole vocabulary:
+    El constructor le entrega a tu bloque un ámbito <code>r</code> — el port
+    del <code>either&nbsp;{&nbsp;}</code> de Arrow en Kotlin. Todo cuelga de
+    él; escribe <code>r.</code> y descubre el vocabulario completo:
   </p>
   <ul>
     <li><code>r.bind(either)</code> / <code>r.bindAll(eithers)</code> —
-      unwrap a success or short-circuit with the failure.</li>
-    <li><code>r.ensure(cond, () => err)</code> — the typed-error
-      <code>require</code>.</li>
-    <li><code>r.ensureNotNull(x, () => err)</code> — returns non-null, with
-      type promotion.</li>
-    <li><code>r.recover(block, onRaise)</code> — handle a raised error in a
-      nested scope and keep going.</li>
-    <li><code>r.withError(transform, block)</code> — adapt a
-      <em>different</em> error type into this scope.</li>
-    <li><code>r.raise(err)</code> — short-circuit directly; returns
-      <code>Never</code>, so flow analysis knows execution stops.</li>
+      desenvuelve un acierto o cortocircuita con el fallo.</li>
+    <li><code>r.ensure(cond, () => err)</code> — el <code>require</code> de
+      los errores tipados.</li>
+    <li><code>r.ensureNotNull(x, () => err)</code> — devuelve un valor no
+      nulo, con promoción de tipo.</li>
+    <li><code>r.recover(block, onRaise)</code> — trata un error elevado en un
+      ámbito anidado y sigue adelante.</li>
+    <li><code>r.withError(transform, block)</code> — adapta un tipo de error
+      <em>distinto</em> a este ámbito.</li>
+    <li><code>r.raise(err)</code> — cortocircuita directamente; devuelve
+      <code>Never</code>, así que el análisis de flujo sabe que la ejecución
+      se detiene.</li>
   </ul>
   <p>
-    Internally this is <em>not</em> <code>flatMap</code> chaining: a failed
-    <code>bind</code> throws a private, scope-tagged signal that the builder
-    catches at its boundary. That is why early returns, loops and
-    <code>if</code>s all just work inside the block, and why nested builders
-    never capture each other's errors. <code>eitherAsync</code> is the async
-    twin — same vocabulary, <code>await</code> allowed (raise only within the
-    same awaited chain).
+    Por dentro esto <em>no</em> es un encadenamiento de <code>flatMap</code>:
+    un <code>bind</code> fallido lanza una señal privada, etiquetada con el
+    ámbito, que el constructor captura en su frontera. Por eso los retornos
+    tempranos, los bucles y los <code>if</code> funcionan sin más dentro del
+    bloque, y por eso los constructores anidados nunca capturan los errores de
+    los demás. <code>eitherAsync</code> es el gemelo asíncrono — mismo
+    vocabulario, con <code>await</code> permitido (elevar errores solo dentro
+    de la misma cadena de awaits).
   </p>
 
   <h2>Demo 1 · ensure &amp; ensureNotNull</h2>
@@ -106,7 +107,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · bind — the flatMap-pyramid killer</h2>
+  <h2>Demo 2 · bind — el asesino de la pirámide de flatMap</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -164,11 +165,11 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
+  <h2>Pruébalo tú</h2>
   <p>
-    Exercise: make <code>checkAge</code> fail with a typed error instead of
-    throwing — <code>ensureNotNull</code> for the parse,
-    <code>ensure</code> for the age limit.
+    Ejercicio: haz que <code>checkAge</code> falle con un error tipado en vez
+    de lanzar una excepción — <code>ensureNotNull</code> para el parseo,
+    <code>ensure</code> para el límite de edad.
   </p>
   <div class="playground">
 <textarea>
@@ -191,21 +192,22 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Two rules.</strong> (1) Never return a <em>lazy</em> pipeline
-    from a raise block — materialize with <code>toList()</code> inside it, or
-    use the <a href="eitherPipelines.html">eager Either terminals</a>; a
-    deferred raise fails loudly with <code>RaiseLeakedError</code>. (2) Never
-    bare-<code>catch</code> inside a raise block — use
-    <code>catching</code>/<code>catchingAsync</code>, which always let the
-    short-circuit signal through.
+    <strong>Dos reglas.</strong> (1) Nunca devuelvas un pipeline
+    <em>perezoso</em> desde un bloque raise — materialízalo con
+    <code>toList()</code> dentro, o usa los
+    <a href="eitherPipelines.html">terminales ansiosos de Either</a>; un raise
+    diferido falla ruidosamente con <code>RaiseLeakedError</code>. (2) Nunca
+    uses un <code>catch</code> pelado dentro de un bloque raise — usa
+    <code>catching</code>/<code>catchingAsync</code>, que siempre dejan pasar
+    la señal de cortocircuito.
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="either.html"><code>Either</code></a> — the boundary type ·
-    <a href="nullable.html"><code>nullable</code></a> — the info-free twin that returns <code>T?</code> ·
-    <a href="accumulate.html">accumulation</a> — collect every failure ·
-    <a href="typedErrors.html">typed errors — full guide</a>
+    <strong>Relacionado:</strong>
+    <a href="either.html"><code>Either</code></a> — el tipo frontera ·
+    <a href="nullable.html"><code>nullable</code></a> — el gemelo sin información que devuelve <code>T?</code> ·
+    <a href="accumulate.html">acumulación</a> — recoge todos los fallos ·
+    <a href="typedErrors.html">errores tipados — guía completa</a>
   </div>
 
   <nav class="tut-nav">

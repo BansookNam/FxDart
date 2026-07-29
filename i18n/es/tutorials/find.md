@@ -1,7 +1,7 @@
 ---
 slug: find
-title: find — FxDart 101
-description: Tutorial de find en FxDart: obtén el primer elemento que cumple un predicado, de forma perezosa y con cortocircuito, y null si no hay ninguno.
+title: firstWhereOrNull — FxDart 101
+description: Tutorial de firstWhereOrNull en FxDart: obtén el primer elemento que cumple un predicado, de forma perezosa y con cortocircuito, y null si no hay ninguno.
 heading: <code>firstWhereOrNull</code>
 section: 8
 crumb: firstWhereOrNull
@@ -16,7 +16,9 @@ nextLabel: findIndex
 
   <h2>Lección</h2>
   <p>
-    <code>find</code> es lo que resulta de fusionar <code>head</code> y
+    <code>firstWhereOrNull</code> es el nombre idiomático en Dart; fxdart
+    también acepta la grafía <code>find</code> de FxTS: son el mismo
+    operador. Es lo que resulta de fusionar <code>head</code> y
     <code>filter</code> — de hecho está implementado exactamente así:
     <code>head(filter(f, iterable))</code>. Esa fusión es la que lo hace
     perezoso y capaz de cortocircuitar: tira de los elementos de uno en uno,
@@ -38,7 +40,7 @@ nextLabel: findIndex
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>find</code> para obtener el primer artículo con <code>qty &gt; 0</code>, o <code>null</code>.</p>
+  <p>Ejercicio: usa <code>firstWhereOrNull</code> para obtener el primer artículo con <code>qty &gt; 0</code>, o <code>null</code>.</p>
   {{playground:2}}
 
   <div class="callout">

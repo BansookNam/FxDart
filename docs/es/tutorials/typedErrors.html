@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Typed errors — FxDart 101</title>
-  <meta name="description" content="FxDart typed errors guide: the either builder, the Raise scope, bind and ensure, error accumulation with NonEmptyList, and pipeline-fused validation.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/typedErrors.html">
+  <title>Errores tipados — FxDart 101</title>
+  <meta name="description" content="Guía de los errores tipados de FxDart: el constructor either, el ámbito Raise, bind y ensure, la acumulación de errores con NonEmptyList y la validación fusionada con pipelines.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/typedErrors.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/typedErrors.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/typedErrors.html">
@@ -44,14 +43,13 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 13 · Typed errors › <strong>typed errors</strong></p>
-  <h1>Typed errors</h1>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 13 · Errores tipados › <strong>typed errors</strong></p>
+  <h1>Errores tipados</h1>
   <p class="hero-sub">
-    Write straight-line code that fails with a <strong>typed</strong> error.
-    The approach of Kotlin's
-    <a href="https://arrow-kt.io" rel="noopener">Arrow&nbsp;2.x</a>, ported to
-    Dart.
+    Escribe código en línea recta que falla con un error
+    <strong>tipado</strong>. El enfoque de
+    <a href="https://arrow-kt.io" rel="noopener">Arrow&nbsp;2.x</a>, la
+    librería de Kotlin, portado a Dart.
   </p>
 
   <div class="signature">Either&lt;E, A&gt; either&lt;E, A&gt;(A Function(Raise&lt;E&gt; r) block)
@@ -59,21 +57,22 @@ Future&lt;Either&lt;E, A&gt;&gt; eitherAsync&lt;E, A&gt;(FutureOr&lt;A&gt; Funct
 A? nullable&lt;A&gt;(A Function(SingletonRaise r) block)</div>
 
   <div class="callout">
-    <strong>Deep dives.</strong> This page is the overview; every subject has
-    a detailed tutorial with runnable demos:
+    <strong>En profundidad.</strong> Esta página es el resumen; cada tema
+    tiene un tutorial detallado con demos ejecutables:
     <a href="either.html"><code>Either</code></a> ·
-    <a href="raise.html"><code>either</code> &amp; the <code>Raise</code> scope</a> ·
+    <a href="raise.html"><code>either</code> &amp; el ámbito <code>Raise</code></a> ·
     <a href="nullable.html"><code>nullable</code></a> ·
     <a href="nonEmptyList.html"><code>NonEmptyList</code></a> ·
-    <a href="accumulate.html">accumulation</a> ·
+    <a href="accumulate.html">acumulación</a> ·
     <a href="eitherPipelines.html"><code>Either</code> × pipelines</a>
   </div>
 
-  <h2>From Kotlin Arrow to Dart</h2>
+  <h2>De Kotlin Arrow a Dart</h2>
   <p>
-    In Kotlin Arrow, an <code>either { }</code> block turns a chain of
-    fallible steps into straight-line code — each <code>.bind()</code> either
-    unwraps a success or short-circuits the whole block with the failure:
+    En Kotlin Arrow, un bloque <code>either { }</code> convierte una cadena de
+    pasos que pueden fallar en código en línea recta: cada <code>.bind()</code>
+    o bien desenvuelve un acierto, o bien cortocircuita el bloque entero con el
+    fallo:
   </p>
   <pre class="code"><code>// Kotlin Arrow
 fun getResult(): Either&lt;Failure, SuccessData&gt; = either {
@@ -82,7 +81,7 @@ fun getResult(): Either&lt;Failure, SuccessData&gt; = either {
     val total = calculateTotal(order).bind()
     SuccessData(user, order, total)
 }</code></pre>
-  <p>FxDart gives you the same shape in Dart:</p>
+  <p>FxDart te da la misma forma en Dart:</p>
   <pre class="code"><code>// FxDart
 Either&lt;Failure, SuccessData&gt; getResult() => either((r) {
   final user  = r.bind(findUser(userId));
@@ -91,150 +90,158 @@ Either&lt;Failure, SuccessData&gt; getResult() => either((r) {
   return SuccessData(user, order, total);
 });</code></pre>
   <p>
-    Both replace the nested <code>flatMap</code> pyramid you would otherwise
-    write:
+    Los dos sustituyen a la pirámide anidada de <code>flatMap</code> que
+    tendrías que escribir si no:
   </p>
-  <pre class="code"><code>// What it replaces
+  <pre class="code"><code>// A lo que sustituye
 Either&lt;Failure, SuccessData&gt; getResult() =>
     findUser(userId).flatMap((user) =>
         findOrder(user.id).flatMap((order) =>
             calculateTotal(order).map((total) =>
                 SuccessData(user, order, total))));</code></pre>
   <p>
-    The two differences from Kotlin are Dart realities: the scope is an
-    explicit parameter (<code>r</code>) because Dart has no lambda receivers,
-    and async has its own builder (<code>eitherAsync</code>) because Dart has
-    no <code>inline</code>. Internally this is <em>not</em> flatMap chaining:
-    like Arrow, <code>r.bind</code> on a failure throws a private,
-    scope-tagged signal that the builder catches at the boundary — which is
-    why early returns, loops, and <code>if</code>s all just work inside the
-    block, and why nested builders never capture each other's errors.
+    Las dos diferencias con Kotlin son realidades de Dart: el ámbito es un
+    parámetro explícito (<code>r</code>) porque Dart no tiene receptores en
+    las lambdas, y la versión asíncrona tiene su propio constructor
+    (<code>eitherAsync</code>) porque Dart no tiene <code>inline</code>. Por
+    dentro esto <em>no</em> es encadenado con flatMap: igual que en Arrow,
+    <code>r.bind</code> sobre un fallo lanza una señal privada, etiquetada con
+    el ámbito, que el constructor captura en la frontera. Por eso los retornos
+    tempranos, los bucles y los <code>if</code> funcionan sin más dentro del
+    bloque, y por eso los constructores anidados nunca capturan los errores de
+    los demás.
   </p>
   <p>
-    <a href="either.html">Deep dive: <code>Either</code> →</a>
+    <a href="either.html">En profundidad: <code>Either</code> →</a>
   </p>
 
-  <h2>The scope vocabulary</h2>
+  <h2>El vocabulario del ámbito</h2>
   <p>
-    Everything hangs off the <code>r</code> the builder hands you — type
-    <code>r.</code> and discover it all:
+    Todo cuelga de la <code>r</code> que te entrega el constructor: escribe
+    <code>r.</code> y lo irás descubriendo entero:
   </p>
   <pre class="code"><code>Either&lt;String, int&gt; parsePort(String raw) => either((r) {
-  final n = r.ensureNotNull(int.tryParse(raw), () => '"$raw" is not a number');
-  r.ensure(n &gt; 0 &amp;&amp; n &lt; 65536, () => '$n is out of range');
+  final n = r.ensureNotNull(int.tryParse(raw), () => '"$raw" no es un número');
+  r.ensure(n &gt; 0 &amp;&amp; n &lt; 65536, () => '$n está fuera de rango');
   return n;
 });
 
 switch (parsePort('8080')) {
-  case Right(:final value): print('listening on $value');
-  case Left(:final value):  print('bad config: $value');
+  case Right(:final value): print('escuchando en $value');
+  case Left(:final value):  print('configuración incorrecta: $value');
 }</code></pre>
   <ul>
     <li><code>r.bind(either)</code> / <code>r.bindAll(eithers)</code> —
-      unwrap or short-circuit.</li>
-    <li><code>r.ensure(cond, () => err)</code> — the typed-error
-      <code>require</code>.</li>
-    <li><code>r.ensureNotNull(x, () => err)</code> — returns non-null, with
-      promotion.</li>
-    <li><code>r.recover(block, onRaise)</code> — handle a raised error in a
-      nested scope.</li>
-    <li><code>r.withError(transform, block)</code> — adapt another error type
-      into this scope.</li>
-    <li><code>r.raise(err)</code> — short-circuit directly; returns
+      desenvuelve o cortocircuita.</li>
+    <li><code>r.ensure(cond, () => err)</code> — el <code>require</code> con
+      error tipado.</li>
+    <li><code>r.ensureNotNull(x, () => err)</code> — devuelve un valor no
+      nulo, con promoción de tipo.</li>
+    <li><code>r.recover(block, onRaise)</code> — trata un error elevado en un
+      ámbito anidado.</li>
+    <li><code>r.withError(transform, block)</code> — adapta otro tipo de error
+      a este ámbito.</li>
+    <li><code>r.raise(err)</code> — cortocircuita directamente; devuelve
       <code>Never</code>.</li>
   </ul>
   <p>
-    <code>eitherAsync</code> is the async twin (raise only in the same awaited
-    chain); <code>nullable</code>/<code>nullableAsync</code> are the
-    nullable-first twins that return <code>T?</code> instead of an
-    <code>Either</code> — FxDart stays nullable-first, so there is no
-    <code>Option</code> type.
+    <code>eitherAsync</code> es el gemelo asíncrono (elevar errores solo dentro
+    de la misma cadena de awaits);
+    <code>nullable</code>/<code>nullableAsync</code> son los gemelos
+    nullable-first que devuelven <code>T?</code> en lugar de un
+    <code>Either</code> — FxDart es nullable-first, así que no hay tipo
+    <code>Option</code>.
   </p>
   <p>
-    <a href="raise.html">Deep dive: <code>either</code> &amp; the
-    <code>Raise</code> scope →</a> ·
-    <a href="nullable.html">Deep dive: <code>nullable</code> →</a>
+    <a href="raise.html">En profundidad: <code>either</code> &amp; el ámbito
+    <code>Raise</code> →</a> ·
+    <a href="nullable.html">En profundidad: <code>nullable</code> →</a>
   </p>
 
-  <h2>Accumulate every failure, not just the first</h2>
+  <h2>Acumula todos los fallos, no solo el primero</h2>
   <p>
-    Validation wants <em>all</em> the errors, not the first one. This is
-    Arrow's replacement for a separate <code>Validated</code> type:
+    Una validación quiere <em>todos</em> los errores, no el primero. Esta es
+    la alternativa de Arrow a tener un tipo <code>Validated</code> aparte:
   </p>
   <pre class="code"><code>final user = either&lt;Nel&lt;String&gt;, User&gt;((r) => r.accumulate((acc) {
   final name = acc.accumulating((r) => validateName(r, input));
   final age  = acc.accumulating((r) => validateAge(r, input));
-  return User(name.value, age.value); // all errors reported together
+  return User(name.value, age.value); // todos los errores se informan juntos
 }));</code></pre>
   <p>
-    <code>r.accumulate</code> runs every branch and concatenates all failures
-    into a <code>NonEmptyList</code> (<code>Nel</code>) — a zero-cost
-    extension type that cannot be empty. Fixed-arity conveniences
-    <code>r.zipOrAccumulate2..5</code> cover the common cases, and
-    <code>r.mapOrAccumulate(items, transform)</code> validates a whole
-    collection fail-slow. <code>r.bindNel</code> lets one branch contribute
-    several errors at once; <code>someEither.toEitherNel()</code> bridges a
-    fail-fast value into an accumulating scope.
+    <code>r.accumulate</code> ejecuta todas las ramas y concatena todos los
+    fallos en una <code>NonEmptyList</code> (<code>Nel</code>): un extension
+    type de coste cero que no puede estar vacío. Los atajos de aridad fija
+    <code>r.zipOrAccumulate2..5</code> cubren los casos habituales, y
+    <code>r.mapOrAccumulate(items, transform)</code> valida una colección
+    entera en modo fail-slow. <code>r.bindNel</code> deja que una sola rama
+    aporte varios errores a la vez, y
+    <code>someEither.toEitherNel()</code> lleva un valor fail-fast a un ámbito
+    acumulador.
   </p>
   <p>
-    <a href="accumulate.html">Deep dive: accumulation →</a> ·
-    <a href="nonEmptyList.html">Deep dive: <code>NonEmptyList</code> →</a>
+    <a href="accumulate.html">En profundidad: acumulación →</a> ·
+    <a href="nonEmptyList.html">En profundidad: <code>NonEmptyList</code> →</a>
   </p>
 
-  <h2>Fused with pipelines</h2>
+  <h2>Fusionados con los pipelines</h2>
   <p>
-    This is the part neither Arrow nor any Dart FP library has: typed errors
-    fused with FxDart's lazy, concurrency-aware pipelines.
+    Esta es la parte que no tienen ni Arrow ni ninguna librería de FP de Dart:
+    errores tipados fusionados con los pipelines perezosos y conscientes de la
+    concurrencia de FxDart.
   </p>
-  <pre class="code"><code>// Validate 500 records, 8 at a time, and keep EVERY failure — in order.
+  <pre class="code"><code>// Valida 500 registros, 8 a la vez, y conserva TODOS los fallos — en orden.
 final result = await fxStream(records)
     .mapOrAccumulate&lt;String, User&gt;((r, rec) async {
-  final parsed = r.ensureNotNull(tryParse(rec), () => 'bad record: $rec');
+  final parsed = r.ensureNotNull(tryParse(rec), () => 'registro incorrecto: $rec');
   return await enrich(parsed);
 }, concurrency: 8);</code></pre>
   <p>
     <code>rights()</code>, <code>lefts()</code>, <code>separated()</code>,
-    <code>sequence()</code> (fail-fast, stops pulling at the first
-    <code>Left</code>) and <code>mapOrAccumulate()</code> (fail-slow) are
-    eager terminals on <code>fx()</code>/async chains. Concurrent validation
-    rides the same <code>concurrent(n)</code> back-channel as the rest of
-    FxDart; each element runs in its own scope, so a failure in one element
-    can never leak into a sibling.
+    <code>sequence()</code> (fail-fast: deja de tirar del pipeline en el
+    primer <code>Left</code>) y <code>mapOrAccumulate()</code> (fail-slow) son
+    terminales ansiosos sobre las cadenas
+    <code>fx()</code>/asíncronas. La validación concurrente viaja por el mismo
+    canal de retorno <code>concurrent(n)</code> que el resto de FxDart; cada
+    elemento se ejecuta en su propio ámbito, así que el fallo de un elemento
+    nunca puede filtrarse a otro.
   </p>
   <p>
-    <a href="eitherPipelines.html">Deep dive: <code>Either</code> ×
+    <a href="eitherPipelines.html">En profundidad: <code>Either</code> ×
     pipelines →</a>
   </p>
 
-  <h2>Exceptions vs raised errors</h2>
+  <h2>Excepciones frente a errores elevados</h2>
   <p>
-    The boundary is hard: <em>raised</em> errors are your domain's typed
-    failures; <em>thrown</em> exceptions are defects, and they propagate out
-    of <code>either</code> untouched. To capture a throw into an
-    <code>Either</code>, be explicit:
+    La frontera es tajante: los errores <em>elevados</em> son los fallos
+    tipados de tu dominio; las excepciones <em>lanzadas</em> son defectos, y
+    salen de <code>either</code> sin que nadie las toque. Para capturar un
+    throw dentro de un <code>Either</code>, sé explícito:
   </p>
   <pre class="code"><code>final parsed = Either.catching(() => jsonDecode(raw));       // Either&lt;Object, dynamic&gt;
 final typed  = Either.catchingWith(ParseFailure.new, () => jsonDecode(raw));</code></pre>
   <p>
-    <a href="either.html">Deep dive: <code>Either.catching</code> lives on the
-    <code>Either</code> page →</a>
+    <a href="either.html">En profundidad: <code>Either.catching</code> vive en
+    la página de <code>Either</code> →</a>
   </p>
 
   <div class="callout">
-    <strong>Two rules.</strong> (1) Never return a <em>lazy</em> pipeline from
-    a raise block — materialize with <code>toList()</code> or use the eager
-    terminals above; a deferred raise fails loudly with
-    <code>RaiseLeakedError</code>. (2) Never bare-<code>catch</code> inside a
-    raise block — use <code>catching</code>/<code>catchingAsync</code>, which
-    always let the short-circuit signal through (<code>on Exception</code> is
-    already safe: the signal is an <code>Error</code>).
+    <strong>Dos reglas.</strong> (1) Nunca devuelvas un pipeline
+    <em>perezoso</em> desde un bloque raise: materialízalo con
+    <code>toList()</code> o usa los terminales ansiosos de arriba; un raise
+    diferido falla ruidosamente con
+    <code>RaiseLeakedError</code>. (2) Nunca hagas un <code>catch</code> pelado
+    dentro de un bloque raise: usa
+    <code>catching</code>/<code>catchingAsync</code>, que siempre dejan pasar
+    la señal de cortocircuito (<code>on Exception</code> ya es seguro: la
+    señal es un <code>Error</code>).
   </div>
 
   <p>
-    Curious why this page is called <em>typed errors</em> instead of a
-    functional-programming keyword like
-    <a href="monad.html"><em>Monad</em></a>?
-    <a href="namingOfTypedErrors.html">The naming rationale →</a>
+    ¿Tienes curiosidad por saber por qué esta página se llama <em>errores
+    tipados</em> y no lleva una palabra clave de programación funcional como
+    <a href="monad.html"><em>mónada</em></a>?
+    <a href="namingOfTypedErrors.html">Las razones del nombre →</a>
   </p>
 
   <nav class="tut-nav">

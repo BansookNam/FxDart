@@ -19,7 +19,7 @@ nextLabel: average
     <code>sumBy</code>는 데이터 파이프라인에서 가장 흔한 두 단계 꼬리 —
     <code>.map((x) =&gt; x.field).sum()</code> — 를 하나의 종결 연산으로
     합칩니다. 키를 뽑아내면서 누적 합을 함께 fold하므로 중간 결과가
-    실체화되지 않고, 의도("이 필드를 합산한다")가 투영 + 집계 두 단계가
+    구체화되지 않고, 의도("이 필드를 합산한다")가 투영 + 집계 두 단계가
     아니라 한 번의 호출로 표현됩니다.
   </p>
   <p>
@@ -46,7 +46,7 @@ nextLabel: average
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="sum.html"><code>sum</code></a> — 파이프라인이 이미 숫자를 담고 있을 때 ·
     <a href="maxBy.html"><code>maxBy</code></a> · <a href="minBy.html"><code>minBy</code></a> — 같은 by-key 계열 ·
     <a href="fold.html"><code>fold</code></a> — 이 함수가 특수화한 일반형

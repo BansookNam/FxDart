@@ -10,7 +10,7 @@ prevLabel: consume
 next: repeat.html
 nextLabel: repeat
 ---
-  <p class="hero-sub">시작값(포함)부터 끝값(미포함)까지 원하는 간격으로 증가하는 정수의 지연 시퀀스입니다.</p>
+  <p class="hero-sub">시작값(포함)부터 끝값(미포함)까지 원하는 간격으로 나아가는 정수의 지연 시퀀스입니다.</p>
 
   {{signature}}
 
@@ -55,7 +55,7 @@ nextLabel: repeat
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="repeat.html"><code>repeat</code></a> — 고정된 값을 n번 반복 ·
     <a href="cycle.html"><code>cycle</code></a> — 시퀀스 전체를 무한히 반복 ·
     <a href="take.html"><code>take</code></a> — 범위에서 얼마나 끌어올지 제한 ·

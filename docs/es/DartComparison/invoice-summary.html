@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Line items to invoice summary — Dart vs FxDart</title>
-  <meta name="description" content="Turn order line items into per-category totals plus a grand total — two loop-and-fold idioms in plain Dart vs groupBy + sumBy + sortBy in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/invoice-summary.html">
+  <title>De líneas de pedido a resumen de factura — Dart vs FxDart</title>
+  <meta name="description" content="Convierte las líneas de un pedido en totales por categoría más un total general — dos modismos de bucle y fold en Dart nativo frente a groupBy + sumBy + sortBy en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/invoice-summary.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/invoice-summary.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/invoice-summary.html">
@@ -44,23 +43,22 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #27 · <strong>Line items to invoice summary</strong></p>
-  <h1>Line items to invoice summary</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #27 · <strong>De líneas de pedido a resumen de factura</strong></p>
+  <h1>De líneas de pedido a resumen de factura</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    An order's line items each have a product, category, quantity, and
-    unit price. Print the invoice summary: one line per category with its
-    total (quantity × unit price, summed), <strong>largest category
-    first</strong>, then a grand total. The data is in the code below;
-    both versions must print the lines shown under
-    <em>Expected output</em>.
+    Cada línea de un pedido tiene un producto, una categoría, una cantidad
+    y un precio unitario. Imprime el resumen de la factura: una línea por
+    categoría con su total (cantidad × precio unitario, sumado),
+    <strong>la categoría mayor primero</strong>, y después un total
+    general. Los datos están en el código de abajo; las dos versiones deben
+    imprimir las líneas que aparecen bajo <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Invoice by category:
 Electronics: $124.87
 Office: $75.80
@@ -68,10 +66,10 @@ Pantry: $29.50
 Total: $230.17</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class Line {
@@ -152,23 +150,24 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    The same amount, <code>qty * unitPrice</code>, is summed twice — per
-    category and overall — and the two versions treat that differently.
-    Native Dart spells it as two unrelated idioms: a mutating
-    <code>for</code> loop into a map for the categories, then a
-    <code>fold</code> with an explicit seed for the grand total. FxDart
-    says "sum of a field" the same way both times — <code><a href="../tutorials/sumBy.html">sumBy</a></code> —
-    once per <code><a href="../tutorials/groupBy.html">groupBy</a></code> group and once over all items, with
-    <code><a href="../tutorials/sortBy.html">sortBy</a></code> ranking the rows. When the invoice grows a
-    discount rule, one vocabulary changes in one place per pipeline; the
-    native version changes a loop body <em>and</em> a fold.
+    El mismo importe, <code>qty * unitPrice</code>, se suma dos veces —por
+    categoría y en total— y las dos versiones tratan eso de forma distinta.
+    Dart nativo lo deletrea con dos modismos que no se parecen en nada: un
+    bucle <code>for</code> que muta un map para las categorías y luego un
+    <code>fold</code> con un valor inicial explícito para el total general.
+    FxDart dice «suma de un campo» igual las dos veces
+    —<code><a href="../tutorials/sumBy.html">sumBy</a></code>— una por cada grupo de <code><a href="../tutorials/groupBy.html">groupBy</a></code> y otra
+    sobre todos los elementos, con <code><a href="../tutorials/sortBy.html">sortBy</a></code> ordenando las filas.
+    Cuando la factura gane una regla de descuento, un único vocabulario
+    cambia en un solo sitio por pipeline; la versión nativa cambia el cuerpo
+    de un bucle <em>y</em> un fold.
   </p>
 
   <nav class="tut-nav">
-    <a href="leaderboard-ties.html">← Anterior: Leaderboard with tied ranks</a>
-    <a href="no-spend-streak.html">Siguiente: Longest streak of no-spend days →</a>
+    <a href="leaderboard-ties.html">← Anterior: Tabla de clasificación con puestos empatados</a>
+    <a href="no-spend-streak.html">Siguiente: La racha más larga de días sin gastar →</a>
   </nav>
 </main>
 <footer class="site-footer">

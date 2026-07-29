@@ -1,8 +1,8 @@
 ---
 slug: duplicate-transactions
-title: Detect duplicated transactions — Dart vs FxDart
-description: Flag charges with the same merchant, amount, and day — putIfAbsent plus nested loops in plain Dart vs groupBy + filter + flatMap in FxDart.
-heading: Detect duplicated transactions
+title: 중복 거래 찾아내기 — Dart vs FxDart
+description: 판매자, 금액, 날짜가 같은 청구를 표시합니다 — 순수 Dart의 putIfAbsent와 중첩 루프를 FxDart의 groupBy + filter + flatMap과 비교합니다.
+heading: 중복 거래 찾아내기
 order: 29
 tier: 3
 functions: groupBy, filter, flatMap, map, join

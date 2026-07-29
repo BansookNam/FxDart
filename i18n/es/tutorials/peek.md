@@ -26,8 +26,8 @@ nextLabel: pluck
   </p>
   <p>
     Es tan perezoso como todo lo demás por aquí: el callback se dispara
-    exactamente una vez por cada elemento que el pipeline llega a producir,
-    en orden, y ni un momento antes.
+    exactamente una vez por cada elemento que llega a pasar por él, en orden,
+    y ni un momento antes.
   </p>
   <p>
     <code>peekAsync</code> está construido directamente sobre
@@ -40,7 +40,7 @@ nextLabel: pluck
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>
-  <p>Los mismos valores entran y salen: <code>peek</code> solo
+  <p>Los mismos valores entran y salen — <code>peek</code> solo
     observa:</p>
   {{playground:0}}
 

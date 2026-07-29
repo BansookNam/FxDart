@@ -52,7 +52,7 @@ nextLabel: sumBy
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="average.html"><code>average</code></a> — 합을 개수로 나눈 값 ·
     <a href="fold.html"><code>fold</code></a> — sum이 특수화한 일반형 ·
     <a href="min.html"><code>min</code></a> · <a href="max.html"><code>max</code></a> — 나머지 숫자 종결 연산자

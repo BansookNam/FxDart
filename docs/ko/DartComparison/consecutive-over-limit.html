@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Three consecutive readings over the limit — Dart vs FxDart</title>
-  <meta name="description" content="Find every 3-hour window of CO2 readings all over 1000 ppm — an index loop in plain Dart vs a sliding window built from zip + drop in FxDart.">
+  <title>한계를 세 번 연속 초과한 측정값 — Dart vs FxDart</title>
+  <meta name="description" content="CO2 측정값이 세 시간 연속으로 1000 ppm을 넘는 구간을 모두 찾습니다 — 순수 Dart의 인덱스 루프와 FxDart의 zip + drop으로 만든 슬라이딩 윈도우를 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/consecutive-over-limit.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/consecutive-over-limit.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/consecutive-over-limit.html">
@@ -43,8 +43,8 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #24 · <strong>Three consecutive readings over the limit</strong></p>
-  <h1>Three consecutive readings over the limit</h1>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #24 · <strong>한계를 세 번 연속 초과한 측정값</strong></p>
+  <h1>한계를 세 번 연속 초과한 측정값</h1>
   <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/zip.html">zip</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
   <h2>요구사항</h2>
@@ -151,7 +151,7 @@ void main() {
 
   <h2>차이가 나는 이유</h2>
   <p>
-    핵심 Dart에는 슬라이딩 윈도우가 없으므로, 네이티브 버전은
+    순수 Dart 코어에는 슬라이딩 윈도우가 없으므로, 네이티브 버전은
     <code>i + 2 &lt; length</code> 경계와 세 번의 수동 조회를 가진
     인덱스 루프가 됩니다 — 맞기는 하지만, 그 안의 모든 조각이 읽는
     사람이 직접 확인해야 하는 부기 작업입니다. FxDart 버전은 윈도우

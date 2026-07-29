@@ -42,7 +42,7 @@ nextLabel: throwError
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="when.html"><code>when</code></a> — 조건이 반대인 unless의 짝 ·
     <a href="cases.html"><code>cases</code></a> — 술어 하나가 아니라 여러 개를 다루기 ·
     <a href="throwIf.html"><code>throwIf</code></a> — 값을 대체하는 대신 예외를 던지기 ·

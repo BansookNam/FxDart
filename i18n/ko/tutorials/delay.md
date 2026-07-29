@@ -49,7 +49,7 @@ nextLabel: unicodeToList
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="memoize.html"><code>memoize</code></a> — 지연된 Future를 캐시해 한 번만 기다리게 만듭니다 ·
     <a href="concurrent.html"><code>concurrent</code></a> — 여러 delay를 병렬로 실행 ·
     <a href="debounce.html"><code>debounce</code></a> / <a href="throttle.html"><code>throttle</code></a> — 기다림 위에 세운 속도 제한 ·

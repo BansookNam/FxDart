@@ -143,13 +143,13 @@ void main() {
 
   <h2>차이가 나는 이유</h2>
   <p>
-    코어 Dart에는 <code><a href="../tutorials/groupBy.html">groupBy</a></code>도 <code><a href="../tutorials/maxBy.html">maxBy</a></code>도 없습니다.
+    순수 Dart에는 <code><a href="../tutorials/groupBy.html">groupBy</a></code>도 <code><a href="../tutorials/maxBy.html">maxBy</a></code>도 없습니다.
     <code>package:collection</code>이 둘 다 제공하지만, 체인의 한
     단계가 아니라 최상위 함수로 제공합니다. 그래서 네이티브 버전은
     안에서 바깥으로 읽어야 합니다: <code>groupBy(</code>… 의 엔트리들에
     대한 <code><a href="../tutorials/map.html">map</a></code>을 <code>maxBy(</code>…로 감싸는 식이죠 — 세
-    단계짜리 생각 하나를 위해 세 가지 형식(함수 호출, 메서드 체인, 함수
-    호출)을 오가야 합니다. FxDart는 읽는 순서를 데이터 흐름과 똑같이
+    단계짜리 생각 하나를 위해 세 가지 관용구(함수 호출, 메서드 체인,
+    함수 호출)를 오가야 합니다. FxDart는 읽는 순서를 데이터 흐름과 똑같이
     유지합니다: 거래를 <code><a href="../tutorials/groupBy.html">groupBy</a></code>로 묶고, 각 그룹을
     <code><a href="../tutorials/map.html">map</a></code>으로 <code>(category, average)</code>로 바꾸고,
     평균을 <code><a href="../tutorials/maxBy.html">maxBy</a></code>로 고릅니다. 알고리즘은 같지만, 문장은

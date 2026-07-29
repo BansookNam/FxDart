@@ -26,7 +26,7 @@ prevLabel: shuffle
     aleatoriedad determinista resulta útil en muchos sitios: tests
     reproducibles, datos de demo estables, fuzzing basado en propiedades con
     fallos que se pueden reproducir, o cualquier caso donde lo que de verdad
-    quieres es "aleatorio, pero igual en cada ejecución". Es lo que usa
+    quieres es «aleatorio, pero igual en cada ejecución». Es lo que usa
     <a href="shuffle.html"><code>shuffle</code></a> por debajo cuando le pasas
     una semilla.
   </p>
@@ -48,7 +48,7 @@ prevLabel: shuffle
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: reparte dos manos "aleatorias" idénticas construyendo ambas a
+  <p>Ejercicio: reparte dos manos «aleatorias» idénticas construyendo ambas a
     partir de la misma semilla.</p>
   {{playground:2}}
 

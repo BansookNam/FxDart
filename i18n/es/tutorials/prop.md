@@ -35,7 +35,7 @@ nextLabel: props
   <h2>Demo 1 · Fundamentos</h2>
   {{playground:0}}
 
-  <h2>Demo 2 · Como función suelta, frente a <code>pluck</code></h2>
+  <h2>Demo 2 · Como tear-off, frente a <code>pluck</code></h2>
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>

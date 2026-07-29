@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Either × pipelines — FxDart 101</title>
-  <meta name="description" content="FxDart tutorial on typed errors fused with pipelines: rights, lefts, separated, fail-fast sequence and fail-slow mapOrAccumulate with concurrency.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/eitherPipelines.html">
+  <meta name="description" content="Tutorial de FxDart sobre errores tipados fusionados con pipelines: rights, lefts, separated, sequence fail-fast y mapOrAccumulate fail-slow con concurrencia.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/eitherPipelines.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/eitherPipelines.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/eitherPipelines.html">
@@ -44,40 +43,43 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 13 · Typed errors › <strong>Either × pipelines</strong></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 13 · Errores tipados › <strong>Either × pipelines</strong></p>
   <h1><code>Either</code> × pipelines</h1>
   <p class="hero-sub">
-    Typed errors fused with FxDart's lazy, concurrency-aware pipelines — the
-    part neither Arrow nor any Dart FP library has.
+    Errores tipados fusionados con los pipelines perezosos y conscientes de la
+    concurrencia de FxDart — la pieza que no tienen ni Arrow ni ninguna
+    librería FP de Dart.
   </p>
 
   <div class="signature">on Fx&lt;Either&lt;L, R&gt;&gt;: rights() · lefts() · separated() · sequence()
 on Fx&lt;T&gt; / FxAsync&lt;T&gt;: Either&lt;Nel&lt;E&gt;, List&lt;R&gt;&gt; mapOrAccumulate(transform, {concurrency})</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    A chain of <code>Either</code> values gets Either-aware
-    <em>terminals</em>: <code>rights()</code> and <code>lefts()</code> keep
-    one side, <code>separated()</code> splits both at once (same record shape
-    as <code>partition</code>), and <code>sequence()</code> is
-    all-or-nothing — every success collected into one list, failing
-    <em>fast</em> on the first <code>Left</code>. Because the pipeline is
-    lazy, fail-fast is literal: <code>sequence()</code> stops <em>pulling</em>
-    at the first failure, so later elements are never computed.
+    Una cadena de valores <code>Either</code> gana <em>terminales</em> que
+    entienden de Either: <code>rights()</code> y <code>lefts()</code> se
+    quedan con uno de los dos lados, <code>separated()</code> parte los dos a
+    la vez (con la misma forma de record que <code>partition</code>) y
+    <code>sequence()</code> es todo o nada — recoge todos los aciertos en una
+    sola lista y falla <em>rápido</em> en el primer <code>Left</code>. Como el
+    pipeline es perezoso, el fail-fast es literal: <code>sequence()</code>
+    deja de <em>tirar</em> de valores en el primer fallo, así que los
+    elementos posteriores nunca llegan a computarse.
   </p>
   <p>
-    The fail-slow twin is <code>mapOrAccumulate(transform)</code> on any
-    <code>fx()</code>/async chain: validate every element, keep every
-    failure. On async chains it takes <code>concurrency:&nbsp;n</code> and
-    rides the same <code>concurrent(n)</code> back-channel as the rest of
-    FxDart — n elements in flight, results in order, and each element runs in
-    its own scope, so a failure in one can never leak into a sibling.
+    Su gemelo fail-slow es <code>mapOrAccumulate(transform)</code> sobre
+    cualquier cadena <code>fx()</code>/asíncrona: valida todos los elementos y
+    conserva todos los fallos. En cadenas asíncronas acepta
+    <code>concurrency:&nbsp;n</code> y viaja por el mismo canal de retorno
+    <code>concurrent(n)</code> que el resto de FxDart — n elementos en vuelo,
+    resultados en orden, y cada elemento se ejecuta en su propio ámbito, así
+    que un fallo en uno jamás puede filtrarse a otro.
   </p>
   <p>
-    All of these are <em>eager</em> by design, which also makes them the
-    sanctioned escape from the laziness × raise hazard: never return a lazy
-    pipeline from a raise block — return one of these results instead.
+    Todos ellos son <em>ansiosos</em> por diseño, lo que además los convierte
+    en la vía de escape autorizada del peligro pereza × raise: nunca
+    devuelvas un pipeline perezoso desde un bloque raise — devuelve en su
+    lugar uno de estos resultados.
   </p>
 
   <h2>Demo 1 · rights, lefts &amp; separated</h2>
@@ -104,7 +106,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · sequence — fail-fast, literally</h2>
+  <h2>Demo 2 · sequence — fail-fast, literalmente</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -127,7 +129,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 3 · concurrent fail-slow validation</h2>
+  <h2>Demo 3 · validación fail-slow concurrente</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -160,9 +162,9 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
+  <h2>Pruébalo tú</h2>
   <p>
-    Exercise: sum what parsed, report what didn't.
+    Ejercicio: suma lo que sí se parseó e informa de lo que no.
   </p>
   <div class="playground">
 <textarea>
@@ -185,11 +187,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="accumulate.html">accumulation</a> — the scope-level fail-slow vocabulary ·
-    <a href="concurrent.html"><code>concurrent</code></a> — the back-channel the async variant rides ·
-    <a href="partition.html"><code>partition</code></a> — <code>separated()</code>'s predicate cousin ·
-    <a href="typedErrors.html">typed errors — full guide</a>
+    <strong>Relacionado:</strong>
+    <a href="accumulate.html">acumulación</a> — el vocabulario fail-slow a nivel de ámbito ·
+    <a href="concurrent.html"><code>concurrent</code></a> — el canal de retorno por el que viaja la variante asíncrona ·
+    <a href="partition.html"><code>partition</code></a> — el primo de <code>separated()</code> basado en predicados ·
+    <a href="typedErrors.html">errores tipados — guía completa</a>
   </div>
 
   <nav class="tut-nav">

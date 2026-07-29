@@ -63,7 +63,7 @@ FxAsyncIterable&lt;C&gt; zipWithAsync&lt;A, B, C&gt;(FutureOr&lt;C&gt; Function(
   <p>
     Se detiene en la más corta de las dos entradas, igual que
     <code>zip</code>, y la forma asíncrona <code>zipWithAsync</code> hereda de
-    <code>zipAsync</code> el consumo en paralelo por par. No hay forma
+    <code>zipAsync</code> el tirar en paralelo por par. No hay forma
     encadenable en <code>Fx</code> para <code>zipWith</code>: llama
     directamente a la función de nivel superior (o constrúyela tú mismo como
     <code>.zip(other).map((r) => f(r.$1, r.$2))</code>).

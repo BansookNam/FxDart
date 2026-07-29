@@ -1,7 +1,7 @@
 ---
 slug: findIndex
-title: findIndex — FxDart 101
-description: Tutorial de findIndex en FxDart: obtén la posición de la primera coincidencia, o -1 si no hay ninguna, de forma perezosa y con cortocircuito.
+title: indexWhere — FxDart 101
+description: Tutorial de indexWhere en FxDart: obtén la posición de la primera coincidencia, o -1 si no hay ninguna, de forma perezosa y con cortocircuito.
 heading: <code>indexWhere</code>
 section: 8
 crumb: indexWhere
@@ -16,14 +16,17 @@ nextLabel: includes
 
   <h2>Lección</h2>
   <p>
-    <code>findIndex</code> es el hermano de <code>find</code>: el mismo
+    <code>indexWhere</code> es el nombre idiomático en Dart (cf.
+    <code>List.indexWhere</code>); fxdart también acepta la grafía
+    <code>findIndex</code> de FxTS: son el mismo operador. Es el hermano de
+    <code>find</code>: el mismo
     recorrido perezoso y con cortocircuito, pero informa de <em>dónde</em>
     estaba la coincidencia en vez de la coincidencia en sí. Fíjate en el
-    valor centinela distinto para "no encontrado" — aquí es <code>-1</code>,
+    valor centinela distinto para «no encontrado» — aquí es <code>-1</code>,
     un <code>int</code>, igual que el <code>Array.prototype.findIndex</code>
     de JavaScript. Es un contraste deliberado con
     <code>head</code>/<code>find</code>/<code>nth</code>, que todos usan
-    <code>null</code>: un índice tiene un valor "imposible" natural, así que
+    <code>null</code>: un índice tiene un valor «imposible» natural, así que
     FxDart mantiene aquí la convención de FxTS en lugar de inventarse un tipo
     de retorno <code>int?</code>.
   </p>
@@ -39,13 +42,13 @@ nextLabel: includes
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>findIndex</code> para encontrar la posición de bob en la cola, o <code>-1</code>.</p>
+  <p>Ejercicio: usa <code>indexWhere</code> para encontrar la posición de bob en la cola, o <code>-1</code>.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="find.html"><code>find</code></a> — la misma búsqueda, pero devuelve el valor ·
-    <a href="includes.html"><code>includes</code></a> — solo "¿está o no?" ·
+    <a href="includes.html"><code>includes</code></a> — solo «¿está o no?» ·
     <a href="nth.html"><code>nth</code></a> — el inverso: entra un índice, sale un valor ·
     <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — lo que lo hace funcionar por dentro
   </div>

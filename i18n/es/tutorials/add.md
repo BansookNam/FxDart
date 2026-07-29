@@ -27,7 +27,7 @@ nextLabel: gt · gte · lt · lte
     <code>(T, T) -&gt; T</code> en lugar de un
     <code>(a, b) =&gt; a + b</code> escrito en línea — de forma muy natural como la
     función combinadora de <code>reduce</code>/<code>fold</code>. Eso sí, es una
-    función binaria, así que para usarla como retrollamada unaria de
+    función binaria, así que para usarla como callback unario de
     <code>map</code> (sumar una cantidad fija a cada elemento) tienes que fijar
     tú mismo uno de los lados: <code>(b) =&gt; add(n, b)</code>.
   </p>

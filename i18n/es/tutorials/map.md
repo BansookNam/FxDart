@@ -38,7 +38,7 @@ nextLabel: mapEffect
   <p>
     <code>mapAsync</code> (o <code>.toAsync().map(...)</code>) acepta una
     función asíncrona. Por sí sola espera cada elemento en orden; añade
-    <code>concurrent(n)</code> y el pipeline anterior evalúa <code>n</code>
+    <code>concurrent(n)</code> y aguas arriba se evalúan <code>n</code>
     elementos a la vez — los resultados siguen llegando en orden:
   </p>
   {{playground:1}}

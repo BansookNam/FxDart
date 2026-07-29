@@ -48,7 +48,7 @@ nextLabel: apply
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="peek.html"><code>peek</code></a> — tap의 파이프라인 버전 ·
     <a href="pipe1.html"><code>pipe1</code></a> / <a href="pipe.html"><code>pipe</code></a> — 값을 함수들에 차례로 흘려보냅니다 ·
     <a href="identity.html"><code>identity</code></a> — 부수 효과 없이 그대로 통과시킵니다 ·

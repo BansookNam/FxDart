@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Parallel downloads, results in order — Dart vs FxDart</title>
-  <meta name="description" content="Six downloads with different speeds, 3 at a time — concurrent keeps request order even when completions interleave, vs pool bookkeeping.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/parallel-downloads.html">
+  <title>Descargas en paralelo, resultados en orden — Dart vs FxDart</title>
+  <meta name="description" content="Seis descargas con velocidades distintas, 3 a la vez — concurrent mantiene el orden de las peticiones aunque las finalizaciones se entrelacen, frente a la contabilidad de un pool.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/parallel-downloads.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/parallel-downloads.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/parallel-downloads.html">
@@ -44,33 +43,33 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #46 · <strong>Parallel downloads, results in order</strong></p>
-  <h1>Parallel downloads, results in order</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #46 · <strong>Descargas en paralelo, resultados en orden</strong></p>
+  <h1>Descargas en paralelo, resultados en orden</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/join.html">join</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Download six files — each with a fixed size and a fixed (simulated)
-    transfer time, in the code below — with at most <strong>three
-    downloads in flight</strong>, and list the results numbered
-    <strong>in request order</strong>. The delays are chosen so completions
-    interleave: the 30&nbsp;ms <code>video.mp4</code> is requested first
-    but the 10&nbsp;ms <code>notes.txt</code> finishes first. Both versions
-    print which file finished first and the maximum observed concurrency —
-    proving the work really overlapped, out of order, while the listing
-    stayed in order.
+    Descarga seis archivos — cada uno con un tamaño fijo y un tiempo de
+    transferencia fijo (simulado), en el código de abajo — con como mucho
+    <strong>tres descargas en vuelo</strong>, y lista los resultados
+    numerados <strong>en el orden en que se pidieron</strong>. Los
+    retardos están elegidos para que las finalizaciones se entrelacen: el
+    <code>video.mp4</code> de 30&nbsp;ms se pide primero, pero el
+    <code>notes.txt</code> de 10&nbsp;ms termina antes. Ambas versiones
+    imprimen qué archivo terminó primero y la concurrencia máxima
+    observada — la prueba de que el trabajo se solapó de verdad, fuera de
+    orden, mientras el listado se mantenía en orden.
   </p>
   <p>
-    That reorder-under-the-hood, order-on-the-surface guarantee is exactly
-    what <code>concurrent(3)</code> does: it evaluates up to three upstream
-    items at once and still yields results in source order. The chain
-    numbers them with <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> and assembles the report
-    with <code><a href="../tutorials/join.html">join</a></code>.
+    Esa garantía de reordenar por dentro y conservar el orden en la
+    superficie es justo lo que hace <code>concurrent(3)</code>: evalúa
+    hasta tres elementos aguas arriba a la vez y aun así entrega los
+    resultados en el orden de la fuente. La cadena los numera con
+    <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> y monta el informe con <code><a href="../tutorials/join.html">join</a></code>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">downloaded 6 files, 3 at a time, in request order:
   1. video.mp4 (900 KB)
   2. notes.txt (2 KB)
@@ -83,10 +82,10 @@ total size: 1737 KB
 max downloads in flight: 3</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class FileSpec {
@@ -195,23 +194,24 @@ Future<void> main() async {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    <code>Future.wait</code> preserves order but downloads everything at
-    once — no limit. Adding the limit is what forces the native worker
-    pool, and preserving order under that pool is precisely the subtle
-    part: the pre-sized <code>results</code> list indexed by a shared
-    cursor. Get the slot bookkeeping wrong and results come back shuffled —
-    a bug that only shows when completion order happens to differ from
-    request order, which is timing-dependent and easy to miss in tests. In
-    FxDart the ordering guarantee is the operator's contract, not your
-    code: <code>concurrent(3)</code> cannot return items out of order, no
-    matter how the timings fall.
+    <code>Future.wait</code> conserva el orden, pero descarga todo a la
+    vez — sin límite. Añadir el límite es lo que obliga a montar el pool
+    de workers nativo, y conservar el orden bajo ese pool es precisamente
+    la parte sutil: la lista <code>results</code> predimensionada e
+    indexada por un cursor compartido. Si te equivocas en la contabilidad
+    de las posiciones, los resultados vuelven desordenados — un bug que
+    solo se manifiesta cuando el orden de finalización resulta ser
+    distinto del orden de petición, algo que depende de los tiempos y es
+    fácil que se escape en los tests. En FxDart la garantía de orden es el
+    contrato del operador, no tu código: <code>concurrent(3)</code> no
+    puede devolver elementos desordenados, caigan como caigan los tiempos.
   </p>
 
   <nav class="tut-nav">
-    <a href="rate-limited-import.html">← Anterior: Rate-limited batch import</a>
-    <a href="paged-feeds-dedupe.html">Siguiente: Two paged feeds, concatenated and deduped →</a>
+    <a href="rate-limited-import.html">← Anterior: Importación por lotes con límite de tasa</a>
+    <a href="paged-feeds-dedupe.html">Siguiente: Dos feeds paginados, concatenados y deduplicados →</a>
   </nav>
 </main>
 <footer class="site-footer">

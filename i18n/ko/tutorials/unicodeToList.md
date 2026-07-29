@@ -47,7 +47,7 @@ nextLabel: curried &amp; uncurried
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="split.html"><code>split</code></a> — 평범한 문자 이터러블 기준으로 나누기 ·
     <a href="reverse.html"><code>reverse</code></a> — Iterable 뒤집기, 문자열에는 동일한 서로게이트 페어 주의가 필요합니다 ·
     <a href="countBy.html"><code>countBy</code></a> — 위에서 문자 개수를 집계할 때 사용 ·

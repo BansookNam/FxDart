@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Error accumulation — FxDart 101</title>
-  <meta name="description" content="FxDart accumulation tutorial: zipOrAccumulate, accumulate with accumulating branches, mapOrAccumulate, bindNel and toEitherNel — collect every failure, not just the first.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/accumulate.html">
+  <title>에러 누적 — FxDart 101</title>
+  <meta name="description" content="FxDart 에러 누적 튜토리얼: zipOrAccumulate, 누적 분기를 쓰는 accumulate, mapOrAccumulate, bindNel과 toEitherNel — 첫 실패만이 아니라 모든 실패를 모읍니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/accumulate.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/accumulate.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/accumulate.html">
@@ -44,47 +43,49 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 13 · 타입 있는 에러 › <strong>accumulation</strong></p>
-  <h1>accumulation — <code>zipOrAccumulate</code> &amp; friends</h1>
+  <h1>에러 누적 — <code>zipOrAccumulate</code> &amp; 친구들</h1>
   <p class="hero-sub">
-    Validation wants <em>all</em> the errors, not the first one. These
-    operations run every branch and concatenate the failures into a
-    <code>NonEmptyList</code> — Arrow 2.x's replacement for a separate
-    <code>Validated</code> type.
+    검증에는 첫 번째 에러가 아니라 <em>모든</em> 에러가 필요합니다. 여기
+    있는 연산들은 모든 분기를 실행하고 실패를
+    <code>NonEmptyList</code>로 이어 붙입니다 — 별도의
+    <code>Validated</code> 타입을 대체하는 Arrow 2.x의 방식입니다.
   </p>
 
   <div class="signature">on Raise&lt;Nel&lt;E&gt;&gt;: R accumulate&lt;R&gt;(R Function(Accumulator&lt;E&gt; acc) block)
 R zipOrAccumulate2..5(branch1, …, combine)
 List&lt;B&gt; mapOrAccumulate&lt;A, B&gt;(items, transform) · A bindNel&lt;A&gt;(EitherNel&lt;E, A&gt; e)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    Inside <code>either&lt;Nel&lt;E&gt;, _&gt;(...)</code> — any scope whose
-    error type is a <code>NonEmptyList</code> — the scope gains the
-    accumulation vocabulary:
+    <code>either&lt;Nel&lt;E&gt;, _&gt;(...)</code> 안에서 — 에러 타입이
+    <code>NonEmptyList</code>인 모든 스코프에서 — 스코프는 누적 어휘를
+    갖게 됩니다:
   </p>
   <ul>
-    <li><code>r.zipOrAccumulate2..5(branches…, combine)</code> — run N
-      independent branches, report every failure, combine the successes.</li>
-    <li><code>r.accumulate((acc) { … })</code> — the general form:
-      run branches with <code>acc.accumulating(block)</code>, then read each
-      result's <code>.value</code>. If anything failed, reading a value (or
-      reaching the end of the block) raises the <em>full</em> error list.</li>
-    <li><code>r.mapOrAccumulate(items, transform)</code> — validate a whole
-      collection fail-slow.</li>
-    <li><code>r.bindNel(eitherNel)</code> — unwrap an
-      <code>EitherNel</code>, raising all of its errors at once;
-      <code>someEither.toEitherNel()</code> bridges a fail-fast value in.</li>
+    <li><code>r.zipOrAccumulate2..5(branches…, combine)</code> — 서로
+      독립적인 분기 N개를 실행하고, 모든 실패를 보고하고, 성공들을
+      합칩니다.</li>
+    <li><code>r.accumulate((acc) { … })</code> — 일반형입니다.
+      <code>acc.accumulating(block)</code>으로 분기를 실행한 뒤 각 결과의
+      <code>.value</code>를 읽습니다. 하나라도 실패했다면 값을 읽는
+      순간(또는 블록 끝에 도달하는 순간) <em>전체</em> 에러 목록이
+      raise됩니다.</li>
+    <li><code>r.mapOrAccumulate(items, transform)</code> — 컬렉션 전체를
+      fail-slow로 검증합니다.</li>
+    <li><code>r.bindNel(eitherNel)</code> — <code>EitherNel</code>을
+      풀어내면서 그 안의 모든 에러를 한꺼번에 raise합니다.
+      <code>someEither.toEitherNel()</code>은 fail-fast 값을 누적 스코프로
+      이어 줍니다.</li>
   </ul>
   <p>
-    The contract is Arrow's: every branch runs (errors concatenate in branch
-    order), a branch that <em>throws</em> instead of raising wins over
-    accumulation, and after the first error successful results are no longer
-    retained — iteration continues only to collect the remaining errors.
+    계약은 Arrow의 것 그대로입니다. 모든 분기가 실행되고(에러는 분기
+    순서대로 이어 붙습니다), raise 대신 <em>throw</em>한 분기는 누적보다
+    우선하며, 첫 에러가 난 뒤로는 성공 결과를 더 이상 보관하지 않습니다 —
+    남은 에러를 모으기 위해 순회만 계속할 뿐입니다.
   </p>
 
-  <h2>Demo 1 · zipOrAccumulate2</h2>
+  <h2>데모 1 · zipOrAccumulate2</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -112,7 +113,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · accumulate — the general form</h2>
+  <h2>데모 2 · accumulate — 일반형</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -143,7 +144,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 3 · mapOrAccumulate, bindNel &amp; toEitherNel</h2>
+  <h2>데모 3 · mapOrAccumulate, bindNel &amp; toEitherNel</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -173,10 +174,10 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
+  <h2>직접 해 보기</h2>
   <p>
-    Exercise: finish both branches of <code>signup</code> so the second call
-    reports <em>both</em> failures.
+    연습: <code>signup</code>의 두 분기를 완성해서 두 번째 호출이
+    <em>두</em> 실패를 모두 보고하도록 만들어 보세요.
   </p>
   <div class="playground">
 <textarea>
@@ -199,11 +200,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="nonEmptyList.html"><code>NonEmptyList</code></a> — the error carrier ·
-    <a href="eitherPipelines.html">Either × pipelines</a> — fail-slow validation over <code>fx()</code> chains, with concurrency ·
-    <a href="raise.html"><code>either</code> &amp; Raise</a> — the fail-fast scope this extends ·
-    <a href="typedErrors.html">typed errors — full guide</a>
+    <strong>관련 항목:</strong>
+    <a href="nonEmptyList.html"><code>NonEmptyList</code></a> — 에러를 실어 나르는 그릇 ·
+    <a href="eitherPipelines.html">Either × 파이프라인</a> — <code>fx()</code> 체인 위에서 동시성과 함께 하는 fail-slow 검증 ·
+    <a href="raise.html"><code>either</code> &amp; Raise</a> — 이 기능이 확장하는 fail-fast 스코프 ·
+    <a href="typedErrors.html">타입 있는 에러 — 전체 가이드</a>
   </div>
 
   <nav class="tut-nav">

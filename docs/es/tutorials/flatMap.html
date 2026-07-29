@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>flatMap — FxDart 101</title>
-  <meta name="description" content="Tutorial de flatMap en FxDart: transforma cada elemento en un iterable y aplana un nivel, con un playground en vivo.">
+  <title>expand — FxDart 101</title>
+  <meta name="description" content="Tutorial de expand en FxDart: transforma cada elemento en un iterable y aplana un nivel, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/flatMap.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/flatMap.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/flatMap.html">
@@ -55,16 +55,20 @@ Iterable&lt;B&gt; flatMap&lt;A, B&gt;(...)        // FxTS alias</div>
 
   <h2>Lección</h2>
   <p>
-    <code>flatMap</code> es <code>map</code> seguido de un nivel de
+    <code>expand</code> es <code>map</code> seguido de un nivel de
     aplanado: cada elemento se convierte en una <em>colección</em> de
     resultados, y esas colecciones se empalman en una única secuencia
     perezosa y plana. Es la herramienta para «una entrada, muchas salidas»:
     partir una frase en palabras, expandir un usuario en sus pedidos, convertir
-    un rango en pares.
+    un rango en pares. <code>expand</code> es el nombre idiomático en Dart
+    (coincide con
+    <a href="https://api.dart.dev/stable/dart-core/Iterable/expand.html"><code>Iterable.expand</code></a>);
+    fxdart también acepta la grafía <code>flatMap</code> de FxTS: son el
+    mismo operador.
   </p>
   <p>
     <strong>Desviación respecto a FxTS:</strong> en FxTS, el callback puede devolver cualquier mezcla
-    de valores sueltos e iterables y <code>flatMap</code> deduce qué
+    de valores sueltos e iterables y el operador deduce qué
     aplanar mediante la magia de tipos de <code>DeepFlat</code>. Dart no tiene equivalente
     de ese tipo condicional, así que el port a Dart exige que <code>f</code>
     devuelva <em>siempre</em> un <code>Iterable&lt;B&gt;</code> — exactamente como
@@ -73,14 +77,14 @@ Iterable&lt;B&gt; flatMap&lt;A, B&gt;(...)        // FxTS alias</div>
     valor por entrada, o una lista vacía para no emitir ninguno.
   </p>
   <p>
-    En el lado asíncrono, la máquina de estados interna de <code>flatMapAsync</code>
+    En el lado asíncrono, la máquina de estados interna de <code>expandAsync</code>
     tiene que recordar «qué subiterable estoy vaciando ahora mismo» entre extracciones,
-    así que consume su fuente <em>en serie</em>: envolverlo en
+    así que consume lo que tiene aguas arriba <em>en serie</em>: envolverlo en
     <code>.concurrent(n)</code> solo acelera la extracción de elementos
     ya disponibles, no un <code>await</code> que ocurra dentro del propio
     callback. Si necesitas trabajo asíncrono concurrente por elemento, hazlo en
     una etapa <code>.map(...).concurrent(n)</code> previa y después
-    <code>.flatMap((list) =&gt; list)</code> para aplanar las
+    <code>.expand((list) =&gt; list)</code> para aplanar las
     listas ya resueltas — mira la Demo 2.
   </p>
 
@@ -110,7 +114,7 @@ void main() {
   <h2>Demo 2 · Asíncrono, la forma correcta de obtener concurrencia</h2>
   <p>
     Pon el <code>await</code> lento en una etapa <code>.map(...).concurrent(n)</code>
-    y deja que <code>flatMap</code> aplane los resultados de forma síncrona:
+    y deja que <code>expand</code> aplane los resultados de forma síncrona:
   </p>
   <div class="playground">
 <textarea>
@@ -137,7 +141,7 @@ Future<void> main() async {
   </div>
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>flatMap</code> para partir cada frase en palabras,
+  <p>Ejercicio: usa <code>expand</code> para partir cada frase en palabras,
     produciendo una única lista plana de palabras.</p>
   <div class="playground">
 <textarea>

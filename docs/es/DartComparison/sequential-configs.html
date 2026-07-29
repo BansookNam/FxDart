@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Load three remote configs in order — Dart vs FxDart</title>
-  <meta name="description" content="Sequential async fetches — a plain await-in-loop in Dart vs toAsync + map in FxDart, one word away from bounded concurrency.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/sequential-configs.html">
+  <title>Cargar tres configuraciones remotas en orden — Dart vs FxDart</title>
+  <meta name="description" content="Peticiones asíncronas secuenciales — un simple await dentro de un bucle en Dart frente a toAsync + map en FxDart, a una palabra de la concurrencia acotada.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/sequential-configs.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/sequential-configs.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/sequential-configs.html">
@@ -44,31 +43,30 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #10 · <strong>Load three remote configs in order</strong></p>
-  <h1>Load three remote configs in order</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #10 · <strong>Cargar tres configuraciones remotas en orden</strong></p>
+  <h1>Cargar tres configuraciones remotas en orden</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Load three remote config sections — <code>features</code>,
-    <code>limits</code>, <code>theme</code> — from a (simulated) API,
-    <strong>one at a time, in order</strong>, then print each loaded value.
-    The fake fetch takes a fixed 15 ms; both versions must print the lines
-    shown under <em>Expected output</em>.
+    Carga tres secciones de configuración remota —<code>features</code>,
+    <code>limits</code>, <code>theme</code>— desde una API (simulada),
+    <strong>de una en una y en orden</strong>, y después imprime cada valor
+    cargado. La petición falsa tarda 15 ms fijos; ambas versiones deben
+    imprimir las líneas que aparecen bajo <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">features -&gt; {darkMode: true, beta: false}
 limits -&gt; {maxUpload: 25, rateLimit: 120}
 theme -&gt; {accent: teal, density: compact}</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 const configNames = ['features', 'limits', 'theme'];
@@ -127,23 +125,25 @@ Future<void> main() async {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    For three sequential awaits, the native <code>for</code> loop is
-    perfectly fine — nobody needs a library to write it, and if the story
-    ended here this would be a tie. The FxDart win is what the code becomes
-    next: <code>toAsync().map(fetchConfig)</code> is a lazy async pipeline
-    that is serial <em>by default</em>, and the day you have thirty configs
-    instead of three, appending <code>.concurrent(8)</code> turns the same
-    chain into a bounded worker pool — order preserved, nothing else
-    touched. The native loop has no such dial; it gets rewritten. See
-    <a href="bounded-concurrency.html">Fetch profiles, two at a time</a> for
-    that ending.
+    Para tres await secuenciales, el bucle <code>for</code> nativo va
+    perfectamente —nadie necesita una librería para escribirlo, y si la
+    historia acabara aquí esto sería un empate—. La victoria de FxDart está
+    en lo que el código llega a ser después:
+    <code>toAsync().map(fetchConfig)</code> es un pipeline asíncrono
+    perezoso que es secuencial <em>por defecto</em>, y el día que tengas
+    treinta configuraciones en lugar de tres, añadir
+    <code>.concurrent(8)</code> convierte esa misma cadena en un pool de
+    workers acotado —orden preservado, sin tocar nada más—. El bucle nativo
+    no tiene semejante mando; hay que reescribirlo. Mira
+    <a href="bounded-concurrency.html">Obtener perfiles de dos en dos</a>
+    para ese desenlace.
   </p>
 
   <nav class="tut-nav">
-    <a href="rank-labels.html">← Anterior: Rank labels for a leaderboard</a>
-    <a href="top-merchants.html">Siguiente: Top 5 merchants by total spend →</a>
+    <a href="rank-labels.html">← Anterior: Etiquetas de puesto para una tabla de clasificación</a>
+    <a href="top-merchants.html">Siguiente: Los 5 comercios con más gasto total →</a>
   </nav>
 </main>
 <footer class="site-footer">

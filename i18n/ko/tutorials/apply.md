@@ -1,7 +1,7 @@
 ---
 slug: apply
 title: apply — FxDart 101
-description: FxDart apply 튜토리얼 - List에 모아 둔 인자로 함수를 호출하는 법을 라이브 플레이그라운드와 함께 다룹니다.
+description: FxDart apply 튜토리얼: List에 모아 둔 인자로 함수를 호출하는 법을 라이브 플레이그라운드와 함께 다룹니다.
 heading: <code>apply</code>
 section: 10
 crumb: apply

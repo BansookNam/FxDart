@@ -47,7 +47,7 @@ nextLabel: averageBy
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="sum.html"><code>sum</code></a> — 평균을 구할 때의 분자 ·
     <a href="size.html"><code>size</code></a> — 평균을 구할 때의 분모 ·
     <a href="min.html"><code>min</code></a> · <a href="max.html"><code>max</code></a> — 나머지 숫자 종결 연산자

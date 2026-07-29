@@ -49,7 +49,7 @@ nextLabel: entries
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="range.html"><code>range</code></a> — 유한한 수 세기 시퀀스 ·
     <a href="repeat.html"><code>repeat</code></a> — 하나의 값을 정해진 횟수만큼 반복합니다 ·
     <a href="take.html"><code>take</code></a> — cycle에 거의 언제나 필요한 제한 ·

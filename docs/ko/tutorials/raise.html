@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>either builder &amp; the Raise scope — FxDart 101</title>
-  <meta name="description" content="FxDart raise tutorial: the either and eitherAsync builders, and the Raise scope vocabulary — bind, ensure, ensureNotNull, recover, withError, raise.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/raise.html">
+  <title>either 빌더 &amp; Raise 스코프 — FxDart 101</title>
+  <meta name="description" content="FxDart raise 튜토리얼: either와 eitherAsync 빌더, 그리고 Raise 스코프의 어휘 — bind, ensure, ensureNotNull, recover, withError, raise.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/raise.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/raise.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/raise.html">
@@ -44,50 +43,51 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 13 · 타입 있는 에러 › <strong>either &amp; Raise</strong></p>
-  <h1><code>either</code> &amp; the <code>Raise</code> scope</h1>
+  <h1><code>either</code> 빌더 &amp; <code>Raise</code> 스코프</h1>
   <p class="hero-sub">
-    Runs a block in a <code>Raise&lt;E&gt;</code> scope: straight-line code
-    that can short-circuit with a typed error. A raised <code>E</code> becomes
-    <code>Left</code>, a normal return becomes <code>Right</code>.
+    블록을 <code>Raise&lt;E&gt;</code> 스코프 안에서 실행합니다: 타입 있는
+    에러로 단락할 수 있는 일직선 코드입니다. raise된 <code>E</code>는
+    <code>Left</code>가 되고, 정상 반환은 <code>Right</code>가 됩니다.
   </p>
 
   <div class="signature">Either&lt;E, A&gt; either&lt;E, A&gt;(A Function(Raise&lt;E&gt; r) block)
 Future&lt;Either&lt;E, A&gt;&gt; eitherAsync&lt;E, A&gt;(FutureOr&lt;A&gt; Function(Raise&lt;E&gt; r) block)
 on Raise&lt;E&gt;: bind · bindAll · ensure · ensureNotNull · recover · withError · raise</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    The builder hands your block a scope <code>r</code> — the port of Kotlin
-    Arrow's <code>either&nbsp;{&nbsp;}</code>. Everything hangs off it; type
-    <code>r.</code> and discover the whole vocabulary:
+    빌더는 여러분의 블록에 스코프 <code>r</code>을 건네줍니다 — Kotlin
+    Arrow의 <code>either&nbsp;{&nbsp;}</code>를 이식한 것입니다. 모든 것이
+    여기에 달려 있습니다. <code>r.</code>을 입력하면 어휘 전체를 발견할 수
+    있습니다:
   </p>
   <ul>
     <li><code>r.bind(either)</code> / <code>r.bindAll(eithers)</code> —
-      unwrap a success or short-circuit with the failure.</li>
-    <li><code>r.ensure(cond, () => err)</code> — the typed-error
+      성공 값을 풀어내거나, 실패와 함께 단락합니다.</li>
+    <li><code>r.ensure(cond, () => err)</code> — 타입 있는 에러 버전의
       <code>require</code>.</li>
-    <li><code>r.ensureNotNull(x, () => err)</code> — returns non-null, with
-      type promotion.</li>
-    <li><code>r.recover(block, onRaise)</code> — handle a raised error in a
-      nested scope and keep going.</li>
-    <li><code>r.withError(transform, block)</code> — adapt a
-      <em>different</em> error type into this scope.</li>
-    <li><code>r.raise(err)</code> — short-circuit directly; returns
-      <code>Never</code>, so flow analysis knows execution stops.</li>
+    <li><code>r.ensureNotNull(x, () => err)</code> — non-null을 반환하며,
+      타입 승격이 일어납니다.</li>
+    <li><code>r.recover(block, onRaise)</code> — 중첩 스코프에서 raise된
+      에러를 처리하고 계속 진행합니다.</li>
+    <li><code>r.withError(transform, block)</code> — <em>다른</em> 에러
+      타입을 이 스코프에 맞게 변환합니다.</li>
+    <li><code>r.raise(err)</code> — 곧바로 단락합니다.
+      <code>Never</code>를 반환하므로 실행이 거기서 멈춘다는 사실을 흐름
+      분석도 알고 있습니다.</li>
   </ul>
   <p>
-    Internally this is <em>not</em> <code>flatMap</code> chaining: a failed
-    <code>bind</code> throws a private, scope-tagged signal that the builder
-    catches at its boundary. That is why early returns, loops and
-    <code>if</code>s all just work inside the block, and why nested builders
-    never capture each other's errors. <code>eitherAsync</code> is the async
-    twin — same vocabulary, <code>await</code> allowed (raise only within the
-    same awaited chain).
+    내부 구현은 <code>flatMap</code> 연쇄가 <em>아닙니다</em>. 실패한
+    <code>bind</code>는 스코프 토큰이 달린 비공개 신호를 던지고, 빌더가
+    자신의 경계에서 그것을 잡아냅니다. 그래서 이른 반환, 반복문,
+    <code>if</code>가 블록 안에서 전부 그대로 동작하고, 중첩된 빌더가 서로의
+    에러를 가로채는 일도 없습니다. <code>eitherAsync</code>는 비동기
+    쌍둥이입니다 — 어휘는 같고 <code>await</code>도 쓸 수 있습니다(raise는
+    같은 await 체인 안에서만).
   </p>
 
-  <h2>Demo 1 · ensure &amp; ensureNotNull</h2>
+  <h2>데모 1 · ensure &amp; ensureNotNull</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -106,7 +106,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · bind — the flatMap-pyramid killer</h2>
+  <h2>데모 2 · bind — flatMap 피라미드를 끝내는 무기</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -135,7 +135,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 3 · recover, withError &amp; raise</h2>
+  <h2>데모 3 · recover, withError &amp; raise</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -164,11 +164,11 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
+  <h2>직접 해 보기</h2>
   <p>
-    Exercise: make <code>checkAge</code> fail with a typed error instead of
-    throwing — <code>ensureNotNull</code> for the parse,
-    <code>ensure</code> for the age limit.
+    연습: <code>checkAge</code>가 예외를 던지는 대신 타입 있는 에러로
+    실패하도록 만들어 보세요 — 파싱에는 <code>ensureNotNull</code>을, 나이
+    제한에는 <code>ensure</code>를 쓰면 됩니다.
   </p>
   <div class="playground">
 <textarea>
@@ -191,21 +191,22 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Two rules.</strong> (1) Never return a <em>lazy</em> pipeline
-    from a raise block — materialize with <code>toList()</code> inside it, or
-    use the <a href="eitherPipelines.html">eager Either terminals</a>; a
-    deferred raise fails loudly with <code>RaiseLeakedError</code>. (2) Never
-    bare-<code>catch</code> inside a raise block — use
-    <code>catching</code>/<code>catchingAsync</code>, which always let the
-    short-circuit signal through.
+    <strong>규칙 두 가지.</strong> (1) raise 블록에서 <em>지연</em>
+    파이프라인을 그대로 반환하지 마세요 — 블록 안에서
+    <code>toList()</code>로 구체화하거나
+    <a href="eitherPipelines.html">즉시 실행 Either 종결 연산자</a>를
+    사용하세요. 지연된 raise는 <code>RaiseLeakedError</code>로 요란하게
+    실패합니다. (2) raise 블록 안에서 맨몸 <code>catch</code>를 쓰지
+    마세요 — 단락 신호를 항상 통과시키는
+    <code>catching</code>/<code>catchingAsync</code>를 사용하세요.
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="either.html"><code>Either</code></a> — the boundary type ·
-    <a href="nullable.html"><code>nullable</code></a> — the info-free twin that returns <code>T?</code> ·
-    <a href="accumulate.html">accumulation</a> — collect every failure ·
-    <a href="typedErrors.html">typed errors — full guide</a>
+    <strong>관련 항목:</strong>
+    <a href="either.html"><code>Either</code></a> — 경계 타입 ·
+    <a href="nullable.html"><code>nullable</code></a> — <code>T?</code>를 돌려주는 정보 없는 쌍둥이 ·
+    <a href="accumulate.html">에러 누적</a> — 모든 실패를 모읍니다 ·
+    <a href="typedErrors.html">타입 있는 에러 — 전체 가이드</a>
   </div>
 
   <nav class="tut-nav">

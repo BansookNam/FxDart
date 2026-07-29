@@ -50,7 +50,7 @@ nextLabel: debounce
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="concurrent.html"><code>concurrent</code></a> — 순서를 보존하는 변형 ·
     <a href="toAsync.html"><code>toAsync</code></a> — 이 동작이 기반으로 삼는 pull 기반 모델 ·
     <a href="streams.html">Stream 브리지</a> — toStream() 앞에 concurrentPool 적용하기 ·

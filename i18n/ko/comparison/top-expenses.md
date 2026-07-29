@@ -28,9 +28,10 @@ async: false
     거의 차이가 없습니다 — 이번 예제는 무승부입니다. 양쪽 모두 부호를
     반전한 키로 정렬해 내림차순을 얻고 앞의 세 개를 취합니다.
     <code>package:collection</code>의 <code>sortedBy</code>는 FxDart의
-    <code>sortBy</code>만큼이나 직관적입니다(코어 <code>List.sort</code>
-    만 쓰면 제자리에서 변형되고 명시적인 비교자가 필요하지만,
-    <code>collection</code>은 표준적인 의존성입니다). 실질적인 차이는
+    <code>sortBy</code>만큼이나 직접적입니다(Dart 코어의
+    <code>List.sort</code>만 단독으로 쓰면 제자리에서 변형되고 명시적인
+    비교자가 필요하지만, <code>collection</code>은 표준적인
+    의존성입니다). 실질적인 차이는
     그 어휘가 어디에 있느냐뿐입니다 — 패키지의 확장 메서드냐, 아니면
     <code>scan</code>, <code>chunk</code>, 비동기 변형까지 함께 제공하는
     체인의 한 단계냐. 어느 쪽을 골라도 떳떳합니다.

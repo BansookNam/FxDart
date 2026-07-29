@@ -10,7 +10,7 @@ description: FxDart es una librería de programación funcional para Dart, porta
     FxDart es un port a Dart de <a href="https://github.com/marpple/FxTS">FxTS</a>:
     una librería para componer <strong>pipelines perezosos</strong> sobre datos síncronos y asíncronos,
     donde convertir seis peticiones secuenciales de 1 segundo en un lote concurrente de 2 segundos
-    es una sola llamada.
+    es una sola llamada a un método.
   </p>
 
   <p>
@@ -48,8 +48,8 @@ description: FxDart es una librería de programación funcional para Dart, porta
       la secuencia asíncrona basada en pull de FxDart (con puentes a <code>Stream</code> en
       ambos sentidos).</li>
     <li><strong>Concurrencia declarativa</strong>: <code>concurrent(n)</code>
-      pide al pipeline <em>anterior</em> que evalúe <code>n</code> elementos a la
-      vez manteniendo el orden de los resultados. Es la función insignia de FxTS,
+      pide al pipeline <em>aguas arriba</em> que evalúe <code>n</code> elementos a la
+      vez manteniendo el orden de los resultados. Es la característica insignia de FxTS,
       portada fielmente a Dart.</li>
   </ul>
 

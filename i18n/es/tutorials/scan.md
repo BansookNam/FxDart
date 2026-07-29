@@ -19,8 +19,9 @@ nextLabel: peek
     <code>scan</code> es <code>reduce</code>/<code>fold</code> con sus pasos
     intermedios a la vista: en lugar de colapsar un iterable en un único valor
     final, emite <em>todas</em> las acumulaciones parciales, incluido el propio
-    valor inicial como primer valor. Ese detalle de que el primer valor es el valor inicial
-    importa: <code>scan(f, 0, [1, 2, 3])</code> emite cuatro valores
+    valor inicial como primer valor. Ese detalle —que el primer valor es el
+    valor inicial— importa: <code>scan(f, 0, [1, 2, 3])</code> emite cuatro
+    valores
     (<code>0</code> y luego tres sumas parciales), no tres.
   </p>
   <p>
@@ -36,10 +37,10 @@ nextLabel: peek
     <code>scan1(f, iterable)</code>.
   </p>
   <p>
-    Ambos son perezosos: no se ejecuta nada hasta que consumes la
-    secuencia. En el lado
-    asíncrono, <code>scanAsync</code>/<code>scan1Async</code> siguen plegando
-    paso a paso y en orden (cada paso necesita el resultado anterior), así que
+    Ambos son perezosos: no se ejecuta nada hasta que tiras de los valores. En
+    el lado asíncrono, <code>scanAsync</code>/<code>scan1Async</code> siguen
+    plegando paso a paso y en orden (cada paso necesita el resultado
+    anterior), así que
     <code>.concurrent(n)</code> no paraleliza el pliegue en sí; lo que sí hace
     es permitir que una etapa de descarga aguas arriba se ejecute con
     concurrencia, siempre que la propia función acumuladora sea barata. Mira la

@@ -18,7 +18,7 @@ nextLabel: fork
   <p>
     <code>reverse</code> emite los elementos de una fuente del último al
     primero. Igual que <code>takeRight</code> y <code>dropRight</code>, no hay
-    forma de saber qué significa "el último" sin haberlo visto todo antes, así
+    forma de saber qué significa «el último» sin haberlo visto todo antes, así
     que <code>reverse</code> <strong>materializa</strong> la fuente entera en
     una lista antes de emitir un solo valor. Es un operador para fuentes
     finitas y bufferizables: nunca terminará con una fuente infinita.

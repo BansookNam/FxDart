@@ -1,13 +1,24 @@
 <!DOCTYPE html>
 <!-- FxDart playground execution frame.
      Runs DDC library-bundle output from the DartPad compile service
-     (compileNewDDC) using the matching ddc_module_loader + dart_sdk_new
-     artifacts, mirroring DartPad's own frame bootstrap. Print output and
-     errors are relayed to the parent page via postMessage. -->
+     (compileNewDDC). Print output and errors are relayed to the parent page
+     via postMessage.
+
+     The frame fetches nothing itself. The parent hands it the two runtime
+     artifacts (ddc_module_loader.js, dart_sdk_new.js) as source text over
+     postMessage — neither is an AMD module, both are plain scripts that
+     assign globals, so injecting them as <script> nodes reproduces exactly
+     what loading them by URL would do. Keeping the network in the parent is
+     what lets the 17MB SDK be cached once, permanently, instead of being
+     re-fetched by every sandboxed (opaque-origin) frame.
+
+     Lifecycle: load -> 'ready' -> parent posts 'boot' -> 'warm' -> parent
+     posts 'execute' -> 'started' -> stdout/stderr -> 'done'. The parent
+     boots frames ahead of time so 'warm' has already fired by the time a
+     reader clicks Run. -->
 <html>
 <head>
   <meta charset="utf-8">
-  <script src="js/require.js"></script>
   <script>
     function post(type, message) {
       parent.postMessage({ sender: 'fx-frame', type: type, message: message }, '*');
@@ -28,30 +39,46 @@
       consoleError.apply(null, arguments);
     };
 
-    require.config({
-      baseUrl: 'https://stable.api.dartpad.dev/artifacts/',
-      waitSeconds: 120,
-      onNodeCreated: function (node) { node.setAttribute('crossorigin', 'anonymous'); }
-    });
-    require.onError = function (err) { post('stderr', String(err)); };
+    // Runs `src` as a classic script at global scope. Not eval(): the module
+    // loader declares things with let/const/class at top level, which eval
+    // would confine to its own lexical scope where the SDK bundle could not
+    // see them. A <script> node shares the global lexical environment, same
+    // as the original <script src> did.
+    function runScript(src) {
+      var node = document.createElement('script');
+      node.textContent = src;
+      document.head.appendChild(node);
+    }
+
+    var booted = false;
 
     window.addEventListener('message', function (e) {
       var data = e.data || {};
-      if (data.command !== 'execute') return;
-      // Load the DDC module loader (defines window.dartDevEmbedder), then the
-      // SDK bundle, then evaluate the compiled user bundle and run its main.
-      require(['ddc_module_loader'], function () {
-        require(['dart_sdk_new'], function () {
-          try {
-            (0, eval)(data.js); // defines package:dartpad_sample/* libraries
-            post('started', '');
-            dartDevEmbedder.runMain('package:dartpad_sample/bootstrap.dart', {});
-            post('done', '');
-          } catch (err) {
-            post('stderr', String(err));
-          }
-        });
-      });
+
+      if (data.command === 'boot') {
+        if (booted) return;
+        booted = true;
+        try {
+          runScript(data.loader); // defines window.dartDevEmbedder
+          runScript(data.sdk);    // registers the dart:* libraries on it
+          if (!window.dartDevEmbedder) throw new Error('dartDevEmbedder missing');
+          post('warm', '');
+        } catch (err) {
+          post('bootfail', String(err));
+        }
+        return;
+      }
+
+      if (data.command === 'execute') {
+        try {
+          (0, eval)(data.js); // defines package:dartpad_sample/* libraries
+          post('started', '');
+          dartDevEmbedder.runMain('package:dartpad_sample/bootstrap.dart', {});
+          post('done', '');
+        } catch (err) {
+          post('stderr', String(err));
+        }
+      }
     });
 
     window.addEventListener('load', function () { post('ready', ''); });

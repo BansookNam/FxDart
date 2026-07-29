@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Multi-currency expense report — Dart vs FxDart</title>
-  <meta name="description" content="Normalize a trip ledger to USD with fixed rates, then group, rank, and summarize — one pipeline per report line vs fold/reduce boilerplate.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/multi-currency-report.html">
+  <title>Informe de gastos multidivisa — Dart vs FxDart</title>
+  <meta name="description" content="Normaliza a USD el libro de cuentas de un viaje con tipos fijos y luego agrupa, ordena y resume — un pipeline por línea de informe frente al boilerplate de fold/reduce.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/multi-currency-report.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/multi-currency-report.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/multi-currency-report.html">
@@ -44,22 +43,23 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #36 · <strong>Multi-currency expense report</strong></p>
-  <h1>Multi-currency expense report</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #36 · <strong>Informe de gastos multidivisa</strong></p>
+  <h1>Informe de gastos multidivisa</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    A trip ledger (data in the code) mixes EUR, GBP, JPY, and USD amounts.
-    Convert everything to USD with the fixed rates in the code, then report:
-    per-category totals sorted by spend, the currencies seen, the largest
-    single expense (with its original amount), and the grand total. Both
-    versions must print the report under <em>Expected output</em>.
+    El libro de cuentas de un viaje (los datos están en el código) mezcla
+    importes en EUR, GBP, JPY y USD. Convierte todo a USD con los tipos
+    fijos del código y después informa de: los totales por categoría
+    ordenados por gasto, las divisas que aparecen, el mayor gasto
+    individual (con su importe original) y el total general. Ambas
+    versiones deben imprimir el informe que aparece bajo <em>Salida
+    esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Trip expenses in USD (currencies: EUR, GBP, JPY, USD)
   Lodging  $240.55
   Travel   $164.82
@@ -69,10 +69,10 @@ Largest single expense: Travel $130.80 (120.00 EUR)
 Total: $465.72</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -179,24 +179,26 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Normalizing first — <code><a href="../tutorials/map.html">map</a></code> each transaction to a
-    <code>(tx, usd)</code> pair — lets every later question run over one
-    list: <code><a href="../tutorials/groupBy.html">groupBy</a></code> + <code><a href="../tutorials/sumBy.html">sumBy</a></code> + <code><a href="../tutorials/sortBy.html">sortBy</a></code>
-    for the breakdown, <code><a href="../tutorials/uniq.html">uniq</a></code> for the currency list,
-    <code><a href="../tutorials/maxBy.html">maxBy</a></code> and <code><a href="../tutorials/sumBy.html">sumBy</a></code> for the summary lines. Each
-    report line is one short pipeline that names its aggregation. The native
-    version makes the identical moves but without the vocabulary: every sum
-    is a seeded <code>fold</code>, the maximum is a hand-written
-    <code>reduce</code> comparator, and the currency list needs the
-    <code>toSet().toList()..sort()</code> shuffle. Nothing is hard — there
-    is just more of it, and less of it says what it means.
+    Normalizar primero —<code><a href="../tutorials/map.html">map</a></code> de cada transacción a un par
+    <code>(tx, usd)</code>— permite que todas las preguntas posteriores
+    se resuelvan sobre una sola lista: <code><a href="../tutorials/groupBy.html">groupBy</a></code> +
+    <code><a href="../tutorials/sumBy.html">sumBy</a></code> + <code><a href="../tutorials/sortBy.html">sortBy</a></code> para el desglose,
+    <code><a href="../tutorials/uniq.html">uniq</a></code> para la lista de divisas, <code><a href="../tutorials/maxBy.html">maxBy</a></code> y
+    <code><a href="../tutorials/sumBy.html">sumBy</a></code> para las líneas de resumen. Cada línea del informe
+    es un pipeline corto que da nombre a su agregación. La versión nativa
+    hace exactamente los mismos movimientos, pero sin el vocabulario: cada
+    suma es un <code>fold</code> con valor inicial, el máximo es un
+    comparador de <code>reduce</code> escrito a mano y la lista de divisas
+    necesita el baile de <code>toSet().toList()..sort()</code>. Nada de
+    esto es difícil —simplemente hay más de todo, y menos de todo dice lo
+    que significa.
   </p>
 
   <nav class="tut-nav">
-    <a href="sparse-timeseries.html">← Anterior: Fill gaps in a sparse time series</a>
-    <a href="restock-plan.html">Siguiente: Inventory restock plan →</a>
+    <a href="sparse-timeseries.html">← Anterior: Rellenar huecos en una serie temporal dispersa</a>
+    <a href="restock-plan.html">Siguiente: Plan de reposición de inventario →</a>
   </nav>
 </main>
 <footer class="site-footer">

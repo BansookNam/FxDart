@@ -1,7 +1,7 @@
 ---
 slug: toList
 title: toList — FxDart 101
-description: FxDart toList 튜토리얼: 지연 평가 체인을 List로 실체화하는 종결 연산자를 동기와 비동기 양쪽에서 다룹니다.
+description: FxDart toList 튜토리얼: 지연 평가 체인을 List로 구체화하는 종결 연산자를 동기와 비동기 양쪽에서 다룹니다.
 heading: <code>toList</code>
 section: 1
 crumb: toList
@@ -10,7 +10,7 @@ prevLabel: pipe1
 next: each.html
 nextLabel: each
 ---
-  <p class="hero-sub">지연 이터러블을 실체화합니다 — 모든 값을 끌어당겨 List로 모읍니다.</p>
+  <p class="hero-sub">지연 이터러블을 구체화합니다 — 모든 값을 끌어당겨 List로 모읍니다.</p>
 
   {{signature}}
 
@@ -52,11 +52,11 @@ nextLabel: each
   {{playground:1}}
 
   <h2>직접 해 보기</h2>
-  <p>연습: 아주 큰 범위에서 앞쪽 4개의 제곱을 List로 실체화해 보세요.</p>
+  <p>연습: 아주 큰 범위에서 앞쪽 4개의 제곱을 List로 구체화해 보세요.</p>
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="each.html"><code>each</code></a> — List 대신 부수 효과를 위한 종결 연산자 ·
     <a href="consume.html"><code>consume</code></a> — 결과를 아예 버리는 종결 연산자 ·
     <a href="fx.html"><code>fx</code></a> — toList가 종결시키는 그 체인 ·

@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Windowed alerts from a sensor stream — Dart vs FxDart</title>
-  <meta name="description" content="Chunk a real Dart Stream into fixed windows and raise alerts — fromStream + chunk + averageBy vs manual buffer bookkeeping in await-for.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/stream-windowed-alerts.html">
+  <title>Alertas por ventanas sobre un stream de sensores — Dart vs FxDart</title>
+  <meta name="description" content="Trocear un Stream real de Dart en ventanas fijas y lanzar alertas — fromStream + chunk + averageBy frente a llevar el búfer a mano dentro de un await-for.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/stream-windowed-alerts.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/stream-windowed-alerts.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/stream-windowed-alerts.html">
@@ -44,30 +43,30 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #44 · <strong>Windowed alerts from a sensor stream</strong></p>
-  <h1>Windowed alerts from a sensor stream</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #44 · <strong>Alertas por ventanas sobre un stream de sensores</strong></p>
+  <h1>Alertas por ventanas sobre un stream de sensores</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/averageBy.html">averageBy</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/filter.html">filter</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    A boiler temperature sensor delivers readings as a real Dart
-    <code>Stream</code> — one every 10&nbsp;ms, twelve in total (fixed data,
-    in the code below). Group the stream into <strong>windows of four
-    readings</strong>, report each window's average and peak, and raise an
-    <code>ALERT</code> line for any window whose average is at or above
-    75.00.
+    Un sensor de temperatura de caldera entrega lecturas como un
+    <code>Stream</code> real de Dart — una cada 10&nbsp;ms, doce en total
+    (datos fijos, en el código de abajo). Agrupa el stream en
+    <strong>ventanas de cuatro lecturas</strong>, informa de la media y el
+    pico de cada ventana, y emite una línea <code>ALERT</code> para toda
+    ventana cuya media sea igual o superior a 75.00.
   </p>
   <p>
-    FxDart's answer is its stream bridge: <code>fxStream</code> lifts the
-    <code>Stream</code> into the pull-based pipeline, and from there
-    windowing is just <code>chunk(4)</code> — the same operator the sync
-    examples use — followed by a <code><a href="../tutorials/map.html">map</a></code> that summarizes each
-    window with <code><a href="../tutorials/averageBy.html">averageBy</a></code> and <code><a href="../tutorials/maxBy.html">maxBy</a></code>.
+    La respuesta de FxDart es su puente con los streams:
+    <code>fxStream</code> eleva el <code>Stream</code> al pipeline basado en
+    pull, y a partir de ahí las ventanas son simplemente
+    <code>chunk(4)</code> — el mismo operador que usan los ejemplos
+    síncronos — seguido de un <code><a href="../tutorials/map.html">map</a></code> que resume cada ventana con
+    <code><a href="../tutorials/averageBy.html">averageBy</a></code> y <code><a href="../tutorials/maxBy.html">maxBy</a></code>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">boiler sensor, windows of 4 readings:
   0s-3s  avg 69.50  peak 70.5
   4s-7s  avg 75.75  peak 77.0
@@ -75,10 +74,10 @@
 ALERT 4s-7s: average 75.75 is above the 75.00 limit</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class Reading {
@@ -178,23 +177,25 @@ Future<void> main() async {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Dart's <code>Stream</code> API has no windowing operator. The idiomatic
-    options are an <code>await for</code> loop with a mutable buffer —
-    accumulate four, flush, reset, as shown — or packaging that same
-    bookkeeping into a custom <code>StreamTransformer</code>, which is more
-    code, not less. Either way the buffer, the flush condition, and the
-    reset are yours to maintain, and the partial-window edge case is yours
-    to reason about. In FxDart, <code>chunk(4)</code> is one word on a
-    stream exactly as it is on a list — crossing from <code>Stream</code>
-    to pipeline costs one <code>fxStream</code> call, and the whole
-    operator vocabulary comes with it.
+    La API de <code>Stream</code> de Dart no tiene ningún operador de
+    ventanas. Las opciones idiomáticas son un bucle <code>await for</code>
+    con un búfer mutable — acumular cuatro, volcar, reiniciar, como se
+    muestra — o empaquetar esa misma contabilidad en un
+    <code>StreamTransformer</code> propio, que es más código, no menos. En
+    cualquier caso el búfer, la condición de volcado y el reinicio son cosa
+    tuya, y el caso límite de la ventana incompleta también te toca razonarlo
+    a ti. En FxDart, <code>chunk(4)</code> es una sola palabra sobre un
+    stream exactamente igual que sobre una lista — cruzar de
+    <code>Stream</code> al pipeline cuesta una llamada a
+    <code>fxStream</code>, y con ella viene todo el vocabulario de
+    operadores.
   </p>
 
   <nav class="tut-nav">
-    <a href="price-lookup-fallback.html">← Anterior: Concurrent price lookup with fallback</a>
-    <a href="rate-limited-import.html">Siguiente: Rate-limited batch import →</a>
+    <a href="price-lookup-fallback.html">← Anterior: Consulta concurrente de precios con fallback</a>
+    <a href="rate-limited-import.html">Siguiente: Importación por lotes con límite de tasa →</a>
   </nav>
 </main>
 <footer class="site-footer">

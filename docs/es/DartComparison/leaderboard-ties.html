@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Leaderboard with tied ranks — Dart vs FxDart</title>
-  <meta name="description" content="Rank players so equal scores share a rank — mutable rank/prevScore state in plain Dart vs sortBy + groupBy + zipWithIndex in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/leaderboard-ties.html">
+  <title>Tabla de clasificación con puestos empatados — Dart vs FxDart</title>
+  <meta name="description" content="Clasifica jugadores de modo que las puntuaciones iguales compartan puesto — estado mutable rank/prevScore en Dart nativo frente a sortBy + groupBy + zipWithIndex en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/leaderboard-ties.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/leaderboard-ties.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/leaderboard-ties.html">
@@ -44,22 +43,22 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #26 · <strong>Leaderboard with tied ranks</strong></p>
-  <h1>Leaderboard with tied ranks</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #26 · <strong>Tabla de clasificación con puestos empatados</strong></p>
+  <h1>Tabla de clasificación con puestos empatados</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/entries.html">entries</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Print a leaderboard from six players' scores, highest first, where
-    <strong>equal scores share a rank</strong> — dense ranking, so two
-    players on 87 points are both #2 and the next score down is #3.
-    The data is in the code below; both versions must print the lines
-    shown under <em>Expected output</em>.
+    Imprime una tabla de clasificación a partir de las puntuaciones de seis
+    jugadores, de mayor a menor, donde <strong>las puntuaciones iguales
+    comparten puesto</strong>: ranking denso, así que dos jugadores con 87
+    puntos son ambos el #2 y la siguiente puntuación por debajo es el #3.
+    Los datos están en el código de abajo; las dos versiones deben imprimir
+    las líneas que aparecen bajo <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">#1 Leo — 92 pts
 #2 Mina — 87 pts
 #2 Anton — 87 pts
@@ -68,10 +67,10 @@
 #4 Bea — 60 pts</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class Player {
@@ -145,23 +144,23 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Tied ranks force the native loop to carry two pieces of mutable state
-    — the current <code>rank</code> and the previous score — and the tie
-    rule lives in an <code>if</code> whose correctness you check by
-    replaying the loop in your head. The FxDart version states the
-    structure instead: <code><a href="../tutorials/sortBy.html">sortBy</a></code> descending,
-    <code><a href="../tutorials/groupBy.html">groupBy</a></code> score (one group per rank), walk the groups with
-    <code><a href="../tutorials/entries.html">entries</a></code> + <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> (group index = rank),
-    and <code><a href="../tutorials/flatMap.html">flatMap</a></code> each group back into player lines. "Equal
-    scores share a rank" stops being emergent loop behavior and becomes
-    the pipeline's shape.
+    Los empates obligan al bucle nativo a arrastrar dos piezas de estado
+    mutable —el <code>rank</code> actual y la puntuación anterior— y la
+    regla de empate vive dentro de un <code>if</code> cuya corrección
+    compruebas reproduciendo el bucle en tu cabeza. La versión con FxDart
+    declara la estructura en su lugar: <code><a href="../tutorials/sortBy.html">sortBy</a></code> descendente,
+    <code><a href="../tutorials/groupBy.html">groupBy</a></code> por puntuación (un grupo por puesto), recorrer los
+    grupos con <code><a href="../tutorials/entries.html">entries</a></code> + <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> (índice de
+    grupo = puesto) y <code><a href="../tutorials/flatMap.html">flatMap</a></code> para devolver cada grupo a líneas
+    de jugador. «Las puntuaciones iguales comparten puesto» deja de ser un
+    comportamiento emergente del bucle y pasa a ser la forma del pipeline.
   </p>
 
   <nav class="tut-nav">
-    <a href="budget-alerts.html">← Anterior: Categories over their monthly budget</a>
-    <a href="invoice-summary.html">Siguiente: Line items to invoice summary →</a>
+    <a href="budget-alerts.html">← Anterior: Categorías que superan su presupuesto mensual</a>
+    <a href="invoice-summary.html">Siguiente: De líneas de pedido a resumen de factura →</a>
   </nav>
 </main>
 <footer class="site-footer">

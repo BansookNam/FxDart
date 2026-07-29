@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Refunds vs charges, both formatted — Dart vs FxDart</title>
-  <meta name="description" content="Split a ledger into refunds and charges and print both sides — two where passes in plain Dart vs one partition in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/refunds-vs-charges.html">
+  <title>Reembolsos frente a cargos, ambos formateados — Dart vs FxDart</title>
+  <meta name="description" content="Divide un libro de cuentas en reembolsos y cargos e imprime ambos lados — dos pasadas de where en Dart nativo frente a un solo partition en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/refunds-vs-charges.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/refunds-vs-charges.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/refunds-vs-charges.html">
@@ -44,30 +43,29 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #15 · <strong>Refunds vs charges, both formatted</strong></p>
-  <h1>Refunds vs charges, both formatted</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #15 · <strong>Reembolsos frente a cargos, ambos formateados</strong></p>
+  <h1>Reembolsos frente a cargos, ambos formateados</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/partition.html">partition</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    A ledger mixes charges and refunds (negative amounts). Split it into the
-    two groups, format every transaction as
-    <code>merchant $amount</code>, and print one line per group —
-    refunds first. The data is in the code below; both versions must print
-    the lines shown under <em>Expected output</em>.
+    Un libro de cuentas mezcla cargos y reembolsos (importes negativos).
+    Divídelo en los dos grupos, formatea cada transacción como
+    <code>merchant $amount</code> e imprime una línea por grupo, primero
+    los reembolsos. Los datos están en el código de abajo; ambas versiones
+    deben imprimir las líneas que aparecen bajo <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">refunds: Web Store $89.99, Airline $120.00, Book Nook $27.99
 charges: Cafe Aroma $12.50, Web Store $89.99, Noodle Bar $18.90, Airline $240.00, Green Grocer $43.20</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class Tx {
@@ -135,23 +133,24 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Dart has no <code><a href="../tutorials/partition.html">partition</a></code> — when you need <em>both</em> halves,
-    <code>where</code> only gives you one, so the native version filters
-    twice: once with the predicate, once with its negation, written out by
-    hand (<code>&lt; 0</code> and <code>&gt;= 0</code>). That is two passes
-    over the data and two predicates to keep in sync — if the refund rule
-    ever changes, nothing forces the second line to follow. FxDart's
-    <code><a href="../tutorials/partition.html">partition</a></code> makes the split one declaration: a single
-    predicate, a single pass, and a record destructure that names both
-    halves. The <code><a href="../tutorials/map.html">map</a></code> + <code><a href="../tutorials/join.html">join</a></code> formatting afterwards
-    is the same in both.
+    Dart no tiene <code><a href="../tutorials/partition.html">partition</a></code>: cuando necesitas <em>ambas</em>
+    mitades, <code>where</code> solo te da una, así que la versión nativa
+    filtra dos veces —una con el predicado y otra con su negación, escrita
+    a mano (<code>&lt; 0</code> y <code>&gt;= 0</code>)—. Eso son dos
+    pasadas sobre los datos y dos predicados que mantener sincronizados: si
+    algún día cambia la regla de los reembolsos, nada obliga a la segunda
+    línea a seguirla. El <code><a href="../tutorials/partition.html">partition</a></code> de FxDart convierte la
+    división en una sola declaración: un único predicado, una única pasada
+    y una desestructuración de record que pone nombre a ambas mitades. El
+    formateo posterior con <code><a href="../tutorials/map.html">map</a></code> + <code><a href="../tutorials/join.html">join</a></code> es igual en
+    ambas.
   </p>
 
   <nav class="tut-nav">
-    <a href="unique-tags.html">← Anterior: All tags across posts, sorted</a>
-    <a href="compound-interest.html">Siguiente: Compound interest table →</a>
+    <a href="unique-tags.html">← Anterior: Todas las etiquetas de las entradas, ordenadas</a>
+    <a href="compound-interest.html">Siguiente: Tabla de interés compuesto →</a>
   </nav>
 </main>
 <footer class="site-footer">

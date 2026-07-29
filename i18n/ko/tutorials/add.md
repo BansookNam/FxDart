@@ -1,7 +1,7 @@
 ---
 slug: add
 title: add — FxDart 101
-description: FxDart add 튜토리얼 - 함수 값으로 쓸 수 있는 제네릭 +, 리듀서로 활용하는 법을 라이브 플레이그라운드와 함께 다룹니다.
+description: FxDart add 튜토리얼: 함수 값으로 쓸 수 있는 제네릭 +, 리듀서로 활용하는 법을 라이브 플레이그라운드와 함께 다룹니다.
 heading: <code>add</code>
 section: 10
 crumb: add

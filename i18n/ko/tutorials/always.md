@@ -1,7 +1,7 @@
 ---
 slug: always
 title: always — FxDart 101
-description: FxDart always 튜토리얼 - 인자를 무시하고 언제나 고정된 값을 반환하는 함수를 만드는 법을 라이브 플레이그라운드와 함께 다룹니다.
+description: FxDart always 튜토리얼: 인자를 무시하고 언제나 고정된 값을 반환하는 함수를 만드는 법을 라이브 플레이그라운드와 함께 다룹니다.
 heading: <code>always</code>
 section: 10
 crumb: always

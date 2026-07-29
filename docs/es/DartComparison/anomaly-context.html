@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Anomalies with surrounding context — Dart vs FxDart</title>
-  <meta name="description" content="Show over-limit sensor readings plus one line before and after — zipWithIndex + flatMap + uniq as one pipeline vs an index set built in nested loops.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/anomaly-context.html">
+  <title>Anomalías con su contexto alrededor — Dart vs FxDart</title>
+  <meta name="description" content="Muestra las lecturas de sensor por encima del límite más una línea antes y otra después — zipWithIndex + flatMap + uniq como un solo pipeline frente a un conjunto de índices construido en bucles anidados.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/anomaly-context.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/anomaly-context.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/anomaly-context.html">
@@ -44,24 +43,24 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #34 · <strong>Anomalies with surrounding context</strong></p>
-  <h1>Anomalies with surrounding context</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #34 · <strong>Anomalías con su contexto alrededor</strong></p>
+  <h1>Anomalías con su contexto alrededor</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    A temperature sensor logged ten readings (data in the code). Print every
-    reading <strong>above 80.0&nbsp;C</strong> — marked with
-    <code>!</code> — together with the reading <em>directly before and
-    after</em> it, the way <code>grep -C1</code> shows context lines. Where
-    context windows overlap, each reading appears once. Finish with the peak
-    reading. Both versions must print the block under
-    <em>Expected output</em>.
+    Un sensor de temperatura registró diez lecturas (los datos están en el
+    código). Imprime todas las lecturas <strong>por encima de
+    80.0&nbsp;C</strong> —marcadas con <code>!</code>— junto con la lectura
+    <em>inmediatamente anterior y posterior</em>, tal como
+    <code>grep -C1</code> muestra las líneas de contexto. Donde las ventanas
+    de contexto se solapan, cada lectura aparece una sola vez. Termina con la
+    lectura máxima. Ambas versiones deben imprimir el bloque que aparece bajo
+    <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Readings above 80.0 C, with context
   09:05  64.8 C
 ! 09:10  91.2 C
@@ -73,10 +72,10 @@
 Peak: 91.2 C at 09:10</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class Reading {
@@ -179,23 +178,25 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    "Each hit expands to a window, then overlapping windows merge" is a
-    flatten-plus-dedupe problem, and FxDart spells it exactly that way:
-    <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> keeps positions, <code><a href="../tutorials/filter.html">filter</a></code> finds the
-    anomalies, <code><a href="../tutorials/flatMap.html">flatMap</a></code> expands each into
-    <code>[i-1, i, i+1]</code>, and <code><a href="../tutorials/uniq.html">uniq</a></code> merges the overlaps —
-    one uninterrupted expression from readings to printed lines. Native Dart
-    has no <code><a href="../tutorials/flatMap.html">flatMap</a></code>-into-<code><a href="../tutorials/uniq.html">uniq</a></code> idiom for this, so
-    the natural version builds a <code>Set&lt;int&gt;</code> of indices in
-    nested <code>for</code> loops, sorts it, and formats in a second loop —
-    the same algorithm, but split into three mutable phases.
+    «Cada coincidencia se expande a una ventana y luego las ventanas que se
+    solapan se fusionan» es un problema de aplanar y deduplicar, y FxDart lo
+    escribe exactamente así: <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> conserva las
+    posiciones, <code><a href="../tutorials/filter.html">filter</a></code> encuentra las anomalías,
+    <code><a href="../tutorials/flatMap.html">flatMap</a></code> expande cada una a <code>[i-1, i, i+1]</code> y
+    <code><a href="../tutorials/uniq.html">uniq</a></code> fusiona los solapamientos —una única expresión
+    ininterrumpida que va de las lecturas a las líneas impresas. Dart nativo
+    no tiene un modismo de <code><a href="../tutorials/flatMap.html">flatMap</a></code>-hacia-<code><a href="../tutorials/uniq.html">uniq</a></code> para
+    esto, así que la versión natural construye un
+    <code>Set&lt;int&gt;</code> de índices en bucles <code>for</code>
+    anidados, lo ordena y da formato en un segundo bucle —el mismo
+    algoritmo, pero partido en tres fases mutables.
   </p>
 
   <nav class="tut-nav">
-    <a href="price-drop-detection.html">← Anterior: Price drops between two snapshots</a>
-    <a href="sparse-timeseries.html">Siguiente: Fill gaps in a sparse time series →</a>
+    <a href="price-drop-detection.html">← Anterior: Bajadas de precio entre dos instantáneas</a>
+    <a href="sparse-timeseries.html">Siguiente: Rellenar huecos en una serie temporal dispersa →</a>
   </nav>
 </main>
 <footer class="site-footer">

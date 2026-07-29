@@ -20,7 +20,7 @@ nextLabel: when
     como función de primera clase, así que puedes pasarlo donde se espera un
     <code>bool Function(bool)</code> en lugar de escribir tú mismo
     <code>(b) =&gt; !b</code>. El <code>not</code> de FxTS opera sobre valores
-    "truthy" de JavaScript de cualquier tipo; Dart no tiene valores truthy implícitos,
+    «truthy» de JavaScript de cualquier tipo; Dart no tiene valores truthy implícitos,
     así que el port a Dart solo acepta un <code>bool</code> real.
   </p>
   <p>
@@ -42,8 +42,8 @@ nextLabel: when
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>not</code> para construir la lista de flags "aún pendiente"
-    a partir de una lista de flags "hecho".</p>
+  <p>Ejercicio: usa <code>not</code> para construir la lista de flags «aún pendiente»
+    a partir de una lista de flags «hecho».</p>
   {{playground:2}}
 
   <div class="callout">

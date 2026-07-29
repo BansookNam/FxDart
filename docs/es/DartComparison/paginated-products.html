@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Paginated product listing — Dart vs FxDart</title>
-  <meta name="description" content="Filter, sort by price, and slice out page 2 — Dart already has skip/take, so this one is a genuine tie.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/paginated-products.html">
+  <title>Listado de productos paginado — Dart vs FxDart</title>
+  <meta name="description" content="Filtra, ordena por precio y extrae la página 2 — Dart ya tiene skip/take, así que este caso es un empate de verdad.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/paginated-products.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/paginated-products.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/paginated-products.html">
@@ -44,32 +43,31 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #22 · <strong>Paginated product listing</strong></p>
-  <h1>Paginated product listing</h1>
-  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #22 · <strong>Listado de productos paginado</strong></p>
+  <h1>Listado de productos paginado</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Empate</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/take.html">take</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    A small shop catalog: name, price, in-stock flag. Show
-    <strong>page 2</strong> of the in-stock products, sorted by price
-    ascending, three per page — one line per product. The data is in the
-    code below; both versions must print the lines shown under
-    <em>Expected output</em>.
+    El catálogo de una tienda pequeña: nombre, precio y bandera de
+    disponibilidad. Muestra la <strong>página 2</strong> de los productos
+    en stock, ordenados por precio ascendente, tres por página — una línea
+    por producto. Los datos están en el código de abajo; ambas versiones
+    deben imprimir las líneas que aparecen bajo <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Page 2 of in-stock products:
 Milk Frother — $24.90
 Cold Brew Jar — $27.80
 Scale — $42.00</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class Product {
@@ -151,21 +149,22 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    They barely do — this is a tie, and it is worth saying plainly.
-    Pagination is exactly the shape Dart's <code>Iterable</code> already
-    covers: <code>skip</code> and <code><a href="../tutorials/take.html">take</a></code> read just as well as
-    FxDart's <code><a href="../tutorials/drop.html">drop</a></code> and <code><a href="../tutorials/take.html">take</a></code>, and both stay lazy.
-    The only native wrinkle is sorting by a key — core Dart needs a
-    comparator (<code>package:collection</code>'s <code>sortedBy</code>
-    closes even that). Pick FxDart here only if the rest of the codebase
-    already speaks its vocabulary; plain Dart loses nothing on this task.
+    Apenas difieren — esto es un empate, y conviene decirlo con claridad.
+    La paginación es exactamente la forma que el <code>Iterable</code> de
+    Dart ya cubre: <code>skip</code> y <code><a href="../tutorials/take.html">take</a></code> se leen igual de
+    bien que el <code><a href="../tutorials/drop.html">drop</a></code> y el <code><a href="../tutorials/take.html">take</a></code> de FxDart, y los
+    dos siguen siendo perezosos. La única arruga nativa es ordenar por una
+    clave — el núcleo de Dart necesita un comparador (el
+    <code>sortedBy</code> de <code>package:collection</code> cierra
+    incluso esa brecha). Elige FxDart aquí solo si el resto del código ya
+    habla su vocabulario; Dart nativo no pierde nada en esta tarea.
   </p>
 
   <nav class="tut-nav">
-    <a href="monthly-category-report.html">← Anterior: Monthly category report, sorted by spend</a>
-    <a href="weekly-sensor-averages.html">Siguiente: Weekly averages from daily readings →</a>
+    <a href="monthly-category-report.html">← Anterior: Informe mensual por categorías, ordenado por gasto</a>
+    <a href="weekly-sensor-averages.html">Siguiente: Medias semanales a partir de lecturas diarias →</a>
   </nav>
 </main>
 <footer class="site-footer">

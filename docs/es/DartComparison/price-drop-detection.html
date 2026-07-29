@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Price drops between two snapshots — Dart vs FxDart</title>
-  <meta name="description" content="Compare two price-list snapshots and report what got cheaper — indexBy + filter + sortBy + head + sumBy vs a map literal and where/fold chains.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/price-drop-detection.html">
+  <title>Bajadas de precio entre dos instantáneas — Dart vs FxDart</title>
+  <meta name="description" content="Compara dos instantáneas de una lista de precios e informa de lo que se abarató — indexBy + filter + sortBy + head + sumBy frente a un literal de Map y cadenas where/fold.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/price-drop-detection.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/price-drop-detection.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/price-drop-detection.html">
@@ -44,23 +43,24 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #33 · <strong>Price drops between two snapshots</strong></p>
-  <h1>Price drops between two snapshots</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #33 · <strong>Bajadas de precio entre dos instantáneas</strong></p>
+  <h1>Bajadas de precio entre dos instantáneas</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/indexBy.html">indexBy</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/head.html">head</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Two snapshots of a shop's price list (data in the code): June and July.
-    Some items got cheaper, some more expensive, one was discontinued and
-    one is new. Report every item that <strong>dropped in price</strong> —
-    old price, new price, and the drop — sorted by biggest drop first, plus
-    a callout for the single biggest drop and the total savings. Both
-    versions must print the report under <em>Expected output</em>.
+    Dos instantáneas de la lista de precios de una tienda (los datos están
+    en el código): junio y julio. Algunos artículos se abarataron, otros se
+    encarecieron, uno se descatalogó y otro es nuevo. Informa de cada
+    artículo que <strong>bajó de precio</strong> —precio anterior, precio
+    nuevo y la bajada—, ordenado de mayor a menor bajada, más una mención
+    destacada a la mayor bajada individual y al ahorro total. Ambas
+    versiones deben imprimir el informe que aparece bajo <em>Salida
+    esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Price drops, June -&gt; July
   Hand Grinder    $49.90 -&gt; $44.00  (-$5.90)
   Espresso Beans  $18.00 -&gt; $14.50  (-$3.50)
@@ -69,10 +69,10 @@ Biggest drop: Hand Grinder (-$5.90)
 Total savings if bought now: $9.90</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -189,24 +189,26 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    The whole task is one flow: index June by SKU, keep July items that got
-    cheaper, pair each with its drop, sort by drop. FxDart has a named step
-    for each move — <code><a href="../tutorials/indexBy.html">indexBy</a></code> for the lookup table,
-    <code><a href="../tutorials/filter.html">filter</a></code> → <code><a href="../tutorials/map.html">map</a></code> → <code><a href="../tutorials/sortBy.html">sortBy</a></code> for the
-    pipeline, then <code><a href="../tutorials/head.html">head</a></code> and <code><a href="../tutorials/sumBy.html">sumBy</a></code> reuse the same
-    result list for the summary lines. Native Dart can express it — a map
-    literal for the index, <code>where</code>/<code><a href="../tutorials/map.html">map</a></code>/
-    <code>sortedBy</code> for the chain — but the vocabulary is scattered:
-    <code>fold</code> with a seed instead of <code><a href="../tutorials/sumBy.html">sumBy</a></code>,
-    <code>sortedBy&lt;num&gt;</code> with a negated key, and no name at all
-    for "build me a lookup by key".
+    Toda la tarea es un único flujo: indexar junio por SKU, quedarse con
+    los artículos de julio que se abarataron, emparejar cada uno con su
+    bajada y ordenar por bajada. FxDart tiene un paso con nombre para cada
+    movimiento —<code><a href="../tutorials/indexBy.html">indexBy</a></code> para la tabla de búsqueda,
+    <code><a href="../tutorials/filter.html">filter</a></code> → <code><a href="../tutorials/map.html">map</a></code> → <code><a href="../tutorials/sortBy.html">sortBy</a></code> para el
+    pipeline, y después <code><a href="../tutorials/head.html">head</a></code> y <code><a href="../tutorials/sumBy.html">sumBy</a></code> reutilizan
+    la misma lista de resultados para las líneas del resumen—. Dart nativo
+    puede expresarlo —un literal de Map para el índice,
+    <code>where</code>/<code><a href="../tutorials/map.html">map</a></code>/<code>sortedBy</code> para la
+    cadena—, pero el vocabulario está disperso: <code>fold</code> con un
+    valor inicial en lugar de <code><a href="../tutorials/sumBy.html">sumBy</a></code>,
+    <code>sortedBy&lt;num&gt;</code> con una clave negada y ningún nombre
+    para «constrúyeme una tabla de búsqueda por clave».
   </p>
 
   <nav class="tut-nav">
-    <a href="cohort-retention.html">← Anterior: Cohort retention table</a>
-    <a href="anomaly-context.html">Siguiente: Anomalies with surrounding context →</a>
+    <a href="cohort-retention.html">← Anterior: Tabla de retención por cohortes</a>
+    <a href="anomaly-context.html">Siguiente: Anomalías con su contexto alrededor →</a>
   </nav>
 </main>
 <footer class="site-footer">

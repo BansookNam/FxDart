@@ -42,7 +42,7 @@ nextLabel: omit
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="entries.html"><code>entries</code></a> — 반대 방향 ·
     <a href="zip.html"><code>zip</code></a> — 나란한 두 리스트로 엔트리 만들기 ·
     <a href="omit.html"><code>omit</code></a> — 만들어진 Map에서 키 제거 ·

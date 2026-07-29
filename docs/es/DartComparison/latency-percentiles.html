@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>p50/p95 latency per endpoint — Dart vs FxDart</title>
-  <meta name="description" content="Percentile table from raw request logs — groupBy + sortBy + nth per endpoint vs a row-accumulating loop with in-place sorts.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/latency-percentiles.html">
+  <title>Latencia p50/p95 por endpoint — Dart vs FxDart</title>
+  <meta name="description" content="Tabla de percentiles a partir de logs de peticiones en crudo — groupBy + sortBy + nth por endpoint frente a un bucle que acumula filas con ordenaciones in situ.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/latency-percentiles.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/latency-percentiles.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/latency-percentiles.html">
@@ -44,23 +43,23 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #39 · <strong>p50/p95 latency per endpoint</strong></p>
-  <h1>p50/p95 latency per endpoint</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #39 · <strong>Latencia p50/p95 por endpoint</strong></p>
+  <h1>Latencia p50/p95 por endpoint</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/nth.html">nth</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    From raw request logs (data in the code), drop failed requests and
-    compute <strong>p50 and p95 latency per endpoint</strong>: sort each
-    endpoint's latencies and take the value at index
-    <code>round((n-1) * q / 100)</code>. Print a table sorted by worst p95
-    first, then call out the worst endpoint. Both versions must print the
-    table under <em>Expected output</em>.
+    A partir de logs de peticiones en crudo (los datos están en el código),
+    descarta las peticiones fallidas y calcula la <strong>latencia p50 y
+    p95 por endpoint</strong>: ordena las latencias de cada endpoint y toma
+    el valor situado en el índice
+    <code>round((n-1) * q / 100)</code>. Imprime una tabla ordenada por el
+    peor p95 primero y luego señala el peor endpoint. Las dos versiones
+    deben imprimir la tabla que aparece bajo <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Latency percentiles (successful requests only)
   /orders  p50 133 ms  p95 620 ms  (5 reqs)
   /search  p50 210 ms  p95 480 ms  (4 reqs)
@@ -68,10 +67,10 @@
 Worst p95: /orders at 620 ms</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -183,24 +182,25 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    A percentile is "sort, then index" — in FxDart that is literally
-    <code><a href="../tutorials/sortBy.html">sortBy</a></code> + <code><a href="../tutorials/nth.html">nth</a></code>, applied inside a
-    <code><a href="../tutorials/groupBy.html">groupBy</a></code> → <code><a href="../tutorials/map.html">map</a></code> pipeline that turns each
-    endpoint group into a stats row; ranking the table and finding the worst
-    endpoint reuse the same rows with <code><a href="../tutorials/sortBy.html">sortBy</a></code> and
-    <code><a href="../tutorials/maxBy.html">maxBy</a></code>. The native version does the same math but through a
-    mutable row list filled in a <code>for</code> loop, an in-place
-    <code>..sort()</code>, raw index access, and a <code>reduce</code>
-    comparator for the maximum. Both are correct; the fxdart side keeps
-    "group → summarize → rank" as three visible strokes instead of one loop
-    doing all three at once.
+    Un percentil es «ordena y luego indexa»: en FxDart eso es literalmente
+    <code><a href="../tutorials/sortBy.html">sortBy</a></code> + <code><a href="../tutorials/nth.html">nth</a></code>, aplicados dentro de un pipeline
+    <code><a href="../tutorials/groupBy.html">groupBy</a></code> → <code><a href="../tutorials/map.html">map</a></code> que convierte cada grupo de
+    endpoint en una fila de estadísticas; ordenar la tabla y encontrar el
+    peor endpoint reutilizan esas mismas filas con <code><a href="../tutorials/sortBy.html">sortBy</a></code> y
+    <code><a href="../tutorials/maxBy.html">maxBy</a></code>. La versión nativa hace las mismas cuentas, pero a
+    través de una lista mutable de filas rellenada en un bucle
+    <code>for</code>, un <code>..sort()</code> in situ, acceso por índice en
+    crudo y un comparador con <code>reduce</code> para el máximo. Ambas son
+    correctas; el lado de fxdart mantiene «agrupar → resumir → ordenar»
+    como tres trazos visibles en lugar de un solo bucle que hace los tres a
+    la vez.
   </p>
 
   <nav class="tut-nav">
-    <a href="alert-digest.html">← Anterior: Log alert digest by service and severity</a>
-    <a href="ledger-diff.html">Siguiente: Diff two ledger snapshots →</a>
+    <a href="alert-digest.html">← Anterior: Resumen de alertas de log por servicio y severidad</a>
+    <a href="ledger-diff.html">Siguiente: Diff de dos snapshots de un libro de cuentas →</a>
   </nav>
 </main>
 <footer class="site-footer">

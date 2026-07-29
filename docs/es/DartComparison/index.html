@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dart vs FxDart — real tasks, side by side</title>
-  <meta name="description" content="50 real-world tasks solved twice — once in plain Dart, once with FxDart — each pair runnable in the browser, with an honest verdict on which reads better.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/index.html">
+  <title>Dart vs FxDart — tareas reales, lado a lado</title>
+  <meta name="description" content="50 tareas del mundo real resueltas dos veces —una en Dart puro y otra con FxDart—, cada pareja ejecutable en el navegador y con un veredicto honesto sobre cuál se lee mejor.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/index.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/index.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/index.html">
@@ -43,71 +42,72 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <h1>Dart vs FxDart</h1>
   <p class="hero-sub">
-    The same real task, solved twice: plain Dart on the left, FxDart on the
-    right. Both versions run in your browser and print exactly the same
-    output — compare them and decide for yourself.
+    La misma tarea real, resuelta dos veces: Dart puro a la izquierda, FxDart
+    a la derecha. Las dos versiones se ejecutan en tu navegador e imprimen
+    exactamente la misma salida — compáralas y decide por ti mismo.
   </p>
 
   <p>
-    A word of honesty before the list: Dart's built-in <code>Iterable</code>
-    is already lazy, and simple <code>where</code>/<code>map</code> chains
-    are perfectly good Dart. FxDart is not here to beat those. What it adds
-    is <strong>vocabulary</strong>
+    Un apunte de honestidad antes de la lista: el <code>Iterable</code>
+    integrado de Dart ya es perezoso, y las cadenas sencillas de
+    <code>where</code>/<code>map</code> son código Dart perfectamente válido.
+    FxDart no está aquí para ganarles. Lo que aporta es
+    <strong>vocabulario</strong>
     (<code><a href="../tutorials/groupBy.html">groupBy</a></code>,
     <code><a href="../tutorials/chunk.html">chunk</a></code>,
     <code><a href="../tutorials/zip.html">zip</a></code>,
     <code><a href="../tutorials/scan.html">scan</a></code>,
     <code><a href="../tutorials/uniqBy.html">uniqBy</a></code>,
     <code><a href="../tutorials/partition.html">partition</a></code> —
-    things core Dart makes you hand-roll),
-    <strong>composition</strong> (one typed
-    <code><a href="../tutorials/fx.html">fx()</a></code> chain instead
-    of nested calls and intermediate variables), and above all
-    <strong>concurrency control</strong> —
-    <code><a href="../tutorials/concurrent.html">.concurrent(n)</a></code> runs an
-    async pipeline n items at a time, in order, which plain Dart can only
-    approximate with manual worker pools. Every example carries a verdict
-    badge, and some of them say native Dart is fine. That's the point: when
-    an example <em>does</em> say FxDart wins, you can believe it.
+    cosas que el Dart de base te obliga a escribir a mano),
+    <strong>composición</strong> (una única cadena tipada
+    <code><a href="../tutorials/fx.html">fx()</a></code> en lugar de
+    llamadas anidadas y variables intermedias) y, sobre todo,
+    <strong>control de la concurrencia</strong>:
+    <code><a href="../tutorials/concurrent.html">.concurrent(n)</a></code> ejecuta
+    un pipeline asíncrono n elementos a la vez, en orden, algo que el Dart puro
+    solo puede aproximar con pools de workers escritos a mano. Cada ejemplo
+    lleva una insignia de veredicto, y algunos dicen que el Dart nativo está
+    bien. De eso se trata: cuando un ejemplo <em>sí</em> dice que gana FxDart,
+    puedes creértelo.
   </p>
 
   <p>
-    <span class="badge verdict-fxdart">FxDart wins</span> — clearly better here ·
-    <span class="badge verdict-tie">Toss-up</span> — equally good, pick by taste ·
-    <span class="badge verdict-native">Native is fine</span> — plain Dart handles it well ·
-    <span class="badge badge-async">async</span> — uses async pipelines
+    <span class="badge verdict-fxdart">Gana FxDart</span> — aquí es claramente mejor ·
+    <span class="badge verdict-tie">Empate</span> — igual de buenos, elige por gusto ·
+    <span class="badge verdict-native">Dart nativo basta</span> — Dart puro lo resuelve bien ·
+    <span class="badge badge-async">async</span> — usa pipelines asíncronos
   </p>
 
-  <p class="cmp-picks"><span>If you only read five, read these:</span>
-    <a href="food-spending.html">#1 Food spending this month</a> ·
-    <a href="top-merchants.html">#11 Top 5 merchants by total spend</a> ·
-    <a href="concurrent-enrichment.html">#30 Enrich top merchants concurrently</a> ·
-    <a href="concurrent-profile-fetch.html">#41 Fetch 10 profiles, 3 at a time</a> ·
-    <a href="daily-ledger-close.html">#50 Finale — DailyLedger monthly close</a>
+  <p class="cmp-picks"><span>Si solo vas a leer cinco, lee estos:</span>
+    <a href="food-spending.html">#1 Gasto en comida este mes</a> ·
+    <a href="top-merchants.html">#11 Los 5 comercios con más gasto total</a> ·
+    <a href="concurrent-enrichment.html">#30 Enriquecer los principales comercios de forma concurrente</a> ·
+    <a href="concurrent-profile-fetch.html">#41 Obtener 10 perfiles, de tres en tres</a> ·
+    <a href="daily-ledger-close.html">#50 Gran final — cierre mensual de DailyLedger</a>
   </p>
 
   <div class="cmp-filter" hidden>
-    <button data-filter="all" class="active">All</button>
+    <button data-filter="all" class="active">Todos</button>
     <button data-filter="async">async</button>
-    <button data-filter="fxdart">FxDart wins</button>
-    <button data-filter="tie">Toss-up</button>
-    <button data-filter="native">Native is fine</button>
-    <input type="search" placeholder="filter by function name…">
+    <button data-filter="fxdart">Gana FxDart</button>
+    <button data-filter="tie">Empate</button>
+    <button data-filter="native">Dart nativo basta</button>
+    <input type="search" placeholder="filtrar por nombre de función…">
   </div>
 
   <section class="cmp-tier">
-  <h2>Part 1 · Two functions</h2>
-  <p class="dim">Everyday one-liners. Native Dart often keeps up here — watch the verdict badges.</p>
+  <h2>Parte 1 · Dos funciones</h2>
+  <p class="dim">Tareas de una línea del día a día. Aquí Dart nativo suele estar a la altura: fíjate en las insignias de veredicto.</p>
   <ol class="cmp-list">
     <li data-verdict="fxdart" data-async="false" data-fns="filter sumBy">
       <a class="cmp-row" href="food-spending.html">
         <span class="cmp-num">1</span>
         <span class="cmp-row-body">
-          <strong>Food spending this month</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Total one category of a ledger — a where/fold chain in plain Dart vs filter + sumBy in FxDart.</span>
+          <strong>Gasto en comida este mes</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Suma una sola categoría de un libro de cuentas — una cadena where/fold en Dart nativo frente a filter + sumBy en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
@@ -116,8 +116,8 @@
       <a class="cmp-row" href="running-balance.html">
         <span class="cmp-num">2</span>
         <span class="cmp-row-body">
-          <strong>Running account balance</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Balance after every transaction — a mutable accumulator loop in plain Dart vs scan + map in FxDart.</span>
+          <strong>Saldo acumulado de una cuenta</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">El saldo después de cada transacción — un bucle con acumulador mutable en Dart nativo frente a scan + map en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
@@ -126,8 +126,8 @@
       <a class="cmp-row" href="top-expenses.html">
         <span class="cmp-num">3</span>
         <span class="cmp-row-body">
-          <strong>Top 3 largest expenses</strong> <span class="badge verdict-tie">Toss-up</span>
-          <span class="dim">Largest three transactions of the month — sortedBy + take from package:collection vs sortBy + take in FxDart.</span>
+          <strong>Los 3 gastos más grandes</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Las tres transacciones más grandes del mes — sortedBy + take de package:collection frente a sortBy + take en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
@@ -136,8 +136,8 @@
       <a class="cmp-row" href="first-visit-merchants.html">
         <span class="cmp-num">4</span>
         <span class="cmp-row-body">
-          <strong>Merchants in first-visit order</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Order-preserving dedupe — a seen-set loop in plain Dart vs map + uniq in FxDart.</span>
+          <strong>Comercios en orden de primera visita</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Deduplicación que preserva el orden — un bucle con conjunto de vistos en Dart nativo frente a map + uniq en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/uniq.html">uniq</a></li></ul>
@@ -146,8 +146,8 @@
       <a class="cmp-row" href="average-basket.html">
         <span class="cmp-num">5</span>
         <span class="cmp-row-body">
-          <strong>Average order value over $100</strong> <span class="badge verdict-tie">Toss-up</span>
-          <span class="dim">Mean total of large orders — where/map/average with package:collection vs filter + averageBy in FxDart.</span>
+          <strong>Valor medio de los pedidos de más de $100</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Total medio de los pedidos grandes — where/map/average con package:collection frente a filter + averageBy en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/averageBy.html">averageBy</a></li></ul>
@@ -156,8 +156,8 @@
       <a class="cmp-row" href="first-over-limit.html">
         <span class="cmp-num">6</span>
         <span class="cmp-row-body">
-          <strong>First sensor reading over the limit</strong> <span class="badge verdict-native">Native is fine</span>
-          <span class="dim">Find the first temperature above a threshold — skipWhile + firstOrNull in plain Dart vs dropWhile + head in FxDart.</span>
+          <strong>La primera lectura del sensor por encima del límite</strong> <span class="badge verdict-native">Dart nativo basta</span>
+          <span class="dim">Encuentra la primera temperatura por encima de un umbral — skipWhile + firstOrNull en Dart nativo frente a dropWhile + head en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/head.html">head</a></li></ul>
@@ -166,8 +166,8 @@
       <a class="cmp-row" href="top-log-level.html">
         <span class="cmp-num">7</span>
         <span class="cmp-row-body">
-          <strong>Most frequent log level</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Count log entries per level and pick the biggest — groupListsBy + reduce in plain Dart vs countBy + maxBy in FxDart.</span>
+          <strong>Nivel de log más frecuente</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Contar entradas de log por nivel y quedarse con el mayor — groupListsBy + reduce en Dart nativo frente a countBy + maxBy en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/countBy.html">countBy</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li></ul>
@@ -176,8 +176,8 @@
       <a class="cmp-row" href="paginate-users.html">
         <span class="cmp-num">8</span>
         <span class="cmp-row-body">
-          <strong>Batch users into pages of 10</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Split a user list into fixed-size pages — slices from package:collection vs chunk + map in FxDart.</span>
+          <strong>Agrupar usuarios en páginas de 10</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Divide una lista de usuarios en páginas de tamaño fijo — slices de package:collection frente a chunk + map en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
@@ -186,8 +186,8 @@
       <a class="cmp-row" href="rank-labels.html">
         <span class="cmp-num">9</span>
         <span class="cmp-row-body">
-          <strong>Rank labels for a leaderboard</strong> <span class="badge verdict-tie">Toss-up</span>
-          <span class="dim">Number a sorted leaderboard 1..n — Dart 3 indexed records vs zipWithIndex + map in FxDart.</span>
+          <strong>Etiquetas de puesto para una tabla de clasificación</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Numera de 1 a n una tabla de clasificación ya ordenada — los records de indexed de Dart 3 frente a zipWithIndex + map en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
@@ -196,8 +196,8 @@
       <a class="cmp-row" href="sequential-configs.html">
         <span class="cmp-num">10</span>
         <span class="cmp-row-body">
-          <strong>Load three remote configs in order</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span>
-          <span class="dim">Sequential async fetches — a plain await-in-loop in Dart vs toAsync + map in FxDart, one word away from bounded concurrency.</span>
+          <strong>Cargar tres configuraciones remotas en orden</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Peticiones asíncronas secuenciales — un simple await dentro de un bucle en Dart frente a toAsync + map en FxDart, a una palabra de la concurrencia acotada.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
@@ -206,15 +206,15 @@
   </section>
 
   <section class="cmp-tier">
-  <h2>Part 2 · Three functions</h2>
-  <p class="dim">Vocabulary native Dart lacks starts to pay off: groupBy, uniqBy, partition, scan.</p>
+  <h2>Parte 2 · Tres funciones</h2>
+  <p class="dim">El vocabulario que le falta a Dart nativo empieza a compensar: groupBy, uniqBy, partition, scan.</p>
   <ol class="cmp-list">
     <li data-verdict="fxdart" data-async="false" data-fns="groupBy sortBy take">
       <a class="cmp-row" href="top-merchants.html">
         <span class="cmp-num">11</span>
         <span class="cmp-row-body">
-          <strong>Top 5 merchants by total spend</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Group a ledger by merchant and rank the totals — groupListsBy + sortedBy in plain Dart vs a groupBy → sortBy → take chain in FxDart.</span>
+          <strong>Los 5 comercios con más gasto total</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Agrupar un libro de cuentas por comercio y ordenar los totales — groupListsBy + sortedBy en Dart nativo frente a una cadena groupBy → sortBy → take en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
@@ -223,8 +223,8 @@
       <a class="cmp-row" href="recent-errors.html">
         <span class="cmp-num">12</span>
         <span class="cmp-row-body">
-          <strong>Recent error messages, deduped</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">The three most recent distinct errors from a newest-first log — a seen-Set loop with a break in plain Dart vs filter + uniqBy + take in FxDart.</span>
+          <strong>Mensajes de error recientes, sin duplicados</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Los tres errores distintos más recientes de un log ordenado de más nuevo a más antiguo — un bucle con un Set de vistos y un break en Dart nativo frente a filter + uniqBy + take en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/uniqBy.html">uniqBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
@@ -233,8 +233,8 @@
       <a class="cmp-row" href="date-window-spend.html">
         <span class="cmp-num">13</span>
         <span class="cmp-row-body">
-          <strong>Spending inside a date window</strong> <span class="badge verdict-tie">Toss-up</span>
-          <span class="dim">Sum a slice of a date-sorted ledger — skipWhile/takeWhile/fold in plain Dart vs dropWhile + takeWhile + sumBy in FxDart. Native holds up well.</span>
+          <strong>Gasto dentro de una ventana de fechas</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Suma un tramo de un libro ordenado por fecha — skipWhile/takeWhile/fold en Dart nativo frente a dropWhile + takeWhile + sumBy en FxDart. Dart nativo aguanta bien.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/takeWhile.html">takeWhile</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
@@ -243,8 +243,8 @@
       <a class="cmp-row" href="unique-tags.html">
         <span class="cmp-num">14</span>
         <span class="cmp-row-body">
-          <strong>All tags across posts, sorted</strong> <span class="badge verdict-tie">Toss-up</span>
-          <span class="dim">Flatten post tags into one sorted, distinct list — expand + toSet + sort in plain Dart vs flatMap + uniq + sort in FxDart. An honest tie.</span>
+          <strong>Todas las etiquetas de las entradas, ordenadas</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Aplanar las etiquetas de las entradas en una sola lista ordenada y sin repetidos — expand + toSet + sort en Dart nativo frente a flatMap + uniq + sort en FxDart. Un empate honesto.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/sort.html">sort</a></li></ul>
@@ -253,8 +253,8 @@
       <a class="cmp-row" href="refunds-vs-charges.html">
         <span class="cmp-num">15</span>
         <span class="cmp-row-body">
-          <strong>Refunds vs charges, both formatted</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Split a ledger into refunds and charges and print both sides — two where passes in plain Dart vs one partition in FxDart.</span>
+          <strong>Reembolsos frente a cargos, ambos formateados</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Divide un libro de cuentas en reembolsos y cargos e imprime ambos lados — dos pasadas de where en Dart nativo frente a un solo partition en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/partition.html">partition</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
@@ -263,8 +263,8 @@
       <a class="cmp-row" href="compound-interest.html">
         <span class="cmp-num">16</span>
         <span class="cmp-row-body">
-          <strong>Compound interest table</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">A year-by-year balance table at 5% — a mutating accumulator loop in plain Dart vs range + scan + map in FxDart.</span>
+          <strong>Tabla de interés compuesto</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Una tabla de saldos año a año al 5% — un bucle con acumulador mutable en Dart nativo frente a range + scan + map en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
@@ -273,8 +273,8 @@
       <a class="cmp-row" href="sensor-anomalies.html">
         <span class="cmp-num">17</span>
         <span class="cmp-row-body">
-          <strong>Pair sensors with readings, keep anomalies</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Join two parallel lists and flag hot readings — an index loop in plain Dart (core has no zip) vs zip + filter + map in FxDart.</span>
+          <strong>Emparejar sensores con lecturas y quedarse con las anomalías</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Une dos listas paralelas y señala las lecturas altas — un bucle con índice en Dart nativo (el núcleo no tiene zip) frente a zip + filter + map en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/zip.html">zip</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
@@ -283,8 +283,8 @@
       <a class="cmp-row" href="top-category-average.html">
         <span class="cmp-num">18</span>
         <span class="cmp-row-body">
-          <strong>Category with highest average expense</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Group expenses and find the priciest category per transaction — collection groupBy + maxBy nested calls in plain Dart vs one FxDart chain.</span>
+          <strong>Categoría con el gasto medio más alto</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Agrupar gastos y encontrar la categoría más cara por transacción — llamadas anidadas a groupBy + maxBy de collection en Dart nativo frente a una sola cadena de FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li></ul>
@@ -293,8 +293,8 @@
       <a class="cmp-row" href="valid-emails.html">
         <span class="cmp-num">19</span>
         <span class="cmp-row-body">
-          <strong>First 5 valid emails, normalized</strong> <span class="badge verdict-native">Native is fine</span>
-          <span class="dim">Trim, lowercase, validate, take five — map/where/take in plain Dart vs map + filter + take in FxDart. Plain Dart is every bit as clean here.</span>
+          <strong>Los 5 primeros correos válidos, normalizados</strong> <span class="badge verdict-native">Dart nativo basta</span>
+          <span class="dim">Recortar, pasar a minúsculas, validar y tomar cinco — map/where/take en Dart nativo frente a map + filter + take en FxDart. Aquí Dart nativo es igual de limpio.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
@@ -303,8 +303,8 @@
       <a class="cmp-row" href="bounded-concurrency.html">
         <span class="cmp-num">20</span>
         <span class="cmp-row-body">
-          <strong>Fetch profiles, two at a time</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span>
-          <span class="dim">Bounded, in-order concurrency — a hand-rolled worker pool in plain Dart vs toAsync + map + concurrent in FxDart.</span>
+          <strong>Obtener perfiles de dos en dos</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Concurrencia acotada y en orden — un pool de workers hecho a mano en Dart nativo frente a toAsync + map + concurrent en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li></ul>
@@ -313,15 +313,15 @@
   </section>
 
   <section class="cmp-tier">
-  <h2>Part 3 · Five functions</h2>
-  <p class="dim">Real reports and pipelines — where composition keeps multi-step logic readable.</p>
+  <h2>Parte 3 · Cinco funciones</h2>
+  <p class="dim">Informes y pipelines reales: donde la composición mantiene legible una lógica de varios pasos.</p>
   <ol class="cmp-list">
     <li data-verdict="fxdart" data-async="false" data-fns="filter groupBy map sortBy join">
       <a class="cmp-row" href="monthly-category-report.html">
         <span class="cmp-num">21</span>
         <span class="cmp-row-body">
-          <strong>Monthly category report, sorted by spend</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Filter a ledger to one month, total each category, and rank them — loop plus mutable map in plain Dart vs filter + groupBy + sortBy in FxDart.</span>
+          <strong>Informe mensual por categorías, ordenado por gasto</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Filtra un libro de cuentas a un solo mes, suma cada categoría y ordénalas — bucle más mapa mutable en Dart nativo frente a filter + groupBy + sortBy en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
@@ -330,8 +330,8 @@
       <a class="cmp-row" href="paginated-products.html">
         <span class="cmp-num">22</span>
         <span class="cmp-row-body">
-          <strong>Paginated product listing</strong> <span class="badge verdict-tie">Toss-up</span>
-          <span class="dim">Filter, sort by price, and slice out page 2 — Dart already has skip/take, so this one is a genuine tie.</span>
+          <strong>Listado de productos paginado</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Filtra, ordena por precio y extrae la página 2 — Dart ya tiene skip/take, así que este caso es un empate de verdad.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/take.html">take</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
@@ -340,8 +340,8 @@
       <a class="cmp-row" href="weekly-sensor-averages.html">
         <span class="cmp-num">23</span>
         <span class="cmp-row-body">
-          <strong>Weekly averages from daily readings</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Fold 21 daily readings into 3 weekly averages — index arithmetic and sublist in plain Dart vs chunk + averageBy + zipWithIndex in FxDart.</span>
+          <strong>Medias semanales a partir de lecturas diarias</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Plegar 21 lecturas diarias en 3 medias semanales — aritmética de índices y sublist en Dart nativo frente a chunk + averageBy + zipWithIndex en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/averageBy.html">averageBy</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
@@ -350,8 +350,8 @@
       <a class="cmp-row" href="consecutive-over-limit.html">
         <span class="cmp-num">24</span>
         <span class="cmp-row-body">
-          <strong>Three consecutive readings over the limit</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Find every 3-hour window of CO2 readings all over 1000 ppm — an index loop in plain Dart vs a sliding window built from zip + drop in FxDart.</span>
+          <strong>Tres lecturas consecutivas por encima del límite</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Encuentra cada ventana de 3 horas de lecturas de CO2 todas por encima de 1000 ppm — un bucle con índices en Dart nativo frente a una ventana deslizante construida con zip + drop en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/zip.html">zip</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
@@ -360,8 +360,8 @@
       <a class="cmp-row" href="budget-alerts.html">
         <span class="cmp-num">25</span>
         <span class="cmp-row-body">
-          <strong>Categories over their monthly budget</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Total spend per category, keep the ones over budget, rank by overage — mutable-map bookkeeping in plain Dart vs groupBy + filter + sortBy in FxDart.</span>
+          <strong>Categorías que superan su presupuesto mensual</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Gasto total por categoría, quedarse con las que se pasan del presupuesto y ordenarlas por exceso — contabilidad con mapas mutables en Dart nativo frente a groupBy + filter + sortBy en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
@@ -370,8 +370,8 @@
       <a class="cmp-row" href="leaderboard-ties.html">
         <span class="cmp-num">26</span>
         <span class="cmp-row-body">
-          <strong>Leaderboard with tied ranks</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Rank players so equal scores share a rank — mutable rank/prevScore state in plain Dart vs sortBy + groupBy + zipWithIndex in FxDart.</span>
+          <strong>Tabla de clasificación con puestos empatados</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Clasifica jugadores de modo que las puntuaciones iguales compartan puesto — estado mutable rank/prevScore en Dart nativo frente a sortBy + groupBy + zipWithIndex en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/entries.html">entries</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li></ul>
@@ -380,8 +380,8 @@
       <a class="cmp-row" href="invoice-summary.html">
         <span class="cmp-num">27</span>
         <span class="cmp-row-body">
-          <strong>Line items to invoice summary</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Turn order line items into per-category totals plus a grand total — two loop-and-fold idioms in plain Dart vs groupBy + sumBy + sortBy in FxDart.</span>
+          <strong>De líneas de pedido a resumen de factura</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Convierte las líneas de un pedido en totales por categoría más un total general — dos modismos de bucle y fold en Dart nativo frente a groupBy + sumBy + sortBy en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
@@ -390,8 +390,8 @@
       <a class="cmp-row" href="no-spend-streak.html">
         <span class="cmp-num">28</span>
         <span class="cmp-row-body">
-          <strong>Longest streak of no-spend days</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Longest run of July days with no transaction — loop with streak/longest counters in plain Dart vs range + scan + max in FxDart.</span>
+          <strong>La racha más larga de días sin gastar</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">La racha más larga de días de julio sin ninguna transacción — bucle con contadores de racha y máximo en Dart nativo frente a range + scan + max en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/max.html">max</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
@@ -400,8 +400,8 @@
       <a class="cmp-row" href="duplicate-transactions.html">
         <span class="cmp-num">29</span>
         <span class="cmp-row-body">
-          <strong>Detect duplicated transactions</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Flag charges with the same merchant, amount, and day — putIfAbsent plus nested loops in plain Dart vs groupBy + filter + flatMap in FxDart.</span>
+          <strong>Detectar transacciones duplicadas</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Marca los cargos con el mismo comercio, importe y día — putIfAbsent más bucles anidados en Dart nativo frente a groupBy + filter + flatMap en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
@@ -410,8 +410,8 @@
       <a class="cmp-row" href="concurrent-enrichment.html">
         <span class="cmp-num">30</span>
         <span class="cmp-row-body">
-          <strong>Enrich top merchants concurrently</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span>
-          <span class="dim">Pick the top 3 merchants, then look each up over a rate-limited API, 2 at a time — a hand-rolled worker pool in plain Dart vs concurrent(2) in FxDart.</span>
+          <strong>Enriquecer los principales comercios de forma concurrente</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Elegir los 3 comercios principales y consultar cada uno en una API con límite de tasa, de dos en dos — un pool de workers hecho a mano en Dart nativo frente a concurrent(2) en FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li></ul>
@@ -420,15 +420,15 @@
   </section>
 
   <section class="cmp-tier">
-  <h2>Part 4 · Six to ten functions</h2>
-  <p class="dim">Full workflows, most with bounded concurrency — the part native Dart cannot express cleanly.</p>
+  <h2>Parte 4 · De seis a diez funciones</h2>
+  <p class="dim">Flujos de trabajo completos, casi todos con concurrencia acotada: la parte que Dart nativo no sabe expresar con elegancia.</p>
   <ol class="cmp-list">
     <li data-verdict="fxdart" data-async="false" data-fns="filter sumBy groupBy map sortBy take zipWithIndex join">
       <a class="cmp-row" href="monthly-ledger-report.html">
         <span class="cmp-num">31</span>
         <span class="cmp-row-body">
-          <strong>Full monthly ledger report</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">One report string from a ledger — total, category breakdown, top merchants — as three fxdart pipelines vs loops and intermediate maps.</span>
+          <strong>Informe mensual completo del libro de cuentas</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Un único informe a partir de un libro de cuentas — total, desglose por categorías, comercios principales — como tres pipelines de fxdart frente a bucles y mapas intermedios.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
@@ -437,8 +437,8 @@
       <a class="cmp-row" href="cohort-retention.html">
         <span class="cmp-num">32</span>
         <span class="cmp-row-body">
-          <strong>Cohort retention table</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Signup-month cohorts vs later activity — nested groupBy/dropWhile/filter pipelines vs nested for loops with accumulator lists.</span>
+          <strong>Tabla de retención por cohortes</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Cohortes por mes de alta frente a la actividad posterior — pipelines anidados de groupBy/dropWhile/filter frente a bucles for anidados con listas acumuladoras.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/size.html">size</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
@@ -447,8 +447,8 @@
       <a class="cmp-row" href="price-drop-detection.html">
         <span class="cmp-num">33</span>
         <span class="cmp-row-body">
-          <strong>Price drops between two snapshots</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Compare two price-list snapshots and report what got cheaper — indexBy + filter + sortBy + head + sumBy vs a map literal and where/fold chains.</span>
+          <strong>Bajadas de precio entre dos instantáneas</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Compara dos instantáneas de una lista de precios e informa de lo que se abarató — indexBy + filter + sortBy + head + sumBy frente a un literal de Map y cadenas where/fold.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/indexBy.html">indexBy</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/head.html">head</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
@@ -457,8 +457,8 @@
       <a class="cmp-row" href="anomaly-context.html">
         <span class="cmp-num">34</span>
         <span class="cmp-row-body">
-          <strong>Anomalies with surrounding context</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Show over-limit sensor readings plus one line before and after — zipWithIndex + flatMap + uniq as one pipeline vs an index set built in nested loops.</span>
+          <strong>Anomalías con su contexto alrededor</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Muestra las lecturas de sensor por encima del límite más una línea antes y otra después — zipWithIndex + flatMap + uniq como un solo pipeline frente a un conjunto de índices construido en bucles anidados.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
@@ -467,8 +467,8 @@
       <a class="cmp-row" href="sparse-timeseries.html">
         <span class="cmp-num">35</span>
         <span class="cmp-row-body">
-          <strong>Fill gaps in a sparse time series</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Days with no transactions become 0.00, then weekly rows with totals — range + groupBy + chunk as one flow vs a counting loop and slices.</span>
+          <strong>Rellenar huecos en una serie temporal dispersa</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Los días sin transacciones pasan a 0.00, y luego filas semanales con totales — range + groupBy + chunk como un solo flujo frente a un bucle con contador y slices.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
@@ -477,8 +477,8 @@
       <a class="cmp-row" href="multi-currency-report.html">
         <span class="cmp-num">36</span>
         <span class="cmp-row-body">
-          <strong>Multi-currency expense report</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Normalize a trip ledger to USD with fixed rates, then group, rank, and summarize — one pipeline per report line vs fold/reduce boilerplate.</span>
+          <strong>Informe de gastos multidivisa</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Normaliza a USD el libro de cuentas de un viaje con tipos fijos y luego agrupa, ordena y resume — un pipeline por línea de informe frente al boilerplate de fold/reduce.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
@@ -487,8 +487,8 @@
       <a class="cmp-row" href="restock-plan.html">
         <span class="cmp-num">37</span>
         <span class="cmp-row-body">
-          <strong>Inventory restock plan</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Prioritize below-threshold items and cut the order list at a budget — scan + zip + takeWhile as data flow vs a mutable running total and break.</span>
+          <strong>Plan de reposición de inventario</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Prioriza los artículos por debajo del umbral y corta la lista de pedidos al llegar al presupuesto — scan + zip + takeWhile como flujo de datos frente a un total acumulado mutable y un break.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/zip.html">zip</a></li><li><a href="../tutorials/takeWhile.html">takeWhile</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
@@ -497,8 +497,8 @@
       <a class="cmp-row" href="alert-digest.html">
         <span class="cmp-num">38</span>
         <span class="cmp-row-body">
-          <strong>Log alert digest by service and severity</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">WARN and ERROR logs rendered as an indented digest — nested grouping via groupBy + flatMap + uniq vs three nested loops and a seen-set.</span>
+          <strong>Resumen de alertas de log por servicio y severidad</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Logs WARN y ERROR presentados como un resumen con sangría — agrupación anidada con groupBy + flatMap + uniq frente a tres bucles anidados y un conjunto seen.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/countBy.html">countBy</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
@@ -507,8 +507,8 @@
       <a class="cmp-row" href="latency-percentiles.html">
         <span class="cmp-num">39</span>
         <span class="cmp-row-body">
-          <strong>p50/p95 latency per endpoint</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Percentile table from raw request logs — groupBy + sortBy + nth per endpoint vs a row-accumulating loop with in-place sorts.</span>
+          <strong>Latencia p50/p95 por endpoint</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Tabla de percentiles a partir de logs de peticiones en crudo — groupBy + sortBy + nth por endpoint frente a un bucle que acumula filas con ordenaciones in situ.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/nth.html">nth</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
@@ -517,8 +517,8 @@
       <a class="cmp-row" href="ledger-diff.html">
         <span class="cmp-num">40</span>
         <span class="cmp-row-body">
-          <strong>Diff two ledger snapshots</strong> <span class="badge verdict-fxdart">FxDart wins</span>
-          <span class="dim">Added, removed, and unchanged entries between two snapshots — differenceBy and intersectionBy by id vs hand-built id sets and where filters.</span>
+          <strong>Diff de dos snapshots de un libro de cuentas</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Entradas añadidas, eliminadas y sin cambios entre dos snapshots — differenceBy e intersectionBy por id frente a conjuntos de id construidos a mano y filtros where.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/differenceBy.html">differenceBy</a></li><li><a href="../tutorials/intersectionBy.html">intersectionBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concat.html">concat</a></li><li><a href="../tutorials/size.html">size</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
@@ -527,8 +527,8 @@
       <a class="cmp-row" href="concurrent-profile-fetch.html">
         <span class="cmp-num">41</span>
         <span class="cmp-row-body">
-          <strong>Fetch 10 profiles, 3 at a time</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span>
-          <span class="dim">Sync prep flowing straight into bounded concurrency — filter and sort, then toAsync + map + concurrent(3), vs a hand-rolled worker pool.</span>
+          <strong>Obtener 10 perfiles, de tres en tres</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Preparación síncrona que desemboca directamente en concurrencia acotada — filter y sort, luego toAsync + map + concurrent(3), frente a un pool de workers hecho a mano.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
@@ -537,8 +537,8 @@
       <a class="cmp-row" href="flaky-api-retry.html">
         <span class="cmp-num">42</span>
         <span class="cmp-row-body">
-          <strong>Poll a flaky API until first success</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span>
-          <span class="dim">Retry-until-ready as a lazy pipeline — range + toAsync + map + dropWhile + head vs an imperative polling loop with a break.</span>
+          <strong>Sondear una API inestable hasta el primer éxito</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Reintentar hasta que esté listo, como pipeline perezoso — range + toAsync + map + dropWhile + head frente a un bucle de sondeo imperativo con un break.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/peek.html">peek</a></li><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/head.html">head</a></li></ul>
@@ -547,8 +547,8 @@
       <a class="cmp-row" href="price-lookup-fallback.html">
         <span class="cmp-num">43</span>
         <span class="cmp-row-body">
-          <strong>Concurrent price lookup with fallback</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span>
-          <span class="dim">Look up live prices 3 at a time, fall back to catalog prices for missing SKUs — concurrent + a null-coalescing map vs a worker pool.</span>
+          <strong>Consulta concurrente de precios con fallback</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Consulta precios en vivo de tres en tres y recurre a los precios de catálogo para los SKU que faltan — concurrent + un map con ?? frente a un pool de workers.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/size.html">size</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
@@ -557,8 +557,8 @@
       <a class="cmp-row" href="stream-windowed-alerts.html">
         <span class="cmp-num">44</span>
         <span class="cmp-row-body">
-          <strong>Windowed alerts from a sensor stream</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span>
-          <span class="dim">Chunk a real Dart Stream into fixed windows and raise alerts — fromStream + chunk + averageBy vs manual buffer bookkeeping in await-for.</span>
+          <strong>Alertas por ventanas sobre un stream de sensores</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Trocear un Stream real de Dart en ventanas fijas y lanzar alertas — fromStream + chunk + averageBy frente a llevar el búfer a mano dentro de un await-for.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/averageBy.html">averageBy</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/filter.html">filter</a></li></ul>
@@ -567,8 +567,8 @@
       <a class="cmp-row" href="rate-limited-import.html">
         <span class="cmp-num">45</span>
         <span class="cmp-row-body">
-          <strong>Rate-limited batch import</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span>
-          <span class="dim">Import 9 transactions in batches of 3, one batch at a time, with a running total — chunk + concurrent(1) + scan vs a sequential loop.</span>
+          <strong>Importación por lotes con límite de tasa</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Importa 9 transacciones en lotes de 3, un lote cada vez, con un total acumulado — chunk + concurrent(1) + scan frente a un bucle secuencial.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/delay.html">delay</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
@@ -577,8 +577,8 @@
       <a class="cmp-row" href="parallel-downloads.html">
         <span class="cmp-num">46</span>
         <span class="cmp-row-body">
-          <strong>Parallel downloads, results in order</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span>
-          <span class="dim">Six downloads with different speeds, 3 at a time — concurrent keeps request order even when completions interleave, vs pool bookkeeping.</span>
+          <strong>Descargas en paralelo, resultados en orden</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Seis descargas con velocidades distintas, 3 a la vez — concurrent mantiene el orden de las peticiones aunque las finalizaciones se entrelacen, frente a la contabilidad de un pool.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/join.html">join</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
@@ -587,8 +587,8 @@
       <a class="cmp-row" href="paged-feeds-dedupe.html">
         <span class="cmp-num">47</span>
         <span class="cmp-row-body">
-          <strong>Two paged feeds, concatenated and deduped</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span>
-          <span class="dim">Drain a primary log store, then its replica, dedupe by id, stop at 8 — concat + uniqBy + take stays lazy, vs nested loops with a seen-set.</span>
+          <strong>Dos feeds paginados, concatenados y deduplicados</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Vacía un almacén de logs primario, luego su réplica, deduplica por id y para en 8 — concat + uniqBy + take siguen siendo perezosos, frente a bucles anidados con un conjunto de vistos.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/concat.html">concat</a></li><li><a href="../tutorials/uniqBy.html">uniqBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
@@ -597,8 +597,8 @@
       <a class="cmp-row" href="settlement-pipeline.html">
         <span class="cmp-num">48</span>
         <span class="cmp-row-body">
-          <strong>End-of-day settlement pipeline</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span>
-          <span class="dim">Validate, group by merchant, post 2 at a time, then report — one chain crossing sync to async, vs groupListsBy plus a worker pool.</span>
+          <strong>Pipeline de liquidación de cierre de día</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Validar, agrupar por comercio, publicar de dos en dos y luego informar — una sola cadena que cruza de síncrono a asíncrono, frente a groupListsBy más un pool de workers.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/reject.html">reject</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/partition.html">partition</a></li></ul>
@@ -607,8 +607,8 @@
       <a class="cmp-row" href="live-search.html">
         <span class="cmp-num">49</span>
         <span class="cmp-row-body">
-          <strong>Live search over a keystroke stream</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span>
-          <span class="dim">Turn a stream of keystrokes into deduped backend searches — fromStream + filter + uniq + take + map vs await-for with guard clauses.</span>
+          <strong>Búsqueda en vivo sobre un stream de pulsaciones</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Convierte un stream de pulsaciones en búsquedas de backend sin duplicados — fromStream + filter + uniq + take + map frente a await-for con cláusulas de guarda.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/take.html">take</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/head.html">head</a></li></ul>
@@ -617,8 +617,8 @@
       <a class="cmp-row" href="daily-ledger-close.html">
         <span class="cmp-num">50</span>
         <span class="cmp-row-body">
-          <strong>Finale — DailyLedger monthly close</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span>
-          <span class="dim">The finale: load ledger entries 3 at a time, then compute the July summary and category breakdown — the real DailyLedger app shapes, both ways.</span>
+          <strong>Gran final — cierre mensual de DailyLedger</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">El gran final: carga las entradas del libro de 3 en 3 y luego calcula el resumen de julio y el desglose por categoría — las formas reales de la app DailyLedger, de las dos maneras.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/partition.html">partition</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>

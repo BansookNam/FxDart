@@ -1,8 +1,8 @@
 ---
 slug: date-window-spend
-title: Spending inside a date window — Dart vs FxDart
-description: Sum a slice of a date-sorted ledger — skipWhile/takeWhile/fold in plain Dart vs dropWhile + takeWhile + sumBy in FxDart. Native holds up well.
-heading: Spending inside a date window
+title: 특정 기간 안의 지출 — Dart vs FxDart
+description: 날짜순으로 정렬된 가계부의 한 구간을 합산합니다 — 순수 Dart의 skipWhile/takeWhile/fold와 FxDart의 dropWhile + takeWhile + sumBy를 비교합니다. 네이티브 쪽도 충분히 잘 버팁니다.
+heading: 특정 기간 안의 지출
 order: 13
 tier: 2
 functions: dropWhile, takeWhile, sumBy
@@ -34,7 +34,7 @@ async: false
     같은 방식으로 정렬 순서를 활용하고, 읽기도 마찬가지로 좋습니다.
     실질적인 차이는 마지막 단계뿐입니다: <code>sumBy</code>는 의도를
     이름으로 말해주는 반면, <code>fold</code>는 초기값과 결합 함수를
-    그대로 드러냅니다. 이건 한 단어짜리 승리이지, 구조적인 승리는
+    그대로 드러냅니다. 이는 한 단어짜리 승리일 뿐, 구조적인 승리는
     아닙니다 — 무승부라고 부르는 게 맞습니다. 코드베이스가 이미
     <code>fx</code>로 체이닝하고 있다면 일관성을 위해 여기서도
     쓰세요; 그렇지 않다면 순수 Dart로 충분합니다.

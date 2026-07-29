@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Longest streak of no-spend days — Dart vs FxDart</title>
-  <meta name="description" content="Longest run of July days with no transaction — loop with streak/longest counters in plain Dart vs range + scan + max in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/no-spend-streak.html">
+  <title>La racha más larga de días sin gastar — Dart vs FxDart</title>
+  <meta name="description" content="La racha más larga de días de julio sin ninguna transacción — bucle con contadores de racha y máximo en Dart nativo frente a range + scan + max en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/no-spend-streak.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/no-spend-streak.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/no-spend-streak.html">
@@ -44,31 +43,31 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #28 · <strong>Longest streak of no-spend days</strong></p>
-  <h1>Longest streak of no-spend days</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #28 · <strong>La racha más larga de días sin gastar</strong></p>
+  <h1>La racha más larga de días sin gastar</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/max.html">max</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    From one month of ledger transactions, find the <strong>longest streak
-    of consecutive July days with no spending at all</strong> (July 2026
-    has 31 days). Print a calendar strip marking each no-spend day with
-    <code>#</code>, then the streak length. The data is in the code below;
-    both versions must print the lines shown under
-    <em>Expected output</em>.
+    A partir de un mes de transacciones del libro de cuentas, encuentra la
+    <strong>racha más larga de días consecutivos de julio sin ningún
+    gasto</strong> (julio de 2026 tiene 31 días). Imprime una tira de
+    calendario que marque con <code>#</code> cada día sin gasto y, después,
+    la longitud de la racha. Los datos están en el código de abajo; ambas
+    versiones deben imprimir las líneas que aparecen bajo
+    <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">July (# = no-spend day): ···###··######··#####·#####··##
 Longest no-spend streak: 6 days</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class Tx {
@@ -154,24 +153,26 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    A streak is a running value, and that is <code><a href="../tutorials/scan.html">scan</a></code>'s exact
-    job: fold's every intermediate state, kept. The pipeline reads as the
-    definition — the days (<code><a href="../tutorials/range.html">range</a></code>), <code><a href="../tutorials/map.html">map</a></code>ped to
-    spent-or-not, <code><a href="../tutorials/scan.html">scan</a></code>ned into a running streak that resets
-    on a spend day, and <code><a href="../tutorials/max.html">max</a></code> picks the peak. The native loop
-    computes the same thing with two mutable counters and an
-    <code>if</code> — you verify it by mentally replaying iterations,
-    and the streak logic is fused to the strip-building beside it. In the
-    FxDart version the strip (<code><a href="../tutorials/map.html">map</a></code> + <code><a href="../tutorials/join.html">join</a></code>) and
-    the streak are two independent, separately readable pipelines over
-    the same <code><a href="../tutorials/range.html">range</a></code>.
+    Una racha es un valor que se va acumulando, y ese es exactamente el
+    trabajo de <code><a href="../tutorials/scan.html">scan</a></code>: todos los estados intermedios de un
+    fold, conservados. El pipeline se lee como la propia definición — los
+    días (<code><a href="../tutorials/range.html">range</a></code>), transformados con <code><a href="../tutorials/map.html">map</a></code> a
+    hubo-gasto-o-no, recorridos con <code><a href="../tutorials/scan.html">scan</a></code> hasta formar una
+    racha acumulada que se reinicia en los días con gasto, y
+    <code><a href="../tutorials/max.html">max</a></code> elige el pico. El bucle nativo calcula lo mismo con
+    dos contadores mutables y un <code>if</code> — lo verificas
+    reproduciendo mentalmente las iteraciones, y la lógica de la racha
+    queda fundida con la construcción de la tira que hay al lado. En la
+    versión de FxDart la tira (<code><a href="../tutorials/map.html">map</a></code> + <code><a href="../tutorials/join.html">join</a></code>) y la
+    racha son dos pipelines independientes, legibles por separado, sobre
+    el mismo <code><a href="../tutorials/range.html">range</a></code>.
   </p>
 
   <nav class="tut-nav">
-    <a href="invoice-summary.html">← Anterior: Line items to invoice summary</a>
-    <a href="duplicate-transactions.html">Siguiente: Detect duplicated transactions →</a>
+    <a href="invoice-summary.html">← Anterior: De líneas de pedido a resumen de factura</a>
+    <a href="duplicate-transactions.html">Siguiente: Detectar transacciones duplicadas →</a>
   </nav>
 </main>
 <footer class="site-footer">

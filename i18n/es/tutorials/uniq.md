@@ -1,6 +1,6 @@
 ---
 slug: uniq
-title: uniq — FxDart 101
+title: distinct — FxDart 101
 description: Tutorial de uniq en FxDart: elimina valores duplicados conservando el orden de primera aparición, con un playground en vivo.
 heading: <code>distinct</code>
 section: 4
@@ -16,9 +16,11 @@ nextLabel: uniqBy
 
   <h2>Lección</h2>
   <p>
-    <code>uniq</code> recorre el iterable una sola vez, manteniendo un
+    <code>distinct</code> recorre el iterable una sola vez, manteniendo un
     <code>Set</code> con los valores ya vistos, y emite cada elemento únicamente
-    la primera vez que aparece. Está implementado como
+    la primera vez que aparece. <code>distinct</code> es el nombre idiomático en
+    Dart; fxdart también acepta <code>uniq</code>, la grafía de FxTS: son el
+    mismo operador. Está implementado como
     <code>uniqBy((a) =&gt; a, iterable)</code> —con la clave identidad—, así que
     si alguna vez necesitas deduplicar por algo que no sea la igualdad del valor
     completo, recurre a
@@ -31,11 +33,11 @@ nextLabel: uniqBy
     la última.
   </p>
   <p>
-    En el lado asíncrono, <code>uniqAsync</code> se puede combinar sin riesgo con
-    <code>.concurrent(n)</code> siempre que la concurrencia viva en una etapa de
-    fetch anterior: primero descarga con <code>.map(...).concurrent(n)</code> y
-    luego aplica <code>.uniq()</code> a los resultados ya resueltos y en orden,
-    como en la Demo 2.
+    En el lado asíncrono, <code>distinctAsync</code> se puede combinar sin riesgo
+    con <code>.concurrent(n)</code> siempre que la concurrencia viva en una etapa
+    de fetch anterior: primero descarga con <code>.map(...).concurrent(n)</code> y
+    luego aplica <code>.distinct()</code> a los resultados ya resueltos y en
+    orden, como en la Demo 2.
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>
@@ -45,7 +47,7 @@ nextLabel: uniqBy
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>uniq</code> para eliminar las etiquetas duplicadas,
+  <p>Ejercicio: usa <code>distinct</code> para eliminar las etiquetas duplicadas,
     conservando el orden de primera aparición.</p>
   {{playground:2}}
 

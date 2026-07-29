@@ -13,7 +13,7 @@ crumb: monad
     <strong>'규칙을 가진 상자'</strong>이고, 컴프리헨션 블록은 이 상자들을
     <strong>'아주 쉽게 열고 닫게 해주는 마법의 문법(Syntactic
     Sugar)'</strong>입니다. 두 개념이 어떻게 연결되는지 구체적으로 쪼개서
-    설명해 드릴게요.
+    설명해 드리겠습니다.
   </p>
 
   <h2>1. 모나드 (Monad)란 무엇인가?</h2>
@@ -36,7 +36,7 @@ crumb: monad
     <li>
       <strong>연결하기</strong>
       (<code>bind</code>, <code>flatMap</code>, <code>&gt;&gt;=</code>) —
-      상자 안의 값을 꺼내서, 새로운 상자를 반환하는 함수에 통과시킨 뒤,
+      상자 안의 값을 꺼내서, <em>새로운</em> 상자를 반환하는 함수에 통과시킨 뒤,
       결과가 든 상자를 반환합니다. 이 <code>flatMap</code> 덕분에 상자가
       중첩되는 것(예: <code>Box(Box(x))</code>)을 막고 평평한
       <code>Box(x)</code>로 유지할 수 있습니다.
@@ -47,9 +47,9 @@ crumb: monad
   <p>
     값이 없을 수도 있는 상황(<code>Option</code>/<code>Maybe</code>), 비동기
     처리(<code>Promise</code>/<code>Future</code>), 여러 개의
-    값(<code>List</code>) 등을 다룰 때 발생하는 부작용(Side Effect)이나 예외
+    값(<code>List</code>) 등을 다룰 때 발생하는 부수 효과(Side Effect)나 에러
     처리를 상자 자체가 알아서 처리하게 만들기 위해서입니다. 개발자는 핵심
-    로직에만 집중할 수 있죠.
+    로직에만 집중할 수 있습니다.
   </p>
 
   <h2>2. 컴프리헨션 블록 (Comprehension Block)이란?</h2>
@@ -77,8 +77,8 @@ results = [x * 2 for x in range(5) if x > 0]</code></pre>
     컴프리헨션 블록(스칼라의 <code>for</code> 컴프리헨션, 하스켈의
     <code>do</code> 표기법 등)은 사실 모나드의 <code>flatMap</code>과
     <code>map</code> 연산을 보기 좋게 포장한 껍데기(Syntactic Sugar)입니다.
-    모나드를 연속해서 사용할 때 컴프리헨션이 없다면, 코드는 '콜백
-    지옥(Callback Hell)'처럼 끝없이 파고들게 됩니다. 스칼라(Scala) 언어의
+    모나드를 연속해서 사용할 때 컴프리헨션이 없다면, 코드는 <em>콜백
+    지옥(Callback Hell)</em>처럼 끝없이 파고들게 됩니다. 스칼라(Scala) 언어의
     예시를 통해 비교해 보겠습니다. 사용자(User)를 찾고, 그 사용자의
     주문(Order)을 찾는 연속된 과정을 가정해 봅시다. (데이터가 없을 수도
     있으므로 <code>Option</code> 모나드를 사용합니다.)

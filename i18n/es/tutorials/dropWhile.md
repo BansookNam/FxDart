@@ -1,7 +1,7 @@
 ---
 slug: dropWhile
-title: dropWhile — FxDart 101
-description: Tutorial de dropWhile en FxDart: omite valores mientras se cumpla un predicado y luego emite el resto, con un playground en vivo.
+title: skipWhile — FxDart 101
+description: Tutorial de skipWhile en FxDart: omite valores mientras se cumpla un predicado y luego emite el resto, con un playground en vivo.
 heading: <code>skipWhile</code>
 section: 5
 crumb: skipWhile
@@ -16,19 +16,20 @@ nextLabel: dropUntil
 
   <h2>Lección</h2>
   <p>
-    <code>dropWhile</code> es el espejo de <code>takeWhile</code>: omite
+    <code>skipWhile</code> es el espejo de <code>takeWhile</code>: omite
     elementos mientras el predicado se cumpla y, en cuanto encuentra uno
-    que falla, cambia definitivamente al modo "emitir todo". Ese cambio es
-    permanente: una vez que <code>dropWhile</code> empieza a dejar pasar
+    que falla, cambia definitivamente al modo «emitir todo». Ese cambio es
+    permanente: una vez que <code>skipWhile</code> empieza a dejar pasar
     valores, ya nunca vuelve a descartar, aunque un elemento posterior
     también hubiera coincidido.
   </p>
   <p>
     Recurre a él para recortar un prefijo de longitud variable que no puedes
     contar de antemano: tokens iniciales tipo espacio en blanco, filas de
-    cabecera, un periodo de calentamiento en un flujo de métricas. En la
-    cadena <code>Fx</code> también está disponible como
-    <code>skipWhile</code>, igual que <code>Iterable.skipWhile</code>.
+    cabecera, un periodo de calentamiento en un flujo de métricas.
+    <code>skipWhile</code> es el nombre idiomático en Dart, en línea con
+    <code>Iterable.skipWhile</code>; fxdart también acepta la grafía
+    <code>dropWhile</code> de FxTS: son el mismo operador.
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>
@@ -41,7 +42,7 @@ nextLabel: dropUntil
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: descarta las temperaturas mientras se mantengan por debajo de
+  <p>Ejercicio: omite las temperaturas mientras se mantengan por debajo de
     25 y luego conserva el resto.</p>
   {{playground:2}}
 

@@ -54,7 +54,7 @@ nextLabel: throttle
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="throttle.html"><code>throttle</code></a> — 잠잠해진 뒤가 아니라 일정 주기로 발화 ·
     <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — 타이밍 데모를 만드는 재료 ·
     <a href="concurrent.html"><code>concurrent</code></a> — 비동기 파이프라인의 속도 제한 ·

@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Weekly averages from daily readings — Dart vs FxDart</title>
-  <meta name="description" content="Fold 21 daily readings into 3 weekly averages — index arithmetic and sublist in plain Dart vs chunk + averageBy + zipWithIndex in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/weekly-sensor-averages.html">
+  <title>Medias semanales a partir de lecturas diarias — Dart vs FxDart</title>
+  <meta name="description" content="Plegar 21 lecturas diarias en 3 medias semanales — aritmética de índices y sublist en Dart nativo frente a chunk + averageBy + zipWithIndex en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/weekly-sensor-averages.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/weekly-sensor-averages.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/weekly-sensor-averages.html">
@@ -44,30 +43,30 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #23 · <strong>Weekly averages from daily readings</strong></p>
-  <h1>Weekly averages from daily readings</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #23 · <strong>Medias semanales a partir de lecturas diarias</strong></p>
+  <h1>Medias semanales a partir de lecturas diarias</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/averageBy.html">averageBy</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    A temperature sensor logged one reading per day for three full weeks
-    (21 values). Report the <strong>average per 7-day week</strong>, one
-    line per week, numbered from 1. The data is in the code below; both
-    versions must print the lines shown under <em>Expected output</em>.
+    Un sensor de temperatura registró una lectura al día durante tres
+    semanas completas (21 valores). Informa de la <strong>media por semana
+    de 7 días</strong>, una línea por semana, numeradas desde 1. Los datos
+    están en el código de abajo; ambas versiones deben imprimir las líneas
+    que aparecen bajo <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Week 1: 21.3°C
 Week 2: 25.0°C
 Week 3: 20.5°C</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 // Daily noon temperatures (°C), three full weeks starting Mon 2026-07-06.
@@ -116,21 +115,22 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    "Split into groups of 7" has no core-Dart spelling, so the native
-    version runs a counting loop and carves each week out with
-    <code>sublist(w * 7, w * 7 + 7)</code> — index arithmetic that the
-    reader must re-verify, and that breaks if the tail week is short.
-    FxDart's <code>chunk(7)</code> says the grouping in one word (and
-    handles a short tail), <code><a href="../tutorials/averageBy.html">averageBy</a></code> replaces the
-    reduce-then-divide dance, and <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> brings the week
-    number into the pipeline instead of borrowing the loop counter.
+    «Divide en grupos de 7» no tiene forma de escribirse en el núcleo de
+    Dart, así que la versión nativa recorre un bucle con contador y recorta
+    cada semana con <code>sublist(w * 7, w * 7 + 7)</code> — aritmética de
+    índices que quien lee tiene que volver a verificar, y que se rompe si
+    la última semana queda incompleta. El <code>chunk(7)</code> de FxDart
+    dice la agrupación en una sola palabra (y gestiona una cola corta),
+    <code><a href="../tutorials/averageBy.html">averageBy</a></code> sustituye al baile de reducir y luego dividir, y
+    <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> trae el número de semana al pipeline en lugar
+    de tomarlo prestado del contador del bucle.
   </p>
 
   <nav class="tut-nav">
-    <a href="paginated-products.html">← Anterior: Paginated product listing</a>
-    <a href="consecutive-over-limit.html">Siguiente: Three consecutive readings over the limit →</a>
+    <a href="paginated-products.html">← Anterior: Listado de productos paginado</a>
+    <a href="consecutive-over-limit.html">Siguiente: Tres lecturas consecutivas por encima del límite →</a>
   </nav>
 </main>
 <footer class="site-footer">

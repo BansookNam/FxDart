@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Compound interest table — Dart vs FxDart</title>
-  <meta name="description" content="A year-by-year balance table at 5% — a mutating accumulator loop in plain Dart vs range + scan + map in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/compound-interest.html">
+  <title>Tabla de interés compuesto — Dart vs FxDart</title>
+  <meta name="description" content="Una tabla de saldos año a año al 5% — un bucle con acumulador mutable en Dart nativo frente a range + scan + map en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/compound-interest.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/compound-interest.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/compound-interest.html">
@@ -44,22 +43,21 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #16 · <strong>Compound interest table</strong></p>
-  <h1>Compound interest table</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #16 · <strong>Tabla de interés compuesto</strong></p>
+  <h1>Tabla de interés compuesto</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Print a year-by-year balance table for <strong>$1000 at 5%</strong>
-    compound interest over six years — one line per year, starting from the
-    year-0 opening balance, each amount formatted to two decimals. The
-    constants are in the code below; both versions must print the lines
-    shown under <em>Expected output</em>.
+    Imprime una tabla de saldos año a año para <strong>$1000 al 5%</strong>
+    de interés compuesto durante seis años —una línea por año, empezando por
+    el saldo inicial del año 0, con cada importe formateado a dos decimales.
+    Las constantes están en el código de abajo; ambas versiones deben
+    imprimir las líneas que aparecen bajo <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">year 0: $1000.00
 year 1: $1050.00
 year 2: $1102.50
@@ -69,10 +67,10 @@ year 5: $1276.28
 year 6: $1340.10</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 const principal = 1000.0;
@@ -113,23 +111,24 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    A running balance is a <em>running fold</em>, and core Dart has no word
-    for it: <code>fold</code> gives only the final value, so the native
-    version falls back to a loop that seeds a list with the year-0 line,
-    mutates <code>balance</code>, and appends — the compounding rule, the
-    iteration, and the formatting all share one body. FxDart's
-    <code><a href="../tutorials/scan.html">scan</a></code> turns each intermediate balance into a value in the
-    pipeline: the seed is the year-0 row, the compounding rule is one pure
-    function, and formatting is a separate <code><a href="../tutorials/map.html">map</a></code> step. Want the
-    year the balance first passes $1200? Chain a filter — the loop version
-    has to grow another flag instead.
+    Un saldo acumulado es un <em>fold acumulado</em>, y Dart nativo no
+    tiene una palabra para eso: <code>fold</code> solo da el valor final,
+    así que la versión nativa recurre a un bucle que inicializa una lista
+    con la línea del año 0, muta <code>balance</code> y va añadiendo —la
+    regla de capitalización, la iteración y el formato comparten un mismo
+    cuerpo. El <code><a href="../tutorials/scan.html">scan</a></code> de FxDart convierte cada saldo intermedio en
+    un valor del pipeline: el valor inicial es la fila del año 0, la regla
+    de capitalización es una única función pura y el formato es un paso
+    <code><a href="../tutorials/map.html">map</a></code> aparte. ¿Quieres el año en que el saldo supera por
+    primera vez los $1200? Encadena un filtro —la versión con bucle tiene
+    que añadir otro flag en su lugar.
   </p>
 
   <nav class="tut-nav">
-    <a href="refunds-vs-charges.html">← Anterior: Refunds vs charges, both formatted</a>
-    <a href="sensor-anomalies.html">Siguiente: Pair sensors with readings, keep anomalies →</a>
+    <a href="refunds-vs-charges.html">← Anterior: Reembolsos frente a cargos, ambos formateados</a>
+    <a href="sensor-anomalies.html">Siguiente: Emparejar sensores con lecturas y quedarse con las anomalías →</a>
   </nav>
 </main>
 <footer class="site-footer">

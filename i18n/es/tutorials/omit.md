@@ -20,7 +20,7 @@ nextLabel: pick
     las entradas del original <em>excepto</em> las claves que enumeres — el mapa
     de origen nunca se muta. Las claves de <code>keysToOmit</code> que no existen
     realmente en el mapa se ignoran sin más; no da error por indicar claves
-    "de sobra" para eliminar.
+    «de sobra» para eliminar.
   </p>
   <p>
     Es una herramienta habitual para ocultar datos y serializar: quitar el hash de la

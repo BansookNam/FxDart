@@ -61,7 +61,7 @@ nextLabel: sortBy
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="sortBy.html"><code>sortBy</code></a> — 비교자 대신 추출한 키로 정렬 ·
     <a href="reverse.html"><code>reverse</code></a> — 비교 없이 순서만 뒤집기 ·
     <a href="partition.html"><code>partition</code></a> — 술어로 두 리스트로 나누기

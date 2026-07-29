@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Running account balance — Dart vs FxDart</title>
-  <meta name="description" content="Balance after every transaction — a mutable accumulator loop in plain Dart vs scan + map in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/running-balance.html">
+  <title>Saldo acumulado de una cuenta — Dart vs FxDart</title>
+  <meta name="description" content="El saldo después de cada transacción — un bucle con acumulador mutable en Dart nativo frente a scan + map en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/running-balance.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/running-balance.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/running-balance.html">
@@ -44,22 +43,23 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #2 · <strong>Running account balance</strong></p>
-  <h1>Running account balance</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #2 · <strong>Saldo acumulado de una cuenta</strong></p>
+  <h1>Saldo acumulado de una cuenta</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    An account opens July with a <strong>$250.00</strong> balance and sees six
-    signed transactions — salary in, rent and groceries out. Print one
-    currency line per step: the opening balance first, then the balance
-    <strong>after each transaction</strong>. The data is in the code below;
-    both versions must print the lines shown under <em>Expected output</em>.
+    Una cuenta abre julio con un saldo de <strong>$250.00</strong> y
+    registra seis transacciones con signo: la nómina que entra, el alquiler
+    y la compra que salen. Imprime una línea en formato de moneda por cada
+    paso: primero el saldo de apertura y después el saldo <strong>tras cada
+    transacción</strong>. Los datos están en el código de abajo; ambas
+    versiones deben imprimir las líneas que aparecen bajo <em>Salida
+    esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Opening balance $250.00
 Salary          $2850.00
 Rent            $1700.00
@@ -69,10 +69,10 @@ Electric Co     $1624.96
 Cafe Aroma      $1615.16</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class Tx {
@@ -143,23 +143,23 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Core Dart has <code>fold</code>, which collapses the list to the
-    <em>final</em> balance — but this task needs every intermediate one, and
-    there is no <code><a href="../tutorials/scan.html">scan</a></code>. So the native version falls back to a
-    mutable <code>balance</code> variable threaded through a loop, and the
-    formatting is interleaved with the accumulation. FxDart's
-    <code><a href="../tutorials/scan.html">scan</a></code> yields each accumulated state as a value (the seed
-    first — which lands the opening-balance line for free), and
-    <code><a href="../tutorials/map.html">map</a></code> formats afterwards as a separate, swappable step.
-    Running state as a pipeline stage instead of a mutation is exactly the
-    vocabulary Dart is missing here.
+    El núcleo de Dart tiene <code>fold</code>, que colapsa la lista hasta
+    el saldo <em>final</em>, pero esta tarea necesita todos los
+    intermedios, y no hay <code><a href="../tutorials/scan.html">scan</a></code>. Así que la versión nativa
+    recurre a una variable mutable <code>balance</code> hilada a través de
+    un bucle, y el formateo queda entremezclado con la acumulación. El
+    <code><a href="../tutorials/scan.html">scan</a></code> de FxDart emite cada estado acumulado como un valor
+    (primero el valor inicial, lo que regala la línea del saldo de
+    apertura) y <code><a href="../tutorials/map.html">map</a></code> formatea después, como un paso aparte e
+    intercambiable. El estado acumulado como etapa de un pipeline en lugar
+    de como una mutación es justo el vocabulario que le falta aquí a Dart.
   </p>
 
   <nav class="tut-nav">
-    <a href="food-spending.html">← Anterior: Food spending this month</a>
-    <a href="top-expenses.html">Siguiente: Top 3 largest expenses →</a>
+    <a href="food-spending.html">← Anterior: Gasto en comida este mes</a>
+    <a href="top-expenses.html">Siguiente: Los 3 gastos más grandes →</a>
   </nav>
 </main>
 <footer class="site-footer">

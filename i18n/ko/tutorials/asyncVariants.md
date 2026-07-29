@@ -57,7 +57,7 @@ nextLabel: streams
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="toAsync.html"><code>toAsync</code></a> — 비동기 파이프라인의 출발점 ·
     <a href="streams.html">Stream 브리지</a> — fromStream, fxStream, toStream ·
     <a href="concurrent.html"><code>concurrent</code></a> — 병렬 평가 ·

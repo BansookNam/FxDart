@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Cohort retention table — Dart vs FxDart</title>
-  <meta name="description" content="Signup-month cohorts vs later activity — nested groupBy/dropWhile/filter pipelines vs nested for loops with accumulator lists.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/cohort-retention.html">
+  <title>Tabla de retención por cohortes — Dart vs FxDart</title>
+  <meta name="description" content="Cohortes por mes de alta frente a la actividad posterior — pipelines anidados de groupBy/dropWhile/filter frente a bucles for anidados con listas acumuladoras.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/cohort-retention.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/cohort-retention.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/cohort-retention.html">
@@ -44,32 +43,33 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #32 · <strong>Cohort retention table</strong></p>
-  <h1>Cohort retention table</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #32 · <strong>Tabla de retención por cohortes</strong></p>
+  <h1>Tabla de retención por cohortes</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/size.html">size</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Each user (data in the code) has a signup month and the list of months
-    they were active. Group users into <strong>cohorts by signup
-    month</strong> and, for every <em>later</em> month, print what percentage
-    of the cohort was still active — one row per cohort, oldest first. Both
-    versions must print the table shown under <em>Expected output</em>.
+    Cada usuario (los datos están en el código) tiene un mes de alta y la
+    lista de meses en los que estuvo activo. Agrupa a los usuarios en
+    <strong>cohortes por mes de alta</strong> y, para cada mes
+    <em>posterior</em>, imprime qué porcentaje de la cohorte seguía activo
+    —una fila por cohorte, de la más antigua a la más reciente. Ambas
+    versiones deben imprimir la tabla que aparece bajo
+    <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Cohort retention by signup month
 2026-04 (4 users): 2026-05 50% | 2026-06 50% | 2026-07 25%
 2026-05 (3 users): 2026-06 33% | 2026-07 67%
 2026-06 (2 users): 2026-07 50%</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -156,23 +156,24 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    A retention table is a pipeline inside a pipeline: cohorts on the
-    outside, months on the inside. In FxDart both layers are expressions —
-    <code><a href="../tutorials/groupBy.html">groupBy</a></code> → <code><a href="../tutorials/sortBy.html">sortBy</a></code> → <code><a href="../tutorials/map.html">map</a></code> over
-    cohorts, and inside each row <code><a href="../tutorials/dropWhile.html">dropWhile</a></code> skips months up to
-    the signup month before <code><a href="../tutorials/filter.html">filter</a></code> + <code><a href="../tutorials/size.html">size</a></code> count the
-    still-active users. The native version needs a mutable accumulator list
-    per layer (<code>rows</code>, <code>cells</code>) and two nested
-    <code>for</code> loops to stitch them together; the actual retention
-    logic is the same, but it is spread across loop bodies instead of being
-    the visible spine of the code.
+    Una tabla de retención es un pipeline dentro de otro pipeline: las
+    cohortes por fuera, los meses por dentro. En FxDart ambas capas son
+    expresiones —<code><a href="../tutorials/groupBy.html">groupBy</a></code> → <code><a href="../tutorials/sortBy.html">sortBy</a></code> →
+    <code><a href="../tutorials/map.html">map</a></code> sobre las cohortes y, dentro de cada fila,
+    <code><a href="../tutorials/dropWhile.html">dropWhile</a></code> salta los meses hasta el mes de alta antes de que
+    <code><a href="../tutorials/filter.html">filter</a></code> + <code><a href="../tutorials/size.html">size</a></code> cuenten los usuarios que siguen
+    activos. La versión nativa necesita una lista acumuladora mutable por
+    capa (<code>rows</code>, <code>cells</code>) y dos bucles
+    <code>for</code> anidados para coserlas; la lógica de retención en sí es
+    la misma, pero está repartida por los cuerpos de los bucles en lugar de
+    ser la columna vertebral visible del código.
   </p>
 
   <nav class="tut-nav">
-    <a href="monthly-ledger-report.html">← Anterior: Full monthly ledger report</a>
-    <a href="price-drop-detection.html">Siguiente: Price drops between two snapshots →</a>
+    <a href="monthly-ledger-report.html">← Anterior: Informe mensual completo del libro de cuentas</a>
+    <a href="price-drop-detection.html">Siguiente: Bajadas de precio entre dos instantáneas →</a>
   </nav>
 </main>
 <footer class="site-footer">

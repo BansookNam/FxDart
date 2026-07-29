@@ -9,10 +9,20 @@
  *      `import 'package:fxdart/fxdart.dart';` line is commented out).
  *      Code with no fxdart import — the "native Dart" panels on the
  *      Dart-vs-FxDart comparison pages — skips the merge entirely.
- *   2. The merged source is sent to the DartPad compile service (compileDDC).
- *   3. The returned JS module is executed in a fresh sandboxed iframe
- *      (frame.html) with the matching dart_sdk.js; print() output streams
- *      back via postMessage.
+ *   2. The merged source is turned into a JS module. Three sources, in order
+ *      of cost: a build-time artifact under pg/ (for code the reader has not
+ *      edited), a cached earlier compile, or the DartPad compile service.
+ *   3. The module is executed in a sandboxed iframe (frame.html) that has
+ *      already been booted with the DDC runtime; print() output streams back
+ *      via postMessage.
+ *
+ * Why this file owns the network instead of the frame: the two DDC runtime
+ * artifacts total 17MB, and every run needs a fresh JS context. Fetching them
+ * here means they are downloaded once — into a Cache Storage bucket keyed by
+ * the compile service's Dart version — and merely handed to each new frame as
+ * source text. Frames are also booted ahead of a click, so the unavoidable
+ * per-run cost (parsing 17MB of SDK in a brand-new context) happens while the
+ * reader is still reading.
  */
 (function () {
   'use strict';
@@ -25,17 +35,107 @@
 
   var script = document.currentScript;
   var ROOT = script.src.replace(/js\/playground\.js.*$/, '');
-  var COMPILE_URL = 'https://stable.api.dartpad.dev/api/v3/compileNewDDC';
+  var API = 'https://stable.api.dartpad.dev/api/v3/';
+  var ARTIFACTS = 'https://stable.api.dartpad.dev/artifacts/';
+
+  // build_docs.dart emits this with a ?v=<hash> of the bundle's contents, so
+  // the URL changes whenever the library does and the cached copy can never
+  // be stale. Falls back to the bare path if the page predates that.
+  var LIB_URL = ROOT + (window.FXDART_LIB || 'assets/fxdart_single.dart');
+
+  var idle = window.requestIdleCallback
+    ? window.requestIdleCallback.bind(window)
+    : function (fn) { return setTimeout(fn, 1); };
+
+  // --- versioning -----------------------------------------------------------
+
+  // Compiled output is only valid against the SDK that produced it, so every
+  // cache here is keyed by the compile service's Dart version. Without a
+  // version we simply do not persist anything — a mismatched pinned SDK would
+  // break the playground until the user cleared site data, which is far worse
+  // than re-fetching.
+  var versionPromise = null;
+  function getVersion() {
+    if (!versionPromise) {
+      versionPromise = fetch(API + 'version')
+        .then(function (r) { return r.ok ? r.json() : {}; })
+        .then(function (j) { return j.dartVersion || ''; })
+        .catch(function () { return ''; });
+    }
+    return versionPromise;
+  }
+
+  function openCache(kind) {
+    return getVersion().then(function (v) {
+      if (!v || !window.caches) return null;
+      return caches.open('fxdart-' + kind + '-' + v);
+    }).catch(function () { return null; });
+  }
+
+  // Drop buckets from superseded Dart versions; otherwise a long-lived visitor
+  // accumulates a 17MB SDK per upgrade.
+  function evictOldCaches() {
+    if (!window.caches || !caches.keys) return;
+    getVersion().then(function (v) {
+      if (!v) return;
+      var keep = ['fxdart-rt-' + v, 'fxdart-c-' + v];
+      return caches.keys().then(function (names) {
+        names.forEach(function (name) {
+          if (name.indexOf('fxdart-') === 0 && keep.indexOf(name) === -1) {
+            caches.delete(name);
+          }
+        });
+      });
+    }).catch(function () {});
+  }
+
+  function cachedText(cache, url) {
+    function fetchIt() {
+      return fetch(url).then(function (r) {
+        if (!r.ok) throw new Error(url + ' → ' + r.status);
+        if (!cache) return r.text();
+        return cache.put(url, r.clone())
+          .catch(function () {})
+          .then(function () { return r.text(); });
+      });
+    }
+    if (!cache) return fetchIt();
+    return cache.match(url).then(function (hit) {
+      return hit ? hit.text() : fetchIt();
+    });
+  }
+
+  // --- DDC runtime ----------------------------------------------------------
+
+  var runtimePromise = null;
+  function getRuntime() {
+    if (!runtimePromise) {
+      runtimePromise = openCache('rt').then(function (cache) {
+        return Promise.all([
+          cachedText(cache, ARTIFACTS + 'ddc_module_loader.js'),
+          cachedText(cache, ARTIFACTS + 'dart_sdk_new.js')
+        ]);
+      }).then(function (parts) {
+        return { loader: parts[0], sdk: parts[1] };
+      });
+      runtimePromise.catch(function () { runtimePromise = null; });
+    }
+    return runtimePromise;
+  }
+
+  // --- fxdart library bundle ------------------------------------------------
 
   var libPromise = null;
   function getLib() {
     if (!libPromise) {
-      // no-cache: always revalidate so a redeployed library bundle (or a
-      // stale partial cache entry) can never be silently mismatched.
-      libPromise = fetch(ROOT + 'assets/fxdart_single.dart', { cache: 'no-cache' }).then(function (r) {
-        if (!r.ok) throw new Error(t('pgLoadFailed', 'Could not load the FxDart library') + ' (' + r.status + ')');
+      libPromise = fetch(LIB_URL).then(function (r) {
+        if (!r.ok) {
+          throw new Error(t('pgLoadFailed', 'Could not load the FxDart library') +
+            ' (' + r.status + ')');
+        }
         return r.text();
       });
+      libPromise.catch(function () { libPromise = null; });
     }
     return libPromise;
   }
@@ -44,14 +144,18 @@
   // top; the fxdart package import is commented out (the library is inlined).
   // Line positions of user code are preserved via commented placeholders so
   // compile errors can be mapped back.
+  //
+  // tool/playground_source.dart reimplements this byte-for-byte to precompute
+  // artifacts at build time — the two must stay in step or the hashes diverge
+  // and every page silently falls back to compiling over the network.
   function buildSource(lib, user) {
     var imports = [];
     var body = [];
     user.split('\n').forEach(function (line) {
-      var t = line.trim();
-      if (/^import\s+['"]package:fxdart\//.test(t)) {
+      var trimmed = line.trim();
+      if (/^import\s+['"]package:fxdart\//.test(trimmed)) {
         body.push('// ' + line);
-      } else if (/^import\s+['"]dart:/.test(t)) {
+      } else if (/^import\s+['"]dart:/.test(trimmed)) {
         imports.push(line);
         body.push('// (hoisted) ' + line);
       } else {
@@ -64,12 +168,199 @@
     return { source: pre + body.join('\n'), offset: offset };
   }
 
+  function needsLib(code) {
+    return /^\s*import\s+['"]package:fxdart\//m.test(code);
+  }
+
   function remapErrors(text, offset) {
     return text.replace(/main\.dart:(\d+):(\d+)/g, function (m, line, col) {
       var userLine = parseInt(line, 10) - offset;
       return userLine > 0 ? 'line ' + userLine + ':' + col : 'library:' + line + ':' + col;
     });
   }
+
+  // --- compiling ------------------------------------------------------------
+
+  // 53-bit string hash (cyrb53). Only used to key the compile cache, where a
+  // collision would mean running the wrong snippet — at a handful of entries
+  // per reader the odds are far below the odds of the cache being evicted.
+  function hash(str) {
+    var h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+    for (var i = 0; i < str.length; i++) {
+      var ch = str.charCodeAt(i);
+      h1 = Math.imul(h1 ^ ch, 2654435761);
+      h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+  }
+
+  function CompileError(message) {
+    this.name = 'CompileError';
+    this.message = message;
+  }
+  CompileError.prototype = Object.create(Error.prototype);
+
+  function compileRemote(source) {
+    return fetch(API + 'compileNewDDC', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source: source })
+    }).then(function (resp) {
+      return resp.text().then(function (text) {
+        if (!resp.ok) {
+          var msg;
+          try { msg = JSON.parse(text).error || text; } catch (e) { msg = text; }
+          throw new CompileError(String(msg));
+        }
+        return JSON.parse(text).result;
+      });
+    });
+  }
+
+  var memCompile = {};
+
+  function compile(source) {
+    var key = hash(source);
+    if (memCompile[key]) return Promise.resolve(memCompile[key]);
+    return openCache('c').then(function (cache) {
+      var url = ROOT + '__compile/' + key;
+      function fresh() {
+        return compileRemote(source).then(function (js) {
+          memCompile[key] = js;
+          if (cache) {
+            cache.put(url, new Response(js, {
+              headers: { 'Content-Type': 'text/javascript' }
+            })).catch(function () {});
+          }
+          return js;
+        });
+      }
+      if (!cache) return fresh();
+      return cache.match(url).then(function (hit) {
+        if (!hit) return fresh();
+        return hit.text().then(function (js) { memCompile[key] = js; return js; });
+      });
+    });
+  }
+
+  // --- build-time artifacts -------------------------------------------------
+
+  // tool/precompile_playgrounds.dart stores gzipped DDC output under pg/. The
+  // files are served as opaque bytes (GitHub Pages sends no Content-Encoding
+  // for .gz), so decompress by hand — but sniff the magic number first, in
+  // case a server does decode it for us.
+  function gunzip(buffer) {
+    var bytes = new Uint8Array(buffer);
+    if (bytes[0] !== 0x1f || bytes[1] !== 0x8b) {
+      return Promise.resolve(new TextDecoder().decode(bytes));
+    }
+    if (typeof DecompressionStream === 'undefined') {
+      return Promise.reject(new Error('gzip unsupported'));
+    }
+    var stream = new Blob([bytes]).stream()
+      .pipeThrough(new DecompressionStream('gzip'));
+    return new Response(stream).text();
+  }
+
+  function fetchPrebuilt(id) {
+    return fetch(ROOT + 'pg/' + id + '.js.gz').then(function (r) {
+      if (!r.ok) throw new Error('no prebuilt artifact');
+      return r.arrayBuffer();
+    }).then(gunzip);
+  }
+
+  // --- execution frames -----------------------------------------------------
+
+  var frames = [];
+
+  window.addEventListener('message', function (e) {
+    for (var i = 0; i < frames.length; i++) {
+      if (frames[i].el.contentWindow === e.source) {
+        frames[i].handle(e.data || {});
+        return;
+      }
+    }
+  });
+
+  function Frame() {
+    var self = this;
+    this.onOutput = null;
+
+    this._ready = new Promise(function (res) { self._readyRes = res; });
+    this._warm = new Promise(function (res, rej) {
+      self._warmRes = res;
+      self._warmRej = rej;
+    });
+
+    this.el = document.createElement('iframe');
+    this.el.setAttribute('sandbox', 'allow-scripts');
+    this.el.setAttribute('aria-hidden', 'true');
+    this.el.setAttribute('title', 'FxDart playground runtime');
+    this.el.style.display = 'none';
+    frames.push(this);
+    this.el.src = ROOT + 'frame.html';
+    document.body.appendChild(this.el);
+
+    Promise.all([this._ready, getRuntime()]).then(function (r) {
+      if (!self.el.contentWindow) return;
+      self.el.contentWindow.postMessage(
+        { command: 'boot', loader: r[1].loader, sdk: r[1].sdk }, '*');
+    }).catch(function (err) { self._warmRej(err); });
+  }
+
+  Frame.prototype.handle = function (d) {
+    if (d.sender !== 'fx-frame') return;
+    if (d.type === 'ready') return this._readyRes();
+    if (d.type === 'warm') return this._warmRes(this);
+    if (d.type === 'bootfail') return this._warmRej(new Error(d.message));
+    if (this.onOutput) this.onOutput(d);
+  };
+
+  Frame.prototype.warm = function () { return this._warm; };
+
+  Frame.prototype.execute = function (js) {
+    this.el.contentWindow.postMessage({ command: 'execute', js: js }, '*');
+  };
+
+  Frame.prototype.destroy = function () {
+    var i = frames.indexOf(this);
+    if (i >= 0) frames.splice(i, 1);
+    this.onOutput = null;
+    this.el.remove();
+  };
+
+  // At most two frames are alive: the one that last ran (kept around so late
+  // async print() output still lands somewhere) and a pre-booted spare. A run
+  // anywhere on the page reclaims the previous one, so a page full of
+  // playgrounds never accumulates SDK-sized contexts.
+  var activeFrame = null;
+  var spareFrame = null;
+
+  function prewarm() {
+    if (spareFrame) return;
+    var f = new Frame();
+    spareFrame = f;
+    f.warm().catch(function () {
+      if (spareFrame === f) { spareFrame = null; f.destroy(); }
+    });
+  }
+
+  function acquireFrame() {
+    if (activeFrame) { activeFrame.destroy(); activeFrame = null; }
+    var f = spareFrame;
+    spareFrame = null;
+    if (!f) f = new Frame();
+    activeFrame = f;
+    return f;
+  }
+
+  function releaseFrame(f) {
+    if (activeFrame === f) { activeFrame.destroy(); activeFrame = null; }
+  }
+
+  // --- UI -------------------------------------------------------------------
 
   function el(tag, cls, text) {
     var node = document.createElement(tag);
@@ -84,8 +375,12 @@
     var initial = textarea.value.replace(/^\n+/, '').replace(/\s+$/, '');
     textarea.value = initial;
 
+    // Set by build_docs.dart when a build-time artifact exists for exactly
+    // this snippet. Only valid while the reader has not edited the code.
+    var prebuiltId = container.getAttribute('data-pg');
+
     var toolbar = el('div', 'pg-toolbar');
-    var runBtn = el('button', 'pg-run', t('pgRun', '\u25b6 Run'));
+    var runBtn = el('button', 'pg-run', t('pgRun', '▶ Run'));
     var resetBtn = el('button', 'pg-reset', t('pgReset', 'Reset'));
     var status = el('span', 'pg-status', '');
     toolbar.appendChild(runBtn);
@@ -112,13 +407,7 @@
     }
     function getCode() { return editor ? editor.getValue() : textarea.value; }
 
-    var iframe = null;
-    var msgHandler = null;
-
-    function cleanup() {
-      if (msgHandler) { window.removeEventListener('message', msgHandler); msgHandler = null; }
-      if (iframe) { iframe.remove(); iframe = null; }
-    }
+    var frame = null;
 
     function appendOut(text, cls) {
       output.style.display = 'block';
@@ -128,81 +417,88 @@
       output.scrollTop = output.scrollHeight;
     }
 
-    function run() {
-      cleanup();
-      output.style.display = 'block';
-      output.textContent = '';
-      runBtn.disabled = true;
-      status.textContent = t('pgCompiling', 'Compiling\u2026');
+    // Resolves to {js, offset}. Cheapest source first.
+    function resolveJs(code) {
+      if (prebuiltId && code.trim() === initial.trim()) {
+        return fetchPrebuilt(prebuiltId)
+          .then(function (js) { return { js: js, offset: 0 }; })
+          .catch(function () { return viaCompiler(code); });
+      }
+      return viaCompiler(code);
+    }
 
+    function viaCompiler(code) {
       // The "native Dart" panels on comparison pages never import fxdart —
       // they compile as-is, with no library merge and no line offset.
-      var code = getCode();
-      var needsLib = /^\s*import\s+['"]package:fxdart\//m.test(code);
-      (needsLib
+      var built = needsLib(code)
         ? getLib().then(function (lib) { return buildSource(lib, code); })
-        : Promise.resolve({ source: code, offset: 0 })
-      ).then(function (built) {
-        return fetch(COMPILE_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ source: built.source })
-        }).then(function (resp) {
-          return resp.text().then(function (text) {
-            if (!resp.ok) {
-              var msg;
-              try { msg = JSON.parse(text).error || text; } catch (e) { msg = text; }
-              status.textContent = t('pgCompileError', 'Compile error');
-              appendOut(remapErrors(String(msg), built.offset), 'pg-err');
-              runBtn.disabled = false;
-              return;
-            }
-            var js = JSON.parse(text).result;
-            execute(js);
-          });
+        : Promise.resolve({ source: code, offset: 0 });
+      return built.then(function (b) {
+        return compile(b.source).then(function (js) {
+          return { js: js, offset: b.offset };
+        }, function (err) {
+          err.offset = b.offset;
+          throw err;
         });
-      }).catch(function (err) {
-        status.textContent = t('pgError', 'Error');
-        appendOut(String(err), 'pg-err');
-        runBtn.disabled = false;
       });
     }
 
-    function execute(js) {
-      status.textContent = t('pgLoading', 'Loading runtime\u2026');
-      iframe = document.createElement('iframe');
-      iframe.setAttribute('sandbox', 'allow-scripts');
-      iframe.style.display = 'none';
-      iframe.src = ROOT + 'frame.html';
+    function finish() {
+      status.textContent = '';
+      runBtn.disabled = false;
+      idle(prewarm);
+    }
+
+    function run() {
+      if (frame) { releaseFrame(frame); frame = null; }
+      output.style.display = 'block';
+      output.textContent = '';
+      runBtn.disabled = true;
+      status.textContent = t('pgCompiling', 'Compiling…');
+
+      // Claim a frame now so its (usually already finished) boot overlaps
+      // with resolving the JS instead of following it.
+      var f = acquireFrame();
+      frame = f;
 
       var gotOutput = false;
-      msgHandler = function (e) {
-        if (!iframe || e.source !== iframe.contentWindow) return;
-        var d = e.data || {};
-        if (d.sender !== 'fx-frame') return;
-        if (d.type === 'ready') {
-          iframe.contentWindow.postMessage({ command: 'execute', js: js }, '*');
-        } else if (d.type === 'started') {
-          status.textContent = t('pgRunning', 'Running\u2026');
+      f.onOutput = function (d) {
+        if (d.type === 'started') {
+          status.textContent = t('pgRunning', 'Running…');
         } else if (d.type === 'stdout') {
           gotOutput = true;
           appendOut(d.message, 'pg-out');
         } else if (d.type === 'stderr') {
           gotOutput = true;
           appendOut(d.message, 'pg-err');
-          status.textContent = '';
-          runBtn.disabled = false;
+          finish();
         } else if (d.type === 'done') {
           // main() returned; async work may still print afterwards.
-          status.textContent = '';
-          runBtn.disabled = false;
+          finish();
           setTimeout(function () {
             if (!gotOutput) appendOut(t('pgNoOutput', '(no output)'), 'pg-dim');
           }, 3000);
         }
       };
-      window.addEventListener('message', msgHandler);
-      document.body.appendChild(iframe);
+
+      resolveJs(getCode()).then(function (res) {
+        status.textContent = t('pgLoading', 'Loading runtime…');
+        return f.warm().then(function () {
+          if (frame !== f) return; // superseded by a newer run
+          f.execute(res.js);
+        });
+      }).catch(function (err) {
+        if (err && err.name === 'CompileError') {
+          status.textContent = t('pgCompileError', 'Compile error');
+          appendOut(remapErrors(String(err.message), err.offset || 0), 'pg-err');
+        } else {
+          status.textContent = t('pgError', 'Error');
+          appendOut(String(err && err.message ? err.message : err), 'pg-err');
+        }
+        runBtn.disabled = false;
+        releaseFrame(f);
+        if (frame === f) frame = null;
+      });
 
       // Safety: re-enable Run if nothing came back.
       setTimeout(function () {
@@ -216,13 +512,43 @@
       output.textContent = '';
       output.style.display = 'none';
       status.textContent = '';
-      cleanup();
+      if (frame) { releaseFrame(frame); frame = null; }
     });
   }
 
-  function init() {
-    document.querySelectorAll('.playground').forEach(enhance);
+  // --- boot -----------------------------------------------------------------
+
+  // Booting a frame downloads the 17MB runtime, so do not spend a drive-by
+  // reader's bandwidth on it. Wait until a playground is actually on screen
+  // (or the reader reaches for one), then warm up while they read.
+  function armPrewarm(containers) {
+    var armed = false;
+    function fire() {
+      if (armed) return;
+      armed = true;
+      idle(prewarm);
+    }
+    containers.forEach(function (c) {
+      c.addEventListener('pointerenter', fire, { once: true });
+      c.addEventListener('focusin', fire, { once: true });
+    });
+    if (!window.IntersectionObserver) return;
+    var io = new IntersectionObserver(function (entries) {
+      for (var i = 0; i < entries.length; i++) {
+        if (entries[i].isIntersecting) { io.disconnect(); fire(); return; }
+      }
+    }, { rootMargin: '200px' });
+    containers.forEach(function (c) { io.observe(c); });
   }
+
+  function init() {
+    var containers = [].slice.call(document.querySelectorAll('.playground'));
+    if (!containers.length) return;
+    containers.forEach(enhance);
+    evictOldCaches();
+    armPrewarm(containers);
+  }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {

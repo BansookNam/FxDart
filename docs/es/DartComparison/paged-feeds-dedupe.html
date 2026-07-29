@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Two paged feeds, concatenated and deduped — Dart vs FxDart</title>
-  <meta name="description" content="Drain a primary log store, then its replica, dedupe by id, stop at 8 — concat + uniqBy + take stays lazy, vs nested loops with a seen-set.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/paged-feeds-dedupe.html">
+  <title>Dos feeds paginados, concatenados y deduplicados — Dart vs FxDart</title>
+  <meta name="description" content="Vacía un almacén de logs primario, luego su réplica, deduplica por id y para en 8 — concat + uniqBy + take siguen siendo perezosos, frente a bucles anidados con un conjunto de vistos.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/paged-feeds-dedupe.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/paged-feeds-dedupe.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/paged-feeds-dedupe.html">
@@ -44,33 +43,36 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #47 · <strong>Two paged feeds, concatenated and deduped</strong></p>
-  <h1>Two paged feeds, concatenated and deduped</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #47 · <strong>Dos feeds paginados, concatenados y deduplicados</strong></p>
+  <h1>Dos feeds paginados, concatenados y deduplicados</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/concat.html">concat</a></li><li><a href="../tutorials/uniqBy.html">uniqBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Log events live in two paged stores — a primary and a replica whose
-    pages overlap it (some events shipped to both). Fetch pages of three
-    (simulated calls, fixed data in the code below), read the primary
-    <em>fully first</em>, then the replica, drop events already seen (by
-    id), and stop after the first <strong>eight unique events</strong>.
-    Report how many of the five pages were actually fetched.
+    Los eventos de log viven en dos almacenes paginados: uno primario y
+    una réplica cuyas páginas se solapan con las del primario (algunos
+    eventos se enviaron a ambos). Trae páginas de tres (llamadas
+    simuladas, datos fijos en el código de abajo), lee <em>primero por
+    completo</em> el primario y después la réplica, descarta los eventos
+    ya vistos (por id) y para tras los primeros <strong>ocho eventos
+    únicos</strong>. Informa de cuántas de las cinco páginas se llegaron a
+    pedir realmente.
   </p>
   <p>
-    To be precise about what FxDart's <code><a href="../tutorials/concat.html">concat</a></code> is: a
-    <strong>sequential</strong> append, not a merge — the replica is not
-    touched until the primary is exhausted. That is the right tool here,
-    because the task wants primary events to win. Each store becomes an
-    async sequence with <code><a href="../tutorials/range.html">range</a></code> + <code><a href="../tutorials/flatMap.html">flatMap</a></code> (page
-    number → page of events), and <code><a href="../tutorials/uniqBy.html">uniqBy</a></code> + <code>take(8)</code>
-    finish the job. Because the chain is pull-based, <code><a href="../tutorials/take.html">take</a></code>
-    stopping also stops the paging: the last replica page is never fetched.
+    Para ser precisos sobre qué es el <code><a href="../tutorials/concat.html">concat</a></code> de FxDart: un
+    añadido <strong>secuencial</strong>, no una mezcla — la réplica no se
+    toca hasta que el primario se ha agotado. Aquí esa es la herramienta
+    correcta, porque la tarea quiere que ganen los eventos del primario.
+    Cada almacén se convierte en una secuencia asíncrona con
+    <code><a href="../tutorials/range.html">range</a></code> + <code><a href="../tutorials/flatMap.html">flatMap</a></code> (número de página → página
+    de eventos), y <code><a href="../tutorials/uniqBy.html">uniqBy</a></code> + <code>take(8)</code> rematan el
+    trabajo. Como la cadena está basada en pull, que <code><a href="../tutorials/take.html">take</a></code> se
+    detenga detiene también la paginación: la última página de la réplica
+    no se pide nunca.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">first 8 unique events (primary first, then replica):
   e1  boot
   e2  login user 7
@@ -83,10 +85,10 @@
 pages fetched: 4 of 5</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class Event {
@@ -189,22 +191,24 @@ Future<void> main() async {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    The native version is three nested loops with a <code>seen</code> set
-    and a labeled <code>break outer;</code> — every piece (pagination,
-    ordering, dedupe, early exit) hand-woven into control flow, and the
-    early exit is the part that keeps the page count at four. It works, but
-    each policy lives in a guard clause rather than a name. The FxDart
-    chain gives every policy its own word — <code><a href="../tutorials/concat.html">concat</a></code> for
-    sequencing, <code><a href="../tutorials/uniqBy.html">uniqBy</a></code> for dedupe, <code><a href="../tutorials/take.html">take</a></code> for the
-    budget — and the laziness that skips the fifth page is the pipeline's
-    default behavior, not a carefully placed jump.
+    La versión nativa son tres bucles anidados con un conjunto
+    <code>seen</code> y un <code>break outer;</code> etiquetado — cada
+    pieza (paginación, orden, deduplicación, salida temprana) tejida a
+    mano dentro del flujo de control, y la salida temprana es la parte que
+    mantiene el recuento de páginas en cuatro. Funciona, pero cada
+    política vive en una cláusula de guarda en lugar de en un nombre. La
+    cadena de FxDart le da a cada política su propia palabra —
+    <code><a href="../tutorials/concat.html">concat</a></code> para la secuenciación, <code><a href="../tutorials/uniqBy.html">uniqBy</a></code> para la
+    deduplicación, <code><a href="../tutorials/take.html">take</a></code> para el presupuesto — y la pereza que
+    se salta la quinta página es el comportamiento por defecto del
+    pipeline, no un salto cuidadosamente colocado.
   </p>
 
   <nav class="tut-nav">
-    <a href="parallel-downloads.html">← Anterior: Parallel downloads, results in order</a>
-    <a href="settlement-pipeline.html">Siguiente: End-of-day settlement pipeline →</a>
+    <a href="parallel-downloads.html">← Anterior: Descargas en paralelo, resultados en orden</a>
+    <a href="settlement-pipeline.html">Siguiente: Pipeline de liquidación de cierre de día →</a>
   </nav>
 </main>
 <footer class="site-footer">

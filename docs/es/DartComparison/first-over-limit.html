@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>First sensor reading over the limit — Dart vs FxDart</title>
-  <meta name="description" content="Find the first temperature above a threshold — skipWhile + firstOrNull in plain Dart vs dropWhile + head in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/first-over-limit.html">
+  <title>La primera lectura del sensor por encima del límite — Dart vs FxDart</title>
+  <meta name="description" content="Encuentra la primera temperatura por encima de un umbral — skipWhile + firstOrNull en Dart nativo frente a dropWhile + head en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/first-over-limit.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/first-over-limit.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/first-over-limit.html">
@@ -44,29 +43,29 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #6 · <strong>First sensor reading over the limit</strong></p>
-  <h1>First sensor reading over the limit</h1>
-  <p class="cmp-meta"><span class="badge verdict-native">Native is fine</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #6 · <strong>La primera lectura del sensor por encima del límite</strong></p>
+  <h1>La primera lectura del sensor por encima del límite</h1>
+  <p class="cmp-meta"><span class="badge verdict-native">Dart nativo basta</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/head.html">head</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    A temperature sensor logs a reading every ten minutes. Find the
-    <strong>first</strong> reading over the <strong>75.0 C</strong> limit and
-    print its time and value — or a fallback line if none crossed it. The
-    data is in the code below; both versions must print the line shown under
-    <em>Expected output</em>.
+    Un sensor de temperatura registra una lectura cada diez minutos.
+    Encuentra la <strong>primera</strong> lectura que supere el límite de
+    <strong>75.0 C</strong> e imprime su hora y su valor —o una línea
+    alternativa si ninguna lo cruzó—. Los datos están en el código de
+    abajo; las dos versiones deben imprimir la línea que aparece bajo
+    <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">First over 75.0 C: 09:40 at 76.3 C</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -137,20 +136,21 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    They don't — and here plain Dart is the honest pick. Core
-    <code>skipWhile</code> plus <code>firstOrNull</code> (from
-    <code>package:collection</code>) is a clean, lazy one-liner that says
-    exactly what it means, with the same nullable result to handle. FxDart's
-    <code>dropWhile → head</code> is the same idea under FxTS names — worth
-    using if the rest of your file is already FxDart chains, but nobody
-    should add a library for this line. When native Dart wins, we say so.
+    No difieren, y aquí Dart nativo es la elección honesta. El
+    <code>skipWhile</code> del núcleo más <code>firstOrNull</code> (de
+    <code>package:collection</code>) es una línea limpia y perezosa que dice
+    exactamente lo que significa, con el mismo resultado nullable que hay
+    que gestionar. El <code>dropWhile → head</code> de FxDart es la misma
+    idea con los nombres de FxTS: merece la pena si el resto de tu archivo
+    ya son cadenas de FxDart, pero nadie debería añadir una librería por
+    esta línea. Cuando gana Dart nativo, lo decimos.
   </p>
 
   <nav class="tut-nav">
-    <a href="average-basket.html">← Anterior: Average order value over $100</a>
-    <a href="top-log-level.html">Siguiente: Most frequent log level →</a>
+    <a href="average-basket.html">← Anterior: Valor medio de los pedidos de más de $100</a>
+    <a href="top-log-level.html">Siguiente: Nivel de log más frecuente →</a>
   </nav>
 </main>
 <footer class="site-footer">

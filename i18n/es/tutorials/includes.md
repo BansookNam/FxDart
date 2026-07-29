@@ -1,7 +1,7 @@
 ---
 slug: includes
-title: includes — FxDart 101
-description: Tutorial de includes en FxDart: comprueba la pertenencia en un iterable usando ==, con cortocircuito, en versión síncrona y asíncrona.
+title: contains — FxDart 101
+description: Tutorial de contains en FxDart: comprueba la pertenencia en un iterable usando ==, con cortocircuito, en versión síncrona y asíncrona.
 heading: <code>contains</code>
 section: 8
 crumb: contains
@@ -16,10 +16,14 @@ nextLabel: isEmpty
 
   <h2>Lección</h2>
   <p>
-    <code>includes</code> es una envoltura fina con la forma de FxTS: en el
-    lado síncrono es literalmente <code>iterable.contains(a)</code>, así que
-    no hay un método de cadena aparte — <code>Fx</code> ya hereda
-    <code>.contains()</code> de <code>Iterable</code> y se comporta igual. La
+    <code>contains</code> es el nombre idiomático en Dart para comprobar la
+    pertenencia, y en una cadena ya lo tienes: <code>Fx</code> hereda
+    <code>.contains()</code> de <code>Iterable</code>, así que
+    <code>fx(xs).contains(a)</code> funciona sin más. Eso sí, no existe una
+    función <code>contains</code> de nivel superior — el nombre choca con el
+    matcher de <code>package:test</code> —, de modo que la forma data-first
+    conserva su grafía de FxTS, <code>includes(a, iterable)</code>, que es
+    literalmente <code>iterable.contains(a)</code>. La
     versión asíncrona, <code>includesAsync</code>, está construida sobre
     <a href="some.html"><code>someAsync</code></a> (con <code>b == a</code>
     como predicado), lo que significa que hereda el mismo cortocircuito: deja
@@ -27,7 +31,7 @@ nextLabel: isEmpty
   </p>
   <p>
     La igualdad se comprueba con el <code>==</code> de Dart, así que respeta
-    cualquier sobrecarga de <code>operator ==</code> en tus propias clases —
+    cualquier redefinición de <code>operator ==</code> en tus propias clases —
     no se limita a los tipos primitivos.
   </p>
 
@@ -39,7 +43,7 @@ nextLabel: isEmpty
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>includes</code> para comprobar si <code>requestId</code> está permitido.</p>
+  <p>Ejercicio: usa <code>contains</code> para comprobar si <code>requestId</code> está permitido.</p>
   {{playground:2}}
 
   <div class="callout">

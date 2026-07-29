@@ -69,7 +69,7 @@ nextLabel: async variants
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="asyncVariants.html"><code>*Async</code> 명명 규칙</a> — mapAsync, filterAsync, … ·
     <a href="streams.html">Stream 브리지</a> — fromStream, fxStream, toStream ·
     <a href="concurrent.html"><code>concurrent</code></a> — 역채널이 실제로 동작하는 모습 ·

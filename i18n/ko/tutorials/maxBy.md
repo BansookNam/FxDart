@@ -22,7 +22,7 @@ nextLabel: minBy
     <strong>한 번</strong> 순회하면서 현재까지의 최선 원소를 유지하므로
     O(n)입니다. 반면 솔깃한 <code>sortBy(key).head()</code> 형태는
     O(n&nbsp;log&nbsp;n)을 치르고, 결코 필요하지도 않은 정렬된 리스트를
-    실체화합니다.
+    구체화합니다.
   </p>
   <p>
     키는 <code><a href="sortBy.html">sortBy</a></code>가 비교하는
@@ -51,7 +51,7 @@ nextLabel: minBy
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="minBy.html"><code>minBy</code></a> — 거울상 ·
     <a href="max.html"><code>max</code></a> — 원소가 아니라 키 자체가 필요할 때 ·
     <a href="sortBy.html"><code>sortBy</code></a> — 어차피 전체 정렬이 필요할 때

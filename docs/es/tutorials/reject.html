@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>reject — FxDart 101</title>
+  <title>whereNot — FxDart 101</title>
   <meta name="description" content="Tutorial de reject en FxDart: exactamente lo contrario de filter, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/reject.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/reject.html">
@@ -55,18 +55,20 @@ Iterable&lt;A&gt; reject&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterab
 
   <h2>Lección</h2>
   <p>
-    <code>reject</code> está implementado como
-    <code>filter((a) =&gt; !f(a), iterable)</code>: existe puramente por
-    legibilidad. <code>list.reject(isInvalid)</code> se lee de forma más
-    natural que <code>list.filter((a) =&gt; !isInvalid(a))</code>, sobre todo
-    cuando el predicado ya tiene un nombre claro y en positivo. Elige entre
-    <code>filter</code> y <code>reject</code> el que te evite escribir una
-    negación en el punto de llamada.
+    <code>whereNot</code> está implementado como
+    <code>where((a) =&gt; !f(a), iterable)</code>: existe puramente por
+    legibilidad. <code>list.whereNot(isInvalid)</code> se lee de forma más
+    natural que <code>list.where((a) =&gt; !isInvalid(a))</code>, sobre todo
+    cuando el predicado ya tiene un nombre claro y en positivo.
+    <code>whereNot</code> es el nombre idiomático en Dart; fxdart también
+    acepta <code>reject</code>, la grafía de FxTS: son el mismo operador.
+    Elige entre <code>where</code> y <code>whereNot</code> el que te evite
+    escribir una negación en el punto de llamada.
   </p>
   <p>
-    Todo el comportamiento de <code>filter</code> se traslada sin cambios: es
+    Todo el comportamiento de <code>where</code> se traslada sin cambios: es
     perezoso, y la forma asíncrona hereda el camino concurrente dedicado de
-    <code>filterAsync</code>, así que <code>.concurrent(n)</code> evalúa
+    <code>whereAsync</code>, así que <code>.concurrent(n)</code> evalúa
     realmente <code>n</code> predicados en paralelo sin dejar de devolver los
     resultados en el orden original.
   </p>
@@ -116,7 +118,7 @@ Future<void> main() async {
   </div>
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>reject</code> para descartar las líneas
+  <p>Ejercicio: usa <code>whereNot</code> para descartar las líneas
     <code>'info: ok'</code> y quedarte solo con los errores.</p>
   <div class="playground">
 <textarea>

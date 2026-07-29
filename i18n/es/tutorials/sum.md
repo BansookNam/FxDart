@@ -19,7 +19,7 @@ nextLabel: sumBy
     <code>sum</code> es un operador terminal y uno de los pliegues
     especializados más simples de la librería: por dentro es literalmente
     <code>fold(0, (a, b) =&gt; a + b, iterable)</code>. Como todo operador
-    terminal, llamarlo tira de todo el pipeline perezoso que tiene por encima:
+    terminal, llamarlo tira de todo el pipeline perezoso que tiene aguas arriba:
     puedes montar una cadena elaborada de pasos <code>map</code>/<code>filter</code>
     y solo pagas por los valores que <code>sum</code> realmente necesita, que
     son todos.

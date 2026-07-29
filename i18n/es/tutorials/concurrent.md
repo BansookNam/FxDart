@@ -14,13 +14,13 @@ nextLabel: concurrentPool
 
   <h2>Lección</h2>
   <p>
-    <code>concurrent(n)</code> es la respuesta de FxDart a "ejecuta varios pasos
-    asíncronos en paralelo, pero mantén los resultados en orden". Funciona
+    <code>concurrent(n)</code> es la respuesta de FxDart a «ejecuta varios pasos
+    asíncronos en paralelo, pero mantén los resultados en orden». Funciona
     mediante el modelo de <strong>marcador de concurrencia</strong> integrado en
     <code>FxAsyncIterator.next([Concurrent? concurrent])</code>: cuando llamas a
     <code>.concurrent(3)</code>, cada pull que lo atraviesa propaga un marcador
     <code>Concurrent(3)</code> <em>aguas arriba</em>, capa a capa, diciéndole a
-    quien produzca los valores "evalúa 3 de golpe en vez de uno". El operador de
+    quien produzca los valores «evalúa 3 de golpe en vez de uno». El operador de
     aguas arriba — normalmente un <code>map</code> perezoso — ve ese marcador y, en
     lugar de esperar un Future y después arrancar el siguiente, llama tres veces
     al <code>next()</code> de su propia fuente sin esperar entre medias, de modo
@@ -33,7 +33,7 @@ nextLabel: concurrentPool
   <p>
     Este es el canal de retorno que mencionaba la lección de <code>toAsync</code>:
     el <code>Stream</code> de Dart no tiene forma de pedirle a posteriori a una
-    fuente de aguas arriba "dame 3 a la vez", porque un <code>Stream</code> empuja los
+    fuente de aguas arriba «dame 3 a la vez», porque un <code>Stream</code> empuja los
     valores a su propio ritmo. El protocolo <code>next()</code> basado en pull de
     FxDart lleva esa petición aguas arriba en cada pull, y eso es justamente lo
     que hace posible <code>concurrent(n)</code>.

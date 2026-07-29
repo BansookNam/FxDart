@@ -32,9 +32,9 @@ async: false
     <code>where</code>, <code>take</code>는 모든 Dart
     <code>Iterable</code>에 기본으로 딸려 있고, 지연 평가되며, 두
     버전은 <code>where</code>를 <code>filter</code>라고 부른다는 점만
-    빼면 같은 파이프라인입니다. 이런 짧은
-    정규화-검증-자르기 체인에는 순수 Dart도 똑같이 명료합니다 — 이럴
-    때는 순수 Dart를 쓰세요. FxDart는 파이프라인에 Dart에 없는 어휘가
+    빼면 같은 파이프라인입니다. 이런 짧은 정규화-검증-자르기 체인에서는
+    순수 Dart도 똑같이 명료합니다 — 이럴 때는 순수 Dart를 쓰세요.
+    FxDart는 파이프라인에 Dart에 없는 어휘가
     필요할 때(<code>groupBy</code>, <code>scan</code>, <code>zip</code>,
     <code>concurrent</code> 등), 혹은 파일의 나머지 부분이 이미
     <code>fx</code>로 체인을 이루고 있을 때 진가를 발휘합니다. 이

@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pair sensors with readings, keep anomalies — Dart vs FxDart</title>
-  <meta name="description" content="Join two parallel lists and flag hot readings — an index loop in plain Dart (core has no zip) vs zip + filter + map in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/sensor-anomalies.html">
+  <title>Emparejar sensores con lecturas y quedarse con las anomalías — Dart vs FxDart</title>
+  <meta name="description" content="Une dos listas paralelas y señala las lecturas altas — un bucle con índice en Dart nativo (el núcleo no tiene zip) frente a zip + filter + map en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/sensor-anomalies.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/sensor-anomalies.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/sensor-anomalies.html">
@@ -44,31 +43,32 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #17 · <strong>Pair sensors with readings, keep anomalies</strong></p>
-  <h1>Pair sensors with readings, keep anomalies</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #17 · <strong>Emparejar sensores con lecturas y quedarse con las anomalías</strong></p>
+  <h1>Emparejar sensores con lecturas y quedarse con las anomalías</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/zip.html">zip</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    A telemetry API returns two <strong>parallel lists</strong>: sensor names
-    and their latest temperature readings, matched by position. Pair them up,
-    keep the readings above <strong>90.0 °C</strong>, and print one alert
-    line per anomaly, in list order. The data is in the code below; both
-    versions must print the lines shown under <em>Expected output</em>.
+    Una API de telemetría devuelve dos <strong>listas paralelas</strong>:
+    los nombres de los sensores y sus últimas lecturas de temperatura,
+    emparejados por posición. Emparéjalos, quédate con las lecturas por
+    encima de <strong>90.0 °C</strong> e imprime una línea de alerta por
+    anomalía, en el orden de la lista. Los datos están en el código de
+    abajo; ambas versiones deben imprimir las líneas que aparecen bajo
+    <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">boiler-2: 104.6 °C
 pump-b: 93.4 °C
 vent-7: 97.1 °C</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 // Two parallel lists, as a telemetry API often returns them.
@@ -115,23 +115,26 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Core Dart has no <code><a href="../tutorials/zip.html">zip</a></code>. <code>package:collection</code> offers
-    <code>IterableZip</code>, but it zips same-typed iterables — pairing a
-    <code>List&lt;String&gt;</code> with a <code>List&lt;double&gt;</code>
-    degrades both to <code>Object</code> and puts casts in your predicate —
-    so in practice Dart developers write the index loop shown here instead.
-    The loop is correct, but the pairing lives in positional bookkeeping
-    (<code>sensors[i]</code>, <code>readings[i]</code>) and produces nothing
-    you can pass along or filter further. FxDart's <code><a href="../tutorials/zip.html">zip</a></code> yields
-    typed <code>(String, double)</code> record pairs, so the anomaly check
-    and the formatting stay ordinary chain steps over real values.
+    El núcleo de Dart no tiene <code><a href="../tutorials/zip.html">zip</a></code>.
+    <code>package:collection</code> ofrece <code>IterableZip</code>, pero
+    empareja iterables del mismo tipo —juntar un
+    <code>List&lt;String&gt;</code> con un <code>List&lt;double&gt;</code>
+    degrada ambos a <code>Object</code> y mete casts en tu predicado—, así
+    que en la práctica los desarrolladores de Dart escriben el bucle con
+    índice que ves aquí. El bucle es correcto, pero el emparejamiento vive
+    en la contabilidad posicional (<code>sensors[i]</code>,
+    <code>readings[i]</code>) y no produce nada que puedas pasar más
+    adelante ni seguir filtrando. El <code><a href="../tutorials/zip.html">zip</a></code> de FxDart emite pares
+    de records tipados <code>(String, double)</code>, así que la
+    comprobación de anomalías y el formateo se quedan en pasos corrientes
+    de la cadena sobre valores reales.
   </p>
 
   <nav class="tut-nav">
-    <a href="compound-interest.html">← Anterior: Compound interest table</a>
-    <a href="top-category-average.html">Siguiente: Category with highest average expense →</a>
+    <a href="compound-interest.html">← Anterior: Tabla de interés compuesto</a>
+    <a href="top-category-average.html">Siguiente: Categoría con el gasto medio más alto →</a>
   </nav>
 </main>
 <footer class="site-footer">

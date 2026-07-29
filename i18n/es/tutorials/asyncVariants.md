@@ -2,7 +2,7 @@
 slug: asyncVariants
 title: async variants — FxDart 101
 description: La convención de nombres *Async de FxDart: cada operador perezoso y de agregación tiene su gemelo para FxAsyncIterable, con playground en vivo.
-heading: The <code>*Async</code> naming convention
+heading: La convención de nombres <code>*Async</code>
 section: 11
 crumb: async variants
 next: streams.html

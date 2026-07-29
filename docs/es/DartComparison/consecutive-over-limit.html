@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Three consecutive readings over the limit — Dart vs FxDart</title>
-  <meta name="description" content="Find every 3-hour window of CO2 readings all over 1000 ppm — an index loop in plain Dart vs a sliding window built from zip + drop in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/consecutive-over-limit.html">
+  <title>Tres lecturas consecutivas por encima del límite — Dart vs FxDart</title>
+  <meta name="description" content="Encuentra cada ventana de 3 horas de lecturas de CO2 todas por encima de 1000 ppm — un bucle con índices en Dart nativo frente a una ventana deslizante construida con zip + drop en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/consecutive-over-limit.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/consecutive-over-limit.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/consecutive-over-limit.html">
@@ -44,32 +43,32 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #24 · <strong>Three consecutive readings over the limit</strong></p>
-  <h1>Three consecutive readings over the limit</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #24 · <strong>Tres lecturas consecutivas por encima del límite</strong></p>
+  <h1>Tres lecturas consecutivas por encima del límite</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/zip.html">zip</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Hourly CO2 readings for one day. Flag every window of
-    <strong>three consecutive readings all above 1000 ppm</strong> —
-    that means the ventilation could not catch up for three straight
-    hours — and print each window as a start–end hour range under a
-    header line. The data is in the code below; both versions must print
-    the lines shown under <em>Expected output</em>.
+    Lecturas horarias de CO2 de un día. Marca cada ventana de <strong>tres
+    lecturas consecutivas todas por encima de 1000 ppm</strong> —eso
+    significa que la ventilación no pudo recuperarse durante tres horas
+    seguidas— e imprime cada ventana como un rango de horas inicio–fin bajo
+    una línea de cabecera. Los datos están en el código de abajo; ambas
+    versiones deben imprimir las líneas que aparecen bajo
+    <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Ventilation alerts (3h over 1000 ppm):
 11:00–13:00
 15:00–17:00</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class Reading {
@@ -151,24 +150,25 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Core Dart has no sliding window, so the native version is an index
-    loop with an <code>i + 2 &lt; length</code> bound and three manual
-    lookups — correct, but every piece of it is bookkeeping a reader must
-    check. The FxDart version builds the window as <em>data</em>:
-    <code><a href="../tutorials/zip.html">zip</a></code> the list with itself shifted by one and by two
-    (<code>drop(1)</code>, <code>drop(2)</code>), and each element becomes
-    a (reading, next, next-next) triple — no indices anywhere.
-    <code><a href="../tutorials/zip.html">zip</a></code> stopping at the shortest input is exactly the
-    window-fits-entirely rule the loop encodes as its bound. Widening the
-    window to 4 hours is one more <code><a href="../tutorials/zip.html">zip</a></code> line, not a re-audit of
-    the arithmetic.
+    Dart nativo no tiene ventana deslizante, así que la versión nativa es
+    un bucle con índices, con una cota <code>i + 2 &lt; length</code> y tres
+    accesos manuales —correcto, pero cada pieza es contabilidad que quien lo
+    lea tiene que verificar. La versión de FxDart construye la ventana como
+    <em>datos</em>: aplica <code><a href="../tutorials/zip.html">zip</a></code> a la lista consigo misma
+    desplazada uno y dos lugares (<code>drop(1)</code>,
+    <code>drop(2)</code>), y cada elemento pasa a ser una terna (lectura,
+    siguiente, la siguiente de esa). Sin índices por ningún lado. Que
+    <code><a href="../tutorials/zip.html">zip</a></code> se detenga en la entrada más corta es exactamente la
+    regla de «la ventana cabe entera» que el bucle codifica en su cota.
+    Ampliar la ventana a 4 horas es una línea más de <code><a href="../tutorials/zip.html">zip</a></code>, no
+    una reauditoría de la aritmética.
   </p>
 
   <nav class="tut-nav">
-    <a href="weekly-sensor-averages.html">← Anterior: Weekly averages from daily readings</a>
-    <a href="budget-alerts.html">Siguiente: Categories over their monthly budget →</a>
+    <a href="weekly-sensor-averages.html">← Anterior: Medias semanales a partir de lecturas diarias</a>
+    <a href="budget-alerts.html">Siguiente: Categorías que superan su presupuesto mensual →</a>
   </nav>
 </main>
 <footer class="site-footer">

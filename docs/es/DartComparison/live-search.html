@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Live search over a keystroke stream — Dart vs FxDart</title>
-  <meta name="description" content="Turn a stream of keystrokes into deduped backend searches — fromStream + filter + uniq + take + map vs await-for with guard clauses.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/live-search.html">
+  <title>Búsqueda en vivo sobre un stream de pulsaciones — Dart vs FxDart</title>
+  <meta name="description" content="Convierte un stream de pulsaciones en búsquedas de backend sin duplicados — fromStream + filter + uniq + take + map frente a await-for con cláusulas de guarda.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/live-search.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/live-search.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/live-search.html">
@@ -44,33 +43,34 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #49 · <strong>Live search over a keystroke stream</strong></p>
-  <h1>Live search over a keystroke stream</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #49 · <strong>Búsqueda en vivo sobre un stream de pulsaciones</strong></p>
+  <h1>Búsqueda en vivo sobre un stream de pulsaciones</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/take.html">take</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/head.html">head</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    A search box emits every keystroke as a Dart <code>Stream</code> — a
-    user typing toward <em>darts</em>, with some values repeated by key
-    autorepeat (fixed sequence in the code below). Turn that into backend
-    searches: skip queries shorter than two characters, never search the
-    same query twice, stop after four searched queries, and print each
-    query with its hit count and top hit — plus how many backend calls were
-    actually made.
+    Un cuadro de búsqueda emite cada pulsación de tecla como un
+    <code>Stream</code> de Dart —alguien escribiendo hacia
+    <em>darts</em>, con algunos valores repetidos por la repetición
+    automática del teclado (secuencia fija en el código de abajo).
+    Conviértelo en búsquedas de backend: descarta las consultas de menos
+    de dos caracteres, no busques nunca dos veces la misma consulta,
+    detente después de cuatro consultas buscadas e imprime cada consulta
+    con su número de resultados y el mejor resultado —además de cuántas
+    llamadas al backend se hicieron realmente.
   </p>
   <p>
-    With <code>fxStream</code> the keystroke stream becomes a pipeline, and
-    each rule becomes an operator: <code><a href="../tutorials/filter.html">filter</a></code> for the length
-    floor, <code><a href="../tutorials/uniq.html">uniq</a></code> for the repeats, <code>take(4)</code> for the
-    budget, then <code><a href="../tutorials/map.html">map</a></code> performs the search. Because
-    <code><a href="../tutorials/take.html">take</a></code> sits before the search step and the chain is
-    pull-based, exactly four backend calls happen and the tail of the
-    stream is never consumed.
+    Con <code>fxStream</code> el stream de pulsaciones se convierte en un
+    pipeline y cada regla se convierte en un operador: <code><a href="../tutorials/filter.html">filter</a></code>
+    para el mínimo de longitud, <code><a href="../tutorials/uniq.html">uniq</a></code> para las repeticiones,
+    <code>take(4)</code> para el presupuesto, y después <code><a href="../tutorials/map.html">map</a></code>
+    realiza la búsqueda. Como <code><a href="../tutorials/take.html">take</a></code> está antes del paso de
+    búsqueda y la cadena está basada en pull, se producen exactamente
+    cuatro llamadas al backend y la cola del stream no se consume nunca.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">live search over the keystroke stream:
   'da' -&gt; 5 hits (top: dart language tour)
   'dar' -&gt; 5 hits (top: dart language tour)
@@ -79,10 +79,10 @@
 backend searches: 4</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 /// A user typing toward "darts" — some keys repeat (autorepeat / jitter).
@@ -178,24 +178,27 @@ Future<void> main() async {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    The native <code>await for</code> loop is compact — but look at where
-    the rules went: the length floor and the dedupe share one
-    <code>continue</code> expression (<code>q.length &lt; 2 ||
-    !seen.add(q)</code>, which smuggles a mutation into a condition), and
-    the budget is a counter check with a <code>break</code>. Three policies
-    compressed into two guard clauses; adding a fourth means untangling
-    them. The pipeline spends one named operator per rule, in the order
-    they apply, and the same chain would accept a real widget's text-change
-    stream unmodified. One honest caveat: fxdart's <code><a href="../tutorials/debounce.html">debounce</a></code> is
-    a function-call utility, not a stream operator — quieting a chatty
-    stream by time is a different tool than the four rules shown here.
+    El bucle nativo <code>await for</code> es compacto —pero fíjate en
+    dónde han acabado las reglas: el mínimo de longitud y la
+    deduplicación comparten una única expresión <code>continue</code>
+    (<code>q.length &lt; 2 || !seen.add(q)</code>, que cuela una mutación
+    dentro de una condición), y el presupuesto es una comprobación de
+    contador con un <code>break</code>. Tres políticas comprimidas en dos
+    cláusulas de guarda; añadir una cuarta implica desenredarlas. El
+    pipeline gasta un operador con nombre por regla, en el orden en que se
+    aplican, y esa misma cadena aceptaría sin cambios el stream de cambios
+    de texto de un widget real. Una advertencia honesta: el
+    <code><a href="../tutorials/debounce.html">debounce</a></code> de fxdart es una utilidad para llamadas a
+    funciones, no un operador de stream —silenciar por tiempo un stream
+    parlanchín es una herramienta distinta de las cuatro reglas que se ven
+    aquí.
   </p>
 
   <nav class="tut-nav">
-    <a href="settlement-pipeline.html">← Anterior: End-of-day settlement pipeline</a>
-    <a href="daily-ledger-close.html">Siguiente: Finale — DailyLedger monthly close →</a>
+    <a href="settlement-pipeline.html">← Anterior: Pipeline de liquidación de cierre de día</a>
+    <a href="daily-ledger-close.html">Siguiente: Gran final — cierre mensual de DailyLedger →</a>
   </nav>
 </main>
 <footer class="site-footer">

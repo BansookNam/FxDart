@@ -116,10 +116,10 @@ void main() {
 
   <h2>차이가 나는 이유</h2>
   <p>
-    "7개씩 묶기"는 코어 Dart에 표현할 방법이 없어서, 네이티브 버전은
+    "7개씩 묶기"는 순수 Dart에 표현할 방법이 없어서, 네이티브 버전은
     카운팅 루프를 돌며 <code>sublist(w * 7, w * 7 + 7)</code>로 매주를
     잘라냅니다 — 읽는 사람이 다시 검증해야 하는 인덱스 연산이고, 마지막
-    주가 짧으면 깨지기도 합니다. FxDart의 <code>chunk(7)</code>은
+    주가 짧으면 깨집니다. FxDart의 <code>chunk(7)</code>은
     그룹화를 한 단어로 표현하며(짧은 마지막 그룹도 알아서 처리합니다),
     <code><a href="../tutorials/averageBy.html">averageBy</a></code>가 reduce 후 나누는 과정을 대신하고,
     <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code>는 루프 카운터를 빌리는 대신 주 번호를
@@ -128,7 +128,7 @@ void main() {
 
   <nav class="tut-nav">
     <a href="paginated-products.html">← 이전: 페이지네이션된 상품 목록</a>
-    <a href="consecutive-over-limit.html">다음: Three consecutive readings over the limit →</a>
+    <a href="consecutive-over-limit.html">다음: 한계를 세 번 연속 초과한 측정값 →</a>
   </nav>
 </main>
 <footer class="site-footer">

@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Top 5 merchants by total spend — Dart vs FxDart</title>
-  <meta name="description" content="Group a ledger by merchant and rank the totals — groupListsBy + sortedBy in plain Dart vs a groupBy → sortBy → take chain in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/top-merchants.html">
+  <title>Los 5 comercios con más gasto total — Dart vs FxDart</title>
+  <meta name="description" content="Agrupar un libro de cuentas por comercio y ordenar los totales — groupListsBy + sortedBy en Dart nativo frente a una cadena groupBy → sortBy → take en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/top-merchants.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/top-merchants.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/top-merchants.html">
@@ -44,22 +43,22 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #11 · <strong>Top 5 merchants by total spend</strong></p>
-  <h1>Top 5 merchants by total spend</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #11 · <strong>Los 5 comercios con más gasto total</strong></p>
+  <h1>Los 5 comercios con más gasto total</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Given a month of ledger transactions — each with a date, merchant, and
-    amount — find the <strong>five merchants you spent the most at</strong>:
-    group by merchant, total each group, sort the totals descending, and
-    print the top five. The data is in the code below; both versions must
-    print the lines shown under <em>Expected output</em>.
+    Dado un mes de transacciones del libro de cuentas —cada una con fecha,
+    comercio e importe—, encuentra los <strong>cinco comercios en los que
+    más gastaste</strong>: agrupa por comercio, suma cada grupo, ordena los
+    totales de mayor a menor e imprime los cinco primeros. Los datos están en
+    el código de abajo; ambas versiones deben imprimir las líneas que
+    aparecen bajo <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Green Grocer: $81.95
 Electric Co: $60.34
 Noodle Bar: $40.00
@@ -67,10 +66,10 @@ Cafe Aroma: $36.50
 Book Nook: $27.99</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -155,22 +154,24 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Core Dart has no <code><a href="../tutorials/groupBy.html">groupBy</a></code> at all — the native version has to
-    pull in <code>package:collection</code> for <code>groupListsBy</code>,
-    then switch idioms mid-task: an extension method to group, another
-    (<code>sortedBy</code>, with an explicit <code>&lt;num&gt;</code> type
-    argument and a negated key to get descending order) to rank. FxDart keeps
-    the whole task in one vocabulary: <code><a href="../tutorials/groupBy.html">groupBy</a></code> produces the map,
-    and <code>fx(map.entries)</code> continues the chain with
-    <code><a href="../tutorials/sortBy.html">sortBy</a></code> and <code><a href="../tutorials/take.html">take</a></code>. Same shape of solution — but
-    one library, one pipeline, no type-argument ceremony.
+    El núcleo de Dart no tiene <code><a href="../tutorials/groupBy.html">groupBy</a></code> en absoluto — la
+    versión nativa tiene que recurrir a <code>package:collection</code>
+    para <code>groupListsBy</code> y luego cambiar de modismo a mitad de
+    tarea: un método de extensión para agrupar y otro
+    (<code>sortedBy</code>, con un argumento de tipo
+    <code>&lt;num&gt;</code> explícito y una clave negada para conseguir
+    orden descendente) para ordenar. FxDart mantiene toda la tarea en un
+    mismo vocabulario: <code><a href="../tutorials/groupBy.html">groupBy</a></code> produce el mapa y
+    <code>fx(map.entries)</code> continúa la cadena con <code><a href="../tutorials/sortBy.html">sortBy</a></code>
+    y <code><a href="../tutorials/take.html">take</a></code>. La misma forma de solución — pero con una sola
+    librería, un solo pipeline y sin ceremonia de argumentos de tipo.
   </p>
 
   <nav class="tut-nav">
-    <a href="sequential-configs.html">← Anterior: Load three remote configs in order</a>
-    <a href="recent-errors.html">Siguiente: Recent error messages, deduped →</a>
+    <a href="sequential-configs.html">← Anterior: Cargar tres configuraciones remotas en orden</a>
+    <a href="recent-errors.html">Siguiente: Mensajes de error recientes, sin duplicados →</a>
   </nav>
 </main>
 <footer class="site-footer">

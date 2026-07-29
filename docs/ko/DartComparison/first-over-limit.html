@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>First sensor reading over the limit — Dart vs FxDart</title>
-  <meta name="description" content="Find the first temperature above a threshold — skipWhile + firstOrNull in plain Dart vs dropWhile + head in FxDart.">
+  <title>한계를 처음 넘긴 센서 측정값 — Dart vs FxDart</title>
+  <meta name="description" content="기준값을 넘는 첫 온도를 찾습니다 — 순수 Dart의 skipWhile + firstOrNull과 FxDart의 dropWhile + head를 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/first-over-limit.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/first-over-limit.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/first-over-limit.html">
@@ -43,8 +43,8 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #6 · <strong>First sensor reading over the limit</strong></p>
-  <h1>First sensor reading over the limit</h1>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #6 · <strong>한계를 처음 넘긴 센서 측정값</strong></p>
+  <h1>한계를 처음 넘긴 센서 측정값</h1>
   <p class="cmp-meta"><span class="badge verdict-native">네이티브로 충분</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/head.html">head</a></li></ul>
   <h2>요구사항</h2>
@@ -138,14 +138,14 @@ void main() {
   <h2>차이가 나는 이유</h2>
   <p>
     둘은 다르지 않습니다 — 그리고 여기서는 순수 Dart가 정직한
-    선택입니다. 핵심 <code>skipWhile</code>과
+    선택입니다. Dart 코어의 <code>skipWhile</code>과
     <code>package:collection</code>의 <code>firstOrNull</code>을 조합한
     코드는 뜻을 그대로 말하는 깔끔한 지연 평가 한 줄이며, null 가능
     결과 처리도 동일합니다. FxDart의 <code>dropWhile → head</code>는
     같은 아이디어를 FxTS 이름으로 표현한 것일 뿐입니다 — 파일의
     나머지가 이미 FxDart 체인이라면 쓸 만하지만, 이 한 줄만을 위해
-    라이브러리를 추가해야 할 사람은 없을 것입니다. 순수 Dart가 이길
-    때는, 그렇다고 솔직히 말합니다.
+    라이브러리를 추가해야 할 사람은 없을 것입니다. 네이티브 Dart가
+    이길 때는, 그렇다고 솔직히 말합니다.
   </p>
 
   <nav class="tut-nav">

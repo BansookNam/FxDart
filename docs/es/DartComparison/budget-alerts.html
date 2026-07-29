@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Categories over their monthly budget — Dart vs FxDart</title>
-  <meta name="description" content="Total spend per category, keep the ones over budget, rank by overage — mutable-map bookkeeping in plain Dart vs groupBy + filter + sortBy in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/budget-alerts.html">
+  <title>Categorías que superan su presupuesto mensual — Dart vs FxDart</title>
+  <meta name="description" content="Gasto total por categoría, quedarse con las que se pasan del presupuesto y ordenarlas por exceso — contabilidad con mapas mutables en Dart nativo frente a groupBy + filter + sortBy en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/budget-alerts.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/budget-alerts.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/budget-alerts.html">
@@ -44,33 +43,33 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #25 · <strong>Categories over their monthly budget</strong></p>
-  <h1>Categories over their monthly budget</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #25 · <strong>Categorías que superan su presupuesto mensual</strong></p>
+  <h1>Categorías que superan su presupuesto mensual</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Each spending category has a monthly budget. From July's transactions,
-    total each category, keep only the categories that <strong>went over
-    their budget</strong>, and print them worst offender first — spent,
-    budget, and the overage on each line. The data is in the code below;
-    both versions must print the lines shown under
-    <em>Expected output</em>.
+    Cada categoría de gasto tiene un presupuesto mensual. A partir de las
+    transacciones de julio, suma el total de cada categoría, quédate solo
+    con las categorías que <strong>se pasaron de su presupuesto</strong> e
+    imprímelas empezando por la peor —con el gasto, el presupuesto y el
+    exceso en cada línea. Los datos están en el código de abajo; ambas
+    versiones deben imprimir las líneas que aparecen bajo
+    <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Over budget in July:
 Food: $135.75 spent, $120.00 budget (over by $15.75)
 Fun: $34.75 spent, $30.00 budget (over by $4.75)
 Bills: $90.33 spent, $90.00 budget (over by $0.33)</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 class Tx {
@@ -162,22 +161,24 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    The formatting line is identical in both versions — the difference is
-    everything before it. Native Dart does the grouping by hand in a
-    mutable map, then switches idiom twice: a <code>for</code> loop to
-    total, a <code>where</code> to filter, a cascade-<code>sort</code>
-    with a hand-built comparator to rank. The FxDart version is one
-    vocabulary end to end: <code><a href="../tutorials/groupBy.html">groupBy</a></code>, <code><a href="../tutorials/map.html">map</a></code> to
-    totals, <code><a href="../tutorials/filter.html">filter</a></code> against the budget, <code><a href="../tutorials/sortBy.html">sortBy</a></code>
-    the overage, <code><a href="../tutorials/join.html">join</a></code>. Each business rule — over budget,
-    worst first — is one named step you can point at in a code review.
+    La línea de formato es idéntica en ambas versiones —la diferencia está
+    en todo lo que viene antes. Dart nativo hace la agrupación a mano en un
+    mapa mutable y luego cambia de modismo dos veces: un bucle
+    <code>for</code> para sumar, un <code>where</code> para filtrar, un
+    <code>sort</code> en cascada con un comparador hecho a mano para
+    ordenar. La versión de FxDart es un solo vocabulario de principio a fin:
+    <code><a href="../tutorials/groupBy.html">groupBy</a></code>, <code><a href="../tutorials/map.html">map</a></code> a los totales,
+    <code><a href="../tutorials/filter.html">filter</a></code> contra el presupuesto, <code><a href="../tutorials/sortBy.html">sortBy</a></code> por el
+    exceso, <code><a href="../tutorials/join.html">join</a></code>. Cada regla de negocio —pasarse del
+    presupuesto, la peor primero— es un paso con nombre que puedes señalar
+    en una revisión de código.
   </p>
 
   <nav class="tut-nav">
-    <a href="consecutive-over-limit.html">← Anterior: Three consecutive readings over the limit</a>
-    <a href="leaderboard-ties.html">Siguiente: Leaderboard with tied ranks →</a>
+    <a href="consecutive-over-limit.html">← Anterior: Tres lecturas consecutivas por encima del límite</a>
+    <a href="leaderboard-ties.html">Siguiente: Tabla de clasificación con puestos empatados →</a>
   </nav>
 </main>
 <footer class="site-footer">

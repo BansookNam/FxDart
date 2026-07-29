@@ -26,8 +26,8 @@ async: false
 
   <h2>차이가 나는 이유</h2>
   <p>
-    FxDart에서는 리포트의 각 구간이 같은 형태를 가집니다: 그룹당
-    <code>groupBy</code> → <code>sumBy</code> → 내림차순
+    FxDart에서는 리포트의 각 구간이 같은 형태를 가집니다:
+    <code>groupBy</code> → 그룹별 <code>sumBy</code> → 내림차순
     <code>sortBy</code> — 그리고 <code>take</code>와
     <code>zipWithIndex</code>가 인덱스 변수 없이도 판매자 구간을 번호
     매겨진 top-3 목록으로 바꿉니다. 네이티브 버전은 이 단계들을 각각

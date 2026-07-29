@@ -1,7 +1,7 @@
 ---
 slug: compact
-title: compact — FxDart 101
-description: Tutorial de compact en FxDart: descarta los null y estrecha el tipo del elemento, con un playground en vivo.
+title: nonNulls — FxDart 101
+description: Tutorial de nonNulls en FxDart: descarta los null y estrecha el tipo del elemento, con un playground en vivo.
 heading: <code>nonNulls</code>
 section: 4
 crumb: nonNulls
@@ -16,26 +16,32 @@ nextLabel: uniq
 
   <h2>Lección</h2>
   <p>
-    <code>compact</code> toma un <code>Iterable&lt;A?&gt;</code> y
+    <code>nonNulls</code> toma un <code>Iterable&lt;A?&gt;</code> y
     devuelve un <code>Iterable&lt;A&gt;</code> — cada <code>null</code>
     desaparece, y el verificador de tipos lo sabe: nada de lo que venga
-    después necesita ya comprobar null. Este es el equivalente en FxDart del
-    <code>compact</code> de FxTS, que descarta los seis valores falsy de JS
-    (<code>undefined</code>, <code>null</code>, <code>0</code>,
-    <code>''</code>, <code>NaN</code>, <code>false</code>). Dart no tiene un
-    concepto único de "falsy", así que el port solo elimina <code>null</code> —
-    un comportamiento deliberadamente más estrecho y fácil de razonar.
+    después necesita ya comprobar null. <code>nonNulls</code> es el nombre
+    idiomático en Dart; fxdart también acepta la grafía <code>compact</code>
+    de FxTS: son el mismo operador. El <code>compact</code> de FxTS descarta
+    los seis valores falsy de JS (<code>undefined</code>, <code>null</code>,
+    <code>0</code>, <code>''</code>, <code>NaN</code>, <code>false</code>);
+    Dart no tiene un concepto único de «falsy», así que el port solo elimina
+    <code>null</code> — un comportamiento deliberadamente más estrecho y
+    fácil de razonar.
   </p>
   <p>
     Aparece constantemente después de <a href="pluck.html"><code>pluck</code></a>
-    o de cualquier búsqueda que devuelva <code>T?</code>: <code>compact(pluck(key, records))</code>
+    o de cualquier búsqueda que devuelva <code>T?</code>: <code>nonNulls(pluck(key, records))</code>
     te da una lista limpia y no nullable en un solo paso.
   </p>
   <p>
-    <strong>No hay método de cadena</strong> para <code>compact</code> —
-    solo existen la función de nivel superior data-first y su contraparte asíncrona.
-    Llámala directamente, o envuelve el resultado con <code>fx(...)</code> /
-    <code>fxAsync(...)</code> para seguir encadenando.
+    En la cadena síncrona, <code>.nonNulls</code> es un <strong>getter
+    heredado de <code>Iterable</code></strong> — escríbelo sin paréntesis
+    (<code>fx(xs).nonNulls</code>) y, como devuelve un
+    <code>Iterable&lt;A&gt;</code> normal, envuélvelo en <code>fx(...)</code>
+    para seguir encadenando. No hay getter asíncrono, así que en un pipeline
+    asíncrono usa la función de nivel superior <code>nonNullsAsync(...)</code>
+    (o su alias de FxTS <code>compactAsync</code>) y envuélvela con
+    <code>fxAsync(...)</code>.
   </p>
 
   <h2>Demo 1 · Fundamentos &amp; estrechamiento de tipos</h2>
@@ -45,7 +51,7 @@ nextLabel: uniq
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>compact</code> para descartar los null de
+  <p>Ejercicio: usa <code>nonNulls</code> para descartar los null de
     <code>answers</code>.</p>
   {{playground:2}}
 

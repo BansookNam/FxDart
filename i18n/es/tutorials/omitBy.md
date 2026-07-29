@@ -26,8 +26,8 @@ nextLabel: pickBy
   </p>
   <p>
     Úsalo siempre que lo que quieras descartar venga definido por una
-    condición —"quitar las notas suspensas", "quitar los artículos sin
-    stock"— en lugar de por un conjunto fijo de nombres de clave.
+    condición —«quitar las notas suspensas», «quitar los artículos sin
+    stock»— en lugar de por un conjunto fijo de nombres de clave.
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>

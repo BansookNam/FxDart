@@ -24,7 +24,7 @@ nextLabel: omitBy
     <code>keysToPick</code>.
   </p>
   <p>
-    Recurre a él cuando quieras una "vista" reducida de un map más grande:
+    Recurre a él cuando quieras una «vista» reducida de un map más grande:
     una respuesta de API pública derivada de un registro interno, una fila
     resumen derivada de una completa, y así sucesivamente.
   </p>

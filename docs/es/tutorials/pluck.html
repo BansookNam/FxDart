@@ -45,7 +45,7 @@
 <main>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 3 · Transformar › <strong>pluck</strong></p>
   <h1><code>pluck</code></h1>
-  <p class="hero-sub">Extrae el valor de una clave concreta de cada mapa de un iterable — una sola línea para la consulta habitual de "dame solo este campo".</p>
+  <p class="hero-sub">Extrae el valor de una clave concreta de cada mapa de un iterable — una sola línea para la consulta habitual de «dame solo este campo».</p>
 
   <div class="signature">Iterable&lt;V?&gt; pluck&lt;K, V&gt;(K key, Iterable&lt;Map&lt;K, V&gt;&gt; iterable)
 FxAsyncIterable&lt;V?&gt; pluckAsync&lt;K, V&gt;(K key, FxAsyncIterable&lt;Map&lt;K, V&gt;&gt; iterable)</div>
@@ -54,8 +54,8 @@ FxAsyncIterable&lt;V?&gt; pluckAsync&lt;K, V&gt;(K key, FxAsyncIterable&lt;Map&l
   <p>
     <code>pluck</code> es una especialización diminuta y con nombre propio de
     <code>map</code> — por dentro es literalmente
-    <code>map((a) =&gt; a[key], iterable)</code>. Existe porque "sacar un
-    campo de una lista de registros" es lo bastante frecuente como para
+    <code>map((a) =&gt; a[key], iterable)</code>. Existe porque «sacar un
+    campo de una lista de registros» es lo bastante frecuente como para
     merecer su propio nombre, y en el punto de llamada se lee mejor que una
     lambda improvisada.
   </p>

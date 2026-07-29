@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Fill gaps in a sparse time series — Dart vs FxDart</title>
-  <meta name="description" content="Days with no transactions become 0.00, then weekly rows with totals — range + groupBy + chunk as one flow vs a counting loop and slices.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/sparse-timeseries.html">
+  <title>Rellenar huecos en una serie temporal dispersa — Dart vs FxDart</title>
+  <meta name="description" content="Los días sin transacciones pasan a 0.00, y luego filas semanales con totales — range + groupBy + chunk como un solo flujo frente a un bucle con contador y slices.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/sparse-timeseries.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/sparse-timeseries.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/sparse-timeseries.html">
@@ -44,31 +43,31 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #35 · <strong>Fill gaps in a sparse time series</strong></p>
-  <h1>Fill gaps in a sparse time series</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #35 · <strong>Rellenar huecos en una serie temporal dispersa</strong></p>
+  <h1>Rellenar huecos en una serie temporal dispersa</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Transactions for July 1–14 (data in the code) exist only on some days.
-    Build the <strong>dense</strong> daily series — days with no
-    transactions count as <code>0.00</code> — then print it as two weekly
-    rows, each with its 7 daily values and a week total. Both versions must
-    print the block under <em>Expected output</em>.
+    Las transacciones del 1 al 14 de julio (los datos están en el código)
+    solo existen en algunos días. Construye la serie diaria
+    <strong>densa</strong> — los días sin transacciones cuentan como
+    <code>0.00</code> — y luego imprímela como dos filas semanales, cada una
+    con sus 7 valores diarios y un total de la semana. Ambas versiones deben
+    imprimir el bloque que aparece bajo <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Daily spend, July 1-14 (0.00 = no transactions)
 Jul 01-07: 16.70 0.00 30.00 0.00 0.00 8.75 0.00  | week total 55.45
 Jul 08-14: 22.10 0.00 0.00 19.60 0.00 9.90 0.00  | week total 51.60</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -165,25 +164,25 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Gap-filling means driving the pipeline from the <em>calendar</em>, not
-    from the data: <code>range(1, 15)</code> generates every day,
-    <code><a href="../tutorials/groupBy.html">groupBy</a></code> answers "what happened that day", and
-    <code><a href="../tutorials/sumBy.html">sumBy</a></code> over a possibly-empty group yields the 0.00 for quiet
-    days for free. The weekly rollup is then <code>chunk(7)</code> +
-    <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> — reshaping the dense series without a single
-    index calculation beyond the row label. Native Dart gets the dense
-    series with a counting <code>for</code> and the rollup with
-    <code>slices</code>/<code>indexed</code> from
-    <code>package:collection</code> — workable, but the sum-of-a-group step
-    is a seeded <code>fold</code> both times, and the two phases don't
-    compose into one visible flow.
+    Rellenar huecos significa dirigir el pipeline desde el
+    <em>calendario</em>, no desde los datos: <code>range(1, 15)</code>
+    genera todos los días, <code><a href="../tutorials/groupBy.html">groupBy</a></code> responde a «qué pasó ese
+    día», y <code><a href="../tutorials/sumBy.html">sumBy</a></code> sobre un grupo posiblemente vacío da gratis el
+    0.00 de los días tranquilos. La agrupación semanal es entonces
+    <code>chunk(7)</code> + <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> — remodelar la serie
+    densa sin un solo cálculo de índice más allá de la etiqueta de la fila.
+    Dart nativo obtiene la serie densa con un <code>for</code> contador y la
+    agrupación con <code>slices</code>/<code>indexed</code> de
+    <code>package:collection</code> — funciona, pero el paso de sumar un
+    grupo es un <code>fold</code> con valor inicial las dos veces, y las dos
+    fases no se componen en un único flujo visible.
   </p>
 
   <nav class="tut-nav">
-    <a href="anomaly-context.html">← Anterior: Anomalies with surrounding context</a>
-    <a href="multi-currency-report.html">Siguiente: Multi-currency expense report →</a>
+    <a href="anomaly-context.html">← Anterior: Anomalías con su contexto alrededor</a>
+    <a href="multi-currency-report.html">Siguiente: Informe de gastos multidivisa →</a>
   </nav>
 </main>
 <footer class="site-footer">

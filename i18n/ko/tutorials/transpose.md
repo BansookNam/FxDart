@@ -43,7 +43,7 @@ nextLabel: reverse
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="zip.html"><code>zip</code></a> — 행이 두 개인 특수한 경우 ·
     <a href="chunk.html"><code>chunk</code></a> — 평평한 소스를 먼저 행으로 묶기 ·
     <a href="reverse.html"><code>reverse</code></a>

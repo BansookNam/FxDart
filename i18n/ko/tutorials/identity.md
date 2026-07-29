@@ -50,7 +50,7 @@ nextLabel: always
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="always.html"><code>always</code></a> — 그대로 통과시키는 대신 상수를 반환합니다 ·
     <a href="tap.html"><code>tap</code></a> — 그대로 통과시키되, 먼저 부수 효과를 실행합니다 ·
     <a href="cases.html"><code>cases</code></a> — 술어를 사용하는 디스패치 테이블입니다 ·

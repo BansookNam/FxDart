@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Inventory restock plan — Dart vs FxDart</title>
-  <meta name="description" content="Prioritize below-threshold items and cut the order list at a budget — scan + zip + takeWhile as data flow vs a mutable running total and break.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/restock-plan.html">
+  <title>Plan de reposición de inventario — Dart vs FxDart</title>
+  <meta name="description" content="Prioriza los artículos por debajo del umbral y corta la lista de pedidos al llegar al presupuesto — scan + zip + takeWhile como flujo de datos frente a un total acumulado mutable y un break.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/restock-plan.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/restock-plan.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/restock-plan.html">
@@ -44,23 +43,24 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #37 · <strong>Inventory restock plan</strong></p>
-  <h1>Inventory restock plan</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #37 · <strong>Plan de reposición de inventario</strong></p>
+  <h1>Plan de reposición de inventario</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/zip.html">zip</a></li><li><a href="../tutorials/takeWhile.html">takeWhile</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    From a stock list (data in the code), find items <strong>below their
-    minimum stock</strong>, prioritize by biggest deficit, and order them in
-    that priority order — but stop before the <strong>cumulative cost
-    exceeds the $500 budget</strong>. Print each planned order with its
-    running total, then a summary of what was ordered and what is left.
-    Both versions must print the plan under <em>Expected output</em>.
+    A partir de una lista de existencias (los datos están en el código),
+    encuentra los artículos <strong>por debajo de su stock mínimo</strong>,
+    priorízalos por mayor déficit y pídelos en ese orden de prioridad, pero
+    detente antes de que el <strong>coste acumulado supere el presupuesto
+    de $500</strong>. Imprime cada pedido planificado con su total
+    acumulado y luego un resumen de lo que se pidió y de lo que queda.
+    Ambas versiones deben imprimir el plan que aparece bajo <em>Salida
+    esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Restock plan (budget $500.00)
   Paper Cups      x200  $10.00   running $10.00
   Espresso Beans  x 12  $216.00  running $226.00
@@ -70,10 +70,10 @@
 Ordering 5 of 6 needed items; total $457.20, $42.80 left</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -189,23 +189,25 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    The budget cutoff is the interesting part. FxDart turns the running
-    total into <em>data</em>: <code><a href="../tutorials/scan.html">scan</a></code> produces the cumulative cost
-    stream, <code><a href="../tutorials/zip.html">zip</a></code> pairs each item with its running total, and
-    <code><a href="../tutorials/takeWhile.html">takeWhile</a></code> cuts the plan at the budget — the cutoff rule is
-    one predicate on one line, and the running totals are already there to
-    print. Native Dart interleaves everything in a single loop: a mutable
-    <code>running</code> variable, an early <code>break</code>, and
-    formatting all share the loop body, so the policy ("stop when over
-    budget") lives inside control flow instead of being a visible pipeline
-    stage you could move or test on its own.
+    El corte por presupuesto es la parte interesante. FxDart convierte el
+    total acumulado en <em>datos</em>: <code><a href="../tutorials/scan.html">scan</a></code> produce el flujo
+    de costes acumulados, <code><a href="../tutorials/zip.html">zip</a></code> empareja cada artículo con su
+    total acumulado y <code><a href="../tutorials/takeWhile.html">takeWhile</a></code> corta el plan en el
+    presupuesto —la regla de corte es un predicado en una sola línea, y los
+    totales acumulados ya están ahí para imprimirlos—. Dart nativo lo
+    entrelaza todo en un único bucle: una variable mutable
+    <code>running</code>, un <code>break</code> anticipado y el formateo
+    comparten el cuerpo del bucle, de modo que la política («para cuando te
+    pases del presupuesto») vive dentro del flujo de control en lugar de
+    ser una etapa visible del pipeline que podrías mover o probar por
+    separado.
   </p>
 
   <nav class="tut-nav">
-    <a href="multi-currency-report.html">← Anterior: Multi-currency expense report</a>
-    <a href="alert-digest.html">Siguiente: Log alert digest by service and severity →</a>
+    <a href="multi-currency-report.html">← Anterior: Informe de gastos multidivisa</a>
+    <a href="alert-digest.html">Siguiente: Resumen de alertas de log por servicio y severidad →</a>
   </nav>
 </main>
 <footer class="site-footer">

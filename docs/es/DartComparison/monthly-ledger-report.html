@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Full monthly ledger report — Dart vs FxDart</title>
-  <meta name="description" content="One report string from a ledger — total, category breakdown, top merchants — as three fxdart pipelines vs loops and intermediate maps.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/monthly-ledger-report.html">
+  <title>Informe mensual completo del libro de cuentas — Dart vs FxDart</title>
+  <meta name="description" content="Un único informe a partir de un libro de cuentas — total, desglose por categorías, comercios principales — como tres pipelines de fxdart frente a bucles y mapas intermedios.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/monthly-ledger-report.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/monthly-ledger-report.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/monthly-ledger-report.html">
@@ -44,23 +43,23 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #31 · <strong>Full monthly ledger report</strong></p>
-  <h1>Full monthly ledger report</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #31 · <strong>Informe mensual completo del libro de cuentas</strong></p>
+  <h1>Informe mensual completo del libro de cuentas</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    From one month of ledger transactions (data in the code), build a single
-    report string with three sections: the <strong>total spent</strong>
-    (income excluded), a <strong>per-category breakdown</strong> sorted by
-    spend, and the <strong>top 3 merchants</strong> as a numbered list.
-    Both versions must print exactly the report shown under
-    <em>Expected output</em>.
+    A partir de un mes de transacciones del libro de cuentas (los datos
+    están en el código), construye una única cadena de informe con tres
+    secciones: el <strong>total gastado</strong> (sin contar los
+    ingresos), un <strong>desglose por categoría</strong> ordenado por
+    gasto y los <strong>3 comercios principales</strong> como lista
+    numerada. Ambas versiones deben imprimir exactamente el informe que
+    aparece bajo <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">July 2026 ledger
 Total spent: $201.99
 
@@ -76,10 +75,10 @@ Top merchants:
   3. Water Works  $28.10</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -208,23 +207,25 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Each report section is the same shape in FxDart: <code><a href="../tutorials/groupBy.html">groupBy</a></code> →
-    <code><a href="../tutorials/sumBy.html">sumBy</a></code> per group → <code><a href="../tutorials/sortBy.html">sortBy</a></code> descending — then
-    <code><a href="../tutorials/take.html">take</a></code> and <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> turn the merchant section
-    into a numbered top-3 without an index variable. The native version has
-    to say each of those steps in a different dialect: <code>fold</code> with
-    a seed for every sum, <code>sortedBy&lt;num&gt;</code> with a negated
-    key, a collection-for for one section and an indexed <code>for</code>
-    loop for the other. The report grows section by section on both sides —
-    but only one side grows by appending pipeline steps rather than
-    accumulating differently-shaped intermediate variables.
+    En FxDart cada sección del informe tiene la misma forma:
+    <code><a href="../tutorials/groupBy.html">groupBy</a></code> → <code><a href="../tutorials/sumBy.html">sumBy</a></code> por grupo →
+    <code><a href="../tutorials/sortBy.html">sortBy</a></code> descendente —y después <code><a href="../tutorials/take.html">take</a></code> y
+    <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> convierten la sección de comercios en un top
+    3 numerado sin ninguna variable de índice. La versión nativa tiene que
+    expresar cada uno de esos pasos en un dialecto distinto:
+    <code>fold</code> con un valor inicial para cada suma,
+    <code>sortedBy&lt;num&gt;</code> con una clave negada, un
+    collection-for para una sección y un bucle <code>for</code> indexado
+    para la otra. El informe crece sección a sección en ambos lados —pero
+    solo uno de los dos crece añadiendo pasos al pipeline en vez de
+    acumulando variables intermedias con formas distintas.
   </p>
 
   <nav class="tut-nav">
-    <a href="concurrent-enrichment.html">← Anterior: Enrich top merchants concurrently</a>
-    <a href="cohort-retention.html">Siguiente: Cohort retention table →</a>
+    <a href="concurrent-enrichment.html">← Anterior: Enriquecer los principales comercios de forma concurrente</a>
+    <a href="cohort-retention.html">Siguiente: Tabla de retención por cohortes →</a>
   </nav>
 </main>
 <footer class="site-footer">

@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Most frequent log level — Dart vs FxDart</title>
-  <meta name="description" content="Count log entries per level and pick the biggest — groupListsBy + reduce in plain Dart vs countBy + maxBy in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/top-log-level.html">
+  <title>Nivel de log más frecuente — Dart vs FxDart</title>
+  <meta name="description" content="Contar entradas de log por nivel y quedarse con el mayor — groupListsBy + reduce en Dart nativo frente a countBy + maxBy en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/top-log-level.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/top-log-level.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/top-log-level.html">
@@ -44,28 +43,28 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #7 · <strong>Most frequent log level</strong></p>
-  <h1>Most frequent log level</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #7 · <strong>Nivel de log más frecuente</strong></p>
+  <h1>Nivel de log más frecuente</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/countBy.html">countBy</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    Given a slice of application logs, count how many entries each
-    <strong>level</strong> (INFO / WARN / ERROR) has and print the most
-    frequent one with its count. The data is in the code below; both
-    versions must print the line shown under <em>Expected output</em>.
+    Dado un fragmento de los logs de una aplicación, cuenta cuántas entradas
+    tiene cada <strong>nivel</strong> (INFO / WARN / ERROR) e imprime el más
+    frecuente junto con su recuento. Los datos están en el código de abajo;
+    ambas versiones deben imprimir la línea que aparece bajo <em>Salida
+    esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Most frequent level: WARN (4 of 9)</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -135,22 +134,24 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Native Dart has no <code><a href="../tutorials/countBy.html">countBy</a></code>: the closest is
-    <code>package:collection</code>'s <code>groupListsBy</code>, which builds
-    a list of <em>every entry</em> per level just so you can take the
-    lengths — or a hand-written <code>Map.update</code> loop. Picking the
-    winner then needs a <code>reduce</code> with an explicit comparison.
-    FxDart names both steps: <code><a href="../tutorials/countBy.html">countBy</a></code> goes straight to the
-    counts (it's terminal — it returns a plain <code>Map</code>), and
-    <code>fx(counts.entries).maxBy(...)</code> re-enters the chain to pick
-    the largest entry. Two named ideas instead of two hand-built ones.
+    Dart nativo no tiene <code><a href="../tutorials/countBy.html">countBy</a></code>: lo más parecido es el
+    <code>groupListsBy</code> de <code>package:collection</code>, que
+    construye una lista con <em>todas las entradas</em> de cada nivel solo
+    para que puedas quedarte con sus longitudes — o un bucle con
+    <code>Map.update</code> escrito a mano. Elegir después al ganador
+    requiere un <code>reduce</code> con una comparación explícita. FxDart
+    pone nombre a ambos pasos: <code><a href="../tutorials/countBy.html">countBy</a></code> va directo a los
+    recuentos (es terminal — devuelve un <code>Map</code> corriente), y
+    <code>fx(counts.entries).maxBy(...)</code> vuelve a entrar en la cadena
+    para elegir la entrada más grande. Dos ideas con nombre en lugar de dos
+    construidas a mano.
   </p>
 
   <nav class="tut-nav">
-    <a href="first-over-limit.html">← Anterior: First sensor reading over the limit</a>
-    <a href="paginate-users.html">Siguiente: Batch users into pages of 10 →</a>
+    <a href="first-over-limit.html">← Anterior: La primera lectura del sensor por encima del límite</a>
+    <a href="paginate-users.html">Siguiente: Agrupar usuarios en páginas de 10 →</a>
   </nav>
 </main>
 <footer class="site-footer">

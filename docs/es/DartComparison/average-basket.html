@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Average order value over $100 — Dart vs FxDart</title>
-  <meta name="description" content="Mean total of large orders — where/map/average with package:collection vs filter + averageBy in FxDart.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/average-basket.html">
+  <title>Valor medio de los pedidos de más de $100 — Dart vs FxDart</title>
+  <meta name="description" content="Total medio de los pedidos grandes — where/map/average con package:collection frente a filter + averageBy en FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/average-basket.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/average-basket.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/average-basket.html">
@@ -44,28 +43,28 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #5 · <strong>Average order value over $100</strong></p>
-  <h1>Average order value over $100</h1>
-  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #5 · <strong>Valor medio de los pedidos de más de $100</strong></p>
+  <h1>Valor medio de los pedidos de más de $100</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Empate</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/averageBy.html">averageBy</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    From a batch of shop orders, take only those totalling <strong>over
-    $100</strong> and print their <strong>average value</strong> as a
-    currency amount. The data is in the code below; both versions must print
-    the line shown under <em>Expected output</em>.
+    De un lote de pedidos de una tienda, quédate solo con los que suman
+    <strong>más de $100</strong> e imprime su <strong>valor medio</strong>
+    como importe monetario. Los datos están en el código de abajo; ambas
+    versiones deben imprimir la línea que aparece bajo
+    <em>Salida esperada</em>.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">Average large-order value: $203.81</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -134,21 +133,23 @@ void main() {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Honestly: they don't, much — a tie. Core Dart alone would need a
-    fold-and-count (or a sum divided by a length, walking the data twice),
-    but <code>package:collection</code>'s <code>.average</code> closes that
-    gap, leaving <code>where → map → average</code> against
-    <code>filter → averageBy</code>. FxDart saves the intermediate
-    <code>map</code> by taking the key function directly, and
-    <code><a href="../tutorials/averageBy.html">averageBy</a></code> is one word instead of an extension property on a
-    projected iterable — vocabulary, not victory. Both read fine.
+    Siendo sinceros: no mucho —es un empate. Dart nativo necesitaría un
+    fold con contador (o una suma dividida por una longitud, recorriendo los
+    datos dos veces), pero el <code>.average</code> de
+    <code>package:collection</code> cierra esa brecha y deja
+    <code>where → map → average</code> frente a
+    <code>filter → averageBy</code>. FxDart se ahorra el <code>map</code>
+    intermedio al aceptar directamente la función de clave, y
+    <code><a href="../tutorials/averageBy.html">averageBy</a></code> es una palabra en vez de una propiedad de
+    extensión sobre un iterable proyectado —vocabulario, no victoria. Ambas
+    se leen bien.
   </p>
 
   <nav class="tut-nav">
-    <a href="first-visit-merchants.html">← Anterior: Merchants in first-visit order</a>
-    <a href="first-over-limit.html">Siguiente: First sensor reading over the limit →</a>
+    <a href="first-visit-merchants.html">← Anterior: Comercios en orden de primera visita</a>
+    <a href="first-over-limit.html">Siguiente: La primera lectura del sensor por encima del límite →</a>
   </nav>
 </main>
 <footer class="site-footer">

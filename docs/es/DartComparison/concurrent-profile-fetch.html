@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Fetch 10 profiles, 3 at a time — Dart vs FxDart</title>
-  <meta name="description" content="Sync prep flowing straight into bounded concurrency — filter and sort, then toAsync + map + concurrent(3), vs a hand-rolled worker pool.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/concurrent-profile-fetch.html">
+  <title>Obtener 10 perfiles, de tres en tres — Dart vs FxDart</title>
+  <meta name="description" content="Preparación síncrona que desemboca directamente en concurrencia acotada — filter y sort, luego toAsync + map + concurrent(3), frente a un pool de workers hecho a mano.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/concurrent-profile-fetch.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/concurrent-profile-fetch.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/concurrent-profile-fetch.html">
@@ -44,30 +43,30 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #41 · <strong>Fetch 10 profiles, 3 at a time</strong></p>
-  <h1>Fetch 10 profiles, 3 at a time</h1>
-  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #41 · <strong>Obtener 10 perfiles, de tres en tres</strong></p>
+  <h1>Obtener 10 perfiles, de tres en tres</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span></p>
   <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
-  <h2>Requirement</h2>
+  <h2>Requisito</h2>
   <p>
-    From a directory of twelve accounts, take the <strong>active</strong>
-    ones, order them by id, and fetch each profile from a (simulated) API —
-    never more than <strong>three requests in flight</strong>, results in the
-    original order. The fake fetch counts overlapping requests and both
-    versions print the maximum observed, proving the limit held. The data is
-    in the code below.
+    De un directorio de doce cuentas, toma las <strong>activas</strong>,
+    ordénalas por id y obtén cada perfil de una API (simulada) —sin superar
+    nunca <strong>tres peticiones en curso</strong> y con los resultados en
+    el orden original. La petición falsa cuenta las peticiones que se
+    solapan y ambas versiones imprimen el máximo observado, demostrando que
+    el límite se respetó. Los datos están en el código de abajo.
   </p>
   <p>
-    This is the flagship shape of the whole async section: a sync pipeline
-    (<code><a href="../tutorials/filter.html">filter</a></code> → <code><a href="../tutorials/sortBy.html">sortBy</a></code>) that crosses into async with
-    <code><a href="../tutorials/toAsync.html">toAsync</a></code> and keeps going — <code><a href="../tutorials/map.html">map</a></code> the fetch,
-    <code>concurrent(3)</code> to bound it, one more <code><a href="../tutorials/map.html">map</a></code> to
-    format, <code><a href="../tutorials/join.html">join</a></code> to finish. One chain from list to report.
+    Esta es la forma emblemática de toda la sección asíncrona: un pipeline
+    síncrono (<code><a href="../tutorials/filter.html">filter</a></code> → <code><a href="../tutorials/sortBy.html">sortBy</a></code>) que cruza al mundo
+    asíncrono con <code><a href="../tutorials/toAsync.html">toAsync</a></code> y sigue adelante —<code><a href="../tutorials/map.html">map</a></code>
+    para la petición, <code>concurrent(3)</code> para acotarla, otro
+    <code><a href="../tutorials/map.html">map</a></code> para dar formato y <code><a href="../tutorials/join.html">join</a></code> para terminar. Una
+    sola cadena, de la lista al informe.
   </p>
 
   <details class="cmp-expected">
-    <summary>Expected output</summary>
+    <summary>Salida esperada</summary>
     <pre class="code">fetched 10 profiles, 3 at a time:
   user#1 Ada &lt;ada@example.com&gt;
   user#2 Bram &lt;bram@example.com&gt;
@@ -82,10 +81,10 @@
 max requests in flight: 3</pre>
   </details>
 
-  <h2>Side by side</h2>
+  <h2>Lado a lado</h2>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
-      <h3>Native Dart</h3>
+      <h3>Dart nativo</h3>
       <div class="playground">
 <textarea>
 import 'package:collection/collection.dart';
@@ -190,23 +189,24 @@ Future<void> main() async {
     </section>
   </div>
 
-  <h2>Why they differ</h2>
+  <h2>Por qué difieren</h2>
   <p>
-    Plain Dart handles the sync half fine (<code>where</code> +
-    <code>sortedBy</code>), but at the async boundary the vocabulary runs
-    out: bounding concurrency while preserving order means a hand-rolled
-    worker pool — shared cursor, pre-sized result slots, a
-    <code>Future.wait</code> over the workers. That pool is real production
-    boilerplate, and it splits the task into two dialects: a fluent chain
-    for prep, then imperative plumbing for the fetch. In the FxDart version
-    the policy stays declarative end to end — <code>concurrent(3)</code> is
-    the entire worker pool, and changing the limit (or dropping it) touches
-    one number instead of the function's shape.
+    Dart nativo resuelve bien la mitad síncrona (<code>where</code> +
+    <code>sortedBy</code>), pero en la frontera asíncrona se le acaba el
+    vocabulario: acotar la concurrencia conservando el orden significa un
+    pool de workers hecho a mano —cursor compartido, huecos de resultado
+    predimensionados, un <code>Future.wait</code> sobre los workers—. Ese
+    pool es boilerplate de producción de verdad, y parte la tarea en dos
+    dialectos: una cadena fluida para la preparación y luego fontanería
+    imperativa para las peticiones. En la versión de FxDart la política se
+    mantiene declarativa de principio a fin —<code>concurrent(3)</code> es
+    el pool de workers entero, y cambiar el límite (o eliminarlo) toca un
+    número en lugar de la forma de la función.
   </p>
 
   <nav class="tut-nav">
-    <a href="ledger-diff.html">← Anterior: Diff two ledger snapshots</a>
-    <a href="flaky-api-retry.html">Siguiente: Poll a flaky API until first success →</a>
+    <a href="ledger-diff.html">← Anterior: Diff de dos snapshots de un libro de cuentas</a>
+    <a href="flaky-api-retry.html">Siguiente: Sondear una API inestable hasta el primer éxito →</a>
   </nav>
 </main>
 <footer class="site-footer">

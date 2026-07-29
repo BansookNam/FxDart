@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Either — FxDart 101</title>
-  <meta name="description" content="FxDart Either tutorial: the sealed result type with Left and Right, exhaustive switch, fold, map, flatMap, and capturing thrown exceptions with Either.catching.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/either.html">
+  <meta name="description" content="Tutorial de Either en FxDart: el tipo de resultado sellado con Left y Right, switch exhaustivo, fold, map, flatMap y captura de excepciones lanzadas con Either.catching.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/either.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/either.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/either.html">
@@ -44,12 +43,11 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 13 · Typed errors › <strong>Either</strong></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 13 · Errores tipados › <strong>Either</strong></p>
   <h1><code>Either</code></h1>
   <p class="hero-sub">
-    A value that is either a failure <code>Left(L)</code> or a success
-    <code>Right(R)</code> — the boundary type of the typed-error system.
+    Un valor que es o bien un fallo <code>Left(L)</code> o bien un acierto
+    <code>Right(R)</code> — el tipo frontera del sistema de errores tipados.
   </p>
 
   <div class="signature">sealed class Either&lt;L, R&gt; — Left(L value) | Right(R value)
@@ -57,27 +55,30 @@ const factory Either.left(L value) | Either.right(R value) — dot-shorthand tar
 T fold&lt;T&gt;(T Function(L left) ifLeft, T Function(R right) ifRight)
 static Either&lt;Object, R&gt; Either.catching&lt;R&gt;(R Function() block)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>Either&lt;L, R&gt;</code> makes failure part of a function's
-    <em>signature</em>: instead of throwing (invisible to the type system) or
-    returning <code>null</code> (says nothing about <em>why</em>), you return
-    <code>Left(error)</code> or <code>Right(value)</code>. The class is
-    <code>sealed</code>, so a <code>switch</code> over it is exhaustive — the
-    compiler reminds you to handle the failure case.
+    <code>Either&lt;L, R&gt;</code> convierte el fallo en parte de la
+    <em>firma</em> de una función: en lugar de lanzar una excepción (invisible
+    para el sistema de tipos) o devolver <code>null</code> (que no dice nada
+    sobre el <em>porqué</em>), devuelves <code>Left(error)</code> o
+    <code>Right(value)</code>. La clase es <code>sealed</code>, así que un
+    <code>switch</code> sobre ella es exhaustivo — el compilador te recuerda
+    que trates el caso de fallo.
   </p>
   <p>
-    The method set is Arrow 2.x's curated one: <code>fold</code> collapses
-    both sides into one value, <code>map</code>/<code>mapLeft</code> transform
-    one side, <code>flatMap</code> chains a dependent fallible step, and
-    <code>getOrNull</code>/<code>getOrElse</code> bridge back to plain Dart.
-    <code>Either</code> is meant to live <em>at the boundary</em>: inside a
-    computation, prefer the <a href="raise.html"><code>either</code>
-    builder</a>, where each step is one straight-line <code>r.bind</code>
-    instead of a <code>flatMap</code> pyramid.
+    El conjunto de métodos es el que Arrow 2.x ha depurado:
+    <code>fold</code> colapsa ambos lados en un único valor,
+    <code>map</code>/<code>mapLeft</code> transforman uno de los dos lados,
+    <code>flatMap</code> encadena un paso falible dependiente, y
+    <code>getOrNull</code>/<code>getOrElse</code> hacen de puente de vuelta al
+    Dart de siempre. <code>Either</code> está pensado para vivir <em>en la
+    frontera</em>: dentro de un cómputo, es preferible el
+    <a href="raise.html">constructor <code>either</code></a>, donde cada paso
+    es un <code>r.bind</code> en línea recta en vez de una pirámide de
+    <code>flatMap</code>.
   </p>
 
-  <h2>Demo 1 · Left, Right, and exhaustive switch</h2>
+  <h2>Demo 1 · Left, Right y switch exhaustivo</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -139,13 +140,15 @@ void main() {
 
   <h2>Demo 3 · dot shorthands (Dart ≥ 3.10)</h2>
   <p>
-    <code>Either</code> carries <code>const</code> factories
-    <code>Either.left</code> / <code>Either.right</code> so Dart 3.10
-    <em>dot shorthands</em> resolve against it: wherever the context type is
-    already <code>Either</code> — a return position, a switch-expression arm,
-    the right side of <code>==</code> — you can drop the type name and write
-    <code>.left(error)</code> / <code>.right(value)</code>. Same objects as
-    <code>Left(…)</code> / <code>Right(…)</code>, just inferred from context.
+    <code>Either</code> incluye las factorías <code>const</code>
+    <code>Either.left</code> / <code>Either.right</code> para que los
+    <em>dot shorthands</em> de Dart 3.10 se resuelvan contra ella: allí donde
+    el tipo del contexto ya es <code>Either</code> — una posición de retorno,
+    una rama de una expresión switch, el lado derecho de
+    <code>==</code> — puedes omitir el nombre del tipo y escribir
+    <code>.left(error)</code> / <code>.right(value)</code>. Son los mismos
+    objetos que <code>Left(…)</code> / <code>Right(…)</code>, solo que
+    inferidos a partir del contexto.
   </p>
   <div class="playground">
 <textarea>
@@ -180,15 +183,16 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
+  <h2>Pruébalo tú</h2>
   <p>
-    Exceptions and typed errors stay strictly separated: a <em>thrown</em>
-    exception propagates out of typed-error code untouched. To capture a
-    throw into an <code>Either</code>, be explicit with
-    <code>Either.catching</code> (failure type <code>Object</code>) or
-    <code>Either.catchingWith</code> (map the throw to your own failure type
-    first). Exercise: make the failing parse print
-    <code>Left(bad input)</code> instead of crashing.
+    Las excepciones y los errores tipados se mantienen estrictamente
+    separados: una excepción <em>lanzada</em> atraviesa el código de errores
+    tipados sin que nada la toque. Para capturar un throw dentro de un
+    <code>Either</code>, sé explícito con <code>Either.catching</code> (tipo
+    de fallo <code>Object</code>) o <code>Either.catchingWith</code> (que
+    primero convierte la excepción a tu propio tipo de fallo). Ejercicio: haz
+    que el parseo fallido imprima <code>Left(bad input)</code> en vez de
+    reventar.
   </p>
   <div class="playground">
 <textarea>
@@ -209,11 +213,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="raise.html"><code>either</code> builder</a> — build Eithers with straight-line code ·
-    <a href="accumulate.html">accumulation</a> — collect every failure, not just the first ·
-    <a href="eitherPipelines.html">Either × pipelines</a> — <code>rights</code>, <code>lefts</code>, <code>sequence</code> over chains ·
-    <a href="typedErrors.html">typed errors — full guide</a>
+    <strong>Relacionado:</strong>
+    <a href="raise.html">constructor <code>either</code></a> — construye Eithers con código en línea recta ·
+    <a href="accumulate.html">acumulación</a> — recoge todos los fallos, no solo el primero ·
+    <a href="eitherPipelines.html">Either × pipelines</a> — <code>rights</code>, <code>lefts</code>, <code>sequence</code> sobre cadenas ·
+    <a href="typedErrors.html">errores tipados — guía completa</a>
   </div>
 
   <nav class="tut-nav">

@@ -58,7 +58,7 @@ nextLabel: concurrent
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="toAsync.html"><code>toAsync</code></a> — 스트림 대신 평범한 Iterable을 끌어올리기 ·
     <a href="asyncVariants.html">비동기 변형</a> — *Async 명명 규칙 ·
     <a href="concurrent.html"><code>concurrent</code></a> — 실제 병렬 처리를 원하면 toStream() 이전에 적용 ·

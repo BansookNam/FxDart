@@ -27,15 +27,15 @@ nextLabel: zipWith
   </p>
   <p>
     <code>zipAsync</code> lanza las llamadas a <code>next()</code> de ambos
-    lados <em>antes</em> de esperar a ninguna de las dos, así que consume las
-    dos fuentes en paralelo en cada par, no secuencialmente. Combinar dos fuentes
-    de 100 ms por elemento sigue costando ~100 ms por par, no 200 ms.
+    lados <em>antes</em> de esperar a ninguna de las dos, así que tira de las
+    dos fuentes en paralelo en cada par, no secuencialmente. Combinar dos
+    fuentes de 100 ms por elemento sigue costando ~100 ms por par, no 200 ms.
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>
   {{playground:0}}
 
-  <h2>Demo 2 · Async, con consumo en paralelo por par</h2>
+  <h2>Demo 2 · Asíncrono, tirando en paralelo por par</h2>
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>

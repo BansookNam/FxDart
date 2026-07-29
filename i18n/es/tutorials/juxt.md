@@ -26,8 +26,8 @@ nextLabel: memoize
     El <code>juxt</code> de FxTS es variádico y admite funciones con
     distinto número de argumentos. Dart no tiene genéricos variádicos, así que la
     versión de FxDart toma una sola función unaria <code>T -&gt; R</code> por entrada
-    — suficiente para cubrir el caso habitual de "aplica estas N proyecciones de
-    solo lectura a este valor".
+    — suficiente para cubrir el caso habitual de «aplica estas N proyecciones de
+    solo lectura a este valor».
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>

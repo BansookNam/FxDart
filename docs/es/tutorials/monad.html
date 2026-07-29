@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Monad &amp; comprehension blocks — FxDart 101</title>
-  <meta name="description" content="What a monad actually is (a box with rules), what a comprehension block is (syntactic sugar for opening the box), and how the two connect — with Python and Scala examples.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/monad.html">
+  <title>Mónadas &amp; bloques de comprensión — FxDart 101</title>
+  <meta name="description" content="Qué es de verdad una mónada (una caja con reglas), qué es un bloque de comprensión (azúcar sintáctico para abrir la caja) y cómo se conectan ambos, con ejemplos en Python y Scala.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/monad.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/monad.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/monad.html">
@@ -44,126 +43,129 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 13 · Typed errors › <strong>monad</strong></p>
-  <h1>Monad &amp; comprehension blocks</h1>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 13 · Errores tipados › <strong>monad</strong></p>
+  <h1>Mónadas &amp; bloques de comprensión</h1>
   <p class="hero-sub">
-    The monad and the comprehension block are two of the most important —
-    and, at the same time, most notoriously confusing — concepts in
-    functional programming. The conclusion first: a monad is a
-    <strong>"box with rules"</strong> for handling data, and a comprehension
-    block is <strong>magic syntax (syntactic sugar)</strong> that lets you
-    open and close those boxes effortlessly. Let's break down how the two
-    connect, piece by piece.
+    La mónada y el bloque de comprensión son dos de los conceptos más
+    importantes —y, a la vez, más célebres por lo confusos— de la programación
+    funcional. Primero la conclusión: una mónada es una <strong>«caja con
+    reglas»</strong> para manejar datos, y un bloque de comprensión es
+    <strong>sintaxis mágica (azúcar sintáctico)</strong> que te permite abrir
+    y cerrar esas cajas sin ningún esfuerzo. Vamos a desmenuzar cómo se
+    conectan las dos cosas, pieza a pieza.
   </p>
 
-  <h2>1. What is a monad?</h2>
+  <h2>1. ¿Qué es una mónada?</h2>
   <p>
-    You can set the mathematical definition (category theory) aside for now.
-    In programming, a monad is a <strong>"box carrying a context"</strong> —
-    a kind of design pattern. When a value sits inside a box (a monad), you
-    don't reach in and manipulate it directly. Instead you say: <em>"Box,
-    apply this function to the value inside you, and put the result back in
-    a box."</em>
+    De momento puedes dejar a un lado la definición matemática (la teoría de
+    categorías). En programación, una mónada es una <strong>«caja que
+    transporta un contexto»</strong>: una especie de patrón de diseño. Cuando
+    un valor vive dentro de una caja (una mónada), no metes la mano para
+    manipularlo directamente. En vez de eso le dices: <em>«Caja, aplica esta
+    función al valor que llevas dentro y vuelve a meter el resultado en una
+    caja.»</em>
   </p>
 
-  <h3>The two core operations</h3>
-  <p>To be a monad, a type must provide these two capabilities:</p>
+  <h3>Las dos operaciones fundamentales</h3>
+  <p>Para ser una mónada, un tipo debe ofrecer estas dos capacidades:</p>
   <ul>
     <li>
-      <strong>Putting a value in the box</strong>
-      (<code>return</code>, <code>pure</code>, a constructor) — wraps an
-      ordinary value in the box. Example: <code>x ➔ Box(x)</code>.
+      <strong>Meter un valor en la caja</strong>
+      (<code>return</code>, <code>pure</code>, un constructor): envuelve un
+      valor corriente en la caja. Ejemplo: <code>x ➔ Box(x)</code>.
     </li>
     <li>
-      <strong>Chaining</strong>
-      (<code>bind</code>, <code>flatMap</code>, <code>&gt;&gt;=</code>) —
-      takes the value out of the box, passes it through a function that
-      returns a <em>new</em> box, and hands back the resulting box. Thanks to
-      <code>flatMap</code>, boxes never nest — instead of
-      <code>Box(Box(x))</code> you always keep a flat <code>Box(x)</code>.
+      <strong>Encadenar</strong>
+      (<code>bind</code>, <code>flatMap</code>, <code>&gt;&gt;=</code>):
+      saca el valor de la caja, lo pasa por una función que devuelve una
+      <em>nueva</em> caja y te entrega la caja resultante. Gracias a
+      <code>flatMap</code>, las cajas nunca se anidan: en lugar de
+      <code>Box(Box(x))</code> siempre te queda una <code>Box(x)</code> plana.
     </li>
   </ul>
 
-  <h3>Why use monads at all?</h3>
+  <h3>¿Y para qué sirven realmente las mónadas?</h3>
   <p>
-    So that the box itself takes care of the side effects and error handling
-    that arise when a value might be absent (<code>Option</code>/<code>Maybe</code>),
-    when work is asynchronous (<code>Promise</code>/<code>Future</code>), or
-    when there are many values (<code>List</code>). The developer gets to
-    focus on the core logic alone.
+    Para que sea la propia caja la que se ocupe de los efectos secundarios y
+    del manejo de errores que aparecen cuando un valor puede no existir
+    (<code>Option</code>/<code>Maybe</code>), cuando el trabajo es asíncrono
+    (<code>Promise</code>/<code>Future</code>) o cuando hay muchos valores
+    (<code>List</code>). Así quien programa puede concentrarse solo en la
+    lógica esencial.
   </p>
 
-  <h2>2. What is a comprehension block?</h2>
+  <h2>2. ¿Qué es un bloque de comprensión?</h2>
   <p>
-    A comprehension is syntax for building and manipulating collections —
-    lists, monads — declaratively and readably. Python's list comprehension
-    is the most famous example:
+    Una comprensión es sintaxis para construir y manipular colecciones
+    —listas, mónadas— de forma declarativa y legible. La comprensión de listas
+    de Python es el ejemplo más famoso:
   </p>
-  <pre class="code"><code># A plain loop
+  <pre class="code"><code># Un bucle normal
 results = []
 for x in range(5):
     if x > 0:
         results.append(x * 2)
 
-# A comprehension block
+# Un bloque de comprensión
 results = [x * 2 for x in range(5) if x > 0]</code></pre>
   <p>
-    The code gets much shorter and keeps your attention on <em>what</em> you
-    are building. But the real power of comprehensions appears beyond plain
-    lists — when they combine with monads.
+    El código se acorta muchísimo y mantiene tu atención en <em>qué</em> estás
+    construyendo. Pero la verdadera potencia de las comprensiones aparece más
+    allá de las listas normales: cuando se combinan con mónadas.
   </p>
 
-  <h2>3. How monads and comprehensions connect (the key part)</h2>
+  <h2>3. Cómo se conectan mónadas y comprensiones (la parte clave)</h2>
   <p>
-    A comprehension block — Scala's <code>for</code>-comprehension, Haskell's
-    <code>do</code>-notation — is in fact a pretty wrapper (syntactic sugar)
-    over the monad's <code>flatMap</code> and <code>map</code> operations.
-    Chain several monads without a comprehension and the code digs itself
-    into an endless <em>callback hell</em>. Compare, in Scala: suppose we
-    find a user, then find that user's order — two consecutive steps, using
-    the <code>Option</code> monad because either might be missing.
+    Un bloque de comprensión —la <code>for</code>-comprehension de Scala, la
+    notación <code>do</code> de Haskell— no es en el fondo más que una
+    envoltura bonita (azúcar sintáctico) sobre las operaciones
+    <code>flatMap</code> y <code>map</code> de la mónada. Encadena varias
+    mónadas sin una comprensión y el código se hunde en un <em>callback
+    hell</em> sin fin. Compáralo en Scala: supongamos que buscamos un usuario
+    y luego el pedido de ese usuario —dos pasos consecutivos, con la mónada
+    <code>Option</code> porque cualquiera de los dos podría faltar.
   </p>
-  <p>❌ Using only the monad methods (hard to read):</p>
-  <pre class="code"><code>// flatMap and map nest, and the code keeps sliding to the right.
+  <p>❌ Usando solo los métodos de la mónada (difícil de leer):</p>
+  <pre class="code"><code>// flatMap y map se anidan, y el código se va desplazando hacia la derecha.
 val result = findUser(1).flatMap(user =&gt;
   findOrder(user.id).map(order =&gt;
-    s"${user.name}'s order: ${order.item}"
+    s"Pedido de ${user.name}: ${order.item}"
   )
 )</code></pre>
-  <p>🟢 Using a comprehension block (very intuitive):</p>
-  <pre class="code"><code>// Scala for-comprehension
+  <p>🟢 Usando un bloque de comprensión (muy intuitivo):</p>
+  <pre class="code"><code>// for-comprehension de Scala
 val result = for {
-  user  &lt;- findUser(1)        // take user out of the box (really flatMap)
-  order &lt;- findOrder(user.id) // take order out of the box (really flatMap/map)
-} yield s"${user.name}'s order: ${order.item}"</code></pre>
+  user  &lt;- findUser(1)        // saca user de la caja (en realidad, flatMap)
+  order &lt;- findOrder(user.id) // saca order de la caja (en realidad, flatMap/map)
+} yield s"Pedido de ${user.name}: ${order.item}"</code></pre>
   <p>
-    The compiler automatically rewrites the <code>for</code> block below into
-    the <code>flatMap</code>/<code>map</code> chain above. In other words,
-    every time you extract a variable with the <code>&lt;-</code> symbol
-    inside a comprehension block, you are actually performing the
-    mathematical operation of opening the monad's box and chaining it.
+    El compilador reescribe automáticamente el bloque <code>for</code> de
+    abajo en la cadena <code>flatMap</code>/<code>map</code> de arriba. Dicho
+    de otro modo, cada vez que extraes una variable con el símbolo
+    <code>&lt;-</code> dentro de un bloque de comprensión estás ejecutando en
+    realidad la operación matemática de abrir la caja de la mónada y
+    encadenarla.
   </p>
 
-  <h2>In summary</h2>
+  <h2>En resumen</h2>
   <ul>
-    <li>A <strong>monad</strong> is a blueprint (an interface) that defines
-      rules like <code>flatMap</code> for safe data chaining.</li>
-    <li>A <strong>comprehension block</strong> is syntax that lets you write
-      that complex <code>flatMap</code> chaining as intuitively and
-      elegantly as ordinary, synchronous-looking code.</li>
+    <li>Una <strong>mónada</strong> es un plano (una interfaz) que define
+      reglas como <code>flatMap</code> para encadenar datos con seguridad.</li>
+    <li>Un <strong>bloque de comprensión</strong> es sintaxis que te permite
+      escribir ese encadenado complejo de <code>flatMap</code> de forma tan
+      intuitiva y elegante como el código corriente, de aspecto síncrono.</li>
   </ul>
 
   <div class="callout">
-    <strong>And in FxDart?</strong> Dart has neither
-    <code>for</code>-comprehensions nor <code>do</code>-notation — which is
-    exactly why FxDart's <a href="typedErrors.html"><code>either((r) {
-    ... })</code> block</a> exists. It plays the same role as a
-    comprehension block (straight-line code instead of a
-    <code>flatMap</code> pyramid), but through a <code>Raise</code> scope
-    rather than monadic desugaring — see
-    <a href="namingOfTypedErrors.html">the naming rationale</a> for why that
-    distinction matters.
+    <strong>¿Y en FxDart?</strong> Dart no tiene ni
+    <code>for</code>-comprehensions ni notación <code>do</code>, y justo por
+    eso existe el <a href="typedErrors.html">bloque <code>either((r) {
+    ... })</code></a> de FxDart. Cumple el mismo papel que un bloque de
+    comprensión (código en línea recta en lugar de una pirámide de
+    <code>flatMap</code>), pero a través de un ámbito <code>Raise</code> en
+    vez de un desazucarado monádico — mira
+    <a href="namingOfTypedErrors.html">las razones del nombre</a> para ver por
+    qué esa distinción importa.
   </div>
 
   <nav class="tut-nav">

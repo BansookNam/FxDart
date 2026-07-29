@@ -1,7 +1,7 @@
 ---
 slug: nth
-title: nth — FxDart 101
-description: Tutorial de nth en FxDart: obtén con seguridad el elemento de un índice, con null si queda fuera de rango, y un playground en vivo.
+title: elementAtOrNull — FxDart 101
+description: Tutorial de elementAtOrNull en FxDart: obtén con seguridad el elemento de un índice, con null si queda fuera de rango, y un playground en vivo.
 heading: <code>elementAtOrNull</code>
 section: 8
 crumb: elementAtOrNull
@@ -16,20 +16,24 @@ nextLabel: find
 
   <h2>Lección</h2>
   <p>
-    <code>nth</code> recorre el iterable y se detiene en cuanto llega a
-    <code>index</code>, así que nunca consume más de <code>index + 1</code>
-    elementos — barato incluso sobre una secuencia perezosa enorme, y mucho
-    más barato que materializarla entera solo para indexar en una <code>List</code>.
+    <code>elementAtOrNull</code> recorre el iterable y se detiene en cuanto
+    llega a <code>index</code>, así que nunca consume más de
+    <code>index + 1</code> elementos — barato incluso sobre una secuencia
+    perezosa enorme, y mucho más barato que materializarla entera solo para
+    indexar en una <code>List</code>. <code>elementAtOrNull</code> es el nombre
+    idiomático en Dart (refleja <code>Iterable.elementAtOrNull</code>); fxdart
+    también acepta la grafía de FxTS <code>nth</code> — son el mismo operador.
     Un índice negativo, o uno más allá del final, simplemente da <code>null</code>;
     a diferencia de la indexación de arrays de algunos lenguajes, aquí los índices
     no dan la vuelta para contar desde el final — el índice tiene que ser una posición
     válida y no negativa.
   </p>
   <p>
-    <code>nth</code> no tiene método de cadena: llama directamente a la función
-    de nivel superior (o a su gemela asíncrona) sobre cualquier <code>Iterable</code>
-    o cadena <code>Fx</code>, ya que <code>Fx</code> <em>es</em> un
-    <code>Iterable</code>.
+    En la cadena síncrona, <code>fx(iterable).elementAtOrNull(index)</code> es el
+    método heredado de <code>Iterable</code>: llámalo directamente sobre
+    cualquier cadena <code>Fx</code>, ya que <code>Fx</code> <em>es</em> un
+    <code>Iterable</code>. Para un <code>FxAsyncIterable</code>, usa la función
+    de nivel superior <code>elementAtOrNullAsync(index, iterable)</code>.
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>
@@ -40,12 +44,12 @@ nextLabel: find
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>nth</code> para imprimir al medallista de plata (índice 1), o <code>'unclaimed'</code>.</p>
+  <p>Ejercicio: usa <code>elementAtOrNull</code> para imprimir al medallista de plata (índice 1), o <code>'unclaimed'</code>.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="head.html"><code>head</code></a> — atajo para <code>nth(0, ...)</code> ·
+    <a href="head.html"><code>head</code></a> — atajo para <code>elementAtOrNull(0, ...)</code> ·
     <a href="last.html"><code>last</code></a> — el último elemento ·
     <a href="find.html"><code>find</code></a> — localiza por predicado en vez de por índice ·
     <a href="slice.html"><code>slice</code></a> — extrae un rango entero

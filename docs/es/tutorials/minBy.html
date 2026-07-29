@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>minBy — FxDart 101</title>
-  <meta name="description" content="FxDart minBy tutorial: the element with the smallest key in one walk — no sort, null when empty — with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/minBy.html">
+  <meta name="description" content="Tutorial de minBy en FxDart: el elemento con la clave más pequeña en una sola pasada — sin ordenar, null cuando está vacío — con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/minBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/minBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/minBy.html">
@@ -44,35 +43,34 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>minBy</strong></p>
   <h1><code>minBy</code></h1>
-  <p class="hero-sub">The element whose key is smallest — one walk, no sort, <code>null</code> when empty.</p>
+  <p class="hero-sub">El elemento cuya clave es la más pequeña — una sola pasada, sin ordenar, <code>null</code> cuando está vacío.</p>
 
   <div class="signature">A? minBy&lt;A&gt;(Object? Function(A a) f, Iterable&lt;A&gt; iterable)
 Future&lt;A?&gt; minByAsync&lt;A&gt;(Object? Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 T? Fx&lt;T&gt;.minBy(Object? Function(T a) f)          // chain (sync)
 Future&lt;T?&gt; FxAsync&lt;T&gt;.minBy(Object? Function(T a) f)  // chain (async)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>minBy</code> is the mirror of
-    <code><a href="maxBy.html">maxBy</a></code>: it returns the
-    <em>element</em> with the smallest key after a single O(n) walk,
-    where <code>sortBy(key).head()</code> would sort the whole pipeline
-    just to read one value.
+    <code>minBy</code> es la imagen especular de
+    <code><a href="maxBy.html">maxBy</a></code>: devuelve el
+    <em>elemento</em> con la clave más pequeña tras una única pasada O(n),
+    mientras que <code>sortBy(key).head()</code> ordenaría el pipeline entero
+    solo para leer un valor.
   </p>
   <p>
-    The contract matches <code>maxBy</code> exactly: keys compare like
-    <code><a href="sortBy.html">sortBy</a></code>
-    (<code>Comparable.compare</code>), ties keep the <strong>first</strong>
-    element encountered, and an empty pipeline returns <code>null</code> —
-    not <code>infinity</code>, which is what the numeric
-    <code><a href="min.html">min</a></code> does, because there is no
-    "zero element" to fall back to.
+    El contrato coincide exactamente con el de <code>maxBy</code>: las claves
+    se comparan como en <code><a href="sortBy.html">sortBy</a></code>
+    (<code>Comparable.compare</code>), los empates los gana el
+    <strong>primer</strong> elemento encontrado, y un pipeline vacío devuelve
+    <code>null</code> — no <code>infinity</code>, que es lo que hace el
+    <code><a href="min.html">min</a></code> numérico, porque aquí no hay
+    ningún «elemento cero» al que recurrir.
   </p>
 
-  <h2>Demo 1 · Basics, empty case &amp; ties</h2>
+  <h2>Demo 1 · Fundamentos, caso vacío &amp; empates</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -97,7 +95,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async</h2>
+  <h2>Demo 2 · Asíncrono</h2>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -114,8 +112,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: find the fastest runner with one call.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: encuentra al corredor más rápido con una sola llamada.</p>
   <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -136,10 +134,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="maxBy.html"><code>maxBy</code></a> — the mirror image ·
-    <a href="min.html"><code>min</code></a> — when you want the key itself, not the element ·
-    <a href="head.html"><code>head</code></a> — the same nullable contract
+    <strong>Relacionado:</strong>
+    <a href="maxBy.html"><code>maxBy</code></a> — la imagen especular ·
+    <a href="min.html"><code>min</code></a> — cuando quieres la clave en sí, no el elemento ·
+    <a href="head.html"><code>head</code></a> — el mismo contrato con nulls
   </div>
 
   <nav class="tut-nav">

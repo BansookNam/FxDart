@@ -40,7 +40,7 @@ nextLabel: pick
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="pick.html"><code>pick</code></a> — 반대로, 일부 키만 남기기 ·
     <a href="omitBy.html"><code>omitBy</code></a> — 키 목록 대신 술어로 제거하기 ·
     <a href="compactObject.html"><code>compactObject</code></a> — 값이 null인 키 제거하기 ·

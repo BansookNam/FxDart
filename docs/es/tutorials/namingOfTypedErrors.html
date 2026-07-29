@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Why "typed errors" (and not Monad) — FxDart 101</title>
-  <meta name="description" content="The naming rationale behind FxDart's typed errors: why the guide is not called Monad, why Arrow's vocabulary was chosen, and why raise was reserved.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/namingOfTypedErrors.html">
+  <title>Por qué «errores tipados» (y no Monad) — FxDart 101</title>
+  <meta name="description" content="Las razones del nombre detrás de los errores tipados de FxDart: por qué la guía no se llama Monad, por qué se eligió el vocabulario de Arrow y por qué se reservó raise.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/namingOfTypedErrors.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/namingOfTypedErrors.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/namingOfTypedErrors.html">
@@ -44,86 +43,92 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
-  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 13 · Typed errors › <strong>naming</strong></p>
-  <h1>Why is it called "typed errors"?</h1>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 13 · Errores tipados › <strong>naming</strong></p>
+  <h1>¿Por qué se llama «errores tipados»?</h1>
   <p class="hero-sub">
-    The feature behind <code>either</code> has famous names in other
-    ecosystems — <a href="monad.html"><em>Monad</em></a>,
-    <em>Railway-oriented programming</em>. This page explains why FxDart
-    deliberately calls it none of those. (Never met a monad? Start with
-    <a href="monad.html">Monad &amp; comprehension blocks</a>.)
+    La funcionalidad que hay detrás de <code>either</code> tiene nombres
+    famosos en otros ecosistemas: <a href="monad.html"><em>mónada</em></a>,
+    <em>railway-oriented programming</em>. Esta página explica por qué FxDart
+    ha decidido deliberadamente no llamarla de ninguna de esas maneras. (¿No
+    te has cruzado nunca con una mónada? Empieza por
+    <a href="monad.html">Mónadas &amp; bloques de comprensión</a>.)
   </p>
 
-  <h2>Why not "Monad"?</h2>
+  <h2>¿Por qué no «mónada»?</h2>
   <p>
-    Because it would misdescribe the feature. The whole point of the
-    <code>Raise</code> design is that it is <em>not</em> monadic style — it
-    exists to <strong>replace</strong> <code>flatMap</code>-chaining with
-    straight-line code. You saw this on the
-    <a href="typedErrors.html">typed errors page</a>: the
-    <code>either((r) { ... })</code> block is the alternative to the nested
-    <code>flatMap</code> pyramid, not a wrapper around it.
+    Porque describiría mal la funcionalidad. Toda la gracia del diseño de
+    <code>Raise</code> es que <em>no</em> es estilo monádico: existe para
+    <strong>sustituir</strong> el encadenado con <code>flatMap</code> por
+    código en línea recta. Ya lo viste en la
+    <a href="typedErrors.html">página de errores tipados</a>: el bloque
+    <code>either((r) { ... })</code> es la alternativa a la pirámide anidada
+    de <code>flatMap</code>, no una envoltura sobre ella.
   </p>
   <p>
-    Kotlin's Arrow — the design source for this feature — went through
-    exactly this decision. Arrow 1.x had a <code>Monad</code> typeclass,
-    higher-kinded-type emulation, and the Haskell vocabulary to go with it.
-    Arrow 2.x <strong>deleted all of it</strong>, and even renamed the core
-    operation <code>shift</code> → <code>raise</code> by community poll —
-    choosing the word users understood over the word theory used. The lesson
-    generalises: name for the audience you want, and FxDart's audience is
-    ordinary Dart developers, not category theorists.
+    Arrow, la librería de Kotlin —el origen del diseño de esta
+    funcionalidad—, pasó exactamente por esta misma decisión. Arrow 1.x tenía
+    una typeclass <code>Monad</code>, emulación de tipos de orden superior y
+    todo el vocabulario de Haskell que va con ello. Arrow 2.x
+    <strong>lo eliminó todo</strong>, e incluso renombró la operación
+    principal <code>shift</code> → <code>raise</code> mediante una votación de
+    la comunidad: eligió la palabra que entendían sus usuarios por encima de
+    la palabra que usaba la teoría. La lección se generaliza: pon nombres
+    pensando en el público que quieres, y el público de FxDart son
+    desarrolladoras y desarrolladores de Dart normales, no teóricos de
+    categorías.
   </p>
   <p>
-    There is also a cautionary tale in Dart itself: FP libraries whose public
-    surface speaks Haskell (<code>Monad2</code>, <code>HKT</code>,
-    <code>Do</code>-notation) intimidate exactly the developers who would
-    benefit most from typed errors. A page called "Monad" would scare off its
-    own readers — and describe the one thing this API isn't.
+    En el propio Dart hay además un aviso a navegantes: las librerías de FP
+    cuya superficie pública habla Haskell (<code>Monad2</code>,
+    <code>HKT</code>, notación <code>Do</code>) intimidan justo a quienes más
+    partido sacarían de los errores tipados. Una página titulada «Monad»
+    espantaría a sus propios lectores, y encima describiría precisamente lo
+    único que esta API no es.
   </p>
 
-  <h2>Why "typed errors"?</h2>
+  <h2>¿Por qué «errores tipados»?</h2>
   <ul>
-    <li><strong>It says what the feature does</strong> — errors carried in
-      the type system instead of thrown past it — rather than what category
-      theory calls the shape.</li>
-    <li><strong>It is Arrow's own name.</strong> The corresponding chapter of
-      the Arrow documentation is literally titled <em>Typed errors</em>, so
-      Kotlin developers searching for the Dart equivalent land on the right
-      words.</li>
-    <li><strong>It follows the house rule.</strong> FxDart's naming
-      philosophy (see <code>WHY_CURRIED.md</code>: "port the meaning, not the
-      spelling") is: Dart names, not Haskell names — <code>map</code> not
-      <code>fmap</code>, <code>flatMap</code> not <code>bind</code>-the-verb,
-      <code>recover</code> not <code>handleErrorWith</code>.</li>
+    <li><strong>Dice lo que hace la funcionalidad</strong> — errores que viajan
+      en el sistema de tipos en lugar de lanzarse por encima de él —, en vez
+      de decir cómo llama la teoría de categorías a esa forma.</li>
+    <li><strong>Es el nombre que usa Arrow.</strong> El capítulo
+      correspondiente de la documentación de Arrow se titula literalmente
+      <em>Typed errors</em>, así que quien programa en Kotlin y busca el
+      equivalente en Dart aterriza en las palabras correctas.</li>
+    <li><strong>Sigue la norma de la casa.</strong> La filosofía de
+      nomenclatura de FxDart (ver <code>WHY_CURRIED.md</code>: «porta el
+      significado, no la grafía») es: nombres de Dart, no nombres de Haskell
+      — <code>map</code> y no <code>fmap</code>, <code>flatMap</code> y no el
+      verbo <code>bind</code>, <code>recover</code> y no
+      <code>handleErrorWith</code>.</li>
   </ul>
 
-  <h2>Why not "raise"?</h2>
+  <h2>¿Por qué no «raise»?</h2>
   <p>
-    <code>raise</code> is the accurate "cool" name — it is what the DSL is
-    actually called, and tutorial URLs here are function-named
-    (<code>concurrent.html</code>, <code>fx.html</code>). It was reserved on
-    purpose: if Section&nbsp;13 later gains per-function tutorial pages
-    (<code>either.html</code>, <code>bind.html</code>, …), a
-    <code>raise.html</code> overview would collide with the future
-    <code>raise</code> function tutorial. <code>typedErrors.html</code> stays
-    free as the section's overview page forever.
+    <code>raise</code> es el nombre «molón» y además exacto: es como se llama
+    de verdad el DSL, y aquí las URL de los tutoriales llevan nombre de
+    función (<code>concurrent.html</code>, <code>fx.html</code>). Se reservó a
+    propósito: si la sección&nbsp;13 gana más adelante páginas de tutorial por
+    función (<code>either.html</code>, <code>bind.html</code>, …), un resumen
+    en <code>raise.html</code> chocaría con el futuro tutorial de la función
+    <code>raise</code>. <code>typedErrors.html</code> queda libre para siempre
+    como página de resumen de la sección.
   </p>
 
-  <h2>What about "Railway"?</h2>
+  <h2>¿Y «railway»?</h2>
   <p>
-    <em>Railway-oriented programming</em> is a well-known metaphor for the
-    same idea (a success track and a failure track). It is a fine mental
-    model — and a poor page name: less searchable, not Arrow vocabulary, and
-    a metaphor you must already know before it helps you.
+    <em>Railway-oriented programming</em> es una metáfora muy conocida para la
+    misma idea (una vía de éxito y una vía de fallo). Es un modelo mental
+    estupendo… y un mal nombre de página: se busca peor, no es vocabulario de
+    Arrow y es una metáfora que ya tienes que conocer antes de que te sirva de
+    algo.
   </p>
 
   <div class="callout">
-    <strong>The principle in one line.</strong> A name is part of the API:
-    it should tell a Dart developer what the thing does, in words they would
-    search for — <em>typed errors</em> — not certify which abstraction it
-    secretly is.
+    <strong>El principio en una línea.</strong> Un nombre forma parte de la
+    API: debería decirle a quien programa en Dart qué hace esa cosa, con las
+    palabras que buscaría — <em>errores tipados</em> —, no certificar qué
+    abstracción es en secreto.
   </div>
 
   <nav class="tut-nav">

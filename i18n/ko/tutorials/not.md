@@ -47,7 +47,7 @@ nextLabel: when
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="negate.html"><code>negate</code></a> — bool 하나가 아니라 술어 함수 전체를 뒤집기 ·
     <a href="some.html"><code>some</code></a> / <a href="every.html"><code>every</code></a> — 위에서 not과 함께 쓴 함수들 ·
     <a href="when.html"><code>when</code></a> — 조건부 변환 ·

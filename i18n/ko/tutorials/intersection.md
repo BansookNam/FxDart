@@ -52,7 +52,7 @@ nextLabel: intersectionBy
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="difference.html"><code>difference</code></a> — 제외하는 쪽의 짝 ·
     <a href="intersectionBy.html"><code>intersectionBy</code></a> — 대신 계산된 키로 맞추기 ·
     <a href="uniq.html"><code>uniq</code></a> — 이터러블 하나에서 중복 제거 ·
