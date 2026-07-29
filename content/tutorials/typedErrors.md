@@ -157,7 +157,7 @@ final typed  = Either.catchingWith(ParseFailure.new, () => jsonDecode(raw));</co
   </div>
 
   <p>
-    Curious why this page is called <em>typed errors</em> and not
-    <em>Monad</em> or something cooler?
+    Curious why this page is called <em>typed errors</em> instead of a
+    functional-programming keyword like <em>Monad</em>?
     <a href="namingOfTypedErrors.html">The naming rationale →</a>
   </p>
