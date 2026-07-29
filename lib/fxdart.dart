@@ -37,5 +37,24 @@ export 'src/strict/curried.dart';
 export 'src/strict/func.dart';
 export 'src/strict/object.dart';
 export 'src/strict/predicates.dart';
+export 'src/typed/accumulate.dart'
+    show AccValue, Accumulate, RaiseAccumulate, RaiseAccumulateOps;
+export 'src/typed/either.dart' show Either, EitherNel, Left, Right;
+export 'src/typed/fx_either.dart';
+export 'src/typed/non_empty_list.dart' show Nel, NonEmptyList;
+export 'src/typed/raise.dart'
+    show
+        Raise,
+        RaiseLeakedError,
+        RaiseOps,
+        SingletonRaise,
+        catching,
+        catchingAsync,
+        either,
+        eitherAsync,
+        foldRaise,
+        foldRaiseAsync,
+        nullable,
+        nullableAsync;
 export 'src/util/shuffle.dart';
 export 'src/util/timing.dart';

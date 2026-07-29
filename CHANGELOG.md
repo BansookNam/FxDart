@@ -1,3 +1,37 @@
+## 0.6.0
+
+### Added — typed errors (the Kotlin Arrow 2.x approach, ported)
+
+* **`Raise<E>` + builders** (`either`, `eitherAsync`, `nullable`,
+  `nullableAsync`, `foldRaise`, `foldRaiseAsync`): write straight-line Dart
+  inside a scope that can short-circuit with a *typed* error; `Either` appears
+  only at the boundary. No `TaskEither`/`IO` wrapper tower — Dart's own
+  `Future`/`throw` is the effect system, exactly as Arrow uses Kotlin's.
+  Foreign-scope signals rethrow (nesting is safe), leaked scopes throw a
+  descriptive `RaiseLeakedError`, and the signal is an `Error` so
+  `on Exception` never swallows it.
+* **Scope vocabulary** (`RaiseOps`): `bind`, `bindAll`, `ensure`,
+  `ensureNotNull` (null-promoting), `recover`, `withError`.
+* **`catching` / `catchingAsync`** and **`Either.catching` /
+  `Either.catchingWith`** — exception boundaries that always rethrow the
+  raise signal first.
+* **`Either<L, R>`** (sealed `Left`/`Right`, exhaustive `switch`), with a
+  curated Arrow 2.x method set: `fold`, `map`, `mapLeft`, `flatMap`, `swap`,
+  `getOrNull`, `getOrElse`, `onLeft`/`onRight`, `recover`, `toEitherNel`.
+* **`NonEmptyList<T>` / `Nel<T>`** — zero-cost extension type (needs SDK
+  ≥ 3.3, hence the floor bump), the error carrier for accumulation.
+* **Error accumulation** (the Arrow replacement for `Validated`):
+  `r.accumulate` with lazily-detonating `AccValue`s, `r.mapOrAccumulate`,
+  `r.zipOrAccumulate2..5`, `r.bindNel`.
+* **Pipeline integration**: `rights`, `lefts`, `separateEither`,
+  `sequenceEither(Async)`, `mapOrAccumulate(Async)` as top-level ops and as
+  `Fx`/`FxAsync` chain terminals — fail-slow concurrent validation rides the
+  existing `concurrent(n)` back-channel.
+
+### Changed
+
+* SDK floor raised from `>=3.0.0` to `>=3.3.0` (extension types).
+
 ## 0.5.4
 
 ### Docs

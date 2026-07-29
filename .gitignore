@@ -80,3 +80,6 @@ coverage/
 
 # Codecov uploader binary — downloaded on demand
 codecov
+
+# Working plans — local only
+plans/
