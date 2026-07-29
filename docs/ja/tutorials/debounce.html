@@ -111,7 +111,7 @@ Future<void> main() async {
     <code>leading: true</code> fires immediately and suppresses the rest of
     the burst; <code>.cancel()</code> drops a pending trailing call entirely:
   </p>
-  <div class="playground">
+  <div class="playground" data-pg="0f596859bd6789a7">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -143,7 +143,7 @@ Future<void> main() async {
   <h2>Try it yourself</h2>
   <p>Exercise: wrap <code>save</code> in <code>debounce</code> (100ms wait)
     so only the final value survives the burst of calls below.</p>
-  <div class="playground">
+  <div class="playground" data-pg="6f6f6cba9298370c">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 

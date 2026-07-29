@@ -99,7 +99,7 @@ void main() {
     <code>fetchUser(1)</code>의 두 번째 호출은 캐시된, 이미 완료된
     <code>Future</code>를 반환합니다 — 150ms를 기다리지 않습니다.
   </p>
-  <div class="playground">
+  <div class="playground" data-pg="03408f60125ab395">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -121,7 +121,7 @@ Future<void> main() async {
   <h2>직접 해 보기</h2>
   <p>연습: 이 "느린" 세제곱 함수를 <code>memoize</code>로 감싸서
     <code>3</code>으로 두 번 호출해도 실제 계산은 한 번만 일어나게 만들어 보세요.</p>
-  <div class="playground">
+  <div class="playground" data-pg="1da85945966b8651">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 

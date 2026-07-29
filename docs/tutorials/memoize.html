@@ -101,7 +101,7 @@ void main() {
     The second call to <code>fetchUser(1)</code> returns the cached,
     already-completed <code>Future</code> — no 150ms wait:
   </p>
-  <div class="playground">
+  <div class="playground" data-pg="03408f60125ab395">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -123,7 +123,7 @@ Future<void> main() async {
   <h2>Try it yourself</h2>
   <p>Exercise: wrap this "slow" cubing function with <code>memoize</code> so
     that calling it twice with <code>3</code> only runs the real computation once.</p>
-  <div class="playground">
+  <div class="playground" data-pg="1da85945966b8651">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 

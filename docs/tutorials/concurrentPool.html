@@ -100,7 +100,7 @@ Future<void> main() async {
   <h2>Demo 2 · Contrast with concurrent</h2>
   <p>Same delays, same pool size of 3 — the only difference is which order
     the results land in:</p>
-  <div class="playground">
+  <div class="playground" data-pg="f1137d02e5864fed">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -136,7 +136,7 @@ Future<void> main() async {
   <p>Exercise: this pool size of 1 processes items one at a time, in launch
     order. Bump it to 3 so all three race at once, and watch the printed
     order switch to completion order.</p>
-  <div class="playground">
+  <div class="playground" data-pg="c9763eae319a843b">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 

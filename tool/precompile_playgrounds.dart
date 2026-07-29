@@ -21,6 +21,7 @@
 // is the point — a stale artifact can never outlive the library it was
 // compiled against.
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -28,6 +29,13 @@ import 'playground_source.dart';
 
 const compileUrl = 'https://stable.api.dartpad.dev/api/v3/compileNewDDC';
 const maxAttempts = 3;
+
+/// How long one request may take end to end. Compiles run ~2.5s, so this only
+/// trips on a stalled connection.
+const requestTimeout = Duration(seconds: 90);
+
+/// How often to name outstanding snippets when progress stops.
+const stallReport = Duration(seconds: 45);
 
 final root = Directory.current.path;
 
@@ -110,64 +118,100 @@ Future<List<MapEntry<String, String>>> _compileAll(
   final lib = File('$root/$libraryPath').readAsStringSync();
   final queue = List.of(targets);
   final failures = <MapEntry<String, String>>[];
+  final inFlight = <String>{};
+  final client = HttpClient()
+    ..connectionTimeout = const Duration(seconds: 30)
+    ..maxConnectionsPerHost = concurrency;
   var done = 0;
+
+  // Requests are now bounded, but if the service turns slow it should still be
+  // obvious which snippets are outstanding rather than just a frozen counter.
+  var lastDone = -1;
+  final watchdog = Timer.periodic(stallReport, (_) {
+    if (done == lastDone && inFlight.isNotEmpty) {
+      stdout.writeln('\n  still waiting on: ${inFlight.join(', ')}');
+    }
+    lastDone = done;
+  });
 
   Future<void> worker() async {
     while (queue.isNotEmpty) {
       final s = queue.removeAt(0);
       final source = needsLib(s.code) ? mergedSource(lib, s.code) : s.code;
+      inFlight.add(s.path);
       try {
-        final js = await _compile(source);
+        final js = await _compile(client, source);
         File(artifactPath(root, s.id))
             .writeAsBytesSync(gzip.encode(utf8.encode(js)));
       } on _CompileFailure catch (e) {
         failures.add(MapEntry(s.path, e.message));
+      } finally {
+        inFlight.remove(s.path);
+        done++;
+        stdout.write('\r  $done/${targets.length}   ');
       }
-      done++;
-      stdout.write('\r  $done/${targets.length}   ');
     }
   }
 
-  await Future.wait(List.generate(concurrency, (_) => worker()));
+  try {
+    await Future.wait(List.generate(concurrency, (_) => worker()));
+  } finally {
+    watchdog.cancel();
+    client.close(force: true);
+  }
   stdout.writeln();
   return failures;
 }
 
-/// One compile, retrying transport hiccups but not compile errors — a snippet
-/// that does not compile is a broken demo and should stop the build.
-Future<String> _compile(String source) async {
-  final client = HttpClient()..connectionTimeout = const Duration(seconds: 30);
-  try {
-    for (var attempt = 1;; attempt++) {
-      try {
-        final req = await client.postUrl(Uri.parse(compileUrl));
-        req.headers.contentType = ContentType.json;
-        req.write(jsonEncode({'source': source}));
-        final resp = await req.close();
-        final text = await resp.transform(utf8.decoder).join();
-        if (resp.statusCode == 200) return jsonDecode(text)['result'] as String;
-        if (resp.statusCode == 400) {
-          // The service reports genuine compile errors as 400.
-          String message;
-          try {
-            message = jsonDecode(text)['error']?.toString() ?? text;
-          } catch (_) {
-            message = text;
-          }
-          throw _CompileFailure(message);
-        }
-        if (attempt >= maxAttempts) {
-          throw _CompileFailure('HTTP ${resp.statusCode}: $text');
-        }
-      } on _CompileFailure {
-        rethrow;
-      } catch (e) {
-        if (attempt >= maxAttempts) throw _CompileFailure('$e');
-      }
+/// One compile, retrying transport hiccups and stalls but not compile errors —
+/// a snippet that does not compile is a broken demo and should stop the build.
+Future<String> _compile(HttpClient client, String source) async {
+  for (var attempt = 1;; attempt++) {
+    try {
+      // The inner deadline frees the socket; this one guarantees the future
+      // completes even if the abort does not take effect.
+      return await _attempt(client, source)
+          .timeout(requestTimeout + const Duration(seconds: 10));
+    } on _CompileFailure {
+      rethrow;
+    } catch (e) {
+      if (attempt >= maxAttempts) throw _CompileFailure('$e');
       await Future<void>.delayed(Duration(seconds: attempt * 2));
     }
+  }
+}
+
+/// A single request, bounded by [requestTimeout].
+///
+/// `HttpClient.connectionTimeout` only covers opening the socket. Without a
+/// deadline on the exchange itself, a server that accepts the connection and
+/// then goes quiet parks the worker forever, and `Future.wait` below never
+/// completes — the build hangs with no error and no way to tell why.
+/// `abort` fails the pending future *and* releases the connection.
+Future<String> _attempt(HttpClient client, String source) async {
+  final req = await client.postUrl(Uri.parse(compileUrl));
+  final deadline = Timer(requestTimeout, () {
+    req.abort(TimeoutException('no response in ${requestTimeout.inSeconds}s'));
+  });
+  try {
+    req.headers.contentType = ContentType.json;
+    req.write(jsonEncode({'source': source}));
+    final resp = await req.close();
+    final text = await resp.transform(utf8.decoder).join();
+    if (resp.statusCode == 200) return jsonDecode(text)['result'] as String;
+    if (resp.statusCode == 400) {
+      // The service reports genuine compile errors as 400.
+      String message;
+      try {
+        message = jsonDecode(text)['error']?.toString() ?? text;
+      } catch (_) {
+        message = text;
+      }
+      throw _CompileFailure(message);
+    }
+    throw HttpException('HTTP ${resp.statusCode}: $text');
   } finally {
-    client.close();
+    deadline.cancel();
   }
 }
 
