@@ -83,8 +83,11 @@ switch (parsePort('8080')) {
       에러를 처리합니다.</li>
     <li><code>r.withError(transform, block)</code> — 다른 에러 타입을 이
       스코프에 맞게 변환합니다.</li>
-    <li><code>r.raise(err)</code> — 직접 단락합니다. 반환 타입은
-      <code>Never</code>.</li>
+    <li><code>r.raise(err)</code> — 에러를 직접 발생시키는 가장 기본적인
+      방법입니다. 호출하는 순간 블록 실행이 그 자리에서 멈추고, 그 에러가
+      곧바로 <code>Left</code>가 되어 반환됩니다. 반환 타입이
+      <code>Never</code>이므로 "이 지점 이후의 코드는 절대 실행되지 않는다"는
+      사실을 컴파일러도 알고 있습니다.</li>
   </ul>
   <p>
     <code>eitherAsync</code>는 비동기 쌍둥이이고(raise는 같은 await 체인
