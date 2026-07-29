@@ -14,6 +14,8 @@ dart run coverage:test_with_coverage   # coverage (what CI runs)
 ./run.sh                               # build docs site + serve locally (-o opens browser, -s skips build)
 ./deploy.sh                            # build + commit + push docs (GitHub Pages serves docs/ off main)
 dart run tool/build_docs.dart          # regenerate docs/ from content/ + i18n/  (--status, --check, --record)
+bash tools/build_single_file.sh        # regenerate docs/assets/fxdart_single.dart (playground bundle)
+dart run tool/precompile_playgrounds.dart  # build docs/pg/ artifacts (--scope, --status, --prune, --limit)
 ```
 
 ## Architecture
@@ -32,7 +34,27 @@ Async operator callbacks in `mapAsync`-style code must stay parallel-safe: overl
 
 ## Docs site (content/ → docs/)
 
-- `docs/` is **generated output — never edit by hand**. Sources: `content/` (English truth), `i18n/<locale>/` (translations, mirror content/, fall back to English), `tool/build_docs.dart` (generator).
+- Most of `docs/` is **generated output — never edit by hand**: every `*.html` + `sitemap.xml` (from `content/` English truth + `i18n/<locale>/` overlays, which fall back to English, via `tool/build_docs.dart`), `docs/assets/fxdart_single.dart` (from `lib/` via `tools/build_single_file.sh`), and `docs/pg/*.js.gz` (via `tool/precompile_playgrounds.dart`).
+- These files under `docs/` are **hand-maintained sources** and are meant to be edited directly: `docs/css/site.css`, `docs/js/*.js`, `docs/frame.html`, `docs/assets/logo*.png`.
 - `content/code/` (playground code) and `sig.txt` are shared across locales — **never translated**.
 - After translating, run `dart run tool/build_docs.dart --record` to mark it current.
 - `deploy.sh` stages only docs-related paths (`docs content i18n tool tools deploy.sh DEPLOY.md`) — commit `lib/`/`test/` changes separately first.
+
+### Playground execution path
+
+A Run resolves the snippet's JS from the cheapest available source: a build-time
+artifact in `docs/pg/` (stamped on the `.playground` div as `data-pg`), then the
+reader's Cache Storage, then the DartPad compile service. `tool/playground_source.dart`
+holds the library+snippet merge and **must stay byte-identical to `buildSource` in
+`docs/js/playground.js`** — if you touch either, verify by capturing the real compile
+POST body from a browser and comparing.
+
+Build order matters: `build_single_file.sh` → `precompile_playgrounds.dart` →
+`build_docs.dart`. Rebuilding the bundle changes every fxdart snippet's id, so
+precompiling takes `--prune` to drop the superseded artifacts. `deploy.sh` honours
+`PG_SCOPE` (`first` default, `all`, `none`).
+
+The 17MB DDC runtime is fetched by the **parent page**, not the sandboxed frame, and
+kept in Cache Storage keyed by the compile service's `dartVersion`; frames are handed
+the source text and booted ahead of the click. Neither DDC artifact is an AMD module,
+which is what makes this possible — do not reintroduce a script loader.
