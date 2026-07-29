@@ -43,6 +43,7 @@
   </div>
 </header>
 <main>
+  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 13 · 타입 있는 에러 › <strong>typed errors</strong></p>
   <h1>타입 있는 에러</h1>
   <p class="hero-sub">
@@ -200,6 +201,12 @@ final typed  = Either.catchingWith(ParseFailure.new, () => jsonDecode(raw));</co
     (신호는 <code>Error</code>이므로 <code>on Exception</code>은 이미
     안전합니다).
   </div>
+
+  <p>
+    왜 이 페이지의 이름이 <em>Monad</em> 같은 더 멋진 이름이 아니라
+    <em>타입 있는 에러</em>인지 궁금하신가요?
+    <a href="namingOfTypedErrors.html">이름에 담긴 이유 →</a>
+  </p>
 
   <nav class="tut-nav">
     <a href="../../101/index.html">← FxDart 101</a>

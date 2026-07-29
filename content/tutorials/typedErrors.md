@@ -155,3 +155,9 @@ final typed  = Either.catchingWith(ParseFailure.new, () => jsonDecode(raw));</co
     always let the short-circuit signal through (<code>on Exception</code> is
     already safe: the signal is an <code>Error</code>).
   </div>
+
+  <p>
+    Curious why this page is called <em>typed errors</em> and not
+    <em>Monad</em> or something cooler?
+    <a href="namingOfTypedErrors.html">The naming rationale →</a>
+  </p>

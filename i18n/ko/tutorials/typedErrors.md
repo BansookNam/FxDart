@@ -159,3 +159,9 @@ final typed  = Either.catchingWith(ParseFailure.new, () => jsonDecode(raw));</co
     (신호는 <code>Error</code>이므로 <code>on Exception</code>은 이미
     안전합니다).
   </div>
+
+  <p>
+    왜 이 페이지의 이름이 <em>Monad</em> 같은 더 멋진 이름이 아니라
+    <em>타입 있는 에러</em>인지 궁금하신가요?
+    <a href="namingOfTypedErrors.html">이름에 담긴 이유 →</a>
+  </p>

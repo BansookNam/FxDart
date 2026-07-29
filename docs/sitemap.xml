@@ -651,6 +651,16 @@
     <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/minBy.html"/>
   </url>
   <url>
+    <loc>https://bansooknam.github.io/FxDart/tutorials/namingOfTypedErrors.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/namingOfTypedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/namingOfTypedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/namingOfTypedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/namingOfTypedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/namingOfTypedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/namingOfTypedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/namingOfTypedErrors.html"/>
+  </url>
+  <url>
     <loc>https://bansooknam.github.io/FxDart/tutorials/negate.html</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/negate.html"/>
     <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/negate.html"/>
@@ -2359,6 +2369,16 @@
     <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/minBy.html"/>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/minBy.html"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/minBy.html"/>
+  </url>
+  <url>
+    <loc>https://bansooknam.github.io/FxDart/ko/tutorials/namingOfTypedErrors.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/namingOfTypedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/namingOfTypedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/namingOfTypedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/namingOfTypedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/namingOfTypedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/namingOfTypedErrors.html"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/namingOfTypedErrors.html"/>
   </url>
   <url>
     <loc>https://bansooknam.github.io/FxDart/ko/tutorials/negate.html</loc>
