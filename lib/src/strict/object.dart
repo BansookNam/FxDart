@@ -63,8 +63,7 @@ List<V?> props<K, V>(Iterable<K> propKeys, Map<K, V> map) =>
 ///
 /// Port of FxTS `compactObject`.
 Map<K, V> compactObject<K, V>(Map<K, V?> map) => {
-      for (final e in map.entries)
-        if (e.value != null) e.key: e.value as V
+      for (final e in map.entries) e.key: ?e.value
     };
 
 /// Creates a new map by running each value whose key appears in

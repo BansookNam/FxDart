@@ -23,6 +23,14 @@ typedef EitherNel<E, A> = Either<NonEmptyList<E>, A>;
 sealed class Either<L, R> {
   const Either();
 
+  /// Wraps a failure — with Dart 3.10 dot shorthands, `return .left(e)`
+  /// works wherever the context type is `Either`.
+  const factory Either.left(L value) = Left<L, R>;
+
+  /// Wraps a success — with Dart 3.10 dot shorthands, `return .right(x)`
+  /// works wherever the context type is `Either`.
+  const factory Either.right(R value) = Right<L, R>;
+
   /// Whether this is a [Left].
   bool get isLeft => this is Left<L, R>;
 

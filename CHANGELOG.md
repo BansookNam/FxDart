@@ -1,3 +1,21 @@
+## 0.7.0
+
+### Added — Dart 3.10 dot shorthands for `Either`
+
+* **`Either.left` / `Either.right`** — `const` redirecting factories on the
+  sealed base type. They exist so dot shorthands resolve: wherever the
+  context type is `Either`, you can now write `return .left(err)` /
+  `return .right(value)` — in return positions, switch-expression arms,
+  and `==` comparisons (`result == .right(3)`).
+
+### Changed
+
+* SDK floor raised from `>=3.3.0` to `>=3.10.4` (dot shorthands; also
+  null-aware collection elements, repeatable `_` wildcards, digit
+  separators). Requires a toolchain from Nov 2025 or later.
+* `compactObject` internals: the explicit null check + `as V` cast is now a
+  single null-aware map element (`e.key: ?e.value`). Behavior unchanged.
+
 ## 0.6.2
 
 ### Docs
@@ -12,7 +30,7 @@
 
 * README: added typed errors description
 
-# 0.6.0
+## 0.6.0
 
 ### Added — typed errors (the Kotlin Arrow 2.x approach, ported)
 
