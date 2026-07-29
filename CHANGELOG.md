@@ -28,6 +28,11 @@
   `Fx`/`FxAsync` chain terminals — fail-slow concurrent validation rides the
   existing `concurrent(n)` back-channel.
 
+* **New agent skill** (`skills/fxdart-typed-errors/`) teaching AI coding
+  assistants the typed-error system — when to reach for `either` blocks vs
+  plain Dart, accumulation recipes, fpdart migration mappings, and the
+  safety pitfalls. The existing `fxdart-pipelines` skill cross-references it.
+
 ### Changed
 
 * SDK floor raised from `>=3.0.0` to `>=3.3.0` (extension types).

@@ -198,6 +198,17 @@ final out = fxStream(inputStream)
   `next()` calls must start overlapping upstream pulls — awaiting the
   upstream serially silently breaks `concurrent`.
 
+## Typed errors (new in 0.6)
+
+Chains gained `Either`-aware eager terminals: `rights()`, `lefts()`,
+`separated()` → `(List<L>, List<R>)`, `sequence()` (fail-fast — the async
+variant stops pulling at the first `Left`), and
+`mapOrAccumulate(transform, concurrency: n)` — fail-slow validation that
+keeps **every** failure in input order while running k elements at a time.
+For the full typed-error system (`either((r) { ... })`, `Raise`, `ensure`,
+error accumulation, exception boundaries), load the sibling
+**`fxdart-typed-errors`** skill.
+
 ## Full API
 
 The complete operator catalog (generate / transform / filter / slice /
