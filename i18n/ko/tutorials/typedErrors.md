@@ -5,6 +5,8 @@ description: FxDart 타입 있는 에러 가이드: either 빌더, Raise 스코�
 heading: 타입 있는 에러
 section: 13
 crumb: typed errors
+next: either.html
+nextLabel: Either
 ---
   <p class="hero-sub">
     <strong>타입 있는</strong> 에러로 실패하는 일직선 코드를 작성하세요.
@@ -14,6 +16,17 @@ crumb: typed errors
   </p>
 
   {{signature}}
+
+  <div class="callout">
+    <strong>깊이 알아보기.</strong> 이 페이지는 전체 개요입니다. 각 주제마다
+    실행 가능한 데모가 담긴 상세 튜토리얼이 있습니다:
+    <a href="either.html"><code>Either</code></a> ·
+    <a href="raise.html"><code>either</code> &amp; <code>Raise</code> 스코프</a> ·
+    <a href="nullable.html"><code>nullable</code></a> ·
+    <a href="nonEmptyList.html"><code>NonEmptyList</code></a> ·
+    <a href="accumulate.html">에러 누적</a> ·
+    <a href="eitherPipelines.html"><code>Either</code> × 파이프라인</a>
+  </div>
 
   <h2>Kotlin Arrow에서 Dart로</h2>
   <p>
@@ -56,6 +69,9 @@ Either&lt;Failure, SuccessData&gt; getResult() =>
     그래서 이른 반환, 반복문, <code>if</code>가 블록 안에서 전부 그대로
     동작하고, 중첩된 빌더가 서로의 에러를 가로채는 일도 없습니다.
   </p>
+  <p>
+    <a href="either.html">깊이 알아보기: <code>Either</code> →</a>
+  </p>
 
   <h2>스코프 어휘</h2>
   <p>
@@ -96,6 +112,11 @@ switch (parsePort('8080')) {
     쌍둥이입니다 — FxDart는 nullable 우선이므로 <code>Option</code> 타입은
     없습니다.
   </p>
+  <p>
+    <a href="raise.html">깊이 알아보기: <code>either</code> &amp;
+    <code>Raise</code> 스코프 →</a> ·
+    <a href="nullable.html">깊이 알아보기: <code>nullable</code> →</a>
+  </p>
 
   <h2>첫 실패만이 아니라 모든 실패를 모으기</h2>
   <p>
@@ -116,6 +137,10 @@ switch (parsePort('8080')) {
     fail-slow로 검증합니다. <code>r.bindNel</code>은 한 분기가 여러 에러를
     한꺼번에 보태게 해 주고, <code>someEither.toEitherNel()</code>은
     fail-fast 값을 누적 스코프로 이어 줍니다.
+  </p>
+  <p>
+    <a href="accumulate.html">깊이 알아보기: 에러 누적 →</a> ·
+    <a href="nonEmptyList.html">깊이 알아보기: <code>NonEmptyList</code> →</a>
   </p>
 
   <h2>파이프라인과의 융합</h2>
@@ -138,6 +163,10 @@ final result = await fxStream(records)
     동작하며, 각 요소는 자기만의 스코프에서 실행되므로 한 요소의 실패가 다른
     요소로 새어 나갈 수 없습니다.
   </p>
+  <p>
+    <a href="eitherPipelines.html">깊이 알아보기: <code>Either</code> ×
+    파이프라인 →</a>
+  </p>
 
   <h2>예외 vs raise된 에러</h2>
   <p>
@@ -148,6 +177,10 @@ final result = await fxStream(records)
   </p>
   <pre class="code"><code>final parsed = Either.catching(() => jsonDecode(raw));       // Either&lt;Object, dynamic&gt;
 final typed  = Either.catchingWith(ParseFailure.new, () => jsonDecode(raw));</code></pre>
+  <p>
+    <a href="either.html">깊이 알아보기: <code>Either.catching</code>은
+    <code>Either</code> 페이지에 있습니다 →</a>
+  </p>
 
   <div class="callout">
     <strong>규칙 두 가지.</strong> (1) raise 블록에서 <em>지연</em>

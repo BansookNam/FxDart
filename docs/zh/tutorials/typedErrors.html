@@ -58,6 +58,17 @@
 Future&lt;Either&lt;E, A&gt;&gt; eitherAsync&lt;E, A&gt;(FutureOr&lt;A&gt; Function(Raise&lt;E&gt; r) block)
 A? nullable&lt;A&gt;(A Function(SingletonRaise r) block)</div>
 
+  <div class="callout">
+    <strong>Deep dives.</strong> This page is the overview; every subject has
+    a detailed tutorial with runnable demos:
+    <a href="either.html"><code>Either</code></a> ·
+    <a href="raise.html"><code>either</code> &amp; the <code>Raise</code> scope</a> ·
+    <a href="nullable.html"><code>nullable</code></a> ·
+    <a href="nonEmptyList.html"><code>NonEmptyList</code></a> ·
+    <a href="accumulate.html">accumulation</a> ·
+    <a href="eitherPipelines.html"><code>Either</code> × pipelines</a>
+  </div>
+
   <h2>From Kotlin Arrow to Dart</h2>
   <p>
     In Kotlin Arrow, an <code>either { }</code> block turns a chain of
@@ -99,6 +110,9 @@ Either&lt;Failure, SuccessData&gt; getResult() =>
     why early returns, loops, and <code>if</code>s all just work inside the
     block, and why nested builders never capture each other's errors.
   </p>
+  <p>
+    <a href="either.html">Deep dive: <code>Either</code> →</a>
+  </p>
 
   <h2>The scope vocabulary</h2>
   <p>
@@ -136,6 +150,11 @@ switch (parsePort('8080')) {
     <code>Either</code> — FxDart stays nullable-first, so there is no
     <code>Option</code> type.
   </p>
+  <p>
+    <a href="raise.html">Deep dive: <code>either</code> &amp; the
+    <code>Raise</code> scope →</a> ·
+    <a href="nullable.html">Deep dive: <code>nullable</code> →</a>
+  </p>
 
   <h2>Accumulate every failure, not just the first</h2>
   <p>
@@ -156,6 +175,10 @@ switch (parsePort('8080')) {
     collection fail-slow. <code>r.bindNel</code> lets one branch contribute
     several errors at once; <code>someEither.toEitherNel()</code> bridges a
     fail-fast value into an accumulating scope.
+  </p>
+  <p>
+    <a href="accumulate.html">Deep dive: accumulation →</a> ·
+    <a href="nonEmptyList.html">Deep dive: <code>NonEmptyList</code> →</a>
   </p>
 
   <h2>Fused with pipelines</h2>
@@ -178,6 +201,10 @@ final result = await fxStream(records)
     FxDart; each element runs in its own scope, so a failure in one element
     can never leak into a sibling.
   </p>
+  <p>
+    <a href="eitherPipelines.html">Deep dive: <code>Either</code> ×
+    pipelines →</a>
+  </p>
 
   <h2>Exceptions vs raised errors</h2>
   <p>
@@ -188,6 +215,10 @@ final result = await fxStream(records)
   </p>
   <pre class="code"><code>final parsed = Either.catching(() => jsonDecode(raw));       // Either&lt;Object, dynamic&gt;
 final typed  = Either.catchingWith(ParseFailure.new, () => jsonDecode(raw));</code></pre>
+  <p>
+    <a href="either.html">Deep dive: <code>Either.catching</code> lives on the
+    <code>Either</code> page →</a>
+  </p>
 
   <div class="callout">
     <strong>Two rules.</strong> (1) Never return a <em>lazy</em> pipeline from
@@ -208,6 +239,7 @@ final typed  = Either.catchingWith(ParseFailure.new, () => jsonDecode(raw));</co
 
   <nav class="tut-nav">
     <a href="../../101/index.html">← FxDart 入门</a>
+    <a href="either.html">下一节： Either →</a>
   </nav>
 </main>
 <footer class="site-footer">

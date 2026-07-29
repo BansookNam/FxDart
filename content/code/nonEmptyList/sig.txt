@@ -1,0 +1,3 @@
+extension type NonEmptyList&lt;T&gt; implements Iterable&lt;T&gt;   —   typedef Nel&lt;T&gt; = NonEmptyList&lt;T&gt;
+factory NonEmptyList.of(T head, [Iterable&lt;T&gt; tail = const []])
+static NonEmptyList&lt;T&gt;? orNull&lt;T&gt;(List&lt;T&gt; list)

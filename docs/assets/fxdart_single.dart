@@ -3257,6 +3257,732 @@ Future<List<T>> shuffleAsync<T>(FxAsyncIterable<T> iterable,
   return _shuffleList(await toListAsync(iterable), random);
 }
 
+// ---- lib/src/typed/non_empty_list.dart ----
+/// Shorthand for [NonEmptyList] (port of Arrow's `Nel` alias).
+typedef Nel<T> = NonEmptyList<T>;
+
+/// A list statically guaranteed to hold at least one element — the error
+/// carrier of the accumulation API (port of Arrow's `NonEmptyList`, which is
+/// a `value class`; the Dart analogue is an extension type: zero allocation,
+/// erased at runtime).
+///
+/// The win over `Iterable` is *cannot-throw*: [head] and `first` cannot hit
+/// an empty receiver. (Dart's `Iterable.first` is already non-nullable — it
+/// just throws on empty.)
+///
+/// **The invariant is compile-time discipline, not a runtime guarantee**:
+/// extension types erase to their representation, so `<int>[] is Nel<int>`
+/// is `true` and `<int>[] as Nel<int>` *succeeds — even for the empty list*.
+/// Constructors ([NonEmptyList.of], [orNull]) are the only sanctioned entry
+/// points; casts bypass the invariant at your own risk.
+///
+/// `==` is identity (delegates to `List.==`); use [deepEquals] for a
+/// structural comparison.
+extension type NonEmptyList<T>._(List<T> _all) implements Iterable<T> {
+  /// A non-empty list of [head] followed by [tail].
+  factory NonEmptyList.of(T head, [Iterable<T> tail = const []]) =>
+      NonEmptyList._([head, ...tail]);
+
+  /// Copies [list] into a [NonEmptyList], or `null` when it is empty.
+  static NonEmptyList<T>? orNull<T>(List<T> list) =>
+      list.isEmpty ? null : NonEmptyList._(List.of(list));
+
+  /// The first element — total, cannot throw.
+  T get head => _all.first;
+
+  /// Everything after [head]; possibly empty.
+  List<T> get tail => _all.sublist(1);
+
+  /// Transforms every element; non-emptiness is preserved in the type.
+  // ignore: annotate_redeclares
+  NonEmptyList<R> map<R>(R Function(T element) f) =>
+      NonEmptyList._([for (final e in _all) f(e)]);
+
+  /// Concatenation — non-empty + non-empty is trivially non-empty.
+  NonEmptyList<T> operator +(NonEmptyList<T> other) =>
+      NonEmptyList._([..._all, ...other._all]);
+
+  /// Element-wise equality (extension types cannot override `==`, which
+  /// stays identity via the underlying `List`).
+  bool deepEquals(NonEmptyList<T> other) {
+    if (_all.length != other._all.length) return false;
+    for (var i = 0; i < _all.length; i++) {
+      if (_all[i] != other._all[i]) return false;
+    }
+    return true;
+  }
+
+  /// A defensive copy as a plain [List].
+  // ignore: annotate_redeclares
+  List<T> toList({bool growable = true}) =>
+      List.of(_all, growable: growable);
+}
+
+// ---- lib/src/typed/raise.dart ----
+
+
+/// The typed-error capability — the heart of the Arrow-style typed error
+/// system, ported from Kotlin Arrow 2.x's `Raise<E>`.
+///
+/// A [Raise] is a *scope* in which computations may short-circuit with a
+/// typed error `E`. You never construct one yourself: builders like [either],
+/// [eitherAsync], and [nullable] create a scope, hand it to your block, and
+/// turn a raised error into their result type at the boundary.
+///
+/// ```dart
+/// Either<String, int> parse(String s) => either((r) {
+///   final n = int.tryParse(s);
+///   return r.ensureNotNull(n, () => '"$s" is not a number');
+/// });
+/// ```
+///
+/// Inside the block you write straight-line Dart; `Either` only appears at
+/// the boundary. This replaces wrapper towers (`TaskEither`, `IO`, …) and
+/// `flatMap` pyramids entirely.
+abstract interface class Raise<E> {
+  /// Short-circuits the enclosing raise scope with [error].
+  ///
+  /// Returns [Never]: Dart's flow analysis knows execution stops here, so
+  /// `value ?? r.raise(err)` promotes to non-null.
+  Never raise(E error);
+}
+
+/// Thrown when `raise` (or a closure capturing the scope) is invoked *after*
+/// its enclosing builder already returned.
+final class RaiseLeakedError extends Error {
+  @override
+  String toString() =>
+      'RaiseLeakedError: raise was called outside the lifecycle of its '
+      'either/nullable scope. Common causes: (1) the block returned a lazy '
+      'iterable (fx(...).map(...), sync*) that raises when consumed later — '
+      'materialize with toList() inside the block, or use mapOrAccumulate / '
+      'sequence terminals; (2) the Raise scope (or a closure over it) was '
+      'stored and called after the builder returned; (3) an async branch '
+      'outlived the scope after another branch raised. Make sure all raise / '
+      'bind / ensure calls happen within the lifecycle of either { }, '
+      'nullable { } or similar builders.';
+}
+
+/// Internal short-circuit signal.
+///
+/// Implements [Error] (NOT [Exception]) deliberately: the ubiquitous
+/// `on Exception catch (e)` in user code must not swallow it. This is the
+/// Dart analogue of Arrow making its signal a `CancellationException` — the
+/// one throwable idiomatic Kotlin never catches. A bare `catch (e)` still
+/// catches it (unavoidable, same as Arrow); use [catching] instead.
+final class _RaiseSignal implements Error {
+  _RaiseSignal(this.raised, this.scope);
+
+  /// The raised error value, statically guaranteed to be the scope's `E`
+  /// (see [_DefaultRaise] — the covariant parameter check enforces it).
+  final Object? raised;
+
+  /// The scope token; builders match it with `identical`.
+  final Object scope;
+
+  @override
+  StackTrace? get stackTrace => null;
+
+  @override
+  String toString() =>
+      'fxdart raise signal escaped its either/nullable scope. Did you catch '
+      'it with a bare `catch`, `Future.catchError`, `Stream.handleError`, or '
+      'leak it across an unawaited future? Use fxdart `catching` instead of '
+      'a bare catch inside raise blocks.';
+}
+
+/// Reified per-invocation scope. Generic in `E` — unlike Arrow's type-erased
+/// `DefaultRaise : Raise<Any?>`. Dart reifies type arguments, so if a scope
+/// is covariantly upcast (`Raise<String>` seen as `Raise<Object?>`) and
+/// misused, the covariant-parameter check fails AT THE `raise()` CALL SITE
+/// with a clean [TypeError] — and the `as E` cast in [foldRaise] is then
+/// provably safe.
+final class _DefaultRaise<E> implements Raise<E> {
+  bool _active = true;
+
+  @override
+  Never raise(E error) => _active
+      ? throw _RaiseSignal(error, this)
+      : throw RaiseLeakedError();
+}
+
+/// The single primitive every builder derives from — the port of Arrow's
+/// `fold` (`Fold.kt`). Runs [block] in a fresh raise scope and dispatches:
+///
+/// - normal completion → [onValue]
+/// - `raise(e)` from *this* scope → [onRaise]
+/// - a thrown exception → [onThrow] (default: rethrow)
+/// - a raise signal from a *different* scope → rethrown untouched (this is
+///   what makes nested scopes correct with no dynamic scoping)
+///
+/// Named `foldRaise` because top-level `fold` already exists in fxdart —
+/// the forced-suffix situation `WHY_CURRIED.md` blesses.
+B foldRaise<E, A, B>(
+  A Function(Raise<E> r) block, {
+  required B Function(E error) onRaise,
+  required B Function(A value) onValue,
+  B Function(Object thrown, StackTrace stackTrace)? onThrow,
+}) {
+  final scope = _DefaultRaise<E>();
+  try {
+    final result = block(scope);
+    scope._active = false;
+    return onValue(result);
+  } on _RaiseSignal catch (signal) {
+    scope._active = false;
+    if (identical(signal.scope, scope)) return onRaise(signal.raised as E);
+    rethrow;
+  } catch (thrown, stackTrace) {
+    scope._active = false;
+    if (onThrow != null) return onThrow(thrown, stackTrace);
+    rethrow;
+  }
+}
+
+/// Async twin of [foldRaise]. Sync and async are separate functions because
+/// Dart has no `inline` — the same split fxdart applies to every
+/// `op`/`opAsync` pair.
+Future<B> foldRaiseAsync<E, A, B>(
+  FutureOr<A> Function(Raise<E> r) block, {
+  required FutureOr<B> Function(E error) onRaise,
+  required FutureOr<B> Function(A value) onValue,
+  FutureOr<B> Function(Object thrown, StackTrace stackTrace)? onThrow,
+}) async {
+  final scope = _DefaultRaise<E>();
+  try {
+    final result = await block(scope);
+    scope._active = false;
+    return await onValue(result);
+  } on _RaiseSignal catch (signal) {
+    scope._active = false;
+    if (identical(signal.scope, scope)) {
+      return await onRaise(signal.raised as E);
+    }
+    rethrow;
+  } catch (thrown, stackTrace) {
+    scope._active = false;
+    if (onThrow != null) return await onThrow(thrown, stackTrace);
+    rethrow;
+  }
+}
+
+/// Runs [block] in a raise scope; a raised `E` becomes [Left], a normal
+/// return becomes [Right]. Thrown exceptions propagate (use
+/// [Either.catching] to capture them).
+///
+/// Port of Arrow's `either { }` builder.
+///
+/// ```dart
+/// final result = either<String, int>((r) {
+///   final n = r.bind(parse('42'));
+///   r.ensure(n > 0, () => 'must be positive');
+///   return n * 2;
+/// }); // Right(84)
+/// ```
+Either<E, A> either<E, A>(A Function(Raise<E> r) block) =>
+    foldRaise<E, A, Either<E, A>>(
+      block,
+      onRaise: (error) => Left(error),
+      onValue: (value) => Right(value),
+    );
+
+/// Async twin of [either]. Raise only within the same awaited chain — a
+/// raise inside an unawaited future cannot be captured and surfaces as an
+/// unhandled zone error.
+Future<Either<E, A>> eitherAsync<E, A>(
+        FutureOr<A> Function(Raise<E> r) block) =>
+    foldRaiseAsync<E, A, Either<E, A>>(
+      block,
+      onRaise: (error) => Left(error),
+      onValue: (value) => Right(value),
+    );
+
+/// The info-free raise scope used by [nullable] — the port of Arrow's
+/// `SingletonRaise` (errors carry no information).
+final class SingletonRaise implements Raise<void> {
+  SingletonRaise._(this._raise);
+
+  final Raise<void> _raise;
+
+  /// Short-circuits with no error value.
+  Never none() => _raise.raise(null);
+
+  @override
+  Never raise([void error]) => none();
+
+  /// Short-circuits unless [condition] holds.
+  void ensure(bool condition) {
+    if (!condition) none();
+  }
+
+  /// Returns [value] non-null, or short-circuits.
+  A ensureNotNull<A>(A? value) => value ?? none();
+
+  /// Unwraps a nullable, short-circuiting on `null`.
+  A bind<A>(A? value) => value ?? none();
+}
+
+/// Runs [block] in an info-free raise scope; a raise becomes `null`.
+///
+/// Port of Arrow's `nullable { }` — the nullable-first alternative to an
+/// `Option` type (`T?` is fxdart's absence channel).
+///
+/// ```dart
+/// final total = nullable((r) {
+///   final a = r.bind(int.tryParse(x));
+///   final b = r.bind(int.tryParse(y));
+///   return a + b;
+/// }); // int? — null if either parse failed
+/// ```
+A? nullable<A>(A Function(SingletonRaise r) block) => foldRaise<void, A, A?>(
+      (r) => block(SingletonRaise._(r)),
+      onRaise: (_) => null,
+      onValue: (value) => value,
+    );
+
+/// Async twin of [nullable].
+Future<A?> nullableAsync<A>(FutureOr<A> Function(SingletonRaise r) block) =>
+    foldRaiseAsync<void, A, A?>(
+      (r) => block(SingletonRaise._(r)),
+      onRaise: (_) => null,
+      onValue: (value) => value,
+    );
+
+/// Runs [block]; a thrown exception is handed to [onError]. The library's
+/// own raise signal is ALWAYS rethrown first — this is the sanctioned
+/// replacement for a bare `catch` inside raise scopes (the port of Arrow's
+/// `catch` + `nonFatalOrThrow` discipline; `catch` is a Dart reserved word,
+/// hence `catching`).
+A catching<A>(
+    A Function() block, A Function(Object error, StackTrace stackTrace) onError) {
+  try {
+    return block();
+  } on _RaiseSignal {
+    rethrow;
+  } catch (error, stackTrace) {
+    return onError(error, stackTrace);
+  }
+}
+
+/// Async twin of [catching].
+Future<A> catchingAsync<A>(FutureOr<A> Function() block,
+    FutureOr<A> Function(Object error, StackTrace stackTrace) onError) async {
+  try {
+    return await block();
+  } on _RaiseSignal {
+    rethrow;
+  } catch (error, stackTrace) {
+    return await onError(error, stackTrace);
+  }
+}
+
+/// The scope API — everything you do with the `r` a builder hands you.
+/// Scope-first by design: type `r.` and discover the whole vocabulary.
+extension RaiseOps<E> on Raise<E> {
+  /// Unwraps [either], raising its [Left].
+  A bind<A>(Either<E, A> either) => switch (either) {
+        Left(:final value) => raise(value),
+        Right(:final value) => value,
+      };
+
+  /// Unwraps every element, raising the first [Left].
+  List<A> bindAll<A>(Iterable<Either<E, A>> eithers) =>
+      [for (final e in eithers) bind(e)];
+
+  /// Raises [error] unless [condition] holds — the typed-error `require`.
+  void ensure(bool condition, E Function() error) {
+    if (!condition) raise(error());
+  }
+
+  /// Returns [value] non-null, or raises [error] — the typed-error
+  /// `requireNotNull`, with promotion via the non-null return type.
+  A ensureNotNull<A>(A? value, E Function() error) =>
+      value ?? raise(error());
+
+  /// Runs [block] in a nested scope; a raised error is handed to [onRaise]
+  /// instead of propagating. Thrown exceptions still propagate.
+  A recover<A>(A Function(Raise<E> r) block, A Function(E error) onRaise) =>
+      foldRaise<E, A, A>(block, onRaise: onRaise, onValue: (value) => value);
+
+  /// Runs [block] in a scope with a DIFFERENT error type `E2`, mapping any
+  /// raised `E2` into this scope's `E` via [transform] — the error-type
+  /// adapter (port of Arrow's `withError`).
+  A withError<E2, A>(
+          E Function(E2 error) transform, A Function(Raise<E2> r) block) =>
+      foldRaise<E2, A, A>(
+        block,
+        onRaise: (error) => raise(transform(error)),
+        onValue: (value) => value,
+      );
+}
+
+// ---- lib/src/typed/accumulate.dart ----
+
+/// A lazily-detonating box returned by [Accumulator.accumulating] — the port
+/// of Arrow's `Value<A>` trick.
+///
+/// If the branch succeeded, [value] is the result. If it (or any sibling)
+/// failed, reading [value] *raises the full accumulated error list* to the
+/// enclosing scope. Run all branches first, read values at the end:
+///
+/// ```dart
+/// final user = either<Nel<String>, User>((r) => r.accumulate((acc) {
+///   final name = acc.accumulating((r) => validateName(r, input));
+///   final age  = acc.accumulating((r) => validateAge(r, input));
+///   return User(name.value, age.value); // detonates here if anything failed
+/// }));
+/// ```
+sealed class Accumulated<A> {
+  /// The branch result — raises the accumulated errors when the branch (or a
+  /// sibling) failed.
+  A get value;
+}
+
+final class _AccumulatedOk<A> implements Accumulated<A> {
+  _AccumulatedOk(this.value);
+
+  @override
+  final A value;
+}
+
+final class _AccumulatedErr<A> implements Accumulated<A> {
+  _AccumulatedErr(this._raiseAll);
+
+  final Never Function() _raiseAll;
+
+  // A getter, never an eager field: detonation must stay lazy (Arrow's own
+  // implementation carries the same warning).
+  @override
+  A get value => _raiseAll();
+}
+
+/// The accumulating scope handed to [AccumulatingRaiseOps.accumulate] —
+/// collects errors across independent branches instead of failing fast.
+abstract interface class Accumulator<E> {
+  /// Runs [block] as an independent branch: a raise inside it is recorded
+  /// (not propagated) and an errored [Accumulated] is returned.
+  Accumulated<A> accumulating<A>(A Function(AccumulatingRaise<E> r) block);
+
+  /// Whether any branch has failed so far.
+  bool get hasErrors;
+}
+
+/// A [Raise] whose errors join a [NonEmptyList] accumulator — what
+/// accumulating branches receive, so one branch can contribute *multiple*
+/// errors (faithful to Arrow's `RaiseAccumulate`: branches get the
+/// accumulating scope, not bare `Raise`).
+abstract interface class AccumulatingRaise<E> implements Raise<E> {
+  /// Views a `Raise<NonEmptyList<E>>` as a single-error scope whose raises
+  /// are wrapped into singleton lists.
+  factory AccumulatingRaise.over(Raise<NonEmptyList<E>> raise) =
+      _AccumulatingRaiseImpl<E>;
+
+  /// Unwraps an [EitherNel], raising ALL of its errors at once.
+  A bindNel<A>(EitherNel<E, A> either);
+
+  /// Nested accumulation over [items]; all errors join this branch's raise.
+  List<B> mapOrAccumulate<A, B>(
+      Iterable<A> items, B Function(AccumulatingRaise<E> r, A item) transform);
+}
+
+final class _AccumulatingRaiseImpl<E> implements AccumulatingRaise<E> {
+  _AccumulatingRaiseImpl(this._nel);
+
+  final Raise<NonEmptyList<E>> _nel;
+
+  @override
+  Never raise(E error) => _nel.raise(NonEmptyList.of(error));
+
+  @override
+  A bindNel<A>(EitherNel<E, A> either) => _nel.bindNel(either);
+
+  @override
+  List<B> mapOrAccumulate<A, B>(Iterable<A> items,
+          B Function(AccumulatingRaise<E> r, A item) transform) =>
+      _nel.mapOrAccumulate(items, transform);
+}
+
+final class _AccumulatorImpl<E> implements Accumulator<E> {
+  _AccumulatorImpl(this._outer);
+
+  final Raise<NonEmptyList<E>> _outer;
+  final List<E> _errors = [];
+
+  @override
+  bool get hasErrors => _errors.isNotEmpty;
+
+  Never _raiseAll() => _outer.raise(NonEmptyList.orNull(_errors)!);
+
+  @override
+  Accumulated<A> accumulating<A>(A Function(AccumulatingRaise<E> r) block) =>
+      foldRaise<NonEmptyList<E>, A, Accumulated<A>>(
+        (r) => block(_AccumulatingRaiseImpl(r)),
+        onRaise: (errors) {
+          _errors.addAll(errors);
+          return _AccumulatedErr<A>(_raiseAll);
+        },
+        onValue: (value) => _AccumulatedOk(value),
+      );
+}
+
+/// The accumulation vocabulary, available on any `Raise<NonEmptyList<E>>`
+/// scope (i.e. inside `either<Nel<E>, _>(...)`) — the Arrow 2.x replacement
+/// for a `Validated` type.
+///
+/// Contract (copied from Arrow's `RaiseAccumulate`):
+/// 1. independent branches all run; errors concatenate in branch order;
+/// 2. after the first error, successful results are no longer retained —
+///    but iteration continues so ALL errors are collected;
+/// 3. reading an errored [Accumulated.value] raises the accumulated list;
+/// 4. [accumulate] raises at end-of-block whenever errors exist, even if no
+///    `.value` was ever read;
+/// 5. a branch that *throws* (rather than raises) wins over accumulation —
+///    the exception propagates out of the builder.
+extension AccumulatingRaiseOps<E> on Raise<NonEmptyList<E>> {
+  /// Opens an accumulating scope: run branches via
+  /// [Accumulator.accumulating], then combine their [Accumulated.value]s.
+  R accumulate<R>(R Function(Accumulator<E> acc) block) {
+    final acc = _AccumulatorImpl<E>(this);
+    final result = block(acc);
+    if (acc.hasErrors) acc._raiseAll();
+    return result;
+  }
+
+  /// Unwraps an [EitherNel], raising ALL of its errors at once.
+  A bindNel<A>(EitherNel<E, A> either) => switch (either) {
+        Left(:final value) => raise(value),
+        Right(:final value) => value,
+      };
+
+  /// Transforms every element of [items], collecting ALL failures instead
+  /// of stopping at the first (fail-slow). Returns the transformed list, or
+  /// raises every accumulated error.
+  List<B> mapOrAccumulate<A, B>(
+      Iterable<A> items, B Function(AccumulatingRaise<E> r, A item) transform) {
+    final errors = <E>[];
+    final results = <B>[];
+    for (final item in items) {
+      foldRaise<NonEmptyList<E>, B, void>(
+        (r) => transform(_AccumulatingRaiseImpl(r), item),
+        onRaise: (nel) => errors.addAll(nel),
+        onValue: (result) {
+          if (errors.isEmpty) results.add(result);
+        },
+      );
+    }
+    if (errors.isNotEmpty) raise(NonEmptyList.orNull(errors)!);
+    return results;
+  }
+
+  /// Runs 2 independent branches, accumulating failures, then combines the
+  /// successes. Arity capped at 5, like `Curry2..Curry5` — beyond that, use
+  /// [accumulate].
+  R zipOrAccumulate2<A, B, R>(
+    A Function(AccumulatingRaise<E> r) fa,
+    B Function(AccumulatingRaise<E> r) fb,
+    R Function(A a, B b) combine,
+  ) =>
+      accumulate((acc) {
+        final a = acc.accumulating(fa);
+        final b = acc.accumulating(fb);
+        return combine(a.value, b.value);
+      });
+
+  /// 3-ary [zipOrAccumulate2].
+  R zipOrAccumulate3<A, B, C, R>(
+    A Function(AccumulatingRaise<E> r) fa,
+    B Function(AccumulatingRaise<E> r) fb,
+    C Function(AccumulatingRaise<E> r) fc,
+    R Function(A a, B b, C c) combine,
+  ) =>
+      accumulate((acc) {
+        final a = acc.accumulating(fa);
+        final b = acc.accumulating(fb);
+        final c = acc.accumulating(fc);
+        return combine(a.value, b.value, c.value);
+      });
+
+  /// 4-ary [zipOrAccumulate2].
+  R zipOrAccumulate4<A, B, C, D, R>(
+    A Function(AccumulatingRaise<E> r) fa,
+    B Function(AccumulatingRaise<E> r) fb,
+    C Function(AccumulatingRaise<E> r) fc,
+    D Function(AccumulatingRaise<E> r) fd,
+    R Function(A a, B b, C c, D d) combine,
+  ) =>
+      accumulate((acc) {
+        final a = acc.accumulating(fa);
+        final b = acc.accumulating(fb);
+        final c = acc.accumulating(fc);
+        final d = acc.accumulating(fd);
+        return combine(a.value, b.value, c.value, d.value);
+      });
+
+  /// 5-ary [zipOrAccumulate2].
+  R zipOrAccumulate5<A, B, C, D, F, R>(
+    A Function(AccumulatingRaise<E> r) fa,
+    B Function(AccumulatingRaise<E> r) fb,
+    C Function(AccumulatingRaise<E> r) fc,
+    D Function(AccumulatingRaise<E> r) fd,
+    F Function(AccumulatingRaise<E> r) ff,
+    R Function(A a, B b, C c, D d, F f) combine,
+  ) =>
+      accumulate((acc) {
+        final a = acc.accumulating(fa);
+        final b = acc.accumulating(fb);
+        final c = acc.accumulating(fc);
+        final d = acc.accumulating(fd);
+        final f = acc.accumulating(ff);
+        return combine(a.value, b.value, c.value, d.value, f.value);
+      });
+}
+
+// ---- lib/src/typed/fx_either.dart ----
+
+
+// Typed errors fused with lazy pipelines — the part neither Arrow nor fpdart
+// has. All of these are EAGER terminals by design, which also makes them the
+// sanctioned escape from the laziness × raise hazard (never return a lazy
+// pipeline from a raise block; return one of these results instead).
+
+/// All [Right] values of [iterable], in order.
+List<R> rights<L, R>(Iterable<Either<L, R>> iterable) =>
+    [for (final e in iterable) if (e case Right(:final value)) value];
+
+/// All [Left] values of [iterable], in order.
+List<L> lefts<L, R>(Iterable<Either<L, R>> iterable) =>
+    [for (final e in iterable) if (e case Left(:final value)) value];
+
+/// Splits [iterable] into `(lefts, rights)` — the Either analogue of
+/// `partition` (port of Arrow's `separateEither`).
+(List<L>, List<R>) separateEither<L, R>(Iterable<Either<L, R>> iterable) {
+  final ls = <L>[];
+  final rs = <R>[];
+  for (final e in iterable) {
+    switch (e) {
+      case Left(:final value):
+        ls.add(value);
+      case Right(:final value):
+        rs.add(value);
+    }
+  }
+  return (ls, rs);
+}
+
+/// Collects every success into one list, failing fast on the first [Left].
+Either<L, List<R>> sequenceEither<L, R>(Iterable<Either<L, R>> iterable) {
+  final out = <R>[];
+  for (final e in iterable) {
+    switch (e) {
+      case Left(:final value):
+        return Left(value);
+      case Right(:final value):
+        out.add(value);
+    }
+  }
+  return Right(out);
+}
+
+/// Async twin of [sequenceEither]. Fail-fast: stops pulling from upstream at
+/// the first [Left].
+Future<Either<L, List<R>>> sequenceEitherAsync<L, R>(
+    FxAsyncIterable<Either<L, R>> iterable) async {
+  final out = <R>[];
+  final it = iterable.iterator;
+  var res = await it.next();
+  while (!res.done) {
+    switch (res.value) {
+      case Left(:final value):
+        return Left(value);
+      case Right(:final value):
+        out.add(value);
+    }
+    res = await it.next();
+  }
+  return Right(out);
+}
+
+/// Transforms every element of [iterable], collecting ALL failures instead
+/// of stopping at the first. The eager, pipeline-level twin of
+/// [AccumulatingRaiseOps.mapOrAccumulate].
+Either<NonEmptyList<E>, List<R>> mapOrAccumulate<E, T, R>(
+        R Function(AccumulatingRaise<E> r, T item) transform,
+        Iterable<T> iterable) =>
+    either<NonEmptyList<E>, List<R>>(
+        (r) => r.mapOrAccumulate(iterable, transform));
+
+/// Async twin of [mapOrAccumulate] — fail-slow concurrent validation.
+///
+/// Implemented by composition: each element runs in its own
+/// [eitherAsync] scope (so a raise in one element can never leak into a
+/// sibling), mapped through the existing parallel-safe `mapAsync` machinery,
+/// then folded eagerly in order. Pass [concurrency] to evaluate up to that
+/// many elements at once via the `concurrent(n)` back-channel.
+Future<Either<NonEmptyList<E>, List<R>>> mapOrAccumulateAsync<E, T, R>(
+    FutureOr<R> Function(AccumulatingRaise<E> r, T item) transform,
+    FxAsyncIterable<T> iterable,
+    {int? concurrency}) async {
+  var mapped = FxAsync(iterable).map((item) =>
+      eitherAsync<NonEmptyList<E>, R>(
+          (r) => transform(AccumulatingRaise.over(r), item)));
+  if (concurrency != null) mapped = mapped.concurrent(concurrency);
+  final errors = <E>[];
+  final results = <R>[];
+  await mapped.each((e) {
+    switch (e) {
+      case Left(:final value):
+        errors.addAll(value);
+      case Right(:final value):
+        if (errors.isEmpty) results.add(value);
+    }
+  });
+  return errors.isEmpty
+      ? Right(results)
+      : Left(NonEmptyList.orNull(errors)!);
+}
+
+/// Either-aware terminals for sync chains of `Either` values.
+extension FxEitherOps<L, R> on Fx<Either<L, R>> {
+  /// All [Right] values, in order.
+  List<R> rights() => [for (final e in this) if (e case Right(:final value)) value];
+
+  /// All [Left] values, in order.
+  List<L> lefts() => [for (final e in this) if (e case Left(:final value)) value];
+
+  /// Splits into `(lefts, rights)` — matches the `partition` record shape.
+  (List<L>, List<R>) separated() => separateEither(this);
+
+  /// Collects every success into one list, failing fast on the first [Left].
+  Either<L, List<R>> sequence() => sequenceEither(this);
+}
+
+/// Either-aware terminals for async chains of `Either` values.
+extension FxAsyncEitherOps<L, R> on FxAsync<Either<L, R>> {
+  /// Async twin of [FxEitherOps.sequence] — stops pulling on the first
+  /// [Left].
+  Future<Either<L, List<R>>> sequence() => sequenceEitherAsync(this);
+}
+
+/// Fail-slow validation over a sync chain.
+extension FxAccumulateOps<T> on Fx<T> {
+  /// Transforms every element, collecting ALL failures instead of stopping
+  /// at the first.
+  Either<NonEmptyList<E>, List<R>> mapOrAccumulate<E, R>(
+          R Function(AccumulatingRaise<E> r, T item) transform) =>
+      either<NonEmptyList<E>, List<R>>(
+          (r) => r.mapOrAccumulate(this, transform));
+}
+
+/// Fail-slow (optionally concurrent) validation over an async chain.
+extension FxAsyncAccumulateOps<T> on FxAsync<T> {
+  /// Async twin of [FxAccumulateOps.mapOrAccumulate]; pass [concurrency] to
+  /// evaluate up to that many elements at once.
+  Future<Either<NonEmptyList<E>, List<R>>> mapOrAccumulate<E, R>(
+          FutureOr<R> Function(AccumulatingRaise<E> r, T item) transform,
+          {int? concurrency}) =>
+      mapOrAccumulateAsync(transform, this, concurrency: concurrency);
+}
+
 // ---- lib/src/fx.dart (transformed: l./s./async_. -> _$NAME) ----
 
 
@@ -3779,6 +4505,175 @@ extension FxAsyncNum on FxAsync<num> {
   /// The largest value.
   Future<num> max() => _$maxAsync(this);
 }
+
+// ---- lib/src/typed/either.dart (transformed: raise_. -> _$typed* / plain) ----
+
+/// `Either<L, R>` where the failure side is a [NonEmptyList] of errors —
+/// the accumulation result type (port of Arrow's `EitherNel`).
+typedef EitherNel<E, A> = Either<NonEmptyList<E>, A>;
+
+/// A value that is either a failure [Left] of `L` or a success [Right] of
+/// `R` — the boundary type of the typed-error system (port of Arrow's
+/// `Either`, 2.x method set: curated, no `ap`/`traverse`/`Do`).
+///
+/// Sealed: `switch` over it is exhaustive without a `default` arm.
+///
+/// ```dart
+/// switch (result) {
+///   case Left(:final value):  log('failed: $value');
+///   case Right(:final value): use(value);
+/// }
+/// ```
+///
+/// Prefer building Eithers with the [_$typedEither] builder over chaining
+/// `flatMap` — inside the builder you write straight-line Dart.
+sealed class Either<L, R> {
+  const Either();
+
+  /// Whether this is a [Left].
+  bool get isLeft => this is Left<L, R>;
+
+  /// Whether this is a [Right].
+  bool get isRight => this is Right<L, R>;
+
+  /// Collapses both sides into one result.
+  T fold<T>(T Function(L left) ifLeft, T Function(R right) ifRight) =>
+      switch (this) {
+        Left(:final value) => ifLeft(value),
+        Right(:final value) => ifRight(value),
+      };
+
+  /// Transforms the success value; a [Left] passes through unchanged.
+  Either<L, T> map<T>(T Function(R value) f) => switch (this) {
+        Left(:final value) => Left(value),
+        Right(:final value) => Right(f(value)),
+      };
+
+  /// Transforms the failure value; a [Right] passes through unchanged.
+  Either<T, R> mapLeft<T>(T Function(L value) f) => switch (this) {
+        Left(:final value) => Left(f(value)),
+        Right(:final value) => Right(value),
+      };
+
+  /// Chains a dependent computation; short-circuits on [Left].
+  Either<L, T> flatMap<T>(Either<L, T> Function(R value) f) => switch (this) {
+        Left(:final value) => Left(value),
+        Right(:final value) => f(value),
+      };
+
+  /// Swaps the sides.
+  Either<R, L> swap() => switch (this) {
+        Left(:final value) => Right(value),
+        Right(:final value) => Left(value),
+      };
+
+  /// The success value, or `null` — the bridge to nullable-first code.
+  R? getOrNull() => switch (this) {
+        Left() => null,
+        Right(:final value) => value,
+      };
+
+  /// The failure value, or `null`.
+  L? leftOrNull() => switch (this) {
+        Left(:final value) => value,
+        Right() => null,
+      };
+
+  /// The success value, or the result of [orElse] applied to the failure.
+  R getOrElse(R Function(L left) orElse) => switch (this) {
+        Left(:final value) => orElse(value),
+        Right(:final value) => value,
+      };
+
+  /// Runs [action] on the failure value; returns this unchanged.
+  Either<L, R> onLeft(void Function(L value) action) {
+    if (this case Left(:final value)) action(value);
+    return this;
+  }
+
+  /// Runs [action] on the success value; returns this unchanged.
+  Either<L, R> onRight(void Function(R value) action) {
+    if (this case Right(:final value)) action(value);
+    return this;
+  }
+
+  /// Lifts the failure into a singleton [NonEmptyList] — the bridge from
+  /// fail-fast values into accumulating scopes.
+  EitherNel<L, R> toEitherNel() => switch (this) {
+        Left(:final value) => Left(NonEmptyList.of(value)),
+        Right(:final value) => Right(value),
+      };
+
+  /// Recovers from a failure inside a fresh raise scope: [transform] may
+  /// return a replacement success value or raise a new error of type `L2`.
+  /// Replaces the whole `orElse`/`handleError`/`handleErrorWith` family
+  /// (port of Arrow's `recover`).
+  Either<L2, R> recover<L2>(
+          R Function(Raise<L2> r, L error) transform) =>
+      switch (this) {
+        Right(:final value) => Right(value),
+        Left(:final value) => _$typedEither((r) => transform(r, value)),
+      };
+
+  /// Runs [block], capturing any thrown object into a [Left].
+  ///
+  /// The library's own raise signal is rethrown, never captured — the port
+  /// of Arrow's `Either.catch` + non-fatal discipline.
+  static Either<Object, R> catching<R>(R Function() block) =>
+      _$typedCatching<Either<Object, R>>(
+          () => Right(block()), (error, stackTrace) => Left(error));
+
+  /// Like [catching], but maps the thrown object to a typed failure first.
+  static Either<L, R> catchingWith<L, R>(
+          L Function(Object error, StackTrace stackTrace) onError,
+          R Function() block) =>
+      _$typedCatching<Either<L, R>>(() => Right(block()),
+          (error, stackTrace) => Left(onError(error, stackTrace)));
+}
+
+/// The failure case of [Either].
+final class Left<L, R> extends Either<L, R> {
+  /// Wraps the failure [value].
+  const Left(this.value);
+
+  /// The failure value.
+  final L value;
+
+  @override
+  bool operator ==(Object other) => other is Left && value == other.value;
+
+  @override
+  int get hashCode => Object.hash(Left, value);
+
+  @override
+  String toString() => 'Left($value)';
+}
+
+/// The success case of [Either].
+final class Right<L, R> extends Either<L, R> {
+  /// Wraps the success [value].
+  const Right(this.value);
+
+  /// The success value.
+  final R value;
+
+  @override
+  bool operator ==(Object other) => other is Right && value == other.value;
+
+  @override
+  int get hashCode => Object.hash(Right, value);
+
+  @override
+  String toString() => 'Right($value)';
+}
+
+// ---- wrappers for either.dart's raise_. prefixed calls ----
+
+Either<E, A> _$typedEither<E, A>(A Function(Raise<E> r) block) =>
+    either(block);
+A _$typedCatching<A>(A Function() block,
+        A Function(Object error, StackTrace stackTrace) onError) =>
+    catching(block, onError);
 
 // ---- wrappers for fx.dart's l./s./async_. prefixed calls ----
 

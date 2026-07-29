@@ -1,0 +1,3 @@
+A? nullable&lt;A&gt;(A Function(SingletonRaise r) block)
+Future&lt;A?&gt; nullableAsync&lt;A&gt;(FutureOr&lt;A&gt; Function(SingletonRaise r) block)
+on SingletonRaise: A bind&lt;A&gt;(A? value) · ensure(bool) · ensureNotNull(A?) · none()

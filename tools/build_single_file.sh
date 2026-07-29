@@ -31,6 +31,10 @@ FILES=(
   "lib/src/dart_aliases.dart"
   "lib/src/util/timing.dart"
   "lib/src/util/shuffle.dart"
+  "lib/src/typed/non_empty_list.dart"
+  "lib/src/typed/raise.dart"
+  "lib/src/typed/accumulate.dart"
+  "lib/src/typed/fx_either.dart"
 )
 
 # Strips lines that start with `import `, `export `, or the exact `library;`
@@ -66,6 +70,19 @@ HEADER
     s/(?<![A-Za-z0-9_])async_\.([a-zA-Z0-9_]+)/_\$$1/g;
   '
 
+  # either.dart is also special: it imports raise.dart under the `raise_`
+  # prefix because inside `class Either` the plain name `catching` would
+  # resolve to the static `Either.catching` (self-reference). Types can be
+  # de-prefixed directly; the two function references go through `_$typed*`
+  # wrappers defined below.
+  echo ""
+  echo "// ---- lib/src/typed/either.dart (transformed: raise_. -> _\$typed* / plain) ----"
+  strip_directives "$ROOT/lib/src/typed/either.dart" | perl -pe '
+    s/(?<![A-Za-z0-9_])raise_\.Raise(?![A-Za-z0-9_])/Raise/g;
+    s/(?<![A-Za-z0-9_])raise_\.either(?![A-Za-z0-9_])/_\$typedEither/g;
+    s/(?<![A-Za-z0-9_])raise_\.catching(?![A-Za-z0-9_])/_\$typedCatching/g;
+  '
+
   # Wrapper section: every `_$NAME` used above, defined as a small top-level
   # delegating function. At top level the plain names resolve to the
   # top-level functions from the concatenated files (not to Fx/FxAsync
@@ -78,6 +95,14 @@ HEADER
   # lines / `this._inner`), cross-checked against each function's signature
   # in the lib/src source files.
   cat <<'WRAPPERS'
+
+// ---- wrappers for either.dart's raise_. prefixed calls ----
+
+Either<E, A> _$typedEither<E, A>(A Function(Raise<E> r) block) =>
+    either(block);
+A _$typedCatching<A>(A Function() block,
+        A Function(Object error, StackTrace stackTrace) onError) =>
+    catching(block, onError);
 
 // ---- wrappers for fx.dart's l./s./async_. prefixed calls ----
 

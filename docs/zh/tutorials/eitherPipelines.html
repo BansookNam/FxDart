@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Either × pipelines — FxDart 101</title>
+  <meta name="description" content="FxDart tutorial on typed errors fused with pipelines: rights, lefts, separated, fail-fast sequence and fail-slow mapOrAccumulate with concurrency.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/eitherPipelines.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/eitherPipelines.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/eitherPipelines.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/eitherPipelines.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/eitherPipelines.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/eitherPipelines.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/eitherPipelines.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/eitherPipelines.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/eitherPipelines.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">首页</a>
+      <a href="../101/index.html">FxDart 入门</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API 教程</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="语言">
+      <span class="lang-label">语言</span>
+      <ul>
+        <li><a href="../../tutorials/eitherPipelines.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/eitherPipelines.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/eitherPipelines.html" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">简体中文</a></li>
+        <li><a href="../../ja/tutorials/eitherPipelines.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/eitherPipelines.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/eitherPipelines.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/eitherPipelines.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">本页尚未翻译，因此以英文显示。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">参与翻译</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 入门</a> › 章节 13 · Typed errors › <strong>Either × pipelines</strong></p>
+  <h1><code>Either</code> × pipelines</h1>
+  <p class="hero-sub">
+    Typed errors fused with FxDart's lazy, concurrency-aware pipelines — the
+    part neither Arrow nor any Dart FP library has.
+  </p>
+
+  <div class="signature">on Fx&lt;Either&lt;L, R&gt;&gt;: rights() · lefts() · separated() · sequence()
+on Fx&lt;T&gt; / FxAsync&lt;T&gt;: Either&lt;Nel&lt;E&gt;, List&lt;R&gt;&gt; mapOrAccumulate(transform, {concurrency})</div>
+
+  <h2>Lecture</h2>
+  <p>
+    A chain of <code>Either</code> values gets Either-aware
+    <em>terminals</em>: <code>rights()</code> and <code>lefts()</code> keep
+    one side, <code>separated()</code> splits both at once (same record shape
+    as <code>partition</code>), and <code>sequence()</code> is
+    all-or-nothing — every success collected into one list, failing
+    <em>fast</em> on the first <code>Left</code>. Because the pipeline is
+    lazy, fail-fast is literal: <code>sequence()</code> stops <em>pulling</em>
+    at the first failure, so later elements are never computed.
+  </p>
+  <p>
+    The fail-slow twin is <code>mapOrAccumulate(transform)</code> on any
+    <code>fx()</code>/async chain: validate every element, keep every
+    failure. On async chains it takes <code>concurrency:&nbsp;n</code> and
+    rides the same <code>concurrent(n)</code> back-channel as the rest of
+    FxDart — n elements in flight, results in order, and each element runs in
+    its own scope, so a failure in one can never leak into a sibling.
+  </p>
+  <p>
+    All of these are <em>eager</em> by design, which also makes them the
+    sanctioned escape from the laziness × raise hazard: never return a lazy
+    pipeline from a raise block — return one of these results instead.
+  </p>
+
+  <h2>Demo 1 · rights, lefts &amp; separated</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Either<String, int> parse(String s) => either(
+    (r) => r.ensureNotNull(int.tryParse(s), () => '"$s" is not a number'));
+
+void main() {
+  final raw = ['1', 'x', '3', 'y'];
+
+  // A chain of Either values gets eager, Either-aware terminals:
+  print(fx(raw).map(parse).rights()); // [1, 3]
+  print(fx(raw).map(parse).lefts());
+  // ["x" is not a number, "y" is not a number]
+
+  // separated() splits both at once — same record shape as partition:
+  final (failures, numbers) = fx(raw).map(parse).separated();
+  print(numbers); // [1, 3]
+  print(failures); // ["x" is not a number, "y" is not a number]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · sequence — fail-fast, literally</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Either<String, int> parse(String s) => either(
+    (r) => r.ensureNotNull(int.tryParse(s), () => '"$s" is not a number'));
+
+void main() {
+  // sequence(): all-or-nothing. Every success collected into one list…
+  print(fx(['1', '2', '3']).map(parse).sequence()); // Right([1, 2, 3])
+
+  // …failing FAST on the first Left. The pipeline is lazy, so it stops
+  // pulling: '3' is never even parsed (watch the peek log).
+  final result = fx(['1', 'x', '3'])
+      .peek((s) => print('parsing $s'))
+      .map(parse)
+      .sequence();
+  print(result); // parsing 1 / parsing x — then Left("x" is not a number)
+}
+</textarea>
+  </div>
+
+  <h2>Demo 3 · concurrent fail-slow validation</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<String> fetchUser(int id) async {
+  await sleep(const Duration(milliseconds: 100));
+  return 'user$id';
+}
+
+Future<void> main() async {
+  // Fail-slow validation over an async chain, 3 elements in flight at a
+  // time — results stay in order, and EVERY failure is collected.
+  final sw = Stopwatch()..start();
+  final ok = await fx([1, 2, 3, 4, 5, 6])
+      .toAsync()
+      .mapOrAccumulate<String, String>((r, id) async {
+    return await fetchUser(id);
+  }, concurrency: 3);
+  print(ok); // Right([user1, user2, user3, user4, user5, user6])
+  print('6 fetches, ~${sw.elapsedMilliseconds ~/ 100 * 100}ms'); // ~200ms
+
+  final bad = await fx([1, 2, 3, 4, 5, 6])
+      .toAsync()
+      .mapOrAccumulate<String, String>((r, id) async {
+    r.ensure(id.isOdd, () => 'id $id is even');
+    return await fetchUser(id);
+  }, concurrency: 3);
+  print(bad); // Left([id 2 is even, id 4 is even, id 6 is even])
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>
+    Exercise: sum what parsed, report what didn't.
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Either<String, int> parse(String s) => either(
+    (r) => r.ensureNotNull(int.tryParse(s), () => '"$s" is not a number'));
+
+void main() {
+  final raw = ['10', '20', 'x', '40'];
+  final parsed = fx(raw).map(parse);
+
+  // TODO: print the SUM of the successfully-parsed numbers (hint: sum()).
+  print(parsed.rights()); // expect: 70
+
+  // TODO: then report every failure.
+  print(<String>[]); // expect: ["x" is not a number]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="accumulate.html">accumulation</a> — the scope-level fail-slow vocabulary ·
+    <a href="concurrent.html"><code>concurrent</code></a> — the back-channel the async variant rides ·
+    <a href="partition.html"><code>partition</code></a> — <code>separated()</code>'s predicate cousin ·
+    <a href="typedErrors.html">typed errors — full guide</a>
+  </div>
+
+  <nav class="tut-nav">
+    <a href="accumulate.html">← 上一节： accumulation</a>
+    <a href="namingOfTypedErrors.html">下一节： the naming rationale →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart 是 <a href="https://github.com/marpple/FxTS">FxTS</a> 的移植版本。特别感谢 <strong>Indong Yoo</strong>（Marpple CTO）与 FxTS 团队，本库的设计思路、语义和测试套件均源于他们的工作。</p>
+  <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 运行","pgReset":"重置","pgCompiling":"编译中…","pgCompileError":"编译错误","pgError":"错误","pgLoading":"正在加载运行时…","pgRunning":"运行中…","pgNoOutput":"（无输出）","pgLoadFailed":"无法加载 FxDart 库"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

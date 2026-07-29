@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>nullable — FxDart 101</title>
+  <meta name="description" content="FxDart nullable tutorial: the nullable and nullableAsync builders — straight-line unwrapping of nullable values, the nullable-first alternative to an Option type.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/nullable.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/nullable.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/nullable.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/nullable.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/nullable.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/nullable.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/nullable.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/nullable.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/nullable.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Início</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../tutorials/nullable.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/nullable.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/nullable.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/nullable.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/nullable.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/nullable.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="../../ru/tutorials/nullable.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 13 · Typed errors › <strong>nullable</strong></p>
+  <h1><code>nullable</code></h1>
+  <p class="hero-sub">
+    Runs a block in an info-free raise scope: any short-circuit makes the
+    whole block evaluate to <code>null</code>. The nullable-first alternative
+    to an <code>Option</code> type.
+  </p>
+
+  <div class="signature">A? nullable&lt;A&gt;(A Function(SingletonRaise r) block)
+Future&lt;A?&gt; nullableAsync&lt;A&gt;(FutureOr&lt;A&gt; Function(SingletonRaise r) block)
+on SingletonRaise: A bind&lt;A&gt;(A? value) · ensure(bool) · ensureNotNull(A?) · none()</div>
+
+  <h2>Lecture</h2>
+  <p>
+    When the only failure information you need is <em>absence</em>, an
+    <code>Either</code> is overkill — Dart already has a dedicated absence
+    channel: <code>T?</code>. <code>nullable</code> is the
+    <a href="raise.html"><code>either</code> builder</a>'s info-free twin
+    (the port of Arrow's <code>nullable&nbsp;{&nbsp;}</code>): the scope's
+    <code>r.bind(value)</code> unwraps a nullable, and if it's
+    <code>null</code> the whole block returns <code>null</code>.
+  </p>
+  <p>
+    Compared to chaining <code>?.</code> and <code>??</code>, the win is that
+    <em>any</em> step can bail out — a lookup, a parse, a condition via
+    <code>r.ensure(cond)</code> — without nesting, and intermediate values
+    stay promoted and non-null. This is why FxDart ships no
+    <code>Option</code>/<code>Maybe</code> type: <code>T?</code> plus this
+    builder covers it, with zero wrapping.
+  </p>
+
+  <h2>Demo 1 · bind on tryParse</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+int? addStrings(String x, String y) => nullable((r) {
+  final a = r.bind(int.tryParse(x)); // unwraps, or the block returns null
+  final b = r.bind(int.tryParse(y));
+  return a + b;
+});
+
+void main() {
+  print(addStrings('1', '2')); // 3
+  print(addStrings('1', 'nope')); // null
+  print(addStrings('one', '2')); // null
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · deep lookups without ?. staircases</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+const configs = {
+  'prod': {'host': 'example.com', 'port': '443'},
+  'dev': {'host': 'localhost', 'port': 'auto'},
+};
+
+// Every fallible hop is one r.bind — no `?.` staircases, no `??` towers,
+// and unlike `?.` you can also assert conditions along the way.
+int? port(String env) => nullable((r) {
+  final cfg = r.ensureNotNull(configs[env]);
+  final n = r.bind(int.tryParse(r.bind(cfg['port'])));
+  r.ensure(n > 0);
+  return n;
+});
+
+void main() {
+  print(port('prod')); // 443
+  print(port('dev')); // null — 'auto' is not a number
+  print(port('staging')); // null — no such environment
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>
+    Exercise: <code>lastSeen['lee']</code> exists but holds <code>null</code>,
+    and <code>'park'</code> is missing entirely — <code>r.bind</code> treats
+    both as absence. Fix <code>describe</code> so both print
+    <code>null</code>.
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+const Map<String, int?> lastSeen = {'kim': 1721900000, 'lee': null};
+
+String? describe(String name) => nullable((r) {
+  // TODO: use r.bind so a missing user AND a null timestamp both make
+  // the whole block return null (right now 'lee' prints a lie).
+  final ts = lastSeen[name];
+  return '$name was last seen at $ts';
+});
+
+void main() {
+  print(describe('kim')); // expect: kim was last seen at 1721900000
+  print(describe('lee')); // expect: null
+  print(describe('park')); // expect: null
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="raise.html"><code>either</code> builder</a> — when the failure needs a reason ·
+    <a href="either.html"><code>Either</code></a> — <code>getOrNull()</code> bridges back to nullable ·
+    <a href="compact.html"><code>nonNulls</code></a> — drop nulls from a pipeline ·
+    <a href="typedErrors.html">typed errors — full guide</a>
+  </div>
+
+  <nav class="tut-nav">
+    <a href="raise.html">← Anterior: either &amp; Raise</a>
+    <a href="nonEmptyList.html">Próximo: NonEmptyList →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

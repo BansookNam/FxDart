@@ -1,0 +1,3 @@
+sealed class Either&lt;L, R&gt; — Left(L value) | Right(R value)
+T fold&lt;T&gt;(T Function(L left) ifLeft, T Function(R right) ifRight)
+static Either&lt;Object, R&gt; Either.catching&lt;R&gt;(R Function() block)

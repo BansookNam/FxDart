@@ -141,6 +141,12 @@
     {"href": "createSeededRandom.html", "label": "createSeededRandom"}
   ],
   "13": [
-    {"href": "typedErrors.html", "label": "typed errors — full guide"}
+    {"href": "typedErrors.html", "label": "typed errors — full guide"},
+    {"href": "either.html", "label": "Either"},
+    {"href": "raise.html", "label": "either &amp; Raise scope"},
+    {"href": "nullable.html", "label": "nullable"},
+    {"href": "nonEmptyList.html", "label": "NonEmptyList (Nel)"},
+    {"href": "accumulate.html", "label": "accumulation (zipOrAccumulate, …)"},
+    {"href": "eitherPipelines.html", "label": "Either × pipelines"}
   ]
 }
