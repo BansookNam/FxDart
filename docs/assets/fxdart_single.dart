@@ -2523,8 +2523,7 @@ List<V?> props<K, V>(Iterable<K> propKeys, Map<K, V> map) =>
 ///
 /// Port of FxTS `compactObject`.
 Map<K, V> compactObject<K, V>(Map<K, V?> map) => {
-      for (final e in map.entries)
-        if (e.value != null) e.key: e.value as V
+      for (final e in map.entries) e.key: ?e.value
     };
 
 /// Creates a new map by running each value whose key appears in
@@ -4529,6 +4528,14 @@ typedef EitherNel<E, A> = Either<NonEmptyList<E>, A>;
 /// `flatMap` — inside the builder you write straight-line Dart.
 sealed class Either<L, R> {
   const Either();
+
+  /// Wraps a failure — with Dart 3.10 dot shorthands, `return .left(e)`
+  /// works wherever the context type is `Either`.
+  const factory Either.left(L value) = Left<L, R>;
+
+  /// Wraps a success — with Dart 3.10 dot shorthands, `return .right(x)`
+  /// works wherever the context type is `Either`.
+  const factory Either.right(R value) = Right<L, R>;
 
   /// Whether this is a [Left].
   bool get isLeft => this is Left<L, R>;

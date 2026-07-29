@@ -43,6 +43,18 @@ nextLabel: either &amp; Raise
   <h2>Demo 2 · fold, map, mapLeft, flatMap</h2>
   {{playground:1}}
 
+  <h2>Demo 3 · dot shorthands (Dart ≥ 3.10)</h2>
+  <p>
+    <code>Either</code> carries <code>const</code> factories
+    <code>Either.left</code> / <code>Either.right</code> so Dart 3.10
+    <em>dot shorthands</em> resolve against it: wherever the context type is
+    already <code>Either</code> — a return position, a switch-expression arm,
+    the right side of <code>==</code> — you can drop the type name and write
+    <code>.left(error)</code> / <code>.right(value)</code>. Same objects as
+    <code>Left(…)</code> / <code>Right(…)</code>, just inferred from context.
+  </p>
+  {{playground:3}}
+
   <h2>Try it yourself</h2>
   <p>
     Exceptions and typed errors stay strictly separated: a <em>thrown</em>

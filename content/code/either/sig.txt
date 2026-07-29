@@ -1,3 +1,4 @@
 sealed class Either&lt;L, R&gt; — Left(L value) | Right(R value)
+const factory Either.left(L value) | Either.right(R value) — dot-shorthand targets (Dart ≥ 3.10)
 T fold&lt;T&gt;(T Function(L left) ifLeft, T Function(R right) ifRight)
 static Either&lt;Object, R&gt; Either.catching&lt;R&gt;(R Function() block)
