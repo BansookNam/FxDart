@@ -1,11 +1,11 @@
 ---
 name: fxdart-typed-errors
-description: Use when writing Dart error handling: functions that can fail with domain errors, validation that should report every problem (not just the first), replacing exceptions-as-control-flow or null-with-no-reason returns, or migrating fpdart/dartz Either/TaskEither code. fxdart 0.6's Raise/either gives typed errors as straight-line code — no flatMap chains, no wrapper types.
+description: Use when writing Dart error handling: functions that can fail with domain errors, validation that should report every problem (not just the first), replacing exceptions-as-control-flow or null-with-no-reason returns, or migrating fpdart/dartz Either/TaskEither code. fxdart's Raise/either gives typed errors as straight-line code — no flatMap chains, no wrapper types.
 ---
 
 # fxdart typed errors
 
-fxdart 0.6 ports the **approach of Kotlin Arrow 2.x** to Dart: a
+fxdart ports the **approach of Kotlin Arrow 2.x** to Dart: a
 `Raise<E>` scope in which straight-line code can short-circuit with a
 *typed* error. `Either` appears only at function boundaries — never as a
 wrapper you `flatMap` through. Zero runtime dependencies; requires
@@ -149,7 +149,7 @@ blocks.
 
 ## Replace this with that
 
-| Hand-rolled / fpdart pattern | fxdart 0.6 |
+| Hand-rolled / fpdart pattern | fxdart |
 |---|---|
 | `throw`/`try`/`catch` as control flow for expected failures | `either((r) { ... r.raise(err) ... })` |
 | Return `null` with the failure reason lost | `Either<Failure, T>` via `either` |

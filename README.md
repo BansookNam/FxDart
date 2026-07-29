@@ -36,7 +36,7 @@ programming model, rebuilt on Dart's type system.
 - **One mental model for sync and async** — the same operator names work on
   `Iterable` (sync) and `FxAsyncIterable` (async), with `Stream` bridges in both
   directions.
-- **Typed errors** (new in 0.6) — Kotlin Arrow 2.x's `Raise`/`Either` approach,
+- **Typed errors** — Kotlin Arrow 2.x's `Raise`/`Either` approach,
   ported: straight-line `either` blocks instead of `flatMap` pyramids, error
   accumulation with `NonEmptyList`, and validation fused directly into the
   concurrent pipelines above.
@@ -53,7 +53,7 @@ anything reading `.agents/skills/` — when and how to use fxdart:
 
 - `skills/fxdart-pipelines/` — collections, concurrent Futures, Streams, and
   complex flow logic.
-- `skills/fxdart-typed-errors/` — the 0.6 typed-error system: `either`
+- `skills/fxdart-typed-errors/` — the typed-error system: `either`
   blocks, error accumulation, and Either-aware pipeline validation.
 
 Install it with the community [`skills`](https://pub.dev/packages/skills) CLI
@@ -141,7 +141,7 @@ ordering guarantee). This back-channel protocol is why fxdart has its own
 `FxAsyncIterable` instead of building on push-based `Stream`s, which cannot
 express it.
 
-### Typed errors (0.6)
+### Typed errors
 
 The `either` builder runs a block in a `Raise<E>` scope: each `r.bind` unwraps
 a success or short-circuits the whole block with a **typed** failure — the

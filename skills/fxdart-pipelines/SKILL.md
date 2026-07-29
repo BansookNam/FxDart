@@ -198,7 +198,7 @@ final out = fxStream(inputStream)
   `next()` calls must start overlapping upstream pulls — awaiting the
   upstream serially silently breaks `concurrent`.
 
-## Typed errors (new in 0.6)
+## Typed errors
 
 Chains gained `Either`-aware eager terminals: `rights()`, `lefts()`,
 `separated()` → `(List<L>, List<R>)`, `sequence()` (fail-fast — the async

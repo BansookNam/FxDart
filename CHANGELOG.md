@@ -1,3 +1,11 @@
+## 0.6.2
+
+### Docs
+
+* Version-agnostic wording across README, the docs site, and the agent
+  skills: feature descriptions no longer name the release that introduced
+  them (versions live here in the CHANGELOG).
+
 ## 0.6.1
 
 ### Docs

@@ -22,7 +22,7 @@
   "section11": "비동기 &amp; 동시성",
   "section11Blurb": "FxAsyncIterable 모델 — FxDart의 강점.",
   "section13": "타입 있는 에러",
-  "section13Blurb": "0.6 신기능 — Kotlin Arrow의 접근 방식을 이식: <code>either</code>, <code>Raise</code>, <code>bind</code>, <code>ensure</code>, <code>Nel</code>을 이용한 에러 누적, 그리고 파이프라인과 융합된 검증. 일직선 코드, 타입 있는 실패, 래퍼 타워 없음.",
+  "section13Blurb": "Kotlin Arrow의 접근 방식을 이식: <code>either</code>, <code>Raise</code>, <code>bind</code>, <code>ensure</code>, <code>Nel</code>을 이용한 에러 누적, 그리고 파이프라인과 융합된 검증. 일직선 코드, 타입 있는 실패, 래퍼 타워 없음.",
   "section12": "유틸",
   "section12Blurb": "속도 제한과 난수."
 }

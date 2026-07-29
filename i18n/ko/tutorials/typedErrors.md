@@ -10,7 +10,7 @@ nextLabel: Either
 ---
   <p class="hero-sub">
     <strong>타입 있는</strong> 에러로 실패하는 일직선 코드를 작성하세요.
-    FxDart 0.6 신기능 — Kotlin
+    Kotlin
     <a href="https://arrow-kt.io" rel="noopener">Arrow&nbsp;2.x</a>의 접근
     방식을 Dart로 이식했습니다.
   </p>
@@ -41,7 +41,7 @@ fun getResult(): Either&lt;Failure, SuccessData&gt; = either {
     val total = calculateTotal(order).bind()
     SuccessData(user, order, total)
 }</code></pre>
-  <p>FxDart 0.6은 Dart에서 같은 모양을 제공합니다:</p>
+  <p>FxDart는 Dart에서 같은 모양을 제공합니다:</p>
   <pre class="code"><code>// FxDart
 Either&lt;Failure, SuccessData&gt; getResult() => either((r) {
   final user  = r.bind(findUser(userId));

@@ -10,7 +10,7 @@ nextLabel: Either
 ---
   <p class="hero-sub">
     Write straight-line code that fails with a <strong>typed</strong> error.
-    New in FxDart 0.6 — the approach of Kotlin's
+    The approach of Kotlin's
     <a href="https://arrow-kt.io" rel="noopener">Arrow&nbsp;2.x</a>, ported to
     Dart.
   </p>
@@ -41,7 +41,7 @@ fun getResult(): Either&lt;Failure, SuccessData&gt; = either {
     val total = calculateTotal(order).bind()
     SuccessData(user, order, total)
 }</code></pre>
-  <p>FxDart 0.6 gives you the same shape in Dart:</p>
+  <p>FxDart gives you the same shape in Dart:</p>
   <pre class="code"><code>// FxDart
 Either&lt;Failure, SuccessData&gt; getResult() => either((r) {
   final user  = r.bind(findUser(userId));
