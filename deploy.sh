@@ -76,7 +76,9 @@ dart run tool/build_docs.dart --status
 # push, commit them yourself first. This also leaves the untracked
 # example/_snip_*.dart scratch files alone.
 step "Staging changes"
-git add docs content i18n tool tools deploy.sh DEPLOY.md
+# benchmark/ is included because benchmark/results/results.json is a
+# build_docs input (the per-page Benchmark sections render from it).
+git add docs content i18n tool tools benchmark deploy.sh DEPLOY.md
 
 if git diff --cached --quiet; then
   echo "nothing to deploy — docs/ is already up to date."

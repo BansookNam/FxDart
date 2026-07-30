@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2cae938658e29016">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=19182d43db0b4d3e">
 </head>
 <body>
 <header class="site-header">
@@ -93,7 +93,7 @@ Iterable&lt;B&gt; flatMap&lt;A, B&gt;(...)        // FxTS alias</div>
   <h2>Demo 1 · Fundamentos</h2>
   <p>El callback debe devolver un <code>Iterable</code>: aquí, una lista de
     2 elementos y una llamada a <code>String.split</code>:</p>
-  <div class="playground" data-pg="af3631dc3fd6df36">
+  <div class="playground" data-pg="1afcbc27e588b379">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -118,7 +118,7 @@ void main() {
     Pon el <code>await</code> lento en una etapa <code>.map(...).concurrent(n)</code>
     y deja que <code>expand</code> aplane los resultados de forma síncrona:
   </p>
-  <div class="playground" data-pg="52dbb79ce5325b03">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -145,7 +145,7 @@ Future<void> main() async {
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: usa <code>expand</code> para partir cada frase en palabras,
     produciendo una única lista plana de palabras.</p>
-  <div class="playground" data-pg="0c0a42e1a6962231">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -179,7 +179,7 @@ void main() {
   <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=2cae938658e29016";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=19182d43db0b4d3e";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

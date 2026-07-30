@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2cae938658e29016">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=19182d43db0b4d3e">
 </head>
 <body>
 <header class="site-header">
@@ -77,7 +77,7 @@ FxAsync&lt;T&gt; FxAsync.take(int count)</div>
   <h2>Demo 1 · Basics, and taking from an infinite source</h2>
   <p><code>cycle</code> repeats its input forever — without
     <code>take</code>, iterating it would never finish:</p>
-  <div class="playground" data-pg="1717114a486c3826">
+  <div class="playground" data-pg="afcc9449e458fcc1">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -98,7 +98,7 @@ void main() {
     upstream still evaluates them 3-at-a-time — <code>take</code> doesn't
     force everything sequential:
   </p>
-  <div class="playground" data-pg="a70d9a26aaec3a67">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -122,7 +122,7 @@ Future<void> main() async {
 
   <h2>Try it yourself</h2>
   <p>Exercise: take only the first 3 names from the queue.</p>
-  <div class="playground" data-pg="0fe3c053ffa9cf43">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -155,7 +155,7 @@ void main() {
   <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=2cae938658e29016";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=19182d43db0b4d3e";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2cae938658e29016">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=19182d43db0b4d3e">
 </head>
 <body>
 <header class="site-header">
@@ -78,7 +78,7 @@ FxAsync&lt;R&gt; FxAsync.mapEffect&lt;R&gt;(FutureOr&lt;R&gt; Function(T a) f)</
   <h2>Demo 1 · Basics</h2>
   <p>The callback both records a side effect and returns a transformed value —
     same shape as <code>map</code>, different intent at the call site:</p>
-  <div class="playground" data-pg="f2578c28436b3c2e">
+  <div class="playground" data-pg="4dd9bbd97d7cf0d7">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -107,7 +107,7 @@ void main() {
     <code>mapAsync</code>, so <code>.concurrent(n)</code> parallelizes it the
     same way — handy for "process and persist" pipelines:
   </p>
-  <div class="playground" data-pg="ef4cb9d613a4f282">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -138,7 +138,7 @@ Future<void> main() async {
   <p>Exercise: use <code>mapEffect</code> to <code>print</code> a
     <code>'billing $&lt;dollars&gt;'</code> line for each amount while
     converting cents to dollars.</p>
-  <div class="playground" data-pg="64ef4d86575ea371">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -172,7 +172,7 @@ void main() {
   <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 运行","pgReset":"重置","pgCompiling":"编译中…","pgCompileError":"编译错误","pgError":"错误","pgLoading":"正在加载运行时…","pgRunning":"运行中…","pgNoOutput":"（无输出）","pgLoadFailed":"无法加载 FxDart 库"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=2cae938658e29016";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=19182d43db0b4d3e";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2cae938658e29016">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=19182d43db0b4d3e">
 </head>
 <body>
 <header class="site-header">
@@ -76,7 +76,7 @@ FxAsync&lt;T&gt; FxAsync.concurrentPool(int length)        // chain</div>
   <h2>데모 1 · 완료 순서</h2>
   <p>항목 1이 가장 느리고(300ms) 항목 2가 가장 빠릅니다(100ms). 결과는
     <code>.toList()</code>에서 곧바로 빠른 것부터 나옵니다.</p>
-  <div class="playground" data-pg="d1f096c71c78e72c">
+  <div class="playground" data-pg="0bbd001010f49ce9">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -99,7 +99,7 @@ Future<void> main() async {
   <h2>데모 2 · concurrent와의 비교</h2>
   <p>지연 시간도 같고 풀 크기도 3으로 같습니다. 차이는 오직 결과가 도착하는
     순서뿐입니다.</p>
-  <div class="playground" data-pg="f1137d02e5864fed">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -135,7 +135,7 @@ Future<void> main() async {
   <p>연습: 풀 크기가 1인 이 코드는 항목을 시작 순서대로 하나씩 처리합니다.
     3으로 올려 세 개가 동시에 경쟁하게 만들고, 출력 순서가 완료 순서로
     바뀌는 것을 확인해 보세요.</p>
-  <div class="playground" data-pg="c9763eae319a843b">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -179,7 +179,7 @@ Future<void> main() async {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=2cae938658e29016";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=19182d43db0b4d3e";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

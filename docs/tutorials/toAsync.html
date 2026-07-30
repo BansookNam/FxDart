@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../assets/fxdart_single.dart?v=2cae938658e29016">
+  <link rel="prefetch" href="../assets/fxdart_single.dart?v=19182d43db0b4d3e">
 </head>
 <body>
 <header class="site-header">
@@ -88,7 +88,7 @@ FxAsync&lt;T&gt; Fx.toAsync&lt;T&gt;()        // chain, on a sync Fx</div>
   <h2>Demo 1 · Values, Futures, and the chain form</h2>
   <p><code>toAsync</code> accepts plain values, Futures, or a mix of both —
     and the chain form does the same thing from an existing <code>Fx</code>:</p>
-  <div class="playground" data-pg="a3390a326e67a3d6">
+  <div class="playground" data-pg="b9d0a1f52275abbf">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -122,7 +122,7 @@ Future<void> main() async {
     one new Future per element only when it's <em>pulled</em> — lazily, one at
     a time, unless you add <code>concurrent(n)</code>:
   </p>
-  <div class="playground" data-pg="5aeab01ac9d6d8d0">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -157,7 +157,7 @@ Future<void> main() async {
   <h2>Try it yourself</h2>
   <p>Exercise: filter the list below so only passing scores (&gt;= 60) make
     it into the result.</p>
-  <div class="playground" data-pg="885edb9b0458b659">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -191,7 +191,7 @@ Future<void> main() async {
   <p>Playground compiles via the DartPad compile service. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Run","pgReset":"Reset","pgCompiling":"Compiling…","pgCompileError":"Compile error","pgError":"Error","pgLoading":"Loading runtime…","pgRunning":"Running…","pgNoOutput":"(no output)","pgLoadFailed":"Could not load the FxDart library"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=2cae938658e29016";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=19182d43db0b4d3e";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2cae938658e29016">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=19182d43db0b4d3e">
 </head>
 <body>
 <header class="site-header">
@@ -83,7 +83,7 @@ class Throttled&lt;T&gt; {
   <h2>Demo 1 · Leading + trailing (the default)</h2>
   <p>The first call fires immediately; the last call in the window fires
     again once the window closes:</p>
-  <div class="playground" data-pg="47dd5b328e05ea12">
+  <div class="playground" data-pg="1581dae6b8670215">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -112,7 +112,7 @@ Future<void> main() async {
     <code>trailing</code> for leading-only, or call <code>.cancel()</code> to
     drop a pending trailing call:
   </p>
-  <div class="playground" data-pg="046138624e5fedb8">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -156,7 +156,7 @@ Future<void> main() async {
   <p>Exercise: wrap <code>onClick</code> in <code>throttle</code> (100ms
     wait) so rapid clicks register at most twice — leading and trailing —
     instead of three separate times.</p>
-  <div class="playground" data-pg="196e8074c5e195ea">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -195,7 +195,7 @@ Future<void> main() async {
   <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=2cae938658e29016";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=19182d43db0b4d3e";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

@@ -71,6 +71,36 @@
   "cmpFilterFn": "filter by function name…",
   "@cmpFilterFn": { "description": "Placeholder of the text box that filters comparison examples by FxDart function name. Function names themselves are never translated." },
 
+  "cmpBenchTitle": "Benchmark",
+  "@cmpBenchTitle": { "description": "Heading of the performance benchmark section on a comparison page." },
+
+  "cmpBenchTime": "Time",
+  "@cmpBenchTime": { "description": "Label of the benchmark chart comparing execution time." },
+
+  "cmpBenchMemory": "Peak memory",
+  "@cmpBenchMemory": { "description": "Label of the benchmark chart comparing peak process memory (RSS)." },
+
+  "cmpBenchWinNative": "Native wins",
+  "@cmpBenchWinNative": { "description": "Benchmark badge: the plain-Dart implementation measured faster / lighter." },
+
+  "cmpBenchWinFxdart": "FxDart wins",
+  "@cmpBenchWinFxdart": { "description": "Benchmark badge: the FxDart implementation measured faster / lighter. 'FxDart' is the product name." },
+
+  "cmpBenchWinTie": "Tie",
+  "@cmpBenchWinTie": { "description": "Benchmark badge: the two implementations measured within the tie margin of each other." },
+
+  "cmpBenchMeta": "{cpu}, {ram} GB RAM · Dart {dart} (AOT-compiled) · {date}",
+  "@cmpBenchMeta": { "description": "Machine line under the Benchmark heading. Keep every {placeholder} intact; they are replaced by the generator (CPU name, RAM, Dart version, date)." },
+
+  "cmpBenchScale": "N = {n}",
+  "@cmpBenchScale": { "description": "Heading of one benchmark scale block, e.g. 'N = 1,000,000'. Keep {n} intact; it is replaced by the generator with the formatted item count." },
+
+  "cmpBenchMethodNote": "Bars are medians of repeated timed iterations in fresh processes per side (small N is batched for timer resolution). Sides within {margin}% of each other — or within {absMs} ms, a difference no person can perceive — count as a tie; close relative races are re-measured up to 5 runs. In an app, anything under a few milliseconds is invisible to the user regardless of which bar is shorter.",
+  "@cmpBenchMethodNote": { "description": "Method footnote of the Benchmark section. Keep {margin} and {absMs} intact; they are replaced by the generator with the tie-margin percentage and the absolute tie floor in milliseconds." },
+
+  "cmpBenchMemNote": "Memory is peak process RSS. The Dart VM and the dataset are identical on both sides, so the difference between the two bars is what the pipeline itself holds onto.",
+  "@cmpBenchMemNote": { "description": "Footnote explaining how the memory bars should be read. RSS is a technical term (resident set size) — keep as 'RSS'." },
+
   "langLabel": "Language",
   "@langLabel": { "description": "Label preceding the language switcher." },
 

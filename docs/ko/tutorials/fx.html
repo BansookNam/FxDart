@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2cae938658e29016">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=19182d43db0b4d3e">
 </head>
 <body>
 <header class="site-header">
@@ -95,7 +95,7 @@ FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)</div>
   <h2>데모 1 · 종결 연산자 전까지는 아무것도 실행되지 않습니다</h2>
   <p>체인을 만든 직후에는 <code>calls</code>가 0에 머물러 있다가,
     <code>toList()</code>가 실제로 값 5개를 끌어당기는 순간 올라가는 것을 보세요.</p>
-  <div class="playground" data-pg="e1d172295393265d">
+  <div class="playground" data-pg="4e2e04feb4989af6">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -126,7 +126,7 @@ void main() {
     <code>Stream</code>을 바로 감쌉니다. 둘 다 같은 체인 메서드를 비동기
     버전으로 제공합니다.
   </p>
-  <div class="playground" data-pg="5bb1e3f9f9312092">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -149,7 +149,7 @@ Future<void> main() async {
   <h2>직접 해 보기</h2>
   <p>연습: 60점 이상인 점수만 남기고, 보너스 점수로 두 배를 한 뒤,
     앞의 2개 결과만 가져오는 체인을 만들어 보세요.</p>
-  <div class="playground" data-pg="002b28e6c82e547c">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -187,7 +187,7 @@ void main() {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=2cae938658e29016";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=19182d43db0b4d3e";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

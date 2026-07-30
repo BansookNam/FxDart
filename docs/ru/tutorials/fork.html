@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2cae938658e29016">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=19182d43db0b4d3e">
 </head>
 <body>
 <header class="site-header">
@@ -87,7 +87,7 @@ FxAsyncIterable&lt;T&gt; forkAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable)</
     the exact same <code>shared</code> object — if the source ran twice,
     <code>calls</code> would end up at 10, not 5:
   </p>
-  <div class="playground" data-pg="1eac41297485ecd2">
+  <div class="playground" data-pg="95c3a1bd978b33bb">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -121,7 +121,7 @@ void main() {
     <code>a</code> already buffered — no new calls to <code>source()</code>
     until <code>b</code> needs a third value neither fork has seen yet:
   </p>
-  <div class="playground" data-pg="a17f306a37a1c65e">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -164,7 +164,7 @@ void main() {
     consumer so the sensor is only read once (<code>reads</code> should be
     3).
   </p>
-  <div class="playground" data-pg="78d00f8d87f024de">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -207,7 +207,7 @@ void main() {
   <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=2cae938658e29016";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=19182d43db0b4d3e";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../assets/fxdart_single.dart?v=2cae938658e29016">
+  <link rel="prefetch" href="../assets/fxdart_single.dart?v=19182d43db0b4d3e">
 </head>
 <body>
 <header class="site-header">
@@ -89,7 +89,7 @@ FxAsync&lt;T&gt; FxAsync.concurrent(int length)        // chain</div>
   <h2>Demo 1 · Sequential vs. concurrent(3), timed</h2>
   <p>Six items, each with a 200ms delay. Sequential takes ~1200ms; asking for
     3 at a time cuts it to ~400ms:</p>
-  <div class="playground" data-pg="e123a6b2c919f9ab">
+  <div class="playground" data-pg="d976549c087e2da0">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -126,7 +126,7 @@ Future<void> main() async {
     compare this with <a href="concurrentPool.html"><code>concurrentPool</code></a>,
     which does the opposite:
   </p>
-  <div class="playground" data-pg="126939446243e3dd">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -153,7 +153,7 @@ Future<void> main() async {
   <p>Exercise: this pipeline processes 6 items of 200ms each, sequentially
     (<code>n = 1</code>). Tune <code>n</code> up and watch the elapsed time
     drop — try <code>3</code>, then <code>6</code>.</p>
-  <div class="playground" data-pg="403f9c41e6e97e6f">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -196,7 +196,7 @@ Future<void> main() async {
   <p>Playground compiles via the DartPad compile service. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Run","pgReset":"Reset","pgCompiling":"Compiling…","pgCompileError":"Compile error","pgError":"Error","pgLoading":"Loading runtime…","pgRunning":"Running…","pgNoOutput":"(no output)","pgLoadFailed":"Could not load the FxDart library"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=2cae938658e29016";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=19182d43db0b4d3e";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

@@ -2,6 +2,7 @@
 // ignore_for_file: deprecated_member_use_from_same_package, unused_element
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 // ---- lib/src/async_iterable.dart ----
 
@@ -442,6 +443,12 @@ dynamic Function(dynamic a) pipeLazy(List<Function> fns) => (a) => pipe(a, fns);
 // ---- lib/src/lazy/map.dart ----
 
 
+// The sync operators here (and in filter.dart, take_drop.dart, zip.dart,
+// combine.dart) are hand-written Iterator classes rather than sync*
+// generators: a sync* moveNext costs ~4x more than a plain class under AOT,
+// and the difference compounds per chained operator. Laziness, effect order,
+// and per-iteration freshness are identical to the generator form.
+
 /// Returns a lazy [Iterable] of values by running each element through [f].
 ///
 /// Port of FxTS `map` (sync).
@@ -449,9 +456,30 @@ dynamic Function(dynamic a) pipeLazy(List<Function> fns) => (a) => pipe(a, fns);
 /// ```dart
 /// map((a) => a + 10, [1, 2, 3, 4]); // (11, 12, 13, 14)
 /// ```
-Iterable<B> map<A, B>(B Function(A a) f, Iterable<A> iterable) sync* {
-  for (final a in iterable) {
-    yield f(a);
+Iterable<B> map<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    _MapIterable(f, iterable);
+
+class _MapIterable<A, B> extends Iterable<B> {
+  _MapIterable(this._f, this._source);
+  final B Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<B> get iterator => _MapIterator(_f, _source.iterator);
+}
+
+class _MapIterator<A, B> implements Iterator<B> {
+  _MapIterator(this._f, this._it);
+  final B Function(A) _f;
+  final Iterator<A> _it;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    if (_it.moveNext()) {
+      current = _f(_it.current);
+      return true;
+    }
+    return false;
   }
 }
 
@@ -487,10 +515,32 @@ FxAsyncIterable<B> mapEffectAsync<A, B>(
 /// Iterates over each element, applying [f] without changing the values.
 ///
 /// Port of FxTS `peek`.
-Iterable<A> peek<A>(void Function(A a) f, Iterable<A> iterable) sync* {
-  for (final a in iterable) {
-    f(a);
-    yield a;
+Iterable<A> peek<A>(void Function(A a) f, Iterable<A> iterable) =>
+    _PeekIterable(f, iterable);
+
+class _PeekIterable<A> extends Iterable<A> {
+  _PeekIterable(this._f, this._source);
+  final void Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _PeekIterator(_f, _source.iterator);
+}
+
+class _PeekIterator<A> implements Iterator<A> {
+  _PeekIterator(this._f, this._it);
+  final void Function(A) _f;
+  final Iterator<A> _it;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    if (_it.moveNext()) {
+      final v = _it.current;
+      _f(v);
+      current = v;
+      return true;
+    }
+    return false;
   }
 }
 
@@ -579,9 +629,38 @@ FxAsyncIterable<dynamic> flatAsync(FxAsyncIterable<dynamic> iterable,
 /// Dart port requires the callback to return an `Iterable<B>` so the result
 /// can stay typed — same contract as `Iterable.expand`.
 Iterable<B> flatMap<A, B>(
-    Iterable<B> Function(A a) f, Iterable<A> iterable) sync* {
-  for (final a in iterable) {
-    yield* f(a);
+        Iterable<B> Function(A a) f, Iterable<A> iterable) =>
+    _FlatMapIterable(f, iterable);
+
+class _FlatMapIterable<A, B> extends Iterable<B> {
+  _FlatMapIterable(this._f, this._source);
+  final Iterable<B> Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<B> get iterator => _FlatMapIterator(_f, _source.iterator);
+}
+
+class _FlatMapIterator<A, B> implements Iterator<B> {
+  _FlatMapIterator(this._f, this._it);
+  final Iterable<B> Function(A) _f;
+  final Iterator<A> _it;
+  Iterator<B>? _inner;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    while (true) {
+      final inner = _inner;
+      if (inner != null) {
+        if (inner.moveNext()) {
+          current = inner.current;
+          return true;
+        }
+        _inner = null;
+      }
+      if (!_it.moveNext()) return false;
+      _inner = _f(_it.current).iterator;
+    }
   }
 }
 
@@ -612,12 +691,38 @@ FxAsyncIterable<B> flatMapAsync<A, B>(
 /// ```dart
 /// scan((acc, a) => acc + a, 10, [1, 2, 3]); // (10, 11, 13, 16)
 /// ```
-Iterable<B> scan<A, B>(
-    B Function(B acc, A a) f, B seed, Iterable<A> iterable) sync* {
-  var acc = seed;
-  yield acc;
-  for (final a in iterable) {
-    yield acc = f(acc, a);
+Iterable<B> scan<A, B>(B Function(B acc, A a) f, B seed, Iterable<A> iterable) =>
+    _ScanIterable(f, seed, iterable);
+
+class _ScanIterable<A, B> extends Iterable<B> {
+  _ScanIterable(this._f, this._seed, this._source);
+  final B Function(B, A) _f;
+  final B _seed;
+  final Iterable<A> _source;
+  @override
+  Iterator<B> get iterator => _ScanIterator(_f, _seed, _source.iterator);
+}
+
+class _ScanIterator<A, B> implements Iterator<B> {
+  _ScanIterator(this._f, this._seed, this._it);
+  final B Function(B, A) _f;
+  final B _seed;
+  final Iterator<A> _it;
+  var _emittedSeed = false;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    if (!_emittedSeed) {
+      _emittedSeed = true;
+      current = _seed;
+      return true;
+    }
+    if (_it.moveNext()) {
+      current = _f(current, _it.current);
+      return true;
+    }
+    return false;
   }
 }
 
@@ -625,13 +730,30 @@ Iterable<B> scan<A, B>(
 /// Returns an empty iterable when [iterable] is empty.
 ///
 /// Port of FxTS `scan(f, iterable)`.
-Iterable<A> scan1<A>(A Function(A acc, A a) f, Iterable<A> iterable) sync* {
-  final iterator = iterable.iterator;
-  if (!iterator.moveNext()) return;
-  var acc = iterator.current;
-  yield acc;
-  while (iterator.moveNext()) {
-    yield acc = f(acc, iterator.current);
+Iterable<A> scan1<A>(A Function(A acc, A a) f, Iterable<A> iterable) =>
+    _Scan1Iterable(f, iterable);
+
+class _Scan1Iterable<A> extends Iterable<A> {
+  _Scan1Iterable(this._f, this._source);
+  final A Function(A, A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _Scan1Iterator(_f, _source.iterator);
+}
+
+class _Scan1Iterator<A> implements Iterator<A> {
+  _Scan1Iterator(this._f, this._it);
+  final A Function(A, A) _f;
+  final Iterator<A> _it;
+  var _started = false;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    if (!_it.moveNext()) return false;
+    current = _started ? _f(current, _it.current) : _it.current;
+    _started = true;
+    return true;
   }
 }
 
@@ -689,9 +811,33 @@ FxAsyncIterable<A> scan1Async<A>(
 /// ```dart
 /// filter((a) => a % 2 == 0, [0, 1, 2, 3, 4, 5, 6]); // (0, 2, 4, 6)
 /// ```
-Iterable<A> filter<A>(bool Function(A a) f, Iterable<A> iterable) sync* {
-  for (final a in iterable) {
-    if (f(a)) yield a;
+Iterable<A> filter<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    _FilterIterable(f, iterable);
+
+class _FilterIterable<A> extends Iterable<A> {
+  _FilterIterable(this._f, this._source);
+  final bool Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _FilterIterator(_f, _source.iterator);
+}
+
+class _FilterIterator<A> implements Iterator<A> {
+  _FilterIterator(this._f, this._it);
+  final bool Function(A) _f;
+  final Iterator<A> _it;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final v = _it.current;
+      if (_f(v)) {
+        current = v;
+        return true;
+      }
+    }
+    return false;
   }
 }
 
@@ -704,9 +850,30 @@ Iterable<A> reject<A>(bool Function(A a) f, Iterable<A> iterable) =>
 /// Filters `null` out and narrows the element type.
 ///
 /// Port of FxTS `compact`.
-Iterable<A> compact<A>(Iterable<A?> iterable) sync* {
-  for (final a in iterable) {
-    if (a != null) yield a;
+Iterable<A> compact<A>(Iterable<A?> iterable) => _CompactIterable(iterable);
+
+class _CompactIterable<A> extends Iterable<A> {
+  _CompactIterable(this._source);
+  final Iterable<A?> _source;
+  @override
+  Iterator<A> get iterator => _CompactIterator(_source.iterator);
+}
+
+class _CompactIterator<A> implements Iterator<A> {
+  _CompactIterator(this._it);
+  final Iterator<A?> _it;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final v = _it.current;
+      if (v != null) {
+        current = v;
+        return true;
+      }
+    }
+    return false;
   }
 }
 
@@ -833,10 +1000,34 @@ FxAsyncIterable<A> compactAsync<A>(FxAsyncIterable<A?> iterable) =>
 /// Returns an iterable with unique values as determined by [f].
 ///
 /// Port of FxTS `uniqBy`.
-Iterable<A> uniqBy<A, B>(B Function(A a) f, Iterable<A> iterable) sync* {
-  final seen = <B>{};
-  for (final a in iterable) {
-    if (seen.add(f(a))) yield a;
+Iterable<A> uniqBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    _UniqByIterable(f, iterable);
+
+class _UniqByIterable<A, B> extends Iterable<A> {
+  _UniqByIterable(this._f, this._source);
+  final B Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _UniqByIterator(_f, _source.iterator);
+}
+
+class _UniqByIterator<A, B> implements Iterator<A> {
+  _UniqByIterator(this._f, this._it);
+  final B Function(A) _f;
+  final Iterator<A> _it;
+  final _seen = <B>{};
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final v = _it.current;
+      if (_seen.add(_f(v))) {
+        current = v;
+        return true;
+      }
+    }
+    return false;
   }
 }
 
@@ -946,12 +1137,29 @@ FxAsyncIterable<A> intersectionAsync<A>(
 /// Returns an iterable of the first [length] values from [iterable].
 ///
 /// Port of FxTS `take`.
-Iterable<A> take<A>(int length, Iterable<A> iterable) sync* {
-  if (length < 1) return;
-  var remaining = length;
-  for (final a in iterable) {
-    yield a;
-    if (--remaining < 1) return;
+Iterable<A> take<A>(int length, Iterable<A> iterable) =>
+    _TakeIterable(length, iterable);
+
+class _TakeIterable<A> extends Iterable<A> {
+  _TakeIterable(this._length, this._source);
+  final int _length;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _TakeIterator(_length, _source.iterator);
+}
+
+class _TakeIterator<A> implements Iterator<A> {
+  _TakeIterator(this._remaining, this._it);
+  int _remaining;
+  final Iterator<A> _it;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    if (_remaining < 1 || !_it.moveNext()) return false;
+    _remaining--;
+    current = _it.current;
+    return true;
   }
 }
 
@@ -1006,10 +1214,34 @@ FxAsyncIterable<A> takeRightAsync<A>(int length, FxAsyncIterable<A> iterable) {
 /// Returns an iterable that yields values as long as [f] returns true.
 ///
 /// Port of FxTS `takeWhile`.
-Iterable<A> takeWhile<A>(bool Function(A a) f, Iterable<A> iterable) sync* {
-  for (final a in iterable) {
-    if (!f(a)) return;
-    yield a;
+Iterable<A> takeWhile<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    _TakeWhileIterable(f, iterable);
+
+class _TakeWhileIterable<A> extends Iterable<A> {
+  _TakeWhileIterable(this._f, this._source);
+  final bool Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _TakeWhileIterator(_f, _source.iterator);
+}
+
+class _TakeWhileIterator<A> implements Iterator<A> {
+  _TakeWhileIterator(this._f, this._it);
+  final bool Function(A) _f;
+  final Iterator<A> _it;
+  var _done = false;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    if (_done || !_it.moveNext()) return false;
+    final v = _it.current;
+    if (!_f(v)) {
+      _done = true;
+      return false;
+    }
+    current = v;
+    return true;
   }
 }
 
@@ -1036,10 +1268,31 @@ FxAsyncIterable<A> takeWhileAsync<A>(
 ///
 /// Port of FxTS `takeUntilInclusive`.
 Iterable<A> takeUntilInclusive<A>(
-    bool Function(A a) f, Iterable<A> iterable) sync* {
-  for (final a in iterable) {
-    yield a;
-    if (f(a)) return;
+        bool Function(A a) f, Iterable<A> iterable) =>
+    _TakeUntilInclusiveIterable(f, iterable);
+
+class _TakeUntilInclusiveIterable<A> extends Iterable<A> {
+  _TakeUntilInclusiveIterable(this._f, this._source);
+  final bool Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _TakeUntilInclusiveIterator(_f, _source.iterator);
+}
+
+class _TakeUntilInclusiveIterator<A> implements Iterator<A> {
+  _TakeUntilInclusiveIterator(this._f, this._it);
+  final bool Function(A) _f;
+  final Iterator<A> _it;
+  var _done = false;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    if (_done || !_it.moveNext()) return false;
+    final v = _it.current;
+    if (_f(v)) _done = true;
+    current = v;
+    return true;
   }
 }
 
@@ -1077,14 +1330,32 @@ FxAsyncIterable<A> takeUntilAsync<A>(
 /// Returns an iterable that skips the first [length] values.
 ///
 /// Port of FxTS `drop`.
-Iterable<A> drop<A>(int length, Iterable<A> iterable) sync* {
-  var remaining = length;
-  for (final a in iterable) {
-    if (remaining > 0) {
-      remaining--;
-      continue;
+Iterable<A> drop<A>(int length, Iterable<A> iterable) =>
+    _DropIterable(length, iterable);
+
+class _DropIterable<A> extends Iterable<A> {
+  _DropIterable(this._length, this._source);
+  final int _length;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _DropIterator(_length, _source.iterator);
+}
+
+class _DropIterator<A> implements Iterator<A> {
+  _DropIterator(this._remaining, this._it);
+  int _remaining;
+  final Iterator<A> _it;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_remaining > 0) {
+      _remaining--;
+      if (!_it.moveNext()) return false;
     }
-    yield a;
+    if (!_it.moveNext()) return false;
+    current = _it.current;
+    return true;
   }
 }
 
@@ -1140,15 +1411,36 @@ FxAsyncIterable<A> dropRightAsync<A>(int length, FxAsyncIterable<A> iterable) {
 /// Skips values while [f] returns true, then yields the rest.
 ///
 /// Port of FxTS `dropWhile`.
-Iterable<A> dropWhile<A>(bool Function(A a) f, Iterable<A> iterable) sync* {
-  final iterator = iterable.iterator;
-  while (iterator.moveNext()) {
-    if (f(iterator.current)) continue;
-    yield iterator.current;
-    while (iterator.moveNext()) {
-      yield iterator.current;
+Iterable<A> dropWhile<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    _DropWhileIterable(f, iterable);
+
+class _DropWhileIterable<A> extends Iterable<A> {
+  _DropWhileIterable(this._f, this._source);
+  final bool Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _DropWhileIterator(_f, _source.iterator);
+}
+
+class _DropWhileIterator<A> implements Iterator<A> {
+  _DropWhileIterator(this._f, this._it);
+  final bool Function(A) _f;
+  final Iterator<A> _it;
+  var _dropping = true;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final v = _it.current;
+      if (_dropping) {
+        if (_f(v)) continue;
+        _dropping = false;
+      }
+      current = v;
+      return true;
     }
-    return;
+    return false;
   }
 }
 
@@ -1176,13 +1468,33 @@ FxAsyncIterable<A> dropWhileAsync<A>(
 /// too — then yields the rest.
 ///
 /// Port of FxTS `dropUntil`.
-Iterable<A> dropUntil<A>(bool Function(A a) f, Iterable<A> iterable) sync* {
-  final iterator = iterable.iterator;
-  while (iterator.moveNext()) {
-    if (f(iterator.current)) break;
-  }
-  while (iterator.moveNext()) {
-    yield iterator.current;
+Iterable<A> dropUntil<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    _DropUntilIterable(f, iterable);
+
+class _DropUntilIterable<A> extends Iterable<A> {
+  _DropUntilIterable(this._f, this._source);
+  final bool Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _DropUntilIterator(_f, _source.iterator);
+}
+
+class _DropUntilIterator<A> implements Iterator<A> {
+  _DropUntilIterator(this._f, this._it);
+  final bool Function(A) _f;
+  final Iterator<A> _it;
+  var _dropping = true;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_dropping) {
+      if (!_it.moveNext()) return false;
+      if (_f(_it.current)) _dropping = false;
+    }
+    if (!_it.moveNext()) return false;
+    current = _it.current;
+    return true;
   }
 }
 
@@ -1207,13 +1519,38 @@ FxAsyncIterable<A> dropUntilAsync<A>(
 /// (exclusive) by index.
 ///
 /// Port of FxTS `slice`. Omit [end] to take everything from [start].
-Iterable<A> slice<A>(int start, Iterable<A> iterable, [int? end]) sync* {
-  var i = 0;
-  for (final item in iterable) {
-    if (i >= start && (end == null || i < end)) {
-      yield item;
+Iterable<A> slice<A>(int start, Iterable<A> iterable, [int? end]) =>
+    _SliceIterable(start, end, iterable);
+
+class _SliceIterable<A> extends Iterable<A> {
+  _SliceIterable(this._start, this._end, this._source);
+  final int _start;
+  final int? _end;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _SliceIterator(_start, _end, _source.iterator);
+}
+
+class _SliceIterator<A> implements Iterator<A> {
+  _SliceIterator(this._start, this._end, this._it);
+  final int _start;
+  final int? _end;
+  final Iterator<A> _it;
+  var _i = 0;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    // Matches the generator form: the source is consumed to its end even
+    // past [_end] — iteration stops only when the source does.
+    while (_it.moveNext()) {
+      final index = _i++;
+      if (index >= _start && (_end == null || index < _end)) {
+        current = _it.current;
+        return true;
+      }
     }
-    i += 1;
+    return false;
   }
 }
 
@@ -1240,17 +1577,34 @@ FxAsyncIterable<A> sliceAsync<A>(int start, FxAsyncIterable<A> iterable,
 /// elements (the last chunk may be shorter).
 ///
 /// Port of FxTS `chunk`.
-Iterable<List<A>> chunk<A>(int size, Iterable<A> iterable) sync* {
-  if (size < 1) return;
-  var items = <A>[];
-  for (final a in iterable) {
-    items.add(a);
-    if (items.length == size) {
-      yield items;
-      items = <A>[];
+Iterable<List<A>> chunk<A>(int size, Iterable<A> iterable) =>
+    _ChunkIterable(size, iterable);
+
+class _ChunkIterable<A> extends Iterable<List<A>> {
+  _ChunkIterable(this._size, this._source);
+  final int _size;
+  final Iterable<A> _source;
+  @override
+  Iterator<List<A>> get iterator => _ChunkIterator(_size, _source.iterator);
+}
+
+class _ChunkIterator<A> implements Iterator<List<A>> {
+  _ChunkIterator(this._size, this._it);
+  final int _size;
+  final Iterator<A> _it;
+  @override
+  late List<A> current;
+  @override
+  bool moveNext() {
+    if (_size < 1) return false;
+    final items = <A>[];
+    while (items.length < _size && _it.moveNext()) {
+      items.add(_it.current);
     }
+    if (items.isEmpty) return false;
+    current = items;
+    return true;
   }
-  if (items.isNotEmpty) yield items;
 }
 
 /// Async counterpart of [chunk].
@@ -1359,23 +1713,64 @@ FxAsyncIterable<B> compressAsync<B>(
 /// ```dart
 /// zip(['a', 'b'], [1, 2]); // (('a', 1), ('b', 2))
 /// ```
-Iterable<(A, B)> zip<A, B>(Iterable<A> iterable1, Iterable<B> iterable2) sync* {
-  final it1 = iterable1.iterator;
-  final it2 = iterable2.iterator;
-  while (it1.moveNext() && it2.moveNext()) {
-    yield (it1.current, it2.current);
+Iterable<(A, B)> zip<A, B>(Iterable<A> iterable1, Iterable<B> iterable2) =>
+    _ZipIterable(iterable1, iterable2);
+
+class _ZipIterable<A, B> extends Iterable<(A, B)> {
+  _ZipIterable(this._source1, this._source2);
+  final Iterable<A> _source1;
+  final Iterable<B> _source2;
+  @override
+  Iterator<(A, B)> get iterator =>
+      _ZipIterator(_source1.iterator, _source2.iterator);
+}
+
+class _ZipIterator<A, B> implements Iterator<(A, B)> {
+  _ZipIterator(this._it1, this._it2);
+  final Iterator<A> _it1;
+  final Iterator<B> _it2;
+  @override
+  late (A, B) current;
+  @override
+  bool moveNext() {
+    if (_it1.moveNext() && _it2.moveNext()) {
+      current = (_it1.current, _it2.current);
+      return true;
+    }
+    return false;
   }
 }
 
 /// Three-iterable variant of [zip]. (Dart has no variadic generics, so each
 /// arity is a separate function.)
-Iterable<(A, B, C)> zip3<A, B, C>(
-    Iterable<A> iterable1, Iterable<B> iterable2, Iterable<C> iterable3) sync* {
-  final it1 = iterable1.iterator;
-  final it2 = iterable2.iterator;
-  final it3 = iterable3.iterator;
-  while (it1.moveNext() && it2.moveNext() && it3.moveNext()) {
-    yield (it1.current, it2.current, it3.current);
+Iterable<(A, B, C)> zip3<A, B, C>(Iterable<A> iterable1, Iterable<B> iterable2,
+        Iterable<C> iterable3) =>
+    _Zip3Iterable(iterable1, iterable2, iterable3);
+
+class _Zip3Iterable<A, B, C> extends Iterable<(A, B, C)> {
+  _Zip3Iterable(this._source1, this._source2, this._source3);
+  final Iterable<A> _source1;
+  final Iterable<B> _source2;
+  final Iterable<C> _source3;
+  @override
+  Iterator<(A, B, C)> get iterator =>
+      _Zip3Iterator(_source1.iterator, _source2.iterator, _source3.iterator);
+}
+
+class _Zip3Iterator<A, B, C> implements Iterator<(A, B, C)> {
+  _Zip3Iterator(this._it1, this._it2, this._it3);
+  final Iterator<A> _it1;
+  final Iterator<B> _it2;
+  final Iterator<C> _it3;
+  @override
+  late (A, B, C) current;
+  @override
+  bool moveNext() {
+    if (_it1.moveNext() && _it2.moveNext() && _it3.moveNext()) {
+      current = (_it1.current, _it2.current, _it3.current);
+      return true;
+    }
+    return false;
   }
 }
 
@@ -1436,10 +1831,29 @@ FxAsyncIterable<C> zipWithAsync<A, B, C>(FutureOr<C> Function(A a, B b) f,
 /// Pairs each element with its index: `(index, value)`.
 ///
 /// Port of FxTS `zipWithIndex`.
-Iterable<(int, A)> zipWithIndex<A>(Iterable<A> iterable) sync* {
-  var i = 0;
-  for (final a in iterable) {
-    yield (i++, a);
+Iterable<(int, A)> zipWithIndex<A>(Iterable<A> iterable) =>
+    _ZipWithIndexIterable(iterable);
+
+class _ZipWithIndexIterable<A> extends Iterable<(int, A)> {
+  _ZipWithIndexIterable(this._source);
+  final Iterable<A> _source;
+  @override
+  Iterator<(int, A)> get iterator => _ZipWithIndexIterator(_source.iterator);
+}
+
+class _ZipWithIndexIterator<A> implements Iterator<(int, A)> {
+  _ZipWithIndexIterator(this._it);
+  final Iterator<A> _it;
+  var _i = 0;
+  @override
+  late (int, A) current;
+  @override
+  bool moveNext() {
+    if (_it.moveNext()) {
+      current = (_i++, _it.current);
+      return true;
+    }
+    return false;
   }
 }
 
@@ -1499,28 +1913,59 @@ FxAsyncIterable<List<A>> transposeAsync<A>(Iterable<FxAsyncIterable<A>> rows) {
 /// range(1, 4);     // (1, 2, 3)
 /// range(4, 1, -1); // (4, 3, 2)
 /// ```
-Iterable<int> range(int start, [int? end, int step = 1]) sync* {
-  if (end == null) {
-    yield* range(0, start);
-    return;
-  }
-  if (step < 0) {
-    for (var i = start; i > end; i += step) {
-      yield i;
-    }
-  } else {
-    for (var i = start; i < end; i += step) {
-      yield i;
-    }
+Iterable<int> range(int start, [int? end, int step = 1]) =>
+    end == null ? _RangeIterable(0, start, 1) : _RangeIterable(start, end, step);
+
+class _RangeIterable extends Iterable<int> {
+  _RangeIterable(this._start, this._end, this._step);
+  final int _start;
+  final int _end;
+  final int _step;
+  @override
+  Iterator<int> get iterator => _RangeIterator(_start, _end, _step);
+}
+
+class _RangeIterator implements Iterator<int> {
+  _RangeIterator(this._next, this._end, this._step);
+  int _next;
+  final int _end;
+  final int _step;
+  @override
+  var current = 0;
+  @override
+  bool moveNext() {
+    if (_step < 0 ? _next <= _end : _next >= _end) return false;
+    current = _next;
+    _next += _step;
+    return true;
   }
 }
 
 /// Yields [value] [n] times.
 ///
 /// Port of FxTS `repeat`.
-Iterable<T> repeat<T>(int n, T value) sync* {
-  for (var i = 0; i < n; i++) {
-    yield value;
+Iterable<T> repeat<T>(int n, T value) => _RepeatIterable(n, value);
+
+class _RepeatIterable<T> extends Iterable<T> {
+  _RepeatIterable(this._n, this._value);
+  final int _n;
+  final T _value;
+  @override
+  Iterator<T> get iterator => _RepeatIterator(_n, _value);
+}
+
+class _RepeatIterator<T> implements Iterator<T> {
+  _RepeatIterator(this._remaining, this._value);
+  int _remaining;
+  final T _value;
+  @override
+  late T current;
+  @override
+  bool moveNext() {
+    if (_remaining < 1) return false;
+    _remaining--;
+    current = _value;
+    return true;
   }
 }
 
@@ -1565,10 +2010,8 @@ FxAsyncIterable<T> cycleAsync<T>(FxAsyncIterable<T> iterable) {
 /// Yields all values of [iterable], then [a].
 ///
 /// Port of FxTS `append`.
-Iterable<A> append<A>(A a, Iterable<A> iterable) sync* {
-  yield* iterable;
-  yield a;
-}
+Iterable<A> append<A>(A a, Iterable<A> iterable) =>
+    concat(iterable, _SingleIterable(a));
 
 /// Async counterpart of [append]. [a] may be a [Future].
 FxAsyncIterable<A> appendAsync<A>(FutureOr<A> a, FxAsyncIterable<A> iterable) {
@@ -1590,9 +2033,14 @@ FxAsyncIterable<A> appendAsync<A>(FutureOr<A> a, FxAsyncIterable<A> iterable) {
 /// Yields [a], then all values of [iterable].
 ///
 /// Port of FxTS `prepend`.
-Iterable<A> prepend<A>(A a, Iterable<A> iterable) sync* {
-  yield a;
-  yield* iterable;
+Iterable<A> prepend<A>(A a, Iterable<A> iterable) =>
+    concat(_SingleIterable(a), iterable);
+
+class _SingleIterable<A> extends Iterable<A> {
+  _SingleIterable(this._value);
+  final A _value;
+  @override
+  Iterator<A> get iterator => _RepeatIterator(1, _value);
 }
 
 /// Async counterpart of [prepend]. [a] may be a [Future].
@@ -1613,9 +2061,36 @@ FxAsyncIterable<A> prependAsync<A>(FutureOr<A> a, FxAsyncIterable<A> iterable) {
 /// Concatenates two iterables lazily.
 ///
 /// Port of FxTS `concat`.
-Iterable<A> concat<A>(Iterable<A> iterable1, Iterable<A> iterable2) sync* {
-  yield* iterable1;
-  yield* iterable2;
+Iterable<A> concat<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
+    _ConcatIterable(iterable1, iterable2);
+
+class _ConcatIterable<A> extends Iterable<A> {
+  _ConcatIterable(this._source1, this._source2);
+  final Iterable<A> _source1;
+  final Iterable<A> _source2;
+  @override
+  Iterator<A> get iterator => _ConcatIterator(_source1.iterator, _source2);
+}
+
+class _ConcatIterator<A> implements Iterator<A> {
+  _ConcatIterator(this._it, this._second);
+  Iterator<A> _it;
+  // The second source's iterator is created only when the first is exhausted,
+  // matching the generator form's effect order.
+  Iterable<A>? _second;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (!_it.moveNext()) {
+      final second = _second;
+      if (second == null) return false;
+      _second = null;
+      _it = second.iterator;
+    }
+    current = _it.current;
+    return true;
+  }
 }
 
 /// Async counterpart of [concat].
@@ -1984,7 +2459,27 @@ Acc Function(Iterable<A>) reduceLazy<A, Acc>(
 /// Adds every number in the iterable.
 ///
 /// Port of FxTS `sum`.
-num sum(Iterable<num> iterable) => fold<num, num>(0, (a, b) => a + b, iterable);
+num sum(Iterable<num> iterable) {
+  // Unboxed accumulators with the boxed `num acc += v` sequence's exact
+  // semantics: ints accumulate in an int until the first double arrives,
+  // then accumulation switches to double seeded with the int total — the
+  // same value the num fold would hold at every step.
+  var iacc = 0;
+  var dacc = 0.0;
+  var isInt = true;
+  for (final v in iterable) {
+    if (isInt) {
+      if (v is int) {
+        iacc += v;
+        continue;
+      }
+      dacc = iacc.toDouble();
+      isInt = false;
+    }
+    dacc += v;
+  }
+  return isInt ? iacc : dacc;
+}
 
 /// Sums the key [f] of every element — `map` + [sum] in one step, so a
 /// pipeline that only needs a field total doesn't spell out the projection.
@@ -1993,8 +2488,25 @@ num sum(Iterable<num> iterable) => fold<num, num>(0, (a, b) => a + b, iterable);
 ///
 /// Dart-native addition (FxTS has only the numeric `sum`); named after
 /// [maxBy]/[minBy] — Kotlin spells it `sumOf`.
-num sumBy<A>(num Function(A a) f, Iterable<A> iterable) =>
-    fold<A, num>(0, (acc, a) => acc + f(a), iterable);
+num sumBy<A>(num Function(A a) f, Iterable<A> iterable) {
+  // Same unboxed int-then-double accumulation as [sum].
+  var iacc = 0;
+  var dacc = 0.0;
+  var isInt = true;
+  for (final a in iterable) {
+    final v = f(a);
+    if (isInt) {
+      if (v is int) {
+        iacc += v;
+        continue;
+      }
+      dacc = iacc.toDouble();
+      isInt = false;
+    }
+    dacc += v;
+  }
+  return isInt ? iacc : dacc;
+}
 
 /// Async counterpart of [sumBy].
 Future<num> sumByAsync<A>(
@@ -2013,13 +2525,25 @@ String sumStrings(Iterable<String> iterable) =>
 ///
 /// Port of FxTS `average`.
 double average(Iterable<num> iterable) {
+  // Same unboxed int-then-double accumulation as [sum].
   var size = 0;
-  num total = 0;
-  for (final a in iterable) {
+  var iacc = 0;
+  var dacc = 0.0;
+  var isInt = true;
+  for (final v in iterable) {
     size++;
-    total += a;
+    if (isInt) {
+      if (v is int) {
+        iacc += v;
+        continue;
+      }
+      dacc = iacc.toDouble();
+      isInt = false;
+    }
+    dacc += v;
   }
-  return size == 0 ? double.nan : total / size;
+  if (size == 0) return double.nan;
+  return isInt ? iacc / size : dacc / size;
 }
 
 /// Async counterpart of [average].
@@ -2098,10 +2622,15 @@ Future<num> maxAsync(FxAsyncIterable<num> iterable) =>
 /// `minByOrNull` shape, nullable like [head]/[last].
 A? minBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
   A? best;
+  Object? bestKey;
   var seen = false;
   for (final a in iterable) {
-    if (!seen || _compareBy(f, a, best as A) < 0) {
+    // The key of the running best is extracted once and cached; [f] runs
+    // exactly once per element.
+    final key = f(a);
+    if (!seen || _compareKeys(key, bestKey) < 0) {
       best = a;
+      bestKey = key;
       seen = true;
     }
   }
@@ -2131,10 +2660,13 @@ Future<A?> minByAsync<A>(
 /// `maxByOrNull` shape, nullable like [head]/[last].
 A? maxBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
   A? best;
+  Object? bestKey;
   var seen = false;
   for (final a in iterable) {
-    if (!seen || _compareBy(f, a, best as A) > 0) {
+    final key = f(a);
+    if (!seen || _compareKeys(key, bestKey) > 0) {
       best = a;
+      bestKey = key;
       seen = true;
     }
   }
@@ -2259,9 +2791,7 @@ Future<List<A>> sortAsync<A>(
 List<A> toSorted<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
     sort(f, iterable);
 
-int _compareBy<A>(Object? Function(A a) f, A a, A b) {
-  final fa = f(a);
-  final fb = f(b);
+int _compareKeys(Object? fa, Object? fb) {
   if (fa is Comparable && fb is Comparable) {
     return Comparable.compare(
         fa as Comparable<Object?>, fb as Comparable<Object?>);
@@ -2269,11 +2799,58 @@ int _compareBy<A>(Object? Function(A a) f, A a, A b) {
   return 0;
 }
 
+int _compareBy<A>(Object? Function(A a) f, A a, A b) => _compareKeys(f(a), f(b));
+
 /// Returns a new list sorted by the key extractor [f] (ascending).
 ///
 /// Port of FxTS `sortBy`.
-List<A> sortBy<A>(Object? Function(A a) f, Iterable<A> iterable) =>
-    sort((a, b) => _compareBy(f, a, b), iterable);
+List<A> sortBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
+  // Decorate-sort-undecorate: extract each key once, sort an index list, and
+  // read the permutation back. Sorting the values directly with a
+  // `_compareBy` comparator would call [f] twice per comparison —
+  // 2·n·log n extractions instead of n. The permutation is identical to the
+  // direct sort's: sort decisions depend only on comparator outcomes, and
+  // the index comparator returns exactly what the direct comparator would.
+  final items = List.of(iterable);
+  final length = items.length;
+  if (length < 2) return items;
+  final keys = [for (final a in items) f(a)];
+  final indices = [for (var i = 0; i < length; i++) i];
+
+  // Homogeneous key types get an unboxed key array and a devirtualized
+  // compareTo — the generic path pays an `is Comparable` test and a dynamic
+  // compareTo on every comparison. compareTo semantics (NaN, -0.0) are the
+  // same on every path. No Int64List: the playground build targets JS.
+  var allDouble = true, allInt = true, allString = true;
+  for (final k in keys) {
+    if (k is! double) allDouble = false;
+    if (k is! int) allInt = false;
+    if (k is! String) allString = false;
+    if (!(allDouble || allInt || allString)) break;
+  }
+  if (allDouble) {
+    final dk = Float64List(length);
+    for (var i = 0; i < length; i++) {
+      dk[i] = keys[i] as double;
+    }
+    indices.sort((i, j) => dk[i].compareTo(dk[j]));
+  } else if (allInt) {
+    final ik = List<int>.filled(length, 0);
+    for (var i = 0; i < length; i++) {
+      ik[i] = keys[i] as int;
+    }
+    indices.sort((i, j) => ik[i].compareTo(ik[j]));
+  } else if (allString) {
+    final sk = List<String>.filled(length, '');
+    for (var i = 0; i < length; i++) {
+      sk[i] = keys[i] as String;
+    }
+    indices.sort((i, j) => sk[i].compareTo(sk[j]));
+  } else {
+    indices.sort((i, j) => _compareKeys(keys[i], keys[j]));
+  }
+  return [for (final i in indices) items[i]];
+}
 
 /// Async counterpart of [sortBy].
 Future<List<A>> sortByAsync<A>(

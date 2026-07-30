@@ -49,6 +49,7 @@ strip_directives() {
 // ignore_for_file: deprecated_member_use_from_same_package, unused_element
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:typed_data';
 HEADER
 
   for f in "${FILES[@]}"; do

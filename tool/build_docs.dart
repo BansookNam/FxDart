@@ -822,6 +822,129 @@ $code
   }());
 }
 
+// --- benchmark section ------------------------------------------------------
+//
+// benchmark/results/results.json is produced by `dart run
+// benchmark/run_benchmarks.dart` (see benchmark/README.md). When present, each
+// comparison page gets a Benchmark section with time and peak-memory bars; when
+// absent (or a case failed), the section is simply omitted and the build still
+// succeeds.
+
+Map<String, dynamic>? _benchCache;
+bool _benchLoaded = false;
+
+Map<String, dynamic>? get _benchResults {
+  if (!_benchLoaded) {
+    _benchLoaded = true;
+    final f = File('$root/benchmark/results/results.json');
+    if (f.existsSync()) {
+      _benchCache = jsonDecode(f.readAsStringSync()) as Map<String, dynamic>;
+    }
+  }
+  return _benchCache;
+}
+
+String _benchFmtInt(num n) {
+  final s = n.round().toString();
+  final b = StringBuffer();
+  for (var i = 0; i < s.length; i++) {
+    if (i > 0 && (s.length - i) % 3 == 0) b.write(',');
+    b.write(s[i]);
+  }
+  return b.toString();
+}
+
+String _benchFmtUs(num us) {
+  if (us < 1) return '${(us * 1000).toStringAsFixed(0)} ns';
+  if (us < 1000) return '${us.toStringAsFixed(us < 10 ? 1 : 0)} µs';
+  return '${(us / 1000).toStringAsFixed(us < 10000 ? 2 : 1)} ms';
+}
+
+String _benchFmtMb(num bytes) =>
+    '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+
+const _benchWinKeys = {
+  'native': 'cmpBenchWinNative',
+  'fxdart': 'cmpBenchWinFxdart',
+  'tie': 'cmpBenchWinTie',
+};
+
+/// Scale-block order: small → large, `full` = the case's headline N.
+const _benchScaleOrder = ['100', '10000', 'full'];
+
+String _cmpBenchSection(String slug, Map<String, String> chrome) {
+  final data = _benchResults;
+  if (data == null) return '';
+  final c = (data['cases'] as Map<String, dynamic>)[slug] as Map<String, dynamic>?;
+  final scales = c?['scales'] as Map<String, dynamic>?;
+  if (scales == null) return '';
+  final machine = data['machine'] as Map<String, dynamic>;
+
+  String metric(String titleKey, String winner, num natVal, num fxVal,
+      String Function(num) fmt) {
+    final max = natVal > fxVal ? natVal : fxVal;
+    String row(String nameKey, String side, num v) {
+      final pct = (v / max * 100).toStringAsFixed(1);
+      return '''
+      <div class="bench-row">
+        <span class="bench-name">${chrome[nameKey]}</span>
+        <span class="bench-track"><span class="bench-bar bench-$side" style="width:$pct%"></span></span>
+        <span class="bench-val">${fmt(v)}</span>
+      </div>''';
+    }
+
+    return '''
+    <div class="bench-metric">
+      <h4>${chrome[titleKey]} <span class="badge verdict-$winner">${chrome[_benchWinKeys[winner]]}</span></h4>
+${row('cmpNative', 'native', natVal)}
+${row('cmpFxdart', 'fxdart', fxVal)}
+    </div>''';
+  }
+
+  final blocks = StringBuffer();
+  for (final scale in _benchScaleOrder) {
+    final s = scales[scale] as Map<String, dynamic>?;
+    if (s == null || s.containsKey('error')) continue;
+    final nat = s['native'] as Map<String, dynamic>;
+    final fx = s['fxdart'] as Map<String, dynamic>;
+    final heading = chrome['cmpBenchScale']!
+        .replaceAll('{n}', _benchFmtInt(s['n'] as num));
+    blocks
+      ..writeln('  <div class="bench-scale">')
+      ..writeln('    <h3>$heading</h3>')
+      ..writeln(metric('cmpBenchTime', s['timeWinner'] as String,
+          nat['medianUs'] as num, fx['medianUs'] as num, _benchFmtUs))
+      ..writeln(metric('cmpBenchMemory', s['memWinner'] as String,
+          nat['medianRssBytes'] as num, fx['medianRssBytes'] as num,
+          _benchFmtMb))
+      ..writeln('  </div>');
+  }
+  if (blocks.isEmpty) return '';
+
+  final meta = chrome['cmpBenchMeta']!
+      .replaceAll('{cpu}', '${machine['cpu']}')
+      .replaceAll('{ram}', '${machine['ramGb']}')
+      .replaceAll('{dart}', '${machine['dart']}')
+      .replaceAll('{date}', '${data['date']}');
+  final absMs = (data['tieAbsMs'] ?? 5) as num;
+  final methodNote = chrome['cmpBenchMethodNote']!
+      .replaceAll('{margin}', '${(data['tieMarginPct'] as num).round()}')
+      .replaceAll(
+          '{absMs}', absMs == absMs.round() ? '${absMs.round()}' : '$absMs');
+
+  return (StringBuffer()
+        ..writeln('  <section class="cmp-bench">')
+        ..writeln('  <h2>${chrome['cmpBenchTitle']}</h2>')
+        ..writeln('  <p class="dim bench-meta">$meta</p>')
+        ..writeln('  <div class="bench-scales">')
+        ..write(blocks)
+        ..writeln('  </div>')
+        ..writeln('  <p class="dim bench-note">$methodNote '
+            '${chrome['cmpBenchMemNote']}</p>')
+        ..writeln('  </section>'))
+      .toString();
+}
+
 /// The orders of the five examples the TOC recommends to a reader in a hurry.
 const _cmpPicks = [1, 11, 30, 41, 50];
 
@@ -949,6 +1072,7 @@ String _renderComparison(
         slug,
         depth,
         chrome))
+    ..write(_cmpBenchSection(slug, chrome))
     ..writeln('')
     ..writeln('  <nav class="tut-nav">');
   if (prev != null) {

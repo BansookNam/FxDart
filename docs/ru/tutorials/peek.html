@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2cae938658e29016">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=19182d43db0b4d3e">
 </head>
 <body>
 <header class="site-header">
@@ -83,7 +83,7 @@ FxAsync&lt;T&gt; FxAsync.peek(FutureOr&lt;void&gt; Function(T a) f)</div>
   <h2>Demo 1 · Basics</h2>
   <p>Same values in, same values out — <code>peek</code> only ever
     observes:</p>
-  <div class="playground" data-pg="bbed56971dfadc40">
+  <div class="playground" data-pg="0e5545089373c893">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -106,7 +106,7 @@ void main() {
   </div>
 
   <h2>Demo 2 · Async, with real concurrency</h2>
-  <div class="playground" data-pg="29e8146218a1f298">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -136,7 +136,7 @@ Future<void> main() async {
   <p>Exercise: use <code>peek</code> to print
     <code>'checking price: $p'</code> for each price without changing the
     values, then sum them with <code>fold</code>.</p>
-  <div class="playground" data-pg="3d4bded00b2454ea">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -170,7 +170,7 @@ void main() {
   <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=2cae938658e29016";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=19182d43db0b4d3e";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

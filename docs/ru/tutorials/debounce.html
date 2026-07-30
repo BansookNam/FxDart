@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2cae938658e29016">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=19182d43db0b4d3e">
 </head>
 <body>
 <header class="site-header">
@@ -86,7 +86,7 @@ class Debounced&lt;T&gt; {
 
   <h2>Demo 1 · Trailing edge (the default)</h2>
   <p>Three rapid calls collapse into one — only the last argument survives:</p>
-  <div class="playground" data-pg="135e2b4416ea1737">
+  <div class="playground" data-pg="7ba618eb3d742e00">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -112,7 +112,7 @@ Future<void> main() async {
     <code>leading: true</code> fires immediately and suppresses the rest of
     the burst; <code>.cancel()</code> drops a pending trailing call entirely:
   </p>
-  <div class="playground" data-pg="0f596859bd6789a7">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -144,7 +144,7 @@ Future<void> main() async {
   <h2>Try it yourself</h2>
   <p>Exercise: wrap <code>save</code> in <code>debounce</code> (100ms wait)
     so only the final value survives the burst of calls below.</p>
-  <div class="playground" data-pg="6f6f6cba9298370c">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -183,7 +183,7 @@ Future<void> main() async {
   <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=2cae938658e29016";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=19182d43db0b4d3e";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
