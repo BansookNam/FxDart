@@ -1,3 +1,32 @@
+## Unreleased
+
+### Performance
+
+* **Lazy sync operators rewritten from `sync*` generators to dedicated
+  iterator classes** (`map`, `filter`, `peek`, `flatMap`, `scan`, `scan1`,
+  `compact`, `uniqBy`, `take`, `drop`, `takeWhile`, `dropWhile`, `dropUntil`,
+  `takeUntilInclusive`, `slice`, `chunk`, `zip`, `zip3`, `zipWithIndex`,
+  `range`, `repeat`, `concat`, `append`, `prepend`). A `sync*` `moveNext`
+  costs ~4× more than a plain iterator class under AOT and the penalty
+  compounds per chained operator. Laziness, effect order, and per-iteration
+  state are unchanged; the whole test suite passes as-is.
+* **`sortBy` extracts each key exactly once** (decorate–sort–undecorate;
+  previously the key extractor ran twice per comparison) and uses unboxed
+  fast paths when every key is `double`, `int`, or `String`. `compareTo`
+  semantics (NaN, `-0.0`) are identical on every path; ordering is
+  unchanged.
+* **`maxBy` / `minBy` cache the running best's key** — the key extractor now
+  runs exactly once per element.
+* **`sum` / `sumBy` / `average` accumulate unboxed**, switching from int to
+  double accumulation at the first double value — bit-identical results to
+  the previous boxed `num` fold on every input sequence.
+
+Measured on the DartComparison benchmark suite (`benchmark/`, Apple M1 Max,
+AOT): median fxdart/native time ratio improved from ~1.8× to ~1.5×, the
+worst case from 18.4× to 5.9×, and four cases (`top-expenses`,
+`top-merchants`, `unique-tags`, `price-drop-detection`) are now faster than
+the hand-written native implementation.
+
 ## 0.7.0
 
 ### Added — Dart 3.10 dot shorthands for `Either`

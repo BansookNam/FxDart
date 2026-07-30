@@ -11,23 +11,64 @@ import 'map.dart';
 /// ```dart
 /// zip(['a', 'b'], [1, 2]); // (('a', 1), ('b', 2))
 /// ```
-Iterable<(A, B)> zip<A, B>(Iterable<A> iterable1, Iterable<B> iterable2) sync* {
-  final it1 = iterable1.iterator;
-  final it2 = iterable2.iterator;
-  while (it1.moveNext() && it2.moveNext()) {
-    yield (it1.current, it2.current);
+Iterable<(A, B)> zip<A, B>(Iterable<A> iterable1, Iterable<B> iterable2) =>
+    _ZipIterable(iterable1, iterable2);
+
+class _ZipIterable<A, B> extends Iterable<(A, B)> {
+  _ZipIterable(this._source1, this._source2);
+  final Iterable<A> _source1;
+  final Iterable<B> _source2;
+  @override
+  Iterator<(A, B)> get iterator =>
+      _ZipIterator(_source1.iterator, _source2.iterator);
+}
+
+class _ZipIterator<A, B> implements Iterator<(A, B)> {
+  _ZipIterator(this._it1, this._it2);
+  final Iterator<A> _it1;
+  final Iterator<B> _it2;
+  @override
+  late (A, B) current;
+  @override
+  bool moveNext() {
+    if (_it1.moveNext() && _it2.moveNext()) {
+      current = (_it1.current, _it2.current);
+      return true;
+    }
+    return false;
   }
 }
 
 /// Three-iterable variant of [zip]. (Dart has no variadic generics, so each
 /// arity is a separate function.)
-Iterable<(A, B, C)> zip3<A, B, C>(
-    Iterable<A> iterable1, Iterable<B> iterable2, Iterable<C> iterable3) sync* {
-  final it1 = iterable1.iterator;
-  final it2 = iterable2.iterator;
-  final it3 = iterable3.iterator;
-  while (it1.moveNext() && it2.moveNext() && it3.moveNext()) {
-    yield (it1.current, it2.current, it3.current);
+Iterable<(A, B, C)> zip3<A, B, C>(Iterable<A> iterable1, Iterable<B> iterable2,
+        Iterable<C> iterable3) =>
+    _Zip3Iterable(iterable1, iterable2, iterable3);
+
+class _Zip3Iterable<A, B, C> extends Iterable<(A, B, C)> {
+  _Zip3Iterable(this._source1, this._source2, this._source3);
+  final Iterable<A> _source1;
+  final Iterable<B> _source2;
+  final Iterable<C> _source3;
+  @override
+  Iterator<(A, B, C)> get iterator =>
+      _Zip3Iterator(_source1.iterator, _source2.iterator, _source3.iterator);
+}
+
+class _Zip3Iterator<A, B, C> implements Iterator<(A, B, C)> {
+  _Zip3Iterator(this._it1, this._it2, this._it3);
+  final Iterator<A> _it1;
+  final Iterator<B> _it2;
+  final Iterator<C> _it3;
+  @override
+  late (A, B, C) current;
+  @override
+  bool moveNext() {
+    if (_it1.moveNext() && _it2.moveNext() && _it3.moveNext()) {
+      current = (_it1.current, _it2.current, _it3.current);
+      return true;
+    }
+    return false;
   }
 }
 
@@ -88,10 +129,29 @@ FxAsyncIterable<C> zipWithAsync<A, B, C>(FutureOr<C> Function(A a, B b) f,
 /// Pairs each element with its index: `(index, value)`.
 ///
 /// Port of FxTS `zipWithIndex`.
-Iterable<(int, A)> zipWithIndex<A>(Iterable<A> iterable) sync* {
-  var i = 0;
-  for (final a in iterable) {
-    yield (i++, a);
+Iterable<(int, A)> zipWithIndex<A>(Iterable<A> iterable) =>
+    _ZipWithIndexIterable(iterable);
+
+class _ZipWithIndexIterable<A> extends Iterable<(int, A)> {
+  _ZipWithIndexIterable(this._source);
+  final Iterable<A> _source;
+  @override
+  Iterator<(int, A)> get iterator => _ZipWithIndexIterator(_source.iterator);
+}
+
+class _ZipWithIndexIterator<A> implements Iterator<(int, A)> {
+  _ZipWithIndexIterator(this._it);
+  final Iterator<A> _it;
+  var _i = 0;
+  @override
+  late (int, A) current;
+  @override
+  bool moveNext() {
+    if (_it.moveNext()) {
+      current = (_i++, _it.current);
+      return true;
+    }
+    return false;
   }
 }
 

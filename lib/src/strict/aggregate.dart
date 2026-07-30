@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import '../async_iterable.dart';
 
@@ -128,7 +129,27 @@ Acc Function(Iterable<A>) reduceLazy<A, Acc>(
 /// Adds every number in the iterable.
 ///
 /// Port of FxTS `sum`.
-num sum(Iterable<num> iterable) => fold<num, num>(0, (a, b) => a + b, iterable);
+num sum(Iterable<num> iterable) {
+  // Unboxed accumulators with the boxed `num acc += v` sequence's exact
+  // semantics: ints accumulate in an int until the first double arrives,
+  // then accumulation switches to double seeded with the int total — the
+  // same value the num fold would hold at every step.
+  var iacc = 0;
+  var dacc = 0.0;
+  var isInt = true;
+  for (final v in iterable) {
+    if (isInt) {
+      if (v is int) {
+        iacc += v;
+        continue;
+      }
+      dacc = iacc.toDouble();
+      isInt = false;
+    }
+    dacc += v;
+  }
+  return isInt ? iacc : dacc;
+}
 
 /// Sums the key [f] of every element — `map` + [sum] in one step, so a
 /// pipeline that only needs a field total doesn't spell out the projection.
@@ -137,8 +158,25 @@ num sum(Iterable<num> iterable) => fold<num, num>(0, (a, b) => a + b, iterable);
 ///
 /// Dart-native addition (FxTS has only the numeric `sum`); named after
 /// [maxBy]/[minBy] — Kotlin spells it `sumOf`.
-num sumBy<A>(num Function(A a) f, Iterable<A> iterable) =>
-    fold<A, num>(0, (acc, a) => acc + f(a), iterable);
+num sumBy<A>(num Function(A a) f, Iterable<A> iterable) {
+  // Same unboxed int-then-double accumulation as [sum].
+  var iacc = 0;
+  var dacc = 0.0;
+  var isInt = true;
+  for (final a in iterable) {
+    final v = f(a);
+    if (isInt) {
+      if (v is int) {
+        iacc += v;
+        continue;
+      }
+      dacc = iacc.toDouble();
+      isInt = false;
+    }
+    dacc += v;
+  }
+  return isInt ? iacc : dacc;
+}
 
 /// Async counterpart of [sumBy].
 Future<num> sumByAsync<A>(
@@ -157,13 +195,25 @@ String sumStrings(Iterable<String> iterable) =>
 ///
 /// Port of FxTS `average`.
 double average(Iterable<num> iterable) {
+  // Same unboxed int-then-double accumulation as [sum].
   var size = 0;
-  num total = 0;
-  for (final a in iterable) {
+  var iacc = 0;
+  var dacc = 0.0;
+  var isInt = true;
+  for (final v in iterable) {
     size++;
-    total += a;
+    if (isInt) {
+      if (v is int) {
+        iacc += v;
+        continue;
+      }
+      dacc = iacc.toDouble();
+      isInt = false;
+    }
+    dacc += v;
   }
-  return size == 0 ? double.nan : total / size;
+  if (size == 0) return double.nan;
+  return isInt ? iacc / size : dacc / size;
 }
 
 /// Async counterpart of [average].
@@ -242,10 +292,15 @@ Future<num> maxAsync(FxAsyncIterable<num> iterable) =>
 /// `minByOrNull` shape, nullable like [head]/[last].
 A? minBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
   A? best;
+  Object? bestKey;
   var seen = false;
   for (final a in iterable) {
-    if (!seen || _compareBy(f, a, best as A) < 0) {
+    // The key of the running best is extracted once and cached; [f] runs
+    // exactly once per element.
+    final key = f(a);
+    if (!seen || _compareKeys(key, bestKey) < 0) {
       best = a;
+      bestKey = key;
       seen = true;
     }
   }
@@ -275,10 +330,13 @@ Future<A?> minByAsync<A>(
 /// `maxByOrNull` shape, nullable like [head]/[last].
 A? maxBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
   A? best;
+  Object? bestKey;
   var seen = false;
   for (final a in iterable) {
-    if (!seen || _compareBy(f, a, best as A) > 0) {
+    final key = f(a);
+    if (!seen || _compareKeys(key, bestKey) > 0) {
       best = a;
+      bestKey = key;
       seen = true;
     }
   }
@@ -403,9 +461,7 @@ Future<List<A>> sortAsync<A>(
 List<A> toSorted<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
     sort(f, iterable);
 
-int _compareBy<A>(Object? Function(A a) f, A a, A b) {
-  final fa = f(a);
-  final fb = f(b);
+int _compareKeys(Object? fa, Object? fb) {
   if (fa is Comparable && fb is Comparable) {
     return Comparable.compare(
         fa as Comparable<Object?>, fb as Comparable<Object?>);
@@ -413,11 +469,58 @@ int _compareBy<A>(Object? Function(A a) f, A a, A b) {
   return 0;
 }
 
+int _compareBy<A>(Object? Function(A a) f, A a, A b) => _compareKeys(f(a), f(b));
+
 /// Returns a new list sorted by the key extractor [f] (ascending).
 ///
 /// Port of FxTS `sortBy`.
-List<A> sortBy<A>(Object? Function(A a) f, Iterable<A> iterable) =>
-    sort((a, b) => _compareBy(f, a, b), iterable);
+List<A> sortBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
+  // Decorate-sort-undecorate: extract each key once, sort an index list, and
+  // read the permutation back. Sorting the values directly with a
+  // `_compareBy` comparator would call [f] twice per comparison —
+  // 2·n·log n extractions instead of n. The permutation is identical to the
+  // direct sort's: sort decisions depend only on comparator outcomes, and
+  // the index comparator returns exactly what the direct comparator would.
+  final items = List.of(iterable);
+  final length = items.length;
+  if (length < 2) return items;
+  final keys = [for (final a in items) f(a)];
+  final indices = [for (var i = 0; i < length; i++) i];
+
+  // Homogeneous key types get an unboxed key array and a devirtualized
+  // compareTo — the generic path pays an `is Comparable` test and a dynamic
+  // compareTo on every comparison. compareTo semantics (NaN, -0.0) are the
+  // same on every path. No Int64List: the playground build targets JS.
+  var allDouble = true, allInt = true, allString = true;
+  for (final k in keys) {
+    if (k is! double) allDouble = false;
+    if (k is! int) allInt = false;
+    if (k is! String) allString = false;
+    if (!(allDouble || allInt || allString)) break;
+  }
+  if (allDouble) {
+    final dk = Float64List(length);
+    for (var i = 0; i < length; i++) {
+      dk[i] = keys[i] as double;
+    }
+    indices.sort((i, j) => dk[i].compareTo(dk[j]));
+  } else if (allInt) {
+    final ik = List<int>.filled(length, 0);
+    for (var i = 0; i < length; i++) {
+      ik[i] = keys[i] as int;
+    }
+    indices.sort((i, j) => ik[i].compareTo(ik[j]));
+  } else if (allString) {
+    final sk = List<String>.filled(length, '');
+    for (var i = 0; i < length; i++) {
+      sk[i] = keys[i] as String;
+    }
+    indices.sort((i, j) => sk[i].compareTo(sk[j]));
+  } else {
+    indices.sort((i, j) => _compareKeys(keys[i], keys[j]));
+  }
+  return [for (final i in indices) items[i]];
+}
 
 /// Async counterpart of [sortBy].
 Future<List<A>> sortByAsync<A>(

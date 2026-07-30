@@ -10,9 +10,33 @@ import 'map.dart';
 /// ```dart
 /// filter((a) => a % 2 == 0, [0, 1, 2, 3, 4, 5, 6]); // (0, 2, 4, 6)
 /// ```
-Iterable<A> filter<A>(bool Function(A a) f, Iterable<A> iterable) sync* {
-  for (final a in iterable) {
-    if (f(a)) yield a;
+Iterable<A> filter<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    _FilterIterable(f, iterable);
+
+class _FilterIterable<A> extends Iterable<A> {
+  _FilterIterable(this._f, this._source);
+  final bool Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _FilterIterator(_f, _source.iterator);
+}
+
+class _FilterIterator<A> implements Iterator<A> {
+  _FilterIterator(this._f, this._it);
+  final bool Function(A) _f;
+  final Iterator<A> _it;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final v = _it.current;
+      if (_f(v)) {
+        current = v;
+        return true;
+      }
+    }
+    return false;
   }
 }
 
@@ -25,9 +49,30 @@ Iterable<A> reject<A>(bool Function(A a) f, Iterable<A> iterable) =>
 /// Filters `null` out and narrows the element type.
 ///
 /// Port of FxTS `compact`.
-Iterable<A> compact<A>(Iterable<A?> iterable) sync* {
-  for (final a in iterable) {
-    if (a != null) yield a;
+Iterable<A> compact<A>(Iterable<A?> iterable) => _CompactIterable(iterable);
+
+class _CompactIterable<A> extends Iterable<A> {
+  _CompactIterable(this._source);
+  final Iterable<A?> _source;
+  @override
+  Iterator<A> get iterator => _CompactIterator(_source.iterator);
+}
+
+class _CompactIterator<A> implements Iterator<A> {
+  _CompactIterator(this._it);
+  final Iterator<A?> _it;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final v = _it.current;
+      if (v != null) {
+        current = v;
+        return true;
+      }
+    }
+    return false;
   }
 }
 
@@ -154,10 +199,34 @@ FxAsyncIterable<A> compactAsync<A>(FxAsyncIterable<A?> iterable) =>
 /// Returns an iterable with unique values as determined by [f].
 ///
 /// Port of FxTS `uniqBy`.
-Iterable<A> uniqBy<A, B>(B Function(A a) f, Iterable<A> iterable) sync* {
-  final seen = <B>{};
-  for (final a in iterable) {
-    if (seen.add(f(a))) yield a;
+Iterable<A> uniqBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    _UniqByIterable(f, iterable);
+
+class _UniqByIterable<A, B> extends Iterable<A> {
+  _UniqByIterable(this._f, this._source);
+  final B Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _UniqByIterator(_f, _source.iterator);
+}
+
+class _UniqByIterator<A, B> implements Iterator<A> {
+  _UniqByIterator(this._f, this._it);
+  final B Function(A) _f;
+  final Iterator<A> _it;
+  final _seen = <B>{};
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final v = _it.current;
+      if (_seen.add(_f(v))) {
+        current = v;
+        return true;
+      }
+    }
+    return false;
   }
 }
 

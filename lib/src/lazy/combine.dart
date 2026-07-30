@@ -12,28 +12,59 @@ import '../async_iterable.dart';
 /// range(1, 4);     // (1, 2, 3)
 /// range(4, 1, -1); // (4, 3, 2)
 /// ```
-Iterable<int> range(int start, [int? end, int step = 1]) sync* {
-  if (end == null) {
-    yield* range(0, start);
-    return;
-  }
-  if (step < 0) {
-    for (var i = start; i > end; i += step) {
-      yield i;
-    }
-  } else {
-    for (var i = start; i < end; i += step) {
-      yield i;
-    }
+Iterable<int> range(int start, [int? end, int step = 1]) =>
+    end == null ? _RangeIterable(0, start, 1) : _RangeIterable(start, end, step);
+
+class _RangeIterable extends Iterable<int> {
+  _RangeIterable(this._start, this._end, this._step);
+  final int _start;
+  final int _end;
+  final int _step;
+  @override
+  Iterator<int> get iterator => _RangeIterator(_start, _end, _step);
+}
+
+class _RangeIterator implements Iterator<int> {
+  _RangeIterator(this._next, this._end, this._step);
+  int _next;
+  final int _end;
+  final int _step;
+  @override
+  var current = 0;
+  @override
+  bool moveNext() {
+    if (_step < 0 ? _next <= _end : _next >= _end) return false;
+    current = _next;
+    _next += _step;
+    return true;
   }
 }
 
 /// Yields [value] [n] times.
 ///
 /// Port of FxTS `repeat`.
-Iterable<T> repeat<T>(int n, T value) sync* {
-  for (var i = 0; i < n; i++) {
-    yield value;
+Iterable<T> repeat<T>(int n, T value) => _RepeatIterable(n, value);
+
+class _RepeatIterable<T> extends Iterable<T> {
+  _RepeatIterable(this._n, this._value);
+  final int _n;
+  final T _value;
+  @override
+  Iterator<T> get iterator => _RepeatIterator(_n, _value);
+}
+
+class _RepeatIterator<T> implements Iterator<T> {
+  _RepeatIterator(this._remaining, this._value);
+  int _remaining;
+  final T _value;
+  @override
+  late T current;
+  @override
+  bool moveNext() {
+    if (_remaining < 1) return false;
+    _remaining--;
+    current = _value;
+    return true;
   }
 }
 
@@ -78,10 +109,8 @@ FxAsyncIterable<T> cycleAsync<T>(FxAsyncIterable<T> iterable) {
 /// Yields all values of [iterable], then [a].
 ///
 /// Port of FxTS `append`.
-Iterable<A> append<A>(A a, Iterable<A> iterable) sync* {
-  yield* iterable;
-  yield a;
-}
+Iterable<A> append<A>(A a, Iterable<A> iterable) =>
+    concat(iterable, _SingleIterable(a));
 
 /// Async counterpart of [append]. [a] may be a [Future].
 FxAsyncIterable<A> appendAsync<A>(FutureOr<A> a, FxAsyncIterable<A> iterable) {
@@ -103,9 +132,14 @@ FxAsyncIterable<A> appendAsync<A>(FutureOr<A> a, FxAsyncIterable<A> iterable) {
 /// Yields [a], then all values of [iterable].
 ///
 /// Port of FxTS `prepend`.
-Iterable<A> prepend<A>(A a, Iterable<A> iterable) sync* {
-  yield a;
-  yield* iterable;
+Iterable<A> prepend<A>(A a, Iterable<A> iterable) =>
+    concat(_SingleIterable(a), iterable);
+
+class _SingleIterable<A> extends Iterable<A> {
+  _SingleIterable(this._value);
+  final A _value;
+  @override
+  Iterator<A> get iterator => _RepeatIterator(1, _value);
 }
 
 /// Async counterpart of [prepend]. [a] may be a [Future].
@@ -126,9 +160,36 @@ FxAsyncIterable<A> prependAsync<A>(FutureOr<A> a, FxAsyncIterable<A> iterable) {
 /// Concatenates two iterables lazily.
 ///
 /// Port of FxTS `concat`.
-Iterable<A> concat<A>(Iterable<A> iterable1, Iterable<A> iterable2) sync* {
-  yield* iterable1;
-  yield* iterable2;
+Iterable<A> concat<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
+    _ConcatIterable(iterable1, iterable2);
+
+class _ConcatIterable<A> extends Iterable<A> {
+  _ConcatIterable(this._source1, this._source2);
+  final Iterable<A> _source1;
+  final Iterable<A> _source2;
+  @override
+  Iterator<A> get iterator => _ConcatIterator(_source1.iterator, _source2);
+}
+
+class _ConcatIterator<A> implements Iterator<A> {
+  _ConcatIterator(this._it, this._second);
+  Iterator<A> _it;
+  // The second source's iterator is created only when the first is exhausted,
+  // matching the generator form's effect order.
+  Iterable<A>? _second;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (!_it.moveNext()) {
+      final second = _second;
+      if (second == null) return false;
+      _second = null;
+      _it = second.iterator;
+    }
+    current = _it.current;
+    return true;
+  }
 }
 
 /// Async counterpart of [concat].

@@ -8,12 +8,29 @@ import 'zip.dart';
 /// Returns an iterable of the first [length] values from [iterable].
 ///
 /// Port of FxTS `take`.
-Iterable<A> take<A>(int length, Iterable<A> iterable) sync* {
-  if (length < 1) return;
-  var remaining = length;
-  for (final a in iterable) {
-    yield a;
-    if (--remaining < 1) return;
+Iterable<A> take<A>(int length, Iterable<A> iterable) =>
+    _TakeIterable(length, iterable);
+
+class _TakeIterable<A> extends Iterable<A> {
+  _TakeIterable(this._length, this._source);
+  final int _length;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _TakeIterator(_length, _source.iterator);
+}
+
+class _TakeIterator<A> implements Iterator<A> {
+  _TakeIterator(this._remaining, this._it);
+  int _remaining;
+  final Iterator<A> _it;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    if (_remaining < 1 || !_it.moveNext()) return false;
+    _remaining--;
+    current = _it.current;
+    return true;
   }
 }
 
@@ -68,10 +85,34 @@ FxAsyncIterable<A> takeRightAsync<A>(int length, FxAsyncIterable<A> iterable) {
 /// Returns an iterable that yields values as long as [f] returns true.
 ///
 /// Port of FxTS `takeWhile`.
-Iterable<A> takeWhile<A>(bool Function(A a) f, Iterable<A> iterable) sync* {
-  for (final a in iterable) {
-    if (!f(a)) return;
-    yield a;
+Iterable<A> takeWhile<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    _TakeWhileIterable(f, iterable);
+
+class _TakeWhileIterable<A> extends Iterable<A> {
+  _TakeWhileIterable(this._f, this._source);
+  final bool Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _TakeWhileIterator(_f, _source.iterator);
+}
+
+class _TakeWhileIterator<A> implements Iterator<A> {
+  _TakeWhileIterator(this._f, this._it);
+  final bool Function(A) _f;
+  final Iterator<A> _it;
+  var _done = false;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    if (_done || !_it.moveNext()) return false;
+    final v = _it.current;
+    if (!_f(v)) {
+      _done = true;
+      return false;
+    }
+    current = v;
+    return true;
   }
 }
 
@@ -98,10 +139,31 @@ FxAsyncIterable<A> takeWhileAsync<A>(
 ///
 /// Port of FxTS `takeUntilInclusive`.
 Iterable<A> takeUntilInclusive<A>(
-    bool Function(A a) f, Iterable<A> iterable) sync* {
-  for (final a in iterable) {
-    yield a;
-    if (f(a)) return;
+        bool Function(A a) f, Iterable<A> iterable) =>
+    _TakeUntilInclusiveIterable(f, iterable);
+
+class _TakeUntilInclusiveIterable<A> extends Iterable<A> {
+  _TakeUntilInclusiveIterable(this._f, this._source);
+  final bool Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _TakeUntilInclusiveIterator(_f, _source.iterator);
+}
+
+class _TakeUntilInclusiveIterator<A> implements Iterator<A> {
+  _TakeUntilInclusiveIterator(this._f, this._it);
+  final bool Function(A) _f;
+  final Iterator<A> _it;
+  var _done = false;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    if (_done || !_it.moveNext()) return false;
+    final v = _it.current;
+    if (_f(v)) _done = true;
+    current = v;
+    return true;
   }
 }
 
@@ -139,14 +201,32 @@ FxAsyncIterable<A> takeUntilAsync<A>(
 /// Returns an iterable that skips the first [length] values.
 ///
 /// Port of FxTS `drop`.
-Iterable<A> drop<A>(int length, Iterable<A> iterable) sync* {
-  var remaining = length;
-  for (final a in iterable) {
-    if (remaining > 0) {
-      remaining--;
-      continue;
+Iterable<A> drop<A>(int length, Iterable<A> iterable) =>
+    _DropIterable(length, iterable);
+
+class _DropIterable<A> extends Iterable<A> {
+  _DropIterable(this._length, this._source);
+  final int _length;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _DropIterator(_length, _source.iterator);
+}
+
+class _DropIterator<A> implements Iterator<A> {
+  _DropIterator(this._remaining, this._it);
+  int _remaining;
+  final Iterator<A> _it;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_remaining > 0) {
+      _remaining--;
+      if (!_it.moveNext()) return false;
     }
-    yield a;
+    if (!_it.moveNext()) return false;
+    current = _it.current;
+    return true;
   }
 }
 
@@ -202,15 +282,36 @@ FxAsyncIterable<A> dropRightAsync<A>(int length, FxAsyncIterable<A> iterable) {
 /// Skips values while [f] returns true, then yields the rest.
 ///
 /// Port of FxTS `dropWhile`.
-Iterable<A> dropWhile<A>(bool Function(A a) f, Iterable<A> iterable) sync* {
-  final iterator = iterable.iterator;
-  while (iterator.moveNext()) {
-    if (f(iterator.current)) continue;
-    yield iterator.current;
-    while (iterator.moveNext()) {
-      yield iterator.current;
+Iterable<A> dropWhile<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    _DropWhileIterable(f, iterable);
+
+class _DropWhileIterable<A> extends Iterable<A> {
+  _DropWhileIterable(this._f, this._source);
+  final bool Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _DropWhileIterator(_f, _source.iterator);
+}
+
+class _DropWhileIterator<A> implements Iterator<A> {
+  _DropWhileIterator(this._f, this._it);
+  final bool Function(A) _f;
+  final Iterator<A> _it;
+  var _dropping = true;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final v = _it.current;
+      if (_dropping) {
+        if (_f(v)) continue;
+        _dropping = false;
+      }
+      current = v;
+      return true;
     }
-    return;
+    return false;
   }
 }
 
@@ -238,13 +339,33 @@ FxAsyncIterable<A> dropWhileAsync<A>(
 /// too — then yields the rest.
 ///
 /// Port of FxTS `dropUntil`.
-Iterable<A> dropUntil<A>(bool Function(A a) f, Iterable<A> iterable) sync* {
-  final iterator = iterable.iterator;
-  while (iterator.moveNext()) {
-    if (f(iterator.current)) break;
-  }
-  while (iterator.moveNext()) {
-    yield iterator.current;
+Iterable<A> dropUntil<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    _DropUntilIterable(f, iterable);
+
+class _DropUntilIterable<A> extends Iterable<A> {
+  _DropUntilIterable(this._f, this._source);
+  final bool Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _DropUntilIterator(_f, _source.iterator);
+}
+
+class _DropUntilIterator<A> implements Iterator<A> {
+  _DropUntilIterator(this._f, this._it);
+  final bool Function(A) _f;
+  final Iterator<A> _it;
+  var _dropping = true;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_dropping) {
+      if (!_it.moveNext()) return false;
+      if (_f(_it.current)) _dropping = false;
+    }
+    if (!_it.moveNext()) return false;
+    current = _it.current;
+    return true;
   }
 }
 
@@ -269,13 +390,38 @@ FxAsyncIterable<A> dropUntilAsync<A>(
 /// (exclusive) by index.
 ///
 /// Port of FxTS `slice`. Omit [end] to take everything from [start].
-Iterable<A> slice<A>(int start, Iterable<A> iterable, [int? end]) sync* {
-  var i = 0;
-  for (final item in iterable) {
-    if (i >= start && (end == null || i < end)) {
-      yield item;
+Iterable<A> slice<A>(int start, Iterable<A> iterable, [int? end]) =>
+    _SliceIterable(start, end, iterable);
+
+class _SliceIterable<A> extends Iterable<A> {
+  _SliceIterable(this._start, this._end, this._source);
+  final int _start;
+  final int? _end;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _SliceIterator(_start, _end, _source.iterator);
+}
+
+class _SliceIterator<A> implements Iterator<A> {
+  _SliceIterator(this._start, this._end, this._it);
+  final int _start;
+  final int? _end;
+  final Iterator<A> _it;
+  var _i = 0;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    // Matches the generator form: the source is consumed to its end even
+    // past [_end] — iteration stops only when the source does.
+    while (_it.moveNext()) {
+      final index = _i++;
+      if (index >= _start && (_end == null || index < _end)) {
+        current = _it.current;
+        return true;
+      }
     }
-    i += 1;
+    return false;
   }
 }
 
@@ -302,17 +448,34 @@ FxAsyncIterable<A> sliceAsync<A>(int start, FxAsyncIterable<A> iterable,
 /// elements (the last chunk may be shorter).
 ///
 /// Port of FxTS `chunk`.
-Iterable<List<A>> chunk<A>(int size, Iterable<A> iterable) sync* {
-  if (size < 1) return;
-  var items = <A>[];
-  for (final a in iterable) {
-    items.add(a);
-    if (items.length == size) {
-      yield items;
-      items = <A>[];
+Iterable<List<A>> chunk<A>(int size, Iterable<A> iterable) =>
+    _ChunkIterable(size, iterable);
+
+class _ChunkIterable<A> extends Iterable<List<A>> {
+  _ChunkIterable(this._size, this._source);
+  final int _size;
+  final Iterable<A> _source;
+  @override
+  Iterator<List<A>> get iterator => _ChunkIterator(_size, _source.iterator);
+}
+
+class _ChunkIterator<A> implements Iterator<List<A>> {
+  _ChunkIterator(this._size, this._it);
+  final int _size;
+  final Iterator<A> _it;
+  @override
+  late List<A> current;
+  @override
+  bool moveNext() {
+    if (_size < 1) return false;
+    final items = <A>[];
+    while (items.length < _size && _it.moveNext()) {
+      items.add(_it.current);
     }
+    if (items.isEmpty) return false;
+    current = items;
+    return true;
   }
-  if (items.isNotEmpty) yield items;
 }
 
 /// Async counterpart of [chunk].

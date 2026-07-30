@@ -2,6 +2,12 @@ import 'dart:async';
 
 import '../async_iterable.dart';
 
+// The sync operators here (and in filter.dart, take_drop.dart, zip.dart,
+// combine.dart) are hand-written Iterator classes rather than sync*
+// generators: a sync* moveNext costs ~4x more than a plain class under AOT,
+// and the difference compounds per chained operator. Laziness, effect order,
+// and per-iteration freshness are identical to the generator form.
+
 /// Returns a lazy [Iterable] of values by running each element through [f].
 ///
 /// Port of FxTS `map` (sync).
@@ -9,9 +15,30 @@ import '../async_iterable.dart';
 /// ```dart
 /// map((a) => a + 10, [1, 2, 3, 4]); // (11, 12, 13, 14)
 /// ```
-Iterable<B> map<A, B>(B Function(A a) f, Iterable<A> iterable) sync* {
-  for (final a in iterable) {
-    yield f(a);
+Iterable<B> map<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    _MapIterable(f, iterable);
+
+class _MapIterable<A, B> extends Iterable<B> {
+  _MapIterable(this._f, this._source);
+  final B Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<B> get iterator => _MapIterator(_f, _source.iterator);
+}
+
+class _MapIterator<A, B> implements Iterator<B> {
+  _MapIterator(this._f, this._it);
+  final B Function(A) _f;
+  final Iterator<A> _it;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    if (_it.moveNext()) {
+      current = _f(_it.current);
+      return true;
+    }
+    return false;
   }
 }
 
@@ -47,10 +74,32 @@ FxAsyncIterable<B> mapEffectAsync<A, B>(
 /// Iterates over each element, applying [f] without changing the values.
 ///
 /// Port of FxTS `peek`.
-Iterable<A> peek<A>(void Function(A a) f, Iterable<A> iterable) sync* {
-  for (final a in iterable) {
-    f(a);
-    yield a;
+Iterable<A> peek<A>(void Function(A a) f, Iterable<A> iterable) =>
+    _PeekIterable(f, iterable);
+
+class _PeekIterable<A> extends Iterable<A> {
+  _PeekIterable(this._f, this._source);
+  final void Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _PeekIterator(_f, _source.iterator);
+}
+
+class _PeekIterator<A> implements Iterator<A> {
+  _PeekIterator(this._f, this._it);
+  final void Function(A) _f;
+  final Iterator<A> _it;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    if (_it.moveNext()) {
+      final v = _it.current;
+      _f(v);
+      current = v;
+      return true;
+    }
+    return false;
   }
 }
 
@@ -139,9 +188,38 @@ FxAsyncIterable<dynamic> flatAsync(FxAsyncIterable<dynamic> iterable,
 /// Dart port requires the callback to return an `Iterable<B>` so the result
 /// can stay typed — same contract as `Iterable.expand`.
 Iterable<B> flatMap<A, B>(
-    Iterable<B> Function(A a) f, Iterable<A> iterable) sync* {
-  for (final a in iterable) {
-    yield* f(a);
+        Iterable<B> Function(A a) f, Iterable<A> iterable) =>
+    _FlatMapIterable(f, iterable);
+
+class _FlatMapIterable<A, B> extends Iterable<B> {
+  _FlatMapIterable(this._f, this._source);
+  final Iterable<B> Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<B> get iterator => _FlatMapIterator(_f, _source.iterator);
+}
+
+class _FlatMapIterator<A, B> implements Iterator<B> {
+  _FlatMapIterator(this._f, this._it);
+  final Iterable<B> Function(A) _f;
+  final Iterator<A> _it;
+  Iterator<B>? _inner;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    while (true) {
+      final inner = _inner;
+      if (inner != null) {
+        if (inner.moveNext()) {
+          current = inner.current;
+          return true;
+        }
+        _inner = null;
+      }
+      if (!_it.moveNext()) return false;
+      _inner = _f(_it.current).iterator;
+    }
   }
 }
 
@@ -172,12 +250,38 @@ FxAsyncIterable<B> flatMapAsync<A, B>(
 /// ```dart
 /// scan((acc, a) => acc + a, 10, [1, 2, 3]); // (10, 11, 13, 16)
 /// ```
-Iterable<B> scan<A, B>(
-    B Function(B acc, A a) f, B seed, Iterable<A> iterable) sync* {
-  var acc = seed;
-  yield acc;
-  for (final a in iterable) {
-    yield acc = f(acc, a);
+Iterable<B> scan<A, B>(B Function(B acc, A a) f, B seed, Iterable<A> iterable) =>
+    _ScanIterable(f, seed, iterable);
+
+class _ScanIterable<A, B> extends Iterable<B> {
+  _ScanIterable(this._f, this._seed, this._source);
+  final B Function(B, A) _f;
+  final B _seed;
+  final Iterable<A> _source;
+  @override
+  Iterator<B> get iterator => _ScanIterator(_f, _seed, _source.iterator);
+}
+
+class _ScanIterator<A, B> implements Iterator<B> {
+  _ScanIterator(this._f, this._seed, this._it);
+  final B Function(B, A) _f;
+  final B _seed;
+  final Iterator<A> _it;
+  var _emittedSeed = false;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    if (!_emittedSeed) {
+      _emittedSeed = true;
+      current = _seed;
+      return true;
+    }
+    if (_it.moveNext()) {
+      current = _f(current, _it.current);
+      return true;
+    }
+    return false;
   }
 }
 
@@ -185,13 +289,30 @@ Iterable<B> scan<A, B>(
 /// Returns an empty iterable when [iterable] is empty.
 ///
 /// Port of FxTS `scan(f, iterable)`.
-Iterable<A> scan1<A>(A Function(A acc, A a) f, Iterable<A> iterable) sync* {
-  final iterator = iterable.iterator;
-  if (!iterator.moveNext()) return;
-  var acc = iterator.current;
-  yield acc;
-  while (iterator.moveNext()) {
-    yield acc = f(acc, iterator.current);
+Iterable<A> scan1<A>(A Function(A acc, A a) f, Iterable<A> iterable) =>
+    _Scan1Iterable(f, iterable);
+
+class _Scan1Iterable<A> extends Iterable<A> {
+  _Scan1Iterable(this._f, this._source);
+  final A Function(A, A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _Scan1Iterator(_f, _source.iterator);
+}
+
+class _Scan1Iterator<A> implements Iterator<A> {
+  _Scan1Iterator(this._f, this._it);
+  final A Function(A, A) _f;
+  final Iterator<A> _it;
+  var _started = false;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    if (!_it.moveNext()) return false;
+    current = _started ? _f(current, _it.current) : _it.current;
+    _started = true;
+    return true;
   }
 }
 

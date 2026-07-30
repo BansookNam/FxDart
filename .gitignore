@@ -83,3 +83,6 @@ codecov
 
 # Working plans — local only
 plans/
+
+# Benchmark AOT binaries — rebuilt on demand by run_benchmarks.dart
+benchmark/.build/
