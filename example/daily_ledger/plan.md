@@ -9,6 +9,10 @@ data work in memory.
 - **Target:** Flutter **web only** (for now). Later compiled and hosted on
   GitHub Pages next to FxDart 101 (see [Deployment](#deployment)).
 - **Location:** `example/daily_ledger/`
+- **Next series:** [`TYPED_ERRORS_PLAN.md`](TYPED_ERRORS_PLAN.md) — rounds
+  10–13, covering FxDart 101 section 13 (`Either`, `Raise`, `nullable`,
+  `Nel`, accumulation, `Either × pipelines`) with one app call site per
+  public member and a "?" explainer per chapter.
 
 ## Principles
 
@@ -186,6 +190,9 @@ Track which fxdart operators the app demonstrates; grow it every round.
 | ✅ round 8 | concat (forecast), averageBy — **new operator added to fxdart 0.5.0 this round** |
 | ✅ round 9 | polish: cached the last per-rebuild pipelines; fxdart-consistency sweep in the ? dialogs |
 | ⏸ intentionally uncovered | omit, slice, cycle, tap, scan1, repeat — no natural fit in this app; forcing them would violate the "readable over clever" principle |
+| ✅ round 10 | typed errors, chapters 1·2·6-sync: `either`, `Raise.raise`, `ensure`, `ensureNotNull`, `bind`, `withError`, `catching`, `Either.left/right`, `Left`/`Right` patterns, `isLeft`/`isRight`, `mapLeft`, `getOrElse`, `getOrNull`, `leftOrNull`, `Nel`/`Nel.of`/`orNull`/`head`/`tail`/`map`/`+`/`toList`/`deepEquals`, `separated()`, `sequence()`, `rights()`, `mapOrAccumulate` |
+| ✅ round 11 | typed errors, chapters 4·5: `zipOrAccumulate5` (entry form), `zipOrAccumulate2` (budget dialog), `accumulate`, `Accumulator.accumulating`, `hasErrors`, `Accumulated.value`, `AccumulatingRaise.over`, `toEitherNel` |
+| ⏭ rounds 12–13 (planned) | `nullable`/`SingletonRaise`, the async half (`eitherAsync`, `mapOrAccumulateAsync`, `sequenceEitherAsync`, `FxAsyncEitherOps.sequence`), `foldRaise(Async)`, `swap`, `flatMap`, `map`, `bindAll`, `RaiseOps.recover`, `Either.recover`, `Either.catching(With)`, `bindNel`, `lefts()`, top-level `rights`/`lefts`/`separateEither`/`sequenceEither`/`mapOrAccumulate` — plus `zipOrAccumulate3`/`4`, which need the recurring-rule editor and the shareable view link to exist first (see round 11 log) |
 
 ## Round log
 
@@ -629,6 +636,119 @@ build compiles.
 
 **Implemented:** all of the above. App 67 tests, `flutter analyze` clean,
 web build compiles.
+
+### Round 10 — done (typed errors: the core)
+
+First round of the typed-error series ([`TYPED_ERRORS_PLAN.md`](TYPED_ERRORS_PLAN.md)).
+Spec-driven rather than feedback-driven, so the log records what shipped and
+what it cost instead of 10 feedbacks.
+
+**Shipped — chapters 1 (`Either`), 2 (`either` & `Raise` scope), 6 sync half
+(`Either × pipelines`):**
+
+- `logic/errors.dart` — sealed `LedgerError` (`FieldError`, `RowError`).
+  `RowError.fields` is a `Nel`, so a row error with no field errors is not
+  representable. `BoxError`/`AuditError` wait for rounds 12/13 rather than
+  landing unused.
+- `logic/validate.dart` — five **scope-first** validators (`vDate`, `vType`,
+  `vTitle`, `vAmount`, `vCategory`): they take `Raise<FieldError>` and return
+  the parsed value, never an `Either`. That is what lets round 11's fail-slow
+  form reuse them verbatim.
+- `logic/import.dart` — the round-7 `(Entry?, ImportIssue?)` tuple + double
+  `compact` became `Either<RowError, Entry>` per row, and the new
+  `ImportMode` picks the terminal: `separated()` (lenient) ·
+  `sequence()` (strict) · `mapOrAccumulate()` (report). One parser, three
+  failure policies, nothing else different — the chapter-6 demo in one enum.
+  `ImportIssue` is deleted.
+- `ui/import_dialog.dart` — mode selector (`SegmentedButton`), preview reading
+  `issues` as a `Nel` (`head` headline, `tail` disclosure), and a rewritten
+  "?" that explains the chosen terminal and closes on a `Right —`/`Left —`
+  verdict line. The full `PipelineExplanation` extension (verdict chips,
+  dimmed post-raise steps) is round 13.
+
+**Correctness fix that fell out of it:** `vDate` round-trips the parsed
+`DateTime`, so `2026-02-30` is now rejected. Round 7's importer accepted it —
+`DateTime(2026, 2, 30)` rolls over silently and quietly created a March 2nd
+entry. Pinned in `validate_test.dart` and `import_test.dart`.
+
+**Findings:**
+
+1. `FX` — `r.withError((FieldError f) => …, (fr) { … })` does **not** infer
+   `E2` from the transform's parameter type; `fr` lands as `Raise<Object?>`
+   and every validator call fails to type-check. Explicit
+   `withError<FieldError, Entry>` fixes it. Worth a note in the `raise`
+   lecture — it is the one place in the typed API where inference needs help.
+2. `DX` — fxdart exports `isNull` and `isEmpty` predicates, which collide with
+   `matcher`'s in any test that imports both unqualified. The three new test
+   files import fxdart with `show`. Also worth a line in the 101 docs.
+3. `DX` — a stale `.dart_tool/package_config.json` pinned fxdart at
+   `languageVersion 3.0`, which made `Nel.of` / `Nel.orNull` unresolvable with
+   a misleading "method isn't defined for the type 'Type'". `flutter pub get`
+   after the library's SDK bump is required; nothing to fix in code.
+
+**Not in this round, on purpose:** `zipOrAccumulate5` (round 11 owns
+field-level accumulation, so a row is still fail-fast internally), `nullable`
+and the async half (round 12), the Health tab and the coverage test (round 13).
+
+**Result:** 67 → 101 tests, `flutter analyze` clean, web build compiles.
+
+### Round 11 — done (typed errors: accumulation & the form)
+
+**Shipped — chapters 4 (`NonEmptyList`) and 5 (accumulation):**
+
+- `validateDraft` (`logic/validate.dart`) — `zipOrAccumulate5` over five
+  independent branches (title · amount · category · dueDate · tags). The
+  entry form dropped `Form` + per-field `validator:` entirely; validation is
+  now a pure function of an `EntryDraft`, so it is unit-testable and the same
+  draft can run through two policies. `validateDraftFailFast` is the same
+  five validators in a plain raise scope, and the form ships an **All at once
+  / First only** toggle so the difference is something you can flip rather
+  than read about. `toEitherNel` lifts the fail-fast result so the UI has one
+  shape to render.
+- Two of the five branches are new rules, both real: a category of the wrong
+  *kind* (a task category on an expense) and a tag containing `|`, which
+  would silently split into two tags on the next CSV export→import
+  round-trip.
+- `ui/error_panel.dart` — the one error surface, taking a `Nel<LedgerError>`.
+  `head` is the headline with no emptiness branch; `tail` is the "and N more"
+  disclosure that collapses by itself; `deepEquals` gates the entrance
+  animation, because `Nel` is an extension type and `==` is `List` identity —
+  using `==` replays the animation on every keystroke.
+- `ImportMode.report` is now fail-slow **inside** each row too (`parseRowAll`):
+  a row with a bad date, category and amount reports all three. Structural
+  problems (cell count, quoting) stay fail-fast — with the wrong number of
+  cells there are no columns to report on — via `AccumulatingRaise.over`,
+  the single-error view of an accumulating scope.
+- `ui/budget_dialog.dart` — `zipOrAccumulate2` (category + limit). Replaces
+  the round-1 editor that ran `double.tryParse` and **closed silently** on
+  anything unparseable: the user got no budget and no explanation. Also adds
+  the missing "Add budget" affordance, so a category created after seeding
+  can finally be budgeted.
+
+**Design finding — dependent fields cannot accumulate.** The CSV row's
+amount rule ("an expense needs an amount") depends on the *type* column, and
+a branch cannot read a sibling's `Accumulated.value` without detonating. The
+fix was to split `vAmount` into a type-independent half (`vAmountValue`) that
+accumulates with the others, and a dependent half (`vAmountRequired`) that
+runs afterwards guarded by `acc.hasErrors`. This is the clearest real-world
+illustration of Arrow's contract in the app, and it is why `parseRowAll` uses
+raw `accumulate`/`accumulating` rather than another `zipOrAccumulateN`.
+
+**Deferred, with the reason:**
+
+- `zipOrAccumulate3` and `zipOrAccumulate4` have **no honest home in the app
+  as it stands**. The spec named a recurring-rule editor (3) and a shareable
+  view-link parser (4); neither feature exists. The rule editor is a genuine
+  gap (rules are projected on Insights but uneditable) and the view link
+  needs the Entries/Insights filter state lifted into `LedgerState` first.
+  Both are round-12 features, built as features — not retrofitted to hit a
+  coverage number.
+- `AccumulatingRaise.bindNel` — its natural call site is an outer
+  `Raise<Nel<FieldError>>` folding a row's `EitherNel`. The import's outer
+  scope raises `RowError`, so `bind` is correct there. Round 13's Health
+  audit is the right home.
+
+**Result:** 101 → 118 tests, `flutter analyze` clean, web build compiles.
 
 ## Final state (after 9 rounds)
 

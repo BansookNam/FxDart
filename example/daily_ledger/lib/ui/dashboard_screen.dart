@@ -8,6 +8,7 @@ import '../logic/stats.dart';
 import '../logic/summaries.dart';
 import '../models/models.dart';
 import 'app_shell.dart';
+import 'budget_dialog.dart';
 import 'format.dart';
 import 'theme.dart';
 import 'widgets.dart';
@@ -478,51 +479,36 @@ class _BudgetList extends StatelessWidget {
   final List<BudgetStatus> statuses;
   const _BudgetList({required this.statuses});
 
-  Future<void> _editBudget(BuildContext context, BudgetStatus status) async {
-    final state = LedgerScope.of(context);
-    final name =
-        state.categoryById(status.categoryId)?.name ?? status.categoryId;
-    final controller = TextEditingController(
-      text: status.budget.toStringAsFixed(0),
-    );
-    final value = await showDialog<double>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Budget for $name'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: const InputDecoration(
-            prefixText: '\$ ',
-            border: OutlineInputBorder(),
-          ),
-          onSubmitted: (v) => Navigator.of(context).pop(double.tryParse(v)),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () =>
-                Navigator.of(context).pop(double.tryParse(controller.text)),
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
-    if (value != null && value > 0) {
-      await state.setBudget(status.categoryId, value);
-    }
-  }
+  /// Round 11: the old inline editor parsed with `double.tryParse` and closed
+  /// silently on anything unparseable. [showBudgetDialog] validates two
+  /// fields with `zipOrAccumulate2` and says what went wrong.
+  Future<void> _editBudget(BuildContext context, BudgetStatus status) =>
+      showBudgetDialog(
+        context,
+        existingCategoryId: status.categoryId,
+        existingLimit: status.budget,
+      );
 
   @override
   Widget build(BuildContext context) {
     final state = LedgerScope.of(context);
     final theme = Theme.of(context);
+    final addButton = Align(
+      alignment: Alignment.centerLeft,
+      child: TextButton.icon(
+        icon: const Icon(Icons.add, size: 18),
+        label: const Text('Add budget'),
+        onPressed: () => showBudgetDialog(context),
+      ),
+    );
     if (statuses.isEmpty) {
-      return const EmptyHint('No budgets set — reset demo data to seed some');
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const EmptyHint('No budgets set — add one, or reset the demo data'),
+          addButton,
+        ],
+      );
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -586,6 +572,7 @@ class _BudgetList extends StatelessWidget {
             ),
           ),
         const SizedBox(height: 4),
+        addButton,
         Align(
           alignment: Alignment.centerRight,
           child: TextButton.icon(
