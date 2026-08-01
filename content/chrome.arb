@@ -95,6 +95,8 @@
   "cmpBenchScale": "N = {n}",
   "@cmpBenchScale": { "description": "Heading of one benchmark scale block, e.g. 'N = 1,000,000'. Keep {n} intact; it is replaced by the generator with the formatted item count." },
 
+  "cmpBenchAsyncNote": "Async case: the headline scale is N = {n}, not 1,000,000. Every element costs an event-loop turn on both sides, so a million real awaits would measure Dart's event loop for minutes — not the pipeline. Delays are zero-length and the example's concurrency limit is kept; what the bars compare is the pipeline machinery.",
+  "@cmpBenchAsyncNote": { "description": "Disclaimer shown on async examples' Benchmark sections explaining why the headline N is capped (2,000–10,000) instead of the sync cases' 1,000,000. Keep {n} intact; it is replaced with the case's headline N." },
   "cmpBenchMethodNote": "Bars are medians of repeated timed iterations in fresh processes per side (small N is batched for timer resolution). Sides within {margin}% of each other — or within {absMs} ms, a difference no person can perceive — count as a tie; close relative races are re-measured up to 5 runs. In an app, anything under a few milliseconds is invisible to the user regardless of which bar is shorter.",
   "@cmpBenchMethodNote": { "description": "Method footnote of the Benchmark section. Keep {margin} and {absMs} intact; they are replaced by the generator with the tie-margin percentage and the absolute tie floor in milliseconds." },
 

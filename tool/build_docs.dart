@@ -872,7 +872,8 @@ const _benchWinKeys = {
 /// Scale-block order: small → large, `full` = the case's headline N.
 const _benchScaleOrder = ['100', '10000', 'full'];
 
-String _cmpBenchSection(String slug, Map<String, String> chrome) {
+String _cmpBenchSection(String slug, Map<String, String> chrome,
+    {bool isAsync = false}) {
   final data = _benchResults;
   if (data == null) return '';
   final c = (data['cases'] as Map<String, dynamic>)[slug] as Map<String, dynamic>?;
@@ -932,10 +933,26 @@ ${row('cmpFxdart', 'fxdart', fxVal)}
       .replaceAll(
           '{absMs}', absMs == absMs.round() ? '${absMs.round()}' : '$absMs');
 
+  // Async cases cap their headline N (every element costs an event-loop turn
+  // on both sides); say so on the page rather than leaving the smaller N to
+  // look like an arbitrary choice.
+  var asyncNote = '';
+  if (isAsync) {
+    final full = scales['full'] as Map<String, dynamic>?;
+    final headlineN = (full?['n'] ??
+        (scales.values.whereType<Map<String, dynamic>>().toList()
+              ..sort((a, b) => (a['n'] as num).compareTo(b['n'] as num)))
+            .last['n']) as num;
+    asyncNote = '  <p class="dim bench-note bench-async-note">'
+        '${chrome['cmpBenchAsyncNote']!.replaceAll('{n}', _benchFmtInt(headlineN))}'
+        '</p>\n';
+  }
+
   return (StringBuffer()
         ..writeln('  <section class="cmp-bench">')
         ..writeln('  <h2>${chrome['cmpBenchTitle']}</h2>')
         ..writeln('  <p class="dim bench-meta">$meta</p>')
+        ..write(asyncNote)
         ..writeln('  <div class="bench-scales">')
         ..write(blocks)
         ..writeln('  </div>')
@@ -1072,7 +1089,8 @@ String _renderComparison(
         slug,
         depth,
         chrome))
-    ..write(_cmpBenchSection(slug, chrome))
+    ..write(_cmpBenchSection(slug, chrome,
+        isAsync: page.get('async') == 'true'))
     ..writeln('')
     ..writeln('  <nav class="tut-nav">');
   if (prev != null) {

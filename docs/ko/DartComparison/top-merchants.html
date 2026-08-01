@@ -169,13 +169,13 @@ void main() {
     하나, 파이프라인 하나로 끝나고 타입 인자를 챙기는 번거로움도 없습니다.
   </p>
   <section class="cmp-bench">
-  <h2>Benchmark</h2>
+  <h2>벤치마크</h2>
   <p class="dim bench-meta">Apple M1 Max, 32 GB RAM · Dart 3.12.2 (AOT-compiled) · 2026-08-02</p>
   <div class="bench-scales">
   <div class="bench-scale">
     <h3>N = 100</h3>
     <div class="bench-metric">
-      <h4>Time <span class="badge verdict-tie">Tie</span></h4>
+      <h4>시간 <span class="badge verdict-tie">무승부</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
@@ -188,7 +188,7 @@ void main() {
       </div>
     </div>
     <div class="bench-metric">
-      <h4>Peak memory <span class="badge verdict-tie">Tie</span></h4>
+      <h4>최대 메모리 <span class="badge verdict-tie">무승부</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
@@ -204,7 +204,7 @@ void main() {
   <div class="bench-scale">
     <h3>N = 10,000</h3>
     <div class="bench-metric">
-      <h4>Time <span class="badge verdict-tie">Tie</span></h4>
+      <h4>시간 <span class="badge verdict-tie">무승부</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
@@ -217,7 +217,7 @@ void main() {
       </div>
     </div>
     <div class="bench-metric">
-      <h4>Peak memory <span class="badge verdict-tie">Tie</span></h4>
+      <h4>최대 메모리 <span class="badge verdict-tie">무승부</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:99.9%"></span></span>
@@ -233,7 +233,7 @@ void main() {
   <div class="bench-scale">
     <h3>N = 1,000,000</h3>
     <div class="bench-metric">
-      <h4>Time <span class="badge verdict-fxdart">FxDart wins</span></h4>
+      <h4>시간 <span class="badge verdict-fxdart">FxDart 승</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
@@ -246,7 +246,7 @@ void main() {
       </div>
     </div>
     <div class="bench-metric">
-      <h4>Peak memory <span class="badge verdict-tie">Tie</span></h4>
+      <h4>최대 메모리 <span class="badge verdict-tie">무승부</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
@@ -260,7 +260,7 @@ void main() {
     </div>
   </div>
   </div>
-  <p class="dim bench-note">Bars are medians of repeated timed iterations in fresh processes per side (small N is batched for timer resolution). Sides within 5% of each other — or within 0.6 ms, a difference no person can perceive — count as a tie; close relative races are re-measured up to 5 runs. In an app, anything under a few milliseconds is invisible to the user regardless of which bar is shorter. Memory is peak process RSS. The Dart VM and the dataset are identical on both sides, so the difference between the two bars is what the pipeline itself holds onto.</p>
+  <p class="dim bench-note">막대는 사이드별로 새 프로세스에서 반복 측정한 중앙값입니다(작은 N은 타이머 해상도를 위해 배치 처리). 두 사이드가 서로 5% 이내이거나 — 사람이 지각할 수 없는 차이인 0.6ms 이내이면 — 무승부로 칩니다. 상대 차이가 근소한 경우는 최대 5회까지 다시 측정합니다. 앱에서는 어느 막대가 짧든 몇 밀리초 이하의 차이는 사용자에게 보이지 않습니다. 메모리는 프로세스 최대 RSS입니다. Dart VM과 데이터셋은 양쪽이 동일하므로, 두 막대의 차이가 곧 파이프라인 자체가 붙들고 있는 양입니다.</p>
   </section>
 
   <nav class="tut-nav">

@@ -42,5 +42,15 @@
   "pgLoading": "Cargando el runtime…",
   "pgRunning": "Ejecutando…",
   "pgNoOutput": "(sin salida)",
-  "pgLoadFailed": "No se pudo cargar la librería FxDart"
+  "pgLoadFailed": "No se pudo cargar la librería FxDart",
+  "cmpBenchTitle": "Benchmark",
+  "cmpBenchTime": "Tiempo",
+  "cmpBenchMemory": "Memoria pico",
+  "cmpBenchWinNative": "Gana nativo",
+  "cmpBenchWinFxdart": "Gana FxDart",
+  "cmpBenchWinTie": "Empate",
+  "cmpBenchScale": "N = {n}",
+  "cmpBenchAsyncNote": "Caso async: la escala principal es N = {n}, no 1,000,000. Cada elemento cuesta una vuelta del event loop en ambos lados, así que un millón de awaits reales mediría el event loop de Dart durante minutos — no el pipeline. Los retardos son de longitud cero y se conserva el límite de concurrencia del ejemplo; lo que comparan las barras es la maquinaria del pipeline.",
+  "cmpBenchMethodNote": "Las barras son medianas de iteraciones cronometradas repetidas en procesos nuevos por lado (los N pequeños se agrupan por resolución del temporizador). Dos lados a menos del {margin}% entre sí — o a menos de {absMs} ms, una diferencia que nadie puede percibir — cuentan como empate; las carreras relativas ajustadas se vuelven a medir hasta 5 veces. En una app, cualquier cosa por debajo de unos pocos milisegundos es invisible para el usuario, gane la barra que gane.",
+  "cmpBenchMemNote": "La memoria es el RSS pico del proceso. La VM de Dart y el dataset son idénticos en ambos lados, así que la diferencia entre las dos barras es lo que retiene el pipeline en sí."
 }
