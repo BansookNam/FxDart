@@ -1,13 +1,15 @@
-// Deterministic ledger shared verbatim by both sides (headline 3,000).
+// Deterministic ledger shared verbatim by both sides.
 // Async case: the on-device store delay is Duration.zero and the example's
-// 3-wide load window is kept. The headline is capped at 3000 (not the usual
-// 5000+) because the example's loadEntry does a linear firstWhere scan over
-// the whole ledger per id — the load phase is O(n^2) on both sides, and
-// 3000 keeps one headline iteration well under the 2 s budget (the runner's
-// BENCH_N=10000 pass runs ~1 s/iteration; accepted).
+// 3-wide load window is kept. The headline is 20,000 rather than the async
+// family's usual 100,000 because the example's loadEntry does a linear
+// firstWhere scan over the whole ledger per id — the load phase is O(n^2) on
+// both sides, so cost grows ~100x for every 10x of n. 20,000 is the largest
+// round headline that still clears the runner's fixed N=10,000 pass (so the
+// third set of bars says something new) while keeping one iteration inside
+// the 2 s budget; measured ~1.3 s/iteration per side.
 import '../../harness.dart';
 
-final n = caseN(3000);
+final n = caseN(20000);
 
 enum EntryType { income, expense, bill }
 

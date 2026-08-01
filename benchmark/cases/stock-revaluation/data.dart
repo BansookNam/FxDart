@@ -1,8 +1,11 @@
 // Deterministic stock list shared verbatim by both sides. Async case:
-// headline 4,000 items, Duration.zero delays, concurrency 3 (the example's).
+// Duration.zero delays, concurrency 3 (the example's).
+// Headline 100,000 — the async family's shared headline scale. It has to
+// clear the runner's fixed N=10,000 pass, or the third set of bars on the
+// page would just restate the second.
 import '../../harness.dart';
 
-final n = caseN(4000);
+final n = caseN(100000);
 
 class Stock {
   final String sku;

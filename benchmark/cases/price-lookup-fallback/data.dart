@@ -1,8 +1,11 @@
-// Deterministic order of line items shared verbatim by both sides
-// (headline 6,000). Async case: all delays are Duration.zero.
+// Deterministic order of line items shared verbatim by both sides.
+// Async case: all delays are Duration.zero.
+// Headline 100,000 — the async family's shared headline scale. It has to
+// clear the runner's fixed N=10,000 pass, or the third set of bars on the
+// page would just restate the second.
 import '../../harness.dart';
 
-final n = caseN(6000);
+final n = caseN(100000);
 
 class Item {
   final String sku;

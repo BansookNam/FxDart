@@ -29,7 +29,7 @@
 | 17 | sensor-anomalies | 100 | 5.7 µs | 8.7 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
 | 18 | top-category-average | 100 | 9.5 µs | 8.8 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 19 | valid-emails | 100 | 5.1 µs | 5.8 µs | **tie** | 16.4 MB | 15.8 MB | tie | 3 |
-| 20 | bounded-concurrency (async) | 100 | 424 µs | 454 µs | **tie** | 16.4 MB | 17.0 MB | tie | 3 |
+| 20 | bounded-concurrency (async) | 100 | 352 µs | 420 µs | **tie** | 16.5 MB | 17.0 MB | tie | 3 |
 | 21 | monthly-category-report | 100 | 2.2 µs | 5.3 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
 | 22 | paginated-products | 100 | 6.9 µs | 9.8 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 23 | weekly-sensor-averages | 98 | 3.7 µs | 6.9 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
@@ -39,7 +39,7 @@
 | 27 | invoice-summary | 100 | 4.0 µs | 12 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
 | 28 | no-spend-streak | 100 | 4.5 µs | 5.3 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
 | 29 | duplicate-transactions | 100 | 43 µs | 42 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
-| 30 | concurrent-enrichment (async) | 100 | 220 µs | 247 µs | **tie** | 16.5 MB | 17.0 MB | tie | 3 |
+| 30 | concurrent-enrichment (async) | 100 | 210 µs | 284 µs | **tie** | 16.5 MB | 17.2 MB | tie | 3 |
 | 31 | monthly-ledger-report | 100 | 24 µs | 32 µs | **tie** | 16.6 MB | 16.6 MB | tie | 3 |
 | 32 | cohort-retention | 100 | 43 µs | 47 µs | **tie** | 16.9 MB | 16.5 MB | tie | 3 |
 | 33 | price-drop-detection | 100 | 56 µs | 45 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
@@ -50,18 +50,18 @@
 | 38 | alert-digest | 100 | 21 µs | 36 µs | **tie** | 16.6 MB | 16.6 MB | tie | 3 |
 | 39 | latency-percentiles | 100 | 17 µs | 26 µs | **tie** | 16.6 MB | 17.0 MB | tie | 3 |
 | 40 | ledger-diff | 100 | 22 µs | 40 µs | **tie** | 16.7 MB | 17.1 MB | tie | 3 |
-| 41 | concurrent-profile-fetch (async) | 100 | 314 µs | 402 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
-| 42 | flaky-api-retry (async) | 100 | 623 µs | 1.17 ms | **tie** | 16.4 MB | 16.4 MB | tie | 3 |
-| 43 | price-lookup-fallback (async) | 100 | 445 µs | 591 µs | **tie** | 16.5 MB | 17.3 MB | tie | 3 |
-| 44 | stream-windowed-alerts (async) | 100 | 36 µs | 122 µs | **tie** | 16.5 MB | 16.8 MB | tie | 3 |
-| 45 | rate-limited-import (async) | 100 | 184 µs | 312 µs | **tie** | 16.5 MB | 17.3 MB | tie | 3 |
-| 46 | parallel-downloads (async) | 100 | 383 µs | 496 µs | **tie** | 16.4 MB | 17.3 MB | native | 3 |
-| 47 | paged-feeds-dedupe (async) | 100 | 94 µs | 202 µs | **tie** | 16.4 MB | 17.1 MB | tie | 3 |
-| 48 | settlement-pipeline (async) | 100 | 32 µs | 44 µs | **tie** | 16.6 MB | 17.3 MB | tie | 3 |
-| 49 | live-search (async) | 100 | 55 µs | 82 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
-| 50 | daily-ledger-close (async) | 100 | 380 µs | 487 µs | **tie** | 16.5 MB | 17.2 MB | tie | 3 |
+| 41 | concurrent-profile-fetch (async) | 100 | 344 µs | 436 µs | **tie** | 16.4 MB | 17.1 MB | tie | 3 |
+| 42 | flaky-api-retry (async) | 100 | 572 µs | 1.15 ms | **tie** | 16.5 MB | 17.0 MB | tie | 3 |
+| 43 | price-lookup-fallback (async) | 100 | 370 µs | 592 µs | **tie** | 16.5 MB | 17.2 MB | tie | 3 |
+| 44 | stream-windowed-alerts (async) | 100 | 33 µs | 117 µs | **tie** | 16.5 MB | 16.8 MB | tie | 3 |
+| 45 | rate-limited-import (async) | 100 | 147 µs | 322 µs | **tie** | 16.5 MB | 17.3 MB | tie | 3 |
+| 46 | parallel-downloads (async) | 100 | 419 µs | 575 µs | **tie** | 16.5 MB | 17.3 MB | tie | 3 |
+| 47 | paged-feeds-dedupe (async) | 100 | 88 µs | 192 µs | **tie** | 16.5 MB | 17.1 MB | tie | 3 |
+| 48 | settlement-pipeline (async) | 100 | 32 µs | 46 µs | **tie** | 16.6 MB | 17.1 MB | tie | 3 |
+| 49 | live-search (async) | 100 | 52 µs | 85 µs | **tie** | 16.5 MB | 17.1 MB | tie | 3 |
+| 50 | daily-ledger-close (async) | 100 | 366 µs | 472 µs | **tie** | 16.7 MB | 16.7 MB | tie | 3 |
 | 51 | category-rank | 100 | 4.5 µs | 11 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
-| 52 | stock-revaluation (async) | 100 | 362 µs | 682 µs | **tie** | 16.4 MB | 17.2 MB | tie | 3 |
+| 52 | stock-revaluation (async) | 100 | 470 µs | 751 µs | **tie** | 16.5 MB | 17.2 MB | tie | 3 |
 
 ## N = 10000
 
@@ -86,7 +86,7 @@
 | 17 | sensor-anomalies | 10000 | 514 µs | 723 µs | **tie** | 23.6 MB | 23.7 MB | tie | 3 |
 | 18 | top-category-average | 10000 | 350 µs | 504 µs | **tie** | 23.0 MB | 22.9 MB | tie | 3 |
 | 19 | valid-emails | 10000 | 555 µs | 594 µs | **tie** | 20.0 MB | 20.0 MB | tie | 3 |
-| 20 | bounded-concurrency (async) | 10000 | 29.9 ms | 37.5 ms | **native** | 26.0 MB | 22.3 MB | fxdart | 3 |
+| 20 | bounded-concurrency (async) | 10000 | 33.5 ms | 39.2 ms | **native** | 26.2 MB | 22.2 MB | fxdart | 3 |
 | 21 | monthly-category-report | 10000 | 108 µs | 283 µs | **tie** | 17.0 MB | 17.8 MB | tie | 3 |
 | 22 | paginated-products | 10000 | 804 µs | 1.34 ms | **tie** | 17.6 MB | 22.5 MB | native | 3 |
 | 23 | weekly-sensor-averages | 9996 | 399 µs | 712 µs | **tie** | 22.7 MB | 22.7 MB | tie | 3 |
@@ -96,7 +96,7 @@
 | 27 | invoice-summary | 10000 | 239 µs | 768 µs | **tie** | 22.4 MB | 23.0 MB | tie | 3 |
 | 28 | no-spend-streak | 10000 | 256 µs | 252 µs | **tie** | 19.5 MB | 18.1 MB | fxdart | 3 |
 | 29 | duplicate-transactions | 10000 | 3.91 ms | 4.30 ms | **tie** | 40.3 MB | 40.2 MB | tie | 3 |
-| 30 | concurrent-enrichment (async) | 10000 | 18.5 ms | 25.3 ms | **native** | 49.3 MB | 51.8 MB | native | 3 |
+| 30 | concurrent-enrichment (async) | 10000 | 22.0 ms | 30.2 ms | **native** | 49.3 MB | 52.0 MB | native | 3 |
 | 31 | monthly-ledger-report | 10000 | 914 µs | 1.62 ms | **native** | 22.9 MB | 23.7 MB | tie | 3 |
 | 32 | cohort-retention | 10000 | 2.40 ms | 2.81 ms | **tie** | 17.6 MB | 21.9 MB | native | 3 |
 | 33 | price-drop-detection | 10000 | 7.24 ms | 4.29 ms | **fxdart** | 37.0 MB | 36.4 MB | tie | 3 |
@@ -107,18 +107,18 @@
 | 38 | alert-digest | 10000 | 1.42 ms | 2.69 ms | **native** | 18.0 MB | 23.5 MB | native | 3 |
 | 39 | latency-percentiles | 10000 | 1.90 ms | 2.62 ms | **native** | 18.2 MB | 23.1 MB | native | 3 |
 | 40 | ledger-diff | 10000 | 2.46 ms | 4.53 ms | **native** | 26.1 MB | 39.2 MB | native | 3 |
-| 41 | concurrent-profile-fetch (async) | 10000 | 30.9 ms | 37.5 ms | **native** | 51.3 MB | 32.0 MB | fxdart | 3 |
-| 42 | flaky-api-retry (async) | 10000 | 51.0 ms | 110.1 ms | **native** | 29.1 MB | 24.6 MB | fxdart | 3 |
-| 43 | price-lookup-fallback (async) | 10000 | 36.7 ms | 56.3 ms | **native** | 48.9 MB | 38.5 MB | fxdart | 3 |
-| 44 | stream-windowed-alerts (async) | 10000 | 3.12 ms | 11.4 ms | **native** | 23.5 MB | 27.3 MB | native | 3 |
-| 45 | rate-limited-import (async) | 10000 | 13.4 ms | 26.6 ms | **native** | 24.2 MB | 30.9 MB | native | 3 |
-| 46 | parallel-downloads (async) | 10000 | 34.2 ms | 51.0 ms | **native** | 50.8 MB | 41.8 MB | fxdart | 3 |
-| 47 | paged-feeds-dedupe (async) | 10000 | 8.48 ms | 17.2 ms | **native** | 43.2 MB | 26.5 MB | fxdart | 3 |
-| 48 | settlement-pipeline (async) | 10000 | 4.29 ms | 4.35 ms | **tie** | 23.1 MB | 46.8 MB | native | 3 |
-| 49 | live-search (async) | 10000 | 5.05 ms | 9.25 ms | **native** | 23.5 MB | 24.1 MB | tie | 3 |
-| 50 | daily-ledger-close (async) | 10000 | 328.6 ms | 343.0 ms | **tie** | 49.9 MB | 50.5 MB | tie | 5 |
+| 41 | concurrent-profile-fetch (async) | 10000 | 34.1 ms | 40.0 ms | **native** | 51.3 MB | 32.6 MB | fxdart | 3 |
+| 42 | flaky-api-retry (async) | 10000 | 52.4 ms | 112.6 ms | **native** | 29.2 MB | 24.7 MB | fxdart | 3 |
+| 43 | price-lookup-fallback (async) | 10000 | 39.1 ms | 58.8 ms | **native** | 49.1 MB | 38.6 MB | fxdart | 3 |
+| 44 | stream-windowed-alerts (async) | 10000 | 3.30 ms | 11.8 ms | **native** | 23.5 MB | 27.7 MB | native | 3 |
+| 45 | rate-limited-import (async) | 10000 | 14.2 ms | 29.1 ms | **native** | 24.3 MB | 31.0 MB | native | 3 |
+| 46 | parallel-downloads (async) | 10000 | 39.3 ms | 51.4 ms | **native** | 51.0 MB | 41.8 MB | fxdart | 3 |
+| 47 | paged-feeds-dedupe (async) | 10000 | 9.92 ms | 18.0 ms | **native** | 43.1 MB | 26.3 MB | fxdart | 3 |
+| 48 | settlement-pipeline (async) | 10000 | 4.62 ms | 4.71 ms | **tie** | 23.2 MB | 46.7 MB | native | 3 |
+| 49 | live-search (async) | 10000 | 4.90 ms | 8.17 ms | **native** | 23.5 MB | 24.0 MB | tie | 3 |
+| 50 | daily-ledger-close (async) | 10000 | 340.1 ms | 348.4 ms | **tie** | 49.9 MB | 50.4 MB | tie | 5 |
 | 51 | category-rank | 10000 | 282 µs | 482 µs | **tie** | 17.3 MB | 23.4 MB | native | 3 |
-| 52 | stock-revaluation (async) | 10000 | 29.6 ms | 55.8 ms | **native** | 48.8 MB | 38.0 MB | fxdart | 3 |
+| 52 | stock-revaluation (async) | 10000 | 38.2 ms | 59.8 ms | **native** | 48.9 MB | 38.1 MB | fxdart | 3 |
 
 ## Headline N (1M sync / case-specific async)
 
@@ -143,7 +143,7 @@
 | 17 | sensor-anomalies | 1000000 | 64.0 ms | 88.2 ms | **native** | 169.8 MB | 159.5 MB | fxdart | 3 |
 | 18 | top-category-average | 1000000 | 62.2 ms | 84.1 ms | **native** | 134.2 MB | 128.7 MB | tie | 3 |
 | 19 | valid-emails | 1000000 | 70.1 ms | 76.4 ms | **native** | 176.3 MB | 174.2 MB | tie | 3 |
-| 20 | bounded-concurrency (async) | 5000 | 15.2 ms | 18.4 ms | **native** | 18.7 MB | 19.8 MB | native | 3 |
+| 20 | bounded-concurrency (async) | 100000 | 392.0 ms | 434.3 ms | **native** | 49.1 MB | 48.7 MB | tie | 3 |
 | 21 | monthly-category-report | 1000000 | 11.4 ms | 29.1 ms | **native** | 120.0 MB | 124.0 MB | tie | 3 |
 | 22 | paginated-products | 1000000 | 102.7 ms | 210.6 ms | **native** | 177.6 MB | 231.3 MB | native | 3 |
 | 23 | weekly-sensor-averages | 999999 | 47.4 ms | 78.7 ms | **native** | 102.8 MB | 92.3 MB | fxdart | 3 |
@@ -153,7 +153,7 @@
 | 27 | invoice-summary | 1000000 | 25.5 ms | 114.4 ms | **native** | 89.2 MB | 121.0 MB | native | 3 |
 | 28 | no-spend-streak | 1000000 | 23.8 ms | 23.5 ms | **tie** | 105.4 MB | 106.7 MB | tie | 3 |
 | 29 | duplicate-transactions | 1000000 | 1013.1 ms | 1041.6 ms | **tie** | 324.4 MB | 331.6 MB | tie | 5 |
-| 30 | concurrent-enrichment (async) | 5000 | 9.46 ms | 12.6 ms | **native** | 43.3 MB | 26.8 MB | fxdart | 3 |
+| 30 | concurrent-enrichment (async) | 100000 | 231.1 ms | 301.4 ms | **native** | 81.3 MB | 84.0 MB | tie | 3 |
 | 31 | monthly-ledger-report | 1000000 | 139.8 ms | 217.7 ms | **native** | 138.6 MB | 134.8 MB | tie | 3 |
 | 32 | cohort-retention | 1000000 | 795.1 ms | 852.2 ms | **native** | 238.7 MB | 242.7 MB | tie | 3 |
 | 33 | price-drop-detection | 1000000 | 1233.4 ms | 767.3 ms | **fxdart** | 393.6 MB | 404.4 MB | tie | 3 |
@@ -164,15 +164,15 @@
 | 38 | alert-digest | 1000000 | 184.6 ms | 313.3 ms | **native** | 238.1 MB | 135.1 MB | fxdart | 3 |
 | 39 | latency-percentiles | 1000000 | 209.9 ms | 326.6 ms | **native** | 193.3 MB | 141.5 MB | fxdart | 3 |
 | 40 | ledger-diff | 500000 | 247.9 ms | 394.9 ms | **native** | 181.8 MB | 170.1 MB | fxdart | 3 |
-| 41 | concurrent-profile-fetch (async) | 5000 | 15.7 ms | 19.2 ms | **native** | 24.0 MB | 27.1 MB | native | 3 |
-| 42 | flaky-api-retry (async) | 5000 | 25.2 ms | 54.6 ms | **native** | 20.4 MB | 20.9 MB | tie | 3 |
-| 43 | price-lookup-fallback (async) | 6000 | 21.6 ms | 33.9 ms | **native** | 25.4 MB | 31.6 MB | native | 3 |
-| 44 | stream-windowed-alerts (async) | 8000 | 2.56 ms | 8.86 ms | **native** | 23.3 MB | 26.7 MB | native | 3 |
-| 45 | rate-limited-import (async) | 6000 | 7.85 ms | 16.3 ms | **native** | 23.5 MB | 21.3 MB | fxdart | 3 |
-| 46 | parallel-downloads (async) | 5000 | 16.5 ms | 24.9 ms | **native** | 25.0 MB | 31.2 MB | native | 3 |
-| 47 | paged-feeds-dedupe (async) | 8000 | 6.69 ms | 13.6 ms | **native** | 24.0 MB | 26.5 MB | native | 3 |
-| 48 | settlement-pipeline (async) | 8000 | 3.48 ms | 3.20 ms | **tie** | 22.8 MB | 23.8 MB | tie | 3 |
-| 49 | live-search (async) | 6000 | 3.19 ms | 5.14 ms | **native** | 23.2 MB | 23.8 MB | tie | 3 |
-| 50 | daily-ledger-close (async) | 3000 | 36.9 ms | 41.0 ms | **native** | 23.8 MB | 24.4 MB | tie | 3 |
+| 41 | concurrent-profile-fetch (async) | 100000 | 330.1 ms | 397.2 ms | **native** | 79.9 MB | 82.0 MB | tie | 3 |
+| 42 | flaky-api-retry (async) | 100000 | 534.7 ms | 1155.3 ms | **native** | 56.3 MB | 49.9 MB | fxdart | 3 |
+| 43 | price-lookup-fallback (async) | 100000 | 396.6 ms | 593.3 ms | **native** | 80.8 MB | 80.4 MB | tie | 3 |
+| 44 | stream-windowed-alerts (async) | 100000 | 34.8 ms | 119.9 ms | **native** | 74.7 MB | 80.5 MB | native | 3 |
+| 45 | rate-limited-import (async) | 100000 | 148.2 ms | 297.5 ms | **native** | 76.5 MB | 80.5 MB | native | 3 |
+| 46 | parallel-downloads (async) | 100000 | 376.8 ms | 581.5 ms | **native** | 80.8 MB | 81.5 MB | tie | 3 |
+| 47 | paged-feeds-dedupe (async) | 100000 | 94.5 ms | 187.1 ms | **native** | 74.1 MB | 76.2 MB | tie | 3 |
+| 48 | settlement-pipeline (async) | 100000 | 55.8 ms | 44.1 ms | **fxdart** | 56.2 MB | 61.6 MB | native | 3 |
+| 49 | live-search (async) | 100000 | 48.0 ms | 85.3 ms | **native** | 53.2 MB | 61.3 MB | native | 3 |
+| 50 | daily-ledger-close (async) | 20000 | 1275.2 ms | 1299.8 ms | **tie** | 52.7 MB | 53.5 MB | tie | 5 |
 | 51 | category-rank | 1000000 | 34.9 ms | 53.1 ms | **native** | 147.4 MB | 147.9 MB | tie | 3 |
-| 52 | stock-revaluation (async) | 4000 | 12.4 ms | 22.9 ms | **native** | 23.4 MB | 28.4 MB | native | 3 |
+| 52 | stock-revaluation (async) | 100000 | 401.4 ms | 645.2 ms | **native** | 81.0 MB | 80.0 MB | tie | 3 |

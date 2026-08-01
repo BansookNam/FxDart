@@ -1,6 +1,8 @@
-// Deterministic paged log stores shared verbatim by both sides
-// (headline 8,000 events across the two stores).
+// Deterministic paged log stores shared verbatim by both sides.
 // Async case: page-fetch delay is Duration.zero.
+// Headline 100,000 — the async family's shared headline scale. It has to
+// clear the runner's fixed N=10,000 pass, or the third set of bars on the
+// page would just restate the second.
 //
 // Scaled shape of the example: two stores paged 3 events per call; the
 // replica overlaps the primary (its first n/8 events were also shipped to
@@ -8,14 +10,14 @@
 // — well before the replica is fully paged, so the early-exit behaviour
 // ("pages fetched: X of Y") stays load-bearing.
 //
-// The example's fixed numbers (4000/3000/4000, take 5000) are fractions of
-// the 8000 headline; they are derived from n so the overlap and the
-// mid-stream early exit hold at every BENCH_N scale:
+// The example's fixed numbers are fractions of the headline; they are
+// derived from n so the overlap and the mid-stream early exit hold at
+// every BENCH_N scale:
 //   primary holds ids 0 .. n/2-1, replica ids 3n/8 .. 7n/8-1 (n/8 overlap),
 //   unique total 7n/8, takeN = 5n/8 < 7n/8 — take always stops mid-stream.
 import '../../harness.dart';
 
-final _base = caseN(8000);
+final _base = caseN(100000);
 final primaryCount = _base ~/ 2; // event ids 0 .. primaryCount-1
 final replicaStart = _base * 3 ~/ 8; // overlap of _base/8 with the primary
 final replicaCount = _base ~/ 2;

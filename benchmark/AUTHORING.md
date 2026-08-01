@@ -29,13 +29,21 @@ Templates: `benchmark/cases/food-spending/` (sync), `benchmark/cases/bounded-con
   Sync cases: headline `1000000`. If the example's algorithm is worse than
   O(n log n) (nested scans), drop the headline to the largest n that
   finishes one iteration in < 2 s and say why in a comment. Async cases:
-  headline between 2000 and 10000, all `Future.delayed` become
-  `Duration.zero`, keep the example's concurrency limit / retry counts /
-  failure pattern. A headline of exactly 10000 is not allowed — it would
-  duplicate the N=10,000 scale the runner always runs. A case with no
-  concurrency window and no retry bookkeeping may exceed the 10000 ceiling
-  (up to ~100000, still < 2 s per iteration) so its headline bar shows
-  something the N=10,000 bar does not; say why in a comment.
+  headline `100000`, all `Future.delayed` become `Duration.zero`, keep the
+  example's concurrency limit / retry counts / failure pattern.
+- **The headline must be strictly greater than 10000.** The runner always
+  runs an N=10,000 pass, so a headline at or below it makes the page's third
+  set of bars duplicate the second (or, worse, shrink below it). Where the
+  async headline of `100000` cannot finish an iteration in < 2 s because the
+  *example's own* algorithm is superlinear — `daily-ledger-close` scans the
+  whole ledger per id — drop to the largest round number above 10000 that
+  fits and say why in a comment.
+- **Early-exit pipelines must scale their trigger with n.** If a `take` /
+  `head` stops the pipeline after a fixed amount of work, a bigger headline
+  measures nothing new. Derive the trigger from `n`, and derive whatever
+  feeds it from `n` too — `live-search` had to scale its query *universe*
+  with n, because a fixed universe caps the distinct-query yield and the take
+  would stop firing at large n.
 - **Determinism.** All data comes from `Lcg` (in `benchmark/harness.dart`) or
   plain formulas — never `dart:math` `Random`, never wall-clock. Failure
   injection for retry/fallback cases: deterministic, e.g. `id % 7 == 3`.
