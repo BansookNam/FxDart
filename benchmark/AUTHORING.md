@@ -31,7 +31,11 @@ Templates: `benchmark/cases/food-spending/` (sync), `benchmark/cases/bounded-con
   finishes one iteration in < 2 s and say why in a comment. Async cases:
   headline between 2000 and 10000, all `Future.delayed` become
   `Duration.zero`, keep the example's concurrency limit / retry counts /
-  failure pattern.
+  failure pattern. A headline of exactly 10000 is not allowed — it would
+  duplicate the N=10,000 scale the runner always runs. A case with no
+  concurrency window and no retry bookkeeping may exceed the 10000 ceiling
+  (up to ~100000, still < 2 s per iteration) so its headline bar shows
+  something the N=10,000 bar does not; say why in a comment.
 - **Determinism.** All data comes from `Lcg` (in `benchmark/harness.dart`) or
   plain formulas — never `dart:math` `Random`, never wall-clock. Failure
   injection for retry/fallback cases: deterministic, e.g. `id % 7 == 3`.
