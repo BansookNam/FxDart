@@ -375,6 +375,27 @@ Future<int> sizeAsync<A>(FxAsyncIterable<A> iterable) async {
   return n;
 }
 
+/// Counts the values [f] holds for — `filter` + `size` in one walk.
+///
+/// Dart-native addition (Kotlin's `count { }`).
+int countWhere<A>(bool Function(A a) f, Iterable<A> iterable) {
+  var n = 0;
+  for (final a in iterable) {
+    if (f(a)) n++;
+  }
+  return n;
+}
+
+/// Async counterpart of [countWhere].
+Future<int> countWhereAsync<A>(
+    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  var n = 0;
+  await eachAsync((A a) async {
+    if (await f(a)) n++;
+  }, iterable);
+  return n;
+}
+
 /// Returns all elements joined into a string, separated by [sep].
 ///
 /// Port of FxTS `join`.
@@ -403,6 +424,30 @@ Future<Map<K, List<A>>> groupByAsync<A, K>(
       (A a) async => result.putIfAbsent(await f(a), () => []).add(a), iterable);
   return result;
 }
+
+/// Groups values into `(key, items)` records, in first-seen key order —
+/// the chainable view of [groupBy], so per-group aggregation continues in
+/// the same pipeline instead of re-entering through `Map.entries`.
+///
+/// Dart-native addition (no FxTS counterpart).
+///
+/// ```dart
+/// groupedBy((w) => w.length, ['ab', 'cd', 'e']);
+/// // [(key: 2, items: [ab, cd]), (key: 1, items: [e])]
+/// ```
+List<({K key, List<A> items})> groupedBy<A, K>(
+        K Function(A a) f, Iterable<A> iterable) =>
+    [
+      for (final e in groupBy(f, iterable).entries) (key: e.key, items: e.value)
+    ];
+
+/// Async counterpart of [groupedBy].
+Future<List<({K key, List<A> items})>> groupedByAsync<A, K>(
+        FutureOr<K> Function(A a) f, FxAsyncIterable<A> iterable) async =>
+    [
+      for (final e in (await groupByAsync(f, iterable)).entries)
+        (key: e.key, items: e.value)
+    ];
 
 /// Indexes values by [f]; later duplicates overwrite earlier ones.
 ///
@@ -474,7 +519,19 @@ int _compareBy<A>(Object? Function(A a) f, A a, A b) => _compareKeys(f(a), f(b))
 /// Returns a new list sorted by the key extractor [f] (ascending).
 ///
 /// Port of FxTS `sortBy`.
-List<A> sortBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
+List<A> sortBy<A>(Object? Function(A a) f, Iterable<A> iterable) =>
+    _sortByImpl(f, iterable, false);
+
+/// Returns a new list sorted by the key extractor [f], descending.
+///
+/// The symmetric twin of [sortBy] (Kotlin's `sortedByDescending`) — works
+/// for any comparable key, unlike the numeric-only `sortBy((a) => -key)`
+/// negation trick.
+List<A> sortByDesc<A>(Object? Function(A a) f, Iterable<A> iterable) =>
+    _sortByImpl(f, iterable, true);
+
+List<A> _sortByImpl<A>(
+    Object? Function(A a) f, Iterable<A> iterable, bool desc) {
   // Decorate-sort-undecorate: extract each key once, sort an index list, and
   // read the permutation back. Sorting the values directly with a
   // `_compareBy` comparator would call [f] twice per comparison —
@@ -491,6 +548,8 @@ List<A> sortBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
   // compareTo — the generic path pays an `is Comparable` test and a dynamic
   // compareTo on every comparison. compareTo semantics (NaN, -0.0) are the
   // same on every path. No Int64List: the playground build targets JS.
+  // Descending picks a swapped-operand comparator once per sort, so the
+  // per-comparison cost is identical to ascending.
   var allDouble = true, allInt = true, allString = true;
   for (final k in keys) {
     if (k is! double) allDouble = false;
@@ -503,21 +562,29 @@ List<A> sortBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
     for (var i = 0; i < length; i++) {
       dk[i] = keys[i] as double;
     }
-    indices.sort((i, j) => dk[i].compareTo(dk[j]));
+    indices.sort(desc
+        ? (i, j) => dk[j].compareTo(dk[i])
+        : (i, j) => dk[i].compareTo(dk[j]));
   } else if (allInt) {
     final ik = List<int>.filled(length, 0);
     for (var i = 0; i < length; i++) {
       ik[i] = keys[i] as int;
     }
-    indices.sort((i, j) => ik[i].compareTo(ik[j]));
+    indices.sort(desc
+        ? (i, j) => ik[j].compareTo(ik[i])
+        : (i, j) => ik[i].compareTo(ik[j]));
   } else if (allString) {
     final sk = List<String>.filled(length, '');
     for (var i = 0; i < length; i++) {
       sk[i] = keys[i] as String;
     }
-    indices.sort((i, j) => sk[i].compareTo(sk[j]));
+    indices.sort(desc
+        ? (i, j) => sk[j].compareTo(sk[i])
+        : (i, j) => sk[i].compareTo(sk[j]));
   } else {
-    indices.sort((i, j) => _compareKeys(keys[i], keys[j]));
+    indices.sort(desc
+        ? (i, j) => _compareKeys(keys[j], keys[i])
+        : (i, j) => _compareKeys(keys[i], keys[j]));
   }
   return [for (final i in indices) items[i]];
 }
@@ -526,6 +593,11 @@ List<A> sortBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
 Future<List<A>> sortByAsync<A>(
         Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
     sortAsync((a, b) => _compareBy(f, a, b), iterable);
+
+/// Async counterpart of [sortByDesc].
+Future<List<A>> sortByDescAsync<A>(
+        Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
+    sortAsync((a, b) => _compareBy(f, b, a), iterable);
 
 /// Splits values into `(pass, fail)` lists by predicate [f].
 ///

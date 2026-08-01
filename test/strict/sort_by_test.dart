@@ -19,6 +19,17 @@ void main() {
             equals(['a', 'b', 'c', 'd', 'e']));
       });
 
+      test('should sort all-double keys (unboxed path)', () {
+        expect(sortBy((double d) => d, [2.5, 0.5, 1.5]),
+            equals([0.5, 1.5, 2.5]));
+      });
+
+      test('should sort generic Comparable keys (DateTime)', () {
+        final dates = [DateTime(2026, 3, 1), DateTime(2026, 1, 2)];
+        expect(sortBy((DateTime d) => d, dates),
+            equals([DateTime(2026, 1, 2), DateTime(2026, 3, 1)]));
+      });
+
       test("should sort the elements by 'f' (key extractor)", () {
         final res = sortBy((Map<String, Object> a) => a['id'], [
           {'id': 4, 'name': 'foo'},

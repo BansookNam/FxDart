@@ -1,4 +1,60 @@
-## Unreleased
+## 0.7.1
+
+### Added — pre-combined operators
+
+Convenience operators that collapse the multi-operator idioms observed
+across the DartComparison examples and the daily_ledger typed-error rounds.
+Each ships sync + async + `Fx`/`FxAsync` chain forms, tests, and a 101
+tutorial. All are composition over existing operators — laziness, effect
+order, and parallel-safety are inherited, not re-implemented.
+
+Pipeline:
+
+* **`mapConcurrent(n, f)`** — `toAsync().map(f).concurrent(n)` as one step,
+  on both sync and async sources. The single most repeated async idiom in
+  the comparison suite (6 of the 11 hardest examples).
+* **`groupedBy(key)`** — groups as chainable `(key:, items:)` named
+  records in first-seen key order; per-group aggregation continues in the
+  same chain instead of re-entering through `Map.entries`.
+* **`sortByDesc(key)`** — descending `sortBy` for any comparable key
+  (dates and strings have no `-key` negation), sharing `sortBy`'s
+  extract-once machinery and unboxed fast paths.
+* **`countWhere(pred)`** — `filter` + `size` fused into one walk.
+* **`attach(f)`** — lazily pairs each value with `f(value)` so the input
+  stays beside its (possibly async) result; the async form is
+  parallel-safe and composes with `concurrent`.
+* **Chain methods for the set ops** — `differenceBy` / `difference` /
+  `intersectionBy` / `intersection` on `Fx` and `FxAsync` (the receiver is
+  the free function's source argument), so example 40's triple chain-break
+  disappears.
+
+Typed errors:
+
+* **`flattenOrAccumulate`** (port of Arrow 2.x's name) — collects every
+  success or EVERY failure from an existing collection of `Either`s; the
+  fail-slow twin of `sequence`, completing the terminal trio with
+  `separated`. Top-level + async + chain terminals.
+* **`eitherCatching` / `eitherCatchingAsync`** — `either` with an
+  exception boundary: thrown exceptions map into the typed error via
+  `onThrow`; the raise signal is never handed to it. Replaces the
+  4-layer `either(catching(...))` envelope.
+* **`RaiseOps.recover` gained `onThrow:`** — Arrow 2.x's three-clause
+  `recover(block, recover, catch)`, non-breaking.
+* **`Accumulator.dependent(block)`** — runs only when no branch has
+  failed, making sibling `Accumulated.value` reads safe by construction;
+  names the manual `if (!acc.hasErrors)` guard that dependent-field
+  validation always needed. (Dart-native addition; no Arrow counterpart.)
+* **`Iterable.toNelOrNull()`** (port of Arrow's `toNonEmptyListOrNull`) —
+  any iterable → `Nel?` without the `.toList()` shuffle.
+* **Async `Either` extracts** — `rightsAsync` / `leftsAsync` /
+  `separateEitherAsync` and `FxAsync<Either>.rights()` / `.lefts()` /
+  `.separated()`, giving the async chain the same extract family the sync
+  chain already had.
+
+### Changed
+
+* `lib/fxdart.dart` now exports `src/typed/fx_either.dart` through an
+  explicit `show` list (it was the one unfiltered typed export).
 
 ### Performance
 

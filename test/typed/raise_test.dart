@@ -202,6 +202,45 @@ void main() {
           throwsStateError);
     });
 
+    test('recover should pass through a successful block untouched', () {
+      expect(
+          either<String, int>((r) => r.recover((r2) => 5, (e) => -1)),
+          Right(5));
+    });
+
+    test('recover should hand thrown exceptions to onThrow when given', () {
+      expect(
+          either<String, int>((r) => r.recover(
+              (r2) => throw StateError('x'), (e) => 0,
+              onThrow: (thrown, _) => 99)),
+          Right(99));
+    });
+
+    test('recover should route a raise to onRaise, never to onThrow', () {
+      var onThrowRan = false;
+      expect(
+          either<String, int>((r) => r.recover(
+              (r2) => r2.raise('gone'), (e) => e.length, onThrow: (thrown, _) {
+                onThrowRan = true;
+                return -1;
+              })),
+          Right(4));
+      expect(onThrowRan, isFalse);
+    });
+
+    test("recover should rethrow the enclosing scope's raise, not hand it "
+        'to onThrow', () {
+      var onThrowRan = false;
+      expect(
+          either<String, int>((r) => r.recover(
+              (_) => r.raise('outer'), (e) => -1, onThrow: (thrown, _) {
+                onThrowRan = true;
+                return -2;
+              })),
+          Left('outer'));
+      expect(onThrowRan, isFalse);
+    });
+
     test('withError should map the inner error type into the outer', () {
       expect(
           either<String, int>((r) =>

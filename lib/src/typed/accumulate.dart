@@ -49,6 +49,25 @@ abstract interface class Accumulator<E> {
 
   /// Whether any branch has failed so far.
   bool get hasErrors;
+
+  /// Runs [block] only when no branch has failed so far — the home for
+  /// *dependent* rules that read sibling [Accumulated.value]s, which is only
+  /// safe once every independent branch succeeded.
+  ///
+  /// When errors already exist the block is skipped entirely and an errored
+  /// [Accumulated] is returned (reading its `value` detonates as usual).
+  /// Errors raised inside a running [dependent] block still accumulate.
+  ///
+  /// No Arrow counterpart — Arrow users hand-roll the same `hasErrors`
+  /// guard; named here because dependent validation is the single most
+  /// common reason to drop from `zipOrAccumulateN` down to raw [accumulate].
+  ///
+  /// ```dart
+  /// final type   = acc.accumulating((r) => vType(r, raw));
+  /// final amount = acc.accumulating((r) => vAmount(r, raw));
+  /// acc.dependent((r) => vAmountRequired(r, amount.value, type.value));
+  /// ```
+  Accumulated<A> dependent<A>(A Function(AccumulatingRaise<E> r) block);
 }
 
 /// A [Raise] whose errors join a [NonEmptyList] accumulator — what
@@ -107,6 +126,10 @@ final class _AccumulatorImpl<E> implements Accumulator<E> {
         },
         onValue: (value) => _AccumulatedOk(value),
       );
+
+  @override
+  Accumulated<A> dependent<A>(A Function(AccumulatingRaise<E> r) block) =>
+      hasErrors ? _AccumulatedErr<A>(_raiseAll) : accumulating(block);
 }
 
 /// The accumulation vocabulary, available on any `Raise<NonEmptyList<E>>`

@@ -57,3 +57,15 @@ extension type NonEmptyList<T>._(List<T> _all) implements Iterable<T> {
   List<T> toList({bool growable = true}) =>
       List.of(_all, growable: growable);
 }
+
+/// The bridge from plain iterables into the [NonEmptyList] world.
+extension IterableToNel<T> on Iterable<T> {
+  /// Copies this iterable into a [NonEmptyList], or `null` when it is
+  /// empty — the `Iterable`-friendly form of [NonEmptyList.orNull] (port of
+  /// Arrow's `toNonEmptyListOrNull`), so accumulated error lists need no
+  /// `.toList()` shuffle first.
+  NonEmptyList<T>? toNelOrNull() {
+    final copy = List.of(this);
+    return copy.isEmpty ? null : NonEmptyList._(copy);
+  }
+}

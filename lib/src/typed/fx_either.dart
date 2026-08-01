@@ -69,6 +69,64 @@ Future<Either<L, List<R>>> sequenceEitherAsync<L, R>(
   return Right(out);
 }
 
+/// Async twin of [rights].
+Future<List<R>> rightsAsync<L, R>(
+    FxAsyncIterable<Either<L, R>> iterable) async {
+  final out = <R>[];
+  final it = iterable.iterator;
+  var res = await it.next();
+  while (!res.done) {
+    if (res.value case Right(:final value)) out.add(value);
+    res = await it.next();
+  }
+  return out;
+}
+
+/// Async twin of [lefts].
+Future<List<L>> leftsAsync<L, R>(
+    FxAsyncIterable<Either<L, R>> iterable) async {
+  final out = <L>[];
+  final it = iterable.iterator;
+  var res = await it.next();
+  while (!res.done) {
+    if (res.value case Left(:final value)) out.add(value);
+    res = await it.next();
+  }
+  return out;
+}
+
+/// Async twin of [separateEither].
+Future<(List<L>, List<R>)> separateEitherAsync<L, R>(
+    FxAsyncIterable<Either<L, R>> iterable) async {
+  final ls = <L>[];
+  final rs = <R>[];
+  final it = iterable.iterator;
+  var res = await it.next();
+  while (!res.done) {
+    switch (res.value) {
+      case Left(:final value):
+        ls.add(value);
+      case Right(:final value):
+        rs.add(value);
+    }
+    res = await it.next();
+  }
+  return (ls, rs);
+}
+
+/// Collects every success, or EVERY failure — the fail-slow twin of
+/// [sequenceEither] over an existing collection of `Either`s (port of
+/// Arrow's `flattenOrAccumulate`).
+Either<NonEmptyList<E>, List<A>> flattenOrAccumulate<E, A>(
+        Iterable<Either<E, A>> iterable) =>
+    mapOrAccumulate((r, Either<E, A> e) => r.bind(e), iterable);
+
+/// Async twin of [flattenOrAccumulate]. Fail-slow: consumes the whole
+/// upstream so every [Left] is collected.
+Future<Either<NonEmptyList<E>, List<A>>> flattenOrAccumulateAsync<E, A>(
+        FxAsyncIterable<Either<E, A>> iterable) =>
+    mapOrAccumulateAsync((r, Either<E, A> e) => r.bind(e), iterable);
+
 /// Transforms every element of [iterable], collecting ALL failures instead
 /// of stopping at the first. The eager, pipeline-level twin of
 /// [AccumulatingRaiseOps.mapOrAccumulate].
@@ -121,6 +179,14 @@ extension FxEitherOps<L, R> on Fx<Either<L, R>> {
 
   /// Collects every success into one list, failing fast on the first [Left].
   Either<L, List<R>> sequence() => sequenceEither(this);
+
+  /// Collects every success, or EVERY failure — the fail-slow twin of
+  /// [sequence].
+  EitherNel<L, List<R>> flattenOrAccumulate() =>
+      // The top-level twin is shadowed by this member's name, so the
+      // composition is spelled out (the FxEitherOps.rights precedent).
+      either<NonEmptyList<L>, List<R>>(
+          (r) => r.mapOrAccumulate(this, (br, Either<L, R> e) => br.bind(e)));
 }
 
 /// Either-aware terminals for async chains of `Either` values.
@@ -128,6 +194,20 @@ extension FxAsyncEitherOps<L, R> on FxAsync<Either<L, R>> {
   /// Async twin of [FxEitherOps.sequence] — stops pulling on the first
   /// [Left].
   Future<Either<L, List<R>>> sequence() => sequenceEitherAsync(this);
+
+  /// Async twin of [FxEitherOps.rights].
+  Future<List<R>> rights() => rightsAsync(this);
+
+  /// Async twin of [FxEitherOps.lefts].
+  Future<List<L>> lefts() => leftsAsync(this);
+
+  /// Async twin of [FxEitherOps.separated].
+  Future<(List<L>, List<R>)> separated() => separateEitherAsync(this);
+
+  /// Async twin of [FxEitherOps.flattenOrAccumulate] — fail-slow, consumes
+  /// the whole upstream.
+  Future<EitherNel<L, List<R>>> flattenOrAccumulate() =>
+      flattenOrAccumulateAsync(this);
 }
 
 /// Fail-slow validation over a sync chain.

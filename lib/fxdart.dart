@@ -40,8 +40,25 @@ export 'src/strict/predicates.dart';
 export 'src/typed/accumulate.dart'
     show Accumulated, Accumulator, AccumulatingRaise, AccumulatingRaiseOps;
 export 'src/typed/either.dart' show Either, EitherNel, Left, Right;
-export 'src/typed/fx_either.dart';
-export 'src/typed/non_empty_list.dart' show Nel, NonEmptyList;
+export 'src/typed/fx_either.dart'
+    show
+        FxAccumulateOps,
+        FxAsyncAccumulateOps,
+        FxAsyncEitherOps,
+        FxEitherOps,
+        flattenOrAccumulate,
+        flattenOrAccumulateAsync,
+        lefts,
+        leftsAsync,
+        mapOrAccumulate,
+        mapOrAccumulateAsync,
+        rights,
+        rightsAsync,
+        separateEither,
+        separateEitherAsync,
+        sequenceEither,
+        sequenceEitherAsync;
+export 'src/typed/non_empty_list.dart' show IterableToNel, Nel, NonEmptyList;
 export 'src/typed/raise.dart'
     show
         Raise,
@@ -52,6 +69,8 @@ export 'src/typed/raise.dart'
         catchingAsync,
         either,
         eitherAsync,
+        eitherCatching,
+        eitherCatchingAsync,
         foldRaise,
         foldRaiseAsync,
         nullable,

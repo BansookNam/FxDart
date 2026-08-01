@@ -9,6 +9,10 @@ void main() {
         expect(average(<num>[]).isNaN, isTrue);
       });
 
+      test('should switch to double accumulation at the first double', () {
+        expect(average([1, 2, 1.5]), equals(1.5));
+      });
+
       test('should be able to be used in the pipeline', () {
         final res = fx([1, 2, 3, 4, 5]).average();
         expect(res, equals(3));

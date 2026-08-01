@@ -13,6 +13,10 @@ void main() {
         expect(sumBy((int n) => n, <int>[]), equals(0));
       });
 
+      test('should switch to double accumulation at the first double key', () {
+        expect(sumBy((num n) => n, [1, 2, 2.5]), equals(5.5));
+      });
+
       test('should be able to be used in the pipeline', () {
         final res = fx(['a', 'bb', 'ccc'])
             .filter((s) => s.length > 1)

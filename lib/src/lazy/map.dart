@@ -71,6 +71,68 @@ FxAsyncIterable<B> mapEffectAsync<A, B>(
         FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
     mapAsync(f, iterable);
 
+/// Maps [f] over [iterable] with up to [concurrency] elements in flight at
+/// once, yielding results in source order — the pre-combined form of
+/// `toAsync` → `mapAsync` → `concurrentAsync`.
+///
+/// Dart-native addition (FxTS pipes `concurrent` as a separate step).
+///
+/// ```dart
+/// await toListAsync(mapConcurrent(3, fetchProfile, users));
+/// ```
+FxAsyncIterable<B> mapConcurrent<A, B>(
+        int concurrency, FutureOr<B> Function(A a) f, Iterable<A> iterable) =>
+    concurrentAsync(concurrency, mapAsync(f, toAsync(iterable)));
+
+/// Async-source counterpart of [mapConcurrent] — the pre-combined form of
+/// `mapAsync` → `concurrentAsync`.
+FxAsyncIterable<B> mapConcurrentAsync<A, B>(int concurrency,
+        FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    concurrentAsync(concurrency, mapAsync(f, iterable));
+
+/// Lazily pairs each element with the value [f] derives from it — the input
+/// stays beside its result, so no hand-built `(x, f(x))` records.
+///
+/// Dart-native addition (no FxTS counterpart).
+///
+/// ```dart
+/// attach((w) => w.length, ['a', 'bb']); // (('a', 1), ('bb', 2))
+/// ```
+Iterable<(A, B)> attach<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    _AttachIterable(f, iterable);
+
+class _AttachIterable<A, B> extends Iterable<(A, B)> {
+  _AttachIterable(this._f, this._source);
+  final B Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<(A, B)> get iterator => _AttachIterator(_f, _source.iterator);
+}
+
+class _AttachIterator<A, B> implements Iterator<(A, B)> {
+  _AttachIterator(this._f, this._it);
+  final B Function(A) _f;
+  final Iterator<A> _it;
+  @override
+  late (A, B) current;
+  @override
+  bool moveNext() {
+    if (_it.moveNext()) {
+      final v = _it.current;
+      current = (v, _f(v));
+      return true;
+    }
+    return false;
+  }
+}
+
+/// Async counterpart of [attach]. Built on [mapAsync], so overlapping
+/// `next()` calls start overlapping upstream pulls — it composes with
+/// `concurrentAsync` like any other async operator.
+FxAsyncIterable<(A, B)> attachAsync<A, B>(
+        FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    mapAsync((A a) async => (a, await f(a)), iterable);
+
 /// Iterates over each element, applying [f] without changing the values.
 ///
 /// Port of FxTS `peek`.

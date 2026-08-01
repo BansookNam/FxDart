@@ -169,11 +169,45 @@ class Fx<T> extends Iterable<T> {
   /// A new chain sorted by the key [f] returns for each value.
   Fx<T> sortBy(Object? Function(T a) f) => Fx(s.sortBy(f, _inner));
 
+  /// A new chain sorted by the key [f], descending — any comparable key,
+  /// not just the numeric ones `sortBy((a) => -key)` can negate.
+  Fx<T> sortByDesc(Object? Function(T a) f) => Fx(s.sortByDesc(f, _inner));
+
+  /// Lazily pairs each value with the result of [f] — the value stays
+  /// beside what was derived from it.
+  Fx<(T, R)> attach<R>(R Function(T a) f) => Fx(l.attach(f, _inner));
+
+  /// Groups values into `(key, items)` records, in first-seen key order —
+  /// the chainable view of [groupBy] (no `Map.entries` re-entry).
+  Fx<({K key, List<T> items})> groupedBy<K>(K Function(T a) f) =>
+      Fx(s.groupedBy(f, _inner));
+
+  /// Values of this chain whose [f]-keys do not occur in [other], deduped.
+  Fx<T> differenceBy<B>(B Function(T a) f, Iterable<T> other) =>
+      Fx(l.differenceBy(f, other, _inner));
+
+  /// Values of this chain that do not occur in [other].
+  Fx<T> difference(Iterable<T> other) => Fx(l.difference(other, _inner));
+
+  /// Values of this chain whose [f]-keys also occur in [other], deduped.
+  Fx<T> intersectionBy<B>(B Function(T a) f, Iterable<T> other) =>
+      Fx(l.intersectionBy(f, other, _inner));
+
+  /// Values of this chain that also occur in [other].
+  Fx<T> intersection(Iterable<T> other) => Fx(l.intersection(other, _inner));
+
   // --- conversion ---------------------------------------------------------
 
   /// Switches to the async chain. Values stay plain; use the top-level
   /// `toAsync` for an `Iterable<Future<T>>`.
   FxAsync<T> toAsync() => FxAsync(async_.toAsync(_inner));
+
+  /// Switches to the async chain and maps [f] with up to [concurrency]
+  /// values in flight at once, in source order — the pre-combined form of
+  /// `toAsync().map(f).concurrent(concurrency)`.
+  FxAsync<R> mapConcurrent<R>(
+          int concurrency, FutureOr<R> Function(T a) f) =>
+      FxAsync(l.mapConcurrent(concurrency, f, _inner));
 
   // --- terminal operators -------------------------------------------------
 
@@ -195,6 +229,9 @@ class Fx<T> extends Iterable<T> {
 
   /// Counts how many values fall under each key [f] returns.
   Map<K, int> countBy<K>(K Function(T a) f) => s.countBy(f, _inner);
+
+  /// Counts the values [f] holds for — `filter` + `size` in one walk.
+  int countWhere(bool Function(T a) f) => s.countWhere(f, _inner);
 
   /// Whether [f] holds for at least one value.
   bool some(bool Function(T a) f) => s.some(f, _inner);
@@ -364,10 +401,40 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Repeats the source endlessly.
   FxAsync<T> cycle() => FxAsync(l.cycleAsync(_inner));
 
+  /// Lazily pairs each value with the (possibly async) result of [f] —
+  /// the value stays beside what was derived from it. Parallel-safe:
+  /// composes with [concurrent].
+  FxAsync<(T, R)> attach<R>(FutureOr<R> Function(T a) f) =>
+      FxAsync(l.attachAsync(f, _inner));
+
+  /// Values of this chain whose [f]-keys do not occur in [other], deduped.
+  FxAsync<T> differenceBy<B>(
+          FutureOr<B> Function(T a) f, FxAsyncIterable<T> other) =>
+      FxAsync(l.differenceByAsync(f, other, _inner));
+
+  /// Values of this chain that do not occur in [other].
+  FxAsync<T> difference(FxAsyncIterable<T> other) =>
+      FxAsync(l.differenceAsync(other, _inner));
+
+  /// Values of this chain whose [f]-keys also occur in [other], deduped.
+  FxAsync<T> intersectionBy<B>(
+          FutureOr<B> Function(T a) f, FxAsyncIterable<T> other) =>
+      FxAsync(l.intersectionByAsync(f, other, _inner));
+
+  /// Values of this chain that also occur in [other].
+  FxAsync<T> intersection(FxAsyncIterable<T> other) =>
+      FxAsync(l.intersectionAsync(other, _inner));
+
   /// Evaluates the upstream chain up to [length] items at a time.
   ///
   /// Port of FxTS `concurrent`.
   FxAsync<T> concurrent(int length) => FxAsync(concurrentAsync(length, _inner));
+
+  /// Maps [f] with up to [concurrency] values in flight at once, in source
+  /// order — the pre-combined form of `map(f).concurrent(concurrency)`.
+  FxAsync<R> mapConcurrent<R>(
+          int concurrency, FutureOr<R> Function(T a) f) =>
+      FxAsync(l.mapConcurrentAsync(concurrency, f, _inner));
 
   /// Like [concurrent] but yields in completion order.
   FxAsync<T> concurrentPool(int length) =>
@@ -455,8 +522,21 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// A new list sorted by the key [f] returns for each value.
   Future<List<T>> sortBy(Object? Function(T a) f) => s.sortByAsync(f, _inner);
 
+  /// A new list sorted by the key [f], descending.
+  Future<List<T>> sortByDesc(Object? Function(T a) f) =>
+      s.sortByDescAsync(f, _inner);
+
+  /// Groups values into `(key, items)` records, in first-seen key order.
+  Future<List<({K key, List<T> items})>> groupedBy<K>(
+          FutureOr<K> Function(T a) f) =>
+      s.groupedByAsync(f, _inner);
+
   /// The number of values.
   Future<int> size() => s.sizeAsync(_inner);
+
+  /// Counts the values [f] holds for — `filter` + `size` in one walk.
+  Future<int> countWhere(FutureOr<bool> Function(T a) f) =>
+      s.countWhereAsync(f, _inner);
 
   // --- Dart-idiomatic aliases -------------------------------------------
   // FxAsync does not extend Iterable, so the Dart names are provided as

@@ -178,6 +178,41 @@ Future<Either<E, A>> eitherAsync<E, A>(
       onValue: (value) => Right(value),
     );
 
+/// [either] with an exception boundary: a *thrown* exception is transformed
+/// by [onThrow] into the scope's typed error. The pre-combined form of the
+/// `either` + [catching] envelope (Arrow: `either { }` with `Raise.catch`).
+///
+/// The library's own raise signal is never handed to [onThrow] — a raise
+/// from this scope becomes [Left] as usual, and a foreign scope's signal is
+/// rethrown untouched.
+///
+/// ```dart
+/// Either<RowError, Entry> parseRow(int line, String raw) => eitherCatching(
+///   (r) => entryFrom(r, raw),  // may raise RowError OR throw FormatException
+///   (e, _) => RowError.one(line, FieldError('row', 'could not parse: $e')),
+/// );
+/// ```
+Either<E, A> eitherCatching<E, A>(A Function(Raise<E> r) block,
+        E Function(Object thrown, StackTrace stackTrace) onThrow) =>
+    foldRaise<E, A, Either<E, A>>(
+      block,
+      onRaise: (error) => Left(error),
+      onValue: (value) => Right(value),
+      onThrow: (thrown, stackTrace) => Left(onThrow(thrown, stackTrace)),
+    );
+
+/// Async twin of [eitherCatching].
+Future<Either<E, A>> eitherCatchingAsync<E, A>(
+        FutureOr<A> Function(Raise<E> r) block,
+        FutureOr<E> Function(Object thrown, StackTrace stackTrace) onThrow) =>
+    foldRaiseAsync<E, A, Either<E, A>>(
+      block,
+      onRaise: (error) => Left(error),
+      onValue: (value) => Right(value),
+      onThrow: (thrown, stackTrace) async =>
+          Left(await onThrow(thrown, stackTrace)),
+    );
+
 /// The info-free raise scope used by [nullable] — the port of Arrow's
 /// `SingletonRaise` (errors carry no information).
 final class SingletonRaise implements Raise<void> {
@@ -281,9 +316,16 @@ extension RaiseOps<E> on Raise<E> {
       value ?? raise(error());
 
   /// Runs [block] in a nested scope; a raised error is handed to [onRaise]
-  /// instead of propagating. Thrown exceptions still propagate.
-  A recover<A>(A Function(Raise<E> r) block, A Function(E error) onRaise) =>
-      foldRaise<E, A, A>(block, onRaise: onRaise, onValue: (value) => value);
+  /// instead of propagating.
+  ///
+  /// Thrown exceptions propagate unless [onThrow] is given, which completes
+  /// Arrow 2.x's three-clause `recover(block, recover, catch)`. The raise
+  /// signal itself is never handed to [onThrow] — this scope's raise goes to
+  /// [onRaise], a foreign scope's signal is rethrown untouched.
+  A recover<A>(A Function(Raise<E> r) block, A Function(E error) onRaise,
+          {A Function(Object thrown, StackTrace stackTrace)? onThrow}) =>
+      foldRaise<E, A, A>(block,
+          onRaise: onRaise, onValue: (value) => value, onThrow: onThrow);
 
   /// Runs [block] in a scope with a DIFFERENT error type `E2`, mapping any
   /// raised `E2` into this scope's `E` via [transform] — the error-type

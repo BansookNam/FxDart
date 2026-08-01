@@ -9,6 +9,11 @@ void main() {
         expect(sum([1, 2, 3]), equals(6));
       });
 
+      test('should switch to double accumulation at the first double', () {
+        expect(sum([1, 2, 2.5]), equals(5.5));
+        expect(sum([1, 2.5, 3]), equals(6.5));
+      });
+
       test('should sum all elements []', () {
         expect(sum(<num>[]), equals(0));
       });
