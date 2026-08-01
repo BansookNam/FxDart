@@ -4,17 +4,18 @@ title: 이번 달 카테고리 순위 — Dart vs FxDart
 description: 지출을 그룹핑·합산·순위 매기기 — 순수 Dart의 groupListsBy와 비교자 뒤집기 vs FxDart의 groupedBy → sortByDesc 체인 하나.
 heading: 이번 달 카테고리 순위
 order: 51
-tier: 3
-functions: groupedBy, map, sumBy, sortByDesc, take
+tier: 4
+functions: filter, groupedBy, map, sumBy, sortByDesc, take
 domain: transactions
 verdict: fxdart
 async: false
 ---
   <h2>요구사항</h2>
   <p>
-    한 달치 가계부 거래 내역이 주어질 때, <strong>총지출 상위 세
-    카테고리</strong>를 큰 순서대로 매기고, 각 카테고리를 합계 금액과 구매
-    건수와 함께 출력하세요. 데이터는 아래 코드에 있으며, 두 버전 모두
+    6월 말 거래가 몇 건 섞여 있는 가계부 내역에서 <strong>2026년
+    7월</strong>만 남기고, <strong>총지출 상위 세 카테고리</strong>를 큰
+    순서대로 매기세요. 각 카테고리를 합계 금액과 구매 건수와 함께
+    출력합니다. 데이터는 아래 코드에 있으며, 두 버전 모두
     <em>예상 출력</em> 아래에 표시된 줄들을 출력해야 합니다.
   </p>
 
@@ -25,8 +26,9 @@ async: false
 
   <h2>차이가 나는 이유</h2>
   <p>
-    과제는 하나의 생각입니다 — 그룹핑, 합산, 순위, 상위 셋 — 그리고
-    FxDart 버전은 하나의 체인입니다. <code>groupedBy</code>가
+    과제는 하나의 생각입니다 — 이번 달만 남기고, 그룹핑, 합산, 순위,
+    상위 셋 — 그리고 FxDart 버전은 하나의 체인입니다.
+    <code>filter</code>가 7월을 남기고, <code>groupedBy</code>가
     <code>(key:, items:)</code> 레코드를 내놓으므로 카테고리별 합계는
     <code>map</code> 한 단계 거리이고, <code>sortByDesc</code>가 키 기준
     "큰 것부터"를 말합니다. 순수 Dart는 같은 생각을 <code>Map</code>

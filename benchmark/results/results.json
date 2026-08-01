@@ -6,7 +6,7 @@
     "os": "macos Version 26.3 (Build 25D125)",
     "compilation": "AOT (dart compile exe), enforced per result line"
   },
-  "date": "2026-08-01",
+  "date": "2026-08-02",
   "warmup": 2,
   "itersPerRound": 5,
   "tieMarginPct": 5.0,
@@ -3076,15 +3076,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 6.031390134529148,
-            "minUs": 4.6706586826347305,
-            "medianRssBytes": 17334272.0,
+            "medianUs": 4.548628428927681,
+            "minUs": 3.4251497005988023,
+            "medianRssBytes": 17252352.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 12.922077922077921,
-            "minUs": 11.337662337662337,
-            "medianRssBytes": 17235968.0,
+            "medianUs": 10.527363184079602,
+            "minUs": 9.512437810945274,
+            "medianRssBytes": 17432576.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -3094,37 +3094,37 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 324.42857142857144,
-            "minUs": 289.42857142857144,
-            "medianRssBytes": 24084480.0,
+            "medianUs": 282.0,
+            "minUs": 267.6666666666667,
+            "medianRssBytes": 18153472.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 599.0,
-            "minUs": 551.25,
-            "medianRssBytes": 24084480.0,
+            "medianUs": 481.6,
+            "minUs": 431.0,
+            "medianRssBytes": 24576000.0,
             "samples": 15
           },
           "timeWinner": "tie",
-          "memWinner": "tie"
+          "memWinner": "native"
         },
         "full": {
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 50034.0,
-            "minUs": 47685.0,
-            "medianRssBytes": 155762688.0,
+            "medianUs": 34874.0,
+            "minUs": 32430.0,
+            "medianRssBytes": 154566656.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 76087.0,
-            "minUs": 72066.0,
-            "medianRssBytes": 139231232.0,
+            "medianUs": 53055.0,
+            "minUs": 50170.0,
+            "medianRssBytes": 155041792.0,
             "samples": 15
           },
           "timeWinner": "native",
-          "memWinner": "fxdart"
+          "memWinner": "tie"
         }
       }
     },

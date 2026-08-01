@@ -2,7 +2,7 @@
 
 - **Machine:** Apple M1 Max, 32 GB RAM
 - **Dart:** 3.12.2 (macos Version 26.3 (Build 25D125)), AOT-compiled
-- **Date:** 2026-08-01
+- **Date:** 2026-08-02
 - **Method:** per side and N-scale, fresh process × rounds, 2 warmup + 5 measured iterations per process (small N auto-batched to ≥2 ms samples); median reported. Ties — within 5.0% of each other, or within 0.6 ms absolute (beneath human perception) — with close relative races re-run up to 5 rounds.
 - Memory is peak process RSS — the runtime and the dataset are identical on both sides, so the *difference* is what the pipeline itself holds onto. At small N it is all runtime baseline; expect ties.
 
@@ -60,7 +60,7 @@
 | 48 | settlement-pipeline (async) | 100 | 32 µs | 44 µs | **tie** | 16.6 MB | 17.3 MB | tie | 3 |
 | 49 | live-search (async) | 100 | 55 µs | 82 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
 | 50 | daily-ledger-close (async) | 100 | 380 µs | 487 µs | **tie** | 16.5 MB | 17.2 MB | tie | 3 |
-| 51 | category-rank | 100 | 6.0 µs | 13 µs | **tie** | 16.5 MB | 16.4 MB | tie | 3 |
+| 51 | category-rank | 100 | 4.5 µs | 11 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
 | 52 | stock-revaluation (async) | 100 | 362 µs | 682 µs | **tie** | 16.4 MB | 17.2 MB | tie | 3 |
 
 ## N = 10000
@@ -117,7 +117,7 @@
 | 48 | settlement-pipeline (async) | 10000 | 4.29 ms | 4.35 ms | **tie** | 23.1 MB | 46.8 MB | native | 3 |
 | 49 | live-search (async) | 10000 | 5.05 ms | 9.25 ms | **native** | 23.5 MB | 24.1 MB | tie | 3 |
 | 50 | daily-ledger-close (async) | 10000 | 328.6 ms | 343.0 ms | **tie** | 49.9 MB | 50.5 MB | tie | 5 |
-| 51 | category-rank | 10000 | 324 µs | 599 µs | **tie** | 23.0 MB | 23.0 MB | tie | 3 |
+| 51 | category-rank | 10000 | 282 µs | 482 µs | **tie** | 17.3 MB | 23.4 MB | native | 3 |
 | 52 | stock-revaluation (async) | 10000 | 29.6 ms | 55.8 ms | **native** | 48.8 MB | 38.0 MB | fxdart | 3 |
 
 ## Headline N (1M sync / case-specific async)
@@ -174,5 +174,5 @@
 | 48 | settlement-pipeline (async) | 8000 | 3.48 ms | 3.20 ms | **tie** | 22.8 MB | 23.8 MB | tie | 3 |
 | 49 | live-search (async) | 6000 | 3.19 ms | 5.14 ms | **native** | 23.2 MB | 23.8 MB | tie | 3 |
 | 50 | daily-ledger-close (async) | 3000 | 36.9 ms | 41.0 ms | **native** | 23.8 MB | 24.4 MB | tie | 3 |
-| 51 | category-rank | 1000000 | 50.0 ms | 76.1 ms | **native** | 148.5 MB | 132.8 MB | fxdart | 3 |
+| 51 | category-rank | 1000000 | 34.9 ms | 53.1 ms | **native** | 147.4 MB | 147.9 MB | tie | 3 |
 | 52 | stock-revaluation (async) | 4000 | 12.4 ms | 22.9 ms | **native** | 23.4 MB | 28.4 MB | native | 3 |

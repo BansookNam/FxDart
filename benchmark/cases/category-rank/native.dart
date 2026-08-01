@@ -10,7 +10,9 @@ Future<void> main() async {
     impl: 'native',
     n: n,
     run: () {
-      final byCategory = txns.groupListsBy((t) => t.category);
+      final byCategory = txns
+          .where((t) => t.date.startsWith('2026-07'))
+          .groupListsBy((t) => t.category);
       final ranked = byCategory.entries
           .map((e) =>
               (e.key, e.value.fold(0.0, (s, t) => s + t.amount), e.value.length))

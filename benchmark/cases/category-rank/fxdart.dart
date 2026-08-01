@@ -11,6 +11,7 @@ Future<void> main() async {
     n: n,
     run: () {
       final ranked = fx(txns)
+          .filter((t) => t.date.startsWith('2026-07'))
           .groupedBy((t) => t.category)
           .map((g) =>
               (g.key, fx(g.items).sumBy((t) => t.amount), g.items.length))

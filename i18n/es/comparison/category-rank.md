@@ -4,19 +4,21 @@ title: Ranking del mes por categoría — Dart vs FxDart
 description: Agrupar, totalizar y rankear el gasto — groupListsBy más el volteo del comparador en Dart nativo frente a una sola cadena groupedBy → sortByDesc en FxDart.
 heading: Ranking del mes por categoría
 order: 51
-tier: 3
-functions: groupedBy, map, sumBy, sortByDesc, take
+tier: 4
+functions: filter, groupedBy, map, sumBy, sortByDesc, take
 domain: transactions
 verdict: fxdart
 async: false
 ---
   <h2>Requisito</h2>
   <p>
-    Dado un mes de transacciones del libro de cuentas, calcula las
-    <strong>tres categorías con más gasto total</strong> — la más grande
-    primero — e imprime cada categoría con su total y cuántas compras
-    abarca. Los datos están en el código de abajo; las dos versiones deben
-    imprimir las líneas que aparecen bajo <em>Salida esperada</em>.
+    Dadas transacciones del libro de cuentas con algunos rezagados de
+    junio mezclados, quédate solo con <strong>julio de 2026</strong> y
+    calcula las <strong>tres categorías con más gasto total</strong> — la
+    más grande primero —, imprimiendo cada categoría con su total y
+    cuántas compras abarca. Los datos están en el código de abajo; las dos
+    versiones deben imprimir las líneas que aparecen bajo
+    <em>Salida esperada</em>.
   </p>
 
   {{output}}
@@ -26,8 +28,9 @@ async: false
 
   <h2>Por qué difieren</h2>
   <p>
-    La tarea es un solo pensamiento — agrupar, totalizar, rankear, top
-    tres — y la versión FxDart es una sola cadena: <code>groupedBy</code>
+    La tarea es un solo pensamiento — quedarse con el mes, agrupar,
+    totalizar, rankear, top tres — y la versión FxDart es una sola cadena:
+    <code>filter</code> conserva julio, <code>groupedBy</code>
     produce registros <code>(key:, items:)</code>, así que el total por
     categoría está a un paso de <code>map</code>, y
     <code>sortByDesc</code> dice «el más grande primero» por clave. Dart

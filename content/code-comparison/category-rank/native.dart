@@ -8,6 +8,8 @@ class Tx {
 }
 
 const txns = [
+  Tx('2026-06-28', 'Food', 31.00), // June spillover — not this month
+  Tx('2026-06-30', 'Transport', 8.20), // June spillover — not this month
   Tx('2026-07-02', 'Food', 12.50),
   Tx('2026-07-03', 'Transport', 2.75),
   Tx('2026-07-05', 'Food', 43.20),
@@ -21,7 +23,9 @@ const txns = [
 ];
 
 void main() {
-  final byCategory = txns.groupListsBy((t) => t.category);
+  final byCategory = txns
+      .where((t) => t.date.startsWith('2026-07'))
+      .groupListsBy((t) => t.category);
   final ranked = byCategory.entries
       .map((e) =>
           (e.key, e.value.fold(0.0, (s, t) => s + t.amount), e.value.length))

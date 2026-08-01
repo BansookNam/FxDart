@@ -48,12 +48,13 @@
   <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #51 · <strong>이번 달 카테고리 순위</strong></p>
   <h1>이번 달 카테고리 순위</h1>
   <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupedBy.html">groupedBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/sortByDesc.html">sortByDesc</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/groupedBy.html">groupedBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/sortByDesc.html">sortByDesc</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
   <h2>요구사항</h2>
   <p>
-    한 달치 가계부 거래 내역이 주어질 때, <strong>총지출 상위 세
-    카테고리</strong>를 큰 순서대로 매기고, 각 카테고리를 합계 금액과 구매
-    건수와 함께 출력하세요. 데이터는 아래 코드에 있으며, 두 버전 모두
+    6월 말 거래가 몇 건 섞여 있는 가계부 내역에서 <strong>2026년
+    7월</strong>만 남기고, <strong>총지출 상위 세 카테고리</strong>를 큰
+    순서대로 매기세요. 각 카테고리를 합계 금액과 구매 건수와 함께
+    출력합니다. 데이터는 아래 코드에 있으며, 두 버전 모두
     <em>예상 출력</em> 아래에 표시된 줄들을 출력해야 합니다.
   </p>
 
@@ -68,7 +69,7 @@ Fun: $37.00 (2 purchases)</pre>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
       <h3>네이티브 Dart</h3>
-      <div class="playground" data-pg="147083e00367768f">
+      <div class="playground" data-pg="70bac571a0cf89d1">
 <textarea>
 import 'package:collection/collection.dart';
 
@@ -80,6 +81,8 @@ class Tx {
 }
 
 const txns = [
+  Tx('2026-06-28', 'Food', 31.00), // June spillover — not this month
+  Tx('2026-06-30', 'Transport', 8.20), // June spillover — not this month
   Tx('2026-07-02', 'Food', 12.50),
   Tx('2026-07-03', 'Transport', 2.75),
   Tx('2026-07-05', 'Food', 43.20),
@@ -93,7 +96,9 @@ const txns = [
 ];
 
 void main() {
-  final byCategory = txns.groupListsBy((t) => t.category);
+  final byCategory = txns
+      .where((t) => t.date.startsWith('2026-07'))
+      .groupListsBy((t) => t.category);
   final ranked = byCategory.entries
       .map((e) =>
           (e.key, e.value.fold(0.0, (s, t) => s + t.amount), e.value.length))
@@ -109,7 +114,7 @@ void main() {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="14abedac96a45bae">
+      <div class="playground" data-pg="4d465f0db189b7e9">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -121,6 +126,8 @@ class Tx {
 }
 
 const txns = [
+  Tx('2026-06-28', 'Food', 31.00), // June spillover — not this month
+  Tx('2026-06-30', 'Transport', 8.20), // June spillover — not this month
   Tx('2026-07-02', 'Food', 12.50),
   Tx('2026-07-03', 'Transport', 2.75),
   Tx('2026-07-05', 'Food', 43.20),
@@ -135,6 +142,7 @@ const txns = [
 
 void main() {
   final ranked = fx(txns)
+      .filter((t) => t.date.startsWith('2026-07'))
       .groupedBy((t) => t.category)
       .map((g) => (g.key, fx(g.items).sumBy((t) => t.amount), g.items.length))
       .sortByDesc((c) => c.$2)
@@ -152,8 +160,9 @@ void main() {
 
   <h2>차이가 나는 이유</h2>
   <p>
-    과제는 하나의 생각입니다 — 그룹핑, 합산, 순위, 상위 셋 — 그리고
-    FxDart 버전은 하나의 체인입니다. <code><a href="../tutorials/groupedBy.html">groupedBy</a></code>가
+    과제는 하나의 생각입니다 — 이번 달만 남기고, 그룹핑, 합산, 순위,
+    상위 셋 — 그리고 FxDart 버전은 하나의 체인입니다.
+    <code><a href="../tutorials/filter.html">filter</a></code>가 7월을 남기고, <code><a href="../tutorials/groupedBy.html">groupedBy</a></code>가
     <code>(key:, items:)</code> 레코드를 내놓으므로 카테고리별 합계는
     <code><a href="../tutorials/map.html">map</a></code> 한 단계 거리이고, <code><a href="../tutorials/sortByDesc.html">sortByDesc</a></code>가 키 기준
     "큰 것부터"를 말합니다. 순수 Dart는 같은 생각을 <code>Map</code>
@@ -173,7 +182,7 @@ void main() {
   </p>
   <section class="cmp-bench">
   <h2>Benchmark</h2>
-  <p class="dim bench-meta">Apple M1 Max, 32 GB RAM · Dart 3.12.2 (AOT-compiled) · 2026-08-01</p>
+  <p class="dim bench-meta">Apple M1 Max, 32 GB RAM · Dart 3.12.2 (AOT-compiled) · 2026-08-02</p>
   <div class="bench-scales">
   <div class="bench-scale">
     <h3>N = 100</h3>
@@ -181,26 +190,26 @@ void main() {
       <h4>Time <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:46.7%"></span></span>
-        <span class="bench-val">6.0 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:43.2%"></span></span>
+        <span class="bench-val">4.5 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">13 µs</span>
+        <span class="bench-val">11 µs</span>
       </div>
     </div>
     <div class="bench-metric">
       <h4>Peak memory <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:99.0%"></span></span>
         <span class="bench-val">16.5 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:99.4%"></span></span>
-        <span class="bench-val">16.4 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">16.6 MB</span>
       </div>
     </div>
   </div>
@@ -210,26 +219,26 @@ void main() {
       <h4>Time <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:54.2%"></span></span>
-        <span class="bench-val">324 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:58.6%"></span></span>
+        <span class="bench-val">282 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">599 µs</span>
+        <span class="bench-val">482 µs</span>
       </div>
     </div>
     <div class="bench-metric">
-      <h4>Peak memory <span class="badge verdict-tie">Tie</span></h4>
+      <h4>Peak memory <span class="badge verdict-native">Native wins</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">23.0 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:73.9%"></span></span>
+        <span class="bench-val">17.3 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">23.0 MB</span>
+        <span class="bench-val">23.4 MB</span>
       </div>
     </div>
   </div>
@@ -239,26 +248,26 @@ void main() {
       <h4>Time <span class="badge verdict-native">Native wins</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:65.8%"></span></span>
-        <span class="bench-val">50.0 ms</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:65.7%"></span></span>
+        <span class="bench-val">34.9 ms</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">76.1 ms</span>
+        <span class="bench-val">53.1 ms</span>
       </div>
     </div>
     <div class="bench-metric">
-      <h4>Peak memory <span class="badge verdict-fxdart">FxDart wins</span></h4>
+      <h4>Peak memory <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">148.5 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:99.7%"></span></span>
+        <span class="bench-val">147.4 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:89.4%"></span></span>
-        <span class="bench-val">132.8 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">147.9 MB</span>
       </div>
     </div>
   </div>
