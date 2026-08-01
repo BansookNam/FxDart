@@ -1,0 +1,152 @@
+import 'dart:async';
+
+import '../async_iterable.dart';
+import 'map.dart';
+
+/// Runs [f], retrying on error until it succeeds or [attempts] runs are
+/// exhausted, then rethrows the last error. Between a failure and the next
+/// run, waits [delay] (called with the number of failures so far, starting
+/// at 1 — return a growing [Duration] for backoff).
+///
+/// fxdart extension (not part of FxTS), after Rx's `retry`/`retryWhen`.
+/// To retry a whole pipeline, wrap its terminal:
+/// `retry(3, () => fxAsync(source()).map(parse).toList())`.
+///
+/// ```dart
+/// final user = await retry(3, () => api.fetchUser(id),
+///     delay: (failed) => Duration(milliseconds: 100 * failed));
+/// ```
+Future<T> retry<T>(int attempts, FutureOr<T> Function() f,
+    {Duration Function(int failed)? delay}) async {
+  _checkAttempts(attempts);
+  for (var attempt = 1;; attempt++) {
+    try {
+      return await f();
+    } catch (_) {
+      if (attempt >= attempts) rethrow;
+      final wait = delay?.call(attempt);
+      if (wait != null && wait > Duration.zero) {
+        await Future<void>.delayed(wait);
+      }
+    }
+  }
+}
+
+void _checkAttempts(int attempts) {
+  if (attempts < 1) {
+    throw ArgumentError.value(attempts, 'attempts', 'must be at least 1');
+  }
+}
+
+/// Lazily maps each value with [f], retrying each call up to [attempts]
+/// times (see [retry]) before letting the error propagate. Parallel-safe:
+/// composes with `concurrent`, and each in-flight value retries
+/// independently.
+///
+/// fxdart extension (not part of FxTS) — the per-element form of [retry].
+///
+/// ```dart
+/// await fxAsync(toAsync(urls))
+///     .mapRetry(3, fetch, delay: (failed) => Duration(seconds: failed))
+///     .concurrent(5)
+///     .toList();
+/// ```
+FxAsyncIterable<R> mapRetryAsync<A, R>(
+    int attempts, FutureOr<R> Function(A a) f, FxAsyncIterable<A> iterable,
+    {Duration Function(int failed)? delay}) {
+  _checkAttempts(attempts);
+  return mapAsync((A a) => retry(attempts, () => f(a), delay: delay), iterable);
+}
+
+/// Fails a pull with a [TimeoutException] when the upstream takes longer
+/// than [limit] to produce it. The limit applies to each pull (the time to
+/// produce one item), not to inter-item gaps or the whole pipeline.
+/// Parallel-safe: overlapping pulls each get their own timer.
+///
+/// fxdart extension (not part of FxTS), after Rx's `timeout` — but
+/// measuring demand-to-item time, the pull-model analog.
+///
+/// ```dart
+/// await fxAsync(toAsync(urls))
+///     .map(fetch)
+///     .timeout(Duration(seconds: 2))
+///     .toList(); // throws TimeoutException if any fetch stalls
+/// ```
+FxAsyncIterable<A> timeoutAsync<A>(
+    Duration limit, FxAsyncIterable<A> iterable) {
+  return DelegateAsyncIterable(() {
+    final iterator = iterable.iterator;
+    return DelegateAsyncIterator(
+        (concurrent) => iterator.next(concurrent).timeout(limit));
+  });
+}
+
+/// Scopes a resource to one lazy iteration: [acquire] runs on the first
+/// pull, [use] builds the elements from the resource, and [release] runs
+/// exactly once when iteration completes or throws.
+///
+/// fxdart extension (not part of FxTS), after Rx's `using`.
+///
+/// **Abandonment caveat:** a consumer that stops pulling mid-iteration
+/// (e.g. `break` inside `for-in`) never reaches the end, so [release] does
+/// not run. Drive the iterable to completion — bound it with `take` instead
+/// of breaking — or manage the resource with `try`/`finally` yourself.
+///
+/// ```dart
+/// final lines = using(
+///   () => File('data.txt').openSync(),
+///   (file) => readLines(file),
+///   (file) => file.closeSync(),
+/// );
+/// ```
+Iterable<T> using<R, T>(R Function() acquire,
+    Iterable<T> Function(R resource) use, void Function(R resource) release) sync* {
+  final resource = acquire();
+  try {
+    yield* use(resource);
+  } finally {
+    release(resource);
+  }
+}
+
+/// Async counterpart of [using]: [acquire] and [release] may be
+/// asynchronous, and the elements come from an [FxAsyncIterable].
+/// [release] runs exactly once — after the terminal pull, or before the
+/// error propagates when a pull fails (including a failing [use]).
+/// The same abandonment caveat as [using] applies.
+FxAsyncIterable<T> usingAsync<R, T>(
+    FutureOr<R> Function() acquire,
+    FxAsyncIterable<T> Function(R resource) use,
+    FutureOr<void> Function(R resource) release) {
+  return DelegateAsyncIterable(() {
+    late R resource;
+    var acquired = false;
+    var done = false;
+    Future<FxAsyncIterator<T>>? started;
+    Future<void>? releasing;
+
+    Future<void> releaseOnce() =>
+        releasing ??= Future.sync(() => release(resource));
+
+    return DelegateAsyncIterator((concurrent) {
+      if (done) return Future.value(IterResult<T>.done());
+      started ??= Future.sync(acquire).then((r) {
+        resource = r;
+        acquired = true;
+        return use(r).iterator;
+      });
+      return started!.then((it) => it.next(concurrent)).then((result) async {
+        if (result.done) {
+          done = true;
+          await releaseOnce();
+        }
+        return result;
+      }, onError: (Object e, StackTrace st) async {
+        done = true;
+        // When acquire itself failed there is no resource to release.
+        if (acquired) await releaseOnce();
+        Error.throwWithStackTrace(e, st);
+      });
+    });
+  });
+}

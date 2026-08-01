@@ -7,8 +7,8 @@ section: 5
 crumb: chunk
 prev: slice.html
 prevLabel: slice
-next: split.html
-nextLabel: split
+next: windowed.html
+nextLabel: windowed
 ---
   <p class="hero-sub">Devuelve un iterable perezoso de listas, cada una con hasta <code>size</code> elementos consecutivos.</p>
 

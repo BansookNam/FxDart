@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ifEmpty — FxDart 101</title>
+  <meta name="description" content="FxDart ifEmpty와 defaultIfEmpty 튜토리얼: 결과가 비어 버린 파이프라인을 위한 지연 대체 값을 라이브 플레이그라운드와 함께 다룹니다.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/ifEmpty.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/ifEmpty.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/ifEmpty.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/ifEmpty.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/ifEmpty.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/ifEmpty.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/ifEmpty.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/ifEmpty.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=11fedf83d3bdddf4">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../tutorials/ifEmpty.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/ifEmpty.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/tutorials/ifEmpty.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/ifEmpty.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/ifEmpty.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/ifEmpty.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/ifEmpty.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 6 · 결합 › <strong>ifEmpty</strong></p>
+  <h1><code>ifEmpty</code></h1>
+  <p class="hero-sub">파이프라인이 비어 있는 것으로 판명되면 대체 소스로 전환합니다 — 반복 시점에, 지연 방식으로 결정됩니다.</p>
+
+  <div class="signature">Iterable&lt;A&gt; ifEmpty&lt;A&gt;(Iterable&lt;A&gt; Function() fallback, Iterable&lt;A&gt; iterable)
+Iterable&lt;A&gt; defaultIfEmpty&lt;A&gt;(A value, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; ifEmptyAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; Function() fallback, FxAsyncIterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; defaultIfEmptyAsync&lt;A&gt;(FutureOr&lt;A&gt; value, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx&lt;T&gt;.ifEmpty(Iterable&lt;T&gt; Function() fallback) / .defaultIfEmpty(T value)                        // chain (sync)
+FxAsync&lt;T&gt; FxAsync&lt;T&gt;.ifEmpty(FxAsyncIterable&lt;T&gt; Function() fallback) / .defaultIfEmpty(FutureOr&lt;T&gt; value) // chain (async)</div>
+
+  <h2>강의</h2>
+  <p>
+    아무것도 만들지 않을 <em>수도</em> 있는 파이프라인은 보통 우회를
+    강요합니다. 구체화하고, <code>isEmpty</code>를 검사하고, 분기하는
+    식입니다. 그러면 체인이 끊기고 — 더 나쁘게는 — 의도한 시점보다 먼저
+    파이프라인이 실행됩니다. <code>ifEmpty(fallback)</code>은 그 분기를
+    파이프라인 자체에 접어 넣습니다. 값은 손대지 않고 그대로 통과하며,
+    소스가 아무것도 내놓지 않은 채 끝났을 때만 대체 이터러블이
+    이어받습니다. 그 외의 경우에는 대체 함수가 <em>호출</em>조차 되지
+    않습니다 — 양방향으로 지연 평가됩니다.
+  </p>
+  <p>
+    <code>defaultIfEmpty(value)</code>는 값 하나짜리 축약형입니다.
+    자리 표시용 행, 빈 보고서의 <code>0</code>, "결과 없음" 표시 같은
+    것들입니다. 둘 다 체인의 어느 위치에서든 조합할 수 있는데, 이는
+    공격적인 필터링 뒤에서 중요해집니다 — 비어 있는지 여부는 원래
+    소스가 아니라 이 지점에 도달한 것들로 결정되기 때문입니다.
+  </p>
+  <p>
+    Dart 고유의 추가 기능입니다(FxTS에는 대응물이 없습니다). Rx의
+    <code>switchIfEmpty</code> / <code>defaultIfEmpty</code>를
+    따랐습니다. 비동기 형태는 비동기 대체 체인과 <code>Future</code>
+    기본값을 받으며,
+    <code><a href="concurrent.html">concurrent</a></code>와 조합됩니다.
+  </p>
+
+  <h2>데모 1 · 빈 보고서를 위한 기본값</h2>
+  <div class="playground" data-pg="1b4da7da6d07ee3a">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final expenses = [
+    (category: 'food', amount: 32.5),
+    (category: 'food', amount: 18.0),
+    (category: 'transport', amount: 12.0),
+  ];
+
+  // Aggressive filtering can leave nothing — defaultIfEmpty puts the
+  // placeholder INSIDE the pipeline instead of an if/else after it:
+  final travel = fx(expenses)
+      .filter((e) => e.category == 'travel')
+      .map((e) => e.amount)
+      .defaultIfEmpty(0.0)
+      .toList();
+  print(travel); // [0.0]
+
+  // Non-empty chains pass through untouched:
+  final food = fx(expenses)
+      .filter((e) => e.category == 'food')
+      .map((e) => e.amount)
+      .defaultIfEmpty(0.0)
+      .toList();
+  print(food); // [32.5, 18.0]
+}
+</textarea>
+  </div>
+
+  <h2>데모 2 · 대체 소스, 그 외에는 손대지 않음</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Iterable<String> cachedResults() {
+  print('  (reading cache)');
+  return ['cached-a', 'cached-b'];
+}
+
+void main() {
+  final live = ['live-1', 'live-2'];
+
+  // The fallback is a FUNCTION — it is not even called unless needed:
+  print('with live results:');
+  print(fx(live).ifEmpty(cachedResults).toList());
+  // with live results:
+  // [live-1, live-2]        ← no "(reading cache)" line: never touched
+
+  print('with no results:');
+  print(fx(<String>[]).ifEmpty(cachedResults).toList());
+  // with no results:
+  //   (reading cache)
+  // [cached-a, cached-b]
+}
+</textarea>
+  </div>
+
+  <h2>직접 해 보기</h2>
+  <p>연습: 대체 검색어를 갖춘 검색을 만들어 보세요.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+final products = [
+  (name: 'oat milk', tags: ['vegan', 'drink']),
+  (name: 'cheddar', tags: ['dairy']),
+  (name: 'soy sauce', tags: ['vegan', 'pantry']),
+];
+
+Iterable<String> search(String tag) =>
+    fx(products).filter((p) => p.tags.contains(tag)).map((p) => p.name);
+
+void main() {
+  // TODO: searching 'gluten-free' finds nothing. Fall back to the
+  // 'vegan' search results instead of an empty list — with ifEmpty,
+  // so the fallback search only runs when actually needed.
+  final results = fx(search('gluten-free'))
+      .toList(); // ← add .ifEmpty(...) before .toList()
+
+  print(results);
+  // Expected once solved: [oat milk, soy sauce]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>관련 항목:</strong>
+    <a href="filter.html"><code>filter</code></a> — 체인이 비게 되는 가장 흔한 이유 ·
+    <a href="concat.html"><code>concat</code></a> — 조건 없이 덧붙이기 ·
+    <a href="head.html"><code>head</code></a> — 값 하나에 대해서는 대체 값 대신 <code>null</code>
+  </div>
+
+  <nav class="tut-nav">
+    <a href="fork.html">← 이전: fork</a>
+    <a href="reduce.html">다음: reduce →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=11fedf83d3bdddf4";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

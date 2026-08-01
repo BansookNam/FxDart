@@ -1,0 +1,2 @@
+Iterable&lt;T&gt; using&lt;R, T&gt;(R Function() acquire, Iterable&lt;T&gt; Function(R resource) use, void Function(R resource) release)
+FxAsyncIterable&lt;T&gt; usingAsync&lt;R, T&gt;(FutureOr&lt;R&gt; Function() acquire, FxAsyncIterable&lt;T&gt; Function(R resource) use, FutureOr&lt;void&gt; Function(R resource) release)

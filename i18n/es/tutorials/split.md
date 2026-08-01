@@ -5,8 +5,8 @@ description: Tutorial de split en FxDart: divide un iterable de caracteres segú
 heading: <code>split</code>
 section: 5
 crumb: split
-prev: chunk.html
-prevLabel: chunk
+prev: pairwise.html
+prevLabel: pairwise
 next: append.html
 nextLabel: append
 ---

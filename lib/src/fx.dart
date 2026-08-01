@@ -3,6 +3,7 @@ import 'dart:async';
 import 'async_iterable.dart';
 import 'async_iterable.dart' as async_;
 import 'lazy/combine.dart' as l;
+import 'lazy/effect.dart' as l;
 import 'lazy/filter.dart' as l;
 import 'lazy/map.dart' as l;
 import 'lazy/take_drop.dart' as l;
@@ -122,6 +123,14 @@ class Fx<T> extends Iterable<T> {
   /// Groups consecutive values into lists of up to [size].
   Fx<List<T>> chunk(int size) => Fx(l.chunk(size, _inner));
 
+  /// Sliding windows of [size] values, each starting [step] values after
+  /// the previous; [partial] keeps the shorter trailing windows.
+  Fx<List<T>> windowed(int size, {int step = 1, bool partial = false}) =>
+      Fx(l.windowed(size, _inner, step: step, partial: partial));
+
+  /// Pairs each value with its successor.
+  Fx<(T, T)> pairwise() => Fx(l.pairwise(_inner));
+
   /// Applies [f] to each value without changing it.
   Fx<T> peek(void Function(T a) f) => Fx(l.peek(f, _inner));
 
@@ -136,6 +145,20 @@ class Fx<T> extends Iterable<T> {
 
   /// Dart-idiomatic alias of [uniqBy].
   Fx<T> distinctBy<B>(B Function(T a) f) => uniqBy(f);
+
+  /// Drops values equal to their predecessor, keeping the first of each run.
+  Fx<T> uniqAdjacent() => Fx(l.uniqAdjacent(_inner));
+
+  /// Drops values whose [f]-key equals the previous value's key.
+  Fx<T> uniqAdjacentBy<B>(B Function(T a) f) =>
+      Fx(l.uniqAdjacentBy(f, _inner));
+
+  /// Switches to [fallback]'s values when this chain turns out to be empty.
+  Fx<T> ifEmpty(Iterable<T> Function() fallback) =>
+      Fx(l.ifEmpty(fallback, _inner));
+
+  /// Yields the single [value] when this chain turns out to be empty.
+  Fx<T> defaultIfEmpty(T value) => Fx(l.defaultIfEmpty(value, _inner));
 
   /// Pairs each value with the value at the same position in [other],
   /// stopping at the shorter side.
@@ -208,6 +231,14 @@ class Fx<T> extends Iterable<T> {
   FxAsync<R> mapConcurrent<R>(
           int concurrency, FutureOr<R> Function(T a) f) =>
       FxAsync(l.mapConcurrent(concurrency, f, _inner));
+
+  /// Switches to the async chain and maps [f], retrying each call up to
+  /// [attempts] times (with optional [delay] backoff) before the error
+  /// propagates.
+  FxAsync<R> mapRetry<R>(int attempts, FutureOr<R> Function(T a) f,
+          {Duration Function(int failed)? delay}) =>
+      FxAsync(l.mapRetryAsync(attempts, f, async_.toAsync(_inner),
+          delay: delay));
 
   // --- terminal operators -------------------------------------------------
 
@@ -362,6 +393,14 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Groups consecutive values into lists of up to [size].
   FxAsync<List<T>> chunk(int size) => FxAsync(l.chunkAsync(size, _inner));
 
+  /// Sliding windows of [size] values, each starting [step] values after
+  /// the previous; [partial] keeps the shorter trailing windows.
+  FxAsync<List<T>> windowed(int size, {int step = 1, bool partial = false}) =>
+      FxAsync(l.windowedAsync(size, _inner, step: step, partial: partial));
+
+  /// Pairs each value with its successor.
+  FxAsync<(T, T)> pairwise() => FxAsync(l.pairwiseAsync(_inner));
+
   /// Applies [f] to each value without changing it.
   FxAsync<T> peek(FutureOr<void> Function(T a) f) =>
       FxAsync(l.peekAsync(f, _inner));
@@ -372,6 +411,33 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Distinct by the key [f] returns, keeping the first of each key.
   FxAsync<T> uniqBy<B>(FutureOr<B> Function(T a) f) =>
       FxAsync(l.uniqByAsync(f, _inner));
+
+  /// Drops values equal to their predecessor, keeping the first of each run.
+  FxAsync<T> uniqAdjacent() => FxAsync(l.uniqAdjacentAsync(_inner));
+
+  /// Drops values whose [f]-key equals the previous value's key.
+  FxAsync<T> uniqAdjacentBy<B>(FutureOr<B> Function(T a) f) =>
+      FxAsync(l.uniqAdjacentByAsync(f, _inner));
+
+  /// Switches to [fallback]'s values when this chain turns out to be empty.
+  FxAsync<T> ifEmpty(FxAsyncIterable<T> Function() fallback) =>
+      FxAsync(l.ifEmptyAsync(fallback, _inner));
+
+  /// Yields the single [value] when this chain turns out to be empty.
+  FxAsync<T> defaultIfEmpty(FutureOr<T> value) =>
+      FxAsync(l.defaultIfEmptyAsync(value, _inner));
+
+  /// Maps [f], retrying each call up to [attempts] times (with optional
+  /// [delay] backoff) before the error propagates. Retries compose with
+  /// [concurrent]: each in-flight value retries independently.
+  FxAsync<R> mapRetry<R>(int attempts, FutureOr<R> Function(T a) f,
+          {Duration Function(int failed)? delay}) =>
+      FxAsync(l.mapRetryAsync(attempts, f, _inner, delay: delay));
+
+  /// Fails a pull with a [TimeoutException] when the upstream takes longer
+  /// than [limit] to produce it (per pull, not whole-pipeline).
+  FxAsync<T> timeout(Duration limit) =>
+      FxAsync(l.timeoutAsync(limit, _inner));
 
   /// Pairs each value with the value at the same position in [other],
   /// stopping at the shorter side.

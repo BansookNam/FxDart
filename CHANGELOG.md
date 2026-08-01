@@ -1,3 +1,52 @@
+## 0.7.2
+
+### Added — Rx-inspired pull operators
+
+Operators extracted from an internal comparison against RxDart
+(`plans/RXDART_COMPARISON_AND_SUGGESTION_PLAN.md`): the Rx ideas that are
+genuinely pull-shaped and time-free, re-designed for the demand-driven
+model. None of these exist in FxTS; each doc comment says so and names the
+Rx counterpart. Push/temporal operators (`combineLatest`, `switchMap`,
+Subjects, time-windowed `debounce`/`buffer`/`sample`, …) remain explicitly
+out of scope — bridge to `Stream`/rxdart via `toStream()`/`fromStream` for
+those. Each addition ships sync + async + `Fx`/`FxAsync` chain forms,
+tests, and a 101 tutorial.
+
+Windowing (one shared sliding core; `chunk` was refactored onto it with
+byte-identical behavior):
+
+* **`windowed(size, {step, partial})`** — sliding windows, the
+  generalization of `chunk` (`chunk` ≡ `step: size, partial: true`).
+  Kotlin's naming; RxDart's `bufferCount(size, startEvery)`.
+* **`pairwise()`** — adjacent `(previous, current)` record pairs, the
+  window-of-2 special case that deltas/streak examples kept hand-rolling.
+
+Filtering:
+
+* **`uniqAdjacent()` / `uniqAdjacentBy(key)`** — drops only *adjacent*
+  duplicates (Rx `distinctUntilChanged`, Dart `Stream.distinct`), so no
+  seen-set accumulates; complements the global `uniq`/`uniqBy`.
+* **`ifEmpty(fallback)` / `defaultIfEmpty(value)`** — lazily switches to a
+  fallback iterable / single default when the source turns out empty
+  (Rx `switchIfEmpty` / `defaultIfEmpty`).
+
+Effects (new `lib/src/lazy/effect.dart`):
+
+* **`retry(attempts, f, {delay})`** — runs an effect until it succeeds,
+  with a per-failure backoff hook; rethrows the last error with its
+  original stack trace. Whole-pipeline retry is its terminal form:
+  `retry(3, () => fxAsync(...).toList())`.
+* **`mapRetry(attempts, f, {delay})`** — the per-element form, built on
+  `mapAsync`, so it is parallel-safe: under `concurrent(n)` each in-flight
+  element retries independently while order is preserved.
+* **`timeout(limit)`** — fails a pull that takes longer than `limit` with
+  a `TimeoutException`. Pull-model semantics: the limit is demand-to-item
+  time per pull, not inter-event gaps (documented difference from Rx).
+* **`using(acquire, use, release)` / `usingAsync`** — scopes a resource to
+  one lazy iteration; `release` runs exactly once on completion or error.
+  Abandoning iteration mid-way skips `release` (a pull-model limit the
+  docs call out; bound with `take` instead of `break`).
+
 ## 0.7.1
 
 ### Added — pre-combined operators

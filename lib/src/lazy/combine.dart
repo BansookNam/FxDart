@@ -212,6 +212,63 @@ FxAsyncIterable<A> concatAsync<A>(
   });
 }
 
+/// Yields [iterable] unchanged, or the result of [fallback] when it turns
+/// out to be empty. [fallback] is only invoked in the empty case.
+///
+/// fxdart extension (not part of FxTS), after Rx's `switchIfEmpty`.
+///
+/// ```dart
+/// ifEmpty(() => [0], [1, 2]); // (1, 2)
+/// ifEmpty(() => [0], <int>[]); // (0)
+/// ```
+Iterable<A> ifEmpty<A>(
+    Iterable<A> Function() fallback, Iterable<A> iterable) sync* {
+  var yielded = false;
+  for (final a in iterable) {
+    yielded = true;
+    yield a;
+  }
+  if (!yielded) yield* fallback();
+}
+
+/// Yields [iterable] unchanged, or the single [value] when it turns out to
+/// be empty.
+///
+/// fxdart extension (not part of FxTS), after Rx's `defaultIfEmpty`.
+///
+/// ```dart
+/// defaultIfEmpty(0, <int>[]); // (0)
+/// ```
+Iterable<A> defaultIfEmpty<A>(A value, Iterable<A> iterable) =>
+    ifEmpty(() => [value], iterable);
+
+/// Async counterpart of [ifEmpty].
+FxAsyncIterable<A> ifEmptyAsync<A>(
+    FxAsyncIterable<A> Function() fallback, FxAsyncIterable<A> iterable) {
+  return dispatchAsync(iterable, (source) {
+    final iterator = source.iterator;
+    var first = true;
+    FxAsyncIterator<A>? fb;
+    return SerialAsyncIterator((concurrent) async {
+      if (fb != null) return fb!.next(concurrent);
+      final result = await iterator.next(concurrent);
+      if (first) {
+        first = false;
+        if (result.done) {
+          fb = fallback().iterator;
+          return fb!.next(concurrent);
+        }
+      }
+      return result;
+    });
+  });
+}
+
+/// Async counterpart of [defaultIfEmpty].
+FxAsyncIterable<A> defaultIfEmptyAsync<A>(
+        FutureOr<A> value, FxAsyncIterable<A> iterable) =>
+    ifEmptyAsync(() => toAsync([value]), iterable);
+
 /// Returns the source in reverse order (materializes the source).
 ///
 /// Port of FxTS `reverse`.

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>uniqAdjacent — FxDart 101</title>
+  <meta name="description" content="Tutorial de uniqAdjacent en FxDart: descarta solo los duplicados adyacentes — detección de cambios de estado sin un conjunto de vistos que crece — con playground en vivo.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/uniqAdjacent.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/uniqAdjacent.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/uniqAdjacent.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/uniqAdjacent.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/uniqAdjacent.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/uniqAdjacent.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/uniqAdjacent.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/uniqAdjacent.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=11fedf83d3bdddf4">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../tutorials/uniqAdjacent.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/uniqAdjacent.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/uniqAdjacent.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/uniqAdjacent.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/uniqAdjacent.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/tutorials/uniqAdjacent.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/uniqAdjacent.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 4 · Filtrado &amp; deduplicación › <strong>uniqAdjacent</strong></p>
+  <h1><code>uniqAdjacent</code></h1>
+  <p class="hero-sub">Descarta los elementos iguales a su predecesor — solo se van los duplicados <em>adyacentes</em>, y no se acumula ningún conjunto de vistos.</p>
+
+  <div class="signature">Iterable&lt;A&gt; uniqAdjacent&lt;A&gt;(Iterable&lt;A&gt; iterable)
+Iterable&lt;A&gt; uniqAdjacentBy&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; uniqAdjacentAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; uniqAdjacentByAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx&lt;T&gt;.uniqAdjacent() / .uniqAdjacentBy&lt;B&gt;(B Function(T a) f)                    // chain (sync)
+FxAsync&lt;T&gt; FxAsync&lt;T&gt;.uniqAdjacent() / .uniqAdjacentBy&lt;B&gt;(FutureOr&lt;B&gt; Function(T a) f) // chain (async)</div>
+
+  <h2>Lección</h2>
+  <p>
+    <code><a href="uniq.html">uniq</a></code> responde a «¿he visto este
+    valor <em>alguna vez</em>?» — mantiene un conjunto con todo lo visto
+    hasta el momento. <code>uniqAdjacent()</code> responde a otra
+    pregunta: «¿el valor <em>cambió</em>?» Compara cada elemento solo con
+    su predecesor inmediato, así que <code>[1, 1, 2, 2, 1]</code> se
+    convierte en <code>(1, 2, 1)</code> — el <code>1</code> final
+    sobrevive, porque es una <em>racha nueva</em>, no una repetición de
+    la actual.
+  </p>
+  <p>
+    Eso lo convierte en el operador para colapsar rachas: feeds de estado
+    que reportan lo mismo en cada tick, valores de sensores que se
+    estabilizan, streams de log que repiten un nivel. Y como no hay
+    conjunto de vistos, la memoria se mantiene constante por larga que
+    sea la secuencia — seguro sobre fuentes inagotables donde
+    <code>uniq</code> crecería sin límite.
+    <code>uniqAdjacentBy(key)</code> compara por una clave derivada,
+    reflejando a <code><a href="uniqBy.html">uniqBy</a></code>.
+  </p>
+  <p>
+    Extensión de fxdart (sin contraparte en FxTS) — Rx lo llama
+    <code>distinctUntilChanged</code>, los streams de Dart lo llaman
+    <code>Stream.distinct</code>. El callback de clave async corre de un
+    elemento en uno (la comparación es inherentemente ordenada), pero el
+    tramo de aguas arriba sigue evaluándose en paralelo bajo
+    <code><a href="concurrent.html">concurrent</a></code>.
+  </p>
+
+  <h2>Demo 1 · Colapsa rachas, conserva los regresos</h2>
+  <div class="playground" data-pg="41774a219b45ac15">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // A status feed that re-reports the same state every tick:
+  final states = ['ok', 'ok', 'ok', 'warn', 'warn', 'ok', 'ok', 'down'];
+
+  // Only the CHANGES survive — returns to an earlier state included:
+  print(fx(states).uniqAdjacent().toList());
+  // [ok, warn, ok, down]
+
+  // Compare with uniq, which answers "ever seen?" instead of "changed?":
+  print(fx(states).uniq().toList());
+  // [ok, warn, down]        ← the return to 'ok' is lost
+
+  // And no seen-set builds up: constant memory, safe on endless feeds.
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Cambios de estado por clave</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final readings = [
+    (t: '09:00', temp: 18.2),
+    (t: '09:05', temp: 18.9),
+    (t: '09:10', temp: 21.4),
+    (t: '09:15', temp: 22.0),
+    (t: '09:20', temp: 19.5),
+  ];
+
+  String zone(double temp) => temp < 20 ? 'cool' : 'warm';
+
+  // uniqAdjacentBy keeps a reading only when its KEY changes — the first
+  // reading of each zone run, timestamps intact:
+  final changes = fx(readings)
+      .uniqAdjacentBy((r) => zone(r.temp))
+      .map((r) => '${r.t}: entered ${zone(r.temp)} (${r.temp}°)')
+      .toList();
+
+  changes.forEach(print);
+  // 09:00: entered cool (18.2°)
+  // 09:10: entered warm (21.4°)
+  // 09:20: entered cool (19.5°)
+}
+</textarea>
+  </div>
+
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: reporta solo los momentos en que cambia la zona de un sensor.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final log = [
+    'INFO boot',
+    'INFO ready',
+    'WARN disk 81%',
+    'WARN disk 82%',
+    'ERROR write failed',
+    'WARN disk 83%',
+    'INFO recovered',
+  ];
+
+  // TODO: report one line per LEVEL run — when the level changes, keep
+  // that line; drop the repeats of the same level.
+  // Hint: the level is the first word — line.split(' ').first.
+  final levelChanges = fx(log)
+      .uniqAdjacent() // ← almost: this compares whole lines. Compare by level.
+      .toList();
+
+  levelChanges.forEach(print);
+  // Expected once solved:
+  // INFO boot
+  // WARN disk 81%
+  // ERROR write failed
+  // WARN disk 83%
+  // INFO recovered
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Relacionado:</strong>
+    <a href="uniq.html"><code>uniq</code></a> — deduplicación global con conjunto de vistos ·
+    <a href="uniqBy.html"><code>uniqBy</code></a> — deduplicación global por clave ·
+    <a href="pairwise.html"><code>pairwise</code></a> — cuando necesitas ambos lados del cambio
+  </div>
+
+  <nav class="tut-nav">
+    <a href="uniqBy.html">← Anterior: distinctBy</a>
+    <a href="difference.html">Siguiente: difference →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=11fedf83d3bdddf4";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

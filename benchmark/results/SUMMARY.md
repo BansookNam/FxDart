@@ -62,6 +62,7 @@
 | 50 | daily-ledger-close (async) | 100 | 366 µs | 472 µs | **tie** | 16.7 MB | 16.7 MB | tie | 3 |
 | 51 | category-rank | 100 | 4.5 µs | 11 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
 | 52 | stock-revaluation (async) | 100 | 470 µs | 751 µs | **tie** | 16.5 MB | 17.2 MB | tie | 3 |
+| 53 | smoothed-zone-changes | 100 | 1.8 µs | 12 µs | **tie** | 16.5 MB | 17.0 MB | tie | 3 |
 
 ## N = 10000
 
@@ -119,6 +120,7 @@
 | 50 | daily-ledger-close (async) | 10000 | 340.1 ms | 348.4 ms | **tie** | 49.9 MB | 50.4 MB | tie | 5 |
 | 51 | category-rank | 10000 | 282 µs | 482 µs | **tie** | 17.3 MB | 23.4 MB | native | 3 |
 | 52 | stock-revaluation (async) | 10000 | 38.2 ms | 59.8 ms | **native** | 48.9 MB | 38.1 MB | fxdart | 3 |
+| 53 | smoothed-zone-changes | 10000 | 178 µs | 1.10 ms | **native** | 22.0 MB | 22.8 MB | tie | 3 |
 
 ## Headline N (1M sync / case-specific async)
 
@@ -176,3 +178,4 @@
 | 50 | daily-ledger-close (async) | 20000 | 1275.2 ms | 1299.8 ms | **tie** | 52.7 MB | 53.5 MB | tie | 5 |
 | 51 | category-rank | 1000000 | 34.9 ms | 53.1 ms | **native** | 147.4 MB | 147.9 MB | tie | 3 |
 | 52 | stock-revaluation (async) | 100000 | 401.4 ms | 645.2 ms | **native** | 81.0 MB | 80.0 MB | tie | 3 |
+| 53 | smoothed-zone-changes | 1000000 | 41.1 ms | 111.0 ms | **native** | 236.8 MB | 83.8 MB | fxdart | 3 |

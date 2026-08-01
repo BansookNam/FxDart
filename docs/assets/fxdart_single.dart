@@ -1111,6 +1111,64 @@ FxAsyncIterable<A> uniqByAsync<A, B>(
 FxAsyncIterable<A> uniqAsync<A>(FxAsyncIterable<A> iterable) =>
     uniqByAsync((A a) => a, iterable);
 
+/// Drops elements whose [f]-key equals the previous element's key, keeping
+/// the first of each run. Unlike [uniqBy], only *adjacent* duplicates are
+/// removed, so no seen-set builds up.
+///
+/// fxdart extension (not part of FxTS), after Rx's `distinctUntilChanged`
+/// and Dart `Stream.distinct`.
+///
+/// ```dart
+/// uniqAdjacentBy((a) => a % 10, [1, 11, 21, 2, 1]); // (1, 2, 1)
+/// ```
+Iterable<A> uniqAdjacentBy<A, B>(B Function(A a) f, Iterable<A> iterable) sync* {
+  var hasPrev = false;
+  late B prevKey;
+  for (final a in iterable) {
+    final key = f(a);
+    if (!hasPrev || key != prevKey) yield a;
+    prevKey = key;
+    hasPrev = true;
+  }
+}
+
+/// Drops elements equal to their predecessor, keeping the first of each run.
+///
+/// fxdart extension (not part of FxTS) — see [uniqAdjacentBy].
+///
+/// ```dart
+/// uniqAdjacent([1, 1, 2, 2, 2, 1]); // (1, 2, 1)
+/// ```
+Iterable<A> uniqAdjacent<A>(Iterable<A> iterable) =>
+    uniqAdjacentBy((A a) => a, iterable);
+
+/// Async counterpart of [uniqAdjacentBy]. The key comparison is inherently
+/// ordered, so keys are computed one at a time; combine with `concurrent`
+/// to still evaluate the upstream in parallel.
+FxAsyncIterable<A> uniqAdjacentByAsync<A, B>(
+    FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) {
+  return dispatchAsync(iterable, (source) {
+    final iterator = source.iterator;
+    var hasPrev = false;
+    late B prevKey;
+    return SerialAsyncIterator((concurrent) async {
+      while (true) {
+        final result = await iterator.next(concurrent);
+        if (result.done) return IterResult<A>.done();
+        final key = await f(result.value);
+        final isNew = !hasPrev || key != prevKey;
+        prevKey = key;
+        hasPrev = true;
+        if (isNew) return IterResult.value(result.value);
+      }
+    });
+  });
+}
+
+/// Async counterpart of [uniqAdjacent].
+FxAsyncIterable<A> uniqAdjacentAsync<A>(FxAsyncIterable<A> iterable) =>
+    uniqAdjacentByAsync((A a) => a, iterable);
+
 /// Returns the elements of [iterable2] whose [f]-keys do not occur in
 /// [iterable1], with duplicates removed.
 ///
@@ -1638,33 +1696,113 @@ FxAsyncIterable<A> sliceAsync<A>(int start, FxAsyncIterable<A> iterable,
 /// Returns an iterable of lists, each containing [size] consecutive
 /// elements (the last chunk may be shorter).
 ///
-/// Port of FxTS `chunk`.
+/// Port of FxTS `chunk`. Equivalent to
+/// `windowed(size, iterable, step: size, partial: true)`, except that a
+/// non-positive [size] yields nothing instead of throwing.
 Iterable<List<A>> chunk<A>(int size, Iterable<A> iterable) =>
-    _ChunkIterable(size, iterable);
+    size < 1 ? Iterable<List<A>>.empty() : _WindowIterable(size, size, true, iterable);
 
-class _ChunkIterable<A> extends Iterable<List<A>> {
-  _ChunkIterable(this._size, this._source);
-  final int _size;
-  final Iterable<A> _source;
-  @override
-  Iterator<List<A>> get iterator => _ChunkIterator(_size, _source.iterator);
+/// Returns an iterable of sliding windows over [iterable]: lists of [size]
+/// consecutive elements, each window starting [step] elements after the
+/// previous one. With [partial] the trailing windows shorter than [size]
+/// are kept instead of dropped.
+///
+/// fxdart extension (not part of FxTS) — the sliding generalization of
+/// [chunk], following Kotlin's `windowed` naming; RxDart's counterpart is
+/// `bufferCount(size, startEvery)`.
+///
+/// ```dart
+/// windowed(3, [1, 2, 3, 4, 5]);                // ([1, 2, 3], [2, 3, 4], [3, 4, 5])
+/// windowed(3, [1, 2, 3, 4, 5], step: 2);       // ([1, 2, 3], [3, 4, 5])
+/// windowed(3, [1, 2, 3, 4, 5], partial: true); // (..., [3, 4, 5], [4, 5], [5])
+/// ```
+Iterable<List<A>> windowed<A>(int size, Iterable<A> iterable,
+    {int step = 1, bool partial = false}) {
+  _checkWindow(size, step);
+  return _WindowIterable(size, step, partial, iterable);
 }
 
-class _ChunkIterator<A> implements Iterator<List<A>> {
-  _ChunkIterator(this._size, this._it);
+void _checkWindow(int size, int step) {
+  if (size < 1) {
+    throw ArgumentError.value(size, 'size', 'must be at least 1');
+  }
+  if (step < 1) {
+    throw ArgumentError.value(step, 'step', 'must be at least 1');
+  }
+}
+
+class _WindowIterable<A> extends Iterable<List<A>> {
+  _WindowIterable(this._size, this._step, this._partial, this._source);
   final int _size;
+  final int _step;
+  final bool _partial;
+  final Iterable<A> _source;
+  @override
+  Iterator<List<A>> get iterator =>
+      _WindowIterator(_size, _step, _partial, _source.iterator);
+}
+
+class _WindowIterator<A> implements Iterator<List<A>> {
+  _WindowIterator(this._size, this._step, this._partial, this._it);
+  final int _size;
+  final int _step;
+  final bool _partial;
   final Iterator<A> _it;
+  List<A> _carry = [];
+  int _pendingSkip = 0;
+  bool _sourceDone = false;
+  bool _finished = false;
   @override
   late List<A> current;
+
   @override
   bool moveNext() {
-    if (_size < 1) return false;
-    final items = <A>[];
-    while (items.length < _size && _it.moveNext()) {
-      items.add(_it.current);
+    if (_finished) return false;
+    while (_pendingSkip > 0 && !_sourceDone) {
+      if (_it.moveNext()) {
+        _pendingSkip--;
+      } else {
+        _sourceDone = true;
+      }
     }
-    if (items.isEmpty) return false;
-    current = items;
+    if (_pendingSkip > 0) {
+      _finished = true;
+      return false;
+    }
+    final window = _carry;
+    _carry = [];
+    while (window.length < _size && !_sourceDone) {
+      if (_it.moveNext()) {
+        window.add(_it.current);
+      } else {
+        _sourceDone = true;
+      }
+    }
+    if (window.isEmpty) {
+      _finished = true;
+      return false;
+    }
+    if (window.length < _size) {
+      // Trailing window(s): keep sliding through the remnant only when
+      // partial windows were asked for.
+      if (!_partial) {
+        _finished = true;
+        return false;
+      }
+      if (_step >= window.length) {
+        _finished = true;
+      } else {
+        _carry = window.sublist(_step);
+      }
+      current = window;
+      return true;
+    }
+    if (_step < _size) {
+      _carry = window.sublist(_step);
+    } else {
+      _pendingSkip = _step - _size;
+    }
+    current = window;
     return true;
   }
 }
@@ -1672,22 +1810,111 @@ class _ChunkIterator<A> implements Iterator<List<A>> {
 /// Async counterpart of [chunk].
 FxAsyncIterable<List<A>> chunkAsync<A>(int size, FxAsyncIterable<A> iterable) {
   if (size < 1) return asyncEmpty();
+  return _windowedAsync(size, size, true, iterable);
+}
+
+/// Async counterpart of [windowed].
+FxAsyncIterable<List<A>> windowedAsync<A>(int size, FxAsyncIterable<A> iterable,
+    {int step = 1, bool partial = false}) {
+  _checkWindow(size, step);
+  return _windowedAsync(size, step, partial, iterable);
+}
+
+FxAsyncIterable<List<A>> _windowedAsync<A>(
+    int size, int step, bool partial, FxAsyncIterable<A> iterable) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
+    var carry = <A>[];
+    var pendingSkip = 0;
     var sourceDone = false;
+    var finished = false;
     return SerialAsyncIterator((concurrent) async {
-      if (sourceDone) return IterResult<List<A>>.done();
-      final items = <A>[];
-      while (items.length < size) {
+      if (finished) return IterResult<List<A>>.done();
+      while (pendingSkip > 0 && !sourceDone) {
         final result = await iterator.next(concurrent);
         if (result.done) {
           sourceDone = true;
-          break;
+        } else {
+          pendingSkip--;
         }
-        items.add(result.value);
       }
-      if (items.isEmpty) return IterResult<List<A>>.done();
-      return IterResult.value(items);
+      if (pendingSkip > 0) {
+        finished = true;
+        return IterResult<List<A>>.done();
+      }
+      final window = carry;
+      carry = <A>[];
+      while (window.length < size && !sourceDone) {
+        final result = await iterator.next(concurrent);
+        if (result.done) {
+          sourceDone = true;
+        } else {
+          window.add(result.value);
+        }
+      }
+      if (window.isEmpty) {
+        finished = true;
+        return IterResult<List<A>>.done();
+      }
+      if (window.length < size) {
+        if (!partial) {
+          finished = true;
+          return IterResult<List<A>>.done();
+        }
+        if (step >= window.length) {
+          finished = true;
+        } else {
+          carry = window.sublist(step);
+        }
+        return IterResult.value(window);
+      }
+      if (step < size) {
+        carry = window.sublist(step);
+      } else {
+        pendingSkip = step - size;
+      }
+      return IterResult.value(window);
+    });
+  });
+}
+
+/// Pairs each element with its successor: `[a, b, c]` becomes
+/// `((a, b), (b, c))`. Fewer than two elements yield nothing.
+///
+/// fxdart extension (not part of FxTS), after RxDart's `pairwise`.
+///
+/// ```dart
+/// pairwise([1, 2, 3, 4]); // ((1, 2), (2, 3), (3, 4))
+/// ```
+Iterable<(A, A)> pairwise<A>(Iterable<A> iterable) sync* {
+  var hasPrev = false;
+  late A prev;
+  for (final a in iterable) {
+    if (hasPrev) yield (prev, a);
+    prev = a;
+    hasPrev = true;
+  }
+}
+
+/// Async counterpart of [pairwise].
+FxAsyncIterable<(A, A)> pairwiseAsync<A>(FxAsyncIterable<A> iterable) {
+  return dispatchAsync(iterable, (source) {
+    final iterator = source.iterator;
+    var hasPrev = false;
+    late A prev;
+    return SerialAsyncIterator((concurrent) async {
+      while (true) {
+        final result = await iterator.next(concurrent);
+        if (result.done) return IterResult<(A, A)>.done();
+        final value = result.value;
+        if (hasPrev) {
+          final pair = (prev, value);
+          prev = value;
+          return IterResult.value(pair);
+        }
+        prev = value;
+        hasPrev = true;
+      }
     });
   });
 }
@@ -2175,6 +2402,63 @@ FxAsyncIterable<A> concatAsync<A>(
   });
 }
 
+/// Yields [iterable] unchanged, or the result of [fallback] when it turns
+/// out to be empty. [fallback] is only invoked in the empty case.
+///
+/// fxdart extension (not part of FxTS), after Rx's `switchIfEmpty`.
+///
+/// ```dart
+/// ifEmpty(() => [0], [1, 2]); // (1, 2)
+/// ifEmpty(() => [0], <int>[]); // (0)
+/// ```
+Iterable<A> ifEmpty<A>(
+    Iterable<A> Function() fallback, Iterable<A> iterable) sync* {
+  var yielded = false;
+  for (final a in iterable) {
+    yielded = true;
+    yield a;
+  }
+  if (!yielded) yield* fallback();
+}
+
+/// Yields [iterable] unchanged, or the single [value] when it turns out to
+/// be empty.
+///
+/// fxdart extension (not part of FxTS), after Rx's `defaultIfEmpty`.
+///
+/// ```dart
+/// defaultIfEmpty(0, <int>[]); // (0)
+/// ```
+Iterable<A> defaultIfEmpty<A>(A value, Iterable<A> iterable) =>
+    ifEmpty(() => [value], iterable);
+
+/// Async counterpart of [ifEmpty].
+FxAsyncIterable<A> ifEmptyAsync<A>(
+    FxAsyncIterable<A> Function() fallback, FxAsyncIterable<A> iterable) {
+  return dispatchAsync(iterable, (source) {
+    final iterator = source.iterator;
+    var first = true;
+    FxAsyncIterator<A>? fb;
+    return SerialAsyncIterator((concurrent) async {
+      if (fb != null) return fb!.next(concurrent);
+      final result = await iterator.next(concurrent);
+      if (first) {
+        first = false;
+        if (result.done) {
+          fb = fallback().iterator;
+          return fb!.next(concurrent);
+        }
+      }
+      return result;
+    });
+  });
+}
+
+/// Async counterpart of [defaultIfEmpty].
+FxAsyncIterable<A> defaultIfEmptyAsync<A>(
+        FutureOr<A> value, FxAsyncIterable<A> iterable) =>
+    ifEmptyAsync(() => toAsync([value]), iterable);
+
 /// Returns the source in reverse order (materializes the source).
 ///
 /// Port of FxTS `reverse`.
@@ -2391,6 +2675,157 @@ Iterable<K> keys<K, V>(Map<K, V> map) => map.keys;
 ///
 /// Port of FxTS `values`.
 Iterable<V> values<K, V>(Map<K, V> map) => map.values;
+
+// ---- lib/src/lazy/effect.dart ----
+
+
+/// Runs [f], retrying on error until it succeeds or [attempts] runs are
+/// exhausted, then rethrows the last error. Between a failure and the next
+/// run, waits [delay] (called with the number of failures so far, starting
+/// at 1 — return a growing [Duration] for backoff).
+///
+/// fxdart extension (not part of FxTS), after Rx's `retry`/`retryWhen`.
+/// To retry a whole pipeline, wrap its terminal:
+/// `retry(3, () => fxAsync(source()).map(parse).toList())`.
+///
+/// ```dart
+/// final user = await retry(3, () => api.fetchUser(id),
+///     delay: (failed) => Duration(milliseconds: 100 * failed));
+/// ```
+Future<T> retry<T>(int attempts, FutureOr<T> Function() f,
+    {Duration Function(int failed)? delay}) async {
+  _checkAttempts(attempts);
+  for (var attempt = 1;; attempt++) {
+    try {
+      return await f();
+    } catch (_) {
+      if (attempt >= attempts) rethrow;
+      final wait = delay?.call(attempt);
+      if (wait != null && wait > Duration.zero) {
+        await Future<void>.delayed(wait);
+      }
+    }
+  }
+}
+
+void _checkAttempts(int attempts) {
+  if (attempts < 1) {
+    throw ArgumentError.value(attempts, 'attempts', 'must be at least 1');
+  }
+}
+
+/// Lazily maps each value with [f], retrying each call up to [attempts]
+/// times (see [retry]) before letting the error propagate. Parallel-safe:
+/// composes with `concurrent`, and each in-flight value retries
+/// independently.
+///
+/// fxdart extension (not part of FxTS) — the per-element form of [retry].
+///
+/// ```dart
+/// await fxAsync(toAsync(urls))
+///     .mapRetry(3, fetch, delay: (failed) => Duration(seconds: failed))
+///     .concurrent(5)
+///     .toList();
+/// ```
+FxAsyncIterable<R> mapRetryAsync<A, R>(
+    int attempts, FutureOr<R> Function(A a) f, FxAsyncIterable<A> iterable,
+    {Duration Function(int failed)? delay}) {
+  _checkAttempts(attempts);
+  return mapAsync((A a) => retry(attempts, () => f(a), delay: delay), iterable);
+}
+
+/// Fails a pull with a [TimeoutException] when the upstream takes longer
+/// than [limit] to produce it. The limit applies to each pull (the time to
+/// produce one item), not to inter-item gaps or the whole pipeline.
+/// Parallel-safe: overlapping pulls each get their own timer.
+///
+/// fxdart extension (not part of FxTS), after Rx's `timeout` — but
+/// measuring demand-to-item time, the pull-model analog.
+///
+/// ```dart
+/// await fxAsync(toAsync(urls))
+///     .map(fetch)
+///     .timeout(Duration(seconds: 2))
+///     .toList(); // throws TimeoutException if any fetch stalls
+/// ```
+FxAsyncIterable<A> timeoutAsync<A>(
+    Duration limit, FxAsyncIterable<A> iterable) {
+  return DelegateAsyncIterable(() {
+    final iterator = iterable.iterator;
+    return DelegateAsyncIterator(
+        (concurrent) => iterator.next(concurrent).timeout(limit));
+  });
+}
+
+/// Scopes a resource to one lazy iteration: [acquire] runs on the first
+/// pull, [use] builds the elements from the resource, and [release] runs
+/// exactly once when iteration completes or throws.
+///
+/// fxdart extension (not part of FxTS), after Rx's `using`.
+///
+/// **Abandonment caveat:** a consumer that stops pulling mid-iteration
+/// (e.g. `break` inside `for-in`) never reaches the end, so [release] does
+/// not run. Drive the iterable to completion — bound it with `take` instead
+/// of breaking — or manage the resource with `try`/`finally` yourself.
+///
+/// ```dart
+/// final lines = using(
+///   () => File('data.txt').openSync(),
+///   (file) => readLines(file),
+///   (file) => file.closeSync(),
+/// );
+/// ```
+Iterable<T> using<R, T>(R Function() acquire,
+    Iterable<T> Function(R resource) use, void Function(R resource) release) sync* {
+  final resource = acquire();
+  try {
+    yield* use(resource);
+  } finally {
+    release(resource);
+  }
+}
+
+/// Async counterpart of [using]: [acquire] and [release] may be
+/// asynchronous, and the elements come from an [FxAsyncIterable].
+/// [release] runs exactly once — after the terminal pull, or before the
+/// error propagates when a pull fails (including a failing [use]).
+/// The same abandonment caveat as [using] applies.
+FxAsyncIterable<T> usingAsync<R, T>(
+    FutureOr<R> Function() acquire,
+    FxAsyncIterable<T> Function(R resource) use,
+    FutureOr<void> Function(R resource) release) {
+  return DelegateAsyncIterable(() {
+    late R resource;
+    var acquired = false;
+    var done = false;
+    Future<FxAsyncIterator<T>>? started;
+    Future<void>? releasing;
+
+    Future<void> releaseOnce() =>
+        releasing ??= Future.sync(() => release(resource));
+
+    return DelegateAsyncIterator((concurrent) {
+      if (done) return Future.value(IterResult<T>.done());
+      started ??= Future.sync(acquire).then((r) {
+        resource = r;
+        acquired = true;
+        return use(r).iterator;
+      });
+      return started!.then((it) => it.next(concurrent)).then((result) async {
+        if (result.done) {
+          done = true;
+          await releaseOnce();
+        }
+        return result;
+      }, onError: (Object e, StackTrace st) async {
+        done = true;
+        // When acquire itself failed there is no resource to release.
+        if (acquired) await releaseOnce();
+        Error.throwWithStackTrace(e, st);
+      });
+    });
+  });
+}
 
 // ---- lib/src/strict/aggregate.dart ----
 
@@ -4965,6 +5400,14 @@ class Fx<T> extends Iterable<T> {
   /// Groups consecutive values into lists of up to [size].
   Fx<List<T>> chunk(int size) => Fx(_$chunk(size, _inner));
 
+  /// Sliding windows of [size] values, each starting [step] values after
+  /// the previous; [partial] keeps the shorter trailing windows.
+  Fx<List<T>> windowed(int size, {int step = 1, bool partial = false}) =>
+      Fx(_$windowed(size, _inner, step: step, partial: partial));
+
+  /// Pairs each value with its successor.
+  Fx<(T, T)> pairwise() => Fx(_$pairwise(_inner));
+
   /// Applies [f] to each value without changing it.
   Fx<T> peek(void Function(T a) f) => Fx(_$peek(f, _inner));
 
@@ -4979,6 +5422,20 @@ class Fx<T> extends Iterable<T> {
 
   /// Dart-idiomatic alias of [uniqBy].
   Fx<T> distinctBy<B>(B Function(T a) f) => uniqBy(f);
+
+  /// Drops values equal to their predecessor, keeping the first of each run.
+  Fx<T> uniqAdjacent() => Fx(_$uniqAdjacent(_inner));
+
+  /// Drops values whose [f]-key equals the previous value's key.
+  Fx<T> uniqAdjacentBy<B>(B Function(T a) f) =>
+      Fx(_$uniqAdjacentBy(f, _inner));
+
+  /// Switches to [fallback]'s values when this chain turns out to be empty.
+  Fx<T> ifEmpty(Iterable<T> Function() fallback) =>
+      Fx(_$ifEmpty(fallback, _inner));
+
+  /// Yields the single [value] when this chain turns out to be empty.
+  Fx<T> defaultIfEmpty(T value) => Fx(_$defaultIfEmpty(value, _inner));
 
   /// Pairs each value with the value at the same position in [other],
   /// stopping at the shorter side.
@@ -5051,6 +5508,14 @@ class Fx<T> extends Iterable<T> {
   FxAsync<R> mapConcurrent<R>(
           int concurrency, FutureOr<R> Function(T a) f) =>
       FxAsync(_$mapConcurrent(concurrency, f, _inner));
+
+  /// Switches to the async chain and maps [f], retrying each call up to
+  /// [attempts] times (with optional [delay] backoff) before the error
+  /// propagates.
+  FxAsync<R> mapRetry<R>(int attempts, FutureOr<R> Function(T a) f,
+          {Duration Function(int failed)? delay}) =>
+      FxAsync(_$mapRetryAsync(attempts, f, _$toAsync(_inner),
+          delay: delay));
 
   // --- terminal operators -------------------------------------------------
 
@@ -5205,6 +5670,14 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Groups consecutive values into lists of up to [size].
   FxAsync<List<T>> chunk(int size) => FxAsync(_$chunkAsync(size, _inner));
 
+  /// Sliding windows of [size] values, each starting [step] values after
+  /// the previous; [partial] keeps the shorter trailing windows.
+  FxAsync<List<T>> windowed(int size, {int step = 1, bool partial = false}) =>
+      FxAsync(_$windowedAsync(size, _inner, step: step, partial: partial));
+
+  /// Pairs each value with its successor.
+  FxAsync<(T, T)> pairwise() => FxAsync(_$pairwiseAsync(_inner));
+
   /// Applies [f] to each value without changing it.
   FxAsync<T> peek(FutureOr<void> Function(T a) f) =>
       FxAsync(_$peekAsync(f, _inner));
@@ -5215,6 +5688,33 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Distinct by the key [f] returns, keeping the first of each key.
   FxAsync<T> uniqBy<B>(FutureOr<B> Function(T a) f) =>
       FxAsync(_$uniqByAsync(f, _inner));
+
+  /// Drops values equal to their predecessor, keeping the first of each run.
+  FxAsync<T> uniqAdjacent() => FxAsync(_$uniqAdjacentAsync(_inner));
+
+  /// Drops values whose [f]-key equals the previous value's key.
+  FxAsync<T> uniqAdjacentBy<B>(FutureOr<B> Function(T a) f) =>
+      FxAsync(_$uniqAdjacentByAsync(f, _inner));
+
+  /// Switches to [fallback]'s values when this chain turns out to be empty.
+  FxAsync<T> ifEmpty(FxAsyncIterable<T> Function() fallback) =>
+      FxAsync(_$ifEmptyAsync(fallback, _inner));
+
+  /// Yields the single [value] when this chain turns out to be empty.
+  FxAsync<T> defaultIfEmpty(FutureOr<T> value) =>
+      FxAsync(_$defaultIfEmptyAsync(value, _inner));
+
+  /// Maps [f], retrying each call up to [attempts] times (with optional
+  /// [delay] backoff) before the error propagates. Retries compose with
+  /// [concurrent]: each in-flight value retries independently.
+  FxAsync<R> mapRetry<R>(int attempts, FutureOr<R> Function(T a) f,
+          {Duration Function(int failed)? delay}) =>
+      FxAsync(_$mapRetryAsync(attempts, f, _inner, delay: delay));
+
+  /// Fails a pull with a [TimeoutException] when the upstream takes longer
+  /// than [limit] to produce it (per pull, not whole-pipeline).
+  FxAsync<T> timeout(Duration limit) =>
+      FxAsync(_$timeoutAsync(limit, _inner));
 
   /// Pairs each value with the value at the same position in [other],
   /// stopping at the shorter side.
@@ -5800,6 +6300,46 @@ FxAsyncIterable<A> _$reverseAsync<A>(FxAsyncIterable<A> iterable) =>
 Iterable<T> _$cycle<T>(Iterable<T> iterable) => cycle(iterable);
 FxAsyncIterable<T> _$cycleAsync<T>(FxAsyncIterable<T> iterable) =>
     cycleAsync(iterable);
+
+// lazy/take_drop.dart + lazy/filter.dart + lazy/combine.dart (0.7.2)
+Iterable<List<A>> _$windowed<A>(int size, Iterable<A> iterable,
+        {int step = 1, bool partial = false}) =>
+    windowed(size, iterable, step: step, partial: partial);
+FxAsyncIterable<List<A>> _$windowedAsync<A>(
+        int size, FxAsyncIterable<A> iterable,
+        {int step = 1, bool partial = false}) =>
+    windowedAsync(size, iterable, step: step, partial: partial);
+Iterable<(A, A)> _$pairwise<A>(Iterable<A> iterable) => pairwise(iterable);
+FxAsyncIterable<(A, A)> _$pairwiseAsync<A>(FxAsyncIterable<A> iterable) =>
+    pairwiseAsync(iterable);
+Iterable<A> _$uniqAdjacent<A>(Iterable<A> iterable) => uniqAdjacent(iterable);
+FxAsyncIterable<A> _$uniqAdjacentAsync<A>(FxAsyncIterable<A> iterable) =>
+    uniqAdjacentAsync(iterable);
+Iterable<A> _$uniqAdjacentBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    uniqAdjacentBy(f, iterable);
+FxAsyncIterable<A> _$uniqAdjacentByAsync<A, B>(
+        FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    uniqAdjacentByAsync(f, iterable);
+Iterable<A> _$ifEmpty<A>(
+        Iterable<A> Function() fallback, Iterable<A> iterable) =>
+    ifEmpty(fallback, iterable);
+FxAsyncIterable<A> _$ifEmptyAsync<A>(FxAsyncIterable<A> Function() fallback,
+        FxAsyncIterable<A> iterable) =>
+    ifEmptyAsync(fallback, iterable);
+Iterable<A> _$defaultIfEmpty<A>(A value, Iterable<A> iterable) =>
+    defaultIfEmpty(value, iterable);
+FxAsyncIterable<A> _$defaultIfEmptyAsync<A>(
+        FutureOr<A> value, FxAsyncIterable<A> iterable) =>
+    defaultIfEmptyAsync(value, iterable);
+
+// lazy/effect.dart (0.7.2)
+FxAsyncIterable<R> _$mapRetryAsync<A, R>(
+        int attempts, FutureOr<R> Function(A a) f, FxAsyncIterable<A> iterable,
+        {Duration Function(int failed)? delay}) =>
+    mapRetryAsync(attempts, f, iterable, delay: delay);
+FxAsyncIterable<A> _$timeoutAsync<A>(
+        Duration limit, FxAsyncIterable<A> iterable) =>
+    timeoutAsync(limit, iterable);
 
 // strict/aggregate.dart
 List<A> _$toList<A>(Iterable<A> iterable) => toList(iterable);

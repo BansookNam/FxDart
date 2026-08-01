@@ -7,8 +7,8 @@ section: 5
 crumb: chunk
 prev: slice.html
 prevLabel: slice
-next: split.html
-nextLabel: split
+next: windowed.html
+nextLabel: windowed
 ---
   <p class="hero-sub">각각 최대 <code>size</code>개의 연속된 원소를 담은 리스트들의 지연 이터러블을 반환합니다.</p>
 

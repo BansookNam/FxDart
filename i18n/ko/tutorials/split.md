@@ -5,8 +5,8 @@ description: FxDart split 튜토리얼 — 문자 이터러블을 구분자 기�
 heading: <code>split</code>
 section: 5
 crumb: split
-prev: chunk.html
-prevLabel: chunk
+prev: pairwise.html
+prevLabel: pairwise
 next: append.html
 nextLabel: append
 ---

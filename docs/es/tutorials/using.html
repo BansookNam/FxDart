@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>using — FxDart 101</title>
+  <meta name="description" content="Tutorial de using y usingAsync en FxDart: acota un recurso a una iteración perezosa — adquiere en el primer pull, libera exactamente una vez — con playground en vivo.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/using.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/using.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/using.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/using.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/using.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/using.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/using.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/using.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=11fedf83d3bdddf4">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../tutorials/using.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/using.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/using.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/using.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/using.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/tutorials/using.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/using.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 11 · Async &amp; concurrencia › <strong>using</strong></p>
+  <h1><code>using</code></h1>
+  <p class="hero-sub">Acota un recurso a una iteración: adquirido en el primer pull, liberado exactamente una vez — al completar <em>o</em> ante un error.</p>
+
+  <div class="signature">Iterable&lt;T&gt; using&lt;R, T&gt;(R Function() acquire, Iterable&lt;T&gt; Function(R resource) use, void Function(R resource) release)
+FxAsyncIterable&lt;T&gt; usingAsync&lt;R, T&gt;(FutureOr&lt;R&gt; Function() acquire, FxAsyncIterable&lt;T&gt; Function(R resource) use, FutureOr&lt;void&gt; Function(R resource) release)</div>
+
+  <h2>Lección</h2>
+  <p>
+    Archivos, sockets, cursores de base de datos — el valor que producen
+    es una secuencia, pero su <em>vida útil</em> es un paréntesis:
+    abrir, leer, cerrar, <em>incluso cuando leer lanza una excepción</em>.
+    Escribir ese paréntesis alrededor de un pipeline perezoso es
+    incómodo, porque «cuando termina la iteración» está allá donde esté
+    el consumidor. <code>using(acquire, use, release)</code> ata el
+    paréntesis a la iteración misma: <code>acquire</code> corre en el
+    primer pull (no al construir el pipeline — la pereza se preserva),
+    <code>use(resource)</code> aporta los elementos, y
+    <code>release(resource)</code> corre exactamente una vez, tras el
+    último elemento o justo antes de que un error se propague.
+  </p>
+  <p>
+    La forma async <code>usingAsync</code> permite que los tres pasos
+    sean asíncronos y compone con
+    <code><a href="concurrent.html">concurrent</a></code> — release sigue
+    disparándose exactamente una vez aunque haya pulls solapados en
+    vuelo. Si <code>acquire</code> falla, no hay nada que liberar, y el
+    error simplemente se propaga.
+  </p>
+  <p>
+    Una salvedad honesta, directa del modelo pull: un consumidor que
+    <em>abandona</em> la iteración — un <code>break</code> dentro de un
+    <code>for-in</code>, soltar el iterador — nunca llega al final, así
+    que <code>release</code> no puede ejecutarse. Acota la iteración con
+    <code><a href="take.html">take</a></code> (un pipeline acotado
+    completa, y completar libera) o gestiona el recurso con
+    <code>try</code>/<code>finally</code> cuando la salida anticipada sea
+    el plan. Extensión de fxdart (sin contraparte en FxTS), inspirada en
+    el <code>using</code> de Rx.
+  </p>
+
+  <h2>Demo 1 · El paréntesis alrededor de una lectura perezosa</h2>
+  <div class="playground" data-pg="9a3969f56e0e7df2">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+/// A stand-in for a file / socket / cursor.
+class Connection {
+  Connection() {
+    print('  open');
+  }
+  Iterable<String> rows() => ['row-1', 'row-2', 'row-3'];
+  void close() => print('  close');
+}
+
+void main() {
+  // acquire → use → release, tied to the ITERATION, not the declaration:
+  final rows = using(
+    () => Connection(),
+    (conn) => fx(conn.rows()).map((r) => r.toUpperCase()),
+    (conn) => conn.close(),
+  );
+
+  print('pipeline built — nothing opened yet');
+  print(toList(rows));
+  // pipeline built — nothing opened yet
+  //   open
+  //   close
+  // [ROW-1, ROW-2, ROW-3]
+
+  // Iterating again brackets again — one open/close per iteration:
+  toList(rows);
+  //   open
+  //   close
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Liberación ante error, exactamente una vez</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Cursor {
+  var closed = false;
+  void close() {
+    closed = true;
+    print('cursor closed (before the error escaped)');
+  }
+}
+
+Future<int> parse(String raw) async {
+  await Future.delayed(const Duration(milliseconds: 10));
+  return int.parse(raw); // 'oops' throws
+}
+
+void main() async {
+  final cursor = Cursor();
+
+  // release runs BEFORE the error propagates — exactly once:
+  try {
+    await toListAsync(usingAsync(
+      () async => cursor,
+      (c) => mapAsync(parse, toAsync(['1', '2', 'oops', '4'])),
+      (c) async => c.close(),
+    ));
+  } catch (e) {
+    print('caught: $e');
+    print('cursor.closed == ${cursor.closed}');
+  }
+  // cursor closed (before the error escaped)
+  // caught: FormatException: ...
+  // cursor.closed == true
+}
+</textarea>
+  </div>
+
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: dale una vida útil a la conexión.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Feed {
+  var open = false;
+  Iterable<int> ticks() => range(1, 100);
+}
+
+void main() {
+  final feed = Feed();
+
+  // TODO: this reads the feed but never manages its lifetime. Wrap it in
+  // using(...) so `feed.open` is set on the first pull and cleared after
+  // the last — and keep the .take(5): a BOUNDED pipeline completes, and
+  // completion is what triggers release. (break-ing out of an unbounded
+  // one would skip it — that is the documented pull-model caveat.)
+  final firstFive = fx(feed.ticks()) // ← rebuild with using(...)
+      .take(5)
+      .toList();
+
+  print(firstFive); // [1, 2, 3, 4, 5]
+  print('open after iteration: ${feed.open}'); // must print false
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Relacionado:</strong>
+    <a href="take.html"><code>take</code></a> — acota la iteración para garantizar la compleción (y la liberación) ·
+    <a href="peek.html"><code>peek</code></a> — observar valores sin poseer una vida útil ·
+    <a href="retry.html"><code>retry</code></a> — un acquire nuevo por intento cuando se envuelve en una factoría
+  </div>
+
+  <nav class="tut-nav">
+    <a href="timeout.html">← Anterior: timeout</a>
+    <a href="debounce.html">Siguiente: debounce →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=11fedf83d3bdddf4";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

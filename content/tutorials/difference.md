@@ -5,8 +5,8 @@ description: FxDart difference tutorial: elements of one iterable that don't occ
 heading: <code>difference</code>
 section: 4
 crumb: difference
-prev: uniqBy.html
-prevLabel: uniqBy
+prev: uniqAdjacent.html
+prevLabel: uniqAdjacent
 next: differenceBy.html
 nextLabel: differenceBy
 ---

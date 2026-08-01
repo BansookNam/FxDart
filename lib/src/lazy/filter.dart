@@ -248,6 +248,64 @@ FxAsyncIterable<A> uniqByAsync<A, B>(
 FxAsyncIterable<A> uniqAsync<A>(FxAsyncIterable<A> iterable) =>
     uniqByAsync((A a) => a, iterable);
 
+/// Drops elements whose [f]-key equals the previous element's key, keeping
+/// the first of each run. Unlike [uniqBy], only *adjacent* duplicates are
+/// removed, so no seen-set builds up.
+///
+/// fxdart extension (not part of FxTS), after Rx's `distinctUntilChanged`
+/// and Dart `Stream.distinct`.
+///
+/// ```dart
+/// uniqAdjacentBy((a) => a % 10, [1, 11, 21, 2, 1]); // (1, 2, 1)
+/// ```
+Iterable<A> uniqAdjacentBy<A, B>(B Function(A a) f, Iterable<A> iterable) sync* {
+  var hasPrev = false;
+  late B prevKey;
+  for (final a in iterable) {
+    final key = f(a);
+    if (!hasPrev || key != prevKey) yield a;
+    prevKey = key;
+    hasPrev = true;
+  }
+}
+
+/// Drops elements equal to their predecessor, keeping the first of each run.
+///
+/// fxdart extension (not part of FxTS) — see [uniqAdjacentBy].
+///
+/// ```dart
+/// uniqAdjacent([1, 1, 2, 2, 2, 1]); // (1, 2, 1)
+/// ```
+Iterable<A> uniqAdjacent<A>(Iterable<A> iterable) =>
+    uniqAdjacentBy((A a) => a, iterable);
+
+/// Async counterpart of [uniqAdjacentBy]. The key comparison is inherently
+/// ordered, so keys are computed one at a time; combine with `concurrent`
+/// to still evaluate the upstream in parallel.
+FxAsyncIterable<A> uniqAdjacentByAsync<A, B>(
+    FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) {
+  return dispatchAsync(iterable, (source) {
+    final iterator = source.iterator;
+    var hasPrev = false;
+    late B prevKey;
+    return SerialAsyncIterator((concurrent) async {
+      while (true) {
+        final result = await iterator.next(concurrent);
+        if (result.done) return IterResult<A>.done();
+        final key = await f(result.value);
+        final isNew = !hasPrev || key != prevKey;
+        prevKey = key;
+        hasPrev = true;
+        if (isNew) return IterResult.value(result.value);
+      }
+    });
+  });
+}
+
+/// Async counterpart of [uniqAdjacent].
+FxAsyncIterable<A> uniqAdjacentAsync<A>(FxAsyncIterable<A> iterable) =>
+    uniqAdjacentByAsync((A a) => a, iterable);
+
 /// Returns the elements of [iterable2] whose [f]-keys do not occur in
 /// [iterable1], with duplicates removed.
 ///

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ifEmpty — FxDart 101</title>
+  <meta name="description" content="FxDart ifEmpty and defaultIfEmpty tutorial: lazy fallbacks for pipelines that turn out empty, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/ifEmpty.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/ifEmpty.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/ifEmpty.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/ifEmpty.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/ifEmpty.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/ifEmpty.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/ifEmpty.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/ifEmpty.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/ifEmpty.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=11fedf83d3bdddf4">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Início</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../tutorials/ifEmpty.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/ifEmpty.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/ifEmpty.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/ifEmpty.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/ifEmpty.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/ifEmpty.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="../../ru/tutorials/ifEmpty.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 6 · Combinando › <strong>ifEmpty</strong></p>
+  <h1><code>ifEmpty</code></h1>
+  <p class="hero-sub">Switches to a fallback when the pipeline turns out to be empty — decided lazily, at iteration time.</p>
+
+  <div class="signature">Iterable&lt;A&gt; ifEmpty&lt;A&gt;(Iterable&lt;A&gt; Function() fallback, Iterable&lt;A&gt; iterable)
+Iterable&lt;A&gt; defaultIfEmpty&lt;A&gt;(A value, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; ifEmptyAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; Function() fallback, FxAsyncIterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; defaultIfEmptyAsync&lt;A&gt;(FutureOr&lt;A&gt; value, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx&lt;T&gt;.ifEmpty(Iterable&lt;T&gt; Function() fallback) / .defaultIfEmpty(T value)                        // chain (sync)
+FxAsync&lt;T&gt; FxAsync&lt;T&gt;.ifEmpty(FxAsyncIterable&lt;T&gt; Function() fallback) / .defaultIfEmpty(FutureOr&lt;T&gt; value) // chain (async)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    A pipeline that <em>might</em> produce nothing usually forces a
+    detour: materialize it, test <code>isEmpty</code>, branch. That
+    breaks the chain and — worse — runs the pipeline before you meant to.
+    <code>ifEmpty(fallback)</code> folds the branch into the pipeline
+    itself: values pass through untouched, and only if the source
+    finishes without yielding anything does the fallback iterable take
+    over. The fallback function is not even <em>called</em> otherwise —
+    lazy in both directions.
+  </p>
+  <p>
+    <code>defaultIfEmpty(value)</code> is the one-value shorthand: the
+    placeholder row, the <code>0</code> for an empty report, the
+    "no results" marker. Both compose anywhere in the chain, which
+    matters after aggressive filtering — the emptiness is decided by
+    whatever reaches this point, not by the original source.
+  </p>
+  <p>
+    fxdart extension (no FxTS counterpart), after Rx's
+    <code>switchIfEmpty</code> / <code>defaultIfEmpty</code>. The async
+    forms accept an async fallback chain and a <code>Future</code>
+    default, and compose with
+    <code><a href="concurrent.html">concurrent</a></code>.
+  </p>
+
+  <h2>Demo 1 · A default for the empty report</h2>
+  <div class="playground" data-pg="1b4da7da6d07ee3a">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final expenses = [
+    (category: 'food', amount: 32.5),
+    (category: 'food', amount: 18.0),
+    (category: 'transport', amount: 12.0),
+  ];
+
+  // Aggressive filtering can leave nothing — defaultIfEmpty puts the
+  // placeholder INSIDE the pipeline instead of an if/else after it:
+  final travel = fx(expenses)
+      .filter((e) => e.category == 'travel')
+      .map((e) => e.amount)
+      .defaultIfEmpty(0.0)
+      .toList();
+  print(travel); // [0.0]
+
+  // Non-empty chains pass through untouched:
+  final food = fx(expenses)
+      .filter((e) => e.category == 'food')
+      .map((e) => e.amount)
+      .defaultIfEmpty(0.0)
+      .toList();
+  print(food); // [32.5, 18.0]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Fallback source, never touched otherwise</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Iterable<String> cachedResults() {
+  print('  (reading cache)');
+  return ['cached-a', 'cached-b'];
+}
+
+void main() {
+  final live = ['live-1', 'live-2'];
+
+  // The fallback is a FUNCTION — it is not even called unless needed:
+  print('with live results:');
+  print(fx(live).ifEmpty(cachedResults).toList());
+  // with live results:
+  // [live-1, live-2]        ← no "(reading cache)" line: never touched
+
+  print('with no results:');
+  print(fx(<String>[]).ifEmpty(cachedResults).toList());
+  // with no results:
+  //   (reading cache)
+  // [cached-a, cached-b]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: search with a fallback query.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+final products = [
+  (name: 'oat milk', tags: ['vegan', 'drink']),
+  (name: 'cheddar', tags: ['dairy']),
+  (name: 'soy sauce', tags: ['vegan', 'pantry']),
+];
+
+Iterable<String> search(String tag) =>
+    fx(products).filter((p) => p.tags.contains(tag)).map((p) => p.name);
+
+void main() {
+  // TODO: searching 'gluten-free' finds nothing. Fall back to the
+  // 'vegan' search results instead of an empty list — with ifEmpty,
+  // so the fallback search only runs when actually needed.
+  final results = fx(search('gluten-free'))
+      .toList(); // ← add .ifEmpty(...) before .toList()
+
+  print(results);
+  // Expected once solved: [oat milk, soy sauce]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="filter.html"><code>filter</code></a> — the usual reason a chain ends up empty ·
+    <a href="concat.html"><code>concat</code></a> — appending unconditionally ·
+    <a href="head.html"><code>head</code></a> — <code>null</code> instead of a fallback, for a single value
+  </div>
+
+  <nav class="tut-nav">
+    <a href="fork.html">← Anterior: fork</a>
+    <a href="reduce.html">Próximo: reduce →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=11fedf83d3bdddf4";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

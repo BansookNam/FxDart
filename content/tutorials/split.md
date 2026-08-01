@@ -5,8 +5,8 @@ description: FxDart split tutorial: split a character iterable on a separator, w
 heading: <code>split</code>
 section: 5
 crumb: split
-prev: chunk.html
-prevLabel: chunk
+prev: pairwise.html
+prevLabel: pairwise
 next: append.html
 nextLabel: append
 ---

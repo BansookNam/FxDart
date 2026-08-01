@@ -1,0 +1,2 @@
+FxAsyncIterable&lt;A&gt; timeoutAsync&lt;A&gt;(Duration limit, FxAsyncIterable&lt;A&gt; iterable)
+FxAsync&lt;T&gt; FxAsync&lt;T&gt;.timeout(Duration limit) // chain (async)

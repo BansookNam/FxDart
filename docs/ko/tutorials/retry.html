@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>retry — FxDart 101</title>
+  <meta name="description" content="FxDart retry와 mapRetry 튜토리얼: 불안정한 효과를 백오프와 함께, 원소 단위 또는 파이프라인 단위로, 병렬 안전하게 다시 실행하는 방법을 라이브 플레이그라운드와 함께 다룹니다.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/retry.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/retry.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/retry.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/retry.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/retry.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/retry.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/retry.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/retry.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=11fedf83d3bdddf4">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../tutorials/retry.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/retry.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/tutorials/retry.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/retry.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/retry.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/retry.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/retry.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 11 · 비동기 &amp; 동시성 › <strong>retry</strong></p>
+  <h1><code>retry</code></h1>
+  <p class="hero-sub">불안정한 효과를 성공할 때까지 다시 실행합니다 — 최대 <code>attempts</code>번, 실패 사이에 선택적 백오프를 두고서.</p>
+
+  <div class="signature">Future&lt;T&gt; retry&lt;T&gt;(int attempts, FutureOr&lt;T&gt; Function() f, {Duration Function(int failed)? delay})
+FxAsyncIterable&lt;R&gt; mapRetryAsync&lt;A, R&gt;(int attempts, FutureOr&lt;R&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable, {Duration Function(int failed)? delay})
+FxAsync&lt;R&gt; Fx&lt;T&gt;.mapRetry&lt;R&gt;(int attempts, FutureOr&lt;R&gt; Function(T a) f, {Duration Function(int failed)? delay})      // chain (sync → async)
+FxAsync&lt;R&gt; FxAsync&lt;T&gt;.mapRetry&lt;R&gt;(int attempts, FutureOr&lt;R&gt; Function(T a) f, {Duration Function(int failed)? delay}) // chain (async)</div>
+
+  <h2>강의</h2>
+  <p>
+    실제 파이프라인은 실제 서비스를 호출하고, 실제 서비스는 가끔
+    실패합니다. 손으로 짠 답은 <code>try</code>/<code>catch</code>와
+    카운터, <code>Future.delayed</code>를 갖춘 <code>for</code> 루프 —
+    프로젝트마다 복사되면서 매번 미묘하게 달라지는 코드입니다.
+    <code>retry(attempts, f)</code>는 그 루프를 한 번으로 정리한
+    것입니다. <code>f</code>를 실행하고, 에러가 나면 다시 실행하되 총
+    <code>attempts</code>번까지만 실행합니다. 예산이 다 떨어지면
+    <em>마지막</em> 에러가 원래 스택 트레이스와 함께 다시 던져집니다.
+    <code>delay</code> 훅은 실패 횟수(<code>1, 2, …</code>)를 받으므로
+    백오프는 한 줄이면 됩니다:
+    <code>delay: (failed)&nbsp;=&gt;&nbsp;Duration(seconds:&nbsp;failed)</code>.
+  </p>
+  <p>
+    <code>mapRetry(attempts, f)</code>는 같은 아이디어를 원소 단위로 적용한
+    것입니다. 모든 호출이 각자의 재시도 예산을 갖는
+    <code><a href="map.html">map</a></code>입니다. 병렬 안전한
+    <code>mapAsync</code> 위에 만들어져 있어서
+    <code><a href="concurrent.html">concurrent(n)</a></code> 아래에서는
+    진행 중인 각 원소가 <em>독립적으로</em> 재시도합니다 — 느리고
+    불안정한 항목 하나가 다시 실행되는 동안 이웃들은 그대로 지나가고,
+    순서는 여전히 보존됩니다. 파이프라인 전체를 재시도하려면 대신
+    종단을 감싸세요:
+    <code>retry(3, ()&nbsp;=&gt;&nbsp;fxAsync(…).toList())</code> —
+    부분 결과는 버려지고 파이프라인은 새 이터레이터에서 처음부터 다시
+    실행됩니다.
+  </p>
+  <p>
+    Dart 고유의 추가 기능입니다(FxTS에는 대응물이 없습니다). Rx의
+    <code>retry</code>/<code>retryWhen</code>을 따르되, "재구독"이
+    "이터러블을 다시 만든다"를 뜻하는 pull 모델에 맞춰 다시
+    설계했습니다. 재시도가 소진된 뒤의 <em>타입이 있는</em> 실패 처리는
+    결과를
+    <code><a href="eitherPipelines.html">eitherCatching</a></code>에
+    넘기세요.
+  </p>
+
+  <h2>데모 1 · 불안정한 fetch, 백오프와 함께</h2>
+  <div class="playground" data-pg="78f002f210325f00">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+int calls = 0;
+
+/// A fetch that fails twice before succeeding.
+Future<String> fetchConfig() async {
+  calls++;
+  await Future.delayed(const Duration(milliseconds: 20));
+  if (calls <= 2) throw Exception('network hiccup #$calls');
+  return '{"theme": "dark"}';
+}
+
+void main() async {
+  // Run again on failure — up to 4 runs, waiting a little longer each time:
+  final config = await retry(
+    4,
+    fetchConfig,
+    delay: (failed) {
+      print('attempt $failed failed, backing off ${failed * 100}ms');
+      return Duration(milliseconds: failed * 100);
+    },
+  );
+
+  print('got $config after $calls calls');
+  // attempt 1 failed, backing off 100ms
+  // attempt 2 failed, backing off 200ms
+  // got {"theme": "dark"} after 3 calls
+
+  // When the budget runs out, the LAST error rethrows — stack trace intact.
+}
+</textarea>
+  </div>
+
+  <h2>데모 2 · concurrent 아래의 mapRetry</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+final failedOnce = <int>{};
+
+/// A per-user lookup where even ids flake on their first call.
+Future<String> fetchUser(int id) async {
+  await Future.delayed(const Duration(milliseconds: 30));
+  if (id.isEven && failedOnce.add(id)) throw Exception('flaky $id');
+  return 'user-$id';
+}
+
+void main() async {
+  final sw = Stopwatch()..start();
+
+  // mapRetry gives EVERY element its own retry budget, and it is built on
+  // the parallel-safe map — so under concurrent(3), a flaky element
+  // re-runs while its neighbors keep going, and order is preserved:
+  final users = await fx([1, 2, 3, 4, 5, 6])
+      .toAsync()
+      .mapRetry(3, fetchUser)
+      .concurrent(3)
+      .toList();
+
+  print(users);
+  // [user-1, user-2, user-3, user-4, user-5, user-6]
+  print('retried: $failedOnce in ${sw.elapsedMilliseconds}ms');
+  // retried: {2, 4, 6} — and still ~4 batch-times, not 9 sequential calls
+}
+</textarea>
+  </div>
+
+  <h2>직접 해 보기</h2>
+  <p>연습: 불안정한 행이 있어도 임포트가 살아남게 만들어 보세요.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+final attempts = <String, int>{};
+
+/// Every row fails on its first import call.
+Future<String> importRow(String row) async {
+  final n = (attempts[row] ?? 0) + 1;
+  attempts[row] = n;
+  await Future.delayed(const Duration(milliseconds: 10));
+  if (n == 1) throw Exception('lock contention on $row');
+  return 'imported $row';
+}
+
+void main() async {
+  final rows = ['r1', 'r2', 'r3'];
+
+  // TODO: this pipeline dies on the first flaky row. Give each row a
+  // retry budget of 2 by swapping .map for .mapRetry(2, ...).
+  final results = await fx(rows)
+      .toAsync()
+      .map(importRow) // ← change me
+      .toList();
+
+  results.forEach(print);
+  // Expected once solved:
+  // imported r1
+  // imported r2
+  // imported r3
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>관련 항목:</strong>
+    <a href="timeout.html"><code>timeout</code></a> — 각 pull이 걸릴 수 있는 시간에 한도 두기 ·
+    <a href="concurrent.html"><code>concurrent</code></a> — 진행 중인 원소마다 재시도가 독립적으로 유지됨 ·
+    <a href="eitherPipelines.html">타입 있는 에러</a> — 실패가 예외가 아니라 값이어야 할 때
+  </div>
+
+  <nav class="tut-nav">
+    <a href="concurrentPool.html">← 이전: concurrentPool</a>
+    <a href="timeout.html">다음: timeout →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=11fedf83d3bdddf4";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

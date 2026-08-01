@@ -7,8 +7,8 @@ section: 4
 crumb: distinctBy
 prev: uniq.html
 prevLabel: uniq
-next: difference.html
-nextLabel: difference
+next: uniqAdjacent.html
+nextLabel: uniqAdjacent
 ---
   <p class="hero-sub">Removes duplicates as determined by a key function, rather than value equality.</p>
 

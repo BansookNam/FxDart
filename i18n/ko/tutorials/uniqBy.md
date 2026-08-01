@@ -7,8 +7,8 @@ section: 4
 crumb: distinctBy
 prev: uniq.html
 prevLabel: uniq
-next: difference.html
-nextLabel: difference
+next: uniqAdjacent.html
+nextLabel: uniqAdjacent
 ---
   <p class="hero-sub">값의 동등성이 아니라 키 함수가 정하는 기준으로 중복을 제거합니다.</p>
 

@@ -1,0 +1,4 @@
+Future&lt;T&gt; retry&lt;T&gt;(int attempts, FutureOr&lt;T&gt; Function() f, {Duration Function(int failed)? delay})
+FxAsyncIterable&lt;R&gt; mapRetryAsync&lt;A, R&gt;(int attempts, FutureOr&lt;R&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable, {Duration Function(int failed)? delay})
+FxAsync&lt;R&gt; Fx&lt;T&gt;.mapRetry&lt;R&gt;(int attempts, FutureOr&lt;R&gt; Function(T a) f, {Duration Function(int failed)? delay})      // chain (sync → async)
+FxAsync&lt;R&gt; FxAsync&lt;T&gt;.mapRetry&lt;R&gt;(int attempts, FutureOr&lt;R&gt; Function(T a) f, {Duration Function(int failed)? delay}) // chain (async)

@@ -447,33 +447,113 @@ FxAsyncIterable<A> sliceAsync<A>(int start, FxAsyncIterable<A> iterable,
 /// Returns an iterable of lists, each containing [size] consecutive
 /// elements (the last chunk may be shorter).
 ///
-/// Port of FxTS `chunk`.
+/// Port of FxTS `chunk`. Equivalent to
+/// `windowed(size, iterable, step: size, partial: true)`, except that a
+/// non-positive [size] yields nothing instead of throwing.
 Iterable<List<A>> chunk<A>(int size, Iterable<A> iterable) =>
-    _ChunkIterable(size, iterable);
+    size < 1 ? Iterable<List<A>>.empty() : _WindowIterable(size, size, true, iterable);
 
-class _ChunkIterable<A> extends Iterable<List<A>> {
-  _ChunkIterable(this._size, this._source);
-  final int _size;
-  final Iterable<A> _source;
-  @override
-  Iterator<List<A>> get iterator => _ChunkIterator(_size, _source.iterator);
+/// Returns an iterable of sliding windows over [iterable]: lists of [size]
+/// consecutive elements, each window starting [step] elements after the
+/// previous one. With [partial] the trailing windows shorter than [size]
+/// are kept instead of dropped.
+///
+/// fxdart extension (not part of FxTS) — the sliding generalization of
+/// [chunk], following Kotlin's `windowed` naming; RxDart's counterpart is
+/// `bufferCount(size, startEvery)`.
+///
+/// ```dart
+/// windowed(3, [1, 2, 3, 4, 5]);                // ([1, 2, 3], [2, 3, 4], [3, 4, 5])
+/// windowed(3, [1, 2, 3, 4, 5], step: 2);       // ([1, 2, 3], [3, 4, 5])
+/// windowed(3, [1, 2, 3, 4, 5], partial: true); // (..., [3, 4, 5], [4, 5], [5])
+/// ```
+Iterable<List<A>> windowed<A>(int size, Iterable<A> iterable,
+    {int step = 1, bool partial = false}) {
+  _checkWindow(size, step);
+  return _WindowIterable(size, step, partial, iterable);
 }
 
-class _ChunkIterator<A> implements Iterator<List<A>> {
-  _ChunkIterator(this._size, this._it);
+void _checkWindow(int size, int step) {
+  if (size < 1) {
+    throw ArgumentError.value(size, 'size', 'must be at least 1');
+  }
+  if (step < 1) {
+    throw ArgumentError.value(step, 'step', 'must be at least 1');
+  }
+}
+
+class _WindowIterable<A> extends Iterable<List<A>> {
+  _WindowIterable(this._size, this._step, this._partial, this._source);
   final int _size;
+  final int _step;
+  final bool _partial;
+  final Iterable<A> _source;
+  @override
+  Iterator<List<A>> get iterator =>
+      _WindowIterator(_size, _step, _partial, _source.iterator);
+}
+
+class _WindowIterator<A> implements Iterator<List<A>> {
+  _WindowIterator(this._size, this._step, this._partial, this._it);
+  final int _size;
+  final int _step;
+  final bool _partial;
   final Iterator<A> _it;
+  List<A> _carry = [];
+  int _pendingSkip = 0;
+  bool _sourceDone = false;
+  bool _finished = false;
   @override
   late List<A> current;
+
   @override
   bool moveNext() {
-    if (_size < 1) return false;
-    final items = <A>[];
-    while (items.length < _size && _it.moveNext()) {
-      items.add(_it.current);
+    if (_finished) return false;
+    while (_pendingSkip > 0 && !_sourceDone) {
+      if (_it.moveNext()) {
+        _pendingSkip--;
+      } else {
+        _sourceDone = true;
+      }
     }
-    if (items.isEmpty) return false;
-    current = items;
+    if (_pendingSkip > 0) {
+      _finished = true;
+      return false;
+    }
+    final window = _carry;
+    _carry = [];
+    while (window.length < _size && !_sourceDone) {
+      if (_it.moveNext()) {
+        window.add(_it.current);
+      } else {
+        _sourceDone = true;
+      }
+    }
+    if (window.isEmpty) {
+      _finished = true;
+      return false;
+    }
+    if (window.length < _size) {
+      // Trailing window(s): keep sliding through the remnant only when
+      // partial windows were asked for.
+      if (!_partial) {
+        _finished = true;
+        return false;
+      }
+      if (_step >= window.length) {
+        _finished = true;
+      } else {
+        _carry = window.sublist(_step);
+      }
+      current = window;
+      return true;
+    }
+    if (_step < _size) {
+      _carry = window.sublist(_step);
+    } else {
+      _pendingSkip = _step - _size;
+    }
+    current = window;
     return true;
   }
 }
@@ -481,22 +561,111 @@ class _ChunkIterator<A> implements Iterator<List<A>> {
 /// Async counterpart of [chunk].
 FxAsyncIterable<List<A>> chunkAsync<A>(int size, FxAsyncIterable<A> iterable) {
   if (size < 1) return asyncEmpty();
+  return _windowedAsync(size, size, true, iterable);
+}
+
+/// Async counterpart of [windowed].
+FxAsyncIterable<List<A>> windowedAsync<A>(int size, FxAsyncIterable<A> iterable,
+    {int step = 1, bool partial = false}) {
+  _checkWindow(size, step);
+  return _windowedAsync(size, step, partial, iterable);
+}
+
+FxAsyncIterable<List<A>> _windowedAsync<A>(
+    int size, int step, bool partial, FxAsyncIterable<A> iterable) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
+    var carry = <A>[];
+    var pendingSkip = 0;
     var sourceDone = false;
+    var finished = false;
     return SerialAsyncIterator((concurrent) async {
-      if (sourceDone) return IterResult<List<A>>.done();
-      final items = <A>[];
-      while (items.length < size) {
+      if (finished) return IterResult<List<A>>.done();
+      while (pendingSkip > 0 && !sourceDone) {
         final result = await iterator.next(concurrent);
         if (result.done) {
           sourceDone = true;
-          break;
+        } else {
+          pendingSkip--;
         }
-        items.add(result.value);
       }
-      if (items.isEmpty) return IterResult<List<A>>.done();
-      return IterResult.value(items);
+      if (pendingSkip > 0) {
+        finished = true;
+        return IterResult<List<A>>.done();
+      }
+      final window = carry;
+      carry = <A>[];
+      while (window.length < size && !sourceDone) {
+        final result = await iterator.next(concurrent);
+        if (result.done) {
+          sourceDone = true;
+        } else {
+          window.add(result.value);
+        }
+      }
+      if (window.isEmpty) {
+        finished = true;
+        return IterResult<List<A>>.done();
+      }
+      if (window.length < size) {
+        if (!partial) {
+          finished = true;
+          return IterResult<List<A>>.done();
+        }
+        if (step >= window.length) {
+          finished = true;
+        } else {
+          carry = window.sublist(step);
+        }
+        return IterResult.value(window);
+      }
+      if (step < size) {
+        carry = window.sublist(step);
+      } else {
+        pendingSkip = step - size;
+      }
+      return IterResult.value(window);
+    });
+  });
+}
+
+/// Pairs each element with its successor: `[a, b, c]` becomes
+/// `((a, b), (b, c))`. Fewer than two elements yield nothing.
+///
+/// fxdart extension (not part of FxTS), after RxDart's `pairwise`.
+///
+/// ```dart
+/// pairwise([1, 2, 3, 4]); // ((1, 2), (2, 3), (3, 4))
+/// ```
+Iterable<(A, A)> pairwise<A>(Iterable<A> iterable) sync* {
+  var hasPrev = false;
+  late A prev;
+  for (final a in iterable) {
+    if (hasPrev) yield (prev, a);
+    prev = a;
+    hasPrev = true;
+  }
+}
+
+/// Async counterpart of [pairwise].
+FxAsyncIterable<(A, A)> pairwiseAsync<A>(FxAsyncIterable<A> iterable) {
+  return dispatchAsync(iterable, (source) {
+    final iterator = source.iterator;
+    var hasPrev = false;
+    late A prev;
+    return SerialAsyncIterator((concurrent) async {
+      while (true) {
+        final result = await iterator.next(concurrent);
+        if (result.done) return IterResult<(A, A)>.done();
+        final value = result.value;
+        if (hasPrev) {
+          final pair = (prev, value);
+          prev = value;
+          return IterResult.value(pair);
+        }
+        prev = value;
+        hasPrev = true;
+      }
     });
   });
 }

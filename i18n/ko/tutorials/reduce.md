@@ -5,8 +5,8 @@ description: FxDart reduce 튜토리얼: 첫 번째 원소를 시드로 삼아 �
 heading: <code>reduce</code>
 section: 7
 crumb: reduce
-prev: fork.html
-prevLabel: fork
+prev: ifEmpty.html
+prevLabel: ifEmpty
 next: fold.html
 nextLabel: fold
 ---

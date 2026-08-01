@@ -1,0 +1,4 @@
+Iterable&lt;List&lt;A&gt;&gt; windowed&lt;A&gt;(int size, Iterable&lt;A&gt; iterable, {int step = 1, bool partial = false})
+FxAsyncIterable&lt;List&lt;A&gt;&gt; windowedAsync&lt;A&gt;(int size, FxAsyncIterable&lt;A&gt; iterable, {int step = 1, bool partial = false})
+Fx&lt;List&lt;T&gt;&gt; Fx&lt;T&gt;.windowed(int size, {int step = 1, bool partial = false})           // chain (sync)
+FxAsync&lt;List&lt;T&gt;&gt; FxAsync&lt;T&gt;.windowed(int size, {int step = 1, bool partial = false}) // chain (async)

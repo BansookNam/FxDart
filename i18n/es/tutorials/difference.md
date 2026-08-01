@@ -5,8 +5,8 @@ description: Tutorial de difference en FxDart: los elementos de un iterable que 
 heading: <code>difference</code>
 section: 4
 crumb: difference
-prev: uniqBy.html
-prevLabel: uniqBy
+prev: uniqAdjacent.html
+prevLabel: uniqAdjacent
 next: differenceBy.html
 nextLabel: differenceBy
 ---

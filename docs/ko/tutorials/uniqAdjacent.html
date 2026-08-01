@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>uniqAdjacent — FxDart 101</title>
+  <meta name="description" content="FxDart uniqAdjacent 튜토리얼: 인접한 중복만 제거하기 — 커지는 seen 집합 없이 상태 변화를 감지하는 방법을 라이브 플레이그라운드와 함께 다룹니다.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/uniqAdjacent.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/uniqAdjacent.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/uniqAdjacent.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/uniqAdjacent.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/uniqAdjacent.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/uniqAdjacent.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/uniqAdjacent.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/uniqAdjacent.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=11fedf83d3bdddf4">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../tutorials/uniqAdjacent.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/uniqAdjacent.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/tutorials/uniqAdjacent.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/uniqAdjacent.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/uniqAdjacent.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/uniqAdjacent.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/uniqAdjacent.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 4 · 필터링 &amp; 중복 제거 › <strong>uniqAdjacent</strong></p>
+  <h1><code>uniqAdjacent</code></h1>
+  <p class="hero-sub">바로 앞 원소와 같은 원소를 버립니다 — <em>인접한</em> 중복만 사라지고, seen 집합은 쌓이지 않습니다.</p>
+
+  <div class="signature">Iterable&lt;A&gt; uniqAdjacent&lt;A&gt;(Iterable&lt;A&gt; iterable)
+Iterable&lt;A&gt; uniqAdjacentBy&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; uniqAdjacentAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; uniqAdjacentByAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx&lt;T&gt;.uniqAdjacent() / .uniqAdjacentBy&lt;B&gt;(B Function(T a) f)                    // chain (sync)
+FxAsync&lt;T&gt; FxAsync&lt;T&gt;.uniqAdjacent() / .uniqAdjacentBy&lt;B&gt;(FutureOr&lt;B&gt; Function(T a) f) // chain (async)</div>
+
+  <h2>강의</h2>
+  <p>
+    <code><a href="uniq.html">uniq</a></code>는 "이 값을 <em>언젠가</em>
+    본 적이 있는가?"에 답합니다 — 지금까지 본 모든 값을 집합에 담아
+    둡니다. <code>uniqAdjacent()</code>는 다른 질문에 답합니다.
+    "값이 <em>바뀌었는가</em>?" 각 원소를 바로 앞 원소와만 비교하므로
+    <code>[1, 1, 2, 2, 1]</code>은 <code>(1, 2, 1)</code>이 됩니다 —
+    마지막 <code>1</code>은 살아남는데, 현재 구간의 반복이 아니라
+    <em>새로운 구간</em>이기 때문입니다.
+  </p>
+  <p>
+    그래서 반복 구간(run)을 접는 데 딱 맞는 연산자입니다. 매 틱마다 같은
+    상태를 다시 보고하는 상태 피드, 평평하게 유지되는 센서 값, 같은
+    레벨을 반복하는 로그 스트림 같은 것들입니다. seen 집합이 없으므로
+    시퀀스가 아무리 길어도 메모리는 일정하게 유지됩니다 —
+    <code>uniq</code>라면 한없이 커졌을 끝없는 소스에서도 안전합니다.
+    <code>uniqAdjacentBy(key)</code>는 유도한 키로 비교하며,
+    <code><a href="uniqBy.html">uniqBy</a></code>를 그대로 따릅니다.
+  </p>
+  <p>
+    Dart 고유의 추가 기능입니다(FxTS에는 대응물이 없습니다) — Rx는
+    <code>distinctUntilChanged</code>, Dart 스트림은
+    <code>Stream.distinct</code>라고 부릅니다. 비동기 키 콜백은 한 번에
+    한 원소씩 실행되지만(비교 자체가 본질적으로 순서에 묶여 있습니다),
+    상류는 여전히
+    <code><a href="concurrent.html">concurrent</a></code> 아래에서
+    병렬로 평가됩니다.
+  </p>
+
+  <h2>데모 1 · 반복 구간은 접고, 되돌아온 값은 남기기</h2>
+  <div class="playground" data-pg="41774a219b45ac15">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // A status feed that re-reports the same state every tick:
+  final states = ['ok', 'ok', 'ok', 'warn', 'warn', 'ok', 'ok', 'down'];
+
+  // Only the CHANGES survive — returns to an earlier state included:
+  print(fx(states).uniqAdjacent().toList());
+  // [ok, warn, ok, down]
+
+  // Compare with uniq, which answers "ever seen?" instead of "changed?":
+  print(fx(states).uniq().toList());
+  // [ok, warn, down]        ← the return to 'ok' is lost
+
+  // And no seen-set builds up: constant memory, safe on endless feeds.
+}
+</textarea>
+  </div>
+
+  <h2>데모 2 · 키 기준 상태 변화</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final readings = [
+    (t: '09:00', temp: 18.2),
+    (t: '09:05', temp: 18.9),
+    (t: '09:10', temp: 21.4),
+    (t: '09:15', temp: 22.0),
+    (t: '09:20', temp: 19.5),
+  ];
+
+  String zone(double temp) => temp < 20 ? 'cool' : 'warm';
+
+  // uniqAdjacentBy keeps a reading only when its KEY changes — the first
+  // reading of each zone run, timestamps intact:
+  final changes = fx(readings)
+      .uniqAdjacentBy((r) => zone(r.temp))
+      .map((r) => '${r.t}: entered ${zone(r.temp)} (${r.temp}°)')
+      .toList();
+
+  changes.forEach(print);
+  // 09:00: entered cool (18.2°)
+  // 09:10: entered warm (21.4°)
+  // 09:20: entered cool (19.5°)
+}
+</textarea>
+  </div>
+
+  <h2>직접 해 보기</h2>
+  <p>연습: 센서의 구역(zone)이 바뀌는 순간만 보고해 보세요.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final log = [
+    'INFO boot',
+    'INFO ready',
+    'WARN disk 81%',
+    'WARN disk 82%',
+    'ERROR write failed',
+    'WARN disk 83%',
+    'INFO recovered',
+  ];
+
+  // TODO: report one line per LEVEL run — when the level changes, keep
+  // that line; drop the repeats of the same level.
+  // Hint: the level is the first word — line.split(' ').first.
+  final levelChanges = fx(log)
+      .uniqAdjacent() // ← almost: this compares whole lines. Compare by level.
+      .toList();
+
+  levelChanges.forEach(print);
+  // Expected once solved:
+  // INFO boot
+  // WARN disk 81%
+  // ERROR write failed
+  // WARN disk 83%
+  // INFO recovered
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>관련 항목:</strong>
+    <a href="uniq.html"><code>uniq</code></a> — seen 집합을 쓰는 전역 중복 제거 ·
+    <a href="uniqBy.html"><code>uniqBy</code></a> — 키 기준 전역 중복 제거 ·
+    <a href="pairwise.html"><code>pairwise</code></a> — 변화의 양쪽이 모두 필요할 때
+  </div>
+
+  <nav class="tut-nav">
+    <a href="uniqBy.html">← 이전: distinctBy</a>
+    <a href="difference.html">다음: difference →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=11fedf83d3bdddf4";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

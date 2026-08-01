@@ -5,8 +5,8 @@ description: FxDart concurrentPool tutorial: a fixed-size pool of in-flight requ
 heading: <code>concurrentPool</code>
 section: 11
 crumb: concurrentPool
-next: debounce.html
-nextLabel: debounce
+next: retry.html
+nextLabel: retry
 ---
   <p class="hero-sub">Like concurrent, but yields results in completion order — whichever finishes first comes out first.</p>
 

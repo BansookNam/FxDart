@@ -22,6 +22,7 @@ FILES=(
   "lib/src/lazy/take_drop.dart"
   "lib/src/lazy/zip.dart"
   "lib/src/lazy/combine.dart"
+  "lib/src/lazy/effect.dart"
   "lib/src/strict/aggregate.dart"
   "lib/src/strict/access.dart"
   "lib/src/strict/object.dart"
@@ -275,6 +276,46 @@ FxAsyncIterable<A> _$reverseAsync<A>(FxAsyncIterable<A> iterable) =>
 Iterable<T> _$cycle<T>(Iterable<T> iterable) => cycle(iterable);
 FxAsyncIterable<T> _$cycleAsync<T>(FxAsyncIterable<T> iterable) =>
     cycleAsync(iterable);
+
+// lazy/take_drop.dart + lazy/filter.dart + lazy/combine.dart (0.7.2)
+Iterable<List<A>> _$windowed<A>(int size, Iterable<A> iterable,
+        {int step = 1, bool partial = false}) =>
+    windowed(size, iterable, step: step, partial: partial);
+FxAsyncIterable<List<A>> _$windowedAsync<A>(
+        int size, FxAsyncIterable<A> iterable,
+        {int step = 1, bool partial = false}) =>
+    windowedAsync(size, iterable, step: step, partial: partial);
+Iterable<(A, A)> _$pairwise<A>(Iterable<A> iterable) => pairwise(iterable);
+FxAsyncIterable<(A, A)> _$pairwiseAsync<A>(FxAsyncIterable<A> iterable) =>
+    pairwiseAsync(iterable);
+Iterable<A> _$uniqAdjacent<A>(Iterable<A> iterable) => uniqAdjacent(iterable);
+FxAsyncIterable<A> _$uniqAdjacentAsync<A>(FxAsyncIterable<A> iterable) =>
+    uniqAdjacentAsync(iterable);
+Iterable<A> _$uniqAdjacentBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    uniqAdjacentBy(f, iterable);
+FxAsyncIterable<A> _$uniqAdjacentByAsync<A, B>(
+        FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    uniqAdjacentByAsync(f, iterable);
+Iterable<A> _$ifEmpty<A>(
+        Iterable<A> Function() fallback, Iterable<A> iterable) =>
+    ifEmpty(fallback, iterable);
+FxAsyncIterable<A> _$ifEmptyAsync<A>(FxAsyncIterable<A> Function() fallback,
+        FxAsyncIterable<A> iterable) =>
+    ifEmptyAsync(fallback, iterable);
+Iterable<A> _$defaultIfEmpty<A>(A value, Iterable<A> iterable) =>
+    defaultIfEmpty(value, iterable);
+FxAsyncIterable<A> _$defaultIfEmptyAsync<A>(
+        FutureOr<A> value, FxAsyncIterable<A> iterable) =>
+    defaultIfEmptyAsync(value, iterable);
+
+// lazy/effect.dart (0.7.2)
+FxAsyncIterable<R> _$mapRetryAsync<A, R>(
+        int attempts, FutureOr<R> Function(A a) f, FxAsyncIterable<A> iterable,
+        {Duration Function(int failed)? delay}) =>
+    mapRetryAsync(attempts, f, iterable, delay: delay);
+FxAsyncIterable<A> _$timeoutAsync<A>(
+        Duration limit, FxAsyncIterable<A> iterable) =>
+    timeoutAsync(limit, iterable);
 
 // strict/aggregate.dart
 List<A> _$toList<A>(Iterable<A> iterable) => toList(iterable);

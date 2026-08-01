@@ -5,8 +5,8 @@ description: FxDart reduce tutorial: fold a pipeline down to one value using its
 heading: <code>reduce</code>
 section: 7
 crumb: reduce
-prev: fork.html
-prevLabel: fork
+prev: ifEmpty.html
+prevLabel: ifEmpty
 next: fold.html
 nextLabel: fold
 ---
