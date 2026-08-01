@@ -7,8 +7,8 @@ section: 7
 crumb: groupBy
 prev: join.html
 prevLabel: join
-next: indexBy.html
-nextLabel: indexBy
+next: groupedBy.html
+nextLabel: groupedBy
 ---
   <p class="hero-sub">계산된 키를 기준으로 모든 원소를 <code>Map&lt;K, List&lt;A&gt;&gt;</code>에 나눠 담습니다.</p>
 

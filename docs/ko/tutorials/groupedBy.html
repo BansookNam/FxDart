@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>groupedBy — FxDart 101</title>
+  <meta name="description" content="FxDart groupedBy 튜토리얼 — 그룹을 체이닝 가능한 (key, items) 레코드로 받아 Map.entries 재진입 없이 그룹별 집계를 잇습니다. 라이브 플레이그라운드 포함.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/groupedBy.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/groupedBy.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/groupedBy.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/groupedBy.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/groupedBy.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/groupedBy.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/groupedBy.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/groupedBy.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=aba49ba340b8c95e">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../tutorials/groupedBy.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/groupedBy.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/tutorials/groupedBy.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/groupedBy.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/groupedBy.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/groupedBy.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/groupedBy.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 7 · 집계 › <strong>groupedBy</strong></p>
+  <h1><code>groupedBy</code></h1>
+  <p class="hero-sub">그룹을 체이닝 가능한 <code>(key, items)</code> 레코드로 — 파이프라인을 떠나지 않고 그룹별 집계를 잇습니다.</p>
+
+  <div class="signature">List&lt;({K key, List&lt;A&gt; items})&gt; groupedBy&lt;A, K&gt;(K Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;List&lt;({K key, List&lt;A&gt; items})&gt;&gt; groupedByAsync&lt;A, K&gt;(FutureOr&lt;K&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;({K key, List&lt;T&gt; items})&gt; Fx&lt;T&gt;.groupedBy&lt;K&gt;(K Function(T a) f)                 // chain (sync)
+Future&lt;List&lt;({K key, List&lt;T&gt; items})&gt;&gt; FxAsync&lt;T&gt;.groupedBy&lt;K&gt;(FutureOr&lt;K&gt; Function(T a) f)  // chain (async)</div>
+
+  <h2>강의</h2>
+  <p>
+    <code><a href="groupBy.html">groupBy</a></code>는 터미널입니다.
+    <code>Map</code>을 건네주는 순간 체인이 끝나고, "그룹별 합계를 내서
+    정렬하고 상위 3개"를 원하는 순간 <code>kv.key</code> /
+    <code>kv.value</code> 격식을 갖춰 <code>fx(map.entries)</code>로
+    파이프라인에 재진입하게 됩니다. <code>groupedBy</code>는 같은 그룹핑을
+    <strong>체이닝 가능한 뷰</strong>로 제공합니다. 각 그룹은 이름 있는
+    레코드 <code>(key:&nbsp;…, items:&nbsp;…)</code>이므로 그룹별 집계,
+    정렬, take가 바로 그 체인에서 이어지고 — 하류 코드는 위치 기반
+    <code>$1</code> / <code>$2</code> 대신 <code>g.key</code> /
+    <code>g.items</code>로 읽힙니다.
+  </p>
+  <p>
+    그룹은 <code>groupBy</code>의 맵이 순회되는 것과 똑같이
+    <strong>키를 처음 만난 순서</strong>로 나옵니다.
+    <code><a href="sortBy.html">sortBy</a></code>처럼 첫 그룹을 내놓기
+    전에 모든 값을 봐야 하므로 그룹핑 자체는 즉시 평가되고, 그 주변의
+    체인은 계속 합성 가능합니다.
+  </p>
+  <p>
+    Dart 고유의 추가 기능입니다(FxTS에는 대응물이 없습니다) — 키로
+    조회할 맵이 필요하면 <code>groupBy</code>를, 그룹이 더 긴 파이프라인의
+    중간 단계일 뿐이라면 <code>groupedBy</code>를 잡으세요.
+  </p>
+
+  <h2>데모 1 · 그룹 → 집계 → 순위, 체인 하나로</h2>
+  <div class="playground" data-pg="aa1dc4ee837af70d">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final spending = [
+    (cat: 'food', amount: 20),
+    (cat: 'rent', amount: 900),
+    (cat: 'food', amount: 30),
+    (cat: 'fun', amount: 15),
+    (cat: 'food', amount: 12),
+  ];
+
+  // groupBy would stop the chain at a Map. groupedBy keeps going:
+  final ranked = fx(spending)
+      .groupedBy((e) => e.cat) // Fx<({String key, List items})>
+      .map((g) => (g.key, fx(g.items).sumBy((e) => e.amount)))
+      .sortByDesc((c) => c.$2)
+      .toList();
+
+  print(ranked); // [(rent, 900), (food, 62), (fun, 15)]
+
+  // Groups come out in first-seen key order, matching groupBy's map:
+  for (final g in fx(spending).groupedBy((e) => e.cat)) {
+    print('${g.key}: ${g.items.length} entries');
+  }
+  // food: 3 entries / rent: 1 entries / fun: 1 entries
+}
+</textarea>
+  </div>
+
+  <h2>데모 2 · 비동기</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() async {
+  final words = ['ab', 'cd', 'e', 'fg', 'hij'];
+
+  // The async twin is a terminal (like the async sortBy): the groups come
+  // back as one Future<List> of the same named records.
+  final groups =
+      await fx(words).toAsync().map((w) => w.toUpperCase()).groupedBy(
+            (w) => w.length,
+          );
+
+  for (final g in groups) {
+    print('len ${g.key}: ${g.items}');
+  }
+  // len 2: [AB, CD, FG]
+  // len 1: [E]
+  // len 3: [HIJ]
+}
+</textarea>
+  </div>
+
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>Map.entries</code>를 건드리지 않고 지출 1위 카테고리를 찾아보세요.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final entries = [
+    (cat: 'food', amount: 25.0),
+    (cat: 'transport', amount: 60.0),
+    (cat: 'food', amount: 40.0),
+    (cat: 'fun', amount: 30.0),
+  ];
+
+  // TODO: find the category with the highest total — one chain:
+  // groupedBy → map to (key, total) → maxBy. No Map.entries anywhere.
+  final top = ('?', 0.0);
+
+  print('${top.$1} spent most: ${top.$2}'); // should print: food spent most: 65.0
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>관련 항목:</strong>
+    <a href="groupBy.html"><code>groupBy</code></a> — 같은 그룹핑을 키 있는 <code>Map</code>으로 ·
+    <a href="countBy.html"><code>countBy</code></a> — 유일한 집계가 개수일 때 ·
+    <a href="sortByDesc.html"><code>sortByDesc</code></a> — 순위 매기기의 자연스러운 다음 단계
+  </div>
+
+  <nav class="tut-nav">
+    <a href="groupBy.html">← 이전: groupBy</a>
+    <a href="indexBy.html">다음: indexBy →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=aba49ba340b8c95e";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -7,8 +7,8 @@ section: 3
 crumb: pluck
 prev: peek.html
 prevLabel: peek
-next: filter.html
-nextLabel: filter
+next: attach.html
+nextLabel: attach
 ---
   <p class="hero-sub">Extracts the value under one key from every map in an iterable — a one-liner for the common "get me just this field" query.</p>
 

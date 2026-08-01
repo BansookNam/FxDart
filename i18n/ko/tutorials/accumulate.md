@@ -57,6 +57,20 @@ nextLabel: Either × pipelines
   <h2>데모 3 · mapOrAccumulate, bindNel &amp; toEitherNel</h2>
   {{playground:2}}
 
+  <h2>데모 4 · dependent — 형제 값을 읽는 규칙</h2>
+  <p>
+    브랜치는 형제의 <code>Accumulated.value</code>를 읽는 순간 폭발합니다 —
+    누적의 단 하나뿐인 강한 규칙입니다. 하지만 실제 검증에는 의존 규칙이
+    있습니다("<em>지출</em>에는 양수 <em>금액</em>이 필요하다"). 그래서
+    폼들은 번번이 수동 <code>if&nbsp;(!acc.hasErrors)</code> 가드로
+    내려가곤 했습니다. <code>acc.dependent(block)</code>은 그 가드에 이름을
+    붙인 것입니다. 블록은 지금까지의 모든 브랜치가 성공했을 때만 실행되고 —
+    그래서 그 안의 형제 <code>.value</code> 읽기는 구조적으로 안전합니다 —
+    아니면 통째로 건너뜁니다. (Arrow에는 대응물이 없습니다. Arrow
+    사용자들도 같은 가드를 손으로 굴립니다.)
+  </p>
+  {{playground:4}}
+
   <h2>직접 해 보기</h2>
   <p>
     연습: <code>signup</code>의 두 분기를 완성해서 두 번째 호출이

@@ -1,0 +1,4 @@
+Iterable&lt;(A, B)&gt; attach&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;(A, B)&gt; attachAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;(T, R)&gt; Fx&lt;T&gt;.attach&lt;R&gt;(R Function(T a) f)                       // chain (sync)
+FxAsync&lt;(T, R)&gt; FxAsync&lt;T&gt;.attach&lt;R&gt;(FutureOr&lt;R&gt; Function(T a) f)   // chain (async)

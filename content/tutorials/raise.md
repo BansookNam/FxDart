@@ -57,6 +57,19 @@ nextLabel: nullable
   <h2>Demo 3 · recover, withError &amp; raise</h2>
   {{playground:2}}
 
+  <h2>Demo 4 · eitherCatching — the exception boundary, pre-combined</h2>
+  <p>
+    Real parsing fails two ways at once: your rules <em>raise</em> typed
+    errors, while the platform (<code>int.parse</code>, <code>jsonDecode</code>)
+    <em>throws</em>. <code>eitherCatching</code> is <code>either</code> +
+    <code>catching</code> as one builder — the block may raise or throw,
+    and the second argument maps anything thrown into the same typed error.
+    The raise signal itself is never handed to it. <code>recover</code>
+    accepts the same optional <code>onThrow:</code> clause, completing
+    Arrow&nbsp;2.x's three-clause <code>recover(block, recover, catch)</code>.
+  </p>
+  {{playground:4}}
+
   <h2>Try it yourself</h2>
   <p>
     Exercise: make <code>checkAge</code> fail with a typed error instead of

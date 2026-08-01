@@ -50,6 +50,18 @@ nextLabel: accumulation
   <h2>데모 2 · map, +, 그리고 파이프라인</h2>
   {{playground:1}}
 
+  <h2>데모 3 · toNelOrNull — 어떤 Iterable이든</h2>
+  <p>
+    <code>Nel.orNull</code>은 <code>List</code>를 받기 때문에, 누적
+    파이프라인은 오류를 패널로 만들기 전에 항상 <code>.toList()</code>
+    셔플로 끝나야 했습니다. <code>toNelOrNull()</code> 확장(Arrow의
+    <code>toNonEmptyListOrNull</code>)은 어떤 <code>Iterable</code>이든 —
+    지연 <code>fx</code> 체인 포함 — 받아 복사한 뒤 <code>Nel?</code>을
+    바로 돌려줍니다. "오류 없음"은 <code>null</code>, 아니면 비어 있지
+    않음이 보장된 목록입니다.
+  </p>
+  {{playground:3}}
+
   <h2>직접 해 보기</h2>
   <p>
     연습: <code>summarize</code>를 완성해 보세요 — <code>null</code> 경우가

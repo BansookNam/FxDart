@@ -1,3 +1,4 @@
 Either&lt;E, A&gt; either&lt;E, A&gt;(A Function(Raise&lt;E&gt; r) block)
 Future&lt;Either&lt;E, A&gt;&gt; eitherAsync&lt;E, A&gt;(FutureOr&lt;A&gt; Function(Raise&lt;E&gt; r) block)
-on Raise&lt;E&gt;: bind · bindAll · ensure · ensureNotNull · recover · withError · raise
+Either&lt;E, A&gt; eitherCatching&lt;E, A&gt;(block, E Function(Object thrown, StackTrace st) onThrow)   (+ eitherCatchingAsync)
+on Raise&lt;E&gt;: bind · bindAll · ensure · ensureNotNull · recover(block, onRaise, {onThrow}) · withError · raise

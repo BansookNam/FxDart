@@ -1,0 +1,4 @@
+List&lt;({K key, List&lt;A&gt; items})&gt; groupedBy&lt;A, K&gt;(K Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;List&lt;({K key, List&lt;A&gt; items})&gt;&gt; groupedByAsync&lt;A, K&gt;(FutureOr&lt;K&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;({K key, List&lt;T&gt; items})&gt; Fx&lt;T&gt;.groupedBy&lt;K&gt;(K Function(T a) f)                 // chain (sync)
+Future&lt;List&lt;({K key, List&lt;T&gt; items})&gt;&gt; FxAsync&lt;T&gt;.groupedBy&lt;K&gt;(FutureOr&lt;K&gt; Function(T a) f)  // chain (async)

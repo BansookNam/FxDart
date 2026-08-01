@@ -1,2 +1,3 @@
-on Fx&lt;Either&lt;L, R&gt;&gt;: rights() · lefts() · separated() · sequence()
+on Fx&lt;Either&lt;L, R&gt;&gt;: rights() · lefts() · separated() · sequence() · flattenOrAccumulate()
+on FxAsync&lt;Either&lt;L, R&gt;&gt;: rights() · lefts() · separated() · sequence() · flattenOrAccumulate()
 on Fx&lt;T&gt; / FxAsync&lt;T&gt;: Either&lt;Nel&lt;E&gt;, List&lt;R&gt;&gt; mapOrAccumulate(transform, {concurrency})

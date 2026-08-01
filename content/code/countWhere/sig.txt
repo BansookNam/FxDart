@@ -1,0 +1,4 @@
+int countWhere&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;int&gt; countWhereAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+int Fx&lt;T&gt;.countWhere(bool Function(T a) f)                    // chain (sync)
+Future&lt;int&gt; FxAsync&lt;T&gt;.countWhere(FutureOr&lt;bool&gt; Function(T a) f)  // chain (async)

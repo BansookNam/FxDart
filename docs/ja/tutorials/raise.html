@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=19182d43db0b4d3e">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=aba49ba340b8c95e">
 </head>
 <body>
 <header class="site-header">
@@ -57,7 +57,8 @@
 
   <div class="signature">Either&lt;E, A&gt; either&lt;E, A&gt;(A Function(Raise&lt;E&gt; r) block)
 Future&lt;Either&lt;E, A&gt;&gt; eitherAsync&lt;E, A&gt;(FutureOr&lt;A&gt; Function(Raise&lt;E&gt; r) block)
-on Raise&lt;E&gt;: bind · bindAll · ensure · ensureNotNull · recover · withError · raise</div>
+Either&lt;E, A&gt; eitherCatching&lt;E, A&gt;(block, E Function(Object thrown, StackTrace st) onThrow)   (+ eitherCatchingAsync)
+on Raise&lt;E&gt;: bind · bindAll · ensure · ensureNotNull · recover(block, onRaise, {onThrow}) · withError · raise</div>
 
   <h2>Lecture</h2>
   <p>
@@ -90,7 +91,7 @@ on Raise&lt;E&gt;: bind · bindAll · ensure · ensureNotNull · recover · with
   </p>
 
   <h2>Demo 1 · ensure &amp; ensureNotNull</h2>
-  <div class="playground" data-pg="9c688ee6c98dfd49">
+  <div class="playground" data-pg="80bff483a8f0c9a4">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -166,6 +167,50 @@ void main() {
 </textarea>
   </div>
 
+  <h2>Demo 4 · eitherCatching — the exception boundary, pre-combined</h2>
+  <p>
+    Real parsing fails two ways at once: your rules <em>raise</em> typed
+    errors, while the platform (<code>int.parse</code>, <code>jsonDecode</code>)
+    <em>throws</em>. <code>eitherCatching</code> is <code>either</code> +
+    <code>catching</code> as one builder — the block may raise or throw,
+    and the second argument maps anything thrown into the same typed error.
+    The raise signal itself is never handed to it. <code>recover</code>
+    accepts the same optional <code>onThrow:</code> clause, completing
+    Arrow&nbsp;2.x's three-clause <code>recover(block, recover, catch)</code>.
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+/// One builder for both failure channels: a raise stays typed, a THROWN
+/// exception is mapped into the same error type by the second argument.
+Either<String, int> parsePort(String raw) => eitherCatching(
+      (r) {
+        final port = int.parse(raw); // may throw FormatException
+        r.ensure(port > 0 && port < 65536, () => 'port out of range: $port');
+        return port;
+      },
+      (thrown, _) => 'not a number: $raw',
+    );
+
+void main() {
+  print(parsePort('8080')); // Right(8080)
+  print(parsePort('99999')); // Left(port out of range: 99999) — raised
+  print(parsePort('http')); // Left(not a number: http) — thrown, mapped
+
+  // was: either((r) => catching(() => ..., (e, _) => r.raise(...)))
+
+  // recover gained the same third clause (Arrow's recover/catch):
+  final fallback = either<String, int>((r) => r.recover(
+        (inner) => int.parse('x'), // throws
+        (raised) => -1,
+        onThrow: (thrown, _) => 0,
+      ));
+  print(fallback); // Right(0)
+}
+</textarea>
+  </div>
+
   <h2>Try it yourself</h2>
   <p>
     Exercise: make <code>checkAge</code> fail with a typed error instead of
@@ -220,7 +265,7 @@ void main() {
   <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=19182d43db0b4d3e";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=aba49ba340b8c95e";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

@@ -7,8 +7,8 @@ section: 7
 crumb: groupBy
 prev: join.html
 prevLabel: join
-next: indexBy.html
-nextLabel: indexBy
+next: groupedBy.html
+nextLabel: groupedBy
 ---
   <p class="hero-sub">Reparte cada elemento en un <code>Map&lt;K, List&lt;A&gt;&gt;</code> según una clave calculada.</p>
 

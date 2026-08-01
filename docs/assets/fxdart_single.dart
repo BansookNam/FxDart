@@ -512,6 +512,68 @@ FxAsyncIterable<B> mapEffectAsync<A, B>(
         FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
     mapAsync(f, iterable);
 
+/// Maps [f] over [iterable] with up to [concurrency] elements in flight at
+/// once, yielding results in source order — the pre-combined form of
+/// `toAsync` → `mapAsync` → `concurrentAsync`.
+///
+/// Dart-native addition (FxTS pipes `concurrent` as a separate step).
+///
+/// ```dart
+/// await toListAsync(mapConcurrent(3, fetchProfile, users));
+/// ```
+FxAsyncIterable<B> mapConcurrent<A, B>(
+        int concurrency, FutureOr<B> Function(A a) f, Iterable<A> iterable) =>
+    concurrentAsync(concurrency, mapAsync(f, toAsync(iterable)));
+
+/// Async-source counterpart of [mapConcurrent] — the pre-combined form of
+/// `mapAsync` → `concurrentAsync`.
+FxAsyncIterable<B> mapConcurrentAsync<A, B>(int concurrency,
+        FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    concurrentAsync(concurrency, mapAsync(f, iterable));
+
+/// Lazily pairs each element with the value [f] derives from it — the input
+/// stays beside its result, so no hand-built `(x, f(x))` records.
+///
+/// Dart-native addition (no FxTS counterpart).
+///
+/// ```dart
+/// attach((w) => w.length, ['a', 'bb']); // (('a', 1), ('bb', 2))
+/// ```
+Iterable<(A, B)> attach<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    _AttachIterable(f, iterable);
+
+class _AttachIterable<A, B> extends Iterable<(A, B)> {
+  _AttachIterable(this._f, this._source);
+  final B Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<(A, B)> get iterator => _AttachIterator(_f, _source.iterator);
+}
+
+class _AttachIterator<A, B> implements Iterator<(A, B)> {
+  _AttachIterator(this._f, this._it);
+  final B Function(A) _f;
+  final Iterator<A> _it;
+  @override
+  late (A, B) current;
+  @override
+  bool moveNext() {
+    if (_it.moveNext()) {
+      final v = _it.current;
+      current = (v, _f(v));
+      return true;
+    }
+    return false;
+  }
+}
+
+/// Async counterpart of [attach]. Built on [mapAsync], so overlapping
+/// `next()` calls start overlapping upstream pulls — it composes with
+/// `concurrentAsync` like any other async operator.
+FxAsyncIterable<(A, B)> attachAsync<A, B>(
+        FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    mapAsync((A a) async => (a, await f(a)), iterable);
+
 /// Iterates over each element, applying [f] without changing the values.
 ///
 /// Port of FxTS `peek`.
@@ -2705,6 +2767,27 @@ Future<int> sizeAsync<A>(FxAsyncIterable<A> iterable) async {
   return n;
 }
 
+/// Counts the values [f] holds for — `filter` + `size` in one walk.
+///
+/// Dart-native addition (Kotlin's `count { }`).
+int countWhere<A>(bool Function(A a) f, Iterable<A> iterable) {
+  var n = 0;
+  for (final a in iterable) {
+    if (f(a)) n++;
+  }
+  return n;
+}
+
+/// Async counterpart of [countWhere].
+Future<int> countWhereAsync<A>(
+    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  var n = 0;
+  await eachAsync((A a) async {
+    if (await f(a)) n++;
+  }, iterable);
+  return n;
+}
+
 /// Returns all elements joined into a string, separated by [sep].
 ///
 /// Port of FxTS `join`.
@@ -2733,6 +2816,30 @@ Future<Map<K, List<A>>> groupByAsync<A, K>(
       (A a) async => result.putIfAbsent(await f(a), () => []).add(a), iterable);
   return result;
 }
+
+/// Groups values into `(key, items)` records, in first-seen key order —
+/// the chainable view of [groupBy], so per-group aggregation continues in
+/// the same pipeline instead of re-entering through `Map.entries`.
+///
+/// Dart-native addition (no FxTS counterpart).
+///
+/// ```dart
+/// groupedBy((w) => w.length, ['ab', 'cd', 'e']);
+/// // [(key: 2, items: [ab, cd]), (key: 1, items: [e])]
+/// ```
+List<({K key, List<A> items})> groupedBy<A, K>(
+        K Function(A a) f, Iterable<A> iterable) =>
+    [
+      for (final e in groupBy(f, iterable).entries) (key: e.key, items: e.value)
+    ];
+
+/// Async counterpart of [groupedBy].
+Future<List<({K key, List<A> items})>> groupedByAsync<A, K>(
+        FutureOr<K> Function(A a) f, FxAsyncIterable<A> iterable) async =>
+    [
+      for (final e in (await groupByAsync(f, iterable)).entries)
+        (key: e.key, items: e.value)
+    ];
 
 /// Indexes values by [f]; later duplicates overwrite earlier ones.
 ///
@@ -2804,7 +2911,19 @@ int _compareBy<A>(Object? Function(A a) f, A a, A b) => _compareKeys(f(a), f(b))
 /// Returns a new list sorted by the key extractor [f] (ascending).
 ///
 /// Port of FxTS `sortBy`.
-List<A> sortBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
+List<A> sortBy<A>(Object? Function(A a) f, Iterable<A> iterable) =>
+    _sortByImpl(f, iterable, false);
+
+/// Returns a new list sorted by the key extractor [f], descending.
+///
+/// The symmetric twin of [sortBy] (Kotlin's `sortedByDescending`) — works
+/// for any comparable key, unlike the numeric-only `sortBy((a) => -key)`
+/// negation trick.
+List<A> sortByDesc<A>(Object? Function(A a) f, Iterable<A> iterable) =>
+    _sortByImpl(f, iterable, true);
+
+List<A> _sortByImpl<A>(
+    Object? Function(A a) f, Iterable<A> iterable, bool desc) {
   // Decorate-sort-undecorate: extract each key once, sort an index list, and
   // read the permutation back. Sorting the values directly with a
   // `_compareBy` comparator would call [f] twice per comparison —
@@ -2821,6 +2940,8 @@ List<A> sortBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
   // compareTo — the generic path pays an `is Comparable` test and a dynamic
   // compareTo on every comparison. compareTo semantics (NaN, -0.0) are the
   // same on every path. No Int64List: the playground build targets JS.
+  // Descending picks a swapped-operand comparator once per sort, so the
+  // per-comparison cost is identical to ascending.
   var allDouble = true, allInt = true, allString = true;
   for (final k in keys) {
     if (k is! double) allDouble = false;
@@ -2833,21 +2954,29 @@ List<A> sortBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
     for (var i = 0; i < length; i++) {
       dk[i] = keys[i] as double;
     }
-    indices.sort((i, j) => dk[i].compareTo(dk[j]));
+    indices.sort(desc
+        ? (i, j) => dk[j].compareTo(dk[i])
+        : (i, j) => dk[i].compareTo(dk[j]));
   } else if (allInt) {
     final ik = List<int>.filled(length, 0);
     for (var i = 0; i < length; i++) {
       ik[i] = keys[i] as int;
     }
-    indices.sort((i, j) => ik[i].compareTo(ik[j]));
+    indices.sort(desc
+        ? (i, j) => ik[j].compareTo(ik[i])
+        : (i, j) => ik[i].compareTo(ik[j]));
   } else if (allString) {
     final sk = List<String>.filled(length, '');
     for (var i = 0; i < length; i++) {
       sk[i] = keys[i] as String;
     }
-    indices.sort((i, j) => sk[i].compareTo(sk[j]));
+    indices.sort(desc
+        ? (i, j) => sk[j].compareTo(sk[i])
+        : (i, j) => sk[i].compareTo(sk[j]));
   } else {
-    indices.sort((i, j) => _compareKeys(keys[i], keys[j]));
+    indices.sort(desc
+        ? (i, j) => _compareKeys(keys[j], keys[i])
+        : (i, j) => _compareKeys(keys[i], keys[j]));
   }
   return [for (final i in indices) items[i]];
 }
@@ -2856,6 +2985,11 @@ List<A> sortBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
 Future<List<A>> sortByAsync<A>(
         Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
     sortAsync((a, b) => _compareBy(f, a, b), iterable);
+
+/// Async counterpart of [sortByDesc].
+Future<List<A>> sortByDescAsync<A>(
+        Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
+    sortAsync((a, b) => _compareBy(f, b, a), iterable);
 
 /// Splits values into `(pass, fail)` lists by predicate [f].
 ///
@@ -3894,6 +4028,18 @@ extension type NonEmptyList<T>._(List<T> _all) implements Iterable<T> {
       List.of(_all, growable: growable);
 }
 
+/// The bridge from plain iterables into the [NonEmptyList] world.
+extension IterableToNel<T> on Iterable<T> {
+  /// Copies this iterable into a [NonEmptyList], or `null` when it is
+  /// empty — the `Iterable`-friendly form of [NonEmptyList.orNull] (port of
+  /// Arrow's `toNonEmptyListOrNull`), so accumulated error lists need no
+  /// `.toList()` shuffle first.
+  NonEmptyList<T>? toNelOrNull() {
+    final copy = List.of(this);
+    return copy.isEmpty ? null : NonEmptyList._(copy);
+  }
+}
+
 // ---- lib/src/typed/raise.dart ----
 
 
@@ -4073,6 +4219,41 @@ Future<Either<E, A>> eitherAsync<E, A>(
       onValue: (value) => Right(value),
     );
 
+/// [either] with an exception boundary: a *thrown* exception is transformed
+/// by [onThrow] into the scope's typed error. The pre-combined form of the
+/// `either` + [catching] envelope (Arrow: `either { }` with `Raise.catch`).
+///
+/// The library's own raise signal is never handed to [onThrow] — a raise
+/// from this scope becomes [Left] as usual, and a foreign scope's signal is
+/// rethrown untouched.
+///
+/// ```dart
+/// Either<RowError, Entry> parseRow(int line, String raw) => eitherCatching(
+///   (r) => entryFrom(r, raw),  // may raise RowError OR throw FormatException
+///   (e, _) => RowError.one(line, FieldError('row', 'could not parse: $e')),
+/// );
+/// ```
+Either<E, A> eitherCatching<E, A>(A Function(Raise<E> r) block,
+        E Function(Object thrown, StackTrace stackTrace) onThrow) =>
+    foldRaise<E, A, Either<E, A>>(
+      block,
+      onRaise: (error) => Left(error),
+      onValue: (value) => Right(value),
+      onThrow: (thrown, stackTrace) => Left(onThrow(thrown, stackTrace)),
+    );
+
+/// Async twin of [eitherCatching].
+Future<Either<E, A>> eitherCatchingAsync<E, A>(
+        FutureOr<A> Function(Raise<E> r) block,
+        FutureOr<E> Function(Object thrown, StackTrace stackTrace) onThrow) =>
+    foldRaiseAsync<E, A, Either<E, A>>(
+      block,
+      onRaise: (error) => Left(error),
+      onValue: (value) => Right(value),
+      onThrow: (thrown, stackTrace) async =>
+          Left(await onThrow(thrown, stackTrace)),
+    );
+
 /// The info-free raise scope used by [nullable] — the port of Arrow's
 /// `SingletonRaise` (errors carry no information).
 final class SingletonRaise implements Raise<void> {
@@ -4176,9 +4357,16 @@ extension RaiseOps<E> on Raise<E> {
       value ?? raise(error());
 
   /// Runs [block] in a nested scope; a raised error is handed to [onRaise]
-  /// instead of propagating. Thrown exceptions still propagate.
-  A recover<A>(A Function(Raise<E> r) block, A Function(E error) onRaise) =>
-      foldRaise<E, A, A>(block, onRaise: onRaise, onValue: (value) => value);
+  /// instead of propagating.
+  ///
+  /// Thrown exceptions propagate unless [onThrow] is given, which completes
+  /// Arrow 2.x's three-clause `recover(block, recover, catch)`. The raise
+  /// signal itself is never handed to [onThrow] — this scope's raise goes to
+  /// [onRaise], a foreign scope's signal is rethrown untouched.
+  A recover<A>(A Function(Raise<E> r) block, A Function(E error) onRaise,
+          {A Function(Object thrown, StackTrace stackTrace)? onThrow}) =>
+      foldRaise<E, A, A>(block,
+          onRaise: onRaise, onValue: (value) => value, onThrow: onThrow);
 
   /// Runs [block] in a scope with a DIFFERENT error type `E2`, mapping any
   /// raised `E2` into this scope's `E` via [transform] — the error-type
@@ -4241,6 +4429,25 @@ abstract interface class Accumulator<E> {
 
   /// Whether any branch has failed so far.
   bool get hasErrors;
+
+  /// Runs [block] only when no branch has failed so far — the home for
+  /// *dependent* rules that read sibling [Accumulated.value]s, which is only
+  /// safe once every independent branch succeeded.
+  ///
+  /// When errors already exist the block is skipped entirely and an errored
+  /// [Accumulated] is returned (reading its `value` detonates as usual).
+  /// Errors raised inside a running [dependent] block still accumulate.
+  ///
+  /// No Arrow counterpart — Arrow users hand-roll the same `hasErrors`
+  /// guard; named here because dependent validation is the single most
+  /// common reason to drop from `zipOrAccumulateN` down to raw [accumulate].
+  ///
+  /// ```dart
+  /// final type   = acc.accumulating((r) => vType(r, raw));
+  /// final amount = acc.accumulating((r) => vAmount(r, raw));
+  /// acc.dependent((r) => vAmountRequired(r, amount.value, type.value));
+  /// ```
+  Accumulated<A> dependent<A>(A Function(AccumulatingRaise<E> r) block);
 }
 
 /// A [Raise] whose errors join a [NonEmptyList] accumulator — what
@@ -4299,6 +4506,10 @@ final class _AccumulatorImpl<E> implements Accumulator<E> {
         },
         onValue: (value) => _AccumulatedOk(value),
       );
+
+  @override
+  Accumulated<A> dependent<A>(A Function(AccumulatingRaise<E> r) block) =>
+      hasErrors ? _AccumulatedErr<A>(_raiseAll) : accumulating(block);
 }
 
 /// The accumulation vocabulary, available on any `Raise<NonEmptyList<E>>`
@@ -4478,6 +4689,64 @@ Future<Either<L, List<R>>> sequenceEitherAsync<L, R>(
   return Right(out);
 }
 
+/// Async twin of [rights].
+Future<List<R>> rightsAsync<L, R>(
+    FxAsyncIterable<Either<L, R>> iterable) async {
+  final out = <R>[];
+  final it = iterable.iterator;
+  var res = await it.next();
+  while (!res.done) {
+    if (res.value case Right(:final value)) out.add(value);
+    res = await it.next();
+  }
+  return out;
+}
+
+/// Async twin of [lefts].
+Future<List<L>> leftsAsync<L, R>(
+    FxAsyncIterable<Either<L, R>> iterable) async {
+  final out = <L>[];
+  final it = iterable.iterator;
+  var res = await it.next();
+  while (!res.done) {
+    if (res.value case Left(:final value)) out.add(value);
+    res = await it.next();
+  }
+  return out;
+}
+
+/// Async twin of [separateEither].
+Future<(List<L>, List<R>)> separateEitherAsync<L, R>(
+    FxAsyncIterable<Either<L, R>> iterable) async {
+  final ls = <L>[];
+  final rs = <R>[];
+  final it = iterable.iterator;
+  var res = await it.next();
+  while (!res.done) {
+    switch (res.value) {
+      case Left(:final value):
+        ls.add(value);
+      case Right(:final value):
+        rs.add(value);
+    }
+    res = await it.next();
+  }
+  return (ls, rs);
+}
+
+/// Collects every success, or EVERY failure — the fail-slow twin of
+/// [sequenceEither] over an existing collection of `Either`s (port of
+/// Arrow's `flattenOrAccumulate`).
+Either<NonEmptyList<E>, List<A>> flattenOrAccumulate<E, A>(
+        Iterable<Either<E, A>> iterable) =>
+    mapOrAccumulate((r, Either<E, A> e) => r.bind(e), iterable);
+
+/// Async twin of [flattenOrAccumulate]. Fail-slow: consumes the whole
+/// upstream so every [Left] is collected.
+Future<Either<NonEmptyList<E>, List<A>>> flattenOrAccumulateAsync<E, A>(
+        FxAsyncIterable<Either<E, A>> iterable) =>
+    mapOrAccumulateAsync((r, Either<E, A> e) => r.bind(e), iterable);
+
 /// Transforms every element of [iterable], collecting ALL failures instead
 /// of stopping at the first. The eager, pipeline-level twin of
 /// [AccumulatingRaiseOps.mapOrAccumulate].
@@ -4530,6 +4799,14 @@ extension FxEitherOps<L, R> on Fx<Either<L, R>> {
 
   /// Collects every success into one list, failing fast on the first [Left].
   Either<L, List<R>> sequence() => sequenceEither(this);
+
+  /// Collects every success, or EVERY failure — the fail-slow twin of
+  /// [sequence].
+  EitherNel<L, List<R>> flattenOrAccumulate() =>
+      // The top-level twin is shadowed by this member's name, so the
+      // composition is spelled out (the FxEitherOps.rights precedent).
+      either<NonEmptyList<L>, List<R>>(
+          (r) => r.mapOrAccumulate(this, (br, Either<L, R> e) => br.bind(e)));
 }
 
 /// Either-aware terminals for async chains of `Either` values.
@@ -4537,6 +4814,20 @@ extension FxAsyncEitherOps<L, R> on FxAsync<Either<L, R>> {
   /// Async twin of [FxEitherOps.sequence] — stops pulling on the first
   /// [Left].
   Future<Either<L, List<R>>> sequence() => sequenceEitherAsync(this);
+
+  /// Async twin of [FxEitherOps.rights].
+  Future<List<R>> rights() => rightsAsync(this);
+
+  /// Async twin of [FxEitherOps.lefts].
+  Future<List<L>> lefts() => leftsAsync(this);
+
+  /// Async twin of [FxEitherOps.separated].
+  Future<(List<L>, List<R>)> separated() => separateEitherAsync(this);
+
+  /// Async twin of [FxEitherOps.flattenOrAccumulate] — fail-slow, consumes
+  /// the whole upstream.
+  Future<EitherNel<L, List<R>>> flattenOrAccumulate() =>
+      flattenOrAccumulateAsync(this);
 }
 
 /// Fail-slow validation over a sync chain.
@@ -4721,11 +5012,45 @@ class Fx<T> extends Iterable<T> {
   /// A new chain sorted by the key [f] returns for each value.
   Fx<T> sortBy(Object? Function(T a) f) => Fx(_$sortBy(f, _inner));
 
+  /// A new chain sorted by the key [f], descending — any comparable key,
+  /// not just the numeric ones `sortBy((a) => -key)` can negate.
+  Fx<T> sortByDesc(Object? Function(T a) f) => Fx(_$sortByDesc(f, _inner));
+
+  /// Lazily pairs each value with the result of [f] — the value stays
+  /// beside what was derived from it.
+  Fx<(T, R)> attach<R>(R Function(T a) f) => Fx(_$attach(f, _inner));
+
+  /// Groups values into `(key, items)` records, in first-seen key order —
+  /// the chainable view of [groupBy] (no `Map.entries` re-entry).
+  Fx<({K key, List<T> items})> groupedBy<K>(K Function(T a) f) =>
+      Fx(_$groupedBy(f, _inner));
+
+  /// Values of this chain whose [f]-keys do not occur in [other], deduped.
+  Fx<T> differenceBy<B>(B Function(T a) f, Iterable<T> other) =>
+      Fx(_$differenceBy(f, other, _inner));
+
+  /// Values of this chain that do not occur in [other].
+  Fx<T> difference(Iterable<T> other) => Fx(_$difference(other, _inner));
+
+  /// Values of this chain whose [f]-keys also occur in [other], deduped.
+  Fx<T> intersectionBy<B>(B Function(T a) f, Iterable<T> other) =>
+      Fx(_$intersectionBy(f, other, _inner));
+
+  /// Values of this chain that also occur in [other].
+  Fx<T> intersection(Iterable<T> other) => Fx(_$intersection(other, _inner));
+
   // --- conversion ---------------------------------------------------------
 
   /// Switches to the async chain. Values stay plain; use the top-level
   /// `toAsync` for an `Iterable<Future<T>>`.
   FxAsync<T> toAsync() => FxAsync(_$toAsync(_inner));
+
+  /// Switches to the async chain and maps [f] with up to [concurrency]
+  /// values in flight at once, in source order — the pre-combined form of
+  /// `toAsync().map(f).concurrent(concurrency)`.
+  FxAsync<R> mapConcurrent<R>(
+          int concurrency, FutureOr<R> Function(T a) f) =>
+      FxAsync(_$mapConcurrent(concurrency, f, _inner));
 
   // --- terminal operators -------------------------------------------------
 
@@ -4747,6 +5072,9 @@ class Fx<T> extends Iterable<T> {
 
   /// Counts how many values fall under each key [f] returns.
   Map<K, int> countBy<K>(K Function(T a) f) => _$countBy(f, _inner);
+
+  /// Counts the values [f] holds for — `filter` + `size` in one walk.
+  int countWhere(bool Function(T a) f) => _$countWhere(f, _inner);
 
   /// Whether [f] holds for at least one value.
   bool some(bool Function(T a) f) => _$some(f, _inner);
@@ -4916,10 +5244,40 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Repeats the source endlessly.
   FxAsync<T> cycle() => FxAsync(_$cycleAsync(_inner));
 
+  /// Lazily pairs each value with the (possibly async) result of [f] —
+  /// the value stays beside what was derived from it. Parallel-safe:
+  /// composes with [concurrent].
+  FxAsync<(T, R)> attach<R>(FutureOr<R> Function(T a) f) =>
+      FxAsync(_$attachAsync(f, _inner));
+
+  /// Values of this chain whose [f]-keys do not occur in [other], deduped.
+  FxAsync<T> differenceBy<B>(
+          FutureOr<B> Function(T a) f, FxAsyncIterable<T> other) =>
+      FxAsync(_$differenceByAsync(f, other, _inner));
+
+  /// Values of this chain that do not occur in [other].
+  FxAsync<T> difference(FxAsyncIterable<T> other) =>
+      FxAsync(_$differenceAsync(other, _inner));
+
+  /// Values of this chain whose [f]-keys also occur in [other], deduped.
+  FxAsync<T> intersectionBy<B>(
+          FutureOr<B> Function(T a) f, FxAsyncIterable<T> other) =>
+      FxAsync(_$intersectionByAsync(f, other, _inner));
+
+  /// Values of this chain that also occur in [other].
+  FxAsync<T> intersection(FxAsyncIterable<T> other) =>
+      FxAsync(_$intersectionAsync(other, _inner));
+
   /// Evaluates the upstream chain up to [length] items at a time.
   ///
   /// Port of FxTS `concurrent`.
   FxAsync<T> concurrent(int length) => FxAsync(concurrentAsync(length, _inner));
+
+  /// Maps [f] with up to [concurrency] values in flight at once, in source
+  /// order — the pre-combined form of `map(f).concurrent(concurrency)`.
+  FxAsync<R> mapConcurrent<R>(
+          int concurrency, FutureOr<R> Function(T a) f) =>
+      FxAsync(_$mapConcurrentAsync(concurrency, f, _inner));
 
   /// Like [concurrent] but yields in completion order.
   FxAsync<T> concurrentPool(int length) =>
@@ -5007,8 +5365,21 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// A new list sorted by the key [f] returns for each value.
   Future<List<T>> sortBy(Object? Function(T a) f) => _$sortByAsync(f, _inner);
 
+  /// A new list sorted by the key [f], descending.
+  Future<List<T>> sortByDesc(Object? Function(T a) f) =>
+      _$sortByDescAsync(f, _inner);
+
+  /// Groups values into `(key, items)` records, in first-seen key order.
+  Future<List<({K key, List<T> items})>> groupedBy<K>(
+          FutureOr<K> Function(T a) f) =>
+      _$groupedByAsync(f, _inner);
+
   /// The number of values.
   Future<int> size() => _$sizeAsync(_inner);
+
+  /// Counts the values [f] holds for — `filter` + `size` in one walk.
+  Future<int> countWhere(FutureOr<bool> Function(T a) f) =>
+      _$countWhereAsync(f, _inner);
 
   // --- Dart-idiomatic aliases -------------------------------------------
   // FxAsync does not extend Iterable, so the Dart names are provided as
@@ -5292,6 +5663,17 @@ Iterable<B> _$scan<A, B>(
 FxAsyncIterable<B> _$scanAsync<A, B>(FutureOr<B> Function(B acc, A a) f,
         FutureOr<B> seed, FxAsyncIterable<A> iterable) =>
     scanAsync(f, seed, iterable);
+FxAsyncIterable<B> _$mapConcurrent<A, B>(
+        int concurrency, FutureOr<B> Function(A a) f, Iterable<A> iterable) =>
+    mapConcurrent(concurrency, f, iterable);
+FxAsyncIterable<B> _$mapConcurrentAsync<A, B>(int concurrency,
+        FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    mapConcurrentAsync(concurrency, f, iterable);
+Iterable<(A, B)> _$attach<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    attach(f, iterable);
+FxAsyncIterable<(A, B)> _$attachAsync<A, B>(
+        FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    attachAsync(f, iterable);
 
 // lazy/filter.dart
 Iterable<A> _$filter<A>(bool Function(A a) f, Iterable<A> iterable) =>
@@ -5312,6 +5694,28 @@ Iterable<A> _$uniqBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
 FxAsyncIterable<A> _$uniqByAsync<A, B>(
         FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
     uniqByAsync(f, iterable);
+Iterable<A> _$differenceBy<A, B>(
+        B Function(A a) f, Iterable<A> iterable1, Iterable<A> iterable2) =>
+    differenceBy(f, iterable1, iterable2);
+FxAsyncIterable<A> _$differenceByAsync<A, B>(FutureOr<B> Function(A a) f,
+        FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
+    differenceByAsync(f, iterable1, iterable2);
+Iterable<A> _$difference<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
+    difference(iterable1, iterable2);
+FxAsyncIterable<A> _$differenceAsync<A>(
+        FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
+    differenceAsync(iterable1, iterable2);
+Iterable<A> _$intersectionBy<A, B>(
+        B Function(A a) f, Iterable<A> iterable1, Iterable<A> iterable2) =>
+    intersectionBy(f, iterable1, iterable2);
+FxAsyncIterable<A> _$intersectionByAsync<A, B>(FutureOr<B> Function(A a) f,
+        FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
+    intersectionByAsync(f, iterable1, iterable2);
+Iterable<A> _$intersection<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
+    intersection(iterable1, iterable2);
+FxAsyncIterable<A> _$intersectionAsync<A>(
+        FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
+    intersectionAsync(iterable1, iterable2);
 
 // lazy/take_drop.dart
 Iterable<A> _$take<A>(int length, Iterable<A> iterable) =>
@@ -5472,6 +5876,22 @@ List<A> _$sortBy<A>(Object? Function(A a) f, Iterable<A> iterable) =>
 Future<List<A>> _$sortByAsync<A>(
         Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
     sortByAsync(f, iterable);
+List<A> _$sortByDesc<A>(Object? Function(A a) f, Iterable<A> iterable) =>
+    sortByDesc(f, iterable);
+Future<List<A>> _$sortByDescAsync<A>(
+        Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
+    sortByDescAsync(f, iterable);
+List<({K key, List<A> items})> _$groupedBy<A, K>(
+        K Function(A a) f, Iterable<A> iterable) =>
+    groupedBy(f, iterable);
+Future<List<({K key, List<A> items})>> _$groupedByAsync<A, K>(
+        FutureOr<K> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    groupedByAsync(f, iterable);
+int _$countWhere<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    countWhere(f, iterable);
+Future<int> _$countWhereAsync<A>(
+        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    countWhereAsync(f, iterable);
 (List<A>, List<A>) _$partition<A>(bool Function(A a) f, Iterable<A> iterable) =>
     partition(f, iterable);
 Future<(List<A>, List<A>)> _$partitionAsync<A>(

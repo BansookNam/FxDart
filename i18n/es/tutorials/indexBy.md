@@ -5,8 +5,8 @@ description: Tutorial de indexBy en FxDart: indexa cada elemento por una clave c
 heading: <code>indexBy</code>
 section: 7
 crumb: indexBy
-prev: groupBy.html
-prevLabel: groupBy
+prev: groupedBy.html
+prevLabel: groupedBy
 next: countBy.html
 nextLabel: countBy
 ---

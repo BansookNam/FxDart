@@ -1,0 +1,4 @@
+FxAsyncIterable&lt;B&gt; mapConcurrent&lt;A, B&gt;(int concurrency, FutureOr&lt;B&gt; Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;B&gt; mapConcurrentAsync&lt;A, B&gt;(int concurrency, FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+FxAsync&lt;R&gt; Fx&lt;T&gt;.mapConcurrent&lt;R&gt;(int concurrency, FutureOr&lt;R&gt; Function(T a) f)       // chain (sync source)
+FxAsync&lt;R&gt; FxAsync&lt;T&gt;.mapConcurrent&lt;R&gt;(int concurrency, FutureOr&lt;R&gt; Function(T a) f)  // chain (async source)

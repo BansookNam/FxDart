@@ -1,0 +1,3 @@
+stock value: $4280.10
+fallback prices used: 2
+max lookups in flight: 3

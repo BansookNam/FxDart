@@ -7,8 +7,8 @@ section: 7
 crumb: sortBy
 prev: sort.html
 prevLabel: sort
-next: partition.html
-nextLabel: partition
+next: sortByDesc.html
+nextLabel: sortByDesc
 ---
   <p class="hero-sub">비교자를 손으로 작성하는 대신, 추출한 키를 기준으로 오름차순 정렬합니다.</p>
 

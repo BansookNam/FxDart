@@ -51,6 +51,23 @@ nextLabel: the naming rationale
   <h2>Demo 3 · concurrent fail-slow validation</h2>
   {{playground:2}}
 
+  <h2>Demo 4 · flattenOrAccumulate &amp; the async extracts</h2>
+  <p>
+    When you already <em>have</em> the <code>Either</code>s, the fail-slow
+    terminal used to be spelled
+    <code>mapOrAccumulate((r,&nbsp;v)&nbsp;=&gt;&nbsp;r.bind(v))</code> — an
+    identity bind. <code>flattenOrAccumulate()</code> (Arrow's name) is
+    that terminal directly: every success, or <em>every</em> failure as a
+    <code>Nel</code>. It completes the trio — <code>separated()</code>
+    keeps both sides, <code>sequence()</code> fails fast,
+    <code>flattenOrAccumulate()</code> fails slow. And the async chain now
+    carries the whole extract family (<code>rights</code> /
+    <code>lefts</code> / <code>separated</code> / <code>sequence</code> /
+    <code>flattenOrAccumulate</code>), so an async validation feeds a
+    counts badge in one terminal.
+  </p>
+  {{playground:4}}
+
   <h2>Try it yourself</h2>
   <p>
     Exercise: sum what parsed, report what didn't.

@@ -54,6 +54,22 @@ nextLabel: the naming rationale
   <h2>데모 3 · 동시성 fail-slow 검증</h2>
   {{playground:2}}
 
+  <h2>데모 4 · flattenOrAccumulate와 비동기 추출 패밀리</h2>
+  <p>
+    이미 <code>Either</code>들을 <em>가지고</em> 있을 때, fail-slow 터미널은
+    <code>mapOrAccumulate((r,&nbsp;v)&nbsp;=&gt;&nbsp;r.bind(v))</code> —
+    항등 bind — 로 써야 했습니다. <code>flattenOrAccumulate()</code>(Arrow의
+    이름 그대로)가 그 터미널입니다. 모든 성공을, 아니면 <em>모든</em> 실패를
+    <code>Nel</code>로 돌려줍니다. 이것으로 삼총사가 완성됩니다 —
+    <code>separated()</code>는 양쪽을 다 보존하고, <code>sequence()</code>는
+    fail-fast, <code>flattenOrAccumulate()</code>는 fail-slow입니다. 그리고
+    비동기 체인에도 이제 추출 패밀리 전체(<code>rights</code> /
+    <code>lefts</code> / <code>separated</code> / <code>sequence</code> /
+    <code>flattenOrAccumulate</code>)가 있어, 비동기 검증이 터미널 하나로
+    카운트 배지를 채웁니다.
+  </p>
+  {{playground:4}}
+
   <h2>직접 해 보기</h2>
   <p>
     연습: 파싱된 것은 더하고, 파싱되지 않은 것은 보고해 보세요.

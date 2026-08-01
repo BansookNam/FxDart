@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=19182d43db0b4d3e">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=aba49ba340b8c95e">
 </head>
 <body>
 <header class="site-header">
@@ -55,7 +55,8 @@
 
   <div class="signature">Either&lt;E, A&gt; either&lt;E, A&gt;(A Function(Raise&lt;E&gt; r) block)
 Future&lt;Either&lt;E, A&gt;&gt; eitherAsync&lt;E, A&gt;(FutureOr&lt;A&gt; Function(Raise&lt;E&gt; r) block)
-on Raise&lt;E&gt;: bind · bindAll · ensure · ensureNotNull · recover · withError · raise</div>
+Either&lt;E, A&gt; eitherCatching&lt;E, A&gt;(block, E Function(Object thrown, StackTrace st) onThrow)   (+ eitherCatchingAsync)
+on Raise&lt;E&gt;: bind · bindAll · ensure · ensureNotNull · recover(block, onRaise, {onThrow}) · withError · raise</div>
 
   <h2>강의</h2>
   <p>
@@ -90,7 +91,7 @@ on Raise&lt;E&gt;: bind · bindAll · ensure · ensureNotNull · recover · with
   </p>
 
   <h2>데모 1 · ensure &amp; ensureNotNull</h2>
-  <div class="playground" data-pg="9c688ee6c98dfd49">
+  <div class="playground" data-pg="80bff483a8f0c9a4">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -166,6 +167,52 @@ void main() {
 </textarea>
   </div>
 
+  <h2>데모 4 · eitherCatching — 예외 경계를 미리 결합한 빌더</h2>
+  <p>
+    실제 파싱은 두 갈래로 동시에 실패합니다. 우리가 정한 규칙은 타입 있는
+    오류를 <em>raise</em>하고, 플랫폼(<code>int.parse</code>,
+    <code>jsonDecode</code>)은 <em>throw</em>합니다.
+    <code>eitherCatching</code>은 <code>either</code> +
+    <code>catching</code>을 하나로 합친 빌더입니다 — 블록은 raise하거나
+    throw할 수 있고, 두 번째 인자가 던져진 예외를 같은 타입의 오류로
+    변환합니다. raise 시그널 자체는 절대 여기에 전달되지 않습니다.
+    <code>recover</code>도 같은 선택적 <code>onThrow:</code> 절을 받아
+    Arrow&nbsp;2.x의 3절짜리 <code>recover(block, recover, catch)</code>를
+    완성합니다.
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+/// One builder for both failure channels: a raise stays typed, a THROWN
+/// exception is mapped into the same error type by the second argument.
+Either<String, int> parsePort(String raw) => eitherCatching(
+      (r) {
+        final port = int.parse(raw); // may throw FormatException
+        r.ensure(port > 0 && port < 65536, () => 'port out of range: $port');
+        return port;
+      },
+      (thrown, _) => 'not a number: $raw',
+    );
+
+void main() {
+  print(parsePort('8080')); // Right(8080)
+  print(parsePort('99999')); // Left(port out of range: 99999) — raised
+  print(parsePort('http')); // Left(not a number: http) — thrown, mapped
+
+  // was: either((r) => catching(() => ..., (e, _) => r.raise(...)))
+
+  // recover gained the same third clause (Arrow's recover/catch):
+  final fallback = either<String, int>((r) => r.recover(
+        (inner) => int.parse('x'), // throws
+        (raised) => -1,
+        onThrow: (thrown, _) => 0,
+      ));
+  print(fallback); // Right(0)
+}
+</textarea>
+  </div>
+
   <h2>직접 해 보기</h2>
   <p>
     연습: <code>checkAge</code>가 예외를 던지는 대신 타입 있는 에러로
@@ -221,7 +268,7 @@ void main() {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=19182d43db0b4d3e";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=aba49ba340b8c95e";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

@@ -5,8 +5,8 @@ description: FxDart partition tutorial: split a pipeline into a (pass, fail) rec
 heading: <code>partition</code>
 section: 7
 crumb: partition
-prev: sortBy.html
-prevLabel: sortBy
+prev: sortByDesc.html
+prevLabel: sortByDesc
 next: head.html
 nextLabel: head
 ---

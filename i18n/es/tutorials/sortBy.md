@@ -7,8 +7,8 @@ section: 7
 crumb: sortBy
 prev: sort.html
 prevLabel: sort
-next: partition.html
-nextLabel: partition
+next: sortByDesc.html
+nextLabel: sortByDesc
 ---
   <p class="hero-sub">Ordena de forma ascendente por una clave que extraes, en lugar de escribir un comparador a mano.</p>
 

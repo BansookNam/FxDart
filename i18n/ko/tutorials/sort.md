@@ -5,8 +5,8 @@ description: FxDart sort 튜토리얼 — 비교자를 기준으로 정렬하며
 heading: <code>sort</code>
 section: 7
 crumb: sort
-prev: countBy.html
-prevLabel: countBy
+prev: countWhere.html
+prevLabel: countWhere
 next: sortBy.html
 nextLabel: sortBy
 ---

@@ -5,8 +5,8 @@ description: FxDart sort tutorial: comparator-based sorting that always returns 
 heading: <code>sort</code>
 section: 7
 crumb: sort
-prev: countBy.html
-prevLabel: countBy
+prev: countWhere.html
+prevLabel: countWhere
 next: sortBy.html
 nextLabel: sortBy
 ---

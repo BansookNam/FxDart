@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>sortByDesc — FxDart 101</title>
+  <meta name="description" content="FxDart sortByDesc tutorial: sort by any comparable key, descending — no numeric negation trick — with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/sortByDesc.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/sortByDesc.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/sortByDesc.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/sortByDesc.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/sortByDesc.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/sortByDesc.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/sortByDesc.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/sortByDesc.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/sortByDesc.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=aba49ba340b8c95e">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Início</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../tutorials/sortByDesc.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/sortByDesc.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/sortByDesc.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/sortByDesc.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/sortByDesc.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/sortByDesc.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="../../ru/tutorials/sortByDesc.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 7 · Agregando › <strong>sortByDesc</strong></p>
+  <h1><code>sortByDesc</code></h1>
+  <p class="hero-sub">Sort by any comparable key, descending — the negation trick, retired.</p>
+
+  <div class="signature">List&lt;A&gt; sortByDesc&lt;A&gt;(Object? Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;List&lt;A&gt;&gt; sortByDescAsync&lt;A&gt;(Object? Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx&lt;T&gt;.sortByDesc(Object? Function(T a) f)                 // chain (sync)
+Future&lt;List&lt;T&gt;&gt; FxAsync&lt;T&gt;.sortByDesc(Object? Function(T a) f)  // chain (async)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    Rankings want their biggest value first, and until now the only
+    one-liner was <code>sortBy((a)&nbsp;=&gt;&nbsp;-key)</code> — a trick
+    that works <em>only for numbers</em>. Dates, strings, and every other
+    <code>Comparable</code> have no minus sign. <code>sortByDesc</code> is
+    <code><a href="sortBy.html">sortBy</a></code> with the comparison
+    swapped: same key extraction (each key computed exactly once), same
+    unboxed fast paths for <code>double</code>/<code>int</code>/<code>String</code>
+    keys, same never-mutates-the-input contract.
+  </p>
+  <p>
+    The classic shape it replaces is the "top N" ranking:
+    <code>sortByDesc(key).take(n)</code> reads as written, where the
+    ascending spelling needed the negation <em>and</em> a comment
+    explaining it. For "newest first" over dates it is the only direct
+    spelling at all.
+  </p>
+  <p>
+    Dart-native addition — the name follows Kotlin's
+    <code>sortedByDescending</code>. When you need the single largest
+    element rather than the full ordering, skip the sort entirely:
+    <code><a href="maxBy.html">maxBy</a></code> is O(n).
+  </p>
+
+  <h2>Demo 1 · Rankings without negation</h2>
+  <div class="playground" data-pg="2a9038fb08ec3aec">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final scores = [
+    (name: 'ana', score: 71),
+    (name: 'bo', score: 94),
+    (name: 'cy', score: 88),
+    (name: 'di', score: 94),
+  ];
+
+  // Top 3, biggest first — reads as written, no minus sign:
+  final top = fx(scores).sortByDesc((p) => p.score).take(3).toList();
+  print([for (final p in top) p.name]); // [bo, di, cy]
+
+  // was: sortBy((p) => -p.score) — works, but only because score is a number.
+
+  // Ties: equal keys stay adjacent; sortByDesc is sortBy with the
+  // comparison swapped, so bo and di (both 94) lead the ranking.
+  print(sortByDesc((int n) => n, [3, 1, 4, 1, 5])); // [5, 4, 3, 1, 1]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Keys numbers can't fake</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Dates have no minus sign — sortBy((e) => -e.date) does not compile.
+  final posts = [
+    (title: 'hello world', date: DateTime(2026, 1, 5)),
+    (title: 'typed errors', date: DateTime(2026, 7, 29)),
+    (title: 'benchmarks', date: DateTime(2026, 7, 30)),
+  ];
+
+  final newestFirst = fx(posts).sortByDesc((p) => p.date).toList();
+  print([for (final p in newestFirst) p.title]);
+  // [benchmarks, typed errors, hello world]
+
+  // Strings, either: reverse-alphabetical tags.
+  print(sortByDesc((String t) => t, ['dart', 'fx', 'async']));
+  // [fx, dart, async]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: newest-first without negating anything.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final releases = [
+    (version: '0.5.0', date: DateTime(2026, 6, 10)),
+    (version: '0.7.0', date: DateTime(2026, 7, 29)),
+    (version: '0.6.0', date: DateTime(2026, 7, 20)),
+  ];
+
+  // TODO: newest release first — one sortByDesc call on the date.
+  final latest = releases;
+
+  print(latest.first.version); // should print: 0.7.0
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="sortBy.html"><code>sortBy</code></a> — ascending twin ·
+    <a href="maxBy.html"><code>maxBy</code></a> — one walk when only the top element matters ·
+    <a href="take.html"><code>take</code></a> — the second half of every "top N"
+  </div>
+
+  <nav class="tut-nav">
+    <a href="sortBy.html">← Anterior: sortBy</a>
+    <a href="partition.html">Próximo: partition →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=aba49ba340b8c95e";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -54,6 +54,20 @@ nextLabel: Either × pipelines
   <h2>Demo 3 · mapOrAccumulate, bindNel &amp; toEitherNel</h2>
   {{playground:2}}
 
+  <h2>Demo 4 · dependent — rules that read sibling values</h2>
+  <p>
+    A branch cannot read a sibling's <code>Accumulated.value</code> without
+    detonating — accumulation's one hard rule. But real validation has
+    dependent rules ("an <em>expense</em> needs a positive <em>amount</em>"),
+    which is why forms kept dropping down to a manual
+    <code>if&nbsp;(!acc.hasErrors)</code> guard. <code>acc.dependent(block)</code>
+    names that guard: the block runs only when every branch so far
+    succeeded — so sibling <code>.value</code> reads inside it are safe by
+    construction — and is skipped entirely otherwise. (No Arrow
+    counterpart; Arrow users hand-roll the same guard.)
+  </p>
+  {{playground:4}}
+
   <h2>Try it yourself</h2>
   <p>
     Exercise: finish both branches of <code>signup</code> so the second call

@@ -5,8 +5,8 @@ description: Tutorial de partition en FxDart: divide un pipeline en un record (l
 heading: <code>partition</code>
 section: 7
 crumb: partition
-prev: sortBy.html
-prevLabel: sortBy
+prev: sortByDesc.html
+prevLabel: sortByDesc
 next: head.html
 nextLabel: head
 ---

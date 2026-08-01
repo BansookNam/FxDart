@@ -7,8 +7,8 @@ section: 7
 crumb: groupBy
 prev: join.html
 prevLabel: join
-next: indexBy.html
-nextLabel: indexBy
+next: groupedBy.html
+nextLabel: groupedBy
 ---
   <p class="hero-sub">Buckets every element into a <code>Map&lt;K, List&lt;A&gt;&gt;</code> by a computed key.</p>
 

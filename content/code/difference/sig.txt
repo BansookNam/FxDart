@@ -1,2 +1,3 @@
 Iterable&lt;A&gt; difference&lt;A&gt;(Iterable&lt;A&gt; iterable1, Iterable&lt;A&gt; iterable2)
 FxAsyncIterable&lt;A&gt; differenceAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;A&gt; iterable2)
+Fx&lt;T&gt; Fx&lt;T&gt;.difference(Iterable&lt;T&gt; other)   // chain: values of the chain not in other

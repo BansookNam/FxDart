@@ -55,6 +55,23 @@ nextLabel: the naming rationale
   <h2>Demo 3 · validación fail-slow concurrente</h2>
   {{playground:2}}
 
+  <h2>Demo 4 · flattenOrAccumulate y los extractores async</h2>
+  <p>
+    Cuando ya <em>tienes</em> los <code>Either</code>s, el terminal
+    fail-slow se escribía
+    <code>mapOrAccumulate((r,&nbsp;v)&nbsp;=&gt;&nbsp;r.bind(v))</code> — un
+    bind identidad. <code>flattenOrAccumulate()</code> (el nombre de Arrow)
+    es ese terminal directamente: cada éxito, o <em>cada</em> fallo como un
+    <code>Nel</code>. Completa el trío — <code>separated()</code> conserva
+    ambos lados, <code>sequence()</code> falla rápido,
+    <code>flattenOrAccumulate()</code> falla lento. Y la cadena async ya
+    lleva la familia completa de extractores (<code>rights</code> /
+    <code>lefts</code> / <code>separated</code> / <code>sequence</code> /
+    <code>flattenOrAccumulate</code>), así que una validación async alimenta
+    una insignia de conteos en un solo terminal.
+  </p>
+  {{playground:4}}
+
   <h2>Pruébalo tú</h2>
   <p>
     Ejercicio: suma lo que sí se parseó e informa de lo que no.

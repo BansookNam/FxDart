@@ -5,8 +5,8 @@ description: FxDart concurrent 튜토리얼: 순서를 유지한 채 비동기 �
 heading: <code>concurrent</code>
 section: 11
 crumb: concurrent
-next: concurrentPool.html
-nextLabel: concurrentPool
+next: mapConcurrent.html
+nextLabel: mapConcurrent
 ---
   <p class="hero-sub">비동기 파이프라인의 원소를 최대 n개까지 한 번에 평가하면서도, 결과는 소스 순서 그대로 도착합니다.</p>
 

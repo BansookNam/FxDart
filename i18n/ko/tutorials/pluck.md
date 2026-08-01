@@ -7,8 +7,8 @@ section: 3
 crumb: pluck
 prev: peek.html
 prevLabel: peek
-next: filter.html
-nextLabel: filter
+next: attach.html
+nextLabel: attach
 ---
   <p class="hero-sub">이터러블에 든 모든 맵에서 특정 키의 값을 뽑아냅니다 — "이 필드만 주세요"라는 흔한 요구를 한 줄로 해결합니다.</p>
 

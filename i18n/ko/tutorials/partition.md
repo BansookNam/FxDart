@@ -5,8 +5,8 @@ description: FxDart partition 튜토리얼: 술어를 기준으로 파이프라�
 heading: <code>partition</code>
 section: 7
 crumb: partition
-prev: sortBy.html
-prevLabel: sortBy
+prev: sortByDesc.html
+prevLabel: sortByDesc
 next: head.html
 nextLabel: head
 ---

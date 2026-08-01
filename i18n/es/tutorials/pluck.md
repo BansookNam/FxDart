@@ -7,8 +7,8 @@ section: 3
 crumb: pluck
 prev: peek.html
 prevLabel: peek
-next: filter.html
-nextLabel: filter
+next: attach.html
+nextLabel: attach
 ---
   <p class="hero-sub">Extrae el valor de una clave concreta de cada mapa de un iterable — una sola línea para la consulta habitual de «dame solo este campo».</p>
 

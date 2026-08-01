@@ -22,7 +22,8 @@
     {"href": "flat.html", "label": "flattened"},
     {"href": "scan.html", "label": "scan"},
     {"href": "peek.html", "label": "peek"},
-    {"href": "pluck.html", "label": "pluck"}
+    {"href": "pluck.html", "label": "pluck"},
+    {"href": "attach.html", "label": "attach"}
   ],
   "4": [
     {"href": "filter.html", "label": "where"},
@@ -75,10 +76,13 @@
     {"href": "size.html", "label": "count"},
     {"href": "join.html", "label": "join"},
     {"href": "groupBy.html", "label": "groupBy"},
+    {"href": "groupedBy.html", "label": "groupedBy"},
     {"href": "indexBy.html", "label": "indexBy"},
     {"href": "countBy.html", "label": "countBy"},
+    {"href": "countWhere.html", "label": "countWhere"},
     {"href": "sort.html", "label": "sort"},
     {"href": "sortBy.html", "label": "sortBy"},
+    {"href": "sortByDesc.html", "label": "sortByDesc"},
     {"href": "partition.html", "label": "partition"}
   ],
   "8": [
@@ -132,6 +136,7 @@
     {"href": "asyncVariants.html", "label": "async variants (mapAsync, …)"},
     {"href": "streams.html", "label": "Stream bridges"},
     {"href": "concurrent.html", "label": "concurrent"},
+    {"href": "mapConcurrent.html", "label": "mapConcurrent"},
     {"href": "concurrentPool.html", "label": "concurrentPool"}
   ],
   "12": [

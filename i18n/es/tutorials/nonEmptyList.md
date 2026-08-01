@@ -50,6 +50,19 @@ nextLabel: accumulation
   <h2>Demo 2 · map, +, y pipelines</h2>
   {{playground:1}}
 
+  <h2>Demo 3 · toNelOrNull — cualquier Iterable</h2>
+  <p>
+    <code>Nel.orNull</code> recibe una <code>List</code>, así que cada
+    pipeline acumulador terminaba en un baile de <code>.toList()</code>
+    antes de que sus errores pudieran volverse un panel. La extensión
+    <code>toNelOrNull()</code> (el <code>toNonEmptyListOrNull</code> de
+    Arrow) acepta cualquier <code>Iterable</code> — incluida una cadena
+    <code>fx</code> perezosa —, la copia y te da el <code>Nel?</code>
+    directamente: <code>null</code> para "sin errores", una lista
+    garantizada no vacía en caso contrario.
+  </p>
+  {{playground:3}}
+
   <h2>Pruébalo tú</h2>
   <p>
     Ejercicio: completa <code>summarize</code> — con el caso <code>null</code>

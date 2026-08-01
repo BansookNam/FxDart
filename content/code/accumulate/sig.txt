@@ -1,3 +1,4 @@
 on Raise&lt;Nel&lt;E&gt;&gt;: R accumulate&lt;R&gt;(R Function(Accumulator&lt;E&gt; acc) block)
 R zipOrAccumulate2..5(branch1, …, combine)
 List&lt;B&gt; mapOrAccumulate&lt;A, B&gt;(items, transform) · A bindNel&lt;A&gt;(EitherNel&lt;E, A&gt; e)
+on Accumulator&lt;E&gt;: accumulating(block) · dependent(block) · hasErrors

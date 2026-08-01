@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>groupedBy — FxDart 101</title>
+  <meta name="description" content="FxDart groupedBy tutorial: groups as chainable (key, items) records — aggregate per group without re-entering through Map.entries — with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/groupedBy.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/groupedBy.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/groupedBy.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/groupedBy.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/groupedBy.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/groupedBy.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/groupedBy.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/groupedBy.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/groupedBy.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=aba49ba340b8c95e">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">ホーム</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="../../tutorials/groupedBy.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/groupedBy.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/groupedBy.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/groupedBy.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="../../es/tutorials/groupedBy.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/groupedBy.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/groupedBy.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 7 · 集約 › <strong>groupedBy</strong></p>
+  <h1><code>groupedBy</code></h1>
+  <p class="hero-sub">Groups as chainable <code>(key, items)</code> records — aggregate per group without leaving the pipeline.</p>
+
+  <div class="signature">List&lt;({K key, List&lt;A&gt; items})&gt; groupedBy&lt;A, K&gt;(K Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;List&lt;({K key, List&lt;A&gt; items})&gt;&gt; groupedByAsync&lt;A, K&gt;(FutureOr&lt;K&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;({K key, List&lt;T&gt; items})&gt; Fx&lt;T&gt;.groupedBy&lt;K&gt;(K Function(T a) f)                 // chain (sync)
+Future&lt;List&lt;({K key, List&lt;T&gt; items})&gt;&gt; FxAsync&lt;T&gt;.groupedBy&lt;K&gt;(FutureOr&lt;K&gt; Function(T a) f)  // chain (async)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code><a href="groupBy.html">groupBy</a></code> is a terminal: it hands
+    you a <code>Map</code>, and the moment you want "total per group,
+    sorted, top 3" you are re-entering the pipeline through
+    <code>fx(map.entries)</code> with <code>kv.key</code> /
+    <code>kv.value</code> ceremony. <code>groupedBy</code> is the same
+    grouping as a <strong>chainable view</strong>: each group is a named
+    record <code>(key:&nbsp;…, items:&nbsp;…)</code>, so per-group
+    aggregation, sorting, and taking continue in the very same chain —
+    and downstream code reads <code>g.key</code> / <code>g.items</code>
+    instead of positional <code>$1</code> / <code>$2</code>.
+  </p>
+  <p>
+    Groups appear in <strong>first-seen key order</strong>, exactly like
+    <code>groupBy</code>'s map iterates. Like
+    <code><a href="sortBy.html">sortBy</a></code>, it must see every value
+    before it can yield the first group, so the grouping itself is eager
+    while the chain around it stays composable.
+  </p>
+  <p>
+    This is a Dart-native addition (no FxTS counterpart) — reach for
+    <code>groupBy</code> when you want keyed lookups, and
+    <code>groupedBy</code> when the groups are just an intermediate step
+    of a longer pipeline.
+  </p>
+
+  <h2>Demo 1 · Group → aggregate → rank, one chain</h2>
+  <div class="playground" data-pg="aa1dc4ee837af70d">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final spending = [
+    (cat: 'food', amount: 20),
+    (cat: 'rent', amount: 900),
+    (cat: 'food', amount: 30),
+    (cat: 'fun', amount: 15),
+    (cat: 'food', amount: 12),
+  ];
+
+  // groupBy would stop the chain at a Map. groupedBy keeps going:
+  final ranked = fx(spending)
+      .groupedBy((e) => e.cat) // Fx<({String key, List items})>
+      .map((g) => (g.key, fx(g.items).sumBy((e) => e.amount)))
+      .sortByDesc((c) => c.$2)
+      .toList();
+
+  print(ranked); // [(rent, 900), (food, 62), (fun, 15)]
+
+  // Groups come out in first-seen key order, matching groupBy's map:
+  for (final g in fx(spending).groupedBy((e) => e.cat)) {
+    print('${g.key}: ${g.items.length} entries');
+  }
+  // food: 3 entries / rent: 1 entries / fun: 1 entries
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Async</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() async {
+  final words = ['ab', 'cd', 'e', 'fg', 'hij'];
+
+  // The async twin is a terminal (like the async sortBy): the groups come
+  // back as one Future<List> of the same named records.
+  final groups =
+      await fx(words).toAsync().map((w) => w.toUpperCase()).groupedBy(
+            (w) => w.length,
+          );
+
+  for (final g in groups) {
+    print('len ${g.key}: ${g.items}');
+  }
+  // len 2: [AB, CD, FG]
+  // len 1: [E]
+  // len 3: [HIJ]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: top spending category without touching <code>Map.entries</code>.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final entries = [
+    (cat: 'food', amount: 25.0),
+    (cat: 'transport', amount: 60.0),
+    (cat: 'food', amount: 40.0),
+    (cat: 'fun', amount: 30.0),
+  ];
+
+  // TODO: find the category with the highest total — one chain:
+  // groupedBy → map to (key, total) → maxBy. No Map.entries anywhere.
+  final top = ('?', 0.0);
+
+  print('${top.$1} spent most: ${top.$2}'); // should print: food spent most: 65.0
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="groupBy.html"><code>groupBy</code></a> — the same grouping as a keyed <code>Map</code> ·
+    <a href="countBy.html"><code>countBy</code></a> — when the only aggregate is a count ·
+    <a href="sortByDesc.html"><code>sortByDesc</code></a> — the natural next step for rankings
+  </div>
+
+  <nav class="tut-nav">
+    <a href="groupBy.html">← 前: groupBy</a>
+    <a href="indexBy.html">次: indexBy →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=aba49ba340b8c95e";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

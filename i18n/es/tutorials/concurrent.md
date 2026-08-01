@@ -5,8 +5,8 @@ description: Tutorial de concurrent en FxDart: evalúa n elementos asíncronos a
 heading: <code>concurrent</code>
 section: 11
 crumb: concurrent
-next: concurrentPool.html
-nextLabel: concurrentPool
+next: mapConcurrent.html
+nextLabel: mapConcurrent
 ---
   <p class="hero-sub">Evalúa hasta n elementos de un pipeline asíncrono a la vez, y aun así los resultados llegan en el orden de la fuente.</p>
 

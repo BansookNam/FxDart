@@ -138,6 +138,17 @@ Iterable<B> _$scan<A, B>(
 FxAsyncIterable<B> _$scanAsync<A, B>(FutureOr<B> Function(B acc, A a) f,
         FutureOr<B> seed, FxAsyncIterable<A> iterable) =>
     scanAsync(f, seed, iterable);
+FxAsyncIterable<B> _$mapConcurrent<A, B>(
+        int concurrency, FutureOr<B> Function(A a) f, Iterable<A> iterable) =>
+    mapConcurrent(concurrency, f, iterable);
+FxAsyncIterable<B> _$mapConcurrentAsync<A, B>(int concurrency,
+        FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    mapConcurrentAsync(concurrency, f, iterable);
+Iterable<(A, B)> _$attach<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    attach(f, iterable);
+FxAsyncIterable<(A, B)> _$attachAsync<A, B>(
+        FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    attachAsync(f, iterable);
 
 // lazy/filter.dart
 Iterable<A> _$filter<A>(bool Function(A a) f, Iterable<A> iterable) =>
@@ -158,6 +169,28 @@ Iterable<A> _$uniqBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
 FxAsyncIterable<A> _$uniqByAsync<A, B>(
         FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
     uniqByAsync(f, iterable);
+Iterable<A> _$differenceBy<A, B>(
+        B Function(A a) f, Iterable<A> iterable1, Iterable<A> iterable2) =>
+    differenceBy(f, iterable1, iterable2);
+FxAsyncIterable<A> _$differenceByAsync<A, B>(FutureOr<B> Function(A a) f,
+        FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
+    differenceByAsync(f, iterable1, iterable2);
+Iterable<A> _$difference<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
+    difference(iterable1, iterable2);
+FxAsyncIterable<A> _$differenceAsync<A>(
+        FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
+    differenceAsync(iterable1, iterable2);
+Iterable<A> _$intersectionBy<A, B>(
+        B Function(A a) f, Iterable<A> iterable1, Iterable<A> iterable2) =>
+    intersectionBy(f, iterable1, iterable2);
+FxAsyncIterable<A> _$intersectionByAsync<A, B>(FutureOr<B> Function(A a) f,
+        FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
+    intersectionByAsync(f, iterable1, iterable2);
+Iterable<A> _$intersection<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
+    intersection(iterable1, iterable2);
+FxAsyncIterable<A> _$intersectionAsync<A>(
+        FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
+    intersectionAsync(iterable1, iterable2);
 
 // lazy/take_drop.dart
 Iterable<A> _$take<A>(int length, Iterable<A> iterable) =>
@@ -318,6 +351,22 @@ List<A> _$sortBy<A>(Object? Function(A a) f, Iterable<A> iterable) =>
 Future<List<A>> _$sortByAsync<A>(
         Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
     sortByAsync(f, iterable);
+List<A> _$sortByDesc<A>(Object? Function(A a) f, Iterable<A> iterable) =>
+    sortByDesc(f, iterable);
+Future<List<A>> _$sortByDescAsync<A>(
+        Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
+    sortByDescAsync(f, iterable);
+List<({K key, List<A> items})> _$groupedBy<A, K>(
+        K Function(A a) f, Iterable<A> iterable) =>
+    groupedBy(f, iterable);
+Future<List<({K key, List<A> items})>> _$groupedByAsync<A, K>(
+        FutureOr<K> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    groupedByAsync(f, iterable);
+int _$countWhere<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    countWhere(f, iterable);
+Future<int> _$countWhereAsync<A>(
+        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    countWhereAsync(f, iterable);
 (List<A>, List<A>) _$partition<A>(bool Function(A a) f, Iterable<A> iterable) =>
     partition(f, iterable);
 Future<(List<A>, List<A>)> _$partitionAsync<A>(

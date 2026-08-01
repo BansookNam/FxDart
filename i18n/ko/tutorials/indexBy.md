@@ -5,8 +5,8 @@ description: FxDart indexBy 튜토리얼 — 계산된 키로 모든 원소를 M
 heading: <code>indexBy</code>
 section: 7
 crumb: indexBy
-prev: groupBy.html
-prevLabel: groupBy
+prev: groupedBy.html
+prevLabel: groupedBy
 next: countBy.html
 nextLabel: countBy
 ---

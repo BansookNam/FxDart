@@ -58,6 +58,21 @@ nextLabel: Either × pipelines
   <h2>Demo 3 · mapOrAccumulate, bindNel &amp; toEitherNel</h2>
   {{playground:2}}
 
+  <h2>Demo 4 · dependent — reglas que leen valores hermanos</h2>
+  <p>
+    Una rama no puede leer el <code>Accumulated.value</code> de una hermana
+    sin detonar — la única regla dura de la acumulación. Pero la validación
+    real tiene reglas dependientes ("un <em>gasto</em> necesita un
+    <em>importe</em> positivo"), y por eso los formularios acababan bajando
+    a un guard manual <code>if&nbsp;(!acc.hasErrors)</code>.
+    <code>acc.dependent(block)</code> le pone nombre a ese guard: el bloque
+    corre solo cuando todas las ramas anteriores tuvieron éxito — así las
+    lecturas de <code>.value</code> hermanas dentro son seguras por
+    construcción — y se salta por completo en caso contrario. (Sin
+    contraparte en Arrow; sus usuarios escriben el mismo guard a mano.)
+  </p>
+  {{playground:4}}
+
   <h2>Pruébalo tú</h2>
   <p>
     Ejercicio: completa las dos ramas de <code>signup</code> para que la

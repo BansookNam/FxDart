@@ -5,8 +5,8 @@ description: Tutorial de sort en FxDart: ordenación basada en comparador que si
 heading: <code>sort</code>
 section: 7
 crumb: sort
-prev: countBy.html
-prevLabel: countBy
+prev: countWhere.html
+prevLabel: countWhere
 next: sortBy.html
 nextLabel: sortBy
 ---

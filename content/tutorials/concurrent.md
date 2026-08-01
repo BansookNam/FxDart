@@ -5,8 +5,8 @@ description: FxDart concurrent tutorial: run n async elements at once while pres
 heading: <code>concurrent</code>
 section: 11
 crumb: concurrent
-next: concurrentPool.html
-nextLabel: concurrentPool
+next: mapConcurrent.html
+nextLabel: mapConcurrent
 ---
   <p class="hero-sub">Evaluates up to n elements of an async pipeline at once, while the result still arrives in source order.</p>
 

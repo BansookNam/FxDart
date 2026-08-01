@@ -5,8 +5,8 @@ description: FxDart where 튜토리얼: 술어가 통과시킨 원소만 남기�
 heading: <code>where</code>
 section: 4
 crumb: where
-prev: pluck.html
-prevLabel: pluck
+prev: attach.html
+prevLabel: attach
 next: reject.html
 nextLabel: reject
 ---

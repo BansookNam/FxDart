@@ -6,7 +6,7 @@
     "os": "macos Version 26.3 (Build 25D125)",
     "compilation": "AOT (dart compile exe), enforced per result line"
   },
-  "date": "2026-07-30",
+  "date": "2026-08-01",
   "warmup": 2,
   "itersPerRound": 5,
   "tieMarginPct": 5.0,
@@ -3064,6 +3064,128 @@
           },
           "timeWinner": "native",
           "memWinner": "tie"
+        }
+      }
+    },
+    "category-rank": {
+      "order": 51,
+      "heading": "Rank the month by category",
+      "async": false,
+      "scales": {
+        "100": {
+          "n": 100,
+          "roundsRun": 3,
+          "native": {
+            "medianUs": 6.031390134529148,
+            "minUs": 4.6706586826347305,
+            "medianRssBytes": 17334272.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 12.922077922077921,
+            "minUs": 11.337662337662337,
+            "medianRssBytes": 17235968.0,
+            "samples": 15
+          },
+          "timeWinner": "tie",
+          "memWinner": "tie"
+        },
+        "10000": {
+          "n": 10000,
+          "roundsRun": 3,
+          "native": {
+            "medianUs": 324.42857142857144,
+            "minUs": 289.42857142857144,
+            "medianRssBytes": 24084480.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 599.0,
+            "minUs": 551.25,
+            "medianRssBytes": 24084480.0,
+            "samples": 15
+          },
+          "timeWinner": "tie",
+          "memWinner": "tie"
+        },
+        "full": {
+          "n": 1000000,
+          "roundsRun": 3,
+          "native": {
+            "medianUs": 50034.0,
+            "minUs": 47685.0,
+            "medianRssBytes": 155762688.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 76087.0,
+            "minUs": 72066.0,
+            "medianRssBytes": 139231232.0,
+            "samples": 15
+          },
+          "timeWinner": "native",
+          "memWinner": "fxdart"
+        }
+      }
+    },
+    "stock-revaluation": {
+      "order": 52,
+      "heading": "Revalue the stock, three lookups at a time",
+      "async": true,
+      "scales": {
+        "100": {
+          "n": 100,
+          "roundsRun": 3,
+          "native": {
+            "medianUs": 361.7142857142857,
+            "minUs": 300.2,
+            "medianRssBytes": 17170432.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 682.3333333333334,
+            "minUs": 562.0,
+            "medianRssBytes": 18022400.0,
+            "samples": 15
+          },
+          "timeWinner": "tie",
+          "memWinner": "tie"
+        },
+        "10000": {
+          "n": 10000,
+          "roundsRun": 3,
+          "native": {
+            "medianUs": 29613.0,
+            "minUs": 28631.0,
+            "medianRssBytes": 51200000.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 55764.0,
+            "minUs": 53938.0,
+            "medianRssBytes": 39862272.0,
+            "samples": 15
+          },
+          "timeWinner": "native",
+          "memWinner": "fxdart"
+        },
+        "full": {
+          "n": 4000,
+          "roundsRun": 3,
+          "native": {
+            "medianUs": 12408.0,
+            "minUs": 11520.0,
+            "medianRssBytes": 24543232.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 22924.0,
+            "minUs": 21893.0,
+            "medianRssBytes": 29818880.0,
+            "samples": 15
+          },
+          "timeWinner": "native",
+          "memWinner": "native"
         }
       }
     }

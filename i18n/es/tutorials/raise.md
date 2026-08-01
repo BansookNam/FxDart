@@ -60,6 +60,21 @@ nextLabel: nullable
   <h2>Demo 3 · recover, withError &amp; raise</h2>
   {{playground:2}}
 
+  <h2>Demo 4 · eitherCatching — la frontera de excepciones, precombinada</h2>
+  <p>
+    El parseo real falla por dos vías a la vez: tus reglas
+    <em>lanzan con raise</em> errores tipados, mientras la plataforma
+    (<code>int.parse</code>, <code>jsonDecode</code>) <em>lanza
+    excepciones</em>. <code>eitherCatching</code> es <code>either</code> +
+    <code>catching</code> en un solo builder — el bloque puede hacer raise
+    o lanzar, y el segundo argumento convierte cualquier excepción lanzada
+    en el mismo error tipado. La señal de raise nunca se le entrega.
+    <code>recover</code> acepta la misma cláusula opcional
+    <code>onThrow:</code>, completando el <code>recover(block, recover,
+    catch)</code> de tres cláusulas de Arrow&nbsp;2.x.
+  </p>
+  {{playground:4}}
+
   <h2>Pruébalo tú</h2>
   <p>
     Ejercicio: haz que <code>checkAge</code> falle con un error tipado en vez

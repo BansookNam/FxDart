@@ -7,8 +7,8 @@ section: 7
 crumb: countBy
 prev: indexBy.html
 prevLabel: indexBy
-next: sort.html
-nextLabel: sort
+next: countWhere.html
+nextLabel: countWhere
 ---
   <p class="hero-sub">계산된 키별로 원소가 몇 개씩 대응되는지 집계합니다.</p>
 

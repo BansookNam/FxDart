@@ -59,6 +59,21 @@ nextLabel: nullable
   <h2>데모 3 · recover, withError &amp; raise</h2>
   {{playground:2}}
 
+  <h2>데모 4 · eitherCatching — 예외 경계를 미리 결합한 빌더</h2>
+  <p>
+    실제 파싱은 두 갈래로 동시에 실패합니다. 우리가 정한 규칙은 타입 있는
+    오류를 <em>raise</em>하고, 플랫폼(<code>int.parse</code>,
+    <code>jsonDecode</code>)은 <em>throw</em>합니다.
+    <code>eitherCatching</code>은 <code>either</code> +
+    <code>catching</code>을 하나로 합친 빌더입니다 — 블록은 raise하거나
+    throw할 수 있고, 두 번째 인자가 던져진 예외를 같은 타입의 오류로
+    변환합니다. raise 시그널 자체는 절대 여기에 전달되지 않습니다.
+    <code>recover</code>도 같은 선택적 <code>onThrow:</code> 절을 받아
+    Arrow&nbsp;2.x의 3절짜리 <code>recover(block, recover, catch)</code>를
+    완성합니다.
+  </p>
+  {{playground:4}}
+
   <h2>직접 해 보기</h2>
   <p>
     연습: <code>checkAge</code>가 예외를 던지는 대신 타입 있는 에러로
