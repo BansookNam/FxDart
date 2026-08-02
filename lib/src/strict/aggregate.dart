@@ -14,7 +14,25 @@ List<A> toList<A>(Iterable<A> iterable) => List.of(iterable);
 /// Port of FxTS `toArray` (async); named `toListAsync` for Dart idiom.
 Future<List<A>> toListAsync<A>(FxAsyncIterable<A> iterable) async {
   final result = <A>[];
+  // Stream-sourced chains collect by subscription — the push execution
+  // model, observably identical for an all-consuming terminal.
+  final drive = fxStreamDrive<A>(iterable, result.add);
+  if (drive != null) {
+    await drive;
+    return result;
+  }
   final iterator = iterable.iterator;
+  // Terminals own their iterator and consume serially, so they may use the
+  // internal fast-pull path: synchronously answered pulls (fused stages
+  // over a sync source) collect with no futures at all.
+  if (iterator is FxFastIterator<A>) {
+    while (true) {
+      final ro = iterator.nextOr();
+      final r = ro is Future<IterResult<A>> ? await ro : ro;
+      if (r.done) return result;
+      result.add(r.value);
+    }
+  }
   while (true) {
     final r = await iterator.next();
     if (r.done) return result;
@@ -34,11 +52,28 @@ void each<A>(void Function(A a) f, Iterable<A> iterable) {
 /// Async counterpart of [each]; awaits [f] per element.
 Future<void> eachAsync<A>(
     FutureOr<void> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  // Stream-sourced chains run by subscription (see [toListAsync]).
+  final drive = fxStreamDrive<A>(iterable, f);
+  if (drive != null) return drive;
   final iterator = iterable.iterator;
+  // Fast-pull loop where available (see [toListAsync]); awaits only
+  // genuinely asynchronous pulls and callback results.
+  if (iterator is FxFastIterator<A>) {
+    while (true) {
+      final ro = iterator.nextOr();
+      final r = ro is Future<IterResult<A>> ? await ro : ro;
+      if (r.done) return;
+      final v = f(r.value);
+      if (v is Future) await v;
+    }
+  }
   while (true) {
     final r = await iterator.next();
     if (r.done) return;
-    await f(r.value);
+    // Await only genuinely asynchronous callbacks — awaiting a sync one
+    // would cost a microtask hop per element.
+    final v = f(r.value);
+    if (v is Future) await v;
   }
 }
 
@@ -99,22 +134,60 @@ Future<A> reduceAsync<A>(
     throw StateError("'reduce' of empty iterable with no initial value");
   }
   var acc = first.value;
+  // Fast-pull loop where available (see [toListAsync]).
+  if (iterator is FxFastIterator<A>) {
+    while (true) {
+      final ro = iterator.nextOr();
+      final r = ro is Future<IterResult<A>> ? await ro : ro;
+      if (r.done) return acc;
+      final v = f(acc, r.value);
+      acc = v is Future<A> ? await v : v;
+    }
+  }
   while (true) {
     final r = await iterator.next();
     if (r.done) return acc;
-    acc = await f(acc, r.value);
+    // Sync accumulators continue without an await hop, as in [eachAsync].
+    final v = f(acc, r.value);
+    acc = v is Future<A> ? await v : v;
   }
 }
 
 /// Async counterpart of [fold].
 Future<Acc> foldAsync<A, Acc>(FutureOr<Acc> seed,
     FutureOr<Acc> Function(Acc acc, A a) f, FxAsyncIterable<A> iterable) async {
-  var acc = await seed;
+  var acc = seed is Future<Acc> ? await seed : seed;
+  // Stream-sourced chains fold by subscription (see [toListAsync]).
+  final drive = fxStreamDrive<A>(iterable, (a) {
+    final v = f(acc, a);
+    if (v is Future<Acc>) {
+      return v.then((next) {
+        acc = next;
+      });
+    }
+    acc = v;
+  });
+  if (drive != null) {
+    await drive;
+    return acc;
+  }
   final iterator = iterable.iterator;
+  // Fast-pull loop where available (see [toListAsync]).
+  if (iterator is FxFastIterator<A>) {
+    while (true) {
+      final ro = iterator.nextOr();
+      final r = ro is Future<IterResult<A>> ? await ro : ro;
+      if (r.done) return acc;
+      final v = f(acc, r.value);
+      acc = v is Future<Acc> ? await v : v;
+    }
+  }
   while (true) {
     final r = await iterator.next();
     if (r.done) return acc;
-    acc = await f(acc, r.value);
+    // Sync accumulators continue without an await hop, as in [eachAsync].
+    final v = f(acc, r.value);
+    acc = v is Future<Acc> ? await v : v;
   }
 }
 

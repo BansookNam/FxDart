@@ -377,11 +377,11 @@
   <h2>3부 · 오류와 복원력</h2>
   <p class="dim">타입 없는 오류 채널 vs 타입 있는 값으로서의 오류 — 재시도, 타임아웃, 폴백, 리소스 수명을 두 모델에서 비교합니다.</p>
   <ol class="cmp-list">
-    <li data-verdict="fxdart" data-async="true" data-speed="rxdart" data-fns="fx toAsync map ifEmpty">
+    <li data-verdict="fxdart" data-async="true" data-speed="tie" data-fns="fx toAsync map ifEmpty">
       <a class="cmp-row" href="price-or-fallback.html">
         <span class="cmp-num">25</span>
         <span class="cmp-row-body">
-          <strong>프로모 가격, 없으면 정가</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-rxdart">⚡ RxDart가 더 빠름</span>
+          <strong>프로모 가격, 없으면 정가</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 속도 동일</span>
           <span class="dim">프로모 가격이 있으면 그 가격, 없으면 정가 — 내부 스트림으로 하는 항목별 복구 vs 호출 바로 옆의 try/catch.</span>
         </span>
       </a>
@@ -417,31 +417,31 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/retry.html">retry</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="true" data-speed="rxdart" data-fns="fx toAsync retry concurrent">
+    <li data-verdict="fxdart" data-async="true" data-speed="fxdart" data-fns="fx toAsync retry concurrent">
       <a class="cmp-row" href="per-row-retry.html">
         <span class="cmp-num">29</span>
         <span class="cmp-row-body">
-          <strong>불안정한 행을 각각 따로 재시도하기</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-rxdart">⚡ RxDart가 더 빠름</span>
+          <strong>불안정한 행을 각각 따로 재시도하기</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart가 더 빠름</span>
           <span class="dim">불안정한 임포트 행 여섯 개, 행마다 두 번 시도, 세 개 동시 진행 — flatMap은 완료 순서로 내보내고, concurrent 아래의 mapRetry는 소스 순서를 지킵니다.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/retry.html">retry</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="true" data-speed="rxdart" data-fns="fx toAsync map timeout">
+    <li data-verdict="tie" data-async="true" data-speed="tie" data-fns="fx toAsync map timeout">
       <a class="cmp-row" href="bound-the-stall.html">
         <span class="cmp-num">30</span>
         <span class="cmp-row-body">
-          <strong>멈춰 버린 읽기에 시간 제한 걸기</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-rxdart">⚡ RxDart가 더 빠름</span>
+          <strong>멈춰 버린 읽기에 시간 제한 걸기</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 속도 동일</span>
           <span class="dim">멈추는 센서 읽기에 150 ms 예산 — 스트림 timeout은 이벤트 사이의 간격을 재고, 풀 timeout은 요구부터 항목까지의 시간을 잽니다.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/timeout.html">timeout</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="true" data-speed="rxdart" data-fns="fx using toAsync toList">
+    <li data-verdict="tie" data-async="true" data-speed="tie" data-fns="fx using toAsync toList">
       <a class="cmp-row" href="cursor-lifetime.html">
         <span class="cmp-num">31</span>
         <span class="cmp-row-body">
-          <strong>읽기를 감싸는 커서의 수명</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-rxdart">⚡ RxDart가 더 빠름</span>
+          <strong>읽기를 감싸는 커서의 수명</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 속도 동일</span>
           <span class="dim">커서를 열고, 행 다섯을 읽고, 닫힘을 보장 — 스트림을 감싸는 Rx.using vs 지연 풀을 감싸는 usingAsync, 한 아이디어의 두 포팅.</span>
         </span>
       </a>
@@ -514,11 +514,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/scan.html">scan</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="true" data-speed="rxdart" data-fns="fx toAsync flatMap takeWhile map">
+    <li data-verdict="fxdart" data-async="true" data-speed="tie" data-fns="fx toAsync flatMap takeWhile map">
       <a class="cmp-row" href="crawl-the-pages.html">
         <span class="cmp-num">38</span>
         <span class="cmp-row-body">
-          <strong>소진될 때까지 페이지 크롤링하기</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-rxdart">⚡ RxDart가 더 빠름</span>
+          <strong>소진될 때까지 페이지 크롤링하기</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 속도 동일</span>
           <span class="dim">준비됐을 때만 다음 페이지를 요청 — 요구가 있을 때 당겨지는 끝없는 지연 커서 vs 첫 빈 페이지에서 취소되는 충분히 큰 Rx.range.</span>
         </span>
       </a>
@@ -624,11 +624,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/fork.html">fork</a></li><li><a href="../tutorials/sum.html">sum</a></li><li><a href="../tutorials/max.html">max</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="true" data-speed="rxdart" data-fns="fx streams filter map toList">
+    <li data-verdict="tie" data-async="true" data-speed="tie" data-fns="fx streams filter map toList">
       <a class="cmp-row" href="stream-into-pipeline.html">
         <span class="cmp-num">49</span>
         <span class="cmp-row-body">
-          <strong>스트림이 타입 있는 파이프라인으로 흘러들 때</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-rxdart">⚡ RxDart가 더 빠름</span>
+          <strong>스트림이 타입 있는 파이프라인으로 흘러들 때</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 속도 동일</span>
           <span class="dim">라이브 로그 스트림이 fxStream을 거쳐 타입 있는 풀 파이프라인으로 흘러갑니다 — 경고만 남기고, 대문자로 바꾸고, 세기. 다리의 양쪽에서.</span>
         </span>
       </a>

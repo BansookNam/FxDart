@@ -296,17 +296,19 @@ FxAsyncIterable<A> ifEmptyAsync<A>(
     final iterator = source.iterator;
     var first = true;
     FxAsyncIterator<A>? fb;
-    return SerialAsyncIterator((concurrent) async {
+    return SerialAsyncIterator((concurrent) {
       if (fb != null) return fb!.next(concurrent);
-      final result = await iterator.next(concurrent);
-      if (first) {
-        first = false;
-        if (result.done) {
-          fb = fallback().iterator;
-          return fb!.next(concurrent);
+      if (!first) return iterator.next(concurrent);
+      return iterator.next(concurrent).then((result) {
+        if (first) {
+          first = false;
+          if (result.done) {
+            fb = fallback().iterator;
+            return fb!.next(concurrent);
+          }
         }
-      }
-      return result;
+        return result;
+      });
     });
   });
 }

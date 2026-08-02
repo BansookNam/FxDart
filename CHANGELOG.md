@@ -1,3 +1,92 @@
+## 0.7.4
+
+### Performance — the async pull machinery
+
+An investigation of the RxDartComparison benchmarks RxDart was winning found
+no algorithmic problem: all of them are async cases, and the entire gap was
+per-element overhead in the pull protocol — microtask hops and future
+allocations that a push `Stream`'s synchronous event dispatch never pays.
+Three design fixes, identical API, laziness, ordering, and error behavior:
+
+* **Wasted `await`s on synchronous callback results.** Every async operator
+  awaited its callback's `FutureOr` result; in Dart, awaiting an
+  already-synchronous value still schedules a microtask — one wasted hop per
+  element *per operator layer*. Hot serial paths are now then-based with
+  bare returns and an `is Future` guard, so synchronous results complete the
+  pull directly (measured 1.4× on a sync-callback map, 1.8× on three
+  stacked maps): `mapAsync`, `filterAsync`, `takeWhileAsync`,
+  `dropWhileAsync` / `dropUntilAsync`, `scanAsync` / `scan1Async`,
+  `flatMapAsync`, `ifEmptyAsync`, and the terminals `eachAsync` /
+  `foldAsync` / `reduceAsync` (so `sumAsync`, `minAsync`, `countAsync`, …
+  inherit it).
+* **`SerialAsyncIterator` idle fast path.** The overlap serializer chained
+  every pull off the previous pull's future even when nothing overlaps —
+  the common serial consumer paid a hop per element for a guarantee it
+  never used. An idle pull now enters the state machine directly; the chain
+  only forms while a pull is actually in flight.
+* **`fromStream` is a direct subscription bridge.** The old bridge stacked
+  `StreamIterator` + the serializer + an async closure (~3 future layers
+  per element). The new one listens once, completes the waiting pull
+  straight from `onData`, and pauses whenever no pull is waiting — same
+  contract (lazy subscribe on first pull, backpressure via pause, an error
+  answers the pull that met it and ends the iteration), 2.1× on a drain.
+* `usingAsync` caches its resolved iterator instead of re-chaining through
+  the acquire future on every pull.
+
+Then three structural changes, all internal — the public protocol, operator
+signatures, laziness, ordering, and error behavior are unchanged:
+
+* **Stage fusion.** A run of `map` / `filter` / `takeWhile` no longer stacks
+  one iterator (and one future) per operator: the run collapses into a
+  single fused pipeline that applies every stage inline on each pulled
+  element. When a `Concurrent` marker arrives on a fresh iterator, the
+  whole iteration is handed to the original unfused layering, so
+  `concurrent(n)` behaves exactly as before.
+* **An internal fast-pull path.** Iterators that can answer a pull
+  synchronously now do (`FutureOr`, library-internal — the public
+  `next()` still returns a `Future`), and the serial terminals
+  (`toListAsync`, `eachAsync`, `foldAsync`, `reduceAsync`, `toStream`)
+  loop on it. A fused chain over a synchronous source runs with no
+  per-element futures at all. `flatMapAsync`, `scanAsync`, `usingAsync`,
+  `timeoutAsync` and the stream bridge all participate; `timeoutAsync`
+  additionally skips arming a timer for a pull that answered synchronously.
+* **Subscription execution for stream-sourced chains.** When an
+  all-consuming terminal sits on a chain whose source is a plain `Stream`,
+  the chain now runs by subscription — stages execute in `onData`, an
+  asynchronous stage pauses the subscription (the `asyncMap` discipline), a
+  failing `takeWhile` cancels it — instead of pulling element by element.
+  This is the push execution model applied under an unchanged pull API,
+  and it is observably identical for a terminal that consumes everything.
+* `concurrentAsync` fills its batch with one continuation per pull instead
+  of `settleAll`'s `Future.wait` plus two wrapper futures per element.
+
+Measured effects (AOT, N=10,000, RxDartComparison). Of the ten cases RxDart
+led in 0.7.2, **six now tie or win** and none regressed:
+`stream-into-pipeline` 12.63× → **1.34×** (tie), `crawl-the-pages` 2.94× →
+**0.96×** (tie), `bound-the-stall` 1.31× → **1.01×** (tie), `cursor-lifetime`
+1.14× → **1.01×** (tie), `price-or-fallback` 1.07× → **1.00×** (tie),
+`per-row-retry` 1.08× → **0.93× (FxDart wins)**. The RxDart-faster count
+across the section drops from 10 to 4 (31 FxDart / 6 tie / 4 RxDart).
+DartComparison's async cases improved as well: `stream-windowed-alerts`
+3.13× → 1.63× behind native, `paged-feeds-dedupe` 2.17× → 2.02×,
+`rate-limited-import` 2.10× → 1.80×, `concurrent-enrichment` 1.36× → 1.24×.
+
+The four still behind — `dependent-calls-in-sequence` (1.27×),
+`latency-extremes` (1.11×), `completion-order-pool` (1.08×),
+`pipeline-into-stream` (1.06×) — are dominated by genuinely asynchronous
+per-element work (a real `await` per step, a completion-order pool, an
+outbound `Stream` controller), where no amount of protocol trimming helps:
+what is left is one future per element, which is what a pull protocol
+fundamentally is.
+
+### Tests
+
+Library line coverage is now **100%** (2999/2999). A new
+`test/async_fast_paths_test.dart` covers the machinery above as white-box
+behavior: fused stages and their effect order, the `Concurrent` fallback on
+every fused operator, subscription-drive error/cancel paths, the stream
+bridge's buffering and error handling, and each operator's legacy path.
+
 ## 0.7.3
 
 ### Performance

@@ -377,11 +377,11 @@
   <h2>Part 3 · Errors & resilience</h2>
   <p class="dim">An untyped error channel vs errors as typed values — retry, timeout, fallbacks and resource lifetimes in both models.</p>
   <ol class="cmp-list">
-    <li data-verdict="fxdart" data-async="true" data-speed="rxdart" data-fns="fx toAsync map ifEmpty">
+    <li data-verdict="fxdart" data-async="true" data-speed="tie" data-fns="fx toAsync map ifEmpty">
       <a class="cmp-row" href="price-or-fallback.html">
         <span class="cmp-num">25</span>
         <span class="cmp-row-body">
-          <strong>A price, or the list price</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-rxdart">⚡ RxDart 更快</span>
+          <strong>A price, or the list price</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 速度相同</span>
           <span class="dim">A promo price where one exists, the list price where none does — per-item recovery as inner streams vs a try/catch right beside the call.</span>
         </span>
       </a>
@@ -417,31 +417,31 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/retry.html">retry</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="true" data-speed="rxdart" data-fns="fx toAsync retry concurrent">
+    <li data-verdict="fxdart" data-async="true" data-speed="fxdart" data-fns="fx toAsync retry concurrent">
       <a class="cmp-row" href="per-row-retry.html">
         <span class="cmp-num">29</span>
         <span class="cmp-row-body">
-          <strong>Retry each flaky row independently</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-rxdart">⚡ RxDart 更快</span>
+          <strong>Retry each flaky row independently</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart 更快</span>
           <span class="dim">Six flaky import rows, two attempts each, three in flight — flatMap emits in completion order, mapRetry under concurrent keeps source order.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/retry.html">retry</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="true" data-speed="rxdart" data-fns="fx toAsync map timeout">
+    <li data-verdict="tie" data-async="true" data-speed="tie" data-fns="fx toAsync map timeout">
       <a class="cmp-row" href="bound-the-stall.html">
         <span class="cmp-num">30</span>
         <span class="cmp-row-body">
-          <strong>Bound the stalled read</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-rxdart">⚡ RxDart 更快</span>
+          <strong>Bound the stalled read</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 速度相同</span>
           <span class="dim">A 150 ms budget on a stalling sensor read — stream timeout watches gaps between events, pull timeout bounds demand-to-item time.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/timeout.html">timeout</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="true" data-speed="rxdart" data-fns="fx using toAsync toList">
+    <li data-verdict="tie" data-async="true" data-speed="tie" data-fns="fx using toAsync toList">
       <a class="cmp-row" href="cursor-lifetime.html">
         <span class="cmp-num">31</span>
         <span class="cmp-row-body">
-          <strong>A cursor's lifetime around a read</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-rxdart">⚡ RxDart 更快</span>
+          <strong>A cursor's lifetime around a read</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 速度相同</span>
           <span class="dim">Open a cursor, read five rows, guarantee the close — Rx.using around a stream vs usingAsync around a lazy pull, two ports of one idea.</span>
         </span>
       </a>
@@ -514,11 +514,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/scan.html">scan</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="true" data-speed="rxdart" data-fns="fx toAsync flatMap takeWhile map">
+    <li data-verdict="fxdart" data-async="true" data-speed="tie" data-fns="fx toAsync flatMap takeWhile map">
       <a class="cmp-row" href="crawl-the-pages.html">
         <span class="cmp-num">38</span>
         <span class="cmp-row-body">
-          <strong>Crawl pages until exhausted</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-rxdart">⚡ RxDart 更快</span>
+          <strong>Crawl pages until exhausted</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 速度相同</span>
           <span class="dim">Ask for the next page only when ready — an endless lazy cursor pulled on demand vs a big-enough Rx.range cancelled at the first empty page.</span>
         </span>
       </a>
@@ -624,11 +624,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/fork.html">fork</a></li><li><a href="../tutorials/sum.html">sum</a></li><li><a href="../tutorials/max.html">max</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="true" data-speed="rxdart" data-fns="fx streams filter map toList">
+    <li data-verdict="tie" data-async="true" data-speed="tie" data-fns="fx streams filter map toList">
       <a class="cmp-row" href="stream-into-pipeline.html">
         <span class="cmp-num">49</span>
         <span class="cmp-row-body">
-          <strong>A stream feeds a typed pipeline</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-rxdart">⚡ RxDart 更快</span>
+          <strong>A stream feeds a typed pipeline</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 速度相同</span>
           <span class="dim">A live log stream flows into a typed pull pipeline through fxStream — keep the warnings, uppercase them, and count, on both sides of the bridge.</span>
         </span>
       </a>

@@ -91,15 +91,31 @@ class DelegateAsyncIterator<T> implements FxAsyncIterator<T> {
 /// machines with this so that a concurrent consumer cannot interleave pulls.
 class SerialAsyncIterator<T> implements FxAsyncIterator<T> {
   final Future<IterResult<T>> Function(Concurrent? concurrent) _inner;
-  Future<void> _prev = Future.value();
+  // The gate of the pull currently in flight, or null when idle. Null lets
+  // the common serial consumer (one pull awaited at a time) call [_inner]
+  // directly — chaining off an already-completed future would cost a
+  // microtask hop per element.
+  Future<void>? _inFlight;
 
   /// Wraps [_inner], chaining each pull after the previous one settles.
   SerialAsyncIterator(this._inner);
 
   @override
   Future<IterResult<T>> next([Concurrent? concurrent]) {
-    final result = _prev.then((_) => _inner(concurrent));
-    _prev = result.then((_) {}, onError: (_) {});
+    final prev = _inFlight;
+    final result =
+        prev == null ? _inner(concurrent) : prev.then((_) => _inner(concurrent));
+    late final Future<void> gate;
+    void clear() {
+      if (identical(_inFlight, gate)) _inFlight = null;
+    }
+
+    // Registered before the caller can await [result], so the gate clears
+    // ahead of the consumer's continuation and back-to-back serial pulls
+    // stay on the direct path. Errors are the caller's to observe on
+    // [result]; the gate only sequences.
+    gate = result.then((_) => clear(), onError: (Object _) => clear());
+    _inFlight = gate;
     return result;
   }
 }
@@ -107,6 +123,57 @@ class SerialAsyncIterator<T> implements FxAsyncIterator<T> {
 /// An empty async iterable.
 FxAsyncIterable<T> asyncEmpty<T>() => DelegateAsyncIterable(
     () => DelegateAsyncIterator((_) async => IterResult<T>.done()));
+
+// --- internal fast-pull protocol ------------------------------------------
+//
+// The public protocol answers every pull with a Future — that is the price
+// of `concurrent(n)` and cannot change without breaking implementers. But a
+// *serial* consumer that owns its iterator (every terminal in this library)
+// doesn't need the Future when the element is already available. Iterators
+// that can answer synchronously implement [FxFastIterator]; terminals check
+// for it and loop on [FxFastIterator.nextOr], so a chain of synchronous
+// stages over a synchronous source runs with no futures at all — the same
+// cost structure as a push Stream's event dispatch. NOT exported: this is
+// library machinery, not API.
+
+/// Internal fast-pull extension of the iterator protocol. [nextOr] is
+/// serial-only: callers must await (or otherwise settle) one pull before
+/// issuing the next, and must not interleave [nextOr] with [next].
+abstract interface class FxFastIterator<T> implements FxAsyncIterator<T> {
+  /// Pulls the next result, answering synchronously when it can.
+  FutureOr<IterResult<T>> nextOr();
+}
+
+/// Shared overlap gate for public `next()` on fast iterators: serializes
+/// overlapping calls (the JS async-generator queueing [SerialAsyncIterator]
+/// also provides) around a [FutureOr]-returning state machine.
+mixin FxFastNextGate<T> implements FxFastIterator<T> {
+  Future<void>? _fxGate;
+
+  @override
+  Future<IterResult<T>> next([Concurrent? concurrent]) {
+    final prev = _fxGate;
+    Future<IterResult<T>> run() {
+      final FutureOr<IterResult<T>> r;
+      try {
+        r = nextOr();
+      } catch (e, st) {
+        return Future.error(e, st);
+      }
+      return r is Future<IterResult<T>> ? r : Future.value(r);
+    }
+
+    final result = prev == null ? run() : prev.then((_) => run());
+    late final Future<void> gate;
+    void clear() {
+      if (identical(_fxGate, gate)) _fxGate = null;
+    }
+
+    gate = result.then((_) => clear(), onError: (Object _) => clear());
+    _fxGate = gate;
+    return result;
+  }
+}
 
 /// Returns an [FxAsyncIterable] of the given iterable, where any [Future]
 /// element is awaited.
@@ -119,34 +186,379 @@ FxAsyncIterable<T> asyncEmpty<T>() => DelegateAsyncIterable(
 /// await toListAsync(mapAsync((a) => a + 10, toAsync([1, 2, 3]))); // [11, 12, 13]
 /// ```
 FxAsyncIterable<T> toAsync<T>(Iterable<FutureOr<T>> iterable) {
-  return DelegateAsyncIterable(() {
-    final iterator = iterable.iterator;
-    return DelegateAsyncIterator((_) {
-      if (!iterator.moveNext()) {
-        return Future.value(IterResult<T>.done());
+  return DelegateAsyncIterable(() => _ToAsyncIterator(iterable.iterator));
+}
+
+/// The [toAsync] iterator. Deliberately NOT gated: overlapping `next()`
+/// calls each advance the sync source immediately (see [toAsync] — that is
+/// what makes `concurrent(n)` physically parallel), and the synchronous
+/// advance is atomic so overlap is safe.
+class _ToAsyncIterator<T> implements FxFastIterator<T> {
+  _ToAsyncIterator(this._it);
+  final Iterator<FutureOr<T>> _it;
+
+  @override
+  FutureOr<IterResult<T>> nextOr() {
+    if (!_it.moveNext()) return IterResult<T>.done();
+    final current = _it.current;
+    if (current is Future<T>) return current.then(IterResult<T>.value);
+    return IterResult<T>.value(current);
+  }
+
+  @override
+  Future<IterResult<T>> next([Concurrent? concurrent]) {
+    final r = nextOr();
+    return r is Future<IterResult<T>> ? r : Future.value(r);
+  }
+}
+
+// --- fused sync-stage pipeline --------------------------------------------
+//
+// A run of map / filter / takeWhile operators is a list of per-element
+// transformations. Layering them as separate iterators costs one future and
+// at least one microtask per element *per layer*; fusing them applies the
+// whole run inline on each pulled element. The moment a [Concurrent] marker
+// arrives on a fresh iterator, fusion is abandoned for [legacy] — the exact
+// operator layering fusion replaced — so the concurrency protocol behaves
+// identically to the unfused chain. Internal; not exported.
+
+/// One fused per-element stage. Stage callbacks are wrapped `(Object?)`
+/// closures created once per operator call, never per element.
+sealed class FxStage {
+  const FxStage();
+}
+
+/// A `mapAsync` stage.
+class FxMapStage extends FxStage {
+  const FxMapStage(this.f);
+  final FutureOr<Object?> Function(Object? value) f;
+}
+
+/// A `filterAsync` stage.
+class FxFilterStage extends FxStage {
+  const FxFilterStage(this.p);
+  final FutureOr<bool> Function(Object? value) p;
+}
+
+/// A `takeWhileAsync` stage — a failing predicate ends the whole pipeline.
+class FxTakeWhileStage extends FxStage {
+  const FxTakeWhileStage(this.p);
+  final FutureOr<bool> Function(Object? value) p;
+}
+
+/// A fused run of stages over one [source].
+class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
+  FxFusedAsyncIterable(this.source, this.stages, this.legacy);
+
+  /// The pre-stage upstream.
+  final FxAsyncIterable<Object?> source;
+
+  /// The stages, in application order.
+  final List<FxStage> stages;
+
+  /// Rebuilds the unfused operator layering (for the concurrent path).
+  final FxAsyncIterable<T> Function() legacy;
+
+  @override
+  FxAsyncIterator<T> get iterator => _FusedIterator<T>(this);
+}
+
+class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
+  _FusedIterator(this._iterable);
+  final FxFusedAsyncIterable<T> _iterable;
+  FxAsyncIterator<Object?>? _source;
+  FxAsyncIterator<T>? _fallback;
+  bool _ended = false;
+
+  @override
+  Future<IterResult<T>> next([Concurrent? concurrent]) {
+    if (_fallback == null &&
+        concurrent is Concurrent &&
+        _source == null &&
+        !_ended) {
+      // Nothing pulled yet and the consumer wants concurrency: hand the
+      // whole iteration to the unfused layering.
+      _fallback = _iterable.legacy().iterator;
+    }
+    final fb = _fallback;
+    if (fb != null) return fb.next(concurrent);
+    return super.next(concurrent);
+  }
+
+  @override
+  FutureOr<IterResult<T>> nextOr() {
+    final fb = _fallback;
+    if (fb != null) return fb.next();
+    if (_ended) return IterResult<T>.done();
+    _source ??= _iterable.source.iterator;
+    return _pull();
+  }
+
+  FutureOr<IterResult<T>> _pull() {
+    final src = _source!;
+    while (true) {
+      if (_ended) return IterResult<T>.done();
+      final FutureOr<IterResult<Object?>> r =
+          src is FxFastIterator<Object?> ? src.nextOr() : src.next();
+      if (r is Future<IterResult<Object?>>) {
+        return r.then((rr) {
+          final out = _apply(rr);
+          if (out is Future<IterResult<T>?>) {
+            return out.then((o) => o ?? _pull());
+          }
+          return out ?? _pull();
+        });
       }
-      final current = iterator.current;
-      if (current is Future<T>) {
-        return current.then(IterResult<T>.value);
+      final out = _apply(r);
+      if (out is Future<IterResult<T>?>) {
+        return out.then((o) => o ?? _pull());
       }
-      return Future.value(IterResult<T>.value(current));
-    });
-  });
+      if (out != null) return out;
+      // Filtered out: pull the next source element.
+    }
+  }
+
+  /// Applies the stages to one source result; `null` means "filtered out".
+  FutureOr<IterResult<T>?> _apply(IterResult<Object?> r) {
+    if (r.done) {
+      _ended = true;
+      return IterResult<T>.done();
+    }
+    return _applyFrom(r.value, 0);
+  }
+
+  FutureOr<IterResult<T>?> _applyFrom(Object? value, int from) {
+    final stages = _iterable.stages;
+    var v = value;
+    for (var i = from; i < stages.length; i++) {
+      final stage = stages[i];
+      if (stage is FxMapStage) {
+        final w = stage.f(v);
+        if (w is Future) {
+          final next = i + 1;
+          return w.then<IterResult<T>?>((x) => _applyFrom(x, next));
+        }
+        v = w;
+      } else if (stage is FxFilterStage) {
+        final k = stage.p(v);
+        if (k is Future<bool>) {
+          final next = i + 1;
+          final vv = v;
+          return k.then<IterResult<T>?>(
+              (kk) => kk ? _applyFrom(vv, next) : null);
+        }
+        if (!k) return null;
+      } else {
+        stage as FxTakeWhileStage;
+        final k = stage.p(v);
+        if (k is Future<bool>) {
+          final next = i + 1;
+          final vv = v;
+          return k.then<IterResult<T>?>((kk) {
+            if (kk) return _applyFrom(vv, next);
+            _ended = true;
+            return IterResult<T>.done();
+          });
+        }
+        if (!k) {
+          _ended = true;
+          return IterResult<T>.done();
+        }
+      }
+    }
+    return IterResult<T>.value(v as T);
+  }
 }
 
 /// Converts a single-subscription or broadcast [Stream] into an
 /// [FxAsyncIterable].
-FxAsyncIterable<T> fromStream<T>(Stream<T> stream) {
-  return DelegateAsyncIterable(() {
-    final iterator = StreamIterator(stream);
-    // StreamIterator cannot handle overlapping moveNext calls; serialize.
-    return SerialAsyncIterator((_) async {
-      if (await iterator.moveNext()) {
-        return IterResult.value(iterator.current);
+FxAsyncIterable<T> fromStream<T>(Stream<T> stream) =>
+    FxStreamSourceIterable(stream);
+
+/// The [fromStream] iterable. A marker class: terminals that consume a
+/// fused chain over a raw stream source can execute it by subscription
+/// (see [fxStreamDrive]) instead of pulling element by element.
+class FxStreamSourceIterable<T> implements FxAsyncIterable<T> {
+  /// Wraps [stream] without listening; each [iterator] listens once.
+  const FxStreamSourceIterable(this.stream);
+
+  /// The underlying push source.
+  final Stream<T> stream;
+
+  @override
+  FxAsyncIterator<T> get iterator => _StreamBridgeIterator(stream);
+}
+
+/// Terminal subscription drive — the push execution model, used when an
+/// all-consuming serial terminal ([toListAsync] and friends) sits on a
+/// (possibly fused) chain whose source is a raw [Stream]. The stages run
+/// inside `onData` in element order, asynchronous stage results pause the
+/// subscription (the `asyncMap` discipline), a failing takeWhile cancels it,
+/// and an error fails the terminal — all observably identical to the pull
+/// path for a terminal that consumes everything. Returns null when the
+/// chain isn't stream-sourced; [emit] may return a Future to pause on.
+Future<void>? fxStreamDrive<T>(
+    FxAsyncIterable<T> iterable, FutureOr<void> Function(T value) emit) {
+  final Stream<Object?> stream;
+  final List<FxStage> stages;
+  if (iterable is FxFusedAsyncIterable<T>) {
+    final source = iterable.source;
+    if (source is! FxStreamSourceIterable<Object?>) return null;
+    stream = source.stream;
+    stages = iterable.stages;
+  } else if (iterable is FxStreamSourceIterable<T>) {
+    stream = iterable.stream;
+    stages = const [];
+  } else {
+    return null;
+  }
+
+  final completer = Completer<void>();
+  late final StreamSubscription<Object?> sub;
+  var terminated = false;
+
+  void finish() {
+    if (terminated) return;
+    terminated = true;
+    sub.cancel();
+    completer.complete();
+  }
+
+  void fail(Object e, StackTrace st) {
+    if (terminated) return;
+    terminated = true;
+    sub.cancel();
+    completer.completeError(e, st);
+  }
+
+  // Applies stages [from] onward to [value]; returns a Future only when a
+  // stage (or [emit]) answered asynchronously — the caller pauses on it.
+  FutureOr<void> apply(Object? value, int from) {
+    var v = value;
+    for (var i = from; i < stages.length; i++) {
+      final stage = stages[i];
+      if (stage is FxMapStage) {
+        final w = stage.f(v);
+        if (w is Future) {
+          final next = i + 1;
+          return w.then((x) => apply(x, next));
+        }
+        v = w;
+      } else if (stage is FxFilterStage) {
+        final k = stage.p(v);
+        if (k is Future<bool>) {
+          final next = i + 1;
+          final vv = v;
+          return k.then((kk) {
+            if (kk) return apply(vv, next);
+          });
+        }
+        if (!k) return null;
+      } else {
+        stage as FxTakeWhileStage;
+        final k = stage.p(v);
+        if (k is Future<bool>) {
+          final next = i + 1;
+          final vv = v;
+          return k.then((kk) {
+            if (kk) return apply(vv, next);
+            finish();
+          });
+        }
+        if (!k) {
+          finish();
+          return null;
+        }
       }
-      return IterResult<T>.done();
-    });
+    }
+    return emit(v as T);
+  }
+
+  sub = stream.listen((value) {
+    final FutureOr<void> r;
+    try {
+      r = apply(value, 0);
+    } catch (e, st) {
+      fail(e, st);
+      return;
+    }
+    if (r is Future) {
+      sub.pause();
+      r.then((_) {
+        if (!terminated) sub.resume();
+      }, onError: fail);
+    }
+  }, onError: fail, onDone: () {
+    if (!terminated) {
+      terminated = true;
+      completer.complete();
+    }
   });
+  return completer.future;
+}
+
+/// Direct subscription bridge behind [fromStream]. Same contract as the
+/// `StreamIterator` it replaces — lazy subscribe on the first pull, paused
+/// whenever no pull is waiting, an error answers the pull that met it and
+/// ends the iteration — but without the `StreamIterator` + serializer +
+/// async-closure stack, which cost several microtask hops per element.
+class _StreamBridgeIterator<T> implements FxFastIterator<T> {
+  _StreamBridgeIterator(this._stream);
+
+  @override
+  FutureOr<IterResult<T>> nextOr() {
+    if (_buffered.isNotEmpty) return IterResult.value(_buffered.removeAt(0));
+    if (_done) return IterResult<T>.done();
+    return next();
+  }
+  final Stream<T> _stream;
+  StreamSubscription<T>? _sub;
+  final List<Completer<IterResult<T>>> _waiters = [];
+  // Values that arrived with no pull waiting (a sync controller can deliver
+  // between our pause taking effect) — served before touching the stream.
+  final List<T> _buffered = [];
+  bool _done = false;
+
+  @override
+  Future<IterResult<T>> next([Concurrent? concurrent]) {
+    if (_buffered.isNotEmpty) {
+      return Future.value(IterResult.value(_buffered.removeAt(0)));
+    }
+    if (_done) return Future.value(IterResult<T>.done());
+    final completer = Completer<IterResult<T>>();
+    _waiters.add(completer);
+    final sub = _sub;
+    if (sub == null) {
+      _sub = _stream.listen((value) {
+        if (_waiters.isEmpty) {
+          _buffered.add(value);
+          if (!_sub!.isPaused) _sub!.pause();
+          return;
+        }
+        _waiters.removeAt(0).complete(IterResult.value(value));
+        if (_waiters.isEmpty && !_sub!.isPaused) _sub!.pause();
+      }, onError: (Object e, StackTrace st) {
+        // Mirror StreamIterator: the pull that meets the error gets it, and
+        // the iteration is over.
+        _done = true;
+        _sub!.cancel();
+        if (_waiters.isNotEmpty) {
+          _waiters.removeAt(0).completeError(e, st);
+        }
+        while (_waiters.isNotEmpty) {
+          _waiters.removeAt(0).complete(IterResult<T>.done());
+        }
+      }, onDone: () {
+        _done = true;
+        while (_waiters.isNotEmpty) {
+          _waiters.removeAt(0).complete(IterResult<T>.done());
+        }
+      });
+    } else if (_waiters.length == 1 && sub.isPaused) {
+      sub.resume();
+    }
+    return completer.future;
+  }
 }
 
 /// Bridges the pull-based async protocol back to a push-based [Stream].
@@ -156,10 +568,20 @@ extension FxAsyncIterableToStream<T> on FxAsyncIterable<T> {
   /// `concurrentAsync` before converting if you need parallel evaluation.
   Stream<T> toStream() async* {
     final iterator = this.iterator;
-    while (true) {
-      final result = await iterator.next();
-      if (result.done) break;
-      yield result.value;
+    if (iterator is FxFastIterator<T>) {
+      // Fast-pull loop: synchronously answered pulls go straight to yield.
+      while (true) {
+        final ro = iterator.nextOr();
+        final result = ro is Future<IterResult<T>> ? await ro : ro;
+        if (result.done) break;
+        yield result.value;
+      }
+    } else {
+      while (true) {
+        final result = await iterator.next();
+        if (result.done) break;
+        yield result.value;
+      }
     }
   }
 }
@@ -189,14 +611,6 @@ class Rejected<T> extends Settled<T> {
 
   /// Wraps a failure ([error] plus its [stackTrace]).
   const Rejected(this.error, this.stackTrace);
-}
-
-/// Awaits every future in [futures], capturing each outcome as a [Settled] so
-/// one rejection never fails the whole batch. Port of `Promise.allSettled`.
-Future<List<Settled<T>>> settleAll<T>(Iterable<Future<T>> futures) {
-  return Future.wait(futures.map((f) => f
-      .then<Settled<T>>((v) => Fulfilled(v))
-      .catchError((Object e, StackTrace st) => Rejected<T>(e, st))));
 }
 
 /// Balances the load of multiple asynchronous requests: pulls up to [length]
@@ -256,12 +670,33 @@ FxAsyncIterable<A> concurrentAsync<A>(int length, FxAsyncIterable<A> iterable) {
           }
         });
       } else {
-        final nextItems = settleAll(List.generate(
+        // One direct then per pull settling into an ordered slot — the
+        // settleAll form cost two extra future wrappers per element plus
+        // the Future.wait bookkeeping. The pulls are issued in one
+        // List.generate first so a synchronous throw from a pull
+        // propagates synchronously, exactly as it did through settleAll.
+        final pulls = List.generate(
             length, (_) => iterator.next(Concurrent.of(length)),
-            growable: false));
+            growable: false);
         pending = true;
-        prev = prev.then((_) => nextItems).then((items) {
-          buffer.addAll(items);
+        final batch = List<Settled<IterResult<A>>?>.filled(length, null);
+        var remaining = length;
+        final batchDone = Completer<void>();
+        void settle(int slot, Settled<IterResult<A>> outcome) {
+          batch[slot] = outcome;
+          if (--remaining == 0) batchDone.complete();
+        }
+
+        for (var i = 0; i < length; i++) {
+          final slot = i;
+          pulls[i].then((v) => settle(slot, Fulfilled(v)),
+              onError: (Object e, StackTrace st) =>
+                  settle(slot, Rejected<IterResult<A>>(e, st)));
+        }
+        prev = prev.then((_) => batchDone.future).then((_) {
+          for (final item in batch) {
+            buffer.add(item!);
+          }
           pending = false;
           recur();
         });

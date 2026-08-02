@@ -74,11 +74,28 @@ FxAsyncIterable<R> mapRetryAsync<A, R>(
 /// ```
 FxAsyncIterable<A> timeoutAsync<A>(
     Duration limit, FxAsyncIterable<A> iterable) {
-  return DelegateAsyncIterable(() {
-    final iterator = iterable.iterator;
-    return DelegateAsyncIterator(
-        (concurrent) => iterator.next(concurrent).timeout(limit));
-  });
+  return DelegateAsyncIterable(
+      () => _TimeoutAsyncIterator(limit, iterable.iterator));
+}
+
+class _TimeoutAsyncIterator<A> implements FxFastIterator<A> {
+  _TimeoutAsyncIterator(this._limit, this._inner);
+  final Duration _limit;
+  final FxAsyncIterator<A> _inner;
+
+  @override
+  Future<IterResult<A>> next([Concurrent? concurrent]) =>
+      _inner.next(concurrent).timeout(_limit);
+
+  @override
+  FutureOr<IterResult<A>> nextOr() {
+    final inner = _inner;
+    if (inner is! FxFastIterator<A>) return inner.next().timeout(_limit);
+    final r = inner.nextOr();
+    // A synchronously answered pull cannot have stalled — no timer needed.
+    if (r is Future<IterResult<A>>) return r.timeout(_limit);
+    return r;
+  }
 }
 
 /// Scopes a resource to one lazy iteration: [acquire] runs on the first
@@ -164,35 +181,75 @@ FxAsyncIterable<T> usingAsync<R, T>(
     FutureOr<R> Function() acquire,
     FxAsyncIterable<T> Function(R resource) use,
     FutureOr<void> Function(R resource) release) {
-  return DelegateAsyncIterable(() {
-    late R resource;
-    var acquired = false;
-    var done = false;
-    Future<FxAsyncIterator<T>>? started;
-    Future<void>? releasing;
+  return DelegateAsyncIterable(() => _UsingAsyncIterator(acquire, use, release));
+}
 
-    Future<void> releaseOnce() =>
-        releasing ??= Future.sync(() => release(resource));
+/// The [usingAsync] iterator. Public `next` stays a pass-through (as
+/// before); the fast-pull path serves synchronously answered inner pulls
+/// without futures, releasing exactly once on completion or error.
+class _UsingAsyncIterator<R, T> implements FxFastIterator<T> {
+  _UsingAsyncIterator(this._acquire, this._use, this._release);
+  final FutureOr<R> Function() _acquire;
+  final FxAsyncIterable<T> Function(R resource) _use;
+  final FutureOr<void> Function(R resource) _release;
+  late R _resource;
+  var _acquired = false;
+  var _done = false;
+  FxAsyncIterator<T>? _iterator; // cached once [_started] resolves
+  Future<FxAsyncIterator<T>>? _started;
+  Future<void>? _releasing;
 
-    return DelegateAsyncIterator((concurrent) {
-      if (done) return Future.value(IterResult<T>.done());
-      started ??= Future.sync(acquire).then((r) {
-        resource = r;
-        acquired = true;
-        return use(r).iterator;
+  Future<void> _releaseOnce() =>
+      _releasing ??= Future.sync(() => _release(_resource));
+
+  Future<FxAsyncIterator<T>> _ensureStarted() =>
+      _started ??= Future.sync(_acquire).then((r) {
+        _resource = r;
+        _acquired = true;
+        return _iterator = _use(r).iterator;
       });
-      return started!.then((it) => it.next(concurrent)).then((result) async {
-        if (result.done) {
-          done = true;
-          await releaseOnce();
-        }
-        return result;
-      }, onError: (Object e, StackTrace st) async {
-        done = true;
+
+  Future<IterResult<T>> _settle(Future<IterResult<T>> pull) =>
+      pull.then((result) {
+        if (!result.done) return result;
+        _done = true;
+        return _releaseOnce().then((_) => result);
+      }, onError: (Object e, StackTrace st) {
+        _done = true;
         // When acquire itself failed there is no resource to release.
-        if (acquired) await releaseOnce();
-        Error.throwWithStackTrace(e, st);
+        if (!_acquired) Error.throwWithStackTrace(e, st);
+        return _releaseOnce()
+            .then<IterResult<T>>((_) => Error.throwWithStackTrace(e, st));
       });
-    });
-  });
+
+  @override
+  Future<IterResult<T>> next([Concurrent? concurrent]) {
+    if (_done) return Future.value(IterResult<T>.done());
+    final it = _iterator;
+    if (it != null) return _settle(it.next(concurrent));
+    return _settle(_ensureStarted().then((i) => i.next(concurrent)));
+  }
+
+  @override
+  FutureOr<IterResult<T>> nextOr() {
+    if (_done) return IterResult<T>.done();
+    final it = _iterator;
+    if (it == null) {
+      return _settle(_ensureStarted().then((i) => i.next()));
+    }
+    if (it is! FxFastIterator<T>) return _settle(it.next());
+    final FutureOr<IterResult<T>> r;
+    try {
+      r = it.nextOr();
+    } catch (e, st) {
+      _done = true;
+      if (!_acquired) rethrow;
+      return _releaseOnce()
+          .then<IterResult<T>>((_) => Error.throwWithStackTrace(e, st));
+    }
+    if (r is Future<IterResult<T>>) return _settle(r);
+    if (!r.done) return r;
+    _done = true;
+    return _releaseOnce().then((_) => r);
+  }
 }

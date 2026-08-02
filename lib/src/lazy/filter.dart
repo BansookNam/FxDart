@@ -159,27 +159,32 @@ FxAsyncIterable<A> _asyncConcurrent<A>(FxAsyncIterable<(bool, A)> iterable) {
 /// Port of FxTS `filter` (async), including its dedicated concurrent path.
 FxAsyncIterable<A> filterAsync<A>(
     FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
+  // Fused-stage form; a Concurrent marker falls back to
+  // [_filterAsyncLegacy]'s concurrent predicate machinery.
+  final stage = FxFilterStage((v) => f(v as A));
+  if (iterable is FxFusedAsyncIterable<A>) {
+    final source = iterable.source;
+    final stages = iterable.stages;
+    final legacy = iterable.legacy;
+    return FxFusedAsyncIterable<A>(
+        source, [...stages, stage], () => _filterAsyncLegacy(f, legacy()));
+  }
+  return FxFusedAsyncIterable<A>(
+      iterable, [stage], () => _filterAsyncLegacy(f, iterable));
+}
+
+FxAsyncIterable<A> _filterAsyncLegacy<A>(
+    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
+  // Only reached via the fused chain's Concurrent fallback, so this is the
+  // concurrent predicate machinery directly (the serial case is the fused
+  // FxFilterStage). A defensive unmarked first pull degrades to width 1.
   return DelegateAsyncIterable(() {
     FxAsyncIterator<A>? inner;
     return DelegateAsyncIterator((concurrent) {
-      if (inner == null) {
-        if (concurrent is Concurrent) {
-          inner = _asyncConcurrent(concurrentAsync(
-                  concurrent.length, _toFilterIterable(f, iterable)))
-              .iterator;
-        } else {
-          final iterator = iterable.iterator;
-          inner = SerialAsyncIterator((c) async {
-            while (true) {
-              final result = await iterator.next(c);
-              if (result.done) return IterResult<A>.done();
-              if (await f(result.value)) {
-                return IterResult.value(result.value);
-              }
-            }
-          });
-        }
-      }
+      inner ??= _asyncConcurrent(concurrentAsync(
+              concurrent is Concurrent ? concurrent.length : 1,
+              _toFilterIterable(f, iterable)))
+          .iterator;
       return inner!.next(concurrent);
     });
   });

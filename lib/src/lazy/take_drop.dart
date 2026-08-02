@@ -191,17 +191,39 @@ class _TakeWhileIterator<A> implements Iterator<A> {
 /// Async counterpart of [takeWhile].
 FxAsyncIterable<A> takeWhileAsync<A>(
     FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
+  // Fused-stage form; a Concurrent marker falls back to
+  // [_takeWhileAsyncLegacy]'s dispatch layering.
+  final stage = FxTakeWhileStage((v) => f(v as A));
+  if (iterable is FxFusedAsyncIterable<A>) {
+    final source = iterable.source;
+    final stages = iterable.stages;
+    final legacy = iterable.legacy;
+    return FxFusedAsyncIterable<A>(
+        source, [...stages, stage], () => _takeWhileAsyncLegacy(f, legacy()));
+  }
+  return FxFusedAsyncIterable<A>(
+      iterable, [stage], () => _takeWhileAsyncLegacy(f, iterable));
+}
+
+FxAsyncIterable<A> _takeWhileAsyncLegacy<A>(
+    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var end = false;
-    return SerialAsyncIterator((concurrent) async {
-      final result = await iterator.next(concurrent);
-      if (result.done || end) return IterResult<A>.done();
-      if (!await f(result.value)) {
-        end = true;
-        return IterResult<A>.done();
-      }
-      return result;
+    return SerialAsyncIterator((concurrent) {
+      if (end) return Future.value(IterResult<A>.done());
+      return iterator.next(concurrent).then((result) {
+        if (result.done || end) return IterResult<A>.done();
+        final keep = f(result.value);
+        FutureOr<IterResult<A>> decide(bool k) {
+          if (k) return result;
+          end = true;
+          return IterResult<A>.done();
+        }
+
+        if (keep is Future<bool>) return keep.then(decide);
+        return decide(keep);
+      });
     });
   });
 }
@@ -450,16 +472,21 @@ FxAsyncIterable<A> dropWhileAsync<A>(
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var dropping = true;
-    return SerialAsyncIterator((concurrent) async {
-      while (true) {
-        final result = await iterator.next(concurrent);
-        if (result.done) return IterResult<A>.done();
-        if (dropping) {
-          if (await f(result.value)) continue;
-          dropping = false;
-        }
-        return result;
-      }
+    return SerialAsyncIterator((concurrent) {
+      Future<IterResult<A>> loop() => iterator.next(concurrent).then((result) {
+            if (result.done) return IterResult<A>.done();
+            if (!dropping) return result;
+            final drop = f(result.value);
+            FutureOr<IterResult<A>> decide(bool d) {
+              if (d) return loop();
+              dropping = false;
+              return result;
+            }
+
+            if (drop is Future<bool>) return drop.then(decide);
+            return decide(drop);
+          });
+      return loop();
     });
   });
 }
@@ -504,13 +531,21 @@ FxAsyncIterable<A> dropUntilAsync<A>(
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var dropping = true;
-    return SerialAsyncIterator((concurrent) async {
-      while (dropping) {
-        final result = await iterator.next(concurrent);
-        if (result.done) return IterResult<A>.done();
-        if (await f(result.value)) dropping = false;
-      }
-      return iterator.next(concurrent);
+    return SerialAsyncIterator((concurrent) {
+      if (!dropping) return iterator.next(concurrent);
+      Future<IterResult<A>> loop() => iterator.next(concurrent).then((result) {
+            if (result.done) return IterResult<A>.done();
+            final match = f(result.value);
+            FutureOr<IterResult<A>> decide(bool m) {
+              if (!m) return loop();
+              dropping = false;
+              return iterator.next(concurrent);
+            }
+
+            if (match is Future<bool>) return match.then(decide);
+            return decide(match);
+          });
+      return loop();
     });
   });
 }
