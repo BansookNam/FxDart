@@ -1,7 +1,7 @@
 ---
 slug: combine-form-fields
 title: Habilitar el envío cuando el formulario es válido — RxDart vs FxDart
-description: Combinar los últimos valores de email y contraseña para gobernar el botón de envío — Rx.combineLatest2 vs combineLatest en la capa de eventos de fxdart 0.8.0.
+description: Combinar los últimos valores de email y contraseña para gobernar el botón de envío — Rx.combineLatest2 vs combineLatest en la capa de eventos de fxdart 0.7.3.
 heading: Habilitar el envío cuando el formulario es válido
 order: 43
 tier: 4
@@ -45,7 +45,7 @@ async: true
     a mano ha desaparecido.
   </p>
   <p>
-    La capa de eventos de fxdart&nbsp;0.8.0 absorbió el enfoque Rx
+    La capa de eventos de fxdart&nbsp;0.7.3 absorbió el enfoque Rx
     exactamente para esta clase de trabajo: una cadena envoltorio
     deliberada sobre <code>Stream</code>s llanos — no una extensión, así
     que convive con rxdart o cualquier otra biblioteca de streams sin

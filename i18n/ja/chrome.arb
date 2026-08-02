@@ -22,5 +22,10 @@
   "pgLoading": "ランタイムを読み込み中…",
   "pgRunning": "実行中…",
   "pgNoOutput": "（出力なし）",
-  "pgLoadFailed": "FxDart ライブラリを読み込めませんでした"
+  "pgLoadFailed": "FxDart ライブラリを読み込めませんでした",
+  "cmpSpeedFxdart": "FxDartが高速",
+  "cmpSpeedTie": "速度は同等",
+  "cmpSpeedNative": "ネイティブが高速",
+  "cmpSpeedRxdart": "RxDartが高速",
+  "cmpSpeedLegend": "各例には2つの視点があります。塗りつぶしバッジはコードの判定 — どちらが書きやすく読みやすいか。枠線のみの⚡バッジは計測結果 — 最大ベンチマークサイズでのAOTコンパイル実測の実行時間の勝者です。詳細なグラフは各ページのベンチマークセクションにあります。"
 }

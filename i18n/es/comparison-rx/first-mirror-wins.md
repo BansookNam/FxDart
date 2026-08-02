@@ -31,7 +31,7 @@ async: true
   <p>
     Ya no difieren. La carrera es una idea push — suscríbete a todo,
     quédate con quien hable primero, <em>cancela</em> el resto — y desde
-    fxdart 0.8.0 <code>FxEvents.race</code> es exactamente eso,
+    fxdart 0.7.3 <code>FxEvents.race</code> es exactamente eso,
     igualando a <code>Rx.race</code> movimiento a movimiento: ambos
     mirrors están genuinamente en vuelo, y en el momento en que el
     mirror de la UE emite a los 60&nbsp;ms la suscripción de EE. UU. se

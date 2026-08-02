@@ -1,7 +1,7 @@
 ---
 slug: throttled-refresh
 title: Aplicar throttle al botón de refresco — RxDart vs FxDart
-description: Dejar pasar un toque por ventana de 300 ms — throttleTime sobre el stream de toques vs la cadena throttle equivalente en la capa de eventos de fxdart 0.8.0.
+description: Dejar pasar un toque por ventana de 300 ms — throttleTime sobre el stream de toques vs la cadena throttle equivalente en la capa de eventos de fxdart 0.7.3.
 heading: Aplicar throttle al botón de refresco
 order: 41
 tier: 4
@@ -41,7 +41,7 @@ async: true
     dentro del operador.
   </p>
   <p>
-    fxdart&nbsp;0.8.0 llegó aquí absorbiendo deliberadamente el enfoque
+    fxdart&nbsp;0.7.3 llegó aquí absorbiendo deliberadamente el enfoque
     Rx para el lado push: <code>fxEvents</code> es una cadena envoltorio
     sobre <code>Stream</code>s llanos — no una extensión, así que
     convive con cualquier biblioteca de streams sin un solo conflicto de

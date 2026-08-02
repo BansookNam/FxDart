@@ -1,8 +1,8 @@
-## Unreleased
+## 0.7.3
 
 ### Performance
 
-AOT-measured pass over the operators the 0.7.2 additions and the
+First pass: AOT-measured, over the operators the 0.7.2 additions and the
 DartComparison benchmark #53 (smoothed-zone-changes) exercise; that case's
 headline-scale gap vs hand-written Dart shrank from 2.7× to 1.37× with no
 API or output change.
@@ -25,7 +25,43 @@ API or output change.
   analysis can erase the wrapper allocation in per-element uses like
   `.map((w) => fx(w).average())`.
 
-## 0.8.0
+Second pass: the same AOT treatment extended to the rest of the sync
+surface. DartComparison #7 (top-log-level) now beats its hand-written
+Dart baseline outright; every benchmark checksum is unchanged.
+
+* **`takeRight` / `dropRight` / `reverse` / `cycle` / `flat` / `fork` /
+  `using` / `split` / `transpose` / `entries`** — the remaining `sync*`
+  generators rewritten as hand-written iterators (2.7–8.3× measured per
+  operator; `split` also accumulates into a `StringBuffer`).
+  **`differenceBy` / `intersectionBy`** fuse their filter-then-`uniq`
+  pair into a single pass over the second iterable.
+* **List sources are indexed directly** in `reverse` / `takeRight` /
+  `dropRight` — no snapshot copy (`reverse` of a 1M-element list 12.8×;
+  `takeRight(1000)` of it ~1500×, since the untaken 999,000 elements are
+  never copied). Non-List sources use O(length) ring buffers, and
+  `dropRight` streams through a delay line instead of materializing:
+  `take(2, dropRight(2, xs))` pulls exactly 4 elements, and unbounded
+  sources now work. Two visible edges: a negative `length` now throws at
+  the call site instead of at the first pull, and mutating a source list
+  mid-iteration is no longer masked by an internal copy.
+* **`find` / `findIndex`** — direct loops instead of `head(filter(…))` /
+  `zipWithIndex` (8.7× / 3.5×: no per-element filter layer or index
+  record). **`last` / `nth`** are O(1) on lists, **`size`** on lists and
+  sets.
+* **`min` / `max`** — indexed fast paths for `List<double>` / `List<int>`
+  (10.2× / 8.3×) and a direct loop otherwise (1.8×); empty/NaN/tie
+  results identical to the fold they replace.
+* **`groupBy` / `countBy` / `uniq`** — per-element closure allocations
+  removed (`putIfAbsent`, `Map.update`'s two closures, `uniqBy`'s
+  identity key): 1.5× / 2.2× / 1.7×.
+* **`map` / `scan` / `scan1`** — `.toList()` fills a pre-sized list when
+  the source is a `List` (1.9× / 2.1× / 2.4×); the callback still runs
+  exactly once per element, in order. The RxDartComparison
+  `running-balance-feed` case (`scan1(…).toList()` end to end) got 2.08×
+  faster, widening fxdart's win there to ~10×.
+* **`Fx`** delegates `length` / `isEmpty` / `isNotEmpty` / `first` /
+  `last` / `single` / `elementAt` / `contains` to the wrapped iterable —
+  `fx(list).length` is O(1) instead of an iterator walk.
 
 ### Added — the events layer (`FxEvents`)
 

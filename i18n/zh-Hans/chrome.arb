@@ -22,5 +22,10 @@
   "pgLoading": "正在加载运行时…",
   "pgRunning": "运行中…",
   "pgNoOutput": "（无输出）",
-  "pgLoadFailed": "无法加载 FxDart 库"
+  "pgLoadFailed": "无法加载 FxDart 库",
+  "cmpSpeedFxdart": "FxDart 更快",
+  "cmpSpeedTie": "速度相同",
+  "cmpSpeedNative": "原生更快",
+  "cmpSpeedRxdart": "RxDart 更快",
+  "cmpSpeedLegend": "每个示例有两个视角:实心徽章评判代码 — 哪个版本更好写、更好读。描边的 ⚡ 徽章报告实测结果 — 在最大基准规模下(AOT 编译)运行时间的赢家;完整图表见各页的基准测试部分。"
 }

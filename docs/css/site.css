@@ -303,6 +303,18 @@ main.cmp-wide { max-width: 1280px; }
 .verdict-rxdart { background: var(--rx); border-color: var(--rx); color: #fff; }
 .badge-async { background: var(--out-bg); border-color: var(--out-bg); color: var(--out-text); }
 
+/* Speed badge: the *measured* standpoint on the index rows, next to the
+   filled code-verdict badge. Hollow where the verdict is filled, ⚡-prefixed,
+   and worded "faster / same speed" — three redundant cues, so color (same
+   side-hues as the verdict badges) reinforces the pairing but never carries
+   the distinction alone. */
+.badge-speed { background: transparent; font-weight: 500; }
+.speed-fxdart { border-color: var(--accent); color: var(--accent); }
+.speed-tie { border-color: var(--border); color: var(--text-dim); }
+.speed-native { border-color: var(--ok); color: var(--ok); }
+.speed-rxdart { border-color: var(--rx); color: var(--rx); }
+.cmp-speed-legend { margin-top: -0.4rem; font-size: 0.88rem; }
+
 .cmp-meta { margin: 0.2rem 0 0.4rem; }
 .cmp-fns { margin: 0.4rem 0 1rem; }
 

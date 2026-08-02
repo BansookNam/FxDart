@@ -1,7 +1,7 @@
 ---
 slug: sampled-gauge
 title: Muestrear el medidor en cada tick de sondeo — RxDart vs FxDart
-description: Leer el valor más reciente del medidor en cada tick de sondeo — un stream disparador de sample explícito en RxDart vs sampleOn en la capa de eventos de fxdart 0.8.0.
+description: Leer el valor más reciente del medidor en cada tick de sondeo — un stream disparador de sample explícito en RxDart vs sampleOn en la capa de eventos de fxdart 0.7.3.
 heading: Muestrear el medidor en cada tick de sondeo
 order: 42
 tier: 4
@@ -40,7 +40,7 @@ async: true
   </p>
   <p>
     Los pipelines pull siguen sin tener reloj ni «valor actual» — esa
-    negativa se mantiene. En su lugar, fxdart&nbsp;0.8.0 absorbió el
+    negativa se mantiene. En su lugar, fxdart&nbsp;0.7.3 absorbió el
     enfoque Rx en una capa de eventos dedicada: <code>fxEvents</code> es
     una cadena envoltorio fina sobre <code>Stream</code>s llanos (nunca
     una extensión, así que no colisiona con nada) que posee los verbos

@@ -1,7 +1,7 @@
 ---
 slug: sampled-gauge
 title: 폴링 틱마다 게이지 샘플링하기 — RxDart vs FxDart
-description: 각 폴링 틱 시점의 최신 게이지 값 읽기 — RxDart의 명시적 sample 트리거 스트림 vs fxdart 0.8.0 이벤트 레이어의 sampleOn.
+description: 각 폴링 틱 시점의 최신 게이지 값 읽기 — RxDart의 명시적 sample 트리거 스트림 vs fxdart 0.7.3 이벤트 레이어의 sampleOn.
 heading: 폴링 틱마다 게이지 샘플링하기
 order: 42
 tier: 4
@@ -40,7 +40,7 @@ async: true
   </p>
   <p>
     pull 파이프라인에는 여전히 시계도 "현재 값"도 없습니다 — 그 거절은
-    그대로입니다. 대신 fxdart&nbsp;0.8.0은 전용 이벤트 레이어에서 Rx의
+    그대로입니다. 대신 fxdart&nbsp;0.7.3은 전용 이벤트 레이어에서 Rx의
     접근을 흡수했습니다: <code>fxEvents</code>는 평범한
     <code>Stream</code> 위의 얇은 래퍼 체인으로(결코 extension이
     아니어서 어떤 것과도 충돌하지 않습니다), pull 쪽이 맡지 않으려 한

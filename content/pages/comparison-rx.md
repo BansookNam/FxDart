@@ -31,7 +31,7 @@ description: 50 real tasks solved twice — RxDart streams vs FxDart pull pipeli
     A word of honesty before the list: when a problem is genuinely about
     <em>events over time</em> — user input, tickers, sockets — a stream is
     the right shape for it. FxDart says so by absorbing the idea: since
-    0.8.0 its <strong>events layer</strong>
+    0.7.3 its <strong>events layer</strong>
     (<code><a href="../tutorials/fxEvents.html">fxEvents</a></code>) puts
     Rx-style push operators — debounce, throttle, sample, combineLatest,
     switchMap, race, a <code>LiveValue</code> — on plain Dart streams, so

@@ -30,7 +30,7 @@ async: true
   <p>
     They no longer do. Racing is a push idea — subscribe to everything,
     keep whoever speaks first, <em>cancel</em> the rest — and since
-    fxdart 0.8.0 <code>FxEvents.race</code> is exactly that, matching
+    fxdart 0.7.3 <code>FxEvents.race</code> is exactly that, matching
     <code>Rx.race</code> move for move: both mirrors are genuinely in
     flight, and the moment the EU mirror emits at 60&nbsp;ms the US
     subscription is cancelled, its <code>onCancel</code> fires, and the

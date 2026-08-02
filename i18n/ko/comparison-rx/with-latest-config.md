@@ -30,7 +30,7 @@ async: true
   <p>
     이제는 다르지 않습니다. 이것은 <code>combineLatest</code>의 비대칭
     형제입니다 — 한 스트림이 주도하고, 다른 스트림은 <em>참조</em>될
-    뿐입니다 — 그리고 fxdart 0.8.0부터는 두 패널 모두 그것을 같은
+    뿐입니다 — 그리고 fxdart 0.7.3부터는 두 패널 모두 그것을 같은
     이름으로 부릅니다: <code>withLatestFrom</code>이 요청마다 내보내되
     지금까지 본 가장 신선한 config를 찍어 주고, config만 바뀔 때는
     침묵합니다. 옛 FxDart 패널에 필요했던 태그 병합 뼈대와
@@ -38,7 +38,7 @@ async: true
     연산자로 동일합니다.
   </p>
   <p>
-    fxdart 0.8.0의 이벤트 레이어는 push 쪽을 위해 Rx의 접근을
+    fxdart 0.7.3의 이벤트 레이어는 push 쪽을 위해 Rx의 접근을
     흡수했습니다: <code>fxEvents</code>는 평범한 <code>Stream</code>
     위의 얇은 래퍼 체인으로 — 결코 extension이 아니어서 rxdart를
     포함해 어떤 것과도 충돌하지 않습니다. RxDart의 연산자 카탈로그는

@@ -379,6 +379,25 @@ class _ScanIterable<A, B> extends Iterable<B> {
   final Iterable<A> _source;
   @override
   Iterator<B> get iterator => _ScanIterator(_f, _seed, _source.iterator);
+  @override
+  List<B> toList({bool growable = true}) {
+    final source = _source;
+    // A List source scans into a pre-sized list (output length is exactly
+    // n+1) — as in [_MapIterable.toList], the inherited toList would grow
+    // and recopy ~log n times. [_f] still runs exactly once per element,
+    // in order.
+    if (source is List<A>) {
+      final length = source.length;
+      final out = List<B>.filled(length + 1, _seed, growable: growable);
+      var acc = _seed;
+      for (var i = 0; i < length; i++) {
+        acc = _f(acc, source[i]);
+        out[i + 1] = acc;
+      }
+      return out;
+    }
+    return super.toList(growable: growable);
+  }
 }
 
 class _ScanIterator<A, B> implements Iterator<B> {
@@ -417,6 +436,25 @@ class _Scan1Iterable<A> extends Iterable<A> {
   final Iterable<A> _source;
   @override
   Iterator<A> get iterator => _Scan1Iterator(_f, _source.iterator);
+  @override
+  List<A> toList({bool growable = true}) {
+    final source = _source;
+    // A List source scans into a pre-sized list (output length is exactly
+    // n) — see [_ScanIterable.toList]. [_f] still runs exactly once per
+    // element after the first, in order.
+    if (source is List<A>) {
+      final length = source.length;
+      if (length == 0) return growable ? <A>[] : List<A>.empty();
+      var acc = source[0];
+      final out = List<A>.filled(length, acc, growable: growable);
+      for (var i = 1; i < length; i++) {
+        acc = _f(acc, source[i]);
+        out[i] = acc;
+      }
+      return out;
+    }
+    return super.toList(growable: growable);
+  }
 }
 
 class _Scan1Iterator<A> implements Iterator<A> {

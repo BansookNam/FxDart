@@ -22,5 +22,10 @@
   "pgLoading": "Carregando runtime…",
   "pgRunning": "Executando…",
   "pgNoOutput": "(sem saída)",
-  "pgLoadFailed": "Não foi possível carregar a biblioteca FxDart"
+  "pgLoadFailed": "Não foi possível carregar a biblioteca FxDart",
+  "cmpSpeedFxdart": "FxDart mais rápido",
+  "cmpSpeedTie": "Mesma velocidade",
+  "cmpSpeedNative": "Nativo mais rápido",
+  "cmpSpeedRxdart": "RxDart mais rápido",
+  "cmpSpeedLegend": "Duas perspectivas por exemplo: o selo preenchido julga o código — qual versão é mais agradável de escrever e ler. O selo ⚡ contornado relata a medição — o vencedor em tempo de execução no maior tamanho do benchmark, compilado AOT; a seção Benchmark de cada página traz as barras completas."
 }

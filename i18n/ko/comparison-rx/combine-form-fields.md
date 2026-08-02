@@ -1,7 +1,7 @@
 ---
 slug: combine-form-fields
 title: 폼이 유효해지면 제출 버튼 켜기 — RxDart vs FxDart
-description: 최신 이메일·비밀번호 값을 결합해 제출 버튼을 구동 — Rx.combineLatest2 vs fxdart 0.8.0 이벤트 레이어의 combineLatest.
+description: 최신 이메일·비밀번호 값을 결합해 제출 버튼을 구동 — Rx.combineLatest2 vs fxdart 0.7.3 이벤트 레이어의 combineLatest.
 heading: 폼이 유효해지면 제출 버튼 켜기
 order: 43
 tier: 4
@@ -42,7 +42,7 @@ async: true
     태그 병합-폴드는 사라졌습니다.
   </p>
   <p>
-    fxdart&nbsp;0.8.0의 이벤트 레이어는 정확히 이런 종류의 일을 위해
+    fxdart&nbsp;0.7.3의 이벤트 레이어는 정확히 이런 종류의 일을 위해
     Rx의 접근을 흡수했습니다: 평범한 <code>Stream</code> 위의 의도된
     래퍼 체인으로 — extension이 아니어서 rxdart든 다른 어떤 스트림
     라이브러리든 충돌 없이 공존합니다 — pull 파이프라인이 가질 수 없는

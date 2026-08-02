@@ -31,7 +31,7 @@ async: true
   <h2>Por qué difieren</h2>
   <p>
     Ya no difieren. «Lo más nuevo cancela lo más viejo» es una
-    afirmación sobre <em>suscripciones</em>, y desde fxdart 0.8.0 la
+    afirmación sobre <em>suscripciones</em>, y desde fxdart 0.7.3 la
     capa <code>fxEvents</code> las tiene: su <code>switchMap</code>
     mapea cada consulta a un stream de búsqueda interno y des-suscribe
     el anterior en el momento en que llega una consulta más nueva, así
@@ -42,7 +42,7 @@ async: true
     terminación que el viejo panel FxDart necesitaba han desaparecido.
   </p>
   <p>
-    fxdart 0.8.0 absorbió el enfoque Rx exactamente para esta clase de
+    fxdart 0.7.3 absorbió el enfoque Rx exactamente para esta clase de
     requisito: <code>fxEvents</code> es una cadena envoltorio fina sobre
     <code>Stream</code>s llanos — nunca una extensión, así que convive
     con cualquier otra biblioteca de streams, rxdart incluido. El

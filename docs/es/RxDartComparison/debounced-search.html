@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Aplicar debounce al buscador — RxDart vs FxDart</title>
-  <meta name="description" content="Esperar a que el tecleo se calme antes de buscar — debounceTime sobre el stream de eventos vs la misma cadena debounce en la capa de eventos de fxdart 0.8.0.">
+  <meta name="description" content="Esperar a que el tecleo se calme antes de buscar — debounceTime sobre el stream de eventos vs la misma cadena debounce en la capa de eventos de fxdart 0.7.3.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/debounced-search.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/debounced-search.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/debounced-search.html">
@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=17d22149da0bfb75">
 </head>
 <body>
 <header class="site-header">
@@ -109,7 +109,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground">
+      <div class="playground" data-pg="2487687044aa2b21">
 <textarea>
 import 'dart:async';
 
@@ -153,7 +153,7 @@ Future<void> main() async {
     de llegar</strong> — y ambos paneles lo dicen ahora de la misma
     manera: aplicar debounce al stream de eventos con 160&nbsp;ms,
     buscar cada consulta superviviente, recoger. RxDart lo escribe
-    <code>debounceTime</code>; fxdart&nbsp;0.8.0 lo escribe
+    <code>debounceTime</code>; fxdart&nbsp;0.7.3 lo escribe
     <code>fxEvents(...).debounce(...)</code>. Operador por operador, las
     dos cadenas son equivalentes, hasta en el valor final vaciado al
     cerrar.
@@ -182,7 +182,7 @@ Future<void> main() async {
   <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=17d22149da0bfb75";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

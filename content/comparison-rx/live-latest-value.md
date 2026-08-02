@@ -28,7 +28,7 @@ async: true
   <h2>Why they differ</h2>
   <p>
     They no longer do. "The latest value, replayed to whoever shows up"
-    is <em>shared, multicast state</em>, and since fxdart 0.8.0 fxdart
+    is <em>shared, multicast state</em>, and since fxdart 0.7.3 fxdart
     has a dedicated object for it too: <code>LiveValue</code> is
     <code>BehaviorSubject</code> reduced to its defining behavior — a
     sink the sensor writes to, a readable <code>.value</code>, and a feed
@@ -38,7 +38,7 @@ async: true
     old FxDart panel needed are gone.
   </p>
   <p>
-    This is fxdart 0.8.0's events layer absorbing the Rx approach for
+    This is fxdart 0.7.3's events layer absorbing the Rx approach for
     the push side: <code>LiveValue.live</code> hands back an
     <code>fxEvents</code> chain — a thin wrapper over a plain broadcast
     <code>Stream</code>, so it collides with nothing, rxdart included —

@@ -128,6 +128,21 @@
   "cmpBenchWinRxdart": "RxDart wins",
   "@cmpBenchWinRxdart": { "description": "Benchmark badge: the RxDart implementation measured faster / lighter. 'RxDart' is the product name." },
 
+  "cmpSpeedFxdart": "FxDart faster",
+  "@cmpSpeedFxdart": { "description": "Index speed badge (measured standpoint): the FxDart implementation measured faster at the largest benchmark size. 'FxDart' is the product name." },
+
+  "cmpSpeedTie": "Same speed",
+  "@cmpSpeedTie": { "description": "Index speed badge (measured standpoint): both implementations measured within the tie margin at the largest benchmark size." },
+
+  "cmpSpeedNative": "Native faster",
+  "@cmpSpeedNative": { "description": "Index speed badge (measured standpoint): the plain-Dart implementation measured faster at the largest benchmark size." },
+
+  "cmpSpeedRxdart": "RxDart faster",
+  "@cmpSpeedRxdart": { "description": "Index speed badge (measured standpoint): the RxDart implementation measured faster at the largest benchmark size. 'RxDart' is the product name." },
+
+  "cmpSpeedLegend": "Two standpoints per example: the filled badge judges the code — which version is nicer to write and read. The outlined ⚡ badge reports the measurement — the wall-clock winner at the largest benchmarked size, AOT-compiled; each page's Benchmark section has the full bars.",
+  "@cmpSpeedLegend": { "description": "Legend line on the comparison index pages explaining the difference between the filled code-verdict badge and the outlined measured-speed badge. Keep the ⚡ character." },
+
   "cmpBenchMeta": "{cpu}, {ram} GB RAM · Dart {dart} (AOT-compiled) · {date}",
   "@cmpBenchMeta": { "description": "Machine line under the Benchmark heading. Keep every {placeholder} intact; they are replaced by the generator (CPU name, RAM, Dart version, date)." },
 

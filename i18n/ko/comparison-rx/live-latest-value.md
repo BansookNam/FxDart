@@ -28,7 +28,7 @@ async: true
   <h2>차이가 나는 이유</h2>
   <p>
     이제는 다르지 않습니다. "누가 나타나든 리플레이되는 최신 값"은
-    <em>공유된 멀티캐스트 상태</em>이고, fxdart 0.8.0부터는 fxdart에도
+    <em>공유된 멀티캐스트 상태</em>이고, fxdart 0.7.3부터는 fxdart에도
     그것을 위한 전용 객체가 있습니다: <code>LiveValue</code>는
     <code>BehaviorSubject</code>를 그것을 정의하는 동작만 남기고 줄인
     것입니다 — 센서가 쓰는 싱크, 읽을 수 있는 <code>.value</code>,
@@ -38,7 +38,7 @@ async: true
     변수와 여분의 캐싱 리스너는 사라졌습니다.
   </p>
   <p>
-    이것이 fxdart 0.8.0의 이벤트 레이어가 push 쪽을 위해 Rx의 접근을
+    이것이 fxdart 0.7.3의 이벤트 레이어가 push 쪽을 위해 Rx의 접근을
     흡수한 모습입니다: <code>LiveValue.live</code>는
     <code>fxEvents</code> 체인을 돌려주는데 — 평범한 브로드캐스트
     <code>Stream</code> 위의 얇은 래퍼라 rxdart를 포함해 어떤 것과도

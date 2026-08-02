@@ -30,7 +30,7 @@ async: true
   <p>
     이제는 다르지 않습니다. 경주는 push의 아이디어입니다 — 전부
     구독하고, 먼저 말하는 쪽을 지키고, 나머지는 <em>취소</em>합니다 —
-    그리고 fxdart 0.8.0부터 <code>FxEvents.race</code>가 정확히
+    그리고 fxdart 0.7.3부터 <code>FxEvents.race</code>가 정확히
     그것이며, <code>Rx.race</code>와 수 하나하나까지 맞아떨어집니다:
     두 미러가 진짜로 동시에 진행되고, EU 미러가 60&nbsp;ms에 값을
     내보내는 순간 US 구독이 취소되어 <code>onCancel</code>이 발동하고,

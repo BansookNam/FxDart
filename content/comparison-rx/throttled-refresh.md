@@ -1,7 +1,7 @@
 ---
 slug: throttled-refresh
 title: Throttle the refresh button — RxDart vs FxDart
-description: Let one tap through per 300 ms window — throttleTime on the tap stream vs the equivalent throttle chain in fxdart 0.8.0's events layer.
+description: Let one tap through per 300 ms window — throttleTime on the tap stream vs the equivalent throttle chain in fxdart 0.7.3's events layer.
 heading: Throttle the refresh button
 order: 41
 tier: 4
@@ -39,7 +39,7 @@ async: true
     the operator.
   </p>
   <p>
-    fxdart&nbsp;0.8.0 got here by deliberately absorbing the Rx approach
+    fxdart&nbsp;0.7.3 got here by deliberately absorbing the Rx approach
     for the push side: <code>fxEvents</code> is a wrapper chain over plain
     <code>Stream</code>s — not an extension, so it coexists with any
     stream library without a single member conflict. RxDart's operator

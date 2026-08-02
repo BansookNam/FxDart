@@ -1,7 +1,7 @@
 ---
 slug: throttled-refresh
 title: 새로고침 버튼 스로틀링하기 — RxDart vs FxDart
-description: 300 ms 윈도마다 탭 하나만 통과 — 탭 스트림 위의 throttleTime vs fxdart 0.8.0 이벤트 레이어의 동등한 throttle 체인.
+description: 300 ms 윈도마다 탭 하나만 통과 — 탭 스트림 위의 throttleTime vs fxdart 0.7.3 이벤트 레이어의 동등한 throttle 체인.
 heading: 새로고침 버튼 스로틀링하기
 order: 41
 tier: 4
@@ -39,7 +39,7 @@ async: true
     처리됩니다.
   </p>
   <p>
-    fxdart&nbsp;0.8.0은 push 쪽을 위해 Rx의 접근을 의도적으로 흡수해
+    fxdart&nbsp;0.7.3은 push 쪽을 위해 Rx의 접근을 의도적으로 흡수해
     여기에 도달했습니다: <code>fxEvents</code>는 평범한
     <code>Stream</code> 위의 래퍼 체인으로 — extension이 아니어서 멤버
     충돌 하나 없이 어떤 스트림 라이브러리와도 공존합니다. RxDart의

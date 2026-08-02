@@ -72,6 +72,37 @@ void main() {
           equals(1));
     });
 
+    test('scan(f, seed, list).toList() pre-sized path matches generic', () {
+      final growable = scan((int acc, int a) => acc + a, 10, [1, 2, 3]).toList();
+      expect(growable, equals([10, 11, 13, 16]));
+      growable.add(0); // stays growable
+      expect(scan((int acc, int a) => acc + a, 10, [1, 2, 3]).toList(growable: false),
+          equals([10, 11, 13, 16]));
+      expect(scan((int acc, int a) => acc + a, 10, <int>[]).toList(),
+          equals([10]));
+      // Lazy source falls through to the inherited toList.
+      expect(
+          scan((int acc, int a) => acc + a, 10, [1, 2, 3].where((a) => a > 1))
+              .toList(),
+          equals([10, 12, 15]));
+    });
+
+    test('scan1(f, list).toList() pre-sized path matches generic', () {
+      final growable = scan1((int acc, int a) => acc + a, [1, 2, 3]).toList();
+      expect(growable, equals([1, 3, 6]));
+      growable.add(0); // stays growable
+      expect(scan1((int acc, int a) => acc + a, [1, 2, 3]).toList(growable: false),
+          equals([1, 3, 6]));
+      expect(scan1((int acc, int a) => acc + a, <int>[]).toList(),
+          equals(<int>[]));
+      expect(scan1((int acc, int a) => acc + a, [5]).toList(), equals([5]));
+      // Lazy source falls through to the inherited toList.
+      expect(
+          scan1((int acc, int a) => acc + a, [1, 2, 3].where((a) => a > 1))
+              .toList(),
+          equals([2, 5]));
+    });
+
     test('map(f, list).toList() pre-sized path matches the generic path', () {
       final growable = map((int a) => a * 2, [1, 2, 3]).toList();
       expect(growable, equals([2, 4, 6]));

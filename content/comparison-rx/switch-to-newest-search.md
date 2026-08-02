@@ -30,7 +30,7 @@ async: true
   <h2>Why they differ</h2>
   <p>
     They no longer do. "Newer cancels older" is a statement about
-    <em>subscriptions</em>, and since fxdart 0.8.0 the
+    <em>subscriptions</em>, and since fxdart 0.7.3 the
     <code>fxEvents</code> layer has them: its <code>switchMap</code> maps
     each query to an inner search stream and unsubscribes the previous
     one the moment a newer query arrives, so a stale result has no
@@ -40,7 +40,7 @@ async: true
     panel needed are gone.
   </p>
   <p>
-    fxdart 0.8.0 absorbed the Rx approach for exactly this kind of
+    fxdart 0.7.3 absorbed the Rx approach for exactly this kind of
     requirement: <code>fxEvents</code> is a thin wrapper chain over plain
     <code>Stream</code>s — never an extension, so it coexists with any
     other stream library, rxdart included. RxDart's operator catalog

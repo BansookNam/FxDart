@@ -30,7 +30,7 @@ async: true
   <p>
     They no longer do. This is <code>combineLatest</code>'s asymmetric
     sibling — one stream drives, the other is only <em>consulted</em> —
-    and since fxdart 0.8.0 both panels name it the same way:
+    and since fxdart 0.7.3 both panels name it the same way:
     <code>withLatestFrom</code> emits per request, stamped with the
     freshest config seen so far, and stays silent when only the config
     changes. The tagged-merge scaffolding and the <code>scan</code> fold
@@ -38,7 +38,7 @@ async: true
     operator-for-operator identical.
   </p>
   <p>
-    fxdart 0.8.0's events layer absorbed the Rx approach for the push
+    fxdart 0.7.3's events layer absorbed the Rx approach for the push
     side: <code>fxEvents</code> is a thin wrapper chain over plain
     <code>Stream</code>s — never an extension, so it collides with
     nothing, rxdart included. RxDart's operator catalog remains far

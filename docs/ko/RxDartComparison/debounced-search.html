@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>검색창 디바운스하기 — RxDart vs FxDart</title>
-  <meta name="description" content="타이핑이 잠잠해질 때까지 기다렸다가 검색 — 이벤트 스트림 위의 debounceTime vs fxdart 0.8.0 이벤트 레이어의 동일한 debounce 체인.">
+  <meta name="description" content="타이핑이 잠잠해질 때까지 기다렸다가 검색 — 이벤트 스트림 위의 debounceTime vs fxdart 0.7.3 이벤트 레이어의 동일한 debounce 체인.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/debounced-search.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/debounced-search.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/debounced-search.html">
@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=17d22149da0bfb75">
 </head>
 <body>
 <header class="site-header">
@@ -108,7 +108,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground">
+      <div class="playground" data-pg="2487687044aa2b21">
 <textarea>
 import 'dart:async';
 
@@ -152,7 +152,7 @@ Future<void> main() async {
     멈추는가</strong>입니다 — 이제 두 패널 모두 같은 방식으로 말합니다:
     이벤트 스트림을 160&nbsp;ms로 디바운스하고, 살아남은 각 쿼리를
     검색하고, 수집합니다. RxDart는 그것을 <code>debounceTime</code>이라고
-    쓰고; fxdart&nbsp;0.8.0은 <code>fxEvents(...).debounce(...)</code>라고
+    쓰고; fxdart&nbsp;0.7.3은 <code>fxEvents(...).debounce(...)</code>라고
     씁니다. 연산자 대 연산자로 두 체인은 동등하며, 닫힐 때 흘려보내는
     트레일링 값까지 같습니다.
   </p>
@@ -179,7 +179,7 @@ Future<void> main() async {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=17d22149da0bfb75";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

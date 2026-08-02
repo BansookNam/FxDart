@@ -1,7 +1,7 @@
 ---
 slug: combine-form-fields
 title: Enable submit when the form is valid — RxDart vs FxDart
-description: Combine the latest email and password values to drive the submit button — Rx.combineLatest2 vs combineLatest in fxdart 0.8.0's events layer.
+description: Combine the latest email and password values to drive the submit button — Rx.combineLatest2 vs combineLatest in fxdart 0.7.3's events layer.
 heading: Enable submit when the form is valid
 order: 43
 tier: 4
@@ -42,7 +42,7 @@ async: true
     used to hand-roll is gone.
   </p>
   <p>
-    fxdart&nbsp;0.8.0's events layer absorbed the Rx approach for exactly
+    fxdart&nbsp;0.7.3's events layer absorbed the Rx approach for exactly
     this kind of job: a deliberate wrapper chain over plain
     <code>Stream</code>s — not an extension, so it coexists with rxdart or
     any other stream library without conflicts — carrying the latest-value

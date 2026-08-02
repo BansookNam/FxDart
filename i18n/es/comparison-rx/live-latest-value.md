@@ -29,7 +29,7 @@ async: true
   <h2>Por qué difieren</h2>
   <p>
     Ya no difieren. «El último valor, reemitido a quien aparezca» es
-    <em>estado compartido y multicast</em>, y desde fxdart 0.8.0 fxdart
+    <em>estado compartido y multicast</em>, y desde fxdart 0.7.3 fxdart
     también tiene un objeto dedicado para ello: <code>LiveValue</code>
     es <code>BehaviorSubject</code> reducido a su comportamiento
     definitorio — un sumidero en el que el sensor escribe, un
@@ -40,7 +40,7 @@ async: true
     caché que el viejo panel FxDart necesitaba han desaparecido.
   </p>
   <p>
-    Esta es la capa de eventos de fxdart 0.8.0 absorbiendo el enfoque Rx
+    Esta es la capa de eventos de fxdart 0.7.3 absorbiendo el enfoque Rx
     para el lado push: <code>LiveValue.live</code> devuelve una cadena
     <code>fxEvents</code> — un envoltorio fino sobre un
     <code>Stream</code> broadcast llano, así que no colisiona con nada,

@@ -728,6 +728,7 @@ class _CmpFamily {
     required this.bench,
     required this.benchResults,
     required this.benchWinLeftKey,
+    required this.benchSpeedLeftKey,
     required this.benchScales,
   });
 
@@ -747,6 +748,7 @@ class _CmpFamily {
   final bool bench; // whether pages get a Benchmark section
   final String benchResults; // benchmark/results/<file> for this family
   final String benchWinLeftKey; // chrome key of the left side's win badge
+  final String benchSpeedLeftKey; // chrome key of the left side's index speed badge
   final List<String> benchScales; // scale-block order, small → large
 }
 
@@ -772,6 +774,7 @@ const _cmpFamilies = [
     bench: true,
     benchResults: 'results.json',
     benchWinLeftKey: 'cmpBenchWinNative',
+    benchSpeedLeftKey: 'cmpSpeedNative',
     benchScales: ['100', '10000', 'full'],
   ),
   _CmpFamily(
@@ -795,6 +798,7 @@ const _cmpFamilies = [
     bench: true,
     benchResults: 'results-rx.json',
     benchWinLeftKey: 'cmpBenchWinRxdart',
+    benchSpeedLeftKey: 'cmpSpeedRxdart',
     benchScales: ['100', 'full'],
   ),
 ];
@@ -817,6 +821,35 @@ String _cmpBadges(Map<String, String> chrome, Page page, _CmpFamily family) {
     b.write(' <span class="badge badge-async">${chrome['cmpAsyncBadge']}</span>');
   }
   return b.toString();
+}
+
+/// The measured time winner at the family's largest benchmark scale, or null
+/// when the case has no recorded results (a new example that simply hasn't
+/// been measured yet — not an error).
+String? _cmpSpeedWinner(_CmpFamily family, String slug) {
+  final data = _benchResults(family.benchResults);
+  final c =
+      (data?['cases'] as Map<String, dynamic>?)?[slug] as Map<String, dynamic>?;
+  final s = (c?['scales'] as Map<String, dynamic>?)?[family.benchScales.last]
+      as Map<String, dynamic>?;
+  if (s == null || s.containsKey('error')) return null;
+  return s['timeWinner'] as String?;
+}
+
+/// The measured-speed badge for index rows — the second standpoint next to
+/// the code verdict. Deliberately distinct three ways from the filled verdict
+/// badge (outlined, ⚡-prefixed, "faster"/"same speed" wording) so a reader
+/// never mistakes the editorial judgment for the measurement or vice versa.
+String _cmpSpeedBadge(
+    Map<String, String> chrome, _CmpFamily family, String slug) {
+  final winner = _cmpSpeedWinner(family, slug);
+  if (winner == null) return '';
+  final key = {
+    family.leftSide: family.benchSpeedLeftKey,
+    'fxdart': 'cmpSpeedFxdart',
+    'tie': 'cmpSpeedTie',
+  }[winner];
+  return ' <span class="badge badge-speed speed-$winner">⚡ ${chrome[key]}</span>';
 }
 
 /// Function chips linking each operator to its 101 tutorial. Every name in
@@ -1072,6 +1105,13 @@ String _renderComparisonIndex(
     // `map`); its links are hand-written in the markdown, not auto-added.
     ..writeln(page.body.replaceAll('{{root}}', _rel(depth)));
 
+  // The two-standpoint legend: the markdown intro explains the filled code
+  // verdicts; this line introduces the outlined measured-speed badge beside
+  // them. Only rendered when the family carries benchmark results at all.
+  if (family.bench && _benchResults(family.benchResults) != null) {
+    b.writeln('  <p class="dim cmp-speed-legend">${chrome['cmpSpeedLegend']}</p>');
+  }
+
   final picks = [
     for (final n in family.picks)
       for (final e in examples)
@@ -1122,14 +1162,17 @@ String _renderComparisonIndex(
           .map((s) => s.trim())
           .where((s) => s.isNotEmpty)
           .join(' ');
+      final speed = _cmpSpeedWinner(family, e.get('slug'));
       b
         ..writeln('    <li data-verdict="${e.get('verdict')}" '
-            'data-async="${e.get('async')}" data-fns="$fns">')
+            'data-async="${e.get('async')}" data-speed="${speed ?? ''}" '
+            'data-fns="$fns">')
         ..writeln('      <a class="cmp-row" href="${e.get('slug')}.html">')
         ..writeln('        <span class="cmp-num">${e.get('order')}</span>')
         ..writeln('        <span class="cmp-row-body">')
         ..writeln('          <strong>${e.get('heading')}</strong> '
-            '${_cmpBadges(chrome, e, family)}')
+            '${_cmpBadges(chrome, e, family)}'
+            '${_cmpSpeedBadge(chrome, family, e.get('slug'))}')
         ..writeln('          <span class="dim">${e.get('description')}</span>')
         ..writeln('        </span>')
         ..writeln('      </a>')

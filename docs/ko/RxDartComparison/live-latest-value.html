@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=17d22149da0bfb75">
 </head>
 <body>
 <header class="site-header">
@@ -101,7 +101,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground">
+      <div class="playground" data-pg="9ab6c7d32c708f48">
 <textarea>
 import 'dart:async';
 
@@ -134,7 +134,7 @@ Future<void> main() async {
   <h2>차이가 나는 이유</h2>
   <p>
     이제는 다르지 않습니다. "누가 나타나든 리플레이되는 최신 값"은
-    <em>공유된 멀티캐스트 상태</em>이고, fxdart 0.8.0부터는 fxdart에도
+    <em>공유된 멀티캐스트 상태</em>이고, fxdart 0.7.3부터는 fxdart에도
     그것을 위한 전용 객체가 있습니다: <code>LiveValue</code>는
     <code>BehaviorSubject</code>를 그것을 정의하는 동작만 남기고 줄인
     것입니다 — 센서가 쓰는 싱크, 읽을 수 있는 <code>.value</code>,
@@ -144,7 +144,7 @@ Future<void> main() async {
     변수와 여분의 캐싱 리스너는 사라졌습니다.
   </p>
   <p>
-    이것이 fxdart 0.8.0의 이벤트 레이어가 push 쪽을 위해 Rx의 접근을
+    이것이 fxdart 0.7.3의 이벤트 레이어가 push 쪽을 위해 Rx의 접근을
     흡수한 모습입니다: <code>LiveValue.live</code>는
     <code><a href="../tutorials/fxEvents.html">fxEvents</a></code> 체인을 돌려주는데 — 평범한 브로드캐스트
     <code>Stream</code> 위의 얇은 래퍼라 rxdart를 포함해 어떤 것과도
@@ -164,7 +164,7 @@ Future<void> main() async {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=17d22149da0bfb75";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
