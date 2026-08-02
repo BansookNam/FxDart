@@ -1,13 +1,13 @@
 ---
 slug: switch-to-newest-search
 title: Solo importa la búsqueda más nueva — RxDart vs FxDart
-description: Una consulta más nueva abandona la búsqueda en vuelo — switchMap en un operador vs un contador de épocas artesanal que descarta resultados obsoletos al aterrizar.
+description: Una consulta más nueva abandona la búsqueda en vuelo — el mismo operador switchMap en ambos lados, rxdart y la cadena fxEvents de fxdart.
 heading: Solo importa la búsqueda más nueva
 order: 45
 tier: 4
-functions: fx, map
+functions: fxEvents, switchMap
 domain: users
-verdict: rxdart
+verdict: tie
 async: true
 ---
   <h2>Requisito</h2>
@@ -30,26 +30,25 @@ async: true
 
   <h2>Por qué difieren</h2>
   <p>
-    «Lo más nuevo cancela lo más viejo» es una afirmación sobre
-    <em>suscripciones</em>, y solo el modelo push las tiene.
-    <code>switchMap</code> es el requisito entero: cada consulta arranca
-    un stream de búsqueda interno, y la llegada de una consulta más nueva
-    des-suscribe la vieja, así que a un resultado obsoleto no le queda
-    ningún oyente al que llegar. Arrancan tres búsquedas, sobreviven dos
-    resultados, y nada de esa lógica aparece en el código del usuario.
+    Ya no difieren. «Lo más nuevo cancela lo más viejo» es una
+    afirmación sobre <em>suscripciones</em>, y desde fxdart 0.8.0 la
+    capa <code>fxEvents</code> las tiene: su <code>switchMap</code>
+    mapea cada consulta a un stream de búsqueda interno y des-suscribe
+    el anterior en el momento en que llega una consulta más nueva, así
+    que a un resultado obsoleto no le queda ningún oyente al que llegar.
+    Arrancan tres búsquedas, sobreviven dos resultados, y nada de esa
+    lógica aparece en el código del usuario — en ninguno de los dos
+    paneles. El contador de épocas artesanal y la contabilidad de
+    terminación que el viejo panel FxDart necesitaba han desaparecido.
   </p>
   <p>
-    Un pipeline pull no puede expresar esto — para cuando una cadena
-    tiraría del primer resultado, el hecho interesante (existe una
-    consulta más nueva) vive fuera de la secuencia. Así que el lado
-    FxDart fabrica el switch a mano: un contador de épocas se incrementa
-    por consulta, cada búsqueda recuerda su época, y un resultado se
-    descarta al llegar si ya no es el más nuevo. Añade la contabilidad de
-    terminación (un <code>Completer</code> para el stream, esperando la
-    última búsqueda en vuelo) y solo entonces una pequeña cadena
-    <code>fx</code> para formatear los supervivientes. Imprime las mismas
-    líneas, pero es una reimplementación manual de la
-    cancelación-por-más-nuevo. Este es el caso de uso que define a
-    <code>switchMap</code>, y el veredicto se sigue de ahí: aquí usa
-    RxDart.
+    fxdart 0.8.0 absorbió el enfoque Rx exactamente para esta clase de
+    requisito: <code>fxEvents</code> es una cadena envoltorio fina sobre
+    <code>Stream</code>s llanos — nunca una extensión, así que convive
+    con cualquier otra biblioteca de streams, rxdart incluido. El
+    catálogo de operadores de RxDart sigue siendo mucho más amplio;
+    cuando los resultados supervivientes necesiten procesamiento real
+    por valor, cruza a la cadena pull tipada con <code>.pull()</code>.
+    Para el caso de uso que define a <code>switchMap</code>, los paneles
+    son ahora equivalentes operador por operador: empate.
   </p>

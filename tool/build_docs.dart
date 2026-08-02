@@ -726,6 +726,9 @@ class _CmpFamily {
     required this.verdictKeys,
     required this.picks,
     required this.bench,
+    required this.benchResults,
+    required this.benchWinLeftKey,
+    required this.benchScales,
   });
 
   final String contentDir; // page markdown under content/
@@ -742,6 +745,9 @@ class _CmpFamily {
   final Map<String, String> verdictKeys; // verdict value -> chrome key
   final List<int> picks; // orders of the curated "read these" list
   final bool bench; // whether pages get a Benchmark section
+  final String benchResults; // benchmark/results/<file> for this family
+  final String benchWinLeftKey; // chrome key of the left side's win badge
+  final List<String> benchScales; // scale-block order, small → large
 }
 
 const _cmpFamilies = [
@@ -764,6 +770,9 @@ const _cmpFamilies = [
     },
     picks: [1, 11, 30, 41, 50],
     bench: true,
+    benchResults: 'results.json',
+    benchWinLeftKey: 'cmpBenchWinNative',
+    benchScales: ['100', '10000', 'full'],
   ),
   _CmpFamily(
     contentDir: 'comparison-rx',
@@ -783,7 +792,10 @@ const _cmpFamilies = [
       'rxdart': 'cmpVerdictRxdart',
     },
     picks: [1, 15, 29, 35, 45],
-    bench: false,
+    bench: true,
+    benchResults: 'results-rx.json',
+    benchWinLeftKey: 'cmpBenchWinRxdart',
+    benchScales: ['100', 'full'],
   ),
 ];
 
@@ -916,19 +928,14 @@ $code
 // absent (or a case failed), the section is simply omitted and the build still
 // succeeds.
 
-Map<String, dynamic>? _benchCache;
-bool _benchLoaded = false;
+final _benchCache = <String, Map<String, dynamic>?>{};
 
-Map<String, dynamic>? get _benchResults {
-  if (!_benchLoaded) {
-    _benchLoaded = true;
-    final f = File('$root/benchmark/results/results.json');
-    if (f.existsSync()) {
-      _benchCache = jsonDecode(f.readAsStringSync()) as Map<String, dynamic>;
-    }
-  }
-  return _benchCache;
-}
+Map<String, dynamic>? _benchResults(String file) =>
+    _benchCache.putIfAbsent(file, () {
+      final f = File('$root/benchmark/results/$file');
+      if (!f.existsSync()) return null;
+      return jsonDecode(f.readAsStringSync()) as Map<String, dynamic>;
+    });
 
 String _benchFmtInt(num n) {
   final s = n.round().toString();
@@ -949,19 +956,16 @@ String _benchFmtUs(num us) {
 String _benchFmtMb(num bytes) =>
     '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
 
-const _benchWinKeys = {
-  'native': 'cmpBenchWinNative',
-  'fxdart': 'cmpBenchWinFxdart',
-  'tie': 'cmpBenchWinTie',
-};
-
-/// Scale-block order: small → large, `full` = the case's headline N.
-const _benchScaleOrder = ['100', '10000', 'full'];
-
 String _cmpBenchSection(String slug, Map<String, String> chrome,
+    _CmpFamily family,
     {bool isAsync = false}) {
-  final data = _benchResults;
+  final data = _benchResults(family.benchResults);
   if (data == null) return '';
+  final winKeys = {
+    family.leftSide: family.benchWinLeftKey,
+    'fxdart': 'cmpBenchWinFxdart',
+    'tie': 'cmpBenchWinTie',
+  };
   final c = (data['cases'] as Map<String, dynamic>)[slug] as Map<String, dynamic>?;
   final scales = c?['scales'] as Map<String, dynamic>?;
   if (scales == null) return '';
@@ -982,17 +986,17 @@ String _cmpBenchSection(String slug, Map<String, String> chrome,
 
     return '''
     <div class="bench-metric">
-      <h4>${chrome[titleKey]} <span class="badge verdict-$winner">${chrome[_benchWinKeys[winner]]}</span></h4>
-${row('cmpNative', 'native', natVal)}
+      <h4>${chrome[titleKey]} <span class="badge verdict-$winner">${chrome[winKeys[winner]]}</span></h4>
+${row(family.leftKey, family.leftSide, natVal)}
 ${row('cmpFxdart', 'fxdart', fxVal)}
     </div>''';
   }
 
   final blocks = StringBuffer();
-  for (final scale in _benchScaleOrder) {
+  for (final scale in family.benchScales) {
     final s = scales[scale] as Map<String, dynamic>?;
     if (s == null || s.containsKey('error')) continue;
-    final nat = s['native'] as Map<String, dynamic>;
+    final nat = s[family.leftSide] as Map<String, dynamic>;
     final fx = s['fxdart'] as Map<String, dynamic>;
     final heading = chrome['cmpBenchScale']!
         .replaceAll('{n}', _benchFmtInt(s['n'] as num));
@@ -1091,7 +1095,11 @@ String _renderComparisonIndex(
     ..writeln('    <button data-filter="all" class="active">'
         '${chrome['cmpFilterAll']}</button>')
     ..writeln('    <button data-filter="async">${chrome['cmpAsyncBadge']}</button>');
+  // A verdict no example carries would render a filter button that can
+  // only ever empty the list — omit it.
+  final present = {for (final e in examples) e.get('verdict')};
   for (final e in family.verdictKeys.entries) {
+    if (!present.contains(e.key)) continue;
     b.writeln('    <button data-filter="${e.key}">${chrome[e.value]}</button>');
   }
   b
@@ -1177,7 +1185,7 @@ String _renderComparison(
         chrome,
         family));
   if (family.bench) {
-    b.write(_cmpBenchSection(slug, chrome,
+    b.write(_cmpBenchSection(slug, chrome, family,
         isAsync: page.get('async') == 'true'));
   }
   b

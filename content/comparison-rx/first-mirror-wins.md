@@ -1,13 +1,13 @@
 ---
 slug: first-mirror-wins
 title: Race two mirrors — RxDart vs FxDart
-description: Two mirrors race for one payload — Rx.race cancels the losing fetch mid-flight; a pull pipeline can only decline to start it.
+description: Two mirrors race for one payload — Rx.race and FxEvents.race both cancel the losing fetch mid-flight, and both prove it with one completed fetch.
 heading: Race two mirrors
 order: 46
 tier: 4
-functions: fx, toAsync, head
+functions: fxEvents, race
 domain: general
-verdict: rxdart
+verdict: tie
 async: true
 ---
   <h2>Requirement</h2>
@@ -28,24 +28,23 @@ async: true
 
   <h2>Why they differ</h2>
   <p>
-    Racing is a push idea: subscribe to everything, keep whoever speaks
-    first, <em>cancel</em> the rest. <code>Rx.race</code> is exactly that —
-    both mirrors are genuinely in flight, and the moment the EU mirror
-    emits at 60&nbsp;ms the US subscription is cancelled, its
-    <code>onCancel</code> fires, and the pending timer dies. That is why
-    the completed-fetch count is still 1 long after the loser's
-    180&nbsp;ms deadline: the work was stopped, not just ignored.
+    They no longer do. Racing is a push idea — subscribe to everything,
+    keep whoever speaks first, <em>cancel</em> the rest — and since
+    fxdart 0.8.0 <code>FxEvents.race</code> is exactly that, matching
+    <code>Rx.race</code> move for move: both mirrors are genuinely in
+    flight, and the moment the EU mirror emits at 60&nbsp;ms the US
+    subscription is cancelled, its <code>onCancel</code> fires, and the
+    pending timer dies. Both panels prove it the same way — the
+    completed-fetch count is still 1 long after the loser's 180&nbsp;ms
+    deadline. The work was stopped, not just ignored, on both sides.
   </p>
   <p>
-    The FxDart side prints the same lines but is <strong>not a
-    race</strong>. <code>head</code> demands one item, so the pull chain
-    listens to the first mirror only — the backup is never subscribed and
-    never starts. Demand-driven laziness can decline to <em>start</em>
-    work, but a pull pipeline has no way to cancel a <code>Future</code>
-    already in flight: had we started both fetches, the loser would have
-    run to completion and merely been ignored. And if the slow mirror had
-    been listed first, this chain would simply have waited 180&nbsp;ms,
-    while <code>Rx.race</code> would still have won with the backup. When
-    the requirement is "first responder wins, losers are cancelled", use
-    the stream model — this is RxDart's turf.
+    The old FxDart panel could only decline to <em>start</em> the backup
+    fetch; the events layer absorbed the Rx approach instead: a thin
+    wrapper chain over plain <code>Stream</code>s that collides with
+    nothing, rxdart included. RxDart's operator catalog remains far
+    larger — fxdart keeps the events core small and hands the winner's
+    per-value processing to the typed pull side via <code>.pull()</code>.
+    For "first responder wins, losers are cancelled", the two are now
+    operator-for-operator equivalent: a tie.
   </p>

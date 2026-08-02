@@ -1,0 +1,1 @@
+FxEvents&lt;R&gt; FxEvents&lt;T&gt;.withLatestFrom&lt;U, R&gt;(Stream&lt;U&gt; other, R Function(T a, U b) combine) // chain (events)

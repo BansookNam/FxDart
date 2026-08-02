@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LiveValue — FxDart 101</title>
+  <meta name="description" content="FxDart LiveValue tutorial: a current value with subscribers — late arrivals replay the latest value first, then live updates — with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/liveValue.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/liveValue.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/liveValue.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/liveValue.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/liveValue.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/liveValue.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/liveValue.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/liveValue.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/liveValue.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Início</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../tutorials/liveValue.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/liveValue.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/liveValue.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/liveValue.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/liveValue.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/liveValue.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="../../ru/tutorials/liveValue.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 14 · Event streams (push) › <strong>LiveValue</strong></p>
+  <h1><code>LiveValue</code></h1>
+  <p class="hero-sub">A live "current value" with subscribers: a late subscriber immediately receives the latest value, then every update after it.</p>
+
+  <div class="signature">class LiveValue&lt;T&gt; {
+  LiveValue();                  // empty — subscribers wait for the first add
+  LiveValue.seeded(T value);    // starts with a current value
+
+  T get value;                  // latest value; StateError when none set
+  bool get hasValue;
+  bool get isClosed;
+  void add(T value);            // set + deliver to subscribers
+  FxEvents&lt;T&gt; get live;         // replay the latest, then live updates
+  Stream&lt;T&gt; get stream;         // plain-Stream view of live
+  Future&lt;void&gt; close();
+}</div>
+
+  <h2>Lecture</h2>
+  <p>
+    A plain <code>Stream</code> has no memory: subscribe late and you get
+    nothing until the next event, which for state — the current user, the
+    current temperature, the current zoom — means every new screen starts
+    blank. <code>LiveValue&lt;T&gt;</code> is state done as an event
+    source: it holds a current value, <code>add</code> updates it and
+    notifies subscribers, and every <strong>late subscriber replays the
+    latest value first</strong>, then rides the live updates. No gap, no
+    blank start, no "wait for the next tick".
+  </p>
+  <p>
+    The API is deliberately small. Construct empty (<code>LiveValue()</code>)
+    or with a seed (<code>LiveValue.seeded(value)</code>). Read
+    synchronously with <code>.value</code> — which throws a
+    <code>StateError</code> when nothing has been set, so check
+    <code>.hasValue</code> or seed it; there is no silent <code>null</code>
+    pretending to be state. Subscribe through <code>.live</code>, which is
+    an <code><a href="fxEvents.html">FxEvents</a></code> chain (map it,
+    debounce it, combine it), or <code>.stream</code> for the plain-Stream
+    view of the same feed.
+  </p>
+  <p>
+    <code>close()</code> ends the feed: subscribers' streams close, and a
+    later <code>add</code> throws — though even a closed
+    <code>LiveValue</code> still replays its last value to a late
+    subscriber before closing their stream. If you know Rx, this is
+    <code>BehaviorSubject</code> reduced to its defining behavior;
+    fxdart events layer, not part of FxTS.
+  </p>
+
+  <h2>Demo 1 · Late subscribers start from the latest value</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final temp = LiveValue.seeded(21.0);
+
+  // An early subscriber: gets the seed immediately, then every update.
+  final earlySeen = <double>[];
+  temp.stream.listen(earlySeen.add);
+
+  temp.add(21.5);
+  temp.add(22.0);
+
+  // A LATE subscriber — arriving after all those updates.
+  final lateSeen = <double>[];
+  temp.stream.listen(lateSeen.add);
+
+  temp.add(22.5);
+  await temp.close();
+  await Future<void>.delayed(Duration.zero);
+
+  print('early: $earlySeen'); // [21.0, 21.5, 22.0, 22.5]
+  print('late:  $lateSeen'); // [22.0, 22.5]
+  // The late subscriber missed nothing that matters: it got the LATEST
+  // value first (22.0), then the live updates — no gap, no stale start.
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · value, hasValue, and close</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final selection = LiveValue<String>();
+
+  // Before any add: no value, and .value throws rather than guessing.
+  print(selection.hasValue); // false
+  try {
+    selection.value;
+  } on StateError {
+    print('no value yet — check hasValue first');
+  }
+
+  selection.add('row-1');
+  selection.add('row-4');
+  print(selection.hasValue); // true
+  print(selection.value); // row-4 — a synchronous read, no subscription
+
+  await selection.close();
+  print(selection.isClosed); // true
+
+  // Even closed, the last value still replays to a late subscriber
+  // (then the stream closes).
+  print(await selection.stream.toList()); // [row-4]
+
+  try {
+    selection.add('row-9');
+  } on StateError {
+    print('add after close throws');
+  }
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: derive a label feed from live state.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // Application state: the current zoom level.
+  final zoom = LiveValue.seeded(1.0);
+
+  // TODO: .live is an FxEvents chain — map the zoom into a percent label,
+  // then use the plain-Stream escape hatch to take the first three:
+  //   zoom.live.map((z) => '${(z * 100).round()}%').stream.take(3).toList()
+  final labels = zoom.stream.take(3).toList();
+
+  zoom.add(1.25);
+  zoom.add(1.5);
+
+  print(await labels);
+  // currently [1.0, 1.25, 1.5] — want [100%, 125%, 150%]
+  await zoom.close();
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="fxEvents.html"><code>fxEvents</code></a> — <code>.live</code> speaks this chain natively ·
+    <a href="combineLatest.html"><code>combineLatest</code></a> — deriving state from two live feeds ·
+    <a href="streams.html">Stream bridges</a> — carrying the feed into the pull world
+  </div>
+
+  <nav class="tut-nav">
+    <a href="race.html">← Anterior: race</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

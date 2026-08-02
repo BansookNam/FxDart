@@ -1,13 +1,13 @@
 ---
 slug: live-latest-value
 title: 늦게 온 리더를 위한 라이브 현재 값 — RxDart vs FxDart
-description: 늦게 접속한 대시보드도 현재 온도를 즉시 받습니다 — BehaviorSubject는 최신 값을 리플레이하고, 풀은 그것을 손으로 캐시합니다.
+description: 늦게 접속한 대시보드도 현재 온도를 즉시 받습니다 — BehaviorSubject와 LiveValue 모두 최신 값을 리플레이한 뒤 라이브로 스트리밍합니다.
 heading: 늦게 온 리더를 위한 라이브 현재 값
 order: 47
 tier: 4
-functions: fx, streams
+functions: liveValue, fxEvents
 domain: sensors
-verdict: rxdart
+verdict: tie
 async: true
 ---
   <h2>요구사항</h2>
@@ -27,23 +27,23 @@ async: true
 
   <h2>차이가 나는 이유</h2>
   <p>
-    "누가 나타나든 리플레이되는 최신 값"은 파이프라인이 아닙니다 —
-    <em>공유된 멀티캐스트 상태</em> 한 조각이고, RxDart에는 그것을
-    위한 전용 객체가 있습니다. <code>BehaviorSubject</code>는 센서가
-    쓰는 싱크이자 모든 구독자가 읽을 수 있는 스트림이며, 그것을
-    정의하는 단 하나의 동작이 정확히 이 요구사항입니다: 늦게 온
-    리스너는 먼저 가장 최근 값을 받고, 그다음 라이브 피드를 받습니다.
-    rx 패널 전체가 "업데이트 넣기, 늦게 구독하기, 수집하기"입니다.
+    이제는 다르지 않습니다. "누가 나타나든 리플레이되는 최신 값"은
+    <em>공유된 멀티캐스트 상태</em>이고, fxdart 0.8.0부터는 fxdart에도
+    그것을 위한 전용 객체가 있습니다: <code>LiveValue</code>는
+    <code>BehaviorSubject</code>를 그것을 정의하는 동작만 남기고 줄인
+    것입니다 — 센서가 쓰는 싱크, 읽을 수 있는 <code>.value</code>,
+    그리고 늦게 온 구독자가 먼저 가장 최근 값을 받고 그다음 라이브
+    업데이트를 받는 피드. 이제 두 패널 모두 "업데이트 넣기, 늦게
+    구독하기, 수집하기"입니다; 옛 FxDart 패널에 필요했던 손수 캐시한
+    변수와 여분의 캐싱 리스너는 사라졌습니다.
   </p>
   <p>
-    FxDart는 subject 같은 것을 의도적으로 뺐습니다 — 풀 파이프라인은
-    단일 소비자의 요구 체인이지 브로드캐스트 허브가 아닙니다. FxDart
-    패널은 subject를 <em>시뮬레이션</em>해야 합니다: 브로드캐스트
-    컨트롤러, 최신 값을 변수에 캐시하는 손수 쓴 리스너, 그리고 늦은
-    리더가 합류한 뒤의 나머지를 위한 <code>fxStream</code> 브리지.
-    같은 줄들을 출력하지만, subject가 공짜로 주던 모든 조각(캐시,
-    합류 시 리플레이, 두 번째 구독의 생명주기)이 이제는 올바르게
-    유지해야 하는 수동 코드입니다. 실전의 결론: 멀티캐스트 최신 값
-    상태에는 RxDart를 쓰고 — 값별 처리가 자라면 subject의 하류에서
-    타입 있는 FxDart 파이프라인으로 브리지하세요.
+    이것이 fxdart 0.8.0의 이벤트 레이어가 push 쪽을 위해 Rx의 접근을
+    흡수한 모습입니다: <code>LiveValue.live</code>는
+    <code>fxEvents</code> 체인을 돌려주는데 — 평범한 브로드캐스트
+    <code>Stream</code> 위의 얇은 래퍼라 rxdart를 포함해 어떤 것과도
+    충돌하지 않습니다 — 값별 처리가 자라면 <code>.pull()</code>이 타입
+    있는 pull 파이프라인으로 건너갑니다. RxDart의 subject 계열과
+    연산자 카탈로그는 여전히 훨씬 큽니다; 최신-값-그다음-라이브
+    자체에 관해서는 두 패널이 동등합니다: 무승부입니다.
   </p>

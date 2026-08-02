@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>폼이 유효해지면 제출 버튼 켜기 — RxDart vs FxDart</title>
-  <meta name="description" content="최신 이메일·비밀번호 값을 결합해 제출 버튼을 구동 — Rx.combineLatest2 vs scan으로 접는, 손수 병합한 태그 스트림.">
+  <meta name="description" content="최신 이메일·비밀번호 값을 결합해 제출 버튼을 구동 — Rx.combineLatest2 vs fxdart 0.8.0 이벤트 레이어의 combineLatest.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/combine-form-fields.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/combine-form-fields.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/combine-form-fields.html">
@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
 </head>
 <body>
 <header class="site-header">
@@ -48,8 +48,8 @@
 <main class="cmp-wide">
   <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #43 · <strong>폼이 유효해지면 제출 버튼 켜기</strong></p>
   <h1>폼이 유효해지면 제출 버튼 켜기</h1>
-  <p class="cmp-meta"><span class="badge verdict-rxdart">RxDart의 영역</span> <span class="badge badge-async">async</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/filter.html">filter</a></li></ul>
+  <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/combineLatest.html">combineLatest</a></li></ul>
   <h2>요구사항</h2>
   <p>
     가입 폼에 필드가 두 개 있습니다. 이메일 필드는 <code>nam</code>,
@@ -117,7 +117,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="b1d8d1cc9240e051">
+      <div class="playground">
 <textarea>
 import 'dart:async';
 
@@ -143,26 +143,9 @@ Stream<String> passwords() {
 bool valid(String email, String password) =>
     email.contains('@') && password.length >= 8;
 
-/// Tag both fields into one stream — the merge Rx.combineLatest2 does for us.
-Stream<(String, String)> fields() {
-  final c = StreamController<(String, String)>();
-  var open = 2;
-  void done() {
-    if (--open == 0) c.close();
-  }
-
-  emails().listen((e) => c.add(('email', e)), onDone: done);
-  passwords().listen((p) => c.add(('password', p)), onDone: done);
-  return c.stream;
-}
-
 Future<void> main() async {
-  final states = await fxStream(fields())
-      .scan<(String, String)>(
-          (acc, ev) =>
-              ev.$1 == 'email' ? (ev.$2, acc.$2) : (acc.$1, ev.$2),
-          ('', ''))
-      .filter((s) => s.$1.isNotEmpty && s.$2.isNotEmpty)
+  final states = await fxEvents(emails())
+      .combineLatest(passwords(), (e, p) => (e, p))
       .toList();
 
   for (final (e, p) in states) {
@@ -178,24 +161,27 @@ Future<void> main() async {
 
   <h2>차이가 나는 이유</h2>
   <p>
-    이것은 <em>소스별 최신 값</em> 상태입니다 — 푸시 모델을 정의하는
-    결합자입니다. <code>Rx.combineLatest2</code>는 각 필드의 가장 새
-    값을 붙들고, 둘 다 말할 때까지 기다렸다가, 어느 쪽에서든 변경이
-    있을 때마다 그 쌍을 다시 내보냅니다. 폼 로직이 요구사항 그대로
-    읽히고, 출력 네 줄이 선언 하나에서 흘러나옵니다.
+    이제는 다르지 않습니다. <em>소스별 최신 값</em> 상태는 push 모델을
+    정의하는 결합자이고, 이제 두 패널 모두 그것을 한 줄로 선언합니다:
+    각 필드의 가장 새 값을 붙들고, 둘 다 말할 때까지 기다렸다가, 어느
+    쪽에서든 변경이 있을 때마다 그 쌍을 다시 내보낸다. RxDart는
+    <code>Rx.combineLatest2(emails(), passwords(), ...)</code>라고 쓰고;
+    fxdart는 <code>fxEvents(emails()).combineLatest(passwords(),
+    ...)</code>라고 씁니다. 같은 대기 규칙, 어느 쪽에서든 같은 재방출,
+    둘 다 닫히면 닫히는 같은 규칙 — fxdart 패널이 예전에 손으로 말던
+    태그 병합-폴드는 사라졌습니다.
   </p>
   <p>
-    풀 파이프라인은 <em>하나의</em> 시퀀스를 소비하므로, FxDart 쪽은
-    <code>combineLatest</code>가 공짜로 얻는 것을 먼저 다시 지어야
-    합니다: 두 필드를 태그 붙은 이벤트의 단일 스트림으로
-    병합하고(손수 쓴 컨트롤러와 그것의 구독-둘 닫기 장부 정리까지),
-    <code>fxStream</code>으로 브리지한 뒤, <code><a href="../tutorials/scan.html">scan</a></code>으로
-    태그들을 (email, password) 상태 레코드로 접고,
-    <code><a href="../tutorials/filter.html">filter</a></code>로 아직 값을 내지 않은 필드가 있는 상태를
-    걸러 냅니다. 폴드 자체는 정직하고, 타입이 있고, 읽기 좋습니다 —
-    하지만 이것은 연산자의 사용이 아니라 연산자의 재구현입니다. 이런
-    반응형 UI 상태야말로 RxDart의 존재 이유이고, 판정은 이론의 여지
-    없이 RxDart의 것입니다.
+    fxdart&nbsp;0.8.0의 이벤트 레이어는 정확히 이런 종류의 일을 위해
+    Rx의 접근을 흡수했습니다: 평범한 <code>Stream</code> 위의 의도된
+    래퍼 체인으로 — extension이 아니어서 rxdart든 다른 어떤 스트림
+    라이브러리든 충돌 없이 공존합니다 — pull 파이프라인이 가질 수 없는
+    최신 값 결합자들을 실어 나릅니다. 정직한 단서 하나는 그대로입니다:
+    RxDart의 연산자 카탈로그는 fxdart의 이벤트 레이어보다 여전히 훨씬
+    큽니다. 결합된 폼 상태가 타입 있는 요구 주도 작업 — 이를테면 타입
+    있는 에러를 가진 검증된 제출 호출 — 을 구동해야 할 때는
+    <code>.pull()</code>이 라이브 쌍들에서 <code>FxAsync</code>
+    파이프라인으로 건너갑니다.
   </p>
 
   <nav class="tut-nav">
@@ -208,7 +194,7 @@ Future<void> main() async {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

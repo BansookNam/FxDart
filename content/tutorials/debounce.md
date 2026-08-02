@@ -54,6 +54,18 @@ nextLabel: throttle
     so only the final value survives the burst of calls below.</p>
   {{playground:2}}
 
+  <h2>On event streams</h2>
+  <p>
+    The same idea exists on the events layer: when the bursty thing is a
+    <code>Stream</code> rather than a callback,
+    <code>fxEvents(s).debounce(window)</code> emits the trailing value of
+    each burst once <code>window</code> has passed without a newer event —
+    and a value still pending when the stream closes is flushed, never
+    dropped. See <a href="fxEvents.html"><code>fxEvents</code></a> for the
+    chain this belongs to.
+  </p>
+  {{playground:3}}
+
   <div class="callout">
     <strong>Related:</strong>
     <a href="throttle.html"><code>throttle</code></a> — fires on a schedule instead of after quiet ·

@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
 </head>
 <body>
 <header class="site-header">
@@ -118,7 +118,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="14b990594878f69e">
+      <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -193,6 +193,71 @@ void main() {
     than an exceptional end, keeping them as data wins — the verdict
     goes to FxDart.
   </p>
+  <section class="cmp-bench">
+  <h2>Benchmark</h2>
+  <p class="dim bench-meta">Apple M1 Max, 32 GB RAM · Dart 3.12.2 (AOT-compiled) · 2026-08-02</p>
+  <div class="bench-scales">
+  <div class="bench-scale">
+    <h3>N = 100</h3>
+    <div class="bench-metric">
+      <h4>Time <span class="badge verdict-tie">Tie</span></h4>
+      <div class="bench-row">
+        <span class="bench-name">RxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">427 µs</span>
+      </div>
+      <div class="bench-row">
+        <span class="bench-name">FxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:24.0%"></span></span>
+        <span class="bench-val">102 µs</span>
+      </div>
+    </div>
+    <div class="bench-metric">
+      <h4>Peak memory <span class="badge verdict-tie">Tie</span></h4>
+      <div class="bench-row">
+        <span class="bench-name">RxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">16.5 MB</span>
+      </div>
+      <div class="bench-row">
+        <span class="bench-name">FxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:99.4%"></span></span>
+        <span class="bench-val">16.5 MB</span>
+      </div>
+    </div>
+  </div>
+  <div class="bench-scale">
+    <h3>N = 1,000,000</h3>
+    <div class="bench-metric">
+      <h4>Time <span class="badge verdict-fxdart">FxDart wins</span></h4>
+      <div class="bench-row">
+        <span class="bench-name">RxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">4106.5 ms</span>
+      </div>
+      <div class="bench-row">
+        <span class="bench-name">FxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:26.0%"></span></span>
+        <span class="bench-val">1068.8 ms</span>
+      </div>
+    </div>
+    <div class="bench-metric">
+      <h4>Peak memory <span class="badge verdict-tie">Tie</span></h4>
+      <div class="bench-row">
+        <span class="bench-name">RxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:96.6%"></span></span>
+        <span class="bench-val">184.0 MB</span>
+      </div>
+      <div class="bench-row">
+        <span class="bench-name">FxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">190.5 MB</span>
+      </div>
+    </div>
+  </div>
+  </div>
+  <p class="dim bench-note">Bars are medians of repeated timed iterations in fresh processes per side (small N is batched for timer resolution). Sides within 5% of each other — or within 0.6 ms, a difference no person can perceive — count as a tie; close relative races are re-measured up to 5 runs. In an app, anything under a few milliseconds is invisible to the user regardless of which bar is shorter. Memory is peak process RSS. The Dart VM and the dataset are identical on both sides, so the difference between the two bars is what the pipeline itself holds onto.</p>
+  </section>
 
   <nav class="tut-nav">
     <a href="stock-after-moves.html">← 前: Stock level after each move</a>
@@ -204,7 +269,7 @@ void main() {
   <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

@@ -568,5 +568,35 @@
       "href": "eitherPipelines.html",
       "label": "Either × pipelines"
     }
+  ],
+  "14": [
+    {
+      "href": "fxEvents.html",
+      "label": "fxEvents"
+    },
+    {
+      "href": "sampleOn.html",
+      "label": "sampleOn"
+    },
+    {
+      "href": "combineLatest.html",
+      "label": "combineLatest"
+    },
+    {
+      "href": "withLatestFrom.html",
+      "label": "withLatestFrom"
+    },
+    {
+      "href": "switchMap.html",
+      "label": "switchMap"
+    },
+    {
+      "href": "race.html",
+      "label": "race"
+    },
+    {
+      "href": "liveValue.html",
+      "label": "LiveValue"
+    }
   ]
 }

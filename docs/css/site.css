@@ -340,6 +340,7 @@ main.cmp-wide { max-width: 1280px; }
 }
 .bench-native { background: var(--ok); }
 .bench-fxdart { background: var(--accent); }
+.bench-rxdart { background: var(--rx); }
 .bench-val {
   font-family: ui-monospace, Menlo, monospace; font-size: 0.82rem;
   color: var(--text); white-space: nowrap; text-align: right;

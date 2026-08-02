@@ -1,13 +1,13 @@
 ---
 slug: live-latest-value
 title: Un valor actual en vivo para lectores tardíos — RxDart vs FxDart
-description: Un panel que se conecta tarde aún recibe la temperatura actual al instante — BehaviorSubject reemite el último valor; pull lo cachea a mano.
+description: Un panel que se conecta tarde aún recibe la temperatura actual al instante — BehaviorSubject y LiveValue reemiten ambos el último valor, y luego transmiten en vivo.
 heading: Un valor actual en vivo para lectores tardíos
 order: 47
 tier: 4
-functions: fx, streams
+functions: liveValue, fxEvents
 domain: sensors
-verdict: rxdart
+verdict: tie
 async: true
 ---
   <h2>Requisito</h2>
@@ -28,26 +28,25 @@ async: true
 
   <h2>Por qué difieren</h2>
   <p>
-    «El último valor, reemitido a quien aparezca» no es un pipeline — es
-    un pedazo de <em>estado compartido y multicast</em>, y RxDart tiene
-    un objeto dedicado para ello. Un <code>BehaviorSubject</code> es a la
-    vez el sumidero en el que el sensor escribe y un stream que cada
-    suscriptor puede leer, y su comportamiento definitorio es exactamente
-    este requisito: un oyente tardío recibe primero el valor más
-    reciente, y luego el feed en vivo. El panel rx entero es «añadir
-    actualizaciones, suscribirse tarde, recoger».
+    Ya no difieren. «El último valor, reemitido a quien aparezca» es
+    <em>estado compartido y multicast</em>, y desde fxdart 0.8.0 fxdart
+    también tiene un objeto dedicado para ello: <code>LiveValue</code>
+    es <code>BehaviorSubject</code> reducido a su comportamiento
+    definitorio — un sumidero en el que el sensor escribe, un
+    <code>.value</code> legible, y un feed donde un suscriptor tardío
+    recibe primero el valor más reciente, y luego las actualizaciones en
+    vivo. Ambos paneles son ahora «añadir actualizaciones, suscribirse
+    tarde, recoger»; la variable cacheada a mano y el oyente extra de
+    caché que el viejo panel FxDart necesitaba han desaparecido.
   </p>
   <p>
-    FxDart omite deliberadamente cualquier cosa parecida a un subject —
-    un pipeline pull es una cadena de demanda de un solo consumidor, no
-    un centro de difusión. El panel FxDart tiene que <em>simular</em> el
-    subject: un controller broadcast, un oyente escrito a mano que cachea
-    el último valor en una variable, y un puente <code>fxStream</code>
-    para el resto una vez que el lector tardío se une. Imprime las mismas
-    líneas, pero cada pieza que el subject daba gratis (la caché, la
-    reemisión al unirse, el ciclo de vida de la segunda suscripción) es
-    ahora código manual que hay que mantener correcto. La decisión
-    práctica: para estado multicast de último valor, usa RxDart — y
-    tiende el puente hacia un pipeline FxDart tipado aguas abajo del
-    subject cuando el procesamiento por valor crezca.
+    Esta es la capa de eventos de fxdart 0.8.0 absorbiendo el enfoque Rx
+    para el lado push: <code>LiveValue.live</code> devuelve una cadena
+    <code>fxEvents</code> — un envoltorio fino sobre un
+    <code>Stream</code> broadcast llano, así que no colisiona con nada,
+    rxdart incluido — y <code>.pull()</code> cruza al pipeline pull
+    tipado cuando el procesamiento por valor crece. La familia de
+    subjects y el catálogo de operadores de RxDart siguen siendo mucho
+    más amplios; para el último-valor-y-luego-en-vivo en sí, los paneles
+    son equivalentes: empate.
   </p>

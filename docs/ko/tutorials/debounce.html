@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
 </head>
 <body>
 <header class="site-header">
@@ -55,7 +55,9 @@
 class Debounced&lt;T&gt; {
   void call(T arg);   // Debounced is callable: debounced(arg)
   void cancel();
-}</div>
+}
+
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.debounce(Duration window) // chain (events)</div>
 
   <h2>강의</h2>
   <p>
@@ -84,7 +86,7 @@ class Debounced&lt;T&gt; {
 
   <h2>데모 1 · 트레일링 에지(기본 동작)</h2>
   <p>빠르게 이어진 세 번의 호출이 하나로 합쳐지고, 마지막 인자만 남습니다.</p>
-  <div class="playground" data-pg="101806404ade47eb">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -163,6 +165,50 @@ Future<void> main() async {
 </textarea>
   </div>
 
+  <h2>이벤트 스트림에서</h2>
+  <p>
+    같은 아이디어가 이벤트 레이어에도 있습니다. 몰아치는 대상이 콜백이
+    아니라 <code>Stream</code>이라면
+    <code>fxEvents(s).debounce(window)</code>가 각 버스트의 트레일링 값을
+    — <code>window</code> 동안 새 이벤트가 없을 때 — 내보내고, 스트림이
+    닫힐 때 아직 대기 중인 값은 버려지지 않고 마지막에 방출됩니다. 이
+    체인이 속한 곳은 <a href="fxEvents.html"><code>fxEvents</code></a>
+    문서를 참고하세요.
+  </p>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // The same idea on a Stream: keystrokes arrive in bursts, and only the
+  // trailing value of each burst survives the 150ms quiet window.
+  final keystrokes = timed(
+      [(0, 'd'), (40, 'da'), (80, 'dar'), (120, 'dart'), (400, 'dart!')], 460);
+
+  final searches = await fxEvents(keystrokes)
+      .debounce(const Duration(milliseconds: 150))
+      .toList();
+
+  print(searches); // [dart, dart!]
+  // 'dart' ends the first burst (150ms of quiet after 120ms); 'dart!' is
+  // still waiting for its window when the stream closes at 460ms — a
+  // pending value is flushed on close, never dropped.
+}
+</textarea>
+  </div>
+
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="throttle.html"><code>throttle</code></a> — 잠잠해진 뒤가 아니라 일정 주기로 발화 ·
@@ -181,7 +227,7 @@ Future<void> main() async {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

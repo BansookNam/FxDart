@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Only the newest search matters — RxDart vs FxDart</title>
-  <meta name="description" content="A newer query abandons the in-flight search — switchMap in one operator vs a hand-rolled epoch counter that drops stale results as they land.">
+  <meta name="description" content="A newer query abandons the in-flight search — the same switchMap operator on both sides, rxdart and fxdart's fxEvents chain.">
   <link rel="canonical" href="https://bansooknam.github.io/FxDart/RxDartComparison/switch-to-newest-search.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/switch-to-newest-search.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/switch-to-newest-search.html">
@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
 </head>
 <body>
 <header class="site-header">
@@ -50,11 +50,11 @@
   <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
   <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #45 · <strong>Only the newest search matters</strong></p>
   <h1>Only the newest search matters</h1>
-  <p class="cmp-meta"><span class="badge verdict-rxdart">RxDart's turf</span> <span class="badge badge-async">async</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/switchMap.html">switchMap</a></li></ul>
   <h2>Requirement</h2>
   <p>
-    A user types three queries — <code><a href="../tutorials/fx.html">fx</a></code>, then
+    A user types three queries — <code>fx</code>, then
     <code>fxdar</code> 40&nbsp;ms later, then <code>fxdart</code> after a
     pause. Each search takes 150&nbsp;ms, so the second query arrives
     while the first search is still in flight: the first result must be
@@ -118,7 +118,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="4105f820864fb4bb">
+      <div class="playground">
 <textarea>
 import 'dart:async';
 
@@ -146,24 +146,13 @@ Future<(String, int)> search(String q) async {
 }
 
 Future<void> main() async {
-  // Hand-rolled switch: remember which search is newest, and drop a stale
-  // result when it finally lands.
-  final results = <(String, int)>[];
-  var epoch = 0;
-  var last = Future<void>.value();
-  final done = Completer<void>();
-  final sub = queries().listen((q) {
-    final mine = ++epoch;
-    last = search(q).then((r) {
-      if (mine == epoch) results.add(r);
-    });
-  }, onDone: done.complete);
-  await done.future;
-  await sub.cancel();
-  await last;
+  final results = await fxEvents(queries())
+      .switchMap((q) => Stream.fromFuture(search(q)))
+      .toList();
 
-  final lines = fx(results).map((r) => '${r.$2} results for "${r.$1}"').toList();
-  lines.forEach(print);
+  for (final (q, n) in results) {
+    print('$n results for "$q"');
+  }
   print('searches started: $searchesStarted, '
       'results delivered: ${results.length}');
 }
@@ -174,25 +163,25 @@ Future<void> main() async {
 
   <h2>Why they differ</h2>
   <p>
-    "Newer cancels older" is a statement about <em>subscriptions</em>, and
-    only the push model has them. <code>switchMap</code> is the whole
-    requirement: each query starts an inner search stream, and the arrival
-    of a newer query unsubscribes the old one, so a stale result has no
-    listener left to reach. Three searches start, two results survive, and
-    none of that logic appears in user code.
+    They no longer do. "Newer cancels older" is a statement about
+    <em>subscriptions</em>, and since fxdart 0.8.0 the
+    <code><a href="../tutorials/fxEvents.html">fxEvents</a></code> layer has them: its <code><a href="../tutorials/switchMap.html">switchMap</a></code> maps
+    each query to an inner search stream and unsubscribes the previous
+    one the moment a newer query arrives, so a stale result has no
+    listener left to reach. Three searches start, two results survive,
+    and none of that logic appears in user code — in either panel. The
+    hand-rolled epoch counter and completion bookkeeping the old FxDart
+    panel needed are gone.
   </p>
   <p>
-    A pull pipeline cannot express this — by the time a chain would pull
-    the first result, the interesting fact (a newer query exists) lives
-    outside the sequence. So the FxDart side hand-rolls the switch: an
-    epoch counter increments per query, each search remembers its epoch,
-    and a result is dropped on arrival if it is no longer the newest. Add
-    the completion bookkeeping (a <code>Completer</code> for the stream,
-    awaiting the last in-flight search) and only then a small
-    <code><a href="../tutorials/fx.html">fx</a></code> chain to format the survivors. It prints the same
-    lines, but it is a manual reimplementation of cancellation-by-newer.
-    This is <code>switchMap</code>'s defining use case, and the verdict
-    follows: use RxDart here.
+    fxdart 0.8.0 absorbed the Rx approach for exactly this kind of
+    requirement: <code><a href="../tutorials/fxEvents.html">fxEvents</a></code> is a thin wrapper chain over plain
+    <code>Stream</code>s — never an extension, so it coexists with any
+    other stream library, rxdart included. RxDart's operator catalog
+    remains far larger; when the surviving results need real per-value
+    processing, cross into the typed pull chain with <code>.pull()</code>.
+    For <code><a href="../tutorials/switchMap.html">switchMap</a></code>'s defining use case the panels are now
+    operator-for-operator equivalent: a tie.
   </p>
 
   <nav class="tut-nav">
@@ -205,7 +194,7 @@ Future<void> main() async {
   <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

@@ -21,19 +21,10 @@ Future<String> search(String q) async {
 }
 
 Future<void> main() async {
-  // fxdart's debounce is a callback wrapper, not a stream operator — the
-  // quiet queries have to be collected by hand, then searched as a pipeline.
-  final quiet = <String>[];
-  final debounced =
-      debounce<String>(quiet.add, const Duration(milliseconds: 160));
-  final done = Completer<void>();
-  final sub = keystrokes().listen(debounced.call,
-      // The trailing debounce window may still be pending at close.
-      onDone: () => Timer(const Duration(milliseconds: 200), done.complete));
-  await done.future;
-  await sub.cancel();
-
-  final results = await fx(quiet).toAsync().map(search).toList();
+  final results = await fxEvents(keystrokes())
+      .debounce(const Duration(milliseconds: 160))
+      .asyncMap(search)
+      .toList();
 
   results.forEach(print);
 }

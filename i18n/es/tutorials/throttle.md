@@ -56,6 +56,19 @@ nextLabel: shuffle
     —leading y trailing— en lugar de tres veces por separado.</p>
   {{playground:2}}
 
+  <h2>En streams de eventos</h2>
+  <p>
+    La misma idea existe en la capa de eventos: cuando lo que no calla es
+    un <code>Stream</code> y no un callback,
+    <code>fxEvents(s).throttle(window, trailing: …)</code> deja pasar un
+    evento por ventana. Un valor por defecto cambia: la forma de stream es
+    solo leading salvo que pases <code>trailing: true</code> (el wrapper de
+    callback de arriba activa ambos flancos por defecto). Consulta
+    <a href="fxEvents.html"><code>fxEvents</code></a> para conocer la
+    cadena a la que pertenece.
+  </p>
+  {{playground:3}}
+
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="debounce.html"><code>debounce</code></a> — espera a que haya calma en vez de seguir un ritmo fijo ·

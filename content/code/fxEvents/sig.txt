@@ -1,0 +1,12 @@
+FxEvents&lt;T&gt; fxEvents&lt;T&gt;(Stream&lt;T&gt; stream)
+
+class FxEvents&lt;T&gt; {
+  Stream&lt;T&gt; get stream;                              // unwrap
+  FxEvents&lt;R&gt; map&lt;R&gt;(R Function(T a) f);
+  FxEvents&lt;T&gt; where(bool Function(T a) f);
+  FxEvents&lt;R&gt; asyncMap&lt;R&gt;(FutureOr&lt;R&gt; Function(T a) f);
+  FxEvents&lt;T&gt; startWith(T value);
+  static FxEvents&lt;T&gt; merge&lt;T&gt;(Iterable&lt;Stream&lt;T&gt;&gt; sources);
+  Future&lt;List&lt;T&gt;&gt; toList();                          // terminal
+  FxAsync&lt;T&gt; pull();                                 // cross into the pull model
+}

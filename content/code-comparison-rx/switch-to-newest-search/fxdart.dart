@@ -24,24 +24,13 @@ Future<(String, int)> search(String q) async {
 }
 
 Future<void> main() async {
-  // Hand-rolled switch: remember which search is newest, and drop a stale
-  // result when it finally lands.
-  final results = <(String, int)>[];
-  var epoch = 0;
-  var last = Future<void>.value();
-  final done = Completer<void>();
-  final sub = queries().listen((q) {
-    final mine = ++epoch;
-    last = search(q).then((r) {
-      if (mine == epoch) results.add(r);
-    });
-  }, onDone: done.complete);
-  await done.future;
-  await sub.cancel();
-  await last;
+  final results = await fxEvents(queries())
+      .switchMap((q) => Stream.fromFuture(search(q)))
+      .toList();
 
-  final lines = fx(results).map((r) => '${r.$2} results for "${r.$1}"').toList();
-  lines.forEach(print);
+  for (final (q, n) in results) {
+    print('$n results for "$q"');
+  }
   print('searches started: $searchesStarted, '
       'results delivered: ${results.length}');
 }

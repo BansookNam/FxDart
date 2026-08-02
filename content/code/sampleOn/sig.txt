@@ -1,0 +1,1 @@
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.sampleOn(Stream&lt;void&gt; trigger) // chain (events)

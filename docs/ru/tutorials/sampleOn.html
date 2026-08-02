@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>sampleOn — FxDart 101</title>
+  <meta name="description" content="FxDart sampleOn tutorial: emit the newest source value each time a trigger stream fires — decouple a fast producer from a slow consumer — with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/sampleOn.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/sampleOn.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/sampleOn.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/sampleOn.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/sampleOn.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/sampleOn.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/sampleOn.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/sampleOn.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/sampleOn.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Главная</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="../../tutorials/sampleOn.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/sampleOn.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/sampleOn.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/sampleOn.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/sampleOn.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/sampleOn.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/sampleOn.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 14 · Event streams (push) › <strong>sampleOn</strong></p>
+  <h1><code>sampleOn</code></h1>
+  <p class="hero-sub">Emits the newest source value each time the trigger stream fires — the source sets the values, the trigger sets the rhythm.</p>
+
+  <div class="signature">FxEvents&lt;T&gt; FxEvents&lt;T&gt;.sampleOn(Stream&lt;void&gt; trigger) // chain (events)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    A sensor updates two hundred times a second; the display repaints
+    sixty. Processing every update is wasted work — what the consumer
+    actually wants is <em>the newest value, on its own schedule</em>.
+    <code>sampleOn(trigger)</code> is exactly that split: the source stream
+    supplies values, the trigger stream supplies moments, and each trigger
+    event emits the latest source value.
+  </p>
+  <p>
+    Two details keep it honest. A trigger that fires when nothing new has
+    arrived stays <strong>silent</strong> — you never see the same value
+    twice in a row just because the clock ticked. And values that were
+    superseded between triggers are <strong>dropped, not queued</strong>:
+    this is a lossy operator by design, for state-like streams where only
+    the newest reading matters.
+  </p>
+  <p>
+    Lifetime follows the source: when the source closes, the chain closes
+    and the trigger subscription is cancelled — an endless
+    <code>Stream.periodic</code> tick makes a perfectly good trigger.
+    Compare the neighbors: <code><a href="throttle.html">throttle</a></code>
+    rate-limits with a fixed window measured from the source's own events;
+    <code>sampleOn</code> hands the schedule to a second stream entirely.
+    fxdart events layer, after Rx's <code>sample</code>.
+  </p>
+
+  <h2>Demo 1 · The trigger sets the rhythm</h2>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // A sensor updates every 50ms; the display repaints on its own ticks.
+  final sensor = timed([(0, 1), (50, 2), (100, 3), (150, 4), (200, 5)], 600);
+  final tick =
+      timed([(75, null), (125, null), (300, null), (450, null)], 620);
+
+  final out = await fxEvents(sensor).sampleOn(tick).toList();
+
+  print(out); // [2, 3, 5]
+  // 75ms tick → newest is 2; 125ms → 3; 300ms → 5.
+  // The 450ms tick sees nothing new and stays silent, and the values
+  // that were never sampled (1 and 4) are dropped, not queued.
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Silent when nothing is new, closes with the source</h2>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // An ENDLESS trigger: a tick every 40ms, forever.
+  final ticks = Stream<void>.periodic(const Duration(milliseconds: 40));
+
+  final source = StreamController<int>();
+  Timer(const Duration(milliseconds: 10), () => source.add(7));
+  Timer(const Duration(milliseconds: 200), source.close);
+
+  final out = await fxEvents(source.stream).sampleOn(ticks).toList();
+
+  print(out); // [7]
+  // Several ticks fire before the source closes, but only the FIRST one
+  // after the 7 arrived emits — a trigger with nothing new is silent.
+  // And when the source closes, the chain closes with it: the endless
+  // tick stream is cancelled, not awaited.
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: one drag position per frame.</p>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // A drag reports its x-position constantly; you only want one per frame.
+  final positions =
+      timed([(0, 10), (30, 14), (60, 30), (90, 55), (120, 80)], 400);
+  final frames = timed([(50, null), (100, null), (150, null)], 420);
+
+  // TODO: sample the newest position on each frame:
+  //   fxEvents(positions).sampleOn(frames).toList()
+  final out = await positions.toList();
+
+  print(out);
+  // currently every position — want [14, 55, 80]: the newest at each frame
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="throttle.html"><code>throttle</code></a> — rate limiting from the source's own timing ·
+    <a href="debounce.html"><code>debounce</code></a> — waiting for quiet instead of sampling ·
+    <a href="withLatestFrom.html"><code>withLatestFrom</code></a> — the same "latest value" idea, but combining two data streams
+  </div>
+
+  <nav class="tut-nav">
+    <a href="fxEvents.html">← Назад: fxEvents</a>
+    <a href="combineLatest.html">Далее: combineLatest →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

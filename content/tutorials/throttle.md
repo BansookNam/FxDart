@@ -53,6 +53,19 @@ nextLabel: shuffle
     instead of three separate times.</p>
   {{playground:2}}
 
+  <h2>On event streams</h2>
+  <p>
+    The same idea exists on the events layer: when the chatty thing is a
+    <code>Stream</code> rather than a callback,
+    <code>fxEvents(s).throttle(window, trailing: …)</code> lets one event
+    per window through. One default differs: the stream form is
+    leading-only unless you pass <code>trailing: true</code> (the callback
+    wrapper above defaults both edges on). See
+    <a href="fxEvents.html"><code>fxEvents</code></a> for the chain this
+    belongs to.
+  </p>
+  {{playground:3}}
+
   <div class="callout">
     <strong>Related:</strong>
     <a href="debounce.html"><code>debounce</code></a> — waits for quiet instead of a fixed schedule ·

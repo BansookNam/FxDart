@@ -1,13 +1,13 @@
 ---
 slug: sampled-gauge
 title: Sample the gauge on each poll tick — RxDart vs FxDart
-description: Read the latest gauge value at each poll tick — an explicit sample trigger stream vs a hand-tracked latest variable read through the bridge.
+description: Read the latest gauge value at each poll tick — an explicit sample trigger stream in RxDart vs sampleOn in fxdart 0.8.0's events layer.
 heading: Sample the gauge on each poll tick
 order: 42
 tier: 4
-functions: fx, streams, map
+functions: fxEvents, sampleOn
 domain: sensors
-verdict: rxdart
+verdict: tie
 async: true
 ---
   <h2>Requirement</h2>
@@ -27,22 +27,24 @@ async: true
 
   <h2>Why they differ</h2>
   <p>
-    "The latest value at this instant" is a concept that only exists in
-    the push model — it means <em>whatever arrived most recently</em>,
-    which presumes things arrive on their own. RxDart's <code>sample</code>
-    takes the gauge stream and a trigger stream and does exactly this
-    job: on each trigger, emit the newest source value since the
-    last trigger. One operator, and the state ("what is current?") lives
-    inside it.
+    They no longer do. "The latest value at this instant" only exists in
+    the push model — it presumes things arrive on their own — and both
+    panels now express it as the same one-operator sentence: the gauge
+    stream, sampled by the poll stream. RxDart writes
+    <code>gauge().sample(polls())</code>; fxdart writes
+    <code>fxEvents(gauge()).sampleOn(polls())</code>. In both, the "what
+    is current?" state lives inside the operator, each trigger emits the
+    newest reading since the last one, and unsampled readings are simply
+    dropped.
   </p>
   <p>
-    A pull pipeline has no "current value" — nothing arrives until you
-    ask. So the FxDart side splits the job in two: a plain subscription
-    tracks the gauge's latest reading in a mutable variable, and the poll
-    stream comes through <code>fxStream</code> so each pulled tick can
-    <code>map</code> to a snapshot of that variable. It prints the same
-    three readings, but the sampling logic is hand-rolled push code
-    sitting <em>next to</em> the chain, not expressed by it. Verdict
-    RxDart: sampling live state is push-native — this is push's home
-    game.
+    The pull pipelines still have no clock and no "current value" — that
+    refusal stands. Instead, fxdart&nbsp;0.8.0 absorbed the Rx approach in
+    a dedicated events layer: <code>fxEvents</code> is a thin wrapper
+    chain over plain <code>Stream</code>s (never an extension, so it
+    collides with nothing) that owns the push-native verbs the pull side
+    would not. RxDart's operator catalog remains far larger; this verb,
+    fxdart now speaks natively. And if each sampled reading were the start
+    of real downstream work, <code>.pull()</code> hands the samples to the
+    typed <code>FxAsync</code> pipeline, pulled on demand.
   </p>

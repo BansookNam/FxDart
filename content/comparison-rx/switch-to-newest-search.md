@@ -1,13 +1,13 @@
 ---
 slug: switch-to-newest-search
 title: Only the newest search matters — RxDart vs FxDart
-description: A newer query abandons the in-flight search — switchMap in one operator vs a hand-rolled epoch counter that drops stale results as they land.
+description: A newer query abandons the in-flight search — the same switchMap operator on both sides, rxdart and fxdart's fxEvents chain.
 heading: Only the newest search matters
 order: 45
 tier: 4
-functions: fx, map
+functions: fxEvents, switchMap
 domain: users
-verdict: rxdart
+verdict: tie
 async: true
 ---
   <h2>Requirement</h2>
@@ -29,23 +29,23 @@ async: true
 
   <h2>Why they differ</h2>
   <p>
-    "Newer cancels older" is a statement about <em>subscriptions</em>, and
-    only the push model has them. <code>switchMap</code> is the whole
-    requirement: each query starts an inner search stream, and the arrival
-    of a newer query unsubscribes the old one, so a stale result has no
-    listener left to reach. Three searches start, two results survive, and
-    none of that logic appears in user code.
+    They no longer do. "Newer cancels older" is a statement about
+    <em>subscriptions</em>, and since fxdart 0.8.0 the
+    <code>fxEvents</code> layer has them: its <code>switchMap</code> maps
+    each query to an inner search stream and unsubscribes the previous
+    one the moment a newer query arrives, so a stale result has no
+    listener left to reach. Three searches start, two results survive,
+    and none of that logic appears in user code — in either panel. The
+    hand-rolled epoch counter and completion bookkeeping the old FxDart
+    panel needed are gone.
   </p>
   <p>
-    A pull pipeline cannot express this — by the time a chain would pull
-    the first result, the interesting fact (a newer query exists) lives
-    outside the sequence. So the FxDart side hand-rolls the switch: an
-    epoch counter increments per query, each search remembers its epoch,
-    and a result is dropped on arrival if it is no longer the newest. Add
-    the completion bookkeeping (a <code>Completer</code> for the stream,
-    awaiting the last in-flight search) and only then a small
-    <code>fx</code> chain to format the survivors. It prints the same
-    lines, but it is a manual reimplementation of cancellation-by-newer.
-    This is <code>switchMap</code>'s defining use case, and the verdict
-    follows: use RxDart here.
+    fxdart 0.8.0 absorbed the Rx approach for exactly this kind of
+    requirement: <code>fxEvents</code> is a thin wrapper chain over plain
+    <code>Stream</code>s — never an extension, so it coexists with any
+    other stream library, rxdart included. RxDart's operator catalog
+    remains far larger; when the surviving results need real per-value
+    processing, cross into the typed pull chain with <code>.pull()</code>.
+    For <code>switchMap</code>'s defining use case the panels are now
+    operator-for-operator equivalent: a tie.
   </p>

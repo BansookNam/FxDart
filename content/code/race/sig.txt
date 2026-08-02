@@ -1,0 +1,1 @@
+static FxEvents&lt;T&gt; FxEvents.race&lt;T&gt;(Iterable&lt;Stream&lt;T&gt;&gt; candidates)

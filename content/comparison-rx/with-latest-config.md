@@ -1,13 +1,13 @@
 ---
 slug: with-latest-config
 title: Stamp each request with the latest config — RxDart vs FxDart
-description: Each outgoing request carries the config version current at that instant — withLatestFrom vs a tagged merge folded with scan behind the bridge.
+description: Each outgoing request carries the config version current at that instant — the same withLatestFrom operator on both sides, rxdart and fxEvents.
 heading: Stamp each request with the latest config
 order: 44
 tier: 4
-functions: fx, streams, scan, filter, map
+functions: fxEvents, withLatestFrom
 domain: general
-verdict: rxdart
+verdict: tie
 async: true
 ---
   <h2>Requirement</h2>
@@ -28,22 +28,22 @@ async: true
 
   <h2>Why they differ</h2>
   <p>
-    This is <code>combineLatest</code>'s asymmetric sibling: one stream
-    drives, the other is only <em>consulted</em>. RxDart's
-    <code>withLatestFrom</code> <em>is</em> this requirement, named — emit per request,
-    pairing it with the freshest config seen so far, and stay silent when
-    only the config changes. Which stream is primary is encoded in the
-    operator itself.
+    They no longer do. This is <code>combineLatest</code>'s asymmetric
+    sibling — one stream drives, the other is only <em>consulted</em> —
+    and since fxdart 0.8.0 both panels name it the same way:
+    <code>withLatestFrom</code> emits per request, stamped with the
+    freshest config seen so far, and stays silent when only the config
+    changes. The tagged-merge scaffolding and the <code>scan</code> fold
+    the old FxDart panel needed are gone; the two chains are now
+    operator-for-operator identical.
   </p>
   <p>
-    The FxDart side has to build that asymmetry by hand. It starts with
-    the same tagged-merge scaffolding as the previous example
-    (controller, close-tracking, bridge), then builds the asymmetry in
-    the fold: a config event stores the version and clears the request
-    slot, a request event fills it. A <code>filter</code> keeps only
-    states with a pending request, and a <code>map</code> formats the
-    stamp. Every step is typed and explicit, and that is the problem:
-    four operators reimplement what <code>withLatestFrom</code> simply
-    <em>names</em>. Verdict RxDart — the right tool whenever one live
-    stream needs the latest value of another.
+    fxdart 0.8.0's events layer absorbed the Rx approach for the push
+    side: <code>fxEvents</code> is a thin wrapper chain over plain
+    <code>Stream</code>s — never an extension, so it collides with
+    nothing, rxdart included. RxDart's operator catalog remains far
+    larger; fxdart keeps the events core small and crosses into the typed
+    pull pipeline with <code>.pull()</code> when per-value processing
+    grows. For stamping one live stream with the latest value of another,
+    the two sides are equivalent: a tie.
   </p>

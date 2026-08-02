@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Debounce the search box — RxDart vs FxDart</title>
-  <meta name="description" content="Wait for the typing to go quiet before searching — one debounceTime operator on the event stream vs a hand-wired callback debouncer.">
+  <meta name="description" content="Wait for the typing to go quiet before searching — debounceTime on the event stream vs the same debounce chain in fxdart 0.8.0's events layer.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/debounced-search.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/debounced-search.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/debounced-search.html">
@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../assets/fxdart_single.dart?v=8861025363f20544">
+  <link rel="prefetch" href="../assets/fxdart_single.dart?v=406219f7354c4ce7">
 </head>
 <body>
 <header class="site-header">
@@ -48,11 +48,11 @@
 <main class="cmp-wide">
   <p class="breadcrumb"><a href="../RxDartComparison/index.html">RxDart vs FxDart</a> › #40 · <strong>Debounce the search box</strong></p>
   <h1>Debounce the search box</h1>
-  <p class="cmp-meta"><span class="badge verdict-rxdart">RxDart's turf</span> <span class="badge badge-async">async</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/debounce.html">debounce</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/debounce.html">debounce</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
   <h2>Requirement</h2>
   <p>
-    A user types <code>f</code>, <code><a href="../tutorials/fx.html">fx</a></code>, <code>fxd</code> in a
+    A user types <code>f</code>, <code>fx</code>, <code>fxd</code> in a
     quick burst, pauses, then types <code>fxdart</code>. Search only when
     the typing has been quiet for 160&nbsp;ms — so exactly two searches
     run (<code>fxd</code> and <code>fxdart</code>) — and print each
@@ -107,7 +107,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="0c6e7672eb13f4b5">
+      <div class="playground">
 <textarea>
 import 'dart:async';
 
@@ -132,19 +132,10 @@ Future<String> search(String q) async {
 }
 
 Future<void> main() async {
-  // fxdart's debounce is a callback wrapper, not a stream operator — the
-  // quiet queries have to be collected by hand, then searched as a pipeline.
-  final quiet = <String>[];
-  final debounced =
-      debounce<String>(quiet.add, const Duration(milliseconds: 160));
-  final done = Completer<void>();
-  final sub = keystrokes().listen(debounced.call,
-      // The trailing debounce window may still be pending at close.
-      onDone: () => Timer(const Duration(milliseconds: 200), done.complete));
-  await done.future;
-  await sub.cancel();
-
-  final results = await fx(quiet).toAsync().map(search).toList();
+  final results = await fxEvents(keystrokes())
+      .debounce(const Duration(milliseconds: 160))
+      .asyncMap(search)
+      .toList();
 
   results.forEach(print);
 }
@@ -155,24 +146,26 @@ Future<void> main() async {
 
   <h2>Why they differ</h2>
   <p>
-    This is a <em>push</em> problem in its purest form: the interesting
-    thing is not the values but <strong>when they stop arriving</strong>.
-    That is exactly what a stream models, and RxDart says it
-    directly — <code>debounceTime(160ms)</code> on the
-    event stream, then search, then collect. Subscription, windowing and
-    the trailing edge at close are all handled by the operator.
+    They no longer do. This is a <em>push</em> problem in its purest
+    form — the interesting thing is not the values but <strong>when they
+    stop arriving</strong> — and both panels now say it the same way:
+    debounce the event stream by 160&nbsp;ms, search each surviving query,
+    collect. RxDart spells it <code>debounceTime</code>; fxdart&nbsp;0.8.0
+    spells it <code>fxEvents(...).debounce(...)</code>. Operator for
+    operator, the two chains are equivalent, down to the trailing value
+    flushed at close.
   </p>
   <p>
-    FxDart has no time-based pipeline operators on purpose — a pull
-    pipeline has no "time between arrivals", only demand. Its
-    <code><a href="../tutorials/debounce.html">debounce</a></code> is the FxTS-style <em>callback wrapper</em>:
-    correct, but you wire it to the stream yourself, collect the quiet
-    queries by hand, wait out the trailing window at close, and only then
-    hand the survivors to a typed pipeline for the actual searches. The
-    honest verdict: on this side of the bridge, use RxDart — and if the
-    downstream work grows (typed error handling, ordered concurrent
-    fetches), pass the debounced stream through
-    <code>fxStream</code> and continue in FxDart from there.
+    That is deliberate: fxdart's events layer absorbed the Rx approach for
+    the push side. <code><a href="../tutorials/fxEvents.html">fxEvents</a></code> is a thin wrapper chain over
+    plain Dart <code>Stream</code>s — never an extension, so it collides
+    with nothing, rxdart included — giving time-based operators a home the
+    pull pipelines rightly refused to be. RxDart's operator catalog
+    remains far larger; fxdart covers the everyday push verbs and stops.
+    And when the debounced queries should feed typed, demand-driven
+    work — ordered concurrent fetches, typed error handling —
+    <code>.pull()</code> is the door back into the <code>FxAsync</code>
+    pipeline.
   </p>
 
   <nav class="tut-nav">
@@ -185,7 +178,7 @@ Future<void> main() async {
   <p>Playground compiles via the DartPad compile service. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Run","pgReset":"Reset","pgCompiling":"Compiling…","pgCompileError":"Compile error","pgError":"Error","pgLoading":"Loading runtime…","pgRunning":"Running…","pgNoOutput":"(no output)","pgLoadFailed":"Could not load the FxDart library"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

@@ -1,13 +1,13 @@
 ---
 slug: combine-form-fields
 title: Enable submit when the form is valid — RxDart vs FxDart
-description: Combine the latest email and password values to drive the submit button — Rx.combineLatest2 vs a hand-merged tagged stream folded with scan.
+description: Combine the latest email and password values to drive the submit button — Rx.combineLatest2 vs combineLatest in fxdart 0.8.0's events layer.
 heading: Enable submit when the form is valid
 order: 43
 tier: 4
-functions: fx, streams, scan, filter
+functions: fxEvents, combineLatest
 domain: users
-verdict: rxdart
+verdict: tie
 async: true
 ---
   <h2>Requirement</h2>
@@ -31,23 +31,25 @@ async: true
 
   <h2>Why they differ</h2>
   <p>
-    This is <em>latest-value-per-source</em> state — the defining
-    combinator of the push model. <code>Rx.combineLatest2</code> holds the
-    newest value from each field, waits until both have spoken, and
-    re-emits the pair on every change from either side. The form logic
-    reads exactly like the requirement, and the four lines of output fall
-    out of one declaration.
+    They no longer do. <em>Latest-value-per-source</em> state is the
+    defining combinator of the push model, and both panels now declare it
+    in one line: hold the newest value from each field, wait until both
+    have spoken, re-emit the pair on every change from either side.
+    RxDart writes <code>Rx.combineLatest2(emails(), passwords(), ...)</code>;
+    fxdart writes <code>fxEvents(emails()).combineLatest(passwords(),
+    ...)</code>. Same waiting rule, same re-emission on either side, same
+    close-when-both-close — the tagged-merge-and-fold the fxdart panel
+    used to hand-roll is gone.
   </p>
   <p>
-    A pull pipeline consumes <em>one</em> sequence, so the FxDart side
-    must first rebuild what <code>combineLatest</code> gets for free:
-    merge the two fields into a single stream of tagged events
-    (a hand-written controller, with its own two-subscription close
-    bookkeeping), bridge it with <code>fxStream</code>, then
-    <code>scan</code> the tags into a (email, password) state record and
-    <code>filter</code> out states where a field has not emitted yet. The
-    fold itself is honest, typed and readable — but it is a reimplementation
-    of the operator, not a use of one. Reactive UI state like this is
-    exactly what RxDart is for, and the verdict is RxDart's without
-    argument.
+    fxdart&nbsp;0.8.0's events layer absorbed the Rx approach for exactly
+    this kind of job: a deliberate wrapper chain over plain
+    <code>Stream</code>s — not an extension, so it coexists with rxdart or
+    any other stream library without conflicts — carrying the latest-value
+    combinators the pull pipelines cannot have. One honest caveat stands:
+    RxDart's operator catalog remains far larger than fxdart's events
+    layer. When the combined form state should drive typed, demand-driven
+    work — a validated submit call with typed errors, say —
+    <code>.pull()</code> crosses from the live pairs into the
+    <code>FxAsync</code> pipeline.
   </p>

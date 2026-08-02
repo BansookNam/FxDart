@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
 </head>
 <body>
 <header class="site-header">
@@ -116,7 +116,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="3dfc1741c05fa364">
+      <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -183,6 +183,72 @@ Future<void> main() async {
     the pipeline is arithmetic. Same operators, one fewer model boundary
     to cross.
   </p>
+  <section class="cmp-bench">
+  <h2>Benchmark</h2>
+  <p class="dim bench-meta">Apple M1 Max, 32 GB RAM · Dart 3.12.2 (AOT-compiled) · 2026-08-02</p>
+  <p class="dim bench-note bench-async-note">Async case: the headline scale is N = 10,000, not 1,000,000. Every element costs an event-loop turn on both sides, so a million real awaits would measure Dart's event loop for minutes — not the pipeline. Delays are zero-length and the example's concurrency limit is kept; what the bars compare is the pipeline machinery.</p>
+  <div class="bench-scales">
+  <div class="bench-scale">
+    <h3>N = 100</h3>
+    <div class="bench-metric">
+      <h4>Time <span class="badge verdict-tie">Tie</span></h4>
+      <div class="bench-row">
+        <span class="bench-name">RxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">828 µs</span>
+      </div>
+      <div class="bench-row">
+        <span class="bench-name">FxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:75.2%"></span></span>
+        <span class="bench-val">623 µs</span>
+      </div>
+    </div>
+    <div class="bench-metric">
+      <h4>Peak memory <span class="badge verdict-tie">Tie</span></h4>
+      <div class="bench-row">
+        <span class="bench-name">RxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:98.8%"></span></span>
+        <span class="bench-val">17.0 MB</span>
+      </div>
+      <div class="bench-row">
+        <span class="bench-name">FxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">17.2 MB</span>
+      </div>
+    </div>
+  </div>
+  <div class="bench-scale">
+    <h3>N = 10,000</h3>
+    <div class="bench-metric">
+      <h4>Time <span class="badge verdict-fxdart">FxDart wins</span></h4>
+      <div class="bench-row">
+        <span class="bench-name">RxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">77.4 ms</span>
+      </div>
+      <div class="bench-row">
+        <span class="bench-name">FxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:77.3%"></span></span>
+        <span class="bench-val">59.8 ms</span>
+      </div>
+    </div>
+    <div class="bench-metric">
+      <h4>Peak memory <span class="badge verdict-rxdart">RxDart wins</span></h4>
+      <div class="bench-row">
+        <span class="bench-name">RxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:76.2%"></span></span>
+        <span class="bench-val">22.6 MB</span>
+      </div>
+      <div class="bench-row">
+        <span class="bench-name">FxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">29.7 MB</span>
+      </div>
+    </div>
+  </div>
+  </div>
+  <p class="dim bench-note">Bars are medians of repeated timed iterations in fresh processes per side (small N is batched for timer resolution). Sides within 5% of each other — or within 0.6 ms, a difference no person can perceive — count as a tie; close relative races are re-measured up to 5 runs. In an app, anything under a few milliseconds is invisible to the user regardless of which bar is shorter. Memory is peak process RSS. The Dart VM and the dataset are identical on both sides, so the difference between the two bars is what the pipeline itself holds onto.</p>
+  </section>
 
   <nav class="tut-nav">
     <a href="all-validation-errors.html">← Назад: Report every validation error</a>
@@ -194,7 +260,7 @@ Future<void> main() async {
   <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

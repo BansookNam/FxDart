@@ -21,15 +21,11 @@ Stream<String> mirror(String name, int ms) {
 }
 
 Future<void> main() async {
-  // Not a race: head() demands ONE item, so only the primary mirror is
-  // ever listened to — the backup never starts (pull cannot cancel work
-  // already in flight; it can only decline to demand it).
-  final winner = await fx([mirror('eu-mirror', 60), mirror('us-mirror', 180)])
-      .toAsync()
-      .map((m) => m.first)
-      .head();
+  // Race both mirrors: first event wins, the loser is CANCELLED mid-flight.
+  final winner = await FxEvents.race(
+      [mirror('eu-mirror', 60), mirror('us-mirror', 180)]).stream.first;
 
-  // Wait long past the backup's 180 ms — it was never subscribed at all.
+  // Wait long past the loser's 180 ms — its timer was cancelled at ~60 ms.
   await Future.delayed(const Duration(milliseconds: 540));
 
   print('winner: $winner');

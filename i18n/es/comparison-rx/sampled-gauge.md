@@ -1,13 +1,13 @@
 ---
 slug: sampled-gauge
 title: Muestrear el medidor en cada tick de sondeo — RxDart vs FxDart
-description: Leer el valor más reciente del medidor en cada tick de sondeo — un stream disparador de sample explícito vs una variable de último valor llevada a mano y leída a través del puente.
+description: Leer el valor más reciente del medidor en cada tick de sondeo — un stream disparador de sample explícito en RxDart vs sampleOn en la capa de eventos de fxdart 0.8.0.
 heading: Muestrear el medidor en cada tick de sondeo
 order: 42
 tier: 4
-functions: fx, streams, map
+functions: fxEvents, sampleOn
 domain: sensors
-verdict: rxdart
+verdict: tie
 async: true
 ---
   <h2>Requisito</h2>
@@ -28,23 +28,26 @@ async: true
 
   <h2>Por qué difieren</h2>
   <p>
-    «El valor más reciente en este instante» es un concepto que solo
-    existe en el modelo push — significa <em>lo último que haya
-    llegado</em>, lo cual presupone que las cosas llegan por su cuenta.
-    El <code>sample</code> de RxDart toma el stream del medidor y un
-    stream disparador y hace exactamente este trabajo: en cada disparo,
-    emite el valor de la fuente más nuevo desde el disparo anterior. Un
-    operador, y el estado («¿qué es lo actual?») vive dentro de él.
+    Ya no difieren. «El valor más reciente en este instante» solo existe
+    en el modelo push — presupone que las cosas llegan por su cuenta — y
+    ambos paneles lo expresan ahora como la misma frase de un solo
+    operador: el stream del medidor, muestreado por el stream de sondeo.
+    RxDart escribe <code>gauge().sample(polls())</code>; fxdart escribe
+    <code>fxEvents(gauge()).sampleOn(polls())</code>. En ambos, el
+    estado de «¿qué es lo actual?» vive dentro del operador, cada
+    disparo emite la lectura más nueva desde el anterior, y las lecturas
+    no muestreadas simplemente se descartan.
   </p>
   <p>
-    Un pipeline pull no tiene «valor actual» — nada llega hasta que
-    preguntas. Así que el lado FxDart divide el trabajo en dos: una
-    suscripción llana sigue la lectura más reciente del medidor en una
-    variable mutable, y el stream de sondeo entra por
-    <code>fxStream</code> para que cada tick tirado pueda hacer
-    <code>map</code> a una instantánea de esa variable. Imprime las
-    mismas tres lecturas, pero la lógica de muestreo es código push
-    escrito a mano que se sienta <em>junto a</em> la cadena, no expresado
-    por ella. Veredicto RxDart: muestrear estado vivo es nativo del push
-    — este partido se juega en casa del push.
+    Los pipelines pull siguen sin tener reloj ni «valor actual» — esa
+    negativa se mantiene. En su lugar, fxdart&nbsp;0.8.0 absorbió el
+    enfoque Rx en una capa de eventos dedicada: <code>fxEvents</code> es
+    una cadena envoltorio fina sobre <code>Stream</code>s llanos (nunca
+    una extensión, así que no colisiona con nada) que posee los verbos
+    nativos del push que el lado pull no quiso tener. El catálogo de
+    operadores de RxDart sigue siendo mucho más amplio; este verbo,
+    fxdart ya lo habla de forma nativa. Y si cada lectura muestreada
+    fuera el inicio de trabajo real aguas abajo, <code>.pull()</code>
+    entrega las muestras al pipeline <code>FxAsync</code> tipado,
+    tiradas bajo demanda.
   </p>

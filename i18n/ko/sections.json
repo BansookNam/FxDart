@@ -24,5 +24,7 @@
   "section13": "타입 있는 에러",
   "section13Blurb": "Kotlin Arrow의 접근 방식을 이식: <code>either</code>, <code>Raise</code>, <code>bind</code>, <code>ensure</code>, <code>Nel</code>을 이용한 에러 누적, 그리고 파이프라인과 융합된 검증. 일직선 코드, 타입 있는 실패, 래퍼 타워 없음.",
   "section12": "유틸",
-  "section12Blurb": "속도 제한과 난수."
+  "section12Blurb": "속도 제한과 난수.",
+  "section14": "이벤트 스트림 (push)",
+  "section14Blurb": "FxDart의 push 쪽 — 평범한 Dart Stream 위의 Rx 스타일 연산자들, 그리고 pull 파이프라인으로 이어지는 다리."
 }

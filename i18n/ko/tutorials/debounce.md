@@ -53,6 +53,18 @@ nextLabel: throttle
     아래 연속 호출 중 마지막 값만 살아남게 만들어 보세요.</p>
   {{playground:2}}
 
+  <h2>이벤트 스트림에서</h2>
+  <p>
+    같은 아이디어가 이벤트 레이어에도 있습니다. 몰아치는 대상이 콜백이
+    아니라 <code>Stream</code>이라면
+    <code>fxEvents(s).debounce(window)</code>가 각 버스트의 트레일링 값을
+    — <code>window</code> 동안 새 이벤트가 없을 때 — 내보내고, 스트림이
+    닫힐 때 아직 대기 중인 값은 버려지지 않고 마지막에 방출됩니다. 이
+    체인이 속한 곳은 <a href="fxEvents.html"><code>fxEvents</code></a>
+    문서를 참고하세요.
+  </p>
+  {{playground:3}}
+
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="throttle.html"><code>throttle</code></a> — 잠잠해진 뒤가 아니라 일정 주기로 발화 ·

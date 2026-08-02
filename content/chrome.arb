@@ -125,6 +125,9 @@
   "cmpBenchWinTie": "Tie",
   "@cmpBenchWinTie": { "description": "Benchmark badge: the two implementations measured within the tie margin of each other." },
 
+  "cmpBenchWinRxdart": "RxDart wins",
+  "@cmpBenchWinRxdart": { "description": "Benchmark badge: the RxDart implementation measured faster / lighter. 'RxDart' is the product name." },
+
   "cmpBenchMeta": "{cpu}, {ram} GB RAM · Dart {dart} (AOT-compiled) · {date}",
   "@cmpBenchMeta": { "description": "Machine line under the Benchmark heading. Keep every {placeholder} intact; they are replaced by the generator (CPU name, RAM, Dart version, date)." },
 

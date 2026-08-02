@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
 </head>
 <body>
 <header class="site-header">
@@ -57,7 +57,9 @@
 class Debounced&lt;T&gt; {
   void call(T arg);   // Debounced is callable: debounced(arg)
   void cancel();
-}</div>
+}
+
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.debounce(Duration window) // chain (events)</div>
 
   <h2>Lecture</h2>
   <p>
@@ -87,7 +89,7 @@ class Debounced&lt;T&gt; {
 
   <h2>Demo 1 · Trailing edge (the default)</h2>
   <p>Three rapid calls collapse into one — only the last argument survives:</p>
-  <div class="playground" data-pg="101806404ade47eb">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -166,6 +168,50 @@ Future<void> main() async {
 </textarea>
   </div>
 
+  <h2>On event streams</h2>
+  <p>
+    The same idea exists on the events layer: when the bursty thing is a
+    <code>Stream</code> rather than a callback,
+    <code>fxEvents(s).debounce(window)</code> emits the trailing value of
+    each burst once <code>window</code> has passed without a newer event —
+    and a value still pending when the stream closes is flushed, never
+    dropped. See <a href="fxEvents.html"><code>fxEvents</code></a> for the
+    chain this belongs to.
+  </p>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // The same idea on a Stream: keystrokes arrive in bursts, and only the
+  // trailing value of each burst survives the 150ms quiet window.
+  final keystrokes = timed(
+      [(0, 'd'), (40, 'da'), (80, 'dar'), (120, 'dart'), (400, 'dart!')], 460);
+
+  final searches = await fxEvents(keystrokes)
+      .debounce(const Duration(milliseconds: 150))
+      .toList();
+
+  print(searches); // [dart, dart!]
+  // 'dart' ends the first burst (150ms of quiet after 120ms); 'dart!' is
+  // still waiting for its window when the stream closes at 460ms — a
+  // pending value is flushed on close, never dropped.
+}
+</textarea>
+  </div>
+
   <div class="callout">
     <strong>Related:</strong>
     <a href="throttle.html"><code>throttle</code></a> — fires on a schedule instead of after quiet ·
@@ -184,7 +230,7 @@ Future<void> main() async {
   <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

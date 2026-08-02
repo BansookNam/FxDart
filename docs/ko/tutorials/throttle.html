@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
 </head>
 <body>
 <header class="site-header">
@@ -55,7 +55,9 @@
 class Throttled&lt;T&gt; {
   void call(T arg);   // Throttled is callable: throttled(arg)
   void cancel();
-}</div>
+}
+
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.throttle(Duration window, {bool leading = true, bool trailing = false}) // chain (events)</div>
 
   <h2>강의</h2>
   <p>
@@ -82,7 +84,7 @@ class Throttled&lt;T&gt; {
   <h2>데모 1 · 리딩 + 트레일링(기본 동작)</h2>
   <p>첫 호출은 즉시 발화하고, 구간이 닫힐 때 그 구간의 마지막 호출이
     한 번 더 발화합니다:</p>
-  <div class="playground" data-pg="d06c406ef872f5de">
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -176,6 +178,55 @@ Future<void> main() async {
 </textarea>
   </div>
 
+  <h2>이벤트 스트림에서</h2>
+  <p>
+    같은 아이디어가 이벤트 레이어에도 있습니다. 수다스러운 대상이 콜백이
+    아니라 <code>Stream</code>이라면
+    <code>fxEvents(s).throttle(window, trailing: …)</code>이 윈도마다
+    이벤트 하나만 통과시킵니다. 기본값이 하나 다릅니다: 스트림 형태는
+    <code>trailing: true</code>를 넘기지 않는 한 리딩 전용입니다(위의
+    콜백 래퍼는 양쪽 에지가 기본으로 켜져 있습니다). 이 체인이 속한 곳은
+    <a href="fxEvents.html"><code>fxEvents</code></a> 문서를 참고하세요.
+  </p>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // The same idea on a Stream: scroll positions fire constantly; one
+  // per 100ms window gets through. Default is leading only.
+  final leading = await fxEvents(timed(
+          [(0, 0), (30, 40), (60, 90), (130, 160), (160, 220), (300, 400)],
+          450))
+      .throttle(const Duration(milliseconds: 100))
+      .toList();
+  print(leading); // [0, 160, 400] — the first event of each window
+
+  // trailing: true emits the NEWEST value seen when each window ends —
+  // note the stream form defaults to trailing: false, unlike the
+  // callback wrapper above.
+  final trailing = await fxEvents(
+          timed([(0, 0), (30, 40), (60, 90), (130, 160), (300, 400)], 450))
+      .throttle(const Duration(milliseconds: 100),
+          leading: false, trailing: true)
+      .toList();
+  print(trailing); // [90, 160, 400]
+}
+</textarea>
+  </div>
+
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="debounce.html"><code>debounce</code></a> — 고정된 주기가 아니라 잠잠해지기를 기다립니다 ·
@@ -194,7 +245,7 @@ Future<void> main() async {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

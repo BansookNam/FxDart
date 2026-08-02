@@ -53,6 +53,18 @@ nextLabel: shuffle
     만 기록되게 만들어 보세요.</p>
   {{playground:2}}
 
+  <h2>이벤트 스트림에서</h2>
+  <p>
+    같은 아이디어가 이벤트 레이어에도 있습니다. 수다스러운 대상이 콜백이
+    아니라 <code>Stream</code>이라면
+    <code>fxEvents(s).throttle(window, trailing: …)</code>이 윈도마다
+    이벤트 하나만 통과시킵니다. 기본값이 하나 다릅니다: 스트림 형태는
+    <code>trailing: true</code>를 넘기지 않는 한 리딩 전용입니다(위의
+    콜백 래퍼는 양쪽 에지가 기본으로 켜져 있습니다). 이 체인이 속한 곳은
+    <a href="fxEvents.html"><code>fxEvents</code></a> 문서를 참고하세요.
+  </p>
+  {{playground:3}}
+
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="debounce.html"><code>debounce</code></a> — 고정된 주기가 아니라 잠잠해지기를 기다립니다 ·

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>switchMap — FxDart 101</title>
+  <meta name="description" content="Tutorial de switchMap en FxDart: mapea cada evento a un stream interno y refleja solo el más nuevo — cancelación por novedad para cajas de búsqueda — con playground en vivo.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/switchMap.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/switchMap.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/switchMap.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/switchMap.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/switchMap.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/switchMap.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/switchMap.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/switchMap.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../tutorials/switchMap.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/switchMap.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/switchMap.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/switchMap.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/switchMap.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/tutorials/switchMap.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/switchMap.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 14 · Streams de eventos (push) › <strong>switchMap</strong></p>
+  <h1><code>switchMap</code></h1>
+  <p class="hero-sub">Mapea cada evento a un stream interno y refleja solo el más nuevo — un evento fresco <em>cancela</em> el stream interno anterior en pleno vuelo.</p>
+
+  <div class="signature">FxEvents&lt;R&gt; FxEvents&lt;T&gt;.switchMap&lt;R&gt;(Stream&lt;R&gt; Function(T a) f) // chain (events)</div>
+
+  <h2>Lección</h2>
+  <p>
+    El bug de la caja de búsqueda que toda UI ha enviado al menos una vez:
+    el usuario teclea <code>da</code>, luego <code>dart</code>; la petición
+    de <code>da</code> es más lenta; sus resultados obsoletos llegan los
+    últimos y pisan los buenos. La solución no es <em>ignorar</em> la
+    respuesta vieja sino hacerla imposible: <code>switchMap(f)</code> mapea
+    cada evento a un stream interno y, en el momento en que llega un evento
+    más nuevo, <strong>cancela</strong> de raíz el stream interno anterior.
+    Solo el stream interno más nuevo se refleja aguas abajo.
+  </p>
+  <p>
+    La cancelación por novedad es una política, y es la correcta exactamente
+    cuando el trabajo viejo se vuelve <em>inútil</em> en cuanto existe
+    entrada más nueva — búsqueda, autocompletado, navegación, «cargar los
+    detalles de la fila seleccionada». Es la equivocada cuando la salida de
+    cada stream interno importa (una subida por archivo, digamos) — ese es
+    un trabajo de fan-out para el
+    <code><a href="mapConcurrent.html">mapConcurrent</a></code> del lado
+    pull, donde nada se cancela.
+  </p>
+  <p>
+    Semántica en los bordes: la cadena se cierra cuando la fuente se ha
+    cerrado <em>y</em> el último stream interno completa — que la fuente
+    termine nunca corta el trabajo que ya está en pantalla. Un mapper que
+    lanza se convierte en un evento de error y la fuente sigue adelante.
+    Capa de eventos de fxdart, según el <code>switchMap</code> de Rx.
+  </p>
+
+  <h2>Demo 1 · La caja de búsqueda, arreglada</h2>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // A search box: the user refines the query while the first search is
+  // still in flight (each search takes ~150ms).
+  final queries = timed([(0, 'da'), (60, 'dart')], 400);
+  final started = <String>[];
+
+  Stream<String> search(String q) {
+    started.add(q);
+    return timed([(150, 'results for "$q"')], 200);
+  }
+
+  final out = await fxEvents(queries).switchMap(search).toList();
+
+  print('started:   $started'); // [da, dart]
+  print('delivered: $out'); // [results for "dart"]
+  // Both searches started — but 'dart' arrived while 'da' was in flight,
+  // so the older inner stream was CANCELLED mid-request. No stale results
+  // can ever overwrite newer ones.
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · El último stream interno termina de decir lo suyo</h2>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // The source closes at 30ms — long before the inner stream has said
+  // anything. The chain does NOT cut the last inner stream short.
+  final out = await fxEvents(timed([(0, 1)], 30))
+      .switchMap((v) => timed([(60, v * 10), (90, v * 100)], 120))
+      .toList();
+
+  print(out); // [10, 100]
+  // Close condition: source done AND the newest inner stream done.
+  // Only a NEWER event cancels an inner stream — the source closing
+  // never does.
+}
+</textarea>
+  </div>
+
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: autocompletado que no puede mostrar sugerencias obsoletas.</p>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // Autocomplete: every keystroke kicks off a ~100ms suggestion fetch.
+  final keys = timed([(0, 's'), (40, 'sw'), (80, 'swi')], 300);
+
+  Stream<String> suggest(String q) => timed([(100, '$q…suggestions')], 130);
+
+  // TODO: only the NEWEST query's suggestions should reach the screen —
+  // replace asyncExpand (which dutifully shows every stale result) with
+  //   fxEvents(keys).switchMap(suggest).toList()
+  final out = await keys.asyncExpand(suggest).toList();
+
+  print(out);
+  // currently every query's suggestions — want [swi…suggestions]:
+  // 's' and 'sw' are superseded before their fetch comes back.
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Relacionado:</strong>
+    <a href="debounce.html"><code>debounce</code></a> — su pareja natural aguas arriba: menos consultas de entrada, cero resultados obsoletos de salida ·
+    <a href="race.html"><code>race</code></a> — cancelación entre streams <em>hermanos</em> en lugar de sucesivos ·
+    <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — cuando cada resultado importa, fan-out del lado pull
+  </div>
+
+  <nav class="tut-nav">
+    <a href="withLatestFrom.html">← Anterior: withLatestFrom</a>
+    <a href="race.html">Siguiente: race →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

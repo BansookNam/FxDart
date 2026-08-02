@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sellar cada petición con la config más reciente — RxDart vs FxDart</title>
-  <meta name="description" content="Cada petición saliente lleva la versión de config vigente en ese instante — withLatestFrom vs una fusión etiquetada plegada con scan tras el puente.">
+  <meta name="description" content="Cada petición saliente lleva la versión de config vigente en ese instante — el mismo operador withLatestFrom en ambos lados, rxdart y fxEvents.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/with-latest-config.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/with-latest-config.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/with-latest-config.html">
@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
 </head>
 <body>
 <header class="site-header">
@@ -48,8 +48,8 @@
 <main class="cmp-wide">
   <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #44 · <strong>Sellar cada petición con la config más reciente</strong></p>
   <h1>Sellar cada petición con la config más reciente</h1>
-  <p class="cmp-meta"><span class="badge verdict-rxdart">Terreno de RxDart</span> <span class="badge badge-async">async</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <p class="cmp-meta"><span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/withLatestFrom.html">withLatestFrom</a></li></ul>
   <h2>Requisito</h2>
   <p>
     Una app dispara cuatro peticiones a la API mientras, en segundo
@@ -119,7 +119,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="00ad6737767b9a85">
+      <div class="playground">
 <textarea>
 import 'dart:async';
 
@@ -152,26 +152,9 @@ Stream<String> requests() {
   return c.stream;
 }
 
-/// Tag both sources into one stream — the pairing withLatestFrom does for us.
-Stream<(String, String)> tagged() {
-  final c = StreamController<(String, String)>();
-  var open = 2;
-  void done() {
-    if (--open == 0) c.close();
-  }
-
-  configs().listen((v) => c.add(('config', v)), onDone: done);
-  requests().listen((r) => c.add(('request', r)), onDone: done);
-  return c.stream;
-}
-
 Future<void> main() async {
-  final stamped = await fxStream(tagged())
-      .scan<(String, String?)>(
-          (acc, ev) => ev.$1 == 'config' ? (ev.$2, null) : (acc.$1, ev.$2),
-          ('', null))
-      .filter((s) => s.$2 != null)
-      .map((s) => '${s.$2} (config ${s.$1})')
+  final stamped = await fxEvents(requests())
+      .withLatestFrom(configs(), (req, cfg) => '$req (config $cfg)')
       .toList();
 
   stamped.forEach(print);
@@ -183,25 +166,26 @@ Future<void> main() async {
 
   <h2>Por qué difieren</h2>
   <p>
-    Este es el hermano asimétrico de <code>combineLatest</code>: un
-    stream dirige, el otro solo se <em>consulta</em>. El
-    <code>withLatestFrom</code> de RxDart <em>es</em> este requisito, con
-    nombre — emite por petición, emparejándola con la config más fresca
-    vista hasta ahora, y guarda silencio cuando solo cambia la config.
-    Qué stream es el primario está codificado en el propio operador.
+    Ya no difieren. Este es el hermano asimétrico de
+    <code>combineLatest</code> — un stream dirige, el otro solo se
+    <em>consulta</em> — y desde fxdart 0.8.0 ambos paneles lo nombran de
+    la misma manera: <code><a href="../tutorials/withLatestFrom.html">withLatestFrom</a></code> emite por petición,
+    sellada con la config más fresca vista hasta ahora, y guarda
+    silencio cuando solo cambia la config. El andamiaje de fusión
+    etiquetada y el pliegue con <code>scan</code> que el viejo panel
+    FxDart necesitaba han desaparecido; las dos cadenas son ahora
+    idénticas operador por operador.
   </p>
   <p>
-    El lado FxDart tiene que construir esa asimetría a mano. Empieza con
-    el mismo andamiaje de fusión etiquetada del ejemplo anterior
-    (controller, seguimiento del cierre, puente), y luego construye la
-    asimetría en el pliegue: un evento de config almacena la versión y
-    limpia el hueco de la petición, un evento de petición lo rellena. Un
-    <code><a href="../tutorials/filter.html">filter</a></code> conserva solo los estados con una petición
-    pendiente, y un <code><a href="../tutorials/map.html">map</a></code> formatea el sello. Cada paso es
-    tipado y explícito, y ese es el problema: cuatro operadores
-    reimplementan lo que <code>withLatestFrom</code> simplemente
-    <em>nombra</em>. Veredicto RxDart — la herramienta correcta siempre
-    que un stream vivo necesita el último valor de otro.
+    La capa de eventos de fxdart 0.8.0 absorbió el enfoque Rx para el
+    lado push: <code><a href="../tutorials/fxEvents.html">fxEvents</a></code> es una cadena envoltorio fina sobre
+    <code>Stream</code>s llanos — nunca una extensión, así que no
+    colisiona con nada, rxdart incluido. El catálogo de operadores de
+    RxDart sigue siendo mucho más amplio; fxdart mantiene pequeño el
+    núcleo de eventos y cruza al pipeline pull tipado con
+    <code>.pull()</code> cuando el procesamiento por valor crece. Para
+    sellar un stream vivo con el último valor de otro, los dos lados son
+    equivalentes: empate.
   </p>
 
   <nav class="tut-nav">
@@ -214,7 +198,7 @@ Future<void> main() async {
   <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

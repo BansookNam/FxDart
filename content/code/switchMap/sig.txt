@@ -1,0 +1,1 @@
+FxEvents&lt;R&gt; FxEvents&lt;T&gt;.switchMap&lt;R&gt;(Stream&lt;R&gt; Function(T a) f) // chain (events)

@@ -71,19 +71,35 @@
   <p>
     목록을 보기 전에 정직하게 한 가지 짚고 넘어가겠습니다: 문제가 정말
     <em>시간에 따라 도착하는 이벤트</em>에 관한 것이라면 — 사용자 입력,
-    시세 틱, 소켓 — 스트림이 그 문제에 맞는 형태이고, 아래 판정 중
-    일부는 그렇게 분명히 말합니다. 이 쌍들이 드러내는 것은, 스트림으로
-    풀리는 문제가 사실은 스트림 옷을 입은 <em>데이터 파이프라인</em>인
-    경우가 얼마나 많은가입니다: 유한한 fetch, 배치 변환, 페이지네이션
-    크롤링 같은 것들이죠. 그런 문제에서는 pull 버전이 더 짧고, 순서가
-    보장되고, 타입이 있으며, 구독 라이프사이클이 아예 필요 없습니다.
+    시세 틱, 소켓 — 스트림이 그 문제에 맞는 형태입니다. FxDart는 그
+    아이디어를 흡수하는 것으로 이를 인정합니다: 0.8.0부터
+    <strong>이벤트 레이어</strong>
+    (<code><a href="../tutorials/fxEvents.html">fxEvents</a></code>)가
+    Rx 스타일의 push 연산자들 — debounce, throttle, sample,
+    combineLatest, switchMap, race, 그리고 <code>LiveValue</code> — 를
+    평범한 Dart 스트림 위에 올려 주므로, 이제 Part&nbsp;4의 시간 형태
+    쌍들은 연산자 대 연산자로 대등하게 만납니다. RxDart의 카탈로그는
+    여전히 훨씬 큽니다; 이 쌍들이 드러내는 것은 이야기의 나머지 절반
+    — 스트림으로 풀리는 문제가 사실은 스트림 옷을 입은 <em>데이터
+    파이프라인</em>인 경우가 얼마나 많은가 — 입니다: 유한한 fetch,
+    배치 변환, 페이지네이션 크롤링 같은 것들이죠. 그런 문제에서는 pull
+    버전이 더 짧고, 순서가 보장되고, 타입이 있으며, 구독
+    라이프사이클이 아예 필요 없습니다.
   </p>
 
   <p>
     <span class="badge verdict-fxdart">FxDart 승</span> — 이 문제에는 pull 모델이 더 잘 맞습니다 ·
     <span class="badge verdict-tie">우열 없음</span> — 두 모델 모두 깔끔하게 표현합니다 ·
-    <span class="badge verdict-rxdart">RxDart의 영역</span> — 진짜 push/시간 형태의 문제라 RxDart가 맞는 도구입니다 ·
     <span class="badge badge-async">async</span> — 비동기 파이프라인을 사용합니다
+  </p>
+
+  <p class="dim">
+    과제가 처리량 형태인 페이지에는 <strong>Benchmark</strong> 섹션도
+    함께 실려 있습니다 — 두 구현 모두 AOT 컴파일해 N=100과 큰 N
+    헤드라인(동기 과제는 1M; 모든 요소가 이벤트 루프를 건너는 경우는
+    10,000)에서 측정합니다. 실제 시간 기준 예제(#39–#47)는 일부러
+    벤치마크하지 않았습니다: 디바운스 윈도와 샘플 틱은 파이프라인이
+    아니라 시계를 측정하기 때문입니다.
   </p>
 
   <p class="cmp-picks"><span>다섯 개만 본다면, 이 예제들을 보세요:</span>
@@ -99,7 +115,6 @@
     <button data-filter="async">async</button>
     <button data-filter="fxdart">FxDart 승</button>
     <button data-filter="tie">우열 없음</button>
-    <button data-filter="rxdart">RxDart의 영역</button>
     <input type="search" placeholder="함수 이름으로 필터링…">
   </div>
 
@@ -518,85 +533,85 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
     </li>
-    <li data-verdict="rxdart" data-async="true" data-fns="fx debounce toAsync map">
+    <li data-verdict="tie" data-async="true" data-fns="fxEvents debounce map">
       <a class="cmp-row" href="debounced-search.html">
         <span class="cmp-num">40</span>
         <span class="cmp-row-body">
-          <strong>검색창 디바운스하기</strong> <span class="badge verdict-rxdart">RxDart의 영역</span> <span class="badge badge-async">async</span>
-          <span class="dim">타이핑이 잠잠해질 때까지 기다렸다가 검색 — 이벤트 스트림 위의 debounceTime 연산자 하나 vs 손으로 배선한 콜백 디바운서.</span>
+          <strong>검색창 디바운스하기</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span>
+          <span class="dim">타이핑이 잠잠해질 때까지 기다렸다가 검색 — 이벤트 스트림 위의 debounceTime vs fxdart 0.8.0 이벤트 레이어의 동일한 debounce 체인.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/debounce.html">debounce</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/debounce.html">debounce</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
     </li>
-    <li data-verdict="rxdart" data-async="true" data-fns="fx throttle map">
+    <li data-verdict="tie" data-async="true" data-fns="fxEvents throttle">
       <a class="cmp-row" href="throttled-refresh.html">
         <span class="cmp-num">41</span>
         <span class="cmp-row-body">
-          <strong>새로고침 버튼 스로틀링하기</strong> <span class="badge verdict-rxdart">RxDart의 영역</span> <span class="badge badge-async">async</span>
-          <span class="dim">300 ms 윈도마다 탭 하나만 통과 — 탭 스트림 위의 throttleTime vs 손으로 스트림에 배선한 fxdart의 throttle 콜백 래퍼.</span>
+          <strong>새로고침 버튼 스로틀링하기</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span>
+          <span class="dim">300 ms 윈도마다 탭 하나만 통과 — 탭 스트림 위의 throttleTime vs fxdart 0.8.0 이벤트 레이어의 동등한 throttle 체인.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/throttle.html">throttle</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/throttle.html">throttle</a></li></ul>
     </li>
-    <li data-verdict="rxdart" data-async="true" data-fns="fx streams map">
+    <li data-verdict="tie" data-async="true" data-fns="fxEvents sampleOn">
       <a class="cmp-row" href="sampled-gauge.html">
         <span class="cmp-num">42</span>
         <span class="cmp-row-body">
-          <strong>폴링 틱마다 게이지 샘플링하기</strong> <span class="badge verdict-rxdart">RxDart의 영역</span> <span class="badge badge-async">async</span>
-          <span class="dim">각 폴링 틱 시점의 최신 게이지 값 읽기 — 명시적 sample 트리거 스트림 vs 브리지 너머로 읽는, 손수 추적한 latest 변수.</span>
+          <strong>폴링 틱마다 게이지 샘플링하기</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span>
+          <span class="dim">각 폴링 틱 시점의 최신 게이지 값 읽기 — RxDart의 명시적 sample 트리거 스트림 vs fxdart 0.8.0 이벤트 레이어의 sampleOn.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/sampleOn.html">sampleOn</a></li></ul>
     </li>
-    <li data-verdict="rxdart" data-async="true" data-fns="fx streams scan filter">
+    <li data-verdict="tie" data-async="true" data-fns="fxEvents combineLatest">
       <a class="cmp-row" href="combine-form-fields.html">
         <span class="cmp-num">43</span>
         <span class="cmp-row-body">
-          <strong>폼이 유효해지면 제출 버튼 켜기</strong> <span class="badge verdict-rxdart">RxDart의 영역</span> <span class="badge badge-async">async</span>
-          <span class="dim">최신 이메일·비밀번호 값을 결합해 제출 버튼을 구동 — Rx.combineLatest2 vs scan으로 접는, 손수 병합한 태그 스트림.</span>
+          <strong>폼이 유효해지면 제출 버튼 켜기</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span>
+          <span class="dim">최신 이메일·비밀번호 값을 결합해 제출 버튼을 구동 — Rx.combineLatest2 vs fxdart 0.8.0 이벤트 레이어의 combineLatest.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/filter.html">filter</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/combineLatest.html">combineLatest</a></li></ul>
     </li>
-    <li data-verdict="rxdart" data-async="true" data-fns="fx streams scan filter map">
+    <li data-verdict="tie" data-async="true" data-fns="fxEvents withLatestFrom">
       <a class="cmp-row" href="with-latest-config.html">
         <span class="cmp-num">44</span>
         <span class="cmp-row-body">
-          <strong>각 요청에 최신 설정 도장 찍기</strong> <span class="badge verdict-rxdart">RxDart의 영역</span> <span class="badge badge-async">async</span>
-          <span class="dim">나가는 요청마다 그 순간의 config 버전을 싣습니다 — withLatestFrom vs 브리지 뒤에서 scan으로 접는 태그 병합.</span>
+          <strong>각 요청에 최신 설정 도장 찍기</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span>
+          <span class="dim">나가는 요청마다 그 순간의 config 버전을 싣습니다 — rxdart와 fxEvents 양쪽 모두 같은 withLatestFrom 연산자.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/withLatestFrom.html">withLatestFrom</a></li></ul>
     </li>
-    <li data-verdict="rxdart" data-async="true" data-fns="fx map">
+    <li data-verdict="tie" data-async="true" data-fns="fxEvents switchMap">
       <a class="cmp-row" href="switch-to-newest-search.html">
         <span class="cmp-num">45</span>
         <span class="cmp-row-body">
-          <strong>최신 검색만 중요할 때</strong> <span class="badge verdict-rxdart">RxDart의 영역</span> <span class="badge badge-async">async</span>
-          <span class="dim">더 새 쿼리가 진행 중인 검색을 버립니다 — 연산자 하나의 switchMap vs 뒤늦은 결과를 도착 즉시 버리는, 손수 만든 에포크 카운터.</span>
+          <strong>최신 검색만 중요할 때</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span>
+          <span class="dim">더 새 쿼리가 진행 중인 검색을 버립니다 — rxdart와 fxdart의 fxEvents 체인 양쪽 모두 같은 switchMap 연산자.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/switchMap.html">switchMap</a></li></ul>
     </li>
-    <li data-verdict="rxdart" data-async="true" data-fns="fx toAsync head">
+    <li data-verdict="tie" data-async="true" data-fns="fxEvents race">
       <a class="cmp-row" href="first-mirror-wins.html">
         <span class="cmp-num">46</span>
         <span class="cmp-row-body">
-          <strong>두 미러 경주시키기</strong> <span class="badge verdict-rxdart">RxDart의 영역</span> <span class="badge badge-async">async</span>
-          <span class="dim">페이로드 하나를 두 미러가 경주합니다 — Rx.race는 지는 fetch를 진행 중에 취소하고, 풀 파이프라인은 시작을 거절할 수 있을 뿐입니다.</span>
+          <strong>두 미러 경주시키기</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span>
+          <span class="dim">페이로드 하나를 두 미러가 경주합니다 — Rx.race와 FxEvents.race 모두 지는 fetch를 진행 중에 취소하고, 완료된 fetch가 하나뿐임을 똑같이 증명합니다.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/head.html">head</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/race.html">race</a></li></ul>
     </li>
-    <li data-verdict="rxdart" data-async="true" data-fns="fx streams">
+    <li data-verdict="tie" data-async="true" data-fns="liveValue fxEvents">
       <a class="cmp-row" href="live-latest-value.html">
         <span class="cmp-num">47</span>
         <span class="cmp-row-body">
-          <strong>늦게 온 리더를 위한 라이브 현재 값</strong> <span class="badge verdict-rxdart">RxDart의 영역</span> <span class="badge badge-async">async</span>
-          <span class="dim">늦게 접속한 대시보드도 현재 온도를 즉시 받습니다 — BehaviorSubject는 최신 값을 리플레이하고, 풀은 그것을 손으로 캐시합니다.</span>
+          <strong>늦게 온 리더를 위한 라이브 현재 값</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span>
+          <span class="dim">늦게 접속한 대시보드도 현재 온도를 즉시 받습니다 — BehaviorSubject와 LiveValue 모두 최신 값을 리플레이한 뒤 라이브로 스트리밍합니다.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/liveValue.html">liveValue</a></li><li><a href="../tutorials/fxEvents.html">fxEvents</a></li></ul>
     </li>
     <li data-verdict="tie" data-async="false" data-fns="fx fork sum max">
       <a class="cmp-row" href="tee-the-pipeline.html">

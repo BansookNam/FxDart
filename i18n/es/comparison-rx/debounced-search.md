@@ -1,13 +1,13 @@
 ---
 slug: debounced-search
 title: Aplicar debounce al buscador — RxDart vs FxDart
-description: Esperar a que el tecleo se calme antes de buscar — un solo operador debounceTime sobre el stream de eventos vs un debouncer de callback cableado a mano.
+description: Esperar a que el tecleo se calme antes de buscar — debounceTime sobre el stream de eventos vs la misma cadena debounce en la capa de eventos de fxdart 0.8.0.
 heading: Aplicar debounce al buscador
 order: 40
 tier: 4
-functions: fx, debounce, toAsync, map
+functions: fxEvents, debounce, map
 domain: users
-verdict: rxdart
+verdict: tie
 async: true
 ---
   <h2>Requisito</h2>
@@ -29,22 +29,26 @@ async: true
 
   <h2>Por qué difieren</h2>
   <p>
-    Este es un problema <em>push</em> en su forma más pura: lo
-    interesante no son los valores sino <strong>cuándo dejan de
-    llegar</strong>. Eso es exactamente lo que un stream modela, y RxDart
-    lo dice directamente — <code>debounceTime(160ms)</code> sobre el
-    stream de eventos, luego buscar, luego recoger. La suscripción, el
-    ventaneo y el borde final al cerrar los maneja todos el operador.
+    Ya no difieren. Este es un problema <em>push</em> en su forma más
+    pura — lo interesante no son los valores sino <strong>cuándo dejan
+    de llegar</strong> — y ambos paneles lo dicen ahora de la misma
+    manera: aplicar debounce al stream de eventos con 160&nbsp;ms,
+    buscar cada consulta superviviente, recoger. RxDart lo escribe
+    <code>debounceTime</code>; fxdart&nbsp;0.8.0 lo escribe
+    <code>fxEvents(...).debounce(...)</code>. Operador por operador, las
+    dos cadenas son equivalentes, hasta en el valor final vaciado al
+    cerrar.
   </p>
   <p>
-    FxDart no tiene operadores de pipeline basados en tiempo a propósito
-    — un pipeline pull no tiene «tiempo entre llegadas», solo demanda. Su
-    <code>debounce</code> es el <em>envoltorio de callback</em> al estilo
-    FxTS: correcto, pero lo cableas al stream tú mismo, recoges a mano
-    las consultas tranquilas, esperas la ventana final al cerrar, y solo
-    entonces entregas las supervivientes a un pipeline tipado para las
-    búsquedas de verdad. El veredicto honesto: en este lado del puente,
-    usa RxDart — y si el trabajo aguas abajo crece (manejo de errores
-    tipado, fetches concurrentes ordenados), pasa el stream con debounce
-    por <code>fxStream</code> y continúa en FxDart desde ahí.
+    Es deliberado: la capa de eventos de fxdart absorbió el enfoque Rx
+    para el lado push. <code>fxEvents</code> es una cadena envoltorio
+    fina sobre <code>Stream</code>s de Dart llanos — nunca una
+    extensión, así que no colisiona con nada, rxdart incluido — que da a
+    los operadores basados en tiempo un hogar que los pipelines pull con
+    razón se negaron a ser. El catálogo de operadores de RxDart sigue
+    siendo mucho más amplio; fxdart cubre los verbos push cotidianos y
+    se detiene ahí. Y cuando las consultas con debounce deban alimentar
+    trabajo tipado y dirigido por demanda — fetches concurrentes
+    ordenados, manejo de errores tipado — <code>.pull()</code> es la
+    puerta de vuelta al pipeline <code>FxAsync</code>.
   </p>

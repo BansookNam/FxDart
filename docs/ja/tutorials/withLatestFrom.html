@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>withLatestFrom — FxDart 101</title>
+  <meta name="description" content="FxDart withLatestFrom tutorial: stamp each source event with another stream's latest value — one-sided combination for context lookups — with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/withLatestFrom.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/withLatestFrom.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/withLatestFrom.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/withLatestFrom.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/withLatestFrom.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/withLatestFrom.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/withLatestFrom.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/withLatestFrom.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/withLatestFrom.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">ホーム</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="../../tutorials/withLatestFrom.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/withLatestFrom.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/withLatestFrom.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/withLatestFrom.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="../../es/tutorials/withLatestFrom.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/withLatestFrom.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/withLatestFrom.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 14 · Event streams (push) › <strong>withLatestFrom</strong></p>
+  <h1><code>withLatestFrom</code></h1>
+  <p class="hero-sub">On every <em>source</em> event, emits <code>combine</code> of it and the other stream's latest value — the other side is context, not a trigger.</p>
+
+  <div class="signature">FxEvents&lt;R&gt; FxEvents&lt;T&gt;.withLatestFrom&lt;U, R&gt;(Stream&lt;U&gt; other, R Function(T a, U b) combine) // chain (events)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    A request fires and should carry the config version that was current
+    <em>at that moment</em>. An order comes in and should be priced at
+    the exchange rate <em>right now</em>. Two streams are involved, but
+    they are not equals: one drives, the other is consulted.
+    <code>withLatestFrom(other, combine)</code> encodes that asymmetry —
+    each source event emits <code>combine(event, latestOfOther)</code>,
+    while events on <code>other</code> update its remembered value and
+    emit <strong>nothing</strong>.
+  </p>
+  <p>
+    That one-sidedness is the entire difference from
+    <code><a href="combineLatest.html">combineLatest</a></code>, where both
+    sides trigger. Pick by asking: should a config update <em>by itself</em>
+    produce output? If yes, <code>combineLatest</code>; if the config only
+    matters when a request happens to fire, <code>withLatestFrom</code>.
+  </p>
+  <p>
+    Edges, honestly. Source events that fire before <code>other</code> has
+    produced anything are <strong>dropped</strong> — there is no latest
+    value to stamp them with (give <code>other</code> a
+    <code>startWith</code> seed if that loss is wrong for you). Lifetime
+    follows the source: when it closes the chain closes, and
+    <code>other</code>'s close is simply ignored — a live feed on the
+    context side never holds the pipeline open. fxdart events layer, after
+    Rx's operator of the same name.
+  </p>
+
+  <h2>Demo 1 · Stamping requests with the current config</h2>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // Requests fire on their own schedule; each should carry the config
+  // version that was current when it fired.
+  final requests = timed([(0, 'r1'), (100, 'r2'), (200, 'r3')], 400);
+  final config = timed([(50, 'v1'), (150, 'v2')], 450);
+
+  final out = await fxEvents(requests)
+      .withLatestFrom(config, (r, v) => '$r@$v')
+      .toList();
+
+  print(out); // [r2@v1, r3@v2]
+  // Only SOURCE events emit — config updates alone never do (that is the
+  // difference from combineLatest). r1 fired before any config existed,
+  // so it was dropped.
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · The other side never triggers, never blocks</h2>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // The other stream is a LIVE feed that never closes.
+  final settings = StreamController<int>();
+  settings.add(7); // latest value already waiting
+
+  final out = await fxEvents(timed([(30, 1), (60, 2)], 100))
+      .withLatestFrom(settings.stream, (a, b) => a + b)
+      .toList();
+
+  print(out); // [8, 9]
+  print('settings still open: ${!settings.isClosed}'); // true
+  // The chain closed with the SOURCE; the other side's lifetime is
+  // ignored, so a live config feed never holds your pipeline hostage.
+  await settings.close();
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: price each order at the rate of its moment.</p>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // Orders arrive in dollars; the exchange rate drifts on its own feed.
+  final orders = timed([(60, 100), (120, 250)], 300);
+  final rate = timed([(0, 1.5), (90, 2.0)], 320);
+
+  // TODO: stamp each order with the rate current at that moment:
+  //   fxEvents(orders).withLatestFrom(rate, (o, r) => o * r).toList()
+  final out = await orders.toList();
+
+  print(out);
+  // currently [100, 250] — want [150.0, 500.0]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="combineLatest.html"><code>combineLatest</code></a> — both sides trigger ·
+    <a href="sampleOn.html"><code>sampleOn</code></a> — the trigger-and-latest idea with no combining ·
+    <a href="fxEvents.html"><code>fxEvents</code></a> — <code>startWith</code>, for seeding the context side
+  </div>
+
+  <nav class="tut-nav">
+    <a href="combineLatest.html">← 前: combineLatest</a>
+    <a href="switchMap.html">次: switchMap →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -30,17 +30,32 @@ description: 50 real tasks solved twice — RxDart streams vs FxDart pull pipeli
   <p>
     A word of honesty before the list: when a problem is genuinely about
     <em>events over time</em> — user input, tickers, sockets — a stream is
-    the right shape for it, and some verdicts below say so plainly. What
-    the pairs expose is how often a problem that gets solved with a
-    stream is really a <em>data pipeline</em> wearing a stream costume:
-    a bounded fetch, a batch transform, a paginated crawl. For those, the
-    pull version is shorter, ordered, typed, and needs no subscription
-    lifecycle at all.
+    the right shape for it. FxDart says so by absorbing the idea: since
+    0.8.0 its <strong>events layer</strong>
+    (<code><a href="../tutorials/fxEvents.html">fxEvents</a></code>) puts
+    Rx-style push operators — debounce, throttle, sample, combineLatest,
+    switchMap, race, a <code>LiveValue</code> — on plain Dart streams, so
+    Part&nbsp;4's time-shaped pairs now meet as equals, operator for
+    operator. RxDart's catalog remains far larger; what the pairs expose
+    is the other half of the story — how often a problem that gets solved
+    with a stream is really a <em>data pipeline</em> wearing a stream
+    costume: a bounded fetch, a batch transform, a paginated crawl. For
+    those, the pull version is shorter, ordered, typed, and needs no
+    subscription lifecycle at all.
   </p>
 
   <p>
     <span class="badge verdict-fxdart">FxDart wins</span> — the pull model fits this problem better ·
     <span class="badge verdict-tie">Toss-up</span> — both models express it cleanly ·
-    <span class="badge verdict-rxdart">RxDart's turf</span> — genuinely push/time-shaped; RxDart is the right tool ·
     <span class="badge badge-async">async</span> — uses async pipelines
+  </p>
+
+  <p class="dim">
+    Pages whose task is throughput-shaped also carry a
+    <strong>Benchmark</strong> section — both implementations AOT-compiled
+    and measured at N=100 and a large-N headline (1M for synchronous
+    tasks; 10,000 where every element crosses the event loop). The
+    wall-clock examples (#39–#47) are deliberately not benchmarked:
+    debounce windows and sample ticks measure the clock, not the
+    pipeline.
   </p>

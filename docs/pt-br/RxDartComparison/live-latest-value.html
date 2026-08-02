@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>A live current value for late readers — RxDart vs FxDart</title>
-  <meta name="description" content="A dashboard that connects late still gets the current temperature instantly — BehaviorSubject replays the latest; pull caches it by hand.">
+  <meta name="description" content="A dashboard that connects late still gets the current temperature instantly — BehaviorSubject and LiveValue both replay the latest, then stream live.">
   <link rel="canonical" href="https://bansooknam.github.io/FxDart/RxDartComparison/live-latest-value.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/live-latest-value.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/live-latest-value.html">
@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
 </head>
 <body>
 <header class="site-header">
@@ -50,8 +50,8 @@
   <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
   <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #47 · <strong>A live current value for late readers</strong></p>
   <h1>A live current value for late readers</h1>
-  <p class="cmp-meta"><span class="badge verdict-rxdart">RxDart's turf</span> <span class="badge badge-async">async</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li></ul>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/liveValue.html">liveValue</a></li><li><a href="../tutorials/fxEvents.html">fxEvents</a></li></ul>
   <h2>Requirement</h2>
   <p>
     A temperature feed pushes updates on a fixed schedule. A dashboard
@@ -103,33 +103,28 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="5462533c3c536ab4">
+      <div class="playground">
 <textarea>
 import 'dart:async';
 
 import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
-  // No subject in a pull library: broadcast the raw updates and cache the
-  // latest one by hand so a late reader has something to start from.
-  final temps = StreamController<double>.broadcast();
+  // A LiveValue IS the "current value": every new listener first
+  // gets the latest update, then everything after it.
+  final temps = LiveValue<double>();
   const updates = [(0, 18.2), (70, 18.6), (140, 19.1), (420, 19.5), (490, 20.0)];
   for (final (ms, t) in updates) {
     Timer(Duration(milliseconds: ms), () => temps.add(t));
   }
   Timer(const Duration(milliseconds: 630), temps.close);
 
-  double? latest;
-  final cache = temps.stream.listen((t) => latest = t);
-
   // The dashboard connects late — three updates have already gone by.
   await Future.delayed(const Duration(milliseconds: 280));
-  final current = latest!; // the hand-cached "replay"
-  final rest = await fxStream(temps.stream).toList();
-  await cache.cancel();
+  final seen = await temps.live.toList();
 
-  print('joined late, current: ${current.toStringAsFixed(1)}');
-  for (final t in rest) {
+  print('joined late, current: ${seen.first.toStringAsFixed(1)}');
+  for (final t in seen.skip(1)) {
     print('update: ${t.toStringAsFixed(1)}');
   }
 }
@@ -140,26 +135,25 @@ Future<void> main() async {
 
   <h2>Why they differ</h2>
   <p>
-    "The latest value, replayed to whoever shows up" is not a pipeline —
-    it is a piece of <em>shared, multicast state</em>, and RxDart has a
-    dedicated object for it. A <code>BehaviorSubject</code> is both the
-    sink the sensor writes to and a stream every subscriber can read, and
-    its one defining behavior is exactly this requirement: a late
-    listener first receives the most recent value, then the live feed.
-    The whole rx panel is "add updates, subscribe late, collect".
+    They no longer do. "The latest value, replayed to whoever shows up"
+    is <em>shared, multicast state</em>, and since fxdart 0.8.0 fxdart
+    has a dedicated object for it too: <code>LiveValue</code> is
+    <code>BehaviorSubject</code> reduced to its defining behavior — a
+    sink the sensor writes to, a readable <code>.value</code>, and a feed
+    where a late subscriber first receives the most recent value, then
+    the live updates. Both panels are now "add updates, subscribe late,
+    collect"; the hand-cached variable and the extra caching listener the
+    old FxDart panel needed are gone.
   </p>
   <p>
-    FxDart deliberately omits anything like a subject — a pull pipeline
-    is a single-consumer chain of demand, not a broadcast hub. The FxDart
-    panel has to <em>simulate</em> the subject: a broadcast controller, a
-    hand-written listener that caches the latest value into a variable,
-    and an <code>fxStream</code> bridge for the remainder once the late
-    reader joins. It prints the same lines, but every piece the subject
-    gave for free (the cache, the replay-on-join, the second
-    subscription's lifecycle) is now manual code that must be kept
-    correct. The practical call: for multicast latest-value state, use
-    RxDart — and bridge into a typed FxDart pipeline downstream of the
-    subject when the per-value processing grows.
+    This is fxdart 0.8.0's events layer absorbing the Rx approach for
+    the push side: <code>LiveValue.live</code> hands back an
+    <code><a href="../tutorials/fxEvents.html">fxEvents</a></code> chain — a thin wrapper over a plain broadcast
+    <code>Stream</code>, so it collides with nothing, rxdart included —
+    and <code>.pull()</code> crosses into the typed pull pipeline when
+    the per-value processing grows. RxDart's subject family and operator
+    catalog remain far larger; for latest-value-then-live itself, the
+    panels are equivalent: a tie.
   </p>
 
   <nav class="tut-nav">
@@ -172,7 +166,7 @@ Future<void> main() async {
   <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

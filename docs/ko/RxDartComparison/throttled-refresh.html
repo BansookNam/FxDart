@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>새로고침 버튼 스로틀링하기 — RxDart vs FxDart</title>
-  <meta name="description" content="300 ms 윈도마다 탭 하나만 통과 — 탭 스트림 위의 throttleTime vs 손으로 스트림에 배선한 fxdart의 throttle 콜백 래퍼.">
+  <meta name="description" content="300 ms 윈도마다 탭 하나만 통과 — 탭 스트림 위의 throttleTime vs fxdart 0.8.0 이벤트 레이어의 동등한 throttle 체인.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/throttled-refresh.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/throttled-refresh.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/throttled-refresh.html">
@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
 </head>
 <body>
 <header class="site-header">
@@ -48,8 +48,8 @@
 <main class="cmp-wide">
   <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #41 · <strong>새로고침 버튼 스로틀링하기</strong></p>
   <h1>새로고침 버튼 스로틀링하기</h1>
-  <p class="cmp-meta"><span class="badge verdict-rxdart">RxDart의 영역</span> <span class="badge badge-async">async</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/throttle.html">throttle</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/throttle.html">throttle</a></li></ul>
   <h2>요구사항</h2>
   <p>
     사용자가 새로고침 버튼을 연타합니다: 0/50/100/400/450/800&nbsp;ms
@@ -104,7 +104,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="d6305852b523e4f2">
+      <div class="playground">
 <textarea>
 import 'dart:async';
 
@@ -122,17 +122,11 @@ Stream<int> taps() {
 }
 
 Future<void> main() async {
-  // fxdart's throttle is a callback wrapper, not a stream operator — it is
-  // wired to the tap stream by hand, collecting the taps that get through.
-  final fired = <int>[];
-  final throttled = throttle<int>(fired.add, const Duration(milliseconds: 300),
-      trailing: false);
-  final done = Completer<void>();
-  final sub = taps().listen(throttled.call, onDone: done.complete);
-  await done.future;
-  await sub.cancel();
+  final fired = await fxEvents(taps())
+      .throttle(const Duration(milliseconds: 300))
+      .toList();
 
-  final lines = fx(fired).map((tap) => 'refresh fired on tap $tap').toList();
+  final lines = fired.map((tap) => 'refresh fired on tap $tap');
   lines.forEach(print);
   print('taps: 6, refreshes: ${fired.length}');
 }
@@ -143,23 +137,26 @@ Future<void> main() async {
 
   <h2>차이가 나는 이유</h2>
   <p>
-    스로틀링은 <em>시간 속의 도착</em>에 대한 속도 제한입니다 — 값
-    자체가 아니라 이벤트가 언제 일어나는가의 속성입니다. 그것은
-    스트림의 영토이고, RxDart는 요구사항 전체를 연산자 하나로
-    접습니다: <code>throttleTime(300ms)</code>이 첫 탭에서 윈도를
-    열고, 연타의 나머지를 삼키고, 윈도 이후의 다음 탭에서 다시 엽니다
-    — 구독, 윈도 장부 정리, 완료까지 모두 처리됩니다.
+    이제는 다르지 않습니다. 스로틀링은 <em>시간 속의 도착</em>에 대한
+    속도 제한 — 값이 아니라 이벤트가 언제 일어나는가의 속성 — 이고,
+    이제 두 패널 모두 요구사항을 탭 스트림 위의 연산자 하나로
+    접습니다. RxDart의 <code>throttleTime(300ms)</code>과 fxdart의
+    <code>fxEvents(...).throttle(300ms)</code>은 같은 리딩 엣지 윈도를
+    구현하며(첫 탭이 값을 내보내며 윈도를 열고, 연타의 나머지는
+    삼켜집니다; 트레일링 엣지는 양쪽 모두 플래그 하나 거리에
+    있습니다), 구독, 윈도 장부 정리, 완료가 모두 연산자 안에서
+    처리됩니다.
   </p>
   <p>
-    FxDart의 파이프라인에는 설계상 시계가 없습니다 — 풀 체인은 도착
-    시각이 아니라 요구를 봅니다 — 그래서 그 <code><a href="../tutorials/throttle.html">throttle</a></code>은
-    FxTS 스타일의 <em>콜백 래퍼</em>입니다. 정확히 같은 리딩 엣지
-    윈도를 구현하지만, 스트림에 배선하는 일은 직접 해야 합니다:
-    구독하고, 각 탭을 스로틀된 함수에 먹이고, 살아남은 것들을 모으고,
-    <code>Completer</code>로 완료를 추적하고, 그 뒤에야 리스트를
-    포매팅용 타입 있는 체인에 넘깁니다. 같은 세 탭, 눈에 띄게 많은
-    배관. 이것은 깨끗하게 RxDart의 것입니다: 스로틀링은 푸시 문제이고,
-    탭 스트림이 그것을 풀어야 할 자리입니다.
+    fxdart&nbsp;0.8.0은 push 쪽을 위해 Rx의 접근을 의도적으로 흡수해
+    여기에 도달했습니다: <code><a href="../tutorials/fxEvents.html">fxEvents</a></code>는 평범한
+    <code>Stream</code> 위의 래퍼 체인으로 — extension이 아니어서 멤버
+    충돌 하나 없이 어떤 스트림 라이브러리와도 공존합니다. RxDart의
+    연산자 카탈로그는 fxdart의 이벤트 레이어보다 여전히 훨씬 큽니다;
+    이 예제 같은 일상적인 시간 동사들에서는 이제 둘이 서로 대체
+    가능합니다. 살아남은 각 탭이 이어서 진짜 타입 있는 비동기 작업을
+    발동해야 한다면, <code>.pull()</code>이 스트림을 요구 주도
+    <code>FxAsync</code> 파이프라인으로 실어 갈 것입니다.
   </p>
 
   <nav class="tut-nav">
@@ -172,7 +169,7 @@ Future<void> main() async {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

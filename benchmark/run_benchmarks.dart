@@ -44,37 +44,84 @@ const tieMarginPct = 5.0;
 const tieAbsMs = 0.6;
 const maxRounds = 5;
 
-/// Scale labels in run order. `full` means the case's headline N.
-const allScales = ['100', '10000', 'full'];
+/// The two benchmark families share this runner; `--rx` selects the second.
+/// The rx family runs only N=100 and the headline (its async cases declare a
+/// 10,000-item headline; sync cases 1M) — no separate N=10,000 pass.
+class _BenchFamily {
+  const _BenchFamily({
+    required this.casesDir,
+    required this.contentDir,
+    required this.resultsFile,
+    required this.summaryFile,
+    required this.left,
+    required this.scales,
+    required this.title,
+  });
+
+  final String casesDir; // benchmark/<casesDir>/<slug>/
+  final String contentDir; // content/<contentDir>/<slug>.md (order/heading)
+  final String resultsFile; // benchmark/results/<resultsFile>
+  final String summaryFile;
+  final String left; // the non-fxdart side: 'native' | 'rxdart'
+  final List<String> scales;
+  final String title; // summary heading
+}
+
+const _dartFam = _BenchFamily(
+  casesDir: 'cases',
+  contentDir: 'comparison',
+  resultsFile: 'results.json',
+  summaryFile: 'SUMMARY.md',
+  left: 'native',
+  scales: ['100', '10000', 'full'],
+  title: 'DartComparison',
+);
+
+const _rxFam = _BenchFamily(
+  casesDir: 'cases-rx',
+  contentDir: 'comparison-rx',
+  resultsFile: 'results-rx.json',
+  summaryFile: 'SUMMARY-RX.md',
+  left: 'rxdart',
+  scales: ['100', 'full'],
+  title: 'RxDartComparison',
+);
+
+_BenchFamily _fam = _dartFam;
 
 final root = File(Platform.script.toFilePath()).parent.parent.path;
 
 Future<void> main(List<String> args) async {
   var rounds = 3;
   var smoke = false;
-  var scales = allScales;
+  var reportOnly = false;
+  List<String>? scalesArg;
   final onlySlugs = <String>[];
   for (var i = 0; i < args.length; i++) {
     switch (args[i]) {
+      case '--rx':
+        _fam = _rxFam;
       case '--report-only':
-        return _reportOnly();
+        reportOnly = true;
       case '--rounds':
         rounds = int.parse(args[++i]);
       case '--smoke':
         smoke = true;
       case '--scales':
-        scales = args[++i].split(',');
-        if (scales.any((s) => !allScales.contains(s))) {
-          stderr.writeln('unknown scale in $scales (allowed: $allScales)');
-          exit(1);
-        }
+        scalesArg = args[++i].split(',');
       default:
         onlySlugs.add(args[i]);
     }
   }
+  if (reportOnly) return _reportOnly();
+  final scales = scalesArg ?? _fam.scales;
+  if (scales.any((s) => !_fam.scales.contains(s))) {
+    stderr.writeln('unknown scale in $scales (allowed: ${_fam.scales})');
+    exit(1);
+  }
 
   final meta = _loadMeta();
-  final caseDirs = Directory('$root/benchmark/cases')
+  final caseDirs = Directory('$root/benchmark/${_fam.casesDir}')
       .listSync()
       .whereType<Directory>()
       .map((d) => d.path.split(Platform.pathSeparator).last)
@@ -97,7 +144,7 @@ Future<void> main(List<String> args) async {
 
   // Partial runs (a slug subset and/or a scale subset) merge into the
   // existing results.json instead of clobbering the cases they didn't run.
-  final outFile = File('$root/benchmark/results/results.json');
+  final outFile = File('$root/benchmark/results/${_fam.resultsFile}');
   final cases = <String, Object?>{};
   if (outFile.existsSync()) {
     try {
@@ -118,7 +165,7 @@ Future<void> main(List<String> args) async {
         final r = await _runCase(slug, scale, rounds, smoke);
         scaleResults[scale] = r.toJson();
         lineParts.add('${scale == 'full' ? 'N=${r.n}' : 'N=$scale'} '
-            '${_fmtUs(r.native.medianUs)}/${_fmtUs(r.fxdart.medianUs)}'
+            '${_fmtUs(r.left.medianUs)}/${_fmtUs(r.fxdart.medianUs)}'
             '→${r.timeWinner}');
       } catch (e) {
         failures++;
@@ -147,10 +194,12 @@ Future<void> main(List<String> args) async {
     'cases': cases,
   };
   final outDir = Directory('$root/benchmark/results')..createSync(recursive: true);
-  File('${outDir.path}/results.json')
+  File('${outDir.path}/${_fam.resultsFile}')
       .writeAsStringSync(const JsonEncoder.withIndent('  ').convert(results));
-  File('${outDir.path}/SUMMARY.md').writeAsStringSync(_summaryMd(results, meta));
-  stdout.writeln('\nWrote benchmark/results/results.json and SUMMARY.md');
+  File('${outDir.path}/${_fam.summaryFile}')
+      .writeAsStringSync(_summaryMd(results, meta));
+  stdout.writeln('\nWrote benchmark/results/${_fam.resultsFile} '
+      'and ${_fam.summaryFile}');
   if (failures > 0) {
     stderr.writeln('$failures case×scale run(s) failed');
     exit(1);
@@ -161,9 +210,9 @@ Future<void> main(List<String> args) async {
 /// and rewrites results.json + SUMMARY.md — used after a tie-rule change,
 /// since verdicts are a pure function of the recorded medians.
 void _reportOnly() {
-  final f = File('$root/benchmark/results/results.json');
+  final f = File('$root/benchmark/results/${_fam.resultsFile}');
   if (!f.existsSync()) {
-    stderr.writeln('no benchmark/results/results.json to re-report from');
+    stderr.writeln('no benchmark/results/${_fam.resultsFile} to re-report from');
     exit(1);
   }
   final results = jsonDecode(f.readAsStringSync()) as Map<String, dynamic>;
@@ -174,7 +223,7 @@ void _reportOnly() {
     for (final s in scales.values) {
       final sm = s as Map<String, dynamic>;
       if (sm.containsKey('error')) continue;
-      final nat = sm['native'] as Map<String, dynamic>;
+      final nat = sm[_fam.left] as Map<String, dynamic>;
       final fx = sm['fxdart'] as Map<String, dynamic>;
       final time = _verdict((nat['medianUs'] as num).toDouble(),
           (fx['medianUs'] as num).toDouble(),
@@ -189,7 +238,7 @@ void _reportOnly() {
   results['tieMarginPct'] = tieMarginPct;
   results['tieAbsMs'] = tieAbsMs;
   f.writeAsStringSync(const JsonEncoder.withIndent('  ').convert(results));
-  File('$root/benchmark/results/SUMMARY.md')
+  File('$root/benchmark/results/${_fam.summaryFile}')
       .writeAsStringSync(_summaryMd(results, _loadMeta()));
   stdout.writeln('Re-derived verdicts under current rules '
       '($flips case×scale verdict(s) changed); rewrote results.json and '
@@ -212,20 +261,20 @@ class _SideStats {
 }
 
 class _ScaleResult {
-  _ScaleResult(this.n, this.native, this.fxdart, this.roundsRun);
+  _ScaleResult(this.n, this.left, this.fxdart, this.roundsRun);
   final int n; // actual dataset size the case reported for this scale
-  final _SideStats native;
+  final _SideStats left; // the family's non-fxdart side
   final _SideStats fxdart;
   final int roundsRun;
 
   String get timeWinner =>
-      _verdict(native.medianUs, fxdart.medianUs, absFloor: tieAbsMs * 1000.0);
-  String get memWinner => _verdict(native.medianRss, fxdart.medianRss);
+      _verdict(left.medianUs, fxdart.medianUs, absFloor: tieAbsMs * 1000.0);
+  String get memWinner => _verdict(left.medianRss, fxdart.medianRss);
 
   Map<String, Object?> toJson() => {
         'n': n,
         'roundsRun': roundsRun,
-        'native': native.toJson(),
+        _fam.left: left.toJson(),
         'fxdart': fxdart.toJson(),
         'timeWinner': timeWinner,
         'memWinner': memWinner,
@@ -236,20 +285,20 @@ String _verdict(double a, double b, {double absFloor = 0}) {
   final diff = (a - b).abs();
   if (diff < absFloor) return 'tie';
   if (diff / (a < b ? a : b) * 100 < tieMarginPct) return 'tie';
-  return a < b ? 'native' : 'fxdart';
+  return a < b ? _fam.left : 'fxdart';
 }
 
 Future<_ScaleResult> _runCase(
     String slug, String scale, int baseRounds, bool smoke) async {
   final sides = {
-    'native': _SideStats([], []),
+    _fam.left: _SideStats([], []),
     'fxdart': _SideStats([], []),
   };
   int? n;
   final checksums = <String, String>{};
 
   Future<void> round() async {
-    for (final impl in ['native', 'fxdart']) {
+    for (final impl in [_fam.left, 'fxdart']) {
       final res = await Process.run(
         _binPath(slug, impl),
         const [],
@@ -284,9 +333,9 @@ Future<_ScaleResult> _runCase(
           .addAll((r['iterUs'] as List).map((v) => (v as num).toDouble()));
       sides[impl]!.rssBytes.add(r['maxRssBytes'] as int);
     }
-    if (checksums.length == 2 && checksums['native'] != checksums['fxdart']) {
+    if (checksums.length == 2 && checksums[_fam.left] != checksums['fxdart']) {
       throw StateError('checksum mismatch at N-scale $scale: '
-          'native=${checksums['native']} fxdart=${checksums['fxdart']}');
+          '${_fam.left}=${checksums[_fam.left]} fxdart=${checksums['fxdart']}');
     }
   }
 
@@ -299,7 +348,7 @@ Future<_ScaleResult> _runCase(
   // imperceptible difference perceptible. (Skipped in smoke mode.)
   if (!smoke) {
     while (roundsRun < maxRounds) {
-      final a = sides['native']!.medianUs, b = sides['fxdart']!.medianUs;
+      final a = sides[_fam.left]!.medianUs, b = sides['fxdart']!.medianUs;
       final diff = (a - b).abs();
       if (diff < tieAbsMs * 1000.0) break; // settled: imperceptible
       if (diff / (a < b ? a : b) * 100 >= tieMarginPct) break; // clear winner
@@ -307,7 +356,7 @@ Future<_ScaleResult> _runCase(
       roundsRun++;
     }
   }
-  return _ScaleResult(n!, sides['native']!, sides['fxdart']!, roundsRun);
+  return _ScaleResult(n!, sides[_fam.left]!, sides['fxdart']!, roundsRun);
 }
 
 // --- AOT compilation --------------------------------------------------------
@@ -330,14 +379,14 @@ Future<void> _compileAll(List<String> slugs) async {
   }
   final jobs = [
     for (final slug in slugs)
-      for (final impl in ['native', 'fxdart']) (slug, impl),
+      for (final impl in [_fam.left, 'fxdart']) (slug, impl),
   ];
   final pending = jobs.where((j) {
     final out = File(_binPath(j.$1, j.$2));
     if (!out.existsSync()) return true;
     final built = out.lastModifiedSync();
     if (j.$2 == 'fxdart' && libTouched.isAfter(built)) return true;
-    final deps = Directory('$root/benchmark/cases/${j.$1}')
+    final deps = Directory('$root/benchmark/${_fam.casesDir}/${j.$1}')
         .listSync()
         .whereType<File>()
         .followedBy([harness]);
@@ -353,7 +402,7 @@ Future<void> _compileAll(List<String> slugs) async {
       final (slug, impl) = pending[next++];
       final res = await Process.run(
         Platform.executable,
-        ['compile', 'exe', '$root/benchmark/cases/$slug/$impl.dart', '-o', _binPath(slug, impl)],
+        ['compile', 'exe', '$root/benchmark/${_fam.casesDir}/$slug/$impl.dart', '-o', _binPath(slug, impl)],
         workingDirectory: root,
       );
       if (res.exitCode != 0) {
@@ -380,7 +429,7 @@ class _Meta {
 }
 
 Map<String, _Meta> _loadMeta() {
-  final dir = Directory('$root/content/comparison');
+  final dir = Directory('$root/content/${_fam.contentDir}');
   if (!dir.existsSync()) return {};
   final out = <String, _Meta>{};
   for (final f in dir.listSync().whereType<File>()) {
@@ -420,7 +469,7 @@ String _summaryMd(Map<String, Object?> results, Map<String, _Meta> meta) {
   final cases = results['cases'] as Map<String, Object?>;
   final scales = (results['scales'] as List).cast<String>();
   final b = StringBuffer()
-    ..writeln('# DartComparison benchmark summary')
+    ..writeln('# ${_fam.title} benchmark summary')
     ..writeln()
     ..writeln('- **Machine:** ${machine['cpu']}, ${machine['ramGb']} GB RAM')
     ..writeln('- **Dart:** ${machine['dart']} (${machine['os']}), AOT-compiled')
@@ -446,8 +495,9 @@ String _summaryMd(Map<String, Object?> results, Map<String, _Meta> meta) {
           ? '## Headline N (1M sync / case-specific async)'
           : '## N = $scale')
       ..writeln()
-      ..writeln('| # | Case | N | Native time | FxDart time | Time winner | '
-          'Native mem | FxDart mem | Mem winner | Rounds |')
+      ..writeln('| # | Case | N | ${_fam.left} time | FxDart time | '
+          'Time winner | ${_fam.left} mem | FxDart mem | Mem winner | '
+          'Rounds |')
       ..writeln('|--:|------|--:|--:|--:|:-:|--:|--:|:-:|--:|');
     for (final e in rows) {
       final c = e.value as Map<String, Object?>;
@@ -460,7 +510,7 @@ String _summaryMd(Map<String, Object?> results, Map<String, _Meta> meta) {
         b.writeln('| $label | — | FAILED: ${sm['error']} ||||||');
         continue;
       }
-      final nat = sm['native'] as Map<String, Object?>;
+      final nat = sm[_fam.left] as Map<String, Object?>;
       final fx = sm['fxdart'] as Map<String, Object?>;
       b.writeln('| $label '
           '| ${sm['n']} '

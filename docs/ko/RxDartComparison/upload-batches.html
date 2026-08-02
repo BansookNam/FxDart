@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
 </head>
 <body>
 <header class="site-header">
@@ -93,7 +93,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="f121d678a2670cbe">
+      <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -137,6 +137,71 @@ void main() {
     각 배치를 전송하기). 열 개짜리 고정 대기열에서는 어느 쪽의 장점도
     발휘되지 않습니다: 무승부.
   </p>
+  <section class="cmp-bench">
+  <h2>벤치마크</h2>
+  <p class="dim bench-meta">Apple M1 Max, 32 GB RAM · Dart 3.12.2 (AOT-compiled) · 2026-08-02</p>
+  <div class="bench-scales">
+  <div class="bench-scale">
+    <h3>N = 100</h3>
+    <div class="bench-metric">
+      <h4>시간 <span class="badge verdict-tie">무승부</span></h4>
+      <div class="bench-row">
+        <span class="bench-name">RxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">31 µs</span>
+      </div>
+      <div class="bench-row">
+        <span class="bench-name">FxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:41.5%"></span></span>
+        <span class="bench-val">13 µs</span>
+      </div>
+    </div>
+    <div class="bench-metric">
+      <h4>최대 메모리 <span class="badge verdict-tie">무승부</span></h4>
+      <div class="bench-row">
+        <span class="bench-name">RxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:99.8%"></span></span>
+        <span class="bench-val">16.5 MB</span>
+      </div>
+      <div class="bench-row">
+        <span class="bench-name">FxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">16.6 MB</span>
+      </div>
+    </div>
+  </div>
+  <div class="bench-scale">
+    <h3>N = 1,000,000</h3>
+    <div class="bench-metric">
+      <h4>시간 <span class="badge verdict-fxdart">FxDart 승</span></h4>
+      <div class="bench-row">
+        <span class="bench-name">RxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">304.7 ms</span>
+      </div>
+      <div class="bench-row">
+        <span class="bench-name">FxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:41.5%"></span></span>
+        <span class="bench-val">126.6 ms</span>
+      </div>
+    </div>
+    <div class="bench-metric">
+      <h4>최대 메모리 <span class="badge verdict-tie">무승부</span></h4>
+      <div class="bench-row">
+        <span class="bench-name">RxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:95.7%"></span></span>
+        <span class="bench-val">128.4 MB</span>
+      </div>
+      <div class="bench-row">
+        <span class="bench-name">FxDart</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">134.2 MB</span>
+      </div>
+    </div>
+  </div>
+  </div>
+  <p class="dim bench-note">막대는 사이드별로 새 프로세스에서 반복 측정한 중앙값입니다(작은 N은 타이머 해상도를 위해 배치 처리). 두 사이드가 서로 5% 이내이거나 — 사람이 지각할 수 없는 차이인 0.6ms 이내이면 — 무승부로 칩니다. 상대 차이가 근소한 경우는 최대 5회까지 다시 측정합니다. 앱에서는 어느 막대가 짧든 몇 밀리초 이하의 차이는 사용자에게 보이지 않습니다. 메모리는 프로세스 최대 RSS입니다. Dart VM과 데이터셋은 양쪽이 동일하므로, 두 막대의 차이가 곧 파이프라인 자체가 붙들고 있는 양입니다.</p>
+  </section>
 
   <nav class="tut-nav">
     <a href="empty-report-default.html">← 이전: 빈 리포트를 위한 기본 한 줄</a>
@@ -148,7 +213,7 @@ void main() {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

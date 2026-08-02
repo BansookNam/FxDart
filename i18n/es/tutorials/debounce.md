@@ -56,6 +56,18 @@ nextLabel: throttle
     para que solo sobreviva el valor final de la ráfaga de llamadas de abajo.</p>
   {{playground:2}}
 
+  <h2>En streams de eventos</h2>
+  <p>
+    La misma idea existe en la capa de eventos: cuando lo que llega en
+    ráfagas es un <code>Stream</code> y no un callback,
+    <code>fxEvents(s).debounce(window)</code> emite el valor final de cada
+    ráfaga una vez que pasa <code>window</code> sin un evento más nuevo — y
+    un valor aún pendiente cuando el stream se cierra se emite al final,
+    nunca se pierde. Consulta <a href="fxEvents.html"><code>fxEvents</code></a>
+    para conocer la cadena a la que pertenece.
+  </p>
+  {{playground:3}}
+
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="throttle.html"><code>throttle</code></a> — se dispara a intervalos regulares en lugar de tras la calma ·

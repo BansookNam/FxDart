@@ -1,0 +1,12 @@
+class LiveValue&lt;T&gt; {
+  LiveValue();                  // empty — subscribers wait for the first add
+  LiveValue.seeded(T value);    // starts with a current value
+
+  T get value;                  // latest value; StateError when none set
+  bool get hasValue;
+  bool get isClosed;
+  void add(T value);            // set + deliver to subscribers
+  FxEvents&lt;T&gt; get live;         // replay the latest, then live updates
+  Stream&lt;T&gt; get stream;         // plain-Stream view of live
+  Future&lt;void&gt; close();
+}

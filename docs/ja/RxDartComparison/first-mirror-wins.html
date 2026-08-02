@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Race two mirrors — RxDart vs FxDart</title>
-  <meta name="description" content="Two mirrors race for one payload — Rx.race cancels the losing fetch mid-flight; a pull pipeline can only decline to start it.">
+  <meta name="description" content="Two mirrors race for one payload — Rx.race and FxEvents.race both cancel the losing fetch mid-flight, and both prove it with one completed fetch.">
   <link rel="canonical" href="https://bansooknam.github.io/FxDart/RxDartComparison/first-mirror-wins.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/first-mirror-wins.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/first-mirror-wins.html">
@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
 </head>
 <body>
 <header class="site-header">
@@ -50,8 +50,8 @@
   <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
   <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #46 · <strong>Race two mirrors</strong></p>
   <h1>Race two mirrors</h1>
-  <p class="cmp-meta"><span class="badge verdict-rxdart">RxDart's turf</span> <span class="badge badge-async">async</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/head.html">head</a></li></ul>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/race.html">race</a></li></ul>
   <h2>Requirement</h2>
   <p>
     The same payload is available from two mirrors: the EU mirror answers
@@ -115,7 +115,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="df64832f20c69114">
+      <div class="playground">
 <textarea>
 import 'dart:async';
 
@@ -140,15 +140,11 @@ Stream<String> mirror(String name, int ms) {
 }
 
 Future<void> main() async {
-  // Not a race: head() demands ONE item, so only the primary mirror is
-  // ever listened to — the backup never starts (pull cannot cancel work
-  // already in flight; it can only decline to demand it).
-  final winner = await fx([mirror('eu-mirror', 60), mirror('us-mirror', 180)])
-      .toAsync()
-      .map((m) => m.first)
-      .head();
+  // Race both mirrors: first event wins, the loser is CANCELLED mid-flight.
+  final winner = await FxEvents.race(
+      [mirror('eu-mirror', 60), mirror('us-mirror', 180)]).stream.first;
 
-  // Wait long past the backup's 180 ms — it was never subscribed at all.
+  // Wait long past the loser's 180 ms — its timer was cancelled at ~60 ms.
   await Future.delayed(const Duration(milliseconds: 540));
 
   print('winner: $winner');
@@ -162,26 +158,25 @@ Future<void> main() async {
 
   <h2>Why they differ</h2>
   <p>
-    Racing is a push idea: subscribe to everything, keep whoever speaks
-    first, <em>cancel</em> the rest. <code>Rx.race</code> is exactly that —
-    both mirrors are genuinely in flight, and the moment the EU mirror
-    emits at 60&nbsp;ms the US subscription is cancelled, its
-    <code>onCancel</code> fires, and the pending timer dies. That is why
-    the completed-fetch count is still 1 long after the loser's
-    180&nbsp;ms deadline: the work was stopped, not just ignored.
+    They no longer do. Racing is a push idea — subscribe to everything,
+    keep whoever speaks first, <em>cancel</em> the rest — and since
+    fxdart 0.8.0 <code>FxEvents.race</code> is exactly that, matching
+    <code>Rx.race</code> move for move: both mirrors are genuinely in
+    flight, and the moment the EU mirror emits at 60&nbsp;ms the US
+    subscription is cancelled, its <code>onCancel</code> fires, and the
+    pending timer dies. Both panels prove it the same way — the
+    completed-fetch count is still 1 long after the loser's 180&nbsp;ms
+    deadline. The work was stopped, not just ignored, on both sides.
   </p>
   <p>
-    The FxDart side prints the same lines but is <strong>not a
-    race</strong>. <code><a href="../tutorials/head.html">head</a></code> demands one item, so the pull chain
-    listens to the first mirror only — the backup is never subscribed and
-    never starts. Demand-driven laziness can decline to <em>start</em>
-    work, but a pull pipeline has no way to cancel a <code>Future</code>
-    already in flight: had we started both fetches, the loser would have
-    run to completion and merely been ignored. And if the slow mirror had
-    been listed first, this chain would simply have waited 180&nbsp;ms,
-    while <code>Rx.race</code> would still have won with the backup. When
-    the requirement is "first responder wins, losers are cancelled", use
-    the stream model — this is RxDart's turf.
+    The old FxDart panel could only decline to <em>start</em> the backup
+    fetch; the events layer absorbed the Rx approach instead: a thin
+    wrapper chain over plain <code>Stream</code>s that collides with
+    nothing, rxdart included. RxDart's operator catalog remains far
+    larger — fxdart keeps the events core small and hands the winner's
+    per-value processing to the typed pull side via <code>.pull()</code>.
+    For "first responder wins, losers are cancelled", the two are now
+    operator-for-operator equivalent: a tie.
   </p>
 
   <nav class="tut-nav">
@@ -194,7 +189,7 @@ Future<void> main() async {
   <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

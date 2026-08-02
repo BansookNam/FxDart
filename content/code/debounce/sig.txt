@@ -4,3 +4,5 @@ class Debounced&lt;T&gt; {
   void call(T arg);   // Debounced is callable: debounced(arg)
   void cancel();
 }
+
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.debounce(Duration window) // chain (events)

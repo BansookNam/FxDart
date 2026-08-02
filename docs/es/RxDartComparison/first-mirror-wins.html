@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Poner a competir dos mirrors — RxDart vs FxDart</title>
-  <meta name="description" content="Dos mirrors compiten por un payload — Rx.race cancela el fetch perdedor en pleno vuelo; un pipeline pull solo puede negarse a arrancarlo.">
+  <meta name="description" content="Dos mirrors compiten por un payload — Rx.race y FxEvents.race cancelan ambos el fetch perdedor en pleno vuelo, y ambos lo demuestran con un solo fetch completado.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/first-mirror-wins.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/first-mirror-wins.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/first-mirror-wins.html">
@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
 </head>
 <body>
 <header class="site-header">
@@ -48,8 +48,8 @@
 <main class="cmp-wide">
   <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #46 · <strong>Poner a competir dos mirrors</strong></p>
   <h1>Poner a competir dos mirrors</h1>
-  <p class="cmp-meta"><span class="badge verdict-rxdart">Terreno de RxDart</span> <span class="badge badge-async">async</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/head.html">head</a></li></ul>
+  <p class="cmp-meta"><span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/race.html">race</a></li></ul>
   <h2>Requisito</h2>
   <p>
     El mismo payload está disponible desde dos mirrors: el mirror de la
@@ -114,7 +114,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="df64832f20c69114">
+      <div class="playground">
 <textarea>
 import 'dart:async';
 
@@ -139,15 +139,11 @@ Stream<String> mirror(String name, int ms) {
 }
 
 Future<void> main() async {
-  // Not a race: head() demands ONE item, so only the primary mirror is
-  // ever listened to — the backup never starts (pull cannot cancel work
-  // already in flight; it can only decline to demand it).
-  final winner = await fx([mirror('eu-mirror', 60), mirror('us-mirror', 180)])
-      .toAsync()
-      .map((m) => m.first)
-      .head();
+  // Race both mirrors: first event wins, the loser is CANCELLED mid-flight.
+  final winner = await FxEvents.race(
+      [mirror('eu-mirror', 60), mirror('us-mirror', 180)]).stream.first;
 
-  // Wait long past the backup's 180 ms — it was never subscribed at all.
+  // Wait long past the loser's 180 ms — its timer was cancelled at ~60 ms.
   await Future.delayed(const Duration(milliseconds: 540));
 
   print('winner: $winner');
@@ -161,29 +157,28 @@ Future<void> main() async {
 
   <h2>Por qué difieren</h2>
   <p>
-    La carrera es una idea push: suscríbete a todo, quédate con quien
-    hable primero, <em>cancela</em> el resto. <code>Rx.race</code> es
-    exactamente eso — ambos mirrors están genuinamente en vuelo, y en el
-    momento en que el mirror de la UE emite a los 60&nbsp;ms la
-    suscripción de EE. UU. se cancela, su <code>onCancel</code> se
-    dispara, y el temporizador pendiente muere. Por eso el conteo de
-    fetches completados sigue siendo 1 mucho después de la fecha límite
-    de 180&nbsp;ms del perdedor: el trabajo se detuvo, no solo se ignoró.
+    Ya no difieren. La carrera es una idea push — suscríbete a todo,
+    quédate con quien hable primero, <em>cancela</em> el resto — y desde
+    fxdart 0.8.0 <code>FxEvents.race</code> es exactamente eso,
+    igualando a <code>Rx.race</code> movimiento a movimiento: ambos
+    mirrors están genuinamente en vuelo, y en el momento en que el
+    mirror de la UE emite a los 60&nbsp;ms la suscripción de EE. UU. se
+    cancela, su <code>onCancel</code> se dispara, y el temporizador
+    pendiente muere. Ambos paneles lo demuestran de la misma manera — el
+    conteo de fetches completados sigue siendo 1 mucho después de la
+    fecha límite de 180&nbsp;ms del perdedor. El trabajo se detuvo, no
+    solo se ignoró, en ambos lados.
   </p>
   <p>
-    El lado FxDart imprime las mismas líneas pero <strong>no es una
-    carrera</strong>. <code><a href="../tutorials/head.html">head</a></code> demanda un elemento, así que la
-    cadena pull escucha solo al primer mirror — al de respaldo nunca se
-    le suscribe y nunca arranca. La pereza dirigida por demanda puede
-    negarse a <em>arrancar</em> trabajo, pero un pipeline pull no tiene
-    manera de cancelar un <code>Future</code> ya en vuelo: si hubiéramos
-    arrancado ambos fetches, el perdedor habría corrido hasta completarse
-    y simplemente se habría ignorado. Y si el mirror lento hubiera estado
-    listado primero, esta cadena sencillamente habría esperado
-    180&nbsp;ms, mientras que <code>Rx.race</code> aún habría ganado con
-    el respaldo. Cuando el requisito es «gana el primero en responder,
-    los perdedores se cancelan», usa el modelo de streams — este es
-    terreno de RxDart.
+    El viejo panel FxDart solo podía negarse a <em>arrancar</em> el
+    fetch de respaldo; la capa de eventos absorbió en cambio el enfoque
+    Rx: una cadena envoltorio fina sobre <code>Stream</code>s llanos que
+    no colisiona con nada, rxdart incluido. El catálogo de operadores de
+    RxDart sigue siendo mucho más amplio — fxdart mantiene pequeño el
+    núcleo de eventos y entrega el procesamiento por valor del ganador
+    al lado pull tipado vía <code>.pull()</code>. Para «gana el primero
+    en responder, los perdedores se cancelan», los dos son ahora
+    equivalentes operador por operador: empate.
   </p>
 
   <nav class="tut-nav">
@@ -196,7 +191,7 @@ Future<void> main() async {
   <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

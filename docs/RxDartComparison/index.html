@@ -70,19 +70,34 @@
   <p>
     A word of honesty before the list: when a problem is genuinely about
     <em>events over time</em> — user input, tickers, sockets — a stream is
-    the right shape for it, and some verdicts below say so plainly. What
-    the pairs expose is how often a problem that gets solved with a
-    stream is really a <em>data pipeline</em> wearing a stream costume:
-    a bounded fetch, a batch transform, a paginated crawl. For those, the
-    pull version is shorter, ordered, typed, and needs no subscription
-    lifecycle at all.
+    the right shape for it. FxDart says so by absorbing the idea: since
+    0.8.0 its <strong>events layer</strong>
+    (<code><a href="../tutorials/fxEvents.html">fxEvents</a></code>) puts
+    Rx-style push operators — debounce, throttle, sample, combineLatest,
+    switchMap, race, a <code>LiveValue</code> — on plain Dart streams, so
+    Part&nbsp;4's time-shaped pairs now meet as equals, operator for
+    operator. RxDart's catalog remains far larger; what the pairs expose
+    is the other half of the story — how often a problem that gets solved
+    with a stream is really a <em>data pipeline</em> wearing a stream
+    costume: a bounded fetch, a batch transform, a paginated crawl. For
+    those, the pull version is shorter, ordered, typed, and needs no
+    subscription lifecycle at all.
   </p>
 
   <p>
     <span class="badge verdict-fxdart">FxDart wins</span> — the pull model fits this problem better ·
     <span class="badge verdict-tie">Toss-up</span> — both models express it cleanly ·
-    <span class="badge verdict-rxdart">RxDart's turf</span> — genuinely push/time-shaped; RxDart is the right tool ·
     <span class="badge badge-async">async</span> — uses async pipelines
+  </p>
+
+  <p class="dim">
+    Pages whose task is throughput-shaped also carry a
+    <strong>Benchmark</strong> section — both implementations AOT-compiled
+    and measured at N=100 and a large-N headline (1M for synchronous
+    tasks; 10,000 where every element crosses the event loop). The
+    wall-clock examples (#39–#47) are deliberately not benchmarked:
+    debounce windows and sample ticks measure the clock, not the
+    pipeline.
   </p>
 
   <p class="cmp-picks"><span>If you only read five, read these:</span>
@@ -98,7 +113,6 @@
     <button data-filter="async">async</button>
     <button data-filter="fxdart">FxDart wins</button>
     <button data-filter="tie">Toss-up</button>
-    <button data-filter="rxdart">RxDart's turf</button>
     <input type="search" placeholder="filter by function name…">
   </div>
 
@@ -517,85 +531,85 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
     </li>
-    <li data-verdict="rxdart" data-async="true" data-fns="fx debounce toAsync map">
+    <li data-verdict="tie" data-async="true" data-fns="fxEvents debounce map">
       <a class="cmp-row" href="debounced-search.html">
         <span class="cmp-num">40</span>
         <span class="cmp-row-body">
-          <strong>Debounce the search box</strong> <span class="badge verdict-rxdart">RxDart's turf</span> <span class="badge badge-async">async</span>
-          <span class="dim">Wait for the typing to go quiet before searching — one debounceTime operator on the event stream vs a hand-wired callback debouncer.</span>
+          <strong>Debounce the search box</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span>
+          <span class="dim">Wait for the typing to go quiet before searching — debounceTime on the event stream vs the same debounce chain in fxdart 0.8.0's events layer.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/debounce.html">debounce</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/debounce.html">debounce</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
     </li>
-    <li data-verdict="rxdart" data-async="true" data-fns="fx throttle map">
+    <li data-verdict="tie" data-async="true" data-fns="fxEvents throttle">
       <a class="cmp-row" href="throttled-refresh.html">
         <span class="cmp-num">41</span>
         <span class="cmp-row-body">
-          <strong>Throttle the refresh button</strong> <span class="badge verdict-rxdart">RxDart's turf</span> <span class="badge badge-async">async</span>
-          <span class="dim">Let one tap through per 300 ms window — throttleTime on the tap stream vs fxdart's throttle callback wrapper wired to the stream by hand.</span>
+          <strong>Throttle the refresh button</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span>
+          <span class="dim">Let one tap through per 300 ms window — throttleTime on the tap stream vs the equivalent throttle chain in fxdart 0.8.0's events layer.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/throttle.html">throttle</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/throttle.html">throttle</a></li></ul>
     </li>
-    <li data-verdict="rxdart" data-async="true" data-fns="fx streams map">
+    <li data-verdict="tie" data-async="true" data-fns="fxEvents sampleOn">
       <a class="cmp-row" href="sampled-gauge.html">
         <span class="cmp-num">42</span>
         <span class="cmp-row-body">
-          <strong>Sample the gauge on each poll tick</strong> <span class="badge verdict-rxdart">RxDart's turf</span> <span class="badge badge-async">async</span>
-          <span class="dim">Read the latest gauge value at each poll tick — an explicit sample trigger stream vs a hand-tracked latest variable read through the bridge.</span>
+          <strong>Sample the gauge on each poll tick</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span>
+          <span class="dim">Read the latest gauge value at each poll tick — an explicit sample trigger stream in RxDart vs sampleOn in fxdart 0.8.0's events layer.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/sampleOn.html">sampleOn</a></li></ul>
     </li>
-    <li data-verdict="rxdart" data-async="true" data-fns="fx streams scan filter">
+    <li data-verdict="tie" data-async="true" data-fns="fxEvents combineLatest">
       <a class="cmp-row" href="combine-form-fields.html">
         <span class="cmp-num">43</span>
         <span class="cmp-row-body">
-          <strong>Enable submit when the form is valid</strong> <span class="badge verdict-rxdart">RxDart's turf</span> <span class="badge badge-async">async</span>
-          <span class="dim">Combine the latest email and password values to drive the submit button — Rx.combineLatest2 vs a hand-merged tagged stream folded with scan.</span>
+          <strong>Enable submit when the form is valid</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span>
+          <span class="dim">Combine the latest email and password values to drive the submit button — Rx.combineLatest2 vs combineLatest in fxdart 0.8.0's events layer.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/filter.html">filter</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/combineLatest.html">combineLatest</a></li></ul>
     </li>
-    <li data-verdict="rxdart" data-async="true" data-fns="fx streams scan filter map">
+    <li data-verdict="tie" data-async="true" data-fns="fxEvents withLatestFrom">
       <a class="cmp-row" href="with-latest-config.html">
         <span class="cmp-num">44</span>
         <span class="cmp-row-body">
-          <strong>Stamp each request with the latest config</strong> <span class="badge verdict-rxdart">RxDart's turf</span> <span class="badge badge-async">async</span>
-          <span class="dim">Each outgoing request carries the config version current at that instant — withLatestFrom vs a tagged merge folded with scan behind the bridge.</span>
+          <strong>Stamp each request with the latest config</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span>
+          <span class="dim">Each outgoing request carries the config version current at that instant — the same withLatestFrom operator on both sides, rxdart and fxEvents.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/withLatestFrom.html">withLatestFrom</a></li></ul>
     </li>
-    <li data-verdict="rxdart" data-async="true" data-fns="fx map">
+    <li data-verdict="tie" data-async="true" data-fns="fxEvents switchMap">
       <a class="cmp-row" href="switch-to-newest-search.html">
         <span class="cmp-num">45</span>
         <span class="cmp-row-body">
-          <strong>Only the newest search matters</strong> <span class="badge verdict-rxdart">RxDart's turf</span> <span class="badge badge-async">async</span>
-          <span class="dim">A newer query abandons the in-flight search — switchMap in one operator vs a hand-rolled epoch counter that drops stale results as they land.</span>
+          <strong>Only the newest search matters</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span>
+          <span class="dim">A newer query abandons the in-flight search — the same switchMap operator on both sides, rxdart and fxdart's fxEvents chain.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/switchMap.html">switchMap</a></li></ul>
     </li>
-    <li data-verdict="rxdart" data-async="true" data-fns="fx toAsync head">
+    <li data-verdict="tie" data-async="true" data-fns="fxEvents race">
       <a class="cmp-row" href="first-mirror-wins.html">
         <span class="cmp-num">46</span>
         <span class="cmp-row-body">
-          <strong>Race two mirrors</strong> <span class="badge verdict-rxdart">RxDart's turf</span> <span class="badge badge-async">async</span>
-          <span class="dim">Two mirrors race for one payload — Rx.race cancels the losing fetch mid-flight; a pull pipeline can only decline to start it.</span>
+          <strong>Race two mirrors</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span>
+          <span class="dim">Two mirrors race for one payload — Rx.race and FxEvents.race both cancel the losing fetch mid-flight, and both prove it with one completed fetch.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/head.html">head</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/race.html">race</a></li></ul>
     </li>
-    <li data-verdict="rxdart" data-async="true" data-fns="fx streams">
+    <li data-verdict="tie" data-async="true" data-fns="liveValue fxEvents">
       <a class="cmp-row" href="live-latest-value.html">
         <span class="cmp-num">47</span>
         <span class="cmp-row-body">
-          <strong>A live current value for late readers</strong> <span class="badge verdict-rxdart">RxDart's turf</span> <span class="badge badge-async">async</span>
-          <span class="dim">A dashboard that connects late still gets the current temperature instantly — BehaviorSubject replays the latest; pull caches it by hand.</span>
+          <strong>A live current value for late readers</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span>
+          <span class="dim">A dashboard that connects late still gets the current temperature instantly — BehaviorSubject and LiveValue both replay the latest, then stream live.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/liveValue.html">liveValue</a></li><li><a href="../tutorials/fxEvents.html">fxEvents</a></li></ul>
     </li>
     <li data-verdict="tie" data-async="false" data-fns="fx fork sum max">
       <a class="cmp-row" href="tee-the-pipeline.html">

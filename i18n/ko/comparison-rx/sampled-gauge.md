@@ -1,13 +1,13 @@
 ---
 slug: sampled-gauge
 title: 폴링 틱마다 게이지 샘플링하기 — RxDart vs FxDart
-description: 각 폴링 틱 시점의 최신 게이지 값 읽기 — 명시적 sample 트리거 스트림 vs 브리지 너머로 읽는, 손수 추적한 latest 변수.
+description: 각 폴링 틱 시점의 최신 게이지 값 읽기 — RxDart의 명시적 sample 트리거 스트림 vs fxdart 0.8.0 이벤트 레이어의 sampleOn.
 heading: 폴링 틱마다 게이지 샘플링하기
 order: 42
 tier: 4
-functions: fx, streams, map
+functions: fxEvents, sampleOn
 domain: sensors
-verdict: rxdart
+verdict: tie
 async: true
 ---
   <h2>요구사항</h2>
@@ -28,21 +28,25 @@ async: true
 
   <h2>차이가 나는 이유</h2>
   <p>
-    "이 순간의 최신 값"은 푸시 모델에만 존재하는 개념입니다 — <em>가장
-    최근에 도착한 것</em>을 뜻하는데, 이는 무언가가 알아서 도착한다는
-    것을 전제하기 때문입니다. RxDart의 <code>sample</code>은 게이지
-    스트림과 트리거 스트림을 받아 정확히 이 일을 합니다: 트리거마다,
-    지난 트리거 이후의 가장 새로운 소스 값을 내보냅니다. 연산자
-    하나이고, 상태("지금 값이 무엇인가?")는 그 안에 삽니다.
+    이제는 다르지 않습니다. "이 순간의 최신 값"은 push 모델에만
+    존재하는 개념이고 — 무언가가 알아서 도착한다는 것을 전제하기
+    때문입니다 — 이제 두 패널 모두 그것을 같은 연산자 하나짜리 문장으로
+    표현합니다: 게이지 스트림을 폴링 스트림으로 샘플링한다. RxDart는
+    <code>gauge().sample(polls())</code>라고 쓰고; fxdart는
+    <code>fxEvents(gauge()).sampleOn(polls())</code>라고 씁니다. 양쪽
+    모두 "지금 값이 무엇인가?" 상태는 연산자 안에 살고, 각 트리거는
+    지난 트리거 이후의 가장 새로운 측정값을 내보내며, 샘플링되지 않은
+    측정값은 그냥 버려집니다.
   </p>
   <p>
-    풀 파이프라인에는 "현재 값"이 없습니다 — 묻기 전에는 아무것도
-    도착하지 않습니다. 그래서 FxDart 쪽은 일을 둘로 나눕니다: 평범한
-    구독이 게이지의 최신 측정값을 가변 변수에 추적하고, 폴링 스트림은
-    <code>fxStream</code>을 거쳐 들어와 당겨진 각 틱이 그 변수의
-    스냅숏으로 <code>map</code>될 수 있게 합니다. 같은 세 측정값을
-    출력하지만, 샘플링 로직은 체인이 표현하는 것이 아니라 체인
-    <em>옆에</em> 앉아 있는 손수 만든 푸시 코드입니다. 판정은 RxDart:
-    살아 있는 상태의 샘플링은 푸시 본연의 일입니다 — 여기는 푸시의
-    홈그라운드입니다.
+    pull 파이프라인에는 여전히 시계도 "현재 값"도 없습니다 — 그 거절은
+    그대로입니다. 대신 fxdart&nbsp;0.8.0은 전용 이벤트 레이어에서 Rx의
+    접근을 흡수했습니다: <code>fxEvents</code>는 평범한
+    <code>Stream</code> 위의 얇은 래퍼 체인으로(결코 extension이
+    아니어서 어떤 것과도 충돌하지 않습니다), pull 쪽이 맡지 않으려 한
+    push 본연의 동사들을 소유합니다. RxDart의 연산자 카탈로그는 여전히
+    훨씬 큽니다; 이 동사만큼은 이제 fxdart가 모국어로 말합니다. 그리고
+    샘플링된 각 측정값이 진짜 하류 작업의 시작이라면,
+    <code>.pull()</code>이 샘플들을 타입 있는 <code>FxAsync</code>
+    파이프라인에 넘겨 요구에 따라 당겨지게 합니다.
   </p>

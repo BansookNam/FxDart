@@ -25,6 +25,39 @@ API or output change.
   analysis can erase the wrapper allocation in per-element uses like
   `.map((w) => fx(w).average())`.
 
+## 0.8.0
+
+### Added — the events layer (`FxEvents`)
+
+fxdart's push side: a zero-dependency chain over plain Dart `Stream`s for
+the problems that are genuinely *events over time* — the jobs the
+RxDartComparison section's Part 4 used to concede. The pull core is
+untouched; this is a separate module (`lib/src/stream/events.dart`) that
+absorbs the Rx approach where the Rx approach is right, in fxdart style.
+
+* **`fxEvents(stream)` → `FxEvents<T>`** — a wrapper chain (deliberately
+  NOT `Stream` extensions, so it can never collide with rxdart or any
+  other stream library in the same file).
+* Time operators: **`debounce(window)`** (trailing, flush-on-close),
+  **`throttle(window, {leading, trailing})`**, **`sampleOn(trigger)`**.
+* Combination: **`combineLatest(other, combine)`**,
+  **`withLatestFrom(other, combine)`**, **`switchMap(f)`**
+  (cancellation-by-newer), **`FxEvents.race(candidates)`** (losers
+  cancelled), **`FxEvents.merge(sources)`**, **`startWith(value)`**, plus
+  `map`/`where`/`asyncMap` passthroughs.
+* **`LiveValue<T>`** — the `BehaviorSubject` counterpart reduced to its
+  defining behavior: a current value whose late subscribers get the
+  latest value first, then the live updates (`.seeded`, `.value`,
+  `.hasValue`, `.live`, `.close`).
+* Bridges: **`.pull()`** crosses an event chain into the typed `FxAsync`
+  pull world (`fromStream` under the hood); `.stream` unwraps for any
+  `Stream` API; `FxAsync.toStream()` remains the other direction.
+
+The RxDartComparison examples #40–47 are rewritten on this layer — the
+push-side verdicts that used to read "RxDart's turf" are now honest ties.
+RxDart still has the far larger operator surface; what closed is the
+model gap, not the catalog.
+
 ## 0.7.2
 
 ### Added — Rx-inspired pull operators

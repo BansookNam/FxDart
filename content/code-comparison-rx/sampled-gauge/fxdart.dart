@@ -23,13 +23,7 @@ Stream<void> polls() {
 }
 
 Future<void> main() async {
-  // The gauge's latest reading is tracked by hand in a variable; the poll
-  // ticks are pulled through the bridge and each pull snapshots it.
-  var latest = 0;
-  final sub = gauge().listen((v) => latest = v);
-
-  final sampled = await fxStream(polls()).map((_) => latest).toList();
-  await sub.cancel();
+  final sampled = await fxEvents(gauge()).sampleOn(polls()).toList();
 
   for (final (i, value) in sampled.indexed) {
     print('poll ${i + 1}: reading $value');

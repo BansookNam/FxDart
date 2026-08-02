@@ -1,13 +1,13 @@
 ---
 slug: combine-form-fields
 title: 폼이 유효해지면 제출 버튼 켜기 — RxDart vs FxDart
-description: 최신 이메일·비밀번호 값을 결합해 제출 버튼을 구동 — Rx.combineLatest2 vs scan으로 접는, 손수 병합한 태그 스트림.
+description: 최신 이메일·비밀번호 값을 결합해 제출 버튼을 구동 — Rx.combineLatest2 vs fxdart 0.8.0 이벤트 레이어의 combineLatest.
 heading: 폼이 유효해지면 제출 버튼 켜기
 order: 43
 tier: 4
-functions: fx, streams, scan, filter
+functions: fxEvents, combineLatest
 domain: users
-verdict: rxdart
+verdict: tie
 async: true
 ---
   <h2>요구사항</h2>
@@ -31,22 +31,25 @@ async: true
 
   <h2>차이가 나는 이유</h2>
   <p>
-    이것은 <em>소스별 최신 값</em> 상태입니다 — 푸시 모델을 정의하는
-    결합자입니다. <code>Rx.combineLatest2</code>는 각 필드의 가장 새
-    값을 붙들고, 둘 다 말할 때까지 기다렸다가, 어느 쪽에서든 변경이
-    있을 때마다 그 쌍을 다시 내보냅니다. 폼 로직이 요구사항 그대로
-    읽히고, 출력 네 줄이 선언 하나에서 흘러나옵니다.
+    이제는 다르지 않습니다. <em>소스별 최신 값</em> 상태는 push 모델을
+    정의하는 결합자이고, 이제 두 패널 모두 그것을 한 줄로 선언합니다:
+    각 필드의 가장 새 값을 붙들고, 둘 다 말할 때까지 기다렸다가, 어느
+    쪽에서든 변경이 있을 때마다 그 쌍을 다시 내보낸다. RxDart는
+    <code>Rx.combineLatest2(emails(), passwords(), ...)</code>라고 쓰고;
+    fxdart는 <code>fxEvents(emails()).combineLatest(passwords(),
+    ...)</code>라고 씁니다. 같은 대기 규칙, 어느 쪽에서든 같은 재방출,
+    둘 다 닫히면 닫히는 같은 규칙 — fxdart 패널이 예전에 손으로 말던
+    태그 병합-폴드는 사라졌습니다.
   </p>
   <p>
-    풀 파이프라인은 <em>하나의</em> 시퀀스를 소비하므로, FxDart 쪽은
-    <code>combineLatest</code>가 공짜로 얻는 것을 먼저 다시 지어야
-    합니다: 두 필드를 태그 붙은 이벤트의 단일 스트림으로
-    병합하고(손수 쓴 컨트롤러와 그것의 구독-둘 닫기 장부 정리까지),
-    <code>fxStream</code>으로 브리지한 뒤, <code>scan</code>으로
-    태그들을 (email, password) 상태 레코드로 접고,
-    <code>filter</code>로 아직 값을 내지 않은 필드가 있는 상태를
-    걸러 냅니다. 폴드 자체는 정직하고, 타입이 있고, 읽기 좋습니다 —
-    하지만 이것은 연산자의 사용이 아니라 연산자의 재구현입니다. 이런
-    반응형 UI 상태야말로 RxDart의 존재 이유이고, 판정은 이론의 여지
-    없이 RxDart의 것입니다.
+    fxdart&nbsp;0.8.0의 이벤트 레이어는 정확히 이런 종류의 일을 위해
+    Rx의 접근을 흡수했습니다: 평범한 <code>Stream</code> 위의 의도된
+    래퍼 체인으로 — extension이 아니어서 rxdart든 다른 어떤 스트림
+    라이브러리든 충돌 없이 공존합니다 — pull 파이프라인이 가질 수 없는
+    최신 값 결합자들을 실어 나릅니다. 정직한 단서 하나는 그대로입니다:
+    RxDart의 연산자 카탈로그는 fxdart의 이벤트 레이어보다 여전히 훨씬
+    큽니다. 결합된 폼 상태가 타입 있는 요구 주도 작업 — 이를테면 타입
+    있는 에러를 가진 검증된 제출 호출 — 을 구동해야 할 때는
+    <code>.pull()</code>이 라이브 쌍들에서 <code>FxAsync</code>
+    파이프라인으로 건너갑니다.
   </p>

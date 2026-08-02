@@ -1,13 +1,13 @@
 ---
 slug: with-latest-config
 title: Sellar cada petición con la config más reciente — RxDart vs FxDart
-description: Cada petición saliente lleva la versión de config vigente en ese instante — withLatestFrom vs una fusión etiquetada plegada con scan tras el puente.
+description: Cada petición saliente lleva la versión de config vigente en ese instante — el mismo operador withLatestFrom en ambos lados, rxdart y fxEvents.
 heading: Sellar cada petición con la config más reciente
 order: 44
 tier: 4
-functions: fx, streams, scan, filter, map
+functions: fxEvents, withLatestFrom
 domain: general
-verdict: rxdart
+verdict: tie
 async: true
 ---
   <h2>Requisito</h2>
@@ -29,23 +29,24 @@ async: true
 
   <h2>Por qué difieren</h2>
   <p>
-    Este es el hermano asimétrico de <code>combineLatest</code>: un
-    stream dirige, el otro solo se <em>consulta</em>. El
-    <code>withLatestFrom</code> de RxDart <em>es</em> este requisito, con
-    nombre — emite por petición, emparejándola con la config más fresca
-    vista hasta ahora, y guarda silencio cuando solo cambia la config.
-    Qué stream es el primario está codificado en el propio operador.
+    Ya no difieren. Este es el hermano asimétrico de
+    <code>combineLatest</code> — un stream dirige, el otro solo se
+    <em>consulta</em> — y desde fxdart 0.8.0 ambos paneles lo nombran de
+    la misma manera: <code>withLatestFrom</code> emite por petición,
+    sellada con la config más fresca vista hasta ahora, y guarda
+    silencio cuando solo cambia la config. El andamiaje de fusión
+    etiquetada y el pliegue con <code>scan</code> que el viejo panel
+    FxDart necesitaba han desaparecido; las dos cadenas son ahora
+    idénticas operador por operador.
   </p>
   <p>
-    El lado FxDart tiene que construir esa asimetría a mano. Empieza con
-    el mismo andamiaje de fusión etiquetada del ejemplo anterior
-    (controller, seguimiento del cierre, puente), y luego construye la
-    asimetría en el pliegue: un evento de config almacena la versión y
-    limpia el hueco de la petición, un evento de petición lo rellena. Un
-    <code>filter</code> conserva solo los estados con una petición
-    pendiente, y un <code>map</code> formatea el sello. Cada paso es
-    tipado y explícito, y ese es el problema: cuatro operadores
-    reimplementan lo que <code>withLatestFrom</code> simplemente
-    <em>nombra</em>. Veredicto RxDart — la herramienta correcta siempre
-    que un stream vivo necesita el último valor de otro.
+    La capa de eventos de fxdart 0.8.0 absorbió el enfoque Rx para el
+    lado push: <code>fxEvents</code> es una cadena envoltorio fina sobre
+    <code>Stream</code>s llanos — nunca una extensión, así que no
+    colisiona con nada, rxdart incluido. El catálogo de operadores de
+    RxDart sigue siendo mucho más amplio; fxdart mantiene pequeño el
+    núcleo de eventos y cruza al pipeline pull tipado con
+    <code>.pull()</code> cuando el procesamiento por valor crece. Para
+    sellar un stream vivo con el último valor de otro, los dos lados son
+    equivalentes: empate.
   </p>

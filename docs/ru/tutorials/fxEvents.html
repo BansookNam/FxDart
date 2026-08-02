@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>fxEvents — FxDart 101</title>
+  <meta name="description" content="FxDart fxEvents tutorial: the events layer — a chainable wrapper over plain Dart Streams, with map, where, merge, startWith, and the pull() bridge — with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/fxEvents.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/fxEvents.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/fxEvents.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/fxEvents.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/fxEvents.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/fxEvents.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/fxEvents.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/fxEvents.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/fxEvents.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Главная</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="../../tutorials/fxEvents.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/fxEvents.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/fxEvents.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/fxEvents.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/fxEvents.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/fxEvents.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/fxEvents.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Раздел 14 · Event streams (push) › <strong>fxEvents</strong></p>
+  <h1><code>fxEvents</code></h1>
+  <p class="hero-sub">Wraps a plain Dart <code>Stream</code> in a chainable <code>FxEvents</code> — the entry point to FxDart's push side.</p>
+
+  <div class="signature">FxEvents&lt;T&gt; fxEvents&lt;T&gt;(Stream&lt;T&gt; stream)
+
+class FxEvents&lt;T&gt; {
+  Stream&lt;T&gt; get stream;                              // unwrap
+  FxEvents&lt;R&gt; map&lt;R&gt;(R Function(T a) f);
+  FxEvents&lt;T&gt; where(bool Function(T a) f);
+  FxEvents&lt;R&gt; asyncMap&lt;R&gt;(FutureOr&lt;R&gt; Function(T a) f);
+  FxEvents&lt;T&gt; startWith(T value);
+  static FxEvents&lt;T&gt; merge&lt;T&gt;(Iterable&lt;Stream&lt;T&gt;&gt; sources);
+  Future&lt;List&lt;T&gt;&gt; toList();                          // terminal
+  FxAsync&lt;T&gt; pull();                                 // cross into the pull model
+}</div>
+
+  <h2>Lecture</h2>
+  <p>
+    Everything before this section is <em>pull</em>: a pipeline sits still
+    until a terminal operator demands the next item. But some problems are
+    genuinely <em>push</em> — keystrokes, sensor readings, socket messages
+    arrive when they arrive, whether anyone asked or not. Those are what
+    Dart's <code>Stream</code> models, and <code>fxEvents(stream)</code>
+    gives that world the same chainable treatment: <code>map</code>,
+    <code>where</code>, <code>asyncMap</code>, <code>startWith</code>,
+    <code>FxEvents.merge</code> — plus the time and combination operators
+    the rest of this section covers.
+  </p>
+  <p>
+    Design decisions worth knowing. <code>FxEvents</code> is a thin
+    <strong>wrapper</strong>, deliberately not a set of <code>Stream</code>
+    extensions — so it can never collide with rxdart or any other stream
+    library in the same file. The chain stays <strong>cold</strong>: wrapping
+    listens to nothing; only a terminal (<code>toList</code>,
+    <code>listen</code>) starts events flowing. And it is an fxdart
+    extension inspired by Rx, not part of FxTS — the operator names follow
+    the Rx tradition because that is where these ideas come from.
+  </p>
+  <p>
+    Two escape hatches keep you unlocked. <code>.stream</code> unwraps back
+    to a plain <code>Stream</code> for any Stream-based API, at any point in
+    the chain. And <code>.pull()</code> crosses into the typed pull world:
+    the events become an <code><a href="toAsync.html">FxAsync</a></code>
+    chain, pulled on demand from there on — push at the edge where events
+    are born, pull in the core where you control demand.
+  </p>
+
+  <h2>Demo 1 · A cold chain over a Stream</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // fxEvents wraps a plain Stream in a chainable FxEvents. The chain is
+  // cold — nothing runs until something listens (toList here).
+  final out = await fxEvents(Stream.fromIterable([1, 2, 3, 4]))
+      .startWith(0)
+      .where((v) => v.isEven)
+      .map((v) => v * 10)
+      .asyncMap((v) async => 'v$v')
+      .toList();
+
+  print(out); // [v0, v20, v40]
+
+  // .stream unwraps back to a plain Stream for any Stream-based API.
+  final Stream<int> plain = fxEvents(Stream.fromIterable([1, 2, 3])).stream;
+  print(await plain.length); // 3
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · merge, and crossing into the pull world</h2>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // Two sensors, one feed: merge interleaves in arrival order and closes
+  // once every source has closed.
+  final merged = await FxEvents.merge([
+    timed([(0, 'kitchen 21.0'), (100, 'kitchen 21.5')], 200),
+    timed([(50, 'attic 15.2'), (150, 'attic 15.1')], 220),
+  ]).toList();
+  print(merged); // [kitchen 21.0, attic 15.2, kitchen 21.5, attic 15.1]
+
+  // .pull() crosses into the typed pull world: from here on the events
+  // are an FxAsync chain, pulled on demand.
+  final odds = await fxEvents(Stream.fromIterable([1, 2, 3, 4, 5]))
+      .pull()
+      .filter((v) => v.isOdd)
+      .map((v) => v * 2)
+      .toList();
+  print(odds); // [2, 6, 10]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: clean up a glitchy sensor feed.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // A raw feed of readings, some of them junk (negative = sensor glitch).
+  final readings = Stream.fromIterable([21, -1, 22, -3, 24]);
+
+  // TODO: wrap the stream with fxEvents(...), then
+  //   .where(...)  — drop the negative glitches
+  //   .map(...)    — format each reading as '<value>°C'
+  //   .toList()    — collect the results
+  final out = await readings.toList();
+
+  print(out);
+  // currently [21, -1, 22, -3, 24] — want [21°C, 22°C, 24°C]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="streams.html">Stream bridges</a> — <code>fromStream</code> / <code>toStream()</code>, the pull side of the border ·
+    <a href="debounce.html"><code>debounce</code></a> &amp; <a href="throttle.html"><code>throttle</code></a> — both have <code>FxEvents</code> forms ·
+    <a href="liveValue.html"><code>LiveValue</code></a> — the current-value companion to this chain
+  </div>
+
+  <nav class="tut-nav">
+    <a href="../../101/index.html">← FxDart 101</a>
+    <a href="sampleOn.html">Далее: sampleOn →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

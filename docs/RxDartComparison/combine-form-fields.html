@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Enable submit when the form is valid — RxDart vs FxDart</title>
-  <meta name="description" content="Combine the latest email and password values to drive the submit button — Rx.combineLatest2 vs a hand-merged tagged stream folded with scan.">
+  <meta name="description" content="Combine the latest email and password values to drive the submit button — Rx.combineLatest2 vs combineLatest in fxdart 0.8.0's events layer.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/combine-form-fields.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/combine-form-fields.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/combine-form-fields.html">
@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../assets/fxdart_single.dart?v=8861025363f20544">
+  <link rel="prefetch" href="../assets/fxdart_single.dart?v=406219f7354c4ce7">
 </head>
 <body>
 <header class="site-header">
@@ -48,8 +48,8 @@
 <main class="cmp-wide">
   <p class="breadcrumb"><a href="../RxDartComparison/index.html">RxDart vs FxDart</a> › #43 · <strong>Enable submit when the form is valid</strong></p>
   <h1>Enable submit when the form is valid</h1>
-  <p class="cmp-meta"><span class="badge verdict-rxdart">RxDart's turf</span> <span class="badge badge-async">async</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/filter.html">filter</a></li></ul>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/combineLatest.html">combineLatest</a></li></ul>
   <h2>Requirement</h2>
   <p>
     A signup form has two fields. The email field emits
@@ -117,7 +117,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="b1d8d1cc9240e051">
+      <div class="playground">
 <textarea>
 import 'dart:async';
 
@@ -143,26 +143,9 @@ Stream<String> passwords() {
 bool valid(String email, String password) =>
     email.contains('@') && password.length >= 8;
 
-/// Tag both fields into one stream — the merge Rx.combineLatest2 does for us.
-Stream<(String, String)> fields() {
-  final c = StreamController<(String, String)>();
-  var open = 2;
-  void done() {
-    if (--open == 0) c.close();
-  }
-
-  emails().listen((e) => c.add(('email', e)), onDone: done);
-  passwords().listen((p) => c.add(('password', p)), onDone: done);
-  return c.stream;
-}
-
 Future<void> main() async {
-  final states = await fxStream(fields())
-      .scan<(String, String)>(
-          (acc, ev) =>
-              ev.$1 == 'email' ? (ev.$2, acc.$2) : (acc.$1, ev.$2),
-          ('', ''))
-      .filter((s) => s.$1.isNotEmpty && s.$2.isNotEmpty)
+  final states = await fxEvents(emails())
+      .combineLatest(passwords(), (e, p) => (e, p))
       .toList();
 
   for (final (e, p) in states) {
@@ -178,25 +161,27 @@ Future<void> main() async {
 
   <h2>Why they differ</h2>
   <p>
-    This is <em>latest-value-per-source</em> state — the defining
-    combinator of the push model. <code>Rx.combineLatest2</code> holds the
-    newest value from each field, waits until both have spoken, and
-    re-emits the pair on every change from either side. The form logic
-    reads exactly like the requirement, and the four lines of output fall
-    out of one declaration.
+    They no longer do. <em>Latest-value-per-source</em> state is the
+    defining combinator of the push model, and both panels now declare it
+    in one line: hold the newest value from each field, wait until both
+    have spoken, re-emit the pair on every change from either side.
+    RxDart writes <code>Rx.combineLatest2(emails(), passwords(), ...)</code>;
+    fxdart writes <code>fxEvents(emails()).combineLatest(passwords(),
+    ...)</code>. Same waiting rule, same re-emission on either side, same
+    close-when-both-close — the tagged-merge-and-fold the fxdart panel
+    used to hand-roll is gone.
   </p>
   <p>
-    A pull pipeline consumes <em>one</em> sequence, so the FxDart side
-    must first rebuild what <code>combineLatest</code> gets for free:
-    merge the two fields into a single stream of tagged events
-    (a hand-written controller, with its own two-subscription close
-    bookkeeping), bridge it with <code>fxStream</code>, then
-    <code><a href="../tutorials/scan.html">scan</a></code> the tags into a (email, password) state record and
-    <code><a href="../tutorials/filter.html">filter</a></code> out states where a field has not emitted yet. The
-    fold itself is honest, typed and readable — but it is a reimplementation
-    of the operator, not a use of one. Reactive UI state like this is
-    exactly what RxDart is for, and the verdict is RxDart's without
-    argument.
+    fxdart&nbsp;0.8.0's events layer absorbed the Rx approach for exactly
+    this kind of job: a deliberate wrapper chain over plain
+    <code>Stream</code>s — not an extension, so it coexists with rxdart or
+    any other stream library without conflicts — carrying the latest-value
+    combinators the pull pipelines cannot have. One honest caveat stands:
+    RxDart's operator catalog remains far larger than fxdart's events
+    layer. When the combined form state should drive typed, demand-driven
+    work — a validated submit call with typed errors, say —
+    <code>.pull()</code> crosses from the live pairs into the
+    <code>FxAsync</code> pipeline.
   </p>
 
   <nav class="tut-nav">
@@ -209,7 +194,7 @@ Future<void> main() async {
   <p>Playground compiles via the DartPad compile service. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Run","pgReset":"Reset","pgCompiling":"Compiling…","pgCompileError":"Compile error","pgError":"Error","pgLoading":"Loading runtime…","pgRunning":"Running…","pgNoOutput":"(no output)","pgLoadFailed":"Could not load the FxDart library"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

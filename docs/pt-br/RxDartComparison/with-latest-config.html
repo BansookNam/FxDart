@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Stamp each request with the latest config — RxDart vs FxDart</title>
-  <meta name="description" content="Each outgoing request carries the config version current at that instant — withLatestFrom vs a tagged merge folded with scan behind the bridge.">
+  <meta name="description" content="Each outgoing request carries the config version current at that instant — the same withLatestFrom operator on both sides, rxdart and fxEvents.">
   <link rel="canonical" href="https://bansooknam.github.io/FxDart/RxDartComparison/with-latest-config.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/with-latest-config.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/with-latest-config.html">
@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
 </head>
 <body>
 <header class="site-header">
@@ -50,8 +50,8 @@
   <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
   <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #44 · <strong>Stamp each request with the latest config</strong></p>
   <h1>Stamp each request with the latest config</h1>
-  <p class="cmp-meta"><span class="badge verdict-rxdart">RxDart's turf</span> <span class="badge badge-async">async</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/withLatestFrom.html">withLatestFrom</a></li></ul>
   <h2>Requirement</h2>
   <p>
     An app fires four API requests while, in the background, deploys bump
@@ -120,7 +120,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="00ad6737767b9a85">
+      <div class="playground">
 <textarea>
 import 'dart:async';
 
@@ -153,26 +153,9 @@ Stream<String> requests() {
   return c.stream;
 }
 
-/// Tag both sources into one stream — the pairing withLatestFrom does for us.
-Stream<(String, String)> tagged() {
-  final c = StreamController<(String, String)>();
-  var open = 2;
-  void done() {
-    if (--open == 0) c.close();
-  }
-
-  configs().listen((v) => c.add(('config', v)), onDone: done);
-  requests().listen((r) => c.add(('request', r)), onDone: done);
-  return c.stream;
-}
-
 Future<void> main() async {
-  final stamped = await fxStream(tagged())
-      .scan<(String, String?)>(
-          (acc, ev) => ev.$1 == 'config' ? (ev.$2, null) : (acc.$1, ev.$2),
-          ('', null))
-      .filter((s) => s.$2 != null)
-      .map((s) => '${s.$2} (config ${s.$1})')
+  final stamped = await fxEvents(requests())
+      .withLatestFrom(configs(), (req, cfg) => '$req (config $cfg)')
       .toList();
 
   stamped.forEach(print);
@@ -184,24 +167,24 @@ Future<void> main() async {
 
   <h2>Why they differ</h2>
   <p>
-    This is <code>combineLatest</code>'s asymmetric sibling: one stream
-    drives, the other is only <em>consulted</em>. RxDart's
-    <code>withLatestFrom</code> <em>is</em> this requirement, named — emit per request,
-    pairing it with the freshest config seen so far, and stay silent when
-    only the config changes. Which stream is primary is encoded in the
-    operator itself.
+    They no longer do. This is <code>combineLatest</code>'s asymmetric
+    sibling — one stream drives, the other is only <em>consulted</em> —
+    and since fxdart 0.8.0 both panels name it the same way:
+    <code><a href="../tutorials/withLatestFrom.html">withLatestFrom</a></code> emits per request, stamped with the
+    freshest config seen so far, and stays silent when only the config
+    changes. The tagged-merge scaffolding and the <code>scan</code> fold
+    the old FxDart panel needed are gone; the two chains are now
+    operator-for-operator identical.
   </p>
   <p>
-    The FxDart side has to build that asymmetry by hand. It starts with
-    the same tagged-merge scaffolding as the previous example
-    (controller, close-tracking, bridge), then builds the asymmetry in
-    the fold: a config event stores the version and clears the request
-    slot, a request event fills it. A <code><a href="../tutorials/filter.html">filter</a></code> keeps only
-    states with a pending request, and a <code><a href="../tutorials/map.html">map</a></code> formats the
-    stamp. Every step is typed and explicit, and that is the problem:
-    four operators reimplement what <code>withLatestFrom</code> simply
-    <em>names</em>. Verdict RxDart — the right tool whenever one live
-    stream needs the latest value of another.
+    fxdart 0.8.0's events layer absorbed the Rx approach for the push
+    side: <code><a href="../tutorials/fxEvents.html">fxEvents</a></code> is a thin wrapper chain over plain
+    <code>Stream</code>s — never an extension, so it collides with
+    nothing, rxdart included. RxDart's operator catalog remains far
+    larger; fxdart keeps the events core small and crosses into the typed
+    pull pipeline with <code>.pull()</code> when per-value processing
+    grows. For stamping one live stream with the latest value of another,
+    the two sides are equivalent: a tie.
   </p>
 
   <nav class="tut-nav">
@@ -214,7 +197,7 @@ Future<void> main() async {
   <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

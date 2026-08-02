@@ -14,17 +14,11 @@ Stream<int> taps() {
 }
 
 Future<void> main() async {
-  // fxdart's throttle is a callback wrapper, not a stream operator — it is
-  // wired to the tap stream by hand, collecting the taps that get through.
-  final fired = <int>[];
-  final throttled = throttle<int>(fired.add, const Duration(milliseconds: 300),
-      trailing: false);
-  final done = Completer<void>();
-  final sub = taps().listen(throttled.call, onDone: done.complete);
-  await done.future;
-  await sub.cancel();
+  final fired = await fxEvents(taps())
+      .throttle(const Duration(milliseconds: 300))
+      .toList();
 
-  final lines = fx(fired).map((tap) => 'refresh fired on tap $tap').toList();
+  final lines = fired.map((tap) => 'refresh fired on tap $tap');
   lines.forEach(print);
   print('taps: 6, refreshes: ${fired.length}');
 }

@@ -1,13 +1,13 @@
 ---
 slug: live-latest-value
 title: A live current value for late readers — RxDart vs FxDart
-description: A dashboard that connects late still gets the current temperature instantly — BehaviorSubject replays the latest; pull caches it by hand.
+description: A dashboard that connects late still gets the current temperature instantly — BehaviorSubject and LiveValue both replay the latest, then stream live.
 heading: A live current value for late readers
 order: 47
 tier: 4
-functions: fx, streams
+functions: liveValue, fxEvents
 domain: sensors
-verdict: rxdart
+verdict: tie
 async: true
 ---
   <h2>Requirement</h2>
@@ -27,24 +27,23 @@ async: true
 
   <h2>Why they differ</h2>
   <p>
-    "The latest value, replayed to whoever shows up" is not a pipeline —
-    it is a piece of <em>shared, multicast state</em>, and RxDart has a
-    dedicated object for it. A <code>BehaviorSubject</code> is both the
-    sink the sensor writes to and a stream every subscriber can read, and
-    its one defining behavior is exactly this requirement: a late
-    listener first receives the most recent value, then the live feed.
-    The whole rx panel is "add updates, subscribe late, collect".
+    They no longer do. "The latest value, replayed to whoever shows up"
+    is <em>shared, multicast state</em>, and since fxdart 0.8.0 fxdart
+    has a dedicated object for it too: <code>LiveValue</code> is
+    <code>BehaviorSubject</code> reduced to its defining behavior — a
+    sink the sensor writes to, a readable <code>.value</code>, and a feed
+    where a late subscriber first receives the most recent value, then
+    the live updates. Both panels are now "add updates, subscribe late,
+    collect"; the hand-cached variable and the extra caching listener the
+    old FxDart panel needed are gone.
   </p>
   <p>
-    FxDart deliberately omits anything like a subject — a pull pipeline
-    is a single-consumer chain of demand, not a broadcast hub. The FxDart
-    panel has to <em>simulate</em> the subject: a broadcast controller, a
-    hand-written listener that caches the latest value into a variable,
-    and an <code>fxStream</code> bridge for the remainder once the late
-    reader joins. It prints the same lines, but every piece the subject
-    gave for free (the cache, the replay-on-join, the second
-    subscription's lifecycle) is now manual code that must be kept
-    correct. The practical call: for multicast latest-value state, use
-    RxDart — and bridge into a typed FxDart pipeline downstream of the
-    subject when the per-value processing grows.
+    This is fxdart 0.8.0's events layer absorbing the Rx approach for
+    the push side: <code>LiveValue.live</code> hands back an
+    <code>fxEvents</code> chain — a thin wrapper over a plain broadcast
+    <code>Stream</code>, so it collides with nothing, rxdart included —
+    and <code>.pull()</code> crosses into the typed pull pipeline when
+    the per-value processing grows. RxDart's subject family and operator
+    catalog remain far larger; for latest-value-then-live itself, the
+    panels are equivalent: a tie.
   </p>

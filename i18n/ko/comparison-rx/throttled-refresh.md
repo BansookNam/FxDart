@@ -1,13 +1,13 @@
 ---
 slug: throttled-refresh
 title: 새로고침 버튼 스로틀링하기 — RxDart vs FxDart
-description: 300 ms 윈도마다 탭 하나만 통과 — 탭 스트림 위의 throttleTime vs 손으로 스트림에 배선한 fxdart의 throttle 콜백 래퍼.
+description: 300 ms 윈도마다 탭 하나만 통과 — 탭 스트림 위의 throttleTime vs fxdart 0.8.0 이벤트 레이어의 동등한 throttle 체인.
 heading: 새로고침 버튼 스로틀링하기
 order: 41
 tier: 4
-functions: fx, throttle, map
+functions: fxEvents, throttle
 domain: users
-verdict: rxdart
+verdict: tie
 async: true
 ---
   <h2>요구사항</h2>
@@ -28,21 +28,24 @@ async: true
 
   <h2>차이가 나는 이유</h2>
   <p>
-    스로틀링은 <em>시간 속의 도착</em>에 대한 속도 제한입니다 — 값
-    자체가 아니라 이벤트가 언제 일어나는가의 속성입니다. 그것은
-    스트림의 영토이고, RxDart는 요구사항 전체를 연산자 하나로
-    접습니다: <code>throttleTime(300ms)</code>이 첫 탭에서 윈도를
-    열고, 연타의 나머지를 삼키고, 윈도 이후의 다음 탭에서 다시 엽니다
-    — 구독, 윈도 장부 정리, 완료까지 모두 처리됩니다.
+    이제는 다르지 않습니다. 스로틀링은 <em>시간 속의 도착</em>에 대한
+    속도 제한 — 값이 아니라 이벤트가 언제 일어나는가의 속성 — 이고,
+    이제 두 패널 모두 요구사항을 탭 스트림 위의 연산자 하나로
+    접습니다. RxDart의 <code>throttleTime(300ms)</code>과 fxdart의
+    <code>fxEvents(...).throttle(300ms)</code>은 같은 리딩 엣지 윈도를
+    구현하며(첫 탭이 값을 내보내며 윈도를 열고, 연타의 나머지는
+    삼켜집니다; 트레일링 엣지는 양쪽 모두 플래그 하나 거리에
+    있습니다), 구독, 윈도 장부 정리, 완료가 모두 연산자 안에서
+    처리됩니다.
   </p>
   <p>
-    FxDart의 파이프라인에는 설계상 시계가 없습니다 — 풀 체인은 도착
-    시각이 아니라 요구를 봅니다 — 그래서 그 <code>throttle</code>은
-    FxTS 스타일의 <em>콜백 래퍼</em>입니다. 정확히 같은 리딩 엣지
-    윈도를 구현하지만, 스트림에 배선하는 일은 직접 해야 합니다:
-    구독하고, 각 탭을 스로틀된 함수에 먹이고, 살아남은 것들을 모으고,
-    <code>Completer</code>로 완료를 추적하고, 그 뒤에야 리스트를
-    포매팅용 타입 있는 체인에 넘깁니다. 같은 세 탭, 눈에 띄게 많은
-    배관. 이것은 깨끗하게 RxDart의 것입니다: 스로틀링은 푸시 문제이고,
-    탭 스트림이 그것을 풀어야 할 자리입니다.
+    fxdart&nbsp;0.8.0은 push 쪽을 위해 Rx의 접근을 의도적으로 흡수해
+    여기에 도달했습니다: <code>fxEvents</code>는 평범한
+    <code>Stream</code> 위의 래퍼 체인으로 — extension이 아니어서 멤버
+    충돌 하나 없이 어떤 스트림 라이브러리와도 공존합니다. RxDart의
+    연산자 카탈로그는 fxdart의 이벤트 레이어보다 여전히 훨씬 큽니다;
+    이 예제 같은 일상적인 시간 동사들에서는 이제 둘이 서로 대체
+    가능합니다. 살아남은 각 탭이 이어서 진짜 타입 있는 비동기 작업을
+    발동해야 한다면, <code>.pull()</code>이 스트림을 요구 주도
+    <code>FxAsync</code> 파이프라인으로 실어 갈 것입니다.
   </p>

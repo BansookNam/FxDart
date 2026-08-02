@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Habilitar el envío cuando el formulario es válido — RxDart vs FxDart</title>
-  <meta name="description" content="Combinar los últimos valores de email y contraseña para gobernar el botón de envío — Rx.combineLatest2 vs un stream etiquetado fusionado a mano y plegado con scan.">
+  <meta name="description" content="Combinar los últimos valores de email y contraseña para gobernar el botón de envío — Rx.combineLatest2 vs combineLatest en la capa de eventos de fxdart 0.8.0.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/combine-form-fields.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/combine-form-fields.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/combine-form-fields.html">
@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=406219f7354c4ce7">
 </head>
 <body>
 <header class="site-header">
@@ -48,8 +48,8 @@
 <main class="cmp-wide">
   <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #43 · <strong>Habilitar el envío cuando el formulario es válido</strong></p>
   <h1>Habilitar el envío cuando el formulario es válido</h1>
-  <p class="cmp-meta"><span class="badge verdict-rxdart">Terreno de RxDart</span> <span class="badge badge-async">async</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/filter.html">filter</a></li></ul>
+  <p class="cmp-meta"><span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/combineLatest.html">combineLatest</a></li></ul>
   <h2>Requisito</h2>
   <p>
     Un formulario de registro tiene dos campos. El campo de email emite
@@ -118,7 +118,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="b1d8d1cc9240e051">
+      <div class="playground">
 <textarea>
 import 'dart:async';
 
@@ -144,26 +144,9 @@ Stream<String> passwords() {
 bool valid(String email, String password) =>
     email.contains('@') && password.length >= 8;
 
-/// Tag both fields into one stream — the merge Rx.combineLatest2 does for us.
-Stream<(String, String)> fields() {
-  final c = StreamController<(String, String)>();
-  var open = 2;
-  void done() {
-    if (--open == 0) c.close();
-  }
-
-  emails().listen((e) => c.add(('email', e)), onDone: done);
-  passwords().listen((p) => c.add(('password', p)), onDone: done);
-  return c.stream;
-}
-
 Future<void> main() async {
-  final states = await fxStream(fields())
-      .scan<(String, String)>(
-          (acc, ev) =>
-              ev.$1 == 'email' ? (ev.$2, acc.$2) : (acc.$1, ev.$2),
-          ('', ''))
-      .filter((s) => s.$1.isNotEmpty && s.$2.isNotEmpty)
+  final states = await fxEvents(emails())
+      .combineLatest(passwords(), (e, p) => (e, p))
       .toList();
 
   for (final (e, p) in states) {
@@ -179,26 +162,31 @@ Future<void> main() async {
 
   <h2>Por qué difieren</h2>
   <p>
-    Esto es estado de <em>último-valor-por-fuente</em> — el combinador
-    que define el modelo push. <code>Rx.combineLatest2</code> retiene el
-    valor más nuevo de cada campo, espera a que ambos hayan hablado, y
-    re-emite el par en cada cambio de cualquiera de los lados. La lógica
-    del formulario se lee exactamente como el requisito, y las cuatro
-    líneas de salida caen de una sola declaración.
+    Ya no difieren. El estado de <em>último-valor-por-fuente</em> es el
+    combinador que define el modelo push, y ambos paneles lo declaran
+    ahora en una línea: retener el valor más nuevo de cada campo,
+    esperar a que ambos hayan hablado, re-emitir el par en cada cambio
+    de cualquiera de los lados. RxDart escribe
+    <code>Rx.combineLatest2(emails(), passwords(), ...)</code>; fxdart
+    escribe <code>fxEvents(emails()).combineLatest(passwords(),
+    ...)</code>. La misma regla de espera, la misma re-emisión por
+    cualquiera de los lados, el mismo cierre-cuando-ambos-cierran — la
+    fusión etiquetada con pliegue que el panel de fxdart solía fabricar
+    a mano ha desaparecido.
   </p>
   <p>
-    Un pipeline pull consume <em>una</em> secuencia, así que el lado
-    FxDart debe reconstruir primero lo que <code>combineLatest</code>
-    consigue gratis: fusionar los dos campos en un único stream de
-    eventos etiquetados (un controller escrito a mano, con su propia
-    contabilidad de cierre de dos suscripciones), tender el puente con
-    <code>fxStream</code>, y luego hacer <code><a href="../tutorials/scan.html">scan</a></code> de las
-    etiquetas hacia un registro de estado (email, contraseña) y
-    <code><a href="../tutorials/filter.html">filter</a></code> para descartar los estados donde un campo aún no
-    ha emitido. El pliegue en sí es honesto, tipado y legible — pero es
-    una reimplementación del operador, no un uso de él. El estado
-    reactivo de UI como este es exactamente para lo que RxDart existe, y
-    el veredicto es de RxDart sin discusión.
+    La capa de eventos de fxdart&nbsp;0.8.0 absorbió el enfoque Rx
+    exactamente para esta clase de trabajo: una cadena envoltorio
+    deliberada sobre <code>Stream</code>s llanos — no una extensión, así
+    que convive con rxdart o cualquier otra biblioteca de streams sin
+    conflictos — que porta los combinadores de último valor que los
+    pipelines pull no pueden tener. Una salvedad honesta se mantiene: el
+    catálogo de operadores de RxDart sigue siendo mucho más amplio que
+    la capa de eventos de fxdart. Cuando el estado combinado del
+    formulario deba gobernar trabajo tipado y dirigido por demanda —
+    digamos, una llamada de envío validada con errores tipados —
+    <code>.pull()</code> cruza desde los pares en vivo al pipeline
+    <code>FxAsync</code>.
   </p>
 
   <nav class="tut-nav">
@@ -211,7 +199,7 @@ Future<void> main() async {
   <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=406219f7354c4ce7";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
