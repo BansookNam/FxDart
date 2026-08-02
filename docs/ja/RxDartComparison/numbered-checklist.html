@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Number the checklist — RxDart vs FxDart</title>
+  <meta name="description" content="Turn six steps into 1.-numbered lines — streams have no indexed map, so Rx smuggles a counter through scan; fxdart says zipWithIndex.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/RxDartComparison/numbered-checklist.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/numbered-checklist.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/numbered-checklist.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/numbered-checklist.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/numbered-checklist.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/numbered-checklist.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/numbered-checklist.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/numbered-checklist.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/numbered-checklist.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">ホーム</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="../../RxDartComparison/numbered-checklist.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/numbered-checklist.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/numbered-checklist.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/numbered-checklist.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/numbered-checklist.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/numbered-checklist.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/numbered-checklist.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #8 · <strong>Number the checklist</strong></p>
+  <h1>Number the checklist</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Turn six setup steps into a numbered checklist — <code>1.&nbsp;Unbox
+    the sensor kit</code> and so on, one line per step, numbering from
+    one. The data is in the code; both versions must print the lines
+    shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">1. Unbox the sensor kit
+2. Charge the base station
+3. Pair the remote
+4. Mount the wall bracket
+5. Run the self-test
+6. Register the warranty</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="1484747393e06bc3">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+// Setup steps for the new sensor kit, in order.
+const steps = [
+  'Unbox the sensor kit',
+  'Charge the base station',
+  'Pair the remote',
+  'Mount the wall bracket',
+  'Run the self-test',
+  'Register the warranty',
+];
+
+Future<void> main() async {
+  // Streams have no indexed map. The closest rxdart gets is scan, whose
+  // accumulator receives an index — so the numbering rides a fold with a
+  // throwaway seed and an ignored accumulator.
+  final numbered = await Stream.fromIterable(steps)
+      .scan<String>((_, step, i) => '${i + 1}. $step', '')
+      .toList();
+
+  numbered.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="a334bfbc32d0aeb8">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+// Setup steps for the new sensor kit, in order.
+const steps = [
+  'Unbox the sensor kit',
+  'Charge the base station',
+  'Pair the remote',
+  'Mount the wall bracket',
+  'Run the self-test',
+  'Register the warranty',
+];
+
+void main() {
+  // zipWithIndex pairs each element with its position: (index, value).
+  final numbered =
+      fx(steps).zipWithIndex().map((e) => '${e.$1 + 1}. ${e.$2}').toList();
+
+  numbered.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Neither core <code>Stream</code> nor RxDart has an indexed
+    <code><a href="../tutorials/map.html">map</a></code>. The closest thing RxDart offers is
+    <code>scan</code>, whose accumulator happens to receive an index as
+    its third argument — so the rx spelling shown numbers the steps by
+    riding a <em>fold</em>: a seed you must invent (<code>''</code>) and
+    an accumulated value you immediately ignore. The alternatives are no
+    cleaner in kind — a mutable counter the mapper closes over, or
+    zipping against <code>Rx.range</code> — every route smuggles the
+    index in from outside, because no operator carries it. It works, and
+    it still reads like a workaround.
+  </p>
+  <p>
+    FxDart says the thing directly: <code><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></code> pairs each
+    element with its position, and a plain <code><a href="../tutorials/map.html">map</a></code> formats the
+    pair. This is not a push-vs-pull gap so much as a vocabulary gap —
+    an indexed pairing operator is trivially expressible in either model,
+    Rx just never grew one — but the reader of each panel feels it: one
+    side states "element with its index", the other encodes it in an
+    accumulator's spare parameter. Verdict: FxDart.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="last-three-errors.html">← 前: The last three errors</a>
+    <a href="expand-order-lines.html">次: Flatten orders into lines →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

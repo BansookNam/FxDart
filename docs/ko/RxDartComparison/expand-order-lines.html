@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>주문을 라인 단위로 펼치기 — RxDart vs FxDart</title>
+  <meta name="description" content="네 건의 주문을 열 개의 order/sku 라인 아이템으로 펼치기 — Stream.expand와 fxdart flatMap은 일대다를 가리키는 같은 단어이고, 소스 순서를 지킵니다.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/expand-order-lines.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/expand-order-lines.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/expand-order-lines.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/expand-order-lines.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/expand-order-lines.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/expand-order-lines.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/expand-order-lines.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/expand-order-lines.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../RxDartComparison/expand-order-lines.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/expand-order-lines.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/expand-order-lines.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/expand-order-lines.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/expand-order-lines.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/expand-order-lines.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/expand-order-lines.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #9 · <strong>주문을 라인 단위로 펼치기</strong></p>
+  <h1>주문을 라인 단위로 펼치기</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>요구사항</h2>
+  <p>
+    어제의 주문 네 건에는 각각 두세 개의 라인 아이템이 있습니다. 이를
+    <code>order/sku</code> 줄들의 리스트 하나로 펼치고 — 모든 아이템이
+    자기 주문 id 아래, 소스 순서대로 — 줄 수를 출력하세요. 데이터는 아래
+    코드에 있으며, 두 버전 모두 <em>예상 출력</em> 아래에 표시된 줄들을
+    출력해야 합니다.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>예상 출력</summary>
+    <pre class="code">A-101/tea-01
+A-101/mug-07
+A-102/pen-11
+A-102/ink-02
+A-102/pad-05
+A-103/mug-07
+A-103/lid-04
+A-104/tea-01
+A-104/jar-03
+A-104/lid-04
+10 lines from 4 orders</pre>
+  </details>
+
+  <h2>나란히 보기</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="a7b12383f87810bb">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+class Order {
+  const Order(this.id, this.skus);
+  final String id;
+  final List<String> skus;
+}
+
+// Yesterday's orders — each holds two or three line items.
+const orders = [
+  Order('A-101', ['tea-01', 'mug-07']),
+  Order('A-102', ['pen-11', 'ink-02', 'pad-05']),
+  Order('A-103', ['mug-07', 'lid-04']),
+  Order('A-104', ['tea-01', 'jar-03', 'lid-04']),
+];
+
+Future<void> main() async {
+  // expand (core Stream API) flattens each order into its line records —
+  // rxdart's flatMapIterable is for line lists that arrive as streams.
+  final lines = await Stream.fromIterable(orders)
+      .expand((o) => o.skus.map((sku) => (order: o.id, sku: sku)))
+      .map((l) => '${l.order}/${l.sku}')
+      .toList();
+
+  lines.forEach(print);
+  print('${lines.length} lines from ${orders.length} orders');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="9c69adbf6736994a">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Order {
+  const Order(this.id, this.skus);
+  final String id;
+  final List<String> skus;
+}
+
+// Yesterday's orders — each holds two or three line items.
+const orders = [
+  Order('A-101', ['tea-01', 'mug-07']),
+  Order('A-102', ['pen-11', 'ink-02', 'pad-05']),
+  Order('A-103', ['mug-07', 'lid-04']),
+  Order('A-104', ['tea-01', 'jar-03', 'lid-04']),
+];
+
+void main() {
+  // flatMap flattens each order into its line records, in source order.
+  final lines = fx(orders)
+      .flatMap((o) => o.skus.map((sku) => (order: o.id, sku: sku)))
+      .map((l) => '${l.order}/${l.sku}')
+      .toList();
+
+  lines.forEach(print);
+  print('${lines.length} lines from ${orders.length} orders');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>차이가 나는 이유</h2>
+  <p>
+    일대다 펼치기는 두 모델 모두의 기반암이고, 동기 페이로드라면 두
+    표기는 같은 단어입니다: <code>Stream.expand</code>와 FxDart의
+    <code><a href="../tutorials/flatMap.html">flatMap</a></code>은 둘 다 <em>요소에서 이터러블로</em>를 받아,
+    조각들을 소스 순서대로 이어 붙이고, 결과를 포맷용 <code><a href="../tutorials/map.html">map</a></code>에
+    넘깁니다. 두 패널은 줄과 줄이 나란히 평행합니다.
+  </p>
+  <p>
+    흥미로운 갈림길은 무대 바로 바깥에 있습니다. 각 주문의 라인들이
+    <em>비동기적으로</em> 도착한다면, Rx 쪽은 RxDart의
+    <code>flatMapIterable</code>이나 <code><a href="../tutorials/flatMap.html">flatMap</a></code>으로 올라가야
+    합니다 — 내부 <em>스트림</em>들, 그리고 병합 순서가 진짜 문제가
+    됩니다(연결(concat)하지 않는 한 완료 순서대로 뒤섞입니다). pull
+    파이프라인 위 FxDart의 비동기 <code><a href="../tutorials/flatMap.html">flatMap</a></code>은 구조상 소스
+    순서를 유지합니다. 하지만 그것은 티어 4의 이야기입니다; 이 인메모리
+    작업에서는 양쪽 모두 펼치기를 직접적으로 표현하고 — Rx 패널은 RxDart
+    연산자조차 필요 없습니다, 코어 <code>Stream</code>이 실어 나르니까요
+    — 남는 흔적은 async main뿐입니다. 무승부입니다.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="numbered-checklist.html">← 이전: 체크리스트에 번호 매기기</a>
+    <a href="empty-report-default.html">다음: 빈 리포트를 위한 기본 한 줄 →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sample the gauge on each poll tick — RxDart vs FxDart</title>
+  <meta name="description" content="Read the latest gauge value at each poll tick — an explicit sample trigger stream vs a hand-tracked latest variable read through the bridge.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/sampled-gauge.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/sampled-gauge.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/sampled-gauge.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/sampled-gauge.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/sampled-gauge.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/sampled-gauge.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/sampled-gauge.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/sampled-gauge.html">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API Tutorials</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Language">
+      <span class="lang-label">Language</span>
+      <ul>
+        <li><a href="../RxDartComparison/sampled-gauge.html" hreflang="en" lang="en" aria-current="page">English</a></li>
+        <li><a href="../ko/RxDartComparison/sampled-gauge.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../zh/RxDartComparison/sampled-gauge.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../ja/RxDartComparison/sampled-gauge.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../es/RxDartComparison/sampled-gauge.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../pt-br/RxDartComparison/sampled-gauge.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../ru/RxDartComparison/sampled-gauge.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../RxDartComparison/index.html">RxDart vs FxDart</a> › #42 · <strong>Sample the gauge on each poll tick</strong></p>
+  <h1>Sample the gauge on each poll tick</h1>
+  <p class="cmp-meta"><span class="badge verdict-rxdart">RxDart's turf</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    A pressure gauge emits readings 1..8, one every 50&nbsp;ms. A
+    dashboard polls three times — at 125, 275 and 425&nbsp;ms — and each
+    poll should show the <strong>latest</strong> reading at that instant:
+    2, 5, then 8. Print the three polled readings after the streams close.
+    Both schedules are simulated in the code; both versions must print the
+    lines shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">poll 1: reading 2
+poll 2: reading 5
+poll 3: reading 8</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="794adcc96bd9dba7">
+<textarea>
+import 'dart:async';
+
+import 'package:rxdart/rxdart.dart';
+
+/// Simulated gauge: pressure readings 1..8, one every 50 ms.
+Stream<int> gauge() {
+  final c = StreamController<int>();
+  for (var i = 1; i <= 8; i++) {
+    Timer(Duration(milliseconds: 50 * i), () => c.add(i));
+  }
+  Timer(const Duration(milliseconds: 500), c.close);
+  return c.stream;
+}
+
+/// The dashboard polls three times, each tick landing between readings.
+Stream<void> polls() {
+  final c = StreamController<void>();
+  for (final ms in const [125, 275, 425]) {
+    Timer(Duration(milliseconds: ms), () => c.add(null));
+  }
+  Timer(const Duration(milliseconds: 550), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  final sampled = await gauge().sample(polls()).toList();
+
+  for (final (i, value) in sampled.indexed) {
+    print('poll ${i + 1}: reading $value');
+  }
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="e89a8c975b3a9d93">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Simulated gauge: pressure readings 1..8, one every 50 ms.
+Stream<int> gauge() {
+  final c = StreamController<int>();
+  for (var i = 1; i <= 8; i++) {
+    Timer(Duration(milliseconds: 50 * i), () => c.add(i));
+  }
+  Timer(const Duration(milliseconds: 500), c.close);
+  return c.stream;
+}
+
+/// The dashboard polls three times, each tick landing between readings.
+Stream<void> polls() {
+  final c = StreamController<void>();
+  for (final ms in const [125, 275, 425]) {
+    Timer(Duration(milliseconds: ms), () => c.add(null));
+  }
+  Timer(const Duration(milliseconds: 550), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // The gauge's latest reading is tracked by hand in a variable; the poll
+  // ticks are pulled through the bridge and each pull snapshots it.
+  var latest = 0;
+  final sub = gauge().listen((v) => latest = v);
+
+  final sampled = await fxStream(polls()).map((_) => latest).toList();
+  await sub.cancel();
+
+  for (final (i, value) in sampled.indexed) {
+    print('poll ${i + 1}: reading $value');
+  }
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    "The latest value at this instant" is a concept that only exists in
+    the push model — it means <em>whatever arrived most recently</em>,
+    which presumes things arrive on their own. RxDart's <code>sample</code>
+    takes the gauge stream and a trigger stream and does exactly this
+    job: on each trigger, emit the newest source value since the
+    last trigger. One operator, and the state ("what is current?") lives
+    inside it.
+  </p>
+  <p>
+    A pull pipeline has no "current value" — nothing arrives until you
+    ask. So the FxDart side splits the job in two: a plain subscription
+    tracks the gauge's latest reading in a mutable variable, and the poll
+    stream comes through <code>fxStream</code> so each pulled tick can
+    <code><a href="../tutorials/map.html">map</a></code> to a snapshot of that variable. It prints the same
+    three readings, but the sampling logic is hand-rolled push code
+    sitting <em>next to</em> the chain, not expressed by it. Verdict
+    RxDart: sampling live state is push-native — this is push's home
+    game.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="throttled-refresh.html">← Previous: Throttle the refresh button</a>
+    <a href="combine-form-fields.html">Next: Enable submit when the form is valid →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a>. Great thanks to <strong>Indong Yoo</strong> (CTO, Marpple) and the FxTS team for the ideas, semantics, and test suite this library is built on.</p>
+  <p>Playground compiles via the DartPad compile service. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Run","pgReset":"Reset","pgCompiling":"Compiling…","pgCompileError":"Compile error","pgError":"Error","pgLoading":"Loading runtime…","pgRunning":"Running…","pgNoOutput":"(no output)","pgLoadFailed":"Could not load the FxDart library"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

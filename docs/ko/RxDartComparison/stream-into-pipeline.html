@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>스트림이 타입 있는 파이프라인으로 흘러들 때 — RxDart vs FxDart</title>
+  <meta name="description" content="라이브 로그 스트림이 fxStream을 거쳐 타입 있는 풀 파이프라인으로 흘러갑니다 — 경고만 남기고, 대문자로 바꾸고, 세기. 다리의 양쪽에서.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/stream-into-pipeline.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/stream-into-pipeline.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/stream-into-pipeline.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/stream-into-pipeline.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/stream-into-pipeline.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/stream-into-pipeline.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/stream-into-pipeline.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/stream-into-pipeline.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../RxDartComparison/stream-into-pipeline.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/stream-into-pipeline.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/stream-into-pipeline.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/stream-into-pipeline.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/stream-into-pipeline.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/stream-into-pipeline.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/stream-into-pipeline.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #49 · <strong>스트림이 타입 있는 파이프라인으로 흘러들 때</strong></p>
+  <h1>스트림이 타입 있는 파이프라인으로 흘러들 때</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/toList.html">toList</a></li></ul>
+  <h2>요구사항</h2>
+  <p>
+    라이브 로그 피드가 고정 스케줄로 일곱 줄을 내보내고 닫힙니다.
+    경고만 남기고, 인시던트 채널용으로 대문자로 바꾸고, 마지막 개수와
+    함께 출력하세요. 피드는 코드에 (양쪽에 동일하게) 시뮬레이션되어
+    있습니다; 두 버전 모두 <em>예상 출력</em> 아래에 표시된 줄들을
+    출력해야 합니다.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>예상 출력</summary>
+    <pre class="code">WARN: DISK 81% FULL
+WARN: LATENCY 900MS
+WARN: RETRY QUEUE AT 12
+warnings: 3</pre>
+  </details>
+
+  <h2>나란히 보기</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="4099e062dda8538b">
+<textarea>
+import 'dart:async';
+
+import 'package:rxdart/rxdart.dart';
+
+/// A live log feed: seven lines on a fixed schedule, then it closes.
+Stream<String> logFeed() {
+  final c = StreamController<String>();
+  const events = [
+    (0, 'info: service up'),
+    (60, 'warn: disk 81% full'),
+    (120, 'info: heartbeat'),
+    (180, 'warn: latency 900ms'),
+    (240, 'info: heartbeat'),
+    (300, 'warn: retry queue at 12'),
+    (360, 'info: sync done'),
+  ];
+  for (final (ms, line) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(line));
+  }
+  Timer(const Duration(milliseconds: 420), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // The stream is the model: filter-and-format in one rxdart operator.
+  final warnings = await logFeed()
+      .mapNotNull((line) => line.startsWith('warn') ? line.toUpperCase() : null)
+      .toList();
+
+  warnings.forEach(print);
+  print('warnings: ${warnings.length}');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="5c193644f22d1013">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// A live log feed: seven lines on a fixed schedule, then it closes.
+Stream<String> logFeed() {
+  final c = StreamController<String>();
+  const events = [
+    (0, 'info: service up'),
+    (60, 'warn: disk 81% full'),
+    (120, 'info: heartbeat'),
+    (180, 'warn: latency 900ms'),
+    (240, 'info: heartbeat'),
+    (300, 'warn: retry queue at 12'),
+    (360, 'info: sync done'),
+  ];
+  for (final (ms, line) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(line));
+  }
+  Timer(const Duration(milliseconds: 420), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // Bridge the push source once, then it is a typed pull pipeline.
+  final warnings = await fxStream(logFeed())
+      .filter((line) => line.startsWith('warn'))
+      .map((line) => line.toUpperCase())
+      .toList();
+
+  warnings.forEach(print);
+  print('warnings: ${warnings.length}');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>차이가 나는 이유</h2>
+  <p>
+    거의 다르지 않습니다 — 그리고 그것이 이 쌍의 요점입니다. 소스는
+    푸시 본연의 것, 내키는 대로 값을 내보내는 <code>Stream</code>이고,
+    RxDart는 그 모델 안에 머뭅니다: <code>mapNotNull</code>이 필터링과
+    포매팅을 연산자 하나로 하고, <code><a href="../tutorials/toList.html">toList</a></code>가 닫힐 때
+    수집합니다. 깨끗하고, 관용적이고, 끝.
+  </p>
+  <p>
+    FxDart 쪽은 스트림과 싸우지도, 소스를 다시 모델링하지도 않습니다
+    — <em>브리지</em>합니다. <code>fxStream</code>은 어떤
+    <code>Stream</code>이든 풀 기반 비동기 이터러블로 감싸고, 그
+    지점부터 코드는 리스트 위에 쓸 법한 것과 같은 타입 있는
+    체인입니다: <code><a href="../tutorials/filter.html">filter</a></code>, <code><a href="../tutorials/map.html">map</a></code>,
+    <code><a href="../tutorials/toList.html">toList</a></code>. 브리지는 밀려온 이벤트를 파이프라인이 요구할
+    때까지 버퍼링하므로, 아무것도 잃지 않고 순서도 보존됩니다. 이것은
+    대결이 아니라 협력의 예제입니다: 이벤트가 태어나는 가장자리에서는
+    스트림을 스트림으로 두고, 타입 있는 요구 주도 처리를 원하는
+    순간에 풀 파이프라인으로 건너오세요 — 두 모델은 한 줄로
+    합성됩니다. 무승부, 그것도 의도된 무승부입니다.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="tee-the-pipeline.html">← 이전: 소스 하나, 독립 리더 둘</a>
+    <a href="pipeline-into-stream.html">다음: 파이프라인이 스트림 소비자로 이어질 때 →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

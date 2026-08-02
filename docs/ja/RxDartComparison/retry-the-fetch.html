@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Retry the flaky fetch — RxDart vs FxDart</title>
+  <meta name="description" content="A fetch that fails twice then succeeds — Rx.retry re-subscribes a stream factory, fxdart retry re-runs a Future, both in one call.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/RxDartComparison/retry-the-fetch.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/retry-the-fetch.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/retry-the-fetch.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/retry-the-fetch.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/retry-the-fetch.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/retry-the-fetch.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/retry-the-fetch.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/retry-the-fetch.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/retry-the-fetch.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">ホーム</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="../../RxDartComparison/retry-the-fetch.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/retry-the-fetch.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/retry-the-fetch.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/retry-the-fetch.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/retry-the-fetch.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/retry-the-fetch.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/retry-the-fetch.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #27 · <strong>Retry the flaky fetch</strong></p>
+  <h1>Retry the flaky fetch</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/retry.html">retry</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    The manifest endpoint resets the connection exactly twice before
+    serving its payload. Retry until it succeeds, with a budget of three
+    attempts in total, then print the payload and how many attempts it
+    took. The failure injection is deterministic and in the code; both
+    versions must print the lines shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">manifest 2026-08 (12 entries)
+attempts: 3</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="d3209dcfb919f05b">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+var attempts = 0;
+
+/// The release manifest endpoint: resets the connection exactly twice,
+/// then serves the payload.
+Future<String> fetchManifest() async {
+  attempts += 1;
+  await Future<void>.delayed(const Duration(milliseconds: 15));
+  if (attempts < 3) throw StateError('connection reset');
+  return 'manifest 2026-08 (12 entries)';
+}
+
+Future<void> main() async {
+  // Rx.retry re-subscribes the stream FACTORY on error — up to 2 retries
+  // after the first attempt, so 3 attempts in total.
+  final payload =
+      await Rx.retry(() => Rx.fromCallable(fetchManifest), 2).first;
+
+  print(payload);
+  print('attempts: $attempts');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="29b79d9937fe1483">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+var attempts = 0;
+
+/// The release manifest endpoint: resets the connection exactly twice,
+/// then serves the payload.
+Future<String> fetchManifest() async {
+  attempts += 1;
+  await Future<void>.delayed(const Duration(milliseconds: 15));
+  if (attempts < 3) throw StateError('connection reset');
+  return 'manifest 2026-08 (12 entries)';
+}
+
+Future<void> main() async {
+  // retry re-runs the function — up to 3 attempts in total, rethrowing
+  // the last error once the budget is spent.
+  final payload = await retry(3, fetchManifest);
+
+  print(payload);
+  print('attempts: $attempts');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Scarcely at all — this is one call on each side, and that is the
+    point of the pair. The difference is what "try again" <em>means</em>
+    in each model. In RxDart a stream that has errored is dead, so
+    <code>Rx.retry</code> takes a <strong>factory</strong> and
+    re-subscribes it: retrying is re-listening, and the count argument is
+    the number of <em>retries</em> after the first attempt (here
+    <code>2</code>, for three attempts). In FxDart the flaky thing is a
+    <code>Future</code>-returning function, so
+    <code><a href="../tutorials/retry.html">retry</a></code> just calls it again — <code>attempts</code> is the
+    total budget (<code>3</code>), and the last error rethrows with its
+    original stack trace when the budget is spent.
+  </p>
+  <p>
+    A genuine tie. The shapes only diverge when the retried thing grows:
+    if it becomes a multi-value pipeline, RxDart keeps the same factory
+    idiom, while FxDart wraps the terminal
+    (<code>retry(3, () => fxAsync(…).toList())</code>) or moves to
+    per-element retries — a pair of its own, two examples ahead.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="resume-with-cache.html">← 前: Resume from cache when the source dies</a>
+    <a href="backoff-retry.html">次: Retry with growing backoff →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

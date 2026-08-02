@@ -64,25 +64,28 @@ void main(List<String> args) {
       pages.add(_PageRef(locale, 'tutorials/$slug.html', page.translated));
     }
 
-    // Dart vs FxDart comparison.
-    final cmpIndex = _loadPage('pages/comparison.md', locale);
-    final cmpPages = [
-      for (final file in _comparisonFiles())
-        _loadPage('comparison/${file.split('/').last}', locale),
-    ]..sort((a, b) =>
-        int.parse(a.get('order')).compareTo(int.parse(b.get('order'))));
-    written[_out(locale, 'DartComparison/index.html')] =
-        _renderComparisonIndex(locale, locales, chrome, cmpIndex, cmpPages);
-    pages.add(
-        _PageRef(locale, 'DartComparison/index.html', cmpIndex.translated));
-    for (var i = 0; i < cmpPages.length; i++) {
-      final page = cmpPages[i];
-      final path = 'DartComparison/${page.get('slug')}.html';
-      written[_out(locale, path)] = _renderComparison(
-          locale, locales, chrome, page,
-          prev: i > 0 ? cmpPages[i - 1] : null,
-          next: i < cmpPages.length - 1 ? cmpPages[i + 1] : null);
-      pages.add(_PageRef(locale, path, page.translated));
+    // The comparison families: Dart vs FxDart, RxDart vs FxDart.
+    for (final family in _cmpFamilies) {
+      final cmpIndex = _loadPage(family.indexMd, locale);
+      final cmpPages = [
+        for (final file in _comparisonFiles(family.contentDir))
+          _loadPage('${family.contentDir}/${file.split('/').last}', locale),
+      ]..sort((a, b) =>
+          int.parse(a.get('order')).compareTo(int.parse(b.get('order'))));
+      written[_out(locale, '${family.outDir}/index.html')] =
+          _renderComparisonIndex(locale, locales, chrome, cmpIndex, cmpPages,
+              family);
+      pages.add(_PageRef(
+          locale, '${family.outDir}/index.html', cmpIndex.translated));
+      for (var i = 0; i < cmpPages.length; i++) {
+        final page = cmpPages[i];
+        final path = '${family.outDir}/${page.get('slug')}.html';
+        written[_out(locale, path)] = _renderComparison(
+            locale, locales, chrome, page, family,
+            prev: i > 0 ? cmpPages[i - 1] : null,
+            next: i < cmpPages.length - 1 ? cmpPages[i + 1] : null);
+        pages.add(_PageRef(locale, path, page.translated));
+      }
     }
   }
 
@@ -123,9 +126,11 @@ void main(List<String> args) {
 List<String> _translatable() => [
       'pages/index.md',
       'pages/101.md',
-      'pages/comparison.md',
+      for (final family in _cmpFamilies) family.indexMd,
       for (final f in _tutorialFiles()) 'tutorials/${f.split('/').last}',
-      for (final f in _comparisonFiles()) 'comparison/${f.split('/').last}',
+      for (final family in _cmpFamilies)
+        for (final f in _comparisonFiles(family.contentDir))
+          '${family.contentDir}/${f.split('/').last}',
     ];
 
 /// Records the current English hash for every existing translation. Run this
@@ -235,13 +240,17 @@ List<String> _tutorialFiles() => (Directory('$root/content/tutorials')
         .toList()
       ..sort());
 
-List<String> _comparisonFiles() => (Directory('$root/content/comparison')
-        .listSync()
-        .whereType<File>()
-        .map((f) => f.path)
-        .where((p) => p.endsWith('.md'))
-        .toList()
-      ..sort());
+List<String> _comparisonFiles(String contentDir) {
+  final dir = Directory('$root/content/$contentDir');
+  if (!dir.existsSync()) return const [];
+  return dir
+      .listSync()
+      .whereType<File>()
+      .map((f) => f.path)
+      .where((p) => p.endsWith('.md'))
+      .toList()
+    ..sort();
+}
 
 // --- content ----------------------------------------------------------------
 
@@ -503,6 +512,7 @@ String _header(
       <a href="${p}index.html"${cls('home')}>${chrome['navHome']}</a>
       <a href="${p}101/index.html"${cls('101')}>${chrome['nav101']}</a>
       <a href="${p}DartComparison/index.html"${cls('compare')}>${chrome['navCompare']}</a>
+      <a href="${p}RxDartComparison/index.html"${cls('compareRx')}>${chrome['navCompareRx']}</a>
       <a href="$apiHref">${chrome['navApi']}</a>
       <a href="$repoUrl">GitHub</a>
       <a href="$fxtsUrl">FxTS</a>
@@ -693,25 +703,101 @@ String _renderTutorial(
   return b.toString();
 }
 
-// --- Dart vs FxDart comparison ----------------------------------------------
+// --- comparison families ------------------------------------------------------
+//
+// The site carries two side-by-side comparison sections built from the same
+// machinery: Dart vs FxDart (the original) and RxDart vs FxDart. A family
+// bundles everything that differs between them — directories, the left-hand
+// panel, chrome keys, verdict vocabulary — so the renderers stay shared.
 
-const _verdictKeys = {
-  'fxdart': 'cmpVerdictFxdart',
-  'tie': 'cmpVerdictTie',
-  'native': 'cmpVerdictNative',
-};
+class _CmpFamily {
+  const _CmpFamily({
+    required this.contentDir,
+    required this.codeDir,
+    required this.indexMd,
+    required this.outDir,
+    required this.leftFile,
+    required this.leftKey,
+    required this.leftSide,
+    required this.navActive,
+    required this.navKey,
+    required this.crumbKey,
+    required this.tierPrefix,
+    required this.verdictKeys,
+    required this.picks,
+    required this.bench,
+  });
+
+  final String contentDir; // page markdown under content/
+  final String codeDir; // code + expected.txt under content/
+  final String indexMd; // the TOC page source
+  final String outDir; // docs/<outDir>/
+  final String leftFile; // left panel source file name
+  final String leftKey; // chrome key of the left panel heading
+  final String leftSide; // css suffix of the left panel
+  final String navActive; // header active-tab id
+  final String navKey; // chrome key of the header tab label
+  final String crumbKey; // chrome key of the breadcrumb / back link
+  final String tierPrefix; // chrome key prefix of the tier headings
+  final Map<String, String> verdictKeys; // verdict value -> chrome key
+  final List<int> picks; // orders of the curated "read these" list
+  final bool bench; // whether pages get a Benchmark section
+}
+
+const _cmpFamilies = [
+  _CmpFamily(
+    contentDir: 'comparison',
+    codeDir: 'code-comparison',
+    indexMd: 'pages/comparison.md',
+    outDir: 'DartComparison',
+    leftFile: 'native.dart',
+    leftKey: 'cmpNative',
+    leftSide: 'native',
+    navActive: 'compare',
+    navKey: 'navCompare',
+    crumbKey: 'crumbCompare',
+    tierPrefix: 'cmpTier',
+    verdictKeys: {
+      'fxdart': 'cmpVerdictFxdart',
+      'tie': 'cmpVerdictTie',
+      'native': 'cmpVerdictNative',
+    },
+    picks: [1, 11, 30, 41, 50],
+    bench: true,
+  ),
+  _CmpFamily(
+    contentDir: 'comparison-rx',
+    codeDir: 'code-comparison-rx',
+    indexMd: 'pages/comparison-rx.md',
+    outDir: 'RxDartComparison',
+    leftFile: 'rxdart.dart',
+    leftKey: 'cmpRxdart',
+    leftSide: 'rxdart',
+    navActive: 'compareRx',
+    navKey: 'navCompareRx',
+    crumbKey: 'crumbCompareRx',
+    tierPrefix: 'cmpRxTier',
+    verdictKeys: {
+      'fxdart': 'cmpVerdictFxdart',
+      'tie': 'cmpVerdictTie',
+      'rxdart': 'cmpVerdictRxdart',
+    },
+    picks: [1, 15, 29, 35, 45],
+    bench: false,
+  ),
+];
 
 String _escapeHtml(String s) =>
     s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
 /// The verdict badge (and, for async examples, the async badge). The verdict
 /// is structure, not prose — an unknown value is a typo, not a new category.
-String _cmpBadges(Map<String, String> chrome, Page page) {
+String _cmpBadges(Map<String, String> chrome, Page page, _CmpFamily family) {
   final verdict = page.get('verdict');
-  final key = _verdictKeys[verdict];
+  final key = family.verdictKeys[verdict];
   if (key == null) {
     throw StateError('${page.get('slug')}: unknown verdict `$verdict` '
-        '(expected one of: ${_verdictKeys.keys.join(', ')})');
+        '(expected one of: ${family.verdictKeys.keys.join(', ')})');
   }
   final b = StringBuffer(
       '<span class="badge verdict-$verdict">${chrome[key]}</span>');
@@ -778,11 +864,11 @@ Set<String> _linkableFunctions(Page page) {
 
 /// Expands {{root}}, {{comparison}} (the side-by-side dual playground) and
 /// {{output}} (the harness-verified expected output) for a comparison page.
-/// Code and expected output live in `content/code-comparison/<slug>/` and are
+/// Code and expected output live in `content/<codeDir>/<slug>/` and are
 /// locale-invariant, like content/code/.
-String _injectComparisonCode(
-    String body, String slug, int depth, Map<String, String> chrome) {
-  final dir = '$root/content/code-comparison/$slug';
+String _injectComparisonCode(String body, String slug, int depth,
+    Map<String, String> chrome, _CmpFamily family) {
+  final dir = '$root/content/${family.codeDir}/$slug';
 
   body = body.replaceAll('{{root}}', _rel(depth));
 
@@ -803,7 +889,7 @@ $code
     }
 
     return '<div class="comparison">\n'
-        '${panel('native.dart', 'cmpNative', 'native')}\n'
+        '${panel(family.leftFile, family.leftKey, family.leftSide)}\n'
         '${panel('fxdart.dart', 'cmpFxdart', 'fxdart')}\n'
         '  </div>';
   }());
@@ -811,8 +897,8 @@ $code
   return body.replaceAll('{{output}}', () {
     final f = File('$dir/expected.txt');
     if (!f.existsSync()) {
-      throw StateError(
-          '$slug: missing expected.txt — run `dart run tool/check_comparison.dart`');
+      throw StateError('$slug: missing expected.txt — run '
+          '`dart run tool/check_comparison.dart${family.bench ? '' : ' --rx'}`');
     }
     final out = _escapeHtml(f.readAsStringSync().trimRight());
     return '<details class="cmp-expected">\n'
@@ -962,22 +1048,20 @@ ${row('cmpFxdart', 'fxdart', fxVal)}
       .toString();
 }
 
-/// The orders of the five examples the TOC recommends to a reader in a hurry.
-const _cmpPicks = [1, 11, 30, 41, 50];
-
 String _renderComparisonIndex(
   Locale locale,
   List<Locale> locales,
   Map<String, String> chrome,
   Page page,
   List<Page> examples,
+  _CmpFamily family,
 ) {
   final depth = locale.depth + 1;
+  final indexPath = '${family.outDir}/index.html';
   final b = StringBuffer()
-    ..write(_head(locale, locales, page, 'DartComparison/index.html', depth,
-        playground: false))
+    ..write(_head(locale, locales, page, indexPath, depth, playground: false))
     ..write(_header(
-        locale, locales, chrome, 'DartComparison/index.html', depth, 'compare'))
+        locale, locales, chrome, indexPath, depth, family.navActive))
     ..writeln('<main>')
     ..write(_banner(chrome, page))
     // The TOC intro mixes fxdart vocabulary with native mentions (`where`,
@@ -985,7 +1069,7 @@ String _renderComparisonIndex(
     ..writeln(page.body.replaceAll('{{root}}', _rel(depth)));
 
   final picks = [
-    for (final n in _cmpPicks)
+    for (final n in family.picks)
       for (final e in examples)
         if (e.get('order') == '$n') e,
   ];
@@ -1006,10 +1090,11 @@ String _renderComparisonIndex(
     ..writeln('  <div class="cmp-filter" hidden>')
     ..writeln('    <button data-filter="all" class="active">'
         '${chrome['cmpFilterAll']}</button>')
-    ..writeln('    <button data-filter="async">${chrome['cmpAsyncBadge']}</button>')
-    ..writeln('    <button data-filter="fxdart">${chrome['cmpVerdictFxdart']}</button>')
-    ..writeln('    <button data-filter="tie">${chrome['cmpVerdictTie']}</button>')
-    ..writeln('    <button data-filter="native">${chrome['cmpVerdictNative']}</button>')
+    ..writeln('    <button data-filter="async">${chrome['cmpAsyncBadge']}</button>');
+  for (final e in family.verdictKeys.entries) {
+    b.writeln('    <button data-filter="${e.key}">${chrome[e.value]}</button>');
+  }
+  b
     ..writeln('    <input type="search" placeholder="${chrome['cmpFilterFn']}">')
     ..writeln('  </div>');
 
@@ -1019,8 +1104,8 @@ String _renderComparisonIndex(
     b
       ..writeln('')
       ..writeln('  <section class="cmp-tier">')
-      ..writeln('  <h2>${chrome['cmpTier$tier']}</h2>')
-      ..writeln('  <p class="dim">${chrome['cmpTier${tier}Blurb']}</p>')
+      ..writeln('  <h2>${chrome['${family.tierPrefix}$tier']}</h2>')
+      ..writeln('  <p class="dim">${chrome['${family.tierPrefix}${tier}Blurb']}</p>')
       ..writeln('  <ol class="cmp-list">');
     for (final e in rows) {
       final fns = e
@@ -1036,7 +1121,7 @@ String _renderComparisonIndex(
         ..writeln('        <span class="cmp-num">${e.get('order')}</span>')
         ..writeln('        <span class="cmp-row-body">')
         ..writeln('          <strong>${e.get('heading')}</strong> '
-            '${_cmpBadges(chrome, e)}')
+            '${_cmpBadges(chrome, e, family)}')
         ..writeln('          <span class="dim">${e.get('description')}</span>')
         ..writeln('        </span>')
         ..writeln('      </a>')
@@ -1061,26 +1146,27 @@ String _renderComparison(
   Locale locale,
   List<Locale> locales,
   Map<String, String> chrome,
-  Page page, {
+  Page page,
+  _CmpFamily family, {
   Page? prev,
   Page? next,
 }) {
   final depth = locale.depth + 1;
   final slug = page.get('slug');
-  final path = 'DartComparison/$slug.html';
+  final path = '${family.outDir}/$slug.html';
   final p = _rel(depth);
 
   final b = StringBuffer()
     ..write(_head(locale, locales, page, path, depth))
-    ..write(_header(locale, locales, chrome, path, depth, 'compare'))
+    ..write(_header(locale, locales, chrome, path, depth, family.navActive))
     // Two editors side by side need more room than the prose column.
     ..writeln('<main class="cmp-wide">')
     ..write(_banner(chrome, page))
     ..writeln('  <p class="breadcrumb">'
-        '<a href="${p}DartComparison/index.html">${chrome['crumbCompare']}</a> › '
+        '<a href="$p${family.outDir}/index.html">${chrome[family.crumbKey]}</a> › '
         '#${page.get('order')} · <strong>${page.get('heading')}</strong></p>')
     ..writeln('  <h1>${page.get('heading')}</h1>')
-    ..writeln('  <p class="cmp-meta">${_cmpBadges(chrome, page)}</p>')
+    ..writeln('  <p class="cmp-meta">${_cmpBadges(chrome, page, family)}</p>')
     ..writeln('  ${_cmpChips(page)}')
     // Auto-link before code injection so the regex only ever sees prose,
     // never the playground code blocks.
@@ -1088,9 +1174,13 @@ String _renderComparison(
         _autoLinkFunctions(page.body, _linkableFunctions(page)),
         slug,
         depth,
-        chrome))
-    ..write(_cmpBenchSection(slug, chrome,
-        isAsync: page.get('async') == 'true'))
+        chrome,
+        family));
+  if (family.bench) {
+    b.write(_cmpBenchSection(slug, chrome,
+        isAsync: page.get('async') == 'true'));
+  }
+  b
     ..writeln('')
     ..writeln('  <nav class="tut-nav">');
   if (prev != null) {
@@ -1098,7 +1188,7 @@ String _renderComparison(
         '← ${chrome['prevPrefix']}${prev.get('heading')}</a>');
   } else {
     b.writeln(
-        '    <a href="${p}DartComparison/index.html">← ${chrome['crumbCompare']}</a>');
+        '    <a href="$p${family.outDir}/index.html">← ${chrome[family.crumbKey]}</a>');
   }
   if (next != null) {
     b.writeln('    <a href="${next.get('slug')}.html">'

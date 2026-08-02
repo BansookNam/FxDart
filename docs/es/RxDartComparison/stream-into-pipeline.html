@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Un stream alimenta un pipeline tipado — RxDart vs FxDart</title>
+  <meta name="description" content="Un stream de logs en vivo fluye hacia un pipeline pull tipado a través de fxStream — conservar los warnings, ponerlos en mayúsculas y contar, a ambos lados del puente.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/stream-into-pipeline.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/stream-into-pipeline.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/stream-into-pipeline.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/stream-into-pipeline.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/stream-into-pipeline.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/stream-into-pipeline.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/stream-into-pipeline.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/stream-into-pipeline.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../RxDartComparison/stream-into-pipeline.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/stream-into-pipeline.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/stream-into-pipeline.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/stream-into-pipeline.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/stream-into-pipeline.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/stream-into-pipeline.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/stream-into-pipeline.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #49 · <strong>Un stream alimenta un pipeline tipado</strong></p>
+  <h1>Un stream alimenta un pipeline tipado</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/toList.html">toList</a></li></ul>
+  <h2>Requisito</h2>
+  <p>
+    Un feed de logs en vivo emite siete líneas con un calendario fijo y
+    se cierra. Conserva solo los warnings, ponlos en mayúsculas para el
+    canal de incidentes, e imprímelos con un conteo final. El feed está
+    simulado en el código (de forma idéntica en ambos lados); las dos
+    versiones deben imprimir las líneas que aparecen bajo
+    <em>Salida esperada</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Salida esperada</summary>
+    <pre class="code">WARN: DISK 81% FULL
+WARN: LATENCY 900MS
+WARN: RETRY QUEUE AT 12
+warnings: 3</pre>
+  </details>
+
+  <h2>Lado a lado</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="4099e062dda8538b">
+<textarea>
+import 'dart:async';
+
+import 'package:rxdart/rxdart.dart';
+
+/// A live log feed: seven lines on a fixed schedule, then it closes.
+Stream<String> logFeed() {
+  final c = StreamController<String>();
+  const events = [
+    (0, 'info: service up'),
+    (60, 'warn: disk 81% full'),
+    (120, 'info: heartbeat'),
+    (180, 'warn: latency 900ms'),
+    (240, 'info: heartbeat'),
+    (300, 'warn: retry queue at 12'),
+    (360, 'info: sync done'),
+  ];
+  for (final (ms, line) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(line));
+  }
+  Timer(const Duration(milliseconds: 420), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // The stream is the model: filter-and-format in one rxdart operator.
+  final warnings = await logFeed()
+      .mapNotNull((line) => line.startsWith('warn') ? line.toUpperCase() : null)
+      .toList();
+
+  warnings.forEach(print);
+  print('warnings: ${warnings.length}');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="5c193644f22d1013">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// A live log feed: seven lines on a fixed schedule, then it closes.
+Stream<String> logFeed() {
+  final c = StreamController<String>();
+  const events = [
+    (0, 'info: service up'),
+    (60, 'warn: disk 81% full'),
+    (120, 'info: heartbeat'),
+    (180, 'warn: latency 900ms'),
+    (240, 'info: heartbeat'),
+    (300, 'warn: retry queue at 12'),
+    (360, 'info: sync done'),
+  ];
+  for (final (ms, line) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(line));
+  }
+  Timer(const Duration(milliseconds: 420), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // Bridge the push source once, then it is a typed pull pipeline.
+  final warnings = await fxStream(logFeed())
+      .filter((line) => line.startsWith('warn'))
+      .map((line) => line.toUpperCase())
+      .toList();
+
+  warnings.forEach(print);
+  print('warnings: ${warnings.length}');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Por qué difieren</h2>
+  <p>
+    Apenas difieren — y ese es el sentido de este par. La fuente es una
+    cosa nativa del push, un <code>Stream</code> que emite cuando le
+    place, y RxDart se queda en ese modelo: <code>mapNotNull</code>
+    filtra y formatea en un operador, <code><a href="../tutorials/toList.html">toList</a></code> recoge al
+    cierre. Limpio, idiomático, listo.
+  </p>
+  <p>
+    El lado FxDart no pelea contra el stream ni re-modela la fuente — le
+    <em>tiende un puente</em>. <code>fxStream</code> envuelve cualquier
+    <code>Stream</code> como un iterable async basado en pull, y a partir
+    de ahí el código es la misma cadena tipada que escribirías sobre una
+    lista: <code><a href="../tutorials/filter.html">filter</a></code>, <code><a href="../tutorials/map.html">map</a></code>, <code><a href="../tutorials/toList.html">toList</a></code>. El
+    puente guarda en buffer los eventos empujados hasta que el pipeline
+    los demanda, así que nada se pierde y el orden se conserva. Este es
+    un ejemplo de cooperación, no de contienda: deja que el stream sea un
+    stream en el borde donde nacen los eventos, y cruza a un pipeline
+    pull en el momento en que quieras procesamiento tipado y dirigido por
+    demanda — los dos modelos se componen en una línea. Empate, y
+    deliberadamente.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="tee-the-pipeline.html">← Anterior: Una fuente, dos lectores independientes</a>
+    <a href="pipeline-into-stream.html">Siguiente: Un pipeline alimenta a un consumidor de streams →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+row 1 (alpha) imported on attempt 1
+row 2 (bravo) imported on attempt 2
+row 3 (charlie) imported on attempt 1
+row 4 (delta) imported on attempt 2
+row 5 (echo) imported on attempt 1
+row 6 (foxtrot) imported on attempt 2

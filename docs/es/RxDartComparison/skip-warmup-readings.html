@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Salta las lecturas de calentamiento — RxDart vs FxDart</title>
+  <meta name="description" content="Descartar las lecturas bajas iniciales de una sonda y conservar todo lo demás — skipWhile y dropWhile son la misma compuerta de un solo sentido; hasta los operadores son del core.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/skip-warmup-readings.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/skip-warmup-readings.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/skip-warmup-readings.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/skip-warmup-readings.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/skip-warmup-readings.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/skip-warmup-readings.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/skip-warmup-readings.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/skip-warmup-readings.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../RxDartComparison/skip-warmup-readings.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/skip-warmup-readings.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/skip-warmup-readings.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/skip-warmup-readings.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/skip-warmup-readings.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/skip-warmup-readings.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/skip-warmup-readings.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #4 · <strong>Salta las lecturas de calentamiento</strong></p>
+  <h1>Salta las lecturas de calentamiento</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Empate</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>Requisito</h2>
+  <p>
+    Una sonda de temperatura lee bajo mientras se calienta. Descarta las
+    lecturas <strong>iniciales</strong> por debajo de 20.0&nbsp;°C,
+    formatea todo lo que viene después de la primera lectura real —
+    incluidas caídas posteriores, que son datos de verdad — e imprime
+    cuántas lecturas sobrevivieron. Los datos están en el código; las dos
+    versiones deben imprimir las líneas que aparecen bajo
+    <em>Salida esperada</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Salida esperada</summary>
+    <pre class="code">Live: 21.4 °C
+Live: 20.9 °C
+Live: 18.7 °C
+Live: 22.3 °C
+Live: 23.0 °C
+Kept 5 of 8 readings</pre>
+  </details>
+
+  <h2>Lado a lado</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="1e1b3b9622e6fa4e">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+// One boot cycle of a temperature probe — it reads low until it warms up.
+const readings = [12.1, 15.8, 18.6, 21.4, 20.9, 18.7, 22.3, 23.0];
+const threshold = 20.0;
+
+Future<void> main() async {
+  // skipWhile drops only the LEADING low readings — once one reading
+  // clears the threshold, later dips (18.7) are real data and stay.
+  final live = await Stream.fromIterable(readings)
+      .skipWhile((r) => r < threshold)
+      .map((r) => 'Live: ${r.toStringAsFixed(1)} °C')
+      .toList();
+
+  live.forEach(print);
+  print('Kept ${live.length} of ${readings.length} readings');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="e115f70b747e59f2">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+// One boot cycle of a temperature probe — it reads low until it warms up.
+const readings = [12.1, 15.8, 18.6, 21.4, 20.9, 18.7, 22.3, 23.0];
+const threshold = 20.0;
+
+void main() {
+  // dropWhile drops only the LEADING low readings — once one reading
+  // clears the threshold, later dips (18.7) are real data and stay.
+  final live = fx(readings)
+      .dropWhile((r) => r < threshold)
+      .map((r) => 'Live: ${r.toStringAsFixed(1)} °C')
+      .toList();
+
+  live.forEach(print);
+  print('Kept ${live.length} of ${readings.length} readings');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Por qué difieren</h2>
+  <p>
+    No difieren, y ese es el hallazgo. <code>skipWhile</code> y
+    <code><a href="../tutorials/dropWhile.html">dropWhile</a></code> son la misma compuerta de un solo sentido:
+    descarta mientras el predicado se cumple, se abre de forma permanente
+    en el primer fallo y no vuelve a cerrarse — por eso la caída de
+    18.7&nbsp;°C posterior al calentamiento sobrevive en ambos lados. Es
+    una compuerta sobre la <em>posición en la secuencia</em>, no sobre el
+    valor, y ambos modelos tienen un nombre para ella.
+  </p>
+  <p>
+    Merece la pena notarlo: el panel RxDart es puro <code>dart:async</code>
+    en este trabajo — <code>skipWhile</code>, <code><a href="../tutorials/map.html">map</a></code> y
+    <code>toList</code> vienen todos en el <code>Stream</code> del core,
+    así que el import de RxDart no gana nada aquí. Así se ve el solape del
+    tier 1 desde la otra dirección: a veces el vocabulario compartido vive
+    en la propia plataforma. El único resto es el modelo de entrega — un
+    main <code>async</code> y un <code>await</code> para recolectar lo que
+    una cadena pull devuelve como un valor corriente, sin event loop de
+    por medio. Empate.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="first-over-budget-rx.html">← Anterior: Primera transacción por encima del presupuesto</a>
+    <a href="unique-visitors.html">Siguiente: Visitantes únicos, conservando la primera visita →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

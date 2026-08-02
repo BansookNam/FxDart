@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=11fedf83d3bdddf4">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
 </head>
 <body>
 <header class="site-header">
@@ -27,6 +27,7 @@
       <a href="../index.html">ホーム</a>
       <a href="../101/index.html">FxDart 101</a>
       <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html">RxDart vs FxDart</a>
       <a href="../101/index.html#api">API チュートリアル</a>
       <a href="https://github.com/bansooknam/fxDart">GitHub</a>
       <a href="https://github.com/marpple/FxTS">FxTS</a>
@@ -112,7 +113,7 @@ void main() {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="325ae384015ec2f1">
+      <div class="playground" data-pg="635700f8647f1b0f">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -175,26 +176,26 @@ void main() {
       <h4>Time <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:40.8%"></span></span>
-        <span class="bench-val">2.2 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:38.1%"></span></span>
+        <span class="bench-val">2.1 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">5.3 µs</span>
+        <span class="bench-val">5.5 µs</span>
       </div>
     </div>
     <div class="bench-metric">
       <h4>Peak memory <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">16.6 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:99.9%"></span></span>
+        <span class="bench-val">16.5 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:99.9%"></span></span>
-        <span class="bench-val">16.5 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">16.6 MB</span>
       </div>
     </div>
   </div>
@@ -204,26 +205,26 @@ void main() {
       <h4>Time <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:38.1%"></span></span>
-        <span class="bench-val">108 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:38.2%"></span></span>
+        <span class="bench-val">110 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">283 µs</span>
+        <span class="bench-val">287 µs</span>
       </div>
     </div>
     <div class="bench-metric">
-      <h4>Peak memory <span class="badge verdict-tie">Tie</span></h4>
+      <h4>Peak memory <span class="badge verdict-native">Native wins</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:95.4%"></span></span>
-        <span class="bench-val">17.0 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:94.8%"></span></span>
+        <span class="bench-val">16.9 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">17.8 MB</span>
+        <span class="bench-val">17.9 MB</span>
       </div>
     </div>
   </div>
@@ -233,26 +234,26 @@ void main() {
       <h4>Time <span class="badge verdict-native">Native wins</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:39.1%"></span></span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:39.4%"></span></span>
         <span class="bench-val">11.4 ms</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">29.1 ms</span>
+        <span class="bench-val">28.9 ms</span>
       </div>
     </div>
     <div class="bench-metric">
       <h4>Peak memory <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:96.7%"></span></span>
-        <span class="bench-val">120.0 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:96.2%"></span></span>
+        <span class="bench-val">119.4 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">124.0 MB</span>
+        <span class="bench-val">124.1 MB</span>
       </div>
     </div>
   </div>
@@ -270,7 +271,7 @@ void main() {
   <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=11fedf83d3bdddf4";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

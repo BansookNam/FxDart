@@ -1,0 +1,8 @@
+start: 20
++40: 60
+-25: 35
+-50: -15 (backorder)
++30: 15
+-20: -5 (backorder)
+-10: -15 (backorder)
++45: 30

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>파이프라인이 스트림 소비자로 이어질 때 — RxDart vs FxDart</title>
+  <meta name="description" content="순서를 지키는 mapConcurrent fetch가 결과를 toStream으로 스트림 소비자에게 넘깁니다 — 반대 방향으로 건넌 다리.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/pipeline-into-stream.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/pipeline-into-stream.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/pipeline-into-stream.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/pipeline-into-stream.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/pipeline-into-stream.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/pipeline-into-stream.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/pipeline-into-stream.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/pipeline-into-stream.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../RxDartComparison/pipeline-into-stream.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/pipeline-into-stream.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/pipeline-into-stream.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/pipeline-into-stream.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/pipeline-into-stream.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/pipeline-into-stream.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/pipeline-into-stream.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #50 · <strong>파이프라인이 스트림 소비자로 이어질 때</strong></p>
+  <h1>파이프라인이 스트림 소비자로 이어질 때</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/mapConcurrent.html">mapConcurrent</a></li><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/streams.html">streams</a></li></ul>
+  <h2>요구사항</h2>
+  <p>
+    주문 상태 다섯 건을 가져오되 동시 진행 요청은 최대 두 개, 결과는
+    소스 순서대로 — 그런 다음 결과를 둘씩 배치로 묶어 각 배치를
+    출력하는 하류 소비자에게 넘기세요. 조회 지연은 코드에 고정되어
+    있습니다; 두 버전 모두 <em>예상 출력</em> 아래에 표시된 줄들을
+    출력해야 합니다.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>예상 출력</summary>
+    <pre class="code">batch 1: A-101 shipped | A-102 packed
+batch 2: A-103 allocated | A-104 delayed
+batch 3: A-105 shipped</pre>
+  </details>
+
+  <h2>나란히 보기</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="6616604438d9f2ae">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+const orderIds = ['A-101', 'A-102', 'A-103', 'A-104', 'A-105'];
+const statuses = {
+  'A-101': 'shipped',
+  'A-102': 'packed',
+  'A-103': 'allocated',
+  'A-104': 'delayed',
+  'A-105': 'shipped',
+};
+const delaysMs = {
+  'A-101': 60,
+  'A-102': 150,
+  'A-103': 180,
+  'A-104': 200,
+  'A-105': 210,
+};
+
+Future<String> fetchStatus(String id) async {
+  await Future.delayed(Duration(milliseconds: delaysMs[id]!));
+  return '$id ${statuses[id]}';
+}
+
+Future<void> main() async {
+  // Streams end to end: bounded concurrent fetch, then buffer into pairs.
+  final batches = await Stream.fromIterable(orderIds)
+      .flatMap((id) => Stream.fromFuture(fetchStatus(id)), maxConcurrent: 2)
+      .bufferCount(2)
+      .toList();
+
+  for (final (i, batch) in batches.indexed) {
+    print('batch ${i + 1}: ${batch.join(' | ')}');
+  }
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="58552a11ba925dfd">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+const orderIds = ['A-101', 'A-102', 'A-103', 'A-104', 'A-105'];
+const statuses = {
+  'A-101': 'shipped',
+  'A-102': 'packed',
+  'A-103': 'allocated',
+  'A-104': 'delayed',
+  'A-105': 'shipped',
+};
+const delaysMs = {
+  'A-101': 60,
+  'A-102': 150,
+  'A-103': 180,
+  'A-104': 200,
+  'A-105': 210,
+};
+
+Future<String> fetchStatus(String id) async {
+  await Future.delayed(Duration(milliseconds: delaysMs[id]!));
+  return '$id ${statuses[id]}';
+}
+
+Future<void> main() async {
+  // The pipeline fetches 2 at a time in order, pairs the results with
+  // chunk(2) — fxdart's bufferCount — and toStream() hands the batches to
+  // any stream consumer; this one only prints.
+  final batches = fx(orderIds)
+      .toAsync()
+      .mapConcurrent(2, fetchStatus)
+      .chunk(2)
+      .toStream();
+
+  var i = 0;
+  await for (final b in batches) {
+    print('batch ${++i}: ${b.join(' | ')}');
+  }
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>차이가 나는 이유</h2>
+  <p>
+    RxDart는 끝에서 끝까지 스트림으로 달립니다:
+    <code>maxConcurrent: 2</code>를 단 <code>flatMap</code>이 fetch에
+    제한을 걸고 <code>bufferCount(2)</code>가 결과를 둘씩 짝짓습니다.
+    단서 하나가 가운데에 삽니다: 동시 <code>flatMap</code>은
+    <em>완료</em> 순서로 내보내므로, 이 패널이 소스 순서로 출력되는
+    것은 지연들이 우연히 그 순서로 완료되기 때문입니다 — 동시성
+    아래에서의 재정렬은 푸시 모델의 기본값이고, 일반적으로 소스
+    순서를 지키려면 모아서 정렬해야 합니다.
+  </p>
+  <p>
+    FxDart 패널은 이전 예제의 다리를 반대 방향으로 건넌 것입니다.
+    가져오는 절반은 풀 파이프라인이고 —
+    <code>mapConcurrent(2, …)</code>는 지연이 어떻게 굴든 구조적으로
+    순서를 지킵니다 — <code>chunk(2)</code>(FxDart의
+    <code>bufferCount</code>)가 결과를 둘씩 짝짓고,
+    <code>toStream()</code>이 배치들을 임의의 스트림 소비자에게
+    넘깁니다. 여기서 그 소비자는 출력만 하지만, RxDart 앱이라면
+    브리지된 스트림 위에서 Rx 연산자들로 계속 이어 갈 수 있습니다:
+    생산자는 누가 소비하는지 신경 쓰지 않습니다. 그 분업이 곧
+    판정입니다: 제한 있고, 순서 있고, 타입 있는 일은 풀 파이프라인에서
+    하고, 그것을 <code>Stream</code>으로 노출한 뒤, 푸시 어휘(버퍼링,
+    디바운싱, UI 바인딩)가 더 잘 맞는 곳부터는 푸시 세계가 이어받게
+    하세요. 무승부 — 다리가 곧 요점입니다.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="stream-into-pipeline.html">← 이전: 스트림이 타입 있는 파이프라인으로 흘러들 때</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>100 ms마다 호출 하나 — RxDart vs FxDart</title>
+  <meta name="description" content="최소 100 ms 간격의 핑 다섯 번, 단조 Stopwatch로 증명 — rx interval vs 순차 풀 체인의 매퍼 안에 넣은 평범한 delay.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/spaced-out-calls.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/spaced-out-calls.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/spaced-out-calls.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/spaced-out-calls.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/spaced-out-calls.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/spaced-out-calls.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/spaced-out-calls.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/spaced-out-calls.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../RxDartComparison/spaced-out-calls.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/spaced-out-calls.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/spaced-out-calls.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/spaced-out-calls.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/spaced-out-calls.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/spaced-out-calls.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/spaced-out-calls.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #39 · <strong>100 ms마다 호출 하나</strong></p>
+  <h1>100 ms마다 호출 하나</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>요구사항</h2>
+  <p>
+    속도 제한이 있는 엔드포인트에 핑 다섯 번을 보내되, 각 호출은 이전
+    호출보다 최소 <strong>100&nbsp;ms</strong> 뒤에 시작해야 합니다.
+    모든 호출의 시작을 단조 <code>Stopwatch</code>에 기록하고, 다섯
+    개의 응답을 출력한 뒤, 모든 간격이 제한을 지켰을 때만
+    <code>spaced: true</code>를 출력하세요. 두 버전 모두
+    <em>예상 출력</em> 아래에 표시된 줄들을 출력해야 합니다.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>예상 출력</summary>
+    <pre class="code">pong #1
+pong #2
+pong #3
+pong #4
+pong #5
+spaced: true</pre>
+  </details>
+
+  <h2>나란히 보기</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="142cae0d57c18595">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+final watch = Stopwatch()..start();
+final startsMs = <int>[];
+
+// One ping — records when it started, on a monotonic clock.
+Future<String> ping(int i) async {
+  startsMs.add(watch.elapsedMilliseconds);
+  await Future.delayed(const Duration(milliseconds: 10));
+  return 'pong #$i';
+}
+
+bool spaced(List<int> starts) {
+  for (var i = 1; i < starts.length; i++) {
+    if (starts[i] - starts[i - 1] < 100) return false;
+  }
+  return starts.length == 5;
+}
+
+Future<void> main() async {
+  // interval holds each event back 100 ms before it reaches the ping.
+  final responses = await Stream.fromIterable(const [1, 2, 3, 4, 5])
+      .interval(const Duration(milliseconds: 100))
+      .asyncMap(ping)
+      .toList();
+
+  responses.forEach(print);
+  print('spaced: ${spaced(startsMs)}');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="c4e75bcf3d658f73">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+final watch = Stopwatch()..start();
+final startsMs = <int>[];
+
+// One ping — records when it started, on a monotonic clock.
+Future<String> ping(int i) async {
+  startsMs.add(watch.elapsedMilliseconds);
+  await Future.delayed(const Duration(milliseconds: 10));
+  return 'pong #$i';
+}
+
+bool spaced(List<int> starts) {
+  for (var i = 1; i < starts.length; i++) {
+    if (starts[i] - starts[i - 1] < 100) return false;
+  }
+  return starts.length == 5;
+}
+
+Future<void> main() async {
+  final responses = await fx(const [1, 2, 3, 4, 5])
+      .toAsync()
+      .map((i) async {
+        // The pull pipeline is sequential — a delay in the mapper IS the pacing.
+        await Future.delayed(const Duration(milliseconds: 100));
+        return ping(i);
+      })
+      .toList();
+
+  responses.forEach(print);
+  print('spaced: ${spaced(startsMs)}');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>차이가 나는 이유</h2>
+  <p>
+    페이싱은 시간에 관한 일이므로 스트림이 이길 것이라 기대할 수
+    있습니다 — 그리고 실제로 RxDart에는 그것을 가리키는 단어가
+    있습니다: <code>interval</code>이 각 이벤트를 핑에 닿기 전에
+    100&nbsp;ms씩 붙들어 두고, 배압이 전체를 순차로 유지합니다.
+    연산자 하나, 요구사항 충족.
+  </p>
+  <p>
+    하지만 풀 파이프라인은 기본이 순차이고, 그것이 페이싱을 민망할
+    만큼 단순한 일로 바꿉니다: 지연을 <em>매퍼 안에</em> 넣으세요. 각
+    풀이 100&nbsp;ms 기다렸다가 호출합니다 — 이번 풀이 끝나기 전에는
+    다음 풀이 시작될 수 없으므로 간격은 구조적이고, 연산자는 필요
+    없습니다. Stopwatch 검증은 양쪽 모두 <code>spaced: true</code>를
+    출력합니다. 양쪽에 단서 하나씩 붙은 무승부라 부르겠습니다:
+    RxDart는 개념에 명시적으로 이름을 붙이고, 이는 다른 시간
+    연산자들로 가득한 파이프라인에서 더 잘 읽힙니다; FxDart는 그것을
+    요구의 한 줄짜리 귀결로 얻지만, 이 과제가 엄격히 직렬인 호출을
+    원하기 때문일 뿐입니다 — 자기 일정대로 도착하는 이벤트(진짜
+    이벤트 스트림)의 간격 조절에는 다리의 스트림
+    쪽(<code>fxStream</code>)과 RxDart의 시간 어휘로 손을 뻗으세요.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="crawl-the-pages.html">← 이전: 소진될 때까지 페이지 크롤링하기</a>
+    <a href="debounced-search.html">다음: 검색창 디바운스하기 →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

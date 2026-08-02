@@ -1,0 +1,3 @@
+winner: payload from eu-mirror
+completed fetches: 1
+loser fetch completed: false

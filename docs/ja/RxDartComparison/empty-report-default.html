@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A default line for an empty report — RxDart vs FxDart</title>
+  <meta name="description" content="Filter to a category with no matches and still print something — defaultIfEmpty on the stream vs ifEmpty on the pull chain, the same idea in both models.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/RxDartComparison/empty-report-default.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/empty-report-default.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/empty-report-default.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/empty-report-default.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/empty-report-default.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/empty-report-default.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/empty-report-default.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/empty-report-default.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/empty-report-default.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">ホーム</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="../../RxDartComparison/empty-report-default.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/empty-report-default.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/empty-report-default.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/empty-report-default.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/empty-report-default.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/empty-report-default.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/empty-report-default.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #10 · <strong>A default line for an empty report</strong></p>
+  <h1>A default line for an empty report</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/ifEmpty.html">ifEmpty</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    A spending report filters this month's transactions down to the
+    <code>travel</code> category — and there aren't any. An empty report
+    should not print nothing: it should print a single
+    <em>no travel spending</em> line instead. The data is in the code;
+    both versions must print the line shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">no travel spending recorded in August</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="7b703c5a24ff5c8c">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+class Tx {
+  final String date;
+  final String category;
+  final int amount;
+  const Tx(this.date, this.category, this.amount);
+}
+
+// This month's card transactions — not a single travel line among them.
+const txns = [
+  Tx('2026-08-01', 'groceries', 42),
+  Tx('2026-08-03', 'dining', 28),
+  Tx('2026-08-05', 'groceries', 17),
+  Tx('2026-08-08', 'utilities', 90),
+  Tx('2026-08-11', 'dining', 33),
+  Tx('2026-08-14', 'groceries', 25),
+];
+
+Future<void> main() async {
+  final report = await Stream.fromIterable(txns)
+      .where((t) => t.category == 'travel')
+      .map((t) => '${t.date}  travel  ${t.amount}')
+      .defaultIfEmpty('no travel spending recorded in August')
+      .toList();
+
+  report.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="fc220a1ce32bb385">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Tx {
+  final String date;
+  final String category;
+  final int amount;
+  const Tx(this.date, this.category, this.amount);
+}
+
+// This month's card transactions — not a single travel line among them.
+const txns = [
+  Tx('2026-08-01', 'groceries', 42),
+  Tx('2026-08-03', 'dining', 28),
+  Tx('2026-08-05', 'groceries', 17),
+  Tx('2026-08-08', 'utilities', 90),
+  Tx('2026-08-11', 'dining', 33),
+  Tx('2026-08-14', 'groceries', 25),
+];
+
+void main() {
+  final report = fx(txns)
+      .filter((t) => t.category == 'travel')
+      .map((t) => '${t.date}  travel  ${t.amount}')
+      .defaultIfEmpty('no travel spending recorded in August')
+      .toList();
+
+  report.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Hardly at all — and in the same place. "Emptiness needs a fallback"
+    is a problem both models
+    hit in exactly the same place — a downstream stage cannot tell
+    <em>filtered to nothing</em> from <em>never had anything</em> unless
+    the pipeline says what to emit in that case — and both libraries
+    answer with one operator. RxDart's <code>defaultIfEmpty</code> injects
+    the default when the source completes without an event; FxDart's
+    <code>defaultIfEmpty</code> (added in 0.7.2, openly borrowed from the
+    Rx vocabulary, with <code>ifEmpty(() =&gt; fallback)</code> as the
+    lazy whole-iterable form) yields it when the first pull finds
+    nothing.
+  </p>
+  <p>
+    The residual difference is the usual one in this Part: the stream
+    version has to know it is empty by <em>waiting for completion</em>,
+    so the whole program goes async over a fixed list, while the pull
+    version discovers emptiness synchronously on the first demand. That
+    cost is real but small here, and the operator parity is the story —
+    a genuine tie, and a nice example of the two libraries trading ideas
+    rather than competing.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="expand-order-lines.html">← 前: Flatten orders into lines</a>
+    <a href="upload-batches.html">次: Upload in batches of 4 →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

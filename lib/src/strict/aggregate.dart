@@ -130,6 +130,26 @@ Acc Function(Iterable<A>) reduceLazy<A, Acc>(
 ///
 /// Port of FxTS `sum`.
 num sum(Iterable<num> iterable) {
+  // Monomorphic lists take an indexed loop: no iterator, and the element
+  // loads stay unboxed. Values match the generic path exactly (same
+  // accumulation order; empty stays the int 0).
+  if (iterable is List<double>) {
+    var acc = 0.0;
+    final len = iterable.length;
+    if (len == 0) return 0;
+    for (var i = 0; i < len; i++) {
+      acc += iterable[i];
+    }
+    return acc;
+  }
+  if (iterable is List<int>) {
+    var acc = 0;
+    final len = iterable.length;
+    for (var i = 0; i < len; i++) {
+      acc += iterable[i];
+    }
+    return acc;
+  }
   // Unboxed accumulators with the boxed `num acc += v` sequence's exact
   // semantics: ints accumulate in an int until the first double arrives,
   // then accumulation switches to double seeded with the int total — the
@@ -159,10 +179,27 @@ num sum(Iterable<num> iterable) {
 /// Dart-native addition (FxTS has only the numeric `sum`); named after
 /// [maxBy]/[minBy] — Kotlin spells it `sumOf`.
 num sumBy<A>(num Function(A a) f, Iterable<A> iterable) {
-  // Same unboxed int-then-double accumulation as [sum].
+  // Same unboxed int-then-double accumulation as [sum]; lists iterate by
+  // index so no iterator is allocated.
   var iacc = 0;
   var dacc = 0.0;
   var isInt = true;
+  if (iterable is List<A>) {
+    final len = iterable.length;
+    for (var i = 0; i < len; i++) {
+      final v = f(iterable[i]);
+      if (isInt) {
+        if (v is int) {
+          iacc += v;
+          continue;
+        }
+        dacc = iacc.toDouble();
+        isInt = false;
+      }
+      dacc += v;
+    }
+    return isInt ? iacc : dacc;
+  }
   for (final a in iterable) {
     final v = f(a);
     if (isInt) {
@@ -195,6 +232,25 @@ String sumStrings(Iterable<String> iterable) =>
 ///
 /// Port of FxTS `average`.
 double average(Iterable<num> iterable) {
+  // Monomorphic-list fast paths, as in [sum].
+  if (iterable is List<double>) {
+    final len = iterable.length;
+    if (len == 0) return double.nan;
+    var acc = 0.0;
+    for (var i = 0; i < len; i++) {
+      acc += iterable[i];
+    }
+    return acc / len;
+  }
+  if (iterable is List<int>) {
+    final len = iterable.length;
+    if (len == 0) return double.nan;
+    var acc = 0;
+    for (var i = 0; i < len; i++) {
+      acc += iterable[i];
+    }
+    return acc / len;
+  }
   // Same unboxed int-then-double accumulation as [sum].
   var size = 0;
   var iacc = 0;
@@ -234,6 +290,15 @@ Future<double> averageAsync(FxAsyncIterable<num> iterable) async {
 /// Dart-native addition completing the by-key family
 /// ([sumBy] / [maxBy] / [minBy]).
 double averageBy<A>(num Function(A a) f, Iterable<A> iterable) {
+  if (iterable is List<A>) {
+    final len = iterable.length;
+    if (len == 0) return double.nan;
+    var total = 0.0;
+    for (var i = 0; i < len; i++) {
+      total += f(iterable[i]);
+    }
+    return total / len;
+  }
   var total = 0.0;
   var count = 0;
   for (final a in iterable) {

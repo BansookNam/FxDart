@@ -17,6 +17,42 @@
   "crumbCompare": "Dart vs FxDart",
   "@crumbCompare": { "description": "Comparison section name in breadcrumbs and back-links. Keep consistent with navCompare." },
 
+  "navCompareRx": "RxDart vs FxDart",
+  "@navCompareRx": { "description": "Top nav link to the RxDart-vs-FxDart comparison examples. 'RxDart' and 'FxDart' are product names — translate only 'vs' if the local idiom differs." },
+
+  "crumbCompareRx": "RxDart vs FxDart",
+  "@crumbCompareRx": { "description": "RxDart comparison section name in breadcrumbs and back-links. Keep consistent with navCompareRx." },
+
+  "cmpRxdart": "RxDart",
+  "@cmpRxdart": { "description": "Header of the left RxDart comparison panel. Product name — never translated." },
+
+  "cmpVerdictRxdart": "RxDart's turf",
+  "@cmpVerdictRxdart": { "description": "Verdict badge: the problem is genuinely push/time-shaped, so RxDart is the right tool here. 'RxDart' is the product name." },
+
+  "cmpRxTier1": "Part 1 · Same job, both libraries",
+  "@cmpRxTier1": { "description": "Heading of the first group of RxDart comparison examples: tasks both libraries express directly." },
+
+  "cmpRxTier1Blurb": "The overlap: transforms, filters and slices that exist in both vocabularies — pull chains vs stream transformers, side by side.",
+  "@cmpRxTier1Blurb": { "description": "Subtitle under the RxDart Part 1 heading." },
+
+  "cmpRxTier2": "Part 2 · Windows, state & order",
+  "@cmpRxTier2": { "description": "Heading of the second group of RxDart comparison examples: windowing, running state, dedup and ordering." },
+
+  "cmpRxTier2Blurb": "Buffers, pairs, running state and adjacency — where subtle semantic differences between push and pull start to show.",
+  "@cmpRxTier2Blurb": { "description": "Subtitle under the RxDart Part 2 heading." },
+
+  "cmpRxTier3": "Part 3 · Errors & resilience",
+  "@cmpRxTier3": { "description": "Heading of the third group of RxDart comparison examples: error handling, retries, timeouts, resources." },
+
+  "cmpRxTier3Blurb": "An untyped error channel vs errors as typed values — retry, timeout, fallbacks and resource lifetimes in both models.",
+  "@cmpRxTier3Blurb": { "description": "Subtitle under the RxDart Part 3 heading." },
+
+  "cmpRxTier4": "Part 4 · Concurrency, time & push",
+  "@cmpRxTier4": { "description": "Heading of the fourth group of RxDart comparison examples: concurrency limits, time-based operators, multicast — where the two models genuinely diverge." },
+
+  "cmpRxTier4Blurb": "Where the models split: demand-driven concurrency on one side, wall-clock and multicast on the other — including the examples where RxDart is simply the right tool.",
+  "@cmpRxTier4Blurb": { "description": "Subtitle under the RxDart Part 4 heading." },
+
   "cmpNative": "Native Dart",
   "@cmpNative": { "description": "Header of the left comparison panel: the implementation in plain Dart with no library." },
 

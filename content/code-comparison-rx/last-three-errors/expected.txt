@@ -1,0 +1,3 @@
+ERROR timeout contacting registry
+ERROR registry unreachable
+ERROR checksum mismatch on chunk 7

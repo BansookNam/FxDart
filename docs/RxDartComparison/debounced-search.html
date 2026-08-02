@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Debounce the search box — RxDart vs FxDart</title>
+  <meta name="description" content="Wait for the typing to go quiet before searching — one debounceTime operator on the event stream vs a hand-wired callback debouncer.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/debounced-search.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/debounced-search.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/debounced-search.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/debounced-search.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/debounced-search.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/debounced-search.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/debounced-search.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/debounced-search.html">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API Tutorials</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Language">
+      <span class="lang-label">Language</span>
+      <ul>
+        <li><a href="../RxDartComparison/debounced-search.html" hreflang="en" lang="en" aria-current="page">English</a></li>
+        <li><a href="../ko/RxDartComparison/debounced-search.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../zh/RxDartComparison/debounced-search.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../ja/RxDartComparison/debounced-search.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../es/RxDartComparison/debounced-search.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../pt-br/RxDartComparison/debounced-search.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../ru/RxDartComparison/debounced-search.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../RxDartComparison/index.html">RxDart vs FxDart</a> › #40 · <strong>Debounce the search box</strong></p>
+  <h1>Debounce the search box</h1>
+  <p class="cmp-meta"><span class="badge verdict-rxdart">RxDart's turf</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/debounce.html">debounce</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    A user types <code>f</code>, <code><a href="../tutorials/fx.html">fx</a></code>, <code>fxd</code> in a
+    quick burst, pauses, then types <code>fxdart</code>. Search only when
+    the typing has been quiet for 160&nbsp;ms — so exactly two searches
+    run (<code>fxd</code> and <code>fxdart</code>) — and print each
+    result. The keystroke schedule is simulated in the code; both versions
+    must print the lines shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">3 results for "fxd"
+12 results for "fxdart"</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="bd6dc1801bb59e6f">
+<textarea>
+import 'dart:async';
+
+import 'package:rxdart/rxdart.dart';
+
+/// Simulated keystrokes: a quick burst, a pause, one more query.
+Stream<String> keystrokes() {
+  final c = StreamController<String>();
+  const events = [(0, 'f'), (40, 'fx'), (80, 'fxd'), (800, 'fxdart')];
+  for (final (ms, q) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(q));
+  }
+  Timer(const Duration(milliseconds: 1500), c.close);
+  return c.stream;
+}
+
+const hits = {'fxd': 3, 'fxdart': 12};
+
+Future<String> search(String q) async {
+  await Future.delayed(const Duration(milliseconds: 20));
+  return '${hits[q]} results for "$q"';
+}
+
+Future<void> main() async {
+  final results = await keystrokes()
+      .debounceTime(const Duration(milliseconds: 160))
+      .asyncMap(search)
+      .toList();
+
+  results.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="0c6e7672eb13f4b5">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Simulated keystrokes: a quick burst, a pause, one more query.
+Stream<String> keystrokes() {
+  final c = StreamController<String>();
+  const events = [(0, 'f'), (40, 'fx'), (80, 'fxd'), (800, 'fxdart')];
+  for (final (ms, q) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(q));
+  }
+  Timer(const Duration(milliseconds: 1500), c.close);
+  return c.stream;
+}
+
+const hits = {'fxd': 3, 'fxdart': 12};
+
+Future<String> search(String q) async {
+  await Future.delayed(const Duration(milliseconds: 20));
+  return '${hits[q]} results for "$q"';
+}
+
+Future<void> main() async {
+  // fxdart's debounce is a callback wrapper, not a stream operator — the
+  // quiet queries have to be collected by hand, then searched as a pipeline.
+  final quiet = <String>[];
+  final debounced =
+      debounce<String>(quiet.add, const Duration(milliseconds: 160));
+  final done = Completer<void>();
+  final sub = keystrokes().listen(debounced.call,
+      // The trailing debounce window may still be pending at close.
+      onDone: () => Timer(const Duration(milliseconds: 200), done.complete));
+  await done.future;
+  await sub.cancel();
+
+  final results = await fx(quiet).toAsync().map(search).toList();
+
+  results.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    This is a <em>push</em> problem in its purest form: the interesting
+    thing is not the values but <strong>when they stop arriving</strong>.
+    That is exactly what a stream models, and RxDart says it
+    directly — <code>debounceTime(160ms)</code> on the
+    event stream, then search, then collect. Subscription, windowing and
+    the trailing edge at close are all handled by the operator.
+  </p>
+  <p>
+    FxDart has no time-based pipeline operators on purpose — a pull
+    pipeline has no "time between arrivals", only demand. Its
+    <code><a href="../tutorials/debounce.html">debounce</a></code> is the FxTS-style <em>callback wrapper</em>:
+    correct, but you wire it to the stream yourself, collect the quiet
+    queries by hand, wait out the trailing window at close, and only then
+    hand the survivors to a typed pipeline for the actual searches. The
+    honest verdict: on this side of the bridge, use RxDart — and if the
+    downstream work grows (typed error handling, ordered concurrent
+    fetches), pass the debounced stream through
+    <code>fxStream</code> and continue in FxDart from there.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="spaced-out-calls.html">← Previous: One call every 100 ms</a>
+    <a href="throttled-refresh.html">Next: Throttle the refresh button →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a>. Great thanks to <strong>Indong Yoo</strong> (CTO, Marpple) and the FxTS team for the ideas, semantics, and test suite this library is built on.</p>
+  <p>Playground compiles via the DartPad compile service. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Run","pgReset":"Reset","pgCompiling":"Compiling…","pgCompileError":"Compile error","pgError":"Error","pgLoading":"Loading runtime…","pgRunning":"Running…","pgNoOutput":"(no output)","pgLoadFailed":"Could not load the FxDart library"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

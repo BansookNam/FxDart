@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reportar cada error de validación — RxDart vs FxDart</title>
+  <meta name="description" content="Cada regla rota por formulario, no solo la primera — valores de error llanos en una cadena síncrona vs un canal de errores que solo puede llevar un error y cerrarse.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/all-validation-errors.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/all-validation-errors.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/all-validation-errors.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/all-validation-errors.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/all-validation-errors.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/all-validation-errors.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/all-validation-errors.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/all-validation-errors.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../RxDartComparison/all-validation-errors.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/all-validation-errors.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/all-validation-errors.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/all-validation-errors.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/all-validation-errors.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/all-validation-errors.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/all-validation-errors.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #33 · <strong>Reportar cada error de validación</strong></p>
+  <h1>Reportar cada error de validación</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/partition.html">partition</a></li></ul>
+  <h2>Requisito</h2>
+  <p>
+    Cinco formularios de registro del lote 2026-08 se comprueban contra
+    tres reglas (nombre presente, email con <code>@</code>, edad 18+). Un
+    formulario puede romper <strong>varias</strong> reglas — reporta cada
+    regla rota por formulario, y luego lista los formularios que pasaron.
+    Los datos están en el código; las dos versiones deben imprimir las
+    líneas que aparecen bajo <em>Salida esperada</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Salida esperada</summary>
+    <pre class="code">form #2: name is required; email is malformed; must be 18 or older
+form #4: email is malformed
+form #5: name is required; must be 18 or older
+valid: ana, cy</pre>
+  </details>
+
+  <h2>Lado a lado</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="376c62e8fed829b4">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+class Signup {
+  const Signup(this.id, this.name, this.email, this.age);
+  final int id;
+  final String name;
+  final String email;
+  final int age;
+}
+
+// The 2026-08 signup batch — three forms break at least one rule.
+const forms = [
+  Signup(1, 'ana', 'ana@example.com', 29),
+  Signup(2, '', 'bo.example.com', 17),
+  Signup(3, 'cy', 'cy@example.com', 41),
+  Signup(4, 'dee', 'dee-example.com', 35),
+  Signup(5, '', 'eli@example.com', 15),
+];
+
+List<String> ruleErrors(Signup s) => [
+      if (s.name.isEmpty) 'name is required',
+      if (!s.email.contains('@')) 'email is malformed',
+      if (s.age < 18) 'must be 18 or older',
+    ];
+
+Future<void> main() async {
+  // The error channel carries ONE error and ends the stream — raising the
+  // first broken rule would drop the rest, so accumulation has to stay on
+  // the data channel by hand. The stream contributes nothing here.
+  final results = await Stream.fromIterable(forms)
+      .map((s) => (form: s, errors: ruleErrors(s)))
+      .toList();
+
+  for (final r in results.where((r) => r.errors.isNotEmpty)) {
+    print('form #${r.form.id}: ${r.errors.join('; ')}');
+  }
+  final valid = results.where((r) => r.errors.isEmpty);
+  print('valid: ${valid.map((r) => r.form.name).join(', ')}');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="01af6791672a90e3">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+class Signup {
+  const Signup(this.id, this.name, this.email, this.age);
+  final int id;
+  final String name;
+  final String email;
+  final int age;
+}
+
+// The 2026-08 signup batch — three forms break at least one rule.
+const forms = [
+  Signup(1, 'ana', 'ana@example.com', 29),
+  Signup(2, '', 'bo.example.com', 17),
+  Signup(3, 'cy', 'cy@example.com', 41),
+  Signup(4, 'dee', 'dee-example.com', 35),
+  Signup(5, '', 'eli@example.com', 15),
+];
+
+List<String> ruleErrors(Signup s) => [
+      if (s.name.isEmpty) 'name is required',
+      if (!s.email.contains('@')) 'email is malformed',
+      if (s.age < 18) 'must be 18 or older',
+    ];
+
+void main() {
+  // Errors are plain values, so every broken rule survives to the report.
+  final (invalid, valid) = fx(forms)
+      .map((s) => (form: s, errors: ruleErrors(s)))
+      .partition((r) => r.errors.isNotEmpty);
+
+  for (final r in invalid) {
+    print('form #${r.form.id}: ${r.errors.join('; ')}');
+  }
+  print('valid: ${valid.map((r) => r.form.name).join(', ')}');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Por qué difieren</h2>
+  <p>
+    La validación acumulativa es el trabajo que el canal de errores de Rx
+    es estructuralmente incapaz de hacer. Un error de stream lleva
+    exactamente un objeto, y emitirlo termina el stream — lanza la
+    primera regla rota y ni los demás fallos de ese formulario ni los
+    formularios restantes se verán jamás. Cada operador de recuperación
+    (<code>onErrorReturn</code>, <code>onErrorResumeNext</code>) está
+    construido para esa forma de un-error-y-fin. Así que la versión
+    RxDart funcional que se muestra aquí abandona en silencio el canal de
+    errores: mapea cada formulario a un registro de sus fallos en el
+    canal de <em>datos</em> — y llegados a ese punto el stream aporta un
+    <code>main</code> async y un <code>toList</code>, nada más.
+  </p>
+  <p>
+    El lado FxDart es la misma idea sin el envoltorio: los errores son
+    valores llanos, así que un <code><a href="../tutorials/map.html">map</a></code> + <code><a href="../tutorials/partition.html">partition</a></code>
+    síncronos entregan los formularios fallidos (con <em>todos</em> sus
+    errores) y los válidos en una sola expresión. Y como FxDart trata los
+    errores como valores en todas partes, este patrón escala más allá de
+    los registros: la capa de errores tipados acumula por ti —
+    <code>zipOrAccumulate</code> ejecuta cada regla y concatena los
+    fallos en una <code>NonEmptyList</code>, y
+    <code>mapOrAccumulate</code> valida una colección entera fail-slow.
+    Mira el tutorial de <code><a href="../tutorials/accumulate.html">accumulate</a></code> para esa versión
+    completa; el modelo de streams no tiene contrapartida a la que
+    recurrir.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="successes-and-failures.html">← Anterior: Separar éxitos de fallos</a>
+    <a href="stop-after-three-failures.html">Siguiente: Rendirse tras tres fallos →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

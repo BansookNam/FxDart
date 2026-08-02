@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saldo acumulado de un feed de depósitos — RxDart vs FxDart</title>
+  <meta name="description" content="Plegar un feed de depósitos y retiradas en un saldo acumulado — el scan de Rx frente al scan de fxdart, una acumulación por movimiento en ambos lados.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/running-balance-feed.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/running-balance-feed.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/running-balance-feed.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/running-balance-feed.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/running-balance-feed.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/running-balance-feed.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/running-balance-feed.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/running-balance-feed.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../RxDartComparison/running-balance-feed.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/running-balance-feed.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/running-balance-feed.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/running-balance-feed.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/running-balance-feed.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/running-balance-feed.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/running-balance-feed.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #2 · <strong>Saldo acumulado de un feed de depósitos</strong></p>
+  <h1>Saldo acumulado de un feed de depósitos</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Empate</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/scan.html">scan</a></li></ul>
+  <h2>Requisito</h2>
+  <p>
+    Una cuenta abre a cero y recibe siete movimientos — depósitos en
+    positivo, retiradas en negativo. Imprime el saldo tras cada
+    movimiento, una línea por paso. Los datos están en el código; las dos
+    versiones deben imprimir las líneas que aparecen bajo
+    <em>Salida esperada</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Salida esperada</summary>
+    <pre class="code">Balance: 250
+Balance: 170
+Balance: 290
+Balance: 250
+Balance: 750
+Balance: 430
+Balance: 520</pre>
+  </details>
+
+  <h2>Lado a lado</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="da3434a104844db5">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+// Deposits (+) and withdrawals (−) against an account opened at zero.
+const moves = [250, -80, 120, -40, 500, -320, 90];
+
+Future<void> main() async {
+  final balances = await Stream.fromIterable(moves)
+      .scan<int>((acc, move, _) => acc + move, 0)
+      .toList();
+
+  for (final b in balances) {
+    print('Balance: $b');
+  }
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="62d29c8d72ba0698">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+// Deposits (+) and withdrawals (−) against an account opened at zero.
+const moves = [250, -80, 120, -40, 500, -320, 90];
+
+void main() {
+  // scan1 folds without a separate seed — for a balance that opens at zero,
+  // each partial sum IS the balance, matching Rx's one-value-per-event pace.
+  final balances = scan1((acc, move) => acc + move, moves).toList();
+
+  for (final b in balances) {
+    print('Balance: $b');
+  }
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Por qué difieren</h2>
+  <p>
+    Apenas difieren. El estado acumulado es un fold con sus pasos
+    intermedios expuestos, y ambas bibliotecas llaman a ese fold
+    <code><a href="../tutorials/scan.html">scan</a></code> — RxDart como transformador de stream, FxDart como
+    operador perezoso portado del mismo linaje Rx. Una acumulación por
+    movimiento, en orden, en ambos lados.
+  </p>
+  <p>
+    Las diferencias visibles son detalles de cadencia, no de modelo. El
+    <code><a href="../tutorials/scan.html">scan</a></code> de RxDart toma una semilla y emite un valor por
+    evento (su acumulador recibe además un índice); el <code><a href="../tutorials/scan.html">scan</a></code>
+    con semilla de FxDart sigue a FxTS y produce primero la semilla misma,
+    así que el panel usa el <code>scan1</code> sin semilla — para un saldo
+    que abre a cero, cada suma parcial <em>es</em> el saldo, y las dos
+    cadencias encajan exactamente. Más allá de eso, el único residuo es la
+    entrega: la versión stream recolecta a través de un main
+    <code>async</code>, la versión pull es una sola cadena síncrona. Un
+    empate justo — ambos lados dicen el requisito con un único operador.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="even-totals.html">← Anterior: Suma los importes pares válidos</a>
+    <a href="first-over-budget-rx.html">Siguiente: Primera transacción por encima del presupuesto →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,2 @@
+fastest: 12 ms
+slowest: 210 ms

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Habilitar el envío cuando el formulario es válido — RxDart vs FxDart</title>
+  <meta name="description" content="Combinar los últimos valores de email y contraseña para gobernar el botón de envío — Rx.combineLatest2 vs un stream etiquetado fusionado a mano y plegado con scan.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/combine-form-fields.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/combine-form-fields.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/combine-form-fields.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/combine-form-fields.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/combine-form-fields.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/combine-form-fields.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/combine-form-fields.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/combine-form-fields.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../RxDartComparison/combine-form-fields.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/combine-form-fields.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/combine-form-fields.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/combine-form-fields.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/combine-form-fields.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/combine-form-fields.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/combine-form-fields.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #43 · <strong>Habilitar el envío cuando el formulario es válido</strong></p>
+  <h1>Habilitar el envío cuando el formulario es válido</h1>
+  <p class="cmp-meta"><span class="badge verdict-rxdart">Terreno de RxDart</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/filter.html">filter</a></li></ul>
+  <h2>Requisito</h2>
+  <p>
+    Un formulario de registro tiene dos campos. El campo de email emite
+    <code>nam</code>, luego <code>nam@fx.dev</code>; el campo de
+    contraseña emite <code>hunter2</code>, luego <code>box-belt-42</code>
+    — en desplazamientos fijos intercalados. Tras cada cambio una vez que
+    ambos campos hayan emitido, re-evalúa el par de últimos valores
+    (válido = el email contiene <code>@</code>, la contraseña ≥ 8
+    caracteres) e imprime el estado combinado — tres líneas de los cuatro
+    eventos de campo, porque el primer cambio aterriza antes de que la
+    contraseña haya hablado; termina con el estado final del botón de
+    envío. Las dos versiones deben imprimir las líneas que aparecen bajo
+    <em>Salida esperada</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Salida esperada</summary>
+    <pre class="code">email=nam password=hunter2 -&gt; disabled
+email=nam@fx.dev password=hunter2 -&gt; disabled
+email=nam@fx.dev password=box-belt-42 -&gt; enabled
+submit: enabled</pre>
+  </details>
+
+  <h2>Lado a lado</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="1f69e7ecac90d2fa">
+<textarea>
+import 'dart:async';
+
+import 'package:rxdart/rxdart.dart';
+
+/// Simulated form input: each field emits at fixed offsets.
+Stream<String> emails() {
+  final c = StreamController<String>();
+  Timer(Duration.zero, () => c.add('nam'));
+  Timer(const Duration(milliseconds: 160), () => c.add('nam@fx.dev'));
+  Timer(const Duration(milliseconds: 400), c.close);
+  return c.stream;
+}
+
+Stream<String> passwords() {
+  final c = StreamController<String>();
+  Timer(const Duration(milliseconds: 80), () => c.add('hunter2'));
+  Timer(const Duration(milliseconds: 240), () => c.add('box-belt-42'));
+  Timer(const Duration(milliseconds: 400), c.close);
+  return c.stream;
+}
+
+bool valid(String email, String password) =>
+    email.contains('@') && password.length >= 8;
+
+Future<void> main() async {
+  final states = await Rx.combineLatest2(
+      emails(), passwords(), (String e, String p) => (e, p)).toList();
+
+  for (final (e, p) in states) {
+    print('email=$e password=$p -> ${valid(e, p) ? 'enabled' : 'disabled'}');
+  }
+  final (e, p) = states.last;
+  print('submit: ${valid(e, p) ? 'enabled' : 'disabled'}');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="b1d8d1cc9240e051">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Simulated form input: each field emits at fixed offsets.
+Stream<String> emails() {
+  final c = StreamController<String>();
+  Timer(Duration.zero, () => c.add('nam'));
+  Timer(const Duration(milliseconds: 160), () => c.add('nam@fx.dev'));
+  Timer(const Duration(milliseconds: 400), c.close);
+  return c.stream;
+}
+
+Stream<String> passwords() {
+  final c = StreamController<String>();
+  Timer(const Duration(milliseconds: 80), () => c.add('hunter2'));
+  Timer(const Duration(milliseconds: 240), () => c.add('box-belt-42'));
+  Timer(const Duration(milliseconds: 400), c.close);
+  return c.stream;
+}
+
+bool valid(String email, String password) =>
+    email.contains('@') && password.length >= 8;
+
+/// Tag both fields into one stream — the merge Rx.combineLatest2 does for us.
+Stream<(String, String)> fields() {
+  final c = StreamController<(String, String)>();
+  var open = 2;
+  void done() {
+    if (--open == 0) c.close();
+  }
+
+  emails().listen((e) => c.add(('email', e)), onDone: done);
+  passwords().listen((p) => c.add(('password', p)), onDone: done);
+  return c.stream;
+}
+
+Future<void> main() async {
+  final states = await fxStream(fields())
+      .scan<(String, String)>(
+          (acc, ev) =>
+              ev.$1 == 'email' ? (ev.$2, acc.$2) : (acc.$1, ev.$2),
+          ('', ''))
+      .filter((s) => s.$1.isNotEmpty && s.$2.isNotEmpty)
+      .toList();
+
+  for (final (e, p) in states) {
+    print('email=$e password=$p -> ${valid(e, p) ? 'enabled' : 'disabled'}');
+  }
+  final (e, p) = states.last;
+  print('submit: ${valid(e, p) ? 'enabled' : 'disabled'}');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Por qué difieren</h2>
+  <p>
+    Esto es estado de <em>último-valor-por-fuente</em> — el combinador
+    que define el modelo push. <code>Rx.combineLatest2</code> retiene el
+    valor más nuevo de cada campo, espera a que ambos hayan hablado, y
+    re-emite el par en cada cambio de cualquiera de los lados. La lógica
+    del formulario se lee exactamente como el requisito, y las cuatro
+    líneas de salida caen de una sola declaración.
+  </p>
+  <p>
+    Un pipeline pull consume <em>una</em> secuencia, así que el lado
+    FxDart debe reconstruir primero lo que <code>combineLatest</code>
+    consigue gratis: fusionar los dos campos en un único stream de
+    eventos etiquetados (un controller escrito a mano, con su propia
+    contabilidad de cierre de dos suscripciones), tender el puente con
+    <code>fxStream</code>, y luego hacer <code><a href="../tutorials/scan.html">scan</a></code> de las
+    etiquetas hacia un registro de estado (email, contraseña) y
+    <code><a href="../tutorials/filter.html">filter</a></code> para descartar los estados donde un campo aún no
+    ha emitido. El pliegue en sí es honesto, tipado y legible — pero es
+    una reimplementación del operador, no un uso de él. El estado
+    reactivo de UI como este es exactamente para lo que RxDart existe, y
+    el veredicto es de RxDart sin discusión.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="sampled-gauge.html">← Anterior: Muestrear el medidor en cada tick de sondeo</a>
+    <a href="with-latest-config.html">Siguiente: Sellar cada petición con la config más reciente →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

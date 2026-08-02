@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>각 요청에 최신 설정 도장 찍기 — RxDart vs FxDart</title>
+  <meta name="description" content="나가는 요청마다 그 순간의 config 버전을 싣습니다 — withLatestFrom vs 브리지 뒤에서 scan으로 접는 태그 병합.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/with-latest-config.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/with-latest-config.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/with-latest-config.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/with-latest-config.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/with-latest-config.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/with-latest-config.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/with-latest-config.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/with-latest-config.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../RxDartComparison/with-latest-config.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/with-latest-config.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/with-latest-config.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/with-latest-config.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/with-latest-config.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/with-latest-config.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/with-latest-config.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #44 · <strong>각 요청에 최신 설정 도장 찍기</strong></p>
+  <h1>각 요청에 최신 설정 도장 찍기</h1>
+  <p class="cmp-meta"><span class="badge verdict-rxdart">RxDart의 영역</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>요구사항</h2>
+  <p>
+    앱이 API 요청 네 건을 발사하는 동안, 배경에서는 배포가 config
+    버전을 <code>v1 → v2 → v3</code>로 고정 오프셋에 맞춰 올립니다.
+    각 요청에는 <em>요청이 발사된 순간</em> 유효하던 config 버전이
+    찍혀야 하고 — config 상승만으로는 아무것도 내보내면 안 됩니다.
+    도장 찍힌 요청 네 건을 출력하세요. 두 스케줄 모두 코드에
+    시뮬레이션되어 있습니다; 두 버전 모두 <em>예상 출력</em> 아래에
+    표시된 줄들을 출력해야 합니다.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>예상 출력</summary>
+    <pre class="code">GET /orders (config v1)
+GET /stock (config v2)
+GET /prices (config v2)
+GET /refunds (config v3)</pre>
+  </details>
+
+  <h2>나란히 보기</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="eacb6c3b3411f396">
+<textarea>
+import 'dart:async';
+
+import 'package:rxdart/rxdart.dart';
+
+/// Simulated deploys: the config version bumps between requests.
+Stream<String> configs() {
+  final c = StreamController<String>();
+  const events = [(0, 'v1'), (200, 'v2'), (500, 'v3')];
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(const Duration(milliseconds: 700), c.close);
+  return c.stream;
+}
+
+/// Simulated API calls, fired at fixed offsets.
+Stream<String> requests() {
+  final c = StreamController<String>();
+  const events = [
+    (80, 'GET /orders'),
+    (300, 'GET /stock'),
+    (400, 'GET /prices'),
+    (600, 'GET /refunds'),
+  ];
+  for (final (ms, r) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(r));
+  }
+  Timer(const Duration(milliseconds: 700), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  final stamped = await requests()
+      .withLatestFrom(configs(), (String req, String cfg) => '$req (config $cfg)')
+      .toList();
+
+  stamped.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="00ad6737767b9a85">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Simulated deploys: the config version bumps between requests.
+Stream<String> configs() {
+  final c = StreamController<String>();
+  const events = [(0, 'v1'), (200, 'v2'), (500, 'v3')];
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(const Duration(milliseconds: 700), c.close);
+  return c.stream;
+}
+
+/// Simulated API calls, fired at fixed offsets.
+Stream<String> requests() {
+  final c = StreamController<String>();
+  const events = [
+    (80, 'GET /orders'),
+    (300, 'GET /stock'),
+    (400, 'GET /prices'),
+    (600, 'GET /refunds'),
+  ];
+  for (final (ms, r) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(r));
+  }
+  Timer(const Duration(milliseconds: 700), c.close);
+  return c.stream;
+}
+
+/// Tag both sources into one stream — the pairing withLatestFrom does for us.
+Stream<(String, String)> tagged() {
+  final c = StreamController<(String, String)>();
+  var open = 2;
+  void done() {
+    if (--open == 0) c.close();
+  }
+
+  configs().listen((v) => c.add(('config', v)), onDone: done);
+  requests().listen((r) => c.add(('request', r)), onDone: done);
+  return c.stream;
+}
+
+Future<void> main() async {
+  final stamped = await fxStream(tagged())
+      .scan<(String, String?)>(
+          (acc, ev) => ev.$1 == 'config' ? (ev.$2, null) : (acc.$1, ev.$2),
+          ('', null))
+      .filter((s) => s.$2 != null)
+      .map((s) => '${s.$2} (config ${s.$1})')
+      .toList();
+
+  stamped.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>차이가 나는 이유</h2>
+  <p>
+    이것은 <code>combineLatest</code>의 비대칭 형제입니다: 한 스트림이
+    주도하고, 다른 스트림은 <em>참조</em>될 뿐입니다. RxDart의
+    <code>withLatestFrom</code>이 곧 이 요구사항의 이름입니다 —
+    요청마다 내보내되 지금까지 본 가장 신선한 config와 짝지어 주고,
+    config만 바뀔 때는 침묵합니다. 어느 스트림이 주인가가 연산자
+    자체에 인코딩되어 있습니다.
+  </p>
+  <p>
+    FxDart 쪽은 그 비대칭을 손으로 지어야 합니다. 이전 예제와 같은
+    태그 병합 뼈대(컨트롤러, 닫힘 추적, 브리지)로 시작한 뒤, 폴드
+    안에서 비대칭을 만듭니다: config 이벤트는 버전을 저장하고 요청
+    슬롯을 비우며, 요청 이벤트는 그 슬롯을 채웁니다.
+    <code><a href="../tutorials/filter.html">filter</a></code>가 대기 중인 요청이 있는 상태만 남기고,
+    <code><a href="../tutorials/map.html">map</a></code>이 도장을 포맷합니다. 모든 단계가 타입 있고
+    명시적인데, 바로 그것이 문제입니다: 연산자 네 개가
+    <code>withLatestFrom</code>이 그저 <em>이름 붙인</em> 것을
+    재구현합니다. 판정은 RxDart — 살아 있는 스트림 하나가 다른
+    스트림의 최신 값을 필요로 할 때마다 옳은 도구입니다.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="combine-form-fields.html">← 이전: 폼이 유효해지면 제출 버튼 켜기</a>
+    <a href="switch-to-newest-search.html">다음: 최신 검색만 중요할 때 →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

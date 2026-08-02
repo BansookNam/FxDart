@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reanudar desde la caché cuando la fuente muere — RxDart vs FxDart</title>
+  <meta name="description" content="El feed en vivo muere tras tres actualizaciones — onErrorResumeNext conmuta a la cola cacheada frente a un bucle de pull explícito que alimenta concat.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/resume-with-cache.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/resume-with-cache.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/resume-with-cache.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/resume-with-cache.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/resume-with-cache.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/resume-with-cache.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/resume-with-cache.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/resume-with-cache.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../RxDartComparison/resume-with-cache.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/resume-with-cache.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/resume-with-cache.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/resume-with-cache.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/resume-with-cache.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/resume-with-cache.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/resume-with-cache.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #26 · <strong>Reanudar desde la caché cuando la fuente muere</strong></p>
+  <h1>Reanudar desde la caché cuando la fuente muere</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/concat.html">concat</a></li><li><a href="../tutorials/take.html">take</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>Requisito</h2>
+  <p>
+    El feed de pedidos en vivo entrega tres actualizaciones y entonces la
+    conexión muere. El panel sigue necesitando sus primeras
+    <strong>seis</strong> filas: conserva todo lo que el feed en vivo
+    alcanzó a entregar y continúa después desde la instantánea cacheada de
+    anoche, marcando esas filas con <code>(from cache)</code>. El fallo se
+    inyecta de forma determinista en el código; las dos versiones deben
+    imprimir las líneas que aparecen bajo <em>Salida esperada</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Salida esperada</summary>
+    <pre class="code">ORD-7011 packed
+ORD-7012 shipped
+ORD-7013 packed
+ORD-7014 picking (from cache)
+ORD-7015 picking (from cache)
+ORD-7016 received (from cache)</pre>
+  </details>
+
+  <h2>Lado a lado</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="09868dae2524c4e5">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+/// The live order feed: three updates arrive, then the connection dies.
+Stream<String> liveFeed() async* {
+  yield 'ORD-7011 packed';
+  yield 'ORD-7012 shipped';
+  yield 'ORD-7013 packed';
+  throw StateError('feed connection lost');
+}
+
+/// Last night's cached snapshot of the rest of the queue.
+const cachedTail = [
+  'ORD-7014 picking',
+  'ORD-7015 picking',
+  'ORD-7016 received',
+  'ORD-7017 received',
+];
+
+Future<void> main() async {
+  // The dashboard shows the first six updates. When the live feed errors,
+  // onErrorResumeNext swaps in the cached tail — one operator.
+  final updates = await liveFeed()
+      .onErrorResumeNext(
+          Stream.fromIterable(cachedTail).map((u) => '$u (from cache)'))
+      .take(6)
+      .toList();
+
+  updates.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="70477e6bf22be734">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+/// The live order feed: three updates arrive, then the connection dies.
+Stream<String> liveFeed() async* {
+  yield 'ORD-7011 packed';
+  yield 'ORD-7012 shipped';
+  yield 'ORD-7013 packed';
+  throw StateError('feed connection lost');
+}
+
+/// Last night's cached snapshot of the rest of the queue.
+const cachedTail = [
+  'ORD-7014 picking',
+  'ORD-7015 picking',
+  'ORD-7016 received',
+  'ORD-7017 received',
+];
+
+Future<void> main() async {
+  // Pull from the live feed until it dies, keeping everything it managed
+  // to deliver — the loop is the explicit error boundary.
+  final live = <String>[];
+  try {
+    await for (final update in liveFeed()) {
+      live.add(update);
+    }
+  } on StateError {
+    // The feed died — resume from the cached tail below.
+  }
+
+  // The dashboard shows the first six updates; take(6) means the cache is
+  // only pulled as far as needed — and nothing here is async anymore.
+  final updates = fx(live)
+      .concat(fx(cachedTail).map((u) => '$u (from cache)'))
+      .take(6)
+      .toList();
+
+  updates.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Por qué difieren</h2>
+  <p>
+    Este es el canal de errores en su mejor momento. El punto de
+    recuperación es <em>de stream completo</em> — «cuando esta fuente
+    muera, cambia a aquella otra para el resto de la secuencia» — que es
+    exactamente la forma que un canal de errores push modela.
+    <code>onErrorResumeNext</code> dice el requisito entero en un solo
+    operador: los valores pasan intactos, y el primer error conmuta la
+    suscripción al stream de recuperación en pleno vuelo, con las tres
+    actualizaciones entregadas ya a salvo.
+  </p>
+  <p>
+    El lado pull no tiene ningún operador que conserve los valores de una
+    fuente que después lanza — un pipeline pull hace aflorar el error en
+    el punto del pull, y un <code>toList</code> fallido descartaría lo que
+    vino antes. Así que la frontera se escribe a mano: un bucle
+    <code>await for</code> recoge las filas en vivo, el
+    <code>try</code>/<code>catch</code> pone nombre al fallo, y
+    <code><a href="../tutorials/concat.html">concat</a></code> + <code><a href="../tutorials/map.html">map</a></code> + <code><a href="../tutorials/take.html">take</a></code> empalman la
+    cola cacheada. Dos o tres líneas honestas más — la misma recuperación,
+    menos la palabra del vocabulario.
+  </p>
+  <p>
+    Un empate, inclinado hacia RxDart en elegancia aquí. Ambos lados se
+    detienen en seis filas, y ninguno lee la caché más allá de lo que la
+    página necesita: <code><a href="../tutorials/take.html">take</a></code> cancela la suscripción en un lado y
+    simplemente deja de tirar en el otro.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="price-or-fallback.html">← Anterior: Un precio, o el precio de lista</a>
+    <a href="retry-the-fetch.html">Siguiente: Reintentar el fetch inestable →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

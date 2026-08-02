@@ -258,14 +258,39 @@ FxAsyncIterable<A> uniqAsync<A>(FxAsyncIterable<A> iterable) =>
 /// ```dart
 /// uniqAdjacentBy((a) => a % 10, [1, 11, 21, 2, 1]); // (1, 2, 1)
 /// ```
-Iterable<A> uniqAdjacentBy<A, B>(B Function(A a) f, Iterable<A> iterable) sync* {
-  var hasPrev = false;
-  late B prevKey;
-  for (final a in iterable) {
-    final key = f(a);
-    if (!hasPrev || key != prevKey) yield a;
-    prevKey = key;
-    hasPrev = true;
+Iterable<A> uniqAdjacentBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    _UniqAdjacentByIterable(f, iterable);
+
+class _UniqAdjacentByIterable<A, B> extends Iterable<A> {
+  _UniqAdjacentByIterable(this._f, this._source);
+  final B Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _UniqAdjacentByIterator(_f, _source.iterator);
+}
+
+class _UniqAdjacentByIterator<A, B> implements Iterator<A> {
+  _UniqAdjacentByIterator(this._f, this._it);
+  final B Function(A) _f;
+  final Iterator<A> _it;
+  bool _hasPrev = false;
+  late B _prevKey;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final a = _it.current;
+      final key = _f(a);
+      final keep = !_hasPrev || key != _prevKey;
+      _prevKey = key;
+      _hasPrev = true;
+      if (keep) {
+        current = a;
+        return true;
+      }
+    }
+    return false;
   }
 }
 

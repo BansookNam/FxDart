@@ -1,0 +1,6 @@
+Live: 21.4 °C
+Live: 20.9 °C
+Live: 18.7 °C
+Live: 22.3 °C
+Live: 23.0 °C
+Kept 5 of 8 readings

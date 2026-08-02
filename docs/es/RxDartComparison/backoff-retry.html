@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reintentar con backoff creciente — RxDart vs FxDart</title>
+  <meta name="description" content="Alargar la espera entre intentos — retryWhen mapea cada error a un stream de temporizador a mano frente a un hook delay que devuelve un Duration.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/backoff-retry.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/backoff-retry.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/backoff-retry.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/backoff-retry.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/backoff-retry.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/backoff-retry.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/backoff-retry.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/backoff-retry.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../RxDartComparison/backoff-retry.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/backoff-retry.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/backoff-retry.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/backoff-retry.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/backoff-retry.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/backoff-retry.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/backoff-retry.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #28 · <strong>Reintentar con backoff creciente</strong></p>
+  <h1>Reintentar con backoff creciente</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/retry.html">retry</a></li></ul>
+  <h2>Requisito</h2>
+  <p>
+    El servicio de tarifas no está disponible exactamente dos veces, y
+    luego sirve. Reintenta con <strong>backoff creciente</strong> — espera
+    40&nbsp;ms tras el primer fallo, 80&nbsp;ms tras el segundo — con un
+    presupuesto de tres intentos. Imprime el payload, el conteo de
+    intentos y la secuencia de backoff registrada (registrada cuando se
+    elige cada espera, así que la salida es determinista). Las dos
+    versiones deben imprimir las líneas que aparecen bajo
+    <em>Salida esperada</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Salida esperada</summary>
+    <pre class="code">rates: EUR 0.85, GBP 0.74, JPY 148.20
+attempts: 3
+backoff: 40ms, 80ms</pre>
+  </details>
+
+  <h2>Lado a lado</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="7b616506d2a43ca4">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+var attempts = 0;
+final backoffMs = <int>[];
+
+/// The FX rate service: unavailable exactly twice, then serves.
+Future<String> fetchRates() async {
+  attempts += 1;
+  await Future<void>.delayed(const Duration(milliseconds: 10));
+  if (attempts < 3) throw StateError('rate service unavailable');
+  return 'rates: EUR 0.85, GBP 0.74, JPY 148.20';
+}
+
+Future<void> main() async {
+  var failures = 0;
+  // retryWhen wants a NOTIFIER stream per error: emit → retry, error →
+  // give up. Backoff means mapping each failure to a timer stream, and
+  // the attempt budget is tracked by hand outside the factory.
+  final payload = await Rx.retryWhen(
+    () => Rx.fromCallable(fetchRates),
+    (error, stackTrace) {
+      failures += 1;
+      if (failures >= 3) return Stream<void>.error(error, stackTrace);
+      final ms = 40 * failures;
+      backoffMs.add(ms);
+      return Rx.timer<void>(null, Duration(milliseconds: ms));
+    },
+  ).first;
+
+  print(payload);
+  print('attempts: $attempts');
+  print('backoff: ${backoffMs.map((ms) => '${ms}ms').join(', ')}');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="3ab3c6305b094e0e">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+var attempts = 0;
+final backoffMs = <int>[];
+
+/// The FX rate service: unavailable exactly twice, then serves.
+Future<String> fetchRates() async {
+  attempts += 1;
+  await Future<void>.delayed(const Duration(milliseconds: 10));
+  if (attempts < 3) throw StateError('rate service unavailable');
+  return 'rates: EUR 0.85, GBP 0.74, JPY 148.20';
+}
+
+Future<void> main() async {
+  // Backoff is the delay hook: it receives the failure count (1, 2, …)
+  // and returns how long to wait before the next attempt.
+  final payload = await retry(3, fetchRates, delay: (failed) {
+    final ms = 40 * failed;
+    backoffMs.add(ms);
+    return Duration(milliseconds: ms);
+  });
+
+  print(payload);
+  print('attempts: $attempts');
+  print('backoff: ${backoffMs.map((ms) => '${ms}ms').join(', ')}');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Por qué difieren</h2>
+  <p>
+    El backoff es donde se rompe la simetría de una-sola-llamada del retry
+    simple. El <code>retryWhen</code> de RxDart es un protocolo de
+    meta-streams: por cada error, tu fábrica debe devolver un <em>stream
+    notificador</em> — emite un valor para disparar el reintento, emite un
+    error para rendirte. Así que «espera 40 ms, luego 80 ms» se convierte
+    en mapear cada fallo a un stream <code>Rx.timer</code>, y como la
+    fábrica solo ve un error a la vez, tanto el conteo de fallos como el
+    presupuesto de intentos viven en variables mutables <em>fuera</em>
+    del operador. Funciona, y es máximamente general — pero estás
+    ensamblando a mano un bucle de reintentos a base de streams.
+  </p>
+  <p>
+    FxDart trata el backoff como lo que es: un número que depende de
+    cuántas veces has fallado. El hook <code>delay</code> de
+    <code><a href="../tutorials/retry.html">retry</a></code> recibe el conteo de fallos (<code>1, 2, …</code>) y
+    devuelve un <code>Duration</code> — la política entera es una
+    expresión, y el presupuesto es el mismo argumento
+    <code>attempts</code> de antes. Nada en esperar entre intentos
+    requiere un stream, y el lado pull nunca finge que sí.
+  </p>
+  <p>
+    Veredicto FxDart, por conteo de conceptos: un hook frente a una
+    fábrica de streams notificadores, un contador externo y un stream de
+    temporizador por fallo.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="retry-the-fetch.html">← Anterior: Reintentar el fetch inestable</a>
+    <a href="per-row-retry.html">Siguiente: Reintentar cada fila inestable por separado →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

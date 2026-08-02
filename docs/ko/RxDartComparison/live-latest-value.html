@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>늦게 온 리더를 위한 라이브 현재 값 — RxDart vs FxDart</title>
+  <meta name="description" content="늦게 접속한 대시보드도 현재 온도를 즉시 받습니다 — BehaviorSubject는 최신 값을 리플레이하고, 풀은 그것을 손으로 캐시합니다.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/live-latest-value.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/live-latest-value.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/live-latest-value.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/live-latest-value.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/live-latest-value.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/live-latest-value.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/live-latest-value.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/live-latest-value.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../RxDartComparison/live-latest-value.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/live-latest-value.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/live-latest-value.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/live-latest-value.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/live-latest-value.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/live-latest-value.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/live-latest-value.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #47 · <strong>늦게 온 리더를 위한 라이브 현재 값</strong></p>
+  <h1>늦게 온 리더를 위한 라이브 현재 값</h1>
+  <p class="cmp-meta"><span class="badge verdict-rxdart">RxDart의 영역</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li></ul>
+  <h2>요구사항</h2>
+  <p>
+    온도 피드가 고정 스케줄로 업데이트를 밀어 보냅니다. 대시보드는 첫
+    세 업데이트가 이미 지나간 뒤에야 접속합니다 — 그래도
+    <strong>현재</strong> 값(합류 시점의 최신인 19.1&nbsp;°C)을 즉시
+    보여 준 뒤, 이후의 모든 업데이트를 보여 줘야 합니다. 스케줄은
+    코드에 시뮬레이션되어 있습니다; 두 버전 모두 <em>예상 출력</em>
+    아래에 표시된 줄들을 출력해야 합니다.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>예상 출력</summary>
+    <pre class="code">joined late, current: 19.1
+update: 19.5
+update: 20.0</pre>
+  </details>
+
+  <h2>나란히 보기</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="47fd3183c72845b5">
+<textarea>
+import 'dart:async';
+
+import 'package:rxdart/rxdart.dart';
+
+Future<void> main() async {
+  // A BehaviorSubject IS the "current value": every new listener first
+  // gets the latest update, then everything after it.
+  final temps = BehaviorSubject<double>();
+  const updates = [(0, 18.2), (70, 18.6), (140, 19.1), (420, 19.5), (490, 20.0)];
+  for (final (ms, t) in updates) {
+    Timer(Duration(milliseconds: ms), () => temps.add(t));
+  }
+  Timer(const Duration(milliseconds: 630), temps.close);
+
+  // The dashboard connects late — three updates have already gone by.
+  await Future.delayed(const Duration(milliseconds: 280));
+  final seen = await temps.toList();
+
+  print('joined late, current: ${seen.first.toStringAsFixed(1)}');
+  for (final t in seen.skip(1)) {
+    print('update: ${t.toStringAsFixed(1)}');
+  }
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="5462533c3c536ab4">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  // No subject in a pull library: broadcast the raw updates and cache the
+  // latest one by hand so a late reader has something to start from.
+  final temps = StreamController<double>.broadcast();
+  const updates = [(0, 18.2), (70, 18.6), (140, 19.1), (420, 19.5), (490, 20.0)];
+  for (final (ms, t) in updates) {
+    Timer(Duration(milliseconds: ms), () => temps.add(t));
+  }
+  Timer(const Duration(milliseconds: 630), temps.close);
+
+  double? latest;
+  final cache = temps.stream.listen((t) => latest = t);
+
+  // The dashboard connects late — three updates have already gone by.
+  await Future.delayed(const Duration(milliseconds: 280));
+  final current = latest!; // the hand-cached "replay"
+  final rest = await fxStream(temps.stream).toList();
+  await cache.cancel();
+
+  print('joined late, current: ${current.toStringAsFixed(1)}');
+  for (final t in rest) {
+    print('update: ${t.toStringAsFixed(1)}');
+  }
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>차이가 나는 이유</h2>
+  <p>
+    "누가 나타나든 리플레이되는 최신 값"은 파이프라인이 아닙니다 —
+    <em>공유된 멀티캐스트 상태</em> 한 조각이고, RxDart에는 그것을
+    위한 전용 객체가 있습니다. <code>BehaviorSubject</code>는 센서가
+    쓰는 싱크이자 모든 구독자가 읽을 수 있는 스트림이며, 그것을
+    정의하는 단 하나의 동작이 정확히 이 요구사항입니다: 늦게 온
+    리스너는 먼저 가장 최근 값을 받고, 그다음 라이브 피드를 받습니다.
+    rx 패널 전체가 "업데이트 넣기, 늦게 구독하기, 수집하기"입니다.
+  </p>
+  <p>
+    FxDart는 subject 같은 것을 의도적으로 뺐습니다 — 풀 파이프라인은
+    단일 소비자의 요구 체인이지 브로드캐스트 허브가 아닙니다. FxDart
+    패널은 subject를 <em>시뮬레이션</em>해야 합니다: 브로드캐스트
+    컨트롤러, 최신 값을 변수에 캐시하는 손수 쓴 리스너, 그리고 늦은
+    리더가 합류한 뒤의 나머지를 위한 <code>fxStream</code> 브리지.
+    같은 줄들을 출력하지만, subject가 공짜로 주던 모든 조각(캐시,
+    합류 시 리플레이, 두 번째 구독의 생명주기)이 이제는 올바르게
+    유지해야 하는 수동 코드입니다. 실전의 결론: 멀티캐스트 최신 값
+    상태에는 RxDart를 쓰고 — 값별 처리가 자라면 subject의 하류에서
+    타입 있는 FxDart 파이프라인으로 브리지하세요.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="first-mirror-wins.html">← 이전: 두 미러 경주시키기</a>
+    <a href="tee-the-pipeline.html">다음: 소스 하나, 독립 리더 둘 →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

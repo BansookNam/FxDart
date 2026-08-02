@@ -134,16 +134,23 @@ List<Snippet> snippets(String root) {
     }
   }
 
-  final cmpDirs = Directory('$root/content/code-comparison')
-      .listSync()
-      .whereType<Directory>()
-      .map((d) => d.path.split(Platform.pathSeparator).last)
-      .toList()
-    ..sort();
-  for (final slug in cmpDirs) {
-    for (final name in const ['native.dart', 'fxdart.dart']) {
-      final path = 'content/code-comparison/$slug/$name';
-      if (File('$root/$path').existsSync()) add(path, isFirstOnPage: true);
+  for (final (dir, sides) in const [
+    ('code-comparison', ['native.dart', 'fxdart.dart']),
+    ('code-comparison-rx', ['rxdart.dart', 'fxdart.dart']),
+  ]) {
+    final base = Directory('$root/content/$dir');
+    if (!base.existsSync()) continue;
+    final cmpDirs = base
+        .listSync()
+        .whereType<Directory>()
+        .map((d) => d.path.split(Platform.pathSeparator).last)
+        .toList()
+      ..sort();
+    for (final slug in cmpDirs) {
+      for (final name in sides) {
+        final path = 'content/$dir/$slug/$name';
+        if (File('$root/$path').existsSync()) add(path, isFirstOnPage: true);
+      }
     }
   }
 

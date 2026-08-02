@@ -1,0 +1,3 @@
+batch of 4: img-01 img-02 img-03 img-04
+batch of 4: img-05 img-06 img-07 img-08
+batch of 2: img-09 img-10

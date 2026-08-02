@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Take until the shutdown marker, inclusive — RxDart vs FxDart</title>
+  <meta name="description" content="Keep every event up to and including SHUTDOWN and drop the stragglers — takeWhileInclusive vs takeUntilInclusive, the same cut in two spellings.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/RxDartComparison/stop-at-shutdown.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/stop-at-shutdown.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/stop-at-shutdown.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/stop-at-shutdown.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/stop-at-shutdown.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/stop-at-shutdown.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/stop-at-shutdown.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/stop-at-shutdown.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/stop-at-shutdown.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Início</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../RxDartComparison/stop-at-shutdown.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/stop-at-shutdown.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/stop-at-shutdown.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/stop-at-shutdown.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/stop-at-shutdown.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/stop-at-shutdown.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/stop-at-shutdown.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #23 · <strong>Take until the shutdown marker, inclusive</strong></p>
+  <h1>Take until the shutdown marker, inclusive</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/takeUntilInclusive.html">takeUntilInclusive</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Tonight's event feed contains a <code>SHUTDOWN</code> marker;
+    everything after it belongs to the next run and must not appear in
+    the report. Keep every event up to <em>and including</em> the marker
+    and print each as an <code>event:</code> line. The feed is in the
+    code; both versions must print the lines shown under
+    <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">event: boot
+event: listen :8080
+event: GET /orders
+event: GET /health
+event: SIGTERM
+event: drain connections
+event: SHUTDOWN</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="005c204b8b633e78">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+// Tonight's event feed — everything after SHUTDOWN belongs to the next run.
+const events = [
+  'boot',
+  'listen :8080',
+  'GET /orders',
+  'GET /health',
+  'SIGTERM',
+  'drain connections',
+  'SHUTDOWN',
+  'GET /too-late',
+  'worker respawn',
+];
+
+Future<void> main() async {
+  final kept = await Stream.fromIterable(events)
+      // Inclusive stop, spelled as while-NOT-marker.
+      .takeWhileInclusive((e) => e != 'SHUTDOWN')
+      .map((e) => 'event: $e')
+      .toList();
+
+  kept.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="35499fb943dbbdd4">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+// Tonight's event feed — everything after SHUTDOWN belongs to the next run.
+const events = [
+  'boot',
+  'listen :8080',
+  'GET /orders',
+  'GET /health',
+  'SIGTERM',
+  'drain connections',
+  'SHUTDOWN',
+  'GET /too-late',
+  'worker respawn',
+];
+
+void main() {
+  fx(events)
+      // Inclusive stop, spelled as until-marker.
+      .takeUntilInclusive((e) => e == 'SHUTDOWN')
+      .map((e) => 'event: $e')
+      .toList()
+      .forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Plain <code>takeWhile</code> has an off-by-one problem for this job:
+    the element that breaks the predicate is exactly the one you still
+    want. Both libraries ship the inclusive fix, spelled from opposite
+    ends — RxDart's <code>takeWhileInclusive</code> keeps going
+    <em>while not the marker</em>, FxDart's <code><a href="../tutorials/takeUntilInclusive.html">takeUntilInclusive</a></code>
+    (FxTS's <code>takeUntil</code>, renamed for Dart clarity) stops
+    <em>at the marker</em>. Same cut, inverted predicate.
+  </p>
+  <p>
+    The models even agree on what happens next. After emitting the
+    marker, RxDart cancels the upstream subscription, so the two
+    straggler events are never delivered; FxDart simply stops pulling, so
+    they are never produced. As in the budget search of Part&nbsp;1,
+    cancellation and demand are the two models' words for the same
+    economy — nothing downstream can tell which model was underneath.
+    A tie, and a
+    handy translation pair to know when moving code between the two.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="audit-with-outcomes.html">← Anterior: Keep values AND failures in the audit</a>
+    <a href="weekly-windows-report.html">Próximo: Weekly totals from a daily series →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

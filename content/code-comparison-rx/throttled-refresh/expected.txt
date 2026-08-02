@@ -1,0 +1,4 @@
+refresh fired on tap 0
+refresh fired on tap 3
+refresh fired on tap 5
+taps: 6, refreshes: 3

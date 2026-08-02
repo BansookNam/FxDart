@@ -1,0 +1,4 @@
+email=nam password=hunter2 -> disabled
+email=nam@fx.dev password=hunter2 -> disabled
+email=nam@fx.dev password=box-belt-42 -> enabled
+submit: enabled

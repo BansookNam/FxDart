@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=11fedf83d3bdddf4">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
 </head>
 <body>
 <header class="site-header">
@@ -27,6 +27,7 @@
       <a href="../index.html">Início</a>
       <a href="../101/index.html">FxDart 101</a>
       <a href="../DartComparison/index.html" class="active">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html">RxDart vs FxDart</a>
       <a href="../101/index.html#api">Tutoriais da API</a>
       <a href="https://github.com/bansooknam/fxDart">GitHub</a>
       <a href="https://github.com/marpple/FxTS">FxTS</a>
@@ -103,7 +104,7 @@ void main() {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="c580493dd3e351f8">
+      <div class="playground" data-pg="3f4a039547ba0f16">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -160,12 +161,12 @@ void main() {
       <h4>Time <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">28 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:95.5%"></span></span>
+        <span class="bench-val">22 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:84.5%"></span></span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
         <span class="bench-val">23 µs</span>
       </div>
     </div>
@@ -173,12 +174,12 @@ void main() {
       <h4>Peak memory <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:99.4%"></span></span>
-        <span class="bench-val">16.3 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
+        <span class="bench-val">16.4 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:99.6%"></span></span>
         <span class="bench-val">16.4 MB</span>
       </div>
     </div>
@@ -190,12 +191,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">2.15 ms</span>
+        <span class="bench-val">2.14 ms</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:95.4%"></span></span>
-        <span class="bench-val">2.05 ms</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:97.5%"></span></span>
+        <span class="bench-val">2.08 ms</span>
       </div>
     </div>
     <div class="bench-metric">
@@ -207,7 +208,7 @@ void main() {
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:98.1%"></span></span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:98.0%"></span></span>
         <span class="bench-val">22.9 MB</span>
       </div>
     </div>
@@ -218,13 +219,13 @@ void main() {
       <h4>Time <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">258.3 ms</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:98.8%"></span></span>
+        <span class="bench-val">256.4 ms</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:98.5%"></span></span>
-        <span class="bench-val">254.5 ms</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">259.5 ms</span>
       </div>
     </div>
     <div class="bench-metric">
@@ -232,12 +233,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">181.1 MB</span>
+        <span class="bench-val">179.9 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:97.7%"></span></span>
-        <span class="bench-val">176.9 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:98.9%"></span></span>
+        <span class="bench-val">178.0 MB</span>
       </div>
     </div>
   </div>
@@ -255,7 +256,7 @@ void main() {
   <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=11fedf83d3bdddf4";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

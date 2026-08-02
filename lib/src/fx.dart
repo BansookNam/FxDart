@@ -22,6 +22,9 @@ import 'strict/aggregate.dart' as s;
 ///     .filter((a) => a % 2 == 0)
 ///     .toList(); // [12, 14]
 /// ```
+// prefer-inline lets AOT escape analysis erase the wrapper allocation when a
+// chain like `fx(w).average()` is built and consumed inside one expression.
+@pragma('vm:prefer-inline')
 Fx<T> fx<T>(Iterable<T> iterable) => Fx(iterable);
 
 /// Wraps an [FxAsyncIterable] in a chainable [FxAsync].
@@ -305,16 +308,18 @@ class Fx<T> extends Iterable<T> {
 /// to `Fx<int>` and `Fx<double>` as well).
 extension FxNum on Fx<num> {
   /// The sum of every value.
-  num sum() => s.sum(this);
+  @pragma('vm:prefer-inline')
+  num sum() => s.sum(_inner);
 
   /// The arithmetic mean of every value.
-  double average() => s.average(this);
+  @pragma('vm:prefer-inline')
+  double average() => s.average(_inner);
 
   /// The smallest value.
-  num min() => s.min(this);
+  num min() => s.min(_inner);
 
   /// The largest value.
-  num max() => s.max(this);
+  num max() => s.max(_inner);
 }
 
 /// Async chainable iterable — the async half of FxTS's `fx` chain.

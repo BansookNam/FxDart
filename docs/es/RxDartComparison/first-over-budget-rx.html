@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Primera transacción por encima del presupuesto — RxDart vs FxDart</title>
+  <meta name="description" content="Encontrar la primera transacción por encima de 100 y detenerse — el firstWhere de Rx cancela la suscripción, el find de fxdart deja de tirar; ambos examinan solo 4 de 8.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/first-over-budget-rx.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/first-over-budget-rx.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/first-over-budget-rx.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/first-over-budget-rx.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/first-over-budget-rx.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/first-over-budget-rx.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/first-over-budget-rx.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/first-over-budget-rx.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../RxDartComparison/first-over-budget-rx.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/first-over-budget-rx.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/first-over-budget-rx.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/first-over-budget-rx.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/first-over-budget-rx.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/first-over-budget-rx.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/first-over-budget-rx.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #3 · <strong>Primera transacción por encima del presupuesto</strong></p>
+  <h1>Primera transacción por encima del presupuesto</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Empate</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/find.html">find</a></li></ul>
+  <h2>Requisito</h2>
+  <p>
+    Recorre el feed de tarjeta de esta semana en orden de llegada e
+    informa de la <strong>primera</strong> transacción por encima del
+    presupuesto de 100 — y deja de buscar. Imprime también cuántas
+    transacciones se examinaron realmente, para demostrar que la búsqueda
+    cortocircuitó. Los datos están en el código; las dos versiones deben
+    imprimir las líneas que aparecen bajo <em>Salida esperada</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Salida esperada</summary>
+    <pre class="code">First over budget: T-04 (128)
+Examined 4 of 8 transactions</pre>
+  </details>
+
+  <h2>Lado a lado</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="163b1806d98426d9">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+// This week's card feed — searched in arrival order.
+const txns = [
+  (id: 'T-01', amount: 42),
+  (id: 'T-02', amount: 67),
+  (id: 'T-03', amount: 15),
+  (id: 'T-04', amount: 128),
+  (id: 'T-05', amount: 80),
+  (id: 'T-06', amount: 210),
+  (id: 'T-07', amount: 33),
+  (id: 'T-08', amount: 55),
+];
+const budget = 100;
+
+Future<void> main() async {
+  var examined = 0;
+  // firstWhere resolves on the first match and cancels the subscription —
+  // the doOnData tap counts how many events actually flowed before that.
+  final hit = await Stream.fromIterable(txns)
+      .doOnData((_) => examined++)
+      .firstWhere((t) => t.amount > budget);
+
+  print('First over budget: ${hit.id} (${hit.amount})');
+  print('Examined $examined of ${txns.length} transactions');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="05237797c7c04fb5">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+// This week's card feed — searched in arrival order.
+const txns = [
+  (id: 'T-01', amount: 42),
+  (id: 'T-02', amount: 67),
+  (id: 'T-03', amount: 15),
+  (id: 'T-04', amount: 128),
+  (id: 'T-05', amount: 80),
+  (id: 'T-06', amount: 210),
+  (id: 'T-07', amount: 33),
+  (id: 'T-08', amount: 55),
+];
+const budget = 100;
+
+void main() {
+  var examined = 0;
+  // find stops pulling at the first match — the predicate runs once per
+  // pulled element, so counting inside it shows how far the pull went.
+  final hit = fx(txns).find((t) {
+    examined++;
+    return t.amount > budget;
+  });
+
+  print('First over budget: ${hit!.id} (${hit.amount})');
+  print('Examined $examined of ${txns.length} transactions');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Por qué difieren</h2>
+  <p>
+    Aquí ambos lados son genuinamente perezosos, cada uno en su propio
+    dialecto. El <code>firstWhere</code> de RxDart resuelve su future en
+    la primera coincidencia y <strong>cancela la suscripción</strong> —
+    las cuatro transacciones restantes nunca se entregan. El
+    <code><a href="../tutorials/find.html">find</a></code> de FxDart simplemente <strong>deja de
+    tirar</strong> — las cuatro transacciones restantes nunca se
+    demandan. Cancelación y demanda son las palabras de cada modelo para
+    la misma economía, y la línea «Examined 4 of 8» sale idéntica en
+    ambos lados.
+  </p>
+  <p>
+    La diferencia instructiva es <em>dónde vive el contador</em>. Un
+    stream tiene un «entre»: <code>doOnData</code> pincha la tubería entre
+    operadores, así que el predicado rx se mantiene puro mientras el tap
+    observa el tráfico. Una cadena pull no tiene «entre» — el momento de
+    la demanda es la propia llamada al predicado, así que el lado FxDart
+    cuenta dentro de él. Ninguna de las dos formas es mejor; son los
+    idiomas de observación nativos de push y pull. Veredicto: empate — un
+    operador cada uno, y ambos se detienen exactamente en el momento
+    justo.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="running-balance-feed.html">← Anterior: Saldo acumulado de un feed de depósitos</a>
+    <a href="skip-warmup-readings.html">Siguiente: Salta las lecturas de calentamiento →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

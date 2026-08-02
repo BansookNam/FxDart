@@ -1,0 +1,5 @@
+day 1: 21.0 forecast vs 20.6 actual (-0.4)
+day 2: 22.5 forecast vs 23.1 actual (+0.6)
+day 3: 23.0 forecast vs 23.0 actual (+0.0)
+day 4: 24.5 forecast vs 25.2 actual (+0.7)
+day 5: 22.0 forecast vs 21.4 actual (-0.6)

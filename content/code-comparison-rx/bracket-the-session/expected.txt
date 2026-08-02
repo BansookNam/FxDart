@@ -1,0 +1,6 @@
+== SESSION OPEN ==
+09:12 login kim
+09:14 open /reports
+09:26 edit budget-aug
+09:41 logout kim
+== SESSION CLOSE ==

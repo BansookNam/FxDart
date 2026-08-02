@@ -1,0 +1,11 @@
+A-101/tea-01
+A-101/mug-07
+A-102/pen-11
+A-102/ink-02
+A-102/pad-05
+A-103/mug-07
+A-103/lid-04
+A-104/tea-01
+A-104/jar-03
+A-104/lid-04
+10 lines from 4 orders

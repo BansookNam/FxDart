@@ -222,13 +222,36 @@ FxAsyncIterable<A> concatAsync<A>(
 /// ifEmpty(() => [0], <int>[]); // (0)
 /// ```
 Iterable<A> ifEmpty<A>(
-    Iterable<A> Function() fallback, Iterable<A> iterable) sync* {
-  var yielded = false;
-  for (final a in iterable) {
-    yielded = true;
-    yield a;
+        Iterable<A> Function() fallback, Iterable<A> iterable) =>
+    _IfEmptyIterable(fallback, iterable);
+
+class _IfEmptyIterable<A> extends Iterable<A> {
+  _IfEmptyIterable(this._fallback, this._source);
+  final Iterable<A> Function() _fallback;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _IfEmptyIterator(_fallback, _source.iterator);
+}
+
+class _IfEmptyIterator<A> implements Iterator<A> {
+  _IfEmptyIterator(this._fallback, this._it);
+  final Iterable<A> Function() _fallback;
+  final Iterator<A> _it;
+  late Iterator<A> _active;
+  bool _started = false;
+  @override
+  A get current => _active.current;
+  @override
+  bool moveNext() {
+    if (!_started) {
+      _started = true;
+      _active = _it;
+      if (_it.moveNext()) return true;
+      // Source turned out empty: switch to the fallback for good.
+      _active = _fallback().iterator;
+    }
+    return _active.moveNext();
   }
-  if (!yielded) yield* fallback();
 }
 
 /// Yields [iterable] unchanged, or the single [value] when it turns out to

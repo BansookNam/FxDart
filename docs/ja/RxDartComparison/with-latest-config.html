@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stamp each request with the latest config — RxDart vs FxDart</title>
+  <meta name="description" content="Each outgoing request carries the config version current at that instant — withLatestFrom vs a tagged merge folded with scan behind the bridge.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/RxDartComparison/with-latest-config.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/with-latest-config.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/with-latest-config.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/with-latest-config.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/with-latest-config.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/with-latest-config.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/with-latest-config.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/with-latest-config.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/with-latest-config.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">ホーム</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="../../RxDartComparison/with-latest-config.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/with-latest-config.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/with-latest-config.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/with-latest-config.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/with-latest-config.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/with-latest-config.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/with-latest-config.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #44 · <strong>Stamp each request with the latest config</strong></p>
+  <h1>Stamp each request with the latest config</h1>
+  <p class="cmp-meta"><span class="badge verdict-rxdart">RxDart's turf</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    An app fires four API requests while, in the background, deploys bump
+    the config version <code>v1 → v2 → v3</code> at fixed offsets. Each
+    request must be stamped with the config version that was current
+    <em>when the request fired</em> — and a config bump on its own must
+    not emit anything. Print the four stamped requests. Both schedules are
+    simulated in the code; both versions must print the lines shown under
+    <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">GET /orders (config v1)
+GET /stock (config v2)
+GET /prices (config v2)
+GET /refunds (config v3)</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="eacb6c3b3411f396">
+<textarea>
+import 'dart:async';
+
+import 'package:rxdart/rxdart.dart';
+
+/// Simulated deploys: the config version bumps between requests.
+Stream<String> configs() {
+  final c = StreamController<String>();
+  const events = [(0, 'v1'), (200, 'v2'), (500, 'v3')];
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(const Duration(milliseconds: 700), c.close);
+  return c.stream;
+}
+
+/// Simulated API calls, fired at fixed offsets.
+Stream<String> requests() {
+  final c = StreamController<String>();
+  const events = [
+    (80, 'GET /orders'),
+    (300, 'GET /stock'),
+    (400, 'GET /prices'),
+    (600, 'GET /refunds'),
+  ];
+  for (final (ms, r) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(r));
+  }
+  Timer(const Duration(milliseconds: 700), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  final stamped = await requests()
+      .withLatestFrom(configs(), (String req, String cfg) => '$req (config $cfg)')
+      .toList();
+
+  stamped.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="00ad6737767b9a85">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Simulated deploys: the config version bumps between requests.
+Stream<String> configs() {
+  final c = StreamController<String>();
+  const events = [(0, 'v1'), (200, 'v2'), (500, 'v3')];
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(const Duration(milliseconds: 700), c.close);
+  return c.stream;
+}
+
+/// Simulated API calls, fired at fixed offsets.
+Stream<String> requests() {
+  final c = StreamController<String>();
+  const events = [
+    (80, 'GET /orders'),
+    (300, 'GET /stock'),
+    (400, 'GET /prices'),
+    (600, 'GET /refunds'),
+  ];
+  for (final (ms, r) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(r));
+  }
+  Timer(const Duration(milliseconds: 700), c.close);
+  return c.stream;
+}
+
+/// Tag both sources into one stream — the pairing withLatestFrom does for us.
+Stream<(String, String)> tagged() {
+  final c = StreamController<(String, String)>();
+  var open = 2;
+  void done() {
+    if (--open == 0) c.close();
+  }
+
+  configs().listen((v) => c.add(('config', v)), onDone: done);
+  requests().listen((r) => c.add(('request', r)), onDone: done);
+  return c.stream;
+}
+
+Future<void> main() async {
+  final stamped = await fxStream(tagged())
+      .scan<(String, String?)>(
+          (acc, ev) => ev.$1 == 'config' ? (ev.$2, null) : (acc.$1, ev.$2),
+          ('', null))
+      .filter((s) => s.$2 != null)
+      .map((s) => '${s.$2} (config ${s.$1})')
+      .toList();
+
+  stamped.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    This is <code>combineLatest</code>'s asymmetric sibling: one stream
+    drives, the other is only <em>consulted</em>. RxDart's
+    <code>withLatestFrom</code> <em>is</em> this requirement, named — emit per request,
+    pairing it with the freshest config seen so far, and stay silent when
+    only the config changes. Which stream is primary is encoded in the
+    operator itself.
+  </p>
+  <p>
+    The FxDart side has to build that asymmetry by hand. It starts with
+    the same tagged-merge scaffolding as the previous example
+    (controller, close-tracking, bridge), then builds the asymmetry in
+    the fold: a config event stores the version and clears the request
+    slot, a request event fills it. A <code><a href="../tutorials/filter.html">filter</a></code> keeps only
+    states with a pending request, and a <code><a href="../tutorials/map.html">map</a></code> formats the
+    stamp. Every step is typed and explicit, and that is the problem:
+    four operators reimplement what <code>withLatestFrom</code> simply
+    <em>names</em>. Verdict RxDart — the right tool whenever one live
+    stream needs the latest value of another.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="combine-form-fields.html">← 前: Enable submit when the form is valid</a>
+    <a href="switch-to-newest-search.html">次: Only the newest search matters →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

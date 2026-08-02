@@ -1,3 +1,30 @@
+## Unreleased
+
+### Performance
+
+AOT-measured pass over the operators the 0.7.2 additions and the
+DartComparison benchmark #53 (smoothed-zone-changes) exercise; that case's
+headline-scale gap vs hand-written Dart shrank from 2.7× to 1.37× with no
+API or output change.
+
+* **`uniqAdjacentBy` / `pairwise` / `ifEmpty`** — rewritten from `sync*`
+  generators to hand-written iterator classes (the 0.7.2 additions had
+  missed the 0.7.1-era conversion; `sync*` `moveNext` is ~4× slower under
+  AOT and compounds per chained operator).
+* **`windowed` / `chunk`** — the shared sliding core keeps overlap in a
+  reused ring buffer, so each emitted window costs exactly one exact-size
+  allocation instead of `sublist` + growable `add`. Windows are now
+  fixed-length lists (mutating a yielded window with `add` no longer
+  works; contents and laziness are unchanged).
+* **`sum` / `average`** — indexed fast paths for `List<double>` /
+  `List<int>` (no iterator, unboxed loads; results bit-identical to the
+  generic path). **`sumBy` / `averageBy`** iterate lists by index.
+* **`Fx.sum/average/min/max`** now unwrap the chain's inner iterable
+  instead of re-iterating through the `Fx` wrapper, and `fx()` /
+  `Fx.average`/`Fx.sum` carry `@pragma('vm:prefer-inline')` so AOT escape
+  analysis can erase the wrapper allocation in per-element uses like
+  `.map((w) => fx(w).average())`.
+
 ## 0.7.2
 
 ### Added — Rx-inspired pull operators

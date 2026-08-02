@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Each call feeds the next — RxDart vs FxDart</title>
+  <meta name="description" content="Four API calls where each response seeds the next request — scan threads the state through the pipeline; asyncMap closes over a mutable token.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/RxDartComparison/dependent-calls-in-sequence.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/dependent-calls-in-sequence.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/dependent-calls-in-sequence.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/dependent-calls-in-sequence.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/dependent-calls-in-sequence.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/dependent-calls-in-sequence.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/dependent-calls-in-sequence.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/dependent-calls-in-sequence.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/dependent-calls-in-sequence.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Главная</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="../../RxDartComparison/dependent-calls-in-sequence.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/dependent-calls-in-sequence.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/dependent-calls-in-sequence.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/dependent-calls-in-sequence.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/dependent-calls-in-sequence.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/dependent-calls-in-sequence.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/dependent-calls-in-sequence.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #37 · <strong>Each call feeds the next</strong></p>
+  <h1>Each call feeds the next</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/scan.html">scan</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Four API steps run strictly one after another — login, profile,
+    orders, invoice — and each request is built from the
+    <strong>previous response</strong> (the session id feeds the profile
+    call, the user id feeds the orders call, …). Print each step with its
+    response. The fake API table is in the code; both versions must print
+    the lines shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">login -&gt; session-9
+profile -&gt; user-42
+orders -&gt; order-7
+invoice -&gt; pdf-3</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="6c1ec76f3c4dc2c8">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+const steps = ['login', 'profile', 'orders', 'invoice'];
+
+// Each response is the input of the next request.
+const api = {
+  'login(guest)': 'session-9',
+  'profile(session-9)': 'user-42',
+  'orders(user-42)': 'order-7',
+  'invoice(order-7)': 'pdf-3',
+};
+
+Future<String> call(String request) async {
+  await Future.delayed(const Duration(milliseconds: 15));
+  return api[request]!;
+}
+
+Future<void> main() async {
+  // asyncMap pauses the source per future, so the calls are sequential
+  // by construction; a closure variable threads each response onward.
+  var token = 'guest';
+  final log = await Stream.fromIterable(steps).asyncMap((step) async {
+    token = await call('$step($token)');
+    return '$step -> $token';
+  }).toList();
+
+  log.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="ee4b7adf533e8de4">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+const steps = ['login', 'profile', 'orders', 'invoice'];
+
+// Each response is the input of the next request.
+const api = {
+  'login(guest)': 'session-9',
+  'profile(session-9)': 'user-42',
+  'orders(user-42)': 'order-7',
+  'invoice(order-7)': 'pdf-3',
+};
+
+Future<String> call(String request) async {
+  await Future.delayed(const Duration(milliseconds: 15));
+  return api[request]!;
+}
+
+Future<void> main() async {
+  // scan threads the previous response into the next request; the pull
+  // pipeline is sequential, so each call waits for the one before it.
+  final log = await fx(steps)
+      .toAsync()
+      .scan<(String, String)>(
+          (acc, step) async => (step, await call('$step(${acc.$2})')),
+          ('', 'guest'))
+      .map((r) => '${r.$1} -> ${r.$2}')
+      .toList();
+
+  // scan emits its seed first — skip that line in the printout.
+  log.skip(1).forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Neither model has to fight for sequentiality here. RxDart's
+    <code>asyncMap</code> pauses the source while each future
+    runs, so the calls are serial by construction; a pull pipeline only
+    ever asks for the next value after the previous one resolved, so it
+    is serial by default. The interesting difference is where the
+    <em>dependency</em> — the token each response hands the next request —
+    lives.
+  </p>
+  <p>
+    The RxDart side threads it through a mutable variable the mapper
+    closes over: idiomatic, compact, and slightly outside the pipeline —
+    the data flow between steps is invisible to the operator chain. The
+    FxDart side threads it through <code><a href="../tutorials/scan.html">scan</a></code>'s accumulator, so
+    the previous response is an explicit input of the next step; the cost
+    is that <code><a href="../tutorials/scan.html">scan</a></code> emits its seed, which the printout has to
+    skip. One hidden variable versus one skipped seed line — a genuine
+    tie, decided by whether you prefer state captured in a closure or
+    state visible in the fold.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="completion-order-pool.html">← Назад: Fastest result first</a>
+    <a href="crawl-the-pages.html">Далее: Crawl pages until exhausted →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

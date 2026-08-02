@@ -1,0 +1,6 @@
+2026-08-01  balance 120.00
+2026-08-02  balance 84.50
+2026-08-03  balance 210.25
+2026-08-04  balance 45.00
+2026-08-05  balance 99.90
+closed: true

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>새로고침 버튼 스로틀링하기 — RxDart vs FxDart</title>
+  <meta name="description" content="300 ms 윈도마다 탭 하나만 통과 — 탭 스트림 위의 throttleTime vs 손으로 스트림에 배선한 fxdart의 throttle 콜백 래퍼.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/throttled-refresh.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/throttled-refresh.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/throttled-refresh.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/throttled-refresh.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/throttled-refresh.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/throttled-refresh.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/throttled-refresh.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/throttled-refresh.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../RxDartComparison/throttled-refresh.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/throttled-refresh.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/throttled-refresh.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/throttled-refresh.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/throttled-refresh.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/throttled-refresh.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/throttled-refresh.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #41 · <strong>새로고침 버튼 스로틀링하기</strong></p>
+  <h1>새로고침 버튼 스로틀링하기</h1>
+  <p class="cmp-meta"><span class="badge verdict-rxdart">RxDart의 영역</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/throttle.html">throttle</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>요구사항</h2>
+  <p>
+    사용자가 새로고침 버튼을 연타합니다: 0/50/100/400/450/800&nbsp;ms
+    시점의 탭들. 300&nbsp;ms 윈도당 최대 한 번의 새로고침만
+    통과시키되, 각 윈도의 <em>첫</em> 탭을 취하세요 — 그래서 정확히
+    세 번의 새로고침이 발동합니다(탭 0, 3, 5). 스트림이 닫힌 뒤 어느
+    탭들이 통과했는지 출력합니다. 탭 스케줄은 코드에 시뮬레이션되어
+    있습니다; 두 버전 모두 <em>예상 출력</em> 아래에 표시된 줄들을
+    출력해야 합니다.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>예상 출력</summary>
+    <pre class="code">refresh fired on tap 0
+refresh fired on tap 3
+refresh fired on tap 5
+taps: 6, refreshes: 3</pre>
+  </details>
+
+  <h2>나란히 보기</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="e1f7ddf83c9c01df">
+<textarea>
+import 'dart:async';
+
+import 'package:rxdart/rxdart.dart';
+
+/// Simulated refresh-button taps: two quick bursts, then one late tap.
+Stream<int> taps() {
+  final c = StreamController<int>();
+  const offsets = [0, 50, 100, 400, 450, 800];
+  for (final (i, ms) in offsets.indexed) {
+    Timer(Duration(milliseconds: ms), () => c.add(i));
+  }
+  Timer(const Duration(milliseconds: 1000), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  final fired = await taps()
+      .throttleTime(const Duration(milliseconds: 300))
+      .toList();
+
+  final lines = fired.map((tap) => 'refresh fired on tap $tap');
+  lines.forEach(print);
+  print('taps: 6, refreshes: ${fired.length}');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="d6305852b523e4f2">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Simulated refresh-button taps: two quick bursts, then one late tap.
+Stream<int> taps() {
+  final c = StreamController<int>();
+  const offsets = [0, 50, 100, 400, 450, 800];
+  for (final (i, ms) in offsets.indexed) {
+    Timer(Duration(milliseconds: ms), () => c.add(i));
+  }
+  Timer(const Duration(milliseconds: 1000), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // fxdart's throttle is a callback wrapper, not a stream operator — it is
+  // wired to the tap stream by hand, collecting the taps that get through.
+  final fired = <int>[];
+  final throttled = throttle<int>(fired.add, const Duration(milliseconds: 300),
+      trailing: false);
+  final done = Completer<void>();
+  final sub = taps().listen(throttled.call, onDone: done.complete);
+  await done.future;
+  await sub.cancel();
+
+  final lines = fx(fired).map((tap) => 'refresh fired on tap $tap').toList();
+  lines.forEach(print);
+  print('taps: 6, refreshes: ${fired.length}');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>차이가 나는 이유</h2>
+  <p>
+    스로틀링은 <em>시간 속의 도착</em>에 대한 속도 제한입니다 — 값
+    자체가 아니라 이벤트가 언제 일어나는가의 속성입니다. 그것은
+    스트림의 영토이고, RxDart는 요구사항 전체를 연산자 하나로
+    접습니다: <code>throttleTime(300ms)</code>이 첫 탭에서 윈도를
+    열고, 연타의 나머지를 삼키고, 윈도 이후의 다음 탭에서 다시 엽니다
+    — 구독, 윈도 장부 정리, 완료까지 모두 처리됩니다.
+  </p>
+  <p>
+    FxDart의 파이프라인에는 설계상 시계가 없습니다 — 풀 체인은 도착
+    시각이 아니라 요구를 봅니다 — 그래서 그 <code><a href="../tutorials/throttle.html">throttle</a></code>은
+    FxTS 스타일의 <em>콜백 래퍼</em>입니다. 정확히 같은 리딩 엣지
+    윈도를 구현하지만, 스트림에 배선하는 일은 직접 해야 합니다:
+    구독하고, 각 탭을 스로틀된 함수에 먹이고, 살아남은 것들을 모으고,
+    <code>Completer</code>로 완료를 추적하고, 그 뒤에야 리스트를
+    포매팅용 타입 있는 체인에 넘깁니다. 같은 세 탭, 눈에 띄게 많은
+    배관. 이것은 깨끗하게 RxDart의 것입니다: 스로틀링은 푸시 문제이고,
+    탭 스트림이 그것을 풀어야 할 자리입니다.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="debounced-search.html">← 이전: 검색창 디바운스하기</a>
+    <a href="sampled-gauge.html">다음: 폴링 틱마다 게이지 샘플링하기 →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

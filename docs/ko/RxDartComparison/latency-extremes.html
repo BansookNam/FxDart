@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>가장 빠른 요청과 가장 느린 요청 — RxDart vs FxDart</title>
+  <meta name="description" content="엔드포인트 여덟 개를 비동기로 프로브해 최소·최대 지연을 출력하기 — 양쪽 모두 Future를 반환하는 축약, 각각 새 패스 한 번씩.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/latency-extremes.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/latency-extremes.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/latency-extremes.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/latency-extremes.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/latency-extremes.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/latency-extremes.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/latency-extremes.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/latency-extremes.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../RxDartComparison/latency-extremes.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/latency-extremes.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/latency-extremes.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/latency-extremes.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/latency-extremes.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/latency-extremes.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/latency-extremes.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #20 · <strong>가장 빠른 요청과 가장 느린 요청</strong></p>
+  <h1>가장 빠른 요청과 가장 느린 요청</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/min.html">min</a></li><li><a href="../tutorials/max.html">max</a></li></ul>
+  <h2>요구사항</h2>
+  <p>
+    헬스체크가 비동기 <code>measure</code> 호출로 엔드포인트 여덟 개를
+    프로브하고, 가장 빠른 지연과 가장 느린 지연을 밀리초로 보고합니다.
+    고정된 샘플은 아래 코드에 있으며, 두 버전 모두 <em>예상 출력</em>
+    아래에 표시된 두 줄을 출력해야 합니다.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>예상 출력</summary>
+    <pre class="code">fastest: 12 ms
+slowest: 210 ms</pre>
+  </details>
+
+  <h2>나란히 보기</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="dc7302b27e86cab6">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+// Fixed latency samples per endpoint, in ms.
+const samples = {
+  '/home': 62,
+  '/login': 118,
+  '/search': 87,
+  '/cart': 45,
+  '/checkout': 210,
+  '/api/items': 74,
+  '/api/user': 133,
+  '/health': 12,
+};
+
+Future<int> measure(String path) async {
+  await Future.delayed(const Duration(milliseconds: 10));
+  return samples[path]!;
+}
+
+Future<void> main() async {
+  // min and max are each terminal, and a stream is single-subscription —
+  // each reduction here consumes a fresh stream from the factory (one
+  // asBroadcastStream pass could serve both — at the cost of tying the
+  // two reductions to one subscription's lifetime).
+  Stream<int> latencies() =>
+      Stream.fromIterable(samples.keys).asyncMap(measure);
+
+  final fastest = await latencies().min();
+  final slowest = await latencies().max();
+
+  print('fastest: $fastest ms');
+  print('slowest: $slowest ms');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="1fa02ec23308cfaa">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+// Fixed latency samples per endpoint, in ms.
+const samples = {
+  '/home': 62,
+  '/login': 118,
+  '/search': 87,
+  '/cart': 45,
+  '/checkout': 210,
+  '/api/items': 74,
+  '/api/user': 133,
+  '/health': 12,
+};
+
+Future<int> measure(String path) async {
+  await Future.delayed(const Duration(milliseconds: 10));
+  return samples[path]!;
+}
+
+Future<void> main() async {
+  // min and max are each terminal — every reduction pulls the chain afresh.
+  FxAsync<int> latencies() => fx(samples.keys).toAsync().map(measure);
+
+  final fastest = await latencies().min();
+  final slowest = await latencies().max();
+
+  print('fastest: $fastest ms');
+  print('slowest: $slowest ms');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>차이가 나는 이유</h2>
+  <p>
+    축약은 push와 pull이 수렴하는 곳입니다: 극값을 알려면 시퀀스 전체를
+    봐야 하므로, <code><a href="../tutorials/min.html">min</a></code>과 <code><a href="../tutorials/max.html">max</a></code>는 둘 다 종결
+    연산이고 둘 다 <code>Future</code>를 반환합니다. RxDart의 버전은
+    <code>Comparable</code>이 아닌 요소를 위한 선택적 비교자도 받습니다;
+    FxDart는 <code><a href="../tutorials/min.html">min</a></code>과 <code><a href="../tutorials/max.html">max</a></code>를 숫자 종결 연산으로
+    유지하고 키 기반 경우는 <code>minBy</code>/<code>maxBy</code>로
+    커버합니다. 평범한 정수 위에서 두 호출은 단어 하나까지 동일합니다 —
+    FxDart 쪽은 먼저 <code><a href="../tutorials/toAsync.html">toAsync</a></code>로 pull들을 비동기 체인으로
+    끌어올릴 뿐입니다.
+  </p>
+  <p>
+    거울처럼 마주 보는 주름 하나는 <em>각</em> 축약이 소스를 소비한다는
+    점입니다. Dart 스트림은 단일 구독이라, min을 묻고 나서 max를
+    물으려면 구독 두 번이 필요합니다 — RxDart 쪽에
+    <code>latencies()</code> 팩토리가 있는 이유입니다. FxDart 쪽도 같은
+    이유로 같은 모양입니다: 종결 호출이 체인을 비우므로, 두 번째 축약은
+    새 체인을 끌어옵니다. 따라서 둘 다 두 번 측정하고(먼저 리스트로
+    수집하는 것이 공유되는 대안입니다), 어느 모델도 내세울 만한 우위가
+    없습니다: 무승부, 주변 코드가 이미 흐르는 방향이 결정합니다.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="dedupe-paged-feed.html">← 이전: 페이지 피드를 id로 중복 제거</a>
+    <a href="stock-after-moves.html">다음: 이동마다의 재고 수준 →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

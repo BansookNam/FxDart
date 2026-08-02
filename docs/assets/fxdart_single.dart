@@ -1121,14 +1121,39 @@ FxAsyncIterable<A> uniqAsync<A>(FxAsyncIterable<A> iterable) =>
 /// ```dart
 /// uniqAdjacentBy((a) => a % 10, [1, 11, 21, 2, 1]); // (1, 2, 1)
 /// ```
-Iterable<A> uniqAdjacentBy<A, B>(B Function(A a) f, Iterable<A> iterable) sync* {
-  var hasPrev = false;
-  late B prevKey;
-  for (final a in iterable) {
-    final key = f(a);
-    if (!hasPrev || key != prevKey) yield a;
-    prevKey = key;
-    hasPrev = true;
+Iterable<A> uniqAdjacentBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    _UniqAdjacentByIterable(f, iterable);
+
+class _UniqAdjacentByIterable<A, B> extends Iterable<A> {
+  _UniqAdjacentByIterable(this._f, this._source);
+  final B Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _UniqAdjacentByIterator(_f, _source.iterator);
+}
+
+class _UniqAdjacentByIterator<A, B> implements Iterator<A> {
+  _UniqAdjacentByIterator(this._f, this._it);
+  final B Function(A) _f;
+  final Iterator<A> _it;
+  bool _hasPrev = false;
+  late B _prevKey;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final a = _it.current;
+      final key = _f(a);
+      final keep = !_hasPrev || key != _prevKey;
+      _prevKey = key;
+      _hasPrev = true;
+      if (keep) {
+        current = a;
+        return true;
+      }
+    }
+    return false;
   }
 }
 
@@ -1748,61 +1773,84 @@ class _WindowIterator<A> implements Iterator<List<A>> {
   final int _step;
   final bool _partial;
   final Iterator<A> _it;
-  List<A> _carry = [];
+  // Overlapping elements are kept in a reused ring buffer so each emitted
+  // window costs exactly one exact-size allocation (no sublist + growth).
+  List<A>? _ring;
+  int _ringStart = 0;
+  int _ringCount = 0;
   int _pendingSkip = 0;
   bool _sourceDone = false;
   bool _finished = false;
   @override
   late List<A> current;
 
+  bool _pull() {
+    if (_sourceDone) return false;
+    if (_it.moveNext()) return true;
+    _sourceDone = true;
+    return false;
+  }
+
+  List<A> _emit(int length) {
+    final ring = _ring!;
+    final window = List<A>.filled(length, ring[_ringStart]);
+    var idx = _ringStart;
+    for (var i = 0; i < length; i++) {
+      window[i] = ring[idx];
+      idx++;
+      if (idx == _size) idx = 0;
+    }
+    return window;
+  }
+
   @override
   bool moveNext() {
     if (_finished) return false;
-    while (_pendingSkip > 0 && !_sourceDone) {
-      if (_it.moveNext()) {
-        _pendingSkip--;
-      } else {
-        _sourceDone = true;
-      }
+    while (_pendingSkip > 0 && _pull()) {
+      _pendingSkip--;
     }
     if (_pendingSkip > 0) {
       _finished = true;
       return false;
     }
-    final window = _carry;
-    _carry = [];
-    while (window.length < _size && !_sourceDone) {
-      if (_it.moveNext()) {
-        window.add(_it.current);
-      } else {
-        _sourceDone = true;
-      }
+    while (_ringCount < _size && _pull()) {
+      final v = _it.current;
+      final ring = _ring ??= List<A>.filled(_size, v);
+      var idx = _ringStart + _ringCount;
+      if (idx >= _size) idx -= _size;
+      ring[idx] = v;
+      _ringCount++;
     }
-    if (window.isEmpty) {
+    if (_ringCount == 0) {
       _finished = true;
       return false;
     }
-    if (window.length < _size) {
+    if (_ringCount < _size) {
       // Trailing window(s): keep sliding through the remnant only when
       // partial windows were asked for.
       if (!_partial) {
         _finished = true;
         return false;
       }
-      if (_step >= window.length) {
+      current = _emit(_ringCount);
+      if (_step >= _ringCount) {
         _finished = true;
       } else {
-        _carry = window.sublist(_step);
+        _ringStart = _ringStart + _step;
+        if (_ringStart >= _size) _ringStart -= _size;
+        _ringCount -= _step;
       }
-      current = window;
       return true;
     }
+    current = _emit(_size);
     if (_step < _size) {
-      _carry = window.sublist(_step);
+      _ringStart = _ringStart + _step;
+      if (_ringStart >= _size) _ringStart -= _size;
+      _ringCount -= _step;
     } else {
+      _ringCount = 0;
       _pendingSkip = _step - _size;
     }
-    current = window;
     return true;
   }
 }
@@ -1886,13 +1934,35 @@ FxAsyncIterable<List<A>> _windowedAsync<A>(
 /// ```dart
 /// pairwise([1, 2, 3, 4]); // ((1, 2), (2, 3), (3, 4))
 /// ```
-Iterable<(A, A)> pairwise<A>(Iterable<A> iterable) sync* {
-  var hasPrev = false;
-  late A prev;
-  for (final a in iterable) {
-    if (hasPrev) yield (prev, a);
-    prev = a;
-    hasPrev = true;
+Iterable<(A, A)> pairwise<A>(Iterable<A> iterable) =>
+    _PairwiseIterable(iterable);
+
+class _PairwiseIterable<A> extends Iterable<(A, A)> {
+  _PairwiseIterable(this._source);
+  final Iterable<A> _source;
+  @override
+  Iterator<(A, A)> get iterator => _PairwiseIterator(_source.iterator);
+}
+
+class _PairwiseIterator<A> implements Iterator<(A, A)> {
+  _PairwiseIterator(this._it);
+  final Iterator<A> _it;
+  bool _hasPrev = false;
+  late A _prev;
+  @override
+  late (A, A) current;
+  @override
+  bool moveNext() {
+    if (!_hasPrev) {
+      if (!_it.moveNext()) return false;
+      _prev = _it.current;
+      _hasPrev = true;
+    }
+    if (!_it.moveNext()) return false;
+    final a = _it.current;
+    current = (_prev, a);
+    _prev = a;
+    return true;
   }
 }
 
@@ -2412,13 +2482,36 @@ FxAsyncIterable<A> concatAsync<A>(
 /// ifEmpty(() => [0], <int>[]); // (0)
 /// ```
 Iterable<A> ifEmpty<A>(
-    Iterable<A> Function() fallback, Iterable<A> iterable) sync* {
-  var yielded = false;
-  for (final a in iterable) {
-    yielded = true;
-    yield a;
+        Iterable<A> Function() fallback, Iterable<A> iterable) =>
+    _IfEmptyIterable(fallback, iterable);
+
+class _IfEmptyIterable<A> extends Iterable<A> {
+  _IfEmptyIterable(this._fallback, this._source);
+  final Iterable<A> Function() _fallback;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _IfEmptyIterator(_fallback, _source.iterator);
+}
+
+class _IfEmptyIterator<A> implements Iterator<A> {
+  _IfEmptyIterator(this._fallback, this._it);
+  final Iterable<A> Function() _fallback;
+  final Iterator<A> _it;
+  late Iterator<A> _active;
+  bool _started = false;
+  @override
+  A get current => _active.current;
+  @override
+  bool moveNext() {
+    if (!_started) {
+      _started = true;
+      _active = _it;
+      if (_it.moveNext()) return true;
+      // Source turned out empty: switch to the fallback for good.
+      _active = _fallback().iterator;
+    }
+    return _active.moveNext();
   }
-  if (!yielded) yield* fallback();
 }
 
 /// Yields [iterable] unchanged, or the single [value] when it turns out to
@@ -2957,6 +3050,26 @@ Acc Function(Iterable<A>) reduceLazy<A, Acc>(
 ///
 /// Port of FxTS `sum`.
 num sum(Iterable<num> iterable) {
+  // Monomorphic lists take an indexed loop: no iterator, and the element
+  // loads stay unboxed. Values match the generic path exactly (same
+  // accumulation order; empty stays the int 0).
+  if (iterable is List<double>) {
+    var acc = 0.0;
+    final len = iterable.length;
+    if (len == 0) return 0;
+    for (var i = 0; i < len; i++) {
+      acc += iterable[i];
+    }
+    return acc;
+  }
+  if (iterable is List<int>) {
+    var acc = 0;
+    final len = iterable.length;
+    for (var i = 0; i < len; i++) {
+      acc += iterable[i];
+    }
+    return acc;
+  }
   // Unboxed accumulators with the boxed `num acc += v` sequence's exact
   // semantics: ints accumulate in an int until the first double arrives,
   // then accumulation switches to double seeded with the int total — the
@@ -2986,10 +3099,27 @@ num sum(Iterable<num> iterable) {
 /// Dart-native addition (FxTS has only the numeric `sum`); named after
 /// [maxBy]/[minBy] — Kotlin spells it `sumOf`.
 num sumBy<A>(num Function(A a) f, Iterable<A> iterable) {
-  // Same unboxed int-then-double accumulation as [sum].
+  // Same unboxed int-then-double accumulation as [sum]; lists iterate by
+  // index so no iterator is allocated.
   var iacc = 0;
   var dacc = 0.0;
   var isInt = true;
+  if (iterable is List<A>) {
+    final len = iterable.length;
+    for (var i = 0; i < len; i++) {
+      final v = f(iterable[i]);
+      if (isInt) {
+        if (v is int) {
+          iacc += v;
+          continue;
+        }
+        dacc = iacc.toDouble();
+        isInt = false;
+      }
+      dacc += v;
+    }
+    return isInt ? iacc : dacc;
+  }
   for (final a in iterable) {
     final v = f(a);
     if (isInt) {
@@ -3022,6 +3152,25 @@ String sumStrings(Iterable<String> iterable) =>
 ///
 /// Port of FxTS `average`.
 double average(Iterable<num> iterable) {
+  // Monomorphic-list fast paths, as in [sum].
+  if (iterable is List<double>) {
+    final len = iterable.length;
+    if (len == 0) return double.nan;
+    var acc = 0.0;
+    for (var i = 0; i < len; i++) {
+      acc += iterable[i];
+    }
+    return acc / len;
+  }
+  if (iterable is List<int>) {
+    final len = iterable.length;
+    if (len == 0) return double.nan;
+    var acc = 0;
+    for (var i = 0; i < len; i++) {
+      acc += iterable[i];
+    }
+    return acc / len;
+  }
   // Same unboxed int-then-double accumulation as [sum].
   var size = 0;
   var iacc = 0;
@@ -3061,6 +3210,15 @@ Future<double> averageAsync(FxAsyncIterable<num> iterable) async {
 /// Dart-native addition completing the by-key family
 /// ([sumBy] / [maxBy] / [minBy]).
 double averageBy<A>(num Function(A a) f, Iterable<A> iterable) {
+  if (iterable is List<A>) {
+    final len = iterable.length;
+    if (len == 0) return double.nan;
+    var total = 0.0;
+    for (var i = 0; i < len; i++) {
+      total += f(iterable[i]);
+    }
+    return total / len;
+  }
   var total = 0.0;
   var count = 0;
   for (final a in iterable) {
@@ -5299,6 +5457,9 @@ extension FxAsyncAccumulateOps<T> on FxAsync<T> {
 ///     .filter((a) => a % 2 == 0)
 ///     .toList(); // [12, 14]
 /// ```
+// prefer-inline lets AOT escape analysis erase the wrapper allocation when a
+// chain like `fx(w).average()` is built and consumed inside one expression.
+@pragma('vm:prefer-inline')
 Fx<T> fx<T>(Iterable<T> iterable) => Fx(iterable);
 
 /// Wraps an [FxAsyncIterable] in a chainable [FxAsync].
@@ -5582,16 +5743,18 @@ class Fx<T> extends Iterable<T> {
 /// to `Fx<int>` and `Fx<double>` as well).
 extension FxNum on Fx<num> {
   /// The sum of every value.
-  num sum() => _$sum(this);
+  @pragma('vm:prefer-inline')
+  num sum() => _$sum(_inner);
 
   /// The arithmetic mean of every value.
-  double average() => _$average(this);
+  @pragma('vm:prefer-inline')
+  double average() => _$average(_inner);
 
   /// The smallest value.
-  num min() => _$min(this);
+  num min() => _$min(_inner);
 
   /// The largest value.
-  num max() => _$max(this);
+  num max() => _$max(_inner);
 }
 
 /// Async chainable iterable — the async half of FxTS's `fx` chain.

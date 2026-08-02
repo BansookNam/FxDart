@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>예산을 넘는 첫 거래 — RxDart vs FxDart</title>
+  <meta name="description" content="100을 넘는 첫 거래를 찾고 멈추기 — Rx firstWhere는 구독을 취소하고, fxdart find는 끌어오기를 멈춥니다. 양쪽 모두 8건 중 4건만 검사합니다.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/first-over-budget-rx.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/first-over-budget-rx.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/first-over-budget-rx.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/first-over-budget-rx.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/first-over-budget-rx.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/first-over-budget-rx.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/first-over-budget-rx.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/first-over-budget-rx.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../RxDartComparison/first-over-budget-rx.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/first-over-budget-rx.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/first-over-budget-rx.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/first-over-budget-rx.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/first-over-budget-rx.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/first-over-budget-rx.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/first-over-budget-rx.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #3 · <strong>예산을 넘는 첫 거래</strong></p>
+  <h1>예산을 넘는 첫 거래</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/find.html">find</a></li></ul>
+  <h2>요구사항</h2>
+  <p>
+    이번 주 카드 피드를 도착 순서대로 훑어 예산 100을 넘는
+    <strong>첫</strong> 거래를 보고하고 — 그 뒤로는 더 찾지 마세요.
+    검색이 짧게 끊겼음을 증명하기 위해, 실제로 검사한 거래 수도
+    출력합니다. 데이터는 아래 코드에 있으며, 두 버전 모두
+    <em>예상 출력</em> 아래에 표시된 줄들을 출력해야 합니다.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>예상 출력</summary>
+    <pre class="code">First over budget: T-04 (128)
+Examined 4 of 8 transactions</pre>
+  </details>
+
+  <h2>나란히 보기</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="163b1806d98426d9">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+// This week's card feed — searched in arrival order.
+const txns = [
+  (id: 'T-01', amount: 42),
+  (id: 'T-02', amount: 67),
+  (id: 'T-03', amount: 15),
+  (id: 'T-04', amount: 128),
+  (id: 'T-05', amount: 80),
+  (id: 'T-06', amount: 210),
+  (id: 'T-07', amount: 33),
+  (id: 'T-08', amount: 55),
+];
+const budget = 100;
+
+Future<void> main() async {
+  var examined = 0;
+  // firstWhere resolves on the first match and cancels the subscription —
+  // the doOnData tap counts how many events actually flowed before that.
+  final hit = await Stream.fromIterable(txns)
+      .doOnData((_) => examined++)
+      .firstWhere((t) => t.amount > budget);
+
+  print('First over budget: ${hit.id} (${hit.amount})');
+  print('Examined $examined of ${txns.length} transactions');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="05237797c7c04fb5">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+// This week's card feed — searched in arrival order.
+const txns = [
+  (id: 'T-01', amount: 42),
+  (id: 'T-02', amount: 67),
+  (id: 'T-03', amount: 15),
+  (id: 'T-04', amount: 128),
+  (id: 'T-05', amount: 80),
+  (id: 'T-06', amount: 210),
+  (id: 'T-07', amount: 33),
+  (id: 'T-08', amount: 55),
+];
+const budget = 100;
+
+void main() {
+  var examined = 0;
+  // find stops pulling at the first match — the predicate runs once per
+  // pulled element, so counting inside it shows how far the pull went.
+  final hit = fx(txns).find((t) {
+    examined++;
+    return t.amount > budget;
+  });
+
+  print('First over budget: ${hit!.id} (${hit.amount})');
+  print('Examined $examined of ${txns.length} transactions');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>차이가 나는 이유</h2>
+  <p>
+    여기서는 양쪽 모두, 각자의 방언으로, 진짜 지연 평가입니다. RxDart의
+    <code>firstWhere</code>는 첫 일치에서 future를 확정하고
+    <strong>구독을 취소합니다</strong> — 남은 네 건의 거래는 결코 전달되지
+    않습니다. FxDart의 <code><a href="../tutorials/find.html">find</a></code>는 그저 <strong>끌어오기를
+    멈춥니다</strong> — 남은 네 건의 거래는 결코 요구되지 않습니다. 취소와
+    수요는 같은 경제성을 가리키는 두 모델 각각의 단어이고,
+    "Examined 4 of 8" 줄은 양쪽에서 동일하게 나옵니다.
+  </p>
+  <p>
+    배울 점이 있는 차이는 <em>카운트가 어디에 사는가</em>입니다.
+    스트림에는 "사이"가 있습니다: <code>doOnData</code>가 연산자 사이의
+    파이프를 톡톡 두드리므로, rx 술어는 순수하게 남고 탭이 트래픽을
+    관찰합니다. pull 체인에는 사이가 없습니다 — 수요의 순간이 곧 술어
+    호출 그 자체이므로, FxDart 쪽은 술어 안에서 셉니다. 어느 표기가 더
+    낫다고 할 수 없습니다; 각각 push와 pull에 고유한 관찰 관용구입니다.
+    판정: 무승부 — 연산자 하나씩, 그리고 둘 다 정확히 옳은 순간에
+    멈춥니다.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="running-balance-feed.html">← 이전: 입출금 피드의 누적 잔액</a>
+    <a href="skip-warmup-readings.html">다음: 예열 구간 판독값 건너뛰기 →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

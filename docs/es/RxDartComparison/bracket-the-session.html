@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Marcadores de apertura y cierre — RxDart vs FxDart</title>
+  <meta name="description" content="Envolver un feed de sesión en líneas OPEN/CLOSE — startWith y endWith en el stream frente a prepend y append en la cadena pull.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/bracket-the-session.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/bracket-the-session.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/bracket-the-session.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/bracket-the-session.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/bracket-the-session.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/bracket-the-session.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/bracket-the-session.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/bracket-the-session.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../RxDartComparison/bracket-the-session.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/bracket-the-session.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/bracket-the-session.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/bracket-the-session.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/bracket-the-session.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/bracket-the-session.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/bracket-the-session.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #18 · <strong>Marcadores de apertura y cierre</strong></p>
+  <h1>Marcadores de apertura y cierre</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Empate</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/prepend.html">prepend</a></li><li><a href="../tutorials/append.html">append</a></li></ul>
+  <h2>Requisito</h2>
+  <p>
+    Un informe de sesión lista los eventos de un usuario en orden,
+    enmarcados por una línea <code>== SESSION OPEN ==</code> antes del
+    primer evento y una línea <code>== SESSION CLOSE ==</code> después del
+    último. Los cuatro eventos están en el código; las dos versiones deben
+    imprimir las líneas que aparecen bajo <em>Salida esperada</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Salida esperada</summary>
+    <pre class="code">== SESSION OPEN ==
+09:12 login kim
+09:14 open /reports
+09:26 edit budget-aug
+09:41 logout kim
+== SESSION CLOSE ==</pre>
+  </details>
+
+  <h2>Lado a lado</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="4413bc17a964d5b5">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+// One user session's events, already collected in order.
+const events = [
+  '09:12 login kim',
+  '09:14 open /reports',
+  '09:26 edit budget-aug',
+  '09:41 logout kim',
+];
+
+Future<void> main() async {
+  final lines = await Stream.fromIterable(events)
+      .startWith('== SESSION OPEN ==')
+      .endWith('== SESSION CLOSE ==')
+      .toList();
+
+  lines.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="309443202be1a7e0">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+// One user session's events, already collected in order.
+const events = [
+  '09:12 login kim',
+  '09:14 open /reports',
+  '09:26 edit budget-aug',
+  '09:41 logout kim',
+];
+
+void main() {
+  final lines = fx(events)
+      .prepend('== SESSION OPEN ==')
+      .append('== SESSION CLOSE ==')
+      .toList();
+
+  lines.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Por qué difieren</h2>
+  <p>
+    Casi en ningún sitio: esto es paridad de vocabulario. El
+    <code>startWith</code> de RxDart inyecta un valor antes de la primera
+    emisión de la fuente y <code>endWith</code> inyecta uno después de que
+    la fuente se complete; el <code><a href="../tutorials/prepend.html">prepend</a></code> y el
+    <code><a href="../tutorials/append.html">append</a></code> de FxDart son las mismas dos palabras en una
+    cadena pull: producen el marcador antes de que el primer tirón llegue
+    a la fuente y después de que la fuente se seque. Un operador cada uno,
+    nombres simétricos, de primera clase en ambos lados.
+  </p>
+  <p>
+    La única diferencia de modelo que merece notarse es <em>cuándo</em>
+    puede existir el marcador de cierre. En el lado push,
+    <code>endWith</code> tiene que esperar el evento done — la posición
+    del marcador es un hecho sobre el ciclo de vida del stream. En el lado
+    pull, <code><a href="../tutorials/append.html">append</a></code> es simplemente lo siguiente que el iterador
+    produce una vez agotada la fuente; no hay ciclo de vida que observar,
+    solo demanda. Para un feed finito en memoria la distinción es
+    invisible, así que este es un empate — elige el modelo en el que ya
+    vive el resto de tu pipeline.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="feeds-in-order.html">← Anterior: Dos feeds, estrictamente en orden</a>
+    <a href="dedupe-paged-feed.html">Siguiente: Deduplica un feed paginado por id →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

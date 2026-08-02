@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Report only status changes — RxDart vs FxDart</title>
+  <meta name="description" content="Collapse a repetitive health feed to one line per run — Stream.distinct vs uniqAdjacent, with distinctUnique and uniq as the global cousins.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/RxDartComparison/status-transitions.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/status-transitions.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/status-transitions.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/status-transitions.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/status-transitions.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/status-transitions.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/status-transitions.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/status-transitions.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/status-transitions.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">ホーム</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="../../RxDartComparison/status-transitions.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/status-transitions.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/status-transitions.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/status-transitions.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/status-transitions.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/status-transitions.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/status-transitions.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #14 · <strong>Report only status changes</strong></p>
+  <h1>Report only status changes</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/uniqAdjacent.html">uniqAdjacent</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    A health-check feed reports <code>ok, ok, warn, warn, ok, ok, ok</code>
+    — mostly repetition. Print one <em>status now</em> line per
+    <strong>run</strong> (three lines), then a single
+    <code>statuses seen:</code> line listing every distinct status in
+    first-seen order. The data is in the code; both
+    versions must print the lines shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">status now: ok
+status now: warn
+status now: ok
+statuses seen: ok, warn</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="671f1bde9a669419">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+// Health-check feed, one status per probe.
+const feed = ['ok', 'ok', 'warn', 'warn', 'ok', 'ok', 'ok'];
+
+Future<void> main() async {
+  final changes = await Stream.fromIterable(feed)
+      .distinct() // plain Stream.distinct is adjacent-only: one per run
+      .map((s) => 'status now: $s')
+      .toList();
+
+  // The global cousin: rxdart's distinctUnique dedups across the whole
+  // stream, so 'ok' survives only once.
+  final seen = await Stream.fromIterable(feed).distinctUnique().toList();
+
+  changes.forEach(print);
+  print('statuses seen: ${seen.join(', ')}');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="3d893f27a42a7a7d">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+// Health-check feed, one status per probe.
+const feed = ['ok', 'ok', 'warn', 'warn', 'ok', 'ok', 'ok'];
+
+void main() {
+  final changes = fx(feed)
+      .uniqAdjacent() // drops repeats of the predecessor: one per run
+      .map((s) => 'status now: $s')
+      .toList();
+
+  // The global cousin: uniq dedups across the whole feed, so 'ok'
+  // survives only once.
+  final seen = fx(feed).uniq().toList();
+
+  changes.forEach(print);
+  print('statuses seen: ${seen.join(', ')}');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Adjacent deduplication — "tell me when the value <em>changes</em>" —
+    is one value of remembered state in either model, and the two sides
+    are line-for-line twins. The only trap is naming, and it cuts in
+    opposite directions. On the stream side, plain
+    <code>Stream.distinct</code> is <em>already</em> adjacent-only —
+    RxDart adds <code>distinctUnique</code> for the global version many
+    people expect <code>distinct</code> to be. FxDart names it the other
+    way around: <code><a href="../tutorials/uniq.html">uniq</a></code> is global, like every collection
+    library's <code><a href="../tutorials/uniq.html">uniq</a></code>, and <code><a href="../tutorials/uniqAdjacent.html">uniqAdjacent</a></code> says the
+    adjacent-ness out loud.
+  </p>
+  <p>
+    Both pairs are shown above on purpose: run-collapsing with
+    <code>distinct</code>&nbsp;/&nbsp;<code><a href="../tutorials/uniqAdjacent.html">uniqAdjacent</a></code>, the
+    seen-anywhere summary with
+    <code>distinctUnique</code>&nbsp;/&nbsp;<code><a href="../tutorials/uniq.html">uniq</a></code>. Note what
+    the global versions cost in each model — a growing "seen" set either
+    way, but the stream one must hold it for the (potentially unbounded)
+    life of a subscription, which is why RxDart makes the global form
+    the opt-in. On a finite feed like this the models don't separate at
+    all: a tie.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="tick-deltas.html">← 前: Deltas between ticks</a>
+    <a href="spend-by-category-rx.html">次: Spend grouped by category →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

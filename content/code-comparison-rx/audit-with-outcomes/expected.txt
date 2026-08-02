@@ -1,0 +1,6 @@
+timeout = 30
+port = 8080
+workers = 4
+ttl = 300
+batch = 25
+failures: 3

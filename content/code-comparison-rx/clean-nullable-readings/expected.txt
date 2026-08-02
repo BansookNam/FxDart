@@ -1,0 +1,7 @@
+3.4 V
+3.9 V
+4.1 V
+3.7 V
+4.4 V
+4.0 V
+Dropped 3 empty samples

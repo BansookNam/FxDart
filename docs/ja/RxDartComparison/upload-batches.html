@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Upload in batches of 4 — RxDart vs FxDart</title>
+  <meta name="description" content="Ten pending files, at most four per request — bufferCount(4) on the stream vs chunk(4) on the pull chain, with the short last batch on both sides.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/RxDartComparison/upload-batches.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/upload-batches.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/upload-batches.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/upload-batches.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/upload-batches.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/upload-batches.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/upload-batches.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/upload-batches.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/upload-batches.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">ホーム</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="../../RxDartComparison/upload-batches.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/upload-batches.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/upload-batches.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/upload-batches.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/upload-batches.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/upload-batches.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/upload-batches.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #11 · <strong>Upload in batches of 4</strong></p>
+  <h1>Upload in batches of 4</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Ten files are queued for upload and the API accepts at most
+    <strong>four per request</strong>. Group the queue into batches of 4
+    (the last one is short) and print each batch's size and ids. The data
+    is in the code; both versions must print the lines shown under
+    <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">batch of 4: img-01 img-02 img-03 img-04
+batch of 4: img-05 img-06 img-07 img-08
+batch of 2: img-09 img-10</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="109a5c4f7b97456a">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+// Ten files waiting to go out — the API accepts at most four per request.
+const pending = [
+  'img-01', 'img-02', 'img-03', 'img-04', 'img-05', //
+  'img-06', 'img-07', 'img-08', 'img-09', 'img-10',
+];
+
+Future<void> main() async {
+  final requests = await Stream.fromIterable(pending)
+      .bufferCount(4)
+      .map((batch) => 'batch of ${batch.length}: ${batch.join(' ')}')
+      .toList();
+
+  requests.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="f121d678a2670cbe">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+// Ten files waiting to go out — the API accepts at most four per request.
+const pending = [
+  'img-01', 'img-02', 'img-03', 'img-04', 'img-05', //
+  'img-06', 'img-07', 'img-08', 'img-09', 'img-10',
+];
+
+void main() {
+  final requests = fx(pending)
+      .chunk(4)
+      .map((batch) => 'batch of ${batch.length}: ${batch.join(' ')}')
+      .toList();
+
+  requests.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Non-overlapping batching is core vocabulary in both models, and both
+    say it in one word: <code>bufferCount(4)</code> collects four events
+    before emitting a <code>List</code>, <code>chunk(4)</code> pulls four
+    values into a <code>List</code> per demand. Both flush the short
+    trailing batch when the source runs out. The <code><a href="../tutorials/map.html">map</a></code> that
+    formats each batch is then character-for-character identical.
+  </p>
+  <p>
+    Where the models would start to diverge is just outside this
+    example's frame. A stream buffers because values arrive on their own
+    schedule — <code>bufferCount</code> also has time-based siblings
+    (<code>bufferTime</code>) that a pull pipeline deliberately doesn't
+    offer, because "what arrived in the last second" has no meaning when
+    the consumer controls arrival. A pull chain chunks because the
+    <em>consumer</em> wants four-at-a-time demand — which is also why
+    <code><a href="../tutorials/chunk.html">chunk</a></code> composes directly with downstream concurrency
+    (send each batch while assembling the next). For a fixed queue of
+    ten, neither advantage is exercised: a tie.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="empty-report-default.html">← 前: A default line for an empty report</a>
+    <a href="sliding-average-rx.html">次: Three-reading moving average →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

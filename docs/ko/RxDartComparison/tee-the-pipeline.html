@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>소스 하나, 독립 리더 둘 — RxDart vs FxDart</title>
+  <meta name="description" content="부수효과 있는 소스 하나에서 두 번 실행하지 않고 합계와 최댓값 얻기 — connectable 스트림 vs 버퍼링된 한 번의 순회를 나누는 fork.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/tee-the-pipeline.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/tee-the-pipeline.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/tee-the-pipeline.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/tee-the-pipeline.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/tee-the-pipeline.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/tee-the-pipeline.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/tee-the-pipeline.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/tee-the-pipeline.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../RxDartComparison/tee-the-pipeline.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/tee-the-pipeline.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/tee-the-pipeline.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/tee-the-pipeline.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/tee-the-pipeline.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/tee-the-pipeline.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/tee-the-pipeline.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #48 · <strong>소스 하나, 독립 리더 둘</strong></p>
+  <h1>소스 하나, 독립 리더 둘</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/fork.html">fork</a></li><li><a href="../tutorials/sum.html">sum</a></li><li><a href="../tutorials/max.html">max</a></li></ul>
+  <h2>요구사항</h2>
+  <p>
+    하나의 측정값 소스가 <strong>두 개의</strong> 독립적인 계산 —
+    합계와 최댓값 — 을 먹여 살리되, 정확히 한 번만 실행되어야 합니다.
+    소스는 실행될 때마다 카운터를 증가시킵니다; 합계, 최댓값, 그리고
+    한 번의 순회를 증명하는 카운터를 출력하세요. 데이터는 코드에 들어
+    있습니다; 두 버전 모두 <em>예상 출력</em> 아래에 표시된 줄들을
+    출력해야 합니다.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>예상 출력</summary>
+    <pre class="code">total: 74
+peak: 25
+source runs: 1</pre>
+  </details>
+
+  <h2>나란히 보기</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="356e32e086d55422">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+int sourceRuns = 0;
+
+/// A side-effecting source — running it twice would double [sourceRuns].
+Stream<int> readings() async* {
+  sourceRuns++;
+  yield* Stream.fromIterable(const [12, 7, 25, 3, 18, 9]);
+}
+
+Future<void> main() async {
+  // Make the stream connectable: attach BOTH readers first, then connect,
+  // so one subscription to the source feeds two reductions.
+  final shared = readings().publish();
+  final total = shared.fold<int>(0, (acc, r) => acc + r);
+  final peak = shared.reduce((a, b) => a > b ? a : b);
+  shared.connect();
+
+  print('total: ${await total}');
+  print('peak: ${await peak}');
+  print('source runs: $sourceRuns');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="3bd7bdf22f63bc57">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+int sourceRuns = 0;
+
+/// A side-effecting source — running it twice would double [sourceRuns].
+Iterable<int> readings() sync* {
+  sourceRuns++;
+  yield* const [12, 7, 25, 3, 18, 9];
+}
+
+void main() {
+  // fork the SAME iterable object twice: both cursors share one buffered
+  // pass over the source, in whatever order they happen to read.
+  final shared = readings();
+  final total = fx(fork(shared)).sum();
+  final peak = fx(fork(shared)).max();
+
+  print('total: $total');
+  print('peak: $peak');
+  print('source runs: $sourceRuns');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>차이가 나는 이유</h2>
+  <p>
+    여기서는 두 모델이 같은 벽에 부딪힙니다: 소스가 소비자마다 다시
+    시작된다는 것. 평범한 단일 구독 스트림을 두 번 listen하는 것은
+    오류이고; <code>sync*</code> 제너레이터를 두 번 순회하면 조용히 두
+    번 실행됩니다. 그리고 두 라이브러리는 같은 아이디어로 답합니다 —
+    한 번의 순회를 공유하기. RxDart는 스트림을 <em>connectable</em>로
+    만듭니다: <code>publish()</code>가 소스를 미루고, 두 리덕션이
+    구독한 뒤, <code>connect()</code>가 그들을 먹이는 단 하나의 구독을
+    시작합니다. FxDart의 <code><a href="../tutorials/fork.html">fork</a></code>는 버퍼링된 하나의 반복을
+    가지 칩니다: 같은 iterable 객체의 모든 fork는 공유 버퍼 위의
+    독립적인 커서이므로, 리더가 몇이든 제너레이터 본문은 한 번만
+    실행됩니다.
+  </p>
+  <p>
+    차이는 능력이 아니라 결입니다. rx 버전은 순서에 민감합니다 —
+    리더들이 <code>connect()</code> <em>전에</em> 붙어야 하고, 늦게 온
+    쪽은 이벤트를 놓칩니다; 그것이 푸시입니다: 전달은 준비 여부와
+    무관하게 일어납니다. fx 버전은 정체성에 민감합니다 — <em>같은
+    객체</em>를 fork해야 하고, 뒤처진 fork는 그저 자기 속도로 버퍼를
+    되감아 읽습니다; 그것이 풀입니다: 값은 요구를 기다립니다. 대가는
+    메모리입니다: 공유 버퍼는 가장 느린 fork가 소비할 때까지 모든
+    값을 붙들고 있으므로, 심하게 뒤처진 리더는 순회 전체를 살려 두게
+    됩니다 — rx의 지각생이라면 그냥 놓치고 말았을 자리에서. 어느 쪽도
+    "파이프라인 티 나누기"에 대한 훌륭한 답이므로 무승부입니다 —
+    나머지 코드가 이미 살고 있는 모델에 맞는 쪽을 고르세요.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="live-latest-value.html">← 이전: 늦게 온 리더를 위한 라이브 현재 값</a>
+    <a href="stream-into-pipeline.html">다음: 스트림이 타입 있는 파이프라인으로 흘러들 때 →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

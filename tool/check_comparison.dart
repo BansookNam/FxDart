@@ -5,6 +5,11 @@
 //   dart run tool/check_comparison.dart              verify all, write expected.txt
 //   dart run tool/check_comparison.dart <slug> ...   verify only these examples
 //   dart run tool/check_comparison.dart --check      fail if anything is stale (CI/deploy guard)
+//   dart run tool/check_comparison.dart --rx [...]   same, for the RxDart-vs-FxDart
+//                                                    family (content/comparison-rx/ +
+//                                                    content/code-comparison-rx/; the
+//                                                    left panel is rxdart.dart and may
+//                                                    import only package:rxdart)
 //
 // What is enforced, per example directory content/code-comparison/<slug>/:
 //   - native.dart and fxdart.dart exist and run to completion.
@@ -28,7 +33,45 @@ import 'package:fxdart/fxdart.dart';
 final root = Directory.current.path;
 
 const _bannedImports = ['dart:io', 'dart:ffi', 'dart:isolate', 'dart:mirrors', 'dart:html'];
-const _nativeAllowedPackages = ['package:collection/'];
+
+/// The two comparison families share one harness; `--rx` selects the second.
+class _Family {
+  const _Family({
+    required this.contentDir,
+    required this.codeDir,
+    required this.leftFile,
+    required this.leftAllowedPackages,
+    required this.leftMustImport,
+    required this.leftPolicy,
+  });
+
+  final String contentDir;
+  final String codeDir;
+  final String leftFile; // the non-fxdart panel
+  final List<String> leftAllowedPackages;
+  final String? leftMustImport; // package prefix the left panel must import
+  final String leftPolicy; // human-readable import policy for error messages
+}
+
+const _dartFamily = _Family(
+  contentDir: 'comparison',
+  codeDir: 'code-comparison',
+  leftFile: 'native.dart',
+  leftAllowedPackages: ['package:collection/'],
+  leftMustImport: null,
+  leftPolicy: 'native panels may import only package:collection',
+);
+
+const _rxFamily = _Family(
+  contentDir: 'comparison-rx',
+  codeDir: 'code-comparison-rx',
+  leftFile: 'rxdart.dart',
+  leftAllowedPackages: ['package:rxdart/'],
+  leftMustImport: 'package:rxdart/',
+  leftPolicy: 'rxdart panels may import only package:rxdart',
+);
+
+late _Family _family;
 
 class Failure {
   Failure(this.slug, this.message);
@@ -40,9 +83,10 @@ class Failure {
 
 Future<void> main(List<String> args) async {
   final check = args.contains('--check');
+  _family = args.contains('--rx') ? _rxFamily : _dartFamily;
   final only = args.where((a) => !a.startsWith('--')).toSet();
 
-  final dir = Directory('$root/content/comparison');
+  final dir = Directory('$root/content/${_family.contentDir}');
   var slugs = dir
       .listSync()
       .whereType<File>()
@@ -105,31 +149,31 @@ class _Result {
 
 Future<_Result> _verify(String slug, {required bool check}) async {
   final failures = <Failure>[];
-  final dir = '$root/content/code-comparison/$slug';
-  final nativeFile = File('$dir/native.dart');
+  final dir = '$root/content/${_family.codeDir}/$slug';
+  final leftFile = File('$dir/${_family.leftFile}');
   final fxdartFile = File('$dir/fxdart.dart');
 
-  for (final f in [nativeFile, fxdartFile]) {
+  for (final f in [leftFile, fxdartFile]) {
     if (!f.existsSync()) {
       failures.add(Failure(slug, 'missing ${f.path.split('/').last}'));
     }
   }
   if (failures.isNotEmpty) return _Result('✗ $slug', failures, false);
 
-  _checkImports(slug, nativeFile, isFxdart: false, failures: failures);
+  _checkImports(slug, leftFile, isFxdart: false, failures: failures);
   _checkImports(slug, fxdartFile, isFxdart: true, failures: failures);
 
-  final native = await _run(slug, nativeFile, failures);
+  final left = await _run(slug, leftFile, failures);
   final fxdartOut = await _run(slug, fxdartFile, failures);
-  if (native == null || fxdartOut == null) {
+  if (left == null || fxdartOut == null) {
     return _Result('✗ $slug', failures, false);
   }
 
-  if (native != fxdartOut) {
+  if (left != fxdartOut) {
     failures.add(Failure(
         slug,
         'output mismatch\n'
-        '  native: ${jsonEncode(native)}\n'
+        '  ${_family.leftFile.split('.').first}: ${jsonEncode(left)}\n'
         '  fxdart: ${jsonEncode(fxdartOut)}'));
     return _Result('✗ $slug', failures, false);
   }
@@ -138,7 +182,7 @@ Future<_Result> _verify(String slug, {required bool check}) async {
   final current =
       expectedFile.existsSync() ? expectedFile.readAsStringSync() : null;
   var wrote = false;
-  if (current != native) {
+  if (current != left) {
     if (check) {
       failures.add(Failure(
           slug,
@@ -146,7 +190,7 @@ Future<_Result> _verify(String slug, {required bool check}) async {
               ? 'expected.txt missing — run `dart run tool/check_comparison.dart`'
               : 'expected.txt is stale — run `dart run tool/check_comparison.dart`'));
     } else {
-      expectedFile.writeAsStringSync(native);
+      expectedFile.writeAsStringSync(left);
       wrote = true;
     }
   }
@@ -173,10 +217,10 @@ void _checkImports(String slug, File file,
     if (imp.startsWith('package:')) {
       final allowed = isFxdart
           ? imp.startsWith('package:fxdart/')
-          : _nativeAllowedPackages.any(imp.startsWith);
+          : _family.leftAllowedPackages.any(imp.startsWith);
       if (!allowed) {
         failures.add(Failure(slug, '$name imports $imp — not available in the '
-            'playground (${isFxdart ? 'fxdart panels may import only package:fxdart' : 'native panels may import only package:collection'})'));
+            'playground (${isFxdart ? 'fxdart panels may import only package:fxdart' : _family.leftPolicy})'));
       }
     }
   }
@@ -186,8 +230,15 @@ void _checkImports(String slug, File file,
     failures.add(Failure(slug, '$name does not import package:fxdart'));
   }
   if (!isFxdart && importsFxdart) {
-    failures.add(Failure(slug, '$name imports package:fxdart — the native '
-        'panel must not use the library'));
+    failures.add(Failure(slug, '$name imports package:fxdart — the '
+        '${_family.leftFile.split('.').first} panel must not use the library'));
+  }
+  final mustImport = _family.leftMustImport;
+  if (!isFxdart &&
+      mustImport != null &&
+      !imports.any((i) => i.startsWith(mustImport))) {
+    failures.add(Failure(slug, '$name does not import $mustImport — the '
+        'left panel must actually use ${mustImport.substring(8).replaceAll('/', '')}'));
   }
 }
 
@@ -201,8 +252,8 @@ List<Failure> _analyzeMerged(List<String> slugs) {
   final tmp = Directory.systemTemp.createTempSync('fxcmp_merged');
   try {
     for (final slug in slugs) {
-      final user =
-          File('$root/content/code-comparison/$slug/fxdart.dart').readAsStringSync();
+      final user = File('$root/content/${_family.codeDir}/$slug/fxdart.dart')
+          .readAsStringSync();
       final imports = <String>[];
       final body = <String>[];
       for (final line in user.split('\n')) {

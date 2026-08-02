@@ -499,61 +499,84 @@ class _WindowIterator<A> implements Iterator<List<A>> {
   final int _step;
   final bool _partial;
   final Iterator<A> _it;
-  List<A> _carry = [];
+  // Overlapping elements are kept in a reused ring buffer so each emitted
+  // window costs exactly one exact-size allocation (no sublist + growth).
+  List<A>? _ring;
+  int _ringStart = 0;
+  int _ringCount = 0;
   int _pendingSkip = 0;
   bool _sourceDone = false;
   bool _finished = false;
   @override
   late List<A> current;
 
+  bool _pull() {
+    if (_sourceDone) return false;
+    if (_it.moveNext()) return true;
+    _sourceDone = true;
+    return false;
+  }
+
+  List<A> _emit(int length) {
+    final ring = _ring!;
+    final window = List<A>.filled(length, ring[_ringStart]);
+    var idx = _ringStart;
+    for (var i = 0; i < length; i++) {
+      window[i] = ring[idx];
+      idx++;
+      if (idx == _size) idx = 0;
+    }
+    return window;
+  }
+
   @override
   bool moveNext() {
     if (_finished) return false;
-    while (_pendingSkip > 0 && !_sourceDone) {
-      if (_it.moveNext()) {
-        _pendingSkip--;
-      } else {
-        _sourceDone = true;
-      }
+    while (_pendingSkip > 0 && _pull()) {
+      _pendingSkip--;
     }
     if (_pendingSkip > 0) {
       _finished = true;
       return false;
     }
-    final window = _carry;
-    _carry = [];
-    while (window.length < _size && !_sourceDone) {
-      if (_it.moveNext()) {
-        window.add(_it.current);
-      } else {
-        _sourceDone = true;
-      }
+    while (_ringCount < _size && _pull()) {
+      final v = _it.current;
+      final ring = _ring ??= List<A>.filled(_size, v);
+      var idx = _ringStart + _ringCount;
+      if (idx >= _size) idx -= _size;
+      ring[idx] = v;
+      _ringCount++;
     }
-    if (window.isEmpty) {
+    if (_ringCount == 0) {
       _finished = true;
       return false;
     }
-    if (window.length < _size) {
+    if (_ringCount < _size) {
       // Trailing window(s): keep sliding through the remnant only when
       // partial windows were asked for.
       if (!_partial) {
         _finished = true;
         return false;
       }
-      if (_step >= window.length) {
+      current = _emit(_ringCount);
+      if (_step >= _ringCount) {
         _finished = true;
       } else {
-        _carry = window.sublist(_step);
+        _ringStart = _ringStart + _step;
+        if (_ringStart >= _size) _ringStart -= _size;
+        _ringCount -= _step;
       }
-      current = window;
       return true;
     }
+    current = _emit(_size);
     if (_step < _size) {
-      _carry = window.sublist(_step);
+      _ringStart = _ringStart + _step;
+      if (_ringStart >= _size) _ringStart -= _size;
+      _ringCount -= _step;
     } else {
+      _ringCount = 0;
       _pendingSkip = _step - _size;
     }
-    current = window;
     return true;
   }
 }
@@ -637,13 +660,35 @@ FxAsyncIterable<List<A>> _windowedAsync<A>(
 /// ```dart
 /// pairwise([1, 2, 3, 4]); // ((1, 2), (2, 3), (3, 4))
 /// ```
-Iterable<(A, A)> pairwise<A>(Iterable<A> iterable) sync* {
-  var hasPrev = false;
-  late A prev;
-  for (final a in iterable) {
-    if (hasPrev) yield (prev, a);
-    prev = a;
-    hasPrev = true;
+Iterable<(A, A)> pairwise<A>(Iterable<A> iterable) =>
+    _PairwiseIterable(iterable);
+
+class _PairwiseIterable<A> extends Iterable<(A, A)> {
+  _PairwiseIterable(this._source);
+  final Iterable<A> _source;
+  @override
+  Iterator<(A, A)> get iterator => _PairwiseIterator(_source.iterator);
+}
+
+class _PairwiseIterator<A> implements Iterator<(A, A)> {
+  _PairwiseIterator(this._it);
+  final Iterator<A> _it;
+  bool _hasPrev = false;
+  late A _prev;
+  @override
+  late (A, A) current;
+  @override
+  bool moveNext() {
+    if (!_hasPrev) {
+      if (!_it.moveNext()) return false;
+      _prev = _it.current;
+      _hasPrev = true;
+    }
+    if (!_it.moveNext()) return false;
+    final a = _it.current;
+    current = (_prev, a);
+    _prev = a;
+    return true;
   }
 }
 

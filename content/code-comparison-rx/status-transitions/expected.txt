@@ -1,0 +1,4 @@
+status now: ok
+status now: warn
+status now: ok
+statuses seen: ok, warn

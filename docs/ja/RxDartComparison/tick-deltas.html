@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deltas between ticks — RxDart vs FxDart</title>
+  <meta name="description" content="Each price tick with its predecessor — pairwise in both libraries, list pairs on the stream side, typed records on the pull side.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/RxDartComparison/tick-deltas.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/tick-deltas.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/tick-deltas.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/tick-deltas.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/tick-deltas.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/tick-deltas.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/tick-deltas.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/tick-deltas.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/tick-deltas.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">ホーム</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="../../RxDartComparison/tick-deltas.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/tick-deltas.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/tick-deltas.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/tick-deltas.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/tick-deltas.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/tick-deltas.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/tick-deltas.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #13 · <strong>Deltas between ticks</strong></p>
+  <h1>Deltas between ticks</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/pairwise.html">pairwise</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    From seven price ticks, print the six <strong>deltas</strong>: each
+    tick next to its predecessor with the signed change to two decimal
+    places (a flat tick prints <code>+0.00</code>). The data is in the
+    code; both versions must print the lines shown under
+    <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">101.20 -&gt; 101.65  +0.45
+101.65 -&gt; 101.40  -0.25
+101.40 -&gt; 102.10  +0.70
+102.10 -&gt; 102.10  +0.00
+102.10 -&gt; 101.85  -0.25
+101.85 -&gt; 102.30  +0.45</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="41a31025c7bd5aaa">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+// Closing price ticks for one symbol, oldest first.
+const ticks = [101.20, 101.65, 101.40, 102.10, 102.10, 101.85, 102.30];
+
+Future<void> main() async {
+  final deltas = await Stream.fromIterable(ticks)
+      .pairwise() // each tick with its predecessor, as a 2-element list
+      .map((p) {
+        final d = p.last - p.first;
+        final sign = d >= 0 ? '+' : '';
+        return '${p.first.toStringAsFixed(2)} -> '
+            '${p.last.toStringAsFixed(2)}  $sign${d.toStringAsFixed(2)}';
+      })
+      .toList();
+
+  deltas.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="b5f279389e43e68d">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+// Closing price ticks for one symbol, oldest first.
+const ticks = [101.20, 101.65, 101.40, 102.10, 102.10, 101.85, 102.30];
+
+void main() {
+  final deltas = fx(ticks)
+      .pairwise() // each tick with its predecessor, as a (prev, next) record
+      .map((p) {
+        final d = p.$2 - p.$1;
+        final sign = d >= 0 ? '+' : '';
+        return '${p.$1.toStringAsFixed(2)} -> '
+            '${p.$2.toStringAsFixed(2)}  $sign${d.toStringAsFixed(2)}';
+      })
+      .toList();
+
+  deltas.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    They don't, by design: <code><a href="../tutorials/pairwise.html">pairwise</a></code> is one of the operators
+    FxDart ported <em>from</em> Rx, because "each value with the one
+    before it" is just as natural whether values are pushed or pulled.
+    Both sides keep one value of state, emit nothing for the first tick,
+    and produce n&nbsp;−&nbsp;1 pairs. The verdict is a tie and the
+    interesting part is the small typing difference in what a "pair" is.
+  </p>
+  <p>
+    RxDart's <code><a href="../tutorials/pairwise.html">pairwise</a></code> emits a two-element
+    <code>List&lt;double&gt;</code> — <code>p.first</code> and
+    <code>p.last</code> are honest but the length-2 invariant lives in
+    documentation, not in the type. FxDart's emits a Dart record
+    <code>(double, double)</code>: <code>p.$1</code> and <code>p.$2</code>
+    are the only fields there are, and the compiler knows it. That is a
+    language-era artifact more than a model difference — records did not
+    exist when RxDart's API froze — but it is representative of the pull
+    library's habit of pushing invariants into types. On the model
+    itself: nothing to choose between them here.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="sliding-average-rx.html">← 前: Three-reading moving average</a>
+    <a href="status-transitions.html">次: Report only status changes →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

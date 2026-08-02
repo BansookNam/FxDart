@@ -1,0 +1,7 @@
+event: boot
+event: listen :8080
+event: GET /orders
+event: GET /health
+event: SIGTERM
+event: drain connections
+event: SHUTDOWN

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dedupe a paged feed by id — RxDart vs FxDart</title>
+  <meta name="description" content="Flatten three overlapping pages and keep each product id once, in arrival order — expand plus distinctUnique vs flatMap plus uniqBy.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/RxDartComparison/dedupe-paged-feed.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/dedupe-paged-feed.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/dedupe-paged-feed.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/dedupe-paged-feed.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/dedupe-paged-feed.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/dedupe-paged-feed.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/dedupe-paged-feed.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/dedupe-paged-feed.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/dedupe-paged-feed.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Главная</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="../../RxDartComparison/dedupe-paged-feed.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/dedupe-paged-feed.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/dedupe-paged-feed.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/dedupe-paged-feed.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/dedupe-paged-feed.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/dedupe-paged-feed.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/dedupe-paged-feed.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #19 · <strong>Dedupe a paged feed by id</strong></p>
+  <h1>Dedupe a paged feed by id</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/uniqBy.html">uniqBy</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    A product feed arrives in three pages whose boundaries overlap, so
+    some items appear on two pages. Flatten the pages and print each item
+    exactly once — first occurrence wins, arrival order kept — keyed by
+    its numeric id. The pages are in the code; both versions must print
+    the lines shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">#101 Desk lamp
+#102 Notebook
+#103 Pen set
+#104 Stapler
+#105 Monitor arm
+#106 Desk mat</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="6bebb99d8ea6b79f">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+// Three pages from a product feed — the page boundaries overlap.
+const pages = [
+  [(101, 'Desk lamp'), (102, 'Notebook'), (103, 'Pen set')],
+  [(103, 'Pen set'), (104, 'Stapler'), (105, 'Monitor arm')],
+  [(105, 'Monitor arm'), (106, 'Desk mat'), (101, 'Desk lamp')],
+];
+
+Future<void> main() async {
+  final items = await Stream.fromIterable(pages)
+      .expand((page) => page)
+      // Plain Stream.distinct is adjacent-only; global dedup needs
+      // distinctUnique with an equals/hashCode pair for the key.
+      .distinctUnique(
+          equals: (a, b) => a.$1 == b.$1, hashCode: (item) => item.$1)
+      .map((item) => '#${item.$1} ${item.$2}')
+      .toList();
+
+  items.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="3c22ebdbf6d70d3b">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+// Three pages from a product feed — the page boundaries overlap.
+const pages = [
+  [(101, 'Desk lamp'), (102, 'Notebook'), (103, 'Pen set')],
+  [(103, 'Pen set'), (104, 'Stapler'), (105, 'Monitor arm')],
+  [(105, 'Monitor arm'), (106, 'Desk mat'), (101, 'Desk lamp')],
+];
+
+void main() {
+  fx(pages)
+      .flatMap((page) => page)
+      .uniqBy((item) => item.$1)
+      .map((item) => '#${item.$1} ${item.$2}')
+      .toList()
+      .forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    The interesting fact is where the duplicates sit. The page boundaries
+    overlap, so a repeated id arrives on a <em>different page</em> —
+    never next to its first occurrence once the pages are flattened.
+    That is exactly the job plain <code>Stream.distinct</code> silently
+    gets wrong: it is adjacent-only, so on this feed it would wave every
+    repeat straight through. The dedup here needs a whole-feed memory,
+    while the flattening itself is fluent in both models —
+    <code>expand</code> on the stream, <code><a href="../tutorials/flatMap.html">flatMap</a></code> on the pull
+    chain.
+  </p>
+  <p>
+    As in the unique-visitors pair, the global dedup is
+    <code>distinctUnique</code> against <code><a href="../tutorials/uniqBy.html">uniqBy</a></code> — an
+    <code>equals</code>/<code>hashCode</code> pair versus one key
+    function — and the adjacent-vs-global naming split is the one the
+    status-changes page walks through. Both sides keep the same set of
+    seen keys and preserve first-arrival order, so the verdict is a tie —
+    the pull version just stays synchronous because the pages are
+    sitting in a local list.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="bracket-the-session.html">← Назад: Open and close markers</a>
+    <a href="latency-extremes.html">Далее: Fastest and slowest request →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

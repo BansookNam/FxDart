@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solo importa la búsqueda más nueva — RxDart vs FxDart</title>
+  <meta name="description" content="Una consulta más nueva abandona la búsqueda en vuelo — switchMap en un operador vs un contador de épocas artesanal que descarta resultados obsoletos al aterrizar.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/switch-to-newest-search.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/switch-to-newest-search.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/switch-to-newest-search.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/switch-to-newest-search.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/switch-to-newest-search.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/switch-to-newest-search.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/switch-to-newest-search.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/switch-to-newest-search.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../RxDartComparison/switch-to-newest-search.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/switch-to-newest-search.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/switch-to-newest-search.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/switch-to-newest-search.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/switch-to-newest-search.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/switch-to-newest-search.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/switch-to-newest-search.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #45 · <strong>Solo importa la búsqueda más nueva</strong></p>
+  <h1>Solo importa la búsqueda más nueva</h1>
+  <p class="cmp-meta"><span class="badge verdict-rxdart">Terreno de RxDart</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>Requisito</h2>
+  <p>
+    Un usuario teclea tres consultas — <code><a href="../tutorials/fx.html">fx</a></code>, luego
+    <code>fxdar</code> 40&nbsp;ms después, luego <code>fxdart</code> tras
+    una pausa. Cada búsqueda tarda 150&nbsp;ms, así que la segunda
+    consulta llega mientras la primera búsqueda sigue en vuelo: el primer
+    resultado debe descartarse, jamás mostrarse. Imprime solo los
+    resultados supervivientes, y luego cuántas búsquedas arrancaron
+    frente a cuántas se entregaron. El calendario está simulado en el
+    código; las dos versiones deben imprimir las líneas que aparecen bajo
+    <em>Salida esperada</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Salida esperada</summary>
+    <pre class="code">7 results for "fxdar"
+12 results for "fxdart"
+searches started: 3, results delivered: 2</pre>
+  </details>
+
+  <h2>Lado a lado</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="01f48675151e99ee">
+<textarea>
+import 'dart:async';
+
+import 'package:rxdart/rxdart.dart';
+
+/// Simulated typing: each new query replaces the previous one.
+Stream<String> queries() {
+  final c = StreamController<String>();
+  const events = [(0, 'fx'), (40, 'fxdar'), (400, 'fxdart')];
+  for (final (ms, q) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(q));
+  }
+  Timer(const Duration(milliseconds: 500), c.close);
+  return c.stream;
+}
+
+const hits = {'fx': 19, 'fxdar': 7, 'fxdart': 12};
+
+var searchesStarted = 0;
+
+Future<(String, int)> search(String q) async {
+  searchesStarted++;
+  await Future.delayed(const Duration(milliseconds: 150));
+  return (q, hits[q]!);
+}
+
+Future<void> main() async {
+  final results = await queries()
+      .switchMap((q) => Stream.fromFuture(search(q)))
+      .toList();
+
+  for (final (q, n) in results) {
+    print('$n results for "$q"');
+  }
+  print('searches started: $searchesStarted, '
+      'results delivered: ${results.length}');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="4105f820864fb4bb">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Simulated typing: each new query replaces the previous one.
+Stream<String> queries() {
+  final c = StreamController<String>();
+  const events = [(0, 'fx'), (40, 'fxdar'), (400, 'fxdart')];
+  for (final (ms, q) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(q));
+  }
+  Timer(const Duration(milliseconds: 500), c.close);
+  return c.stream;
+}
+
+const hits = {'fx': 19, 'fxdar': 7, 'fxdart': 12};
+
+var searchesStarted = 0;
+
+Future<(String, int)> search(String q) async {
+  searchesStarted++;
+  await Future.delayed(const Duration(milliseconds: 150));
+  return (q, hits[q]!);
+}
+
+Future<void> main() async {
+  // Hand-rolled switch: remember which search is newest, and drop a stale
+  // result when it finally lands.
+  final results = <(String, int)>[];
+  var epoch = 0;
+  var last = Future<void>.value();
+  final done = Completer<void>();
+  final sub = queries().listen((q) {
+    final mine = ++epoch;
+    last = search(q).then((r) {
+      if (mine == epoch) results.add(r);
+    });
+  }, onDone: done.complete);
+  await done.future;
+  await sub.cancel();
+  await last;
+
+  final lines = fx(results).map((r) => '${r.$2} results for "${r.$1}"').toList();
+  lines.forEach(print);
+  print('searches started: $searchesStarted, '
+      'results delivered: ${results.length}');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Por qué difieren</h2>
+  <p>
+    «Lo más nuevo cancela lo más viejo» es una afirmación sobre
+    <em>suscripciones</em>, y solo el modelo push las tiene.
+    <code>switchMap</code> es el requisito entero: cada consulta arranca
+    un stream de búsqueda interno, y la llegada de una consulta más nueva
+    des-suscribe la vieja, así que a un resultado obsoleto no le queda
+    ningún oyente al que llegar. Arrancan tres búsquedas, sobreviven dos
+    resultados, y nada de esa lógica aparece en el código del usuario.
+  </p>
+  <p>
+    Un pipeline pull no puede expresar esto — para cuando una cadena
+    tiraría del primer resultado, el hecho interesante (existe una
+    consulta más nueva) vive fuera de la secuencia. Así que el lado
+    FxDart fabrica el switch a mano: un contador de épocas se incrementa
+    por consulta, cada búsqueda recuerda su época, y un resultado se
+    descarta al llegar si ya no es el más nuevo. Añade la contabilidad de
+    terminación (un <code>Completer</code> para el stream, esperando la
+    última búsqueda en vuelo) y solo entonces una pequeña cadena
+    <code><a href="../tutorials/fx.html">fx</a></code> para formatear los supervivientes. Imprime las mismas
+    líneas, pero es una reimplementación manual de la
+    cancelación-por-más-nuevo. Este es el caso de uso que define a
+    <code>switchMap</code>, y el veredicto se sigue de ahí: aquí usa
+    RxDart.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="with-latest-config.html">← Anterior: Sellar cada petición con la config más reciente</a>
+    <a href="first-mirror-wins.html">Siguiente: Poner a competir dos mirrors →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

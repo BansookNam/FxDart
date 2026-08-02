@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>세 번 실패하면 포기하기 — RxDart vs FxDart</title>
+  <meta name="description" content="scan으로 실패를 세어 세 번째에서(포함하여) 멈추기 — 매퍼 안의 try/catch 하나 vs scan이 보기 전에 오류를 마커 값으로 바꾸는 작업.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/stop-after-three-failures.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/stop-after-three-failures.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/stop-after-three-failures.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/stop-after-three-failures.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/stop-after-three-failures.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/stop-after-three-failures.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/stop-after-three-failures.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/stop-after-three-failures.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../RxDartComparison/stop-after-three-failures.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/stop-after-three-failures.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/stop-after-three-failures.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/stop-after-three-failures.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/stop-after-three-failures.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/stop-after-three-failures.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/stop-after-three-failures.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #34 · <strong>세 번 실패하면 포기하기</strong></p>
+  <h1>세 번 실패하면 포기하기</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/takeUntilInclusive.html">takeUntilInclusive</a></li></ul>
+  <h2>요구사항</h2>
+  <p>
+    헬스 프로브 열 개의 피드가 순서대로 실행됩니다; 프로브 2, 5, 7,
+    8, 9가 오류를 던집니다. <strong>세 번째</strong> 실패가 보이는
+    순간(그것을 포함하여) 실행을 멈춘 뒤 세 가지 수치를 출력하세요:
+    <em>processed</em> — 중단 전에 파이프라인에 들어온 프로브 수;
+    <em>failures</em> — 그중 오류를 던진 수; <em>probes run</em> —
+    실제로 실행된 프로브 본문 수로, 프로브 자체 안의 부수효과
+    카운터로 집계합니다. 뒤쪽 프로브들은 결코 실행되면 안 되므로,
+    실행 수는 처리 수와 일치해야 합니다. 스케줄은 코드에 들어
+    있습니다; 두 버전 모두 <em>예상 출력</em> 아래에 표시된 줄들을
+    출력해야 합니다.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>예상 출력</summary>
+    <pre class="code">processed: 7
+failures: 3
+probes run: 7</pre>
+  </details>
+
+  <h2>나란히 보기</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="5ea89febed2887cb">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+const probeIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const failing = {2, 5, 7, 8, 9};
+
+int runs = 0;
+
+// One health probe — throws when the endpoint is down.
+Future<void> probe(int id) async {
+  runs++;
+  await Future.delayed(const Duration(milliseconds: 5));
+  if (failing.contains(id)) throw StateError('probe $id failed');
+}
+
+Future<void> main() async {
+  // Failures must become data before scan can count them — each probe
+  // gets an inner stream that recovers the error as a marker value.
+  final states = await Stream.fromIterable(probeIds)
+      .asyncExpand((id) => Rx.fromCallable(() async {
+            await probe(id);
+            return true;
+          }).onErrorReturn(false))
+      .scan<({int done, int fails})>(
+          (acc, ok, _) => (done: acc.done + 1, fails: acc.fails + (ok ? 0 : 1)),
+          (done: 0, fails: 0))
+      .takeWhileInclusive((s) => s.fails < 3)
+      .toList();
+
+  final last = states.last;
+  print('processed: ${last.done}');
+  print('failures: ${last.fails}');
+  print('probes run: $runs');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="3dfc1741c05fa364">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+const probeIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const failing = {2, 5, 7, 8, 9};
+
+int runs = 0;
+
+// One health probe — throws when the endpoint is down.
+Future<void> probe(int id) async {
+  runs++;
+  await Future.delayed(const Duration(milliseconds: 5));
+  if (failing.contains(id)) throw StateError('probe $id failed');
+}
+
+Future<void> main() async {
+  final states = await fx(probeIds)
+      .toAsync()
+      .map((id) async {
+        try {
+          await probe(id);
+          return true;
+        } catch (_) {
+          return false;
+        }
+      })
+      .scan<({int done, int fails})>(
+          (acc, ok) => (done: acc.done + 1, fails: acc.fails + (ok ? 0 : 1)),
+          (done: 0, fails: 0))
+      .takeUntilInclusive((s) => s.fails == 3)
+      .toList();
+
+  final last = states.last;
+  print('processed: ${last.done}');
+  print('failures: ${last.fails}');
+  print('probes run: $runs');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>차이가 나는 이유</h2>
+  <p>
+    세는 핵심부는 양쪽이 같습니다 — <code><a href="../tutorials/scan.html">scan</a></code>이 진행 중인
+    <code>(done, fails)</code> 상태를 접고, 포함형 take 연산자가 세
+    번째 실패에서 파이프라인을 자릅니다(한쪽은
+    <code>takeUntilInclusive(fails == 3)</code>, 다른 쪽은
+    <code>takeWhileInclusive(fails &lt; 3)</code>). 양쪽 모두 일을
+    진짜로 멈추기도 합니다: <code>probes run: 7</code>은 구독 취소와
+    풀 중단이 똑같이 효과적인 브레이크임을 증명합니다.
+  </p>
+  <p>
+    차이는 scan이 셀 수 있게 되기 <em>전에</em> 각 쪽이 해야 했던
+    일입니다. 오류를 던진 프로브는 스트림의 오류 채널에 사는데,
+    거기는 scan이 볼 수 없는 곳이고 — 실패 1번에서 스트림을 끝내
+    버릴 곳이기도 합니다. 그래서 RxDart 쪽은 먼저 모든 프로브를 내부
+    스트림(<code>Rx.fromCallable</code> +
+    <code>onErrorReturn(false)</code>)으로 변환해, 실패를 마커 값으로
+    데이터 채널에 몰래 되돌려 보냅니다. FxDart 쪽에는 변환 단계가
+    필요 없습니다. 변환해 올 <em>출처</em>가 없기 때문입니다:
+    <code><a href="../tutorials/map.html">map</a></code> 안의 try/catch가 결과를 사건이 일어난 바로 그
+    자리에서 <code>bool</code>로 만들고, 파이프라인의 나머지는
+    산수입니다. 같은 연산자들, 건너야 할 모델 경계는 하나 더 적게.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="all-validation-errors.html">← 이전: 모든 검증 오류 보고하기</a>
+    <a href="ordered-bounded-fetch.html">다음: 4개씩 가져오되 결과는 순서대로 →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+GET /orders (config v1)
+GET /stock (config v2)
+GET /prices (config v2)
+GET /refunds (config v3)

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>읽기를 감싸는 커서의 수명 — RxDart vs FxDart</title>
+  <meta name="description" content="커서를 열고, 행 다섯을 읽고, 닫힘을 보장 — 스트림을 감싸는 Rx.using vs 지연 풀을 감싸는 usingAsync, 한 아이디어의 두 포팅.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/cursor-lifetime.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/cursor-lifetime.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/cursor-lifetime.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/cursor-lifetime.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/cursor-lifetime.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/cursor-lifetime.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/cursor-lifetime.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/cursor-lifetime.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../RxDartComparison/cursor-lifetime.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/cursor-lifetime.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/cursor-lifetime.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/cursor-lifetime.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/cursor-lifetime.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/cursor-lifetime.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/cursor-lifetime.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #31 · <strong>읽기를 감싸는 커서의 수명</strong></p>
+  <h1>읽기를 감싸는 커서의 수명</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/using.html">using</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/toList.html">toList</a></li></ul>
+  <h2>요구사항</h2>
+  <p>
+    가짜 데이터베이스 커서를 통해 장부 행 다섯 개를 읽습니다. 커서의
+    수명은 읽기를 정확히 감싸야 합니다: 읽기가 시작될 때 생성되고,
+    마지막 행 이후 정확히 한 번 닫힙니다 — 닫힌 뒤에 읽으면 오류를
+    던지므로, 이 괄호는 실제로 하중을 받습니다. 행들을 출력한 뒤,
+    증명으로 <code>closed:&nbsp;true</code>를 출력하세요. 커서는
+    코드에 들어 있습니다; 두 버전 모두 <em>예상 출력</em> 아래에
+    표시된 줄들을 출력해야 합니다.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>예상 출력</summary>
+    <pre class="code">2026-08-01  balance 120.00
+2026-08-02  balance 84.50
+2026-08-03  balance 210.25
+2026-08-04  balance 45.00
+2026-08-05  balance 99.90
+closed: true</pre>
+  </details>
+
+  <h2>나란히 보기</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="b6f868318ade633e">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+/// A fake database cursor: sequential reads plus a [closed] flag the
+/// output can attest to. Reading after close throws.
+class LedgerCursor {
+  static const _rows = [
+    '2026-08-01  balance 120.00',
+    '2026-08-02  balance 84.50',
+    '2026-08-03  balance 210.25',
+    '2026-08-04  balance 45.00',
+    '2026-08-05  balance 99.90',
+  ];
+
+  var closed = false;
+
+  int get length => _rows.length;
+
+  Future<String> read(int i) async {
+    if (closed) throw StateError('read after close');
+    await Future<void>.delayed(const Duration(milliseconds: 5));
+    return _rows[i];
+  }
+
+  void close() => closed = true;
+}
+
+Future<void> main() async {
+  late final LedgerCursor cursor;
+
+  // The bracket: the resource is created on listen, read as a stream,
+  // and disposed when the stream terminates — however it terminates.
+  final rows = await Rx.using<String, LedgerCursor>(
+    resourceFactory: () => cursor = LedgerCursor(),
+    streamFactory: (c) => Rx.range(0, c.length - 1).asyncMap(c.read),
+    disposer: (c) => c.close(),
+  ).toList();
+
+  rows.forEach(print);
+  print('closed: ${cursor.closed}');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="914bca5595cecbda">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+/// A fake database cursor: sequential reads plus a [closed] flag the
+/// output can attest to. Reading after close throws.
+class LedgerCursor {
+  static const _rows = [
+    '2026-08-01  balance 120.00',
+    '2026-08-02  balance 84.50',
+    '2026-08-03  balance 210.25',
+    '2026-08-04  balance 45.00',
+    '2026-08-05  balance 99.90',
+  ];
+
+  var closed = false;
+
+  int get length => _rows.length;
+
+  Future<String> read(int i) async {
+    if (closed) throw StateError('read after close');
+    await Future<void>.delayed(const Duration(milliseconds: 5));
+    return _rows[i];
+  }
+
+  void close() => closed = true;
+}
+
+Future<void> main() async {
+  late final LedgerCursor cursor;
+
+  // The bracket: the resource is acquired on the first pull, read lazily,
+  // and released exactly once — after the last row, or right before an
+  // error would propagate.
+  final rows = await fxAsync(usingAsync(
+    () => cursor = LedgerCursor(),
+    (c) => toAsync(Iterable.generate(c.length, c.read)),
+    (c) => c.close(),
+  )).toList();
+
+  rows.forEach(print);
+  print('closed: ${cursor.closed}');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>차이가 나는 이유</h2>
+  <p>
+    대체로 다르지 않습니다 — 둘 다 같은 Rx 아이디어의 포팅이고,
+    FxDart도 그렇게 말합니다: <code>usingAsync</code>(0.7.2 신규)는
+    Rx의 <code><a href="../tutorials/using.html">using</a></code>을 뒤따라 나왔습니다. 모양은 같은 3부
+    괄호입니다: 획득, 사용, 해제. <code>Rx.using</code>은 스트림이
+    listen될 때 커서를 만들고 스트림이 종료될 때 disposer를
+    호출합니다; <code>usingAsync</code>는 첫 <em>풀</em>에서 획득하고
+    마지막 풀 이후 또는 오류가 전파되기 직전에 정확히 한 번
+    해제합니다. 둘 다에서 리소스의 수명은 호출자의 스코프가 아니라
+    시퀀스의 소비에 묶입니다 — 그것이 이 도구의 존재 이유입니다.
+  </p>
+  <p>
+    가장자리에서 각 모델의 기질이 드러납니다. 스트림 버전의
+    disposer는 <em>구독 해지</em> 시에도 실행됩니다 — 중간에 취소해도
+    커서는 닫힙니다. 구독이란 자기만의 생명주기를 지닌 객체이기
+    때문입니다. 풀 버전에는 구독이 없습니다: 해제는 완료나 오류에서
+    발동하므로, 이터레이터를 조용히 <em>방치</em>하는 소비자는 해제를
+    결코 촉발하지 못합니다 — 정직한 관용구는 파이프라인에 한계를 두는
+    것(<code>take</code>, 또는 이번처럼 유한한 소스)이고, 그러면
+    완료가, 따라서 해제가 보장됩니다. 여기서는 읽기가 유한하고 끝까지
+    진행되므로, 양쪽 모두 다섯 번째 행 다음에 커서를 정확히 한 번
+    닫습니다.
+  </p>
+  <p>
+    설계상의 무승부입니다: 두 라이브러리가 추상화에 합의하고, 각자의
+    모델에서 "반복이 끝났다"가 무엇을 의미하는지에서만 갈리는
+    쌍입니다.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="bound-the-stall.html">← 이전: 멈춰 버린 읽기에 시간 제한 걸기</a>
+    <a href="successes-and-failures.html">다음: 성공과 실패 나누기 →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

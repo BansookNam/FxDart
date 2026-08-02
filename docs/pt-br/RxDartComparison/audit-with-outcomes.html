@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Keep values AND failures in the audit — RxDart vs FxDart</title>
+  <meta name="description" content="Parse eight config lines where three fail, printing the values and the failure count — errors smuggled back as data vs a plain partition.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/RxDartComparison/audit-with-outcomes.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/audit-with-outcomes.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/audit-with-outcomes.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/audit-with-outcomes.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/audit-with-outcomes.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/audit-with-outcomes.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/audit-with-outcomes.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/audit-with-outcomes.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/audit-with-outcomes.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Início</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../RxDartComparison/audit-with-outcomes.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/audit-with-outcomes.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/audit-with-outcomes.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/audit-with-outcomes.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/audit-with-outcomes.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/audit-with-outcomes.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/audit-with-outcomes.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #22 · <strong>Keep values AND failures in the audit</strong></p>
+  <h1>Keep values AND failures in the audit</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/partition.html">partition</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    A deploy audit parses eight <code>key=value</code> config lines,
+    three of which have unparseable values. The report needs
+    <em>both</em> halves: print each successfully parsed
+    <code>key = value</code>, then a count of the failures. The lines are
+    in the code; both versions must print the output shown under
+    <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">timeout = 30
+port = 8080
+workers = 4
+ttl = 300
+batch = 25
+failures: 3</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="891d0960744e2382">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+// Config lines from a deploy audit — three fail to parse.
+const lines = [
+  'timeout=30',
+  'retries=four',
+  'port=8080',
+  'cache=',
+  'workers=4',
+  'depth=n/a',
+  'ttl=300',
+  'batch=25',
+];
+
+(String, int) parse(String line) {
+  final parts = line.split('=');
+  final value = int.tryParse(parts[1]);
+  if (value == null) throw FormatException(line);
+  return (parts[0], value);
+}
+
+Future<void> main() async {
+  // An error normally terminates the stream, so keeping every failure
+  // means one inner stream per line, its error smuggled back as data.
+  final outcomes = await Stream.fromIterable(lines)
+      .asyncExpand(
+          (line) => Rx.fromCallable<(String, int)?>(() => parse(line))
+              .onErrorReturn(null))
+      .toList();
+
+  for (final (key, value) in outcomes.whereType<(String, int)>()) {
+    print('$key = $value');
+  }
+  print('failures: ${outcomes.where((o) => o == null).length}');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="14b990594878f69e">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+// Config lines from a deploy audit — three fail to parse.
+const lines = [
+  'timeout=30',
+  'retries=four',
+  'port=8080',
+  'cache=',
+  'workers=4',
+  'depth=n/a',
+  'ttl=300',
+  'batch=25',
+];
+
+(String, int) parse(String line) {
+  final parts = line.split('=');
+  final value = int.tryParse(parts[1]);
+  if (value == null) throw FormatException(line);
+  return (parts[0], value);
+}
+
+(String, int)? tryParse(String line) {
+  try {
+    return parse(line);
+  } on FormatException {
+    return null;
+  }
+}
+
+void main() {
+  // The throw lands one try/catch away from being a plain value again,
+  // and a single pass splits outcomes into the two lists the report needs.
+  final (ok, failed) = fx(lines).map(tryParse).partition((r) => r != null);
+
+  for (final (key, value) in ok.whereType<(String, int)>()) {
+    print('$key = $value');
+  }
+  print('failures: ${failed.length}');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    The stream model carries errors on a separate, out-of-band channel —
+    and that channel is terminal: one <code>FormatException</code> ends
+    the whole subscription, taking the five good lines with it. To keep
+    values <em>and</em> failures, the RxDart side has to give every line
+    its own inner stream (<code>Rx.fromCallable</code>) and convert the
+    error into data before it can escape —
+    <code>onErrorReturn(null)</code> here, with <code>null</code> standing
+    in for "this one failed". That is the lightest spelling the model
+    allows for a throwing function (the heavier <code>materialize</code>
+    route reifies full notification objects), and it exists only to undo
+    a decision the model made for you: errors were never values to begin
+    with. (Both panels share the same throwing <code>parse</code> on
+    purpose — with a null-returning parser both models could keep
+    outcomes as plain data; the throw is the premise, and what each side
+    must do about it is the comparison.)
+  </p>
+  <p>
+    The pull side never puts failures on a channel in the first place.
+    The same throw lands one local <code>try</code>/<code>catch</code>
+    away from being an ordinary value again — a nullable record — so the
+    whole requirement is <code><a href="../tutorials/map.html">map</a></code> then <code><a href="../tutorials/partition.html">partition</a></code>:
+    one pass, two lists, both halves equally first-class. This is the shape of FxDart's broader typed-errors
+    stance (its <code>Either</code> pipelines are this same idea with
+    richer error types). When failures are part of the report rather
+    than an exceptional end, keeping them as data wins — the verdict
+    goes to FxDart.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="stock-after-moves.html">← Anterior: Stock level after each move</a>
+    <a href="stop-at-shutdown.html">Próximo: Take until the shutdown marker, inclusive →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

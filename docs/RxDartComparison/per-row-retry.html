@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Retry each flaky row independently — RxDart vs FxDart</title>
+  <meta name="description" content="Six flaky import rows, two attempts each, three in flight — flatMap emits in completion order, mapRetry under concurrent keeps source order.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/per-row-retry.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/per-row-retry.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/per-row-retry.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/per-row-retry.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/per-row-retry.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/per-row-retry.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/per-row-retry.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/per-row-retry.html">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API Tutorials</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Language">
+      <span class="lang-label">Language</span>
+      <ul>
+        <li><a href="../RxDartComparison/per-row-retry.html" hreflang="en" lang="en" aria-current="page">English</a></li>
+        <li><a href="../ko/RxDartComparison/per-row-retry.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../zh/RxDartComparison/per-row-retry.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../ja/RxDartComparison/per-row-retry.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../es/RxDartComparison/per-row-retry.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../pt-br/RxDartComparison/per-row-retry.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../ru/RxDartComparison/per-row-retry.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../RxDartComparison/index.html">RxDart vs FxDart</a> › #29 · <strong>Retry each flaky row independently</strong></p>
+  <h1>Retry each flaky row independently</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/retry.html">retry</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Import six rows through a flaky endpoint: the even rows fail exactly
+    once before succeeding. Give <strong>each row its own retry
+    budget</strong> of two attempts, run up to three rows at a time, and
+    print the results <strong>in source order</strong> with the attempt
+    count that succeeded. The failure injection and per-row delays are
+    deterministic and in the code; both versions must print the lines
+    shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">row 1 (alpha) imported on attempt 1
+row 2 (bravo) imported on attempt 2
+row 3 (charlie) imported on attempt 1
+row 4 (delta) imported on attempt 2
+row 5 (echo) imported on attempt 1
+row 6 (foxtrot) imported on attempt 2</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="02813a84ecd74e9d">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+/// Six import rows; the even rows hit a flaky endpoint that fails exactly
+/// once before succeeding. Per-row delays make completion order differ
+/// from source order under concurrency.
+const rows = [
+  (1, 'alpha'),
+  (2, 'bravo'),
+  (3, 'charlie'),
+  (4, 'delta'),
+  (5, 'echo'),
+  (6, 'foxtrot'),
+];
+const importMs = [0, 70, 30, 50, 30, 20, 40]; // indexed by row id
+
+final attemptsByRow = <int, int>{};
+
+Future<String> importRow((int, String) row) async {
+  final (id, name) = row;
+  final attempt = attemptsByRow.update(id, (n) => n + 1, ifAbsent: () => 1);
+  await Future<void>.delayed(Duration(milliseconds: importMs[id]));
+  if (id.isEven && attempt == 1) throw StateError('endpoint reset on $name');
+  return 'row $id ($name) imported on attempt $attempt';
+}
+
+Future<void> main() async {
+  final results = await Stream.fromIterable(rows)
+      // Each row gets its own retrying inner stream, 3 subscribed at a
+      // time — but flatMap emits in COMPLETION order, so every result
+      // must carry its row id for the sort back to source order.
+      .flatMap(
+          (row) => Rx.retry(() => Rx.fromCallable(() => importRow(row)), 1)
+              .map((line) => (row.$1, line)),
+          maxConcurrent: 3)
+      .toList();
+
+  results.sort((a, b) => a.$1.compareTo(b.$1));
+  for (final (_, line) in results) {
+    print(line);
+  }
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="a0f97f92a2092c25">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+/// Six import rows; the even rows hit a flaky endpoint that fails exactly
+/// once before succeeding. Per-row delays make completion order differ
+/// from source order under concurrency.
+const rows = [
+  (1, 'alpha'),
+  (2, 'bravo'),
+  (3, 'charlie'),
+  (4, 'delta'),
+  (5, 'echo'),
+  (6, 'foxtrot'),
+];
+const importMs = [0, 70, 30, 50, 30, 20, 40]; // indexed by row id
+
+final attemptsByRow = <int, int>{};
+
+Future<String> importRow((int, String) row) async {
+  final (id, name) = row;
+  final attempt = attemptsByRow.update(id, (n) => n + 1, ifAbsent: () => 1);
+  await Future<void>.delayed(Duration(milliseconds: importMs[id]));
+  if (id.isEven && attempt == 1) throw StateError('endpoint reset on $name');
+  return 'row $id ($name) imported on attempt $attempt';
+}
+
+Future<void> main() async {
+  // Two attempts per row, three rows in flight — each in-flight row
+  // retries independently, and mapRetry under concurrent yields in
+  // SOURCE order by construction.
+  final results = await fx(rows)
+      .toAsync()
+      .mapRetry(2, importRow)
+      .concurrent(3)
+      .toList();
+
+  results.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Both sides express the resilience half the same way: a retry wrapper
+    per row, so one flaky row re-runs while its neighbors sail through.
+    RxDart spells it <code>flatMap</code> into a retrying inner stream
+    per row with <code>maxConcurrent:&nbsp;3</code>; FxDart spells it
+    <code>mapRetry(2,&nbsp;…)</code> under <code>concurrent(3)</code>,
+    where each in-flight element carries its own independent budget.
+  </p>
+  <p>
+    The difference is what comes out the other end.
+    <code>flatMap</code> merges inner streams in <em>completion</em>
+    order — that is its contract — so with three rows in flight and
+    unequal delays, the results arrive shuffled. Getting source order
+    back means tagging every result with its row id and sorting after
+    <code>toList</code>. The RxDart operator that would preserve order,
+    <code>concatMap</code>, does it by giving up the concurrency —
+    one row at a time. In the pull model, ordered concurrency is the
+    native mode: <code>concurrent(3)</code> evaluates three pulls at
+    once but yields them in source order by construction, so there is
+    nothing to tag and nothing to sort.
+  </p>
+  <p>
+    Verdict FxDart — the ordering is the story. "N at a time, retried
+    independently, in order" is one chain in the pull model and a
+    merge-then-reorder workaround in the push model.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="backoff-retry.html">← Previous: Retry with growing backoff</a>
+    <a href="bound-the-stall.html">Next: Bound the stalled read →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a>. Great thanks to <strong>Indong Yoo</strong> (CTO, Marpple) and the FxTS team for the ideas, semantics, and test suite this library is built on.</p>
+  <p>Playground compiles via the DartPad compile service. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Run","pgReset":"Reset","pgCompiling":"Compiling…","pgCompileError":"Compile error","pgError":"Error","pgLoading":"Loading runtime…","pgRunning":"Running…","pgNoOutput":"(no output)","pgLoadFailed":"Could not load the FxDart library"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>One source, two independent readers — RxDart vs FxDart</title>
+  <meta name="description" content="Total and max from one side-effecting source without running it twice — a connectable stream vs fork sharing one buffered pass.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/RxDartComparison/tee-the-pipeline.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/tee-the-pipeline.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/tee-the-pipeline.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/tee-the-pipeline.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/tee-the-pipeline.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/tee-the-pipeline.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/tee-the-pipeline.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/tee-the-pipeline.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/tee-the-pipeline.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Главная</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Руководства по API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Язык">
+      <span class="lang-label">Язык</span>
+      <ul>
+        <li><a href="../../RxDartComparison/tee-the-pipeline.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/tee-the-pipeline.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/tee-the-pipeline.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/tee-the-pipeline.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/tee-the-pipeline.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/tee-the-pipeline.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/tee-the-pipeline.html" hreflang="ru" lang="ru" aria-current="page">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">Эта страница ещё не переведена, поэтому показана на английском. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Помогите с переводом</a></p>
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #48 · <strong>One source, two independent readers</strong></p>
+  <h1>One source, two independent readers</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/fork.html">fork</a></li><li><a href="../tutorials/sum.html">sum</a></li><li><a href="../tutorials/max.html">max</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    One reading source must feed <strong>two</strong> independent
+    computations — the total and the peak — while running exactly once.
+    The source increments a counter each time it runs; print the total,
+    the peak, and the counter to prove the single pass. The data is in the
+    code; both versions must print the lines shown under
+    <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">total: 74
+peak: 25
+source runs: 1</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="356e32e086d55422">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+int sourceRuns = 0;
+
+/// A side-effecting source — running it twice would double [sourceRuns].
+Stream<int> readings() async* {
+  sourceRuns++;
+  yield* Stream.fromIterable(const [12, 7, 25, 3, 18, 9]);
+}
+
+Future<void> main() async {
+  // Make the stream connectable: attach BOTH readers first, then connect,
+  // so one subscription to the source feeds two reductions.
+  final shared = readings().publish();
+  final total = shared.fold<int>(0, (acc, r) => acc + r);
+  final peak = shared.reduce((a, b) => a > b ? a : b);
+  shared.connect();
+
+  print('total: ${await total}');
+  print('peak: ${await peak}');
+  print('source runs: $sourceRuns');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="3bd7bdf22f63bc57">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+int sourceRuns = 0;
+
+/// A side-effecting source — running it twice would double [sourceRuns].
+Iterable<int> readings() sync* {
+  sourceRuns++;
+  yield* const [12, 7, 25, 3, 18, 9];
+}
+
+void main() {
+  // fork the SAME iterable object twice: both cursors share one buffered
+  // pass over the source, in whatever order they happen to read.
+  final shared = readings();
+  final total = fx(fork(shared)).sum();
+  final peak = fx(fork(shared)).max();
+
+  print('total: $total');
+  print('peak: $peak');
+  print('source runs: $sourceRuns');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Both models hit the same wall here: their sources restart per
+    consumer. Listening to a plain single-subscription stream twice is an
+    error; iterating a <code>sync*</code> generator twice quietly runs it
+    twice. And both libraries answer with the same idea — share one pass.
+    RxDart makes the stream <em>connectable</em>: <code>publish()</code>
+    defers the source, both reductions subscribe, and <code>connect()</code>
+    starts the single subscription that feeds them. FxDart's
+    <code><a href="../tutorials/fork.html">fork</a></code> branches one buffered iteration: every fork of the
+    same iterable object is an independent cursor over a shared buffer, so
+    the generator body runs once no matter how many readers pull from it.
+  </p>
+  <p>
+    The differences are texture, not capability. The rx version is
+    ordering-sensitive — readers must attach <em>before</em>
+    <code>connect()</code>, and a latecomer misses events; that is push:
+    delivery happens whether you are ready or not. The fx version is
+    identity-sensitive — you must fork the <em>same object</em>, and a
+    fork that lags simply replays the buffer at its own pace; that is
+    pull: values wait for demand. The cost is memory: the shared buffer
+    holds every value until the slowest fork has consumed it, so a badly
+    lagging reader keeps the whole pass alive, where rx's latecomer
+    would simply have missed it. Either is a fine answer to "tee the
+    pipeline", which makes this a tie — pick the one matching the model
+    the rest of your code already lives in.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="live-latest-value.html">← Назад: A live current value for late readers</a>
+    <a href="stream-into-pipeline.html">Далее: A stream feeds a typed pipeline →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart — это порт <a href="https://github.com/marpple/FxTS">FxTS</a>. Большая благодарность <strong>Indong Yoo</strong> (CTO, Marpple) и команде FxTS за идеи, семантику и набор тестов, на которых построена эта библиотека.</p>
+  <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

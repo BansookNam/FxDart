@@ -1,0 +1,7 @@
+1. 23:41  cache flushed
+2. 23:52  nightly backup started
+3. 23:58  nightly backup finished
+4. 00:04  cache warmed
+5. 00:12  first request served
+6. 06:30  daily report generated
+7. 07:02  queue drained

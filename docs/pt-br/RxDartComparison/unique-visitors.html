@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Unique visitors, first visit kept — RxDart vs FxDart</title>
+  <meta name="description" content="Dedupe a visit log across the whole feed, keeping each user's first visit — distinctUnique with equals+hashCode vs uniqBy with one key function.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/RxDartComparison/unique-visitors.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/unique-visitors.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/unique-visitors.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/unique-visitors.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/unique-visitors.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/unique-visitors.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/unique-visitors.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/unique-visitors.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/unique-visitors.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Início</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../RxDartComparison/unique-visitors.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/unique-visitors.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/unique-visitors.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/unique-visitors.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/unique-visitors.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/unique-visitors.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/unique-visitors.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #5 · <strong>Unique visitors, first visit kept</strong></p>
+  <h1>Unique visitors, first visit kept</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/uniqBy.html">uniqBy</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Today's visit log holds eight visits by four accounts. Keep each
+    user's <strong>first</strong> visit only — deduping across the whole
+    log, not just adjacent entries — and print who they are, when they
+    first arrived, and the unique count. The data is in the code; both
+    versions must print the lines shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">ana — first visit 09:02
+ben — first visit 09:15
+cho — first visit 10:05
+dee — first visit 11:01
+4 unique visitors in 8 visits</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="9fb33ec6844ceb42">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+// Today's visit log — repeat visits by the same account.
+const visits = [
+  (user: 'ana', at: '09:02'),
+  (user: 'ben', at: '09:15'),
+  (user: 'ana', at: '09:40'),
+  (user: 'cho', at: '10:05'),
+  (user: 'ben', at: '10:22'),
+  (user: 'dee', at: '11:01'),
+  (user: 'cho', at: '11:30'),
+  (user: 'ana', at: '11:48'),
+];
+
+Future<void> main() async {
+  // distinctUnique dedups across the WHOLE stream (plain Stream.distinct
+  // is adjacent-only); "same visitor" is spelled as equals + hashCode.
+  final firstSeen = await Stream.fromIterable(visits)
+      .distinctUnique(
+          equals: (a, b) => a.user == b.user, hashCode: (v) => v.user.hashCode)
+      .map((v) => '${v.user} — first visit ${v.at}')
+      .toList();
+
+  firstSeen.forEach(print);
+  print('${firstSeen.length} unique visitors in ${visits.length} visits');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="b0021e7f1250dca0">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+// Today's visit log — repeat visits by the same account.
+const visits = [
+  (user: 'ana', at: '09:02'),
+  (user: 'ben', at: '09:15'),
+  (user: 'ana', at: '09:40'),
+  (user: 'cho', at: '10:05'),
+  (user: 'ben', at: '10:22'),
+  (user: 'dee', at: '11:01'),
+  (user: 'cho', at: '11:30'),
+  (user: 'ana', at: '11:48'),
+];
+
+void main() {
+  // uniqBy keeps the first element per key — "same visitor" is one
+  // key function, and the record's user field is the key.
+  final firstSeen = fx(visits)
+      .uniqBy((v) => v.user)
+      .map((v) => '${v.user} — first visit ${v.at}')
+      .toList();
+
+  firstSeen.forEach(print);
+  print('${firstSeen.length} unique visitors in ${visits.length} visits');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    This is one of RxDart's best matches for an FxDart operator.
+    Plain <code>Stream.distinct</code> only compares <em>adjacent</em>
+    events (FxDart's <code>uniqAdjacent</code> is the same idea), so
+    RxDart adds <code>distinctUnique</code>: dedup across the whole
+    stream, first occurrence kept — exactly <code><a href="../tutorials/uniqBy.html">uniqBy</a></code>'s
+    contract. Both maintain a seen-set for the stream's lifetime, both
+    preserve arrival order, and ana's 09:40 and 11:48 revisits vanish
+    identically on both sides.
+  </p>
+  <p>
+    The remaining difference is ergonomic, not semantic. "Same visitor"
+    is one key function for <code><a href="../tutorials/uniqBy.html">uniqBy</a></code> —
+    <code>(v) =&gt; v.user</code> — while <code>distinctUnique</code>
+    asks for a matched <code>equals</code> + <code>hashCode</code> pair,
+    two closures that must agree with each other. That is a mild
+    inconvenience, not a model gap, and the async main is the usual
+    stream overhead on fixed data. Verdict: a tie — the global-dedup operator exists on
+    both sides and behaves the same way.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="skip-warmup-readings.html">← Anterior: Skip the warm-up readings</a>
+    <a href="clean-nullable-readings.html">Próximo: Drop the nulls, keep the values →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

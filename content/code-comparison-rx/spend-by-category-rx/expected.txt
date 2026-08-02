@@ -1,0 +1,3 @@
+groceries: 69
+transport: 23
+dining: 72

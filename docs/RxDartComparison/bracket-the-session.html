@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Open and close markers — RxDart vs FxDart</title>
+  <meta name="description" content="Wrap a session feed in OPEN/CLOSE lines — startWith and endWith on the stream vs prepend and append on the pull chain.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/bracket-the-session.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/bracket-the-session.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/bracket-the-session.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/bracket-the-session.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/bracket-the-session.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/bracket-the-session.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/bracket-the-session.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/bracket-the-session.html">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API Tutorials</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Language">
+      <span class="lang-label">Language</span>
+      <ul>
+        <li><a href="../RxDartComparison/bracket-the-session.html" hreflang="en" lang="en" aria-current="page">English</a></li>
+        <li><a href="../ko/RxDartComparison/bracket-the-session.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../zh/RxDartComparison/bracket-the-session.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../ja/RxDartComparison/bracket-the-session.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../es/RxDartComparison/bracket-the-session.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../pt-br/RxDartComparison/bracket-the-session.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../ru/RxDartComparison/bracket-the-session.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../RxDartComparison/index.html">RxDart vs FxDart</a> › #18 · <strong>Open and close markers</strong></p>
+  <h1>Open and close markers</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/prepend.html">prepend</a></li><li><a href="../tutorials/append.html">append</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    A session report lists one user's events in order, bracketed by an
+    <code>== SESSION OPEN ==</code> line before the first event and an
+    <code>== SESSION CLOSE ==</code> line after the last. The four events
+    are in the code; both versions must print the lines shown under
+    <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">== SESSION OPEN ==
+09:12 login kim
+09:14 open /reports
+09:26 edit budget-aug
+09:41 logout kim
+== SESSION CLOSE ==</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="4413bc17a964d5b5">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+// One user session's events, already collected in order.
+const events = [
+  '09:12 login kim',
+  '09:14 open /reports',
+  '09:26 edit budget-aug',
+  '09:41 logout kim',
+];
+
+Future<void> main() async {
+  final lines = await Stream.fromIterable(events)
+      .startWith('== SESSION OPEN ==')
+      .endWith('== SESSION CLOSE ==')
+      .toList();
+
+  lines.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="309443202be1a7e0">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+// One user session's events, already collected in order.
+const events = [
+  '09:12 login kim',
+  '09:14 open /reports',
+  '09:26 edit budget-aug',
+  '09:41 logout kim',
+];
+
+void main() {
+  final lines = fx(events)
+      .prepend('== SESSION OPEN ==')
+      .append('== SESSION CLOSE ==')
+      .toList();
+
+  lines.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    Almost nowhere: this is vocabulary parity. RxDart's
+    <code>startWith</code> injects a value before the source's first
+    emission and <code>endWith</code> injects one after the source
+    completes; FxDart's <code><a href="../tutorials/prepend.html">prepend</a></code> and <code><a href="../tutorials/append.html">append</a></code> are
+    the same two words on a pull chain, yielding the marker before the
+    first pull reaches the source and after the source runs dry. One
+    operator each, symmetric names, first-class on both sides.
+  </p>
+  <p>
+    The only model difference worth noticing is <em>when</em> the closing
+    marker can exist. On the push side <code>endWith</code> has to wait
+    for the done event — the marker's position is a fact about the
+    stream's lifecycle. On the pull side <code><a href="../tutorials/append.html">append</a></code> is just the
+    next thing the iterator yields once the source is exhausted; there is
+    no lifecycle to observe, only demand. For a finite in-memory feed the
+    distinction is invisible, so this one is a tie — pick the model the
+    rest of your pipeline already lives in.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="feeds-in-order.html">← Previous: Two feeds, strictly in order</a>
+    <a href="dedupe-paged-feed.html">Next: Dedupe a paged feed by id →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a>. Great thanks to <strong>Indong Yoo</strong> (CTO, Marpple) and the FxTS team for the ideas, semantics, and test suite this library is built on.</p>
+  <p>Playground compiles via the DartPad compile service. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Run","pgReset":"Reset","pgCompiling":"Compiling…","pgCompileError":"Compile error","pgError":"Error","pgLoading":"Loading runtime…","pgRunning":"Running…","pgNoOutput":"(no output)","pgLoadFailed":"Could not load the FxDart library"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

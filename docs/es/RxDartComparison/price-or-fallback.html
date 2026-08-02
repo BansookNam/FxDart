@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Un precio, o el precio de lista — RxDart vs FxDart</title>
+  <meta name="description" content="Un precio promocional donde exista, el precio de lista donde no — recuperación por elemento como streams internos frente a un try/catch justo al lado de la llamada.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/price-or-fallback.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/price-or-fallback.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/price-or-fallback.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/price-or-fallback.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/price-or-fallback.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/price-or-fallback.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/price-or-fallback.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/price-or-fallback.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../RxDartComparison/price-or-fallback.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/price-or-fallback.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/price-or-fallback.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/price-or-fallback.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/price-or-fallback.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/price-or-fallback.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/price-or-fallback.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #25 · <strong>Un precio, o el precio de lista</strong></p>
+  <h1>Un precio, o el precio de lista</h1>
+  <p class="cmp-meta"><span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/ifEmpty.html">ifEmpty</a></li></ul>
+  <h2>Requisito</h2>
+  <p>
+    Cotiza dos órdenes de compra contra el libro de precios promocionales
+    de agosto. La búsqueda asíncrona <strong>lanza</strong> para los SKU
+    sin precio promocional — esas líneas deben caer a su precio de lista,
+    y cada línea debe aparecer en la cotización. Una orden sin líneas se
+    cotiza como la única línea <code>(no lines to quote)</code>. Los datos
+    están en el código; las dos versiones deben imprimir las líneas que
+    aparecen bajo <em>Salida esperada</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Salida esperada</summary>
+    <pre class="code">PO-3391:
+  SKU-201: 11.50 (promo)
+  SKU-333: 9.50 (list)
+  SKU-204: 8.25 (promo)
+  SKU-207: 19.90 (promo)
+  SKU-410: 5.20 (list)
+PO-3402:
+  (no lines to quote)</pre>
+  </details>
+
+  <h2>Lado a lado</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="7395716d0ce56678">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+/// August promo price book — looking up any other SKU throws.
+const promoPrices = {'SKU-201': 11.50, 'SKU-204': 8.25, 'SKU-207': 19.90};
+
+/// Purchase orders to quote: (order id, lines of sku + list price).
+const orders = [
+  (
+    'PO-3391',
+    [
+      (sku: 'SKU-201', list: 14.00),
+      (sku: 'SKU-333', list: 9.50),
+      (sku: 'SKU-204', list: 9.75),
+      (sku: 'SKU-207', list: 24.00),
+      (sku: 'SKU-410', list: 5.20),
+    ]
+  ),
+  ('PO-3402', <({String sku, double list})>[]),
+];
+
+Future<double> promoPrice(String sku) async {
+  await Future<void>.delayed(const Duration(milliseconds: 5));
+  final price = promoPrices[sku];
+  if (price == null) throw StateError('no promo price for $sku');
+  return price;
+}
+
+Future<void> main() async {
+  for (final (id, lines) in orders) {
+    print('$id:');
+    final quotes = await Stream.fromIterable(lines)
+        // One error channel for the whole stream: by the time an
+        // onErrorReturnWith after asyncMap saw the failure, the line that
+        // caused it would be gone. Recovery that still knows its line
+        // means wrapping each lookup in its own inner stream.
+        .flatMap((line) => Rx.fromCallable(() => promoPrice(line.sku))
+            .map((p) => '  ${line.sku}: ${p.toStringAsFixed(2)} (promo)')
+            .onErrorReturnWith((_, _) =>
+                '  ${line.sku}: ${line.list.toStringAsFixed(2)} (list)'))
+        .defaultIfEmpty('  (no lines to quote)')
+        .toList();
+    quotes.forEach(print);
+  }
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="c59cfd38cca047cb">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+/// August promo price book — looking up any other SKU throws.
+const promoPrices = {'SKU-201': 11.50, 'SKU-204': 8.25, 'SKU-207': 19.90};
+
+/// Purchase orders to quote: (order id, lines of sku + list price).
+const orders = [
+  (
+    'PO-3391',
+    [
+      (sku: 'SKU-201', list: 14.00),
+      (sku: 'SKU-333', list: 9.50),
+      (sku: 'SKU-204', list: 9.75),
+      (sku: 'SKU-207', list: 24.00),
+      (sku: 'SKU-410', list: 5.20),
+    ]
+  ),
+  ('PO-3402', <({String sku, double list})>[]),
+];
+
+Future<double> promoPrice(String sku) async {
+  await Future<void>.delayed(const Duration(milliseconds: 5));
+  final price = promoPrices[sku];
+  if (price == null) throw StateError('no promo price for $sku');
+  return price;
+}
+
+Future<void> main() async {
+  for (final (id, lines) in orders) {
+    print('$id:');
+    final quotes = await fx(lines)
+        .toAsync()
+        // Recovery is plain control flow inside the callback: catch the
+        // typed error right beside the call, return the fallback value.
+        .map((line) async {
+          try {
+            final p = await promoPrice(line.sku);
+            return '  ${line.sku}: ${p.toStringAsFixed(2)} (promo)';
+          } on StateError {
+            return '  ${line.sku}: ${line.list.toStringAsFixed(2)} (list)';
+          }
+        })
+        .defaultIfEmpty('  (no lines to quote)')
+        .toList();
+    quotes.forEach(print);
+  }
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Por qué difieren</h2>
+  <p>
+    Un stream lleva sus valores y sus errores por <em>canales
+    separados</em>, y el canal de errores pertenece al pipeline entero.
+    Para cuando un <code>onErrorReturnWith</code> colocado tras un
+    <code>asyncMap</code> viera el fallo, la línea que lo causó ya habría
+    desaparecido — un evento de error lleva el error, no el elemento. La
+    recuperación idiomática en RxDart es darle a cada búsqueda su propio
+    stream <em>interno</em> — <code>flatMap</code> hacia
+    <code>Rx.fromCallable</code> — de modo que cada fallo sea terminal
+    solo para su propio stream de un elemento, donde la línea sigue a mano
+    para el fallback.
+  </p>
+  <p>
+    En el modelo pull no hay un segundo canal por el que caer. La búsqueda
+    es un <code>await</code> dentro del callback de <code><a href="../tutorials/map.html">map</a></code>, así
+    que la recuperación es control de flujo ordinario de Dart: atrapa el
+    <code>StateError</code> tipado justo al lado de la llamada y devuelve
+    el precio de lista — el elemento, su fallback y el manejo del error
+    viven todos en las mismas cuatro líneas. Sin envolver, sin volver a
+    mezclar, y el fallo no llega a tocar el pipeline en ningún momento.
+  </p>
+  <p>
+    La segunda orden, vacía, aterriza igual en ambos lados —
+    <code>defaultIfEmpty</code>, un operador que FxDart tomó de Rx. El
+    veredicto se lo lleva FxDart por el plato principal: la recuperación
+    de errores por elemento es una frase en el modelo pull y una
+    construcción en el modelo push.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="weekly-windows-report.html">← Anterior: Totales semanales de una serie diaria</a>
+    <a href="resume-with-cache.html">Siguiente: Reanudar desde la caché cuando la fuente muere →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

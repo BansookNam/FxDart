@@ -12,6 +12,7 @@
   --out-text: #d8ddf5;
   --err: #e5484d;
   --ok: #2f9e68;
+  --rx: #d6336c;
   --max: 900px;
 }
 @media (prefers-color-scheme: dark) {
@@ -26,6 +27,7 @@
     --code-bg: #1d2032;
     --out-bg: #0c0e18;
     --out-text: #ccd2ee;
+    --rx: #e64980;
   }
 }
 
@@ -148,6 +150,12 @@ th { background: var(--bg-soft); }
   box-shadow: 0 4px 18px rgba(108, 92, 231, 0.35);
 }
 .demo-cta.cta-compare:hover { box-shadow: 0 6px 24px rgba(108, 92, 231, 0.5); }
+
+.demo-cta.cta-compare-rx {
+  background: linear-gradient(135deg, #d6336c, #a61e4d);
+  box-shadow: 0 4px 18px rgba(214, 51, 108, 0.4);
+}
+.demo-cta.cta-compare-rx:hover { box-shadow: 0 6px 24px rgba(214, 51, 108, 0.5); }
 
 /* pros / cons */
 .proscons { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
@@ -292,6 +300,7 @@ main.cmp-wide { max-width: 1280px; }
 .verdict-fxdart { background: var(--accent); border-color: var(--accent); color: #fff; }
 .verdict-tie { background: var(--bg-soft); color: var(--text-dim); }
 .verdict-native { background: var(--ok); border-color: var(--ok); color: #fff; }
+.verdict-rxdart { background: var(--rx); border-color: var(--rx); color: #fff; }
 .badge-async { background: var(--out-bg); border-color: var(--out-bg); color: var(--out-text); }
 
 .cmp-meta { margin: 0.2rem 0 0.4rem; }

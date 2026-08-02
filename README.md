@@ -21,7 +21,11 @@ programming model, rebuilt on Dart's type system.
   <img src="https://img.shields.io/badge/%E2%9A%96%EF%B8%8F%20Dart%20vs%20FxDart-50%20Side--by--Side%20Examples%20%E2%86%92-0984E3?style=for-the-badge&labelColor=074B80" alt="Dart vs FxDart — 50 Side-by-Side Examples" height="56">
 </a>
 
-<b>👆 Click above</b> — <b>FxDart 101</b> is a guided course with a live in-browser playground for every function; <b>Daily Ledger</b> is a full app built with fxdart; <b>Dart vs FxDart</b> puts native Dart and fxdart solutions side by side, with an honest verdict on each.
+<a href="https://bansooknam.github.io/FxDart/RxDartComparison/">
+  <img src="https://img.shields.io/badge/%E2%9A%A1%20RxDart%20vs%20FxDart-50%20Push--vs--Pull%20Examples%20%E2%86%92-E64980?style=for-the-badge&labelColor=8B1E4B" alt="RxDart vs FxDart — 50 Push-vs-Pull Examples" height="56">
+</a>
+
+<b>👆 Click above</b> — <b>FxDart 101</b> is a guided course with a live in-browser playground for every function; <b>Daily Ledger</b> is a full app built with fxdart; <b>Dart vs FxDart</b> puts native Dart and fxdart solutions side by side, with an honest verdict on each; <b>RxDart vs FxDart</b> runs the same 50-example format against RxDart — push streams vs pull pipelines, including the cases where RxDart is simply the right tool.
 
 ## Why fxdart?
 

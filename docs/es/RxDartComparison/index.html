@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RxDart vs FxDart — dos modelos, lado a lado</title>
+  <meta name="description" content="50 tareas reales resueltas dos veces —streams de RxDart frente a pipelines pull de FxDart—, cada pareja ejecutable en el navegador y con un veredicto honesto sobre qué modelo encaja.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/index.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/index.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/index.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/index.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/index.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/index.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/index.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/index.html">
+  <link rel="stylesheet" href="../../css/site.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../RxDartComparison/index.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/index.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/index.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/index.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/index.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/index.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/index.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <h1>RxDart vs FxDart</h1>
+  <p class="hero-sub">
+    La misma tarea real, resuelta dos veces: RxDart a la izquierda, FxDart
+    a la derecha. Las dos versiones se ejecutan en tu navegador e imprimen
+    exactamente la misma salida — compara los dos modelos y decide qué
+    modelo es en realidad tu problema.
+  </p>
+
+  <p>
+    Estas dos bibliotecas no son tanto rivales como
+    <strong>complementos</strong>. RxDart extiende el <code>Stream</code>
+    de Dart — un modelo <em>push</em> en el que el productor decide cuándo
+    llegan los valores, lo que hace naturales los operadores ligados al
+    reloj (<code>debounceTime</code>, <code>combineLatest</code>,
+    <code>switchMap</code>) y el multicast (<code>BehaviorSubject</code>).
+    FxDart trabaja sobre iterables — un modelo <em>pull</em> en el que el
+    consumidor decide cuándo pedir, lo que hace naturales la pereza, el
+    manejo tipado de errores y la concurrencia acotada en orden
+    (<code><a href="../tutorials/concurrent.html">.concurrent(n)</a></code>),
+    y convierte el backpressure en un no-problema: no tirar
+    <em>es</em> el backpressure. Los dos se encuentran en los puentes —
+    <code><a href="../tutorials/streams.html">fromStream / toStream</a></code> —
+    y varios de los ejemplos de abajo usan las dos bibliotecas juntas a
+    propósito.
+  </p>
+
+  <p>
+    Un apunte de honestidad antes de la lista: cuando un problema va
+    genuinamente de <em>eventos en el tiempo</em> — entrada del usuario,
+    tickers, sockets — un stream es la forma correcta para él, y algunos
+    veredictos de abajo lo dicen sin rodeos. Lo que las parejas exponen es
+    cuántas veces un problema que se resuelve con un stream es en realidad
+    un <em>pipeline de datos</em> disfrazado de stream: una descarga
+    acotada, una transformación por lotes, un rastreo paginado. Para esos,
+    la versión pull es más corta, ordenada, tipada y no necesita ciclo de
+    vida de suscripción alguno.
+  </p>
+
+  <p>
+    <span class="badge verdict-fxdart">Gana FxDart</span> — el modelo pull encaja mejor con este problema ·
+    <span class="badge verdict-tie">Empate</span> — ambos modelos lo expresan con limpieza ·
+    <span class="badge verdict-rxdart">Terreno de RxDart</span> — genuinamente push/temporal; RxDart es la herramienta adecuada ·
+    <span class="badge badge-async">async</span> — usa pipelines asíncronos
+  </p>
+
+  <p class="cmp-picks"><span>Si solo vas a leer cinco, lee estos:</span>
+    <a href="even-totals.html">#1 Suma los importes pares válidos</a> ·
+    <a href="spend-by-category-rx.html">#15 Gasto agrupado por categoría</a> ·
+    <a href="per-row-retry.html">#29 Reintentar cada fila inestable por separado</a> ·
+    <a href="ordered-bounded-fetch.html">#35 Obtener de 4 en 4, resultados en orden</a> ·
+    <a href="switch-to-newest-search.html">#45 Solo importa la búsqueda más nueva</a>
+  </p>
+
+  <div class="cmp-filter" hidden>
+    <button data-filter="all" class="active">Todos</button>
+    <button data-filter="async">async</button>
+    <button data-filter="fxdart">Gana FxDart</button>
+    <button data-filter="tie">Empate</button>
+    <button data-filter="rxdart">Terreno de RxDart</button>
+    <input type="search" placeholder="filtrar por nombre de función…">
+  </div>
+
+  <section class="cmp-tier">
+  <h2>Parte 1 · El mismo trabajo, ambas librerías</h2>
+  <p class="dim">La zona común: transformaciones, filtros y cortes que existen en ambos vocabularios — cadenas pull y transformadores de stream, lado a lado.</p>
+  <ol class="cmp-list">
+    <li data-verdict="fxdart" data-async="false" data-fns="fx compact filter sum">
+      <a class="cmp-row" href="even-totals.html">
+        <span class="cmp-num">1</span>
+        <span class="cmp-row-body">
+          <strong>Suma los importes pares válidos</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Descarta los parseos fallidos, quédate con los pares y suma — un pipeline de Stream con un main asíncrono frente a una sola cadena pull síncrona sobre la misma lista fija.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/compact.html">compact</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sum.html">sum</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="false" data-fns="scan">
+      <a class="cmp-row" href="running-balance-feed.html">
+        <span class="cmp-num">2</span>
+        <span class="cmp-row-body">
+          <strong>Saldo acumulado de un feed de depósitos</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Plegar un feed de depósitos y retiradas en un saldo acumulado — el scan de Rx frente al scan de fxdart, una acumulación por movimiento en ambos lados.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/scan.html">scan</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="false" data-fns="fx find">
+      <a class="cmp-row" href="first-over-budget-rx.html">
+        <span class="cmp-num">3</span>
+        <span class="cmp-row-body">
+          <strong>Primera transacción por encima del presupuesto</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Encontrar la primera transacción por encima de 100 y detenerse — el firstWhere de Rx cancela la suscripción, el find de fxdart deja de tirar; ambos examinan solo 4 de 8.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/find.html">find</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="false" data-fns="fx dropWhile map">
+      <a class="cmp-row" href="skip-warmup-readings.html">
+        <span class="cmp-num">4</span>
+        <span class="cmp-row-body">
+          <strong>Salta las lecturas de calentamiento</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Descartar las lecturas bajas iniciales de una sonda y conservar todo lo demás — skipWhile y dropWhile son la misma compuerta de un solo sentido; hasta los operadores son del core.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="false" data-fns="fx uniqBy map">
+      <a class="cmp-row" href="unique-visitors.html">
+        <span class="cmp-num">5</span>
+        <span class="cmp-row-body">
+          <strong>Visitantes únicos, conservando la primera visita</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Deduplicar un registro de visitas a lo largo de todo el feed, conservando la primera visita de cada usuario — distinctUnique con equals+hashCode frente a uniqBy con una sola función de clave.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/uniqBy.html">uniqBy</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="false" data-fns="fx compact map">
+      <a class="cmp-row" href="clean-nullable-readings.html">
+        <span class="cmp-num">6</span>
+        <span class="cmp-row-body">
+          <strong>Descarta los null, conserva los valores</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Limpiar un feed de sensor con nulos y formatear los supervivientes — whereNotNull es compact con otro nombre, y ambos estrechan double? a double estáticamente.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/compact.html">compact</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="false" data-fns="fx filter takeRight">
+      <a class="cmp-row" href="last-three-errors.html">
+        <span class="cmp-num">7</span>
+        <span class="cmp-row-body">
+          <strong>Los últimos tres errores</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Conservar las líneas ERROR e imprimir las tres últimas — takeLast espera el evento done, takeRight drena el iterable; ambos almacenan exactamente tres.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/takeRight.html">takeRight</a></li></ul>
+    </li>
+    <li data-verdict="fxdart" data-async="false" data-fns="fx zipWithIndex map">
+      <a class="cmp-row" href="numbered-checklist.html">
+        <span class="cmp-num">8</span>
+        <span class="cmp-row-body">
+          <strong>Numera la lista de pasos</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Convertir seis pasos en líneas numeradas con 1. — los streams no tienen map con índice, así que Rx cuela un contador a través de scan; fxdart dice zipWithIndex.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="false" data-fns="fx flatMap map">
+      <a class="cmp-row" href="expand-order-lines.html">
+        <span class="cmp-num">9</span>
+        <span class="cmp-row-body">
+          <strong>Aplana los pedidos en líneas</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Aplanar cuatro pedidos en sus diez líneas pedido/sku — Stream.expand y el flatMap de fxdart son la misma palabra para uno-a-muchos, en orden de origen.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="false" data-fns="fx filter ifEmpty map">
+      <a class="cmp-row" href="empty-report-default.html">
+        <span class="cmp-num">10</span>
+        <span class="cmp-row-body">
+          <strong>Una línea por defecto para un informe vacío</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Filtrar a una categoría sin coincidencias y aun así imprimir algo — defaultIfEmpty en el stream frente a ifEmpty en la cadena pull, la misma idea en ambos modelos.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/ifEmpty.html">ifEmpty</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+  </ol>
+  </section>
+
+  <section class="cmp-tier">
+  <h2>Parte 2 · Ventanas, estado y orden</h2>
+  <p class="dim">Búferes, pares, estado acumulado y adyacencia: donde empiezan a notarse las sutiles diferencias semánticas entre push y pull.</p>
+  <ol class="cmp-list">
+    <li data-verdict="tie" data-async="false" data-fns="fx chunk map">
+      <a class="cmp-row" href="upload-batches.html">
+        <span class="cmp-num">11</span>
+        <span class="cmp-row-body">
+          <strong>Sube en lotes de 4</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Diez archivos pendientes, como mucho cuatro por petición — bufferCount(4) en el stream frente a chunk(4) en la cadena pull, con el último lote corto en ambos lados.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="fxdart" data-async="false" data-fns="fx windowed average map">
+      <a class="cmp-row" href="sliding-average-rx.html">
+        <span class="cmp-num">12</span>
+        <span class="cmp-row-body">
+          <strong>Media móvil de tres lecturas</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Una media móvil sobre lecturas de sensor — bufferCount(3, 1) más un filtro de longitud para los parciales finales frente a windowed(3) diciendo exactamente lo que significa.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/windowed.html">windowed</a></li><li><a href="../tutorials/average.html">average</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="false" data-fns="fx pairwise map">
+      <a class="cmp-row" href="tick-deltas.html">
+        <span class="cmp-num">13</span>
+        <span class="cmp-row-body">
+          <strong>Deltas entre ticks</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Cada tick de precio junto a su predecesor — pairwise en ambas bibliotecas, parejas como listas en el lado stream, records tipados en el lado pull.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/pairwise.html">pairwise</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="false" data-fns="fx uniqAdjacent uniq map">
+      <a class="cmp-row" href="status-transitions.html">
+        <span class="cmp-num">14</span>
+        <span class="cmp-row-body">
+          <strong>Informa solo de los cambios de estado</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Colapsar un feed de salud repetitivo a una línea por racha — Stream.distinct frente a uniqAdjacent, con distinctUnique y uniq como los primos globales.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/uniqAdjacent.html">uniqAdjacent</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="fxdart" data-async="false" data-fns="fx groupedBy map sumBy">
+      <a class="cmp-row" href="spend-by-category-rx.html">
+        <span class="cmp-num">15</span>
+        <span class="cmp-row-body">
+          <strong>Gasto agrupado por categoría</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Totales por categoría en orden de primera aparición — un stream de GroupedStreams plegado y vuelto a mezclar frente a un groupBy que simplemente devuelve un Map.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/groupedBy.html">groupedBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="false" data-fns="fx zip map">
+      <a class="cmp-row" href="align-forecast-actual.html">
+        <span class="cmp-num">16</span>
+        <span class="cmp-row-body">
+          <strong>Alinea el pronóstico con los datos reales</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Emparejar dos series fijas posición a posición e imprimir la diferencia de cada día — zipWith en streams frente a zip en iterables, la misma alineación en ambos casos.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/zip.html">zip</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="false" data-fns="fx concat map">
+      <a class="cmp-row" href="feeds-in-order.html">
+        <span class="cmp-num">17</span>
+        <span class="cmp-row-body">
+          <strong>Dos feeds, estrictamente en orden</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">La cola del log de ayer seguida del log de hoy como una sola lista numerada — concatWith secuenciando suscripciones frente a concat secuenciando tirones.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/concat.html">concat</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="false" data-fns="fx prepend append">
+      <a class="cmp-row" href="bracket-the-session.html">
+        <span class="cmp-num">18</span>
+        <span class="cmp-row-body">
+          <strong>Marcadores de apertura y cierre</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Envolver un feed de sesión en líneas OPEN/CLOSE — startWith y endWith en el stream frente a prepend y append en la cadena pull.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/prepend.html">prepend</a></li><li><a href="../tutorials/append.html">append</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="false" data-fns="fx flatMap uniqBy map">
+      <a class="cmp-row" href="dedupe-paged-feed.html">
+        <span class="cmp-num">19</span>
+        <span class="cmp-row-body">
+          <strong>Deduplica un feed paginado por id</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Aplanar tres páginas que se solapan y conservar cada id de producto una vez, en orden de llegada — expand más distinctUnique frente a flatMap más uniqBy.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/uniqBy.html">uniqBy</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="true" data-fns="fx toAsync min max">
+      <a class="cmp-row" href="latency-extremes.html">
+        <span class="cmp-num">20</span>
+        <span class="cmp-row-body">
+          <strong>La petición más rápida y la más lenta</strong> <span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span>
+          <span class="dim">Sondear ocho endpoints de forma asíncrona e imprimir la latencia mínima y máxima — reducciones que devuelven Future en ambos lados, una pasada fresca cada una.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/min.html">min</a></li><li><a href="../tutorials/max.html">max</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="false" data-fns="fx scan map">
+      <a class="cmp-row" href="stock-after-moves.html">
+        <span class="cmp-num">21</span>
+        <span class="cmp-row-body">
+          <strong>Nivel de stock tras cada movimiento</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Plegar recepciones y envíos de almacén en un nivel de stock acumulado y marcar los backorders — scan en ambos lados, semillas reproducidas de forma distinta.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="fxdart" data-async="false" data-fns="fx map partition">
+      <a class="cmp-row" href="audit-with-outcomes.html">
+        <span class="cmp-num">22</span>
+        <span class="cmp-row-body">
+          <strong>Conserva valores Y fallos en la auditoría</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Parsear ocho líneas de configuración donde tres fallan, imprimiendo los valores y el recuento de fallos — errores colados de vuelta como datos frente a una partición sencilla.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/partition.html">partition</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="false" data-fns="fx takeUntilInclusive map">
+      <a class="cmp-row" href="stop-at-shutdown.html">
+        <span class="cmp-num">23</span>
+        <span class="cmp-row-body">
+          <strong>Toma hasta el marcador de apagado, inclusive</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Conservar cada evento hasta SHUTDOWN incluido y descartar los rezagados — takeWhileInclusive frente a takeUntilInclusive, el mismo corte en dos grafías.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/takeUntilInclusive.html">takeUntilInclusive</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="fxdart" data-async="false" data-fns="fx chunk sumBy map zipWithIndex">
+      <a class="cmp-row" href="weekly-windows-report.html">
+        <span class="cmp-num">24</span>
+        <span class="cmp-row-body">
+          <strong>Totales semanales de una serie diaria</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Enrollar 21 días de gasto en tres totales numerados por semana — bufferCount con scan reclutado como contador frente a chunk más zipWithIndex.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li></ul>
+    </li>
+  </ol>
+  </section>
+
+  <section class="cmp-tier">
+  <h2>Parte 3 · Errores y resiliencia</h2>
+  <p class="dim">Un canal de errores sin tipos frente a errores como valores tipados: reintentos, timeouts, respaldos y la vida de los recursos en ambos modelos.</p>
+  <ol class="cmp-list">
+    <li data-verdict="fxdart" data-async="true" data-fns="fx toAsync map ifEmpty">
+      <a class="cmp-row" href="price-or-fallback.html">
+        <span class="cmp-num">25</span>
+        <span class="cmp-row-body">
+          <strong>Un precio, o el precio de lista</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Un precio promocional donde exista, el precio de lista donde no — recuperación por elemento como streams internos frente a un try/catch justo al lado de la llamada.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/ifEmpty.html">ifEmpty</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="true" data-fns="fx concat take map">
+      <a class="cmp-row" href="resume-with-cache.html">
+        <span class="cmp-num">26</span>
+        <span class="cmp-row-body">
+          <strong>Reanudar desde la caché cuando la fuente muere</strong> <span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span>
+          <span class="dim">El feed en vivo muere tras tres actualizaciones — onErrorResumeNext conmuta a la cola cacheada frente a un bucle de pull explícito que alimenta concat.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/concat.html">concat</a></li><li><a href="../tutorials/take.html">take</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="true" data-fns="fx retry">
+      <a class="cmp-row" href="retry-the-fetch.html">
+        <span class="cmp-num">27</span>
+        <span class="cmp-row-body">
+          <strong>Reintentar el fetch inestable</strong> <span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span>
+          <span class="dim">Un fetch que falla dos veces y luego acierta — Rx.retry re-suscribe una fábrica de streams, el retry de fxdart re-ejecuta un Future, ambos en una llamada.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/retry.html">retry</a></li></ul>
+    </li>
+    <li data-verdict="fxdart" data-async="true" data-fns="fx retry">
+      <a class="cmp-row" href="backoff-retry.html">
+        <span class="cmp-num">28</span>
+        <span class="cmp-row-body">
+          <strong>Reintentar con backoff creciente</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Alargar la espera entre intentos — retryWhen mapea cada error a un stream de temporizador a mano frente a un hook delay que devuelve un Duration.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/retry.html">retry</a></li></ul>
+    </li>
+    <li data-verdict="fxdart" data-async="true" data-fns="fx toAsync retry concurrent">
+      <a class="cmp-row" href="per-row-retry.html">
+        <span class="cmp-num">29</span>
+        <span class="cmp-row-body">
+          <strong>Reintentar cada fila inestable por separado</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Seis filas de importación inestables, dos intentos cada una, tres en vuelo — flatMap emite en orden de terminación, mapRetry bajo concurrent conserva el orden de origen.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/retry.html">retry</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="true" data-fns="fx toAsync map timeout">
+      <a class="cmp-row" href="bound-the-stall.html">
+        <span class="cmp-num">30</span>
+        <span class="cmp-row-body">
+          <strong>Acotar la lectura atascada</strong> <span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span>
+          <span class="dim">Un presupuesto de 150 ms sobre una lectura de sensor que se atasca — el timeout de stream vigila los huecos entre eventos, el timeout pull acota el tiempo demanda-a-elemento.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/timeout.html">timeout</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="true" data-fns="fx using toAsync toList">
+      <a class="cmp-row" href="cursor-lifetime.html">
+        <span class="cmp-num">31</span>
+        <span class="cmp-row-body">
+          <strong>La vida de un cursor alrededor de una lectura</strong> <span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span>
+          <span class="dim">Abrir un cursor, leer cinco filas, garantizar el cierre — Rx.using alrededor de un stream vs usingAsync alrededor de un pull perezoso, dos ports de una misma idea.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/using.html">using</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/toList.html">toList</a></li></ul>
+    </li>
+    <li data-verdict="fxdart" data-async="true" data-fns="fx toAsync map partition">
+      <a class="cmp-row" href="successes-and-failures.html">
+        <span class="cmp-num">32</span>
+        <span class="cmp-row-body">
+          <strong>Separar éxitos de fallos</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Siete validaciones async, dos fallan — un try/catch por elemento que alimenta una partición tipada vs streams internos que devuelven el canal de errores a los datos.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/partition.html">partition</a></li></ul>
+    </li>
+    <li data-verdict="fxdart" data-async="false" data-fns="fx map partition">
+      <a class="cmp-row" href="all-validation-errors.html">
+        <span class="cmp-num">33</span>
+        <span class="cmp-row-body">
+          <strong>Reportar cada error de validación</strong> <span class="badge verdict-fxdart">Gana FxDart</span>
+          <span class="dim">Cada regla rota por formulario, no solo la primera — valores de error llanos en una cadena síncrona vs un canal de errores que solo puede llevar un error y cerrarse.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/partition.html">partition</a></li></ul>
+    </li>
+    <li data-verdict="fxdart" data-async="true" data-fns="fx toAsync map scan takeUntilInclusive">
+      <a class="cmp-row" href="stop-after-three-failures.html">
+        <span class="cmp-num">34</span>
+        <span class="cmp-row-body">
+          <strong>Rendirse tras tres fallos</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Contar fallos con scan y parar en el tercero, inclusive — un try/catch en el mapper vs convertir los errores en valores marcadores antes de que scan pueda verlos.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/takeUntilInclusive.html">takeUntilInclusive</a></li></ul>
+    </li>
+  </ol>
+  </section>
+
+  <section class="cmp-tier">
+  <h2>Parte 4 · Concurrencia, tiempo y push</h2>
+  <p class="dim">Donde los modelos se separan: concurrencia dirigida por la demanda en un lado, tiempo de reloj y multicast en el otro — incluidos los ejemplos donde RxDart es sencillamente la herramienta adecuada.</p>
+  <ol class="cmp-list">
+    <li data-verdict="fxdart" data-async="true" data-fns="fx toAsync mapConcurrent">
+      <a class="cmp-row" href="ordered-bounded-fetch.html">
+        <span class="cmp-num">35</span>
+        <span class="cmp-row-body">
+          <strong>Obtener de 4 en 4, resultados en orden</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Ocho fetches, cuatro en vuelo, impresos en orden de origen — mapConcurrent es ordenado por construcción; flatMap(maxConcurrent) debe etiquetar y reordenar.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/mapConcurrent.html">mapConcurrent</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="true" data-fns="fx toAsync map concurrentPool">
+      <a class="cmp-row" href="completion-order-pool.html">
+        <span class="cmp-num">36</span>
+        <span class="cmp-row-body">
+          <strong>El resultado más rápido primero</strong> <span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span>
+          <span class="dim">Imprimir cada resultado en cuanto aterriza — el orden de terminación es el comportamiento nativo de flatMap, y fxdart lo iguala con un operador dedicado concurrentPool.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrentPool.html">concurrentPool</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="true" data-fns="fx toAsync map scan">
+      <a class="cmp-row" href="dependent-calls-in-sequence.html">
+        <span class="cmp-num">37</span>
+        <span class="cmp-row-body">
+          <strong>Cada llamada alimenta la siguiente</strong> <span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span>
+          <span class="dim">Cuatro llamadas a la API donde cada respuesta siembra la petición siguiente — scan enhebra el estado por el pipeline; asyncMap se cierra sobre un token mutable.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/scan.html">scan</a></li></ul>
+    </li>
+    <li data-verdict="fxdart" data-async="true" data-fns="fx toAsync flatMap takeWhile map">
+      <a class="cmp-row" href="crawl-the-pages.html">
+        <span class="cmp-num">38</span>
+        <span class="cmp-row-body">
+          <strong>Rastrear páginas hasta agotarlas</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Pedir la página siguiente solo al estar listo — un cursor perezoso sin fin tirado bajo demanda vs un Rx.range suficientemente grande cancelado en la primera página vacía.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/takeWhile.html">takeWhile</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="true" data-fns="fx toAsync map">
+      <a class="cmp-row" href="spaced-out-calls.html">
+        <span class="cmp-num">39</span>
+        <span class="cmp-row-body">
+          <strong>Una llamada cada 100 ms</strong> <span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span>
+          <span class="dim">Cinco pings separados al menos 100 ms, probado con un Stopwatch monotónico — el interval de rx vs un delay llano en el mapper de una cadena pull secuencial.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="rxdart" data-async="true" data-fns="fx debounce toAsync map">
+      <a class="cmp-row" href="debounced-search.html">
+        <span class="cmp-num">40</span>
+        <span class="cmp-row-body">
+          <strong>Aplicar debounce al buscador</strong> <span class="badge verdict-rxdart">Terreno de RxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Esperar a que el tecleo se calme antes de buscar — un solo operador debounceTime sobre el stream de eventos vs un debouncer de callback cableado a mano.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/debounce.html">debounce</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="rxdart" data-async="true" data-fns="fx throttle map">
+      <a class="cmp-row" href="throttled-refresh.html">
+        <span class="cmp-num">41</span>
+        <span class="cmp-row-body">
+          <strong>Aplicar throttle al botón de refresco</strong> <span class="badge verdict-rxdart">Terreno de RxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Dejar pasar un toque por ventana de 300 ms — throttleTime sobre el stream de toques vs el envoltorio de callback throttle de fxdart cableado al stream a mano.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/throttle.html">throttle</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="rxdart" data-async="true" data-fns="fx streams map">
+      <a class="cmp-row" href="sampled-gauge.html">
+        <span class="cmp-num">42</span>
+        <span class="cmp-row-body">
+          <strong>Muestrear el medidor en cada tick de sondeo</strong> <span class="badge verdict-rxdart">Terreno de RxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Leer el valor más reciente del medidor en cada tick de sondeo — un stream disparador de sample explícito vs una variable de último valor llevada a mano y leída a través del puente.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="rxdart" data-async="true" data-fns="fx streams scan filter">
+      <a class="cmp-row" href="combine-form-fields.html">
+        <span class="cmp-num">43</span>
+        <span class="cmp-row-body">
+          <strong>Habilitar el envío cuando el formulario es válido</strong> <span class="badge verdict-rxdart">Terreno de RxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Combinar los últimos valores de email y contraseña para gobernar el botón de envío — Rx.combineLatest2 vs un stream etiquetado fusionado a mano y plegado con scan.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/filter.html">filter</a></li></ul>
+    </li>
+    <li data-verdict="rxdart" data-async="true" data-fns="fx streams scan filter map">
+      <a class="cmp-row" href="with-latest-config.html">
+        <span class="cmp-num">44</span>
+        <span class="cmp-row-body">
+          <strong>Sellar cada petición con la config más reciente</strong> <span class="badge verdict-rxdart">Terreno de RxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Cada petición saliente lleva la versión de config vigente en ese instante — withLatestFrom vs una fusión etiquetada plegada con scan tras el puente.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="rxdart" data-async="true" data-fns="fx map">
+      <a class="cmp-row" href="switch-to-newest-search.html">
+        <span class="cmp-num">45</span>
+        <span class="cmp-row-body">
+          <strong>Solo importa la búsqueda más nueva</strong> <span class="badge verdict-rxdart">Terreno de RxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Una consulta más nueva abandona la búsqueda en vuelo — switchMap en un operador vs un contador de épocas artesanal que descarta resultados obsoletos al aterrizar.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+    </li>
+    <li data-verdict="rxdart" data-async="true" data-fns="fx toAsync head">
+      <a class="cmp-row" href="first-mirror-wins.html">
+        <span class="cmp-num">46</span>
+        <span class="cmp-row-body">
+          <strong>Poner a competir dos mirrors</strong> <span class="badge verdict-rxdart">Terreno de RxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Dos mirrors compiten por un payload — Rx.race cancela el fetch perdedor en pleno vuelo; un pipeline pull solo puede negarse a arrancarlo.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/head.html">head</a></li></ul>
+    </li>
+    <li data-verdict="rxdart" data-async="true" data-fns="fx streams">
+      <a class="cmp-row" href="live-latest-value.html">
+        <span class="cmp-num">47</span>
+        <span class="cmp-row-body">
+          <strong>Un valor actual en vivo para lectores tardíos</strong> <span class="badge verdict-rxdart">Terreno de RxDart</span> <span class="badge badge-async">async</span>
+          <span class="dim">Un panel que se conecta tarde aún recibe la temperatura actual al instante — BehaviorSubject reemite el último valor; pull lo cachea a mano.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="false" data-fns="fx fork sum max">
+      <a class="cmp-row" href="tee-the-pipeline.html">
+        <span class="cmp-num">48</span>
+        <span class="cmp-row-body">
+          <strong>Una fuente, dos lectores independientes</strong> <span class="badge verdict-tie">Empate</span>
+          <span class="dim">Total y máximo de una fuente con efectos sin ejecutarla dos veces — un stream conectable vs fork compartiendo una sola pasada con buffer.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/fork.html">fork</a></li><li><a href="../tutorials/sum.html">sum</a></li><li><a href="../tutorials/max.html">max</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="true" data-fns="fx streams filter map toList">
+      <a class="cmp-row" href="stream-into-pipeline.html">
+        <span class="cmp-num">49</span>
+        <span class="cmp-row-body">
+          <strong>Un stream alimenta un pipeline tipado</strong> <span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span>
+          <span class="dim">Un stream de logs en vivo fluye hacia un pipeline pull tipado a través de fxStream — conservar los warnings, ponerlos en mayúsculas y contar, a ambos lados del puente.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/toList.html">toList</a></li></ul>
+    </li>
+    <li data-verdict="tie" data-async="true" data-fns="fx toAsync mapConcurrent chunk streams">
+      <a class="cmp-row" href="pipeline-into-stream.html">
+        <span class="cmp-num">50</span>
+        <span class="cmp-row-body">
+          <strong>Un pipeline alimenta a un consumidor de streams</strong> <span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span>
+          <span class="dim">Un fetch ordenado con mapConcurrent entrega sus resultados a un consumidor de streams vía toStream — el puente cruzado en la otra dirección.</span>
+        </span>
+      </a>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/mapConcurrent.html">mapConcurrent</a></li><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/streams.html">streams</a></li></ul>
+    </li>
+  </ol>
+  </section>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script src="../../js/comparison.js" defer></script>
+</body>
+</html>

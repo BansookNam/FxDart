@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>상태가 바뀔 때만 보고하기 — RxDart vs FxDart</title>
+  <meta name="description" content="반복투성이 헬스 피드를 런당 한 줄로 접기 — Stream.distinct vs uniqAdjacent, 전역 사촌으로는 distinctUnique와 uniq.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/status-transitions.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/status-transitions.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/status-transitions.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/status-transitions.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/status-transitions.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/status-transitions.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/status-transitions.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/status-transitions.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../RxDartComparison/status-transitions.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/status-transitions.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/status-transitions.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/status-transitions.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/status-transitions.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/status-transitions.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/status-transitions.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #14 · <strong>상태가 바뀔 때만 보고하기</strong></p>
+  <h1>상태가 바뀔 때만 보고하기</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/uniqAdjacent.html">uniqAdjacent</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
+  <h2>요구사항</h2>
+  <p>
+    헬스체크 피드가 <code>ok, ok, warn, warn, ok, ok, ok</code>를
+    보고합니다 — 대부분 반복입니다. <strong>런</strong>마다
+    <em>status now</em> 한 줄씩(세 줄)을 출력한 뒤, 처음 본 순서로 모든
+    고유 상태를 나열하는 <code>statuses seen:</code> 한 줄을 출력하세요.
+    데이터는 아래 코드에 있으며, 두 버전 모두 <em>예상 출력</em> 아래에
+    표시된 줄들을 출력해야 합니다.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>예상 출력</summary>
+    <pre class="code">status now: ok
+status now: warn
+status now: ok
+statuses seen: ok, warn</pre>
+  </details>
+
+  <h2>나란히 보기</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="671f1bde9a669419">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+// Health-check feed, one status per probe.
+const feed = ['ok', 'ok', 'warn', 'warn', 'ok', 'ok', 'ok'];
+
+Future<void> main() async {
+  final changes = await Stream.fromIterable(feed)
+      .distinct() // plain Stream.distinct is adjacent-only: one per run
+      .map((s) => 'status now: $s')
+      .toList();
+
+  // The global cousin: rxdart's distinctUnique dedups across the whole
+  // stream, so 'ok' survives only once.
+  final seen = await Stream.fromIterable(feed).distinctUnique().toList();
+
+  changes.forEach(print);
+  print('statuses seen: ${seen.join(', ')}');
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="3d893f27a42a7a7d">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+// Health-check feed, one status per probe.
+const feed = ['ok', 'ok', 'warn', 'warn', 'ok', 'ok', 'ok'];
+
+void main() {
+  final changes = fx(feed)
+      .uniqAdjacent() // drops repeats of the predecessor: one per run
+      .map((s) => 'status now: $s')
+      .toList();
+
+  // The global cousin: uniq dedups across the whole feed, so 'ok'
+  // survives only once.
+  final seen = fx(feed).uniq().toList();
+
+  changes.forEach(print);
+  print('statuses seen: ${seen.join(', ')}');
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>차이가 나는 이유</h2>
+  <p>
+    인접 중복 제거 — "값이 <em>바뀔 때</em> 알려 달라" — 는 어느
+    모델에서든 기억해 둔 상태 값 하나이고, 두 쪽은 줄과 줄이
+    쌍둥이입니다. 유일한 함정은 이름 짓기인데, 방향이 서로 반대로
+    갈립니다. 스트림 쪽에서는 순수 <code>Stream.distinct</code>가
+    <em>이미</em> 인접 전용입니다 — RxDart는 많은 이들이
+    <code>distinct</code>일 거라 기대하는 전역 버전을 위해
+    <code>distinctUnique</code>를 추가합니다. FxDart는 반대 방향으로
+    이름을 짓습니다: <code><a href="../tutorials/uniq.html">uniq</a></code>가 모든 컬렉션 라이브러리의
+    <code><a href="../tutorials/uniq.html">uniq</a></code>처럼 전역이고, <code><a href="../tutorials/uniqAdjacent.html">uniqAdjacent</a></code>가 인접성을
+    소리 내어 말합니다.
+  </p>
+  <p>
+    두 쌍 모두 위에 일부러 함께 실었습니다: 런 접기는
+    <code>distinct</code>&nbsp;/&nbsp;<code><a href="../tutorials/uniqAdjacent.html">uniqAdjacent</a></code>로,
+    어디서든-본-것 요약은
+    <code>distinctUnique</code>&nbsp;/&nbsp;<code><a href="../tutorials/uniq.html">uniq</a></code>로. 전역
+    버전이 각 모델에서 치르는 비용을 눈여겨보세요 — 어느 쪽이든 자라나는
+    "seen" 집합이지만, 스트림 쪽은 (잠재적으로 끝나지 않는) 구독의 수명
+    동안 그것을 들고 있어야 합니다. RxDart가 전역 형태를 옵트인으로 만든
+    이유입니다. 이런 유한한 피드에서 두 모델은 전혀 갈라지지 않습니다:
+    무승부.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="tick-deltas.html">← 이전: 틱 사이의 변화량</a>
+    <a href="spend-by-category-rx.html">다음: 카테고리별 지출 합계 →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

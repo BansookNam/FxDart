@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fastest result first — RxDart vs FxDart</title>
+  <meta name="description" content="Print each result the moment it lands — completion order is flatMap's native behavior, and fxdart matches it with a dedicated concurrentPool operator.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/RxDartComparison/completion-order-pool.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/completion-order-pool.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/completion-order-pool.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/completion-order-pool.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/completion-order-pool.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/completion-order-pool.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/completion-order-pool.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/completion-order-pool.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/completion-order-pool.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Início</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../RxDartComparison/completion-order-pool.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/completion-order-pool.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/completion-order-pool.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/completion-order-pool.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/completion-order-pool.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/completion-order-pool.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/completion-order-pool.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #36 · <strong>Fastest result first</strong></p>
+  <h1>Fastest result first</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrentPool.html">concurrentPool</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Run six user lookups with distinct response times, at most
+    <strong>3</strong> at once, and report the results in
+    <strong>completion order</strong> — the fastest lookup prints first,
+    regardless of where it sat in the input. The delays are chosen so the
+    order is stable (user 2, then 1, 4, 3, 5, 6). The data is in the code;
+    both versions must print the lines shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">user#2
+user#1
+user#4
+user#3
+user#5
+user#6</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="e71426320acde924">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+// Six lookups with distinct response times — the fastest should print first.
+const ids = [1, 2, 3, 4, 5, 6];
+const delaysMs = {1: 100, 2: 40, 3: 240, 4: 120, 5: 200, 6: 220};
+
+Future<String> lookup(int id) async {
+  await Future.delayed(Duration(milliseconds: delaysMs[id]!));
+  return 'user#$id';
+}
+
+Future<void> main() async {
+  // flatMap runs 3 lookups at a time and emits each result the moment it
+  // completes — completion order is its native behavior.
+  final results = await Stream.fromIterable(ids)
+      .flatMap((id) => Rx.fromCallable(() => lookup(id)), maxConcurrent: 3)
+      .toList();
+
+  results.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="b934232e5313332b">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+// Six lookups with distinct response times — the fastest should print first.
+const ids = [1, 2, 3, 4, 5, 6];
+const delaysMs = {1: 100, 2: 40, 3: 240, 4: 120, 5: 200, 6: 220};
+
+Future<String> lookup(int id) async {
+  await Future.delayed(Duration(milliseconds: delaysMs[id]!));
+  return 'user#$id';
+}
+
+Future<void> main() async {
+  // concurrentPool runs 3 lookups at a time and yields in COMPLETION order.
+  final results =
+      await fx(ids).toAsync().map(lookup).concurrentPool(3).toList();
+
+  results.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    This is the mirror image of the previous example, and the verdict
+    flips to even. Completion order is what a merge <em>is</em>: RxDart's
+    <code>flatMap(maxConcurrent: 3)</code> subscribes to three inner
+    streams and forwards whichever fires first, so "fastest first, three
+    at a time" is the operator's literal behavior — nothing to add,
+    nothing to undo.
+  </p>
+  <p>
+    A pull pipeline's default is the opposite — results come back in the
+    order they were demanded — so FxDart offers completion order as a
+    named variant: <code>concurrentPool(3)</code> keeps three pulls open
+    and yields whichever resolves first, exactly like the merge. Each
+    library reaches this requirement in one operator; the only real
+    difference is which behavior each model gets for free and which one
+    it had to name. Pick by the order you need — <code>mapConcurrent</code>
+    when results must line up with inputs, <code>flatMap</code> /
+    <code><a href="../tutorials/concurrentPool.html">concurrentPool</a></code> when latency to first result matters more.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="ordered-bounded-fetch.html">← Anterior: Fetch 4 at a time, results in order</a>
+    <a href="dependent-calls-in-sequence.html">Próximo: Each call feeds the next →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

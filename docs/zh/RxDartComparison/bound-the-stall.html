@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bound the stalled read — RxDart vs FxDart</title>
+  <meta name="description" content="A 150 ms budget on a stalling sensor read — stream timeout watches gaps between events, pull timeout bounds demand-to-item time.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/RxDartComparison/bound-the-stall.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/bound-the-stall.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/bound-the-stall.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/bound-the-stall.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/RxDartComparison/bound-the-stall.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/RxDartComparison/bound-the-stall.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/RxDartComparison/bound-the-stall.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/RxDartComparison/bound-the-stall.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/RxDartComparison/bound-the-stall.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8861025363f20544">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">首页</a>
+      <a href="../101/index.html">FxDart 入门</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html" class="active">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API 教程</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="语言">
+      <span class="lang-label">语言</span>
+      <ul>
+        <li><a href="../../RxDartComparison/bound-the-stall.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/RxDartComparison/bound-the-stall.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/RxDartComparison/bound-the-stall.html" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">简体中文</a></li>
+        <li><a href="../../ja/RxDartComparison/bound-the-stall.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/RxDartComparison/bound-the-stall.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/RxDartComparison/bound-the-stall.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/RxDartComparison/bound-the-stall.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main class="cmp-wide">
+  <p class="i18n-banner">本页尚未翻译，因此以英文显示。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">参与翻译</a></p>
+  <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #30 · <strong>Bound the stalled read</strong></p>
+  <h1>Bound the stalled read</h1>
+  <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span></p>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/timeout.html">timeout</a></li></ul>
+  <h2>Requirement</h2>
+  <p>
+    Read four probe values in sequence; the third read stalls for
+    500&nbsp;ms. Give every read a 150&nbsp;ms budget: print the readings
+    that arrive in time, then <code>reading timed out</code> for the
+    stall, and <strong>stop</strong> — the fourth read must not be
+    reported. The stall is injected deterministically in the code; both
+    versions must print the lines shown under <em>Expected output</em>.
+  </p>
+
+  <details class="cmp-expected">
+    <summary>Expected output</summary>
+    <pre class="code">reading: 21.5
+reading: 21.7
+reading timed out</pre>
+  </details>
+
+  <h2>Side by side</h2>
+  <div class="comparison">
+    <section class="cmp-panel cmp-rxdart">
+      <h3>RxDart</h3>
+      <div class="playground" data-pg="cb00af9e6b404935">
+<textarea>
+import 'package:rxdart/rxdart.dart';
+
+/// Four probe reads; the third stalls far past the 150 ms budget.
+const readMs = [30, 40, 500, 30];
+const probeValues = [21.5, 21.7, 22.4, 21.9];
+
+Future<double> readProbe(int i) async {
+  await Future<void>.delayed(Duration(milliseconds: readMs[i]));
+  return probeValues[i];
+}
+
+Future<void> main() async {
+  final lines = await Stream.fromIterable([0, 1, 2, 3])
+      // The budget is per read, so bound the Future itself. (The stream-
+      // level .timeout operator measures a different thing: gaps between
+      // events on the push side.)
+      .asyncMap((i) =>
+          readProbe(i).timeout(const Duration(milliseconds: 150)))
+      .map((v) => 'reading: ${v.toStringAsFixed(1)}')
+      // Replace the timeout error with a report line…
+      .onErrorReturnWith((_, _) => 'reading timed out')
+      // …and stop there: the paused source would otherwise resume pushing
+      // readings once the stalled read finally lands.
+      .takeWhileInclusive((line) => line != 'reading timed out')
+      .toList();
+
+  lines.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+    <section class="cmp-panel cmp-fxdart">
+      <h3>FxDart</h3>
+      <div class="playground" data-pg="3c50e131d8b0f7f4">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Four probe reads; the third stalls far past the 150 ms budget.
+const readMs = [30, 40, 500, 30];
+const probeValues = [21.5, 21.7, 22.4, 21.9];
+
+Future<double> readProbe(int i) async {
+  await Future<void>.delayed(Duration(milliseconds: readMs[i]));
+  return probeValues[i];
+}
+
+Future<void> main() async {
+  final lines = <String>[];
+  try {
+    // Pull model: timeout bounds DEMAND-TO-ITEM time — the third pull
+    // takes 500 ms to produce its reading, tripping the 150 ms limit.
+    // Collect as we go: the readings before the stall are already kept
+    // when the failing pull throws.
+    await fx([0, 1, 2, 3])
+        .toAsync()
+        .map(readProbe)
+        .timeout(const Duration(milliseconds: 150))
+        .map((v) => 'reading: ${v.toStringAsFixed(1)}')
+        .each(lines.add);
+  } on TimeoutException {
+    lines.add('reading timed out');
+  }
+
+  lines.forEach(print);
+}
+</textarea>
+      </div>
+    </section>
+  </div>
+
+  <h2>Why they differ</h2>
+  <p>
+    The per-read budget itself is easy on both sides — the RxDart panel
+    bounds the <code>Future</code> inside <code>asyncMap</code>, FxDart's
+    <code><a href="../tutorials/timeout.html">timeout</a></code> bounds the pull — so the interesting difference
+    is what each model's <em>stream-level</em> operator of the same name
+    measures. <code>Stream.timeout</code> watches the gap
+    <strong>between events</strong>: the producer decides when values
+    arrive, so "too slow" can only mean "nothing has arrived lately".
+    FxDart's <code><a href="../tutorials/timeout.html">timeout</a></code> bounds <strong>demand-to-item</strong>
+    time: the consumer asks, and the clock runs from the ask to the
+    answer. In this finite, sequential task the two would coincide — but
+    they are genuinely different quantities: a pull pipeline with no
+    demand has no gaps to measure, and a push stream owes no answer to
+    anyone's ask.
+  </p>
+  <p>
+    Each side then needs one real wrinkle to meet the "then stop"
+    clause. On the push side the stalled source is still out there, and
+    it would resume pushing readings once the slow read finally lands —
+    so after <code>onErrorReturnWith</code> converts the error into the
+    report line, <code>takeWhileInclusive</code> ends the stream and
+    cancels the subscription. On the pull side stopping is free — the
+    <code>TimeoutException</code> simply exits the loop and nothing pulls
+    again — but keeping the readings that preceded the stall means
+    collecting with <code>each</code> instead of a <code>toList</code>
+    that would have discarded them when it threw.
+  </p>
+  <p>
+    A tie: one operator plus one wrinkle on each side, and the wrinkles
+    are mirror images of each model's nature.
+  </p>
+
+  <nav class="tut-nav">
+    <a href="per-row-retry.html">← 上一节： Retry each flaky row independently</a>
+    <a href="cursor-lifetime.html">下一节： A cursor's lifetime around a read →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart 是 <a href="https://github.com/marpple/FxTS">FxTS</a> 的移植版本。特别感谢 <strong>Indong Yoo</strong>（Marpple CTO）与 FxTS 团队，本库的设计思路、语义和测试套件均源于他们的工作。</p>
+  <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 运行","pgReset":"重置","pgCompiling":"编译中…","pgCompileError":"编译错误","pgError":"错误","pgLoading":"正在加载运行时…","pgRunning":"运行中…","pgNoOutput":"（无输出）","pgLoadFailed":"无法加载 FxDart 库"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8861025363f20544";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>
