@@ -232,8 +232,35 @@ class _UniqByIterator<A, B> implements Iterator<A> {
 
 /// Returns an iterable with duplicate values removed.
 ///
-/// Port of FxTS `uniq`.
-Iterable<A> uniq<A>(Iterable<A> iterable) => uniqBy((A a) => a, iterable);
+/// Port of FxTS `uniq`. Dedicated iterator (not `uniqBy(identity)`) — the
+/// identity-key closure would cost an indirect call per element.
+Iterable<A> uniq<A>(Iterable<A> iterable) => _UniqIterable(iterable);
+
+class _UniqIterable<A> extends Iterable<A> {
+  _UniqIterable(this._source);
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _UniqIterator(_source.iterator);
+}
+
+class _UniqIterator<A> implements Iterator<A> {
+  _UniqIterator(this._it);
+  final Iterator<A> _it;
+  final Set<A> _seen = {};
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final v = _it.current;
+      if (_seen.add(v)) {
+        current = v;
+        return true;
+      }
+    }
+    return false;
+  }
+}
 
 /// Async counterpart of [uniqBy].
 FxAsyncIterable<A> uniqByAsync<A, B>(
@@ -336,10 +363,8 @@ FxAsyncIterable<A> uniqAdjacentAsync<A>(FxAsyncIterable<A> iterable) =>
 ///
 /// Port of FxTS `differenceBy`.
 Iterable<A> differenceBy<A, B>(
-    B Function(A a) f, Iterable<A> iterable1, Iterable<A> iterable2) sync* {
-  final set = map(f, iterable1).toSet();
-  yield* uniq(reject((A a) => set.contains(f(a)), iterable2));
-}
+        B Function(A a) f, Iterable<A> iterable1, Iterable<A> iterable2) =>
+    _SetOpIterable(f, iterable1, iterable2, false);
 
 /// Returns the elements of [iterable2] that do not occur in [iterable1].
 ///
@@ -352,9 +377,50 @@ Iterable<A> difference<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
 ///
 /// Port of FxTS `intersectionBy`.
 Iterable<A> intersectionBy<A, B>(
-    B Function(A a) f, Iterable<A> iterable1, Iterable<A> iterable2) sync* {
-  final set = map(f, iterable1).toSet();
-  yield* uniq(filter((A a) => set.contains(f(a)), iterable2));
+        B Function(A a) f, Iterable<A> iterable1, Iterable<A> iterable2) =>
+    _SetOpIterable(f, iterable1, iterable2, true);
+
+/// Shared machinery of [differenceBy] / [intersectionBy]: one pass over
+/// [_source2], filtering on [_source1]'s key set and deduping by element —
+/// the fused form of `uniq(filter/reject(set.contains ∘ f, iterable2))`.
+class _SetOpIterable<A, B> extends Iterable<A> {
+  _SetOpIterable(this._f, this._source1, this._source2, this._keep);
+  final B Function(A) _f;
+  final Iterable<A> _source1;
+  final Iterable<A> _source2;
+  final bool _keep;
+  @override
+  Iterator<A> get iterator => _SetOpIterator(_f, _source1, _source2, _keep);
+}
+
+class _SetOpIterator<A, B> implements Iterator<A> {
+  _SetOpIterator(this._f, this._source1, this._source2, this._keep);
+  final B Function(A) _f;
+  final Iterable<A> _source1;
+  final Iterable<A> _source2;
+  final bool _keep;
+  Set<B>? _set; // iterable1's keys, materialized on the first pull
+  Iterator<A>? _it;
+  final Set<A> _seen = {};
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    var it = _it;
+    if (it == null) {
+      _set = {for (final a in _source1) _f(a)};
+      it = _it = _source2.iterator;
+    }
+    final set = _set!;
+    while (it.moveNext()) {
+      final a = it.current;
+      if (set.contains(_f(a)) == _keep && _seen.add(a)) {
+        current = a;
+        return true;
+      }
+    }
+    return false;
+  }
 }
 
 /// Returns the elements of [iterable2] that also occur in [iterable1].

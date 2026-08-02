@@ -167,16 +167,38 @@ FxAsyncIterable<(int, A)> zipWithIndexAsync<A>(FxAsyncIterable<A> iterable) {
 /// the n-th element of every input row that has one.
 ///
 /// Port of FxTS `transpose` (single-arity: pass the rows as one iterable).
-Iterable<List<A>> transpose<A>(Iterable<Iterable<A>> rows) sync* {
-  final iterators = rows.map((r) => r.iterator).toList(growable: false);
-  if (iterators.isEmpty) return;
-  while (true) {
-    final current = <A>[];
-    for (final it in iterators) {
-      if (it.moveNext()) current.add(it.current);
+Iterable<List<A>> transpose<A>(Iterable<Iterable<A>> rows) =>
+    _TransposeIterable(rows);
+
+class _TransposeIterable<A> extends Iterable<List<A>> {
+  _TransposeIterable(this._rows);
+  final Iterable<Iterable<A>> _rows;
+  @override
+  Iterator<List<A>> get iterator => _TransposeIterator(_rows);
+}
+
+class _TransposeIterator<A> implements Iterator<List<A>> {
+  _TransposeIterator(this._rows);
+  final Iterable<Iterable<A>> _rows;
+  List<Iterator<A>>? _its; // row iterators, created on the first pull
+  bool _done = false;
+  @override
+  late List<A> current;
+  @override
+  bool moveNext() {
+    if (_done) return false;
+    final its =
+        _its ??= _rows.map((r) => r.iterator).toList(growable: false);
+    final column = <A>[];
+    for (final it in its) {
+      if (it.moveNext()) column.add(it.current);
     }
-    if (current.isEmpty) return;
-    yield current;
+    if (column.isEmpty) {
+      _done = true;
+      return false;
+    }
+    current = column;
+    return true;
   }
 }
 

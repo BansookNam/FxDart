@@ -14,6 +14,33 @@ void main() {
         expect(toList(dropRight(0, [1, 2, 3, 4, 5])), equals([1, 2, 3, 4, 5]));
       });
 
+      test('should drop from a lazy (non-list) source', () {
+        expect(toList(dropRight(2, [1, 2, 3, 4, 5].where((_) => true))),
+            equals([1, 2, 3]));
+        expect(toList(dropRight(9, [1, 2, 3].where((_) => true))),
+            equals(<int>[]));
+        expect(toList(dropRight(0, [1, 2].where((_) => true))),
+            equals([1, 2]));
+      });
+
+      test('streams through a delay line: only pulls what it emits + length',
+          () {
+        // The old implementation materialized the whole source on the first
+        // pull; the delay line keeps take(2, dropRight(2, ...)) at 4 pulls.
+        var pulled = 0;
+        final source = range(0, 1000).map((a) {
+          pulled++;
+          return a;
+        });
+        expect(toList(take(2, dropRight(2, source))), equals([0, 1]));
+        expect(pulled, equals(4));
+      });
+
+      test('should throw eagerly on a negative length', () {
+        expect(() => dropRight(-1, [1, 2, 3]), throwsRangeError);
+        expect(() => takeRight(-1, [1, 2, 3]), throwsRangeError);
+      });
+
       test('should be discarded string by length', () {
         final acc = <String>[];
         for (final a in dropRight(2, 'abcde'.split(''))) {

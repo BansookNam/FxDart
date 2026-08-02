@@ -3,10 +3,12 @@ import 'dart:async';
 import '../async_iterable.dart';
 
 // The sync operators here (and in filter.dart, take_drop.dart, zip.dart,
-// combine.dart) are hand-written Iterator classes rather than sync*
-// generators: a sync* moveNext costs ~4x more than a plain class under AOT,
-// and the difference compounds per chained operator. Laziness, effect order,
-// and per-iteration freshness are identical to the generator form.
+// combine.dart, effect.dart) are hand-written Iterator classes rather than
+// sync* generators: a sync* moveNext costs ~4x more than a plain class under
+// AOT, and the difference compounds per chained operator. Laziness, effect
+// order, and per-iteration freshness are identical to the generator form.
+// Operators over a List source additionally index it directly (no snapshot
+// copy, no iterator) where the output is unchanged.
 
 /// Returns a lazy [Iterable] of values by running each element through [f].
 ///
@@ -24,6 +26,23 @@ class _MapIterable<A, B> extends Iterable<B> {
   final Iterable<A> _source;
   @override
   Iterator<B> get iterator => _MapIterator(_f, _source.iterator);
+  @override
+  List<B> toList({bool growable = true}) {
+    final source = _source;
+    // A List source maps into a pre-sized list — the inherited toList grows
+    // and recopies ~log n times. [_f] still runs exactly once per element,
+    // in order.
+    if (source is List<A>) {
+      final length = source.length;
+      if (length == 0) return growable ? <B>[] : List<B>.empty();
+      final out = List<B>.filled(length, _f(source[0]), growable: growable);
+      for (var i = 1; i < length; i++) {
+        out[i] = _f(source[i]);
+      }
+      return out;
+    }
+    return super.toList(growable: growable);
+  }
 }
 
 class _MapIterator<A, B> implements Iterator<B> {
@@ -199,12 +218,50 @@ bool _isFlatAble(Object? a) => a is Iterable && a is! String;
 /// flat([1, [2, 3], [4, [5]]]);    // (1, 2, 3, 4, [5])
 /// flat([1, [2, [3]]], 2);         // (1, 2, 3)
 /// ```
-Iterable<dynamic> flat(Iterable<dynamic> iterable, [int depth = 1]) sync* {
-  for (final value in iterable) {
-    if (_isFlatAble(value) && depth >= 1) {
-      yield* flat(value as Iterable, depth - 1);
-    } else {
-      yield value;
+Iterable<dynamic> flat(Iterable<dynamic> iterable, [int depth = 1]) =>
+    _FlatIterable(iterable, depth);
+
+class _FlatIterable extends Iterable<dynamic> {
+  _FlatIterable(this._source, this._depth);
+  final Iterable<dynamic> _source;
+  final int _depth;
+  @override
+  Iterator<dynamic> get iterator => _FlatIterator(_source.iterator, _depth);
+}
+
+class _FlatIterator implements Iterator<dynamic> {
+  _FlatIterator(this._root, this._depth);
+  final Iterator<dynamic> _root;
+  final int _depth;
+  // Explicit descent stack instead of recursive generators: an element is
+  // descended into while fewer than [_depth] containers are open.
+  final List<Iterator<dynamic>> _stack = [];
+  @override
+  dynamic current;
+  @override
+  bool moveNext() {
+    while (true) {
+      while (_stack.isNotEmpty) {
+        final top = _stack.last;
+        if (top.moveNext()) {
+          final value = top.current;
+          if (_isFlatAble(value) && _stack.length < _depth) {
+            _stack.add((value as Iterable).iterator);
+            continue;
+          }
+          current = value;
+          return true;
+        }
+        _stack.removeLast();
+      }
+      if (!_root.moveNext()) return false;
+      final value = _root.current;
+      if (_isFlatAble(value) && _depth >= 1) {
+        _stack.add((value as Iterable).iterator);
+        continue;
+      }
+      current = value;
+      return true;
     }
   }
 }

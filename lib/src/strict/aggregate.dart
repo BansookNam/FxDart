@@ -334,7 +334,37 @@ num _maxOf(num acc, num a) => a.isNaN || acc.isNaN
 
 /// Returns the smallest number; `infinity` for an empty iterable, `NaN` if
 /// any element is `NaN` — mirroring FxTS `min`.
-num min(Iterable<num> iterable) => fold(double.infinity, _minOf, iterable);
+num min(Iterable<num> iterable) {
+  // Monomorphic-list fast paths, as in [sum]; results match the [_minOf]
+  // fold exactly (empty → infinity, any NaN → NaN, strict < keeps the
+  // first of equal values).
+  if (iterable is List<double>) {
+    final length = iterable.length;
+    var acc = double.infinity;
+    var hasNaN = false;
+    for (var i = 0; i < length; i++) {
+      final v = iterable[i];
+      if (v.isNaN) hasNaN = true;
+      if (v < acc) acc = v;
+    }
+    return hasNaN ? double.nan : acc;
+  }
+  if (iterable is List<int>) {
+    final length = iterable.length;
+    if (length == 0) return double.infinity;
+    var acc = iterable[0];
+    for (var i = 1; i < length; i++) {
+      final v = iterable[i];
+      if (v < acc) acc = v;
+    }
+    return acc;
+  }
+  num acc = double.infinity;
+  for (final v in iterable) {
+    acc = _minOf(acc, v);
+  }
+  return acc;
+}
 
 /// Async counterpart of [min].
 Future<num> minAsync(FxAsyncIterable<num> iterable) =>
@@ -342,7 +372,35 @@ Future<num> minAsync(FxAsyncIterable<num> iterable) =>
 
 /// Returns the largest number; `-infinity` for an empty iterable, `NaN` if
 /// any element is `NaN` — mirroring FxTS `max`.
-num max(Iterable<num> iterable) => fold(-double.infinity, _maxOf, iterable);
+num max(Iterable<num> iterable) {
+  // Mirror image of [min]'s fast paths.
+  if (iterable is List<double>) {
+    final length = iterable.length;
+    var acc = -double.infinity;
+    var hasNaN = false;
+    for (var i = 0; i < length; i++) {
+      final v = iterable[i];
+      if (v.isNaN) hasNaN = true;
+      if (v > acc) acc = v;
+    }
+    return hasNaN ? double.nan : acc;
+  }
+  if (iterable is List<int>) {
+    final length = iterable.length;
+    if (length == 0) return -double.infinity;
+    var acc = iterable[0];
+    for (var i = 1; i < length; i++) {
+      final v = iterable[i];
+      if (v > acc) acc = v;
+    }
+    return acc;
+  }
+  num acc = -double.infinity;
+  for (final v in iterable) {
+    acc = _maxOf(acc, v);
+  }
+  return acc;
+}
 
 /// Async counterpart of [max].
 Future<num> maxAsync(FxAsyncIterable<num> iterable) =>
@@ -424,8 +482,9 @@ Future<A?> maxByAsync<A>(
 
 /// Returns the number of elements.
 ///
-/// Port of FxTS `size`.
+/// Port of FxTS `size`. O(1) for a [List] or [Set].
 int size<A>(Iterable<A> iterable) {
+  if (iterable is List || iterable is Set) return iterable.length;
   var n = 0;
   for (final _ in iterable) {
     n++;
@@ -475,8 +534,10 @@ Future<String> joinAsync<A>(String sep, FxAsyncIterable<A> iterable) async =>
 /// Port of FxTS `groupBy` (TS objects become Dart Maps).
 Map<K, List<A>> groupBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
   final result = <K, List<A>>{};
+  // `??=` instead of putIfAbsent: putIfAbsent allocates an ifAbsent closure
+  // per element.
   for (final a in iterable) {
-    result.putIfAbsent(f(a), () => []).add(a);
+    (result[f(a)] ??= []).add(a);
   }
   return result;
 }
@@ -538,8 +599,11 @@ Future<Map<K, A>> indexByAsync<A, K>(
 /// Port of FxTS `countBy`.
 Map<K, int> countBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
   final result = <K, int>{};
+  // Read-modify-write instead of Map.update: update allocates two closures
+  // per element.
   for (final a in iterable) {
-    result.update(f(a), (n) => n + 1, ifAbsent: () => 1);
+    final k = f(a);
+    result[k] = (result[k] ?? 0) + 1;
   }
   return result;
 }

@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import '../async_iterable.dart';
-import '../lazy/filter.dart' show filter, filterAsync;
-import '../lazy/zip.dart' show zipWithIndex, zipWithIndexAsync;
+import '../lazy/filter.dart' show filterAsync;
+import '../lazy/zip.dart' show zipWithIndexAsync;
 
 /// Returns the first element, or `null` when empty.
 ///
@@ -20,8 +20,12 @@ Future<A?> headAsync<A>(FxAsyncIterable<A> iterable) async {
 
 /// Returns the last element, or `null` when empty.
 ///
-/// Port of FxTS `last`.
+/// Port of FxTS `last`. O(1) for a [List].
 A? last<A>(Iterable<A> iterable) {
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    return length == 0 ? null : iterable[length - 1];
+  }
   A? result;
   for (final a in iterable) {
     result = a;
@@ -42,9 +46,12 @@ Future<A?> lastAsync<A>(FxAsyncIterable<A> iterable) async {
 
 /// Returns the element at [index], or `null` when out of range.
 ///
-/// Port of FxTS `nth`.
+/// Port of FxTS `nth`. O(1) for a [List].
 A? nth<A>(int index, Iterable<A> iterable) {
   if (index < 0) return null;
+  if (iterable is List<A>) {
+    return index < iterable.length ? iterable[index] : null;
+  }
   var i = 0;
   for (final a in iterable) {
     if (i++ == index) return a;
@@ -66,9 +73,23 @@ Future<A?> nthAsync<A>(int index, FxAsyncIterable<A> iterable) async {
 
 /// Returns the first element [f] returns true for, or `null`.
 ///
-/// Port of FxTS `find`.
-A? find<A>(bool Function(A a) f, Iterable<A> iterable) =>
-    head(filter(f, iterable));
+/// Port of FxTS `find`. A direct loop, not `head(filter(...))` — the filter
+/// layer would cost an iterator allocation plus two indirect calls per
+/// element; lists iterate by index.
+A? find<A>(bool Function(A a) f, Iterable<A> iterable) {
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      final a = iterable[i];
+      if (f(a)) return a;
+    }
+    return null;
+  }
+  for (final a in iterable) {
+    if (f(a)) return a;
+  }
+  return null;
+}
 
 /// Async counterpart of [find].
 Future<A?> findAsync<A>(
@@ -77,10 +98,20 @@ Future<A?> findAsync<A>(
 
 /// Returns the index of the first element [f] returns true for, or `-1`.
 ///
-/// Port of FxTS `findIndex`.
+/// Port of FxTS `findIndex`. A counted direct loop, not `zipWithIndex` —
+/// the zip layer would allocate an `(int, A)` record per element.
 int findIndex<A>(bool Function(A a) f, Iterable<A> iterable) {
-  for (final (i, a) in zipWithIndex(iterable)) {
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      if (f(iterable[i])) return i;
+    }
+    return -1;
+  }
+  var i = 0;
+  for (final a in iterable) {
     if (f(a)) return i;
+    i++;
   }
   return -1;
 }

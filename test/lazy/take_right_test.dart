@@ -19,6 +19,16 @@ void main() {
         expect(toList(takeRight(5, [1, 2, 3, 4])), equals([1, 2, 3, 4]));
       });
 
+      test('should take from a lazy (non-list) source via the ring buffer',
+          () {
+        final lazy = [1, 2, 3, 4].where((_) => true);
+        expect(toList(takeRight(0, lazy)), equals(<int>[]));
+        expect(toList(takeRight(2, lazy)), equals([3, 4]));
+        expect(toList(takeRight(5, lazy)), equals([1, 2, 3, 4]));
+        expect(toList(takeRight(2, <int>[].where((_) => true))),
+            equals(<int>[]));
+      });
+
       test('should be able to be used in the pipeline', () {
         final res1 = pipe([
           1,

@@ -46,6 +46,26 @@ class Fx<T> extends Iterable<T> {
   @override
   Iterator<T> get iterator => _inner.iterator;
 
+  // Pure delegation to the inner iterable — same results as the inherited
+  // Iterable members, but O(1) instead of a walk when the chain wraps a
+  // List (`fx(list).length` was O(n) through the wrapper's iterator).
+  @override
+  int get length => _inner.length;
+  @override
+  bool get isEmpty => _inner.isEmpty;
+  @override
+  bool get isNotEmpty => _inner.isNotEmpty;
+  @override
+  T get first => _inner.first;
+  @override
+  T get last => _inner.last;
+  @override
+  T get single => _inner.single;
+  @override
+  T elementAt(int index) => _inner.elementAt(index);
+  @override
+  bool contains(Object? element) => _inner.contains(element);
+
   /// Applies a user-defined [converter] to the whole chain.
   R to<R>(R Function(Fx<T> iterable) converter) => converter(this);
 

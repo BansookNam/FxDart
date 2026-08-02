@@ -49,14 +49,86 @@ FxAsyncIterable<A> takeAsync<A>(int length, FxAsyncIterable<A> iterable) {
 
 /// Returns an iterable of the last [length] values.
 ///
-/// Port of FxTS `takeRight` (materializes the source).
-Iterable<A> takeRight<A>(int length, Iterable<A> iterable) sync* {
+/// Port of FxTS `takeRight`. A [List] source is indexed directly; any other
+/// source is consumed into a ring buffer of [length] elements on the first
+/// pull.
+Iterable<A> takeRight<A>(int length, Iterable<A> iterable) {
   if (length < 0) throw RangeError("'length' must be greater than 0");
-  final arr = iterable.toList(growable: false);
-  for (var i = arr.length - length < 0 ? 0 : arr.length - length;
-      i < arr.length;
-      i++) {
-    yield arr[i];
+  return _TakeRightIterable(length, iterable);
+}
+
+class _TakeRightIterable<A> extends Iterable<A> {
+  _TakeRightIterable(this._length, this._source);
+  final int _length;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator {
+    final source = _source;
+    if (source is List<A>) {
+      final len = source.length;
+      final start = len - _length < 0 ? 0 : len - _length;
+      return _ListRangeIterator(source, start, len);
+    }
+    return _TakeRightIterator(_length, source);
+  }
+}
+
+/// Indexes a [List] over `[start, end)` — no snapshot copy.
+class _ListRangeIterator<A> implements Iterator<A> {
+  _ListRangeIterator(this._list, this._i, this._end);
+  final List<A> _list;
+  int _i;
+  final int _end;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    if (_i >= _end) return false;
+    current = _list[_i++];
+    return true;
+  }
+}
+
+class _TakeRightIterator<A> implements Iterator<A> {
+  _TakeRightIterator(this._length, this._source);
+  final int _length;
+  final Iterable<A> _source;
+  List<A>? _ring;
+  int _pos = 0;
+  int _left = -1; // -1: source not consumed yet
+  @override
+  late A current;
+
+  void _init() {
+    _left = 0;
+    if (_length == 0) return;
+    // One pass over the source, keeping only the last [_length] elements —
+    // O(length) memory instead of materializing everything.
+    List<A>? ring;
+    var write = 0;
+    var count = 0;
+    for (final a in _source) {
+      ring ??= List<A>.filled(_length, a);
+      ring[write] = a;
+      write++;
+      if (write == _length) write = 0;
+      if (count < _length) count++;
+    }
+    if (ring == null) return;
+    _ring = ring;
+    _pos = count < _length ? 0 : write;
+    _left = count;
+  }
+
+  @override
+  bool moveNext() {
+    if (_left < 0) _init();
+    if (_left == 0) return false;
+    current = _ring![_pos];
+    _pos++;
+    if (_pos == _length) _pos = 0;
+    _left--;
+    return true;
   }
 }
 
@@ -248,12 +320,69 @@ FxAsyncIterable<A> dropAsync<A>(int length, FxAsyncIterable<A> iterable) {
 
 /// Returns an iterable that omits the last [length] values.
 ///
-/// Port of FxTS `dropRight` (materializes the source).
-Iterable<A> dropRight<A>(int length, Iterable<A> iterable) sync* {
+/// Port of FxTS `dropRight`. A [List] source is indexed directly; any other
+/// source streams through a [length]-element delay line, so the pipeline
+/// stays lazy in O([length]) memory instead of materializing the source.
+Iterable<A> dropRight<A>(int length, Iterable<A> iterable) {
   if (length < 0) throw RangeError("'length' must be greater than 0");
-  final arr = iterable.toList(growable: false);
-  for (var i = 0; i < arr.length - length; i++) {
-    yield arr[i];
+  return _DropRightIterable(length, iterable);
+}
+
+class _DropRightIterable<A> extends Iterable<A> {
+  _DropRightIterable(this._length, this._source);
+  final int _length;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator {
+    final source = _source;
+    if (source is List<A>) {
+      final end = source.length - _length;
+      return _ListRangeIterator(source, 0, end < 0 ? 0 : end);
+    }
+    if (_length == 0) return source.iterator;
+    return _DropRightIterator(_length, source.iterator);
+  }
+}
+
+class _DropRightIterator<A> implements Iterator<A> {
+  _DropRightIterator(this._length, this._it);
+  final int _length;
+  final Iterator<A> _it;
+  // A ring of the [_length] most recent elements: each new upstream value
+  // releases the value pulled [_length] steps earlier, so the last [_length]
+  // are exactly the ones never emitted.
+  List<A>? _ring;
+  int _pos = 0;
+  bool _done = false;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    if (_done) return false;
+    final it = _it;
+    var ring = _ring;
+    if (ring == null) {
+      var filled = 0;
+      while (filled < _length && it.moveNext()) {
+        ring ??= List<A>.filled(_length, it.current);
+        ring[filled] = it.current;
+        filled++;
+      }
+      if (filled < _length) {
+        _done = true;
+        return false;
+      }
+      _ring = ring;
+    }
+    if (!it.moveNext()) {
+      _done = true;
+      return false;
+    }
+    current = ring![_pos];
+    ring[_pos] = it.current;
+    _pos++;
+    if (_pos == _length) _pos = 0;
+    return true;
   }
 }
 
@@ -719,25 +848,52 @@ FxAsyncIterable<(A, A)> pairwiseAsync<A>(FxAsyncIterable<A> iterable) {
 ///
 /// Port of FxTS `split`, which iterates strings character-wise; in Dart pass
 /// e.g. `'a,b,c'.split('')`.
-Iterable<String> split(String sep, Iterable<String> iterable) sync* {
-  if (sep == '') {
-    yield* iterable;
-    return;
-  }
-  var acc = '';
-  var chr = '';
-  for (chr in iterable) {
-    if (chr == sep) {
-      yield acc;
-      acc = '';
-    } else {
-      acc += chr;
+Iterable<String> split(String sep, Iterable<String> iterable) =>
+    _SplitIterable(sep, iterable);
+
+class _SplitIterable extends Iterable<String> {
+  _SplitIterable(this._sep, this._source);
+  final String _sep;
+  final Iterable<String> _source;
+  @override
+  Iterator<String> get iterator =>
+      _sep == '' ? _source.iterator : _SplitIterator(_sep, _source.iterator);
+}
+
+class _SplitIterator implements Iterator<String> {
+  _SplitIterator(this._sep, this._it);
+  final String _sep;
+  final Iterator<String> _it;
+  final StringBuffer _acc = StringBuffer();
+  String _last = '';
+  bool _finished = false;
+  @override
+  late String current;
+  @override
+  bool moveNext() {
+    if (_finished) return false;
+    while (_it.moveNext()) {
+      final chr = _it.current;
+      _last = chr;
+      if (chr == _sep) {
+        current = _acc.toString();
+        _acc.clear();
+        return true;
+      }
+      _acc.write(chr);
     }
-  }
-  if (chr == sep) {
-    yield '';
-  } else if (acc.isNotEmpty) {
-    yield acc;
+    // Source exhausted: a trailing separator yields one empty token, a
+    // non-empty accumulator yields the final token.
+    _finished = true;
+    if (_last == _sep) {
+      current = '';
+      return true;
+    }
+    if (_acc.isNotEmpty) {
+      current = _acc.toString();
+      return true;
+    }
+    return false;
   }
 }
 

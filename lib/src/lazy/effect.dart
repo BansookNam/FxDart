@@ -100,12 +100,58 @@ FxAsyncIterable<A> timeoutAsync<A>(
 /// );
 /// ```
 Iterable<T> using<R, T>(R Function() acquire,
-    Iterable<T> Function(R resource) use, void Function(R resource) release) sync* {
-  final resource = acquire();
-  try {
-    yield* use(resource);
-  } finally {
-    release(resource);
+        Iterable<T> Function(R resource) use, void Function(R resource) release) =>
+    _UsingIterable(acquire, use, release);
+
+class _UsingIterable<R, T> extends Iterable<T> {
+  _UsingIterable(this._acquire, this._use, this._release);
+  final R Function() _acquire;
+  final Iterable<T> Function(R) _use;
+  final void Function(R) _release;
+  @override
+  Iterator<T> get iterator => _UsingIterator(_acquire, _use, _release);
+}
+
+class _UsingIterator<R, T> implements Iterator<T> {
+  _UsingIterator(this._acquire, this._use, this._release);
+  final R Function() _acquire;
+  final Iterable<T> Function(R) _use;
+  final void Function(R) _release;
+  Iterator<T>? _inner;
+  late R _resource;
+  bool _done = false;
+  @override
+  T get current => _inner!.current;
+  @override
+  bool moveNext() {
+    if (_done) return false;
+    var inner = _inner;
+    if (inner == null) {
+      // [_acquire] runs on the first pull; a failing acquire has no resource
+      // to release (same as the generator form, where acquire sat outside
+      // the try/finally).
+      _resource = _acquire();
+      try {
+        inner = _inner = _use(_resource).iterator;
+      } catch (_) {
+        _done = true;
+        _release(_resource);
+        rethrow;
+      }
+    }
+    bool moved;
+    try {
+      moved = inner.moveNext();
+    } catch (_) {
+      _done = true;
+      _release(_resource);
+      rethrow;
+    }
+    if (!moved) {
+      _done = true;
+      _release(_resource);
+    }
+    return moved;
   }
 }
 

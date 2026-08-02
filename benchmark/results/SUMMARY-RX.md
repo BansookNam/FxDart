@@ -10,90 +10,90 @@
 
 | # | Case | N | rxdart time | FxDart time | Time winner | rxdart mem | FxDart mem | Mem winner | Rounds |
 |--:|------|--:|--:|--:|:-:|--:|--:|:-:|--:|
-| 1 | even-totals | 100 | 10 µs | 1.1 µs | **tie** | 17.1 MB | 16.5 MB | tie | 3 |
-| 2 | running-balance-feed | 100 | 8.1 µs | 1.5 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
-| 3 | first-over-budget-rx | 100 | 18 µs | 1.0 µs | **tie** | 16.6 MB | 16.4 MB | tie | 3 |
-| 4 | skip-warmup-readings | 100 | 28 µs | 19 µs | **tie** | 16.5 MB | 16.4 MB | tie | 3 |
-| 5 | unique-visitors | 100 | 12 µs | 4.8 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
-| 6 | clean-nullable-readings | 100 | 35 µs | 20 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
-| 7 | last-three-errors | 100 | 9.3 µs | 3.1 µs | **tie** | 17.0 MB | 16.5 MB | tie | 3 |
-| 8 | numbered-checklist | 100 | 18 µs | 12 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
-| 9 | expand-order-lines | 100 | 408 µs | 27 µs | **tie** | 15.6 MB | 16.5 MB | rxdart | 3 |
-| 10 | empty-report-default | 100 | 7.3 µs | 2.3 µs | **tie** | 16.5 MB | 16.4 MB | tie | 3 |
-| 11 | upload-batches | 100 | 31 µs | 13 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
-| 12 | sliding-average-rx | 100 | 113 µs | 68 µs | **tie** | 16.7 MB | 16.5 MB | tie | 3 |
-| 13 | tick-deltas | 100 | 79 µs | 45 µs | **tie** | 16.6 MB | 16.3 MB | tie | 3 |
-| 14 | status-transitions | 100 | 15 µs | 5.6 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
-| 15 | spend-by-category-rx | 100 | 23 µs | 7.7 µs | **tie** | 16.7 MB | 16.4 MB | tie | 3 |
-| 16 | align-forecast-actual | 100 | 79 µs | 47 µs | **tie** | 16.6 MB | 16.6 MB | tie | 3 |
-| 17 | feeds-in-order | 100 | 21 µs | 10 µs | **tie** | 17.1 MB | 17.0 MB | tie | 3 |
-| 18 | bracket-the-session | 100 | 11 µs | 3.2 µs | **tie** | 16.5 MB | 16.4 MB | tie | 3 |
-| 19 | dedupe-paged-feed | 100 | 23 µs | 14 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
-| 20 | latency-extremes (async) | 100 | 781 µs | 836 µs | **tie** | 16.5 MB | 17.0 MB | tie | 3 |
-| 21 | stock-after-moves | 100 | 343 µs | 14 µs | **tie** | 15.0 MB | 16.5 MB | rxdart | 3 |
-| 22 | audit-with-outcomes | 100 | 427 µs | 102 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
-| 23 | stop-at-shutdown | 100 | 19 µs | 10 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
-| 24 | weekly-windows-report | 98 | 79 µs | 6.8 µs | **tie** | 16.9 MB | 16.5 MB | tie | 3 |
-| 25 | price-or-fallback (async) | 100 | 560 µs | 583 µs | **tie** | 17.2 MB | 16.7 MB | tie | 3 |
-| 26 | resume-with-cache (async) | 100 | 24 µs | 28 µs | **tie** | 16.6 MB | 17.0 MB | tie | 3 |
-| 27 | retry-the-fetch (async) | 100 | 625 µs | 541 µs | **tie** | 17.0 MB | 16.5 MB | tie | 3 |
-| 28 | backoff-retry (async) | 100 | 762 µs | 535 µs | **tie** | 17.0 MB | 16.5 MB | tie | 3 |
-| 29 | per-row-retry (async) | 100 | 837 µs | 910 µs | **tie** | 17.2 MB | 17.2 MB | tie | 3 |
-| 30 | bound-the-stall (async) | 100 | 170 µs | 207 µs | **tie** | 17.1 MB | 16.5 MB | tie | 3 |
-| 31 | cursor-lifetime (async) | 100 | 406 µs | 532 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
-| 32 | successes-and-failures (async) | 100 | 817 µs | 600 µs | **tie** | 16.8 MB | 17.0 MB | tie | 3 |
-| 33 | all-validation-errors | 100 | 117 µs | 29 µs | **tie** | 15.5 MB | 16.4 MB | rxdart | 3 |
-| 34 | stop-after-three-failures (async) | 100 | 828 µs | 623 µs | **tie** | 17.0 MB | 17.2 MB | tie | 3 |
-| 35 | ordered-bounded-fetch (async) | 100 | 703 µs | 444 µs | **tie** | 16.6 MB | 17.1 MB | tie | 3 |
-| 36 | completion-order-pool (async) | 100 | 447 µs | 446 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
-| 37 | dependent-calls-in-sequence (async) | 100 | 405 µs | 623 µs | **tie** | 16.5 MB | 17.0 MB | tie | 3 |
-| 38 | crawl-the-pages (async) | 100 | 24 µs | 62 µs | **tie** | 17.1 MB | 17.0 MB | tie | 3 |
-| 48 | tee-the-pipeline | 100 | 20 µs | 12 µs | **tie** | 16.5 MB | 16.4 MB | tie | 3 |
-| 49 | stream-into-pipeline (async) | 100 | 8.4 µs | 104 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
-| 50 | pipeline-into-stream (async) | 100 | 474 µs | 492 µs | **tie** | 16.8 MB | 17.1 MB | tie | 3 |
+| 1 | even-totals | 100 | 11 µs | 1.1 µs | **tie** | 16.6 MB | 16.4 MB | tie | 3 |
+| 2 | running-balance-feed | 100 | 8.5 µs | 1.5 µs | **tie** | 17.0 MB | 16.5 MB | tie | 3 |
+| 3 | first-over-budget-rx | 100 | 10 µs | 502 ns | **tie** | 16.5 MB | 16.4 MB | tie | 3 |
+| 4 | skip-warmup-readings | 100 | 27 µs | 17 µs | **tie** | 16.5 MB | 16.4 MB | tie | 3 |
+| 5 | unique-visitors | 100 | 11 µs | 4.7 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
+| 6 | clean-nullable-readings | 100 | 22 µs | 12 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
+| 7 | last-three-errors | 100 | 8.3 µs | 2.7 µs | **tie** | 16.5 MB | 16.4 MB | tie | 3 |
+| 8 | numbered-checklist | 100 | 18 µs | 11 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
+| 9 | expand-order-lines | 100 | 368 µs | 28 µs | **tie** | 15.8 MB | 16.5 MB | tie | 3 |
+| 10 | empty-report-default | 100 | 6.8 µs | 2.4 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
+| 11 | upload-batches | 100 | 30 µs | 11 µs | **tie** | 16.6 MB | 16.4 MB | tie | 3 |
+| 12 | sliding-average-rx | 100 | 115 µs | 69 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
+| 13 | tick-deltas | 100 | 78 µs | 54 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
+| 14 | status-transitions | 100 | 15 µs | 5.8 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
+| 15 | spend-by-category-rx | 100 | 19 µs | 6.1 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
+| 16 | align-forecast-actual | 100 | 81 µs | 45 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
+| 17 | feeds-in-order | 100 | 22 µs | 10 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
+| 18 | bracket-the-session | 100 | 12 µs | 3.2 µs | **tie** | 17.0 MB | 16.4 MB | tie | 3 |
+| 19 | dedupe-paged-feed | 100 | 22 µs | 12 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
+| 20 | latency-extremes (async) | 100 | 706 µs | 758 µs | **tie** | 17.0 MB | 17.0 MB | tie | 3 |
+| 21 | stock-after-moves | 100 | 337 µs | 13 µs | **tie** | 14.9 MB | 16.4 MB | rxdart | 3 |
+| 22 | audit-with-outcomes | 100 | 412 µs | 103 µs | **tie** | 16.6 MB | 16.4 MB | tie | 3 |
+| 23 | stop-at-shutdown | 100 | 19 µs | 12 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
+| 24 | weekly-windows-report | 98 | 69 µs | 7.0 µs | **tie** | 17.4 MB | 16.6 MB | tie | 3 |
+| 25 | price-or-fallback (async) | 100 | 485 µs | 531 µs | **tie** | 17.2 MB | 16.6 MB | tie | 3 |
+| 26 | resume-with-cache (async) | 100 | 24 µs | 27 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
+| 27 | retry-the-fetch (async) | 100 | 596 µs | 503 µs | **tie** | 16.9 MB | 16.9 MB | tie | 3 |
+| 28 | backoff-retry (async) | 100 | 704 µs | 598 µs | **tie** | 17.0 MB | 16.5 MB | tie | 3 |
+| 29 | per-row-retry (async) | 100 | 785 µs | 803 µs | **tie** | 17.2 MB | 16.7 MB | tie | 3 |
+| 30 | bound-the-stall (async) | 100 | 153 µs | 207 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
+| 31 | cursor-lifetime (async) | 100 | 331 µs | 422 µs | **tie** | 16.5 MB | 16.9 MB | tie | 3 |
+| 32 | successes-and-failures (async) | 100 | 751 µs | 535 µs | **tie** | 17.0 MB | 17.0 MB | tie | 3 |
+| 33 | all-validation-errors | 100 | 110 µs | 28 µs | **tie** | 15.6 MB | 16.4 MB | rxdart | 3 |
+| 34 | stop-after-three-failures (async) | 100 | 819 µs | 603 µs | **tie** | 16.6 MB | 17.0 MB | tie | 3 |
+| 35 | ordered-bounded-fetch (async) | 100 | 724 µs | 469 µs | **tie** | 16.7 MB | 17.0 MB | tie | 3 |
+| 36 | completion-order-pool (async) | 100 | 423 µs | 438 µs | **tie** | 16.5 MB | 17.0 MB | tie | 3 |
+| 37 | dependent-calls-in-sequence (async) | 100 | 412 µs | 571 µs | **tie** | 16.5 MB | 16.9 MB | tie | 3 |
+| 38 | crawl-the-pages (async) | 100 | 22 µs | 60 µs | **tie** | 17.1 MB | 17.0 MB | tie | 3 |
+| 48 | tee-the-pipeline | 100 | 19 µs | 4.6 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
+| 49 | stream-into-pipeline (async) | 100 | 8.3 µs | 107 µs | **tie** | 16.3 MB | 16.5 MB | tie | 3 |
+| 50 | pipeline-into-stream (async) | 100 | 439 µs | 514 µs | **tie** | 16.5 MB | 17.1 MB | tie | 3 |
 
 ## Headline N (1M sync / case-specific async)
 
 | # | Case | N | rxdart time | FxDart time | Time winner | rxdart mem | FxDart mem | Mem winner | Rounds |
 |--:|------|--:|--:|--:|:-:|--:|--:|:-:|--:|
-| 1 | even-totals | 1000000 | 87.1 ms | 14.1 ms | **fxdart** | 24.2 MB | 21.6 MB | fxdart | 3 |
-| 2 | running-balance-feed | 1000000 | 76.3 ms | 15.5 ms | **fxdart** | 56.5 MB | 54.9 MB | tie | 3 |
-| 3 | first-over-budget-rx | 1000000 | 88.1 ms | 6.00 ms | **fxdart** | 123.2 MB | 110.6 MB | fxdart | 3 |
-| 4 | skip-warmup-readings | 1000000 | 320.9 ms | 214.7 ms | **fxdart** | 137.3 MB | 144.8 MB | rxdart | 3 |
-| 5 | unique-visitors | 1000000 | 428.3 ms | 106.4 ms | **fxdart** | 209.0 MB | 200.6 MB | tie | 3 |
-| 6 | clean-nullable-readings | 1000000 | 240.7 ms | 143.1 ms | **fxdart** | 122.6 MB | 118.3 MB | tie | 3 |
-| 7 | last-three-errors | 1000000 | 67.9 ms | 24.6 ms | **fxdart** | 111.9 MB | 127.7 MB | rxdart | 3 |
-| 8 | numbered-checklist | 1000000 | 234.5 ms | 187.9 ms | **fxdart** | 198.8 MB | 197.1 MB | tie | 3 |
-| 9 | expand-order-lines | 1000000 | 4000.0 ms | 445.3 ms | **fxdart** | 487.1 MB | 488.4 MB | tie | 3 |
-| 10 | empty-report-default | 1000000 | 54.0 ms | 19.9 ms | **fxdart** | 123.4 MB | 120.8 MB | tie | 3 |
-| 11 | upload-batches | 1000000 | 304.7 ms | 126.6 ms | **fxdart** | 128.4 MB | 134.2 MB | tie | 3 |
-| 12 | sliding-average-rx | 1000000 | 1137.6 ms | 732.3 ms | **fxdart** | 153.6 MB | 151.3 MB | tie | 3 |
-| 13 | tick-deltas | 1000000 | 814.0 ms | 476.7 ms | **fxdart** | 161.7 MB | 163.0 MB | tie | 3 |
-| 14 | status-transitions | 1000000 | 132.6 ms | 50.7 ms | **fxdart** | 84.1 MB | 88.8 MB | rxdart | 3 |
-| 15 | spend-by-category-rx | 1000000 | 110.9 ms | 73.1 ms | **fxdart** | 92.5 MB | 115.5 MB | rxdart | 3 |
-| 16 | align-forecast-actual | 1000000 | 863.6 ms | 520.3 ms | **fxdart** | 206.4 MB | 219.4 MB | rxdart | 3 |
-| 17 | feeds-in-order | 1000000 | 236.2 ms | 162.2 ms | **fxdart** | 275.0 MB | 282.6 MB | tie | 3 |
-| 18 | bracket-the-session | 1000000 | 101.9 ms | 32.0 ms | **fxdart** | 128.0 MB | 139.0 MB | rxdart | 3 |
-| 19 | dedupe-paged-feed | 1000000 | 312.6 ms | 231.5 ms | **fxdart** | 299.6 MB | 240.6 MB | fxdart | 3 |
-| 20 | latency-extremes (async) | 10000 | 70.7 ms | 77.5 ms | **rxdart** | 24.2 MB | 24.2 MB | tie | 3 |
-| 21 | stock-after-moves | 1000000 | 3503.4 ms | 185.9 ms | **fxdart** | 124.8 MB | 121.8 MB | tie | 3 |
-| 22 | audit-with-outcomes | 1000000 | 4106.5 ms | 1068.8 ms | **fxdart** | 184.0 MB | 190.5 MB | tie | 3 |
-| 23 | stop-at-shutdown | 1000000 | 194.9 ms | 124.8 ms | **fxdart** | 187.5 MB | 198.5 MB | rxdart | 3 |
-| 24 | weekly-windows-report | 999999 | 692.8 ms | 80.3 ms | **fxdart** | 57.6 MB | 83.0 MB | rxdart | 3 |
-| 25 | price-or-fallback (async) | 10000 | 51.0 ms | 51.0 ms | **tie** | 49.1 MB | 55.5 MB | rxdart | 3 |
-| 26 | resume-with-cache (async) | 10000 | 1.85 ms | 2.05 ms | **tie** | 23.3 MB | 24.1 MB | tie | 3 |
-| 27 | retry-the-fetch (async) | 10000 | 59.0 ms | 53.2 ms | **fxdart** | 24.0 MB | 23.5 MB | tie | 3 |
-| 28 | backoff-retry (async) | 10000 | 67.2 ms | 52.6 ms | **fxdart** | 29.3 MB | 26.7 MB | fxdart | 3 |
-| 29 | per-row-retry (async) | 10000 | 84.2 ms | 83.8 ms | **tie** | 60.9 MB | 44.3 MB | fxdart | 5 |
-| 30 | bound-the-stall (async) | 10000 | 15.3 ms | 21.2 ms | **rxdart** | 27.5 MB | 28.0 MB | tie | 3 |
-| 31 | cursor-lifetime (async) | 10000 | 40.8 ms | 44.8 ms | **rxdart** | 25.5 MB | 25.6 MB | tie | 3 |
-| 32 | successes-and-failures (async) | 10000 | 76.2 ms | 55.8 ms | **fxdart** | 25.3 MB | 27.2 MB | rxdart | 3 |
-| 33 | all-validation-errors | 1000000 | 1161.1 ms | 341.6 ms | **fxdart** | 343.0 MB | 366.6 MB | rxdart | 3 |
-| 34 | stop-after-three-failures (async) | 10000 | 77.4 ms | 59.8 ms | **fxdart** | 22.6 MB | 29.7 MB | rxdart | 3 |
-| 35 | ordered-bounded-fetch (async) | 10000 | 71.3 ms | 39.6 ms | **fxdart** | 51.6 MB | 22.3 MB | fxdart | 3 |
-| 36 | completion-order-pool (async) | 10000 | 38.7 ms | 41.9 ms | **rxdart** | 30.2 MB | 22.3 MB | fxdart | 3 |
-| 37 | dependent-calls-in-sequence (async) | 10000 | 40.5 ms | 56.4 ms | **rxdart** | 28.9 MB | 29.6 MB | tie | 3 |
-| 38 | crawl-the-pages (async) | 10000 | 1.98 ms | 6.14 ms | **rxdart** | 23.1 MB | 21.7 MB | fxdart | 3 |
-| 48 | tee-the-pipeline | 1000000 | 147.5 ms | 110.8 ms | **fxdart** | 24.3 MB | 54.5 MB | rxdart | 3 |
-| 49 | stream-into-pipeline (async) | 10000 | 788 µs | 9.95 ms | **rxdart** | 22.8 MB | 25.9 MB | rxdart | 3 |
-| 50 | pipeline-into-stream (async) | 10000 | 40.8 ms | 46.5 ms | **rxdart** | 50.8 MB | 31.1 MB | fxdart | 3 |
+| 1 | even-totals | 1000000 | 86.2 ms | 13.9 ms | **fxdart** | 24.2 MB | 21.5 MB | fxdart | 3 |
+| 2 | running-balance-feed | 1000000 | 71.8 ms | 15.1 ms | **fxdart** | 56.0 MB | 55.0 MB | tie | 3 |
+| 3 | first-over-budget-rx | 1000000 | 81.2 ms | 2.78 ms | **fxdart** | 122.2 MB | 111.4 MB | fxdart | 3 |
+| 4 | skip-warmup-readings | 1000000 | 300.2 ms | 196.2 ms | **fxdart** | 132.2 MB | 144.9 MB | rxdart | 3 |
+| 5 | unique-visitors | 1000000 | 441.9 ms | 95.7 ms | **fxdart** | 208.7 MB | 199.7 MB | tie | 3 |
+| 6 | clean-nullable-readings | 1000000 | 219.0 ms | 129.8 ms | **fxdart** | 122.9 MB | 120.6 MB | tie | 3 |
+| 7 | last-three-errors | 1000000 | 66.0 ms | 24.2 ms | **fxdart** | 112.4 MB | 108.0 MB | tie | 3 |
+| 8 | numbered-checklist | 1000000 | 212.9 ms | 166.4 ms | **fxdart** | 199.1 MB | 199.5 MB | tie | 3 |
+| 9 | expand-order-lines | 1000000 | 3754.1 ms | 410.7 ms | **fxdart** | 483.4 MB | 490.3 MB | tie | 3 |
+| 10 | empty-report-default | 1000000 | 52.6 ms | 19.4 ms | **fxdart** | 123.0 MB | 121.2 MB | tie | 3 |
+| 11 | upload-batches | 1000000 | 296.7 ms | 114.6 ms | **fxdart** | 128.3 MB | 132.9 MB | tie | 3 |
+| 12 | sliding-average-rx | 1000000 | 1093.0 ms | 702.9 ms | **fxdart** | 153.7 MB | 151.5 MB | tie | 3 |
+| 13 | tick-deltas | 1000000 | 788.4 ms | 460.9 ms | **fxdart** | 161.1 MB | 162.9 MB | tie | 3 |
+| 14 | status-transitions | 1000000 | 126.7 ms | 48.6 ms | **fxdart** | 84.1 MB | 88.8 MB | rxdart | 3 |
+| 15 | spend-by-category-rx | 1000000 | 107.2 ms | 58.9 ms | **fxdart** | 93.5 MB | 113.7 MB | rxdart | 3 |
+| 16 | align-forecast-actual | 1000000 | 813.4 ms | 484.1 ms | **fxdart** | 206.6 MB | 213.0 MB | tie | 3 |
+| 17 | feeds-in-order | 1000000 | 218.3 ms | 144.2 ms | **fxdart** | 272.4 MB | 282.8 MB | tie | 3 |
+| 18 | bracket-the-session | 1000000 | 98.6 ms | 31.5 ms | **fxdart** | 127.7 MB | 138.1 MB | rxdart | 3 |
+| 19 | dedupe-paged-feed | 1000000 | 311.9 ms | 237.6 ms | **fxdart** | 297.0 MB | 237.6 MB | fxdart | 3 |
+| 20 | latency-extremes (async) | 10000 | 72.6 ms | 79.3 ms | **rxdart** | 24.2 MB | 24.2 MB | tie | 3 |
+| 21 | stock-after-moves | 1000000 | 3362.1 ms | 172.4 ms | **fxdart** | 125.3 MB | 126.3 MB | tie | 3 |
+| 22 | audit-with-outcomes | 1000000 | 3990.8 ms | 1049.1 ms | **fxdart** | 183.2 MB | 185.3 MB | tie | 3 |
+| 23 | stop-at-shutdown | 1000000 | 192.9 ms | 122.6 ms | **fxdart** | 187.4 MB | 205.4 MB | rxdart | 3 |
+| 24 | weekly-windows-report | 999999 | 675.0 ms | 72.2 ms | **fxdart** | 57.5 MB | 82.9 MB | rxdart | 3 |
+| 25 | price-or-fallback (async) | 10000 | 44.7 ms | 47.7 ms | **rxdart** | 49.1 MB | 55.6 MB | rxdart | 4 |
+| 26 | resume-with-cache (async) | 10000 | 1.91 ms | 2.20 ms | **tie** | 23.2 MB | 23.6 MB | tie | 3 |
+| 27 | retry-the-fetch (async) | 10000 | 56.1 ms | 48.5 ms | **fxdart** | 23.9 MB | 23.8 MB | tie | 3 |
+| 28 | backoff-retry (async) | 10000 | 62.4 ms | 50.5 ms | **fxdart** | 29.1 MB | 26.9 MB | fxdart | 3 |
+| 29 | per-row-retry (async) | 10000 | 72.4 ms | 77.9 ms | **rxdart** | 61.3 MB | 44.4 MB | fxdart | 3 |
+| 30 | bound-the-stall (async) | 10000 | 14.8 ms | 19.3 ms | **rxdart** | 27.5 MB | 27.2 MB | tie | 3 |
+| 31 | cursor-lifetime (async) | 10000 | 31.0 ms | 35.3 ms | **rxdart** | 25.5 MB | 25.5 MB | tie | 3 |
+| 32 | successes-and-failures (async) | 10000 | 69.3 ms | 49.6 ms | **fxdart** | 25.7 MB | 27.6 MB | rxdart | 3 |
+| 33 | all-validation-errors | 1000000 | 1207.3 ms | 354.8 ms | **fxdart** | 344.6 MB | 366.5 MB | rxdart | 3 |
+| 34 | stop-after-three-failures (async) | 10000 | 72.3 ms | 55.9 ms | **fxdart** | 22.1 MB | 29.8 MB | rxdart | 3 |
+| 35 | ordered-bounded-fetch (async) | 10000 | 67.3 ms | 37.9 ms | **fxdart** | 51.7 MB | 22.5 MB | fxdart | 3 |
+| 36 | completion-order-pool (async) | 10000 | 35.7 ms | 38.5 ms | **rxdart** | 30.3 MB | 22.2 MB | fxdart | 3 |
+| 37 | dependent-calls-in-sequence (async) | 10000 | 39.1 ms | 57.0 ms | **rxdart** | 28.5 MB | 29.5 MB | tie | 3 |
+| 38 | crawl-the-pages (async) | 10000 | 1.89 ms | 5.57 ms | **rxdart** | 22.6 MB | 22.1 MB | tie | 3 |
+| 48 | tee-the-pipeline | 1000000 | 143.7 ms | 36.2 ms | **fxdart** | 24.3 MB | 55.0 MB | rxdart | 3 |
+| 49 | stream-into-pipeline (async) | 10000 | 791 µs | 9.99 ms | **rxdart** | 22.8 MB | 25.5 MB | rxdart | 3 |
+| 50 | pipeline-into-stream (async) | 10000 | 40.9 ms | 44.7 ms | **rxdart** | 50.7 MB | 31.0 MB | fxdart | 3 |

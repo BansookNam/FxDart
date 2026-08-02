@@ -71,14 +71,38 @@ class _RepeatIterator<T> implements Iterator<T> {
 /// Yields the source, then repeats its values indefinitely.
 ///
 /// Port of FxTS `cycle`.
-Iterable<T> cycle<T>(Iterable<T> iterable) sync* {
-  final arr = <T>[];
-  for (final a in iterable) {
-    yield a;
-    arr.add(a);
-  }
-  while (arr.isNotEmpty) {
-    yield* arr;
+Iterable<T> cycle<T>(Iterable<T> iterable) => _CycleIterable(iterable);
+
+class _CycleIterable<T> extends Iterable<T> {
+  _CycleIterable(this._source);
+  final Iterable<T> _source;
+  @override
+  Iterator<T> get iterator => _CycleIterator(_source.iterator);
+}
+
+class _CycleIterator<T> implements Iterator<T> {
+  _CycleIterator(this._it);
+  final Iterator<T> _it;
+  final List<T> _buf = [];
+  bool _filling = true;
+  int _i = 0;
+  @override
+  late T current;
+  @override
+  bool moveNext() {
+    if (_filling) {
+      if (_it.moveNext()) {
+        current = _it.current;
+        _buf.add(current);
+        return true;
+      }
+      _filling = false;
+    }
+    if (_buf.isEmpty) return false;
+    current = _buf[_i];
+    _i++;
+    if (_i == _buf.length) _i = 0;
+    return true;
   }
 }
 
@@ -292,13 +316,43 @@ FxAsyncIterable<A> defaultIfEmptyAsync<A>(
         FutureOr<A> value, FxAsyncIterable<A> iterable) =>
     ifEmptyAsync(() => toAsync([value]), iterable);
 
-/// Returns the source in reverse order (materializes the source).
+/// Returns the source in reverse order. A [List] source is indexed directly,
+/// back to front; any other source materializes on the first pull.
 ///
 /// Port of FxTS `reverse`.
-Iterable<A> reverse<A>(Iterable<A> iterable) sync* {
-  final arr = iterable.toList(growable: false);
-  for (var i = arr.length - 1; i >= 0; i--) {
-    yield arr[i];
+Iterable<A> reverse<A>(Iterable<A> iterable) => _ReverseIterable(iterable);
+
+class _ReverseIterable<A> extends Iterable<A> {
+  _ReverseIterable(this._source);
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator {
+    final source = _source;
+    if (source is List<A>) return _ReverseIterator(source, source.length);
+    return _ReverseIterator(null, 0, source);
+  }
+}
+
+class _ReverseIterator<A> implements Iterator<A> {
+  _ReverseIterator(this._arr, this._i, [this._pending]);
+  List<A>? _arr;
+  int _i;
+  Iterable<A>? _pending; // non-List source, materialized on the first pull
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    var arr = _arr;
+    if (arr == null) {
+      final pending = _pending;
+      if (pending == null) return false;
+      _pending = null;
+      arr = _arr = pending.toList(growable: false);
+      _i = arr.length;
+    }
+    if (_i == 0) return false;
+    current = arr[--_i];
+    return true;
   }
 }
 
@@ -343,23 +397,42 @@ final Expando<_ForkState<Object?>> _forkStates = Expando('fxdart fork state');
 /// read from it.
 ///
 /// Port of FxTS `fork`.
-Iterable<T> fork<T>(Iterable<T> iterable) sync* {
-  var state = _forkStates[iterable] as _ForkState<T>?;
-  if (state == null) {
-    state = _ForkState<T>(iterable.iterator);
-    _forkStates[iterable] = state;
-  }
-  var i = 0;
-  while (true) {
-    if (i < state.buffer.length) {
-      yield state.buffer[i++];
-      continue;
+Iterable<T> fork<T>(Iterable<T> iterable) => _ForkIterable(iterable);
+
+class _ForkIterable<T> extends Iterable<T> {
+  _ForkIterable(this._source);
+  final Iterable<T> _source;
+  @override
+  Iterator<T> get iterator => _ForkIterator(_source);
+}
+
+class _ForkIterator<T> implements Iterator<T> {
+  _ForkIterator(this._source);
+  final Iterable<T> _source;
+  _ForkState<T>? _state; // resolved on the first pull, as before
+  int _i = 0;
+  @override
+  late T current;
+  @override
+  bool moveNext() {
+    var state = _state;
+    if (state == null) {
+      state = _forkStates[_source] as _ForkState<T>?;
+      if (state == null) {
+        state = _ForkState<T>(_source.iterator);
+        _forkStates[_source] = state;
+      }
+      _state = state;
+    }
+    if (_i < state.buffer.length) {
+      current = state.buffer[_i++];
+      return true;
     }
     if (state.error != null) {
       Error.throwWithStackTrace(
           state.error!, state.stackTrace ?? StackTrace.current);
     }
-    if (state.done) return;
+    if (state.done) return false;
     final bool moved;
     try {
       moved = state.source.moveNext();
@@ -370,9 +443,11 @@ Iterable<T> fork<T>(Iterable<T> iterable) sync* {
     }
     if (!moved) {
       state.done = true;
-      return;
+      return false;
     }
     state.buffer.add(state.source.current);
+    current = state.buffer[_i++];
+    return true;
   }
 }
 
@@ -493,11 +568,8 @@ FxAsyncIterable<T> forkAsync<T>(FxAsyncIterable<T> iterable) {
 /// Yields the `(key, value)` pairs of [map] as records.
 ///
 /// Port of FxTS `entries` (TS objects/Maps become Dart Maps).
-Iterable<(K, V)> entries<K, V>(Map<K, V> map) sync* {
-  for (final e in map.entries) {
-    yield (e.key, e.value);
-  }
-}
+Iterable<(K, V)> entries<K, V>(Map<K, V> map) =>
+    map.entries.map((e) => (e.key, e.value));
 
 /// Yields the keys of [map].
 ///
