@@ -16,7 +16,8 @@ Future<List<A>> toListAsync<A>(FxAsyncIterable<A> iterable) async {
   final result = <A>[];
   // Stream-sourced chains collect by subscription — the push execution
   // model, observably identical for an all-consuming terminal.
-  final drive = fxStreamDrive<A>(iterable, result.add);
+  final drive =
+      fxStreamDrive<A>(iterable, result.add) ?? fxPoolDrive<A>(iterable, result.add);
   if (drive != null) {
     await drive;
     return result;
@@ -53,7 +54,7 @@ void each<A>(void Function(A a) f, Iterable<A> iterable) {
 Future<void> eachAsync<A>(
     FutureOr<void> Function(A a) f, FxAsyncIterable<A> iterable) async {
   // Stream-sourced chains run by subscription (see [toListAsync]).
-  final drive = fxStreamDrive<A>(iterable, f);
+  final drive = fxStreamDrive<A>(iterable, f) ?? fxPoolDrive<A>(iterable, f);
   if (drive != null) return drive;
   final iterator = iterable.iterator;
   // Fast-pull loop where available (see [toListAsync]); awaits only
@@ -158,7 +159,7 @@ Future<Acc> foldAsync<A, Acc>(FutureOr<Acc> seed,
     FutureOr<Acc> Function(Acc acc, A a) f, FxAsyncIterable<A> iterable) async {
   var acc = seed is Future<Acc> ? await seed : seed;
   // Stream-sourced chains fold by subscription (see [toListAsync]).
-  final drive = fxStreamDrive<A>(iterable, (a) {
+  FutureOr<void> accumulate(A a) {
     final v = f(acc, a);
     if (v is Future<Acc>) {
       return v.then((next) {
@@ -166,7 +167,10 @@ Future<Acc> foldAsync<A, Acc>(FutureOr<Acc> seed,
       });
     }
     acc = v;
-  });
+  }
+
+  final drive = fxStreamDrive<A>(iterable, accumulate) ??
+      fxPoolDrive<A>(iterable, accumulate);
   if (drive != null) {
     await drive;
     return acc;

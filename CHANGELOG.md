@@ -1,3 +1,98 @@
+## 0.7.5
+
+### Fixed — `concurrentPool` went quadratic on a fast source
+
+`concurrentPoolAsync` refills its pool on every completion instead of on
+demand — the 0.1.1 "eagerly keep the pool full" behavior, which is what lets
+a one-pull-at-a-time terminal like `toList` still overlap `n` requests. The
+consequence went unnoticed: when the source resolves *faster* than the
+consumer drains, the ready-results buffer runs ahead without bound, and that
+buffer was a growable `List` dequeued with `removeAt(0)` — O(length) per
+element. The pipeline as a whole was O(n²).
+
+It takes an effectively-instant source to show — cached lookups,
+`Future.value`, futures that are already complete. Any real per-element
+latency holds the buffer at the pool size, which is why the benchmark suite
+never caught it. Both internal buffers (settled results waiting for a
+consumer, and consumer pulls waiting for a result) are now `Queue`s, O(1) at
+each end. Measured AOT over an all-resolved source with a pool of 3:
+
+| N | before | after |
+|---|---|---|
+| 2,000 | 6.5 ms | 1.8 ms |
+| 4,000 | 22.0 ms | 5.5 ms |
+| 8,000 | 84.8 ms | 7.0 ms |
+| 16,000 | 724.1 ms | 12.9 ms |
+
+Completion ordering, laziness, the eager refill itself, and error
+propagation are unchanged, and the async benchmark suite is unmoved — with
+real latency the buffers never grow, so there was nothing there to win.
+
+### Added — `FxDart.config`
+
+A namespace for process-wide settings, holding one switch so far:
+
+* **`FxDart.config.optimizeMemoryForConcurrentPool`** (default `false`) —
+  puts `concurrentPoolAsync` back on the `List` buffers described above. The
+  trade it names is smaller than it sounds: a `Queue` keeps a power-of-two
+  backing store and so can hold up to ~2× the elements' worth of slots, but
+  on the `completion-order-pool` benchmark the two forms measured the same
+  peak RSS to within 0.1 MB. It is there as an escape hatch — to reproduce a
+  measurement taken against an earlier version, or to pin the old behavior
+  if some workload turns out to prefer it.
+
+Settings are read when a pipeline **starts iterating**, not when it is
+built, so flipping one affects pipelines started afterwards and leaves an
+already-running iteration on the behavior it began with.
+
+### Performance — push execution reaches the pool and the stream bridge
+
+0.7.4 gave stream-*sourced* chains a subscription execution model; the two
+places that still round-tripped every element through a `Completer` or an
+async generator now follow it. Both are internal — no signature moves, and
+`next()` still returns a `Future`, so a hand-driven `.iterator.next()` loop
+is unaffected.
+
+* **`concurrentPool` drained by push.** `concurrentPoolAsync` returns a
+  marker iterable, and `fxPoolDrive` sits beside `fxStreamDrive` in
+  `toListAsync` / `eachAsync` / `foldAsync`: when an all-consuming terminal
+  owns the pool, each element is emitted from inside the pull's own
+  continuation instead of crossing a per-element `Completer`. Completion
+  ordering, eager refill, error position, and the slow-consumer buffer are
+  unchanged; a pool used mid-chain keeps the pull path. **2.0 → 1.0
+  microtasks per element**, and `completion-order-pool` goes from 1.07×
+  behind RxDart to parity — the section's speed tally moves from 31 FxDart /
+  6 tie / 4 RxDart to **31 / 7 / 3**.
+* **`toStream()` without `async*`.** It was the last `async*` in `lib/`, and
+  every `yield` crossed `_AsyncStarStreamController`. It is now a
+  hand-written `sync` controller, every `add` issued from a future
+  continuation or a controller callback. The generator's lock-step is
+  preserved exactly — one element produced per element consumed, a paused
+  subscription stops pulling, `break` in an `await for` stops production for
+  good, nothing pulled before the stream is listened to. **`toStream()` now
+  adds 0.0 microtasks per element.**
+
+The second one did not move its benchmark, and the reason is worth
+recording: `pipeline-into-stream` stays at ~1.06× because a stage-by-stage
+count shows `chunk` and `toStream` each cost nothing per element and all
+3.0 of that chain's microtasks belong to `mapConcurrent` — that is,
+`concurrentAsync`'s ordered batching. That is the next target, and a larger
+one, since `mapConcurrent` is the most repeated async idiom in the
+comparison suite.
+
+### Tests
+
+`test/util/config_test.dart` runs `concurrentPool`'s completion ordering,
+full drain of a fast source, and error propagation against *both* buffer
+implementations, and guards the fix directly: quadrupling N must cost less
+than 8× the time, which the `List` form fails at ~16×.
+
+`test/stream/to_stream_test.dart` covers the two rewrites: the stream
+bridge's lock-step, pause/resume, cancel, lazy start, error delivery and
+single-subscription contract, and the pool terminals' element coverage,
+completion order under a slow consumer, and error propagation — including
+that the manual pull path still works while the push drive exists.
+
 ## 0.7.4
 
 ### Performance — the async pull machinery

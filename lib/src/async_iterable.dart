@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:collection';
+
+import 'config.dart';
 
 /// The concurrency signal that lazy operators thread *backwards* through the
 /// iterator protocol's `next(concurrent)` argument.
@@ -566,23 +569,74 @@ extension FxAsyncIterableToStream<T> on FxAsyncIterable<T> {
   /// Drives this async iterable sequentially and emits its values as a
   /// [Stream]. The [Concurrent] back-channel is not used; apply
   /// `concurrentAsync` before converting if you need parallel evaluation.
-  Stream<T> toStream() async* {
-    final iterator = this.iterator;
-    if (iterator is FxFastIterator<T>) {
-      // Fast-pull loop: synchronously answered pulls go straight to yield.
-      while (true) {
-        final ro = iterator.nextOr();
-        final result = ro is Future<IterResult<T>> ? await ro : ro;
-        if (result.done) break;
-        yield result.value;
-      }
-    } else {
-      while (true) {
-        final result = await iterator.next();
-        if (result.done) break;
-        yield result.value;
+  Stream<T> toStream() {
+    // Hand-written controller rather than `async*`: every `yield` in an
+    // async generator crosses `_AsyncStarStreamController`, which cost ~2.5
+    // microtask hops per element on top of the pull itself. The controller
+    // is `sync` so a settled pull hands its value straight to the listener,
+    // exactly as the generator's `yield` did — and every `add` here happens
+    // inside a future continuation or a controller callback, which is the
+    // context a sync controller requires.
+    //
+    // The generator's lock-step is preserved: one element is produced per
+    // element the listener takes, a paused subscription stops production,
+    // and cancelling (a `break` in `await for`) stops it for good.
+    late final StreamController<T> controller;
+    FxAsyncIterator<T>? iterator;
+    var pulling = false;
+    var stopped = false;
+
+    void close() {
+      stopped = true;
+      controller.close();
+    }
+
+    void failWith(Object e, StackTrace st) {
+      if (stopped) return;
+      stopped = true;
+      controller.addError(e, st);
+      controller.close();
+    }
+
+    void pump() {
+      if (stopped || pulling) return;
+      final it = iterator ??= this.iterator;
+      while (!stopped && !controller.isPaused && controller.hasListener) {
+        final FutureOr<IterResult<T>> ro;
+        try {
+          ro = it is FxFastIterator<T> ? it.nextOr() : it.next();
+        } catch (e, st) {
+          failWith(e, st);
+          return;
+        }
+        if (ro is Future<IterResult<T>>) {
+          pulling = true;
+          ro.then((result) {
+            pulling = false;
+            if (stopped) return;
+            if (result.done) return close();
+            controller.add(result.value);
+            pump();
+          }, onError: failWith);
+          return;
+        }
+        if (ro.done) return close();
+        controller.add(ro.value);
       }
     }
+
+    controller = StreamController<T>(
+      sync: true,
+      // Deferred: `listen()` has not returned yet inside onListen, so a
+      // synchronous first event would reach a listener whose own
+      // subscription variable is still unassigned.
+      onListen: () => scheduleMicrotask(pump),
+      onResume: pump,
+      onCancel: () {
+        stopped = true;
+      },
+    );
+    return controller.stream;
   }
 }
 
@@ -726,8 +780,56 @@ FxAsyncIterable<A> concurrentAsync<A>(int length, FxAsyncIterable<A> iterable) {
   });
 }
 
+/// The FIFO behind [concurrentPoolAsync]'s two buffers. Which implementation
+/// an iterator gets is decided once, when it starts, by
+/// [FxConfig.optimizeMemoryForConcurrentPool].
+abstract interface class _PoolFifo<E> {
+  void add(E value);
+  E removeFirst();
+  bool get isEmpty;
+  bool get isNotEmpty;
+}
+
+/// The default: O(1) at both ends, so the pipeline stays linear even when the
+/// buffer runs far ahead of the consumer.
+final class _QueueFifo<E> implements _PoolFifo<E> {
+  final Queue<E> _queue = Queue<E>();
+
+  @override
+  void add(E value) => _queue.addLast(value);
+  @override
+  E removeFirst() => _queue.removeFirst();
+  @override
+  bool get isEmpty => _queue.isEmpty;
+  @override
+  bool get isNotEmpty => _queue.isNotEmpty;
+}
+
+/// The original form: a growable `List` whose `removeAt(0)` is O(length).
+final class _ListFifo<E> implements _PoolFifo<E> {
+  final List<E> _list = <E>[];
+
+  @override
+  void add(E value) => _list.add(value);
+  @override
+  E removeFirst() => _list.removeAt(0);
+  @override
+  bool get isEmpty => _list.isEmpty;
+  @override
+  bool get isNotEmpty => _list.isNotEmpty;
+}
+
+_PoolFifo<E> _poolFifo<E>() => FxDart.config.optimizeMemoryForConcurrentPool
+    ? _ListFifo<E>()
+    : _QueueFifo<E>();
+
 /// Like [concurrentAsync] but yields results in **completion order** rather
 /// than source order, keeping up to [length] requests in flight.
+///
+/// The pool refills on every completion rather than on demand, so a source
+/// faster than its consumer buffers ahead without bound; the buffers are
+/// therefore `Queue`s, whose dequeue stays O(1) at any length. See
+/// [FxConfig.optimizeMemoryForConcurrentPool] to get the old `List`s back.
 ///
 /// Port of FxTS `concurrentPool`.
 FxAsyncIterable<A> concurrentPoolAsync<A>(
@@ -735,20 +837,41 @@ FxAsyncIterable<A> concurrentPoolAsync<A>(
   if (length < 1) {
     throw RangeError("'length' must be positive integer");
   }
-  return DelegateAsyncIterable(() {
+  return FxConcurrentPoolIterable<A>(length, iterable);
+}
+
+/// The [concurrentPoolAsync] iterable. A marker class: an all-consuming
+/// serial terminal can drain the pool by push (see [fxPoolDrive]) instead of
+/// answering every element through a [Completer].
+class FxConcurrentPoolIterable<T> implements FxAsyncIterable<T> {
+  /// Wraps [source] without pulling from it; each [iterator] starts a pool.
+  const FxConcurrentPoolIterable(this.length, this.source);
+
+  /// How many pulls stay in flight.
+  final int length;
+
+  /// The chain the pool pulls from.
+  final FxAsyncIterable<T> source;
+
+  @override
+  FxAsyncIterator<T> get iterator => _poolIterator(length, source);
+}
+
+FxAsyncIterator<A> _poolIterator<A>(int length, FxAsyncIterable<A> iterable) {
+  return DelegateAsyncIterable<A>(() {
     final iterator = iterable.iterator;
     var inFlight = 0;
     var sourceDone = false;
     var failed = false;
-    final ready = <Settled<IterResult<A>>>[];
-    final settlementQueue = <Completer<IterResult<A>>>[];
+    final ready = _poolFifo<Settled<IterResult<A>>>();
+    final settlementQueue = _poolFifo<Completer<IterResult<A>>>();
 
     bool exhausted() => sourceDone && inFlight == 0 && ready.isEmpty;
 
     void drain() {
       while (ready.isNotEmpty && settlementQueue.isNotEmpty) {
-        final item = ready.removeAt(0);
-        final completer = settlementQueue.removeAt(0);
+        final item = ready.removeFirst();
+        final completer = settlementQueue.removeFirst();
         switch (item) {
           case Fulfilled(value: final value):
             completer.complete(value);
@@ -758,7 +881,7 @@ FxAsyncIterable<A> concurrentPoolAsync<A>(
       }
       if (exhausted()) {
         while (settlementQueue.isNotEmpty) {
-          settlementQueue.removeAt(0).complete(IterResult<A>.done());
+          settlementQueue.removeFirst().complete(IterResult<A>.done());
         }
       }
     }
@@ -799,7 +922,119 @@ FxAsyncIterable<A> concurrentPoolAsync<A>(
       fill();
       return completer.future;
     });
-  });
+  }).iterator;
+}
+
+/// Terminal pool drive — the push execution model applied to
+/// [concurrentPoolAsync], the counterpart of [fxStreamDrive]. On the pull
+/// path every element crosses from the pull's `then` callback to the
+/// suspended consumer through a [Completer], which costs a microtask hop per
+/// element; here [emit] runs inside that same callback, so the element never
+/// crosses a future at all.
+///
+/// Semantics are the pull path's: [length] pulls stay in flight, values are
+/// emitted in completion order, an upstream error is delivered after the
+/// values that settled before it, and an [emit] that returns a Future holds
+/// the following values in order until it settles (the pull path's `ready`
+/// buffer, which fills the same way while a slow consumer is away). Returns
+/// null when [iterable] is not a pool.
+Future<void>? fxPoolDrive<T>(
+    FxAsyncIterable<T> iterable, FutureOr<void> Function(T value) emit) {
+  if (iterable is! FxConcurrentPoolIterable<T>) return null;
+  final length = iterable.length;
+  final iterator = iterable.source.iterator;
+  final completer = Completer<void>();
+  // Holds settled values while an asynchronous [emit] is in flight, so they
+  // reach it one at a time and in completion order.
+  final pending = Queue<Settled<T>>();
+  var inFlight = 0;
+  var sourceDone = false;
+  var terminated = false;
+  var emitting = false;
+
+  void fail(Object e, StackTrace st) {
+    if (terminated) return;
+    terminated = true;
+    completer.completeError(e, st);
+  }
+
+  void finishIfDone() {
+    if (terminated || emitting || pending.isNotEmpty) return;
+    if (sourceDone && inFlight == 0) {
+      terminated = true;
+      completer.complete();
+    }
+  }
+
+  late void Function() fill;
+  late void Function() flush;
+
+  void deliver(Settled<T> item) {
+    switch (item) {
+      case Rejected(error: final e, stackTrace: final st):
+        fail(e, st);
+      case Fulfilled(value: final v):
+        final FutureOr<void> r;
+        try {
+          r = emit(v);
+        } catch (e, st) {
+          fail(e, st);
+          return;
+        }
+        if (r is Future) {
+          emitting = true;
+          r.then((_) {
+            emitting = false;
+            if (!terminated) flush();
+          }, onError: fail);
+        }
+    }
+  }
+
+  flush = () {
+    while (!terminated && !emitting && pending.isNotEmpty) {
+      deliver(pending.removeFirst());
+    }
+    if (terminated) return;
+    fill();
+    finishIfDone();
+  };
+
+  void settle(Settled<T> item) {
+    if (terminated) return;
+    if (emitting || pending.isNotEmpty) {
+      pending.add(item);
+    } else {
+      deliver(item);
+    }
+    if (terminated) return;
+    fill();
+    finishIfDone();
+  }
+
+  fill = () {
+    // The pull path's eager refill, unchanged: keep [length] pulls in flight
+    // regardless of how fast [emit] is consuming them.
+    while (!terminated && !sourceDone && inFlight < length) {
+      inFlight++;
+      iterator.next(Concurrent.of(length)).then((result) {
+        inFlight--;
+        if (result.done) {
+          sourceDone = true;
+          if (!terminated) finishIfDone();
+          return;
+        }
+        settle(Fulfilled(result.value));
+      }, onError: (Object e, StackTrace st) {
+        inFlight--;
+        sourceDone = true;
+        settle(Rejected<T>(e, st));
+      });
+    }
+  };
+
+  fill();
+  return completer.future;
 }
 
 /// Shared helper implementing the FxTS "sequential wrap" dispatch pattern:

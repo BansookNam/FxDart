@@ -105,5 +105,24 @@ void main() {
       expect(acc..sort(), equals([1, 2, 3, 4, 5, 6]));
       expect(sw.elapsedMilliseconds, lessThan(450));
     });
+
+    test('answers surplus overlapping pulls with done', () async {
+      // More concurrent pulls than the source has elements: the extras must
+      // settle as done once the pool drains, not hang.
+      final it = concurrentPoolAsync(2, toAsync(() sync* {
+        for (var i = 1; i <= 3; i++) {
+          yield delay(const Duration(milliseconds: 10), i);
+        }
+      }()))
+          .iterator;
+
+      final results = await Future.wait(List.generate(5, (_) => it.next()));
+      final values = [
+        for (final r in results)
+          if (!r.done) r.value,
+      ]..sort();
+      expect(values, equals([1, 2, 3]));
+      expect(results.where((r) => r.done).length, equals(2));
+    });
   });
 }
