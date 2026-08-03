@@ -45,12 +45,12 @@
 | 33 | all-validation-errors | 100 | 111 µs | 28 µs | **tie** | 15.5 MB | 16.5 MB | rxdart | 3 |
 | 34 | stop-after-three-failures (async) | 100 | 825 µs | 581 µs | **tie** | 17.0 MB | 17.1 MB | tie | 3 |
 | 35 | ordered-bounded-fetch (async) | 100 | 788 µs | 422 µs | **tie** | 16.6 MB | 16.6 MB | tie | 3 |
-| 36 | completion-order-pool (async) | 100 | 457 µs | 446 µs | **tie** | 17.0 MB | 17.1 MB | tie | 3 |
+| 36 | completion-order-pool (async) | 100 | 390 µs | 388 µs | **tie** | 16.4 MB | 16.9 MB | tie | 5 |
 | 37 | dependent-calls-in-sequence (async) | 100 | 423 µs | 548 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
 | 38 | crawl-the-pages (async) | 100 | 23 µs | 22 µs | **tie** | 16.6 MB | 16.6 MB | tie | 3 |
 | 48 | tee-the-pipeline | 100 | 20 µs | 4.5 µs | **tie** | 17.0 MB | 16.5 MB | tie | 3 |
 | 49 | stream-into-pipeline (async) | 100 | 8.8 µs | 12 µs | **tie** | 17.0 MB | 16.5 MB | tie | 3 |
-| 50 | pipeline-into-stream (async) | 100 | 440 µs | 506 µs | **tie** | 17.0 MB | 17.1 MB | tie | 3 |
+| 50 | pipeline-into-stream (async) | 100 | 375 µs | 428 µs | **tie** | 17.0 MB | 16.5 MB | tie | 5 |
 
 ## Headline N (1M sync / case-specific async)
 
@@ -91,9 +91,9 @@
 | 33 | all-validation-errors | 1000000 | 1211.2 ms | 359.1 ms | **fxdart** | 342.8 MB | 368.0 MB | rxdart | 3 |
 | 34 | stop-after-three-failures (async) | 10000 | 76.6 ms | 52.9 ms | **fxdart** | 22.1 MB | 22.3 MB | tie | 3 |
 | 35 | ordered-bounded-fetch (async) | 10000 | 75.8 ms | 40.3 ms | **fxdart** | 51.7 MB | 22.2 MB | fxdart | 3 |
-| 36 | completion-order-pool (async) | 10000 | 39.2 ms | 42.4 ms | **rxdart** | 30.0 MB | 22.3 MB | fxdart | 3 |
+| 36 | completion-order-pool (async) | 10000 | 34.7 ms | 34.0 ms | **tie** | 29.6 MB | 22.2 MB | fxdart | 5 |
 | 37 | dependent-calls-in-sequence (async) | 10000 | 42.0 ms | 53.4 ms | **rxdart** | 29.0 MB | 29.0 MB | tie | 3 |
 | 38 | crawl-the-pages (async) | 10000 | 1.89 ms | 1.81 ms | **tie** | 23.1 MB | 23.1 MB | tie | 3 |
 | 48 | tee-the-pipeline | 1000000 | 151.1 ms | 37.2 ms | **fxdart** | 24.8 MB | 54.9 MB | rxdart | 3 |
 | 49 | stream-into-pipeline (async) | 10000 | 809 µs | 1.08 ms | **tie** | 22.8 MB | 22.9 MB | tie | 3 |
-| 50 | pipeline-into-stream (async) | 10000 | 45.4 ms | 47.9 ms | **rxdart** | 50.5 MB | 30.9 MB | fxdart | 4 |
+| 50 | pipeline-into-stream (async) | 10000 | 37.9 ms | 39.9 ms | **rxdart** | 50.4 MB | 30.5 MB | fxdart | 5 |
