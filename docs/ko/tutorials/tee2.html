@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>tee2 — FxDart 101</title>
-  <meta name="description" content="FxDart tee2 tutorial: run two or three folds over a single pass of a source, with no buffering, plus a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/tee2.html">
+  <meta name="description" content="FxDart tee2 튜토리얼: 소스를 한 번만 순회하면서 두세 개의 폴드를 동시에 굴립니다. 버퍼링 없음, 라이브 플레이그라운드 포함.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/tee2.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/tee2.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/tee2.html">
@@ -17,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=261d0b501ae2fb4d">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2360064b2e6855a8">
 </head>
 <body>
 <header class="site-header">
@@ -47,56 +46,54 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 페이지는 아직 번역되지 않아 영어로 표시됩니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 6 · 결합 › <strong>tee2</strong></p>
   <h1><code>tee2</code></h1>
-  <p class="hero-sub">Runs several folds over one pass of a source — one iteration, nothing buffered.</p>
+  <p class="hero-sub">한 번의 순회로 여러 개의 폴드를 굴립니다 — 반복은 한 번, 버퍼는 없음.</p>
 
   <div class="signature">typedef Fold&lt;A, R&gt; = ({R seed, R Function(R acc, A a) step});
 (R1, R2) tee2&lt;A, R1, R2&gt;(Iterable&lt;A&gt; iterable, Fold&lt;A, R1&gt; first, Fold&lt;A, R2&gt; second)
 (R1, R2, R3) tee3&lt;A, R1, R2, R3&gt;(Iterable&lt;A&gt; iterable, Fold&lt;A, R1&gt; first, Fold&lt;A, R2&gt; second, Fold&lt;A, R3&gt; third)
 Future&lt;(R1, R2)&gt; tee2Async&lt;A, R1, R2&gt;(FxAsyncIterable&lt;A&gt; iterable, AsyncFold&lt;A, R1&gt; first, AsyncFold&lt;A, R2&gt; second)</div>
 
-  <h2>Lecture</h2>
+  <h2>강의</h2>
   <p>
-    Two questions about the same data usually cost two passes:
-    <code>readings.fold(...)</code> for the total, then
-    <code>readings.reduce(...)</code> for the peak. That is fine for a
-    <code>List</code>, and wrong for anything else — a <code>sync*</code>
-    generator, a network page, a source that counts how often it ran will
-    all be walked twice. <code>tee2</code> asks both questions at once:
-    each element advances the total <em>and</em> the peak before the next
-    one is pulled, so the source is iterated exactly once.
+    같은 데이터에 대한 두 개의 질문은 보통 두 번의 순회를 요구합니다.
+    합계는 <code>readings.fold(...)</code>로, 최댓값은
+    <code>readings.reduce(...)</code>로. <code>List</code>라면 괜찮지만,
+    그 외의 것에는 잘못된 방식입니다 — <code>sync*</code> 제너레이터,
+    네트워크 페이지, 몇 번 실행됐는지 세는 소스는 모두 두 번 순회됩니다.
+    <code>tee2</code>는 두 질문을 한꺼번에 던집니다. 다음 원소를 당기기
+    전에 각 원소가 합계 <em>와</em> 최댓값을 모두 전진시키므로, 소스는
+    정확히 한 번만 순회됩니다.
   </p>
   <p>
-    A reader is given as a <strong>fold</strong> — a record of
-    <code>seed</code> (where it starts) and <code>step</code> (how one
-    element advances it). That shape is what makes the single pass free.
-    Because both readers move together, element by element, there is never
-    a value that one has seen and the other has not, so there is nothing
-    to remember: <code>tee2</code> over a million elements holds two
-    accumulators, not a million values. The two accumulators are entirely
-    independent and need not share a type. <code>tee3</code> takes three.
+    리더는 <strong>폴드</strong>로 주어집니다 — 어디서 시작하는지를
+    나타내는 <code>seed</code>와, 원소 하나가 그것을 어떻게 전진시키는지를
+    나타내는 <code>step</code>의 레코드입니다. 바로 이 모양이 한 번의
+    순회를 공짜로 만듭니다. 두 리더가 원소 단위로 함께 움직이므로, 한쪽은
+    봤는데 다른 쪽은 못 본 값이란 존재하지 않고, 따라서 기억해 둘 것도
+    없습니다. 원소가 백만 개여도 <code>tee2</code>가 들고 있는 것은 백만
+    개의 값이 아니라 두 개의 누산기뿐입니다. 두 누산기는 완전히 독립적이며
+    타입이 같을 필요도 없습니다. <code>tee3</code>는 세 개를 받습니다.
   </p>
   <p>
-    The constraint is the price of that. <code>tee2</code> feeds folds, not
-    pipelines — the readers cannot advance at their own pace, take
-    different amounts, or stop early independently. When you genuinely need
-    two <em>independent</em> readers, reach for
-    <a href="fork.html"><code>fork</code></a> instead, and accept the shared
-    buffer it keeps so a lagging cursor can catch up. Rule of thumb: if both
-    readers consume the whole source and reduce it to a value,
-    <code>tee2</code>; if either one is a pipeline in its own right,
+    그 대가가 제약입니다. <code>tee2</code>가 먹이는 것은 폴드이지
+    파이프라인이 아닙니다 — 리더들은 각자의 속도로 전진하거나, 서로 다른
+    개수만 가져가거나, 따로 일찍 멈출 수 없습니다. 정말로 <em>독립적인</em>
+    리더 둘이 필요하다면 <a href="fork.html"><code>fork</code></a>를
+    쓰고, 뒤처진 커서가 따라올 수 있도록 유지되는 공유 버퍼를 감수하세요.
+    기준은 이렇습니다: 두 리더가 모두 소스를 끝까지 소비해서 하나의 값으로
+    줄인다면 <code>tee2</code>, 둘 중 하나라도 그 자체로 파이프라인이라면
     <code>fork</code>.
   </p>
 
-  <h2>Demo 1 · Total and peak from one read</h2>
+  <h2>데모 1 · 한 번 읽어서 얻는 합계와 최댓값</h2>
   <p>
-    <code>sensor()</code> increments <code>reads</code> for every value it
-    produces. Two separate passes would leave <code>reads</code> at 12;
-    <code>tee2</code> leaves it at 6:
+    <code>sensor()</code>는 값을 내놓을 때마다 <code>reads</code>를
+    증가시킵니다. 따로 두 번 순회했다면 <code>reads</code>는 12가 되지만,
+    <code>tee2</code>는 6에서 멈춥니다:
   </p>
-  <div class="playground">
+  <div class="playground" data-pg="b69b91d17e0ccb0f">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -123,12 +120,12 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Independent accumulators, tee3, and on a chain</h2>
+  <h2>데모 2 · 독립적인 누산기, tee3, 그리고 체인 위에서</h2>
   <p>
-    The two folds carry unrelated types — an <code>int</code> character
-    count beside a <code>String</code> running winner. <code>tee3</code>
-    adds a third fold, and on an <code>fx</code> chain the folds see what
-    the <em>chain</em> produces, not the original source:
+    두 폴드는 서로 무관한 타입을 나릅니다 — <code>int</code> 문자 수와
+    <code>String</code> 현재 우승자가 나란히 갑니다. <code>tee3</code>는
+    세 번째 폴드를 더하고, <code>fx</code> 체인 위에서 폴드들은 원래
+    소스가 아니라 <em>체인</em>이 만들어 내는 것을 봅니다:
   </p>
   <div class="playground">
 <textarea>
@@ -164,12 +161,12 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
+  <h2>직접 해보기</h2>
   <p>
-    Exercise: <code>sensor()</code> is currently walked twice, so
-    <code>reads</code> prints 6. Replace the two passes with a single
-    <code>tee2</code> — summing in one fold and counting in the other — so
-    that <code>reads</code> prints 3.
+    연습: 지금은 <code>sensor()</code>를 두 번 순회하고 있어서
+    <code>reads</code>가 6을 출력합니다. 두 번의 순회를 하나의
+    <code>tee2</code>로 바꿔 — 한 폴드에서 합계를, 다른 폴드에서 개수를
+    세도록 — <code>reads</code>가 3을 출력하게 만드세요.
   </p>
   <div class="playground">
 <textarea>
@@ -197,10 +194,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="fork.html"><code>fork</code></a> — independent readers, at the cost of a buffer ·
-    <a href="reduce.html"><code>reduce</code></a> — a single fold ·
-    <a href="groupBy.html"><code>groupBy</code></a> — many accumulators keyed by value
+    <strong>관련 항목:</strong>
+    <a href="fork.html"><code>fork</code></a> — 버퍼를 대가로 한 독립 리더 ·
+    <a href="reduce.html"><code>reduce</code></a> — 폴드 하나 ·
+    <a href="groupBy.html"><code>groupBy</code></a> — 값을 키로 하는 여러 누산기
   </div>
 
   <nav class="tut-nav">
@@ -213,7 +210,7 @@ void main() {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=261d0b501ae2fb4d";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=2360064b2e6855a8";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
