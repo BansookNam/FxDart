@@ -320,11 +320,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/uniqBy.html">uniqBy</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="true" data-speed="rxdart" data-fns="fx toAsync min max">
+    <li data-verdict="tie" data-async="true" data-speed="tie" data-fns="fx toAsync min max">
       <a class="cmp-row" href="latency-extremes.html">
         <span class="cmp-num">20</span>
         <span class="cmp-row-body">
-          <strong>가장 빠른 요청과 가장 느린 요청</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-rxdart">⚡ RxDart가 더 빠름</span>
+          <strong>가장 빠른 요청과 가장 느린 요청</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 속도 동일</span>
           <span class="dim">엔드포인트 여덟 개를 비동기로 프로브해 최소·최대 지연을 출력하기 — 양쪽 모두 Future를 반환하는 축약, 각각 새 패스 한 번씩.</span>
         </span>
       </a>
@@ -417,21 +417,21 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/retry.html">retry</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="true" data-speed="fxdart" data-fns="fx toAsync retry concurrent">
+    <li data-verdict="fxdart" data-async="true" data-speed="tie" data-fns="fx toAsync retry concurrent">
       <a class="cmp-row" href="per-row-retry.html">
         <span class="cmp-num">29</span>
         <span class="cmp-row-body">
-          <strong>불안정한 행을 각각 따로 재시도하기</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart가 더 빠름</span>
+          <strong>불안정한 행을 각각 따로 재시도하기</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 속도 동일</span>
           <span class="dim">불안정한 임포트 행 여섯 개, 행마다 두 번 시도, 세 개 동시 진행 — flatMap은 완료 순서로 내보내고, concurrent 아래의 mapRetry는 소스 순서를 지킵니다.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/retry.html">retry</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="true" data-speed="tie" data-fns="fx toAsync map timeout">
+    <li data-verdict="tie" data-async="true" data-speed="fxdart" data-fns="fx toAsync map timeout">
       <a class="cmp-row" href="bound-the-stall.html">
         <span class="cmp-num">30</span>
         <span class="cmp-row-body">
-          <strong>멈춰 버린 읽기에 시간 제한 걸기</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 속도 동일</span>
+          <strong>멈춰 버린 읽기에 시간 제한 걸기</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart가 더 빠름</span>
           <span class="dim">멈추는 센서 읽기에 150 ms 예산 — 스트림 timeout은 이벤트 사이의 간격을 재고, 풀 timeout은 요구부터 항목까지의 시간을 잽니다.</span>
         </span>
       </a>
@@ -504,11 +504,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrentPool.html">concurrentPool</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="true" data-speed="rxdart" data-fns="fx toAsync map scan">
+    <li data-verdict="tie" data-async="true" data-speed="fxdart" data-fns="fx toAsync map scan">
       <a class="cmp-row" href="dependent-calls-in-sequence.html">
         <span class="cmp-num">37</span>
         <span class="cmp-row-body">
-          <strong>각 호출이 다음 호출로 이어질 때</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-rxdart">⚡ RxDart가 더 빠름</span>
+          <strong>각 호출이 다음 호출로 이어질 때</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart가 더 빠름</span>
           <span class="dim">각 응답이 다음 요청의 재료가 되는 API 호출 네 번 — scan은 상태를 파이프라인 속으로 꿰어 넣고, asyncMap은 가변 토큰을 클로저로 붙듭니다.</span>
         </span>
       </a>
@@ -614,7 +614,7 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/liveValue.html">liveValue</a></li><li><a href="../tutorials/fxEvents.html">fxEvents</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="false" data-speed="fxdart" data-fns="fx fork sum max">
+    <li data-verdict="tie" data-async="false" data-speed="fxdart" data-fns="tee2">
       <a class="cmp-row" href="tee-the-pipeline.html">
         <span class="cmp-num">48</span>
         <span class="cmp-row-body">
@@ -622,7 +622,7 @@
           <span class="dim">부수효과 있는 소스 하나에서 두 번 실행하지 않고 합계와 최댓값 얻기 — connectable 스트림 vs 버퍼링된 한 번의 순회를 나누는 fork.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/fork.html">fork</a></li><li><a href="../tutorials/sum.html">sum</a></li><li><a href="../tutorials/max.html">max</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/tee2.html">tee2</a></li></ul>
     </li>
     <li data-verdict="tie" data-async="true" data-speed="tie" data-fns="fx streams filter map toList">
       <a class="cmp-row" href="stream-into-pipeline.html">
@@ -634,11 +634,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/streams.html">streams</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/toList.html">toList</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="true" data-speed="rxdart" data-fns="fx toAsync mapConcurrent chunk streams">
+    <li data-verdict="tie" data-async="true" data-speed="tie" data-fns="fx toAsync mapConcurrent chunk streams">
       <a class="cmp-row" href="pipeline-into-stream.html">
         <span class="cmp-num">50</span>
         <span class="cmp-row-body">
-          <strong>파이프라인이 스트림 소비자로 이어질 때</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-rxdart">⚡ RxDart가 더 빠름</span>
+          <strong>파이프라인이 스트림 소비자로 이어질 때</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 속도 동일</span>
           <span class="dim">순서를 지키는 mapConcurrent fetch가 결과를 toStream으로 스트림 소비자에게 넘깁니다 — 반대 방향으로 건넌 다리.</span>
         </span>
       </a>

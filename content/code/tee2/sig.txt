@@ -1,0 +1,4 @@
+typedef Fold&lt;A, R&gt; = ({R seed, R Function(R acc, A a) step});
+(R1, R2) tee2&lt;A, R1, R2&gt;(Iterable&lt;A&gt; iterable, Fold&lt;A, R1&gt; first, Fold&lt;A, R2&gt; second)
+(R1, R2, R3) tee3&lt;A, R1, R2, R3&gt;(Iterable&lt;A&gt; iterable, Fold&lt;A, R1&gt; first, Fold&lt;A, R2&gt; second, Fold&lt;A, R3&gt; third)
+Future&lt;(R1, R2)&gt; tee2Async&lt;A, R1, R2&gt;(FxAsyncIterable&lt;A&gt; iterable, AsyncFold&lt;A, R1&gt; first, AsyncFold&lt;A, R2&gt; second)

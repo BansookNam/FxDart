@@ -1,3 +1,62 @@
+## Unreleased
+
+### Added — `tee2` / `tee3`
+
+Several folds over a **single** pass of a source, with no buffering.
+
+`fork` can already feed two readers from one pass, but only by buffering:
+its cursors advance independently, so draining one before the other holds
+every element the lagging cursor has not reached. Expressing the readers as
+folds — a `seed` and a `step` — lets both advance on the same element, so
+there is never a value one has seen and the other has not, and nothing to
+remember. The counterpart of Rx's `publish()`, where attaching both
+subscribers before `connect()` is what avoids the buffer.
+
+The two accumulators are independent and need not share a type; `tee3`
+takes three; `tee2Async` is the async form. Chain methods on `Fx` and
+`FxAsync`. The trade is deliberate: `tee2` feeds folds, not pipelines — for
+two genuinely independent readers, `fork` and its buffer remain the answer.
+
+On the RxDartComparison's `tee-the-pipeline`, measured paired and
+interleaved: time **36.6 → 17.8 ms** (-51%), peak RSS **57.6 → 22.6 MB**
+(-61%). That was the section's largest memory loss; fxdart now holds less
+than RxDart's 25.4 MB. The example and its benchmark were moved onto
+`tee2`, matching a multicast primitive against a multicast primitive
+rather than a general buffering one.
+
+### Performance — the fused stage list is compiled into a link chain
+
+The four per-element loops (`_mapFrom`, `_applyFrom`, `fxStreamDrive`,
+`fxFusedDrive`) walked a `List<FxStage>` by index, and in the drives that
+list was a *captured* local — so `stages.length` and `stages[i]` each went
+through the closure context object, per stage per element. The list is now
+compiled once per `FxFusedAsyncIterable` into a chain of `FxLink` nodes,
+each holding its successor: the loops walk pointers, and an asynchronous
+stage resumes at `link.next` instead of re-deriving `i + 1`.
+
+Internal only — no signature, laziness, ordering or error-behaviour change.
+
+`stream-into-pipeline`, the RxDartComparison's largest remaining deficit,
+goes from **1039 µs against RxDart's 783 µs (1.32×)** to **778 vs 766
+(1.02×)** — parity. Across 30 async cases the effect is otherwise small
+(median -0.49%, mean -1.24%, 5 cases ≥2% faster, 1 ≥2% slower).
+
+Two changes measured alongside these were **reverted** for failing to pay:
+collapsing an adjacent `filter`+`map` into one fused stage (+0.16% median,
+-0.8% on its own target case), and an `onErrorResume` operator, which made
+`resume-with-cache` **151% slower** — routing the cached tail through the
+async chain costs more than the `await for` it replaced.
+
+### Tests
+
+Library line coverage back to **100%** (3264/3264), the 0.7.4 standard
+that 0.7.6's fused drive had left at 98.47%. `test/strict/tee_test.dart`
+and `test/lazy/fused_link_test.dart` cover the new operator and the
+compiled chain's asynchronous branches — including the pull path (reached
+by wrapping a run in `take`, which denies the terminal its push drive) and
+the drive's synchronous-throw paths, reachable only when a run's source is
+itself a run.
+
 ## 0.7.6
 
 ### Performance — records stopped costing 2× in async pipelines

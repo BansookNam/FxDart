@@ -1,11 +1,11 @@
 ---
 slug: tee-the-pipeline
 title: One source, two independent readers — RxDart vs FxDart
-description: Total and max from one side-effecting source without running it twice — a connectable stream vs fork sharing one buffered pass.
+description: Total and max from one side-effecting source without running it twice — a connectable stream vs two folds advancing on the same element.
 heading: One source, two independent readers
 order: 48
 tier: 4
-functions: fx, fork, sum, max
+functions: tee2
 domain: sensors
 verdict: tie
 async: false
@@ -34,21 +34,23 @@ async: false
     RxDart makes the stream <em>connectable</em>: <code>publish()</code>
     defers the source, both reductions subscribe, and <code>connect()</code>
     starts the single subscription that feeds them. FxDart's
-    <code>fork</code> branches one buffered iteration: every fork of the
-    same iterable object is an independent cursor over a shared buffer, so
-    the generator body runs once no matter how many readers pull from it.
+    <code>tee2</code> keeps both reductions in step instead: each element
+    advances the total and the peak before the next one is pulled, so the
+    single pass never has to remember anything.
   </p>
   <p>
-    The differences are texture, not capability. The rx version is
-    ordering-sensitive — readers must attach <em>before</em>
-    <code>connect()</code>, and a latecomer misses events; that is push:
-    delivery happens whether you are ready or not. The fx version is
-    identity-sensitive — you must fork the <em>same object</em>, and a
-    fork that lags simply replays the buffer at its own pace; that is
-    pull: values wait for demand. The cost is memory: the shared buffer
-    holds every value until the slowest fork has consumed it, so a badly
-    lagging reader keeps the whole pass alive, where rx's latecomer
-    would simply have missed it. Either is a fine answer to "tee the
-    pipeline", which makes this a tie — pick the one matching the model
-    the rest of your code already lives in.
+    Both avoid a buffer, and for the same underlying reason — every
+    reader sees each element while it is the current one. That is what
+    <code>connect()</code> buys by making the readers attach first, and
+    what <code>tee2</code> buys by taking the readers as folds: a seed
+    and a step, rather than two pipelines free to advance independently.
+    The constraint is the price. <code>publish()</code> will feed any
+    stream operators you care to subscribe; <code>tee2</code> only feeds
+    folds. When the two readers really are independent pipelines, FxDart's
+    answer is <code>fork</code> — every fork of the same iterable object
+    is a cursor over one shared, buffered pass — and there the buffer
+    comes back, holding every value until the slowest cursor has consumed
+    it. So this is a tie on capability: the general tool costs memory on
+    both sides, and the specialised one is free on both. Pick the one
+    matching the model the rest of your code already lives in.
   </p>

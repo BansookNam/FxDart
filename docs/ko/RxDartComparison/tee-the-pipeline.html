@@ -46,10 +46,11 @@
   </div>
 </header>
 <main class="cmp-wide">
+  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #48 · <strong>소스 하나, 독립 리더 둘</strong></p>
   <h1>소스 하나, 독립 리더 둘</h1>
   <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/fork.html">fork</a></li><li><a href="../tutorials/sum.html">sum</a></li><li><a href="../tutorials/max.html">max</a></li></ul>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/tee2.html">tee2</a></li></ul>
   <h2>요구사항</h2>
   <p>
     하나의 측정값 소스가 <strong>두 개의</strong> 독립적인 계산 —
@@ -100,7 +101,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="5b6e4389ba7b30a3">
+      <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -113,11 +114,12 @@ Iterable<int> readings() sync* {
 }
 
 void main() {
-  // fork the SAME iterable object twice: both cursors share one buffered
-  // pass over the source, in whatever order they happen to read.
-  final shared = readings();
-  final total = fx(fork(shared)).sum();
-  final peak = fx(fork(shared)).max();
+  // tee2 advances BOTH reductions on the same element, so one pass feeds
+  // them both and nothing is ever buffered.
+  final (total, peak) = tee2(
+      readings(),
+      (seed: 0, step: (int acc, int r) => acc + r),
+      (seed: 0, step: (int acc, int r) => r > acc ? r : acc));
 
   print('total: $total');
   print('peak: $peak');
@@ -137,7 +139,7 @@ void main() {
     한 번의 순회를 공유하기. RxDart는 스트림을 <em>connectable</em>로
     만듭니다: <code>publish()</code>가 소스를 미루고, 두 리덕션이
     구독한 뒤, <code>connect()</code>가 그들을 먹이는 단 하나의 구독을
-    시작합니다. FxDart의 <code><a href="../tutorials/fork.html">fork</a></code>는 버퍼링된 하나의 반복을
+    시작합니다. FxDart의 <code>fork</code>는 버퍼링된 하나의 반복을
     가지 칩니다: 같은 iterable 객체의 모든 fork는 공유 버퍼 위의
     독립적인 커서이므로, 리더가 몇이든 제너레이터 본문은 한 번만
     실행됩니다.
@@ -157,7 +159,7 @@ void main() {
   </p>
   <section class="cmp-bench">
   <h2>벤치마크</h2>
-  <p class="dim bench-meta">Apple M1 Max, 32 GB RAM · Dart 3.12.2 (AOT-compiled) · 2026-08-03</p>
+  <p class="dim bench-meta">Apple M1 Max, 32 GB RAM · Dart 3.12.2 (AOT-compiled) · 2026-08-04</p>
   <div class="bench-scales">
   <div class="bench-scale">
     <h3>N = 100</h3>
@@ -166,12 +168,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">RxDart</span>
         <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">20 µs</span>
+        <span class="bench-val">22 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:22.0%"></span></span>
-        <span class="bench-val">4.5 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:10.3%"></span></span>
+        <span class="bench-val">2.3 µs</span>
       </div>
     </div>
     <div class="bench-metric">
@@ -179,12 +181,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">RxDart</span>
         <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">17.0 MB</span>
+        <span class="bench-val">16.6 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:97.0%"></span></span>
-        <span class="bench-val">16.5 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:98.8%"></span></span>
+        <span class="bench-val">16.4 MB</span>
       </div>
     </div>
   </div>
@@ -195,25 +197,25 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">RxDart</span>
         <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">151.1 ms</span>
+        <span class="bench-val">142.4 ms</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:24.6%"></span></span>
-        <span class="bench-val">37.2 ms</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:12.4%"></span></span>
+        <span class="bench-val">17.6 ms</span>
       </div>
     </div>
     <div class="bench-metric">
-      <h4>최대 메모리 <span class="badge verdict-rxdart">RxDart 승</span></h4>
+      <h4>최대 메모리 <span class="badge verdict-fxdart">FxDart 승</span></h4>
       <div class="bench-row">
         <span class="bench-name">RxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:45.1%"></span></span>
-        <span class="bench-val">24.8 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">24.3 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">54.9 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:88.6%"></span></span>
+        <span class="bench-val">21.6 MB</span>
       </div>
     </div>
   </div>

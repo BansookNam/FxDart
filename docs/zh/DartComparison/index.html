@@ -194,11 +194,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="true" data-speed="native" data-fns="toAsync map">
+    <li data-verdict="fxdart" data-async="true" data-speed="tie" data-fns="toAsync map">
       <a class="cmp-row" href="sequential-configs.html">
         <span class="cmp-num">10</span>
         <span class="cmp-row-body">
-          <strong>Load three remote configs in order</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-native">⚡ 原生更快</span>
+          <strong>Load three remote configs in order</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 速度相同</span>
           <span class="dim">Sequential async fetches — a plain await-in-loop in Dart vs toAsync + map in FxDart, one word away from bounded concurrency.</span>
         </span>
       </a>
@@ -291,11 +291,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li></ul>
     </li>
-    <li data-verdict="native" data-async="false" data-speed="native" data-fns="map filter take">
+    <li data-verdict="native" data-async="false" data-speed="tie" data-fns="map filter take">
       <a class="cmp-row" href="valid-emails.html">
         <span class="cmp-num">19</span>
         <span class="cmp-row-body">
-          <strong>First 5 valid emails, normalized</strong> <span class="badge verdict-native">Native is fine</span> <span class="badge badge-speed speed-native">⚡ 原生更快</span>
+          <strong>First 5 valid emails, normalized</strong> <span class="badge verdict-native">Native is fine</span> <span class="badge badge-speed speed-tie">⚡ 速度相同</span>
           <span class="dim">Trim, lowercase, validate, take five — map/where/take in plain Dart vs map + filter + take in FxDart. Plain Dart is every bit as clean here.</span>
         </span>
       </a>
@@ -435,11 +435,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="groupBy sortBy map dropWhile filter size join">
+    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="groupBy sortBy map dropWhile filter size join">
       <a class="cmp-row" href="cohort-retention.html">
         <span class="cmp-num">32</span>
         <span class="cmp-row-body">
-          <strong>Cohort retention table</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-native">⚡ 原生更快</span>
+          <strong>Cohort retention table</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-tie">⚡ 速度相同</span>
           <span class="dim">Signup-month cohorts vs later activity — nested groupBy/dropWhile/filter pipelines vs nested for loops with accumulator lists.</span>
         </span>
       </a>
@@ -485,11 +485,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="filter sortBy scan drop zip takeWhile map sumBy join">
+    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="filter sortBy scan drop zip takeWhile map sumBy join">
       <a class="cmp-row" href="restock-plan.html">
         <span class="cmp-num">37</span>
         <span class="cmp-row-body">
-          <strong>Inventory restock plan</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart 更快</span>
+          <strong>Inventory restock plan</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-tie">⚡ 速度相同</span>
           <span class="dim">Prioritize below-threshold items and cut the order list at a budget — scan + zip + takeWhile as data flow vs a mutable running total and break.</span>
         </span>
       </a>
@@ -545,11 +545,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/peek.html">peek</a></li><li><a href="../tutorials/dropWhile.html">dropWhile</a></li><li><a href="../tutorials/head.html">head</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="true" data-speed="native" data-fns="toAsync map concurrent filter size sumBy">
+    <li data-verdict="fxdart" data-async="true" data-speed="tie" data-fns="toAsync map concurrent filter size sumBy">
       <a class="cmp-row" href="price-lookup-fallback.html">
         <span class="cmp-num">43</span>
         <span class="cmp-row-body">
-          <strong>Concurrent price lookup with fallback</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-native">⚡ 原生更快</span>
+          <strong>Concurrent price lookup with fallback</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 速度相同</span>
           <span class="dim">Look up live prices 3 at a time, fall back to catalog prices for missing SKUs — concurrent + a null-coalescing map vs a worker pool.</span>
         </span>
       </a>

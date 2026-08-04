@@ -5,8 +5,8 @@ description: FxDart ifEmpty와 defaultIfEmpty 튜토리얼: 결과가 비어 버
 heading: <code>ifEmpty</code>
 section: 6
 crumb: ifEmpty
-prev: fork.html
-prevLabel: fork
+prev: tee2.html
+prevLabel: tee2
 next: reduce.html
 nextLabel: reduce
 ---

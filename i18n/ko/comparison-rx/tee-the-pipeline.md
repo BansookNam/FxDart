@@ -5,7 +5,7 @@ description: 부수효과 있는 소스 하나에서 두 번 실행하지 않고
 heading: 소스 하나, 독립 리더 둘
 order: 48
 tier: 4
-functions: fx, fork, sum, max
+functions: tee2
 domain: sensors
 verdict: tie
 async: false

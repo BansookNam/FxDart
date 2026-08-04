@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>tee2 — FxDart 101</title>
+  <meta name="description" content="FxDart tee2 tutorial: run two or three folds over a single pass of a source, with no buffering, plus a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/tee2.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/tee2.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/tee2.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/tee2.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/tee2.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/tee2.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/tee2.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/tee2.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/tee2.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=261d0b501ae2fb4d">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../tutorials/tee2.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/tee2.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/tee2.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/tee2.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/tee2.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/tutorials/tee2.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/tee2.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 6 · Combinar › <strong>tee2</strong></p>
+  <h1><code>tee2</code></h1>
+  <p class="hero-sub">Runs several folds over one pass of a source — one iteration, nothing buffered.</p>
+
+  <div class="signature">typedef Fold&lt;A, R&gt; = ({R seed, R Function(R acc, A a) step});
+(R1, R2) tee2&lt;A, R1, R2&gt;(Iterable&lt;A&gt; iterable, Fold&lt;A, R1&gt; first, Fold&lt;A, R2&gt; second)
+(R1, R2, R3) tee3&lt;A, R1, R2, R3&gt;(Iterable&lt;A&gt; iterable, Fold&lt;A, R1&gt; first, Fold&lt;A, R2&gt; second, Fold&lt;A, R3&gt; third)
+Future&lt;(R1, R2)&gt; tee2Async&lt;A, R1, R2&gt;(FxAsyncIterable&lt;A&gt; iterable, AsyncFold&lt;A, R1&gt; first, AsyncFold&lt;A, R2&gt; second)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    Two questions about the same data usually cost two passes:
+    <code>readings.fold(...)</code> for the total, then
+    <code>readings.reduce(...)</code> for the peak. That is fine for a
+    <code>List</code>, and wrong for anything else — a <code>sync*</code>
+    generator, a network page, a source that counts how often it ran will
+    all be walked twice. <code>tee2</code> asks both questions at once:
+    each element advances the total <em>and</em> the peak before the next
+    one is pulled, so the source is iterated exactly once.
+  </p>
+  <p>
+    A reader is given as a <strong>fold</strong> — a record of
+    <code>seed</code> (where it starts) and <code>step</code> (how one
+    element advances it). That shape is what makes the single pass free.
+    Because both readers move together, element by element, there is never
+    a value that one has seen and the other has not, so there is nothing
+    to remember: <code>tee2</code> over a million elements holds two
+    accumulators, not a million values. The two accumulators are entirely
+    independent and need not share a type. <code>tee3</code> takes three.
+  </p>
+  <p>
+    The constraint is the price of that. <code>tee2</code> feeds folds, not
+    pipelines — the readers cannot advance at their own pace, take
+    different amounts, or stop early independently. When you genuinely need
+    two <em>independent</em> readers, reach for
+    <a href="fork.html"><code>fork</code></a> instead, and accept the shared
+    buffer it keeps so a lagging cursor can catch up. Rule of thumb: if both
+    readers consume the whole source and reduce it to a value,
+    <code>tee2</code>; if either one is a pipeline in its own right,
+    <code>fork</code>.
+  </p>
+
+  <h2>Demo 1 · Total and peak from one read</h2>
+  <p>
+    <code>sensor()</code> increments <code>reads</code> for every value it
+    produces. Two separate passes would leave <code>reads</code> at 12;
+    <code>tee2</code> leaves it at 6:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  var reads = 0;
+  Iterable<int> sensor() sync* {
+    for (final v in [12, 7, 25, 3, 18, 9]) {
+      reads++;
+      yield v;
+    }
+  }
+
+  // Both reductions advance on the SAME element, so the sensor is read once
+  // and nothing is buffered along the way:
+  final (total, peak) = tee2(
+      sensor(),
+      (seed: 0, step: (int acc, int r) => acc + r),
+      (seed: 0, step: (int acc, int r) => r > acc ? r : acc));
+
+  print('total: $total'); // 74
+  print('peak: $peak'); // 25
+  print('reads: $reads'); // 6 — not 12
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Independent accumulators, tee3, and on a chain</h2>
+  <p>
+    The two folds carry unrelated types — an <code>int</code> character
+    count beside a <code>String</code> running winner. <code>tee3</code>
+    adds a third fold, and on an <code>fx</code> chain the folds see what
+    the <em>chain</em> produces, not the original source:
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // The two accumulators are independent, and need not share a type:
+  final (chars, longest) = tee2(
+      ['alpha', 'be', 'gamma!', 'de'],
+      (seed: 0, step: (int acc, String s) => acc + s.length),
+      (seed: '', step: (String acc, String s) => s.length > acc.length ? s : acc));
+
+  print('chars: $chars'); // 15
+  print('longest: $longest'); // gamma!
+
+  // tee3 adds a third. Here: sum, max, and a running count.
+  final (sum, max, count) = tee3(
+      [4, 8, 2],
+      (seed: 0, step: (int a, int x) => a + x),
+      (seed: 0, step: (int a, int x) => x > a ? x : a),
+      (seed: 0, step: (int a, int _) => a + 1));
+
+  print('$sum / $max / $count'); // 14 / 8 / 3
+
+  // On a chain, tee2 folds what the chain produces — not the source:
+  final (odds, doubled) = fx([1, 2, 3, 4, 5])
+      .filter((a) => a.isOdd)
+      .tee2((seed: 0, step: (int a, int x) => a + 1),
+          (seed: <int>[], step: (List<int> a, int x) => a..add(x * 2)));
+
+  print('$odds odd values, doubled: $doubled'); // 3 odd values, doubled: [2, 6, 10]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>
+    Exercise: <code>sensor()</code> is currently walked twice, so
+    <code>reads</code> prints 6. Replace the two passes with a single
+    <code>tee2</code> — summing in one fold and counting in the other — so
+    that <code>reads</code> prints 3.
+  </p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  var reads = 0;
+  Iterable<int> sensor() sync* {
+    for (final v in [10, 20, 30]) {
+      reads++;
+      yield v;
+    }
+  }
+
+  // TODO: replace these two passes with one tee2 so the sensor is read only
+  // once (`reads` should print 3, not 6).
+  final total = sensor().fold<int>(0, (a, b) => a + b);
+  final count = sensor().length;
+
+  print('total: $total');
+  print('count: $count');
+  print('reads: $reads');
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="fork.html"><code>fork</code></a> — independent readers, at the cost of a buffer ·
+    <a href="reduce.html"><code>reduce</code></a> — a single fold ·
+    <a href="groupBy.html"><code>groupBy</code></a> — many accumulators keyed by value
+  </div>
+
+  <nav class="tut-nav">
+    <a href="fork.html">← Anterior: fork</a>
+    <a href="ifEmpty.html">Siguiente: ifEmpty →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=261d0b501ae2fb4d";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

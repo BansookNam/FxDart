@@ -46,10 +46,11 @@
   </div>
 </header>
 <main class="cmp-wide">
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #48 · <strong>Una fuente, dos lectores independientes</strong></p>
   <h1>Una fuente, dos lectores independientes</h1>
   <p class="cmp-meta"><span class="badge verdict-tie">Empate</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/fork.html">fork</a></li><li><a href="../tutorials/sum.html">sum</a></li><li><a href="../tutorials/max.html">max</a></li></ul>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/tee2.html">tee2</a></li></ul>
   <h2>Requisito</h2>
   <p>
     Una fuente de lecturas debe alimentar <strong>dos</strong> cómputos
@@ -100,7 +101,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="5b6e4389ba7b30a3">
+      <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -113,11 +114,12 @@ Iterable<int> readings() sync* {
 }
 
 void main() {
-  // fork the SAME iterable object twice: both cursors share one buffered
-  // pass over the source, in whatever order they happen to read.
-  final shared = readings();
-  final total = fx(fork(shared)).sum();
-  final peak = fx(fork(shared)).max();
+  // tee2 advances BOTH reductions on the same element, so one pass feeds
+  // them both and nothing is ever buffered.
+  final (total, peak) = tee2(
+      readings(),
+      (seed: 0, step: (int acc, int r) => acc + r),
+      (seed: 0, step: (int acc, int r) => r > acc ? r : acc));
 
   print('total: $total');
   print('peak: $peak');
@@ -137,7 +139,7 @@ void main() {
     la misma idea — compartir una sola pasada. RxDart hace el stream
     <em>conectable</em>: <code>publish()</code> difiere la fuente, ambas
     reducciones se suscriben, y <code>connect()</code> arranca la única
-    suscripción que las alimenta. El <code><a href="../tutorials/fork.html">fork</a></code> de FxDart
+    suscripción que las alimenta. El <code>fork</code> de FxDart
     ramifica una sola iteración con buffer: cada fork del mismo objeto
     iterable es un cursor independiente sobre un buffer compartido, así
     que el cuerpo del generador corre una vez sin importar cuántos
@@ -160,7 +162,7 @@ void main() {
   </p>
   <section class="cmp-bench">
   <h2>Benchmark</h2>
-  <p class="dim bench-meta">Apple M1 Max, 32 GB RAM · Dart 3.12.2 (AOT-compiled) · 2026-08-03</p>
+  <p class="dim bench-meta">Apple M1 Max, 32 GB RAM · Dart 3.12.2 (AOT-compiled) · 2026-08-04</p>
   <div class="bench-scales">
   <div class="bench-scale">
     <h3>N = 100</h3>
@@ -169,12 +171,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">RxDart</span>
         <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">20 µs</span>
+        <span class="bench-val">22 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:22.0%"></span></span>
-        <span class="bench-val">4.5 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:10.3%"></span></span>
+        <span class="bench-val">2.3 µs</span>
       </div>
     </div>
     <div class="bench-metric">
@@ -182,12 +184,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">RxDart</span>
         <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">17.0 MB</span>
+        <span class="bench-val">16.6 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:97.0%"></span></span>
-        <span class="bench-val">16.5 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:98.8%"></span></span>
+        <span class="bench-val">16.4 MB</span>
       </div>
     </div>
   </div>
@@ -198,25 +200,25 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">RxDart</span>
         <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">151.1 ms</span>
+        <span class="bench-val">142.4 ms</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:24.6%"></span></span>
-        <span class="bench-val">37.2 ms</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:12.4%"></span></span>
+        <span class="bench-val">17.6 ms</span>
       </div>
     </div>
     <div class="bench-metric">
-      <h4>Memoria pico <span class="badge verdict-rxdart">Gana RxDart</span></h4>
+      <h4>Memoria pico <span class="badge verdict-fxdart">Gana FxDart</span></h4>
       <div class="bench-row">
         <span class="bench-name">RxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:45.1%"></span></span>
-        <span class="bench-val">24.8 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">24.3 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">54.9 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:88.6%"></span></span>
+        <span class="bench-val">21.6 MB</span>
       </div>
     </div>
   </div>

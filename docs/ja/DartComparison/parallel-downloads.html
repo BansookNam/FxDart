@@ -213,7 +213,7 @@ Future<void> main() async {
   </p>
   <section class="cmp-bench">
   <h2>Benchmark</h2>
-  <p class="dim bench-meta">Apple M1 Max, 32 GB RAM · Dart 3.12.2 (AOT-compiled) · 2026-08-03</p>
+  <p class="dim bench-meta">Apple M1 Max, 32 GB RAM · Dart 3.12.2 (AOT-compiled) · 2026-08-04</p>
   <p class="dim bench-note bench-async-note">Async case: the headline scale is N = 100,000, not 1,000,000. Every element costs an event-loop turn on both sides, so a million real awaits would measure Dart's event loop for minutes — not the pipeline. Delays are zero-length and the example's concurrency limit is kept; what the bars compare is the pipeline machinery.</p>
   <div class="bench-scales">
   <div class="bench-scale">
@@ -222,26 +222,26 @@ Future<void> main() async {
       <h4>Time <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:72.0%"></span></span>
-        <span class="bench-val">374 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:85.8%"></span></span>
+        <span class="bench-val">346 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">520 µs</span>
+        <span class="bench-val">403 µs</span>
       </div>
     </div>
     <div class="bench-metric">
       <h4>Peak memory <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">16.6 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:99.5%"></span></span>
+        <span class="bench-val">16.5 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:99.7%"></span></span>
-        <span class="bench-val">16.5 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">16.6 MB</span>
       </div>
     </div>
   </div>
@@ -251,13 +251,13 @@ Future<void> main() async {
       <h4>Time <span class="badge verdict-native">Native wins</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:68.6%"></span></span>
-        <span class="bench-val">34.5 ms</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:86.9%"></span></span>
+        <span class="bench-val">32.4 ms</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">50.2 ms</span>
+        <span class="bench-val">37.3 ms</span>
       </div>
     </div>
     <div class="bench-metric">
@@ -265,12 +265,12 @@ Future<void> main() async {
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">50.9 MB</span>
+        <span class="bench-val">50.8 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:65.0%"></span></span>
-        <span class="bench-val">33.1 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:64.5%"></span></span>
+        <span class="bench-val">32.8 MB</span>
       </div>
     </div>
   </div>
@@ -280,26 +280,26 @@ Future<void> main() async {
       <h4>Time <span class="badge verdict-native">Native wins</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:70.5%"></span></span>
-        <span class="bench-val">358.7 ms</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:85.9%"></span></span>
+        <span class="bench-val">342.9 ms</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">508.8 ms</span>
+        <span class="bench-val">399.3 ms</span>
       </div>
     </div>
     <div class="bench-metric">
       <h4>Peak memory <span class="badge verdict-native">Native wins</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:46.7%"></span></span>
-        <span class="bench-val">80.8 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:64.9%"></span></span>
+        <span class="bench-val">80.9 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">173.0 MB</span>
+        <span class="bench-val">124.7 MB</span>
       </div>
     </div>
   </div>

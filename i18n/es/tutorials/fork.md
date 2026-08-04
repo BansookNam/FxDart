@@ -7,8 +7,8 @@ section: 6
 crumb: fork
 prev: reverse.html
 prevLabel: reverse
-next: ifEmpty.html
-nextLabel: ifEmpty
+next: tee2.html
+nextLabel: tee2
 ---
   <p class="hero-sub">Ramifica una única iteración con buffer de una fuente en lectores independientes y reproducibles.</p>
 

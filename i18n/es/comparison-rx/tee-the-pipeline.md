@@ -5,7 +5,7 @@ description: Total y máximo de una fuente con efectos sin ejecutarla dos veces 
 heading: Una fuente, dos lectores independientes
 order: 48
 tier: 4
-functions: fx, fork, sum, max
+functions: tee2
 domain: sensors
 verdict: tie
 async: false

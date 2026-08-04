@@ -7,8 +7,8 @@ section: 6
 crumb: fork
 prev: reverse.html
 prevLabel: reverse
-next: ifEmpty.html
-nextLabel: ifEmpty
+next: tee2.html
+nextLabel: tee2
 ---
   <p class="hero-sub">소스를 한 번만 순회해 버퍼에 담고, 이를 독립적이고 다시 읽을 수 있는 리더들로 분기합니다.</p>
 
