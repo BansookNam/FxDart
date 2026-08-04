@@ -33,7 +33,7 @@ nextLabel: tee3
     a value that one has seen and the other has not, so there is nothing
     to remember: <code>tee</code> over a million elements holds two
     accumulators, not a million values. The two accumulators are entirely
-    independent and need not share a type. <code>tee3</code> takes three.
+    independent and need not share a type. <a href="tee3.html"><code>tee3</code></a> takes three.
   </p>
   <p>
     The constraint is the price of that. <code>tee</code> feeds folds, not

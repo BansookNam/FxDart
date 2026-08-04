@@ -22,7 +22,8 @@ nextLabel: zip3
     <code>(A, B)</code>를 반환하므로, 배열 인덱스 대신
     <code>.$1</code>/<code>.$2</code>나 패턴 매칭으로 결과를 분해합니다.
     Dart에는 가변 제네릭이 없기 때문에 인자 개수마다 함수가 따로 있습니다.
-    이터러블 두 개는 <code>zip</code>, 세 개는 <code>zip3</code>입니다.
+    이터러블 두 개는 <code>zip</code>, 세 개는
+    <a href="zip3.html"><code>zip3</code></a>입니다.
   </p>
   <p>
     <code>zipAsync</code>는 양쪽의 <code>next()</code> 호출을 어느 쪽도

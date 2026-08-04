@@ -230,7 +230,7 @@
   "tutorials/takeUntilInclusive.md": "-7989cc022180e7a8",
   "tutorials/takeWhile.md": "394a91a0d386185c",
   "tutorials/tap.md": "34c73b427d561535",
-  "tutorials/tee.md": "-2ee1f9c6df1711c6",
+  "tutorials/tee.md": "68f21f99b581c827",
   "tutorials/tee3.md": "3270d3be35bf4243",
   "tutorials/throttle.md": "-4403438455fd8a97",
   "tutorials/throwError.md": "1d1244726650ce9e",
@@ -250,7 +250,7 @@
   "tutorials/when.md": "2f4e18dacd10c900",
   "tutorials/windowed.md": "-349246284f73c839",
   "tutorials/withLatestFrom.md": "10bba75138154f7b",
-  "tutorials/zip.md": "-3cff5f7132418ae",
+  "tutorials/zip.md": "-2045c88cecb1262e",
   "tutorials/zip3.md": "-2c1620a5ab1655b6",
   "tutorials/zipWith.md": "-7def76ab10488ef8",
   "tutorials/zipWithIndex.md": "4a4021e6950a5b5e"

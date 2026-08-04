@@ -22,8 +22,8 @@ nextLabel: zip3
     <code>(A, B)</code> — so you destructure results with
     <code>.$1</code>/<code>.$2</code> or pattern matching instead of
     array indices. Since Dart has no variadic generics, each arity gets its
-    own function: <code>zip</code> for two iterables, <code>zip3</code> for
-    three.
+    own function: <code>zip</code> for two iterables,
+    <a href="zip3.html"><code>zip3</code></a> for three.
   </p>
   <p>
     <code>zipAsync</code> issues both sides' <code>next()</code> calls

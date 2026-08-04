@@ -203,6 +203,10 @@
       "label": "zip"
     },
     {
+      "href": "zip3.html",
+      "label": "zip3"
+    },
+    {
       "href": "zipWith.html",
       "label": "zipWith"
     },
@@ -221,6 +225,14 @@
     {
       "href": "fork.html",
       "label": "fork"
+    },
+    {
+      "href": "tee.html",
+      "label": "tee"
+    },
+    {
+      "href": "tee3.html",
+      "label": "tee3"
     },
     {
       "href": "ifEmpty.html",
