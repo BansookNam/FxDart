@@ -185,12 +185,6 @@ class Fx<T> extends Iterable<T> {
   /// Yields the single [value] when this chain turns out to be empty.
   Fx<T> defaultIfEmpty(T value) => Fx(l.defaultIfEmpty(value, _inner));
 
-  /// Continues with [onError]'s iterable when this chain throws, keeping
-  /// everything delivered before the error.
-  Fx<T> onErrorResume(
-          Iterable<T> Function(Object error, StackTrace stackTrace) onError) =>
-      Fx(l.onErrorResume(onError, _inner));
-
   /// Runs two folds over a single pass of this chain — one iteration, no
   /// buffering.
   (R1, R2) tee2<R1, R2>(s.Fold<T, R1> first, s.Fold<T, R2> second) =>
@@ -500,14 +494,6 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   @pragma('vm:prefer-inline')
   FxAsync<T> defaultIfEmpty(FutureOr<T> value) =>
       FxAsync(l.defaultIfEmptyAsync(value, _inner));
-
-  /// Continues with [onError]'s iterable when a pull on this chain fails,
-  /// keeping everything delivered before the error.
-  @pragma('vm:prefer-inline')
-  FxAsync<T> onErrorResume(
-          FxAsyncIterable<T> Function(Object error, StackTrace stackTrace)
-              onError) =>
-      FxAsync(l.onErrorResumeAsync(onError, _inner));
 
   /// Runs two folds over a single pass of this chain — one iteration, no
   /// buffering.
