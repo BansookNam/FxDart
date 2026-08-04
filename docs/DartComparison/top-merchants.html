@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Top 5 merchants by total spend — Dart vs FxDart</title>
-  <meta name="description" content="Group a ledger by merchant and rank the totals — groupListsBy + sortedBy in plain Dart vs a groupBy → sortBy → take chain in FxDart.">
+  <meta name="description" content="Group a ledger by merchant and rank the totals — groupListsBy + sortedBy in plain Dart vs one groupedBy → sortByDesc → take chain in FxDart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/top-merchants.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/top-merchants.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/top-merchants.html">
@@ -49,7 +49,7 @@
   <p class="breadcrumb"><a href="../DartComparison/index.html">Dart vs FxDart</a> › #11 · <strong>Top 5 merchants by total spend</strong></p>
   <h1>Top 5 merchants by total spend</h1>
   <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupedBy.html">groupedBy</a></li><li><a href="../tutorials/sortByDesc.html">sortByDesc</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
   <h2>Requirement</h2>
   <p>
     Given a month of ledger transactions — each with a date, merchant, and
@@ -114,7 +114,7 @@ void main() {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="520b04d13004fa45">
+      <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -143,12 +143,12 @@ const txns = [
 double total(List<Tx> ts) => ts.fold(0.0, (sum, t) => sum + t.amount);
 
 void main() {
-  final byMerchant = fx(txns).groupBy((t) => t.merchant);
-  final top = fx(byMerchant.entries)
-      .sortBy((kv) => -total(kv.value))
+  final top = fx(txns)
+      .groupedBy((t) => t.merchant)
+      .sortByDesc((g) => total(g.items))
       .take(5);
-  for (final kv in top) {
-    print('${kv.key}: \$${total(kv.value).toStringAsFixed(2)}');
+  for (final g in top) {
+    print('${g.key}: \$${total(g.items).toStringAsFixed(2)}');
   }
 }
 </textarea>
@@ -158,15 +158,25 @@ void main() {
 
   <h2>Why they differ</h2>
   <p>
-    Core Dart has no <code><a href="../tutorials/groupBy.html">groupBy</a></code> at all — the native version has to
-    pull in <code>package:collection</code> for <code>groupListsBy</code>,
-    then switch idioms mid-task: an extension method to group, another
-    (<code>sortedBy</code>, with an explicit <code>&lt;num&gt;</code> type
-    argument and a negated key to get descending order) to rank. FxDart keeps
-    the whole task in one vocabulary: <code><a href="../tutorials/groupBy.html">groupBy</a></code> produces the map,
-    and <code>fx(map.entries)</code> continues the chain with
-    <code><a href="../tutorials/sortBy.html">sortBy</a></code> and <code><a href="../tutorials/take.html">take</a></code>. Same shape of solution — but
-    one library, one pipeline, no type-argument ceremony.
+    Core Dart has no grouping at all, so the native version pulls in
+    <code>package:collection</code> — and grouping there <em>ends</em> the
+    chain: <code>groupListsBy</code> hands back a <code>Map</code>, so ranking
+    it means naming an intermediate variable, re-entering through
+    <code>.entries</code>, and reading each group as an untyped
+    <code>kv.key</code> / <code>kv.value</code> pair. Sorting adds two more
+    workarounds: an explicit <code>&lt;num&gt;</code> type argument (inference
+    fails because <code>double</code> is <code>Comparable&lt;num&gt;</code>,
+    not <code>Comparable&lt;double&gt;</code>) and a <em>negated</em> key,
+    since <code>sortedBy</code> only sorts ascending.
+  </p>
+  <p>
+    In FxDart the four steps are four links of one chain, top to bottom in the
+    order the requirement states them. <code><a href="../tutorials/groupedBy.html">groupedBy</a></code> stays inside the
+    pipeline — it yields <code>(key:, items:)</code> groups instead of a map,
+    so nothing has to be unpacked and re-wrapped — and
+    <code><a href="../tutorials/sortByDesc.html">sortByDesc</a></code> says &ldquo;descending&rdquo; in its name instead
+    of encoding it as a minus sign. No intermediate variable, no type-argument
+    ceremony, no sign trick: the code says group, rank, take five.
   </p>
   <section class="cmp-bench">
   <h2>Benchmark</h2>
@@ -179,11 +189,11 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">24 µs</span>
+        <span class="bench-val">30 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:61.3%"></span></span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:50.6%"></span></span>
         <span class="bench-val">15 µs</span>
       </div>
     </div>
@@ -192,12 +202,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">16.6 MB</span>
+        <span class="bench-val">16.5 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:99.6%"></span></span>
-        <span class="bench-val">16.5 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:99.2%"></span></span>
+        <span class="bench-val">16.4 MB</span>
       </div>
     </div>
   </div>
@@ -208,25 +218,25 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">664 µs</span>
+        <span class="bench-val">671 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:73.5%"></span></span>
-        <span class="bench-val">488 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:70.8%"></span></span>
+        <span class="bench-val">475 µs</span>
       </div>
     </div>
     <div class="bench-metric">
       <h4>Peak memory <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:99.7%"></span></span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
         <span class="bench-val">23.0 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">23.1 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:99.6%"></span></span>
+        <span class="bench-val">22.9 MB</span>
       </div>
     </div>
   </div>
@@ -237,12 +247,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">109.6 ms</span>
+        <span class="bench-val">123.3 ms</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:56.7%"></span></span>
-        <span class="bench-val">62.1 ms</span>
+        <span class="bench-val">69.9 ms</span>
       </div>
     </div>
     <div class="bench-metric">
@@ -250,12 +260,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">137.8 MB</span>
+        <span class="bench-val">137.3 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:85.8%"></span></span>
-        <span class="bench-val">118.3 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:86.3%"></span></span>
+        <span class="bench-val">118.4 MB</span>
       </div>
     </div>
   </div>

@@ -25,11 +25,11 @@ const txns = [
 double total(List<Tx> ts) => ts.fold(0.0, (sum, t) => sum + t.amount);
 
 void main() {
-  final byMerchant = fx(txns).groupBy((t) => t.merchant);
-  final top = fx(byMerchant.entries)
-      .sortBy((kv) => -total(kv.value))
+  final top = fx(txns)
+      .groupedBy((t) => t.merchant)
+      .sortByDesc((g) => total(g.items))
       .take(5);
-  for (final kv in top) {
-    print('${kv.key}: \$${total(kv.value).toStringAsFixed(2)}');
+  for (final g in top) {
+    print('${g.key}: \$${total(g.items).toStringAsFixed(2)}');
   }
 }

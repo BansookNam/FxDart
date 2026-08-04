@@ -1,11 +1,11 @@
 ---
 slug: top-merchants
 title: Top 5 merchants by total spend — Dart vs FxDart
-description: Group a ledger by merchant and rank the totals — groupListsBy + sortedBy in plain Dart vs a groupBy → sortBy → take chain in FxDart.
+description: Group a ledger by merchant and rank the totals — groupListsBy + sortedBy in plain Dart vs one groupedBy → sortByDesc → take chain in FxDart.
 heading: Top 5 merchants by total spend
 order: 11
 tier: 2
-functions: groupBy, sortBy, take
+functions: groupedBy, sortByDesc, take
 domain: transactions
 verdict: fxdart
 async: false
@@ -26,13 +26,23 @@ async: false
 
   <h2>Why they differ</h2>
   <p>
-    Core Dart has no <code>groupBy</code> at all — the native version has to
-    pull in <code>package:collection</code> for <code>groupListsBy</code>,
-    then switch idioms mid-task: an extension method to group, another
-    (<code>sortedBy</code>, with an explicit <code>&lt;num&gt;</code> type
-    argument and a negated key to get descending order) to rank. FxDart keeps
-    the whole task in one vocabulary: <code>groupBy</code> produces the map,
-    and <code>fx(map.entries)</code> continues the chain with
-    <code>sortBy</code> and <code>take</code>. Same shape of solution — but
-    one library, one pipeline, no type-argument ceremony.
+    Core Dart has no grouping at all, so the native version pulls in
+    <code>package:collection</code> — and grouping there <em>ends</em> the
+    chain: <code>groupListsBy</code> hands back a <code>Map</code>, so ranking
+    it means naming an intermediate variable, re-entering through
+    <code>.entries</code>, and reading each group as an untyped
+    <code>kv.key</code> / <code>kv.value</code> pair. Sorting adds two more
+    workarounds: an explicit <code>&lt;num&gt;</code> type argument (inference
+    fails because <code>double</code> is <code>Comparable&lt;num&gt;</code>,
+    not <code>Comparable&lt;double&gt;</code>) and a <em>negated</em> key,
+    since <code>sortedBy</code> only sorts ascending.
+  </p>
+  <p>
+    In FxDart the four steps are four links of one chain, top to bottom in the
+    order the requirement states them. <code>groupedBy</code> stays inside the
+    pipeline — it yields <code>(key:, items:)</code> groups instead of a map,
+    so nothing has to be unpacked and re-wrapped — and
+    <code>sortByDesc</code> says &ldquo;descending&rdquo; in its name instead
+    of encoding it as a minus sign. No intermediate variable, no type-argument
+    ceremony, no sign trick: the code says group, rank, take five.
   </p>

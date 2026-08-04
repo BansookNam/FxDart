@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>총지출 기준 상위 5개 판매자 — Dart vs FxDart</title>
-  <meta name="description" content="가계부를 판매자별로 그룹화해 합계 순위를 매깁니다 — 순수 Dart의 groupListsBy + sortedBy와 FxDart의 groupBy → sortBy → take 체인을 비교합니다.">
+  <meta name="description" content="가계부를 판매자별로 그룹화해 합계 순위를 매깁니다 — 순수 Dart의 groupListsBy + sortedBy와 FxDart의 groupedBy → sortByDesc → take 체인 하나를 비교합니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/top-merchants.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/top-merchants.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/DartComparison/top-merchants.html">
@@ -49,7 +49,7 @@
   <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #11 · <strong>총지출 기준 상위 5개 판매자</strong></p>
   <h1>총지출 기준 상위 5개 판매자</h1>
   <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupedBy.html">groupedBy</a></li><li><a href="../tutorials/sortByDesc.html">sortByDesc</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
   <h2>요구사항</h2>
   <p>
     날짜, 판매자, 금액을 가진 한 달치 가계부 거래 내역이 주어질 때,
@@ -114,7 +114,7 @@ void main() {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="520b04d13004fa45">
+      <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -143,12 +143,12 @@ const txns = [
 double total(List<Tx> ts) => ts.fold(0.0, (sum, t) => sum + t.amount);
 
 void main() {
-  final byMerchant = fx(txns).groupBy((t) => t.merchant);
-  final top = fx(byMerchant.entries)
-      .sortBy((kv) => -total(kv.value))
+  final top = fx(txns)
+      .groupedBy((t) => t.merchant)
+      .sortByDesc((g) => total(g.items))
       .take(5);
-  for (final kv in top) {
-    print('${kv.key}: \$${total(kv.value).toStringAsFixed(2)}');
+  for (final g in top) {
+    print('${g.key}: \$${total(g.items).toStringAsFixed(2)}');
   }
 }
 </textarea>
@@ -158,16 +158,26 @@ void main() {
 
   <h2>차이가 나는 이유</h2>
   <p>
-    순수 Dart에는 <code><a href="../tutorials/groupBy.html">groupBy</a></code>가 아예 없습니다 — 네이티브 버전은
-    <code>groupListsBy</code>를 쓰려고 <code>package:collection</code>을
-    끌어와야 하고, 작업 도중에 관용구를 바꿔야 합니다: 그룹화에는 확장
-    메서드 하나, 순위 매기기에는 또 다른 확장 메서드(<code>sortedBy</code>,
-    명시적인 <code>&lt;num&gt;</code> 타입 인자와 내림차순을 얻기 위한
-    부호 반전 키가 필요합니다)를 써야 하죠. FxDart는 작업 전체를 하나의
-    어휘로 유지합니다: <code><a href="../tutorials/groupBy.html">groupBy</a></code>가 맵을 만들고,
-    <code>fx(map.entries)</code>가 <code><a href="../tutorials/sortBy.html">sortBy</a></code>와
-    <code><a href="../tutorials/take.html">take</a></code>로 체인을 이어갑니다. 해법의 형태는 같지만, 라이브러리
-    하나, 파이프라인 하나로 끝나고 타입 인자를 챙기는 번거로움도 없습니다.
+    순수 Dart에는 그룹화 기능이 아예 없어서 네이티브 버전은
+    <code>package:collection</code>을 끌어와야 하고, 거기서 그룹화는 체인을
+    <em>끊습니다</em>: <code>groupListsBy</code>가 <code>Map</code>을 돌려주니
+    순위를 매기려면 중간 변수에 이름을 붙이고, <code>.entries</code>로 다시
+    들어가서, 각 그룹을 타입 정보 없는 <code>kv.key</code> /
+    <code>kv.value</code> 쌍으로 읽어야 하죠. 정렬에는 우회로가 두 개 더
+    붙습니다: 명시적인 <code>&lt;num&gt;</code> 타입 인자(<code>double</code>은
+    <code>Comparable&lt;double&gt;</code>이 아니라
+    <code>Comparable&lt;num&gt;</code>이라 추론이 실패합니다), 그리고
+    <code>sortedBy</code>가 오름차순만 지원하니 <em>부호를 반전한</em> 키가
+    필요합니다.
+  </p>
+  <p>
+    FxDart에서는 네 단계가 하나의 체인의 네 고리가 되어, 요구사항이 말하는
+    순서 그대로 위에서 아래로 흘러갑니다. <code><a href="../tutorials/groupedBy.html">groupedBy</a></code>는 맵 대신
+    <code>(key:, items:)</code> 그룹을 내보내며 파이프라인 안에 머물러서
+    풀었다가 다시 감쌀 일이 없고, <code><a href="../tutorials/sortByDesc.html">sortByDesc</a></code>는 "내림차순"을 빼기
+    기호로 인코딩하는 대신 이름으로 말합니다. 중간 변수도, 타입 인자를 챙기는
+    번거로움도, 부호 반전 트릭도 없습니다 — 코드가 그냥 그룹화하고, 순위를
+    매기고, 다섯 개를 가져오라고 말합니다.
   </p>
   <section class="cmp-bench">
   <h2>벤치마크</h2>
@@ -180,11 +190,11 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">24 µs</span>
+        <span class="bench-val">30 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:61.3%"></span></span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:50.6%"></span></span>
         <span class="bench-val">15 µs</span>
       </div>
     </div>
@@ -193,12 +203,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">16.6 MB</span>
+        <span class="bench-val">16.5 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:99.6%"></span></span>
-        <span class="bench-val">16.5 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:99.2%"></span></span>
+        <span class="bench-val">16.4 MB</span>
       </div>
     </div>
   </div>
@@ -209,25 +219,25 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">664 µs</span>
+        <span class="bench-val">671 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:73.5%"></span></span>
-        <span class="bench-val">488 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:70.8%"></span></span>
+        <span class="bench-val">475 µs</span>
       </div>
     </div>
     <div class="bench-metric">
       <h4>최대 메모리 <span class="badge verdict-tie">무승부</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:99.7%"></span></span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
         <span class="bench-val">23.0 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">23.1 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:99.6%"></span></span>
+        <span class="bench-val">22.9 MB</span>
       </div>
     </div>
   </div>
@@ -238,12 +248,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">109.6 ms</span>
+        <span class="bench-val">123.3 ms</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:56.7%"></span></span>
-        <span class="bench-val">62.1 ms</span>
+        <span class="bench-val">69.9 ms</span>
       </div>
     </div>
     <div class="bench-metric">
@@ -251,12 +261,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">137.8 MB</span>
+        <span class="bench-val">137.3 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:85.8%"></span></span>
-        <span class="bench-val">118.3 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:86.3%"></span></span>
+        <span class="bench-val">118.4 MB</span>
       </div>
     </div>
   </div>

@@ -20,7 +20,7 @@
 | 8 | paginate-users | 100 | 8.1 µs | 8.9 µs | **tie** | 16.5 MB | 16.4 MB | tie | 3 |
 | 9 | rank-labels | 100 | 14 µs | 17 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
 | 10 | sequential-configs (async) | 100 | 333 µs | 385 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
-| 11 | top-merchants | 100 | 24 µs | 15 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
+| 11 | top-merchants | 100 | 23 µs | 14 µs | **tie** | 16.6 MB | 16.4 MB | tie | 5 |
 | 12 | recent-errors | 100 | 1.1 µs | 3.1 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
 | 13 | date-window-spend | 100 | 1.7 µs | 2.4 µs | **tie** | 16.4 MB | 16.0 MB | tie | 3 |
 | 14 | unique-tags | 100 | 53 µs | 47 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
@@ -78,7 +78,7 @@
 | 8 | paginate-users | 10000 | 750 µs | 780 µs | **tie** | 22.9 MB | 23.4 MB | tie | 3 |
 | 9 | rank-labels | 10000 | 1.58 ms | 1.70 ms | **tie** | 34.8 MB | 37.8 MB | native | 3 |
 | 10 | sequential-configs (async) | 10000 | 31.9 ms | 31.7 ms | **tie** | 50.6 MB | 50.3 MB | tie | 4 |
-| 11 | top-merchants | 10000 | 664 µs | 488 µs | **tie** | 23.0 MB | 23.1 MB | tie | 3 |
+| 11 | top-merchants | 10000 | 663 µs | 482 µs | **tie** | 23.0 MB | 22.9 MB | tie | 5 |
 | 12 | recent-errors | 10000 | 86 µs | 232 µs | **tie** | 15.8 MB | 15.8 MB | tie | 3 |
 | 13 | date-window-spend | 10000 | 156 µs | 206 µs | **tie** | 20.7 MB | 15.5 MB | fxdart | 3 |
 | 14 | unique-tags | 10000 | 1.22 ms | 875 µs | **tie** | 20.5 MB | 23.3 MB | native | 3 |
@@ -136,7 +136,7 @@
 | 8 | paginate-users | 1000000 | 81.3 ms | 90.6 ms | **native** | 122.8 MB | 126.8 MB | tie | 3 |
 | 9 | rank-labels | 1000000 | 202.4 ms | 216.0 ms | **native** | 241.0 MB | 221.9 MB | fxdart | 3 |
 | 10 | sequential-configs (async) | 100000 | 324.3 ms | 322.2 ms | **tie** | 82.6 MB | 82.1 MB | tie | 5 |
-| 11 | top-merchants | 1000000 | 109.6 ms | 62.1 ms | **fxdart** | 137.8 MB | 118.3 MB | fxdart | 3 |
+| 11 | top-merchants | 1000000 | 116.1 ms | 65.6 ms | **fxdart** | 137.4 MB | 118.5 MB | fxdart | 5 |
 | 12 | recent-errors | 1000000 | 10.2 ms | 26.0 ms | **native** | 113.9 MB | 113.5 MB | tie | 3 |
 | 13 | date-window-spend | 1000000 | 14.9 ms | 20.8 ms | **native** | 125.8 MB | 119.2 MB | fxdart | 3 |
 | 14 | unique-tags | 1000000 | 107.8 ms | 74.3 ms | **fxdart** | 161.8 MB | 161.8 MB | tie | 3 |

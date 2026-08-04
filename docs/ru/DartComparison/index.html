@@ -211,15 +211,15 @@
   <h2>Part 2 · Three functions</h2>
   <p class="dim">Vocabulary native Dart lacks starts to pay off: groupBy, uniqBy, partition, scan.</p>
   <ol class="cmp-list">
-    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="groupBy sortBy take">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="groupedBy sortByDesc take">
       <a class="cmp-row" href="top-merchants.html">
         <span class="cmp-num">11</span>
         <span class="cmp-row-body">
           <strong>Top 5 merchants by total spend</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart быстрее</span>
-          <span class="dim">Group a ledger by merchant and rank the totals — groupListsBy + sortedBy in plain Dart vs a groupBy → sortBy → take chain in FxDart.</span>
+          <span class="dim">Group a ledger by merchant and rank the totals — groupListsBy + sortedBy in plain Dart vs one groupedBy → sortByDesc → take chain in FxDart.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupedBy.html">groupedBy</a></li><li><a href="../tutorials/sortByDesc.html">sortByDesc</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
     </li>
     <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="filter uniqBy take">
       <a class="cmp-row" href="recent-errors.html">
