@@ -40,6 +40,18 @@ async: <true|false — true when the FXDART side is an async pipeline (toAsync/f
 ---
 ```
 
+Optional key `noBenchmark: timing` — set it when the example is built on
+time-defined operators (`debounce`, `throttle`, `sampleOn`, `race`, and the
+interleaving-dependent combinators). Those cannot be measured honestly: both
+sides wait out the same windows, so the bars would time Dart's event loop, and
+shrinking the windows makes the emission count depend on machine speed, which
+breaks the runner's identical-checksum rule. The page then renders the
+`cmpBenchNoneTiming` explanation where the bars would be, instead of silently
+showing no Benchmark section. Do **not** use it for a case that merely has not
+been measured yet — an absent case with no key stays silent, which is correct
+for "not done". The value maps to a chrome key (`cmpBenchNone<Value>`), so an
+unrecognised one is a build error rather than a missing paragraph.
+
 Tiers group by *relationship between the models*, not function count:
 tier 1 = the overlap (both express it directly), tier 2 = windowing/state/
 order, tier 3 = errors & resilience, tier 4 = concurrency, time & push.

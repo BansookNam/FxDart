@@ -10,6 +10,7 @@ alsoLink: streams
 domain: general
 verdict: tie
 async: true
+noBenchmark: timing
 ---
   <h2>Requisito</h2>
   <p>

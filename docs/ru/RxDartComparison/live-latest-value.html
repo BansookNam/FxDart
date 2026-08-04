@@ -155,6 +155,10 @@ Future<void> main() async {
     catalog remain far larger; for latest-value-then-live itself, the
     panels are equivalent: a tie.
   </p>
+  <section class="cmp-bench">
+  <h2>Benchmark</h2>
+  <p class="dim bench-note bench-none">No benchmark for this example. This operator is defined by elapsed time, not by work done: both sides wait out the same windows, so a bar would be measuring Dart's timers rather than either library. Shrinking the windows does not help either — how many values a burst produces would then depend on how fast the machine is, and the two sides could no longer be checked against an identical result. The examples built on timing operators are left unmeasured for that reason; the ones whose delays merely stand in for I/O are benchmarked with those delays set to zero.</p>
+  </section>
 
   <nav class="tut-nav">
     <a href="debounced-search.html">← Назад: Debounce the search box</a>

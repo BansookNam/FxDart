@@ -46,6 +46,7 @@
   </div>
 </header>
 <main class="cmp-wide">
+  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #43 · <strong>Habilitar el envío cuando el formulario es válido</strong></p>
   <h1>Habilitar el envío cuando el formulario es válido</h1>
   <p class="cmp-meta"><span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span></p>
@@ -188,6 +189,10 @@ Future<void> main() async {
     <code>.pull()</code> cruza desde los pares en vivo al pipeline
     <code>FxAsync</code>.
   </p>
+  <section class="cmp-bench">
+  <h2>Benchmark</h2>
+  <p class="dim bench-note bench-none">Sin benchmark para este ejemplo. Este operador se define por el tiempo transcurrido, no por el trabajo realizado: ambos lados esperan las mismas ventanas, así que una barra estaría midiendo los temporizadores de Dart y no las librerías. Acortar las ventanas tampoco sirve — cuántos valores produce una ráfaga pasaría a depender de lo rápida que sea la máquina, y ya no se podría comprobar que ambos lados dan un resultado idéntico. Por eso los ejemplos construidos sobre operadores de temporización se dejan sin medir; los que solo usan retardos para simular E/S sí se miden, con esos retardos puestos a cero.</p>
+  </section>
 
   <nav class="tut-nav">
     <a href="spaced-out-calls.html">← Anterior: Una llamada cada 100 ms</a>

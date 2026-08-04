@@ -9,6 +9,7 @@ functions: fxEvents, sampleOn
 domain: sensors
 verdict: tie
 async: true
+noBenchmark: timing
 ---
   <h2>Requirement</h2>
   <p>

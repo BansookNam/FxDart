@@ -998,7 +998,25 @@ String _benchFmtMb(num bytes) =>
 
 String _cmpBenchSection(String slug, Map<String, String> chrome,
     _CmpFamily family,
-    {bool isAsync = false}) {
+    {bool isAsync = false, String? noBenchmark}) {
+  // Some examples cannot be benchmarked honestly — see the `noBenchmark:`
+  // front-matter key. Say so where the bars would be, so a deliberate
+  // exclusion does not read as a case someone forgot to measure.
+  if (noBenchmark != null && noBenchmark.isNotEmpty) {
+    final key = 'cmpBenchNone'
+        '${noBenchmark[0].toUpperCase()}${noBenchmark.substring(1)}';
+    final text = chrome[key];
+    if (text == null) {
+      throw StateError('$slug: unknown `noBenchmark: $noBenchmark` '
+          '(no chrome key "$key")');
+    }
+    return (StringBuffer()
+          ..writeln('  <section class="cmp-bench">')
+          ..writeln('  <h2>${chrome['cmpBenchTitle']}</h2>')
+          ..writeln('  <p class="dim bench-note bench-none">$text</p>')
+          ..writeln('  </section>'))
+        .toString();
+  }
   final data = _benchResults(family.benchResults);
   if (data == null) return '';
   final winKeys = {
@@ -1236,7 +1254,8 @@ String _renderComparison(
         family));
   if (family.bench) {
     b.write(_cmpBenchSection(slug, chrome, family,
-        isAsync: page.get('async') == 'true'));
+        isAsync: page.get('async') == 'true',
+        noBenchmark: page.get('noBenchmark')));
   }
   b
     ..writeln('')

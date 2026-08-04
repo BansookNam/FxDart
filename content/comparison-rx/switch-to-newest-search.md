@@ -9,6 +9,7 @@ functions: fxEvents, switchMap
 domain: users
 verdict: tie
 async: true
+noBenchmark: timing
 ---
   <h2>Requirement</h2>
   <p>

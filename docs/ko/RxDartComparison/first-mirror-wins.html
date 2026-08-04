@@ -46,6 +46,7 @@
   </div>
 </header>
 <main class="cmp-wide">
+  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #46 · <strong>두 미러 경주시키기</strong></p>
   <h1>두 미러 경주시키기</h1>
   <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span></p>
@@ -177,6 +178,10 @@ Future<void> main() async {
     "먼저 응답하는 쪽이 이기고, 패자는 취소된다"에서 이제 둘은 연산자
     대 연산자로 동등합니다: 무승부입니다.
   </p>
+  <section class="cmp-bench">
+  <h2>벤치마크</h2>
+  <p class="dim bench-note bench-none">이 예제에는 벤치마크가 없습니다. 이 연산자는 처리한 일의 양이 아니라 흘러간 시간으로 정의됩니다. 양쪽 모두 똑같은 시간 창을 기다리므로, 막대는 두 라이브러리가 아니라 Dart의 타이머를 재게 됩니다. 시간 창을 줄여도 해결되지 않습니다 — 그러면 한 번의 이벤트 폭주에서 몇 개의 값이 나오는지가 머신 속도에 좌우되고, 두 구현이 같은 결과를 냈는지 대조할 수 없게 되기 때문입니다. 타이밍 연산자로 만들어진 예제들을 측정하지 않고 두는 이유가 이것입니다. 지연이 그저 I/O를 흉내 낼 뿐인 예제들은 그 지연을 0으로 두고 벤치마크합니다.</p>
+  </section>
 
   <nav class="tut-nav">
     <a href="sampled-gauge.html">← 이전: 폴링 틱마다 게이지 샘플링하기</a>

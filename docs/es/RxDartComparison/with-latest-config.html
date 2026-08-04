@@ -188,6 +188,10 @@ Future<void> main() async {
     sellar un stream vivo con el último valor de otro, los dos lados son
     equivalentes: empate.
   </p>
+  <section class="cmp-bench">
+  <h2>Benchmark</h2>
+  <p class="dim bench-note bench-none">Sin benchmark para este ejemplo. Este operador se define por el tiempo transcurrido, no por el trabajo realizado: ambos lados esperan las mismas ventanas, así que una barra estaría midiendo los temporizadores de Dart y no las librerías. Acortar las ventanas tampoco sirve — cuántos valores produce una ráfaga pasaría a depender de lo rápida que sea la máquina, y ya no se podría comprobar que ambos lados dan un resultado idéntico. Por eso los ejemplos construidos sobre operadores de temporización se dejan sin medir; los que solo usan retardos para simular E/S sí se miden, con esos retardos puestos a cero.</p>
+  </section>
 
   <nav class="tut-nav">
     <a href="switch-to-newest-search.html">← Anterior: Solo importa la búsqueda más nueva</a>
