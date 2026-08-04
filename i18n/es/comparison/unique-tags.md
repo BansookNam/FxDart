@@ -3,7 +3,7 @@ slug: unique-tags
 title: Todas las etiquetas de las entradas, ordenadas — Dart vs FxDart
 description: Aplanar las etiquetas de las entradas en una sola lista ordenada y sin repetidos — expand + toSet + sort en Dart nativo frente a flatMap + uniq + sort en FxDart. Un empate honesto.
 heading: Todas las etiquetas de las entradas, ordenadas
-order: 14
+order: 12
 tier: 2
 functions: flatMap, uniq, sort
 domain: general

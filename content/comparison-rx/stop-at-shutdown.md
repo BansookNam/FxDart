@@ -3,7 +3,7 @@ slug: stop-at-shutdown
 title: Take until the shutdown marker, inclusive — RxDart vs FxDart
 description: Keep every event up to and including SHUTDOWN and drop the stragglers — takeWhileInclusive vs takeUntilInclusive, the same cut in two spellings.
 heading: Take until the shutdown marker, inclusive
-order: 23
+order: 22
 tier: 2
 functions: fx, takeUntilInclusive, map
 domain: logs

@@ -3,7 +3,7 @@ slug: stop-after-three-failures
 title: Rendirse tras tres fallos — RxDart vs FxDart
 description: Contar fallos con scan y parar en el tercero, inclusive — un try/catch en el mapper vs convertir los errores en valores marcadores antes de que scan pueda verlos.
 heading: Rendirse tras tres fallos
-order: 34
+order: 27
 tier: 3
 functions: fx, toAsync, map, scan, takeUntilInclusive
 domain: logs

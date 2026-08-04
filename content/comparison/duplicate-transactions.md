@@ -3,7 +3,7 @@ slug: duplicate-transactions
 title: Detect duplicated transactions — Dart vs FxDart
 description: Flag charges with the same merchant, amount, and day — putIfAbsent plus nested loops in plain Dart vs groupBy + filter + flatMap in FxDart.
 heading: Detect duplicated transactions
-order: 29
+order: 21
 tier: 3
 functions: groupBy, filter, flatMap, map, join
 domain: transactions

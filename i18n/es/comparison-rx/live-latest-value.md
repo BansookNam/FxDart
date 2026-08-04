@@ -3,7 +3,7 @@ slug: live-latest-value
 title: Un valor actual en vivo para lectores tardíos — RxDart vs FxDart
 description: Un panel que se conecta tarde aún recibe la temperatura actual al instante — BehaviorSubject y LiveValue reemiten ambos el último valor, y luego transmiten en vivo.
 heading: Un valor actual en vivo para lectores tardíos
-order: 47
+order: 39
 tier: 4
 functions: liveValue, fxEvents
 domain: sensors

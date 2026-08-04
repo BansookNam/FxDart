@@ -3,7 +3,7 @@ slug: tick-deltas
 title: Deltas entre ticks — RxDart vs FxDart
 description: Cada tick de precio junto a su predecesor — pairwise en ambas bibliotecas, parejas como listas en el lado stream, records tipados en el lado pull.
 heading: Deltas entre ticks
-order: 13
+order: 19
 tier: 2
 functions: fx, pairwise, map
 domain: sensors

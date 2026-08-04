@@ -3,7 +3,7 @@ slug: food-spending
 title: Gasto en comida este mes — Dart vs FxDart
 description: Suma una sola categoría de un libro de cuentas — una cadena where/fold en Dart nativo frente a filter + sumBy en FxDart.
 heading: Gasto en comida este mes
-order: 1
+order: 8
 tier: 1
 functions: filter, sumBy
 domain: transactions

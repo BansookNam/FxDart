@@ -3,7 +3,7 @@ slug: latency-extremes
 title: Fastest and slowest request — RxDart vs FxDart
 description: Probe eight endpoints asynchronously and print the min and max latency — Future-returning reductions on both sides, one fresh pass each.
 heading: Fastest and slowest request
-order: 20
+order: 24
 tier: 2
 functions: fx, toAsync, min, max
 domain: logs

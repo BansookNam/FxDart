@@ -3,7 +3,7 @@ slug: consecutive-over-limit
 title: 한계를 세 번 연속 초과한 측정값 — Dart vs FxDart
 description: CO2 측정값이 세 시간 연속으로 1000 ppm을 넘는 구간을 모두 찾습니다 — 순수 Dart의 인덱스 루프와 FxDart의 zip + drop으로 만든 슬라이딩 윈도우를 비교합니다.
 heading: 한계를 세 번 연속 초과한 측정값
-order: 24
+order: 30
 tier: 3
 functions: zip, drop, filter, map, join
 domain: sensors

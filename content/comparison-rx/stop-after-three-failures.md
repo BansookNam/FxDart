@@ -3,7 +3,7 @@ slug: stop-after-three-failures
 title: Give up after three failures — RxDart vs FxDart
 description: Count failures with scan and stop at the third, inclusive — one try/catch in the mapper vs turning errors into marker values before scan can see them.
 heading: Give up after three failures
-order: 34
+order: 27
 tier: 3
 functions: fx, toAsync, map, scan, takeUntilInclusive
 domain: logs

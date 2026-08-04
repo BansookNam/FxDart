@@ -3,7 +3,7 @@ slug: numbered-checklist
 title: Number the checklist — RxDart vs FxDart
 description: Turn six steps into 1.-numbered lines — streams have no indexed map, so Rx smuggles a counter through scan; fxdart says zipWithIndex.
 heading: Number the checklist
-order: 8
+order: 10
 tier: 1
 functions: fx, zipWithIndex, map
 domain: general

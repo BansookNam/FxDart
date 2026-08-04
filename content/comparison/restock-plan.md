@@ -3,7 +3,7 @@ slug: restock-plan
 title: Inventory restock plan — Dart vs FxDart
 description: Prioritize below-threshold items and cut the order list at a budget — scan + zip + takeWhile as data flow vs a mutable running total and break.
 heading: Inventory restock plan
-order: 37
+order: 32
 tier: 4
 functions: filter, sortBy, scan, drop, zip, takeWhile, map, sumBy, join
 domain: orders

@@ -3,7 +3,7 @@ slug: flaky-api-retry
 title: Sondear una API inestable hasta el primer éxito — Dart vs FxDart
 description: Reintentar hasta que esté listo, como pipeline perezoso — range + toAsync + map + dropWhile + head frente a un bucle de sondeo imperativo con un break.
 heading: Sondear una API inestable hasta el primer éxito
-order: 42
+order: 38
 tier: 4
 functions: range, toAsync, map, peek, dropWhile, head
 domain: general

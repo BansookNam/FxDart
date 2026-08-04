@@ -3,7 +3,7 @@ slug: switch-to-newest-search
 title: Solo importa la búsqueda más nueva — RxDart vs FxDart
 description: Una consulta más nueva abandona la búsqueda en vuelo — el mismo operador switchMap en ambos lados, rxdart y la cadena fxEvents de fxdart.
 heading: Solo importa la búsqueda más nueva
-order: 45
+order: 40
 tier: 4
 functions: fxEvents, switchMap
 domain: users

@@ -3,7 +3,7 @@ slug: upload-batches
 title: Upload in batches of 4 — RxDart vs FxDart
 description: Ten pending files, at most four per request — bufferCount(4) on the stream vs chunk(4) on the pull chain, with the short last batch on both sides.
 heading: Upload in batches of 4
-order: 11
+order: 16
 tier: 2
 functions: fx, chunk, map
 domain: orders

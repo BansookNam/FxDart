@@ -3,7 +3,7 @@ slug: weekly-sensor-averages
 title: Medias semanales a partir de lecturas diarias — Dart vs FxDart
 description: Plegar 21 lecturas diarias en 3 medias semanales — aritmética de índices y sublist en Dart nativo frente a chunk + averageBy + zipWithIndex en FxDart.
 heading: Medias semanales a partir de lecturas diarias
-order: 23
+order: 25
 tier: 3
 functions: chunk, map, averageBy, zipWithIndex, join
 domain: sensors

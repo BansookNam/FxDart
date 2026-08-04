@@ -3,7 +3,7 @@ slug: ledger-diff
 title: Diff two ledger snapshots — Dart vs FxDart
 description: Added, removed, and unchanged entries between two snapshots — differenceBy and intersectionBy by id vs hand-built id sets and where filters.
 heading: Diff two ledger snapshots
-order: 40
+order: 37
 tier: 4
 functions: differenceBy, intersectionBy, sortBy, map, concat, size, sumBy, join
 domain: transactions

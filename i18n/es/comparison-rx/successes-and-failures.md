@@ -3,7 +3,7 @@ slug: successes-and-failures
 title: Separar éxitos de fallos — RxDart vs FxDart
 description: Siete validaciones async, dos fallan — un try/catch por elemento que alimenta una partición tipada vs streams internos que devuelven el canal de errores a los datos.
 heading: Separar éxitos de fallos
-order: 32
+order: 26
 tier: 3
 functions: fx, toAsync, map, partition
 domain: orders

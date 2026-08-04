@@ -3,7 +3,7 @@ slug: leaderboard-ties
 title: 동점 순위가 있는 리더보드 — Dart vs FxDart
 description: 동점 점수가 같은 순위를 공유하도록 선수 순위를 매깁니다 — 순수 Dart의 가변 rank/prevScore 상태와 FxDart의 sortBy + groupBy + zipWithIndex를 비교합니다.
 heading: 동점 순위가 있는 리더보드
-order: 26
+order: 24
 tier: 3
 functions: sortBy, groupBy, entries, zipWithIndex, flatMap
 domain: users

@@ -3,7 +3,7 @@ slug: category-rank
 title: 이번 달 카테고리 순위 — Dart vs FxDart
 description: 지출을 그룹핑·합산·순위 매기기 — 순수 Dart의 groupListsBy와 비교자 뒤집기 vs FxDart의 groupedBy → sortByDesc 체인 하나.
 heading: 이번 달 카테고리 순위
-order: 51
+order: 47
 tier: 4
 functions: filter, groupedBy, map, sumBy, sortByDesc, take
 domain: transactions

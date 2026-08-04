@@ -3,7 +3,7 @@ slug: no-spend-streak
 title: 지출 없는 날의 최장 연속 기록 — Dart vs FxDart
 description: 지출이 전혀 없었던 7월 날짜의 최장 연속 구간을 찾습니다 — 순수 Dart의 streak/longest 카운터 루프와 FxDart의 range + scan + max를 비교합니다.
 heading: 지출 없는 날의 최장 연속 기록
-order: 28
+order: 22
 tier: 3
 functions: range, map, scan, max, join
 domain: transactions

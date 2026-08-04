@@ -3,7 +3,7 @@ slug: per-row-retry
 title: 불안정한 행을 각각 따로 재시도하기 — RxDart vs FxDart
 description: 불안정한 임포트 행 여섯 개, 행마다 두 번 시도, 세 개 동시 진행 — flatMap은 완료 순서로 내보내고, concurrent 아래의 mapRetry는 소스 순서를 지킵니다.
 heading: 불안정한 행을 각각 따로 재시도하기
-order: 29
+order: 31
 tier: 3
 functions: fx, toAsync, retry, concurrent
 domain: orders

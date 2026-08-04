@@ -3,7 +3,7 @@ slug: retry-the-fetch
 title: 불안정한 fetch 재시도하기 — RxDart vs FxDart
 description: 두 번 실패한 뒤 성공하는 fetch — Rx.retry는 스트림 팩토리를 재구독하고, fxdart retry는 Future를 다시 실행합니다. 양쪽 다 호출 하나.
 heading: 불안정한 fetch 재시도하기
-order: 27
+order: 29
 tier: 3
 functions: fx, retry
 domain: general

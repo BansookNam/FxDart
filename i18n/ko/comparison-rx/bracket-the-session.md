@@ -3,7 +3,7 @@ slug: bracket-the-session
 title: 열림과 닫힘 마커 — RxDart vs FxDart
 description: 세션 피드를 OPEN/CLOSE 줄로 감싸기 — 스트림의 startWith와 endWith vs pull 체인의 prepend와 append.
 heading: 열림과 닫힘 마커
-order: 18
+order: 14
 tier: 2
 functions: fx, prepend, append
 domain: logs

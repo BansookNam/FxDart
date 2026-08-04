@@ -3,7 +3,7 @@ slug: sensor-anomalies
 title: 센서와 측정값 짝짓고 이상치 찾기 — Dart vs FxDart
 description: 두 개의 병렬 리스트를 결합해 고온 측정값에 표시합니다 — 순수 Dart의 인덱스 루프(core에는 zip이 없음) 대 FxDart의 zip + filter + map.
 heading: 센서와 측정값 짝짓고 이상치 찾기
-order: 17
+order: 19
 tier: 2
 functions: zip, filter, map
 domain: sensors

@@ -3,7 +3,7 @@ slug: sensor-anomalies
 title: Emparejar sensores con lecturas y quedarse con las anomalías — Dart vs FxDart
 description: Une dos listas paralelas y señala las lecturas altas — un bucle con índice en Dart nativo (el núcleo no tiene zip) frente a zip + filter + map en FxDart.
 heading: Emparejar sensores con lecturas y quedarse con las anomalías
-order: 17
+order: 19
 tier: 2
 functions: zip, filter, map
 domain: sensors

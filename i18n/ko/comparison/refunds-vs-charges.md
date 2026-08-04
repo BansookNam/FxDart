@@ -3,7 +3,7 @@ slug: refunds-vs-charges
 title: 환불과 청구, 둘 다 포맷팅 — Dart vs FxDart
 description: 원장을 환불과 청구로 나누어 두 쪽 모두 출력합니다 — 순수 Dart의 where 두 번 대 FxDart의 partition 한 번을 비교합니다.
 heading: 환불과 청구, 둘 다 포맷팅
-order: 15
+order: 13
 tier: 2
 functions: partition, map, join
 domain: transactions

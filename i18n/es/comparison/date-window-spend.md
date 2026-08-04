@@ -3,7 +3,7 @@ slug: date-window-spend
 title: Gasto dentro de una ventana de fechas — Dart vs FxDart
 description: Suma un tramo de un libro ordenado por fecha — skipWhile/takeWhile/fold en Dart nativo frente a dropWhile + takeWhile + sumBy en FxDart. Dart nativo aguanta bien.
 heading: Gasto dentro de una ventana de fechas
-order: 13
+order: 18
 tier: 2
 functions: dropWhile, takeWhile, sumBy
 alsoLink: fx

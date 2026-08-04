@@ -3,7 +3,7 @@ slug: running-balance
 title: Running account balance — Dart vs FxDart
 description: Balance after every transaction — a mutable accumulator loop in plain Dart vs scan + map in FxDart.
 heading: Running account balance
-order: 2
+order: 7
 tier: 1
 functions: scan, map
 domain: transactions

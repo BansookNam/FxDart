@@ -3,7 +3,7 @@ slug: multi-currency-report
 title: Multi-currency expense report — Dart vs FxDart
 description: Normalize a trip ledger to USD with fixed rates, then group, rank, and summarize — one pipeline per report line vs fold/reduce boilerplate.
 heading: Multi-currency expense report
-order: 36
+order: 31
 tier: 4
 functions: map, groupBy, sumBy, sortBy, uniq, maxBy, join
 domain: transactions

@@ -3,7 +3,7 @@ slug: align-forecast-actual
 title: 예보와 실측값 맞추기 — RxDart vs FxDart
 description: 고정된 두 시리즈를 위치별로 짝지어 날마다의 차이를 출력하기 — 스트림의 zipWith vs 이터러블의 zip, 정렬은 어느 쪽이든 같습니다.
 heading: 예보와 실측값 맞추기
-order: 16
+order: 20
 tier: 2
 functions: fx, zip, map
 domain: sensors

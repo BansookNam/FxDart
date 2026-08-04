@@ -3,7 +3,7 @@ slug: cursor-lifetime
 title: A cursor's lifetime around a read — RxDart vs FxDart
 description: Open a cursor, read five rows, guarantee the close — Rx.using around a stream vs usingAsync around a lazy pull, two ports of one idea.
 heading: A cursor's lifetime around a read
-order: 31
+order: 32
 tier: 3
 functions: fx, using, toAsync, toList
 domain: general

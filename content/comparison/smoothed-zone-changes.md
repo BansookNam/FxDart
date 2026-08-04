@@ -3,7 +3,7 @@ slug: smoothed-zone-changes
 title: Smoothed zone changes — Dart vs FxDart
 description: Moving average, zone runs, transition alerts — three index loops with mutable carry in plain Dart vs windowed → uniqAdjacentBy → pairwise in FxDart.
 heading: Smoothed zone changes
-order: 53
+order: 43
 tier: 4
 functions: windowed, average, uniqAdjacent, pairwise, ifEmpty, map
 domain: sensors

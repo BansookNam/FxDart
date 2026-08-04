@@ -3,7 +3,7 @@ slug: sequential-configs
 title: Cargar tres configuraciones remotas en orden — Dart vs FxDart
 description: Peticiones asíncronas secuenciales — un simple await dentro de un bucle en Dart frente a toAsync + map en FxDart, a una palabra de la concurrencia acotada.
 heading: Cargar tres configuraciones remotas en orden
-order: 10
+order: 3
 tier: 1
 functions: toAsync, map
 domain: general

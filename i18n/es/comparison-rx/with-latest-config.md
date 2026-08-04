@@ -3,7 +3,7 @@ slug: with-latest-config
 title: Sellar cada petición con la config más reciente — RxDart vs FxDart
 description: Cada petición saliente lleva la versión de config vigente en ese instante — el mismo operador withLatestFrom en ambos lados, rxdart y fxEvents.
 heading: Sellar cada petición con la config más reciente
-order: 44
+order: 41
 tier: 4
 functions: fxEvents, withLatestFrom
 domain: general

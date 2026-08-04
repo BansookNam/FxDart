@@ -3,7 +3,7 @@ slug: restock-plan
 title: 재고 재주문 계획 — Dart vs FxDart
 description: 기준치 미달 품목의 우선순위를 정하고 예산선에서 주문 목록을 잘라냅니다 — 데이터 흐름으로서의 scan + zip + takeWhile 대 가변 누적 합계와 break.
 heading: 재고 재주문 계획
-order: 37
+order: 32
 tier: 4
 functions: filter, sortBy, scan, drop, zip, takeWhile, map, sumBy, join
 domain: orders

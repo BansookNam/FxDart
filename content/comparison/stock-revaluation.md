@@ -3,7 +3,7 @@ slug: stock-revaluation
 title: Revalue the stock, three lookups at a time — Dart vs FxDart
 description: Live price lookups with a fallback — a worker pool plus hand-built pairs in plain Dart vs attach + concurrent + countWhere in FxDart.
 heading: Revalue the stock, three lookups at a time
-order: 52
+order: 48
 tier: 4
 functions: toAsync, attach, concurrent, map, sumBy, countWhere
 domain: orders

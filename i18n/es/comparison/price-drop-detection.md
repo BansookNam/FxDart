@@ -3,7 +3,7 @@ slug: price-drop-detection
 title: Bajadas de precio entre dos instantáneas — Dart vs FxDart
 description: Compara dos instantáneas de una lista de precios e informa de lo que se abarató — indexBy + filter + sortBy + head + sumBy frente a un literal de Map y cadenas where/fold.
 heading: Bajadas de precio entre dos instantáneas
-order: 33
+order: 53
 tier: 4
 functions: indexBy, filter, map, sortBy, head, sumBy, join
 domain: orders

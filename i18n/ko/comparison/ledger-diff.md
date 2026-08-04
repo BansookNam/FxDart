@@ -3,7 +3,7 @@ slug: ledger-diff
 title: 두 가계부 스냅샷 비교 — Dart vs FxDart
 description: 두 스냅샷 사이의 추가/삭제/불변 항목을 찾습니다 — id 기준 differenceBy와 intersectionBy를 직접 만든 id 집합과 where 필터 조합과 비교합니다.
 heading: 두 가계부 스냅샷 비교
-order: 40
+order: 37
 tier: 4
 functions: differenceBy, intersectionBy, sortBy, map, concat, size, sumBy, join
 domain: transactions

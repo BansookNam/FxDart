@@ -3,7 +3,7 @@ slug: valid-emails
 title: 정규화한 유효 이메일 상위 5개 — Dart vs FxDart
 description: 다듬고, 소문자로 바꾸고, 유효성을 검사한 뒤 다섯 개를 취합니다 — 순수 Dart의 map/where/take와 FxDart의 map + filter + take를 비교합니다. 이 경우 순수 Dart도 똑같이 깔끔합니다.
 heading: 정규화한 유효 이메일 상위 5개
-order: 19
+order: 14
 tier: 2
 functions: map, filter, take
 alsoLink: fx, groupBy, scan, zip, concurrent

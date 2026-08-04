@@ -3,7 +3,7 @@ slug: crawl-the-pages
 title: Crawl pages until exhausted — RxDart vs FxDart
 description: Ask for the next page only when ready — an endless lazy cursor pulled on demand vs a big-enough Rx.range cancelled at the first empty page.
 heading: Crawl pages until exhausted
-order: 38
+order: 48
 tier: 4
 functions: fx, toAsync, flatMap, takeWhile, map
 domain: orders

@@ -3,7 +3,7 @@ slug: with-latest-config
 title: 각 요청에 최신 설정 도장 찍기 — RxDart vs FxDart
 description: 나가는 요청마다 그 순간의 config 버전을 싣습니다 — rxdart와 fxEvents 양쪽 모두 같은 withLatestFrom 연산자.
 heading: 각 요청에 최신 설정 도장 찍기
-order: 44
+order: 41
 tier: 4
 functions: fxEvents, withLatestFrom
 domain: general

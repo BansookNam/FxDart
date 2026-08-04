@@ -3,7 +3,7 @@ slug: latency-percentiles
 title: Latencia p50/p95 por endpoint — Dart vs FxDart
 description: Tabla de percentiles a partir de logs de peticiones en crudo — groupBy + sortBy + nth por endpoint frente a un bucle que acumula filas con ordenaciones in situ.
 heading: Latencia p50/p95 por endpoint
-order: 39
+order: 40
 tier: 4
 functions: filter, groupBy, map, sortBy, nth, maxBy, join
 domain: logs

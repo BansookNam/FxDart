@@ -3,7 +3,7 @@ slug: anomaly-context
 title: Anomalies with surrounding context — Dart vs FxDart
 description: Show over-limit sensor readings plus one line before and after — zipWithIndex + flatMap + uniq as one pipeline vs an index set built in nested loops.
 heading: Anomalies with surrounding context
-order: 34
+order: 42
 tier: 4
 functions: zipWithIndex, filter, flatMap, uniq, map, maxBy, join
 domain: sensors

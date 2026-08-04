@@ -3,7 +3,7 @@ slug: paginated-products
 title: 페이지네이션된 상품 목록 — Dart vs FxDart
 description: 필터링하고 가격순으로 정렬한 뒤 2페이지를 잘라냅니다 — Dart에는 이미 skip/take가 있으므로 이번에는 진짜 무승부입니다.
 heading: 페이지네이션된 상품 목록
-order: 22
+order: 26
 tier: 3
 functions: filter, sortBy, drop, take, map
 domain: orders

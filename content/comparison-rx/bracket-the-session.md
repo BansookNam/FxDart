@@ -3,7 +3,7 @@ slug: bracket-the-session
 title: Open and close markers — RxDart vs FxDart
 description: Wrap a session feed in OPEN/CLOSE lines — startWith and endWith on the stream vs prepend and append on the pull chain.
 heading: Open and close markers
-order: 18
+order: 14
 tier: 2
 functions: fx, prepend, append
 domain: logs

@@ -3,7 +3,7 @@ slug: debounced-search
 title: Debounce the search box — RxDart vs FxDart
 description: Wait for the typing to go quiet before searching — debounceTime on the event stream vs the same debounce chain in fxdart 0.7.3's events layer.
 heading: Debounce the search box
-order: 40
+order: 38
 tier: 4
 functions: fxEvents, debounce, map
 domain: users

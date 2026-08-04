@@ -3,7 +3,7 @@ slug: numbered-checklist
 title: Numera la lista de pasos — RxDart vs FxDart
 description: Convertir seis pasos en líneas numeradas con 1. — los streams no tienen map con índice, así que Rx cuela un contador a través de scan; fxdart dice zipWithIndex.
 heading: Numera la lista de pasos
-order: 8
+order: 10
 tier: 1
 functions: fx, zipWithIndex, map
 domain: general

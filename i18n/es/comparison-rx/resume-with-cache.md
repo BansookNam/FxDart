@@ -3,7 +3,7 @@ slug: resume-with-cache
 title: Reanudar desde la caché cuando la fuente muere — RxDart vs FxDart
 description: El feed en vivo muere tras tres actualizaciones — onErrorResumeNext conmuta a la cola cacheada frente a un bucle de pull explícito que alimenta concat.
 heading: Reanudar desde la caché cuando la fuente muere
-order: 26
+order: 34
 tier: 3
 functions: fx, concat, take, map
 domain: orders

@@ -3,7 +3,7 @@ slug: weekly-sensor-averages
 title: Weekly averages from daily readings — Dart vs FxDart
 description: Fold 21 daily readings into 3 weekly averages — index arithmetic and sublist in plain Dart vs chunk + averageBy + zipWithIndex in FxDart.
 heading: Weekly averages from daily readings
-order: 23
+order: 25
 tier: 3
 functions: chunk, map, averageBy, zipWithIndex, join
 domain: sensors

@@ -3,7 +3,7 @@ slug: cohort-retention
 title: Tabla de retención por cohortes — Dart vs FxDart
 description: Cohortes por mes de alta frente a la actividad posterior — pipelines anidados de groupBy/dropWhile/filter frente a bucles for anidados con listas acumuladoras.
 heading: Tabla de retención por cohortes
-order: 32
+order: 50
 tier: 4
 functions: groupBy, sortBy, map, dropWhile, filter, size, join
 domain: users

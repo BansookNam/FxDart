@@ -3,7 +3,7 @@ slug: even-totals
 title: Total the valid even amounts — RxDart vs FxDart
 description: Drop failed parses, keep evens, sum — a Stream pipeline with an async main vs one synchronous pull chain over the same fixed list.
 heading: Total the valid even amounts
-order: 1
+order: 4
 tier: 1
 functions: fx, compact, filter, sum
 domain: transactions

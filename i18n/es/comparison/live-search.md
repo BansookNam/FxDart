@@ -3,7 +3,7 @@ slug: live-search
 title: Búsqueda en vivo sobre un stream de pulsaciones — Dart vs FxDart
 description: Convierte un stream de pulsaciones en búsquedas de backend sin duplicados — fromStream + filter + uniq + take + map frente a await-for con cláusulas de guarda.
 heading: Búsqueda en vivo sobre un stream de pulsaciones
-order: 49
+order: 45
 tier: 4
 functions: streams, filter, uniq, take, map, head
 alsoLink: debounce

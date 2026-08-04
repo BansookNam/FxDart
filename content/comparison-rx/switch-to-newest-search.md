@@ -3,7 +3,7 @@ slug: switch-to-newest-search
 title: Only the newest search matters — RxDart vs FxDart
 description: A newer query abandons the in-flight search — the same switchMap operator on both sides, rxdart and fxdart's fxEvents chain.
 heading: Only the newest search matters
-order: 45
+order: 40
 tier: 4
 functions: fxEvents, switchMap
 domain: users

@@ -3,7 +3,7 @@ slug: daily-ledger-close
 title: Finale — DailyLedger monthly close — Dart vs FxDart
 description: The finale: load ledger entries 3 at a time, then compute the July summary and category breakdown — the real DailyLedger app shapes, both ways.
 heading: Finale — DailyLedger monthly close
-order: 50
+order: 51
 tier: 4
 functions: toAsync, map, concurrent, filter, partition, sumBy, groupBy, sortBy, take
 domain: transactions

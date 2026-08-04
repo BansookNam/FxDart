@@ -3,7 +3,7 @@ slug: date-window-spend
 title: Spending inside a date window — Dart vs FxDart
 description: Sum a slice of a date-sorted ledger — skipWhile/takeWhile/fold in plain Dart vs dropWhile + takeWhile + sumBy in FxDart. Native holds up well.
 heading: Spending inside a date window
-order: 13
+order: 18
 tier: 2
 functions: dropWhile, takeWhile, sumBy
 alsoLink: fx

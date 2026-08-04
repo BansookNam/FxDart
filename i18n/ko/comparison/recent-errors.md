@@ -3,7 +3,7 @@ slug: recent-errors
 title: 최근 오류 메시지, 중복 제거 — Dart vs FxDart
 description: 최신순 로그에서 가장 최근의 서로 다른 오류 3개를 추출합니다 — 순수 Dart의 seen-Set 루프와 break 대 FxDart의 filter + uniqBy + take를 비교합니다.
 heading: 최근 오류 메시지, 중복 제거
-order: 12
+order: 20
 tier: 2
 functions: filter, uniqBy, take
 domain: logs

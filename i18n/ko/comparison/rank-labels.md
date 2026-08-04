@@ -3,7 +3,7 @@ slug: rank-labels
 title: 리더보드 순위 라벨 — Dart vs FxDart
 description: 정렬된 리더보드에 1부터 n까지 번호를 매깁니다 — Dart 3의 indexed 레코드와 FxDart의 zipWithIndex + map을 비교합니다.
 heading: 리더보드 순위 라벨
-order: 9
+order: 6
 tier: 1
 functions: zipWithIndex, map
 alsoLink: fx

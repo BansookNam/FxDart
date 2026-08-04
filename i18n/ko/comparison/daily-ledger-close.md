@@ -3,7 +3,7 @@ slug: daily-ledger-close
 title: 피날레 — DailyLedger 월말 마감 — Dart vs FxDart
 description: 마지막 예제입니다: 가계부 항목을 세 개씩 불러온 뒤 7월 요약과 카테고리 분석을 계산합니다 — 실제 DailyLedger 앱에서 쓰는 형태를 두 방식으로 비교합니다.
 heading: 피날레 — DailyLedger 월말 마감
-order: 50
+order: 51
 tier: 4
 functions: toAsync, map, concurrent, filter, partition, sumBy, groupBy, sortBy, take
 domain: transactions

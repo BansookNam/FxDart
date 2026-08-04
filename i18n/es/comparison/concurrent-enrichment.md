@@ -3,7 +3,7 @@ slug: concurrent-enrichment
 title: Enriquecer los principales comercios de forma concurrente — Dart vs FxDart
 description: Elegir los 3 comercios principales y consultar cada uno en una API con límite de tasa, de dos en dos — un pool de workers hecho a mano en Dart nativo frente a concurrent(2) en FxDart.
 heading: Enriquecer los principales comercios de forma concurrente
-order: 30
+order: 23
 tier: 3
 functions: sortBy, take, toAsync, map, concurrent
 domain: transactions

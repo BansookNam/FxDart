@@ -3,7 +3,7 @@ slug: crawl-the-pages
 title: 소진될 때까지 페이지 크롤링하기 — RxDart vs FxDart
 description: 준비됐을 때만 다음 페이지를 요청 — 요구가 있을 때 당겨지는 끝없는 지연 커서 vs 첫 빈 페이지에서 취소되는 충분히 큰 Rx.range.
 heading: 소진될 때까지 페이지 크롤링하기
-order: 38
+order: 48
 tier: 4
 functions: fx, toAsync, flatMap, takeWhile, map
 domain: orders

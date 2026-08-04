@@ -3,7 +3,7 @@ slug: pipeline-into-stream
 title: 파이프라인이 스트림 소비자로 이어질 때 — RxDart vs FxDart
 description: 순서를 지키는 mapConcurrent fetch가 결과를 toStream으로 스트림 소비자에게 넘깁니다 — 반대 방향으로 건넌 다리.
 heading: 파이프라인이 스트림 소비자로 이어질 때
-order: 50
+order: 47
 tier: 4
 functions: fx, toAsync, mapConcurrent, chunk, streams
 domain: orders

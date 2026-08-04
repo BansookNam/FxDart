@@ -3,7 +3,7 @@ slug: audit-with-outcomes
 title: Conserva valores Y fallos en la auditoría — RxDart vs FxDart
 description: Parsear ocho líneas de configuración donde tres fallan, imprimiendo los valores y el recuento de fallos — errores colados de vuelta como datos frente a una partición sencilla.
 heading: Conserva valores Y fallos en la auditoría
-order: 22
+order: 13
 tier: 2
 functions: fx, map, partition
 domain: logs

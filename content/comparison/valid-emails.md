@@ -3,7 +3,7 @@ slug: valid-emails
 title: First 5 valid emails, normalized — Dart vs FxDart
 description: Trim, lowercase, validate, take five — map/where/take in plain Dart vs map + filter + take in FxDart. Plain Dart is every bit as clean here.
 heading: First 5 valid emails, normalized
-order: 19
+order: 14
 tier: 2
 functions: map, filter, take
 alsoLink: fx, groupBy, scan, zip, concurrent

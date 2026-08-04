@@ -3,7 +3,7 @@ slug: unique-tags
 title: 모든 게시물의 태그를 정렬해 모으기 — Dart vs FxDart
 description: 게시물 태그를 하나의 정렬된 중복 없는 리스트로 평탄화합니다 — 순수 Dart의 expand + toSet + sort와 FxDart의 flatMap + uniq + sort를 비교합니다. 정직한 무승부입니다.
 heading: 모든 게시물의 태그를 정렬해 모으기
-order: 14
+order: 12
 tier: 2
 functions: flatMap, uniq, sort
 domain: general

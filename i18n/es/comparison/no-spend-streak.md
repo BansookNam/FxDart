@@ -3,7 +3,7 @@ slug: no-spend-streak
 title: La racha más larga de días sin gastar — Dart vs FxDart
 description: La racha más larga de días de julio sin ninguna transacción — bucle con contadores de racha y máximo en Dart nativo frente a range + scan + max en FxDart.
 heading: La racha más larga de días sin gastar
-order: 28
+order: 22
 tier: 3
 functions: range, map, scan, max, join
 domain: transactions

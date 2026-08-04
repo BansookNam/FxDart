@@ -3,7 +3,7 @@ slug: first-over-limit
 title: 한계를 처음 넘긴 센서 측정값 — Dart vs FxDart
 description: 기준값을 넘는 첫 온도를 찾습니다 — 순수 Dart의 skipWhile + firstOrNull과 FxDart의 dropWhile + head를 비교합니다.
 heading: 한계를 처음 넘긴 센서 측정값
-order: 6
+order: 10
 tier: 1
 functions: dropWhile, head
 domain: sensors

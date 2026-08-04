@@ -3,7 +3,7 @@ slug: concurrent-profile-fetch
 title: 프로필 10개를 세 개씩 가져오기 — Dart vs FxDart
 description: 동기 준비 과정이 그대로 제한된 동시성으로 이어집니다 — filter와 sort 다음에 toAsync + map + concurrent(3)를 잇는 방식과 직접 만든 워커 풀을 비교합니다.
 heading: 프로필 10개를 세 개씩 가져오기
-order: 41
+order: 49
 tier: 4
 functions: filter, sortBy, toAsync, map, concurrent, join
 domain: users

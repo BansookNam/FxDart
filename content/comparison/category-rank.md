@@ -3,7 +3,7 @@ slug: category-rank
 title: Rank the month by category — Dart vs FxDart
 description: Group, total, and rank spending — groupListsBy plus a comparator swap in plain Dart vs one groupedBy → sortByDesc chain in FxDart.
 heading: Rank the month by category
-order: 51
+order: 47
 tier: 4
 functions: filter, groupedBy, map, sumBy, sortByDesc, take
 domain: transactions

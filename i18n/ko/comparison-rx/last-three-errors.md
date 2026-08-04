@@ -3,7 +3,7 @@ slug: last-three-errors
 title: 마지막 에러 세 건 — RxDart vs FxDart
 description: ERROR 줄만 남겨 마지막 세 건을 출력하기 — takeLast는 done 이벤트를 기다리고, takeRight는 이터러블을 끝까지 소진합니다. 둘 다 정확히 세 개를 버퍼링합니다.
 heading: 마지막 에러 세 건
-order: 7
+order: 6
 tier: 1
 functions: fx, filter, takeRight
 domain: logs

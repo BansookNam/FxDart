@@ -3,7 +3,7 @@ slug: expand-order-lines
 title: 주문을 라인 단위로 펼치기 — RxDart vs FxDart
 description: 네 건의 주문을 열 개의 order/sku 라인 아이템으로 펼치기 — Stream.expand와 fxdart flatMap은 일대다를 가리키는 같은 단어이고, 소스 순서를 지킵니다.
 heading: 주문을 라인 단위로 펼치기
-order: 9
+order: 3
 tier: 1
 functions: fx, flatMap, map
 domain: orders

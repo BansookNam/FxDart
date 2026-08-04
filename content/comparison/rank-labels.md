@@ -3,7 +3,7 @@ slug: rank-labels
 title: Rank labels for a leaderboard — Dart vs FxDart
 description: Number a sorted leaderboard 1..n — Dart 3 indexed records vs zipWithIndex + map in FxDart.
 heading: Rank labels for a leaderboard
-order: 9
+order: 6
 tier: 1
 functions: zipWithIndex, map
 alsoLink: fx

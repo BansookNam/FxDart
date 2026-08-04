@@ -3,7 +3,7 @@ slug: sensor-anomalies
 title: Pair sensors with readings, keep anomalies — Dart vs FxDart
 description: Join two parallel lists and flag hot readings — an index loop in plain Dart (core has no zip) vs zip + filter + map in FxDart.
 heading: Pair sensors with readings, keep anomalies
-order: 17
+order: 19
 tier: 2
 functions: zip, filter, map
 domain: sensors

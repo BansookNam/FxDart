@@ -3,7 +3,7 @@ slug: price-lookup-fallback
 title: Consulta concurrente de precios con fallback — Dart vs FxDart
 description: Consulta precios en vivo de tres en tres y recurre a los precios de catálogo para los SKU que faltan — concurrent + un map con ?? frente a un pool de workers.
 heading: Consulta concurrente de precios con fallback
-order: 43
+order: 33
 tier: 4
 functions: toAsync, map, concurrent, filter, size, sumBy
 domain: orders

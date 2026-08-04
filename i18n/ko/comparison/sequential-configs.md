@@ -3,7 +3,7 @@ slug: sequential-configs
 title: 원격 설정 세 개를 순서대로 불러오기 — Dart vs FxDart
 description: 순차 비동기 fetch — 순수 Dart의 평범한 await-in-loop 대 FxDart의 toAsync + map, 단어 하나 차이로 동시성 제한 버전이 됩니다.
 heading: 원격 설정 세 개를 순서대로 불러오기
-order: 10
+order: 3
 tier: 1
 functions: toAsync, map
 domain: general

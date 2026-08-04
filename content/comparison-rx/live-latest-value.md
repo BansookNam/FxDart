@@ -3,7 +3,7 @@ slug: live-latest-value
 title: A live current value for late readers — RxDart vs FxDart
 description: A dashboard that connects late still gets the current temperature instantly — BehaviorSubject and LiveValue both replay the latest, then stream live.
 heading: A live current value for late readers
-order: 47
+order: 39
 tier: 4
 functions: liveValue, fxEvents
 domain: sensors

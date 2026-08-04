@@ -3,7 +3,7 @@ slug: first-over-limit
 title: La primera lectura del sensor por encima del límite — Dart vs FxDart
 description: Encuentra la primera temperatura por encima de un umbral — skipWhile + firstOrNull en Dart nativo frente a dropWhile + head en FxDart.
 heading: La primera lectura del sensor por encima del límite
-order: 6
+order: 10
 tier: 1
 functions: dropWhile, head
 domain: sensors

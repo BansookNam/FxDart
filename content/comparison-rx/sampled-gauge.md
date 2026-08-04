@@ -3,7 +3,7 @@ slug: sampled-gauge
 title: Sample the gauge on each poll tick — RxDart vs FxDart
 description: Read the latest gauge value at each poll tick — an explicit sample trigger stream in RxDart vs sampleOn in fxdart 0.7.3's events layer.
 heading: Sample the gauge on each poll tick
-order: 42
+order: 45
 tier: 4
 functions: fxEvents, sampleOn
 domain: sensors

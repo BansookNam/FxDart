@@ -3,7 +3,7 @@ slug: recent-errors
 title: Recent error messages, deduped — Dart vs FxDart
 description: The three most recent distinct errors from a newest-first log — a seen-Set loop with a break in plain Dart vs filter + uniqBy + take in FxDart.
 heading: Recent error messages, deduped
-order: 12
+order: 20
 tier: 2
 functions: filter, uniqBy, take
 domain: logs

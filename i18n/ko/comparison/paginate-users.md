@@ -3,7 +3,7 @@ slug: paginate-users
 title: 사용자를 10명씩 페이지로 나누기 — Dart vs FxDart
 description: 사용자 목록을 고정 크기 페이지로 나눕니다 — package:collection의 slices와 FxDart의 chunk + map을 비교합니다.
 heading: 사용자를 10명씩 페이지로 나누기
-order: 8
+order: 5
 tier: 1
 functions: chunk, map
 alsoLink: concurrent

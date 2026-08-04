@@ -3,7 +3,7 @@ slug: stock-after-moves
 title: Nivel de stock tras cada movimiento — RxDart vs FxDart
 description: Plegar recepciones y envíos de almacén en un nivel de stock acumulado y marcar los backorders — scan en ambos lados, semillas reproducidas de forma distinta.
 heading: Nivel de stock tras cada movimiento
-order: 21
+order: 11
 tier: 2
 functions: fx, scan, map
 domain: orders

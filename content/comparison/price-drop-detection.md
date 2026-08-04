@@ -3,7 +3,7 @@ slug: price-drop-detection
 title: Price drops between two snapshots — Dart vs FxDart
 description: Compare two price-list snapshots and report what got cheaper — indexBy + filter + sortBy + head + sumBy vs a map literal and where/fold chains.
 heading: Price drops between two snapshots
-order: 33
+order: 53
 tier: 4
 functions: indexBy, filter, map, sortBy, head, sumBy, join
 domain: orders

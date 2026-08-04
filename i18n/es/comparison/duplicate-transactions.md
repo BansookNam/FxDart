@@ -3,7 +3,7 @@ slug: duplicate-transactions
 title: Detectar transacciones duplicadas — Dart vs FxDart
 description: Marca los cargos con el mismo comercio, importe y día — putIfAbsent más bucles anidados en Dart nativo frente a groupBy + filter + flatMap en FxDart.
 heading: Detectar transacciones duplicadas
-order: 29
+order: 21
 tier: 3
 functions: groupBy, filter, flatMap, map, join
 domain: transactions

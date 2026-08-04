@@ -3,7 +3,7 @@ slug: cursor-lifetime
 title: 읽기를 감싸는 커서의 수명 — RxDart vs FxDart
 description: 커서를 열고, 행 다섯을 읽고, 닫힘을 보장 — 스트림을 감싸는 Rx.using vs 지연 풀을 감싸는 usingAsync, 한 아이디어의 두 포팅.
 heading: 읽기를 감싸는 커서의 수명
-order: 31
+order: 32
 tier: 3
 functions: fx, using, toAsync, toList
 domain: general

@@ -3,7 +3,7 @@ slug: first-over-budget-rx
 title: First transaction over budget — RxDart vs FxDart
 description: Find the first transaction over 100 and stop — Rx firstWhere cancels the subscription, fxdart find stops pulling; both examine only 4 of 8.
 heading: First transaction over budget
-order: 3
+order: 1
 tier: 1
 functions: fx, find
 domain: transactions

@@ -3,7 +3,7 @@ slug: budget-alerts
 title: Categories over their monthly budget — Dart vs FxDart
 description: Total spend per category, keep the ones over budget, rank by overage — mutable-map bookkeeping in plain Dart vs groupBy + filter + sortBy in FxDart.
 heading: Categories over their monthly budget
-order: 25
+order: 28
 tier: 3
 functions: groupBy, map, filter, sortBy, join
 domain: transactions

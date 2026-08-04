@@ -3,7 +3,7 @@ slug: latency-percentiles
 title: 엔드포인트별 p50/p95 지연 시간 — Dart vs FxDart
 description: 원본 요청 로그로부터 백분위수 표를 만듭니다 — 엔드포인트별 groupBy + sortBy + nth와 제자리 정렬을 쓰는 행 누적 루프를 비교합니다.
 heading: 엔드포인트별 p50/p95 지연 시간
-order: 39
+order: 40
 tier: 4
 functions: filter, groupBy, map, sortBy, nth, maxBy, join
 domain: logs

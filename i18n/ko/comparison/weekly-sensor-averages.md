@@ -3,7 +3,7 @@ slug: weekly-sensor-averages
 title: 일별 측정값으로 구하는 주간 평균 — Dart vs FxDart
 description: 21개의 일별 측정값을 3개의 주간 평균으로 접습니다 — 순수 Dart의 인덱스 연산과 sublist, FxDart의 chunk + averageBy + zipWithIndex를 비교합니다.
 heading: 일별 측정값으로 구하는 주간 평균
-order: 23
+order: 25
 tier: 3
 functions: chunk, map, averageBy, zipWithIndex, join
 domain: sensors

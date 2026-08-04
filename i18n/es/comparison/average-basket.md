@@ -3,7 +3,7 @@ slug: average-basket
 title: Valor medio de los pedidos de más de $100 — Dart vs FxDart
 description: Total medio de los pedidos grandes — where/map/average con package:collection frente a filter + averageBy en FxDart.
 heading: Valor medio de los pedidos de más de $100
-order: 5
+order: 4
 tier: 1
 functions: filter, averageBy
 domain: orders

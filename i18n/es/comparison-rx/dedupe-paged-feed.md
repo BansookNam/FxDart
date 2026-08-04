@@ -3,7 +3,7 @@ slug: dedupe-paged-feed
 title: Deduplica un feed paginado por id — RxDart vs FxDart
 description: Aplanar tres páginas que se solapan y conservar cada id de producto una vez, en orden de llegada — expand más distinctUnique frente a flatMap más uniqBy.
 heading: Deduplica un feed paginado por id
-order: 19
+order: 23
 tier: 2
 functions: fx, flatMap, uniqBy, map
 domain: orders

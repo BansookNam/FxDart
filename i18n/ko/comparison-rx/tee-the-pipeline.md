@@ -3,7 +3,7 @@ slug: tee-the-pipeline
 title: 소스 하나, 독립 리더 둘 — RxDart vs FxDart
 description: 부수효과 있는 소스 하나에서 두 번 실행하지 않고 합계와 최댓값 얻기 — connectable 스트림 vs 같은 원소 위에서 함께 전진하는 두 개의 폴드.
 heading: 소스 하나, 독립 리더 둘
-order: 48
+order: 50
 tier: 4
 functions: tee
 domain: sensors

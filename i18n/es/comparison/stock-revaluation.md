@@ -3,7 +3,7 @@ slug: stock-revaluation
 title: Revaluar el stock, tres consultas a la vez — Dart vs FxDart
 description: Consultas de precios en vivo con respaldo — un pool de workers y pares hechos a mano en Dart nativo frente a attach + concurrent + countWhere en FxDart.
 heading: Revaluar el stock, tres consultas a la vez
-order: 52
+order: 48
 tier: 4
 functions: toAsync, attach, concurrent, map, sumBy, countWhere
 domain: orders

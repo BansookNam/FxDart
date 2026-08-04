@@ -3,7 +3,7 @@ slug: ledger-diff
 title: Diff de dos snapshots de un libro de cuentas — Dart vs FxDart
 description: Entradas añadidas, eliminadas y sin cambios entre dos snapshots — differenceBy e intersectionBy por id frente a conjuntos de id construidos a mano y filtros where.
 heading: Diff de dos snapshots de un libro de cuentas
-order: 40
+order: 37
 tier: 4
 functions: differenceBy, intersectionBy, sortBy, map, concat, size, sumBy, join
 domain: transactions

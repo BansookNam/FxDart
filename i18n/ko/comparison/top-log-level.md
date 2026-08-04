@@ -3,7 +3,7 @@ slug: top-log-level
 title: 가장 많이 발생한 로그 레벨 — Dart vs FxDart
 description: 로그 항목을 레벨별로 세어 가장 많은 것을 고릅니다 — 순수 Dart의 groupListsBy + reduce와 FxDart의 countBy + maxBy를 비교합니다.
 heading: 가장 많이 발생한 로그 레벨
-order: 7
+order: 2
 tier: 1
 functions: countBy, maxBy
 domain: logs

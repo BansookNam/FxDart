@@ -3,7 +3,7 @@ slug: per-row-retry
 title: Retry each flaky row independently — RxDart vs FxDart
 description: Six flaky import rows, two attempts each, three in flight — flatMap emits in completion order, mapRetry under concurrent keeps source order.
 heading: Retry each flaky row independently
-order: 29
+order: 31
 tier: 3
 functions: fx, toAsync, retry, concurrent
 domain: orders

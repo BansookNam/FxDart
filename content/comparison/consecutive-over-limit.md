@@ -3,7 +3,7 @@ slug: consecutive-over-limit
 title: Three consecutive readings over the limit — Dart vs FxDart
 description: Find every 3-hour window of CO2 readings all over 1000 ppm — an index loop in plain Dart vs a sliding window built from zip + drop in FxDart.
 heading: Three consecutive readings over the limit
-order: 24
+order: 30
 tier: 3
 functions: zip, drop, filter, map, join
 domain: sensors

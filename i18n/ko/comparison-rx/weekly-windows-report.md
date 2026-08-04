@@ -3,7 +3,7 @@ slug: weekly-windows-report
 title: 일별 시리즈에서 주간 합계 — RxDart vs FxDart
 description: 21일치 지출을 주 번호가 붙은 세 개의 합계로 말아 올리기 — 카운터로 차출된 scan을 곁들인 bufferCount vs chunk + zipWithIndex.
 heading: 일별 시리즈에서 주간 합계
-order: 24
+order: 12
 tier: 2
 functions: fx, chunk, sumBy, map, zipWithIndex
 domain: transactions

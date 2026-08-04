@@ -3,7 +3,7 @@ slug: clean-nullable-readings
 title: Drop the nulls, keep the values — RxDart vs FxDart
 description: Clean a nullable sensor feed and format the survivors — whereNotNull is compact by another name, and both narrow double? to double statically.
 heading: Drop the nulls, keep the values
-order: 6
+order: 8
 tier: 1
 functions: fx, compact, map
 domain: sensors

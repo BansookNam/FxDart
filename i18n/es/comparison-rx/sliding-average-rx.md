@@ -3,7 +3,7 @@ slug: sliding-average-rx
 title: Media móvil de tres lecturas — RxDart vs FxDart
 description: Una media móvil sobre lecturas de sensor — bufferCount(3, 1) más un filtro de longitud para los parciales finales frente a windowed(3) diciendo exactamente lo que significa.
 heading: Media móvil de tres lecturas
-order: 12
+order: 21
 tier: 2
 functions: fx, windowed, average, map
 domain: sensors

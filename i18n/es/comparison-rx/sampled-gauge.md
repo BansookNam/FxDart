@@ -3,7 +3,7 @@ slug: sampled-gauge
 title: Muestrear el medidor en cada tick de sondeo — RxDart vs FxDart
 description: Leer el valor más reciente del medidor en cada tick de sondeo — un stream disparador de sample explícito en RxDart vs sampleOn en la capa de eventos de fxdart 0.7.3.
 heading: Muestrear el medidor en cada tick de sondeo
-order: 42
+order: 45
 tier: 4
 functions: fxEvents, sampleOn
 domain: sensors

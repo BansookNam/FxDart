@@ -3,7 +3,7 @@ slug: status-transitions
 title: Report only status changes — RxDart vs FxDart
 description: Collapse a repetitive health feed to one line per run — Stream.distinct vs uniqAdjacent, with distinctUnique and uniq as the global cousins.
 heading: Report only status changes
-order: 14
+order: 15
 tier: 2
 functions: fx, uniqAdjacent, uniq, map
 domain: logs

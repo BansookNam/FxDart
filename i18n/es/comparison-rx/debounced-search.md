@@ -3,7 +3,7 @@ slug: debounced-search
 title: Aplicar debounce al buscador — RxDart vs FxDart
 description: Esperar a que el tecleo se calme antes de buscar — debounceTime sobre el stream de eventos vs la misma cadena debounce en la capa de eventos de fxdart 0.7.3.
 heading: Aplicar debounce al buscador
-order: 40
+order: 38
 tier: 4
 functions: fxEvents, debounce, map
 domain: users

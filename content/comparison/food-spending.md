@@ -3,7 +3,7 @@ slug: food-spending
 title: Food spending this month — Dart vs FxDart
 description: Total one category of a ledger — a where/fold chain in plain Dart vs filter + sumBy in FxDart.
 heading: Food spending this month
-order: 1
+order: 8
 tier: 1
 functions: filter, sumBy
 domain: transactions

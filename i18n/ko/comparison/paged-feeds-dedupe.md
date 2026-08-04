@@ -3,7 +3,7 @@ slug: paged-feeds-dedupe
 title: 두 페이징된 피드를 이어붙이고 중복 제거하기 — Dart vs FxDart
 description: 기본 로그 저장소를 먼저 소진한 뒤 복제본을 읽고, id로 중복을 제거하며 8개에서 멈춥니다 — concat + uniqBy + take는 지연 상태를 유지하지만, 네이티브는 seen 집합을 쓰는 중첩 루프가 필요합니다.
 heading: 두 페이징된 피드를 이어붙이고 중복 제거하기
-order: 47
+order: 41
 tier: 4
 functions: range, toAsync, flatMap, concat, uniqBy, take
 domain: logs

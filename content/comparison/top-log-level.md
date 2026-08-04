@@ -3,7 +3,7 @@ slug: top-log-level
 title: Most frequent log level — Dart vs FxDart
 description: Count log entries per level and pick the biggest — groupListsBy + reduce in plain Dart vs countBy + maxBy in FxDart.
 heading: Most frequent log level
-order: 7
+order: 2
 tier: 1
 functions: countBy, maxBy
 domain: logs

@@ -3,7 +3,7 @@ slug: tee-the-pipeline
 title: Una fuente, dos lectores independientes — RxDart vs FxDart
 description: Total y máximo de una fuente con efectos sin ejecutarla dos veces — un stream conectable vs fork compartiendo una sola pasada con buffer.
 heading: Una fuente, dos lectores independientes
-order: 48
+order: 50
 tier: 4
 functions: tee
 domain: sensors

@@ -3,7 +3,7 @@ slug: resume-with-cache
 title: 소스가 죽으면 캐시로 이어가기 — RxDart vs FxDart
 description: 라이브 피드가 업데이트 세 건 뒤에 죽습니다 — 캐시된 꼬리를 갈아 끼우는 onErrorResumeNext vs concat에 이어 붙이는 명시적 풀 루프.
 heading: 소스가 죽으면 캐시로 이어가기
-order: 26
+order: 34
 tier: 3
 functions: fx, concat, take, map
 domain: orders

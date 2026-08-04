@@ -3,7 +3,7 @@ slug: monthly-category-report
 title: 지출액순으로 정렬한 월간 카테고리 리포트 — Dart vs FxDart
 description: 가계부를 한 달로 필터링하고 카테고리별로 합산해 순위를 매깁니다 — 순수 Dart의 루프와 가변 맵을 FxDart의 filter + groupBy + sortBy와 비교합니다.
 heading: 지출액순으로 정렬한 월간 카테고리 리포트
-order: 21
+order: 29
 tier: 3
 functions: filter, groupBy, map, sortBy, join
 domain: transactions

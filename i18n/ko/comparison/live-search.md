@@ -3,7 +3,7 @@ slug: live-search
 title: 키 입력 스트림 위의 실시간 검색 — Dart vs FxDart
 description: 키 입력 스트림을 중복 제거된 백엔드 검색으로 바꿉니다 — fromStream + filter + uniq + take + map과 guard 절이 있는 await-for를 비교합니다.
 heading: 키 입력 스트림 위의 실시간 검색
-order: 49
+order: 45
 tier: 4
 functions: streams, filter, uniq, take, map, head
 alsoLink: debounce

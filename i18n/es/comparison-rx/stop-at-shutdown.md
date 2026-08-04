@@ -3,7 +3,7 @@ slug: stop-at-shutdown
 title: Toma hasta el marcador de apagado, inclusive — RxDart vs FxDart
 description: Conservar cada evento hasta SHUTDOWN incluido y descartar los rezagados — takeWhileInclusive frente a takeUntilInclusive, el mismo corte en dos grafías.
 heading: Toma hasta el marcador de apagado, inclusive
-order: 23
+order: 22
 tier: 2
 functions: fx, takeUntilInclusive, map
 domain: logs

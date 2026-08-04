@@ -3,7 +3,7 @@ slug: stop-after-three-failures
 title: 세 번 실패하면 포기하기 — RxDart vs FxDart
 description: scan으로 실패를 세어 세 번째에서(포함하여) 멈추기 — 매퍼 안의 try/catch 하나 vs scan이 보기 전에 오류를 마커 값으로 바꾸는 작업.
 heading: 세 번 실패하면 포기하기
-order: 34
+order: 27
 tier: 3
 functions: fx, toAsync, map, scan, takeUntilInclusive
 domain: logs

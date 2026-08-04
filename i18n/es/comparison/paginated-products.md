@@ -3,7 +3,7 @@ slug: paginated-products
 title: Listado de productos paginado — Dart vs FxDart
 description: Filtra, ordena por precio y extrae la página 2 — Dart ya tiene skip/take, así que este caso es un empate de verdad.
 heading: Listado de productos paginado
-order: 22
+order: 26
 tier: 3
 functions: filter, sortBy, drop, take, map
 domain: orders

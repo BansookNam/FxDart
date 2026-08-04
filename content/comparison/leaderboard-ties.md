@@ -3,7 +3,7 @@ slug: leaderboard-ties
 title: Leaderboard with tied ranks — Dart vs FxDart
 description: Rank players so equal scores share a rank — mutable rank/prevScore state in plain Dart vs sortBy + groupBy + zipWithIndex in FxDart.
 heading: Leaderboard with tied ranks
-order: 26
+order: 24
 tier: 3
 functions: sortBy, groupBy, entries, zipWithIndex, flatMap
 domain: users

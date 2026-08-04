@@ -3,7 +3,7 @@ slug: crawl-the-pages
 title: Rastrear páginas hasta agotarlas — RxDart vs FxDart
 description: Pedir la página siguiente solo al estar listo — un cursor perezoso sin fin tirado bajo demanda vs un Rx.range suficientemente grande cancelado en la primera página vacía.
 heading: Rastrear páginas hasta agotarlas
-order: 38
+order: 48
 tier: 4
 functions: fx, toAsync, flatMap, takeWhile, map
 domain: orders

@@ -3,7 +3,7 @@ slug: running-balance
 title: 계좌 잔액 추이 — Dart vs FxDart
 description: 매 거래 후의 잔액 — 순수 Dart의 가변 누산 루프 대 FxDart의 scan + map.
 heading: 계좌 잔액 추이
-order: 2
+order: 7
 tier: 1
 functions: scan, map
 domain: transactions

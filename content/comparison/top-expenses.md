@@ -3,7 +3,7 @@ slug: top-expenses
 title: Top 3 largest expenses — Dart vs FxDart
 description: Largest three transactions of the month — sortedBy + take from package:collection vs sortBy + take in FxDart.
 heading: Top 3 largest expenses
-order: 3
+order: 1
 tier: 1
 functions: sortBy, take
 alsoLink: chunk, scan

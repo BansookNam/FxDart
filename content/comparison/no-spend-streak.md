@@ -3,7 +3,7 @@ slug: no-spend-streak
 title: Longest streak of no-spend days — Dart vs FxDart
 description: Longest run of July days with no transaction — loop with streak/longest counters in plain Dart vs range + scan + max in FxDart.
 heading: Longest streak of no-spend days
-order: 28
+order: 22
 tier: 3
 functions: range, map, scan, max, join
 domain: transactions

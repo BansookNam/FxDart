@@ -3,7 +3,7 @@ slug: alert-digest
 title: Log alert digest by service and severity — Dart vs FxDart
 description: WARN and ERROR logs rendered as an indented digest — nested grouping via groupBy + flatMap + uniq vs three nested loops and a seen-set.
 heading: Log alert digest by service and severity
-order: 38
+order: 39
 tier: 4
 functions: filter, countBy, groupBy, sortBy, flatMap, map, uniq, join
 domain: logs

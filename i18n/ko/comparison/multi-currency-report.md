@@ -3,7 +3,7 @@ slug: multi-currency-report
 title: 다중 통화 지출 리포트 — Dart vs FxDart
 description: 고정 환율로 여행 가계부를 USD로 정규화한 다음 그룹화, 순위화, 요약합니다 — 리포트 줄마다 파이프라인 하나 쓰는 방식과 fold/reduce 보일러플레이트를 비교합니다.
 heading: 다중 통화 지출 리포트
-order: 36
+order: 31
 tier: 4
 functions: map, groupBy, sumBy, sortBy, uniq, maxBy, join
 domain: transactions

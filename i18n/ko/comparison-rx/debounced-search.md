@@ -3,7 +3,7 @@ slug: debounced-search
 title: 검색창 디바운스하기 — RxDart vs FxDart
 description: 타이핑이 잠잠해질 때까지 기다렸다가 검색 — 이벤트 스트림 위의 debounceTime vs fxdart 0.7.3 이벤트 레이어의 동일한 debounce 체인.
 heading: 검색창 디바운스하기
-order: 40
+order: 38
 tier: 4
 functions: fxEvents, debounce, map
 domain: users

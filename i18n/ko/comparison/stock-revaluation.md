@@ -3,7 +3,7 @@ slug: stock-revaluation
 title: 재고 재평가, 조회는 한 번에 셋 — Dart vs FxDart
 description: 대체 가격이 있는 실시간 가격 조회 — 순수 Dart의 워커 풀과 손수 만든 쌍 vs FxDart의 attach + concurrent + countWhere.
 heading: 재고 재평가, 조회는 한 번에 셋
-order: 52
+order: 48
 tier: 4
 functions: toAsync, attach, concurrent, map, sumBy, countWhere
 domain: orders

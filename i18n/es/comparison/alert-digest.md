@@ -3,7 +3,7 @@ slug: alert-digest
 title: Resumen de alertas de log por servicio y severidad — Dart vs FxDart
 description: Logs WARN y ERROR presentados como un resumen con sangría — agrupación anidada con groupBy + flatMap + uniq frente a tres bucles anidados y un conjunto seen.
 heading: Resumen de alertas de log por servicio y severidad
-order: 38
+order: 39
 tier: 4
 functions: filter, countBy, groupBy, sortBy, flatMap, map, uniq, join
 domain: logs

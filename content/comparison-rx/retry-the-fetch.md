@@ -3,7 +3,7 @@ slug: retry-the-fetch
 title: Retry the flaky fetch — RxDart vs FxDart
 description: A fetch that fails twice then succeeds — Rx.retry re-subscribes a stream factory, fxdart retry re-runs a Future, both in one call.
 heading: Retry the flaky fetch
-order: 27
+order: 29
 tier: 3
 functions: fx, retry
 domain: general

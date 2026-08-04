@@ -3,7 +3,7 @@ slug: latency-extremes
 title: 가장 빠른 요청과 가장 느린 요청 — RxDart vs FxDart
 description: 엔드포인트 여덟 개를 비동기로 프로브해 최소·최대 지연을 출력하기 — 양쪽 모두 Future를 반환하는 축약, 각각 새 패스 한 번씩.
 heading: 가장 빠른 요청과 가장 느린 요청
-order: 20
+order: 24
 tier: 2
 functions: fx, toAsync, min, max
 domain: logs

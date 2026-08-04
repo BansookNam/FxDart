@@ -3,7 +3,7 @@ slug: clean-nullable-readings
 title: Descarta los null, conserva los valores — RxDart vs FxDart
 description: Limpiar un feed de sensor con nulos y formatear los supervivientes — whereNotNull es compact con otro nombre, y ambos estrechan double? a double estáticamente.
 heading: Descarta los null, conserva los valores
-order: 6
+order: 8
 tier: 1
 functions: fx, compact, map
 domain: sensors

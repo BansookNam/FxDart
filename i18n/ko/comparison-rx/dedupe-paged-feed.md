@@ -3,7 +3,7 @@ slug: dedupe-paged-feed
 title: 페이지 피드를 id로 중복 제거 — RxDart vs FxDart
 description: 겹치는 세 페이지를 펼치고 각 상품 id를 도착 순서대로 한 번씩만 남기기 — expand + distinctUnique vs flatMap + uniqBy.
 heading: 페이지 피드를 id로 중복 제거
-order: 19
+order: 23
 tier: 2
 functions: fx, flatMap, uniqBy, map
 domain: orders

@@ -3,7 +3,7 @@ slug: sliding-average-rx
 title: 판독값 3개 이동 평균 — RxDart vs FxDart
 description: 센서 판독값의 이동 평균 — 꼬리 부분 윈도우를 막는 길이 필터가 필요한 bufferCount(3, 1) vs 뜻하는 바를 그대로 말하는 windowed(3).
 heading: 판독값 3개 이동 평균
-order: 12
+order: 21
 tier: 2
 functions: fx, windowed, average, map
 domain: sensors

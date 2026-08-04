@@ -3,7 +3,7 @@ slug: recent-errors
 title: Mensajes de error recientes, sin duplicados — Dart vs FxDart
 description: Los tres errores distintos más recientes de un log ordenado de más nuevo a más antiguo — un bucle con un Set de vistos y un break en Dart nativo frente a filter + uniqBy + take en FxDart.
 heading: Mensajes de error recientes, sin duplicados
-order: 12
+order: 20
 tier: 2
 functions: filter, uniqBy, take
 domain: logs

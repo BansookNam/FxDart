@@ -3,7 +3,7 @@ slug: weekly-windows-report
 title: Totales semanales de una serie diaria — RxDart vs FxDart
 description: Enrollar 21 días de gasto en tres totales numerados por semana — bufferCount con scan reclutado como contador frente a chunk más zipWithIndex.
 heading: Totales semanales de una serie diaria
-order: 24
+order: 12
 tier: 2
 functions: fx, chunk, sumBy, map, zipWithIndex
 domain: transactions

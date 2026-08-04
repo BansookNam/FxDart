@@ -3,7 +3,7 @@ slug: stream-into-pipeline
 title: Un stream alimenta un pipeline tipado — RxDart vs FxDart
 description: Un stream de logs en vivo fluye hacia un pipeline pull tipado a través de fxStream — conservar los warnings, ponerlos en mayúsculas y contar, a ambos lados del puente.
 heading: Un stream alimenta un pipeline tipado
-order: 49
+order: 37
 tier: 4
 functions: fx, streams, filter, map, toList
 domain: logs

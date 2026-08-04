@@ -3,7 +3,7 @@ slug: top-log-level
 title: Nivel de log más frecuente — Dart vs FxDart
 description: Contar entradas de log por nivel y quedarse con el mayor — groupListsBy + reduce en Dart nativo frente a countBy + maxBy en FxDart.
 heading: Nivel de log más frecuente
-order: 7
+order: 2
 tier: 1
 functions: countBy, maxBy
 domain: logs

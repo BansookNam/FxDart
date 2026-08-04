@@ -3,7 +3,7 @@ slug: rate-limited-import
 title: Importación por lotes con límite de tasa — Dart vs FxDart
 description: Importa 9 transacciones en lotes de 3, un lote cada vez, con un total acumulado — chunk + concurrent(1) + scan frente a un bucle secuencial.
 heading: Importación por lotes con límite de tasa
-order: 45
+order: 46
 tier: 4
 functions: chunk, toAsync, map, concurrent, delay, scan, drop, sumBy
 domain: transactions

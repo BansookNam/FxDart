@@ -3,7 +3,7 @@ slug: cohort-retention
 title: Cohort retention table — Dart vs FxDart
 description: Signup-month cohorts vs later activity — nested groupBy/dropWhile/filter pipelines vs nested for loops with accumulator lists.
 heading: Cohort retention table
-order: 32
+order: 50
 tier: 4
 functions: groupBy, sortBy, map, dropWhile, filter, size, join
 domain: users

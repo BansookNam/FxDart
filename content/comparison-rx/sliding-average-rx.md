@@ -3,7 +3,7 @@ slug: sliding-average-rx
 title: Three-reading moving average — RxDart vs FxDart
 description: A moving average over sensor readings — bufferCount(3, 1) plus a length filter for the trailing partials vs windowed(3) saying exactly what it means.
 heading: Three-reading moving average
-order: 12
+order: 21
 tier: 2
 functions: fx, windowed, average, map
 domain: sensors

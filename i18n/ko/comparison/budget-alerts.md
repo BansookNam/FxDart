@@ -3,7 +3,7 @@ slug: budget-alerts
 title: 월 예산을 초과한 카테고리 — Dart vs FxDart
 description: 카테고리별 지출을 합산하고, 예산을 초과한 것만 남긴 뒤, 초과액 순으로 정렬합니다 — 순수 Dart의 가변 맵 기반 집계와 FxDart의 groupBy + filter + sortBy를 비교합니다.
 heading: 월 예산을 초과한 카테고리
-order: 25
+order: 28
 tier: 3
 functions: groupBy, map, filter, sortBy, join
 domain: transactions

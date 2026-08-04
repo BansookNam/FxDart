@@ -3,7 +3,7 @@ slug: concurrent-profile-fetch
 title: Fetch 10 profiles, 3 at a time — Dart vs FxDart
 description: Sync prep flowing straight into bounded concurrency — filter and sort, then toAsync + map + concurrent(3), vs a hand-rolled worker pool.
 heading: Fetch 10 profiles, 3 at a time
-order: 41
+order: 49
 tier: 4
 functions: filter, sortBy, toAsync, map, concurrent, join
 domain: users

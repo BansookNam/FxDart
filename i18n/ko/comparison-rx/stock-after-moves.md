@@ -3,7 +3,7 @@ slug: stock-after-moves
 title: 이동마다의 재고 수준 — RxDart vs FxDart
 description: 창고 입고와 출고를 누적 재고 수준으로 접고 백오더를 표시하기 — 양쪽 모두 scan, 시드를 재생하는 방식만 다릅니다.
 heading: 이동마다의 재고 수준
-order: 21
+order: 11
 tier: 2
 functions: fx, scan, map
 domain: orders

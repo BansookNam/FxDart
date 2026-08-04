@@ -3,7 +3,7 @@ slug: all-validation-errors
 title: Report every validation error — RxDart vs FxDart
 description: Every rule failure per form, not just the first — plain error values in a sync chain vs an error channel that can only carry one error and then close.
 heading: Report every validation error
-order: 33
+order: 25
 tier: 3
 functions: fx, map, partition
 alsoLink: accumulate

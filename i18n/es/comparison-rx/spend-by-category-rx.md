@@ -3,7 +3,7 @@ slug: spend-by-category-rx
 title: Gasto agrupado por categoría — RxDart vs FxDart
 description: Totales por categoría en orden de primera aparición — un stream de GroupedStreams plegado y vuelto a mezclar frente a un groupBy que simplemente devuelve un Map.
 heading: Gasto agrupado por categoría
-order: 15
+order: 17
 tier: 2
 functions: fx, groupedBy, map, sumBy
 domain: transactions

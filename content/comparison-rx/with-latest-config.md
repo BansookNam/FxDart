@@ -3,7 +3,7 @@ slug: with-latest-config
 title: Stamp each request with the latest config — RxDart vs FxDart
 description: Each outgoing request carries the config version current at that instant — the same withLatestFrom operator on both sides, rxdart and fxEvents.
 heading: Stamp each request with the latest config
-order: 44
+order: 41
 tier: 4
 functions: fxEvents, withLatestFrom
 domain: general

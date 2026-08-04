@@ -3,7 +3,7 @@ slug: bounded-concurrency
 title: Fetch profiles, two at a time — Dart vs FxDart
 description: Bounded, in-order concurrency — a hand-rolled worker pool in plain Dart vs toAsync + map + concurrent in FxDart.
 heading: Fetch profiles, two at a time
-order: 20
+order: 15
 tier: 2
 functions: toAsync, map, concurrent
 domain: users

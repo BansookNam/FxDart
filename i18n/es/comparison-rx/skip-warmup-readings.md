@@ -3,7 +3,7 @@ slug: skip-warmup-readings
 title: Salta las lecturas de calentamiento — RxDart vs FxDart
 description: Descartar las lecturas bajas iniciales de una sonda y conservar todo lo demás — skipWhile y dropWhile son la misma compuerta de un solo sentido; hasta los operadores son del core.
 heading: Salta las lecturas de calentamiento
-order: 4
+order: 9
 tier: 1
 functions: fx, dropWhile, map
 domain: sensors

@@ -3,7 +3,7 @@ slug: sequential-configs
 title: Load three remote configs in order — Dart vs FxDart
 description: Sequential async fetches — a plain await-in-loop in Dart vs toAsync + map in FxDart, one word away from bounded concurrency.
 heading: Load three remote configs in order
-order: 10
+order: 3
 tier: 1
 functions: toAsync, map
 domain: general

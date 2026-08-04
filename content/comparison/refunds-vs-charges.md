@@ -3,7 +3,7 @@ slug: refunds-vs-charges
 title: Refunds vs charges, both formatted — Dart vs FxDart
 description: Split a ledger into refunds and charges and print both sides — two where passes in plain Dart vs one partition in FxDart.
 heading: Refunds vs charges, both formatted
-order: 15
+order: 13
 tier: 2
 functions: partition, map, join
 domain: transactions

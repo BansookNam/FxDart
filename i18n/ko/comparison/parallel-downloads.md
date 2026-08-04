@@ -3,7 +3,7 @@ slug: parallel-downloads
 title: 병렬 다운로드, 순서대로 결과 받기 — Dart vs FxDart
 description: 속도가 제각각인 다운로드 여섯 개를 한 번에 세 개씩 — concurrent는 완료 순서가 뒤섞여도 요청 순서를 유지하지만, 네이티브는 풀 관리가 필요합니다.
 heading: 병렬 다운로드, 순서대로 결과 받기
-order: 46
+order: 36
 tier: 4
 functions: toAsync, map, concurrent, zipWithIndex, join, sumBy
 domain: general

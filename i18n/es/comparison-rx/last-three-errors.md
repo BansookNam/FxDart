@@ -3,7 +3,7 @@ slug: last-three-errors
 title: Los últimos tres errores — RxDart vs FxDart
 description: Conservar las líneas ERROR e imprimir las tres últimas — takeLast espera el evento done, takeRight drena el iterable; ambos almacenan exactamente tres.
 heading: Los últimos tres errores
-order: 7
+order: 6
 tier: 1
 functions: fx, filter, takeRight
 domain: logs

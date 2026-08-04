@@ -3,7 +3,7 @@ slug: top-expenses
 title: 가장 큰 지출 상위 3건 — Dart vs FxDart
 description: 이번 달 거래 중 금액이 가장 큰 세 건 — package:collection의 sortedBy + take와 FxDart의 sortBy + take를 비교합니다.
 heading: 가장 큰 지출 상위 3건
-order: 3
+order: 1
 tier: 1
 functions: sortBy, take
 alsoLink: chunk, scan

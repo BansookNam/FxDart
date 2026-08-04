@@ -3,7 +3,7 @@ slug: empty-report-default
 title: A default line for an empty report — RxDart vs FxDart
 description: Filter to a category with no matches and still print something — defaultIfEmpty on the stream vs ifEmpty on the pull chain, the same idea in both models.
 heading: A default line for an empty report
-order: 10
+order: 7
 tier: 1
 functions: fx, filter, ifEmpty, map
 domain: transactions

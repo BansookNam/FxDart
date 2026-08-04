@@ -3,7 +3,7 @@ slug: bounded-concurrency
 title: Obtener perfiles de dos en dos — Dart vs FxDart
 description: Concurrencia acotada y en orden — un pool de workers hecho a mano en Dart nativo frente a toAsync + map + concurrent en FxDart.
 heading: Obtener perfiles de dos en dos
-order: 20
+order: 15
 tier: 2
 functions: toAsync, map, concurrent
 domain: users

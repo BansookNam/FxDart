@@ -3,7 +3,7 @@ slug: status-transitions
 title: 상태가 바뀔 때만 보고하기 — RxDart vs FxDart
 description: 반복투성이 헬스 피드를 런당 한 줄로 접기 — Stream.distinct vs uniqAdjacent, 전역 사촌으로는 distinctUnique와 uniq.
 heading: 상태가 바뀔 때만 보고하기
-order: 14
+order: 15
 tier: 2
 functions: fx, uniqAdjacent, uniq, map
 domain: logs

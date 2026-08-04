@@ -3,7 +3,7 @@ slug: settlement-pipeline
 title: Pipeline de liquidación de cierre de día — Dart vs FxDart
 description: Validar, agrupar por comercio, publicar de dos en dos y luego informar — una sola cadena que cruza de síncrono a asíncrono, frente a groupListsBy más un pool de workers.
 heading: Pipeline de liquidación de cierre de día
-order: 48
+order: 52
 tier: 4
 functions: reject, groupBy, map, sumBy, sortBy, toAsync, concurrent, partition
 domain: transactions

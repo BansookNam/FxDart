@@ -3,7 +3,7 @@ slug: upload-batches
 title: 4개씩 배치로 업로드하기 — RxDart vs FxDart
 description: 대기 중인 파일 열 개, 요청당 최대 네 개 — 스트림의 bufferCount(4)와 pull 체인의 chunk(4), 짧은 마지막 배치는 양쪽 모두 같습니다.
 heading: 4개씩 배치로 업로드하기
-order: 11
+order: 16
 tier: 2
 functions: fx, chunk, map
 domain: orders

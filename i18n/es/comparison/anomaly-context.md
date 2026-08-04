@@ -3,7 +3,7 @@ slug: anomaly-context
 title: Anomalías con su contexto alrededor — Dart vs FxDart
 description: Muestra las lecturas de sensor por encima del límite más una línea antes y otra después — zipWithIndex + flatMap + uniq como un solo pipeline frente a un conjunto de índices construido en bucles anidados.
 heading: Anomalías con su contexto alrededor
-order: 34
+order: 42
 tier: 4
 functions: zipWithIndex, filter, flatMap, uniq, map, maxBy, join
 domain: sensors

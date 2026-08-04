@@ -3,7 +3,7 @@ slug: throttled-refresh
 title: Throttle the refresh button — RxDart vs FxDart
 description: Let one tap through per 300 ms window — throttleTime on the tap stream vs the equivalent throttle chain in fxdart 0.7.3's events layer.
 heading: Throttle the refresh button
-order: 41
+order: 44
 tier: 4
 functions: fxEvents, throttle
 domain: users

@@ -3,7 +3,7 @@ slug: parallel-downloads
 title: Descargas en paralelo, resultados en orden — Dart vs FxDart
 description: Seis descargas con velocidades distintas, 3 a la vez — concurrent mantiene el orden de las peticiones aunque las finalizaciones se entrelacen, frente a la contabilidad de un pool.
 heading: Descargas en paralelo, resultados en orden
-order: 46
+order: 36
 tier: 4
 functions: toAsync, map, concurrent, zipWithIndex, join, sumBy
 domain: general

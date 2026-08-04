@@ -3,7 +3,7 @@ slug: rate-limited-import
 title: 속도 제한이 있는 배치 임포트 — Dart vs FxDart
 description: 거래 9건을 3건씩 배치로, 한 번에 한 배치씩 임포트하며 누적 합계를 계산합니다 — chunk + concurrent(1) + scan과 순차 루프를 비교합니다.
 heading: 속도 제한이 있는 배치 임포트
-order: 45
+order: 46
 tier: 4
 functions: chunk, toAsync, map, concurrent, delay, scan, drop, sumBy
 domain: transactions

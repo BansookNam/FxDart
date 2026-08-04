@@ -3,7 +3,7 @@ slug: top-expenses
 title: Los 3 gastos más grandes — Dart vs FxDart
 description: Las tres transacciones más grandes del mes — sortedBy + take de package:collection frente a sortBy + take en FxDart.
 heading: Los 3 gastos más grandes
-order: 3
+order: 1
 tier: 1
 functions: sortBy, take
 alsoLink: chunk, scan

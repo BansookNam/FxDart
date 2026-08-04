@@ -3,7 +3,7 @@ slug: paged-feeds-dedupe
 title: Dos feeds paginados, concatenados y deduplicados — Dart vs FxDart
 description: Vacía un almacén de logs primario, luego su réplica, deduplica por id y para en 8 — concat + uniqBy + take siguen siendo perezosos, frente a bucles anidados con un conjunto de vistos.
 heading: Dos feeds paginados, concatenados y deduplicados
-order: 47
+order: 41
 tier: 4
 functions: range, toAsync, flatMap, concat, uniqBy, take
 domain: logs

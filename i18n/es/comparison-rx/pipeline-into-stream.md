@@ -3,7 +3,7 @@ slug: pipeline-into-stream
 title: Un pipeline alimenta a un consumidor de streams — RxDart vs FxDart
 description: Un fetch ordenado con mapConcurrent entrega sus resultados a un consumidor de streams vía toStream — el puente cruzado en la otra dirección.
 heading: Un pipeline alimenta a un consumidor de streams
-order: 50
+order: 47
 tier: 4
 functions: fx, toAsync, mapConcurrent, chunk, streams
 domain: orders

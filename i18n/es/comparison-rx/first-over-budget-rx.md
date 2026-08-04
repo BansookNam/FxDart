@@ -3,7 +3,7 @@ slug: first-over-budget-rx
 title: Primera transacción por encima del presupuesto — RxDart vs FxDart
 description: Encontrar la primera transacción por encima de 100 y detenerse — el firstWhere de Rx cancela la suscripción, el find de fxdart deja de tirar; ambos examinan solo 4 de 8.
 heading: Primera transacción por encima del presupuesto
-order: 3
+order: 1
 tier: 1
 functions: fx, find
 domain: transactions

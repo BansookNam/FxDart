@@ -3,7 +3,7 @@ slug: numbered-checklist
 title: 체크리스트에 번호 매기기 — RxDart vs FxDart
 description: 여섯 단계를 1.로 시작하는 번호 목록으로 — 스트림에는 인덱스 있는 map이 없어 Rx는 scan에 카운터를 밀반입하고, fxdart는 zipWithIndex라고 말합니다.
 heading: 체크리스트에 번호 매기기
-order: 8
+order: 10
 tier: 1
 functions: fx, zipWithIndex, map
 domain: general

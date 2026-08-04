@@ -3,7 +3,7 @@ slug: settlement-pipeline
 title: End-of-day settlement pipeline — Dart vs FxDart
 description: Validate, group by merchant, post 2 at a time, then report — one chain crossing sync to async, vs groupListsBy plus a worker pool.
 heading: End-of-day settlement pipeline
-order: 48
+order: 52
 tier: 4
 functions: reject, groupBy, map, sumBy, sortBy, toAsync, concurrent, partition
 domain: transactions

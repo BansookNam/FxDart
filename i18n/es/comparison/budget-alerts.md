@@ -3,7 +3,7 @@ slug: budget-alerts
 title: Categorías que superan su presupuesto mensual — Dart vs FxDart
 description: Gasto total por categoría, quedarse con las que se pasan del presupuesto y ordenarlas por exceso — contabilidad con mapas mutables en Dart nativo frente a groupBy + filter + sortBy en FxDart.
 heading: Categorías que superan su presupuesto mensual
-order: 25
+order: 28
 tier: 3
 functions: groupBy, map, filter, sortBy, join
 domain: transactions

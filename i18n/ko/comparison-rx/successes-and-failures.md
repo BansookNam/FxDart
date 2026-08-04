@@ -3,7 +3,7 @@ slug: successes-and-failures
 title: 성공과 실패 나누기 — RxDart vs FxDart
 description: 비동기 검증 일곱 건, 두 건 실패 — 타입 있는 partition에 이어지는 항목별 try/catch vs 오류 채널을 다시 데이터로 되돌리는 내부 스트림들.
 heading: 성공과 실패 나누기
-order: 32
+order: 26
 tier: 3
 functions: fx, toAsync, map, partition
 domain: orders

@@ -3,7 +3,7 @@ slug: expand-order-lines
 title: Aplana los pedidos en líneas — RxDart vs FxDart
 description: Aplanar cuatro pedidos en sus diez líneas pedido/sku — Stream.expand y el flatMap de fxdart son la misma palabra para uno-a-muchos, en orden de origen.
 heading: Aplana los pedidos en líneas
-order: 9
+order: 3
 tier: 1
 functions: fx, flatMap, map
 domain: orders

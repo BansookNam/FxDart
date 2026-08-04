@@ -3,7 +3,7 @@ slug: feeds-in-order
 title: Two feeds, strictly in order — RxDart vs FxDart
 description: Yesterday's log tail followed by today's log as one numbered list — concatWith sequencing subscriptions vs concat sequencing pulls.
 heading: Two feeds, strictly in order
-order: 17
+order: 18
 tier: 2
 functions: fx, concat, map
 domain: logs

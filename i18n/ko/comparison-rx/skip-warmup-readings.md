@@ -3,7 +3,7 @@ slug: skip-warmup-readings
 title: 예열 구간 판독값 건너뛰기 — RxDart vs FxDart
 description: 프로브의 앞쪽 낮은 판독값은 버리고 그 뒤는 전부 남기기 — skipWhile과 dropWhile은 같은 단방향 게이트이고, 연산자마저 코어에 있습니다.
 heading: 예열 구간 판독값 건너뛰기
-order: 4
+order: 9
 tier: 1
 functions: fx, dropWhile, map
 domain: sensors

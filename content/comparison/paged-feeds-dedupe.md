@@ -3,7 +3,7 @@ slug: paged-feeds-dedupe
 title: Two paged feeds, concatenated and deduped — Dart vs FxDart
 description: Drain a primary log store, then its replica, dedupe by id, stop at 8 — concat + uniqBy + take stays lazy, vs nested loops with a seen-set.
 heading: Two paged feeds, concatenated and deduped
-order: 47
+order: 41
 tier: 4
 functions: range, toAsync, flatMap, concat, uniqBy, take
 domain: logs

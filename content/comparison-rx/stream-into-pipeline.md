@@ -3,7 +3,7 @@ slug: stream-into-pipeline
 title: A stream feeds a typed pipeline — RxDart vs FxDart
 description: A live log stream flows into a typed pull pipeline through fxStream — keep the warnings, uppercase them, and count, on both sides of the bridge.
 heading: A stream feeds a typed pipeline
-order: 49
+order: 37
 tier: 4
 functions: fx, streams, filter, map, toList
 domain: logs

@@ -3,7 +3,7 @@ slug: smoothed-zone-changes
 title: 평활화된 구간 전환 — Dart vs FxDart
 description: 이동 평균, 구간 런, 전환 알림 — 순수 Dart의 가변 상태를 든 인덱스 루프 세 개 vs FxDart의 windowed → uniqAdjacentBy → pairwise 체인.
 heading: 평활화된 구간 전환
-order: 53
+order: 43
 tier: 4
 functions: windowed, average, uniqAdjacent, pairwise, ifEmpty, map
 domain: sensors

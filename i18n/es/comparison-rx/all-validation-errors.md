@@ -3,7 +3,7 @@ slug: all-validation-errors
 title: Reportar cada error de validación — RxDart vs FxDart
 description: Cada regla rota por formulario, no solo la primera — valores de error llanos en una cadena síncrona vs un canal de errores que solo puede llevar un error y cerrarse.
 heading: Reportar cada error de validación
-order: 33
+order: 25
 tier: 3
 functions: fx, map, partition
 alsoLink: accumulate

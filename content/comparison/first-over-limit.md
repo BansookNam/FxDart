@@ -3,7 +3,7 @@ slug: first-over-limit
 title: First sensor reading over the limit — Dart vs FxDart
 description: Find the first temperature above a threshold — skipWhile + firstOrNull in plain Dart vs dropWhile + head in FxDart.
 heading: First sensor reading over the limit
-order: 6
+order: 10
 tier: 1
 functions: dropWhile, head
 domain: sensors

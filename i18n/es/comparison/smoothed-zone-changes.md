@@ -3,7 +3,7 @@ slug: smoothed-zone-changes
 title: Cambios de zona suavizados — Dart vs FxDart
 description: Media móvil, rachas de zona y alertas de transición — tres bucles con estado mutable en Dart puro vs windowed → uniqAdjacentBy → pairwise en FxDart.
 heading: Cambios de zona suavizados
-order: 53
+order: 43
 tier: 4
 functions: windowed, average, uniqAdjacent, pairwise, ifEmpty, map
 domain: sensors

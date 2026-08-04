@@ -3,7 +3,7 @@ slug: expand-order-lines
 title: Flatten orders into lines — RxDart vs FxDart
 description: Flatten four orders into their ten order/sku line items — Stream.expand and fxdart flatMap are the same word for one-to-many, in source order.
 heading: Flatten orders into lines
-order: 9
+order: 3
 tier: 1
 functions: fx, flatMap, map
 domain: orders

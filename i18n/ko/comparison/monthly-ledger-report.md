@@ -3,7 +3,7 @@ slug: monthly-ledger-report
 title: 전체 월간 가계부 리포트 — Dart vs FxDart
 description: 가계부로부터 하나의 리포트 문자열을 만듭니다 — 총액, 카테고리별 내역, 상위 판매자를 세 개의 fxdart 파이프라인과 루프 및 중간 맵으로 각각 비교합니다.
 heading: 전체 월간 가계부 리포트
-order: 31
+order: 34
 tier: 4
 functions: filter, sumBy, groupBy, map, sortBy, take, zipWithIndex, join
 domain: transactions

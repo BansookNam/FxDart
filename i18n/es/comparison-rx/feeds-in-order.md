@@ -3,7 +3,7 @@ slug: feeds-in-order
 title: Dos feeds, estrictamente en orden — RxDart vs FxDart
 description: La cola del log de ayer seguida del log de hoy como una sola lista numerada — concatWith secuenciando suscripciones frente a concat secuenciando tirones.
 heading: Dos feeds, estrictamente en orden
-order: 17
+order: 18
 tier: 2
 functions: fx, concat, map
 domain: logs

@@ -3,7 +3,7 @@ slug: align-forecast-actual
 title: Alinea el pronóstico con los datos reales — RxDart vs FxDart
 description: Emparejar dos series fijas posición a posición e imprimir la diferencia de cada día — zipWith en streams frente a zip en iterables, la misma alineación en ambos casos.
 heading: Alinea el pronóstico con los datos reales
-order: 16
+order: 20
 tier: 2
 functions: fx, zip, map
 domain: sensors

@@ -3,7 +3,7 @@ slug: audit-with-outcomes
 title: Keep values AND failures in the audit — RxDart vs FxDart
 description: Parse eight config lines where three fail, printing the values and the failure count — errors smuggled back as data vs a plain partition.
 heading: Keep values AND failures in the audit
-order: 22
+order: 13
 tier: 2
 functions: fx, map, partition
 domain: logs

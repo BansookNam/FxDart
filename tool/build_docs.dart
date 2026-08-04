@@ -770,7 +770,11 @@ const _cmpFamilies = [
       'tie': 'cmpVerdictTie',
       'native': 'cmpVerdictNative',
     },
-    picks: [1, 11, 30, 41, 50],
+    // Orders, not slugs — reordering a Part reassigns these, so they are
+    // re-picked whenever an ordering pass runs (see plans/CMP_ORDERING_RULE.md).
+    // 1/11/23 are the leaders of Parts 1–3; Part 4 is laid out as a reverse
+    // pyramid, so its two best sit at its last and first rows (53 and 31).
+    picks: [1, 11, 23, 31, 53],
     bench: true,
     benchResults: 'results.json',
     benchWinLeftKey: 'cmpBenchWinNative',
@@ -794,7 +798,10 @@ const _cmpFamilies = [
       'tie': 'cmpVerdictTie',
       'rxdart': 'cmpVerdictRxdart',
     },
-    picks: [1, 15, 29, 35, 45],
+    // Orders, not slugs — see the DartComparison note above. 1/11/25 lead
+    // Parts 1–3; Part 4 is a reverse pyramid, so its two best are its first
+    // and last rows (35 and 50).
+    picks: [1, 11, 25, 35, 50],
     bench: true,
     benchResults: 'results-rx.json',
     benchWinLeftKey: 'cmpBenchWinRxdart',

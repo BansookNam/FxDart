@@ -3,7 +3,7 @@ slug: monthly-category-report
 title: Monthly category report, sorted by spend — Dart vs FxDart
 description: Filter a ledger to one month, total each category, and rank them — loop plus mutable map in plain Dart vs filter + groupBy + sortBy in FxDart.
 heading: Monthly category report, sorted by spend
-order: 21
+order: 29
 tier: 3
 functions: filter, groupBy, map, sortBy, join
 domain: transactions

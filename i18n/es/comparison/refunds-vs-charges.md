@@ -3,7 +3,7 @@ slug: refunds-vs-charges
 title: Reembolsos frente a cargos, ambos formateados — Dart vs FxDart
 description: Divide un libro de cuentas en reembolsos y cargos e imprime ambos lados — dos pasadas de where en Dart nativo frente a un solo partition en FxDart.
 heading: Reembolsos frente a cargos, ambos formateados
-order: 15
+order: 13
 tier: 2
 functions: partition, map, join
 domain: transactions

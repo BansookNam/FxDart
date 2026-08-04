@@ -3,7 +3,7 @@ slug: empty-report-default
 title: Una línea por defecto para un informe vacío — RxDart vs FxDart
 description: Filtrar a una categoría sin coincidencias y aun así imprimir algo — defaultIfEmpty en el stream frente a ifEmpty en la cadena pull, la misma idea en ambos modelos.
 heading: Una línea por defecto para un informe vacío
-order: 10
+order: 7
 tier: 1
 functions: fx, filter, ifEmpty, map
 domain: transactions

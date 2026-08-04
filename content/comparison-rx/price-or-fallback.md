@@ -3,7 +3,7 @@ slug: price-or-fallback
 title: A price, or the list price — RxDart vs FxDart
 description: A promo price where one exists, the list price where none does — per-item recovery as inner streams vs a try/catch right beside the call.
 heading: A price, or the list price
-order: 25
+order: 33
 tier: 3
 functions: fx, toAsync, map, ifEmpty
 domain: orders

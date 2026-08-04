@@ -3,7 +3,7 @@ slug: live-search
 title: Live search over a keystroke stream — Dart vs FxDart
 description: Turn a stream of keystrokes into deduped backend searches — fromStream + filter + uniq + take + map vs await-for with guard clauses.
 heading: Live search over a keystroke stream
-order: 49
+order: 45
 tier: 4
 functions: streams, filter, uniq, take, map, head
 alsoLink: debounce

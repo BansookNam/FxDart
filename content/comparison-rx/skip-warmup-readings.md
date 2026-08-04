@@ -3,7 +3,7 @@ slug: skip-warmup-readings
 title: Skip the warm-up readings — RxDart vs FxDart
 description: Drop a probe's leading low readings, keep everything after — skipWhile and dropWhile are the same one-way gate; even the operators are core.
 heading: Skip the warm-up readings
-order: 4
+order: 9
 tier: 1
 functions: fx, dropWhile, map
 domain: sensors

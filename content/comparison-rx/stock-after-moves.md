@@ -3,7 +3,7 @@ slug: stock-after-moves
 title: Stock level after each move — RxDart vs FxDart
 description: Fold warehouse receipts and shipments into a running stock level and flag backorders — scan on both sides, seeds replayed differently.
 heading: Stock level after each move
-order: 21
+order: 11
 tier: 2
 functions: fx, scan, map
 domain: orders

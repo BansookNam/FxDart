@@ -3,7 +3,7 @@ slug: first-visit-merchants
 title: Comercios en orden de primera visita — Dart vs FxDart
 description: Deduplicación que preserva el orden — un bucle con conjunto de vistos en Dart nativo frente a map + uniq en FxDart.
 heading: Comercios en orden de primera visita
-order: 4
+order: 9
 tier: 1
 functions: map, uniq
 domain: transactions

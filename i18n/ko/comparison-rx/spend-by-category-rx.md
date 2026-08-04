@@ -3,7 +3,7 @@ slug: spend-by-category-rx
 title: 카테고리별 지출 합계 — RxDart vs FxDart
 description: 처음 등장한 순서의 카테고리별 합계 — GroupedStream들의 스트림을 접고 다시 병합해야 하는 쪽 vs 그냥 Map을 돌려주는 groupBy.
 heading: 카테고리별 지출 합계
-order: 15
+order: 17
 tier: 2
 functions: fx, groupedBy, map, sumBy
 domain: transactions

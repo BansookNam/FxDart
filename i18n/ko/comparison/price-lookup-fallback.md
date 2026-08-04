@@ -3,7 +3,7 @@ slug: price-lookup-fallback
 title: 폴백이 있는 동시 가격 조회 — Dart vs FxDart
 description: 실시간 가격을 한 번에 세 개씩 조회하고, 누락된 SKU는 카탈로그 가격으로 대체합니다 — concurrent + null 병합 map과 워커 풀을 비교합니다.
 heading: 폴백이 있는 동시 가격 조회
-order: 43
+order: 33
 tier: 4
 functions: toAsync, map, concurrent, filter, size, sumBy
 domain: orders

@@ -3,7 +3,7 @@ slug: date-window-spend
 title: 특정 기간 안의 지출 — Dart vs FxDart
 description: 날짜순으로 정렬된 가계부의 한 구간을 합산합니다 — 순수 Dart의 skipWhile/takeWhile/fold와 FxDart의 dropWhile + takeWhile + sumBy를 비교합니다. 네이티브 쪽도 충분히 잘 버팁니다.
 heading: 특정 기간 안의 지출
-order: 13
+order: 18
 tier: 2
 functions: dropWhile, takeWhile, sumBy
 alsoLink: fx

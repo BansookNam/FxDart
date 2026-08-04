@@ -3,7 +3,7 @@ slug: rate-limited-import
 title: Rate-limited batch import — Dart vs FxDart
 description: Import 9 transactions in batches of 3, one batch at a time, with a running total — chunk + concurrent(1) + scan vs a sequential loop.
 heading: Rate-limited batch import
-order: 45
+order: 46
 tier: 4
 functions: chunk, toAsync, map, concurrent, delay, scan, drop, sumBy
 domain: transactions

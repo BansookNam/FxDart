@@ -3,7 +3,7 @@ slug: top-category-average
 title: Categoría con el gasto medio más alto — Dart vs FxDart
 description: Agrupar gastos y encontrar la categoría más cara por transacción — llamadas anidadas a groupBy + maxBy de collection en Dart nativo frente a una sola cadena de FxDart.
 heading: Categoría con el gasto medio más alto
-order: 18
+order: 17
 tier: 2
 functions: groupBy, map, maxBy
 domain: transactions

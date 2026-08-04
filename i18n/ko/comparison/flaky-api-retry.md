@@ -3,7 +3,7 @@ slug: flaky-api-retry
 title: 불안정한 API를 첫 성공까지 폴링하기 — Dart vs FxDart
 description: 준비될 때까지의 재시도를 지연 파이프라인으로 표현합니다 — range + toAsync + map + dropWhile + head와 break를 쓰는 명령형 폴링 루프를 비교합니다.
 heading: 불안정한 API를 첫 성공까지 폴링하기
-order: 42
+order: 38
 tier: 4
 functions: range, toAsync, map, peek, dropWhile, head
 domain: general

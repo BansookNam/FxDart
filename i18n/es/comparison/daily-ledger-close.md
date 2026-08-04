@@ -3,7 +3,7 @@ slug: daily-ledger-close
 title: Gran final — cierre mensual de DailyLedger — Dart vs FxDart
 description: El gran final: carga las entradas del libro de 3 en 3 y luego calcula el resumen de julio y el desglose por categoría — las formas reales de la app DailyLedger, de las dos maneras.
 heading: Gran final — cierre mensual de DailyLedger
-order: 50
+order: 51
 tier: 4
 functions: toAsync, map, concurrent, filter, partition, sumBy, groupBy, sortBy, take
 domain: transactions

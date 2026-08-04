@@ -3,7 +3,7 @@ slug: average-basket
 title: 100달러 초과 주문의 평균값 — Dart vs FxDart
 description: 고액 주문의 평균 총액을 구합니다 — package:collection을 사용한 where/map/average와 FxDart의 filter + averageBy를 비교합니다.
 heading: 100달러 초과 주문의 평균값
-order: 5
+order: 4
 tier: 1
 functions: filter, averageBy
 domain: orders

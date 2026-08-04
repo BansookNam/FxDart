@@ -3,7 +3,7 @@ slug: monthly-category-report
 title: Informe mensual por categorías, ordenado por gasto — Dart vs FxDart
 description: Filtra un libro de cuentas a un solo mes, suma cada categoría y ordénalas — bucle más mapa mutable en Dart nativo frente a filter + groupBy + sortBy en FxDart.
 heading: Informe mensual por categorías, ordenado por gasto
-order: 21
+order: 29
 tier: 3
 functions: filter, groupBy, map, sortBy, join
 domain: transactions

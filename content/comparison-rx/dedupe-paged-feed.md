@@ -3,7 +3,7 @@ slug: dedupe-paged-feed
 title: Dedupe a paged feed by id — RxDart vs FxDart
 description: Flatten three overlapping pages and keep each product id once, in arrival order — expand plus distinctUnique vs flatMap plus uniqBy.
 heading: Dedupe a paged feed by id
-order: 19
+order: 23
 tier: 2
 functions: fx, flatMap, uniqBy, map
 domain: orders

@@ -3,7 +3,7 @@ slug: even-totals
 title: 유효한 짝수 금액 합산하기 — RxDart vs FxDart
 description: 파싱 실패는 버리고, 짝수만 남겨 합산하기 — async main이 필요한 Stream 파이프라인과 같은 고정 리스트 위의 동기 pull 체인 하나를 비교합니다.
 heading: 유효한 짝수 금액 합산하기
-order: 1
+order: 4
 tier: 1
 functions: fx, compact, filter, sum
 domain: transactions

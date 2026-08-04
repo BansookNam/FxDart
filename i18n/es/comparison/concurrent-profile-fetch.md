@@ -3,7 +3,7 @@ slug: concurrent-profile-fetch
 title: Obtener 10 perfiles, de tres en tres — Dart vs FxDart
 description: Preparación síncrona que desemboca directamente en concurrencia acotada — filter y sort, luego toAsync + map + concurrent(3), frente a un pool de workers hecho a mano.
 heading: Obtener 10 perfiles, de tres en tres
-order: 41
+order: 49
 tier: 4
 functions: filter, sortBy, toAsync, map, concurrent, join
 domain: users

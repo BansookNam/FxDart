@@ -3,7 +3,7 @@ slug: food-spending
 title: 이번 달 식비 합계 — Dart vs FxDart
 description: 가계부 한 카테고리를 합산합니다 — 순수 Dart의 where/fold 체인과 FxDart의 filter + sumBy를 비교합니다.
 heading: 이번 달 식비 합계
-order: 1
+order: 8
 tier: 1
 functions: filter, sumBy
 domain: transactions

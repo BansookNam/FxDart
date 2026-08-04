@@ -3,7 +3,7 @@ slug: cohort-retention
 title: 코호트 리텐션 테이블 — Dart vs FxDart
 description: 가입월 기준 코호트와 이후 활동을 비교합니다 — 중첩된 groupBy/dropWhile/filter 파이프라인과 누산 리스트를 사용하는 중첩 for 루프를 비교합니다.
 heading: 코호트 리텐션 테이블
-order: 32
+order: 50
 tier: 4
 functions: groupBy, sortBy, map, dropWhile, filter, size, join
 domain: users

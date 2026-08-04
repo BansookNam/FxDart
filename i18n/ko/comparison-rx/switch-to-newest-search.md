@@ -3,7 +3,7 @@ slug: switch-to-newest-search
 title: 최신 검색만 중요할 때 — RxDart vs FxDart
 description: 더 새 쿼리가 진행 중인 검색을 버립니다 — rxdart와 fxdart의 fxEvents 체인 양쪽 모두 같은 switchMap 연산자.
 heading: 최신 검색만 중요할 때
-order: 45
+order: 40
 tier: 4
 functions: fxEvents, switchMap
 domain: users

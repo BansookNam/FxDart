@@ -3,7 +3,7 @@ slug: even-totals
 title: Suma los importes pares válidos — RxDart vs FxDart
 description: Descarta los parseos fallidos, quédate con los pares y suma — un pipeline de Stream con un main asíncrono frente a una sola cadena pull síncrona sobre la misma lista fija.
 heading: Suma los importes pares válidos
-order: 1
+order: 4
 tier: 1
 functions: fx, compact, filter, sum
 domain: transactions

@@ -3,7 +3,7 @@ slug: stream-into-pipeline
 title: 스트림이 타입 있는 파이프라인으로 흘러들 때 — RxDart vs FxDart
 description: 라이브 로그 스트림이 fxStream을 거쳐 타입 있는 풀 파이프라인으로 흘러갑니다 — 경고만 남기고, 대문자로 바꾸고, 세기. 다리의 양쪽에서.
 heading: 스트림이 타입 있는 파이프라인으로 흘러들 때
-order: 49
+order: 37
 tier: 4
 functions: fx, streams, filter, map, toList
 domain: logs

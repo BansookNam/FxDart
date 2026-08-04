@@ -3,7 +3,7 @@ slug: resume-with-cache
 title: Resume from cache when the source dies — RxDart vs FxDart
 description: The live feed dies after three updates — onErrorResumeNext swaps in the cached tail vs an explicit pull loop feeding concat.
 heading: Resume from cache when the source dies
-order: 26
+order: 34
 tier: 3
 functions: fx, concat, take, map
 domain: orders

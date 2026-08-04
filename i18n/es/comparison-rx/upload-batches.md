@@ -3,7 +3,7 @@ slug: upload-batches
 title: Sube en lotes de 4 — RxDart vs FxDart
 description: Diez archivos pendientes, como mucho cuatro por petición — bufferCount(4) en el stream frente a chunk(4) en la cadena pull, con el último lote corto en ambos lados.
 heading: Sube en lotes de 4
-order: 11
+order: 16
 tier: 2
 functions: fx, chunk, map
 domain: orders

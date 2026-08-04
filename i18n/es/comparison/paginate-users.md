@@ -3,7 +3,7 @@ slug: paginate-users
 title: Agrupar usuarios en páginas de 10 — Dart vs FxDart
 description: Divide una lista de usuarios en páginas de tamaño fijo — slices de package:collection frente a chunk + map en FxDart.
 heading: Agrupar usuarios en páginas de 10
-order: 8
+order: 5
 tier: 1
 functions: chunk, map
 alsoLink: concurrent

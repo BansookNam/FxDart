@@ -3,7 +3,7 @@ slug: feeds-in-order
 title: 두 피드를 엄격히 순서대로 — RxDart vs FxDart
 description: 어제 로그의 꼬리 뒤에 오늘 로그를 이어 번호 목록 하나로 — 구독을 순서대로 세우는 concatWith vs pull을 순서대로 세우는 concat.
 heading: 두 피드를 엄격히 순서대로
-order: 17
+order: 18
 tier: 2
 functions: fx, concat, map
 domain: logs

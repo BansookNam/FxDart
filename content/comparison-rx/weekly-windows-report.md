@@ -3,7 +3,7 @@ slug: weekly-windows-report
 title: Weekly totals from a daily series — RxDart vs FxDart
 description: Roll 21 days of spend into three week-numbered totals — bufferCount with scan drafted as a counter vs chunk plus zipWithIndex.
 heading: Weekly totals from a daily series
-order: 24
+order: 12
 tier: 2
 functions: fx, chunk, sumBy, map, zipWithIndex
 domain: transactions

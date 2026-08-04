@@ -3,7 +3,7 @@ slug: sampled-gauge
 title: 폴링 틱마다 게이지 샘플링하기 — RxDart vs FxDart
 description: 각 폴링 틱 시점의 최신 게이지 값 읽기 — RxDart의 명시적 sample 트리거 스트림 vs fxdart 0.7.3 이벤트 레이어의 sampleOn.
 heading: 폴링 틱마다 게이지 샘플링하기
-order: 42
+order: 45
 tier: 4
 functions: fxEvents, sampleOn
 domain: sensors

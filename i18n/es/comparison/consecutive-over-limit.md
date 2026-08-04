@@ -3,7 +3,7 @@ slug: consecutive-over-limit
 title: Tres lecturas consecutivas por encima del límite — Dart vs FxDart
 description: Encuentra cada ventana de 3 horas de lecturas de CO2 todas por encima de 1000 ppm — un bucle con índices en Dart nativo frente a una ventana deslizante construida con zip + drop en FxDart.
 heading: Tres lecturas consecutivas por encima del límite
-order: 24
+order: 30
 tier: 3
 functions: zip, drop, filter, map, join
 domain: sensors

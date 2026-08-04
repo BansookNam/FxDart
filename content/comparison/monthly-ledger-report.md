@@ -3,7 +3,7 @@ slug: monthly-ledger-report
 title: Full monthly ledger report — Dart vs FxDart
 description: One report string from a ledger — total, category breakdown, top merchants — as three fxdart pipelines vs loops and intermediate maps.
 heading: Full monthly ledger report
-order: 31
+order: 34
 tier: 4
 functions: filter, sumBy, groupBy, map, sortBy, take, zipWithIndex, join
 domain: transactions

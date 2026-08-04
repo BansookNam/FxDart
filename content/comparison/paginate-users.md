@@ -3,7 +3,7 @@ slug: paginate-users
 title: Batch users into pages of 10 — Dart vs FxDart
 description: Split a user list into fixed-size pages — slices from package:collection vs chunk + map in FxDart.
 heading: Batch users into pages of 10
-order: 8
+order: 5
 tier: 1
 functions: chunk, map
 alsoLink: concurrent

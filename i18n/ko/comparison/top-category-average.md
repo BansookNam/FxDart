@@ -3,7 +3,7 @@ slug: top-category-average
 title: 거래당 평균 지출이 가장 높은 카테고리 — Dart vs FxDart
 description: 지출을 그룹화해 거래당 가장 비싼 카테고리를 찾습니다 — 순수 Dart에서 collection의 groupBy + maxBy 중첩 호출과 하나의 FxDart 체인을 비교합니다.
 heading: 거래당 평균 지출이 가장 높은 카테고리
-order: 18
+order: 17
 tier: 2
 functions: groupBy, map, maxBy
 domain: transactions

@@ -3,7 +3,7 @@ slug: spaced-out-calls
 title: 100 ms마다 호출 하나 — RxDart vs FxDart
 description: 최소 100 ms 간격의 핑 다섯 번, 단조 Stopwatch로 증명 — rx interval vs 순차 풀 체인의 매퍼 안에 넣은 평범한 delay.
 heading: 100 ms마다 호출 하나
-order: 39
+order: 42
 tier: 4
 functions: fx, toAsync, map
 alsoLink: streams

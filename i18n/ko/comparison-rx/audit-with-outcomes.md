@@ -3,7 +3,7 @@ slug: audit-with-outcomes
 title: 감사 로그에 값과 실패를 함께 — RxDart vs FxDart
 description: 여덟 줄의 설정을 파싱하는데 셋이 실패하는 상황에서 값과 실패 수를 출력하기 — 에러를 데이터로 되밀반입하는 쪽 vs 평범한 partition.
 heading: 감사 로그에 값과 실패를 함께
-order: 22
+order: 13
 tier: 2
 functions: fx, map, partition
 domain: logs

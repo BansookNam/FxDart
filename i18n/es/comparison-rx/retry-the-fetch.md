@@ -3,7 +3,7 @@ slug: retry-the-fetch
 title: Reintentar el fetch inestable — RxDart vs FxDart
 description: Un fetch que falla dos veces y luego acierta — Rx.retry re-suscribe una fábrica de streams, el retry de fxdart re-ejecuta un Future, ambos en una llamada.
 heading: Reintentar el fetch inestable
-order: 27
+order: 29
 tier: 3
 functions: fx, retry
 domain: general

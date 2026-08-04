@@ -3,7 +3,7 @@ slug: spaced-out-calls
 title: One call every 100 ms — RxDart vs FxDart
 description: Five pings at least 100 ms apart, proved by a monotonic Stopwatch — rx interval vs a plain delay in the mapper of a sequential pull chain.
 heading: One call every 100 ms
-order: 39
+order: 42
 tier: 4
 functions: fx, toAsync, map
 alsoLink: streams

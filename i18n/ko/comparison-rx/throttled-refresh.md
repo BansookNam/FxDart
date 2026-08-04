@@ -3,7 +3,7 @@ slug: throttled-refresh
 title: 새로고침 버튼 스로틀링하기 — RxDart vs FxDart
 description: 300 ms 윈도마다 탭 하나만 통과 — 탭 스트림 위의 throttleTime vs fxdart 0.7.3 이벤트 레이어의 동등한 throttle 체인.
 heading: 새로고침 버튼 스로틀링하기
-order: 41
+order: 44
 tier: 4
 functions: fxEvents, throttle
 domain: users

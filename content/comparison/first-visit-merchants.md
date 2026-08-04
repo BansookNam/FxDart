@@ -3,7 +3,7 @@ slug: first-visit-merchants
 title: Merchants in first-visit order — Dart vs FxDart
 description: Order-preserving dedupe — a seen-set loop in plain Dart vs map + uniq in FxDart.
 heading: Merchants in first-visit order
-order: 4
+order: 9
 tier: 1
 functions: map, uniq
 domain: transactions

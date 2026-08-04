@@ -3,7 +3,7 @@ slug: concurrent-enrichment
 title: Enrich top merchants concurrently — Dart vs FxDart
 description: Pick the top 3 merchants, then look each up over a rate-limited API, 2 at a time — a hand-rolled worker pool in plain Dart vs concurrent(2) in FxDart.
 heading: Enrich top merchants concurrently
-order: 30
+order: 23
 tier: 3
 functions: sortBy, take, toAsync, map, concurrent
 domain: transactions

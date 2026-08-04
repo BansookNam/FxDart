@@ -3,7 +3,7 @@ slug: price-drop-detection
 title: 두 스냅숏 사이의 가격 하락 — Dart vs FxDart
 description: 두 가격표 스냅숏을 비교해 저렴해진 항목을 보고합니다 — indexBy + filter + sortBy + head + sumBy와, 맵 리터럴 및 where/fold 체인을 비교합니다.
 heading: 두 스냅숏 사이의 가격 하락
-order: 33
+order: 53
 tier: 4
 functions: indexBy, filter, map, sortBy, head, sumBy, join
 domain: orders

@@ -3,7 +3,7 @@ slug: all-validation-errors
 title: 모든 검증 오류 보고하기 — RxDart vs FxDart
 description: 폼마다 첫 번째만이 아닌 모든 규칙 위반 — 동기 체인의 평범한 오류 값 vs 오류를 하나만 싣고 닫혀 버리는 오류 채널.
 heading: 모든 검증 오류 보고하기
-order: 33
+order: 25
 tier: 3
 functions: fx, map, partition
 alsoLink: accumulate

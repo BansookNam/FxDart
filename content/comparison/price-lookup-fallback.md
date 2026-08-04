@@ -3,7 +3,7 @@ slug: price-lookup-fallback
 title: Concurrent price lookup with fallback — Dart vs FxDart
 description: Look up live prices 3 at a time, fall back to catalog prices for missing SKUs — concurrent + a null-coalescing map vs a worker pool.
 heading: Concurrent price lookup with fallback
-order: 43
+order: 33
 tier: 4
 functions: toAsync, map, concurrent, filter, size, sumBy
 domain: orders

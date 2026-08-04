@@ -3,7 +3,7 @@ slug: dependent-calls-in-sequence
 title: Cada llamada alimenta la siguiente — RxDart vs FxDart
 description: Cuatro llamadas a la API donde cada respuesta siembra la petición siguiente — scan enhebra el estado por el pipeline; asyncMap se cierra sobre un token mutable.
 heading: Cada llamada alimenta la siguiente
-order: 37
+order: 49
 tier: 4
 functions: fx, toAsync, map, scan
 domain: general

@@ -3,7 +3,7 @@ slug: anomaly-context
 title: 주변 맥락과 함께 보는 이상치 — Dart vs FxDart
 description: 한계를 초과한 센서 측정값을 앞뒤 한 줄씩과 함께 보여줍니다 — zipWithIndex + flatMap + uniq로 이루어진 하나의 파이프라인과 중첩 루프로 만든 인덱스 집합을 비교합니다.
 heading: 주변 맥락과 함께 보는 이상치
-order: 34
+order: 42
 tier: 4
 functions: zipWithIndex, filter, flatMap, uniq, map, maxBy, join
 domain: sensors

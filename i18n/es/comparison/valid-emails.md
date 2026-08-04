@@ -3,7 +3,7 @@ slug: valid-emails
 title: Los 5 primeros correos válidos, normalizados — Dart vs FxDart
 description: Recortar, pasar a minúsculas, validar y tomar cinco — map/where/take en Dart nativo frente a map + filter + take en FxDart. Aquí Dart nativo es igual de limpio.
 heading: Los 5 primeros correos válidos, normalizados
-order: 19
+order: 14
 tier: 2
 functions: map, filter, take
 alsoLink: fx, groupBy, scan, zip, concurrent

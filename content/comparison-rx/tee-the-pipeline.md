@@ -3,7 +3,7 @@ slug: tee-the-pipeline
 title: One source, two independent readers — RxDart vs FxDart
 description: Total and max from one side-effecting source without running it twice — a connectable stream vs two folds advancing on the same element.
 heading: One source, two independent readers
-order: 48
+order: 50
 tier: 4
 functions: tee
 domain: sensors

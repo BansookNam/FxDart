@@ -3,7 +3,7 @@ slug: empty-report-default
 title: 빈 리포트를 위한 기본 한 줄 — RxDart vs FxDart
 description: 일치하는 항목이 없는 카테고리로 필터링해도 무언가는 출력하기 — 스트림의 defaultIfEmpty와 pull 체인의 ifEmpty, 두 모델에 담긴 같은 아이디어.
 heading: 빈 리포트를 위한 기본 한 줄
-order: 10
+order: 7
 tier: 1
 functions: fx, filter, ifEmpty, map
 domain: transactions

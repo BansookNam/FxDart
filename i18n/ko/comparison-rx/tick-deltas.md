@@ -3,7 +3,7 @@ slug: tick-deltas
 title: 틱 사이의 변화량 — RxDart vs FxDart
 description: 각 가격 틱을 직전 틱과 나란히 — 두 라이브러리 모두 pairwise, 스트림 쪽은 리스트 쌍, pull 쪽은 타입 있는 레코드.
 heading: 틱 사이의 변화량
-order: 13
+order: 19
 tier: 2
 functions: fx, pairwise, map
 domain: sensors

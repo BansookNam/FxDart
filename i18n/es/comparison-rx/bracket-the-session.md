@@ -3,7 +3,7 @@ slug: bracket-the-session
 title: Marcadores de apertura y cierre — RxDart vs FxDart
 description: Envolver un feed de sesión en líneas OPEN/CLOSE — startWith y endWith en el stream frente a prepend y append en la cadena pull.
 heading: Marcadores de apertura y cierre
-order: 18
+order: 14
 tier: 2
 functions: fx, prepend, append
 domain: logs

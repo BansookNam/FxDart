@@ -3,7 +3,7 @@ slug: monthly-ledger-report
 title: Informe mensual completo del libro de cuentas — Dart vs FxDart
 description: Un único informe a partir de un libro de cuentas — total, desglose por categorías, comercios principales — como tres pipelines de fxdart frente a bucles y mapas intermedios.
 heading: Informe mensual completo del libro de cuentas
-order: 31
+order: 34
 tier: 4
 functions: filter, sumBy, groupBy, map, sortBy, take, zipWithIndex, join
 domain: transactions

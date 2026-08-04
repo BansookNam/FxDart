@@ -3,7 +3,7 @@ slug: clean-nullable-readings
 title: null은 버리고 값만 남기기 — RxDart vs FxDart
 description: null이 섞인 센서 피드를 정리하고 남은 값을 포맷하기 — whereNotNull은 이름만 다른 compact이고, 둘 다 double?을 double로 정적으로 좁힙니다.
 heading: null은 버리고 값만 남기기
-order: 6
+order: 8
 tier: 1
 functions: fx, compact, map
 domain: sensors

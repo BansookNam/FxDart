@@ -3,7 +3,7 @@ slug: live-latest-value
 title: 늦게 온 리더를 위한 라이브 현재 값 — RxDart vs FxDart
 description: 늦게 접속한 대시보드도 현재 온도를 즉시 받습니다 — BehaviorSubject와 LiveValue 모두 최신 값을 리플레이한 뒤 라이브로 스트리밍합니다.
 heading: 늦게 온 리더를 위한 라이브 현재 값
-order: 47
+order: 39
 tier: 4
 functions: liveValue, fxEvents
 domain: sensors

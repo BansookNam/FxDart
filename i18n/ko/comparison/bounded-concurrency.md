@@ -3,7 +3,7 @@ slug: bounded-concurrency
 title: 두 개씩 프로필 가져오기 — Dart vs FxDart
 description: 순서를 지키는 동시성 제한 — 순수 Dart로 직접 만든 워커 풀과 FxDart의 toAsync + map + concurrent를 비교합니다.
 heading: 두 개씩 프로필 가져오기
-order: 20
+order: 15
 tier: 2
 functions: toAsync, map, concurrent
 domain: users

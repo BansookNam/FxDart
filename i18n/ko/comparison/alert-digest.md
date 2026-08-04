@@ -3,7 +3,7 @@ slug: alert-digest
 title: 서비스와 심각도별 로그 알림 다이제스트 — Dart vs FxDart
 description: WARN과 ERROR 로그를 들여쓰기된 다이제스트로 표현합니다 — groupBy + flatMap + uniq를 이용한 중첩 그룹화와 세 겹의 중첩 루프 및 seen 집합을 비교합니다.
 heading: 서비스와 심각도별 로그 알림 다이제스트
-order: 38
+order: 39
 tier: 4
 functions: filter, countBy, groupBy, sortBy, flatMap, map, uniq, join
 domain: logs

@@ -3,7 +3,7 @@ slug: dependent-calls-in-sequence
 title: 각 호출이 다음 호출로 이어질 때 — RxDart vs FxDart
 description: 각 응답이 다음 요청의 재료가 되는 API 호출 네 번 — scan은 상태를 파이프라인 속으로 꿰어 넣고, asyncMap은 가변 토큰을 클로저로 붙듭니다.
 heading: 각 호출이 다음 호출로 이어질 때
-order: 37
+order: 49
 tier: 4
 functions: fx, toAsync, map, scan
 domain: general

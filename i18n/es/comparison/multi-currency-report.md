@@ -3,7 +3,7 @@ slug: multi-currency-report
 title: Informe de gastos multidivisa — Dart vs FxDart
 description: Normaliza a USD el libro de cuentas de un viaje con tipos fijos y luego agrupa, ordena y resume — un pipeline por línea de informe frente al boilerplate de fold/reduce.
 heading: Informe de gastos multidivisa
-order: 36
+order: 31
 tier: 4
 functions: map, groupBy, sumBy, sortBy, uniq, maxBy, join
 domain: transactions

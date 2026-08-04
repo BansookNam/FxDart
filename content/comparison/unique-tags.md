@@ -3,7 +3,7 @@ slug: unique-tags
 title: All tags across posts, sorted — Dart vs FxDart
 description: Flatten post tags into one sorted, distinct list — expand + toSet + sort in plain Dart vs flatMap + uniq + sort in FxDart. An honest tie.
 heading: All tags across posts, sorted
-order: 14
+order: 12
 tier: 2
 functions: flatMap, uniq, sort
 domain: general

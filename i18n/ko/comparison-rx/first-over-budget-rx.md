@@ -3,7 +3,7 @@ slug: first-over-budget-rx
 title: 예산을 넘는 첫 거래 — RxDart vs FxDart
 description: 100을 넘는 첫 거래를 찾고 멈추기 — Rx firstWhere는 구독을 취소하고, fxdart find는 끌어오기를 멈춥니다. 양쪽 모두 8건 중 4건만 검사합니다.
 heading: 예산을 넘는 첫 거래
-order: 3
+order: 1
 tier: 1
 functions: fx, find
 domain: transactions

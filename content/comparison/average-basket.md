@@ -3,7 +3,7 @@ slug: average-basket
 title: Average order value over $100 — Dart vs FxDart
 description: Mean total of large orders — where/map/average with package:collection vs filter + averageBy in FxDart.
 heading: Average order value over $100
-order: 5
+order: 4
 tier: 1
 functions: filter, averageBy
 domain: orders

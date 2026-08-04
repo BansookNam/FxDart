@@ -3,7 +3,7 @@ slug: latency-extremes
 title: La petición más rápida y la más lenta — RxDart vs FxDart
 description: Sondear ocho endpoints de forma asíncrona e imprimir la latencia mínima y máxima — reducciones que devuelven Future en ambos lados, una pasada fresca cada una.
 heading: La petición más rápida y la más lenta
-order: 20
+order: 24
 tier: 2
 functions: fx, toAsync, min, max
 domain: logs

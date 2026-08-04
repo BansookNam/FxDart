@@ -3,7 +3,7 @@ slug: top-category-average
 title: Category with highest average expense — Dart vs FxDart
 description: Group expenses and find the priciest category per transaction — collection groupBy + maxBy nested calls in plain Dart vs one FxDart chain.
 heading: Category with highest average expense
-order: 18
+order: 17
 tier: 2
 functions: groupBy, map, maxBy
 domain: transactions

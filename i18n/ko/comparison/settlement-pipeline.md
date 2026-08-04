@@ -3,7 +3,7 @@ slug: settlement-pipeline
 title: 일일 정산 마감 파이프라인 — Dart vs FxDart
 description: 검증하고, 판매자별로 묶고, 2건씩 게시한 다음 보고합니다 — 동기에서 비동기로 넘어가는 체인 하나 대 groupListsBy와 워커 풀.
 heading: 일일 정산 마감 파이프라인
-order: 48
+order: 52
 tier: 4
 functions: reject, groupBy, map, sumBy, sortBy, toAsync, concurrent, partition
 domain: transactions

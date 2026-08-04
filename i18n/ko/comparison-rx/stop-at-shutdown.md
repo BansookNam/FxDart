@@ -3,7 +3,7 @@ slug: stop-at-shutdown
 title: 종료 마커까지, 마커 포함 — RxDart vs FxDart
 description: SHUTDOWN까지의 모든 이벤트를 마커 포함해 남기고 낙오자들은 버리기 — takeWhileInclusive vs takeUntilInclusive, 같은 절단의 두 표기.
 heading: 종료 마커까지, 마커 포함
-order: 23
+order: 22
 tier: 2
 functions: fx, takeUntilInclusive, map
 domain: logs

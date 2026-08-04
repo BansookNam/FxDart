@@ -3,7 +3,7 @@ slug: successes-and-failures
 title: Split successes from failures — RxDart vs FxDart
 description: Seven async validations, two fail — a per-item try/catch feeding a typed partition vs inner streams that turn the error channel back into data.
 heading: Split successes from failures
-order: 32
+order: 26
 tier: 3
 functions: fx, toAsync, map, partition
 domain: orders

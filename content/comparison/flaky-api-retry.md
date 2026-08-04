@@ -3,7 +3,7 @@ slug: flaky-api-retry
 title: Poll a flaky API until first success — Dart vs FxDart
 description: Retry-until-ready as a lazy pipeline — range + toAsync + map + dropWhile + head vs an imperative polling loop with a break.
 heading: Poll a flaky API until first success
-order: 42
+order: 38
 tier: 4
 functions: range, toAsync, map, peek, dropWhile, head
 domain: general

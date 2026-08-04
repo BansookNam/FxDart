@@ -3,7 +3,7 @@ slug: align-forecast-actual
 title: Align forecast with actuals — RxDart vs FxDart
 description: Pair two fixed series position by position and print each day's difference — zipWith on streams vs zip on iterables, same alignment either way.
 heading: Align forecast with actuals
-order: 16
+order: 20
 tier: 2
 functions: fx, zip, map
 domain: sensors

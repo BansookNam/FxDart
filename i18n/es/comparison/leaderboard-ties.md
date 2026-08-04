@@ -3,7 +3,7 @@ slug: leaderboard-ties
 title: Tabla de clasificación con puestos empatados — Dart vs FxDart
 description: Clasifica jugadores de modo que las puntuaciones iguales compartan puesto — estado mutable rank/prevScore en Dart nativo frente a sortBy + groupBy + zipWithIndex en FxDart.
 heading: Tabla de clasificación con puestos empatados
-order: 26
+order: 24
 tier: 3
 functions: sortBy, groupBy, entries, zipWithIndex, flatMap
 domain: users

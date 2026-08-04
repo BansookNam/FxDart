@@ -3,7 +3,7 @@ slug: running-balance
 title: Saldo acumulado de una cuenta — Dart vs FxDart
 description: El saldo después de cada transacción — un bucle con acumulador mutable en Dart nativo frente a scan + map en FxDart.
 heading: Saldo acumulado de una cuenta
-order: 2
+order: 7
 tier: 1
 functions: scan, map
 domain: transactions

@@ -3,7 +3,7 @@ slug: per-row-retry
 title: Reintentar cada fila inestable por separado — RxDart vs FxDart
 description: Seis filas de importación inestables, dos intentos cada una, tres en vuelo — flatMap emite en orden de terminación, mapRetry bajo concurrent conserva el orden de origen.
 heading: Reintentar cada fila inestable por separado
-order: 29
+order: 31
 tier: 3
 functions: fx, toAsync, retry, concurrent
 domain: orders

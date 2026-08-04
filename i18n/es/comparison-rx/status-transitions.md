@@ -3,7 +3,7 @@ slug: status-transitions
 title: Informa solo de los cambios de estado — RxDart vs FxDart
 description: Colapsar un feed de salud repetitivo a una línea por racha — Stream.distinct frente a uniqAdjacent, con distinctUnique y uniq como los primos globales.
 heading: Informa solo de los cambios de estado
-order: 14
+order: 15
 tier: 2
 functions: fx, uniqAdjacent, uniq, map
 domain: logs

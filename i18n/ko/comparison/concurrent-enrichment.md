@@ -3,7 +3,7 @@ slug: concurrent-enrichment
 title: 상위 판매자를 동시에 보강하기 — Dart vs FxDart
 description: 상위 3개 판매자를 고른 뒤, 요청 속도 제한이 있는 API로 두 개씩 조회합니다 — 순수 Dart로 직접 만든 워커 풀과 FxDart의 concurrent(2)를 비교합니다.
 heading: 상위 판매자를 동시에 보강하기
-order: 30
+order: 23
 tier: 3
 functions: sortBy, take, toAsync, map, concurrent
 domain: transactions

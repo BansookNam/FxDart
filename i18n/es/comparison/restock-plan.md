@@ -3,7 +3,7 @@ slug: restock-plan
 title: Plan de reposición de inventario — Dart vs FxDart
 description: Prioriza los artículos por debajo del umbral y corta la lista de pedidos al llegar al presupuesto — scan + zip + takeWhile como flujo de datos frente a un total acumulado mutable y un break.
 heading: Plan de reposición de inventario
-order: 37
+order: 32
 tier: 4
 functions: filter, sortBy, scan, drop, zip, takeWhile, map, sumBy, join
 domain: orders
