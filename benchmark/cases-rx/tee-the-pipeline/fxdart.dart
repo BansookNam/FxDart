@@ -18,11 +18,12 @@ Future<void> main() async {
     n: n,
     run: () {
       sourceRuns = 0;
-      // fork the SAME iterable object twice: both cursors share one
-      // buffered pass over the source, in whatever order they read.
-      final shared = readings();
-      final total = fx(fork(shared)).sum();
-      final peak = fx(fork(shared)).max();
+      // tee2 advances BOTH reductions on the same element, so one pass feeds
+      // them both and nothing is ever buffered.
+      final (total, peak) = tee2(
+          readings(),
+          (seed: 0, step: (int a, int r) => a + r),
+          (seed: 0, step: (int a, int r) => r > a ? r : a));
       // The single-pass proof: sourceRuns is folded into the checksum.
       return 'total=$total|peak=$peak|runs=$sourceRuns';
     },
