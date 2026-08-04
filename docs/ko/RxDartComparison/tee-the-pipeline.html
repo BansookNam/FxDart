@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2360064b2e6855a8">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=915ad7bb5dc5bb9e">
 </head>
 <body>
 <header class="site-header">
@@ -49,7 +49,7 @@
   <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #48 · <strong>소스 하나, 독립 리더 둘</strong></p>
   <h1>소스 하나, 독립 리더 둘</h1>
   <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/tee2.html">tee2</a></li></ul>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/tee.html">tee</a></li></ul>
   <h2>요구사항</h2>
   <p>
     하나의 측정값 소스가 <strong>두 개의</strong> 독립적인 계산 —
@@ -100,7 +100,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="fd21ba3885214fab">
+      <div class="playground" data-pg="23580016a6b22a18">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -113,9 +113,9 @@ Iterable<int> readings() sync* {
 }
 
 void main() {
-  // tee2 advances BOTH reductions on the same element, so one pass feeds
+  // tee advances BOTH reductions on the same element, so one pass feeds
   // them both and nothing is ever buffered.
-  final (total, peak) = tee2(
+  final (total, peak) = tee(
       readings(),
       (seed: 0, step: (int acc, int r) => acc + r),
       (seed: 0, step: (int acc, int r) => r > acc ? r : acc));
@@ -138,7 +138,7 @@ void main() {
     한 번의 순회를 공유하기. RxDart는 스트림을 <em>connectable</em>로
     만듭니다: <code>publish()</code>가 소스를 미루고, 두 리덕션이
     구독한 뒤, <code>connect()</code>가 그들을 먹이는 단 하나의 구독을
-    시작합니다. FxDart의 <code><a href="../tutorials/tee2.html">tee2</a></code>는 대신 두 리덕션의 보폭을
+    시작합니다. FxDart의 <code><a href="../tutorials/tee.html">tee</a></code>는 대신 두 리덕션의 보폭을
     맞춥니다: 다음 원소를 당기기 전에 각 원소가 합계와 최댓값을 모두
     전진시키므로, 한 번의 순회가 아무것도 기억할 필요가 없습니다.
   </p>
@@ -147,9 +147,9 @@ void main() {
     그것이 <em>현재</em> 원소인 동안 보기 때문입니다. 리더들을 먼저
     붙게 만듦으로써 <code>connect()</code>가 사는 것이 그것이고,
     리더들을 폴드로 — 파이프라인이 아니라 <code>seed</code>와
-    <code>step</code>으로 — 받음으로써 <code><a href="../tutorials/tee2.html">tee2</a></code>가 사는 것도
+    <code>step</code>으로 — 받음으로써 <code><a href="../tutorials/tee.html">tee</a></code>가 사는 것도
     그것입니다. 그 제약이 대가입니다. <code>publish()</code>는 원하는
-    어떤 스트림 연산자든 먹일 수 있지만, <code><a href="../tutorials/tee2.html">tee2</a></code>는 폴드만
+    어떤 스트림 연산자든 먹일 수 있지만, <code><a href="../tutorials/tee.html">tee</a></code>는 폴드만
     먹입니다. 두 리더가 정말로 독립적인 파이프라인이라면 FxDart의
     답은 <code>fork</code>입니다 — 같은 iterable 객체의 모든 fork는
     버퍼링된 하나의 공유 순회 위의 커서이고 — 거기서는 버퍼가 돌아와,
@@ -234,7 +234,7 @@ void main() {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=2360064b2e6855a8";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=915ad7bb5dc5bb9e";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

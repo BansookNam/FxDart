@@ -421,15 +421,15 @@ Future<(List<A>, List<A>)> _$partitionAsync<A>(
 // prefix rewrite needs these two names to exist as types, not functions.
 typedef _$Fold<A, R> = Fold<A, R>;
 typedef _$AsyncFold<A, R> = AsyncFold<A, R>;
-(R1, R2) _$tee2<A, R1, R2>(
+(R1, R2) _$tee<A, R1, R2>(
         Iterable<A> iterable, Fold<A, R1> first, Fold<A, R2> second) =>
-    tee2(iterable, first, second);
+    tee(iterable, first, second);
 (R1, R2, R3) _$tee3<A, R1, R2, R3>(Iterable<A> iterable, Fold<A, R1> first,
         Fold<A, R2> second, Fold<A, R3> third) =>
     tee3(iterable, first, second, third);
-Future<(R1, R2)> _$tee2Async<A, R1, R2>(FxAsyncIterable<A> iterable,
+Future<(R1, R2)> _$teeAsync<A, R1, R2>(FxAsyncIterable<A> iterable,
         AsyncFold<A, R1> first, AsyncFold<A, R2> second) =>
-    tee2Async(iterable, first, second);
+    teeAsync(iterable, first, second);
 
 // strict/access.dart
 A? _$head<A>(Iterable<A> iterable) => head(iterable);

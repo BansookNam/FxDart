@@ -5,8 +5,8 @@ description: FxDart ifEmpty and defaultIfEmpty tutorial: lazy fallbacks for pipe
 heading: <code>ifEmpty</code>
 section: 6
 crumb: ifEmpty
-prev: tee2.html
-prevLabel: tee2
+prev: tee3.html
+prevLabel: tee3
 next: reduce.html
 nextLabel: reduce
 ---

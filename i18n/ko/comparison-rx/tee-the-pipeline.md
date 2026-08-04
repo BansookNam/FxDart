@@ -5,7 +5,7 @@ description: 부수효과 있는 소스 하나에서 두 번 실행하지 않고
 heading: 소스 하나, 독립 리더 둘
 order: 48
 tier: 4
-functions: tee2
+functions: tee
 domain: sensors
 verdict: tie
 async: false
@@ -34,7 +34,7 @@ async: false
     한 번의 순회를 공유하기. RxDart는 스트림을 <em>connectable</em>로
     만듭니다: <code>publish()</code>가 소스를 미루고, 두 리덕션이
     구독한 뒤, <code>connect()</code>가 그들을 먹이는 단 하나의 구독을
-    시작합니다. FxDart의 <code>tee2</code>는 대신 두 리덕션의 보폭을
+    시작합니다. FxDart의 <code>tee</code>는 대신 두 리덕션의 보폭을
     맞춥니다: 다음 원소를 당기기 전에 각 원소가 합계와 최댓값을 모두
     전진시키므로, 한 번의 순회가 아무것도 기억할 필요가 없습니다.
   </p>
@@ -43,9 +43,9 @@ async: false
     그것이 <em>현재</em> 원소인 동안 보기 때문입니다. 리더들을 먼저
     붙게 만듦으로써 <code>connect()</code>가 사는 것이 그것이고,
     리더들을 폴드로 — 파이프라인이 아니라 <code>seed</code>와
-    <code>step</code>으로 — 받음으로써 <code>tee2</code>가 사는 것도
+    <code>step</code>으로 — 받음으로써 <code>tee</code>가 사는 것도
     그것입니다. 그 제약이 대가입니다. <code>publish()</code>는 원하는
-    어떤 스트림 연산자든 먹일 수 있지만, <code>tee2</code>는 폴드만
+    어떤 스트림 연산자든 먹일 수 있지만, <code>tee</code>는 폴드만
     먹입니다. 두 리더가 정말로 독립적인 파이프라인이라면 FxDart의
     답은 <code>fork</code>입니다 — 같은 iterable 객체의 모든 fork는
     버퍼링된 하나의 공유 순회 위의 커서이고 — 거기서는 버퍼가 돌아와,

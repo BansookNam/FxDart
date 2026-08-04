@@ -11,7 +11,7 @@ void main() {
 
   // Both reductions advance on the SAME element, so the sensor is read once
   // and nothing is buffered along the way:
-  final (total, peak) = tee2(
+  final (total, peak) = tee(
       sensor(),
       (seed: 0, step: (int acc, int r) => acc + r),
       (seed: 0, step: (int acc, int r) => r > acc ? r : acc));

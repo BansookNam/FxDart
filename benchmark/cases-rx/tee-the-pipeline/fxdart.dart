@@ -18,9 +18,9 @@ Future<void> main() async {
     n: n,
     run: () {
       sourceRuns = 0;
-      // tee2 advances BOTH reductions on the same element, so one pass feeds
+      // tee advances BOTH reductions on the same element, so one pass feeds
       // them both and nothing is ever buffered.
-      final (total, peak) = tee2(
+      final (total, peak) = tee(
           readings(),
           (seed: 0, step: (int a, int r) => a + r),
           (seed: 0, step: (int a, int r) => r > a ? r : a));

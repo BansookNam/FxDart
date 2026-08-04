@@ -7,8 +7,8 @@ section: 6
 crumb: fork
 prev: reverse.html
 prevLabel: reverse
-next: tee2.html
-nextLabel: tee2
+next: tee.html
+nextLabel: tee
 ---
   <p class="hero-sub">Branches one buffered iteration of a source into independent, replayable readers.</p>
 

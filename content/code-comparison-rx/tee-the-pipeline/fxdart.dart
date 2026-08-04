@@ -9,9 +9,9 @@ Iterable<int> readings() sync* {
 }
 
 void main() {
-  // tee2 advances BOTH reductions on the same element, so one pass feeds
+  // tee advances BOTH reductions on the same element, so one pass feeds
   // them both and nothing is ever buffered.
-  final (total, peak) = tee2(
+  final (total, peak) = tee(
       readings(),
       (seed: 0, step: (int acc, int r) => acc + r),
       (seed: 0, step: (int acc, int r) => r > acc ? r : acc));

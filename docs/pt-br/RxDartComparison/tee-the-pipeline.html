@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2360064b2e6855a8">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=915ad7bb5dc5bb9e">
 </head>
 <body>
 <header class="site-header">
@@ -51,7 +51,7 @@
   <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #48 · <strong>One source, two independent readers</strong></p>
   <h1>One source, two independent readers</h1>
   <p class="cmp-meta"><span class="badge verdict-tie">Toss-up</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/tee2.html">tee2</a></li></ul>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/tee.html">tee</a></li></ul>
   <h2>Requirement</h2>
   <p>
     One reading source must feed <strong>two</strong> independent
@@ -102,7 +102,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="fd21ba3885214fab">
+      <div class="playground" data-pg="23580016a6b22a18">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -115,9 +115,9 @@ Iterable<int> readings() sync* {
 }
 
 void main() {
-  // tee2 advances BOTH reductions on the same element, so one pass feeds
+  // tee advances BOTH reductions on the same element, so one pass feeds
   // them both and nothing is ever buffered.
-  final (total, peak) = tee2(
+  final (total, peak) = tee(
       readings(),
       (seed: 0, step: (int acc, int r) => acc + r),
       (seed: 0, step: (int acc, int r) => r > acc ? r : acc));
@@ -140,7 +140,7 @@ void main() {
     RxDart makes the stream <em>connectable</em>: <code>publish()</code>
     defers the source, both reductions subscribe, and <code>connect()</code>
     starts the single subscription that feeds them. FxDart's
-    <code><a href="../tutorials/tee2.html">tee2</a></code> keeps both reductions in step instead: each element
+    <code><a href="../tutorials/tee.html">tee</a></code> keeps both reductions in step instead: each element
     advances the total and the peak before the next one is pulled, so the
     single pass never has to remember anything.
   </p>
@@ -148,10 +148,10 @@ void main() {
     Both avoid a buffer, and for the same underlying reason — every
     reader sees each element while it is the current one. That is what
     <code>connect()</code> buys by making the readers attach first, and
-    what <code><a href="../tutorials/tee2.html">tee2</a></code> buys by taking the readers as folds: a seed
+    what <code><a href="../tutorials/tee.html">tee</a></code> buys by taking the readers as folds: a seed
     and a step, rather than two pipelines free to advance independently.
     The constraint is the price. <code>publish()</code> will feed any
-    stream operators you care to subscribe; <code><a href="../tutorials/tee2.html">tee2</a></code> only feeds
+    stream operators you care to subscribe; <code><a href="../tutorials/tee.html">tee</a></code> only feeds
     folds. When the two readers really are independent pipelines, FxDart's
     answer is <code>fork</code> — every fork of the same iterable object
     is a cursor over one shared, buffered pass — and there the buffer
@@ -236,7 +236,7 @@ void main() {
   <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=2360064b2e6855a8";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=915ad7bb5dc5bb9e";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

@@ -9,7 +9,7 @@ void main() {
     }
   }
 
-  // TODO: replace these two passes with one tee2 so the sensor is read only
+  // TODO: replace these two passes with one tee so the sensor is read only
   // once (`reads` should print 3, not 6).
   final total = sensor().fold<int>(0, (a, b) => a + b);
   final count = sensor().length;

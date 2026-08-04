@@ -5,7 +5,7 @@ description: Total and max from one side-effecting source without running it twi
 heading: One source, two independent readers
 order: 48
 tier: 4
-functions: tee2
+functions: tee
 domain: sensors
 verdict: tie
 async: false
@@ -34,7 +34,7 @@ async: false
     RxDart makes the stream <em>connectable</em>: <code>publish()</code>
     defers the source, both reductions subscribe, and <code>connect()</code>
     starts the single subscription that feeds them. FxDart's
-    <code>tee2</code> keeps both reductions in step instead: each element
+    <code>tee</code> keeps both reductions in step instead: each element
     advances the total and the peak before the next one is pulled, so the
     single pass never has to remember anything.
   </p>
@@ -42,10 +42,10 @@ async: false
     Both avoid a buffer, and for the same underlying reason — every
     reader sees each element while it is the current one. That is what
     <code>connect()</code> buys by making the readers attach first, and
-    what <code>tee2</code> buys by taking the readers as folds: a seed
+    what <code>tee</code> buys by taking the readers as folds: a seed
     and a step, rather than two pipelines free to advance independently.
     The constraint is the price. <code>publish()</code> will feed any
-    stream operators you care to subscribe; <code>tee2</code> only feeds
+    stream operators you care to subscribe; <code>tee</code> only feeds
     folds. When the two readers really are independent pipelines, FxDart's
     answer is <code>fork</code> — every fork of the same iterable object
     is a cursor over one shared, buffered pass — and there the buffer

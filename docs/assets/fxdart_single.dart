@@ -5683,7 +5683,7 @@ Future<(List<A>, List<A>)> partitionAsync<A>(
 
 // --- tee: several folds over one pass -------------------------------------
 
-/// One reduction in a [tee2] / [tee3] pass: where it starts, and how each
+/// One reduction in a [tee] / [tee3] pass: where it starts, and how each
 /// element advances it.
 typedef Fold<A, R> = ({R seed, R Function(R acc, A a) step});
 
@@ -5703,12 +5703,12 @@ typedef Fold<A, R> = ({R seed, R Function(R acc, A a) step});
 /// fxdart extension (not part of FxTS).
 ///
 /// ```dart
-/// final (total, peak) = tee2(readings,
+/// final (total, peak) = tee(readings,
 ///     (seed: 0, step: (int a, int r) => a + r),
 ///     (seed: 0, step: (int a, int r) => r > a ? r : a));
 /// ```
 @pragma('vm:align-loops')
-(R1, R2) tee2<A, R1, R2>(
+(R1, R2) tee<A, R1, R2>(
     Iterable<A> iterable, Fold<A, R1> first, Fold<A, R2> second) {
   final f1 = first.step;
   final f2 = second.step;
@@ -5721,7 +5721,7 @@ typedef Fold<A, R> = ({R seed, R Function(R acc, A a) step});
   return (a1, a2);
 }
 
-/// Three-fold [tee2].
+/// Three-fold [tee].
 @pragma('vm:align-loops')
 (R1, R2, R3) tee3<A, R1, R2, R3>(Iterable<A> iterable, Fold<A, R1> first,
     Fold<A, R2> second, Fold<A, R3> third) {
@@ -5739,9 +5739,9 @@ typedef Fold<A, R> = ({R seed, R Function(R acc, A a) step});
   return (a1, a2, a3);
 }
 
-/// Async counterpart of [tee2]. Steps may return a [Future]; each element is
+/// Async counterpart of [tee]. Steps may return a [Future]; each element is
 /// applied to both accumulators before the next is pulled.
-Future<(R1, R2)> tee2Async<A, R1, R2>(FxAsyncIterable<A> iterable,
+Future<(R1, R2)> teeAsync<A, R1, R2>(FxAsyncIterable<A> iterable,
     AsyncFold<A, R1> first, AsyncFold<A, R2> second) async {
   final f1 = first.step;
   final f2 = second.step;
@@ -5765,7 +5765,7 @@ Future<(R1, R2)> tee2Async<A, R1, R2>(FxAsyncIterable<A> iterable,
   return (a1, a2);
 }
 
-/// The [tee2Async] counterpart of [Fold].
+/// The [teeAsync] counterpart of [Fold].
 typedef AsyncFold<A, R> = ({
   FutureOr<R> seed,
   FutureOr<R> Function(R acc, A a) step
@@ -8261,10 +8261,10 @@ class Fx<T> extends Iterable<T> {
 
   /// Runs two folds over a single pass of this chain — one iteration, no
   /// buffering.
-  (R1, R2) tee2<R1, R2>(_$Fold<T, R1> first, _$Fold<T, R2> second) =>
-      _$tee2(_inner, first, second);
+  (R1, R2) tee<R1, R2>(_$Fold<T, R1> first, _$Fold<T, R2> second) =>
+      _$tee(_inner, first, second);
 
-  /// Three-fold [tee2].
+  /// Three-fold [tee].
   (R1, R2, R3) tee3<R1, R2, R3>(
           _$Fold<T, R1> first, _$Fold<T, R2> second, _$Fold<T, R3> third) =>
       _$tee3(_inner, first, second, third);
@@ -8572,9 +8572,9 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Runs two folds over a single pass of this chain — one iteration, no
   /// buffering.
   @pragma('vm:prefer-inline')
-  Future<(R1, R2)> tee2<R1, R2>(
+  Future<(R1, R2)> tee<R1, R2>(
           _$AsyncFold<T, R1> first, _$AsyncFold<T, R2> second) =>
-      _$tee2Async(_inner, first, second);
+      _$teeAsync(_inner, first, second);
 
   /// Maps [f], retrying each call up to [attempts] times (with optional
   /// [delay] backoff) before the error propagates. Retries compose with
@@ -9341,15 +9341,15 @@ Future<(List<A>, List<A>)> _$partitionAsync<A>(
 // prefix rewrite needs these two names to exist as types, not functions.
 typedef _$Fold<A, R> = Fold<A, R>;
 typedef _$AsyncFold<A, R> = AsyncFold<A, R>;
-(R1, R2) _$tee2<A, R1, R2>(
+(R1, R2) _$tee<A, R1, R2>(
         Iterable<A> iterable, Fold<A, R1> first, Fold<A, R2> second) =>
-    tee2(iterable, first, second);
+    tee(iterable, first, second);
 (R1, R2, R3) _$tee3<A, R1, R2, R3>(Iterable<A> iterable, Fold<A, R1> first,
         Fold<A, R2> second, Fold<A, R3> third) =>
     tee3(iterable, first, second, third);
-Future<(R1, R2)> _$tee2Async<A, R1, R2>(FxAsyncIterable<A> iterable,
+Future<(R1, R2)> _$teeAsync<A, R1, R2>(FxAsyncIterable<A> iterable,
         AsyncFold<A, R1> first, AsyncFold<A, R2> second) =>
-    tee2Async(iterable, first, second);
+    teeAsync(iterable, first, second);
 
 // strict/access.dart
 A? _$head<A>(Iterable<A> iterable) => head(iterable);
