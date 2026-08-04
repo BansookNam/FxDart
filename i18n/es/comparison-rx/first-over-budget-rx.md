@@ -48,3 +48,53 @@ async: false
     operador cada uno, y ambos se detienen exactamente en el momento
     justo.
   </p>
+
+  <h3>Por qué la diferencia del benchmark es tan grande</h3>
+  <p>
+    Las barras de abajo no miden la pereza. A la escala del benchmark, la
+    primera transacción por encima del presupuesto está en el elemento
+    900 001 de un millón, y <strong>ambos lados examinan exactamente
+    900 001</strong> — los checksums lo demuestran. Lo que miden las
+    barras es el precio de que un elemento atraviese cada modelo: unos
+    <strong>1 ns</strong> del lado pull, unos <strong>88 ns</strong> del
+    lado push.
+  </p>
+  <p>
+    Eso no es un defecto de RxDart, ni una forma de escribirlo que se
+    arregle eligiendo mejor los operadores. Medimos las alternativas sobre
+    el mismo conjunto de datos — 900 001 elementos, resultados idénticos:
+  </p>
+  <ul>
+    <li><code>where().first</code> en lugar de <code>firstWhere</code>:
+      50 ns (la combinación de operadores más rápida que encontramos)</li>
+    <li>contar dentro del predicado en lugar de un tap
+      <code>doOnData</code>, lo que elimina una capa de transformación:
+      62 ns</li>
+    <li><code>await for</code> con <code>break</code>, sin operadores:
+      227 ns — el más lento, no el más rápido</li>
+    <li>un <code>StreamController</code> síncrono movido a mano, que ya no
+      es Rx idiomático pero es el suelo del modelo push: 20 ns</li>
+  </ul>
+  <p>
+    Incluso ese suelo es 20× la cadena pull. La razón es estructural. Un
+    <code>Stream</code> es un <em>mecanismo de entrega</em>: cada valor se
+    entrega a una suscripción, a través de todas las capas de
+    transformación que tenga la cadena, con la disciplina del bucle de
+    eventos que hace seguro compartir, pausar, cancelar y componer un
+    stream a través de fronteras asíncronas. El <code>find</code> de
+    FxDart sobre una <code>List</code> compila a un bucle indexado que
+    llama a un closure por elemento y retorna — no hay entrega, ni
+    suscripción, ni planificación, porque aquí nada es realmente
+    asíncrono.
+  </p>
+  <p>
+    Así que la lectura honesta de estas barras es estrecha: <em>cuando la
+    fuente ya está en memoria y la pregunta es síncrona, hacerla pasar por
+    un stream es puro sobrecoste.</em> Convierte la fuente en algo
+    genuinamente asíncrono — un socket, un websocket, una API paginada — y
+    ese coste por elemento desaparece bajo la E/S que el stream fue
+    diseñado para gestionar, que es justo el terreno que cubre la Parte 4.
+    El veredicto del código sigue siendo empate: ambos escriben el mismo
+    cortocircuito con un operador, y ambos se detienen en el momento
+    justo.
+  </p>
