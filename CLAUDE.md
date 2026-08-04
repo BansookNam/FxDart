@@ -41,6 +41,12 @@ Async operator callbacks in `mapAsync`-style code must stay parallel-safe: overl
 - `content/code/` (playground code) and `sig.txt` are shared across locales — **never translated**.
 - `benchmark/results/results.json` (written by `dart run benchmark/run_benchmarks.dart`, see `benchmark/README.md`) is a build_docs **input**: it renders the Benchmark bar-chart section on each DartComparison page. Benchmark cases in `benchmark/cases/<slug>/` must stay faithful to their `content/code-comparison/<slug>/` example — see `benchmark/AUTHORING.md`.
 - After translating, run `dart run tool/build_docs.dart --record` to mark it current.
+- Staleness is a hash of the **English file only**, so *any* edit to it — including a
+  mechanical front-matter bump applied to the overlays in the same commit — marks every
+  translation of that page outdated and grows a "may be outdated" banner. `--record`
+  belongs in the same commit as the edit. Before recording in bulk, confirm the English
+  diff really is prose-free (`git show <sha> -- content/comparison | grep -v '^[-+]order:'`),
+  since recording is what silences a *genuine* staleness too.
 - `deploy.sh` stages only docs-related paths (`docs content i18n tool tools deploy.sh DEPLOY.md`) — commit `lib/`/`test/` changes separately first.
 
 ### Playground execution path
