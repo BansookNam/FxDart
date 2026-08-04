@@ -293,11 +293,55 @@ class FxScanStage extends FxStage {
   final FutureOr<Object?> seed;
 }
 
+/// A stage compiled into the chain the hot loop actually walks.
+///
+/// The stage *list* is the build-time description; this is its executable
+/// form. Walking a linked chain drops the per-stage list load, its bounds
+/// check, and the index arithmetic from every element, and — the reason it
+/// exists — lets an asynchronous stage resume at [next] directly instead of
+/// re-deriving `i + 1` and re-entering the loop by index.
+///
+/// Links are immutable and built once per [FxFusedAsyncIterable], so every
+/// iterator over it shares one chain; a fused scan's running accumulator
+/// lives on the iterator, never here.
+sealed class FxLink {
+  const FxLink(this.next);
+
+  /// The next stage, or null at the end of the run.
+  final FxLink? next;
+}
+
+/// Compiled [FxMapStage].
+final class FxMapLink extends FxLink {
+  const FxMapLink(this.f, super.next);
+  final FutureOr<Object?> Function(Object? value) f;
+}
+
+/// Compiled [FxFilterStage].
+final class FxFilterLink extends FxLink {
+  const FxFilterLink(this.p, super.next);
+  final FutureOr<bool> Function(Object? value) p;
+}
+
+/// Compiled [FxTakeWhileStage].
+final class FxTakeWhileLink extends FxLink {
+  const FxTakeWhileLink(this.p, super.next);
+  final FutureOr<bool> Function(Object? value) p;
+}
+
+/// Compiled [FxScanStage].
+final class FxScanLink extends FxLink {
+  const FxScanLink(this.f, this.seed, super.next);
+  final FutureOr<Object?> Function(Object? acc, Object? value) f;
+  final FutureOr<Object?> seed;
+}
+
 /// A fused run of stages over one [source].
 class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
   FxFusedAsyncIterable(this.source, this.stages, this.legacy)
       : oneToOne = _oneToOne(stages),
-        scanIndex = _scanIndex(stages);
+        scanIndex = _scanIndex(stages),
+        links = _compile(stages);
 
   /// The pre-stage upstream.
   final FxAsyncIterable<Object?> source;
@@ -317,6 +361,36 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
   /// Index of the run's [FxScanStage], or -1 when there is none. At most one
   /// scan fuses into a run; a second one starts a new run over this iterable.
   final int scanIndex;
+
+  /// [stages] compiled into the chain the per-element loops walk.
+  final FxLink? links;
+
+  /// The run's scan link, or null when the run has no scan — the entry point
+  /// for emitting the seed through the stages that follow it. Resolved once
+  /// per iterable, never per pull: [FxFastIterator.nextOr] consults it on
+  /// every element, so walking the chain here would be a per-element cost.
+  late final FxScanLink? scanLink = _findScan(links);
+
+  static FxScanLink? _findScan(FxLink? l) {
+    for (; l != null; l = l.next) {
+      if (l is FxScanLink) return l;
+    }
+    return null;
+  }
+
+  /// Links [stages] back to front, so each link holds the one after it.
+  static FxLink? _compile(List<FxStage> stages) {
+    FxLink? head;
+    for (var i = stages.length - 1; i >= 0; i--) {
+      head = switch (stages[i]) {
+        FxMapStage(:final f) => FxMapLink(f, head),
+        FxFilterStage(:final p) => FxFilterLink(p, head),
+        FxTakeWhileStage(:final p) => FxTakeWhileLink(p, head),
+        FxScanStage(:final f, :final seed) => FxScanLink(f, seed, head),
+      };
+    }
+    return head;
+  }
 
   static bool _oneToOne(List<FxStage> stages) {
     for (final stage in stages) {
@@ -369,10 +443,10 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
     if (fb != null) return fb.next();
     if (_ended) return IterResult<T>.done();
     _source ??= _iterable.source.iterator;
-    final scanIndex = _iterable.scanIndex;
-    if (scanIndex >= 0 && !_seedEmitted) {
+    final scan = _iterable.scanLink;
+    if (scan != null && !_seedEmitted) {
       _seedEmitted = true;
-      return _emitSeed(scanIndex);
+      return _emitSeed(scan);
     }
     return _pull();
   }
@@ -380,19 +454,19 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
   /// A fused [FxScanStage] emits its seed before the source is pulled — as
   /// the standalone `scanAsync` iterator does — carried through the stages
   /// that follow the scan.
-  FutureOr<IterResult<T>> _emitSeed(int scanIndex) {
-    final seed = (_iterable.stages[scanIndex] as FxScanStage).seed;
+  FutureOr<IterResult<T>> _emitSeed(FxScanLink scan) {
+    final seed = scan.seed;
     if (seed is Future) {
       return seed.then((s) {
         _acc = s;
-        return _fromSeed(s, scanIndex + 1);
+        return _fromSeed(s, scan.next);
       });
     }
     _acc = seed;
-    return _fromSeed(seed, scanIndex + 1);
+    return _fromSeed(seed, scan.next);
   }
 
-  FutureOr<IterResult<T>> _fromSeed(Object? seed, int from) {
+  FutureOr<IterResult<T>> _fromSeed(Object? seed, FxLink? from) {
     final out = _applyFrom(seed, from);
     if (out is Future<IterResult<T>?>) {
       return out.then((o) => o ?? _pull());
@@ -412,14 +486,14 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
             _ended = true;
             return IterResult<T>.done();
           }
-          return _mapFrom(rr.value, 0);
+          return _mapFrom(rr.value, _iterable.links);
         });
       }
       if (r.done) {
         _ended = true;
         return IterResult<T>.done();
       }
-      return _mapFrom(r.value, 0);
+      return _mapFrom(r.value, _iterable.links);
     }
     while (true) {
       if (_ended) return IterResult<T>.done();
@@ -447,22 +521,20 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
   /// stage can drop an element, so the result is never "filtered out" and the
   /// return type stays non-nullable — an asynchronous stage's own future *is*
   /// the pull's answer, one hop instead of two.
-  FutureOr<IterResult<T>> _mapFrom(Object? value, int from) {
-    final stages = _iterable.stages;
+  FutureOr<IterResult<T>> _mapFrom(Object? value, FxLink? from) {
     var v = value;
-    for (var i = from; i < stages.length; i++) {
-      final stage = stages[i];
-      if (stage is FxMapStage) {
-        final w = stage.f(v);
+    var l = from;
+    while (l != null) {
+      final next = l.next;
+      if (l is FxMapLink) {
+        final w = l.f(v);
         if (w is Future) {
-          final next = i + 1;
           return w.then<IterResult<T>>((x) => _mapFrom(x, next));
         }
         v = w;
       } else {
-        final w = (stage as FxScanStage).f(_acc, v);
+        final w = (l as FxScanLink).f(_acc, v);
         if (w is Future) {
-          final next = i + 1;
           return w.then<IterResult<T>>((x) {
             _acc = x;
             return _mapFrom(x, next);
@@ -471,6 +543,7 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
         _acc = w;
         v = w;
       }
+      l = next;
     }
     return IterResult<T>.value(v as T);
   }
@@ -481,25 +554,23 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
       _ended = true;
       return IterResult<T>.done();
     }
-    return _applyFrom(r.value, 0);
+    return _applyFrom(r.value, _iterable.links);
   }
 
-  FutureOr<IterResult<T>?> _applyFrom(Object? value, int from) {
-    final stages = _iterable.stages;
+  FutureOr<IterResult<T>?> _applyFrom(Object? value, FxLink? from) {
     var v = value;
-    for (var i = from; i < stages.length; i++) {
-      final stage = stages[i];
-      if (stage is FxMapStage) {
-        final w = stage.f(v);
+    var l = from;
+    while (l != null) {
+      final next = l.next;
+      if (l is FxMapLink) {
+        final w = l.f(v);
         if (w is Future) {
-          final next = i + 1;
           return w.then<IterResult<T>?>((x) => _applyFrom(x, next));
         }
         v = w;
-      } else if (stage is FxScanStage) {
-        final w = stage.f(_acc, v);
+      } else if (l is FxScanLink) {
+        final w = l.f(_acc, v);
         if (w is Future) {
-          final next = i + 1;
           return w.then<IterResult<T>?>((x) {
             _acc = x;
             return _applyFrom(x, next);
@@ -507,20 +578,18 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
         }
         _acc = w;
         v = w;
-      } else if (stage is FxFilterStage) {
-        final k = stage.p(v);
+      } else if (l is FxFilterLink) {
+        final k = l.p(v);
         if (k is Future<bool>) {
-          final next = i + 1;
           final vv = v;
           return k.then<IterResult<T>?>(
               (kk) => kk ? _applyFrom(vv, next) : null);
         }
         if (!k) return null;
       } else {
-        stage as FxTakeWhileStage;
-        final k = stage.p(v);
+        l as FxTakeWhileLink;
+        final k = l.p(v);
         if (k is Future<bool>) {
-          final next = i + 1;
           final vv = v;
           return k.then<IterResult<T>?>((kk) {
             if (kk) return _applyFrom(vv, next);
@@ -533,6 +602,7 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
           return IterResult<T>.done();
         }
       }
+      l = next;
     }
     return IterResult<T>.value(v as T);
   }
@@ -569,7 +639,7 @@ class FxStreamSourceIterable<T> implements FxAsyncIterable<T> {
 Future<void>? fxStreamDrive<T>(
     FxAsyncIterable<T> iterable, FutureOr<void> Function(T value) emit) {
   final Stream<Object?> stream;
-  final List<FxStage> stages;
+  final FxLink? links;
   if (iterable is FxFusedAsyncIterable<T>) {
     final source = iterable.source;
     if (source is! FxStreamSourceIterable<Object?>) return null;
@@ -577,10 +647,10 @@ Future<void>? fxStreamDrive<T>(
     // the subscription drive has no place for; the pull path handles it.
     if (iterable.scanIndex >= 0) return null;
     stream = source.stream;
-    stages = iterable.stages;
+    links = iterable.links;
   } else if (iterable is FxStreamSourceIterable<T>) {
     stream = iterable.stream;
-    stages = const [];
+    links = null;
   } else {
     return null;
   }
@@ -605,21 +675,20 @@ Future<void>? fxStreamDrive<T>(
 
   // Applies stages [from] onward to [value]; returns a Future only when a
   // stage (or [emit]) answered asynchronously — the caller pauses on it.
-  FutureOr<void> apply(Object? value, int from) {
+  FutureOr<void> apply(Object? value, FxLink? from) {
     var v = value;
-    for (var i = from; i < stages.length; i++) {
-      final stage = stages[i];
-      if (stage is FxMapStage) {
-        final w = stage.f(v);
+    var l = from;
+    while (l != null) {
+      final next = l.next;
+      if (l is FxMapLink) {
+        final w = l.f(v);
         if (w is Future) {
-          final next = i + 1;
           return w.then((x) => apply(x, next));
         }
         v = w;
-      } else if (stage is FxFilterStage) {
-        final k = stage.p(v);
+      } else if (l is FxFilterLink) {
+        final k = l.p(v);
         if (k is Future<bool>) {
-          final next = i + 1;
           final vv = v;
           return k.then((kk) {
             if (kk) return apply(vv, next);
@@ -627,10 +696,9 @@ Future<void>? fxStreamDrive<T>(
         }
         if (!k) return null;
       } else {
-        stage as FxTakeWhileStage;
-        final k = stage.p(v);
+        l as FxTakeWhileLink;
+        final k = l.p(v);
         if (k is Future<bool>) {
-          final next = i + 1;
           final vv = v;
           return k.then((kk) {
             if (kk) return apply(vv, next);
@@ -642,6 +710,7 @@ Future<void>? fxStreamDrive<T>(
           return null;
         }
       }
+      l = next;
     }
     return emit(v as T);
   }
@@ -649,7 +718,7 @@ Future<void>? fxStreamDrive<T>(
   sub = stream.listen((value) {
     final FutureOr<void> r;
     try {
-      r = apply(value, 0);
+      r = apply(value, links);
     } catch (e, st) {
       fail(e, st);
       return;
@@ -688,7 +757,7 @@ Future<void>? fxStreamDrive<T>(
 Future<void>? fxFusedDrive<T>(
     FxAsyncIterable<T> iterable, FutureOr<void> Function(T value) emit) {
   if (iterable is! FxFusedAsyncIterable<T>) return null;
-  final stages = iterable.stages;
+  final links = iterable.links;
   final upstream = iterable.source;
   // A plain-Iterable source steps with `moveNext()`: no IterResult per
   // element, and no iterator layer to dispatch through.
@@ -721,23 +790,23 @@ Future<void>? fxFusedDrive<T>(
   /// escape into the discarded future [Future.then] returns, leaving the
   /// terminal hung on an error nobody observes. Declared as a variable rather
   /// than a local function only because it and [step] call each other.
-  late void Function(Object?, int) resume;
+  late void Function(Object?, FxLink?) resume;
 
   /// Applies stages [from] onward to [value] and emits the survivor. Returns
   /// null when the element finished synchronously (dropped, ended, or
   /// emitted) and the caller should pull the next one; otherwise a future
   /// whose own continuation resumes the loop.
-  Future<void>? step(Object? value, int from) {
+  Future<void>? step(Object? value, FxLink? from) {
     var v = value;
-    for (var i = from; i < stages.length; i++) {
-      final stage = stages[i];
-      final next = i + 1;
-      if (stage is FxMapStage) {
-        final w = stage.f(v);
+    var l = from;
+    while (l != null) {
+      final next = l.next;
+      if (l is FxMapLink) {
+        final w = l.f(v);
         if (w is Future) return w.then((x) => resume(x, next), onError: fail);
         v = w;
-      } else if (stage is FxScanStage) {
-        final w = stage.f(acc, v);
+      } else if (l is FxScanLink) {
+        final w = l.f(acc, v);
         if (w is Future) {
           return w.then((x) {
             acc = x;
@@ -746,8 +815,8 @@ Future<void>? fxFusedDrive<T>(
         }
         acc = w;
         v = w;
-      } else if (stage is FxFilterStage) {
-        final k = stage.p(v);
+      } else if (l is FxFilterLink) {
+        final k = l.p(v);
         if (k is Future<bool>) {
           final vv = v;
           return k.then((kk) {
@@ -758,8 +827,8 @@ Future<void>? fxFusedDrive<T>(
         }
         if (!k) return null;
       } else {
-        stage as FxTakeWhileStage;
-        final k = stage.p(v);
+        l as FxTakeWhileLink;
+        final k = l.p(v);
         if (k is Future<bool>) {
           final vv = v;
           return k.then((kk) {
@@ -773,6 +842,7 @@ Future<void>? fxFusedDrive<T>(
           return null;
         }
       }
+      l = next;
     }
     final r = emit(v as T);
     if (r is Future) {
@@ -783,7 +853,7 @@ Future<void>? fxFusedDrive<T>(
     return null;
   }
 
-  resume = (Object? value, int from) {
+  resume = (Object? value, FxLink? from) {
     if (terminated) return;
     final Future<void>? held;
     try {
@@ -805,12 +875,12 @@ Future<void>? fxFusedDrive<T>(
           return fail(e, st);
         }
         if (cur is Future) {
-          cur.then((v) => resume(v, 0), onError: fail);
+          cur.then((v) => resume(v, links), onError: fail);
           return;
         }
         final Future<void>? held;
         try {
-          held = step(cur, 0);
+          held = step(cur, links);
         } catch (e, st) {
           return fail(e, st);
         }
@@ -827,14 +897,14 @@ Future<void>? fxFusedDrive<T>(
         r.then((rr) {
           if (terminated) return;
           if (rr.done) return finish();
-          resume(rr.value, 0);
+          resume(rr.value, links);
         }, onError: fail);
         return;
       }
       if (r.done) return finish();
       final Future<void>? held;
       try {
-        held = step(r.value, 0);
+        held = step(r.value, links);
       } catch (e, st) {
         return fail(e, st);
       }
@@ -842,20 +912,20 @@ Future<void>? fxFusedDrive<T>(
     }
   };
 
-  final scanIndex = iterable.scanIndex;
-  if (scanIndex >= 0) {
-    final seed = (stages[scanIndex] as FxScanStage).seed;
+  final scan = iterable.scanLink;
+  if (scan != null) {
+    final seed = scan.seed;
     if (seed is Future) {
       seed.then((s) {
         acc = s;
-        resume(s, scanIndex + 1);
+        resume(s, scan.next);
       }, onError: fail);
       return completer.future;
     }
     acc = seed;
     final Future<void>? held;
     try {
-      held = step(seed, scanIndex + 1);
+      held = step(seed, scan.next);
     } catch (e, st) {
       fail(e, st);
       return completer.future;
