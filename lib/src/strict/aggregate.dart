@@ -838,3 +838,93 @@ Future<(List<A>, List<A>)> partitionAsync<A>(
   await eachAsync((A a) async => (await f(a) ? pass : fail).add(a), iterable);
   return (pass, fail);
 }
+
+// --- tee: several folds over one pass -------------------------------------
+
+/// One reduction in a [tee2] / [tee3] pass: where it starts, and how each
+/// element advances it.
+typedef Fold<A, R> = ({R seed, R Function(R acc, A a) step});
+
+/// Runs two folds over a **single** pass of [iterable], returning both
+/// results.
+///
+/// [fork] can also feed two readers from one pass, but only by buffering:
+/// its cursors advance independently, so draining one before the other holds
+/// every element the lagging cursor has not reached. Expressing the readers
+/// as folds instead lets both advance on the same element, so the pass costs
+/// no memory at all — the counterpart of Rx's `publish()`, where attaching
+/// both subscribers before `connect()` is what avoids the buffer.
+///
+/// The source is iterated exactly once, so a side-effecting or single-shot
+/// iterable is safe. Both steps see every element, in order.
+///
+/// fxdart extension (not part of FxTS).
+///
+/// ```dart
+/// final (total, peak) = tee2(readings,
+///     (seed: 0, step: (int a, int r) => a + r),
+///     (seed: 0, step: (int a, int r) => r > a ? r : a));
+/// ```
+@pragma('vm:align-loops')
+(R1, R2) tee2<A, R1, R2>(
+    Iterable<A> iterable, Fold<A, R1> first, Fold<A, R2> second) {
+  final f1 = first.step;
+  final f2 = second.step;
+  var a1 = first.seed;
+  var a2 = second.seed;
+  for (final a in iterable) {
+    a1 = f1(a1, a);
+    a2 = f2(a2, a);
+  }
+  return (a1, a2);
+}
+
+/// Three-fold [tee2].
+@pragma('vm:align-loops')
+(R1, R2, R3) tee3<A, R1, R2, R3>(Iterable<A> iterable, Fold<A, R1> first,
+    Fold<A, R2> second, Fold<A, R3> third) {
+  final f1 = first.step;
+  final f2 = second.step;
+  final f3 = third.step;
+  var a1 = first.seed;
+  var a2 = second.seed;
+  var a3 = third.seed;
+  for (final a in iterable) {
+    a1 = f1(a1, a);
+    a2 = f2(a2, a);
+    a3 = f3(a3, a);
+  }
+  return (a1, a2, a3);
+}
+
+/// Async counterpart of [tee2]. Steps may return a [Future]; each element is
+/// applied to both accumulators before the next is pulled.
+Future<(R1, R2)> tee2Async<A, R1, R2>(FxAsyncIterable<A> iterable,
+    AsyncFold<A, R1> first, AsyncFold<A, R2> second) async {
+  final f1 = first.step;
+  final f2 = second.step;
+  var a1 = await first.seed;
+  var a2 = await second.seed;
+  await eachAsync((A a) {
+    final r1 = f1(a1, a);
+    if (r1 is Future<R1>) {
+      return r1.then((v1) {
+        a1 = v1;
+        final r2 = f2(a2, a);
+        if (r2 is Future<R2>) return r2.then((v2) => a2 = v2);
+        a2 = r2;
+      });
+    }
+    a1 = r1;
+    final r2 = f2(a2, a);
+    if (r2 is Future<R2>) return r2.then((v2) => a2 = v2);
+    a2 = r2;
+  }, iterable);
+  return (a1, a2);
+}
+
+/// The [tee2Async] counterpart of [Fold].
+typedef AsyncFold<A, R> = ({
+  FutureOr<R> seed,
+  FutureOr<R> Function(R acc, A a) step
+});
