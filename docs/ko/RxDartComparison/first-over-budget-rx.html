@@ -46,7 +46,6 @@
   </div>
 </header>
 <main class="cmp-wide">
-  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../RxDartComparison/index.html">RxDart vs FxDart</a> › #1 · <strong>예산을 넘는 첫 거래</strong></p>
   <h1>예산을 넘는 첫 거래</h1>
   <p class="cmp-meta"><span class="badge verdict-tie">우열 없음</span></p>
@@ -191,6 +190,58 @@ void main() {
     구독도, 스케줄링도 없습니다. 여기에 실제로 비동기인 것이 하나도 없기
     때문입니다.
   </p>
+  <h3>트리거 위치가 결과를 조작한 것 아닌가요?</h3>
+  <p>
+    타당한 질문이고, 이 사례에서 유일하게 <em>판단이 개입된</em> 지점입니다.
+    검색이 조기 종료되기 때문에 작업량은 데이터가 결정합니다: 벤치마크는 예산을
+    초과한 첫 거래를 전체의 90% 지점에 두었고, 그래서 100만 개짜리 실행은
+    900,001개를 검사합니다. 위치를 옮기면 양쪽 모두 그만큼 덜 일합니다. 이
+    격차가 그 선택이 만들어낸 착시라면, 트리거를 앞으로 당겼을 때 격차가
+    좁혀져야 합니다.
+  </p>
+  <p>
+    좁혀지지 않습니다. 유휴 상태의 머신에서 각각 5라운드씩 연달아 측정했고,
+    노이즈를 보이기 위해 90% 데이터셋은 두 번 돌렸습니다:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>규모</th><th>트리거</th><th>검사한 개수</th>
+        <th>RxDart</th><th>FxDart</th><th>배율</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>100</td><td>90%</td><td>91</td>
+        <td>10 µs</td><td>286 ns</td><td>35×</td></tr>
+      <tr><td>100</td><td>90% (반복)</td><td>91</td>
+        <td>11 µs</td><td>280 ns</td><td>39×</td></tr>
+      <tr><td>100</td><td>50%</td><td>51</td>
+        <td>7.5 µs</td><td>256 ns</td><td>29×</td></tr>
+      <tr><td>1,000,000</td><td>90%</td><td>900,001</td>
+        <td>79.1 ms</td><td>861 µs</td><td>92×</td></tr>
+      <tr><td>1,000,000</td><td>90% (반복)</td><td>900,001</td>
+        <td>78.9 ms</td><td>901 µs</td><td>88×</td></tr>
+      <tr><td>1,000,000</td><td>50%</td><td>500,001</td>
+        <td>44.2 ms</td><td>374 µs</td><td>118×</td></tr>
+    </tbody>
+  </table>
+  <p>
+    작업량을 절반으로 줄이면 양쪽 모두 절반이 되고, 배율은 오히려
+    <em>커집니다</em> — 88×에서 118×로. 100만 개 행을 검사한 개수로 나눠 보면
+    이유가 분명해집니다: RxDart는 세 번의 실행에서 원소당 <strong>87.7, 87.9,
+    88.4 ns</strong>로, 트리거 위치와 무관하게 평평합니다. 반면 FxDart는
+    <strong>1.00, 0.96, 0.75 ns</strong>로, 스캔이 짧을수록 원소당 비용이 오히려
+    조금 더 쌉니다. 트리거를 앞으로 당기는 것은 오히려 FxDart에 유리합니다.
+    100개짜리 행은 원소당 비용이 아니라 고정 셋업 비용이 지배하기 때문에 배율이
+    더 작고 노이즈도 큽니다 — 헤드라인 규모가 따로 있는 이유이기도 합니다.
+  </p>
+  <p>
+    그러니 90%는 무언가를 부풀리려고 둔 것이 아닙니다. 헤드라인이 시작 비용이
+    아니라 <em>당겨오는 일</em>을 재도록 두는 위치이고, 우리가 시도한 위치들
+    중 FxDart에 가장 불리한 위치입니다. 위치가 바꿀 수 없는 것은 원소당
+    가격이고, 격차는 전부 거기서 나옵니다.
+  </p>
+
   <p>
     그래서 이 막대의 정직한 해석은 좁습니다: <em>소스가 이미 메모리에 있고
     질문이 동기적이라면, 그것을 스트림으로 흘려보내는 일은 순수한
@@ -202,7 +253,7 @@ void main() {
   </p>
   <section class="cmp-bench">
   <h2>벤치마크</h2>
-  <p class="dim bench-meta">Apple M1 Max, 32 GB RAM · Dart 3.12.2 (AOT-compiled) · 2026-08-04</p>
+  <p class="dim bench-meta">Apple M1 Max, 32 GB RAM · Dart 3.12.2 (AOT-compiled) · 2026-08-05</p>
   <div class="bench-scales">
   <div class="bench-scale">
     <h3>N = 100</h3>
@@ -215,8 +266,8 @@ void main() {
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:2.6%"></span></span>
-        <span class="bench-val">295 ns</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:2.5%"></span></span>
+        <span class="bench-val">280 ns</span>
       </div>
     </div>
     <div class="bench-metric">
@@ -224,11 +275,11 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">RxDart</span>
         <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">17.1 MB</span>
+        <span class="bench-val">16.6 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:96.0%"></span></span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:99.0%"></span></span>
         <span class="bench-val">16.4 MB</span>
       </div>
     </div>
@@ -240,12 +291,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">RxDart</span>
         <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">80.9 ms</span>
+        <span class="bench-val">78.9 ms</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:1.2%"></span></span>
-        <span class="bench-val">965 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:1.1%"></span></span>
+        <span class="bench-val">901 µs</span>
       </div>
     </div>
     <div class="bench-metric">
@@ -253,12 +304,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">RxDart</span>
         <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">122.5 MB</span>
+        <span class="bench-val">121.9 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:90.8%"></span></span>
-        <span class="bench-val">111.2 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:91.9%"></span></span>
+        <span class="bench-val">112.0 MB</span>
       </div>
     </div>
   </div>

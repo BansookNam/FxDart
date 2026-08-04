@@ -6,7 +6,7 @@
     "os": "macos Version 26.3 (Build 25D125)",
     "compilation": "AOT (dart compile exe), enforced per result line"
   },
-  "date": "2026-08-04",
+  "date": "2026-08-05",
   "warmup": 2,
   "itersPerRound": 5,
   "tieMarginPct": 5.0,
@@ -103,42 +103,42 @@
       }
     },
     "first-over-budget-rx": {
-      "order": 3,
+      "order": 1,
       "heading": "First transaction over budget",
       "async": false,
       "scales": {
         "100": {
           "n": 100,
-          "roundsRun": 3,
+          "roundsRun": 5,
           "rxdart": {
-            "medianUs": 11.341317365269461,
-            "minUs": 9.932203389830509,
-            "medianRssBytes": 17907712.0,
-            "samples": 15
+            "medianUs": 11.077922077922079,
+            "minUs": 9.558441558441558,
+            "medianRssBytes": 17399808.0,
+            "samples": 25
           },
           "fxdart": {
-            "medianUs": 0.29485257371314344,
-            "minUs": 0.2673663168415792,
-            "medianRssBytes": 17186816.0,
-            "samples": 15
+            "medianUs": 0.280359820089955,
+            "minUs": 0.26286856571714146,
+            "medianRssBytes": 17219584.0,
+            "samples": 25
           },
           "timeWinner": "tie",
           "memWinner": "tie"
         },
         "full": {
           "n": 1000000,
-          "roundsRun": 3,
+          "roundsRun": 5,
           "rxdart": {
-            "medianUs": 80931.0,
-            "minUs": 79744.0,
-            "medianRssBytes": 128483328.0,
-            "samples": 15
+            "medianUs": 78889.0,
+            "minUs": 77970.0,
+            "medianRssBytes": 127827968.0,
+            "samples": 25
           },
           "fxdart": {
-            "medianUs": 964.5,
-            "minUs": 892.0,
-            "medianRssBytes": 116621312.0,
-            "samples": 15
+            "medianUs": 901.0,
+            "minUs": 855.3333333333334,
+            "medianRssBytes": 117473280.0,
+            "samples": 25
           },
           "timeWinner": "fxdart",
           "memWinner": "fxdart"

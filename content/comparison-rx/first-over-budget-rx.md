@@ -83,6 +83,59 @@ async: false
     no subscription, no scheduling, because nothing here is actually
     asynchronous.
   </p>
+  <h3>Does the trigger's position rig it?</h3>
+  <p>
+    Fair question, and the one thing about this case that <em>is</em> a
+    judgement call. Because the search short-circuits, the dataset decides how
+    much work happens: the benchmark puts the first over-budget transaction at
+    90% of the way through, so a million-element run examines 900,001. Move it
+    and both sides do proportionally less. If the gap were an artefact of that
+    choice, moving the trigger earlier would close it.
+  </p>
+  <p>
+    It does not. Measured back to back on an idle machine, five rounds each,
+    with the 90% dataset run twice to show the noise:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Scale</th><th>Trigger</th><th>Examined</th>
+        <th>RxDart</th><th>FxDart</th><th>Ratio</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>100</td><td>90%</td><td>91</td>
+        <td>10 µs</td><td>286 ns</td><td>35×</td></tr>
+      <tr><td>100</td><td>90% (repeat)</td><td>91</td>
+        <td>11 µs</td><td>280 ns</td><td>39×</td></tr>
+      <tr><td>100</td><td>50%</td><td>51</td>
+        <td>7.5 µs</td><td>256 ns</td><td>29×</td></tr>
+      <tr><td>1,000,000</td><td>90%</td><td>900,001</td>
+        <td>79.1 ms</td><td>861 µs</td><td>92×</td></tr>
+      <tr><td>1,000,000</td><td>90% (repeat)</td><td>900,001</td>
+        <td>78.9 ms</td><td>901 µs</td><td>88×</td></tr>
+      <tr><td>1,000,000</td><td>50%</td><td>500,001</td>
+        <td>44.2 ms</td><td>374 µs</td><td>118×</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Halving the work halves both sides — and the ratio <em>widens</em>, from
+    88× to 118×. Divide the million-element rows by the elements examined and
+    the reason is plain: RxDart costs <strong>87.7, 87.9 and 88.4 ns</strong>
+    per element across the three runs, flat regardless of where the trigger
+    sits, while FxDart costs <strong>1.00, 0.96 and 0.75 ns</strong> — the
+    shorter scan is slightly cheaper per element still. An earlier trigger, if
+    anything, flatters FxDart. The 100-element rows are dominated by fixed
+    setup rather than per-element cost, which is why their ratios are smaller
+    and noisier; that is also why the headline scale exists.
+  </p>
+  <p>
+    So 90% is not there to inflate anything — it is there so the headline
+    measures <em>pulling</em> rather than startup, and it is the least
+    FxDart-favourable of the positions we tried. What the position cannot
+    change is the per-element price, and that is the whole of the gap.
+  </p>
+
   <p>
     So the honest reading of these bars is narrow: <em>when the source is
     already in memory and the question is synchronous, routing it through

@@ -87,6 +87,62 @@ async: false
     suscripción, ni planificación, porque aquí nada es realmente
     asíncrono.
   </p>
+  <h3>¿No está amañado por dónde se sitúa el disparador?</h3>
+  <p>
+    Pregunta justa, y lo único de este caso que <em>sí</em> es una decisión de
+    criterio. Como la búsqueda se cortocircuita, es el conjunto de datos el que
+    decide cuánto trabajo se hace: el benchmark coloca la primera transacción
+    por encima del presupuesto al 90% del recorrido, así que una ejecución de
+    un millón examina 900.001. Muévela y ambos lados trabajan proporcionalmente
+    menos. Si la diferencia fuese un artefacto de esa elección, adelantar el
+    disparador la cerraría.
+  </p>
+  <p>
+    No la cierra. Medido seguido en una máquina ociosa, cinco rondas cada uno,
+    con el conjunto del 90% ejecutado dos veces para mostrar el ruido:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Escala</th><th>Disparador</th><th>Examinados</th>
+        <th>RxDart</th><th>FxDart</th><th>Factor</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>100</td><td>90%</td><td>91</td>
+        <td>10 µs</td><td>286 ns</td><td>35×</td></tr>
+      <tr><td>100</td><td>90% (repetición)</td><td>91</td>
+        <td>11 µs</td><td>280 ns</td><td>39×</td></tr>
+      <tr><td>100</td><td>50%</td><td>51</td>
+        <td>7,5 µs</td><td>256 ns</td><td>29×</td></tr>
+      <tr><td>1.000.000</td><td>90%</td><td>900.001</td>
+        <td>79,1 ms</td><td>861 µs</td><td>92×</td></tr>
+      <tr><td>1.000.000</td><td>90% (repetición)</td><td>900.001</td>
+        <td>78,9 ms</td><td>901 µs</td><td>88×</td></tr>
+      <tr><td>1.000.000</td><td>50%</td><td>500.001</td>
+        <td>44,2 ms</td><td>374 µs</td><td>118×</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Reducir el trabajo a la mitad reduce a la mitad ambos lados — y el factor
+    <em>se ensancha</em>, de 88× a 118×. Divide las filas del millón entre los
+    elementos examinados y la razón queda clara: RxDart cuesta <strong>87,7,
+    87,9 y 88,4 ns</strong> por elemento en las tres ejecuciones, plano
+    independientemente de dónde esté el disparador, mientras que FxDart cuesta
+    <strong>1,00, 0,96 y 0,75 ns</strong> — el recorrido más corto sale incluso
+    algo más barato por elemento. Adelantar el disparador, si acaso, favorece a
+    FxDart. Las filas de 100 elementos las domina el coste fijo de arranque y
+    no el coste por elemento, por eso sus factores son menores y más ruidosos;
+    y por eso mismo existe la escala grande.
+  </p>
+  <p>
+    Así que el 90% no está ahí para inflar nada — está ahí para que la escala
+    grande mida el <em>tirar de los datos</em> y no el arranque, y es la
+    posición menos favorable a FxDart de las que probamos. Lo que la posición
+    no puede cambiar es el precio por elemento, y en eso consiste toda la
+    diferencia.
+  </p>
+
   <p>
     Así que la lectura honesta de estas barras es estrecha: <em>cuando la
     fuente ya está en memoria y la pregunta es síncrona, hacerla pasar por
