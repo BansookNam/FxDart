@@ -283,6 +283,18 @@ class FxTakeWhileStage extends FxStage {
   final FutureOr<bool> Function(Object? value) p;
 }
 
+/// A `filterAsync` immediately followed by a `mapAsync`, collapsed into one
+/// stage by [mapAsync]. `filter(p).map(f)` is the most repeated shape in the
+/// async suite — and the one an Rx author writes as a single `mapNotNull` —
+/// so running it as two stages made fxdart walk the chain twice per element
+/// for work RxDart does in one callback. Behaviour is exactly the pair's:
+/// [p] decides, then [f] transforms only the survivors, in that order.
+class FxFilterMapStage extends FxStage {
+  const FxFilterMapStage(this.p, this.f);
+  final FutureOr<bool> Function(Object? value) p;
+  final FutureOr<Object?> Function(Object? value) f;
+}
+
 /// A `scanAsync` stage. Unlike the others it carries state: the running
 /// accumulator lives on the iterator (one scan per fused run, so one slot),
 /// and [seed] is emitted through the stages *after* this one before the
@@ -336,6 +348,13 @@ final class FxScanLink extends FxLink {
   final FutureOr<Object?> seed;
 }
 
+/// Compiled [FxFilterMapStage].
+final class FxFilterMapLink extends FxLink {
+  const FxFilterMapLink(this.p, this.f, super.next);
+  final FutureOr<bool> Function(Object? value) p;
+  final FutureOr<Object?> Function(Object? value) f;
+}
+
 /// A fused run of stages over one [source].
 class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
   FxFusedAsyncIterable(this.source, this.stages, this.legacy)
@@ -387,6 +406,7 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
         FxFilterStage(:final p) => FxFilterLink(p, head),
         FxTakeWhileStage(:final p) => FxTakeWhileLink(p, head),
         FxScanStage(:final f, :final seed) => FxScanLink(f, seed, head),
+        FxFilterMapStage(:final p, :final f) => FxFilterMapLink(p, f, head),
       };
     }
     return head;
@@ -586,6 +606,20 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
               (kk) => kk ? _applyFrom(vv, next) : null);
         }
         if (!k) return null;
+      } else if (l is FxFilterMapLink) {
+        final fm = l;
+        final k = fm.p(v);
+        if (k is Future<bool>) {
+          final vv = v;
+          return k.then<IterResult<T>?>(
+              (kk) => kk ? _mapAfterFilter(fm, vv, next) : null);
+        }
+        if (!k) return null;
+        final w = fm.f(v);
+        if (w is Future) {
+          return w.then<IterResult<T>?>((x) => _applyFrom(x, next));
+        }
+        v = w;
       } else {
         l as FxTakeWhileLink;
         final k = l.p(v);
@@ -605,6 +639,15 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
       l = next;
     }
     return IterResult<T>.value(v as T);
+  }
+
+  /// The map half of an [FxFilterMapLink] whose predicate answered
+  /// asynchronously with true.
+  FutureOr<IterResult<T>?> _mapAfterFilter(
+      FxFilterMapLink l, Object? value, FxLink? next) {
+    final w = l.f(value);
+    if (w is Future) return w.then<IterResult<T>?>((x) => _applyFrom(x, next));
+    return _applyFrom(w, next);
   }
 }
 
@@ -695,6 +738,22 @@ Future<void>? fxStreamDrive<T>(
           });
         }
         if (!k) return null;
+      } else if (l is FxFilterMapLink) {
+        final fm = l;
+        final k = fm.p(v);
+        if (k is Future<bool>) {
+          final vv = v;
+          return k.then((kk) {
+            if (!kk) return null;
+            final w = fm.f(vv);
+            if (w is Future) return w.then((x) => apply(x, next));
+            return apply(w, next);
+          });
+        }
+        if (!k) return null;
+        final w = fm.f(v);
+        if (w is Future) return w.then((x) => apply(x, next));
+        v = w;
       } else {
         l as FxTakeWhileLink;
         final k = l.p(v);
@@ -792,6 +851,12 @@ Future<void>? fxFusedDrive<T>(
   /// than a local function only because it and [step] call each other.
   late void Function(Object?, FxLink?) resume;
 
+  /// [resume] for the map half of an [FxFilterMapLink] whose predicate
+  /// answered asynchronously with true: applies the map, then re-enters the
+  /// loop at the following link. Separate from [resume] because the value to
+  /// continue with is not known until the map has run.
+  late void Function(FxFilterMapLink, Object?, FxLink?) resumeMap;
+
   /// Applies stages [from] onward to [value] and emits the survivor. Returns
   /// null when the element finished synchronously (dropped, ended, or
   /// emitted) and the caller should pull the next one; otherwise a future
@@ -826,6 +891,24 @@ Future<void>? fxFusedDrive<T>(
           }, onError: fail);
         }
         if (!k) return null;
+      } else if (l is FxFilterMapLink) {
+        final fm = l;
+        final k = fm.p(v);
+        if (k is Future<bool>) {
+          final vv = v;
+          return k.then((kk) {
+            if (terminated) return;
+            if (!kk) return pump();
+            // The map half runs in the predicate's own continuation, so a
+            // throw here is caught by [resume]'s try, not lost to this
+            // discarded future.
+            resumeMap(fm, vv, next);
+          }, onError: fail);
+        }
+        if (!k) return null;
+        final w = fm.f(v);
+        if (w is Future) return w.then((x) => resume(x, next), onError: fail);
+        v = w;
       } else {
         l as FxTakeWhileLink;
         final k = l.p(v);
@@ -858,6 +941,22 @@ Future<void>? fxFusedDrive<T>(
     final Future<void>? held;
     try {
       held = step(value, from);
+    } catch (e, st) {
+      return fail(e, st);
+    }
+    if (held == null && !terminated) pump();
+  };
+
+  resumeMap = (FxFilterMapLink l, Object? value, FxLink? from) {
+    if (terminated) return;
+    final Future<void>? held;
+    try {
+      final w = l.f(value);
+      if (w is Future) {
+        w.then((x) => resume(x, from), onError: fail);
+        return;
+      }
+      held = step(w, from);
     } catch (e, st) {
       return fail(e, st);
     }
