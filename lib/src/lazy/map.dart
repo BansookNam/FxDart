@@ -78,20 +78,6 @@ FxAsyncIterable<B> mapAsync<A, B>(
     final source = iterable.source;
     final stages = iterable.stages;
     final legacy = iterable.legacy;
-    // Peephole: a map landing straight on a filter becomes one stage, so the
-    // chain is walked once per element instead of twice — the shape an Rx
-    // author writes as a single `mapNotNull`. The unfused [legacy] rebuild is
-    // untouched, so the `concurrent` path still sees the original layering.
-    final last = stages.isEmpty ? null : stages.last;
-    if (last is FxFilterStage) {
-      return FxFusedAsyncIterable<B>(
-          source,
-          [
-            ...stages.take(stages.length - 1),
-            FxFilterMapStage(last.p, (v) => f(v as A)),
-          ],
-          () => _mapAsyncLegacy(f, legacy()));
-    }
     return FxFusedAsyncIterable<B>(
         source, [...stages, stage], () => _mapAsyncLegacy(f, legacy()));
   }
