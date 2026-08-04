@@ -1,3 +1,87 @@
+## 0.7.6
+
+### Performance — records stopped costing 2× in async pipelines
+
+`dependent-calls-in-sequence` was the RxDartComparison's worst async loss —
+1.29× behind RxDart. Nothing about the pipeline explained it —
+the same chain with a `String` accumulator ran at hand-written-loop speed.
+The accumulator's **type** was the whole gap: swapping the tuple
+`(String, String)` for a two-field class made it disappear, and giving
+RxDart's `asyncMap` the same tuple made *RxDart* the slower side (57 ms).
+
+The cause is not records themselves; it is where the operator's iterator gets
+allocated. Dart AOT specializes an operator's type checks only when the type
+arguments are statically known at the allocation site. Built through a chain
+of un-inlined generic factories — `FxAsync.scan` → `scanAsync` →
+`DelegateAsyncIterable(() => …)` — the type arguments are runtime values, so
+every `x is Future<B>` and `x as B` in the hot loop becomes a real subtype
+test. Cheap for an ordinary class; **~1 µs per element** when `B` is a record
+type. fxdart hands records out everywhere: `zip`, `attach`, `pairwise`,
+`zipWithIndex`, and any tuple `scan` accumulator.
+
+Three fixes, all internal — no signature moves, and `next()` still returns a
+`Future`, so a hand-driven `.iterator.next()` loop is unaffected:
+
+* **`vm:prefer-inline` across the async operator surface.** Every `*Async`
+  factory and every one-line `FxAsync` chain method now inlines back into the
+  caller, so the iterator is allocated where the type arguments are constants
+  and the loop's type checks fold away. The chain is only as strong as its
+  weakest link — one un-inlined generic hop loses the specialization for the
+  whole operator — which is why this is applied across the surface rather
+  than case by case. Measured on record-carrying async pipelines:
+  `scan` **2.26×**, `attach` **2.49×**.
+* **`scan` is a fusable stage.** `scanAsync` is one-in-one-out like `map`,
+  only stateful, so it now joins the `map`/`filter`/`takeWhile` stage run
+  instead of layering a pull on top of it. `scan(…).map(…)` is one iterator,
+  not two — one future and one microtask hop per element saved. At most one
+  scan per run (the accumulator has one slot); a second scan starts a new run.
+  The seed is emitted through the stages that follow the scan, as it always
+  was. A `Concurrent` marker still falls back to the unfused layering.
+* **`fxFusedDrive`, the third push terminal.** Beside `fxStreamDrive`
+  (0.7.4) and `fxPoolDrive` (0.7.5): when an all-consuming serial terminal
+  (`toListAsync` / `eachAsync` / `foldAsync`) owns a fused stage run, the
+  stages execute inside the stage future's own callback and hand the value
+  straight to the terminal — the pull's second future and its `IterResult`
+  wrapper are gone. A plain-`Iterable` source (`toAsync`) is stepped with
+  `moveNext()` directly, so it allocates nothing per element either.
+  **2.0 → 1.0 microtasks per element.**
+
+Together, per element (AOT, 200,000 elements, the example's per-call
+`Future.delayed` replaced by a microtask so what is measured is the pipeline
+and not the platform timer):
+
+| | before | after |
+|---|---|---|
+| `scan(tuple).map(…).toList()` | 1966 ns | 887 ns |
+| `map(async).toList()` | 1114 ns | 863 ns |
+| `attach(async).toList()` | 2210 ns | 888 ns |
+
+`dependent-calls-in-sequence`, measured before and after on the same machine
+in the same session, goes from **47.4 ms against RxDart's 36.7 ms (a loss)**
+to **34.9 ms against 36.8 ms (a win)** — 1.36× faster than before, and the
+last async case where the pull model was visibly behind a push `Stream` for
+ordinary sequential work.
+
+Across the whole RxDartComparison suite at the headline scale, the speed
+tally moves from **31 FxDart / 7 tie / 3 RxDart** to **34 / 7 / 0** — RxDart
+no longer wins a case. `latency-extremes` and `pipeline-into-stream` move
+from RxDart wins to ties; `bound-the-stall` and `price-or-fallback` move from
+ties to FxDart wins. Nothing moves the other way. In the DartComparison
+suite, where the same async machinery is measured against hand-written Dart,
+`price-lookup-fallback` (1.35× → 1.01×) and `sequential-configs` (1.12× →
+1.01×) move from native wins to ties, taking that tally from 41 native /
+3 tie / 9 FxDart to **39 / 5 / 9**.
+
+### Tests
+
+`test/lazy/fused_scan_test.dart` pins the combinations the fusion creates:
+scan before and after map/filter/takeWhile, the seed flowing through the
+later stages (and being dropped or ending the run there), two scans in a
+chain, a `Future` seed, an empty source, sync and async accumulator errors,
+a `Future` element in the source, a throwing source, the `concurrent`
+fallback to the unfused layering, a stream source keeping the pull path, and
+`each` / `fold` / an async `emit` seeing exactly what `toList` sees.
+
 ## 0.7.5
 
 ### Fixed — `concurrentPool` went quadratic on a fast source

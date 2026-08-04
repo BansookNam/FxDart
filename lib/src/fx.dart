@@ -28,9 +28,11 @@ import 'strict/aggregate.dart' as s;
 Fx<T> fx<T>(Iterable<T> iterable) => Fx(iterable);
 
 /// Wraps an [FxAsyncIterable] in a chainable [FxAsync].
+@pragma('vm:prefer-inline')
 FxAsync<T> fxAsync<T>(FxAsyncIterable<T> iterable) => FxAsync(iterable);
 
 /// Wraps a [Stream] in a chainable [FxAsync].
+@pragma('vm:prefer-inline')
 FxAsync<T> fxStream<T>(Stream<T> stream) => FxAsync(fromStream(stream));
 
 /// Lazy chainable iterable — the sync half of FxTS's `fx` chain.
@@ -246,11 +248,13 @@ class Fx<T> extends Iterable<T> {
 
   /// Switches to the async chain. Values stay plain; use the top-level
   /// `toAsync` for an `Iterable<Future<T>>`.
+  @pragma('vm:prefer-inline')
   FxAsync<T> toAsync() => FxAsync(async_.toAsync(_inner));
 
   /// Switches to the async chain and maps [f] with up to [concurrency]
   /// values in flight at once, in source order — the pre-combined form of
   /// `toAsync().map(f).concurrent(concurrency)`.
+  @pragma('vm:prefer-inline')
   FxAsync<R> mapConcurrent<R>(
           int concurrency, FutureOr<R> Function(T a) f) =>
       FxAsync(l.mapConcurrent(concurrency, f, _inner));
@@ -258,6 +262,7 @@ class Fx<T> extends Iterable<T> {
   /// Switches to the async chain and maps [f], retrying each call up to
   /// [attempts] times (with optional [delay] backoff) before the error
   /// propagates.
+  @pragma('vm:prefer-inline')
   FxAsync<R> mapRetry<R>(int attempts, FutureOr<R> Function(T a) f,
           {Duration Function(int failed)? delay}) =>
       FxAsync(l.mapRetryAsync(attempts, f, async_.toAsync(_inner),
@@ -336,9 +341,11 @@ extension FxNum on Fx<num> {
   double average() => s.average(_inner);
 
   /// The smallest value.
+  @pragma('vm:prefer-inline')
   num min() => s.min(_inner);
 
   /// The largest value.
+  @pragma('vm:prefer-inline')
   num max() => s.max(_inner);
 }
 
@@ -358,176 +365,220 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   // --- lazy operators -----------------------------------------------------
 
   /// Lazily transforms each value with [f] (which may be async).
+  @pragma('vm:prefer-inline')
   FxAsync<R> map<R>(FutureOr<R> Function(T a) f) =>
       FxAsync(l.mapAsync(f, _inner));
 
   /// Identical to [map]; intended for side effects by convention.
+  @pragma('vm:prefer-inline')
   FxAsync<R> mapEffect<R>(FutureOr<R> Function(T a) f) => map(f);
 
   /// Maps each value to an iterable via [f] and flattens the results.
+  @pragma('vm:prefer-inline')
   FxAsync<R> flatMap<R>(FutureOr<Iterable<R>> Function(T a) f) =>
       FxAsync(l.flatMapAsync(f, _inner));
 
   /// Flattens nested iterables [depth] levels.
+  @pragma('vm:prefer-inline')
   FxAsync<dynamic> flat([int depth = 1]) => FxAsync(l.flatAsync(_inner, depth));
 
   /// All values [f] returns true for ([f] may be async).
+  @pragma('vm:prefer-inline')
   FxAsync<T> filter(FutureOr<bool> Function(T a) f) =>
       FxAsync(l.filterAsync(f, _inner));
 
   /// The opposite of [filter].
+  @pragma('vm:prefer-inline')
   FxAsync<T> reject(FutureOr<bool> Function(T a) f) =>
       FxAsync(l.rejectAsync(f, _inner));
 
   /// The first [count] values.
+  @pragma('vm:prefer-inline')
   FxAsync<T> take(int count) => FxAsync(l.takeAsync(count, _inner));
 
   /// The last [count] values.
+  @pragma('vm:prefer-inline')
   FxAsync<T> takeRight(int count) => FxAsync(l.takeRightAsync(count, _inner));
 
   /// Leading values while [f] holds.
+  @pragma('vm:prefer-inline')
   FxAsync<T> takeWhile(FutureOr<bool> Function(T a) f) =>
       FxAsync(l.takeWhileAsync(f, _inner));
 
   /// Yields values until [f] matches, including the matching value.
+  @pragma('vm:prefer-inline')
   FxAsync<T> takeUntilInclusive(FutureOr<bool> Function(T a) f) =>
       FxAsync(l.takeUntilInclusiveAsync(f, _inner));
 
   /// Deprecated spelling of [takeUntilInclusive].
   @Deprecated('Use takeUntilInclusive instead')
+  @pragma('vm:prefer-inline')
   FxAsync<T> takeUntil(FutureOr<bool> Function(T a) f) => takeUntilInclusive(f);
 
   /// Skips the first [count] values.
+  @pragma('vm:prefer-inline')
   FxAsync<T> drop(int count) => FxAsync(l.dropAsync(count, _inner));
 
   /// Drops the last [count] values.
+  @pragma('vm:prefer-inline')
   FxAsync<T> dropRight(int count) => FxAsync(l.dropRightAsync(count, _inner));
 
   /// Drops leading values while [f] holds, then yields the rest.
+  @pragma('vm:prefer-inline')
   FxAsync<T> dropWhile(FutureOr<bool> Function(T a) f) =>
       FxAsync(l.dropWhileAsync(f, _inner));
 
   /// Skips values until [f] matches (dropping the match), yields the rest.
+  @pragma('vm:prefer-inline')
   FxAsync<T> dropUntil(FutureOr<bool> Function(T a) f) =>
       FxAsync(l.dropUntilAsync(f, _inner));
 
   /// The half-open index range `[start, end)` (to the end when [end] is null).
+  @pragma('vm:prefer-inline')
   FxAsync<T> slice(int start, [int? end]) =>
       FxAsync(l.sliceAsync(start, _inner, end));
 
   /// Groups consecutive values into lists of up to [size].
+  @pragma('vm:prefer-inline')
   FxAsync<List<T>> chunk(int size) => FxAsync(l.chunkAsync(size, _inner));
 
   /// Sliding windows of [size] values, each starting [step] values after
   /// the previous; [partial] keeps the shorter trailing windows.
+  @pragma('vm:prefer-inline')
   FxAsync<List<T>> windowed(int size, {int step = 1, bool partial = false}) =>
       FxAsync(l.windowedAsync(size, _inner, step: step, partial: partial));
 
   /// Pairs each value with its successor.
+  @pragma('vm:prefer-inline')
   FxAsync<(T, T)> pairwise() => FxAsync(l.pairwiseAsync(_inner));
 
   /// Applies [f] to each value without changing it.
+  @pragma('vm:prefer-inline')
   FxAsync<T> peek(FutureOr<void> Function(T a) f) =>
       FxAsync(l.peekAsync(f, _inner));
 
   /// Distinct values, keeping the first occurrence of each.
+  @pragma('vm:prefer-inline')
   FxAsync<T> uniq() => FxAsync(l.uniqAsync(_inner));
 
   /// Distinct by the key [f] returns, keeping the first of each key.
+  @pragma('vm:prefer-inline')
   FxAsync<T> uniqBy<B>(FutureOr<B> Function(T a) f) =>
       FxAsync(l.uniqByAsync(f, _inner));
 
   /// Drops values equal to their predecessor, keeping the first of each run.
+  @pragma('vm:prefer-inline')
   FxAsync<T> uniqAdjacent() => FxAsync(l.uniqAdjacentAsync(_inner));
 
   /// Drops values whose [f]-key equals the previous value's key.
+  @pragma('vm:prefer-inline')
   FxAsync<T> uniqAdjacentBy<B>(FutureOr<B> Function(T a) f) =>
       FxAsync(l.uniqAdjacentByAsync(f, _inner));
 
   /// Switches to [fallback]'s values when this chain turns out to be empty.
+  @pragma('vm:prefer-inline')
   FxAsync<T> ifEmpty(FxAsyncIterable<T> Function() fallback) =>
       FxAsync(l.ifEmptyAsync(fallback, _inner));
 
   /// Yields the single [value] when this chain turns out to be empty.
+  @pragma('vm:prefer-inline')
   FxAsync<T> defaultIfEmpty(FutureOr<T> value) =>
       FxAsync(l.defaultIfEmptyAsync(value, _inner));
 
   /// Maps [f], retrying each call up to [attempts] times (with optional
   /// [delay] backoff) before the error propagates. Retries compose with
   /// [concurrent]: each in-flight value retries independently.
+  @pragma('vm:prefer-inline')
   FxAsync<R> mapRetry<R>(int attempts, FutureOr<R> Function(T a) f,
           {Duration Function(int failed)? delay}) =>
       FxAsync(l.mapRetryAsync(attempts, f, _inner, delay: delay));
 
   /// Fails a pull with a [TimeoutException] when the upstream takes longer
   /// than [limit] to produce it (per pull, not whole-pipeline).
+  @pragma('vm:prefer-inline')
   FxAsync<T> timeout(Duration limit) =>
       FxAsync(l.timeoutAsync(limit, _inner));
 
   /// Pairs each value with the value at the same position in [other],
   /// stopping at the shorter side.
+  @pragma('vm:prefer-inline')
   FxAsync<(T, U)> zip<U>(FxAsyncIterable<U> other) =>
       FxAsync(l.zipAsync(_inner, other));
 
   /// Pairs each value with its index.
+  @pragma('vm:prefer-inline')
   FxAsync<(int, T)> zipWithIndex() => FxAsync(l.zipWithIndexAsync(_inner));
 
   /// Yields the chain, then [a].
+  @pragma('vm:prefer-inline')
   FxAsync<T> append(FutureOr<T> a) => FxAsync(l.appendAsync(a, _inner));
 
   /// Yields [a], then the chain.
+  @pragma('vm:prefer-inline')
   FxAsync<T> prepend(FutureOr<T> a) => FxAsync(l.prependAsync(a, _inner));
 
   /// Yields this chain followed by [other].
+  @pragma('vm:prefer-inline')
   FxAsync<T> concat(FxAsyncIterable<T> other) =>
       FxAsync(l.concatAsync(_inner, other));
 
   /// Emits [seed], then each running accumulation as [f] folds in each value.
+  @pragma('vm:prefer-inline')
   FxAsync<B> scan<B>(FutureOr<B> Function(B acc, T a) f, FutureOr<B> seed) =>
       FxAsync(l.scanAsync(f, seed, _inner));
 
   /// The values in reverse order (materializes the source).
+  @pragma('vm:prefer-inline')
   FxAsync<T> reverse() => FxAsync(l.reverseAsync(_inner));
 
   /// Repeats the source endlessly.
+  @pragma('vm:prefer-inline')
   FxAsync<T> cycle() => FxAsync(l.cycleAsync(_inner));
 
   /// Lazily pairs each value with the (possibly async) result of [f] —
   /// the value stays beside what was derived from it. Parallel-safe:
   /// composes with [concurrent].
+  @pragma('vm:prefer-inline')
   FxAsync<(T, R)> attach<R>(FutureOr<R> Function(T a) f) =>
       FxAsync(l.attachAsync(f, _inner));
 
   /// Values of this chain whose [f]-keys do not occur in [other], deduped.
+  @pragma('vm:prefer-inline')
   FxAsync<T> differenceBy<B>(
           FutureOr<B> Function(T a) f, FxAsyncIterable<T> other) =>
       FxAsync(l.differenceByAsync(f, other, _inner));
 
   /// Values of this chain that do not occur in [other].
+  @pragma('vm:prefer-inline')
   FxAsync<T> difference(FxAsyncIterable<T> other) =>
       FxAsync(l.differenceAsync(other, _inner));
 
   /// Values of this chain whose [f]-keys also occur in [other], deduped.
+  @pragma('vm:prefer-inline')
   FxAsync<T> intersectionBy<B>(
           FutureOr<B> Function(T a) f, FxAsyncIterable<T> other) =>
       FxAsync(l.intersectionByAsync(f, other, _inner));
 
   /// Values of this chain that also occur in [other].
+  @pragma('vm:prefer-inline')
   FxAsync<T> intersection(FxAsyncIterable<T> other) =>
       FxAsync(l.intersectionAsync(other, _inner));
 
   /// Evaluates the upstream chain up to [length] items at a time.
   ///
   /// Port of FxTS `concurrent`.
+  @pragma('vm:prefer-inline')
   FxAsync<T> concurrent(int length) => FxAsync(concurrentAsync(length, _inner));
 
   /// Maps [f] with up to [concurrency] values in flight at once, in source
   /// order — the pre-combined form of `map(f).concurrent(concurrency)`.
+  @pragma('vm:prefer-inline')
   FxAsync<R> mapConcurrent<R>(
           int concurrency, FutureOr<R> Function(T a) f) =>
       FxAsync(l.mapConcurrentAsync(concurrency, f, _inner));
 
   /// Like [concurrent] but yields in completion order.
+  @pragma('vm:prefer-inline')
   FxAsync<T> concurrentPool(int length) =>
       FxAsync(concurrentPoolAsync(length, _inner));
 
@@ -634,33 +685,43 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   // explicit aliases here. Both spellings are supported; the 101 teaches these.
 
   /// Alias of [filter].
+  @pragma('vm:prefer-inline')
   FxAsync<T> where(FutureOr<bool> Function(T a) f) => filter(f);
 
   /// Alias of [reject].
+  @pragma('vm:prefer-inline')
   FxAsync<T> whereNot(FutureOr<bool> Function(T a) f) => reject(f);
 
   /// Alias of [flatMap].
+  @pragma('vm:prefer-inline')
   FxAsync<R> expand<R>(FutureOr<Iterable<R>> Function(T a) f) => flatMap(f);
 
   /// Alias of [flat].
+  @pragma('vm:prefer-inline')
   FxAsync<dynamic> flattened([int depth = 1]) => flat(depth);
 
   /// Alias of [drop].
+  @pragma('vm:prefer-inline')
   FxAsync<T> skip(int count) => drop(count);
 
   /// Alias of [dropWhile].
+  @pragma('vm:prefer-inline')
   FxAsync<T> skipWhile(FutureOr<bool> Function(T a) f) => dropWhile(f);
 
   /// Alias of [takeRight].
+  @pragma('vm:prefer-inline')
   FxAsync<T> takeLast(int count) => takeRight(count);
 
   /// Alias of [uniq].
+  @pragma('vm:prefer-inline')
   FxAsync<T> distinct() => uniq();
 
   /// Alias of [uniqBy].
+  @pragma('vm:prefer-inline')
   FxAsync<T> distinctBy<B>(FutureOr<B> Function(T a) f) => uniqBy(f);
 
   /// Alias of [zipWithIndex].
+  @pragma('vm:prefer-inline')
   FxAsync<(int, T)> indexed() => zipWithIndex();
 
   /// Alias of [each].

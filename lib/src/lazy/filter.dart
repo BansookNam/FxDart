@@ -157,6 +157,7 @@ FxAsyncIterable<A> _asyncConcurrent<A>(FxAsyncIterable<(bool, A)> iterable) {
 /// Async counterpart of [filter]. The predicate may return a [Future].
 ///
 /// Port of FxTS `filter` (async), including its dedicated concurrent path.
+@pragma('vm:prefer-inline')
 FxAsyncIterable<A> filterAsync<A>(
     FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
   // Fused-stage form; a Concurrent marker falls back to
@@ -191,11 +192,13 @@ FxAsyncIterable<A> _filterAsyncLegacy<A>(
 }
 
 /// Async counterpart of [reject].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<A> rejectAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
     filterAsync((A a) async => !await f(a), iterable);
 
 /// Async counterpart of [compact].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<A> compactAsync<A>(FxAsyncIterable<A?> iterable) =>
     mapAsync((A? a) => a as A, filterAsync((A? a) => a != null, iterable));
 
@@ -268,6 +271,7 @@ class _UniqIterator<A> implements Iterator<A> {
 }
 
 /// Async counterpart of [uniqBy].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<A> uniqByAsync<A, B>(
     FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) {
   return DelegateAsyncIterable(() {
@@ -277,6 +281,7 @@ FxAsyncIterable<A> uniqByAsync<A, B>(
 }
 
 /// Async counterpart of [uniq].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<A> uniqAsync<A>(FxAsyncIterable<A> iterable) =>
     uniqByAsync((A a) => a, iterable);
 
@@ -339,6 +344,7 @@ Iterable<A> uniqAdjacent<A>(Iterable<A> iterable) =>
 /// Async counterpart of [uniqAdjacentBy]. The key comparison is inherently
 /// ordered, so keys are computed one at a time; combine with `concurrent`
 /// to still evaluate the upstream in parallel.
+@pragma('vm:prefer-inline')
 FxAsyncIterable<A> uniqAdjacentByAsync<A, B>(
     FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) {
   return dispatchAsync(iterable, (source) {
@@ -360,6 +366,7 @@ FxAsyncIterable<A> uniqAdjacentByAsync<A, B>(
 }
 
 /// Async counterpart of [uniqAdjacent].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<A> uniqAdjacentAsync<A>(FxAsyncIterable<A> iterable) =>
     uniqAdjacentByAsync((A a) => a, iterable);
 
@@ -465,21 +472,25 @@ FxAsyncIterable<A> _setOpAsync<A, B>(
 }
 
 /// Async counterpart of [differenceBy].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<A> differenceByAsync<A, B>(FutureOr<B> Function(A a) f,
         FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
     _setOpAsync(f, iterable1, iterable2, false);
 
 /// Async counterpart of [difference].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<A> differenceAsync<A>(
         FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
     differenceByAsync((A a) => a, iterable1, iterable2);
 
 /// Async counterpart of [intersectionBy].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<A> intersectionByAsync<A, B>(FutureOr<B> Function(A a) f,
         FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
     _setOpAsync(f, iterable1, iterable2, true);
 
 /// Async counterpart of [intersection].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<A> intersectionAsync<A>(
         FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
     intersectionByAsync((A a) => a, iterable1, iterable2);

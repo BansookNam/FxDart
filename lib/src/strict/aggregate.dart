@@ -14,10 +14,13 @@ List<A> toList<A>(Iterable<A> iterable) => List.of(iterable);
 /// Port of FxTS `toArray` (async); named `toListAsync` for Dart idiom.
 Future<List<A>> toListAsync<A>(FxAsyncIterable<A> iterable) async {
   final result = <A>[];
-  // Stream-sourced chains collect by subscription — the push execution
-  // model, observably identical for an all-consuming terminal.
+  // Push execution where it applies — a stream source, a concurrency pool,
+  // or a fused stage run — instead of pulling element by element. All three
+  // are observably identical for an all-consuming terminal.
   final drive =
-      fxStreamDrive<A>(iterable, result.add) ?? fxPoolDrive<A>(iterable, result.add);
+      fxStreamDrive<A>(iterable, result.add) ??
+          fxPoolDrive<A>(iterable, result.add) ??
+          fxFusedDrive<A>(iterable, result.add);
   if (drive != null) {
     await drive;
     return result;
@@ -54,7 +57,9 @@ void each<A>(void Function(A a) f, Iterable<A> iterable) {
 Future<void> eachAsync<A>(
     FutureOr<void> Function(A a) f, FxAsyncIterable<A> iterable) async {
   // Stream-sourced chains run by subscription (see [toListAsync]).
-  final drive = fxStreamDrive<A>(iterable, f) ?? fxPoolDrive<A>(iterable, f);
+  final drive = fxStreamDrive<A>(iterable, f) ??
+      fxPoolDrive<A>(iterable, f) ??
+      fxFusedDrive<A>(iterable, f);
   if (drive != null) return drive;
   final iterator = iterable.iterator;
   // Fast-pull loop where available (see [toListAsync]); awaits only
@@ -170,7 +175,8 @@ Future<Acc> foldAsync<A, Acc>(FutureOr<Acc> seed,
   }
 
   final drive = fxStreamDrive<A>(iterable, accumulate) ??
-      fxPoolDrive<A>(iterable, accumulate);
+      fxPoolDrive<A>(iterable, accumulate) ??
+      fxFusedDrive<A>(iterable, accumulate);
   if (drive != null) {
     await drive;
     return acc;
@@ -206,6 +212,7 @@ Acc Function(Iterable<A>) reduceLazy<A, Acc>(
 /// Adds every number in the iterable.
 ///
 /// Port of FxTS `sum`.
+@pragma('vm:prefer-inline')
 num sum(Iterable<num> iterable) {
   // Monomorphic lists take an indexed loop: no iterator, and the element
   // loads stay unboxed. Values match the generic path exactly (same
@@ -255,6 +262,7 @@ num sum(Iterable<num> iterable) {
 ///
 /// Dart-native addition (FxTS has only the numeric `sum`); named after
 /// [maxBy]/[minBy] — Kotlin spells it `sumOf`.
+@pragma('vm:prefer-inline')
 num sumBy<A>(num Function(A a) f, Iterable<A> iterable) {
   // Same unboxed int-then-double accumulation as [sum]; lists iterate by
   // index so no iterator is allocated.
@@ -308,6 +316,7 @@ String sumStrings(Iterable<String> iterable) =>
 /// Returns the average of the numbers. `NaN` for an empty iterable.
 ///
 /// Port of FxTS `average`.
+@pragma('vm:prefer-inline')
 double average(Iterable<num> iterable) {
   // Monomorphic-list fast paths, as in [sum].
   if (iterable is List<double>) {
@@ -366,6 +375,7 @@ Future<double> averageAsync(FxAsyncIterable<num> iterable) async {
 ///
 /// Dart-native addition completing the by-key family
 /// ([sumBy] / [maxBy] / [minBy]).
+@pragma('vm:prefer-inline')
 double averageBy<A>(num Function(A a) f, Iterable<A> iterable) {
   if (iterable is List<A>) {
     final len = iterable.length;
@@ -411,6 +421,7 @@ num _maxOf(num acc, num a) => a.isNaN || acc.isNaN
 
 /// Returns the smallest number; `infinity` for an empty iterable, `NaN` if
 /// any element is `NaN` — mirroring FxTS `min`.
+@pragma('vm:prefer-inline')
 num min(Iterable<num> iterable) {
   // Monomorphic-list fast paths, as in [sum]; results match the [_minOf]
   // fold exactly (empty → infinity, any NaN → NaN, strict < keeps the
@@ -449,6 +460,7 @@ Future<num> minAsync(FxAsyncIterable<num> iterable) =>
 
 /// Returns the largest number; `-infinity` for an empty iterable, `NaN` if
 /// any element is `NaN` — mirroring FxTS `max`.
+@pragma('vm:prefer-inline')
 num max(Iterable<num> iterable) {
   // Mirror image of [min]'s fast paths.
   if (iterable is List<double>) {
@@ -560,6 +572,7 @@ Future<A?> maxByAsync<A>(
 /// Returns the number of elements.
 ///
 /// Port of FxTS `size`. O(1) for a [List] or [Set].
+@pragma('vm:prefer-inline')
 int size<A>(Iterable<A> iterable) {
   if (iterable is List || iterable is Set) return iterable.length;
   var n = 0;

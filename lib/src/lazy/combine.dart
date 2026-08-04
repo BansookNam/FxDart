@@ -107,6 +107,7 @@ class _CycleIterator<T> implements Iterator<T> {
 }
 
 /// Async counterpart of [cycle].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<T> cycleAsync<T>(FxAsyncIterable<T> iterable) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
@@ -137,6 +138,7 @@ Iterable<A> append<A>(A a, Iterable<A> iterable) =>
     concat(iterable, _SingleIterable(a));
 
 /// Async counterpart of [append]. [a] may be a [Future].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<A> appendAsync<A>(FutureOr<A> a, FxAsyncIterable<A> iterable) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
@@ -167,6 +169,7 @@ class _SingleIterable<A> extends Iterable<A> {
 }
 
 /// Async counterpart of [prepend]. [a] may be a [Future].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<A> prependAsync<A>(FutureOr<A> a, FxAsyncIterable<A> iterable) {
   return DelegateAsyncIterable(() {
     final iterator = iterable.iterator;
@@ -217,6 +220,7 @@ class _ConcatIterator<A> implements Iterator<A> {
 }
 
 /// Async counterpart of [concat].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<A> concatAsync<A>(
     FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) {
   return DelegateAsyncIterable(() {
@@ -290,6 +294,7 @@ Iterable<A> defaultIfEmpty<A>(A value, Iterable<A> iterable) =>
     ifEmpty(() => [value], iterable);
 
 /// Async counterpart of [ifEmpty].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<A> ifEmptyAsync<A>(
     FxAsyncIterable<A> Function() fallback, FxAsyncIterable<A> iterable) {
   return dispatchAsync(iterable, (source) {
@@ -314,6 +319,7 @@ FxAsyncIterable<A> ifEmptyAsync<A>(
 }
 
 /// Async counterpart of [defaultIfEmpty].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<A> defaultIfEmptyAsync<A>(
         FutureOr<A> value, FxAsyncIterable<A> iterable) =>
     ifEmptyAsync(() => toAsync([value]), iterable);
@@ -359,6 +365,7 @@ class _ReverseIterator<A> implements Iterator<A> {
 }
 
 /// Async counterpart of [reverse].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<A> reverseAsync<A>(FxAsyncIterable<A> iterable) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
@@ -497,6 +504,7 @@ final Expando<_ForkAsyncState<Object?>> _forkAsyncStates =
 
 /// Async counterpart of [fork]. All forks of the same [FxAsyncIterable]
 /// object share one underlying iterator and buffer.
+@pragma('vm:prefer-inline')
 FxAsyncIterable<T> forkAsync<T>(FxAsyncIterable<T> iterable) {
   var state = _forkAsyncStates[iterable] as _ForkAsyncState<T>?;
   if (state == null) {

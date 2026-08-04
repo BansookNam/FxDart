@@ -21,6 +21,7 @@ Future<A?> headAsync<A>(FxAsyncIterable<A> iterable) async {
 /// Returns the last element, or `null` when empty.
 ///
 /// Port of FxTS `last`. O(1) for a [List].
+@pragma('vm:prefer-inline')
 A? last<A>(Iterable<A> iterable) {
   if (iterable is List<A>) {
     final length = iterable.length;
@@ -47,6 +48,7 @@ Future<A?> lastAsync<A>(FxAsyncIterable<A> iterable) async {
 /// Returns the element at [index], or `null` when out of range.
 ///
 /// Port of FxTS `nth`. O(1) for a [List].
+@pragma('vm:prefer-inline')
 A? nth<A>(int index, Iterable<A> iterable) {
   if (index < 0) return null;
   if (iterable is List<A>) {
@@ -76,6 +78,7 @@ Future<A?> nthAsync<A>(int index, FxAsyncIterable<A> iterable) async {
 /// Port of FxTS `find`. A direct loop, not `head(filter(...))` — the filter
 /// layer would cost an iterator allocation plus two indirect calls per
 /// element; lists iterate by index.
+@pragma('vm:prefer-inline')
 A? find<A>(bool Function(A a) f, Iterable<A> iterable) {
   if (iterable is List<A>) {
     final length = iterable.length;
@@ -100,6 +103,7 @@ Future<A?> findAsync<A>(
 ///
 /// Port of FxTS `findIndex`. A counted direct loop, not `zipWithIndex` —
 /// the zip layer would allocate an `(int, A)` record per element.
+@pragma('vm:prefer-inline')
 int findIndex<A>(bool Function(A a) f, Iterable<A> iterable) {
   if (iterable is List<A>) {
     final length = iterable.length;

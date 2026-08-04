@@ -73,6 +73,7 @@ class _Zip3Iterator<A, B, C> implements Iterator<(A, B, C)> {
 }
 
 /// Async counterpart of [zip]: pulls both sources in parallel per pair.
+@pragma('vm:prefer-inline')
 FxAsyncIterable<(A, B)> zipAsync<A, B>(
     FxAsyncIterable<A> iterable1, FxAsyncIterable<B> iterable2) {
   return DelegateAsyncIterable(() {
@@ -93,6 +94,7 @@ FxAsyncIterable<(A, B)> zipAsync<A, B>(
 }
 
 /// Async counterpart of [zip3].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<(A, B, C)> zip3Async<A, B, C>(FxAsyncIterable<A> iterable1,
     FxAsyncIterable<B> iterable2, FxAsyncIterable<C> iterable3) {
   return DelegateAsyncIterable(() {
@@ -122,6 +124,7 @@ Iterable<C> zipWith<A, B, C>(
     map((r) => f(r.$1, r.$2), zip(iterable1, iterable2));
 
 /// Async counterpart of [zipWith].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<C> zipWithAsync<A, B, C>(FutureOr<C> Function(A a, B b) f,
         FxAsyncIterable<A> iterable1, FxAsyncIterable<B> iterable2) =>
     mapAsync((r) => f(r.$1, r.$2), zipAsync(iterable1, iterable2));
@@ -156,6 +159,7 @@ class _ZipWithIndexIterator<A> implements Iterator<(int, A)> {
 }
 
 /// Async counterpart of [zipWithIndex].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<(int, A)> zipWithIndexAsync<A>(FxAsyncIterable<A> iterable) {
   return dispatchAsync(iterable, (source) {
     var i = 0;
@@ -203,6 +207,7 @@ class _TransposeIterator<A> implements Iterator<List<A>> {
 }
 
 /// Async counterpart of [transpose].
+@pragma('vm:prefer-inline')
 FxAsyncIterable<List<A>> transposeAsync<A>(Iterable<FxAsyncIterable<A>> rows) {
   return DelegateAsyncIterable(() {
     final iterators = rows.map((r) => r.iterator).toList(growable: false);

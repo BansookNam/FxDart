@@ -51,6 +51,7 @@ void _checkAttempts(int attempts) {
 ///     .concurrent(5)
 ///     .toList();
 /// ```
+@pragma('vm:prefer-inline')
 FxAsyncIterable<R> mapRetryAsync<A, R>(
     int attempts, FutureOr<R> Function(A a) f, FxAsyncIterable<A> iterable,
     {Duration Function(int failed)? delay}) {
@@ -72,6 +73,7 @@ FxAsyncIterable<R> mapRetryAsync<A, R>(
 ///     .timeout(Duration(seconds: 2))
 ///     .toList(); // throws TimeoutException if any fetch stalls
 /// ```
+@pragma('vm:prefer-inline')
 FxAsyncIterable<A> timeoutAsync<A>(
     Duration limit, FxAsyncIterable<A> iterable) {
   return DelegateAsyncIterable(
@@ -177,6 +179,7 @@ class _UsingIterator<R, T> implements Iterator<T> {
 /// [release] runs exactly once — after the terminal pull, or before the
 /// error propagates when a pull fails (including a failing [use]).
 /// The same abandonment caveat as [using] applies.
+@pragma('vm:prefer-inline')
 FxAsyncIterable<T> usingAsync<R, T>(
     FutureOr<R> Function() acquire,
     FxAsyncIterable<T> Function(R resource) use,
