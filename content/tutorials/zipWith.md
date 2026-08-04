@@ -5,8 +5,8 @@ description: FxDart zipWith tutorial: zip two iterables and combine each pair th
 heading: <code>zipWith</code>
 section: 6
 crumb: zipWith
-prev: zip.html
-prevLabel: zip
+prev: zip3.html
+prevLabel: zip3
 next: zipWithIndex.html
 nextLabel: zipWithIndex
 ---

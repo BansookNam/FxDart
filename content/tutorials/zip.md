@@ -7,8 +7,8 @@ section: 6
 crumb: zip
 prev: concat.html
 prevLabel: concat
-next: zipWith.html
-nextLabel: zipWith
+next: zip3.html
+nextLabel: zip3
 ---
   <p class="hero-sub">Pairs up elements from two iterables into records, stopping at the shorter one.</p>
 

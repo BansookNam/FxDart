@@ -5,8 +5,8 @@ description: FxDart zipWith 튜토리얼: 두 이터러블을 zip하면서 각 �
 heading: <code>zipWith</code>
 section: 6
 crumb: zipWith
-prev: zip.html
-prevLabel: zip
+prev: zip3.html
+prevLabel: zip3
 next: zipWithIndex.html
 nextLabel: zipWithIndex
 ---

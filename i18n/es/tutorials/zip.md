@@ -7,8 +7,8 @@ section: 6
 crumb: zip
 prev: concat.html
 prevLabel: concat
-next: zipWith.html
-nextLabel: zipWith
+next: zip3.html
+nextLabel: zip3
 ---
   <p class="hero-sub">Empareja los elementos de dos iterables en records y se detiene en el más corto.</p>
 

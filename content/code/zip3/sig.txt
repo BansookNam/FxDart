@@ -1,0 +1,2 @@
+Iterable&lt;(A, B, C)&gt; zip3&lt;A, B, C&gt;(Iterable&lt;A&gt; iterable1, Iterable&lt;B&gt; iterable2, Iterable&lt;C&gt; iterable3)
+FxAsyncIterable&lt;(A, B, C)&gt; zip3Async&lt;A, B, C&gt;(FxAsyncIterable&lt;A&gt; iterable1, FxAsyncIterable&lt;B&gt; iterable2, FxAsyncIterable&lt;C&gt; iterable3)

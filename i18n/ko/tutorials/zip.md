@@ -7,8 +7,8 @@ section: 6
 crumb: zip
 prev: concat.html
 prevLabel: concat
-next: zipWith.html
-nextLabel: zipWith
+next: zip3.html
+nextLabel: zip3
 ---
   <p class="hero-sub">두 이터러블의 원소를 짝지어 레코드로 묶고, 짧은 쪽이 끝나면 멈춥니다.</p>
 

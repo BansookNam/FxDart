@@ -5,8 +5,8 @@ description: Tutorial de zipWith en FxDart: empareja dos iterables y combina cad
 heading: <code>zipWith</code>
 section: 6
 crumb: zipWith
-prev: zip.html
-prevLabel: zip
+prev: zip3.html
+prevLabel: zip3
 next: zipWithIndex.html
 nextLabel: zipWithIndex
 ---
