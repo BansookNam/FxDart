@@ -256,3 +256,96 @@ class _UsingAsyncIterator<R, T> implements FxFastIterator<T> {
     return _releaseOnce().then((_) => r);
   }
 }
+
+// --- onErrorResume --------------------------------------------------------
+
+/// Returns a lazy [Iterable] that yields [iterable]'s values until it throws,
+/// then continues with the values of the iterable [onError] returns.
+///
+/// Everything the source delivered before the error is kept — this resumes,
+/// it does not restart. The switch happens at most once: if the replacement
+/// iterable throws too, that error propagates. [onError] receives the error
+/// and its stack trace, so it can re-throw to opt out for errors it does not
+/// handle.
+///
+/// fxdart extension (not part of FxTS), after Rx's `onErrorResumeNext`.
+/// Because the result stays lazy, a downstream `take` stops pulling the
+/// source as soon as it has enough — the fallback is never even built.
+///
+/// ```dart
+/// onErrorResume((_, __) => cachedTail, liveReadings); // (live…, cached…)
+/// ```
+Iterable<A> onErrorResume<A>(
+        Iterable<A> Function(Object error, StackTrace stackTrace) onError,
+        Iterable<A> iterable) =>
+    _OnErrorResumeIterable(onError, iterable);
+
+final class _OnErrorResumeIterable<A> extends Iterable<A> {
+  _OnErrorResumeIterable(this._onError, this._source);
+  final Iterable<A> Function(Object, StackTrace) _onError;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _OnErrorResumeIterator(_onError, _source);
+}
+
+final class _OnErrorResumeIterator<A> implements Iterator<A> {
+  _OnErrorResumeIterator(this._onError, Iterable<A> source)
+      : _it = source.iterator;
+  final Iterable<A> Function(Object, StackTrace) _onError;
+  Iterator<A> _it;
+  bool _switched = false;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (true) {
+      try {
+        if (!_it.moveNext()) return false;
+        current = _it.current;
+        return true;
+      } catch (e, st) {
+        // A second failure is the replacement's own — let it out.
+        if (_switched) rethrow;
+        _switched = true;
+        _it = _onError(e, st).iterator;
+      }
+    }
+  }
+}
+
+/// Async counterpart of [onErrorResume]: pulls [iterable] until a pull fails,
+/// then continues pulling the iterable [onError] returns.
+///
+/// The failing pull is answered by the replacement's first value, so no
+/// element is lost or duplicated. Values delivered before the error are kept,
+/// and the switch happens at most once. Errors thrown by [onError] itself, or
+/// by the replacement, propagate.
+///
+/// ```dart
+/// fxAsync(liveFeed).onErrorResume((_, __) => cachedTail).take(20).toList();
+/// ```
+FxAsyncIterable<A> onErrorResumeAsync<A>(
+    FxAsyncIterable<A> Function(Object error, StackTrace stackTrace) onError,
+    FxAsyncIterable<A> iterable) {
+  return dispatchAsync(iterable, (source) {
+    final iterator = source.iterator;
+    FxAsyncIterator<A>? fb;
+    return SerialAsyncIterator((concurrent) {
+      final f = fb;
+      if (f != null) return f.next(concurrent);
+      // A synchronous throw from next() is as much a source failure as a
+      // rejected future, and must switch the same way.
+      Future<IterResult<A>> pull;
+      try {
+        pull = iterator.next(concurrent);
+      } catch (e, st) {
+        final n = fb = onError(e, st).iterator;
+        return n.next(concurrent);
+      }
+      return pull.catchError((Object e, StackTrace st) {
+        final n = fb = onError(e, st).iterator;
+        return n.next(concurrent);
+      });
+    });
+  });
+}

@@ -185,6 +185,12 @@ class Fx<T> extends Iterable<T> {
   /// Yields the single [value] when this chain turns out to be empty.
   Fx<T> defaultIfEmpty(T value) => Fx(l.defaultIfEmpty(value, _inner));
 
+  /// Continues with [onError]'s iterable when this chain throws, keeping
+  /// everything delivered before the error.
+  Fx<T> onErrorResume(
+          Iterable<T> Function(Object error, StackTrace stackTrace) onError) =>
+      Fx(l.onErrorResume(onError, _inner));
+
   /// Pairs each value with the value at the same position in [other],
   /// stopping at the shorter side.
   Fx<(T, U)> zip<U>(Iterable<U> other) => Fx(l.zip(_inner, other));
@@ -484,6 +490,14 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   @pragma('vm:prefer-inline')
   FxAsync<T> defaultIfEmpty(FutureOr<T> value) =>
       FxAsync(l.defaultIfEmptyAsync(value, _inner));
+
+  /// Continues with [onError]'s iterable when a pull on this chain fails,
+  /// keeping everything delivered before the error.
+  @pragma('vm:prefer-inline')
+  FxAsync<T> onErrorResume(
+          FxAsyncIterable<T> Function(Object error, StackTrace stackTrace)
+              onError) =>
+      FxAsync(l.onErrorResumeAsync(onError, _inner));
 
   /// Maps [f], retrying each call up to [attempts] times (with optional
   /// [delay] backoff) before the error propagates. Retries compose with
