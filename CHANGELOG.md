@@ -1,6 +1,6 @@
-## Unreleased
+## 0.7.7
 
-### Added — `tee2` / `tee3`
+### Added — `tee` / `tee3`
 
 Several folds over a **single** pass of a source, with no buffering.
 
@@ -13,15 +13,15 @@ remember. The counterpart of Rx's `publish()`, where attaching both
 subscribers before `connect()` is what avoids the buffer.
 
 The two accumulators are independent and need not share a type; `tee3`
-takes three; `tee2Async` is the async form. Chain methods on `Fx` and
-`FxAsync`. The trade is deliberate: `tee2` feeds folds, not pipelines — for
+takes three; `teeAsync` is the async form. Chain methods on `Fx` and
+`FxAsync`. The trade is deliberate: `tee` feeds folds, not pipelines — for
 two genuinely independent readers, `fork` and its buffer remain the answer.
 
 On the RxDartComparison's `tee-the-pipeline`, measured paired and
 interleaved: time **36.6 → 17.8 ms** (-51%), peak RSS **57.6 → 22.6 MB**
 (-61%). That was the section's largest memory loss; fxdart now holds less
 than RxDart's 25.4 MB. The example and its benchmark were moved onto
-`tee2`, matching a multicast primitive against a multicast primitive
+`tee`, matching a multicast primitive against a multicast primitive
 rather than a general buffering one.
 
 ### Performance — the fused stage list is compiled into a link chain
@@ -46,6 +46,16 @@ collapsing an adjacent `filter`+`map` into one fused stage (+0.16% median,
 -0.8% on its own target case), and an `onErrorResume` operator, which made
 `resume-with-cache` **151% slower** — routing the cached tail through the
 async chain costs more than the `await for` it replaced.
+
+### Docs
+
+101 section 6 gains `tee` and `tee3` (between `fork` and `ifEmpty`), both
+translated to Korean. The `tee` page carries the name's etymology — the
+letter T, after the plumbing T-splitter Unix borrowed for its own `tee` —
+and is explicit that Python's `itertools.tee`, which splits one iterable
+into independent iterators, is the operation FxDart spells `fork`, not
+`tee`. FxDart's `tee` branches the *consumption* one level further
+downstream.
 
 ### Tests
 

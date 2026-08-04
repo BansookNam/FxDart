@@ -187,10 +187,10 @@ class Fx<T> extends Iterable<T> {
 
   /// Runs two folds over a single pass of this chain — one iteration, no
   /// buffering.
-  (R1, R2) tee2<R1, R2>(s.Fold<T, R1> first, s.Fold<T, R2> second) =>
-      s.tee2(_inner, first, second);
+  (R1, R2) tee<R1, R2>(s.Fold<T, R1> first, s.Fold<T, R2> second) =>
+      s.tee(_inner, first, second);
 
-  /// Three-fold [tee2].
+  /// Three-fold [tee].
   (R1, R2, R3) tee3<R1, R2, R3>(
           s.Fold<T, R1> first, s.Fold<T, R2> second, s.Fold<T, R3> third) =>
       s.tee3(_inner, first, second, third);
@@ -498,9 +498,9 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Runs two folds over a single pass of this chain — one iteration, no
   /// buffering.
   @pragma('vm:prefer-inline')
-  Future<(R1, R2)> tee2<R1, R2>(
+  Future<(R1, R2)> tee<R1, R2>(
           s.AsyncFold<T, R1> first, s.AsyncFold<T, R2> second) =>
-      s.tee2Async(_inner, first, second);
+      s.teeAsync(_inner, first, second);
 
   /// Maps [f], retrying each call up to [attempts] times (with optional
   /// [delay] backoff) before the error propagates. Retries compose with

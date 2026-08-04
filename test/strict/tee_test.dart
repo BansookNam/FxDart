@@ -12,10 +12,10 @@ class _CountingSource {
 }
 
 void main() {
-  group('tee2', () {
+  group('tee', () {
     test('runs both folds over a single pass of the source', () {
       final src = _CountingSource();
-      final (total, peak) = tee2(
+      final (total, peak) = tee(
           src([12, 7, 25, 3, 18, 9]),
           (seed: 0, step: (int a, int r) => a + r),
           (seed: 0, step: (int a, int r) => r > a ? r : a));
@@ -27,7 +27,7 @@ void main() {
 
     test('agrees with the same folds run separately', () {
       const values = [5, 1, 9, 4];
-      final (sum, max) = tee2(
+      final (sum, max) = tee(
           values,
           (seed: 0, step: (int a, int r) => a + r),
           (seed: 0, step: (int a, int r) => r > a ? r : a));
@@ -37,7 +37,7 @@ void main() {
     });
 
     test('returns the seeds untouched for an empty source', () {
-      final (a, b) = tee2(
+      final (a, b) = tee(
           const <int>[],
           (seed: 5, step: (int acc, int x) => acc + x),
           (seed: 'z', step: (String acc, int x) => '$acc$x'));
@@ -47,7 +47,7 @@ void main() {
     });
 
     test('carries independent, differently typed accumulators', () {
-      final (chars, seen) = tee2(
+      final (chars, seen) = tee(
           ['a', 'bb', 'ccc'],
           (seed: 0, step: (int acc, String x) => acc + x.length),
           (seed: <String>[], step: (List<String> acc, String x) => acc..add(x)));
@@ -59,7 +59,7 @@ void main() {
     test('steps see every element in order', () {
       final left = <int>[];
       final right = <int>[];
-      tee2(
+      tee(
           [3, 1, 2],
           (seed: 0, step: (int a, int x) => (left..add(x)).length),
           (seed: 0, step: (int a, int x) => (right..add(x)).length));
@@ -70,7 +70,7 @@ void main() {
 
     test('a throwing step propagates', () {
       expect(
-          () => tee2(
+          () => tee(
               [1, 2],
               (seed: 0, step: (int a, int x) => a + x),
               (seed: 0, step: (int a, int x) => throw StateError('step'))),
@@ -105,8 +105,8 @@ void main() {
   });
 
   group('Fx chain', () {
-    test('tee2 folds the chain in one pass', () {
-      final (sum, product) = fx([1, 2, 3, 4]).tee2(
+    test('tee folds the chain in one pass', () {
+      final (sum, product) = fx([1, 2, 3, 4]).tee(
           (seed: 0, step: (int acc, int x) => acc + x),
           (seed: 1, step: (int acc, int x) => acc * x));
 
@@ -114,11 +114,11 @@ void main() {
       expect(product, 24);
     });
 
-    test('tee2 sees the chain output, not the source', () {
+    test('tee sees the chain output, not the source', () {
       final (sum, count) = fx([1, 2, 3, 4, 5])
           .filter((a) => a.isOdd)
           .map((a) => a * 10)
-          .tee2((seed: 0, step: (int acc, int x) => acc + x),
+          .tee((seed: 0, step: (int acc, int x) => acc + x),
               (seed: 0, step: (int acc, int _) => acc + 1));
 
       expect(sum, 90);
@@ -135,9 +135,9 @@ void main() {
     });
   });
 
-  group('tee2Async', () {
+  group('teeAsync', () {
     test('folds an async chain in one pass', () async {
-      final (sum, max) = await fxAsync(toAsync([3, 9, 4])).tee2(
+      final (sum, max) = await fxAsync(toAsync([3, 9, 4])).tee(
           (seed: 0, step: (int acc, int x) => acc + x),
           (seed: 0, step: (int acc, int x) => x > acc ? x : acc));
 
@@ -146,7 +146,7 @@ void main() {
     });
 
     test('awaits asynchronous steps on both sides', () async {
-      final (sum, max) = await fxAsync(toAsync([3, 9, 4])).tee2(
+      final (sum, max) = await fxAsync(toAsync([3, 9, 4])).tee(
           (seed: 0, step: (int acc, int x) async => acc + x),
           (seed: 0, step: (int acc, int x) async => x > acc ? x : acc));
 
@@ -155,14 +155,14 @@ void main() {
     });
 
     test('mixes a synchronous step with an asynchronous one', () async {
-      final (sum, max) = await fxAsync(toAsync([3, 9, 4])).tee2(
+      final (sum, max) = await fxAsync(toAsync([3, 9, 4])).tee(
           (seed: 0, step: (int acc, int x) => acc + x),
           (seed: 0, step: (int acc, int x) async => x > acc ? x : acc));
 
       expect(sum, 16);
       expect(max, 9);
 
-      final (sum2, max2) = await fxAsync(toAsync([3, 9, 4])).tee2(
+      final (sum2, max2) = await fxAsync(toAsync([3, 9, 4])).tee(
           (seed: 0, step: (int acc, int x) async => acc + x),
           (seed: 0, step: (int acc, int x) => x > acc ? x : acc));
 
@@ -171,7 +171,7 @@ void main() {
     });
 
     test('accepts Future seeds', () async {
-      final (a, b) = await fxAsync(toAsync([1, 2])).tee2(
+      final (a, b) = await fxAsync(toAsync([1, 2])).tee(
           (seed: Future.value(10), step: (int acc, int x) => acc + x),
           (seed: 0, step: (int acc, int x) => acc + x * 2));
 
@@ -180,7 +180,7 @@ void main() {
     });
 
     test('returns the seeds untouched for an empty source', () async {
-      final (a, b) = await fxAsync(toAsync(<int>[])).tee2(
+      final (a, b) = await fxAsync(toAsync(<int>[])).tee(
           (seed: 7, step: (int acc, int x) => acc + x),
           (seed: 8, step: (int acc, int x) => acc + x));
 
@@ -190,7 +190,7 @@ void main() {
     test('steps see every element in order', () async {
       final left = <int>[];
       final right = <int>[];
-      await fxAsync(toAsync([3, 1, 2])).tee2(
+      await fxAsync(toAsync([3, 1, 2])).tee(
           (seed: 0, step: (int a, int x) async => (left..add(x)).length),
           (seed: 0, step: (int a, int x) => (right..add(x)).length));
 
@@ -200,7 +200,7 @@ void main() {
 
     test('a throwing step propagates', () {
       expect(
-          fxAsync(toAsync([1, 2])).tee2(
+          fxAsync(toAsync([1, 2])).tee(
               (seed: 0, step: (int a, int x) => a + x),
               (seed: 0, step: (int a, int x) async => throw StateError('step'))),
           throwsStateError);
