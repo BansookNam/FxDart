@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Habilitar el envío cuando el formulario es válido — RxDart vs FxDart</title>
-  <meta name="description" content="Combinar los últimos valores de email y contraseña para gobernar el botón de envío — Rx.combineLatest2 vs combineLatest en la capa de eventos de fxdart 0.7.3.">
+  <meta name="description" content="Combinar los últimos valores de email y contraseña para gobernar el botón de envío — Rx.combineLatest2 vs combineLatest en la capa de eventos de fxdart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/combine-form-fields.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/combine-form-fields.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/combine-form-fields.html">
@@ -162,9 +162,9 @@ Future<void> main() async {
 
   <h2>Por qué difieren</h2>
   <p>
-    Ya no difieren. El estado de <em>último-valor-por-fuente</em> es el
+    No difieren. El estado de <em>último-valor-por-fuente</em> es el
     combinador que define el modelo push, y ambos paneles lo declaran
-    ahora en una línea: retener el valor más nuevo de cada campo,
+    en una línea: retener el valor más nuevo de cada campo,
     esperar a que ambos hayan hablado, re-emitir el par en cada cambio
     de cualquiera de los lados. RxDart escribe
     <code>Rx.combineLatest2(emails(), passwords(), ...)</code>; fxdart
@@ -175,7 +175,7 @@ Future<void> main() async {
     a mano ha desaparecido.
   </p>
   <p>
-    La capa de eventos de fxdart&nbsp;0.7.3 absorbió el enfoque Rx
+    La capa de eventos de fxdart absorbe el enfoque Rx
     exactamente para esta clase de trabajo: una cadena envoltorio
     deliberada sobre <code>Stream</code>s llanos — no una extensión, así
     que convive con rxdart o cualquier otra biblioteca de streams sin

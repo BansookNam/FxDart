@@ -50,6 +50,6 @@ async: false
     <code>ifEmpty</code> aporta la línea del día estable dentro del
     pipeline en lugar de un if después. Cada fragmento se puede probar por
     separado y nada reimplementa límites de ventana. Estos cuatro
-    operadores son nuevos en fxdart 0.7.2 — adaptaciones al modelo pull de
-    la familia de ventanas de Rx.
+    operadores son adaptaciones al modelo pull de la familia de ventanas
+    de Rx.
   </p>

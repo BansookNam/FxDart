@@ -73,13 +73,12 @@
     Un apunte de honestidad antes de la lista: cuando un problema va
     genuinamente de <em>eventos en el tiempo</em> — entrada del usuario,
     tickers, sockets — un stream es la forma correcta para él. FxDart lo
-    dice absorbiendo la idea: desde 0.7.3 su <strong>capa de
-    eventos</strong>
+    dice absorbiendo la idea: su <strong>capa de eventos</strong>
     (<code><a href="../tutorials/fxEvents.html">fxEvents</a></code>) pone
     operadores push al estilo Rx — debounce, throttle, sample,
     combineLatest, switchMap, race, un <code>LiveValue</code> — sobre
     streams de Dart llanos, de modo que las parejas temporales de la
-    Parte&nbsp;4 se encuentran ahora como iguales, operador por operador.
+    Parte&nbsp;4 se encuentran como iguales, operador por operador.
     El catálogo de RxDart sigue siendo mucho más amplio; lo que las
     parejas exponen es la otra mitad de la historia — cuántas veces un
     problema que se resuelve con un stream es en realidad un
@@ -522,7 +521,7 @@
         <span class="cmp-num">38</span>
         <span class="cmp-row-body">
           <strong>Aplicar debounce al buscador</strong> <span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span>
-          <span class="dim">Esperar a que el tecleo se calme antes de buscar — debounceTime sobre el stream de eventos vs la misma cadena debounce en la capa de eventos de fxdart 0.7.3.</span>
+          <span class="dim">Esperar a que el tecleo se calme antes de buscar — debounceTime sobre el stream de eventos vs la misma cadena debounce en la capa de eventos de fxdart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/debounce.html">debounce</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
@@ -572,7 +571,7 @@
         <span class="cmp-num">43</span>
         <span class="cmp-row-body">
           <strong>Habilitar el envío cuando el formulario es válido</strong> <span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span>
-          <span class="dim">Combinar los últimos valores de email y contraseña para gobernar el botón de envío — Rx.combineLatest2 vs combineLatest en la capa de eventos de fxdart 0.7.3.</span>
+          <span class="dim">Combinar los últimos valores de email y contraseña para gobernar el botón de envío — Rx.combineLatest2 vs combineLatest en la capa de eventos de fxdart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/combineLatest.html">combineLatest</a></li></ul>
@@ -582,7 +581,7 @@
         <span class="cmp-num">44</span>
         <span class="cmp-row-body">
           <strong>Aplicar throttle al botón de refresco</strong> <span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span>
-          <span class="dim">Dejar pasar un toque por ventana de 300 ms — throttleTime sobre el stream de toques vs la cadena throttle equivalente en la capa de eventos de fxdart 0.7.3.</span>
+          <span class="dim">Dejar pasar un toque por ventana de 300 ms — throttleTime sobre el stream de toques vs la cadena throttle equivalente en la capa de eventos de fxdart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/throttle.html">throttle</a></li></ul>
@@ -592,7 +591,7 @@
         <span class="cmp-num">45</span>
         <span class="cmp-row-body">
           <strong>Muestrear el medidor en cada tick de sondeo</strong> <span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span>
-          <span class="dim">Leer el valor más reciente del medidor en cada tick de sondeo — un stream disparador de sample explícito en RxDart vs sampleOn en la capa de eventos de fxdart 0.7.3.</span>
+          <span class="dim">Leer el valor más reciente del medidor en cada tick de sondeo — un stream disparador de sample explícito en RxDart vs sampleOn en la capa de eventos de fxdart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/sampleOn.html">sampleOn</a></li></ul>

@@ -1,7 +1,7 @@
 ---
 slug: combine-form-fields
 title: Enable submit when the form is valid — RxDart vs FxDart
-description: Combine the latest email and password values to drive the submit button — Rx.combineLatest2 vs combineLatest in fxdart 0.7.3's events layer.
+description: Combine the latest email and password values to drive the submit button — Rx.combineLatest2 vs combineLatest in fxdart's events layer.
 heading: Enable submit when the form is valid
 order: 43
 tier: 4
@@ -32,8 +32,8 @@ noBenchmark: timing
 
   <h2>Why they differ</h2>
   <p>
-    They no longer do. <em>Latest-value-per-source</em> state is the
-    defining combinator of the push model, and both panels now declare it
+    They don't. <em>Latest-value-per-source</em> state is the
+    defining combinator of the push model, and both panels declare it
     in one line: hold the newest value from each field, wait until both
     have spoken, re-emit the pair on every change from either side.
     RxDart writes <code>Rx.combineLatest2(emails(), passwords(), ...)</code>;
@@ -43,7 +43,7 @@ noBenchmark: timing
     used to hand-roll is gone.
   </p>
   <p>
-    fxdart&nbsp;0.7.3's events layer absorbed the Rx approach for exactly
+    fxdart's events layer absorbs the Rx approach for exactly
     this kind of job: a deliberate wrapper chain over plain
     <code>Stream</code>s — not an extension, so it coexists with rxdart or
     any other stream library without conflicts — carrying the latest-value

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Aplicar debounce al buscador — RxDart vs FxDart</title>
-  <meta name="description" content="Esperar a que el tecleo se calme antes de buscar — debounceTime sobre el stream de eventos vs la misma cadena debounce en la capa de eventos de fxdart 0.7.3.">
+  <meta name="description" content="Esperar a que el tecleo se calme antes de buscar — debounceTime sobre el stream de eventos vs la misma cadena debounce en la capa de eventos de fxdart.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/debounced-search.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/debounced-search.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/debounced-search.html">
@@ -148,12 +148,12 @@ Future<void> main() async {
 
   <h2>Por qué difieren</h2>
   <p>
-    Ya no difieren. Este es un problema <em>push</em> en su forma más
+    No difieren. Este es un problema <em>push</em> en su forma más
     pura — lo interesante no son los valores sino <strong>cuándo dejan
-    de llegar</strong> — y ambos paneles lo dicen ahora de la misma
+    de llegar</strong> — y ambos paneles lo dicen de la misma
     manera: aplicar debounce al stream de eventos con 160&nbsp;ms,
     buscar cada consulta superviviente, recoger. RxDart lo escribe
-    <code>debounceTime</code>; fxdart&nbsp;0.7.3 lo escribe
+    <code>debounceTime</code>; fxdart lo escribe
     <code>fxEvents(...).debounce(...)</code>. Operador por operador, las
     dos cadenas son equivalentes, hasta en el valor final vaciado al
     cerrar.

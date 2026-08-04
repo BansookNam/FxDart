@@ -29,7 +29,7 @@ async: true
   <h2>차이가 나는 이유</h2>
   <p>
     대체로 다르지 않습니다 — 둘 다 같은 Rx 아이디어의 포팅이고,
-    FxDart도 그렇게 말합니다: <code>usingAsync</code>(0.7.2 신규)는
+    FxDart도 그렇게 말합니다: <code>usingAsync</code>는
     Rx의 <code>using</code>을 뒤따라 나왔습니다. 모양은 같은 3부
     괄호입니다: 획득, 사용, 해제. <code>Rx.using</code>은 스트림이
     listen될 때 커서를 만들고 스트림이 종료될 때 disposer를

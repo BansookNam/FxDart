@@ -30,9 +30,9 @@ noBenchmark: timing
 
   <h2>Por qué difieren</h2>
   <p>
-    Ya no difieren. La carrera es una idea push — suscríbete a todo,
-    quédate con quien hable primero, <em>cancela</em> el resto — y desde
-    fxdart 0.7.3 <code>FxEvents.race</code> es exactamente eso,
+    No difieren. La carrera es una idea push — suscríbete a todo,
+    quédate con quien hable primero, <em>cancela</em> el resto — y
+    <code>FxEvents.race</code> es exactamente eso,
     igualando a <code>Rx.race</code> movimiento a movimiento: ambos
     mirrors están genuinamente en vuelo, y en el momento en que el
     mirror de la UE emite a los 60&nbsp;ms la suscripción de EE. UU. se
@@ -43,13 +43,14 @@ noBenchmark: timing
     solo se ignoró, en ambos lados.
   </p>
   <p>
-    El viejo panel FxDart solo podía negarse a <em>arrancar</em> el
-    fetch de respaldo; la capa de eventos absorbió en cambio el enfoque
-    Rx: una cadena envoltorio fina sobre <code>Stream</code>s llanos que
-    no colisiona con nada, rxdart incluido. El catálogo de operadores de
+    Una cadena pull solo puede negarse a <em>arrancar</em> el fetch de
+    respaldo, nunca cancelar uno en vuelo; la capa de eventos absorbe en
+    cambio el enfoque Rx: una cadena envoltorio fina sobre
+    <code>Stream</code>s llanos que no colisiona con nada, rxdart
+    incluido. El catálogo de operadores de
     RxDart sigue siendo mucho más amplio — fxdart mantiene pequeño el
     núcleo de eventos y entrega el procesamiento por valor del ganador
     al lado pull tipado vía <code>.pull()</code>. Para «gana el primero
-    en responder, los perdedores se cancelan», los dos son ahora
+    en responder, los perdedores se cancelan», los dos son
     equivalentes operador por operador: empate.
   </p>

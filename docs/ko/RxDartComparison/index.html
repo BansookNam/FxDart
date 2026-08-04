@@ -72,12 +72,12 @@
     목록을 보기 전에 정직하게 한 가지 짚고 넘어가겠습니다: 문제가 정말
     <em>시간에 따라 도착하는 이벤트</em>에 관한 것이라면 — 사용자 입력,
     시세 틱, 소켓 — 스트림이 그 문제에 맞는 형태입니다. FxDart는 그
-    아이디어를 흡수하는 것으로 이를 인정합니다: 0.7.3부터
+    아이디어를 흡수하는 것으로 이를 인정합니다:
     <strong>이벤트 레이어</strong>
     (<code><a href="../tutorials/fxEvents.html">fxEvents</a></code>)가
     Rx 스타일의 push 연산자들 — debounce, throttle, sample,
     combineLatest, switchMap, race, 그리고 <code>LiveValue</code> — 를
-    평범한 Dart 스트림 위에 올려 주므로, 이제 Part&nbsp;4의 시간 형태
+    평범한 Dart 스트림 위에 올려 주므로, Part&nbsp;4의 시간 형태
     쌍들은 연산자 대 연산자로 대등하게 만납니다. RxDart의 카탈로그는
     여전히 훨씬 큽니다; 이 쌍들이 드러내는 것은 이야기의 나머지 절반
     — 스트림으로 풀리는 문제가 사실은 스트림 옷을 입은 <em>데이터
@@ -519,7 +519,7 @@
         <span class="cmp-num">38</span>
         <span class="cmp-row-body">
           <strong>검색창 디바운스하기</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span>
-          <span class="dim">타이핑이 잠잠해질 때까지 기다렸다가 검색 — 이벤트 스트림 위의 debounceTime vs fxdart 0.7.3 이벤트 레이어의 동일한 debounce 체인.</span>
+          <span class="dim">타이핑이 잠잠해질 때까지 기다렸다가 검색 — 이벤트 스트림 위의 debounceTime vs fxdart 이벤트 레이어의 동일한 debounce 체인.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/debounce.html">debounce</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
@@ -569,7 +569,7 @@
         <span class="cmp-num">43</span>
         <span class="cmp-row-body">
           <strong>폼이 유효해지면 제출 버튼 켜기</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span>
-          <span class="dim">최신 이메일·비밀번호 값을 결합해 제출 버튼을 구동 — Rx.combineLatest2 vs fxdart 0.7.3 이벤트 레이어의 combineLatest.</span>
+          <span class="dim">최신 이메일·비밀번호 값을 결합해 제출 버튼을 구동 — Rx.combineLatest2 vs fxdart 이벤트 레이어의 combineLatest.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/combineLatest.html">combineLatest</a></li></ul>
@@ -579,7 +579,7 @@
         <span class="cmp-num">44</span>
         <span class="cmp-row-body">
           <strong>새로고침 버튼 스로틀링하기</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span>
-          <span class="dim">300 ms 윈도마다 탭 하나만 통과 — 탭 스트림 위의 throttleTime vs fxdart 0.7.3 이벤트 레이어의 동등한 throttle 체인.</span>
+          <span class="dim">300 ms 윈도마다 탭 하나만 통과 — 탭 스트림 위의 throttleTime vs fxdart 이벤트 레이어의 동등한 throttle 체인.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/throttle.html">throttle</a></li></ul>
@@ -589,7 +589,7 @@
         <span class="cmp-num">45</span>
         <span class="cmp-row-body">
           <strong>폴링 틱마다 게이지 샘플링하기</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-async">async</span>
-          <span class="dim">각 폴링 틱 시점의 최신 게이지 값 읽기 — RxDart의 명시적 sample 트리거 스트림 vs fxdart 0.7.3 이벤트 레이어의 sampleOn.</span>
+          <span class="dim">각 폴링 틱 시점의 최신 게이지 값 읽기 — RxDart의 명시적 sample 트리거 스트림 vs fxdart 이벤트 레이어의 sampleOn.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/sampleOn.html">sampleOn</a></li></ul>

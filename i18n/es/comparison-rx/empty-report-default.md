@@ -34,7 +34,7 @@ async: false
     pipeline diga qué emitir en ese caso — y ambas bibliotecas responden
     con un operador. El <code>defaultIfEmpty</code> de RxDart inyecta el
     valor por defecto cuando la fuente se completa sin ningún evento; el
-    <code>defaultIfEmpty</code> de FxDart (añadido en 0.7.2, tomado
+    <code>defaultIfEmpty</code> de FxDart (tomado
     abiertamente del vocabulario Rx, con
     <code>ifEmpty(() =&gt; fallback)</code> como forma perezosa sobre el
     iterable completo) lo produce cuando el primer tirón no encuentra

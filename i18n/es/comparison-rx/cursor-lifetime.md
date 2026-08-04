@@ -29,7 +29,7 @@ async: true
   <h2>Por qué difieren</h2>
   <p>
     En su mayor parte no difieren — ambos son ports de la misma idea de
-    Rx, y FxDart lo dice: <code>usingAsync</code> (nuevo en 0.7.2) llegó
+    Rx, y FxDart lo dice: <code>usingAsync</code> llegó
     después del <code>using</code> de Rx. La forma es el mismo paréntesis
     de tres partes: adquirir, usar, liberar. <code>Rx.using</code> crea el
     cursor cuando el stream recibe un listener y llama al liberador cuando

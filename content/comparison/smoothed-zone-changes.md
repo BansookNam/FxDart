@@ -48,6 +48,6 @@ async: false
     (from,&nbsp;to) transitions, and <code>ifEmpty</code> supplies the
     stable-day line inside the pipeline instead of an if-check after it.
     Each fragment is independently testable, and none of it re-implements
-    window bounds. These four operators are new in fxdart 0.7.2 —
-    pull-model ports of the Rx windowing family.
+    window bounds. These four operators are pull-model ports of the Rx
+    windowing family.
   </p>

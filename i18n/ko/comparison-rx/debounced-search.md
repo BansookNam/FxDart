@@ -1,7 +1,7 @@
 ---
 slug: debounced-search
 title: 검색창 디바운스하기 — RxDart vs FxDart
-description: 타이핑이 잠잠해질 때까지 기다렸다가 검색 — 이벤트 스트림 위의 debounceTime vs fxdart 0.7.3 이벤트 레이어의 동일한 debounce 체인.
+description: 타이핑이 잠잠해질 때까지 기다렸다가 검색 — 이벤트 스트림 위의 debounceTime vs fxdart 이벤트 레이어의 동일한 debounce 체인.
 heading: 검색창 디바운스하기
 order: 38
 tier: 4
@@ -29,12 +29,12 @@ noBenchmark: timing
 
   <h2>차이가 나는 이유</h2>
   <p>
-    이제는 다르지 않습니다. 이것은 가장 순수한 형태의 <em>push</em>
+    다르지 않습니다. 이것은 가장 순수한 형태의 <em>push</em>
     문제이고 — 흥미로운 것은 값이 아니라 <strong>값이 언제 도착하기를
-    멈추는가</strong>입니다 — 이제 두 패널 모두 같은 방식으로 말합니다:
+    멈추는가</strong>입니다 — 두 패널 모두 같은 방식으로 말합니다:
     이벤트 스트림을 160&nbsp;ms로 디바운스하고, 살아남은 각 쿼리를
     검색하고, 수집합니다. RxDart는 그것을 <code>debounceTime</code>이라고
-    쓰고; fxdart&nbsp;0.7.3은 <code>fxEvents(...).debounce(...)</code>라고
+    쓰고; fxdart는 <code>fxEvents(...).debounce(...)</code>라고
     씁니다. 연산자 대 연산자로 두 체인은 동등하며, 닫힐 때 흘려보내는
     트레일링 값까지 같습니다.
   </p>

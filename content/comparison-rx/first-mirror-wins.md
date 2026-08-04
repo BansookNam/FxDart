@@ -29,9 +29,9 @@ noBenchmark: timing
 
   <h2>Why they differ</h2>
   <p>
-    They no longer do. Racing is a push idea — subscribe to everything,
-    keep whoever speaks first, <em>cancel</em> the rest — and since
-    fxdart 0.7.3 <code>FxEvents.race</code> is exactly that, matching
+    They don't. Racing is a push idea — subscribe to everything,
+    keep whoever speaks first, <em>cancel</em> the rest — and
+    <code>FxEvents.race</code> is exactly that, matching
     <code>Rx.race</code> move for move: both mirrors are genuinely in
     flight, and the moment the EU mirror emits at 60&nbsp;ms the US
     subscription is cancelled, its <code>onCancel</code> fires, and the
@@ -40,12 +40,12 @@ noBenchmark: timing
     deadline. The work was stopped, not just ignored, on both sides.
   </p>
   <p>
-    The old FxDart panel could only decline to <em>start</em> the backup
-    fetch; the events layer absorbed the Rx approach instead: a thin
-    wrapper chain over plain <code>Stream</code>s that collides with
-    nothing, rxdart included. RxDart's operator catalog remains far
+    A pull chain can only decline to <em>start</em> the backup fetch,
+    never cancel one in flight; the events layer absorbs the Rx approach
+    instead: a thin wrapper chain over plain <code>Stream</code>s that
+    collides with nothing, rxdart included. RxDart's operator catalog remains far
     larger — fxdart keeps the events core small and hands the winner's
     per-value processing to the typed pull side via <code>.pull()</code>.
-    For "first responder wins, losers are cancelled", the two are now
+    For "first responder wins, losers are cancelled", the two are
     operator-for-operator equivalent: a tie.
   </p>

@@ -70,12 +70,12 @@
   <p>
     A word of honesty before the list: when a problem is genuinely about
     <em>events over time</em> — user input, tickers, sockets — a stream is
-    the right shape for it. FxDart says so by absorbing the idea: since
-    0.7.3 its <strong>events layer</strong>
+    the right shape for it. FxDart says so by absorbing the idea: its
+    <strong>events layer</strong>
     (<code><a href="../tutorials/fxEvents.html">fxEvents</a></code>) puts
     Rx-style push operators — debounce, throttle, sample, combineLatest,
     switchMap, race, a <code>LiveValue</code> — on plain Dart streams, so
-    Part&nbsp;4's time-shaped pairs now meet as equals, operator for
+    Part&nbsp;4's time-shaped pairs meet as equals, operator for
     operator. RxDart's catalog remains far larger; what the pairs expose
     is the other half of the story — how often a problem that gets solved
     with a stream is really a <em>data pipeline</em> wearing a stream
@@ -517,7 +517,7 @@
         <span class="cmp-num">38</span>
         <span class="cmp-row-body">
           <strong>Debounce the search box</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span>
-          <span class="dim">Wait for the typing to go quiet before searching — debounceTime on the event stream vs the same debounce chain in fxdart 0.7.3's events layer.</span>
+          <span class="dim">Wait for the typing to go quiet before searching — debounceTime on the event stream vs the same debounce chain in fxdart's events layer.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/debounce.html">debounce</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
@@ -567,7 +567,7 @@
         <span class="cmp-num">43</span>
         <span class="cmp-row-body">
           <strong>Enable submit when the form is valid</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span>
-          <span class="dim">Combine the latest email and password values to drive the submit button — Rx.combineLatest2 vs combineLatest in fxdart 0.7.3's events layer.</span>
+          <span class="dim">Combine the latest email and password values to drive the submit button — Rx.combineLatest2 vs combineLatest in fxdart's events layer.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/combineLatest.html">combineLatest</a></li></ul>
@@ -577,7 +577,7 @@
         <span class="cmp-num">44</span>
         <span class="cmp-row-body">
           <strong>Throttle the refresh button</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span>
-          <span class="dim">Let one tap through per 300 ms window — throttleTime on the tap stream vs the equivalent throttle chain in fxdart 0.7.3's events layer.</span>
+          <span class="dim">Let one tap through per 300 ms window — throttleTime on the tap stream vs the equivalent throttle chain in fxdart's events layer.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/throttle.html">throttle</a></li></ul>
@@ -587,7 +587,7 @@
         <span class="cmp-num">45</span>
         <span class="cmp-row-body">
           <strong>Sample the gauge on each poll tick</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span>
-          <span class="dim">Read the latest gauge value at each poll tick — an explicit sample trigger stream in RxDart vs sampleOn in fxdart 0.7.3's events layer.</span>
+          <span class="dim">Read the latest gauge value at each poll tick — an explicit sample trigger stream in RxDart vs sampleOn in fxdart's events layer.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/sampleOn.html">sampleOn</a></li></ul>

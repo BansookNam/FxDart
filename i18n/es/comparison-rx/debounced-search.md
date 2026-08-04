@@ -1,7 +1,7 @@
 ---
 slug: debounced-search
 title: Aplicar debounce al buscador — RxDart vs FxDart
-description: Esperar a que el tecleo se calme antes de buscar — debounceTime sobre el stream de eventos vs la misma cadena debounce en la capa de eventos de fxdart 0.7.3.
+description: Esperar a que el tecleo se calme antes de buscar — debounceTime sobre el stream de eventos vs la misma cadena debounce en la capa de eventos de fxdart.
 heading: Aplicar debounce al buscador
 order: 38
 tier: 4
@@ -30,12 +30,12 @@ noBenchmark: timing
 
   <h2>Por qué difieren</h2>
   <p>
-    Ya no difieren. Este es un problema <em>push</em> en su forma más
+    No difieren. Este es un problema <em>push</em> en su forma más
     pura — lo interesante no son los valores sino <strong>cuándo dejan
-    de llegar</strong> — y ambos paneles lo dicen ahora de la misma
+    de llegar</strong> — y ambos paneles lo dicen de la misma
     manera: aplicar debounce al stream de eventos con 160&nbsp;ms,
     buscar cada consulta superviviente, recoger. RxDart lo escribe
-    <code>debounceTime</code>; fxdart&nbsp;0.7.3 lo escribe
+    <code>debounceTime</code>; fxdart lo escribe
     <code>fxEvents(...).debounce(...)</code>. Operador por operador, las
     dos cadenas son equivalentes, hasta en el valor final vaciado al
     cerrar.

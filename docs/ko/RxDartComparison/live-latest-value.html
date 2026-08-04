@@ -133,18 +133,18 @@ Future<void> main() async {
 
   <h2>차이가 나는 이유</h2>
   <p>
-    이제는 다르지 않습니다. "누가 나타나든 리플레이되는 최신 값"은
-    <em>공유된 멀티캐스트 상태</em>이고, fxdart 0.7.3부터는 fxdart에도
+    다르지 않습니다. "누가 나타나든 리플레이되는 최신 값"은
+    <em>공유된 멀티캐스트 상태</em>이고, fxdart에도
     그것을 위한 전용 객체가 있습니다: <code>LiveValue</code>는
     <code>BehaviorSubject</code>를 그것을 정의하는 동작만 남기고 줄인
     것입니다 — 센서가 쓰는 싱크, 읽을 수 있는 <code>.value</code>,
     그리고 늦게 온 구독자가 먼저 가장 최근 값을 받고 그다음 라이브
-    업데이트를 받는 피드. 이제 두 패널 모두 "업데이트 넣기, 늦게
-    구독하기, 수집하기"입니다; 옛 FxDart 패널에 필요했던 손수 캐시한
-    변수와 여분의 캐싱 리스너는 사라졌습니다.
+    업데이트를 받는 피드. 두 패널 모두 "업데이트 넣기, 늦게
+    구독하기, 수집하기"입니다 — 손수 캐시한 변수도, 여분의 캐싱
+    리스너도 없습니다.
   </p>
   <p>
-    이것이 fxdart 0.7.3의 이벤트 레이어가 push 쪽을 위해 Rx의 접근을
+    이것이 fxdart의 이벤트 레이어가 push 쪽을 위해 Rx의 접근을
     흡수한 모습입니다: <code>LiveValue.live</code>는
     <code><a href="../tutorials/fxEvents.html">fxEvents</a></code> 체인을 돌려주는데 — 평범한 브로드캐스트
     <code>Stream</code> 위의 얇은 래퍼라 rxdart를 포함해 어떤 것과도

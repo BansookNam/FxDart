@@ -1,7 +1,7 @@
 ---
 slug: sampled-gauge
 title: Sample the gauge on each poll tick — RxDart vs FxDart
-description: Read the latest gauge value at each poll tick — an explicit sample trigger stream in RxDart vs sampleOn in fxdart 0.7.3's events layer.
+description: Read the latest gauge value at each poll tick — an explicit sample trigger stream in RxDart vs sampleOn in fxdart's events layer.
 heading: Sample the gauge on each poll tick
 order: 45
 tier: 4
@@ -28,9 +28,9 @@ noBenchmark: timing
 
   <h2>Why they differ</h2>
   <p>
-    They no longer do. "The latest value at this instant" only exists in
+    They don't. "The latest value at this instant" only exists in
     the push model — it presumes things arrive on their own — and both
-    panels now express it as the same one-operator sentence: the gauge
+    panels express it as the same one-operator sentence: the gauge
     stream, sampled by the poll stream. RxDart writes
     <code>gauge().sample(polls())</code>; fxdart writes
     <code>fxEvents(gauge()).sampleOn(polls())</code>. In both, the "what
@@ -40,12 +40,12 @@ noBenchmark: timing
   </p>
   <p>
     The pull pipelines still have no clock and no "current value" — that
-    refusal stands. Instead, fxdart&nbsp;0.7.3 absorbed the Rx approach in
+    refusal stands. Instead, fxdart absorbs the Rx approach in
     a dedicated events layer: <code>fxEvents</code> is a thin wrapper
     chain over plain <code>Stream</code>s (never an extension, so it
     collides with nothing) that owns the push-native verbs the pull side
     would not. RxDart's operator catalog remains far larger; this verb,
-    fxdart now speaks natively. And if each sampled reading were the start
+    fxdart speaks natively. And if each sampled reading were the start
     of real downstream work, <code>.pull()</code> hands the samples to the
     typed <code>FxAsync</code> pipeline, pulled on demand.
   </p>

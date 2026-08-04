@@ -31,19 +31,19 @@ noBenchmark: timing
 
   <h2>Por qué difieren</h2>
   <p>
-    Ya no difieren. «Lo más nuevo cancela lo más viejo» es una
-    afirmación sobre <em>suscripciones</em>, y desde fxdart 0.7.3 la
-    capa <code>fxEvents</code> las tiene: su <code>switchMap</code>
+    No difieren. «Lo más nuevo cancela lo más viejo» es una
+    afirmación sobre <em>suscripciones</em>, y la capa
+    <code>fxEvents</code> las tiene: su <code>switchMap</code>
     mapea cada consulta a un stream de búsqueda interno y des-suscribe
     el anterior en el momento en que llega una consulta más nueva, así
     que a un resultado obsoleto no le queda ningún oyente al que llegar.
     Arrancan tres búsquedas, sobreviven dos resultados, y nada de esa
     lógica aparece en el código del usuario — en ninguno de los dos
-    paneles. El contador de épocas artesanal y la contabilidad de
-    terminación que el viejo panel FxDart necesitaba han desaparecido.
+    paneles. Sin contador de épocas artesanal y sin contabilidad de
+    terminación.
   </p>
   <p>
-    fxdart 0.7.3 absorbió el enfoque Rx exactamente para esta clase de
+    fxdart absorbe el enfoque Rx exactamente para esta clase de
     requisito: <code>fxEvents</code> es una cadena envoltorio fina sobre
     <code>Stream</code>s llanos — nunca una extensión, así que convive
     con cualquier otra biblioteca de streams, rxdart incluido. El
@@ -51,5 +51,5 @@ noBenchmark: timing
     cuando los resultados supervivientes necesiten procesamiento real
     por valor, cruza a la cadena pull tipada con <code>.pull()</code>.
     Para el caso de uso que define a <code>switchMap</code>, los paneles
-    son ahora equivalentes operador por operador: empate.
+    son equivalentes operador por operador: empate.
   </p>

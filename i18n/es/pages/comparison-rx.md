@@ -33,13 +33,12 @@ description: 50 tareas reales resueltas dos veces —streams de RxDart frente a 
     Un apunte de honestidad antes de la lista: cuando un problema va
     genuinamente de <em>eventos en el tiempo</em> — entrada del usuario,
     tickers, sockets — un stream es la forma correcta para él. FxDart lo
-    dice absorbiendo la idea: desde 0.7.3 su <strong>capa de
-    eventos</strong>
+    dice absorbiendo la idea: su <strong>capa de eventos</strong>
     (<code><a href="../tutorials/fxEvents.html">fxEvents</a></code>) pone
     operadores push al estilo Rx — debounce, throttle, sample,
     combineLatest, switchMap, race, un <code>LiveValue</code> — sobre
     streams de Dart llanos, de modo que las parejas temporales de la
-    Parte&nbsp;4 se encuentran ahora como iguales, operador por operador.
+    Parte&nbsp;4 se encuentran como iguales, operador por operador.
     El catálogo de RxDart sigue siendo mucho más amplio; lo que las
     parejas exponen es la otra mitad de la historia — cuántas veces un
     problema que se resuelve con un stream es en realidad un

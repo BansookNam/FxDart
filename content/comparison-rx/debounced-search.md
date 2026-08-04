@@ -1,7 +1,7 @@
 ---
 slug: debounced-search
 title: Debounce the search box — RxDart vs FxDart
-description: Wait for the typing to go quiet before searching — debounceTime on the event stream vs the same debounce chain in fxdart 0.7.3's events layer.
+description: Wait for the typing to go quiet before searching — debounceTime on the event stream vs the same debounce chain in fxdart's events layer.
 heading: Debounce the search box
 order: 38
 tier: 4
@@ -28,12 +28,12 @@ noBenchmark: timing
 
   <h2>Why they differ</h2>
   <p>
-    They no longer do. This is a <em>push</em> problem in its purest
+    They don't. This is a <em>push</em> problem in its purest
     form — the interesting thing is not the values but <strong>when they
-    stop arriving</strong> — and both panels now say it the same way:
+    stop arriving</strong> — and both panels say it the same way:
     debounce the event stream by 160&nbsp;ms, search each surviving query,
-    collect. RxDart spells it <code>debounceTime</code>; fxdart&nbsp;0.7.3
-    spells it <code>fxEvents(...).debounce(...)</code>. Operator for
+    collect. RxDart spells it <code>debounceTime</code>; fxdart spells
+    it <code>fxEvents(...).debounce(...)</code>. Operator for
     operator, the two chains are equivalent, down to the trailing value
     flushed at close.
   </p>

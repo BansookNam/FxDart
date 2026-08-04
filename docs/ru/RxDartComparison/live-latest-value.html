@@ -135,18 +135,17 @@ Future<void> main() async {
 
   <h2>Why they differ</h2>
   <p>
-    They no longer do. "The latest value, replayed to whoever shows up"
-    is <em>shared, multicast state</em>, and since fxdart 0.7.3 fxdart
-    has a dedicated object for it too: <code>LiveValue</code> is
+    They don't. "The latest value, replayed to whoever shows up"
+    is <em>shared, multicast state</em>, and fxdart has a dedicated
+    object for it too: <code>LiveValue</code> is
     <code>BehaviorSubject</code> reduced to its defining behavior — a
     sink the sensor writes to, a readable <code>.value</code>, and a feed
     where a late subscriber first receives the most recent value, then
-    the live updates. Both panels are now "add updates, subscribe late,
-    collect"; the hand-cached variable and the extra caching listener the
-    old FxDart panel needed are gone.
+    the live updates. Both panels are "add updates, subscribe late,
+    collect" — no hand-cached variable, no extra caching listener.
   </p>
   <p>
-    This is fxdart 0.7.3's events layer absorbing the Rx approach for
+    This is fxdart's events layer absorbing the Rx approach for
     the push side: <code>LiveValue.live</code> hands back an
     <code><a href="../tutorials/fxEvents.html">fxEvents</a></code> chain — a thin wrapper over a plain broadcast
     <code>Stream</code>, so it collides with nothing, rxdart included —

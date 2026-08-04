@@ -134,19 +134,18 @@ Future<void> main() async {
 
   <h2>Por qué difieren</h2>
   <p>
-    Ya no difieren. «El último valor, reemitido a quien aparezca» es
-    <em>estado compartido y multicast</em>, y desde fxdart 0.7.3 fxdart
-    también tiene un objeto dedicado para ello: <code>LiveValue</code>
+    No difieren. «El último valor, reemitido a quien aparezca» es
+    <em>estado compartido y multicast</em>, y fxdart también tiene un
+    objeto dedicado para ello: <code>LiveValue</code>
     es <code>BehaviorSubject</code> reducido a su comportamiento
     definitorio — un sumidero en el que el sensor escribe, un
     <code>.value</code> legible, y un feed donde un suscriptor tardío
     recibe primero el valor más reciente, y luego las actualizaciones en
-    vivo. Ambos paneles son ahora «añadir actualizaciones, suscribirse
-    tarde, recoger»; la variable cacheada a mano y el oyente extra de
-    caché que el viejo panel FxDart necesitaba han desaparecido.
+    vivo. Ambos paneles son «añadir actualizaciones, suscribirse tarde,
+    recoger» — sin variable cacheada a mano y sin oyente extra de caché.
   </p>
   <p>
-    Esta es la capa de eventos de fxdart 0.7.3 absorbiendo el enfoque Rx
+    Esta es la capa de eventos de fxdart absorbiendo el enfoque Rx
     para el lado push: <code>LiveValue.live</code> devuelve una cadena
     <code><a href="../tutorials/fxEvents.html">fxEvents</a></code> — un envoltorio fino sobre un
     <code>Stream</code> broadcast llano, así que no colisiona con nada,

@@ -29,7 +29,7 @@ async: true
   <h2>Why they differ</h2>
   <p>
     They mostly don't — both are ports of the same Rx idea, and FxDart
-    says so: <code>usingAsync</code> (new in 0.7.2) came after Rx's
+    says so: <code>usingAsync</code> came after Rx's
     <code>using</code>. The shape is the same three-part bracket:
     acquire, use, release. <code>Rx.using</code> creates the cursor when
     the stream is listened to and calls the disposer when the stream

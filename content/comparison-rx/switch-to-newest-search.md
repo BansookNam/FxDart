@@ -30,23 +30,22 @@ noBenchmark: timing
 
   <h2>Why they differ</h2>
   <p>
-    They no longer do. "Newer cancels older" is a statement about
-    <em>subscriptions</em>, and since fxdart 0.7.3 the
-    <code>fxEvents</code> layer has them: its <code>switchMap</code> maps
+    They don't. "Newer cancels older" is a statement about
+    <em>subscriptions</em>, and the <code>fxEvents</code> layer has
+    them: its <code>switchMap</code> maps
     each query to an inner search stream and unsubscribes the previous
     one the moment a newer query arrives, so a stale result has no
     listener left to reach. Three searches start, two results survive,
-    and none of that logic appears in user code — in either panel. The
-    hand-rolled epoch counter and completion bookkeeping the old FxDart
-    panel needed are gone.
+    and none of that logic appears in user code — in either panel. No
+    hand-rolled epoch counter, no completion bookkeeping.
   </p>
   <p>
-    fxdart 0.7.3 absorbed the Rx approach for exactly this kind of
+    fxdart absorbs the Rx approach for exactly this kind of
     requirement: <code>fxEvents</code> is a thin wrapper chain over plain
     <code>Stream</code>s — never an extension, so it coexists with any
     other stream library, rxdart included. RxDart's operator catalog
     remains far larger; when the surviving results need real per-value
     processing, cross into the typed pull chain with <code>.pull()</code>.
-    For <code>switchMap</code>'s defining use case the panels are now
+    For <code>switchMap</code>'s defining use case the panels are
     operator-for-operator equivalent: a tie.
   </p>

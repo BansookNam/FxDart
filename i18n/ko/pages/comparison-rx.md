@@ -32,12 +32,12 @@ description: 실전 과제 50개를 두 번씩 풉니다 — RxDart 스트림 vs
     목록을 보기 전에 정직하게 한 가지 짚고 넘어가겠습니다: 문제가 정말
     <em>시간에 따라 도착하는 이벤트</em>에 관한 것이라면 — 사용자 입력,
     시세 틱, 소켓 — 스트림이 그 문제에 맞는 형태입니다. FxDart는 그
-    아이디어를 흡수하는 것으로 이를 인정합니다: 0.7.3부터
+    아이디어를 흡수하는 것으로 이를 인정합니다:
     <strong>이벤트 레이어</strong>
     (<code><a href="../tutorials/fxEvents.html">fxEvents</a></code>)가
     Rx 스타일의 push 연산자들 — debounce, throttle, sample,
     combineLatest, switchMap, race, 그리고 <code>LiveValue</code> — 를
-    평범한 Dart 스트림 위에 올려 주므로, 이제 Part&nbsp;4의 시간 형태
+    평범한 Dart 스트림 위에 올려 주므로, Part&nbsp;4의 시간 형태
     쌍들은 연산자 대 연산자로 대등하게 만납니다. RxDart의 카탈로그는
     여전히 훨씬 큽니다; 이 쌍들이 드러내는 것은 이야기의 나머지 절반
     — 스트림으로 풀리는 문제가 사실은 스트림 옷을 입은 <em>데이터

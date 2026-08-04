@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Debounce the search box — RxDart vs FxDart</title>
-  <meta name="description" content="Wait for the typing to go quiet before searching — debounceTime on the event stream vs the same debounce chain in fxdart 0.7.3's events layer.">
+  <meta name="description" content="Wait for the typing to go quiet before searching — debounceTime on the event stream vs the same debounce chain in fxdart's events layer.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/RxDartComparison/debounced-search.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/RxDartComparison/debounced-search.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/RxDartComparison/debounced-search.html">
@@ -146,12 +146,12 @@ Future<void> main() async {
 
   <h2>Why they differ</h2>
   <p>
-    They no longer do. This is a <em>push</em> problem in its purest
+    They don't. This is a <em>push</em> problem in its purest
     form — the interesting thing is not the values but <strong>when they
-    stop arriving</strong> — and both panels now say it the same way:
+    stop arriving</strong> — and both panels say it the same way:
     debounce the event stream by 160&nbsp;ms, search each surviving query,
-    collect. RxDart spells it <code>debounceTime</code>; fxdart&nbsp;0.7.3
-    spells it <code>fxEvents(...).debounce(...)</code>. Operator for
+    collect. RxDart spells it <code>debounceTime</code>; fxdart spells
+    it <code>fxEvents(...).debounce(...)</code>. Operator for
     operator, the two chains are equivalent, down to the trailing value
     flushed at close.
   </p>

@@ -30,18 +30,17 @@ noBenchmark: timing
 
   <h2>Por qué difieren</h2>
   <p>
-    Ya no difieren. Este es el hermano asimétrico de
+    No difieren. Este es el hermano asimétrico de
     <code>combineLatest</code> — un stream dirige, el otro solo se
-    <em>consulta</em> — y desde fxdart 0.7.3 ambos paneles lo nombran de
+    <em>consulta</em> — y ambos paneles lo nombran de
     la misma manera: <code>withLatestFrom</code> emite por petición,
     sellada con la config más fresca vista hasta ahora, y guarda
-    silencio cuando solo cambia la config. El andamiaje de fusión
-    etiquetada y el pliegue con <code>scan</code> que el viejo panel
-    FxDart necesitaba han desaparecido; las dos cadenas son ahora
+    silencio cuando solo cambia la config. Sin andamiaje de fusión
+    etiquetada y sin pliegue con <code>scan</code>: las dos cadenas son
     idénticas operador por operador.
   </p>
   <p>
-    La capa de eventos de fxdart 0.7.3 absorbió el enfoque Rx para el
+    La capa de eventos de fxdart absorbe el enfoque Rx para el
     lado push: <code>fxEvents</code> es una cadena envoltorio fina sobre
     <code>Stream</code>s llanos — nunca una extensión, así que no
     colisiona con nada, rxdart incluido. El catálogo de operadores de

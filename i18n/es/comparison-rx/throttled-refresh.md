@@ -1,7 +1,7 @@
 ---
 slug: throttled-refresh
 title: Aplicar throttle al botón de refresco — RxDart vs FxDart
-description: Dejar pasar un toque por ventana de 300 ms — throttleTime sobre el stream de toques vs la cadena throttle equivalente en la capa de eventos de fxdart 0.7.3.
+description: Dejar pasar un toque por ventana de 300 ms — throttleTime sobre el stream de toques vs la cadena throttle equivalente en la capa de eventos de fxdart.
 heading: Aplicar throttle al botón de refresco
 order: 44
 tier: 4
@@ -30,9 +30,9 @@ noBenchmark: timing
 
   <h2>Por qué difieren</h2>
   <p>
-    Ya no difieren. El throttling es limitar la tasa de <em>llegadas en
+    No difieren. El throttling es limitar la tasa de <em>llegadas en
     el tiempo</em> — una propiedad de cuándo ocurren los eventos, no de
-    los valores — y ambos paneles colapsan ahora el requisito en un solo
+    los valores — y ambos paneles colapsan el requisito en un solo
     operador sobre el stream de toques. El <code>throttleTime(300ms)</code>
     de RxDart y el <code>fxEvents(...).throttle(300ms)</code> de fxdart
     implementan la misma ventana de borde inicial (el primer toque emite
@@ -42,13 +42,13 @@ noBenchmark: timing
     dentro del operador.
   </p>
   <p>
-    fxdart&nbsp;0.7.3 llegó aquí absorbiendo deliberadamente el enfoque
+    fxdart absorbe deliberadamente el enfoque
     Rx para el lado push: <code>fxEvents</code> es una cadena envoltorio
     sobre <code>Stream</code>s llanos — no una extensión, así que
     convive con cualquier biblioteca de streams sin un solo conflicto de
     miembros. El catálogo de operadores de RxDart sigue siendo mucho más
     amplio que la capa de eventos de fxdart; para los verbos temporales
-    cotidianos como este, los dos son ahora intercambiables. Si cada
+    cotidianos como este, los dos son intercambiables. Si cada
     toque superviviente tuviera luego que disparar trabajo async real y
     tipado, <code>.pull()</code> llevaría el stream al pipeline
     <code>FxAsync</code> dirigido por demanda.
