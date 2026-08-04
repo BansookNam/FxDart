@@ -70,20 +70,56 @@
   </p>
 
   <p>
-    A word of honesty before the list: when a problem is genuinely about
-    <em>events over time</em> — user input, tickers, sockets — a stream is
-    the right shape for it. FxDart says so by absorbing the idea: its
+    One habit is worth naming before the list, because it is common and it
+    is a mistake. <code>Stream</code> carries a rich operator vocabulary,
+    so it is tempting to reach for it by wrapping data you already hold —
+    <code>Stream.fromIterable(orders)</code> — purely to get
+    <code>map</code>, <code>where</code>, <code>distinct</code>,
+    <code>expand</code> and a fluent chain, and then to
+    <code>await</code> the answer back at the end. Nothing in that problem
+    is asynchronous. The values are in memory, the question has an answer
+    right now, and the <code>await</code> at the end is the tell: a
+    synchronous question was converted into a delivery mechanism to
+    borrow its syntax. What that buys is vocabulary; what it costs is a
+    subscription, an event-loop turn, and a delivery step for every single
+    element.
+  </p>
+
+  <p>
+    The benchmarks below put a number on it. Across the
+    <strong>25 examples whose source is already in memory</strong>, AOT-compiled
+    and measured at <strong>N&nbsp;=&nbsp;1,000,000</strong>, the pull pipeline
+    is faster in <strong>every one</strong> — a median of
+    <strong>2.7×</strong>, rising to <strong>88×</strong> where a
+    short-circuiting search stops early
+    (<a href="first-over-budget-rx.html">#1</a>, 78.9&nbsp;ms vs
+    0.9&nbsp;ms) and costing whole seconds on the heavier reports
+    (<a href="stock-after-moves.html">#11</a>, 3.4&nbsp;s vs 175&nbsp;ms).
+    Where the work is <em>genuinely</em> asynchronous, the same harness
+    finds the two models level: across those 16 examples the median gap is
+    <strong>1.05×</strong>, and most carry a tie badge. That contrast is
+    the section in one line — streams are not slow, but putting
+    synchronous data through one means paying for a delivery that never
+    needed to happen.
+  </p>
+
+  <p>
+    The converse deserves saying just as plainly: when a problem really is
+    about <em>events over time</em> — user input, tickers, sockets — a
+    stream is the right shape for it, and no amount of pipeline vocabulary
+    replaces one. FxDart says so by absorbing the idea: its
     <strong>events layer</strong>
     (<code><a href="../tutorials/fxEvents.html">fxEvents</a></code>) puts
     Rx-style push operators — debounce, throttle, sample, combineLatest,
     switchMap, race, a <code>LiveValue</code> — on plain Dart streams, so
-    Part&nbsp;4's time-shaped pairs meet as equals, operator for
-    operator. RxDart's catalog remains far larger; what the pairs expose
-    is the other half of the story — how often a problem that gets solved
-    with a stream is really a <em>data pipeline</em> wearing a stream
-    costume: a bounded fetch, a batch transform, a paginated crawl. For
-    those, the pull version is shorter, ordered, typed, and needs no
-    subscription lifecycle at all.
+    Part&nbsp;4's time-shaped pairs meet as equals, operator for operator.
+    RxDart's catalog remains far larger, and past those everyday verbs it
+    is still the tool to reach for. What the pairs expose is the other
+    half of the story — how often a problem that gets solved with a stream
+    is really a <em>data pipeline</em> wearing a stream costume: a bounded
+    fetch, a batch transform, a paginated crawl. For those, the pull
+    version is shorter, ordered, typed, and needs no subscription
+    lifecycle at all.
   </p>
 
   <p>
@@ -97,7 +133,7 @@
     <strong>Benchmark</strong> section — both implementations AOT-compiled
     and measured at N=100 and a large-N headline (1M for synchronous
     tasks; 10,000 where every element crosses the event loop). The
-    wall-clock examples (#39–#47) are deliberately not benchmarked:
+    wall-clock examples (#38–#46) are deliberately not benchmarked:
     debounce windows and sample ticks measure the clock, not the
     pipeline.
   </p>

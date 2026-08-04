@@ -70,17 +70,54 @@
   </p>
 
   <p>
-    Un apunte de honestidad antes de la lista: cuando un problema va
-    genuinamente de <em>eventos en el tiempo</em> — entrada del usuario,
-    tickers, sockets — un stream es la forma correcta para él. FxDart lo
+    Antes de la lista conviene nombrar una costumbre, porque es frecuente
+    y es un error. <code>Stream</code> trae un vocabulario de operadores
+    muy rico, así que resulta tentador recurrir a él envolviendo datos que
+    ya tienes en la mano —
+    <code>Stream.fromIterable(pedidos)</code> — solo para conseguir
+    <code>map</code>, <code>where</code>, <code>distinct</code>,
+    <code>expand</code> y una cadena fluida, y luego recuperar la
+    respuesta con un <code>await</code> al final. En ese problema no hay
+    nada asíncrono. Los valores están en memoria, la pregunta ya tiene
+    respuesta ahora mismo, y el <code>await</code> del final es la señal:
+    una pregunta síncrona convertida en un mecanismo de entrega para
+    tomar prestada su sintaxis. Lo que eso compra es vocabulario; lo que
+    cuesta es una suscripción, un giro del bucle de eventos y un paso de
+    entrega por cada elemento.
+  </p>
+
+  <p>
+    Los benchmarks de abajo le ponen número. En los
+    <strong>25 ejemplos cuya fuente ya está en memoria</strong>, compilados
+    AOT y medidos con <strong>N&nbsp;=&nbsp;1.000.000</strong>, el pipeline
+    pull es más rápido en <strong>todos</strong> — una mediana de
+    <strong>2,7×</strong>, que sube a <strong>88×</strong> cuando una
+    búsqueda se corta antes de tiempo
+    (<a href="first-over-budget-rx.html">#1</a>, 78,9&nbsp;ms vs
+    0,9&nbsp;ms) y se mide en segundos enteros en los informes más pesados
+    (<a href="stock-after-moves.html">#11</a>, 3,4&nbsp;s vs 175&nbsp;ms).
+    Donde el trabajo es <em>genuinamente</em> asíncrono, el mismo banco de
+    pruebas encuentra los dos modelos a la par: en esos 16 ejemplos la
+    diferencia mediana es de <strong>1,05×</strong>, y la mayoría lleva
+    insignia de empate. Ese contraste resume la sección en una línea: los
+    streams no son lentos, pero hacer pasar datos síncronos por uno es
+    pagar una entrega que nunca hizo falta.
+  </p>
+
+  <p>
+    Lo contrario merece decirse con la misma claridad: cuando un problema
+    va de verdad de <em>eventos en el tiempo</em> — entrada del usuario,
+    tickers, sockets — un stream es la forma correcta para él, y ningún
+    vocabulario de pipeline lo sustituye. FxDart lo
     dice absorbiendo la idea: su <strong>capa de eventos</strong>
     (<code><a href="../tutorials/fxEvents.html">fxEvents</a></code>) pone
     operadores push al estilo Rx — debounce, throttle, sample,
     combineLatest, switchMap, race, un <code>LiveValue</code> — sobre
     streams de Dart llanos, de modo que las parejas temporales de la
     Parte&nbsp;4 se encuentran como iguales, operador por operador.
-    El catálogo de RxDart sigue siendo mucho más amplio; lo que las
-    parejas exponen es la otra mitad de la historia — cuántas veces un
+    El catálogo de RxDart sigue siendo mucho más amplio, y más allá de
+    esos verbos cotidianos sigue siendo la herramienta a la que acudir.
+    Lo que las parejas exponen es la otra mitad de la historia — cuántas veces un
     problema que se resuelve con un stream es en realidad un
     <em>pipeline de datos</em> disfrazado de stream: una descarga
     acotada, una transformación por lotes, un rastreo paginado. Para esos,
@@ -99,7 +136,7 @@
     sección de <strong>Benchmark</strong> — ambas implementaciones
     compiladas AOT y medidas en N=100 y un titular de N grande (1M para
     tareas síncronas; 10,000 donde cada elemento cruza el event loop).
-    Los ejemplos de reloj de pared (#39–#47) deliberadamente no llevan
+    Los ejemplos de reloj de pared (#38–#46) deliberadamente no llevan
     benchmark: las ventanas de debounce y los ticks de sample miden el
     reloj, no el pipeline.
   </p>
