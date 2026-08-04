@@ -15,7 +15,8 @@ dart run coverage:test_with_coverage   # coverage (what CI runs)
 ./deploy.sh                            # build + commit + push docs (GitHub Pages serves docs/ off main)
 dart run tool/build_docs.dart          # regenerate docs/ from content/ + i18n/  (--status, --check, --record)
 bash tools/build_single_file.sh        # regenerate docs/assets/fxdart_single.dart (playground bundle)
-dart run tool/precompile_playgrounds.dart  # build docs/pg/ artifacts (--scope, --status, --prune, --limit)
+dart run tool/precompile_playgrounds.dart  # build docs/pg/ artifacts (--scope, --status, --prune, --limit, --only)
+dart run tool/rebuild_page.dart DartComparison/top-merchants.html  # after editing one page's snippets: compile + restamp + commit
 dart run benchmark/run_benchmarks.dart     # DartComparison perf benchmarks (--smoke, --rounds N, [slugs…])
 ```
 
@@ -52,7 +53,12 @@ holds the library+snippet merge and **must stay byte-identical to `buildSource` 
 POST body from a browser and comparing.
 
 Build order matters: `build_single_file.sh` → `precompile_playgrounds.dart` →
-`build_docs.dart`. Rebuilding the bundle changes every fxdart snippet's id, so
+`build_docs.dart`. Editing **any** snippet changes its id, so it orphans the
+artifact its page was stamped with and the panel silently falls back to the
+compile service — `tool/rebuild_page.dart <page>` does that whole sequence for
+one page (both comparison panels, or all of a tutorial's demos; locale prefixes
+are accepted and ignored, since artifacts are shared across locales).
+Rebuilding the bundle changes every fxdart snippet's id, so
 precompiling takes `--prune` to drop the superseded artifacts. `deploy.sh` honours
 `PG_SCOPE` (`first` default, `all`, `none`).
 

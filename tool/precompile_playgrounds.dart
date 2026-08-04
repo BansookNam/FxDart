@@ -14,6 +14,12 @@
 //   dart run tool/precompile_playgrounds.dart --scope=all  every snippet on the site
 //   dart run tool/precompile_playgrounds.dart --status     report coverage, no network
 //   dart run tool/precompile_playgrounds.dart --prune      also drop stale artifacts
+//   dart run tool/precompile_playgrounds.dart --only=a,b   only snippets whose source
+//                                                          path contains a or b
+//
+// `--only` is how a single page gets rebuilt after its code changes; it widens
+// the default scope to `all`, since a tutorial's later demos are not
+// first-on-page. `tool/rebuild_page.dart` wraps it with route resolution.
 //
 // Rerunnable and incremental: an artifact whose id already exists is left
 // alone, so only new or changed snippets cost a round trip. Rebuilding
@@ -40,7 +46,14 @@ const stallReport = Duration(seconds: 45);
 final root = Directory.current.path;
 
 void main(List<String> args) async {
-  final scope = _flag(args, 'scope') ?? 'first';
+  final only = _flag(args, 'only')
+      ?.split(',')
+      .map((s) => s.trim())
+      .where((s) => s.isNotEmpty)
+      .toList();
+  // A filtered run is about specific snippets, not about which block a reader
+  // hits first, so it starts from every snippet unless told otherwise.
+  final scope = _flag(args, 'scope') ?? (only != null ? 'all' : 'first');
   final concurrency = int.parse(_flag(args, 'concurrency') ?? '4');
   final prune = args.contains('--prune');
   final statusOnly = args.contains('--status');
@@ -55,17 +68,27 @@ void main(List<String> args) async {
   }
 
   final all = snippets(root);
-  final wanted = switch (scope) {
+  var wanted = switch (scope) {
     'all' => all,
     'none' => <Snippet>[],
     _ => all.where((s) => s.isFirstOnPage).toList(),
   };
+  if (only != null) {
+    wanted = wanted.where((s) => only.any(s.path.contains)).toList();
+    if (wanted.isEmpty) {
+      stderr.writeln('--only=${only.join(',')} matched no snippet source path');
+      exit(1);
+    }
+  }
 
   // Deduplicate: two snippets with identical text share one artifact.
   final targets = <String, Snippet>{};
   for (final s in wanted) {
     targets.putIfAbsent(s.id, () => s);
   }
+
+  // What the run is called in its own output: "all"/"first", or the filter.
+  final label = only != null ? 'only=${only.join(',')}' : scope;
 
   Directory('$root/$artifactDir').createSync(recursive: true);
   var missing = targets.values
@@ -81,15 +104,15 @@ void main(List<String> args) async {
   }
 
   if (statusOnly) {
-    _report(all, targets.keys.toSet(), missing.length, scope);
+    _report(all, targets.keys.toSet(), missing.length, label);
     return;
   }
 
   if (missing.isEmpty) {
-    stdout.writeln('all ${targets.length} artifacts in scope "$scope" are current');
+    stdout.writeln('all ${targets.length} artifacts in scope "$label" are current');
   } else {
     stdout.writeln('compiling ${missing.length} of ${targets.length} '
-        'snippets in scope "$scope" ($concurrency at a time)…');
+        'snippets in scope "$label" ($concurrency at a time)…');
     final failures = await _compileAll(missing, concurrency);
     if (failures.isNotEmpty) {
       stderr.writeln('\n${failures.length} snippet(s) failed to compile:');
@@ -101,7 +124,7 @@ void main(List<String> args) async {
   }
 
   if (prune) _prune(all);
-  _report(all, targets.keys.toSet(), 0, scope);
+  _report(all, targets.keys.toSet(), 0, label);
 }
 
 String? _flag(List<String> args, String name) {
