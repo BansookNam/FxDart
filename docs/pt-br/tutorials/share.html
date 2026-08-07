@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>share — FxDart 101</title>
+  <meta name="description" content="FxDart share tutorial: let many listeners consume one run of an event chain, and feed a LiveValue straight from a stream — with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/share.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/share.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/share.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/share.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/share.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/share.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/share.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/share.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/share.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=978ace2ed00c1080">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Início</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriais da API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../tutorials/share.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/share.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/share.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/share.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/share.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/share.html" hreflang="pt-BR" lang="pt-BR" aria-current="page">Português</a></li>
+        <li><a href="../../ru/tutorials/share.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página ainda não foi traduzida, por isso é exibida em inglês. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ajude a traduzir</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Seção 14 · Event streams (push) › <strong>share</strong></p>
+  <h1><code>share</code> &amp; <code>LiveValue.from</code></h1>
+  <p class="hero-sub">One run of a chain, many listeners — and the version that remembers its latest value for whoever arrives late.</p>
+
+  <div class="signature">FxEvents&lt;T&gt; FxEvents&lt;T&gt;.share()                        // chain (events)
+LiveValue&lt;T&gt;.from(Stream&lt;T&gt; source)                    // hot, unseeded
+LiveValue&lt;T&gt;.seededFrom(T seed, Stream&lt;T&gt; source)      // hot, seeded</div>
+
+  <h2>Lecture</h2>
+  <p>
+    Every operator in this section builds its own
+    <code>StreamController</code>, so the chain it returns is
+    <strong>single-subscription</strong>: listen to it twice and the
+    second listener gets a <code>StateError</code>. That default is
+    deliberate — it keeps the chain cold, so nothing runs until someone
+    consumes it, and it keeps per-listener state honest. But it means two
+    widgets cannot watch the same debounced, throttled, switch-mapped
+    feed without building it twice.
+  </p>
+  <p>
+    <code>share()</code> fixes that. It connects on the
+    <strong>first</strong> listener and broadcasts to every listener from
+    there, so the work upstream happens once no matter how many are
+    watching. A debounce timer, a socket, an expensive map — one of each,
+    not one per subscriber.
+  </p>
+  <p>
+    There is a limit worth stating plainly, because Rx's <code>share</code>
+    does not have it. Rx re-subscribes when the listener count returns to
+    zero and then rises again; here it <strong>cannot</strong>, because
+    the upstream chain is single-subscription and there is no second run
+    to give. So when the last listener leaves, the source is cancelled and
+    the shared stream closes for good — a listener arriving afterwards is
+    handed an already-closed stream rather than a fresh run. Attach every
+    listener before the first event, or keep one alive.
+  </p>
+  <p>
+    <code>share()</code> also does not <em>remember</em>: a listener that
+    arrives after an event has passed has simply missed it. When latecomers
+    need the current state — which is most UI —
+    <code><a href="liveValue.html">LiveValue</a></code> is the answer, and
+    <code>LiveValue.from(source)</code> / <code>LiveValue.seededFrom(seed,
+    source)</code> build one directly from a stream. Those are
+    <strong>hot</strong>: the subscription opens immediately, so values
+    arriving before anyone listens still update
+    <code>value</code>, and <code>close()</code> cancels the source. They
+    are named constructors rather than an optional seed so that a nullable
+    <code>T</code> can still be seeded with null. fxdart events layer,
+    after Rx's <code>share</code> and <code>shareValue</code>.
+  </p>
+
+  <h2>Demo 1 · Why one listener is the default</h2>
+  <div class="playground" data-pg="9e45e1ca97c4514c">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // Every FxEvents operator builds its own StreamController, so a chain
+  // over a live source is SINGLE-SUBSCRIPTION: consumable exactly once.
+  var runs = 0;
+  final feed = StreamController<int>();
+  final chain = fxEvents(feed.stream).map((v) {
+    runs++;
+    return v * 10;
+  });
+
+  final consumer = chain.toList();
+
+  try {
+    await chain.toList();
+  } on StateError catch (e) {
+    print('a second listener: $e');
+  }
+
+  feed
+    ..add(1)
+    ..add(2)
+    ..add(3);
+  await feed.close();
+
+  print(await consumer); // [10, 20, 30]
+  print('the chain ran $runs times');
+  // Single-subscription is the right default — it keeps the chain cold
+  // and cheap — but it means two widgets cannot watch the same feed.
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · One run, two listeners</h2>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  var runs = 0;
+  final shared = fxEvents(timed([(0, 1), (60, 2)], 150)).map((v) {
+    runs++;
+    return v * 10;
+  }).share();
+
+  // Both listeners attach BEFORE the first event.
+  final a = shared.toList();
+  final b = shared.toList();
+
+  print(await a); // [10, 20]
+  print(await b); // [10, 20]
+  print('map ran $runs times for 2 listeners'); // 2, not 4
+
+  // The upstream chain is single-subscription, so it cannot be re-run:
+  // when the last listener leaves, the shared stream closes for good.
+  print(await shared.toList()); // [] — this listener came too late
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: a <code>LiveValue</code> fed straight from a stream.</p>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // Exercise: a LiveValue fed straight from a stream. Unlike share() it
+  // remembers, so a late subscriber is not left with nothing.
+  final sensor = StreamController<int>();
+  final temperature = LiveValue.seededFrom(20, sensor.stream);
+
+  print(temperature.value); // 20 — the seed, before the source speaks
+
+  sensor.add(23);
+  await Future<void>.delayed(Duration.zero);
+  print(temperature.value); // 23 — updated with nobody listening yet
+
+  temperature.stream.listen((v) => print('late subscriber sees $v'));
+  await Future<void>.delayed(Duration.zero); // replays 23 immediately
+
+  sensor.add(24);
+  await Future<void>.delayed(Duration.zero); // then the live update
+
+  await temperature.close(); // cancels the source subscription too
+  await sensor.close();
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="liveValue.html"><code>LiveValue</code></a> — the sharing that remembers: late subscribers get the current value first ·
+    <a href="tee.html"><code>tee</code></a> — the pull-side answer to two readers over one pass, with no buffer ·
+    <a href="fork.html"><code>fork</code></a> — two independent pull cursors over one source, at the cost of a buffer
+  </div>
+
+  <nav class="tut-nav">
+    <a href="onErrorResume.html">← Anterior: onErrorResume</a>
+    <a href="liveValue.html">Próximo: LiveValue →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart é um port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muito obrigado a <strong>Indong Yoo</strong> (CTO, Marpple) e ao time do FxTS pelas ideias, pela semântica e pela suíte de testes sobre a qual esta biblioteca foi construída.</p>
+  <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=978ace2ed00c1080";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

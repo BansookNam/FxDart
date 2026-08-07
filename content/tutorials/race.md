@@ -5,10 +5,10 @@ description: FxDart FxEvents.race tutorial: the first stream to emit wins and ev
 heading: <code>race</code>
 section: 14
 crumb: race
-prev: switchMap.html
-prevLabel: switchMap
-next: liveValue.html
-nextLabel: LiveValue
+prev: mergeMap.html
+prevLabel: mergeMap
+next: waitAll.html
+nextLabel: waitAll
 ---
   <p class="hero-sub">The first candidate to emit wins: its whole stream is mirrored, and every other candidate is cancelled on the spot.</p>
 

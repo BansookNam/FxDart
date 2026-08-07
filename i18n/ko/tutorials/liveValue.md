@@ -5,8 +5,10 @@ description: FxDart LiveValue 튜토리얼: 구독자를 거느린 현재 값 �
 heading: <code>LiveValue</code>
 section: 14
 crumb: LiveValue
-prev: race.html
-prevLabel: race
+prev: share.html
+prevLabel: share
+next: fxSubscriptions.html
+nextLabel: FxSubscriptions
 ---
   <p class="hero-sub">구독자를 거느린 살아 있는 "현재 값": 늦게 온 구독자는 즉시 최신 값을 받고, 그 뒤의 모든 갱신을 이어 받습니다.</p>
 

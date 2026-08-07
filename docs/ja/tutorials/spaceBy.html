@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>spaceBy — FxDart 101</title>
+  <meta name="description" content="FxDart spaceBy tutorial: pace a burst without dropping any of it, shift a stream with delay, and read the newest value on a clock with sample — with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/spaceBy.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/spaceBy.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/spaceBy.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/spaceBy.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/spaceBy.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/spaceBy.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/spaceBy.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/spaceBy.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/spaceBy.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=978ace2ed00c1080">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">ホーム</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="../../tutorials/spaceBy.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/spaceBy.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/spaceBy.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/spaceBy.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="../../es/tutorials/spaceBy.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/spaceBy.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/spaceBy.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 14 · Event streams (push) › <strong>spaceBy</strong></p>
+  <h1><code>delay</code>, <code>spaceBy</code> &amp; <code>sample</code></h1>
+  <p class="hero-sub">Three ways to move events around in time: shift them all, spread them out, or read only the newest on a fixed clock.</p>
+
+  <div class="signature">FxEvents&lt;T&gt; FxEvents&lt;T&gt;.delay(Duration duration)  // chain (events)
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.spaceBy(Duration gap)
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.sample(Duration period)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    Rate limiting always costs you something, and the only real question
+    is <em>what</em>. <code><a href="throttle.html">throttle</a></code>
+    and <code><a href="debounce.html">debounce</a></code> pay in
+    <strong>events</strong>: they keep one per window and drop the rest,
+    which is right when the events are samples of a continuous thing and
+    an old one is worthless. <code>spaceBy(gap)</code> pays in
+    <strong>time</strong> instead: every event survives, queued and
+    released one per <code>gap</code>, which is right when each event is a
+    discrete instruction you must not lose — six messages to send against
+    an API that allows one call per 100ms.
+  </p>
+  <p>
+    That trade has a sharp edge. Because <code>spaceBy</code> queues
+    rather than drops, a source that produces faster than
+    <code>gap</code> forever grows an unbounded queue. It is for
+    <em>bursts</em> — a batch that arrives at once and must all get
+    through — not for genuinely endless input, where throttle's
+    lossiness is a feature.
+  </p>
+  <p>
+    <code>delay(duration)</code> is the simplest of the three: the entire
+    stream is shifted by a fixed amount, spacing intact, nothing dropped.
+    The close waits for the last delayed event to land, so nothing is
+    lost at the end; errors are forwarded immediately, since only data is
+    worth holding.
+  </p>
+  <p>
+    <code>sample(period)</code> is
+    <code><a href="sampleOn.html">sampleOn</a></code> with the clock built
+    in — the newest value every <code>period</code>, silent when nothing
+    new has arrived. Reach for it when the source is a state-like feed
+    (a position, a temperature, a scroll offset) and the consumer has its
+    own refresh rate. fxdart events layer, after Rx's <code>delay</code>,
+    <code>interval</code> and <code>sampleTime</code>.
+  </p>
+
+  <h2>Demo 1 · Pacing a burst, losslessly</h2>
+  <div class="playground" data-pg="88ecc114087b8829">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // Four requests queued up at once, against an API that allows one
+  // call per 150ms.
+  final watch = Stopwatch()..start();
+  final sent = await fxEvents(Stream.fromIterable(['r1', 'r2', 'r3', 'r4']))
+      .spaceBy(const Duration(milliseconds: 150))
+      .toList();
+  watch.stop();
+
+  print(sent); // [r1, r2, r3, r4] — every one of them
+  print('took ~${(watch.elapsedMilliseconds / 100).round() * 100}ms');
+
+  // throttle, given the same burst, keeps ONE and drops the rest:
+  final throttled = await fxEvents(Stream.fromIterable(['r1', 'r2', 'r3', 'r4']))
+      .throttle(const Duration(milliseconds: 150))
+      .toList();
+  print(throttled); // [r1]
+  // Same rate limit, opposite trade: spaceBy is lossless and slow,
+  // throttle is lossy and immediate.
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Shifting, and reading on a clock</h2>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // delay shifts the whole stream — nothing dropped, spacing preserved.
+  final watch = Stopwatch()..start();
+  final shifted = await fxEvents(Stream.fromIterable([1, 2, 3]))
+      .delay(const Duration(milliseconds: 200))
+      .toList();
+  print('$shifted after ~${(watch.elapsedMilliseconds / 100).round() * 100}ms');
+
+  // sample reads the newest value on its own clock, like sampleOn but
+  // with the clock built in.
+  final sensor = timed([(0, 'a'), (60, 'b'), (300, 'c')], 640);
+  final read = await fxEvents(sensor)
+      .sample(const Duration(milliseconds: 200))
+      .toList();
+
+  print(read); // [b, c]
+  // The 200ms tick saw b, the 400ms tick saw c, and the 600ms tick had
+  // nothing new to report — so it stayed silent.
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: a send rate and a reporting rate, in one chain.</p>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // Exercise: a burst of outbound messages, paced to the wire and
+  // then batched for the log.
+  final outbox = Stream.fromIterable(['m1', 'm2', 'm3', 'm4', 'm5', 'm6']);
+
+  final logged = await fxEvents(outbox)
+      .spaceBy(const Duration(milliseconds: 100))
+      .chunkEvery(const Duration(milliseconds: 250))
+      .toList();
+
+  print(logged); // [[m1, m2], [m3, m4], [m5, m6]] (roughly)
+  // spaceBy sets the send rate; chunkEvery sets the reporting rate.
+  // Because spaceBy queues rather than drops, an unbounded burst grows
+  // an unbounded queue — reach for throttle or debounce when the input
+  // is genuinely endless.
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="throttle.html"><code>throttle</code></a> — the lossy counterpart: one event per window, immediately ·
+    <a href="debounce.html"><code>debounce</code></a> — wait for the burst to end, then take its last value ·
+    <a href="chunkOn.html"><code>chunkEvery</code></a> — keep every event too, but grouped rather than spread out
+  </div>
+
+  <nav class="tut-nav">
+    <a href="chunkOn.html">← 前: chunkOn</a>
+    <a href="onErrorResume.html">次: onErrorResume →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=978ace2ed00c1080";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

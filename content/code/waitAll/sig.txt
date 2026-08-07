@@ -1,0 +1,8 @@
+static FxEvents&lt;List&lt;T&gt;&gt; FxEvents.waitAll&lt;T&gt;(Iterable&lt;Stream&lt;T&gt;&gt; sources)
+static FxEvents&lt;R&gt; FxEvents.zip&lt;T, R&gt;(Iterable&lt;Stream&lt;T&gt;&gt; sources, R Function(List&lt;T&gt;) combine)
+static FxEvents&lt;List&lt;T&gt;&gt; FxEvents.combineLatestAll&lt;T&gt;(Iterable&lt;Stream&lt;T&gt;&gt; sources)
+static FxEvents&lt;T&gt; FxEvents.concat&lt;T&gt;(Iterable&lt;Stream&lt;T&gt;&gt; sources)
+FxEvents&lt;R&gt; FxEvents&lt;T&gt;.zipWith&lt;U, R&gt;(Stream&lt;U&gt; other, R Function(T, U) combine)
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.followedBy(Stream&lt;T&gt; next)   // chain (events)
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.mergeWith(Stream&lt;T&gt; other)
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.raceWith(Stream&lt;T&gt; other)

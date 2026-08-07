@@ -1,3 +1,77 @@
+## 0.7.8
+
+### Added — the events layer's second half
+
+`fxEvents` shipped in 0.7.3 with the operators a push chain cannot live
+without: `debounce`, `throttle`, `sampleOn`, `combineLatest`,
+`withLatestFrom`, `switchMap`, `startWith`, plus `race`/`merge` and
+`LiveValue`. This fills in the rest of the rxdart surface that is
+genuinely push-only — the things a pull pipeline has no way to express,
+because it has no clock and no notion of several live sources at once.
+
+**Gating** — `stopOn(trigger)` closes the chain and cancels both
+subscriptions the first time `trigger` fires; `startOn(trigger)` drops
+source events until it fires, then passes them for good. The names are
+not Rx's `takeUntil`/`skipUntil` because `Fx.takeUntil(predicate)`
+already means `takeUntilInclusive` on the pull side, and one name cannot
+mean two things in one library. `FxSubscriptions` is the companion for
+owner-driven teardown: a bag with `add`/`addAll`/`cancelAll`/`pauseAll`/
+`resumeAll`, emptied before its cancellations are awaited so a second
+`cancelAll` cannot cancel anything twice.
+
+**Higher-order mapping** — `mergeMap(f, {concurrent})` runs every inner
+stream at once, optionally capped, with the extra source values queued;
+`concatMap(f)` runs them strictly in order; `exhaustMap(f)` keeps the
+first and ignores the rest, which is the double-submit guard. With the
+existing `switchMap` that is all four policies for "an event arrived
+while the last one is still running". `mergeMap` rather than `flatMap`,
+since `flatMap` already means iterable-flattening.
+
+**Batching** — `chunk(count)`, `chunkOn(trigger)`, `chunkEvery(window)`.
+The root word is the pull layer's `chunk`; `…On` takes a trigger stream
+and `…Every` takes a clock. Both time-driven forms stay silent on an
+empty window rather than emitting an empty list, and flush what is
+buffered when the source closes.
+
+**Time shaping** — `delay(duration)` shifts the whole stream with its
+spacing intact; `spaceBy(gap)` is the lossless counterpart of `throttle`,
+queueing a burst and releasing one event per gap; `sample(period)` is
+`sampleOn` with the clock built in.
+
+**Multi-source** — `FxEvents.waitAll` emits one list of every source's
+last value once all have closed (`Future.wait` for streams);
+`FxEvents.zip`/`zipWith` pair by index; `FxEvents.combineLatestAll` is
+the N-ary `combineLatest`; `FxEvents.concat`/`followedBy` sequence;
+`mergeWith`/`raceWith` are the instance forms of the existing statics.
+
+**Fan-out** — `share()` lets many listeners consume one run of a chain.
+Every operator here builds its own `StreamController`, so a chain is
+single-subscription; `share` connects on the first listener and
+broadcasts from there. It deliberately does *not* reconnect the way Rx's
+`share` does — the upstream chain has no second run to give — so the
+last listener leaving closes it for good. `LiveValue.from(source)` and
+`LiveValue.seededFrom(seed, source)` build a hot `LiveValue` straight
+from a stream; named constructors rather than an optional seed so a
+nullable `T` can still be seeded with null.
+
+**Errors** — `onErrorReturn(value)` substitutes per error and carries on,
+since a Dart stream error does not end the subscription;
+`onErrorResume(f)` cancels the source on the first error and switches to
+a fallback stream for good; `FxEvents.retry(factory, [count])` rebuilds
+the stream instead of patching its errors, with the budget counting
+re-subscriptions.
+
+### Docs
+
+Eight new FxDart 101 pages in section 14 (`stopOn`, `mergeMap`,
+`chunkOn`, `spaceBy`, `waitAll`, `onErrorResume`, `share`,
+`fxSubscriptions`), each with three runnable demos, in English and
+Korean. Section 14 now runs to fifteen pages.
+
+### Tests
+
+Line coverage stays at **100.00%** (3607/3607, up from 3264).
+
 ## 0.7.7
 
 ### Added — `tee` / `tee3`

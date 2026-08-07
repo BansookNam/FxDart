@@ -7,8 +7,8 @@ section: 14
 crumb: switchMap
 prev: withLatestFrom.html
 prevLabel: withLatestFrom
-next: race.html
-nextLabel: race
+next: mergeMap.html
+nextLabel: mergeMap
 ---
   <p class="hero-sub">각 이벤트를 내부 스트림으로 매핑하고 최신 것 하나만 비춥니다 — 새 이벤트가 오면 이전 내부 스트림을 진행 도중에 <em>취소</em>합니다.</p>
 

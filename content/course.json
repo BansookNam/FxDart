@@ -603,12 +603,44 @@
       "label": "switchMap"
     },
     {
+      "href": "mergeMap.html",
+      "label": "mergeMap"
+    },
+    {
       "href": "race.html",
       "label": "race"
     },
     {
+      "href": "waitAll.html",
+      "label": "waitAll"
+    },
+    {
+      "href": "stopOn.html",
+      "label": "stopOn"
+    },
+    {
+      "href": "chunkOn.html",
+      "label": "chunkOn"
+    },
+    {
+      "href": "spaceBy.html",
+      "label": "spaceBy"
+    },
+    {
+      "href": "onErrorResume.html",
+      "label": "onErrorResume"
+    },
+    {
+      "href": "share.html",
+      "label": "share"
+    },
+    {
       "href": "liveValue.html",
       "label": "LiveValue"
+    },
+    {
+      "href": "fxSubscriptions.html",
+      "label": "FxSubscriptions"
     }
   ]
 }

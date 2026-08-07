@@ -1,0 +1,3 @@
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.delay(Duration duration)  // chain (events)
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.spaceBy(Duration gap)
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.sample(Duration period)

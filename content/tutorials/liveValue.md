@@ -5,8 +5,10 @@ description: FxDart LiveValue tutorial: a current value with subscribers — lat
 heading: <code>LiveValue</code>
 section: 14
 crumb: LiveValue
-prev: race.html
-prevLabel: race
+prev: share.html
+prevLabel: share
+next: fxSubscriptions.html
+nextLabel: FxSubscriptions
 ---
   <p class="hero-sub">A live "current value" with subscribers: a late subscriber immediately receives the latest value, then every update after it.</p>
 

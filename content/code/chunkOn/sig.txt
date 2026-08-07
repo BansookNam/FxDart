@@ -1,0 +1,3 @@
+FxEvents&lt;List&lt;T&gt;&gt; FxEvents&lt;T&gt;.chunk(int count)              // chain (events)
+FxEvents&lt;List&lt;T&gt;&gt; FxEvents&lt;T&gt;.chunkOn(Stream&lt;void&gt; trigger)
+FxEvents&lt;List&lt;T&gt;&gt; FxEvents&lt;T&gt;.chunkEvery(Duration window)

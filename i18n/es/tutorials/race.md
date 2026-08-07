@@ -5,10 +5,10 @@ description: Tutorial de FxEvents.race en FxDart: el primer stream en emitir gan
 heading: <code>race</code>
 section: 14
 crumb: race
-prev: switchMap.html
-prevLabel: switchMap
-next: liveValue.html
-nextLabel: LiveValue
+prev: mergeMap.html
+prevLabel: mergeMap
+next: waitAll.html
+nextLabel: waitAll
 ---
   <p class="hero-sub">El primer candidato en emitir gana: su stream entero se refleja, y todos los demás candidatos se cancelan en el acto.</p>
 

@@ -38,6 +38,7 @@ FILES=(
   "lib/src/typed/accumulate.dart"
   "lib/src/typed/fx_either.dart"
   "lib/src/stream/events.dart"
+  "lib/src/stream/subscriptions.dart"
 )
 
 # Strips lines that start with `import `, `export `, or the exact `library;`

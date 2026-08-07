@@ -333,5 +333,768 @@ void main() {
       expect(await firstTwo, equals([10, 20]));
       await live.close();
     });
+
+    test('from feeds the value hot, and the source closing closes it',
+        () async {
+      final c = StreamController<int>();
+      final live = LiveValue.from(c.stream);
+      expect(live.hasValue, isFalse);
+
+      c.add(1);
+      await Future<void>.delayed(Duration.zero);
+      expect(live.value, 1, reason: 'updated with nobody listening');
+
+      final seen = <int>[];
+      final sub = live.stream.listen(seen.add);
+      await Future<void>.delayed(Duration.zero);
+      c.add(2);
+      await Future<void>.delayed(Duration.zero);
+      expect(seen, equals([1, 2]));
+
+      await c.close();
+      await Future<void>.delayed(Duration.zero);
+      expect(live.isClosed, isTrue);
+      await sub.cancel();
+    });
+
+    test('from forwards source errors to subscribers', () async {
+      final c = StreamController<int>();
+      final live = LiveValue.from(c.stream);
+      final seen = <Object>[];
+      final sub = live.stream.listen(seen.add, onError: seen.add);
+      await Future<void>.delayed(Duration.zero);
+      c.addError(StateError('boom'));
+      await Future<void>.delayed(Duration.zero);
+      expect(seen.single, isA<StateError>());
+      await sub.cancel();
+      await live.close();
+      await c.close();
+    });
+
+    test('seededFrom holds the seed until the source speaks, and close '
+        'cancels the source', () async {
+      final c = StreamController<int>();
+      final live = LiveValue.seededFrom(0, c.stream);
+      expect(live.value, 0);
+
+      c.add(7);
+      await Future<void>.delayed(Duration.zero);
+      expect(live.value, 7);
+
+      await live.close();
+      expect(live.isClosed, isTrue);
+      c.add(8);
+      await Future<void>.delayed(Duration.zero);
+      expect(live.value, 7, reason: 'source was cancelled by close');
+      await c.close();
+    });
+  });
+
+  group('gating', () {
+    test('stopOn mirrors until the trigger fires', () async {
+      final source = StreamController<int>();
+      final stop = StreamController<void>();
+      final out = fxEvents(source.stream).stopOn(stop.stream).toList();
+
+      source.add(1);
+      await Future<void>.delayed(Duration.zero);
+      source.add(2);
+      await Future<void>.delayed(Duration.zero);
+      stop.add(null);
+      await Future<void>.delayed(Duration.zero);
+      source.add(3);
+
+      expect(await out, equals([1, 2]));
+      await source.close();
+      await stop.close();
+    });
+
+    test('stopOn closes with the source when the trigger never fires',
+        () async {
+      final stop = StreamController<void>();
+      expect(
+          await fxEvents(Stream.fromIterable([1, 2]))
+              .stopOn(stop.stream)
+              .toList(),
+          equals([1, 2]));
+      await stop.close();
+    });
+
+    test('stopOn forwards trigger errors and supports cancel', () async {
+      final source = StreamController<int>();
+      final stop = StreamController<void>();
+      final seen = <Object>[];
+      final sub =
+          fxEvents(source.stream).stopOn(stop.stream).listen(seen.add,
+              onError: seen.add);
+      stop.addError(StateError('trigger blew up'));
+      await Future<void>.delayed(Duration.zero);
+      expect(seen.single, isA<StateError>());
+      await sub.cancel();
+      await source.close();
+      await stop.close();
+    });
+
+    test('startOn drops events until the trigger fires', () async {
+      final source = StreamController<int>();
+      final start = StreamController<void>();
+      final out = fxEvents(source.stream).startOn(start.stream).toList();
+
+      source.add(1);
+      await Future<void>.delayed(Duration.zero);
+      start.add(null);
+      await Future<void>.delayed(Duration.zero);
+      source.add(2);
+      await Future<void>.delayed(Duration.zero);
+      source.add(3);
+      await Future<void>.delayed(Duration.zero);
+      await source.close();
+
+      expect(await out, equals([2, 3]));
+      await start.close();
+    });
+
+    test('startOn emits nothing when the source closes first', () async {
+      final start = StreamController<void>();
+      expect(
+          await fxEvents(Stream.fromIterable([1, 2]))
+              .startOn(start.stream)
+              .toList(),
+          hasLength(0));
+      await start.close();
+    });
+
+    test('startOn forwards trigger errors and supports cancel', () async {
+      final source = StreamController<int>();
+      final start = StreamController<void>();
+      final seen = <Object>[];
+      final sub = fxEvents(source.stream)
+          .startOn(start.stream)
+          .listen(seen.add, onError: seen.add);
+      start.addError(StateError('trigger blew up'));
+      await Future<void>.delayed(Duration.zero);
+      expect(seen.single, isA<StateError>());
+      await sub.cancel();
+      await source.close();
+      await start.close();
+    });
+  });
+
+  group('time', () {
+    test('sample emits the newest value on its own clock', () async {
+      final out = await fxEvents(timed([(0, 'a'), (60, 'b'), (300, 'c')], 640))
+          .sample(const Duration(milliseconds: 200))
+          .toList();
+      expect(out, equals(['b', 'c']),
+          reason: 'the 600ms tick has nothing new to report');
+    });
+
+    test('delay shifts every event without dropping any', () async {
+      final watch = Stopwatch()..start();
+      final out = await fxEvents(Stream.fromIterable([1, 2, 3]))
+          .delay(const Duration(milliseconds: 200))
+          .toList();
+      watch.stop();
+      expect(out, equals([1, 2, 3]));
+      expect(watch.elapsedMilliseconds, greaterThanOrEqualTo(150));
+    });
+
+    test('delay forwards errors immediately and cancels pending timers',
+        () async {
+      final c = StreamController<int>();
+      final seen = <Object>[];
+      final sub = fxEvents(c.stream)
+          .delay(const Duration(milliseconds: 300))
+          .listen(seen.add, onError: seen.add);
+      c
+        ..addError(StateError('boom'))
+        ..add(1);
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+      expect(seen.single, isA<StateError>(), reason: 'data is still in flight');
+      await sub.cancel();
+      await Future<void>.delayed(const Duration(milliseconds: 350));
+      expect(seen.length, 1, reason: 'the pending timer was cancelled');
+      await c.close();
+    });
+
+    test('spaceBy stretches a burst out instead of dropping it', () async {
+      final watch = Stopwatch()..start();
+      final out = await fxEvents(Stream.fromIterable([1, 2, 3]))
+          .spaceBy(const Duration(milliseconds: 150))
+          .toList();
+      watch.stop();
+      expect(out, equals([1, 2, 3]), reason: 'lossless, unlike throttle');
+      expect(watch.elapsedMilliseconds, greaterThanOrEqualTo(300));
+    });
+
+    test('spaceBy supports cancel mid-queue', () async {
+      final c = StreamController<int>();
+      final seen = <int>[];
+      final sub = fxEvents(c.stream)
+          .spaceBy(const Duration(milliseconds: 300))
+          .listen(seen.add);
+      c
+        ..add(1)
+        ..add(2);
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+      await sub.cancel();
+      await Future<void>.delayed(const Duration(milliseconds: 350));
+      expect(seen, hasLength(0));
+      await c.close();
+    });
+  });
+
+  group('batching', () {
+    test('chunk groups by count and flushes a short final batch', () async {
+      expect(
+          await fxEvents(Stream.fromIterable([1, 2, 3, 4, 5])).chunk(2).toList(),
+          equals([
+            [1, 2],
+            [3, 4],
+            [5],
+          ]));
+    });
+
+    test('chunk emits nothing extra when the count divides evenly', () async {
+      expect(
+          await fxEvents(Stream.fromIterable([1, 2, 3, 4])).chunk(2).toList(),
+          equals([
+            [1, 2],
+            [3, 4],
+          ]));
+    });
+
+    test('chunk rejects a count below 1', () {
+      expect(() => fxEvents(Stream<int>.empty()).chunk(0), throwsArgumentError);
+    });
+
+    test('chunk forwards errors, pauses and cancels', () async {
+      final c = StreamController<int>();
+      final seen = <Object>[];
+      final sub = fxEvents(c.stream).chunk(2).listen(seen.add, onError: seen.add);
+      c.addError(StateError('boom'));
+      await Future<void>.delayed(Duration.zero);
+      sub.pause();
+      c
+        ..add(1)
+        ..add(2);
+      await Future<void>.delayed(Duration.zero);
+      expect(seen.length, 1);
+      sub.resume();
+      await Future<void>.delayed(Duration.zero);
+      expect(seen.last, equals([1, 2]));
+      await sub.cancel();
+      await c.close();
+    });
+
+    test('chunkOn batches on the trigger and stays silent when empty',
+        () async {
+      final source = StreamController<int>();
+      final tick = StreamController<void>();
+      final out = fxEvents(source.stream).chunkOn(tick.stream).toList();
+
+      source
+        ..add(1)
+        ..add(2);
+      await Future<void>.delayed(Duration.zero);
+      tick.add(null);
+      await Future<void>.delayed(Duration.zero);
+      tick.add(null); // buffer is empty — no batch
+      await Future<void>.delayed(Duration.zero);
+      source.add(3);
+      await Future<void>.delayed(Duration.zero);
+      await source.close();
+
+      expect(
+          await out,
+          equals([
+            [1, 2],
+            [3],
+          ]),
+          reason: 'the tail is flushed on close');
+      await tick.close();
+    });
+
+    test('chunkOn forwards trigger errors and supports cancel', () async {
+      final source = StreamController<int>();
+      final tick = StreamController<void>();
+      final seen = <Object>[];
+      final sub = fxEvents(source.stream)
+          .chunkOn(tick.stream)
+          .listen(seen.add, onError: seen.add);
+      tick.addError(StateError('boom'));
+      await Future<void>.delayed(Duration.zero);
+      expect(seen.single, isA<StateError>());
+      await sub.cancel();
+      await source.close();
+      await tick.close();
+    });
+
+    test('chunkEvery batches per window', () async {
+      final out = await fxEvents(
+              timed([(0, 1), (30, 2), (60, 3), (250, 4), (280, 5)], 520))
+          .chunkEvery(const Duration(milliseconds: 200))
+          .toList();
+      expect(
+          out,
+          equals([
+            [1, 2, 3],
+            [4, 5],
+          ]));
+    });
+
+    test('chunkEvery forwards errors, pauses and cancels', () async {
+      final c = StreamController<int>();
+      final seen = <Object>[];
+      final sub = fxEvents(c.stream)
+          .chunkEvery(const Duration(milliseconds: 60))
+          .listen(seen.add, onError: seen.add);
+      c.addError(StateError('boom'));
+      await Future<void>.delayed(Duration.zero);
+      sub.pause();
+      c.add(1);
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(seen.length, 1);
+      sub.resume();
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(seen.last, equals([1]));
+      await sub.cancel();
+      await c.close();
+    });
+  });
+
+  group('multi-source', () {
+    test('concat plays the sources one after another', () async {
+      expect(
+          await FxEvents.concat([
+            Stream.fromIterable([1, 2]),
+            Stream.fromIterable([3]),
+          ]).toList(),
+          equals([1, 2, 3]));
+    });
+
+    test('concat ends the chain on a source error', () async {
+      expect(
+          FxEvents.concat([
+            Stream<int>.error(StateError('boom')),
+            Stream.fromIterable([1]),
+          ]).toList(),
+          throwsStateError);
+    });
+
+    test('followedBy is the two-source form', () async {
+      expect(
+          await fxEvents(Stream.fromIterable([1]))
+              .followedBy(Stream.fromIterable([2]))
+              .toList(),
+          equals([1, 2]));
+    });
+
+    test('zip pairs sources by index and stops at the shortest', () async {
+      final out = await FxEvents.zip<int, String>([
+        timed([(0, 1), (60, 2), (120, 3)], 400),
+        timed([(30, 10), (90, 20)], 500),
+      ], (v) => v.join('+'))
+          .toList();
+      expect(out, equals(['1+10', '2+20']));
+    });
+
+    test('zip closes immediately with no sources', () async {
+      expect(await FxEvents.zip<int, int>([], (v) => v.first).toList(),
+          hasLength(0));
+    });
+
+    test('zip forwards errors and supports cancel', () async {
+      final a = StreamController<int>();
+      final b = StreamController<int>();
+      final seen = <Object>[];
+      final sub = FxEvents.zip<int, int>([a.stream, b.stream], (v) => v.first)
+          .listen(seen.add, onError: seen.add);
+      a.addError(StateError('boom'));
+      await Future<void>.delayed(Duration.zero);
+      expect(seen.single, isA<StateError>());
+      await sub.cancel();
+      await a.close();
+      await b.close();
+    });
+
+    test('zipWith pairs two differently typed streams', () async {
+      final out = await fxEvents(timed([(0, 1), (60, 2), (120, 3)], 400))
+          .zipWith<String, String>(
+              timed([(30, 'a'), (90, 'b')], 500), (n, s) => '$n$s')
+          .toList();
+      expect(out, equals(['1a', '2b']));
+    });
+
+    test('zipWith forwards errors and supports cancel', () async {
+      final a = StreamController<int>();
+      final b = StreamController<int>();
+      final seen = <Object>[];
+      final sub = fxEvents(a.stream)
+          .zipWith<int, int>(b.stream, (x, y) => x + y)
+          .listen(seen.add, onError: seen.add);
+      b.addError(StateError('boom'));
+      await Future<void>.delayed(Duration.zero);
+      expect(seen.single, isA<StateError>());
+      await sub.cancel();
+      await a.close();
+      await b.close();
+    });
+
+    test('mergeWith interleaves, raceWith keeps the first to speak', () async {
+      expect(
+          await fxEvents(Stream.fromIterable([1]))
+              .mergeWith(Stream.fromIterable([2]))
+              .toList(),
+          unorderedEquals([1, 2]));
+      expect(
+          await fxEvents(timed([(0, 'fast')], 100))
+              .raceWith(timed([(200, 'slow')], 300))
+              .toList(),
+          equals(['fast']));
+    });
+
+    test('combineLatestAll emits the latest of every source', () async {
+      final a = StreamController<int>();
+      final b = StreamController<int>();
+      final out = FxEvents.combineLatestAll([a.stream, b.stream]).toList();
+
+      a.add(1);
+      await Future<void>.delayed(Duration.zero);
+      expect(a.hasListener, isTrue);
+      b.add(10);
+      await Future<void>.delayed(Duration.zero);
+      a.add(2); // second event from a — already 'seen'
+      await Future<void>.delayed(Duration.zero);
+      await a.close();
+      await b.close();
+
+      expect(
+          await out,
+          equals([
+            [1, 10],
+            [2, 10],
+          ]));
+    });
+
+    test('combineLatestAll closes immediately with no sources', () async {
+      expect(await FxEvents.combineLatestAll<int>([]).toList(), hasLength(0));
+    });
+
+    test('combineLatestAll forwards errors and supports cancel', () async {
+      final a = StreamController<int>();
+      final seen = <Object>[];
+      final sub = FxEvents.combineLatestAll([a.stream])
+          .listen(seen.add, onError: seen.add);
+      a.addError(StateError('boom'));
+      await Future<void>.delayed(Duration.zero);
+      expect(seen.single, isA<StateError>());
+      await sub.cancel();
+      await a.close();
+    });
+
+    test('waitAll emits every last value once all have closed', () async {
+      expect(
+          await FxEvents.waitAll([
+            Stream.fromIterable([1, 2]),
+            Stream.fromIterable([10, 20, 30]),
+          ]).toList(),
+          equals([
+            [2, 30],
+          ]));
+    });
+
+    test('waitAll emits nothing when a source never speaks', () async {
+      expect(
+          await FxEvents.waitAll([
+            Stream.fromIterable([1]),
+            Stream<int>.empty(),
+          ]).toList(),
+          hasLength(0));
+    });
+
+    test('waitAll emits an empty list for no sources', () async {
+      expect(await FxEvents.waitAll<int>([]).toList(), equals([<int>[]]));
+    });
+
+    test('waitAll forwards errors and supports cancel', () async {
+      final a = StreamController<int>();
+      final seen = <Object>[];
+      final sub =
+          FxEvents.waitAll([a.stream]).listen(seen.add, onError: seen.add);
+      a.addError(StateError('boom'));
+      await Future<void>.delayed(Duration.zero);
+      expect(seen.single, isA<StateError>());
+      await sub.cancel();
+      await a.close();
+    });
+  });
+
+  group('higher-order mapping', () {
+    test('mergeMap runs every inner stream at once', () async {
+      final out = await fxEvents(Stream.fromIterable([1, 2]))
+          .mergeMap((n) => timed([(30 * n, n * 10)], 30 * n + 30))
+          .toList();
+      expect(out, equals([10, 20]));
+    });
+
+    test('mergeMap with concurrent queues the extra sources', () async {
+      final running = <int>[];
+      final peak = <int>[];
+      final out = await fxEvents(Stream.fromIterable([1, 2, 3, 4]))
+          .mergeMap((n) {
+            running.add(n);
+            peak.add(running.length);
+            return timed([(60, n)], 90)
+                .map((v) => v)
+                .asBroadcastStream()
+                .map((v) {
+              running.remove(n);
+              return v;
+            });
+          }, concurrent: 2)
+          .toList();
+      expect(out, unorderedEquals([1, 2, 3, 4]));
+      expect(peak.reduce((a, b) => a > b ? a : b), lessThanOrEqualTo(2));
+    });
+
+    test('mergeMap rejects a concurrent below 1', () {
+      expect(
+          () => fxEvents(Stream<int>.empty())
+              .mergeMap((n) => Stream.value(n), concurrent: 0),
+          throwsArgumentError);
+    });
+
+    test('mergeMap forwards a mapper throw and still closes', () async {
+      final seen = <Object>[];
+      final done = Completer<void>();
+      fxEvents(Stream.fromIterable([1]))
+          .mergeMap<int>((_) => throw StateError('boom'))
+          .listen(seen.add, onError: seen.add, onDone: done.complete);
+      await done.future;
+      expect(seen.single, isA<StateError>());
+    });
+
+    test('mergeMap forwards source and inner errors, and supports cancel',
+        () async {
+      final c = StreamController<int>();
+      final seen = <Object>[];
+      final sub = fxEvents(c.stream)
+          .mergeMap((n) => Stream<int>.error(StateError('inner $n')))
+          .listen(seen.add, onError: seen.add);
+      c.addError(StateError('outer'));
+      c.add(1);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(seen.length, 2);
+      await sub.cancel();
+      await c.close();
+    });
+
+    test('concatMap plays inner streams strictly in order', () async {
+      final out = await fxEvents(Stream.fromIterable([1, 2]))
+          .concatMap((n) => Stream.fromIterable([n, n * 10]))
+          .toList();
+      expect(out, equals([1, 10, 2, 20]));
+    });
+
+    test('exhaustMap ignores events while an inner stream runs', () async {
+      final out = await fxEvents(timed([(0, 1), (30, 2), (200, 3)], 400))
+          .exhaustMap((n) => timed([(100, n)], 120))
+          .toList();
+      expect(out, equals([1, 3]), reason: '2 arrived while 1 was in flight');
+    });
+
+    test('exhaustMap waits for an inner stream still running at close',
+        () async {
+      final out = await fxEvents(timed([(0, 1)], 30))
+          .exhaustMap((n) => timed([(150, n * 10)], 200))
+          .toList();
+      expect(out, equals([10]),
+          reason: 'the source closed first, the inner stream finished later');
+    });
+
+    test('exhaustMap forwards a mapper throw', () async {
+      final seen = <Object>[];
+      final done = Completer<void>();
+      fxEvents(Stream.fromIterable([1]))
+          .exhaustMap<int>((_) => throw StateError('boom'))
+          .listen(seen.add, onError: seen.add, onDone: done.complete);
+      await done.future;
+      expect(seen.single, isA<StateError>());
+    });
+
+    test('exhaustMap forwards source errors and supports cancel', () async {
+      final c = StreamController<int>();
+      final seen = <Object>[];
+      final sub = fxEvents(c.stream)
+          .exhaustMap((n) => timed([(200, n)], 300))
+          .listen(seen.add, onError: seen.add);
+      c.addError(StateError('boom'));
+      await Future<void>.delayed(Duration.zero);
+      c.add(1);
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      await sub.cancel();
+      expect(seen.single, isA<StateError>());
+      await c.close();
+    });
+  });
+
+  group('errors', () {
+    test('onErrorReturn substitutes a value for every error', () async {
+      final c = StreamController<int>();
+      final out = fxEvents(c.stream).onErrorReturn(-1).toList();
+      c
+        ..add(1)
+        ..addError(StateError('a'))
+        ..add(2)
+        ..addError(StateError('b'));
+      await c.close();
+      expect(await out, equals([1, -1, 2, -1]));
+    });
+
+    test('onErrorReturn pauses and cancels', () async {
+      final c = StreamController<int>();
+      final seen = <int>[];
+      final sub = fxEvents(c.stream).onErrorReturn(-1).listen(seen.add);
+      sub.pause();
+      c.add(1);
+      await Future<void>.delayed(Duration.zero);
+      expect(seen, hasLength(0));
+      sub.resume();
+      await Future<void>.delayed(Duration.zero);
+      expect(seen, equals([1]));
+      await sub.cancel();
+      await c.close();
+    });
+
+    test('onErrorResume abandons the source for the fallback', () async {
+      final c = StreamController<int>();
+      final out = fxEvents(c.stream)
+          .onErrorResume((e, _) => Stream.fromIterable(['$e'.length, 99]))
+          .toList();
+      c
+        ..add(1)
+        ..addError(StateError('boom'))
+        ..add(2);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      await c.close();
+      final result = await out;
+      expect(result.first, 1);
+      expect(result.last, 99);
+      expect(result, hasLength(3), reason: 'the post-error 2 never arrives');
+    });
+
+    test('onErrorResume passes a clean source straight through', () async {
+      expect(
+          await fxEvents(Stream.fromIterable([1, 2]))
+              .onErrorResume((e, _) => Stream.value(-1))
+              .toList(),
+          equals([1, 2]));
+    });
+
+    test('onErrorResume forwards a throw from the builder', () async {
+      expect(
+          fxEvents(Stream<int>.error(StateError('boom')))
+              .onErrorResume((e, st) => throw ArgumentError('builder'))
+              .toList(),
+          throwsArgumentError);
+    });
+
+    test('onErrorResume forwards fallback errors and supports cancel',
+        () async {
+      final c = StreamController<int>();
+      final seen = <Object>[];
+      final sub = fxEvents(c.stream)
+          .onErrorResume((e, _) => Stream<int>.error(ArgumentError('again')))
+          .listen(seen.add, onError: seen.add);
+      await Future<void>.delayed(Duration.zero);
+      await sub.cancel();
+      await c.close();
+      expect(seen, hasLength(0));
+    });
+
+    test('retry resubscribes until the factory succeeds', () async {
+      var attempts = 0;
+      final out = await FxEvents.retry<int>(() {
+        attempts++;
+        return attempts < 3
+            ? Stream<int>.error(StateError('attempt $attempts'))
+            : Stream.fromIterable([1, 2]);
+      }).toList();
+      expect(out, equals([1, 2]));
+      expect(attempts, 3);
+    });
+
+    test('retry gives up after count retries and forwards the last error',
+        () async {
+      var attempts = 0;
+      final seen = <Object>[];
+      final done = Completer<void>();
+      FxEvents.retry<int>(() {
+        attempts++;
+        return Stream<int>.error(StateError('attempt $attempts'));
+      }, 2)
+          .listen(seen.add, onError: seen.add, onDone: done.complete);
+      await done.future;
+      expect(attempts, 3, reason: 'one attempt plus two retries');
+      expect(seen.single, isA<StateError>());
+    });
+
+    test('retry forwards a throw from the factory', () async {
+      expect(FxEvents.retry<int>(() => throw StateError('boom')).toList(),
+          throwsStateError);
+    });
+
+    test('retry supports cancel mid-attempt', () async {
+      final c = StreamController<int>();
+      final seen = <int>[];
+      final sub = FxEvents.retry<int>(() => c.stream).listen(seen.add);
+      c.add(1);
+      await Future<void>.delayed(Duration.zero);
+      await sub.cancel();
+      expect(seen, equals([1]));
+      await c.close();
+    });
+  });
+
+  group('share', () {
+    test('two listeners see one run of the chain', () async {
+      var runs = 0;
+      final shared = fxEvents(timed([(0, 1), (60, 2)], 150))
+          .map((v) {
+            runs++;
+            return v;
+          })
+          .share();
+      final a = shared.toList();
+      final b = shared.toList();
+      expect(await a, equals([1, 2]));
+      expect(await b, equals([1, 2]));
+      expect(runs, 2, reason: 'the map ran once per event, not once per listener');
+    });
+
+    test('a listener arriving after the run is handed a closed stream',
+        () async {
+      final shared = fxEvents(Stream.fromIterable([1, 2, 3])).share();
+      expect(await shared.toList(), equals([1, 2, 3]));
+      expect(await shared.toList(), hasLength(0));
+    });
+
+    test('the last listener leaving disconnects for good', () async {
+      final c = StreamController<int>();
+      final shared = fxEvents(c.stream).share();
+      final sub = shared.listen((_) {});
+      await Future<void>.delayed(Duration.zero);
+      await sub.cancel();
+      expect(await shared.toList(), hasLength(0));
+      await c.close();
+    });
+
+    test('share forwards errors', () async {
+      final shared =
+          fxEvents(Stream<int>.error(StateError('boom'))).share();
+      expect(shared.toList(), throwsStateError);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    });
   });
 }

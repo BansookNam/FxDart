@@ -7,8 +7,8 @@ section: 14
 crumb: switchMap
 prev: withLatestFrom.html
 prevLabel: withLatestFrom
-next: race.html
-nextLabel: race
+next: mergeMap.html
+nextLabel: mergeMap
 ---
   <p class="hero-sub">Maps each event to an inner stream and mirrors only the newest one — a fresh event <em>cancels</em> the previous inner stream mid-flight.</p>
 

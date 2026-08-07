@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>onErrorResume — FxDart 101</title>
+  <meta name="description" content="FxDart onErrorResume tutorial: substitute a value per error, switch to a fallback stream, or rebuild the whole stream with retry — with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/onErrorResume.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/onErrorResume.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/onErrorResume.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/onErrorResume.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/onErrorResume.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/onErrorResume.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/onErrorResume.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/onErrorResume.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/onErrorResume.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=978ace2ed00c1080">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Inicio</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">Tutoriales de la API</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Idioma">
+      <span class="lang-label">Idioma</span>
+      <ul>
+        <li><a href="../../tutorials/onErrorResume.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/onErrorResume.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/onErrorResume.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/onErrorResume.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/onErrorResume.html" hreflang="es" lang="es" aria-current="page">Español</a></li>
+        <li><a href="../../pt-br/tutorials/onErrorResume.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/onErrorResume.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 14 · Streams de eventos (push) › <strong>onErrorResume</strong></p>
+  <h1><code>onErrorReturn</code>, <code>onErrorResume</code> &amp; <code>retry</code></h1>
+  <p class="hero-sub">Three depths of recovery: patch each error with a value, abandon the source for a fallback, or throw the whole stream away and rebuild it.</p>
+
+  <div class="signature">FxEvents&lt;T&gt; FxEvents&lt;T&gt;.onErrorReturn(T value)   // chain (events)
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.onErrorResume(Stream&lt;T&gt; Function(Object, StackTrace) f)
+static FxEvents&lt;T&gt; FxEvents.retry&lt;T&gt;(Stream&lt;T&gt; Function() factory, [int? count])</div>
+
+  <h2>Lecture</h2>
+  <p>
+    Errors behave differently on the push side, and the difference trips
+    people up. In a pull pipeline an exception ends the iteration — there
+    is one failure and then nothing. In a Dart <code>Stream</code> an
+    error is just another <strong>event</strong>: it is delivered, and the
+    subscription carries on. A stream can emit ten errors and forty
+    values and still close normally.
+  </p>
+  <p>
+    That is why <code>onErrorReturn(value)</code> is a
+    <em>per-error substitution</em> rather than a one-shot rescue. Every
+    error becomes one <code>value</code> event and the stream keeps
+    going — right for a flaky sensor where a bad reading should become a
+    placeholder and the feed should survive.
+  </p>
+  <p>
+    <code>onErrorResume(f)</code> is the one-shot switch. On the
+    <strong>first</strong> error the source is cancelled outright and the
+    stream <code>f</code> builds from that error takes over for good —
+    the cache-on-network-failure move. Nothing more of the original
+    source is ever seen, and an error thrown by <code>f</code> itself is
+    forwarded rather than swallowed.
+  </p>
+  <p>
+    <code>FxEvents.retry(factory, [count])</code> works one level up: it
+    does not patch a stream's errors, it <strong>rebuilds the stream</strong>.
+    On error the failed attempt is thrown away and <code>factory()</code>
+    is called again for a fresh subscription — the right shape when the
+    failure is the connection itself. The budget counts
+    <em>re</em>-subscriptions, so <code>count: 2</code> allows at most
+    three attempts; when it runs out the last error is forwarded and the
+    stream closes. Events an attempt already emitted are not taken back,
+    so the factory should produce something replayable.
+  </p>
+  <p>
+    fxdart events layer, after Rx's <code>onErrorReturn</code>,
+    <code>onErrorResume</code> and <code>Rx.retry</code>. For failures
+    you want to <em>model</em> rather than recover from, the pull side's
+    <code><a href="either.html">Either</a></code> and
+    <code><a href="raise.html">Raise</a></code> make them values with
+    types — see <a href="either.html">Typed errors</a>.
+  </p>
+
+  <h2>Demo 1 · A value per error</h2>
+  <div class="playground" data-pg="6c57cdd861eb0cee">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // A flaky sensor that reports the odd bad reading.
+  final sensor = StreamController<int>();
+  final readings = fxEvents(sensor.stream).onErrorReturn(-1).toList();
+
+  sensor
+    ..add(21)
+    ..addError(StateError('glitch'))
+    ..add(22)
+    ..addError(StateError('glitch'))
+    ..add(23);
+  await sensor.close();
+
+  print(await readings); // [21, -1, 22, -1, 23]
+  // Dart stream errors do NOT end a subscription, so this substitutes
+  // per error rather than rescuing once: every error became one -1 and
+  // the stream carried on.
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · Abandoning the source for a fallback</h2>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // A live feed that dies mid-session; fall back to the cache.
+  final network = StreamController<String>();
+  final out = fxEvents(network.stream)
+      .onErrorResume((error, _) => Stream.fromIterable(['cached A', 'cached B']))
+      .toList();
+
+  network
+    ..add('live 1')
+    ..addError(StateError('connection lost'))
+    ..add('live 2'); // never arrives — the source was abandoned
+  await Future<void>.delayed(const Duration(milliseconds: 20));
+  await network.close();
+
+  print(await out); // [live 1, cached A, cached B]
+  // Unlike onErrorReturn this is a ONE-SHOT switch: the source is
+  // cancelled at the first error and the fallback takes over entirely.
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: rebuilding a flaky stream, with and without a budget.</p>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // Exercise: retry rebuilds the whole stream instead of patching over
+  // its errors — the right move when the failure is the connection.
+  var attempts = 0;
+
+  final out = await FxEvents.retry<String>(() {
+    attempts++;
+    print('attempt $attempts');
+    return attempts < 3
+        ? Stream<String>.error(StateError('flaky'))
+        : Stream.fromIterable(['ok']);
+  }).toList();
+
+  print(out); // [ok] after three attempts
+
+  // With a budget, retry gives up and forwards the last error.
+  var tries = 0;
+  final seen = <Object>[];
+  final done = Completer<void>();
+  FxEvents.retry<String>(() {
+    tries++;
+    return Stream<String>.error(StateError('always down'));
+  }, 2)
+      .listen(seen.add, onError: seen.add, onDone: done.complete);
+  await done.future;
+
+  print('gave up after $tries attempts'); // one attempt plus two retries
+  print(seen.single.runtimeType); // StateError
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="retry.html"><code>retry</code></a> — the pull-layer original, with a backoff hook and per-element scope ·
+    <a href="either.html"><code>Either</code></a> — errors as typed values rather than events to recover from ·
+    <a href="race.html"><code>race</code></a> — a candidate that errors first wins with its error
+  </div>
+
+  <nav class="tut-nav">
+    <a href="spaceBy.html">← Anterior: spaceBy</a>
+    <a href="share.html">Siguiente: share →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart es un port de <a href="https://github.com/marpple/FxTS">FxTS</a>. Muchas gracias a <strong>Indong Yoo</strong> (CTO de Marpple) y al equipo de FxTS por las ideas, la semántica y la batería de tests sobre las que se construye esta librería.</p>
+  <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=978ace2ed00c1080";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

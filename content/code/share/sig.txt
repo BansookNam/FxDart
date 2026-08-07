@@ -1,0 +1,3 @@
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.share()                        // chain (events)
+LiveValue&lt;T&gt;.from(Stream&lt;T&gt; source)                    // hot, unseeded
+LiveValue&lt;T&gt;.seededFrom(T seed, Stream&lt;T&gt; source)      // hot, seeded

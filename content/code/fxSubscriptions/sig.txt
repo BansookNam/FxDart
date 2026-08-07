@@ -1,0 +1,11 @@
+class FxSubscriptions {
+  int get length;
+  bool get isEmpty;
+  bool get isNotEmpty;
+
+  StreamSubscription&lt;T&gt; add&lt;T&gt;(StreamSubscription&lt;T&gt; subscription);
+  void addAll(Iterable&lt;StreamSubscription&lt;void&gt;&gt; subscriptions);
+  Future&lt;void&gt; cancelAll();   // cancel every one, and empty the bag
+  void pauseAll();
+  void resumeAll();
+}

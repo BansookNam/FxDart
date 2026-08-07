@@ -5,8 +5,10 @@ description: Tutorial de LiveValue en FxDart: un valor actual con suscriptores �
 heading: <code>LiveValue</code>
 section: 14
 crumb: LiveValue
-prev: race.html
-prevLabel: race
+prev: share.html
+prevLabel: share
+next: fxSubscriptions.html
+nextLabel: FxSubscriptions
 ---
   <p class="hero-sub">Un «valor actual» vivo con suscriptores: un suscriptor tardío recibe de inmediato el último valor, y después cada actualización posterior.</p>
 

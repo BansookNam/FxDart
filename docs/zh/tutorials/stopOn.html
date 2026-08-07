@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>stopOn — FxDart 101</title>
+  <meta name="description" content="FxDart stopOn tutorial: end an event chain when another stream fires, and startOn to open it — cancellation gates for live feeds — with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/stopOn.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/stopOn.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/stopOn.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/stopOn.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/stopOn.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/stopOn.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/stopOn.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/stopOn.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/stopOn.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=978ace2ed00c1080">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">首页</a>
+      <a href="../101/index.html">FxDart 入门</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API 教程</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="语言">
+      <span class="lang-label">语言</span>
+      <ul>
+        <li><a href="../../tutorials/stopOn.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/stopOn.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/stopOn.html" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">简体中文</a></li>
+        <li><a href="../../ja/tutorials/stopOn.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/stopOn.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/stopOn.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/stopOn.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">本页尚未翻译，因此以英文显示。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">参与翻译</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 入门</a> › 章节 14 · Event streams (push) › <strong>stopOn</strong></p>
+  <h1><code>stopOn</code> &amp; <code>startOn</code></h1>
+  <p class="hero-sub">Two gates driven by a second stream: <code>stopOn</code> closes the chain when the trigger fires, <code>startOn</code> opens it.</p>
+
+  <div class="signature">FxEvents&lt;T&gt; FxEvents&lt;T&gt;.stopOn(Stream&lt;void&gt; trigger)   // chain (events)
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.startOn(Stream&lt;void&gt; trigger)  // chain (events)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    A push chain has no natural end. A pull pipeline stops when the
+    consumer stops asking, but a live feed — a socket, a sensor, a
+    <code>Stream.periodic</code> — keeps producing until something
+    <em>cancels</em> it. Forgetting to do that is the classic leak:
+    a screen is disposed, the widget is gone, and its subscription is
+    still awake, still allocating, still calling <code>setState</code> on
+    a corpse.
+  </p>
+  <p>
+    <code>stopOn(trigger)</code> makes the shutdown part of the chain
+    rather than a variable you have to remember to cancel. The first
+    event on <code>trigger</code> closes the output and cancels
+    <strong>both</strong> subscriptions — the source's and the trigger's.
+    Nothing the trigger carries is read, only that it fired, so its type
+    is <code>Stream&lt;void&gt;</code> and any stream at all will do.
+  </p>
+  <p>
+    <code>startOn(trigger)</code> is the mirror: source events are
+    <strong>dropped</strong> until the trigger fires once, and passed for
+    good afterwards. It is the "wait until ready" gate — do not act on
+    taps until the session has loaded. Note that it is unrelated to
+    <code><a href="fxEvents.html">startWith</a></code>, which prepends a
+    value rather than gating the start; the two names sit close together
+    and mean quite different things.
+  </p>
+  <p>
+    The <code>…On</code> suffix is the events layer's convention for
+    "driven by a trigger stream", shared with
+    <code><a href="sampleOn.html">sampleOn</a></code> and
+    <code><a href="chunkOn.html">chunkOn</a></code>. fxdart events layer,
+    after Rx's <code>takeUntil</code> and <code>skipUntil</code> — the
+    names differ because <code>Fx.takeUntil</code> already means the
+    predicate-driven <code>takeUntilInclusive</code> on the pull side,
+    and one name cannot mean two things in one library.
+  </p>
+
+  <h2>Demo 1 · The off switch</h2>
+  <div class="playground" data-pg="cc09a03d30e45710">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // A telemetry feed with no natural end — it would run for 5 seconds.
+  final telemetry = timed([
+    (0, 'cpu 12%'),
+    (60, 'cpu 31%'),
+    (120, 'cpu 44%'),
+    (300, 'cpu 51%'),
+  ], 5000);
+
+  // The screen is torn down at 200ms.
+  final disposed = timed([(200, null)], 240);
+
+  final watch = Stopwatch()..start();
+  final seen = await fxEvents(telemetry).stopOn(disposed).toList();
+  watch.stop();
+
+  print(seen); // [cpu 12%, cpu 31%, cpu 44%]
+  print('closed after ~${(watch.elapsedMilliseconds / 100).round() * 100}ms');
+  // stopOn did not wait out the source's 5 seconds: the first trigger
+  // event closed the chain and cancelled BOTH subscriptions.
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · The on switch</h2>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // Taps start arriving before the app has finished warming up.
+  final taps = timed([
+    (0, 'tap 1'),
+    (50, 'tap 2'),
+    (150, 'tap 3'),
+    (200, 'tap 4'),
+  ], 300);
+
+  // "Ready" fires once, at 100ms.
+  final ready = timed([(100, null)], 400);
+
+  final handled = await fxEvents(taps).startOn(ready).toList();
+
+  print(handled); // [tap 3, tap 4]
+  // Everything before the trigger is dropped; everything after it passes
+  // for good — startOn opens the gate once and never closes it again.
+  // Note this is unrelated to startWith, which prepends a value.
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: a session window, built from both gates.</p>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // Exercise: record only the ticks that fall inside a session.
+  final ticks = timed([
+    (0, 1),
+    (150, 2),
+    (300, 3),
+    (450, 4),
+    (600, 5),
+    (750, 6),
+    (900, 7),
+    (1050, 8),
+  ], 1200);
+
+  final loggedIn = timed([(375, null)], 1300);
+  final loggedOut = timed([(825, null)], 1300);
+
+  final session = await fxEvents(ticks)
+      .startOn(loggedIn)
+      .stopOn(loggedOut)
+      .toList();
+
+  print(session); // [4, 5, 6]
+  // The two gates compose: startOn opens at 375ms, stopOn closes at
+  // 825ms, and the ticks outside that window never reach the chain.
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="fxSubscriptions.html"><code>FxSubscriptions</code></a> — the other half of teardown: cancel many subscriptions at once ·
+    <a href="sampleOn.html"><code>sampleOn</code></a> — the same trigger convention, for reading instead of stopping ·
+    <a href="race.html"><code>race</code></a> — cancellation decided by whoever speaks first
+  </div>
+
+  <nav class="tut-nav">
+    <a href="waitAll.html">← 上一节： waitAll</a>
+    <a href="chunkOn.html">下一节： chunkOn →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart 是 <a href="https://github.com/marpple/FxTS">FxTS</a> 的移植版本。特别感谢 <strong>Indong Yoo</strong>（Marpple CTO）与 FxTS 团队，本库的设计思路、语义和测试套件均源于他们的工作。</p>
+  <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 运行","pgReset":"重置","pgCompiling":"编译中…","pgCompileError":"编译错误","pgError":"错误","pgLoading":"正在加载运行时…","pgRunning":"运行中…","pgNoOutput":"（无输出）","pgLoadFailed":"无法加载 FxDart 库"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=978ace2ed00c1080";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

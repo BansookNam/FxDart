@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>mergeMap — FxDart 101</title>
+  <meta name="description" content="FxDart mergeMap 튜토리얼: 이벤트를 내부 스트림으로 매핑해 전부 동시에, concatMap으로 순서대로, exhaustMap으로 먼저 온 것만 — 을 라이브 플레이그라운드와 함께 다룹니다.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/mergeMap.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/mergeMap.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/mergeMap.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/mergeMap.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/mergeMap.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/mergeMap.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/mergeMap.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/mergeMap.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=978ace2ed00c1080">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../tutorials/mergeMap.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/mergeMap.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/tutorials/mergeMap.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/mergeMap.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/mergeMap.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/mergeMap.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/mergeMap.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 14 · 이벤트 스트림 (push) › <strong>mergeMap</strong></p>
+  <h1><code>mergeMap</code>, <code>concatMap</code> &amp; <code>exhaustMap</code></h1>
+  <p class="hero-sub">"지난 이벤트가 아직 실행 중인데 새 이벤트가 도착했다"에 대한 나머지 세 가지 답: 전부 실행하거나, 순서대로 실행하거나, 새 것을 무시하거나.</p>
+
+  <div class="signature">FxEvents&lt;R&gt; FxEvents&lt;T&gt;.mergeMap&lt;R&gt;(Stream&lt;R&gt; Function(T) f, {int? concurrent})
+FxEvents&lt;R&gt; FxEvents&lt;T&gt;.concatMap&lt;R&gt;(Stream&lt;R&gt; Function(T) f)
+FxEvents&lt;R&gt; FxEvents&lt;T&gt;.exhaustMap&lt;R&gt;(Stream&lt;R&gt; Function(T) f)</div>
+
+  <h2>강의</h2>
+  <p>
+    이벤트를 <em>내부 스트림</em> — 요청, 업로드, 질의 — 으로 매핑하면
+    풀 파이프라인은 결코 답할 필요가 없는 질문 하나가 생깁니다: 지난
+    내부 스트림이 끝나기 전에 다음 이벤트가 도착하면 어떻게 되는가?
+    합리적인 정책은 정확히 넷뿐이고, 잘못 고르는 곳에서 대부분의
+    리액티브 버그가 태어납니다.
+    <code><a href="switchMap.html">switchMap</a></code>이 "마지막이
+    이긴다"는 답이고, 이 셋이 나머지 셋입니다.
+  </p>
+  <p>
+    <code>mergeMap(f)</code>는 모든 내부 스트림을
+    <strong>한꺼번에</strong> 실행하고 그 출력을 도착 순서로
+    엇섞습니다. 모든 결과가 중요하고 어느 것도 다른 것을 밀어내지 않을
+    때 쓰세요 — 파일 셋 업로드, 서비스 셋으로 팬아웃.
+    <code>concurrent: n</code>을 주면 한 번에 최대 <em>n</em>개만
+    돌고 나머지는 큐에서 기다립니다. 팬아웃이 소켓 이백 개를 열지 않게
+    하는 방법이 이것입니다.
+  </p>
+  <p>
+    <code>concatMap(f)</code>는 <strong>엄격히 순서대로</strong>
+    실행합니다. 각각이 완료된 뒤에야 다음이 시작합니다. 겹치는 것도
+    버려지는 것도 없으므로 느린 내부 스트림 하나가 체인 전체를
+    막습니다 — "이 편집들을 순서대로 적용하라"처럼 순서가 정확성
+    조건일 때는 그것이 바로 요점입니다.
+  </p>
+  <p>
+    <code>exhaustMap(f)</code>는 <strong>첫 번째</strong>를 지키고
+    나머지를 무시합니다: 내부 스트림이 도는 동안 들어온 이벤트는 큐에
+    쌓이지도, 취소되지도 않고 그냥 버려집니다. 이것이 중복 제출
+    가드입니다. 요청이 아직 날아가는 중인 버튼을 두 번째로 눌러도 아무
+    일도 일어나지 않습니다 — 그 요청이 <code>POST /orders</code>일 때
+    정확히 원하는 동작이죠.
+  </p>
+  <p>
+    fxdart 이벤트 레이어, Rx의 <code>flatMap</code>,
+    <code>flatMap(maxConcurrent: 1)</code>, <code>exhaustMap</code>을
+    따랐습니다. 첫 번째를 여기서 <code>mergeMap</code>이라 부르는 것은
+    <code><a href="flatMap.html">flatMap</a></code>이 풀 쪽에서 이미
+    이터러블 평탄화를 뜻하기 때문입니다.
+  </p>
+
+  <h2>데모 1 · mergeMap — 전부 한꺼번에</h2>
+  <div class="playground" data-pg="c56aeea10a01c478">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // Three files picked in quick succession; every upload matters.
+  final picked = timed([(0, 'a.png'), (60, 'b.png'), (120, 'c.png')], 200);
+
+  final uploaded = await fxEvents(picked)
+      .mergeMap((file) => timed([(300, 'uploaded $file')], 340))
+      .toList();
+
+  print(uploaded); // [uploaded a.png, uploaded b.png, uploaded c.png]
+  // All three uploads ran AT ONCE — the whole thing took ~420ms, not the
+  // ~900ms three sequential uploads would have cost. Nothing was
+  // cancelled, unlike switchMap, and nothing was ignored, unlike
+  // exhaustMap.
+}
+</textarea>
+  </div>
+
+  <h2>데모 2 · exhaustMap — 중복 제출 가드</h2>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // An impatient user taps Submit four times.
+  final taps = timed([(0, 1), (50, 2), (100, 3), (400, 4)], 600);
+
+  final submitted = await fxEvents(taps)
+      .exhaustMap((n) => timed([(200, 'submit $n')], 240))
+      .toList();
+
+  print(submitted); // [submit 1, submit 4]
+  // Taps 2 and 3 landed while submit 1 was still in flight, so they were
+  // IGNORED outright — no queue, no cancellation, no duplicate order.
+  // Tap 4 arrived after the first request had finished, so it ran.
+}
+</textarea>
+  </div>
+
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>concatMap</code>의 순서, 그리고 한도가 걸린 팬아웃.</p>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // Exercise 1: concatMap keeps inner streams strictly in order.
+  final pages = await fxEvents(Stream.fromIterable([1, 2, 3]))
+      .concatMap((n) => timed([(120, 'page $n')], 150))
+      .toList();
+  print(pages); // [page 1, page 2, page 3] — one at a time, ~450ms
+
+  // Exercise 2: mergeMap with a concurrency cap — four jobs, two at a
+  // time. Source order decides who STARTS; completion decides who is
+  // emitted first.
+  final jobs = await fxEvents(Stream.fromIterable([1, 2, 3, 4]))
+      .mergeMap((n) => timed([(120, 'job $n')], 150), concurrent: 2)
+      .toList();
+  print(jobs); // [job 1, job 2, job 3, job 4] — in two waves
+
+  // The four policies, in one line each:
+  //   mergeMap   — run them all, interleaved
+  //   concatMap  — run them one after another, in order
+  //   switchMap  — keep only the newest, cancel the rest
+  //   exhaustMap — keep only the first, ignore the rest
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>관련 항목:</strong>
+    <a href="switchMap.html"><code>switchMap</code></a> — 네 번째 정책: 최신이 이기고 나머지는 취소 ·
+    <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — 풀 쪽의 한도 있는 팬아웃, 결과는 순서를 지킴 ·
+    <a href="debounce.html"><code>debounce</code></a> — 더 나은 해법일 때가 많음: 내부 스트림이 되기 전에 여분의 이벤트를 막기
+  </div>
+
+  <nav class="tut-nav">
+    <a href="switchMap.html">← 이전: switchMap</a>
+    <a href="race.html">다음: race →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=978ace2ed00c1080";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

@@ -7,8 +7,8 @@ section: 14
 crumb: switchMap
 prev: withLatestFrom.html
 prevLabel: withLatestFrom
-next: race.html
-nextLabel: race
+next: mergeMap.html
+nextLabel: mergeMap
 ---
   <p class="hero-sub">Mapea cada evento a un stream interno y refleja solo el más nuevo — un evento fresco <em>cancela</em> el stream interno anterior en pleno vuelo.</p>
 

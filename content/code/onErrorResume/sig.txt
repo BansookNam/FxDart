@@ -1,0 +1,3 @@
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.onErrorReturn(T value)   // chain (events)
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.onErrorResume(Stream&lt;T&gt; Function(Object, StackTrace) f)
+static FxEvents&lt;T&gt; FxEvents.retry&lt;T&gt;(Stream&lt;T&gt; Function() factory, [int? count])

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FxSubscriptions — FxDart 101</title>
+  <meta name="description" content="FxDart FxSubscriptions 튜토리얼: 여러 스트림 구독을 한 자루에 담아 함께 취소·일시정지·재개하기 — dispose 한 줄 — 을 라이브 플레이그라운드와 함께 다룹니다.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/fxSubscriptions.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/fxSubscriptions.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/fxSubscriptions.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/fxSubscriptions.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/fxSubscriptions.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/fxSubscriptions.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/fxSubscriptions.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/fxSubscriptions.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=978ace2ed00c1080">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API 튜토리얼</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="언어">
+      <span class="lang-label">언어</span>
+      <ul>
+        <li><a href="../../tutorials/fxSubscriptions.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/fxSubscriptions.html" hreflang="ko" lang="ko" aria-current="page">한국어</a></li>
+        <li><a href="../../zh/tutorials/fxSubscriptions.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/fxSubscriptions.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/fxSubscriptions.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/fxSubscriptions.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/fxSubscriptions.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 14 · 이벤트 스트림 (push) › <strong>FxSubscriptions</strong></p>
+  <h1><code>FxSubscriptions</code></h1>
+  <p class="hero-sub">함께 취소되는 구독 자루 — 스트림마다 필드 하나가 아니라 정리는 호출 한 번.</p>
+
+  <div class="signature">class FxSubscriptions {
+  int get length;
+  bool get isEmpty;
+  bool get isNotEmpty;
+
+  StreamSubscription&lt;T&gt; add&lt;T&gt;(StreamSubscription&lt;T&gt; subscription);
+  void addAll(Iterable&lt;StreamSubscription&lt;void&gt;&gt; subscriptions);
+  Future&lt;void&gt; cancelAll();   // cancel every one, and empty the bag
+  void pauseAll();
+  void resumeAll();
+}</div>
+
+  <h2>강의</h2>
+  <p>
+    여러 스트림을 듣는 객체는 오직 한 가지 이유로 모든 구독을 살려
+    둡니다: 나중에 다시 취소하려고요. 그 결과가 익숙한 널 가능 필드
+    더미입니다. 각각 맨 위에 선언되고, 각각 <code>initState</code>에서
+    할당되고, 각각 <code>dispose</code>에서 취소되고 — 그리고 누수는
+    언제나 누군가 세 번째 목록에 추가하기를 잊은 그 하나입니다.
+  </p>
+  <p>
+    <code>FxSubscriptions</code>는 그것을 객체 하나로 접습니다.
+    <code>add</code>는 구독을 자루에 넣고 <strong>그것을
+    돌려주므로</strong> 문장이 아니라 식으로 읽히고,
+    <code>cancelAll()</code>이 그 전부를 끝냅니다. 정리는 한 줄이
+    됩니다: <code>Future&lt;void&gt; dispose() =&gt; subs.cancelAll();</code>
+  </p>
+  <p>
+    <code>pauseAll()</code>과 <code>resumeAll()</code>은 더 부드러운
+    버전으로, 배선을 해체하지 않은 채 일만 멈춰야 할 때를 위한
+    것입니다 — 화면이 백그라운드로 가거나 탭이 포커스를 잃을 때요.
+    일시정지된 구독은 버리지 않고 버퍼에 담으므로 그 틈에서 잃는 것이
+    없습니다.
+  </p>
+  <p>
+    자루는 취소를 기다리기 <em>전에</em> 비워지므로, 기다리는 동안 두
+    번째 <code>cancelAll()</code>이 무언가를 두 번 취소할 수 없고, 같은
+    객체가 그 뒤로 새 세대의 구독을 담을 수 있습니다. fxdart 이벤트
+    레이어, Rx의 <code>CompositeSubscription</code>을 따랐습니다.
+  </p>
+  <p>
+    <code><a href="stopOn.html">stopOn</a></code>과 자연스럽게 짝을
+    이룹니다: 무언가가 <em>일어나서</em> 체인이 끝나야 할 때는
+    <code>stopOn</code>을, 그것들을 소유하던 것이 <em>사라져서</em> 여러
+    체인이 끝나야 할 때는 <code>FxSubscriptions</code>를 쓰세요.
+  </p>
+
+  <h2>데모 1 · dispose 한 줄</h2>
+  <div class="playground" data-pg="f053977144dab29d">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // A screen listening to three feeds at once.
+  final ticks = StreamController<int>();
+  final clicks = StreamController<String>();
+
+  final subs = FxSubscriptions();
+  subs
+    ..add(fxEvents(ticks.stream).map((v) => v * 2).listen((v) => print('tick $v')))
+    ..add(fxEvents(clicks.stream).listen((v) => print('click $v')));
+
+  print('holding ${subs.length} subscriptions');
+
+  ticks.add(1);
+  clicks.add('home');
+  await Future<void>.delayed(Duration.zero);
+
+  // One call ends them all — the dispose() one-liner.
+  await subs.cancelAll();
+  print('after cancelAll: isEmpty = ${subs.isEmpty}');
+
+  ticks.add(2);
+  clicks.add('cart');
+  await Future<void>.delayed(Duration.zero); // nothing prints
+
+  await ticks.close();
+  await clicks.close();
+}
+</textarea>
+  </div>
+
+  <h2>데모 2 · 해체하지 않고 멈추기</h2>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  final a = StreamController<int>();
+  final b = StreamController<int>();
+  final seen = <int>[];
+
+  final subs = FxSubscriptions();
+  subs
+    ..add(a.stream.listen(seen.add))
+    ..add(b.stream.listen(seen.add));
+
+  // Backgrounded: hold everything without tearing it down.
+  subs.pauseAll();
+  a.add(1);
+  b.add(2);
+  await Future<void>.delayed(Duration.zero);
+  print(seen); // [] — buffered, not lost
+
+  // Foregrounded again.
+  subs.resumeAll();
+  await Future<void>.delayed(Duration.zero);
+  print(seen); // [1, 2]
+
+  await subs.cancelAll();
+  await a.close();
+  await b.close();
+}
+</textarea>
+  </div>
+
+  <h2>직접 해 보기</h2>
+  <p>연습: <code>addAll</code>, 그리고 취소 후 자루 재사용.</p>
+  <div class="playground">
+<textarea>
+import 'dart:async';
+
+import 'package:fxdart/fxdart.dart';
+
+/// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].
+Stream<T> timed<T>(List<(int, T)> events, int closeMs) {
+  final c = StreamController<T>();
+  for (final (ms, v) in events) {
+    Timer(Duration(milliseconds: ms), () => c.add(v));
+  }
+  Timer(Duration(milliseconds: closeMs), c.close);
+  return c.stream;
+}
+
+Future<void> main() async {
+  // Exercise: the bag is reusable. cancelAll empties it, so the same
+  // object can hold a fresh generation of subscriptions afterwards.
+  final feed = StreamController<int>.broadcast();
+  final subs = FxSubscriptions();
+
+  // add returns what it was handed, so it reads as an expression.
+  final first = subs.add(feed.stream.listen((v) => print('gen 1: $v')));
+  print('same subscription back: ${identical(first, first)}');
+
+  feed.add(1);
+  await Future<void>.delayed(Duration.zero);
+
+  await subs.cancelAll();
+
+  // addAll takes a batch — a second generation, after the first is gone.
+  subs.addAll([
+    feed.stream.listen((v) => print('gen 2a: $v')),
+    feed.stream.listen((v) => print('gen 2b: $v')),
+  ]);
+  print('holding ${subs.length} again');
+
+  feed.add(2);
+  await Future<void>.delayed(Duration.zero);
+
+  await subs.cancelAll();
+  await feed.close();
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>관련 항목:</strong>
+    <a href="stopOn.html"><code>stopOn</code></a> — 소유자의 생명주기가 아니라 이벤트가 조종하는 정리 ·
+    <a href="fxEvents.html"><code>fxEvents</code></a> — 그 <code>listen</code>이 이 자루에 담을 구독을 건네주는 체인 ·
+    <a href="liveValue.html"><code>LiveValue</code></a> — 자기 <code>close()</code>를 가지며, 이 자루에 담기지 않음
+  </div>
+
+  <nav class="tut-nav">
+    <a href="liveValue.html">← 이전: LiveValue</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart는 <a href="https://github.com/marpple/FxTS">FxTS</a>의 포팅 프로젝트입니다. 이 라이브러리의 토대가 된 아이디어와 동작 정의, 테스트 스위트를 만들어 준 <strong>유인동</strong>(Marpple CTO)님과 FxTS 팀에 깊이 감사드립니다.</p>
+  <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=978ace2ed00c1080";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

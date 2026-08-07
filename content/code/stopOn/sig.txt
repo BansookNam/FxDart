@@ -1,0 +1,2 @@
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.stopOn(Stream&lt;void&gt; trigger)   // chain (events)
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.startOn(Stream&lt;void&gt; trigger)  // chain (events)

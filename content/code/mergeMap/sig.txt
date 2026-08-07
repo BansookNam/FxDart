@@ -1,0 +1,3 @@
+FxEvents&lt;R&gt; FxEvents&lt;T&gt;.mergeMap&lt;R&gt;(Stream&lt;R&gt; Function(T) f, {int? concurrent})
+FxEvents&lt;R&gt; FxEvents&lt;T&gt;.concatMap&lt;R&gt;(Stream&lt;R&gt; Function(T) f)
+FxEvents&lt;R&gt; FxEvents&lt;T&gt;.exhaustMap&lt;R&gt;(Stream&lt;R&gt; Function(T) f)

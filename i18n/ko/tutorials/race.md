@@ -5,10 +5,10 @@ description: FxDart FxEvents.race 튜토리얼: 먼저 내보내는 스트림이
 heading: <code>race</code>
 section: 14
 crumb: race
-prev: switchMap.html
-prevLabel: switchMap
-next: liveValue.html
-nextLabel: LiveValue
+prev: mergeMap.html
+prevLabel: mergeMap
+next: waitAll.html
+nextLabel: waitAll
 ---
   <p class="hero-sub">먼저 내보내는 후보가 이깁니다: 그 스트림 전체가 비춰지고, 다른 모든 후보는 그 자리에서 취소됩니다.</p>
 
