@@ -19,6 +19,10 @@ run.sh
 DEPLOY.md
 CODECOV.md
 
+# Working plans — local only. .pubignore fully overrides .gitignore, so the
+# .gitignore entry for plans/ does NOT keep it out of the published archive.
+plans/
+
 # Build & local artifacts (normally covered by .gitignore, which
 # .pubignore overrides once present)
 coverage/
