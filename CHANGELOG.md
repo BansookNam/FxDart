@@ -159,6 +159,10 @@ A `List` source is indexed from the end by both, so the predicate is
 called only on the trailing run, in reverse. That is a visible
 difference for an impure predicate, and it is documented on each.
 
+### Tests
+
+Line coverage stays at **100.00%** (3837/3837, up from 3607).
+
 ## 0.7.8
 
 ### Added — the events layer's second half
