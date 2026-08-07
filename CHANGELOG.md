@@ -52,6 +52,22 @@ the handler wants a raise scope rather than an `Either` built by hand.
 It does not replace the plain case where you already *have* the
 replacement `Either`, which is what these two are for.
 
+### Added — `Either.filterOrElse`
+
+Inline validation without a `flatMap` + `if`:
+
+```dart
+parseAge(s)
+    .filterOrElse((n) => n >= 0, (n) => 'age cannot be $n')
+    .filterOrElse((n) => n < 150, (n) => 'age $n is implausible');
+```
+
+A `Right` whose value fails the predicate becomes the `Left` that
+`onFalse` builds from that value; a `Left` passes through and the
+predicate never runs. It is the `Either`-value form of `Raise.ensure`,
+which already did this inside an `either { }` builder — a test pins the
+two to the same answer.
+
 ## 0.7.8
 
 ### Added — the events layer's second half

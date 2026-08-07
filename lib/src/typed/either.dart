@@ -170,6 +170,26 @@ sealed class Either<L, R> {
         Right(:final value) => Right(value),
       };
 
+  /// Demotes a [Right] whose value fails [predicate] to a [Left] built by
+  /// [onFalse] — inline validation without a `flatMap` + `if`.
+  ///
+  /// ```dart
+  /// parseAge(s)
+  ///     .filterOrElse((n) => n >= 0, (n) => 'age cannot be $n')
+  ///     .filterOrElse((n) => n < 150, (n) => 'age $n is implausible');
+  /// ```
+  ///
+  /// A [Left] passes through untouched and [predicate] never runs. This is
+  /// the `Either`-value form of `Raise.ensure`, which does the same job
+  /// inside an `either { }` builder.
+  Either<L, R> filterOrElse(
+      bool Function(R value) predicate, L Function(R value) onFalse) {
+    if (this case Right(:final value) when !predicate(value)) {
+      return Left(onFalse(value));
+    }
+    return this;
+  }
+
   /// Returns this when it is a [Right], otherwise the result of [other] —
   /// "try this, and if it failed try that".
   ///
