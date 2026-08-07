@@ -32,6 +32,54 @@ Map<K, V> pick<K, V>(Iterable<K> keysToPick, Map<K, V> map) {
   };
 }
 
+/// Returns a copy of [map] with every value run through [f]; keys are
+/// untouched.
+///
+/// Not an FxTS port — TS spreads entries through `Object.fromEntries`, which
+/// in Dart is [fromEntries] over [mapEntries] and reads worse than the thing
+/// it does. Insertion order is preserved.
+///
+/// ```dart
+/// mapValues((n) => n * 2, {'a': 1, 'b': 2}); // {a: 2, b: 4}
+/// ```
+Map<K, T> mapValues<K, V, T>(T Function(V value) f, Map<K, V> map) => {
+      for (final e in map.entries) e.key: f(e.value)
+    };
+
+/// Returns a copy of [map] with every key run through [f]; values are
+/// untouched.
+///
+/// [f] is not required to be injective: when two keys collide, the **last**
+/// one in iteration order wins, as it would in a map literal. Insertion order
+/// follows the first appearance of each new key.
+///
+/// ```dart
+/// mapKeys((k) => k.toUpperCase(), {'a': 1, 'b': 2}); // {A: 1, B: 2}
+/// ```
+Map<T, V> mapKeys<K, V, T>(T Function(K key) f, Map<K, V> map) => {
+      for (final e in map.entries) f(e.key): e.value
+    };
+
+/// Returns a new map built by running each `(key, value)` record through [f]
+/// — the general form of [mapValues] and [mapKeys], and the transforming
+/// counterpart of [pickBy].
+///
+/// Colliding results follow the same last-one-wins rule as [mapKeys].
+///
+/// ```dart
+/// mapEntries((e) => (e.$1.toUpperCase(), e.$2 * 2), {'a': 1});
+/// // {A: 2}
+/// ```
+Map<K2, V2> mapEntries<K, V, K2, V2>(
+    (K2, V2) Function((K, V) entry) f, Map<K, V> map) {
+  final out = <K2, V2>{};
+  for (final e in map.entries) {
+    final (k, v) = f((e.key, e.value));
+    out[k] = v;
+  }
+  return out;
+}
+
 /// Returns a copy of [map] without entries matching the predicate [f].
 ///
 /// Port of FxTS `omitBy` (entry tuples become records).
@@ -42,7 +90,14 @@ Map<K, V> omitBy<K, V>(bool Function((K, V) entry) f, Map<K, V> map) => {
 
 /// Returns a copy of [map] with only entries matching the predicate [f].
 ///
-/// Port of FxTS `pickBy`.
+/// Port of FxTS `pickBy`. Together with [omitBy] this is the key-aware map
+/// filter; the predicate takes the whole `(key, value)` record, so ignoring
+/// one half is how you filter by the other.
+///
+/// ```dart
+/// pickBy((e) => e.$2 > 1, {'a': 1, 'b': 2});      // by value  -> {b: 2}
+/// pickBy((e) => e.$1.startsWith('a'), {'a': 1});  // by key    -> {a: 1}
+/// ```
 Map<K, V> pickBy<K, V>(bool Function((K, V) entry) f, Map<K, V> map) => {
       for (final e in map.entries)
         if (f((e.key, e.value))) e.key: e.value

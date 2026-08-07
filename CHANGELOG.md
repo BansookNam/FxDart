@@ -68,6 +68,26 @@ predicate never runs. It is the `Either`-value form of `Raise.ensure`,
 which already did this inside an `either { }` builder — a test pins the
 two to the same answer.
 
+### Added — `mapValues` / `mapKeys` / `mapEntries`
+
+The map half of the library could `pick`, `omit`, `pickBy`, `omitBy`,
+`evolve` and `compactObject`, but not transform every entry:
+
+```dart
+mapValues((n) => n * 2, {'a': 1, 'b': 2});  // {a: 2, b: 4}
+mapKeys((k) => k.toUpperCase(), scores);
+mapEntries((e) => (e.$2, e.$1), byName);    // invert
+```
+
+`mapEntries` takes the whole `(key, value)` record, the same shape
+`pickBy`/`omitBy`/`fromEntries` already use, and generalises the other
+two. `mapKeys` and `mapEntries` are last-one-wins on a collision, like a
+map literal — documented, and pinned by a test.
+
+No `filter`/`filterWithKey` went in: `pickBy`/`omitBy` already take the
+whole record, so ignoring one half is how you filter by the other. Their
+docs now say so with an example, which is what was actually missing.
+
 ## 0.7.8
 
 ### Added — the events layer's second half
