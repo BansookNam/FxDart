@@ -57,3 +57,51 @@ bool isMap(Object? a) => a is Map;
 /// alias of [isMap].
 @Deprecated('Use isMap instead')
 bool isObject(Object? a) => a is Map;
+
+/// Combinators on a unary predicate, so conditions passed to `filter`,
+/// `reject`, `takeWhile`, `dropWhile`, ... can be built from named pieces
+/// instead of nested lambdas.
+///
+/// Not an FxTS port — TypeScript composes predicates with `&&` inside an
+/// arrow function and keeps the types through inference. In Dart the same
+/// thing costs a lambda per combination, so the operators are worth naming.
+///
+/// ```dart
+/// bool isEven(int n) => n % 2 == 0;
+/// bool isPositive(int n) => n > 0;
+///
+/// fx([-4, -3, 2, 3, 4]).filter(isEven.and(isPositive)).toList(); // [2, 4]
+/// ```
+///
+/// Every combinator returns a new predicate and calls neither operand until
+/// that predicate runs; [and] and [or] short-circuit exactly like `&&`/`||`.
+extension FxPredicateOps<T> on bool Function(T) {
+  /// The logical opposite of this predicate.
+  ///
+  /// The extension-getter form of the top-level `negate` — `isEven.negate`
+  /// and `negate(isEven)` are the same function.
+  bool Function(T) get negate => (a) => !this(a);
+
+  /// True when both this predicate and [other] hold. [other] is not called
+  /// when this one already fails.
+  bool Function(T) and(bool Function(T a) other) =>
+      (a) => this(a) && other(a);
+
+  /// True when this predicate or [other] holds. [other] is not called when
+  /// this one already succeeds.
+  bool Function(T) or(bool Function(T a) other) => (a) => this(a) || other(a);
+
+  /// True when exactly one of this predicate and [other] holds. Both are
+  /// always called — there is nothing to short-circuit.
+  bool Function(T) xor(bool Function(T a) other) => (a) => this(a) ^ other(a);
+
+  /// Moves this predicate onto a different input type by running [f] first
+  /// — `map` for the *argument* rather than the result, which is why it is
+  /// *contra*map.
+  ///
+  /// ```dart
+  /// final hasEvenLength = isEven.contramap<String>((s) => s.length);
+  /// hasEvenLength('abcd'); // true
+  /// ```
+  bool Function(A) contramap<A>(T Function(A a) f) => (a) => this(f(a));
+}

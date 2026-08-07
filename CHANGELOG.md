@@ -1,3 +1,23 @@
+## 0.7.9
+
+### Added — predicate combinators
+
+A unary predicate can now be built out of named pieces instead of nested
+lambdas: `isEven.and(isPositive)`, `.or`, `.xor`, `.negate`, and
+`.contramap<A>(f)` to move a predicate onto another input type. They
+compose anywhere a predicate is expected — `filter`, `reject`,
+`takeWhile`, `dropWhile`, `countWhere`, `partition`.
+
+This is not an FxTS port. TypeScript writes the same thing as `&&`
+inside an arrow function and keeps its types through inference; in Dart
+that costs a lambda and a repeated parameter name per combination, so
+the operators earn their names. `.negate` is the extension-getter form
+of the existing top-level `negate` — the two are the same function.
+
+`and` and `or` short-circuit like `&&`/`||` and call the right-hand
+predicate only when the left one doesn't decide; `xor` always calls
+both. Nothing runs until the composed predicate itself is called.
+
 ## 0.7.8
 
 ### Added — the events layer's second half
