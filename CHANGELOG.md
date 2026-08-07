@@ -134,6 +134,31 @@ Both are strict in a way `fold` isn't: walking backwards means knowing
 where the end is, so a non-`List` source is materialized and
 `foldRightAsync` drains the stream before it starts. Documented on each.
 
+### Added — `takeWhileRight` / `dropWhileRight`
+
+`takeRight`/`dropRight` could only count, so trimming a trailing run
+meant knowing its length in advance:
+
+```dart
+dropWhileRight((c) => c == ' ', chars);  // trim the trailing blanks
+takeWhileRight((a) => a > 2, [1, 4, 2, 3, 4]);  // (3, 4)
+```
+
+Both return **source order**, so they compose with everything else and
+partition the source between them — a test pins that. fpdart's
+`takeWhileRight` hands back the reversed run instead.
+
+`dropWhileRight` streams: a matching run is held back only until some
+element fails the predicate, which proves the run was not the suffix and
+releases it, so memory is the longest run rather than the source. A test
+pins that it emits after three pulls of a five-element source.
+`takeWhileRight` cannot emit before the source ends, by definition, and
+buffers the longest run it has seen.
+
+A `List` source is indexed from the end by both, so the predicate is
+called only on the trailing run, in reverse. That is a visible
+difference for an impure predicate, and it is documented on each.
+
 ## 0.7.8
 
 ### Added — the events layer's second half

@@ -231,6 +231,102 @@ FxAsyncIterable<A> _takeWhileAsyncLegacy<A>(
   });
 }
 
+/// Returns the longest **suffix** whose every element satisfies [f], in
+/// source order.
+///
+/// The predicate counterpart of [takeRight], where [takeWhile] is the
+/// predicate counterpart of [take]. Not an FxTS port.
+///
+/// ```dart
+/// takeWhileRight((a) => a > 2, [1, 4, 2, 3, 4]); // (3, 4)
+/// ```
+///
+/// Order is the source's, so this composes with the rest of the library;
+/// fpdart's `takeWhileRight` hands back the reversed run instead. Nothing
+/// can be emitted before the source ends, and a non-[List] source is
+/// buffered up to the longest matching run it has seen. A [List] source is
+/// indexed from the end instead, so [f] is called only on the trailing run
+/// and in reverse — keep the predicate pure.
+Iterable<A> takeWhileRight<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    _TakeWhileRightIterable(f, iterable);
+
+/// The index at which [list]'s trailing run of [f]-matching elements begins
+/// (`list.length` when the last element already fails).
+int _suffixStart<A>(bool Function(A) f, List<A> list) {
+  var start = list.length;
+  while (start > 0 && f(list[start - 1])) {
+    start--;
+  }
+  return start;
+}
+
+class _TakeWhileRightIterable<A> extends Iterable<A> {
+  _TakeWhileRightIterable(this._f, this._source);
+  final bool Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator {
+    final source = _source;
+    if (source is List<A>) {
+      return _ListRangeIterator(source, _suffixStart(_f, source), source.length);
+    }
+    return _TakeWhileRightIterator(_f, _source);
+  }
+}
+
+class _TakeWhileRightIterator<A> implements Iterator<A> {
+  _TakeWhileRightIterator(this._f, this._source);
+  final bool Function(A) _f;
+  final Iterable<A> _source;
+  // The run in flight, built on the first pull. Every element that fails [_f]
+  // proves the run so far was not the suffix, so it is dropped — the buffer
+  // costs the longest run seen, not the whole source.
+  List<A>? _tail;
+  int _i = 0;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    var tail = _tail;
+    if (tail == null) {
+      tail = _tail = <A>[];
+      for (final a in _source) {
+        if (_f(a)) {
+          tail.add(a);
+        } else if (tail.isNotEmpty) {
+          tail.clear();
+        }
+      }
+    }
+    if (_i >= tail.length) return false;
+    current = tail[_i++];
+    return true;
+  }
+}
+
+/// Async counterpart of [takeWhileRight].
+@pragma('vm:prefer-inline')
+FxAsyncIterable<A> takeWhileRightAsync<A>(
+    bool Function(A a) f, FxAsyncIterable<A> iterable) {
+  return dispatchAsync(iterable, (source) {
+    final iterator = source.iterator;
+    Iterator<A>? tail;
+    return SerialAsyncIterator((concurrent) async {
+      if (tail == null) {
+        final arr = <A>[];
+        while (true) {
+          final r = await iterator.next(concurrent);
+          if (r.done) break;
+          arr.add(r.value);
+        }
+        tail = takeWhileRight(f, arr).iterator;
+      }
+      if (tail!.moveNext()) return IterResult.value(tail!.current);
+      return IterResult<A>.done();
+    });
+  });
+}
+
 /// Returns an iterable that yields values until [f] returns true —
 /// **including** the element that matched.
 ///
@@ -495,6 +591,105 @@ FxAsyncIterable<A> dropWhileAsync<A>(
             return decide(drop);
           });
       return loop();
+    });
+  });
+}
+
+/// Drops the longest **suffix** whose every element satisfies [f], yielding
+/// what is left in source order — trimming a trailing run.
+///
+/// The predicate counterpart of [dropRight], and the complement of
+/// [takeWhileRight]: the two partition the source. Not an FxTS port.
+///
+/// ```dart
+/// dropWhileRight((a) => a == 0, [1, 2, 0, 0]); // (1, 2)
+/// ```
+///
+/// Unlike [takeWhileRight] this streams: a matching run is held back only
+/// until an element fails [f], which proves the run was not the suffix and
+/// releases it. Memory is the longest run, not the source. A [List] source
+/// is indexed from the end instead, so [f] is called only on the trailing
+/// run and in reverse — keep the predicate pure.
+Iterable<A> dropWhileRight<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    _DropWhileRightIterable(f, iterable);
+
+class _DropWhileRightIterable<A> extends Iterable<A> {
+  _DropWhileRightIterable(this._f, this._source);
+  final bool Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator {
+    final source = _source;
+    if (source is List<A>) {
+      return _ListRangeIterator(source, 0, _suffixStart(_f, source));
+    }
+    return _DropWhileRightIterator(_f, _source.iterator);
+  }
+}
+
+class _DropWhileRightIterator<A> implements Iterator<A> {
+  _DropWhileRightIterator(this._f, this._it);
+  final bool Function(A) _f;
+  final Iterator<A> _it;
+  // Matching elements are held back: they are the suffix only if the source
+  // ends here. The first failing element releases them all.
+  final _pending = <A>[];
+  final _ready = <A>[];
+  int _out = 0;
+  bool _done = false;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    if (_out < _ready.length) {
+      current = _ready[_out++];
+      return true;
+    }
+    if (_done) return false;
+    _ready.clear();
+    _out = 0;
+    while (_it.moveNext()) {
+      final v = _it.current;
+      if (_f(v)) {
+        _pending.add(v);
+        continue;
+      }
+      if (_pending.isEmpty) {
+        current = v;
+        return true;
+      }
+      _ready
+        ..addAll(_pending)
+        ..add(v);
+      _pending.clear();
+      current = _ready[_out++];
+      return true;
+    }
+    // The source ended inside a matching run: that run was the suffix.
+    _done = true;
+    return false;
+  }
+}
+
+/// Async counterpart of [dropWhileRight].
+@pragma('vm:prefer-inline')
+FxAsyncIterable<A> dropWhileRightAsync<A>(
+    bool Function(A a) f, FxAsyncIterable<A> iterable) {
+  return dispatchAsync(iterable, (source) {
+    final iterator = source.iterator;
+    Iterator<A>? head;
+    return SerialAsyncIterator((concurrent) async {
+      if (head == null) {
+        final arr = <A>[];
+        while (true) {
+          final r = await iterator.next(concurrent);
+          if (r.done) break;
+          arr.add(r.value);
+        }
+        head = dropWhileRight(f, arr).iterator;
+      }
+      if (head!.moveNext()) return IterResult.value(head!.current);
+      return IterResult<A>.done();
     });
   });
 }

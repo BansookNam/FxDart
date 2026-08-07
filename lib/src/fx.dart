@@ -130,6 +130,10 @@ class Fx<T> extends Iterable<T> {
   @override
   Fx<T> takeWhile(bool Function(T value) test) => Fx(l.takeWhile(test, _inner));
 
+  /// The longest trailing run of values [f] holds for, in source order.
+  Fx<T> takeWhileRight(bool Function(T a) f) =>
+      Fx(l.takeWhileRight(f, _inner));
+
   /// Yields values until [f] matches, including the matching element.
   Fx<T> takeUntilInclusive(bool Function(T a) f) =>
       Fx(l.takeUntilInclusive(f, _inner));
@@ -149,6 +153,10 @@ class Fx<T> extends Iterable<T> {
 
   /// Drops leading values while [f] holds, then yields the rest.
   Fx<T> dropWhile(bool Function(T a) f) => Fx(l.dropWhile(f, _inner));
+
+  /// Drops the longest trailing run of values [f] holds for.
+  Fx<T> dropWhileRight(bool Function(T a) f) =>
+      Fx(l.dropWhileRight(f, _inner));
 
   @override
   Fx<T> skipWhile(bool Function(T value) test) => dropWhile(test);
@@ -460,6 +468,12 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   FxAsync<T> takeWhile(FutureOr<bool> Function(T a) f) =>
       FxAsync(l.takeWhileAsync(f, _inner));
 
+  /// The longest trailing run of values [f] holds for, in source order.
+  /// [f] is sync here — a suffix is only known once the source has ended.
+  @pragma('vm:prefer-inline')
+  FxAsync<T> takeWhileRight(bool Function(T a) f) =>
+      FxAsync(l.takeWhileRightAsync(f, _inner));
+
   /// Yields values until [f] matches, including the matching value.
   @pragma('vm:prefer-inline')
   FxAsync<T> takeUntilInclusive(FutureOr<bool> Function(T a) f) =>
@@ -482,6 +496,12 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   @pragma('vm:prefer-inline')
   FxAsync<T> dropWhile(FutureOr<bool> Function(T a) f) =>
       FxAsync(l.dropWhileAsync(f, _inner));
+
+  /// Drops the longest trailing run of values [f] holds for. [f] is sync
+  /// here — a suffix is only known once the source has ended.
+  @pragma('vm:prefer-inline')
+  FxAsync<T> dropWhileRight(bool Function(T a) f) =>
+      FxAsync(l.dropWhileRightAsync(f, _inner));
 
   /// Skips values until [f] matches (dropping the match), yields the rest.
   @pragma('vm:prefer-inline')
