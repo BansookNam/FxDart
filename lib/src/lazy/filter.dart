@@ -40,6 +40,54 @@ class _FilterIterator<A> implements Iterator<A> {
   }
 }
 
+/// Like [filter], but the predicate also receives the element's 0-based
+/// position in the **input** — dropped elements still advance the count.
+///
+/// ```dart
+/// filterWithIndex((a, i) => i.isEven, ['a', 'b', 'c']); // ('a', 'c')
+/// ```
+Iterable<A> filterWithIndex<A>(
+        bool Function(A a, int index) f, Iterable<A> iterable) =>
+    _FilterWithIndexIterable(f, iterable);
+
+class _FilterWithIndexIterable<A> extends Iterable<A> {
+  _FilterWithIndexIterable(this._f, this._source);
+  final bool Function(A, int) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _FilterWithIndexIterator(_f, _source.iterator);
+}
+
+class _FilterWithIndexIterator<A> implements Iterator<A> {
+  _FilterWithIndexIterator(this._f, this._it);
+  final bool Function(A, int) _f;
+  final Iterator<A> _it;
+  var _i = 0;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final v = _it.current;
+      if (_f(v, _i++)) {
+        current = v;
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+/// Async counterpart of [filterWithIndex].
+@pragma('vm:prefer-inline')
+FxAsyncIterable<A> filterWithIndexAsync<A>(
+    FutureOr<bool> Function(A a, int index) f, FxAsyncIterable<A> iterable) {
+  return dispatchAsync(iterable, (source) {
+    var i = 0;
+    return filterAsync((A a) => f(a, i++), source).iterator;
+  });
+}
+
 /// The opposite of [filter]: all elements [f] returns false for.
 ///
 /// Port of FxTS `reject`.

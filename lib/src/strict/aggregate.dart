@@ -131,6 +131,22 @@ Acc fold<A, Acc>(Acc seed, Acc Function(Acc acc, A a) f, Iterable<A> iterable) {
   return acc;
 }
 
+/// Like [fold], but the callback also receives the element's 0-based
+/// position.
+///
+/// ```dart
+/// foldWithIndex(0, (acc, a, i) => acc + a * i, [1, 2, 3]); // 8
+/// ```
+Acc foldWithIndex<A, Acc>(Acc seed,
+    Acc Function(Acc acc, A a, int index) f, Iterable<A> iterable) {
+  var acc = seed;
+  var i = 0;
+  for (final a in iterable) {
+    acc = f(acc, a, i++);
+  }
+  return acc;
+}
+
 /// Async counterpart of [reduce].
 Future<A> reduceAsync<A>(
     FutureOr<A> Function(A acc, A a) f, FxAsyncIterable<A> iterable) async {
@@ -199,6 +215,20 @@ Future<Acc> foldAsync<A, Acc>(FutureOr<Acc> seed,
     final v = f(acc, r.value);
     acc = v is Future<Acc> ? await v : v;
   }
+}
+
+/// Async counterpart of [foldWithIndex].
+///
+/// A fold is a terminal that consumes its source strictly in order, so the
+/// counter lives in the accumulator and every one of [foldAsync]'s fast
+/// paths still applies.
+@pragma('vm:prefer-inline')
+Future<Acc> foldWithIndexAsync<A, Acc>(
+    FutureOr<Acc> seed,
+    FutureOr<Acc> Function(Acc acc, A a, int index) f,
+    FxAsyncIterable<A> iterable) {
+  var i = 0;
+  return foldAsync<A, Acc>(seed, (acc, a) => f(acc, a, i++), iterable);
 }
 
 /// Returns a reducer section for use in a pipeline: `reduceLazy(f, seed)`

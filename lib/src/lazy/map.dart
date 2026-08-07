@@ -61,6 +61,77 @@ class _MapIterator<A, B> implements Iterator<B> {
   }
 }
 
+/// Like [map], but the callback also receives the element's 0-based
+/// position.
+///
+/// Not an FxTS port. `zipWithIndex` + `map` over the pair already expressed
+/// this, at the cost of a record per element and a `p.$1`/`p.$2` callback
+/// body; taking the index as a second argument keeps the chain readable and
+/// allocates nothing.
+///
+/// ```dart
+/// mapWithIndex((a, i) => '$i:$a', ['a', 'b']); // ('0:a', '1:b')
+/// ```
+Iterable<B> mapWithIndex<A, B>(
+        B Function(A a, int index) f, Iterable<A> iterable) =>
+    _MapWithIndexIterable(f, iterable);
+
+class _MapWithIndexIterable<A, B> extends Iterable<B> {
+  _MapWithIndexIterable(this._f, this._source);
+  final B Function(A, int) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<B> get iterator => _MapWithIndexIterator(_f, _source.iterator);
+  @override
+  List<B> toList({bool growable = true}) {
+    final source = _source;
+    // Pre-sized from a List source, as in [_MapIterable.toList].
+    if (source is List<A>) {
+      final length = source.length;
+      if (length == 0) return growable ? <B>[] : List<B>.empty();
+      final out = List<B>.filled(length, _f(source[0], 0), growable: growable);
+      for (var i = 1; i < length; i++) {
+        out[i] = _f(source[i], i);
+      }
+      return out;
+    }
+    return super.toList(growable: growable);
+  }
+}
+
+class _MapWithIndexIterator<A, B> implements Iterator<B> {
+  _MapWithIndexIterator(this._f, this._it);
+  final B Function(A, int) _f;
+  final Iterator<A> _it;
+  var _i = 0;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    if (_it.moveNext()) {
+      current = _f(_it.current, _i++);
+      return true;
+    }
+    return false;
+  }
+}
+
+/// Async counterpart of [mapWithIndex].
+///
+/// The index counts elements of *this* stage's input, in source order —
+/// `concurrent` overlaps the upstream pulls but still resolves them in
+/// order, so the numbering is the same either way.
+@pragma('vm:prefer-inline')
+FxAsyncIterable<B> mapWithIndexAsync<A, B>(
+    FutureOr<B> Function(A a, int index) f, FxAsyncIterable<A> iterable) {
+  // dispatchAsync so the counter is per-iteration, not per-iterable — the
+  // same shape as [zipWithIndexAsync].
+  return dispatchAsync(iterable, (source) {
+    var i = 0;
+    return mapAsync((A a) => f(a, i++), source).iterator;
+  });
+}
+
 /// Async counterpart of [map]. The callback may return a [Future].
 ///
 /// ```dart
@@ -370,6 +441,60 @@ class _FlatMapIterator<A, B> implements Iterator<B> {
       _inner = _f(_it.current).iterator;
     }
   }
+}
+
+/// Like [flatMap], but the callback also receives the source element's
+/// 0-based position. The index counts *source* elements, not emitted ones.
+///
+/// ```dart
+/// flatMapWithIndex((a, i) => [i, a], [10, 20]); // (0, 10, 1, 20)
+/// ```
+Iterable<B> flatMapWithIndex<A, B>(
+        Iterable<B> Function(A a, int index) f, Iterable<A> iterable) =>
+    _FlatMapWithIndexIterable(f, iterable);
+
+class _FlatMapWithIndexIterable<A, B> extends Iterable<B> {
+  _FlatMapWithIndexIterable(this._f, this._source);
+  final Iterable<B> Function(A, int) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<B> get iterator => _FlatMapWithIndexIterator(_f, _source.iterator);
+}
+
+class _FlatMapWithIndexIterator<A, B> implements Iterator<B> {
+  _FlatMapWithIndexIterator(this._f, this._it);
+  final Iterable<B> Function(A, int) _f;
+  final Iterator<A> _it;
+  Iterator<B>? _inner;
+  var _i = 0;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    while (true) {
+      final inner = _inner;
+      if (inner != null) {
+        if (inner.moveNext()) {
+          current = inner.current;
+          return true;
+        }
+        _inner = null;
+      }
+      if (!_it.moveNext()) return false;
+      _inner = _f(_it.current, _i++).iterator;
+    }
+  }
+}
+
+/// Async counterpart of [flatMapWithIndex].
+@pragma('vm:prefer-inline')
+FxAsyncIterable<B> flatMapWithIndexAsync<A, B>(
+    FutureOr<Iterable<B>> Function(A a, int index) f,
+    FxAsyncIterable<A> iterable) {
+  return dispatchAsync(iterable, (source) {
+    var i = 0;
+    return flatMapAsync((A a) => f(a, i++), source).iterator;
+  });
 }
 
 /// Async counterpart of [flatMap].

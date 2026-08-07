@@ -76,11 +76,20 @@ class Fx<T> extends Iterable<T> {
   @override
   Fx<R> map<R>(R Function(T a) toElement) => Fx(l.map(toElement, _inner));
 
+  /// [map] with the element's 0-based position — `zipWithIndex().map(...)`
+  /// without the intermediate record.
+  Fx<R> mapWithIndex<R>(R Function(T a, int index) f) =>
+      Fx(l.mapWithIndex(f, _inner));
+
   /// Identical to [map]; intended for side effects by convention.
   Fx<R> mapEffect<R>(R Function(T a) f) => map(f);
 
   /// See top-level `flatMap`; same contract as [Iterable.expand].
   Fx<R> flatMap<R>(Iterable<R> Function(T a) f) => Fx(l.flatMap(f, _inner));
+
+  /// [flatMap] with the source element's 0-based position.
+  Fx<R> flatMapWithIndex<R>(Iterable<R> Function(T a, int index) f) =>
+      Fx(l.flatMapWithIndex(f, _inner));
 
   @override
   Fx<R> expand<R>(Iterable<R> Function(T element) toElements) =>
@@ -94,6 +103,11 @@ class Fx<T> extends Iterable<T> {
 
   /// All elements [f] returns true for.
   Fx<T> filter(bool Function(T a) f) => Fx(l.filter(f, _inner));
+
+  /// [filter] with the element's 0-based position in the input — dropped
+  /// elements still advance the count.
+  Fx<T> filterWithIndex(bool Function(T a, int index) f) =>
+      Fx(l.filterWithIndex(f, _inner));
 
   @override
   Fx<T> where(bool Function(T element) test) => filter(test);
@@ -287,6 +301,11 @@ class Fx<T> extends Iterable<T> {
   /// Runs [f] for every value, forcing the pipeline.
   void each(void Function(T a) f) => s.each(f, _inner);
 
+  /// [Iterable.fold] with the element's 0-based position.
+  Acc foldWithIndex<Acc>(
+          Acc seed, Acc Function(Acc acc, T a, int index) f) =>
+      s.foldWithIndex(seed, f, _inner);
+
   /// Consumes up to [n] values (all when omitted), forcing side effects.
   void consume([int? n]) => s.consume(_inner, n);
 
@@ -379,6 +398,11 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   FxAsync<R> map<R>(FutureOr<R> Function(T a) f) =>
       FxAsync(l.mapAsync(f, _inner));
 
+  /// [map] with the value's 0-based position in source order.
+  @pragma('vm:prefer-inline')
+  FxAsync<R> mapWithIndex<R>(FutureOr<R> Function(T a, int index) f) =>
+      FxAsync(l.mapWithIndexAsync(f, _inner));
+
   /// Identical to [map]; intended for side effects by convention.
   @pragma('vm:prefer-inline')
   FxAsync<R> mapEffect<R>(FutureOr<R> Function(T a) f) => map(f);
@@ -388,6 +412,12 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   FxAsync<R> flatMap<R>(FutureOr<Iterable<R>> Function(T a) f) =>
       FxAsync(l.flatMapAsync(f, _inner));
 
+  /// [flatMap] with the source value's 0-based position.
+  @pragma('vm:prefer-inline')
+  FxAsync<R> flatMapWithIndex<R>(
+          FutureOr<Iterable<R>> Function(T a, int index) f) =>
+      FxAsync(l.flatMapWithIndexAsync(f, _inner));
+
   /// Flattens nested iterables [depth] levels.
   @pragma('vm:prefer-inline')
   FxAsync<dynamic> flat([int depth = 1]) => FxAsync(l.flatAsync(_inner, depth));
@@ -396,6 +426,12 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   @pragma('vm:prefer-inline')
   FxAsync<T> filter(FutureOr<bool> Function(T a) f) =>
       FxAsync(l.filterAsync(f, _inner));
+
+  /// [filter] with the value's 0-based position in the input — dropped
+  /// values still advance the count.
+  @pragma('vm:prefer-inline')
+  FxAsync<T> filterWithIndex(FutureOr<bool> Function(T a, int index) f) =>
+      FxAsync(l.filterWithIndexAsync(f, _inner));
 
   /// The opposite of [filter].
   @pragma('vm:prefer-inline')
@@ -623,6 +659,11 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   Future<Acc> fold<Acc>(
           FutureOr<Acc> seed, FutureOr<Acc> Function(Acc acc, T a) f) =>
       s.foldAsync(seed, f, _inner);
+
+  /// [fold] with the value's 0-based position.
+  Future<Acc> foldWithIndex<Acc>(FutureOr<Acc> seed,
+          FutureOr<Acc> Function(Acc acc, T a, int index) f) =>
+      s.foldWithIndexAsync(seed, f, _inner);
 
   /// Groups values into lists keyed by [f].
   Future<Map<K, List<T>>> groupBy<K>(FutureOr<K> Function(T a) f) =>

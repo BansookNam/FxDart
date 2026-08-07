@@ -88,6 +88,29 @@ No `filter`/`filterWithKey` went in: `pickBy`/`omitBy` already take the
 whole record, so ignoring one half is how you filter by the other. Their
 docs now say so with an example, which is what was actually missing.
 
+### Added — index-aware `map` / `filter` / `flatMap` / `fold`
+
+`mapWithIndex`, `filterWithIndex`, `flatMapWithIndex` and `foldWithIndex`
+hand the element's 0-based position to the callback as a second argument,
+sync and async, top-level and as `Fx`/`FxAsync` chain methods:
+
+```dart
+fx(rows).mapWithIndex((row, i) => '${i + 1}. $row').toList();
+```
+
+`zipWithIndex` already expressed all four, but through a record per
+element and a callback body reading `p.$1`/`p.$2`. These allocate
+nothing extra and read as the operation they are. Tests pin each one
+against its `zipWithIndex` equivalent.
+
+The index counts what reaches *that stage's input*, so a `filter` above
+`mapWithIndex` renumbers, and `filterWithIndex` still advances its count
+across elements it drops. Numbering follows source order even under
+`concurrent`, which overlaps the upstream pulls but still resolves them
+in order — pinned by a test at width 5 with reversed latencies. The
+async operators keep their counter per *iteration*, not per iterable, so
+re-iterating a chain restarts at 0.
+
 ## 0.7.8
 
 ### Added — the events layer's second half
