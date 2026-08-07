@@ -147,6 +147,74 @@ Acc foldWithIndex<A, Acc>(Acc seed,
   return acc;
 }
 
+/// Folds [iterable] **from the last element to the first**, starting from
+/// [seed] — the right-associative counterpart of [fold].
+///
+/// Use it when the combining step is not associative and has to nest from
+/// the right: `foldRight(0, (acc, a) => a - acc, [1, 2, 3])` is
+/// `1 - (2 - (3 - 0))`, where [fold] would give `((0 - 1) - 2) - 3`.
+///
+/// The reducer keeps [fold]'s `(acc, element)` argument order rather than
+/// Haskell's `foldr` flip, so the same callback works with either
+/// direction. A non-[List] source is materialized first — walking backwards
+/// requires knowing where the end is.
+Acc foldRight<A, Acc>(
+    Acc seed, Acc Function(Acc acc, A a) f, Iterable<A> iterable) {
+  var acc = seed;
+  final list = iterable is List<A> ? iterable : iterable.toList(growable: false);
+  for (var i = list.length - 1; i >= 0; i--) {
+    acc = f(acc, list[i]);
+  }
+  return acc;
+}
+
+/// Like [foldRight], but the callback also receives the element's position.
+///
+/// The index is the element's 0-based position in the **source**, so the
+/// last element arrives first carrying the highest index. That is the
+/// position [foldWithIndex] and [mapWithIndex] would give the same element;
+/// it deliberately does not renumber the reversed walk 0, 1, 2.
+Acc foldRightWithIndex<A, Acc>(Acc seed,
+    Acc Function(Acc acc, A a, int index) f, Iterable<A> iterable) {
+  var acc = seed;
+  final list = iterable is List<A> ? iterable : iterable.toList(growable: false);
+  for (var i = list.length - 1; i >= 0; i--) {
+    acc = f(acc, list[i], i);
+  }
+  return acc;
+}
+
+/// Async counterpart of [foldRight].
+///
+/// There is no way to start from the end of a stream without reaching it,
+/// so this drains [iterable] into a list first — unlike [foldAsync], it
+/// holds every element in memory and cannot short-circuit.
+Future<Acc> foldRightAsync<A, Acc>(FutureOr<Acc> seed,
+    FutureOr<Acc> Function(Acc acc, A a) f, FxAsyncIterable<A> iterable) async {
+  var acc = seed is Future<Acc> ? await seed : seed;
+  final list = await toListAsync(iterable);
+  for (var i = list.length - 1; i >= 0; i--) {
+    // Sync accumulators continue without an await hop, as in [foldAsync].
+    final v = f(acc, list[i]);
+    acc = v is Future<Acc> ? await v : v;
+  }
+  return acc;
+}
+
+/// Async counterpart of [foldRightWithIndex].
+Future<Acc> foldRightWithIndexAsync<A, Acc>(
+    FutureOr<Acc> seed,
+    FutureOr<Acc> Function(Acc acc, A a, int index) f,
+    FxAsyncIterable<A> iterable) async {
+  var acc = seed is Future<Acc> ? await seed : seed;
+  final list = await toListAsync(iterable);
+  for (var i = list.length - 1; i >= 0; i--) {
+    final v = f(acc, list[i], i);
+    acc = v is Future<Acc> ? await v : v;
+  }
+  return acc;
+}
+
 /// Async counterpart of [reduce].
 Future<A> reduceAsync<A>(
     FutureOr<A> Function(A acc, A a) f, FxAsyncIterable<A> iterable) async {

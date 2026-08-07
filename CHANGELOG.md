@@ -111,6 +111,29 @@ in order — pinned by a test at width 5 with reversed latencies. The
 async operators keep their counter per *iteration*, not per iterable, so
 re-iterating a chain restarts at 0.
 
+### Added — `foldRight` / `foldRightWithIndex`
+
+`fold` only went left to right, which is the wrong direction whenever
+the combining step isn't associative:
+
+```dart
+foldRight(0, (acc, a) => a - acc, [1, 2, 3]);  // 1 - (2 - (3 - 0)) == 2
+fold(0, (acc, a) => acc - a, [1, 2, 3]);       // ((0 - 1) - 2) - 3 == -6
+```
+
+The reducer keeps `fold`'s `(acc, element)` argument order rather than
+Haskell's `foldr` flip, so one callback works with either direction.
+
+`foldRightWithIndex` reports each element's position in the **source**,
+so the last element arrives first carrying the highest index — the same
+number `foldWithIndex` and `mapWithIndex` give that element, pinned by a
+test. fpdart renumbers its reversed walk 0, 1, 2 instead; agreeing with
+the rest of the library seemed worth more than matching that.
+
+Both are strict in a way `fold` isn't: walking backwards means knowing
+where the end is, so a non-`List` source is materialized and
+`foldRightAsync` drains the stream before it starts. Documented on each.
+
 ## 0.7.8
 
 ### Added — the events layer's second half

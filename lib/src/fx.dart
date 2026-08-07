@@ -306,6 +306,15 @@ class Fx<T> extends Iterable<T> {
           Acc seed, Acc Function(Acc acc, T a, int index) f) =>
       s.foldWithIndex(seed, f, _inner);
 
+  /// Folds from the last value to the first — see top-level `foldRight`.
+  Acc foldRight<Acc>(Acc seed, Acc Function(Acc acc, T a) f) =>
+      s.foldRight(seed, f, _inner);
+
+  /// [foldRight] with each value's 0-based position in the source.
+  Acc foldRightWithIndex<Acc>(
+          Acc seed, Acc Function(Acc acc, T a, int index) f) =>
+      s.foldRightWithIndex(seed, f, _inner);
+
   /// Consumes up to [n] values (all when omitted), forcing side effects.
   void consume([int? n]) => s.consume(_inner, n);
 
@@ -664,6 +673,17 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   Future<Acc> foldWithIndex<Acc>(FutureOr<Acc> seed,
           FutureOr<Acc> Function(Acc acc, T a, int index) f) =>
       s.foldWithIndexAsync(seed, f, _inner);
+
+  /// Folds from the last value to the first, buffering the whole chain —
+  /// see top-level `foldRightAsync`.
+  Future<Acc> foldRight<Acc>(
+          FutureOr<Acc> seed, FutureOr<Acc> Function(Acc acc, T a) f) =>
+      s.foldRightAsync(seed, f, _inner);
+
+  /// [foldRight] with each value's 0-based position in the source.
+  Future<Acc> foldRightWithIndex<Acc>(FutureOr<Acc> seed,
+          FutureOr<Acc> Function(Acc acc, T a, int index) f) =>
+      s.foldRightWithIndexAsync(seed, f, _inner);
 
   /// Groups values into lists keyed by [f].
   Future<Map<K, List<T>>> groupBy<K>(FutureOr<K> Function(T a) f) =>
