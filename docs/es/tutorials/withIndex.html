@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>mapWithIndex &amp; friends — FxDart 101</title>
-  <meta name="description" content="FxDart mapWithIndex, filterWithIndex, flatMapWithIndex and foldWithIndex tutorial: take the element's position as a second argument, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/withIndex.html">
+  <meta name="description" content="Tutorial de mapWithIndex, filterWithIndex, flatMapWithIndex y foldWithIndex en FxDart: recibe la posición del elemento como segundo argumento, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/withIndex.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/withIndex.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/withIndex.html">
@@ -47,10 +46,9 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 6 · Combinar › <strong>…WithIndex</strong></p>
   <h1><code>mapWithIndex</code> &amp; friends</h1>
-  <p class="hero-sub">The four index-aware operators — <code>map</code>, <code>filter</code>, <code>flatMap</code> and <code>fold</code> with the element's position as a second argument.</p>
+  <p class="hero-sub">Los cuatro operadores que conocen el índice: <code>map</code>, <code>filter</code>, <code>flatMap</code> y <code>fold</code> con la posición del elemento como segundo argumento.</p>
 
   <div class="signature">Iterable&lt;B&gt; mapWithIndex&lt;A, B&gt;(B Function(A a, int index) f, Iterable&lt;A&gt; iterable)
 Iterable&lt;A&gt; filterWithIndex&lt;A&gt;(bool Function(A a, int index) f, Iterable&lt;A&gt; iterable)
@@ -59,44 +57,47 @@ Acc foldWithIndex&lt;A, Acc&gt;(Acc seed, Acc Function(Acc acc, A a, int index) 
                                                      // …Async for every one, and:
 Fx&lt;R&gt; Fx.mapWithIndex&lt;R&gt;(R Function(T a, int index) f)        // chain</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <a href="zipWithIndex.html"><code>zipWithIndex</code></a> already gives
-    you the position: pair every element with its index, then read the pair.
-    That works, and it is the right tool when the pair itself is what you
-    want. When it isn't, you pay for a record per element and a callback body
-    written in <code>p.$1</code> / <code>p.$2</code> rather than names.
+    <a href="zipWithIndex.html"><code>zipWithIndex</code></a> ya te da la
+    posición: empareja cada elemento con su índice y luego lees el par. Eso
+    funciona, y es la herramienta correcta cuando el par es lo que quieres.
+    Cuando no lo es, pagas un record por elemento y un cuerpo de callback
+    escrito con <code>p.$1</code> / <code>p.$2</code> en vez de con nombres.
   </p>
   <p>
-    These four take the index directly instead. There is nothing to allocate
-    and nothing to unpack, and the chain says what it does.
+    Estos cuatro reciben el índice directamente. No hay nada que reservar ni
+    nada que desempaquetar, y la cadena dice lo que hace.
   </p>
   <p>
-    <strong>The index counts that stage's input.</strong> It is not the
-    element's position in the original source — a
-    <a href="filter.html"><code>filter</code></a> above
-    <code>mapWithIndex</code> renumbers what survives it, starting from 0
-    again. <code>filterWithIndex</code> is the one to read twice: its count
-    advances across the elements it <em>drops</em>, because those are still
-    input. <code>flatMapWithIndex</code> counts source elements, not emitted
-    ones, so an inner iterable of five values still advances the index by one.
+    <strong>El índice cuenta la entrada de esa etapa.</strong> No es la
+    posición del elemento en la fuente original: un
+    <a href="filter.html"><code>filter</code></a> por encima de
+    <code>mapWithIndex</code> renumera lo que lo atraviesa, empezando otra vez
+    en 0. El que hay que leer dos veces es <code>filterWithIndex</code>: su
+    cuenta avanza también con los elementos que <em>descarta</em>, porque
+    siguen siendo entrada. <code>flatMapWithIndex</code> cuenta elementos de
+    la fuente, no emitidos, así que un iterable interno de cinco valores
+    avanza el índice en uno.
   </p>
   <p>
-    Every one has an <code>…Async</code> form, and the numbering survives
-    <a href="concurrent.html"><code>concurrent</code></a>: it overlaps the
-    upstream pulls but still resolves them in order, so element <em>n</em>
-    gets index <em>n</em> whatever the latencies were. The counter also lives
-    per <em>iteration</em>, so re-running a chain starts again at 0.
+    Todos tienen su forma <code>…Async</code>, y la numeración sobrevive a
+    <a href="concurrent.html"><code>concurrent</code></a>: solapa los tirones
+    aguas arriba pero los resuelve igualmente en orden, así que el elemento
+    <em>n</em> recibe el índice <em>n</em> fueran cuales fueran las latencias.
+    El contador vive además por <em>iteración</em>, así que volver a recorrer
+    una cadena empieza otra vez en 0.
   </p>
   <p>
-    One Dart wrinkle on <code>foldWithIndex</code>: an untyped accumulator
-    lambda infers <code>Acc</code> as <code>Object?</code> and the arithmetic
-    stops compiling. That is not new here — Dart's own
-    <code>Iterable.fold</code> behaves the same way — and the fix is the same:
-    write <code>foldWithIndex&lt;int&gt;(…)</code>.
+    Una arruga de Dart en <code>foldWithIndex</code>: si el lambda del
+    acumulador no lleva tipos, <code>Acc</code> se infiere como
+    <code>Object?</code> y la aritmética deja de compilar. No es nada nuevo de
+    aquí — el propio <code>Iterable.fold</code> de Dart se comporta igual — y
+    la solución es la misma: escribe
+    <code>foldWithIndex&lt;int&gt;(…)</code>.
   </p>
 
-  <h2>Demo 1 · mapWithIndex, and what it replaces</h2>
+  <h2>Demo 1 · mapWithIndex, y a qué sustituye</h2>
   <div class="playground" data-pg="94ec4a5a7277eea7">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -115,7 +116,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · filter, flatMap, fold — and async</h2>
+  <h2>Demo 2 · filter, flatMap, fold — y asíncrono</h2>
   <div class="playground" data-pg="63d65fdc76e56938">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -141,8 +142,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: number the finishers 1st, 2nd, 3rd using the index.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: numera a los que llegan a meta como 1st, 2nd, 3rd usando el índice.</p>
   <div class="playground" data-pg="f434e27c41e461a6">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -161,11 +162,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="zipWithIndex.html"><code>indexed</code></a> — the pair form, when the pair is what you want ·
-    <a href="map.html"><code>map</code></a> / <a href="filter.html"><code>filter</code></a> / <a href="flatMap.html"><code>flatMap</code></a> — the operators these extend ·
-    <a href="fold.html"><code>fold</code></a> — the seeded reduction ·
-    <a href="foldRight.html"><code>foldRight</code></a> — the same fold from the other end
+    <strong>Relacionado:</strong>
+    <a href="zipWithIndex.html"><code>indexed</code></a> — la forma de pares, cuando el par es lo que quieres ·
+    <a href="map.html"><code>map</code></a> / <a href="filter.html"><code>filter</code></a> / <a href="flatMap.html"><code>flatMap</code></a> — los operadores que estos extienden ·
+    <a href="fold.html"><code>fold</code></a> — la reducción con semilla ·
+    <a href="foldRight.html"><code>foldRight</code></a> — el mismo fold desde el otro extremo
   </div>
 
   <nav class="tut-nav">

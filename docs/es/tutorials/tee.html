@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>tee — FxDart 101</title>
-  <meta name="description" content="FxDart tee tutorial: run two or three folds over a single pass of a source, with no buffering, plus a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/tee.html">
+  <meta name="description" content="Tutorial de tee en FxDart: ejecuta dos o tres folds sobre una sola pasada de la fuente, sin almacenar nada, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/tee.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/tee.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/tee.html">
@@ -47,57 +46,57 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 6 · Combinar › <strong>tee</strong></p>
   <h1><code>tee</code></h1>
-  <p class="hero-sub">Runs several folds over one pass of a source — one iteration, nothing buffered.</p>
+  <p class="hero-sub">Ejecuta varios folds sobre una pasada de la fuente: una iteración, nada almacenado.</p>
 
   <div class="signature">typedef Fold&lt;A, R&gt; = ({R seed, R Function(R acc, A a) step});
 (R1, R2) tee&lt;A, R1, R2&gt;(Iterable&lt;A&gt; iterable, Fold&lt;A, R1&gt; first, Fold&lt;A, R2&gt; second)
 (R1, R2, R3) tee3&lt;A, R1, R2, R3&gt;(Iterable&lt;A&gt; iterable, Fold&lt;A, R1&gt; first, Fold&lt;A, R2&gt; second, Fold&lt;A, R3&gt; third)
 Future&lt;(R1, R2)&gt; teeAsync&lt;A, R1, R2&gt;(FxAsyncIterable&lt;A&gt; iterable, AsyncFold&lt;A, R1&gt; first, AsyncFold&lt;A, R2&gt; second)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    Two questions about the same data usually cost two passes:
-    <code>readings.fold(...)</code> for the total, then
-    <code>readings.reduce(...)</code> for the peak. That is fine for a
-    <code>List</code>, and wrong for anything else — a <code>sync*</code>
-    generator, a network page, a source that counts how often it ran will
-    all be walked twice. <code>tee</code> asks both questions at once:
-    each element advances the total <em>and</em> the peak before the next
-    one is pulled, so the source is iterated exactly once.
+    Dos preguntas sobre los mismos datos suelen costar dos pasadas:
+    <code>readings.fold(...)</code> para el total y luego
+    <code>readings.reduce(...)</code> para el pico. Eso está bien para una
+    <code>List</code>, y está mal para cualquier otra cosa: un generador
+    <code>sync*</code>, una página de red o una fuente que cuenta cuántas
+    veces se ejecutó se recorrerán dos veces. <code>tee</code> hace las dos
+    preguntas a la vez: cada elemento hace avanzar el total <em>y</em> el pico
+    antes de tirar del siguiente, así que la fuente se recorre exactamente una
+    vez.
   </p>
   <p>
-    A reader is given as a <strong>fold</strong> — a record of
-    <code>seed</code> (where it starts) and <code>step</code> (how one
-    element advances it). That shape is what makes the single pass free.
-    Because both readers move together, element by element, there is never
-    a value that one has seen and the other has not, so there is nothing
-    to remember: <code>tee</code> over a million elements holds two
-    accumulators, not a million values. The two accumulators are entirely
-    independent and need not share a type. <a href="tee3.html"><code>tee3</code></a> takes three.
+    Un lector se da como un <strong>fold</strong>: un record con
+    <code>seed</code> (dónde empieza) y <code>step</code> (cómo lo hace
+    avanzar un elemento). Esa forma es lo que hace gratis la pasada única.
+    Como los dos lectores se mueven juntos, elemento a elemento, nunca hay un
+    valor que uno haya visto y el otro no, así que no hay nada que recordar:
+    <code>tee</code> sobre un millón de elementos sostiene dos acumuladores,
+    no un millón de valores. Los dos acumuladores son totalmente
+    independientes y no tienen por qué compartir tipo. <a href="tee3.html"><code>tee3</code></a> admite tres.
   </p>
   <p>
-    The constraint is the price of that. <code>tee</code> feeds folds, not
-    pipelines — the readers cannot advance at their own pace, take
-    different amounts, or stop early independently. When you genuinely need
-    two <em>independent</em> readers, reach for
-    <a href="fork.html"><code>fork</code></a> instead, and accept the shared
-    buffer it keeps so a lagging cursor can catch up. Rule of thumb: if both
-    readers consume the whole source and reduce it to a value,
-    <code>tee</code>; if either one is a pipeline in its own right,
+    La restricción es el precio de eso. <code>tee</code> alimenta folds, no
+    pipelines: los lectores no pueden avanzar a su propio ritmo, tomar
+    cantidades distintas ni pararse antes por su cuenta. Cuando de verdad
+    necesitas dos lectores <em>independientes</em>, echa mano de
+    <a href="fork.html"><code>fork</code></a> y acepta el búfer compartido que
+    mantiene para que un cursor rezagado pueda alcanzar al otro. Regla
+    práctica: si los dos lectores consumen la fuente entera y la reducen a un
+    valor, <code>tee</code>; si alguno es un pipeline por derecho propio,
     <code>fork</code>.
   </p>
 
-  <h2>Where the name comes from</h2>
+  <h2>De dónde viene el nombre</h2>
   <p>
-    <code>tee</code> is not an abbreviation — it is the letter <strong>T</strong>,
-    borrowed from the T-splitter used in plumbing. A T-fitting branches one
-    pipe into two, so what flows in one way leaves two ways at once. Unix
-    took the image for its <code>tee</code> command, which reads standard
-    input and sends it to standard output <em>and</em> a file at the same
-    time:
+    <code>tee</code> no es una abreviatura: es la letra <strong>T</strong>,
+    tomada de la pieza en T de la fontanería. Un empalme en T divide una
+    tubería en dos, así que lo que entra por un lado sale por dos a la vez.
+    Unix se quedó con la imagen para su orden <code>tee</code>, que lee la
+    entrada estándar y la envía a la salida estándar <em>y</em> a un fichero
+    al mismo tiempo:
   </p>
   <pre><code>       input
         │
@@ -109,20 +108,21 @@ Future&lt;(R1, R2)&gt; teeAsync&lt;A, R1, R2&gt;(FxAsyncIterable&lt;A&gt; iterab
    ▼         ▼
   stdout    file</code></pre>
   <p>
-    Python's <code>itertools.tee()</code> borrows the same picture, splitting
-    one iterable into several independent iterators. Worth knowing, because
-    that is the part FxDart spells <a href="fork.html"><code>fork</code></a>,
-    not <code>tee</code>: <code>fork</code> gives you independent cursors,
-    the way Python's does. FxDart's <code>tee</code> branches the
-    <em>consumption</em> instead — one pass, several folds reading it in
-    step. Same T-shaped picture, split one level further downstream.
+    El <code>itertools.tee()</code> de Python toma prestada la misma imagen,
+    dividiendo un iterable en varios iteradores independientes. Conviene
+    saberlo, porque esa es la parte que FxDart llama
+    <a href="fork.html"><code>fork</code></a>, no <code>tee</code>:
+    <code>fork</code> te da cursores independientes, como el de Python. El
+    <code>tee</code> de FxDart ramifica el <em>consumo</em> en su lugar: una
+    pasada, varios folds leyéndola al unísono. La misma imagen en forma de T,
+    dividida un nivel más aguas abajo.
   </p>
 
-  <h2>Demo 1 · Total and peak from one read</h2>
+  <h2>Demo 1 · Total y pico con una sola lectura</h2>
   <p>
-    <code>sensor()</code> increments <code>reads</code> for every value it
-    produces. Two separate passes would leave <code>reads</code> at 12;
-    <code>tee</code> leaves it at 6:
+    <code>sensor()</code> incrementa <code>reads</code> por cada valor que
+    produce. Dos pasadas separadas dejarían <code>reads</code> en 12;
+    <code>tee</code> lo deja en 6:
   </p>
   <div class="playground" data-pg="f76139ff56efbf89">
 <textarea>
@@ -151,12 +151,13 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Independent accumulators, tee3, and on a chain</h2>
+  <h2>Demo 2 · Acumuladores independientes, tee3, y sobre una cadena</h2>
   <p>
-    The two folds carry unrelated types — an <code>int</code> character
-    count beside a <code>String</code> running winner. <code>tee3</code>
-    adds a third fold, and on an <code>fx</code> chain the folds see what
-    the <em>chain</em> produces, not the original source:
+    Los dos folds llevan tipos que no tienen nada que ver: un recuento de
+    caracteres <code>int</code> junto a un <code>String</code> con el ganador
+    provisional. <code>tee3</code> añade un tercer fold y, sobre una cadena
+    <code>fx</code>, los folds ven lo que produce la <em>cadena</em>, no la
+    fuente original:
   </p>
   <div class="playground">
 <textarea>
@@ -192,12 +193,12 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
+  <h2>Pruébalo tú</h2>
   <p>
-    Exercise: <code>sensor()</code> is currently walked twice, so
-    <code>reads</code> prints 6. Replace the two passes with a single
-    <code>tee</code> — summing in one fold and counting in the other — so
-    that <code>reads</code> prints 3.
+    Ejercicio: ahora mismo <code>sensor()</code> se recorre dos veces, así que
+    <code>reads</code> imprime 6. Sustituye las dos pasadas por un solo
+    <code>tee</code> — sumando en un fold y contando en el otro — para que
+    <code>reads</code> imprima 3.
   </p>
   <div class="playground">
 <textarea>
@@ -225,10 +226,10 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="fork.html"><code>fork</code></a> — independent readers, at the cost of a buffer ·
-    <a href="reduce.html"><code>reduce</code></a> — a single fold ·
-    <a href="groupBy.html"><code>groupBy</code></a> — many accumulators keyed by value
+    <strong>Relacionado:</strong>
+    <a href="fork.html"><code>fork</code></a> — lectores independientes, a costa de un búfer ·
+    <a href="reduce.html"><code>reduce</code></a> — un solo fold ·
+    <a href="groupBy.html"><code>groupBy</code></a> — muchos acumuladores indexados por valor
   </div>
 
   <nav class="tut-nav">

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>FxSubscriptions — FxDart 101</title>
-  <meta name="description" content="FxDart FxSubscriptions tutorial: hold many stream subscriptions in one bag and cancel, pause or resume them together — the dispose one-liner — with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/fxSubscriptions.html">
+  <meta name="description" content="Tutorial de FxSubscriptions en FxDart: guarda muchas suscripciones a streams en una bolsa y cancélalas, páusalas o reanúdalas juntas — el dispose de una línea — con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/fxSubscriptions.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/fxSubscriptions.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/fxSubscriptions.html">
@@ -47,10 +46,9 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 14 · Streams de eventos (push) › <strong>FxSubscriptions</strong></p>
   <h1><code>FxSubscriptions</code></h1>
-  <p class="hero-sub">A bag of subscriptions, cancelled together — so teardown is one call instead of one field per stream.</p>
+  <p class="hero-sub">Una bolsa de suscripciones, canceladas a la vez — para que el desmontaje sea una llamada en vez de un campo por stream.</p>
 
   <div class="signature">class FxSubscriptions {
   int get length;
@@ -64,47 +62,46 @@
   void resumeAll();
 }</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    An object that listens to several streams has to keep every
-    subscription alive for one reason only: to cancel it again later. The
-    result is the familiar pile of nullable fields, each declared at the
-    top, each assigned in <code>initState</code>, each cancelled in
-    <code>dispose</code> — and the leak is always the one somebody forgot
-    to add to the third list.
+    Un objeto que escucha varios streams tiene que mantener viva cada
+    suscripción por un único motivo: volver a cancelarla más tarde. El
+    resultado es el montón conocido de campos nullables, cada uno declarado
+    arriba, cada uno asignado en <code>initState</code>, cada uno cancelado en
+    <code>dispose</code>; y la fuga siempre es la que alguien se olvidó de
+    añadir a la tercera lista.
   </p>
   <p>
-    <code>FxSubscriptions</code> collapses that to one object.
-    <code>add</code> puts a subscription in the bag and
-    <strong>returns it</strong>, so it reads as an expression rather than
-    a statement, and <code>cancelAll()</code> ends every one of them.
-    Teardown becomes a single line: <code>Future&lt;void&gt; dispose() =&gt;
+    <code>FxSubscriptions</code> reduce eso a un solo objeto.
+    <code>add</code> mete una suscripción en la bolsa y
+    <strong>la devuelve</strong>, así que se lee como una expresión y no como
+    una sentencia, y <code>cancelAll()</code> las termina todas. El desmontaje
+    se convierte en una sola línea: <code>Future&lt;void&gt; dispose() =&gt;
     subs.cancelAll();</code>
   </p>
   <p>
-    <code>pauseAll()</code> and <code>resumeAll()</code> are the softer
-    version, for when the work should stop without the wiring coming
-    apart — a screen going to the background, a tab losing focus. Paused
-    subscriptions buffer rather than drop, so nothing is lost across the
-    gap.
+    <code>pauseAll()</code> y <code>resumeAll()</code> son la versión suave,
+    para cuando el trabajo debe pararse sin que se deshaga el cableado: una
+    pantalla que pasa a segundo plano, una pestaña que pierde el foco. Las
+    suscripciones en pausa almacenan en vez de descartar, así que no se pierde
+    nada durante el hueco.
   </p>
   <p>
-    The bag is emptied <em>before</em> its cancellations are awaited, so a
-    second <code>cancelAll()</code> during the wait cannot cancel anything
-    twice, and the same object can hold a fresh generation of
-    subscriptions afterwards. fxdart events layer, after Rx's
-    <code>CompositeSubscription</code>.
+    La bolsa se vacía <em>antes</em> de esperar sus cancelaciones, así que un
+    segundo <code>cancelAll()</code> durante la espera no puede cancelar nada
+    dos veces, y el mismo objeto puede albergar después una generación nueva
+    de suscripciones. Capa de eventos de fxdart, siguiendo a
+    <code>CompositeSubscription</code> de Rx.
   </p>
   <p>
-    It pairs naturally with
-    <code><a href="stopOn.html">stopOn</a></code>: use
-    <code>stopOn</code> when a chain should end because something
-    <em>happened</em>, and <code>FxSubscriptions</code> when a set of
-    chains should end because the thing that owned them is
-    <em>going away</em>.
+    Se lleva de forma natural con
+    <code><a href="stopOn.html">stopOn</a></code>: usa <code>stopOn</code>
+    cuando una cadena debe terminar porque algo <em>ha pasado</em>, y
+    <code>FxSubscriptions</code> cuando un conjunto de cadenas debe terminar
+    porque lo que las poseía <em>se va</em>.
   </p>
 
-  <h2>Demo 1 · The dispose one-liner</h2>
+  <h2>Demo 1 · El dispose de una línea</h2>
   <div class="playground" data-pg="a568be4999fbbc3a">
 <textarea>
 import 'dart:async';
@@ -151,7 +148,7 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Pausing without tearing down</h2>
+  <h2>Demo 2 · Pausar sin desmontar</h2>
   <div class="playground">
 <textarea>
 import 'dart:async';
@@ -197,8 +194,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: <code>addAll</code>, and reusing the bag after a cancel.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: <code>addAll</code>, y reutilizar la bolsa después de un cancel.</p>
   <div class="playground">
 <textarea>
 import 'dart:async';
@@ -247,10 +244,10 @@ Future<void> main() async {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="stopOn.html"><code>stopOn</code></a> — teardown driven by an event rather than by an owner's lifecycle ·
-    <a href="fxEvents.html"><code>fxEvents</code></a> — the chain whose <code>listen</code> hands you the subscriptions this holds ·
-    <a href="liveValue.html"><code>LiveValue</code></a> — has its own <code>close()</code>, and is not held by this bag
+    <strong>Relacionado:</strong>
+    <a href="stopOn.html"><code>stopOn</code></a> — desmontaje gobernado por un evento en vez de por el ciclo de vida de un propietario ·
+    <a href="fxEvents.html"><code>fxEvents</code></a> — la cadena cuyo <code>listen</code> te entrega las suscripciones que esto guarda ·
+    <a href="liveValue.html"><code>LiveValue</code></a> — tiene su propio <code>close()</code>, y esta bolsa no lo guarda
   </div>
 
   <nav class="tut-nav">

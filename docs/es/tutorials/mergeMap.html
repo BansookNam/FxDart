@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>mergeMap — FxDart 101</title>
-  <meta name="description" content="FxDart mergeMap tutorial: map events to inner streams and run them all at once, in order with concatMap, or first-wins with exhaustMap — with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/mergeMap.html">
+  <meta name="description" content="Tutorial de mergeMap en FxDart: mapea eventos a streams internos y ejecútalos todos a la vez, en orden con concatMap, o gana el primero con exhaustMap — con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/mergeMap.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/mergeMap.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/mergeMap.html">
@@ -47,57 +46,57 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 14 · Streams de eventos (push) › <strong>mergeMap</strong></p>
   <h1><code>mergeMap</code>, <code>concatMap</code> &amp; <code>exhaustMap</code></h1>
-  <p class="hero-sub">Three more answers to "an event arrived while the last one is still running": run them all, run them in order, or ignore the new one.</p>
+  <p class="hero-sub">Tres respuestas más a «llegó un evento mientras el anterior sigue en marcha»: ejecutarlos todos, ejecutarlos en orden, o ignorar el nuevo.</p>
 
   <div class="signature">FxEvents&lt;R&gt; FxEvents&lt;T&gt;.mergeMap&lt;R&gt;(Stream&lt;R&gt; Function(T) f, {int? concurrent})
 FxEvents&lt;R&gt; FxEvents&lt;T&gt;.concatMap&lt;R&gt;(Stream&lt;R&gt; Function(T) f)
 FxEvents&lt;R&gt; FxEvents&lt;T&gt;.exhaustMap&lt;R&gt;(Stream&lt;R&gt; Function(T) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    Mapping an event to an <em>inner stream</em> — a request, an upload, a
-    query — raises one question that a pull pipeline never has to answer:
-    what happens when the next event arrives before the last inner stream
-    has finished? There are exactly four sensible policies, and picking
-    the wrong one is where most reactive bugs live.
-    <code><a href="switchMap.html">switchMap</a></code> is the
-    last-wins answer; these three are the other three.
+    Mapear un evento a un <em>stream interno</em> —una petición, una subida,
+    una consulta— plantea una pregunta que un pipeline pull nunca tiene que
+    responder: ¿qué pasa cuando el siguiente evento llega antes de que el
+    último stream interno haya terminado? Hay exactamente cuatro políticas
+    sensatas, y elegir la equivocada es donde vive la mayoría de los bugs
+    reactivos. <code><a href="switchMap.html">switchMap</a></code> es la
+    respuesta de «gana el último»; estas tres son las otras tres.
   </p>
   <p>
-    <code>mergeMap(f)</code> runs every inner stream <strong>at once</strong>
-    and interleaves their output in arrival order. Use it when every
-    result matters and none supersedes another — uploading three files,
-    fanning out to three services. With <code>concurrent: n</code> at most
-    <em>n</em> run at a time and the rest wait in a queue, which is how
-    you keep a fan-out from opening two hundred sockets.
+    <code>mergeMap(f)</code> ejecuta todos los streams internos
+    <strong>a la vez</strong> e intercala su salida por orden de llegada. Úsalo
+    cuando todos los resultados importan y ninguno reemplaza a otro: subir
+    tres ficheros, abanicarse hacia tres servicios. Con
+    <code>concurrent: n</code> se ejecutan como mucho <em>n</em> a la vez y el
+    resto espera en cola, que es como evitas que un abanico abra doscientos
+    sockets.
   </p>
   <p>
-    <code>concatMap(f)</code> runs them <strong>strictly in order</strong>,
-    each to completion before the next begins. Nothing overlaps and
-    nothing is dropped, so a slow inner stream backs the whole chain up —
-    that is the point when order is the correctness condition, as in
-    "apply these edits in sequence".
+    <code>concatMap(f)</code> los ejecuta <strong>estrictamente en orden</strong>,
+    cada uno hasta terminar antes de que empiece el siguiente. Nada se solapa
+    y nada se descarta, así que un stream interno lento atasca la cadena
+    entera; eso es justo lo que quieres cuando el orden es la condición de
+    corrección, como en «aplica estas ediciones en secuencia».
   </p>
   <p>
-    <code>exhaustMap(f)</code> keeps the <strong>first</strong> and ignores
-    the rest: while an inner stream is running, incoming events are
-    dropped outright — not queued, not cancelled. This is the
-    double-submit guard. A second tap on a button whose request is still
-    in flight does nothing at all, which is exactly what you want when the
-    request is <code>POST /orders</code>.
+    <code>exhaustMap(f)</code> se queda con el <strong>primero</strong> e
+    ignora el resto: mientras un stream interno está en marcha, los eventos
+    entrantes se descartan sin más — ni encolados ni cancelados. Esta es la
+    protección contra el doble envío. Un segundo toque en un botón cuya
+    petición sigue en vuelo no hace absolutamente nada, que es exactamente lo
+    que quieres cuando la petición es <code>POST /orders</code>.
   </p>
   <p>
-    fxdart events layer, after Rx's <code>flatMap</code>,
-    <code>flatMap(maxConcurrent: 1)</code> and <code>exhaustMap</code>.
-    The first is called <code>mergeMap</code> here because
-    <code><a href="flatMap.html">flatMap</a></code> already means
-    iterable-flattening on the pull side.
+    Capa de eventos de fxdart, siguiendo a <code>flatMap</code>,
+    <code>flatMap(maxConcurrent: 1)</code> y <code>exhaustMap</code> de Rx.
+    Al primero se le llama aquí <code>mergeMap</code> porque
+    <code><a href="flatMap.html">flatMap</a></code> ya significa aplanar
+    iterables en el lado pull.
   </p>
 
-  <h2>Demo 1 · mergeMap — everything at once</h2>
+  <h2>Demo 1 · mergeMap — todo a la vez</h2>
   <div class="playground" data-pg="2455885a139caee9">
 <textarea>
 import 'dart:async';
@@ -131,7 +130,7 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Demo 2 · exhaustMap — the double-submit guard</h2>
+  <h2>Demo 2 · exhaustMap — la protección contra el doble envío</h2>
   <div class="playground">
 <textarea>
 import 'dart:async';
@@ -164,8 +163,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: <code>concatMap</code>'s ordering, and a bounded fan-out.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: el orden de <code>concatMap</code> y un abanico acotado.</p>
   <div class="playground">
 <textarea>
 import 'dart:async';
@@ -207,10 +206,10 @@ Future<void> main() async {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="switchMap.html"><code>switchMap</code></a> — the fourth policy: newest wins, the rest are cancelled ·
-    <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — pull-side bounded fan-out, where results stay in order ·
-    <a href="debounce.html"><code>debounce</code></a> — often the better fix: stop the extra events before they become inner streams
+    <strong>Relacionado:</strong>
+    <a href="switchMap.html"><code>switchMap</code></a> — la cuarta política: gana el más nuevo, el resto se cancela ·
+    <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — abanico acotado del lado pull, donde los resultados mantienen el orden ·
+    <a href="debounce.html"><code>debounce</code></a> — a menudo la mejor solución: corta los eventos de más antes de que se conviertan en streams internos
   </div>
 
   <nav class="tut-nav">

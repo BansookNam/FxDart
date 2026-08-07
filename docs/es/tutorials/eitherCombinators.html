@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Either combinators — FxDart 101</title>
-  <meta name="description" content="FxDart Either combinators tutorial: map2 through map5, alt, orElse and filterOrElse, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/eitherCombinators.html">
+  <meta name="description" content="Tutorial de los combinadores de Either en FxDart: de map2 a map5, más alt, orElse y filterOrElse, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/eitherCombinators.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/eitherCombinators.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/eitherCombinators.html">
@@ -47,10 +46,9 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 13 · Errores tipados › <strong>Either combinators</strong></p>
   <h1><code>Either</code> combinators</h1>
-  <p class="hero-sub">Combining, falling back, and validating — <code>map2</code>…<code>map5</code>, <code>alt</code>, <code>orElse</code>, <code>filterOrElse</code>.</p>
+  <p class="hero-sub">Combinar, recurrir a una alternativa y validar: <code>map2</code>…<code>map5</code>, <code>alt</code>, <code>orElse</code>, <code>filterOrElse</code>.</p>
 
   <div class="signature">Either&lt;L, T&gt; Either.map2&lt;B, T&gt;(Either&lt;L, B&gt; b, T Function(R a, B b) combine)
                                                      // …through map5
@@ -58,71 +56,75 @@ Either&lt;L, R&gt; Either.alt(Either&lt;L, R&gt; Function() other)
 Either&lt;L2, R&gt; Either.orElse&lt;L2&gt;(Either&lt;L2, R&gt; Function(L left) other)
 Either&lt;L, R&gt; Either.filterOrElse(bool Function(R value) predicate, L Function(R value) onFalse)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <a href="either.html"><code>Either</code></a> on its own gives you
-    <code>map</code>, <code>flatMap</code> and <code>fold</code>. These four
-    methods cover the shapes that kept turning into a <code>flatMap</code>
-    with an <code>if</code> inside it.
+    <a href="either.html"><code>Either</code></a> por sí solo te da
+    <code>map</code>, <code>flatMap</code> y <code>fold</code>. Estos cuatro
+    métodos cubren las formas que acababan convirtiéndose en un
+    <code>flatMap</code> con un <code>if</code> dentro.
   </p>
 
-  <h3><code>map2</code> … <code>map5</code> — combining independent results</h3>
+  <h3><code>map2</code> … <code>map5</code>: combinar resultados independientes</h3>
   <p>
-    When several <code>Either</code>s have to succeed together —
-    parse a name <em>and</em> an age <em>and</em> an email —
-    <code>map2</code> combines them and keeps the <strong>leftmost</strong>
-    failure. The combining callback runs only when every branch is a
-    <code>Right</code>. Arities run to five, the same cap as
-    <a href="accumulate.html"><code>zipOrAccumulate2..5</code></a> and
+    Cuando varios <code>Either</code> tienen que salir bien a la vez —
+    parsear un nombre <em>y</em> una edad <em>y</em> un email —,
+    <code>map2</code> los combina y conserva el fallo <strong>más a la
+    izquierda</strong>. El callback combinador solo se ejecuta cuando todas
+    las ramas son <code>Right</code>. Las aridades llegan hasta cinco, el
+    mismo tope que
+    <a href="accumulate.html"><code>zipOrAccumulate2..5</code></a> y
     <code>Curry2..Curry5</code>.
   </p>
   <p>
-    "Fail-fast" here is about the <em>reporting</em>, not the work. The
-    branches are values you already computed, so all of them ran; what stops
-    at the first failure is the answer you get back. When you want every
-    failure — a form that highlights all four bad fields at once — that is
-    <a href="accumulate.html">accumulation</a>, which reports an
-    <code>EitherNel</code> instead and needs an <code>accumulate</code> scope.
-    Reach for <code>map2</code> when one message is the right answer.
+    Aquí «fallar rápido» va del <em>informe</em>, no del trabajo. Las ramas
+    son valores que ya calculaste, así que todas se ejecutaron; lo que se
+    detiene en el primer fallo es la respuesta que recibes. Cuando quieres
+    todos los fallos — un formulario que marca los cuatro campos malos de
+    una vez —, eso es <a href="accumulate.html">acumulación</a>, que informa
+    con un <code>EitherNel</code> y necesita un ámbito
+    <code>accumulate</code>. Recurre a <code>map2</code> cuando un solo
+    mensaje es la respuesta correcta.
   </p>
 
-  <h3><code>alt</code> and <code>orElse</code> — falling back</h3>
+  <h3><code>alt</code> y <code>orElse</code>: recurrir a una alternativa</h3>
   <p>
-    <code>alt</code> is the fallback ladder: try this, and if it failed try
-    that. The alternative is a callback, so nothing beyond the first hit is
-    touched — cache, then disk, then network, paying only for what you
-    actually reach. The failure is discarded.
+    <code>alt</code> es la escalera de alternativas: prueba esto y, si falló,
+    prueba aquello. La alternativa es un callback, así que no se toca nada más
+    allá del primer acierto — caché, luego disco, luego red, pagando solo por
+    lo que de verdad alcanzas. El fallo se descarta.
   </p>
   <p>
-    <code>orElse</code> is the same move for when the failure matters: the
-    handler receives it and may return a different failure type, so it is also
-    how you translate one error vocabulary into another.
+    <code>orElse</code> es el mismo movimiento para cuando el fallo importa:
+    el manejador lo recibe y puede devolver un tipo de fallo distinto, así que
+    también es como se traduce un vocabulario de errores a otro.
   </p>
   <p>
-    <a href="raise.html"><code>recover</code></a> is the richer sibling. It
-    runs the handler inside a fresh raise scope, so the handler writes
-    straight-line Dart and calls <code>r.raise</code> instead of constructing
-    an <code>Either</code> by hand. Use <code>alt</code>/<code>orElse</code>
-    when the replacement <code>Either</code> already exists, and
-    <code>recover</code> when the handler has real work to do.
-  </p>
-
-  <h3><code>filterOrElse</code> — validating in place</h3>
-  <p>
-    Demotes a <code>Right</code> whose value fails a predicate into a
-    <code>Left</code> that the second callback builds <em>from that value</em>
-    — so the message can name what was wrong. A <code>Left</code> passes
-    through untouched and the predicate never runs. Chain them and the first
-    failing check wins.
-  </p>
-  <p>
-    It is the <code>Either</code>-value form of
-    <a href="raise.html"><code>Raise.ensure</code></a>, which does the same
-    job inside an <code>either { }</code> builder. Inside a builder, prefer
-    <code>ensure</code>; on a value you already hold, this.
+    <a href="raise.html"><code>recover</code></a> es el hermano más rico.
+    Ejecuta el manejador dentro de un ámbito raise nuevo, de modo que el
+    manejador escribe Dart normal y llama a <code>r.raise</code> en lugar de
+    construir un <code>Either</code> a mano. Usa
+    <code>alt</code>/<code>orElse</code> cuando el <code>Either</code> de
+    reemplazo ya existe, y <code>recover</code> cuando el manejador tiene
+    trabajo de verdad.
   </p>
 
-  <h2>Demo 1 · map2 and map3</h2>
+  <h3><code>filterOrElse</code>: validar sobre la marcha</h3>
+  <p>
+    Degrada un <code>Right</code> cuyo valor falla un predicado a un
+    <code>Left</code> que el segundo callback construye <em>a partir de ese
+    valor</em>, de modo que el mensaje puede nombrar qué estaba mal. Un
+    <code>Left</code> pasa intacto y el predicado nunca se ejecuta.
+    Encadénalos y gana la primera comprobación que falle.
+  </p>
+  <p>
+    Es la forma sobre un valor <code>Either</code> de
+    <a href="raise.html"><code>Raise.ensure</code></a>, que hace el mismo
+    trabajo dentro de un constructor <code>either { }</code>. Dentro de un
+    constructor, prefiere <code>ensure</code>; sobre un valor que ya tienes en
+    la mano, esto.
+  </p>
+
+  <h2>Demo 1 · map2 y map3</h2>
   <div class="playground" data-pg="7efd74a4229617e4">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -172,8 +174,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: reject an age outside 0..149, with a message of your own.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: rechaza una edad fuera de 0..149, con un mensaje tuyo.</p>
   <div class="playground" data-pg="0f7464945b15c65b">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -195,11 +197,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="either.html"><code>Either</code></a> — the type these extend ·
-    <a href="raise.html"><code>either</code> &amp; <code>Raise</code></a> — builder scope, <code>ensure</code> and <code>recover</code> ·
-    <a href="accumulate.html">accumulation</a> — every failure instead of the first ·
-    <a href="eitherPipelines.html">Either × pipelines</a> — carrying Eithers through a chain
+    <strong>Relacionado:</strong>
+    <a href="either.html"><code>Either</code></a> — el tipo que estos extienden ·
+    <a href="raise.html"><code>either</code> &amp; <code>Raise</code></a> — ámbito constructor, <code>ensure</code> y <code>recover</code> ·
+    <a href="accumulate.html">acumulación</a> — todos los fallos en vez del primero ·
+    <a href="eitherPipelines.html">Either × pipelines</a> — llevar Eithers a través de una cadena
   </div>
 
   <nav class="tut-nav">

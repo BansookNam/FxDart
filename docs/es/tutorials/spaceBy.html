@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>spaceBy — FxDart 101</title>
-  <meta name="description" content="FxDart spaceBy tutorial: pace a burst without dropping any of it, shift a stream with delay, and read the newest value on a clock with sample — with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/spaceBy.html">
+  <meta name="description" content="Tutorial de spaceBy en FxDart: dosifica una ráfaga sin perder nada, desplaza un stream con delay y lee el valor más reciente por reloj con sample — con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/spaceBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/spaceBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/spaceBy.html">
@@ -47,54 +46,54 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 14 · Streams de eventos (push) › <strong>spaceBy</strong></p>
   <h1><code>delay</code>, <code>spaceBy</code> &amp; <code>sample</code></h1>
-  <p class="hero-sub">Three ways to move events around in time: shift them all, spread them out, or read only the newest on a fixed clock.</p>
+  <p class="hero-sub">Tres formas de mover eventos en el tiempo: desplazarlos todos, separarlos, o leer solo el más reciente a un ritmo fijo.</p>
 
   <div class="signature">FxEvents&lt;T&gt; FxEvents&lt;T&gt;.delay(Duration duration)  // chain (events)
 FxEvents&lt;T&gt; FxEvents&lt;T&gt;.spaceBy(Duration gap)
 FxEvents&lt;T&gt; FxEvents&lt;T&gt;.sample(Duration period)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    Rate limiting always costs you something, and the only real question
-    is <em>what</em>. <code><a href="throttle.html">throttle</a></code>
-    and <code><a href="debounce.html">debounce</a></code> pay in
-    <strong>events</strong>: they keep one per window and drop the rest,
-    which is right when the events are samples of a continuous thing and
-    an old one is worthless. <code>spaceBy(gap)</code> pays in
-    <strong>time</strong> instead: every event survives, queued and
-    released one per <code>gap</code>, which is right when each event is a
-    discrete instruction you must not lose — six messages to send against
-    an API that allows one call per 100ms.
+    Limitar el ritmo siempre te cuesta algo, y la única pregunta real es
+    <em>qué</em>. <code><a href="throttle.html">throttle</a></code> y
+    <code><a href="debounce.html">debounce</a></code> pagan en
+    <strong>eventos</strong>: se quedan con uno por ventana y descartan el
+    resto, lo cual es correcto cuando los eventos son muestras de algo
+    continuo y uno viejo no vale nada. <code>spaceBy(gap)</code> paga en
+    <strong>tiempo</strong>: todos los eventos sobreviven, encolados y
+    liberados uno por <code>gap</code>, lo cual es correcto cuando cada
+    evento es una instrucción discreta que no puedes perder — seis mensajes
+    que enviar contra una API que permite una llamada cada 100 ms.
   </p>
   <p>
-    That trade has a sharp edge. Because <code>spaceBy</code> queues
-    rather than drops, a source that produces faster than
-    <code>gap</code> forever grows an unbounded queue. It is for
-    <em>bursts</em> — a batch that arrives at once and must all get
-    through — not for genuinely endless input, where throttle's
-    lossiness is a feature.
+    Ese intercambio tiene un filo. Como <code>spaceBy</code> encola en vez de
+    descartar, una fuente que produzca más rápido que <code>gap</code>
+    indefinidamente hace crecer una cola sin límite. Es para
+    <em>ráfagas</em> —un lote que llega de golpe y tiene que pasar entero—, no
+    para una entrada genuinamente interminable, donde perder eventos es
+    justamente la virtud de throttle.
   </p>
   <p>
-    <code>delay(duration)</code> is the simplest of the three: the entire
-    stream is shifted by a fixed amount, spacing intact, nothing dropped.
-    The close waits for the last delayed event to land, so nothing is
-    lost at the end; errors are forwarded immediately, since only data is
-    worth holding.
+    <code>delay(duration)</code> es el más simple de los tres: el stream
+    entero se desplaza una cantidad fija, con su separación intacta y sin
+    descartar nada. El cierre espera a que aterrice el último evento
+    retrasado, así que no se pierde nada al final; los errores se reenvían de
+    inmediato, ya que solo los datos merecen retenerse.
   </p>
   <p>
-    <code>sample(period)</code> is
-    <code><a href="sampleOn.html">sampleOn</a></code> with the clock built
-    in — the newest value every <code>period</code>, silent when nothing
-    new has arrived. Reach for it when the source is a state-like feed
-    (a position, a temperature, a scroll offset) and the consumer has its
-    own refresh rate. fxdart events layer, after Rx's <code>delay</code>,
-    <code>interval</code> and <code>sampleTime</code>.
+    <code>sample(period)</code> es
+    <code><a href="sampleOn.html">sampleOn</a></code> con el reloj
+    incorporado: el valor más reciente cada <code>period</code>, en silencio
+    cuando no ha llegado nada nuevo. Échale mano cuando la fuente sea un feed
+    con aire de estado (una posición, una temperatura, un desplazamiento de
+    scroll) y el consumidor tenga su propia tasa de refresco. Capa de eventos
+    de fxdart, siguiendo a <code>delay</code>, <code>interval</code> y
+    <code>sampleTime</code> de Rx.
   </p>
 
-  <h2>Demo 1 · Pacing a burst, losslessly</h2>
+  <h2>Demo 1 · Dosificar una ráfaga sin pérdidas</h2>
   <div class="playground" data-pg="94a9824eb033967c">
 <textarea>
 import 'dart:async';
@@ -134,7 +133,7 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Shifting, and reading on a clock</h2>
+  <h2>Demo 2 · Desplazar, y leer por reloj</h2>
   <div class="playground">
 <textarea>
 import 'dart:async';
@@ -173,8 +172,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: a send rate and a reporting rate, in one chain.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: un ritmo de envío y un ritmo de informe, en una sola cadena.</p>
   <div class="playground">
 <textarea>
 import 'dart:async';
@@ -211,10 +210,10 @@ Future<void> main() async {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="throttle.html"><code>throttle</code></a> — the lossy counterpart: one event per window, immediately ·
-    <a href="debounce.html"><code>debounce</code></a> — wait for the burst to end, then take its last value ·
-    <a href="chunkOn.html"><code>chunkEvery</code></a> — keep every event too, but grouped rather than spread out
+    <strong>Relacionado:</strong>
+    <a href="throttle.html"><code>throttle</code></a> — la contraparte con pérdidas: un evento por ventana, de inmediato ·
+    <a href="debounce.html"><code>debounce</code></a> — espera a que acabe la ráfaga y toma su último valor ·
+    <a href="chunkOn.html"><code>chunkEvery</code></a> — también conserva todos los eventos, pero agrupados en vez de separados
   </div>
 
   <nav class="tut-nav">

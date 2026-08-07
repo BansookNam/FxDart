@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>predicate combinators — FxDart 101</title>
-  <meta name="description" content="FxDart predicate combinators tutorial: build conditions from named predicates with and, or, xor, negate and contramap, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/predicateOps.html">
+  <meta name="description" content="Tutorial de los combinadores de predicados de FxDart: construye condiciones con and, or, xor, negate y contramap, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/predicateOps.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/predicateOps.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/predicateOps.html">
@@ -47,10 +46,9 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 10 · Utilidades de funciones › <strong>and · or · xor · contramap</strong></p>
   <h1>predicate combinators</h1>
-  <p class="hero-sub">Builds a condition out of named predicates — <code>and</code>, <code>or</code>, <code>xor</code>, <code>negate</code>, <code>contramap</code> — instead of nesting lambdas.</p>
+  <p class="hero-sub">Construye una condición a partir de predicados con nombre — <code>and</code>, <code>or</code>, <code>xor</code>, <code>negate</code>, <code>contramap</code> — en lugar de anidar lambdas.</p>
 
   <div class="signature">extension FxPredicateOps&lt;T&gt; on bool Function(T)
 
@@ -60,46 +58,50 @@ bool Function(T) or(bool Function(T a) other)
 bool Function(T) xor(bool Function(T a) other)
 bool Function(A) contramap&lt;A&gt;(T Function(A a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    Every filtering operator in the library takes a predicate:
+    Todos los operadores de filtrado de la biblioteca toman un predicado:
     <a href="filter.html"><code>filter</code></a>,
     <a href="reject.html"><code>reject</code></a>,
     <a href="takeWhile.html"><code>takeWhile</code></a>,
     <a href="dropWhile.html"><code>skipWhile</code></a>,
     <a href="countWhere.html"><code>countWhere</code></a>,
-    <a href="partition.html"><code>partition</code></a>. Once you have named
-    the conditions — <code>isEven</code>, <code>isPositive</code>,
-    <code>isBlank</code> — combining them should not cost you a fresh lambda
-    with a re-typed parameter each time. These combinators are that.
+    <a href="partition.html"><code>partition</code></a>. Una vez que has
+    puesto nombre a las condiciones — <code>isEven</code>,
+    <code>isPositive</code>, <code>isBlank</code> —, combinarlas no debería
+    costarte una lambda nueva con el parámetro vuelto a tipar cada vez. Estos
+    combinadores son justo eso.
   </p>
   <p>
-    They are an extension on <code>bool Function(T)</code>, so any predicate
-    you already have grows the methods: a top-level function, a tear-off, a
-    stored closure, or the result of another combinator. Each one returns a
-    new predicate and calls nothing until <em>that</em> predicate runs.
+    Son una extensión sobre <code>bool Function(T)</code>, así que a cualquier
+    predicado que ya tengas le crecen los métodos: una función de nivel
+    superior, un tear-off, un closure guardado o el resultado de otro
+    combinador. Cada uno devuelve un predicado nuevo y no llama a nada hasta
+    que se ejecuta <em>ese</em> predicado.
   </p>
   <p>
-    <code>and</code> and <code>or</code> short-circuit exactly like
-    <code>&amp;&amp;</code> and <code>||</code> — the right-hand predicate is
-    skipped when the left one has already decided, which matters when it is
-    the expensive half. <code>xor</code> has nothing to short-circuit and
-    always calls both.
+    <code>and</code> y <code>or</code> cortocircuitan exactamente como
+    <code>&amp;&amp;</code> y <code>||</code>: el predicado de la derecha se
+    salta cuando el de la izquierda ya ha decidido, lo que importa cuando es
+    la mitad cara. <code>xor</code> no tiene nada que cortocircuitar y siempre
+    llama a los dos.
   </p>
   <p>
-    <code>contramap</code> is the odd one and the useful one. It maps the
-    <em>argument</em> rather than the result — that is what the
-    <em>contra</em> means — so a predicate on <code>int</code> becomes a
-    predicate on anything you can turn into an <code>int</code>:
-    <code>isEven.contramap&lt;String&gt;((s) =&gt; s.length)</code> tests a
-    string's length without a word about strings in <code>isEven</code>.
+    <code>contramap</code> es el raro y el útil. Transforma el
+    <em>argumento</em> en vez del resultado — eso es lo que significa el
+    <em>contra</em> —, así que un predicado sobre <code>int</code> pasa a ser
+    un predicado sobre cualquier cosa que puedas convertir en
+    <code>int</code>: <code>isEven.contramap&lt;String&gt;((s) =&gt; s.length)</code>
+    prueba la longitud de una cadena sin una palabra sobre cadenas dentro de
+    <code>isEven</code>.
   </p>
   <p>
-    <code>.negate</code> is the extension-getter form of the top-level
-    <a href="negate.html"><code>negate</code></a> — the same function, reached
-    from the other side. Use whichever reads better at the call site;
-    <code>isBlank.or(isShort).negate</code> reads left to right, where
-    <code>negate(...)</code> would push the whole expression inside a call.
+    <code>.negate</code> es la forma de getter de extensión del
+    <a href="negate.html"><code>negate</code></a> de nivel superior: la misma
+    función, alcanzada desde el otro lado. Usa la que se lea mejor en el punto
+    de llamada; <code>isBlank.or(isShort).negate</code> se lee de izquierda a
+    derecha, mientras que <code>negate(...)</code> metería la expresión entera
+    dentro de una llamada.
   </p>
 
   <h2>Demo 1 · and, or, xor, negate</h2>
@@ -121,7 +123,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · contramap, and short-circuiting</h2>
+  <h2>Demo 2 · contramap, y el cortocircuito</h2>
   <div class="playground" data-pg="10679eea76fd5857">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -148,8 +150,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: keep the rows that are neither blank nor short.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: conserva las filas que no están en blanco ni son cortas.</p>
   <div class="playground" data-pg="ce69589702d3ce48">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -169,11 +171,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="negate.html"><code>negate</code></a> — the top-level form of <code>.negate</code> ·
-    <a href="not.html"><code>not</code></a> — flips a single boolean value, not a predicate ·
-    <a href="filter.html"><code>filter</code></a> / <a href="reject.html"><code>whereNot</code></a> — where a combined predicate usually lands ·
-    <a href="predicates.html"><code>predicates</code></a> — the built-in type predicates to combine with
+    <strong>Relacionado:</strong>
+    <a href="negate.html"><code>negate</code></a> — la forma de nivel superior de <code>.negate</code> ·
+    <a href="not.html"><code>not</code></a> — voltea un solo valor booleano, no un predicado ·
+    <a href="filter.html"><code>filter</code></a> / <a href="reject.html"><code>whereNot</code></a> — donde suele acabar un predicado compuesto ·
+    <a href="predicates.html"><code>predicates</code></a> — los predicados de tipo integrados con los que combinar
   </div>
 
   <nav class="tut-nav">

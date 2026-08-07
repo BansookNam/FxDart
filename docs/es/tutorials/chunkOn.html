@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>chunkOn — FxDart 101</title>
-  <meta name="description" content="FxDart chunkOn tutorial: batch events by count, by a trigger stream, or by a time window — turn a chatty stream into few network calls — with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/chunkOn.html">
+  <meta name="description" content="Tutorial de chunkOn en FxDart: agrupa eventos por cantidad, por un stream disparador o por una ventana de tiempo — convierte un stream parlanchín en pocas llamadas de red — con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/chunkOn.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/chunkOn.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/chunkOn.html">
@@ -47,51 +46,52 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 14 · Streams de eventos (push) › <strong>chunkOn</strong></p>
   <h1><code>chunk</code>, <code>chunkOn</code> &amp; <code>chunkEvery</code></h1>
-  <p class="hero-sub">Collect events into lists — by count, by a trigger, or by a clock — so a chatty stream becomes a few batched calls.</p>
+  <p class="hero-sub">Recoge eventos en listas — por cantidad, por disparador o por reloj — para que un stream parlanchín se convierta en unas pocas llamadas agrupadas.</p>
 
   <div class="signature">FxEvents&lt;List&lt;T&gt;&gt; FxEvents&lt;T&gt;.chunk(int count)              // chain (events)
 FxEvents&lt;List&lt;T&gt;&gt; FxEvents&lt;T&gt;.chunkOn(Stream&lt;void&gt; trigger)
 FxEvents&lt;List&lt;T&gt;&gt; FxEvents&lt;T&gt;.chunkEvery(Duration window)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    Batching is the cheapest performance win a chatty stream has. A
-    hundred analytics events are a hundred round trips one at a time and
-    two round trips in batches of fifty; the work is identical, the cost
-    is not. The pull layer batches by count with
-    <code><a href="chunk.html">chunk</a></code>, and that is all it can
-    do — a pull pipeline has no clock, so "everything that happened in
-    the last two seconds" is not a question it can ask.
+    Agrupar es la mejora de rendimiento más barata que tiene un stream
+    parlanchín. Cien eventos de analítica son cien viajes de ida y vuelta uno
+    a uno, y dos viajes en lotes de cincuenta; el trabajo es idéntico, el
+    coste no. La capa pull agrupa por cantidad con
+    <code><a href="chunk.html">chunk</a></code>, y eso es todo lo que puede
+    hacer: un pipeline pull no tiene reloj, así que «todo lo que ha pasado en
+    los últimos dos segundos» no es una pregunta que pueda formular.
   </p>
   <p>
-    The push side can. <code>chunk(count)</code> is the same
-    fixed-size batching, with a short final batch flushed when the source
-    closes so nothing is stranded. <code>chunkEvery(window)</code> batches
-    by <strong>time</strong> instead: whatever arrived in the last window
-    is emitted as one list. And <code>chunkOn(trigger)</code> hands the
-    decision to a second stream — batch when the user scrolls, when the
-    frame ends, when the connection comes back.
+    El lado push sí puede. <code>chunk(count)</code> es esa misma agrupación
+    de tamaño fijo, con un último lote corto que se vacía cuando la fuente se
+    cierra para que no quede nada varado.
+    <code>chunkEvery(window)</code> agrupa por <strong>tiempo</strong> en su
+    lugar: lo que haya llegado en la última ventana se emite como una lista. Y
+    <code>chunkOn(trigger)</code> entrega la decisión a un segundo stream:
+    agrupa cuando el usuario hace scroll, cuando termina el frame, cuando
+    vuelve la conexión.
   </p>
   <p>
-    Both time-driven forms are <strong>silent on an empty window</strong>.
-    A tick that finds nothing buffered emits nothing rather than an empty
-    list, so downstream code never has to filter out batches that mean
-    "nothing happened" — the same honesty rule
-    <code><a href="sampleOn.html">sampleOn</a></code> follows. Whatever is
-    still buffered when the source closes is flushed before the close.
+    Las dos formas gobernadas por el tiempo <strong>callan ante una ventana
+    vacía</strong>. Un tic que no encuentra nada acumulado no emite nada en
+    lugar de una lista vacía, así que el código de aguas abajo nunca tiene que
+    filtrar lotes que significan «no ha pasado nada»: la misma regla de
+    honestidad que sigue
+    <code><a href="sampleOn.html">sampleOn</a></code>. Lo que siga acumulado
+    cuando la fuente se cierre se vacía antes del cierre.
   </p>
   <p>
-    fxdart events layer, after Rx's <code>bufferCount</code>,
-    <code>buffer</code> and <code>bufferTime</code>. The family keeps the
-    pull layer's <code>chunk</code> as its root word — one name for one
-    idea across both halves of the library — with the <code>…On</code>
-    suffix for a trigger and <code>…Every</code> for a clock.
+    Capa de eventos de fxdart, siguiendo a <code>bufferCount</code>,
+    <code>buffer</code> y <code>bufferTime</code> de Rx. La familia conserva
+    el <code>chunk</code> de la capa pull como palabra raíz —un nombre para
+    una idea en las dos mitades de la biblioteca— con el sufijo
+    <code>…On</code> para un disparador y <code>…Every</code> para un reloj.
   </p>
 
-  <h2>Demo 1 · Batching by the clock</h2>
+  <h2>Demo 1 · Agrupar por reloj</h2>
   <div class="playground" data-pg="95b54595d9ad3543">
 <textarea>
 import 'dart:async';
@@ -129,7 +129,7 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Demo 2 · By count, and by trigger</h2>
+  <h2>Demo 2 · Por cantidad y por disparador</h2>
   <div class="playground">
 <textarea>
 import 'dart:async';
@@ -164,8 +164,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: a per-window summary instead of one report per click.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: un resumen por ventana en vez de un informe por clic.</p>
   <div class="playground">
 <textarea>
 import 'dart:async';
@@ -211,10 +211,10 @@ Future<void> main() async {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="chunk.html"><code>chunk</code></a> — the pull-layer original, batching by count over an Iterable ·
-    <a href="throttle.html"><code>throttle</code></a> — when you want one event per window rather than all of them ·
-    <a href="spaceBy.html"><code>spaceBy</code></a> — the other way to slow a burst: stretch it instead of grouping it
+    <strong>Relacionado:</strong>
+    <a href="chunk.html"><code>chunk</code></a> — el original de la capa pull, que agrupa por cantidad sobre un Iterable ·
+    <a href="throttle.html"><code>throttle</code></a> — cuando quieres un evento por ventana en vez de todos ·
+    <a href="spaceBy.html"><code>spaceBy</code></a> — la otra forma de frenar una ráfaga: estirarla en vez de agruparla
   </div>
 
   <nav class="tut-nav">

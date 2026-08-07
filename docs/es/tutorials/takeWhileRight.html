@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>takeWhileRight — FxDart 101</title>
-  <meta name="description" content="FxDart takeWhileRight tutorial: keep the longest trailing run that satisfies a predicate, in source order, with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/takeWhileRight.html">
+  <meta name="description" content="Tutorial de takeWhileRight en FxDart: conserva la racha final más larga que cumple un predicado, en el orden de la fuente, con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/takeWhileRight.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/takeWhileRight.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/takeWhileRight.html">
@@ -47,47 +46,47 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 5 · Segmentación › <strong>takeWhileRight</strong></p>
   <h1><code>takeWhileRight</code></h1>
-  <p class="hero-sub">Keeps the longest run at the <em>end</em> of a source where a predicate holds, in source order.</p>
+  <p class="hero-sub">Conserva la racha más larga del <em>final</em> de una fuente en la que se cumple un predicado, en el orden de la fuente.</p>
 
   <div class="signature">Iterable&lt;A&gt; takeWhileRight&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;A&gt; takeWhileRightAsync&lt;A&gt;(bool Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx.takeWhileRight(bool Function(T a) f)        // chain
 FxAsync&lt;T&gt; FxAsync.takeWhileRight(bool Function(T a) f)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <a href="takeRight.html"><code>takeRight</code></a> takes the last
-    <em>n</em> elements; <code>takeWhileRight</code> takes the last elements
-    that <em>match</em>, however many that turns out to be. It is to
-    <code>takeRight</code> what <a href="takeWhile.html"><code>takeWhile</code></a>
-    is to <a href="take.html"><code>take</code></a> — a predicate where the
-    other wanted a count.
+    <a href="takeRight.html"><code>takeRight</code></a> toma los últimos
+    <em>n</em> elementos; <code>takeWhileRight</code> toma los últimos que
+    <em>coinciden</em>, sean los que sean. Es a
+    <code>takeRight</code> lo que <a href="takeWhile.html"><code>takeWhile</code></a>
+    es a <a href="take.html"><code>take</code></a>: un predicado donde el
+    otro quería una cantidad.
   </p>
   <p>
-    Only a run that reaches the very end counts. If the last element already
-    fails, the result is empty no matter how long a matching run sat just
-    before it. That is what makes it a suffix operator rather than a
-    "longest match anywhere" search.
+    Solo cuenta la racha que llega hasta el final. Si el último elemento ya
+    falla, el resultado está vacío por larga que fuera la racha que había
+    justo antes. Eso es lo que lo convierte en un operador de sufijo y no en
+    una búsqueda de «la racha más larga en cualquier parte».
   </p>
   <p>
-    The result comes back in <strong>source order</strong>, not reversed, so
-    it chains with everything else in the library and lines up with
-    <a href="dropWhileRight.html"><code>dropWhileRight</code></a> — together
-    the two split a source in half with nothing lost or repeated.
+    El resultado vuelve en el <strong>orden de la fuente</strong>, no invertido,
+    así que encadena con todo lo demás de la biblioteca y encaja con
+    <a href="dropWhileRight.html"><code>dropWhileRight</code></a>: entre los
+    dos parten una fuente sin perder ni repetir nada.
   </p>
   <p>
-    Nothing can be emitted before the source ends: until the last element has
-    arrived, no element is known to belong to the suffix. Over a
-    <code>List</code> the trailing run is found by walking backwards from the
-    end, so the predicate only ever sees that run; over any other source
-    every element is tested in order and the current run is buffered. Keep
-    the predicate pure and the difference will not reach you.
+    No puede emitirse nada antes de que la fuente termine: hasta que no llega
+    el último elemento, no se sabe de ningún elemento que pertenezca al
+    sufijo. Sobre una <code>List</code> la racha final se busca caminando
+    hacia atrás desde el final, así que el predicado solo ve esa racha; sobre
+    cualquier otra fuente se prueba cada elemento en orden y la racha actual
+    se almacena en memoria. Mantén el predicado puro y la diferencia no te
+    alcanzará.
   </p>
 
-  <h2>Demo 1 · Basics</h2>
+  <h2>Demo 1 · Fundamentos</h2>
   <div class="playground" data-pg="774f96fff85ef3ed">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -105,7 +104,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · Async, and the split</h2>
+  <h2>Demo 2 · Asíncrono, y el reparto</h2>
   <div class="playground" data-pg="69811751beca16df">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -126,8 +125,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: keep only the trailing run of readings at or above 30.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: conserva solo la racha final de lecturas iguales o superiores a 30.</p>
   <div class="playground" data-pg="5b45396677da10d2">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -144,11 +143,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="dropWhileRight.html"><code>dropWhileRight</code></a> — the complement: drop that same run ·
-    <a href="takeRight.html"><code>takeRight</code></a> — a trailing slice by count ·
-    <a href="takeWhile.html"><code>takeWhile</code></a> — the same idea from the front ·
-    <a href="filter.html"><code>filter</code></a> — matches anywhere, not just at the end
+    <strong>Relacionado:</strong>
+    <a href="dropWhileRight.html"><code>dropWhileRight</code></a> — el complemento: descarta esa misma racha ·
+    <a href="takeRight.html"><code>takeRight</code></a> — un tramo final por cantidad ·
+    <a href="takeWhile.html"><code>takeWhile</code></a> — la misma idea desde el principio ·
+    <a href="filter.html"><code>filter</code></a> — coincidencias en cualquier parte, no solo al final
   </div>
 
   <nav class="tut-nav">

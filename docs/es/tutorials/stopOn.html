@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>stopOn — FxDart 101</title>
-  <meta name="description" content="FxDart stopOn tutorial: end an event chain when another stream fires, and startOn to open it — cancellation gates for live feeds — with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/stopOn.html">
+  <meta name="description" content="Tutorial de stopOn en FxDart: termina una cadena de eventos cuando otro stream dispara, y startOn para abrirla — compuertas de cancelación para feeds en vivo — con playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/stopOn.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/stopOn.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/stopOn.html">
@@ -47,53 +46,53 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 14 · Streams de eventos (push) › <strong>stopOn</strong></p>
   <h1><code>stopOn</code> &amp; <code>startOn</code></h1>
-  <p class="hero-sub">Two gates driven by a second stream: <code>stopOn</code> closes the chain when the trigger fires, <code>startOn</code> opens it.</p>
+  <p class="hero-sub">Dos compuertas gobernadas por un segundo stream: <code>stopOn</code> cierra la cadena cuando el disparador salta, <code>startOn</code> la abre.</p>
 
   <div class="signature">FxEvents&lt;T&gt; FxEvents&lt;T&gt;.stopOn(Stream&lt;void&gt; trigger)   // chain (events)
 FxEvents&lt;T&gt; FxEvents&lt;T&gt;.startOn(Stream&lt;void&gt; trigger)  // chain (events)</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    A push chain has no natural end. A pull pipeline stops when the
-    consumer stops asking, but a live feed — a socket, a sensor, a
-    <code>Stream.periodic</code> — keeps producing until something
-    <em>cancels</em> it. Forgetting to do that is the classic leak:
-    a screen is disposed, the widget is gone, and its subscription is
-    still awake, still allocating, still calling <code>setState</code> on
-    a corpse.
+    Una cadena push no tiene un final natural. Un pipeline pull para cuando
+    el consumidor deja de pedir, pero un feed en vivo — un socket, un sensor,
+    un <code>Stream.periodic</code> — sigue produciendo hasta que algo lo
+    <em>cancela</em>. Olvidarse de hacerlo es la fuga clásica: se destruye una
+    pantalla, el widget ya no está, y su suscripción sigue despierta, sigue
+    reservando memoria, sigue llamando a <code>setState</code> sobre un
+    cadáver.
   </p>
   <p>
-    <code>stopOn(trigger)</code> makes the shutdown part of the chain
-    rather than a variable you have to remember to cancel. The first
-    event on <code>trigger</code> closes the output and cancels
-    <strong>both</strong> subscriptions — the source's and the trigger's.
-    Nothing the trigger carries is read, only that it fired, so its type
-    is <code>Stream&lt;void&gt;</code> and any stream at all will do.
+    <code>stopOn(trigger)</code> convierte el apagado en parte de la cadena en
+    vez de en una variable que tienes que acordarte de cancelar. El primer
+    evento de <code>trigger</code> cierra la salida y cancela
+    <strong>las dos</strong> suscripciones: la de la fuente y la del
+    disparador. No se lee nada de lo que lleve el disparador, solo que
+    disparó, así que su tipo es <code>Stream&lt;void&gt;</code> y sirve
+    cualquier stream.
   </p>
   <p>
-    <code>startOn(trigger)</code> is the mirror: source events are
-    <strong>dropped</strong> until the trigger fires once, and passed for
-    good afterwards. It is the "wait until ready" gate — do not act on
-    taps until the session has loaded. Note that it is unrelated to
-    <code><a href="fxEvents.html">startWith</a></code>, which prepends a
-    value rather than gating the start; the two names sit close together
-    and mean quite different things.
+    <code>startOn(trigger)</code> es el espejo: los eventos de la fuente se
+    <strong>descartan</strong> hasta que el disparador salta una vez, y a
+    partir de ahí pasan para siempre. Es la compuerta de «espera a estar
+    listo»: no actúes sobre los toques hasta que la sesión haya cargado. Ojo,
+    no tiene relación con <code><a href="fxEvents.html">startWith</a></code>,
+    que antepone un valor en lugar de controlar el arranque; los dos nombres
+    quedan cerca y significan cosas bastante distintas.
   </p>
   <p>
-    The <code>…On</code> suffix is the events layer's convention for
-    "driven by a trigger stream", shared with
-    <code><a href="sampleOn.html">sampleOn</a></code> and
-    <code><a href="chunkOn.html">chunkOn</a></code>. fxdart events layer,
-    after Rx's <code>takeUntil</code> and <code>skipUntil</code> — the
-    names differ because <code>Fx.takeUntil</code> already means the
-    predicate-driven <code>takeUntilInclusive</code> on the pull side,
-    and one name cannot mean two things in one library.
+    El sufijo <code>…On</code> es el convenio de la capa de eventos para
+    «gobernado por un stream disparador», compartido con
+    <code><a href="sampleOn.html">sampleOn</a></code> y
+    <code><a href="chunkOn.html">chunkOn</a></code>. Capa de eventos de
+    fxdart, siguiendo a <code>takeUntil</code> y <code>skipUntil</code> de Rx:
+    los nombres difieren porque <code>Fx.takeUntil</code> ya significa el
+    <code>takeUntilInclusive</code> gobernado por predicado del lado pull, y
+    un nombre no puede significar dos cosas en una misma biblioteca.
   </p>
 
-  <h2>Demo 1 · The off switch</h2>
+  <h2>Demo 1 · El interruptor de apagado</h2>
   <div class="playground" data-pg="83beac0b34c6a2dd">
 <textarea>
 import 'dart:async';
@@ -134,7 +133,7 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Demo 2 · The on switch</h2>
+  <h2>Demo 2 · El interruptor de encendido</h2>
   <div class="playground">
 <textarea>
 import 'dart:async';
@@ -173,8 +172,8 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: a session window, built from both gates.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: una ventana de sesión, construida con las dos compuertas.</p>
   <div class="playground">
 <textarea>
 import 'dart:async';
@@ -220,10 +219,10 @@ Future<void> main() async {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="fxSubscriptions.html"><code>FxSubscriptions</code></a> — the other half of teardown: cancel many subscriptions at once ·
-    <a href="sampleOn.html"><code>sampleOn</code></a> — the same trigger convention, for reading instead of stopping ·
-    <a href="race.html"><code>race</code></a> — cancellation decided by whoever speaks first
+    <strong>Relacionado:</strong>
+    <a href="fxSubscriptions.html"><code>FxSubscriptions</code></a> — la otra mitad del desmontaje: cancelar muchas suscripciones a la vez ·
+    <a href="sampleOn.html"><code>sampleOn</code></a> — el mismo convenio de disparador, para leer en vez de parar ·
+    <a href="race.html"><code>race</code></a> — cancelación decidida por quien hable primero
   </div>
 
   <nav class="tut-nav">
