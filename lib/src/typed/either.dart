@@ -170,10 +170,46 @@ sealed class Either<L, R> {
         Right(:final value) => Right(value),
       };
 
+  /// Returns this when it is a [Right], otherwise the result of [other] —
+  /// "try this, and if it failed try that".
+  ///
+  /// [other] is not called on the success path, so the alternative can be an
+  /// expensive lookup. The failure is discarded; use [orElse] when the
+  /// fallback depends on what went wrong.
+  ///
+  /// ```dart
+  /// fromCache(key).alt(() => fromDisk(key)).alt(() => fromNetwork(key));
+  /// ```
+  Either<L, R> alt(Either<L, R> Function() other) => switch (this) {
+        Left() => other(),
+        Right() => this,
+      };
+
+  /// Like [alt], but [other] receives the failure and may return a different
+  /// failure type — the fallback that gets to look at what went wrong.
+  ///
+  /// ```dart
+  /// parseInt(s).orElse((e) => Left('$s is not a number ($e)'));
+  /// ```
+  ///
+  /// [recover] is the richer sibling: it runs inside a fresh raise scope, so
+  /// the handler writes straight-line Dart and raises rather than building an
+  /// `Either` by hand. Reach for [orElse] when you already *have* the
+  /// replacement `Either` and only want to swap it in.
+  Either<L2, R> orElse<L2>(Either<L2, R> Function(L left) other) =>
+      switch (this) {
+        Left(:final value) => other(value),
+        Right(:final value) => Right(value),
+      };
+
   /// Recovers from a failure inside a fresh raise scope: [transform] may
-  /// return a replacement success value or raise a new error of type `L2`.
-  /// Replaces the whole `orElse`/`handleError`/`handleErrorWith` family
-  /// (port of Arrow's `recover`).
+  /// return a replacement success value or raise a new error of type `L2`
+  /// (port of Arrow's `recover`). It stands in for the whole
+  /// `handleError`/`handleErrorWith` family — a handler that wants to fail
+  /// again just calls `r.raise`, no `Either` construction by hand.
+  ///
+  /// [orElse] is the plainer form for when the replacement is already an
+  /// `Either`, and [alt] for when the failure doesn't matter at all.
   Either<L2, R> recover<L2>(
           R Function(raise_.Raise<L2> r, L error) transform) =>
       switch (this) {

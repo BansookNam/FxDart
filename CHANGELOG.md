@@ -32,6 +32,26 @@ failure and works on plain values, which is what a fallible-lookup chain
 wants. What's fail-fast in `mapN` is the *reporting*, not the work — the
 branches are already-evaluated values, so all of them ran.
 
+### Added — `Either.alt` / `Either.orElse`
+
+The fallback ladder — "try this, and if it failed try that" — now has a
+name:
+
+```dart
+fromCache(key).alt(() => fromDisk(key)).alt(() => fromNetwork(key));
+```
+
+`alt(other)` discards the failure and takes the alternative lazily, so
+nothing is looked up on the success path. `orElse(f)` hands the failure
+to `f` and may change the failure type, for a fallback that depends on
+what went wrong.
+
+`recover` claimed to replace this whole family, and its doc has been
+corrected. It replaces `handleError`/`handleErrorWith` — the cases where
+the handler wants a raise scope rather than an `Either` built by hand.
+It does not replace the plain case where you already *have* the
+replacement `Either`, which is what these two are for.
+
 ## 0.7.8
 
 ### Added — the events layer's second half
