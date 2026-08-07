@@ -62,6 +62,71 @@ sealed class Either<L, R> {
         Right(:final value) => f(value),
       };
 
+  /// Combines this success with [b]'s, keeping the **first** failure — the
+  /// fail-fast counterpart of `zipOrAccumulate2`.
+  ///
+  /// ```dart
+  /// parseName(form).map2(parseAge(form), User.new);
+  /// ```
+  ///
+  /// Both branches are already-evaluated [Either] values, so both ran; what
+  /// is fail-fast is the *reporting* — the leftmost [Left] is returned and
+  /// the rest are discarded. When you want every failure instead, use
+  /// `zipOrAccumulate2` inside an `accumulate` scope, which reports an
+  /// `EitherNel`. [combine] runs only when every branch is a [Right].
+  // The arities are written as a run of `is Left` checks rather than nested
+  // `flatMap`s: it makes "the leftmost Left wins" literally readable, and it
+  // allocates no closures per call.
+  Either<L, T> map2<B, T>(Either<L, B> b, T Function(R a, B b) combine) {
+    final a = this;
+    if (a is Left<L, R>) return Left(a.value);
+    if (b is Left<L, B>) return Left(b.value);
+    return Right(combine((a as Right<L, R>).value, (b as Right<L, B>).value));
+  }
+
+  /// 3-ary [map2].
+  Either<L, T> map3<B, C, T>(
+      Either<L, B> b, Either<L, C> c, T Function(R a, B b, C c) combine) {
+    final a = this;
+    if (a is Left<L, R>) return Left(a.value);
+    if (b is Left<L, B>) return Left(b.value);
+    if (c is Left<L, C>) return Left(c.value);
+    return Right(combine((a as Right<L, R>).value, (b as Right<L, B>).value,
+        (c as Right<L, C>).value));
+  }
+
+  /// 4-ary [map2].
+  Either<L, T> map4<B, C, D, T>(Either<L, B> b, Either<L, C> c, Either<L, D> d,
+      T Function(R a, B b, C c, D d) combine) {
+    final a = this;
+    if (a is Left<L, R>) return Left(a.value);
+    if (b is Left<L, B>) return Left(b.value);
+    if (c is Left<L, C>) return Left(c.value);
+    if (d is Left<L, D>) return Left(d.value);
+    return Right(combine((a as Right<L, R>).value, (b as Right<L, B>).value,
+        (c as Right<L, C>).value, (d as Right<L, D>).value));
+  }
+
+  /// 5-ary [map2]. Arity capped at 5, like `zipOrAccumulate2..5` and
+  /// `Curry2..Curry5` — beyond that, chain [flatMap] or use the `either`
+  /// builder.
+  Either<L, T> map5<B, C, D, E, T>(
+      Either<L, B> b,
+      Either<L, C> c,
+      Either<L, D> d,
+      Either<L, E> e,
+      T Function(R a, B b, C c, D d, E e) combine) {
+    final a = this;
+    if (a is Left<L, R>) return Left(a.value);
+    if (b is Left<L, B>) return Left(b.value);
+    if (c is Left<L, C>) return Left(c.value);
+    if (d is Left<L, D>) return Left(d.value);
+    if (e is Left<L, E>) return Left(e.value);
+    return Right(combine((a as Right<L, R>).value, (b as Right<L, B>).value,
+        (c as Right<L, C>).value, (d as Right<L, D>).value,
+        (e as Right<L, E>).value));
+  }
+
   /// Swaps the sides.
   Either<R, L> swap() => switch (this) {
         Left(:final value) => Right(value),

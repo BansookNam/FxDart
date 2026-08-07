@@ -18,6 +18,20 @@ of the existing top-level `negate` — the two are the same function.
 predicate only when the left one doesn't decide; `xor` always calls
 both. Nothing runs until the composed predicate itself is called.
 
+### Added — `Either.map2` … `map5`
+
+Combining independent `Either`s no longer has to go through an
+accumulating scope: `parseName(form).map2(parseAge(form), User.new)`
+keeps the **leftmost** `Left` and runs `combine` only when every branch
+is a `Right`. Arities 2–5, capped where `zipOrAccumulate2..5` and
+`Curry2..Curry5` are capped.
+
+The two are not redundant. `zipOrAccumulate` reports an `EitherNel` with
+*every* failure and needs an `accumulate` scope; `mapN` reports one
+failure and works on plain values, which is what a fallible-lookup chain
+wants. What's fail-fast in `mapN` is the *reporting*, not the work — the
+branches are already-evaluated values, so all of them ran.
+
 ## 0.7.8
 
 ### Added — the events layer's second half
