@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>mapWithIndex &amp; friends — FxDart 101</title>
+  <meta name="description" content="FxDart mapWithIndex, filterWithIndex, flatMapWithIndex and foldWithIndex tutorial: take the element's position as a second argument, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/withIndex.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/withIndex.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/withIndex.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/withIndex.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/withIndex.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/withIndex.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/withIndex.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/withIndex.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/withIndex.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=1af5c01d072924d4">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">首页</a>
+      <a href="../101/index.html">FxDart 入门</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API 教程</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="语言">
+      <span class="lang-label">语言</span>
+      <ul>
+        <li><a href="../../tutorials/withIndex.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/withIndex.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/withIndex.html" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">简体中文</a></li>
+        <li><a href="../../ja/tutorials/withIndex.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/withIndex.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/withIndex.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/withIndex.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">本页尚未翻译，因此以英文显示。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">参与翻译</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 入门</a> › 章节 6 · 组合 › <strong>…WithIndex</strong></p>
+  <h1><code>mapWithIndex</code> &amp; friends</h1>
+  <p class="hero-sub">The four index-aware operators — <code>map</code>, <code>filter</code>, <code>flatMap</code> and <code>fold</code> with the element's position as a second argument.</p>
+
+  <div class="signature">Iterable&lt;B&gt; mapWithIndex&lt;A, B&gt;(B Function(A a, int index) f, Iterable&lt;A&gt; iterable)
+Iterable&lt;A&gt; filterWithIndex&lt;A&gt;(bool Function(A a, int index) f, Iterable&lt;A&gt; iterable)
+Iterable&lt;B&gt; flatMapWithIndex&lt;A, B&gt;(Iterable&lt;B&gt; Function(A a, int index) f, Iterable&lt;A&gt; iterable)
+Acc foldWithIndex&lt;A, Acc&gt;(Acc seed, Acc Function(Acc acc, A a, int index) f, Iterable&lt;A&gt; iterable)
+                                                     // …Async for every one, and:
+Fx&lt;R&gt; Fx.mapWithIndex&lt;R&gt;(R Function(T a, int index) f)        // chain</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <a href="zipWithIndex.html"><code>zipWithIndex</code></a> already gives
+    you the position: pair every element with its index, then read the pair.
+    That works, and it is the right tool when the pair itself is what you
+    want. When it isn't, you pay for a record per element and a callback body
+    written in <code>p.$1</code> / <code>p.$2</code> rather than names.
+  </p>
+  <p>
+    These four take the index directly instead. There is nothing to allocate
+    and nothing to unpack, and the chain says what it does.
+  </p>
+  <p>
+    <strong>The index counts that stage's input.</strong> It is not the
+    element's position in the original source — a
+    <a href="filter.html"><code>filter</code></a> above
+    <code>mapWithIndex</code> renumbers what survives it, starting from 0
+    again. <code>filterWithIndex</code> is the one to read twice: its count
+    advances across the elements it <em>drops</em>, because those are still
+    input. <code>flatMapWithIndex</code> counts source elements, not emitted
+    ones, so an inner iterable of five values still advances the index by one.
+  </p>
+  <p>
+    Every one has an <code>…Async</code> form, and the numbering survives
+    <a href="concurrent.html"><code>concurrent</code></a>: it overlaps the
+    upstream pulls but still resolves them in order, so element <em>n</em>
+    gets index <em>n</em> whatever the latencies were. The counter also lives
+    per <em>iteration</em>, so re-running a chain starts again at 0.
+  </p>
+  <p>
+    One Dart wrinkle on <code>foldWithIndex</code>: an untyped accumulator
+    lambda infers <code>Acc</code> as <code>Object?</code> and the arithmetic
+    stops compiling. That is not new here — Dart's own
+    <code>Iterable.fold</code> behaves the same way — and the fix is the same:
+    write <code>foldWithIndex&lt;int&gt;(…)</code>.
+  </p>
+
+  <h2>Demo 1 · mapWithIndex, and what it replaces</h2>
+  <div class="playground" data-pg="94ec4a5a7277eea7">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final rows = ['alpha', 'beta', 'gamma'];
+
+  print(fx(rows).mapWithIndex((row, i) => '${i + 1}. $row').toList());
+  // [1. alpha, 2. beta, 3. gamma]
+
+  // The same result through zipWithIndex: a record per element, and a
+  // callback reading $1/$2 instead of named parameters.
+  print(fx(rows).zipWithIndex().map((p) => '${p.$1 + 1}. ${p.$2}').toList());
+  // [1. alpha, 2. beta, 3. gamma]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · filter, flatMap, fold — and async</h2>
+  <div class="playground" data-pg="63d65fdc76e56938">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+Future<void> main() async {
+  final rows = ['a', 'b', 'c', 'd'];
+
+  // The index counts the INPUT, so dropped elements still advance it.
+  print(fx(rows).filterWithIndex((row, i) => i.isEven).toList()); // [a, c]
+
+  print(fx(rows).flatMapWithIndex((row, i) => List.filled(i, row)).toList());
+  // [b, c, c, d, d, d]
+
+  print(fx([10, 20, 30]).foldWithIndex<int>(0, (acc, a, i) => acc + a * i));
+  // 80
+
+  // Async too, and the numbering stays in source order under concurrent.
+  final numbered = await fxAsync(toAsync(rows))
+      .mapWithIndex((row, i) => '$i$row')
+      .toList();
+  print(numbered); // [0a, 1b, 2c, 3d]
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: number the finishers 1st, 2nd, 3rd using the index.</p>
+  <div class="playground" data-pg="f434e27c41e461a6">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final finishers = ['Kim', 'Lee', 'Park'];
+  const suffix = ['st', 'nd', 'rd'];
+
+  // TODO: number the finishers 1st, 2nd, 3rd using the index.
+  final board =
+      fx(finishers).mapWithIndex((name, i) => '${i + 1}${suffix[i]} $name');
+
+  print(board.toList()); // [1st Kim, 2nd Lee, 3rd Park]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="zipWithIndex.html"><code>indexed</code></a> — the pair form, when the pair is what you want ·
+    <a href="map.html"><code>map</code></a> / <a href="filter.html"><code>filter</code></a> / <a href="flatMap.html"><code>flatMap</code></a> — the operators these extend ·
+    <a href="fold.html"><code>fold</code></a> — the seeded reduction ·
+    <a href="foldRight.html"><code>foldRight</code></a> — the same fold from the other end
+  </div>
+
+  <nav class="tut-nav">
+    <a href="zipWithIndex.html">← 上一节： indexed</a>
+    <a href="transpose.html">下一节： transpose →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart 是 <a href="https://github.com/marpple/FxTS">FxTS</a> 的移植版本。特别感谢 <strong>Indong Yoo</strong>（Marpple CTO）与 FxTS 团队，本库的设计思路、语义和测试套件均源于他们的工作。</p>
+  <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 运行","pgReset":"重置","pgCompiling":"编译中…","pgCompileError":"编译错误","pgError":"错误","pgLoading":"正在加载运行时…","pgRunning":"运行中…","pgNoOutput":"（无输出）","pgLoadFailed":"无法加载 FxDart 库"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=1af5c01d072924d4";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

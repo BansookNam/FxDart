@@ -7,8 +7,8 @@ section: 10
 crumb: not
 prev: negate.html
 prevLabel: negate
-next: when.html
-nextLabel: when
+next: predicateOps.html
+nextLabel: predicate combinators
 ---
   <p class="hero-sub">Boolean negation as a function you can pass around.</p>
 

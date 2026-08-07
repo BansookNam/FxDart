@@ -1,0 +1,4 @@
+Acc foldRight&lt;A, Acc&gt;(Acc seed, Acc Function(Acc acc, A a) f, Iterable&lt;A&gt; iterable)
+Acc foldRightWithIndex&lt;A, Acc&gt;(Acc seed, Acc Function(Acc acc, A a, int index) f, Iterable&lt;A&gt; iterable)
+Future&lt;Acc&gt; foldRightAsync&lt;A, Acc&gt;(FutureOr&lt;Acc&gt; seed, FutureOr&lt;Acc&gt; Function(Acc acc, A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Acc Fx.foldRight&lt;Acc&gt;(Acc seed, Acc Function(Acc acc, T a) f)        // chain

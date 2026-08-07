@@ -1,0 +1,7 @@
+extension FxPredicateOps&lt;T&gt; on bool Function(T)
+
+bool Function(T) get negate
+bool Function(T) and(bool Function(T a) other)
+bool Function(T) or(bool Function(T a) other)
+bool Function(T) xor(bool Function(T a) other)
+bool Function(A) contramap&lt;A&gt;(T Function(A a) f)

@@ -7,8 +7,8 @@ section: 5
 crumb: skipWhile
 prev: dropRight.html
 prevLabel: dropRight
-next: dropUntil.html
-nextLabel: dropUntil
+next: dropWhileRight.html
+nextLabel: dropWhileRight
 ---
   <p class="hero-sub">Omite valores mientras un predicado devuelva true y luego emite todo lo demás, coincida o no.</p>
 

@@ -5,8 +5,8 @@ description: FxDart when tutorial: apply a transform only when a predicate holds
 heading: <code>when</code>
 section: 10
 crumb: when
-prev: not.html
-prevLabel: not
+prev: predicateOps.html
+prevLabel: predicate combinators
 next: unless.html
 nextLabel: unless
 ---

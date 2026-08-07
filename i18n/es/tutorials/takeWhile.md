@@ -7,8 +7,8 @@ section: 5
 crumb: takeWhile
 prev: takeRight.html
 prevLabel: takeRight
-next: takeUntilInclusive.html
-nextLabel: takeUntilInclusive
+next: takeWhileRight.html
+nextLabel: takeWhileRight
 ---
   <p class="hero-sub">Emite valores mientras un predicado devuelva true; después se detiene definitivamente.</p>
 

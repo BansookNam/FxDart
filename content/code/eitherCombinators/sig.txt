@@ -1,0 +1,5 @@
+Either&lt;L, T&gt; Either.map2&lt;B, T&gt;(Either&lt;L, B&gt; b, T Function(R a, B b) combine)
+                                                     // …through map5
+Either&lt;L, R&gt; Either.alt(Either&lt;L, R&gt; Function() other)
+Either&lt;L2, R&gt; Either.orElse&lt;L2&gt;(Either&lt;L2, R&gt; Function(L left) other)
+Either&lt;L, R&gt; Either.filterOrElse(bool Function(R value) predicate, L Function(R value) onFalse)

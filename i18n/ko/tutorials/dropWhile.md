@@ -7,8 +7,8 @@ section: 5
 crumb: skipWhile
 prev: dropRight.html
 prevLabel: dropRight
-next: dropUntil.html
-nextLabel: dropUntil
+next: dropWhileRight.html
+nextLabel: dropWhileRight
 ---
   <p class="hero-sub">술어가 true를 반환하는 동안 값을 건너뛰고, 그 뒤로는 술어에 맞든 아니든 모두 내보냅니다.</p>
 

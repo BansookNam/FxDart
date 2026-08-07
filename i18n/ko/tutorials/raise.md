@@ -5,8 +5,8 @@ description: FxDart raise 튜토리얼: either와 eitherAsync 빌더, 그리고 
 heading: <code>either</code> 빌더 &amp; <code>Raise</code> 스코프
 section: 13
 crumb: either &amp; Raise
-prev: either.html
-prevLabel: Either
+prev: eitherCombinators.html
+prevLabel: Either combinators
 next: nullable.html
 nextLabel: nullable
 ---

@@ -7,8 +7,8 @@ section: 10
 crumb: not
 prev: negate.html
 prevLabel: negate
-next: when.html
-nextLabel: when
+next: predicateOps.html
+nextLabel: predicate combinators
 ---
   <p class="hero-sub">La negación booleana como una función que puedes pasar de un lado a otro.</p>
 

@@ -1,0 +1,3 @@
+Map&lt;K, T&gt; mapValues&lt;K, V, T&gt;(T Function(V value) f, Map&lt;K, V&gt; map)
+Map&lt;T, V&gt; mapKeys&lt;K, V, T&gt;(T Function(K key) f, Map&lt;K, V&gt; map)
+Map&lt;K2, V2&gt; mapEntries&lt;K, V, K2, V2&gt;((K2, V2) Function((K, V) entry) f, Map&lt;K, V&gt; map)

@@ -7,8 +7,8 @@ section: 6
 crumb: indexed
 prev: zipWith.html
 prevLabel: zipWith
-next: transpose.html
-nextLabel: transpose
+next: withIndex.html
+nextLabel: …WithIndex
 ---
   <p class="hero-sub">각 원소를 (0부터 시작하는) 인덱스와 짝지어 <code>(index, value)</code>로 만듭니다.</p>
 

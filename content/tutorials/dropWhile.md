@@ -7,8 +7,8 @@ section: 5
 crumb: skipWhile
 prev: dropRight.html
 prevLabel: dropRight
-next: dropUntil.html
-nextLabel: dropUntil
+next: dropWhileRight.html
+nextLabel: dropWhileRight
 ---
   <p class="hero-sub">Skips values while a predicate returns true, then yields everything after — matches or not.</p>
 

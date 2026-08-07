@@ -7,8 +7,8 @@ section: 7
 crumb: fold
 prev: reduce.html
 prevLabel: reduce
-next: reduceLazy.html
-nextLabel: reduceLazy
+next: foldRight.html
+nextLabel: foldRight
 ---
   <p class="hero-sub">초깃값을 받는 형태의 reduce입니다. 파이프라인이 비어 있어도 언제나 안전합니다.</p>
 

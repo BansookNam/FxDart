@@ -7,8 +7,8 @@ section: 6
 crumb: indexed
 prev: zipWith.html
 prevLabel: zipWith
-next: transpose.html
-nextLabel: transpose
+next: withIndex.html
+nextLabel: …WithIndex
 ---
   <p class="hero-sub">Pairs each element with its (0-based) index: <code>(index, value)</code>.</p>
 

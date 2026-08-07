@@ -7,8 +7,8 @@ section: 6
 crumb: indexed
 prev: zipWith.html
 prevLabel: zipWith
-next: transpose.html
-nextLabel: transpose
+next: withIndex.html
+nextLabel: …WithIndex
 ---
   <p class="hero-sub">Empareja cada elemento con su índice (empezando en 0): <code>(index, value)</code>.</p>
 

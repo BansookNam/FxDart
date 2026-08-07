@@ -7,8 +7,8 @@ section: 5
 crumb: takeWhile
 prev: takeRight.html
 prevLabel: takeRight
-next: takeUntilInclusive.html
-nextLabel: takeUntilInclusive
+next: takeWhileRight.html
+nextLabel: takeWhileRight
 ---
   <p class="hero-sub">술어가 true를 반환하는 동안 값을 내보내다가, 거짓이 되면 그대로 끝냅니다.</p>
 

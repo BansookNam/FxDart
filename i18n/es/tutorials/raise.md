@@ -5,8 +5,8 @@ description: Tutorial de raise en FxDart: los constructores either y eitherAsync
 heading: <code>either</code> &amp; el ámbito <code>Raise</code>
 section: 13
 crumb: either &amp; Raise
-prev: either.html
-prevLabel: Either
+prev: eitherCombinators.html
+prevLabel: Either combinators
 next: nullable.html
 nextLabel: nullable
 ---

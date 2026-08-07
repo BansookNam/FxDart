@@ -5,8 +5,8 @@ description: FxDart dropUntil 튜토리얼: 처음 술어에 맞는 원소까지
 heading: <code>dropUntil</code>
 section: 5
 crumb: dropUntil
-prev: dropWhile.html
-prevLabel: dropWhile
+prev: dropWhileRight.html
+prevLabel: dropWhileRight
 next: slice.html
 nextLabel: slice
 ---

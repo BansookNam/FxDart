@@ -5,8 +5,8 @@ description: FxDart evolve 튜토리얼: Map에서 지정한 값만 키별로 �
 heading: <code>evolve</code>
 section: 9
 crumb: evolve
-prev: props.html
-prevLabel: props
+prev: mapValues.html
+prevLabel: mapValues
 next: compactObject.html
 nextLabel: compactObject
 ---

@@ -5,8 +5,8 @@ description: FxDart when 튜토리얼: 술어가 참일 때만 변환을 적용�
 heading: <code>when</code>
 section: 10
 crumb: when
-prev: not.html
-prevLabel: not
+prev: predicateOps.html
+prevLabel: predicate combinators
 next: unless.html
 nextLabel: unless
 ---

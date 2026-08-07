@@ -1,0 +1,4 @@
+Iterable&lt;A&gt; takeWhileRight&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;A&gt; takeWhileRightAsync&lt;A&gt;(bool Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.takeWhileRight(bool Function(T a) f)        // chain
+FxAsync&lt;T&gt; FxAsync.takeWhileRight(bool Function(T a) f)

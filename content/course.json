@@ -145,6 +145,10 @@
       "label": "takeWhile"
     },
     {
+      "href": "takeWhileRight.html",
+      "label": "takeWhileRight"
+    },
+    {
       "href": "takeUntilInclusive.html",
       "label": "takeUntilInclusive"
     },
@@ -159,6 +163,10 @@
     {
       "href": "dropWhile.html",
       "label": "skipWhile"
+    },
+    {
+      "href": "dropWhileRight.html",
+      "label": "dropWhileRight"
     },
     {
       "href": "dropUntil.html",
@@ -215,6 +223,10 @@
       "label": "indexed"
     },
     {
+      "href": "withIndex.html",
+      "label": "…WithIndex (map, filter, fold)"
+    },
+    {
       "href": "transpose.html",
       "label": "transpose"
     },
@@ -247,6 +259,10 @@
     {
       "href": "fold.html",
       "label": "fold"
+    },
+    {
+      "href": "foldRight.html",
+      "label": "foldRight"
     },
     {
       "href": "reduceLazy.html",
@@ -401,6 +417,10 @@
       "label": "props"
     },
     {
+      "href": "mapValues.html",
+      "label": "mapValues"
+    },
+    {
       "href": "evolve.html",
       "label": "evolve"
     },
@@ -453,6 +473,10 @@
     {
       "href": "not.html",
       "label": "not"
+    },
+    {
+      "href": "predicateOps.html",
+      "label": "predicate combinators"
     },
     {
       "href": "when.html",
@@ -559,6 +583,10 @@
     {
       "href": "either.html",
       "label": "Either"
+    },
+    {
+      "href": "eitherCombinators.html",
+      "label": "Either combinators"
     },
     {
       "href": "raise.html",

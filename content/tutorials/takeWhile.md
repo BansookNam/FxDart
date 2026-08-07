@@ -7,8 +7,8 @@ section: 5
 crumb: takeWhile
 prev: takeRight.html
 prevLabel: takeRight
-next: takeUntilInclusive.html
-nextLabel: takeUntilInclusive
+next: takeWhileRight.html
+nextLabel: takeWhileRight
 ---
   <p class="hero-sub">Yields values as long as a predicate returns true, then stops for good.</p>
 

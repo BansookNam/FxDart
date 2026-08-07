@@ -7,8 +7,8 @@ section: 7
 crumb: fold
 prev: reduce.html
 prevLabel: reduce
-next: reduceLazy.html
-nextLabel: reduceLazy
+next: foldRight.html
+nextLabel: foldRight
 ---
   <p class="hero-sub">The seeded form of reduce: always safe, even on an empty pipeline.</p>
 

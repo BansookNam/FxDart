@@ -5,8 +5,8 @@ description: Tutorial de transpose en FxDart: convierte filas en columnas para c
 heading: <code>transpose</code>
 section: 6
 crumb: transpose
-prev: zipWithIndex.html
-prevLabel: zipWithIndex
+prev: withIndex.html
+prevLabel: …WithIndex
 next: reverse.html
 nextLabel: reverse
 ---

@@ -7,8 +7,8 @@ section: 9
 crumb: props
 prev: prop.html
 prevLabel: prop
-next: evolve.html
-nextLabel: evolve
+next: mapValues.html
+nextLabel: mapValues
 ---
   <p class="hero-sub"><code>Map</code>에서 여러 키에 해당하는 값들을 <code>List</code>로 반환합니다.</p>
 

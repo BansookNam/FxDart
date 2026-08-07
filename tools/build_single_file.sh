@@ -138,6 +138,19 @@ Iterable<B> _$flatMap<A, B>(Iterable<B> Function(A a) f, Iterable<A> iterable) =
 FxAsyncIterable<B> _$flatMapAsync<A, B>(
         FutureOr<Iterable<B>> Function(A a) f, FxAsyncIterable<A> iterable) =>
     flatMapAsync(f, iterable);
+Iterable<B> _$mapWithIndex<A, B>(
+        B Function(A a, int index) f, Iterable<A> iterable) =>
+    mapWithIndex(f, iterable);
+FxAsyncIterable<B> _$mapWithIndexAsync<A, B>(
+        FutureOr<B> Function(A a, int index) f, FxAsyncIterable<A> iterable) =>
+    mapWithIndexAsync(f, iterable);
+Iterable<B> _$flatMapWithIndex<A, B>(
+        Iterable<B> Function(A a, int index) f, Iterable<A> iterable) =>
+    flatMapWithIndex(f, iterable);
+FxAsyncIterable<B> _$flatMapWithIndexAsync<A, B>(
+        FutureOr<Iterable<B>> Function(A a, int index) f,
+        FxAsyncIterable<A> iterable) =>
+    flatMapWithIndexAsync(f, iterable);
 Iterable<B> _$scan<A, B>(
         B Function(B acc, A a) f, B seed, Iterable<A> iterable) =>
     scan(f, seed, iterable);
@@ -162,6 +175,13 @@ Iterable<A> _$filter<A>(bool Function(A a) f, Iterable<A> iterable) =>
 FxAsyncIterable<A> _$filterAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
     filterAsync(f, iterable);
+Iterable<A> _$filterWithIndex<A>(
+        bool Function(A a, int index) f, Iterable<A> iterable) =>
+    filterWithIndex(f, iterable);
+FxAsyncIterable<A> _$filterWithIndexAsync<A>(
+        FutureOr<bool> Function(A a, int index) f,
+        FxAsyncIterable<A> iterable) =>
+    filterWithIndexAsync(f, iterable);
 Iterable<A> _$reject<A>(bool Function(A a) f, Iterable<A> iterable) =>
     reject(f, iterable);
 FxAsyncIterable<A> _$rejectAsync<A>(
@@ -213,6 +233,16 @@ Iterable<A> _$takeWhile<A>(bool Function(A a) f, Iterable<A> iterable) =>
 FxAsyncIterable<A> _$takeWhileAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
     takeWhileAsync(f, iterable);
+Iterable<A> _$takeWhileRight<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    takeWhileRight(f, iterable);
+FxAsyncIterable<A> _$takeWhileRightAsync<A>(
+        bool Function(A a) f, FxAsyncIterable<A> iterable) =>
+    takeWhileRightAsync(f, iterable);
+Iterable<A> _$dropWhileRight<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    dropWhileRight(f, iterable);
+FxAsyncIterable<A> _$dropWhileRightAsync<A>(
+        bool Function(A a) f, FxAsyncIterable<A> iterable) =>
+    dropWhileRightAsync(f, iterable);
 Iterable<A> _$takeUntilInclusive<A>(
         bool Function(A a) f, Iterable<A> iterable) =>
     takeUntilInclusive(f, iterable);
@@ -339,6 +369,28 @@ Future<A> _$reduceAsync<A>(
 Future<Acc> _$foldAsync<A, Acc>(FutureOr<Acc> seed,
         FutureOr<Acc> Function(Acc acc, A a) f, FxAsyncIterable<A> iterable) =>
     foldAsync(seed, f, iterable);
+Acc _$foldWithIndex<A, Acc>(Acc seed,
+        Acc Function(Acc acc, A a, int index) f, Iterable<A> iterable) =>
+    foldWithIndex(seed, f, iterable);
+Future<Acc> _$foldWithIndexAsync<A, Acc>(
+        FutureOr<Acc> seed,
+        FutureOr<Acc> Function(Acc acc, A a, int index) f,
+        FxAsyncIterable<A> iterable) =>
+    foldWithIndexAsync(seed, f, iterable);
+Acc _$foldRight<A, Acc>(
+        Acc seed, Acc Function(Acc acc, A a) f, Iterable<A> iterable) =>
+    foldRight(seed, f, iterable);
+Acc _$foldRightWithIndex<A, Acc>(Acc seed,
+        Acc Function(Acc acc, A a, int index) f, Iterable<A> iterable) =>
+    foldRightWithIndex(seed, f, iterable);
+Future<Acc> _$foldRightAsync<A, Acc>(FutureOr<Acc> seed,
+        FutureOr<Acc> Function(Acc acc, A a) f, FxAsyncIterable<A> iterable) =>
+    foldRightAsync(seed, f, iterable);
+Future<Acc> _$foldRightWithIndexAsync<A, Acc>(
+        FutureOr<Acc> seed,
+        FutureOr<Acc> Function(Acc acc, A a, int index) f,
+        FxAsyncIterable<A> iterable) =>
+    foldRightWithIndexAsync(seed, f, iterable);
 num _$sum(Iterable<num> iterable) => sum(iterable);
 Future<num> _$sumAsync(FxAsyncIterable<num> iterable) => sumAsync(iterable);
 double _$average(Iterable<num> iterable) => average(iterable);

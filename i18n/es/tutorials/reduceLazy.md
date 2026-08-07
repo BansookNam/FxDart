@@ -5,8 +5,8 @@ description: Tutorial de reduceLazy en FxDart: construye una función reductora 
 heading: <code>reduceLazy</code>
 section: 7
 crumb: reduceLazy
-prev: fold.html
-prevLabel: fold
+prev: foldRight.html
+prevLabel: foldRight
 next: sum.html
 nextLabel: sum
 ---

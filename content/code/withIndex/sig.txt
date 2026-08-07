@@ -1,0 +1,6 @@
+Iterable&lt;B&gt; mapWithIndex&lt;A, B&gt;(B Function(A a, int index) f, Iterable&lt;A&gt; iterable)
+Iterable&lt;A&gt; filterWithIndex&lt;A&gt;(bool Function(A a, int index) f, Iterable&lt;A&gt; iterable)
+Iterable&lt;B&gt; flatMapWithIndex&lt;A, B&gt;(Iterable&lt;B&gt; Function(A a, int index) f, Iterable&lt;A&gt; iterable)
+Acc foldWithIndex&lt;A, Acc&gt;(Acc seed, Acc Function(Acc acc, A a, int index) f, Iterable&lt;A&gt; iterable)
+                                                     // …Async for every one, and:
+Fx&lt;R&gt; Fx.mapWithIndex&lt;R&gt;(R Function(T a, int index) f)        // chain

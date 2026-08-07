@@ -1655,6 +1655,77 @@ class _MapIterator<A, B> implements Iterator<B> {
   }
 }
 
+/// Like [map], but the callback also receives the element's 0-based
+/// position.
+///
+/// Not an FxTS port. `zipWithIndex` + `map` over the pair already expressed
+/// this, at the cost of a record per element and a `p.$1`/`p.$2` callback
+/// body; taking the index as a second argument keeps the chain readable and
+/// allocates nothing.
+///
+/// ```dart
+/// mapWithIndex((a, i) => '$i:$a', ['a', 'b']); // ('0:a', '1:b')
+/// ```
+Iterable<B> mapWithIndex<A, B>(
+        B Function(A a, int index) f, Iterable<A> iterable) =>
+    _MapWithIndexIterable(f, iterable);
+
+class _MapWithIndexIterable<A, B> extends Iterable<B> {
+  _MapWithIndexIterable(this._f, this._source);
+  final B Function(A, int) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<B> get iterator => _MapWithIndexIterator(_f, _source.iterator);
+  @override
+  List<B> toList({bool growable = true}) {
+    final source = _source;
+    // Pre-sized from a List source, as in [_MapIterable.toList].
+    if (source is List<A>) {
+      final length = source.length;
+      if (length == 0) return growable ? <B>[] : List<B>.empty();
+      final out = List<B>.filled(length, _f(source[0], 0), growable: growable);
+      for (var i = 1; i < length; i++) {
+        out[i] = _f(source[i], i);
+      }
+      return out;
+    }
+    return super.toList(growable: growable);
+  }
+}
+
+class _MapWithIndexIterator<A, B> implements Iterator<B> {
+  _MapWithIndexIterator(this._f, this._it);
+  final B Function(A, int) _f;
+  final Iterator<A> _it;
+  var _i = 0;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    if (_it.moveNext()) {
+      current = _f(_it.current, _i++);
+      return true;
+    }
+    return false;
+  }
+}
+
+/// Async counterpart of [mapWithIndex].
+///
+/// The index counts elements of *this* stage's input, in source order —
+/// `concurrent` overlaps the upstream pulls but still resolves them in
+/// order, so the numbering is the same either way.
+@pragma('vm:prefer-inline')
+FxAsyncIterable<B> mapWithIndexAsync<A, B>(
+    FutureOr<B> Function(A a, int index) f, FxAsyncIterable<A> iterable) {
+  // dispatchAsync so the counter is per-iteration, not per-iterable — the
+  // same shape as [zipWithIndexAsync].
+  return dispatchAsync(iterable, (source) {
+    var i = 0;
+    return mapAsync((A a) => f(a, i++), source).iterator;
+  });
+}
+
 /// Async counterpart of [map]. The callback may return a [Future].
 ///
 /// ```dart
@@ -1964,6 +2035,60 @@ class _FlatMapIterator<A, B> implements Iterator<B> {
       _inner = _f(_it.current).iterator;
     }
   }
+}
+
+/// Like [flatMap], but the callback also receives the source element's
+/// 0-based position. The index counts *source* elements, not emitted ones.
+///
+/// ```dart
+/// flatMapWithIndex((a, i) => [i, a], [10, 20]); // (0, 10, 1, 20)
+/// ```
+Iterable<B> flatMapWithIndex<A, B>(
+        Iterable<B> Function(A a, int index) f, Iterable<A> iterable) =>
+    _FlatMapWithIndexIterable(f, iterable);
+
+class _FlatMapWithIndexIterable<A, B> extends Iterable<B> {
+  _FlatMapWithIndexIterable(this._f, this._source);
+  final Iterable<B> Function(A, int) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<B> get iterator => _FlatMapWithIndexIterator(_f, _source.iterator);
+}
+
+class _FlatMapWithIndexIterator<A, B> implements Iterator<B> {
+  _FlatMapWithIndexIterator(this._f, this._it);
+  final Iterable<B> Function(A, int) _f;
+  final Iterator<A> _it;
+  Iterator<B>? _inner;
+  var _i = 0;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    while (true) {
+      final inner = _inner;
+      if (inner != null) {
+        if (inner.moveNext()) {
+          current = inner.current;
+          return true;
+        }
+        _inner = null;
+      }
+      if (!_it.moveNext()) return false;
+      _inner = _f(_it.current, _i++).iterator;
+    }
+  }
+}
+
+/// Async counterpart of [flatMapWithIndex].
+@pragma('vm:prefer-inline')
+FxAsyncIterable<B> flatMapWithIndexAsync<A, B>(
+    FutureOr<Iterable<B>> Function(A a, int index) f,
+    FxAsyncIterable<A> iterable) {
+  return dispatchAsync(iterable, (source) {
+    var i = 0;
+    return flatMapAsync((A a) => f(a, i++), source).iterator;
+  });
 }
 
 /// Async counterpart of [flatMap].
@@ -2320,6 +2445,54 @@ class _FilterIterator<A> implements Iterator<A> {
     }
     return false;
   }
+}
+
+/// Like [filter], but the predicate also receives the element's 0-based
+/// position in the **input** — dropped elements still advance the count.
+///
+/// ```dart
+/// filterWithIndex((a, i) => i.isEven, ['a', 'b', 'c']); // ('a', 'c')
+/// ```
+Iterable<A> filterWithIndex<A>(
+        bool Function(A a, int index) f, Iterable<A> iterable) =>
+    _FilterWithIndexIterable(f, iterable);
+
+class _FilterWithIndexIterable<A> extends Iterable<A> {
+  _FilterWithIndexIterable(this._f, this._source);
+  final bool Function(A, int) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator => _FilterWithIndexIterator(_f, _source.iterator);
+}
+
+class _FilterWithIndexIterator<A> implements Iterator<A> {
+  _FilterWithIndexIterator(this._f, this._it);
+  final bool Function(A, int) _f;
+  final Iterator<A> _it;
+  var _i = 0;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final v = _it.current;
+      if (_f(v, _i++)) {
+        current = v;
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+/// Async counterpart of [filterWithIndex].
+@pragma('vm:prefer-inline')
+FxAsyncIterable<A> filterWithIndexAsync<A>(
+    FutureOr<bool> Function(A a, int index) f, FxAsyncIterable<A> iterable) {
+  return dispatchAsync(iterable, (source) {
+    var i = 0;
+    return filterAsync((A a) => f(a, i++), source).iterator;
+  });
 }
 
 /// The opposite of [filter]: all elements [f] returns false for.
@@ -3006,6 +3179,102 @@ FxAsyncIterable<A> _takeWhileAsyncLegacy<A>(
   });
 }
 
+/// Returns the longest **suffix** whose every element satisfies [f], in
+/// source order.
+///
+/// The predicate counterpart of [takeRight], where [takeWhile] is the
+/// predicate counterpart of [take]. Not an FxTS port.
+///
+/// ```dart
+/// takeWhileRight((a) => a > 2, [1, 4, 2, 3, 4]); // (3, 4)
+/// ```
+///
+/// Order is the source's, so this composes with the rest of the library;
+/// fpdart's `takeWhileRight` hands back the reversed run instead. Nothing
+/// can be emitted before the source ends, and a non-[List] source is
+/// buffered up to the longest matching run it has seen. A [List] source is
+/// indexed from the end instead, so [f] is called only on the trailing run
+/// and in reverse — keep the predicate pure.
+Iterable<A> takeWhileRight<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    _TakeWhileRightIterable(f, iterable);
+
+/// The index at which [list]'s trailing run of [f]-matching elements begins
+/// (`list.length` when the last element already fails).
+int _suffixStart<A>(bool Function(A) f, List<A> list) {
+  var start = list.length;
+  while (start > 0 && f(list[start - 1])) {
+    start--;
+  }
+  return start;
+}
+
+class _TakeWhileRightIterable<A> extends Iterable<A> {
+  _TakeWhileRightIterable(this._f, this._source);
+  final bool Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator {
+    final source = _source;
+    if (source is List<A>) {
+      return _ListRangeIterator(source, _suffixStart(_f, source), source.length);
+    }
+    return _TakeWhileRightIterator(_f, _source);
+  }
+}
+
+class _TakeWhileRightIterator<A> implements Iterator<A> {
+  _TakeWhileRightIterator(this._f, this._source);
+  final bool Function(A) _f;
+  final Iterable<A> _source;
+  // The run in flight, built on the first pull. Every element that fails [_f]
+  // proves the run so far was not the suffix, so it is dropped — the buffer
+  // costs the longest run seen, not the whole source.
+  List<A>? _tail;
+  int _i = 0;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    var tail = _tail;
+    if (tail == null) {
+      tail = _tail = <A>[];
+      for (final a in _source) {
+        if (_f(a)) {
+          tail.add(a);
+        } else if (tail.isNotEmpty) {
+          tail.clear();
+        }
+      }
+    }
+    if (_i >= tail.length) return false;
+    current = tail[_i++];
+    return true;
+  }
+}
+
+/// Async counterpart of [takeWhileRight].
+@pragma('vm:prefer-inline')
+FxAsyncIterable<A> takeWhileRightAsync<A>(
+    bool Function(A a) f, FxAsyncIterable<A> iterable) {
+  return dispatchAsync(iterable, (source) {
+    final iterator = source.iterator;
+    Iterator<A>? tail;
+    return SerialAsyncIterator((concurrent) async {
+      if (tail == null) {
+        final arr = <A>[];
+        while (true) {
+          final r = await iterator.next(concurrent);
+          if (r.done) break;
+          arr.add(r.value);
+        }
+        tail = takeWhileRight(f, arr).iterator;
+      }
+      if (tail!.moveNext()) return IterResult.value(tail!.current);
+      return IterResult<A>.done();
+    });
+  });
+}
+
 /// Returns an iterable that yields values until [f] returns true —
 /// **including** the element that matched.
 ///
@@ -3270,6 +3539,105 @@ FxAsyncIterable<A> dropWhileAsync<A>(
             return decide(drop);
           });
       return loop();
+    });
+  });
+}
+
+/// Drops the longest **suffix** whose every element satisfies [f], yielding
+/// what is left in source order — trimming a trailing run.
+///
+/// The predicate counterpart of [dropRight], and the complement of
+/// [takeWhileRight]: the two partition the source. Not an FxTS port.
+///
+/// ```dart
+/// dropWhileRight((a) => a == 0, [1, 2, 0, 0]); // (1, 2)
+/// ```
+///
+/// Unlike [takeWhileRight] this streams: a matching run is held back only
+/// until an element fails [f], which proves the run was not the suffix and
+/// releases it. Memory is the longest run, not the source. A [List] source
+/// is indexed from the end instead, so [f] is called only on the trailing
+/// run and in reverse — keep the predicate pure.
+Iterable<A> dropWhileRight<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    _DropWhileRightIterable(f, iterable);
+
+class _DropWhileRightIterable<A> extends Iterable<A> {
+  _DropWhileRightIterable(this._f, this._source);
+  final bool Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator {
+    final source = _source;
+    if (source is List<A>) {
+      return _ListRangeIterator(source, 0, _suffixStart(_f, source));
+    }
+    return _DropWhileRightIterator(_f, _source.iterator);
+  }
+}
+
+class _DropWhileRightIterator<A> implements Iterator<A> {
+  _DropWhileRightIterator(this._f, this._it);
+  final bool Function(A) _f;
+  final Iterator<A> _it;
+  // Matching elements are held back: they are the suffix only if the source
+  // ends here. The first failing element releases them all.
+  final _pending = <A>[];
+  final _ready = <A>[];
+  int _out = 0;
+  bool _done = false;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    if (_out < _ready.length) {
+      current = _ready[_out++];
+      return true;
+    }
+    if (_done) return false;
+    _ready.clear();
+    _out = 0;
+    while (_it.moveNext()) {
+      final v = _it.current;
+      if (_f(v)) {
+        _pending.add(v);
+        continue;
+      }
+      if (_pending.isEmpty) {
+        current = v;
+        return true;
+      }
+      _ready
+        ..addAll(_pending)
+        ..add(v);
+      _pending.clear();
+      current = _ready[_out++];
+      return true;
+    }
+    // The source ended inside a matching run: that run was the suffix.
+    _done = true;
+    return false;
+  }
+}
+
+/// Async counterpart of [dropWhileRight].
+@pragma('vm:prefer-inline')
+FxAsyncIterable<A> dropWhileRightAsync<A>(
+    bool Function(A a) f, FxAsyncIterable<A> iterable) {
+  return dispatchAsync(iterable, (source) {
+    final iterator = source.iterator;
+    Iterator<A>? head;
+    return SerialAsyncIterator((concurrent) async {
+      if (head == null) {
+        final arr = <A>[];
+        while (true) {
+          final r = await iterator.next(concurrent);
+          if (r.done) break;
+          arr.add(r.value);
+        }
+        head = dropWhileRight(f, arr).iterator;
+      }
+      if (head!.moveNext()) return IterResult.value(head!.current);
+      return IterResult<A>.done();
     });
   });
 }
@@ -4973,6 +5341,90 @@ Acc fold<A, Acc>(Acc seed, Acc Function(Acc acc, A a) f, Iterable<A> iterable) {
   return acc;
 }
 
+/// Like [fold], but the callback also receives the element's 0-based
+/// position.
+///
+/// ```dart
+/// foldWithIndex(0, (acc, a, i) => acc + a * i, [1, 2, 3]); // 8
+/// ```
+Acc foldWithIndex<A, Acc>(Acc seed,
+    Acc Function(Acc acc, A a, int index) f, Iterable<A> iterable) {
+  var acc = seed;
+  var i = 0;
+  for (final a in iterable) {
+    acc = f(acc, a, i++);
+  }
+  return acc;
+}
+
+/// Folds [iterable] **from the last element to the first**, starting from
+/// [seed] — the right-associative counterpart of [fold].
+///
+/// Use it when the combining step is not associative and has to nest from
+/// the right: `foldRight(0, (acc, a) => a - acc, [1, 2, 3])` is
+/// `1 - (2 - (3 - 0))`, where [fold] would give `((0 - 1) - 2) - 3`.
+///
+/// The reducer keeps [fold]'s `(acc, element)` argument order rather than
+/// Haskell's `foldr` flip, so the same callback works with either
+/// direction. A non-[List] source is materialized first — walking backwards
+/// requires knowing where the end is.
+Acc foldRight<A, Acc>(
+    Acc seed, Acc Function(Acc acc, A a) f, Iterable<A> iterable) {
+  var acc = seed;
+  final list = iterable is List<A> ? iterable : iterable.toList(growable: false);
+  for (var i = list.length - 1; i >= 0; i--) {
+    acc = f(acc, list[i]);
+  }
+  return acc;
+}
+
+/// Like [foldRight], but the callback also receives the element's position.
+///
+/// The index is the element's 0-based position in the **source**, so the
+/// last element arrives first carrying the highest index. That is the
+/// position [foldWithIndex] and [mapWithIndex] would give the same element;
+/// it deliberately does not renumber the reversed walk 0, 1, 2.
+Acc foldRightWithIndex<A, Acc>(Acc seed,
+    Acc Function(Acc acc, A a, int index) f, Iterable<A> iterable) {
+  var acc = seed;
+  final list = iterable is List<A> ? iterable : iterable.toList(growable: false);
+  for (var i = list.length - 1; i >= 0; i--) {
+    acc = f(acc, list[i], i);
+  }
+  return acc;
+}
+
+/// Async counterpart of [foldRight].
+///
+/// There is no way to start from the end of a stream without reaching it,
+/// so this drains [iterable] into a list first — unlike [foldAsync], it
+/// holds every element in memory and cannot short-circuit.
+Future<Acc> foldRightAsync<A, Acc>(FutureOr<Acc> seed,
+    FutureOr<Acc> Function(Acc acc, A a) f, FxAsyncIterable<A> iterable) async {
+  var acc = seed is Future<Acc> ? await seed : seed;
+  final list = await toListAsync(iterable);
+  for (var i = list.length - 1; i >= 0; i--) {
+    // Sync accumulators continue without an await hop, as in [foldAsync].
+    final v = f(acc, list[i]);
+    acc = v is Future<Acc> ? await v : v;
+  }
+  return acc;
+}
+
+/// Async counterpart of [foldRightWithIndex].
+Future<Acc> foldRightWithIndexAsync<A, Acc>(
+    FutureOr<Acc> seed,
+    FutureOr<Acc> Function(Acc acc, A a, int index) f,
+    FxAsyncIterable<A> iterable) async {
+  var acc = seed is Future<Acc> ? await seed : seed;
+  final list = await toListAsync(iterable);
+  for (var i = list.length - 1; i >= 0; i--) {
+    final v = f(acc, list[i], i);
+    acc = v is Future<Acc> ? await v : v;
+  }
+  return acc;
+}
+
 /// Async counterpart of [reduce].
 Future<A> reduceAsync<A>(
     FutureOr<A> Function(A acc, A a) f, FxAsyncIterable<A> iterable) async {
@@ -5041,6 +5493,20 @@ Future<Acc> foldAsync<A, Acc>(FutureOr<Acc> seed,
     final v = f(acc, r.value);
     acc = v is Future<Acc> ? await v : v;
   }
+}
+
+/// Async counterpart of [foldWithIndex].
+///
+/// A fold is a terminal that consumes its source strictly in order, so the
+/// counter lives in the accumulator and every one of [foldAsync]'s fast
+/// paths still applies.
+@pragma('vm:prefer-inline')
+Future<Acc> foldWithIndexAsync<A, Acc>(
+    FutureOr<Acc> seed,
+    FutureOr<Acc> Function(Acc acc, A a, int index) f,
+    FxAsyncIterable<A> iterable) {
+  var i = 0;
+  return foldAsync<A, Acc>(seed, (acc, a) => f(acc, a, i++), iterable);
 }
 
 /// Returns a reducer section for use in a pipeline: `reduceLazy(f, seed)`
@@ -5997,6 +6463,54 @@ Map<K, V> pick<K, V>(Iterable<K> keysToPick, Map<K, V> map) {
   };
 }
 
+/// Returns a copy of [map] with every value run through [f]; keys are
+/// untouched.
+///
+/// Not an FxTS port — TS spreads entries through `Object.fromEntries`, which
+/// in Dart is [fromEntries] over [mapEntries] and reads worse than the thing
+/// it does. Insertion order is preserved.
+///
+/// ```dart
+/// mapValues((n) => n * 2, {'a': 1, 'b': 2}); // {a: 2, b: 4}
+/// ```
+Map<K, T> mapValues<K, V, T>(T Function(V value) f, Map<K, V> map) => {
+      for (final e in map.entries) e.key: f(e.value)
+    };
+
+/// Returns a copy of [map] with every key run through [f]; values are
+/// untouched.
+///
+/// [f] is not required to be injective: when two keys collide, the **last**
+/// one in iteration order wins, as it would in a map literal. Insertion order
+/// follows the first appearance of each new key.
+///
+/// ```dart
+/// mapKeys((k) => k.toUpperCase(), {'a': 1, 'b': 2}); // {A: 1, B: 2}
+/// ```
+Map<T, V> mapKeys<K, V, T>(T Function(K key) f, Map<K, V> map) => {
+      for (final e in map.entries) f(e.key): e.value
+    };
+
+/// Returns a new map built by running each `(key, value)` record through [f]
+/// — the general form of [mapValues] and [mapKeys], and the transforming
+/// counterpart of [pickBy].
+///
+/// Colliding results follow the same last-one-wins rule as [mapKeys].
+///
+/// ```dart
+/// mapEntries((e) => (e.$1.toUpperCase(), e.$2 * 2), {'a': 1});
+/// // {A: 2}
+/// ```
+Map<K2, V2> mapEntries<K, V, K2, V2>(
+    (K2, V2) Function((K, V) entry) f, Map<K, V> map) {
+  final out = <K2, V2>{};
+  for (final e in map.entries) {
+    final (k, v) = f((e.key, e.value));
+    out[k] = v;
+  }
+  return out;
+}
+
 /// Returns a copy of [map] without entries matching the predicate [f].
 ///
 /// Port of FxTS `omitBy` (entry tuples become records).
@@ -6007,7 +6521,14 @@ Map<K, V> omitBy<K, V>(bool Function((K, V) entry) f, Map<K, V> map) => {
 
 /// Returns a copy of [map] with only entries matching the predicate [f].
 ///
-/// Port of FxTS `pickBy`.
+/// Port of FxTS `pickBy`. Together with [omitBy] this is the key-aware map
+/// filter; the predicate takes the whole `(key, value)` record, so ignoring
+/// one half is how you filter by the other.
+///
+/// ```dart
+/// pickBy((e) => e.$2 > 1, {'a': 1, 'b': 2});      // by value  -> {b: 2}
+/// pickBy((e) => e.$1.startsWith('a'), {'a': 1});  // by key    -> {a: 1}
+/// ```
 Map<K, V> pickBy<K, V>(bool Function((K, V) entry) f, Map<K, V> map) => {
       for (final e in map.entries)
         if (f((e.key, e.value))) e.key: e.value
@@ -6403,6 +6924,54 @@ bool isMap(Object? a) => a is Map;
 /// alias of [isMap].
 @Deprecated('Use isMap instead')
 bool isObject(Object? a) => a is Map;
+
+/// Combinators on a unary predicate, so conditions passed to `filter`,
+/// `reject`, `takeWhile`, `dropWhile`, ... can be built from named pieces
+/// instead of nested lambdas.
+///
+/// Not an FxTS port — TypeScript composes predicates with `&&` inside an
+/// arrow function and keeps the types through inference. In Dart the same
+/// thing costs a lambda per combination, so the operators are worth naming.
+///
+/// ```dart
+/// bool isEven(int n) => n % 2 == 0;
+/// bool isPositive(int n) => n > 0;
+///
+/// fx([-4, -3, 2, 3, 4]).filter(isEven.and(isPositive)).toList(); // [2, 4]
+/// ```
+///
+/// Every combinator returns a new predicate and calls neither operand until
+/// that predicate runs; [and] and [or] short-circuit exactly like `&&`/`||`.
+extension FxPredicateOps<T> on bool Function(T) {
+  /// The logical opposite of this predicate.
+  ///
+  /// The extension-getter form of the top-level `negate` — `isEven.negate`
+  /// and `negate(isEven)` are the same function.
+  bool Function(T) get negate => (a) => !this(a);
+
+  /// True when both this predicate and [other] hold. [other] is not called
+  /// when this one already fails.
+  bool Function(T) and(bool Function(T a) other) =>
+      (a) => this(a) && other(a);
+
+  /// True when this predicate or [other] holds. [other] is not called when
+  /// this one already succeeds.
+  bool Function(T) or(bool Function(T a) other) => (a) => this(a) || other(a);
+
+  /// True when exactly one of this predicate and [other] holds. Both are
+  /// always called — there is nothing to short-circuit.
+  bool Function(T) xor(bool Function(T a) other) => (a) => this(a) ^ other(a);
+
+  /// Moves this predicate onto a different input type by running [f] first
+  /// — `map` for the *argument* rather than the result, which is why it is
+  /// *contra*map.
+  ///
+  /// ```dart
+  /// final hasEvenLength = isEven.contramap<String>((s) => s.length);
+  /// hasEvenLength('abcd'); // true
+  /// ```
+  bool Function(A) contramap<A>(T Function(A a) f) => (a) => this(f(a));
+}
 
 // ---- lib/src/dart_aliases.dart ----
 /// Dart-idiomatic aliases for the FxTS-named operators.
@@ -8930,11 +9499,20 @@ class Fx<T> extends Iterable<T> {
   @override
   Fx<R> map<R>(R Function(T a) toElement) => Fx(_$map(toElement, _inner));
 
+  /// [map] with the element's 0-based position — `zipWithIndex().map(...)`
+  /// without the intermediate record.
+  Fx<R> mapWithIndex<R>(R Function(T a, int index) f) =>
+      Fx(_$mapWithIndex(f, _inner));
+
   /// Identical to [map]; intended for side effects by convention.
   Fx<R> mapEffect<R>(R Function(T a) f) => map(f);
 
   /// See top-level `flatMap`; same contract as [Iterable.expand].
   Fx<R> flatMap<R>(Iterable<R> Function(T a) f) => Fx(_$flatMap(f, _inner));
+
+  /// [flatMap] with the source element's 0-based position.
+  Fx<R> flatMapWithIndex<R>(Iterable<R> Function(T a, int index) f) =>
+      Fx(_$flatMapWithIndex(f, _inner));
 
   @override
   Fx<R> expand<R>(Iterable<R> Function(T element) toElements) =>
@@ -8948,6 +9526,11 @@ class Fx<T> extends Iterable<T> {
 
   /// All elements [f] returns true for.
   Fx<T> filter(bool Function(T a) f) => Fx(_$filter(f, _inner));
+
+  /// [filter] with the element's 0-based position in the input — dropped
+  /// elements still advance the count.
+  Fx<T> filterWithIndex(bool Function(T a, int index) f) =>
+      Fx(_$filterWithIndex(f, _inner));
 
   @override
   Fx<T> where(bool Function(T element) test) => filter(test);
@@ -8970,6 +9553,10 @@ class Fx<T> extends Iterable<T> {
   @override
   Fx<T> takeWhile(bool Function(T value) test) => Fx(_$takeWhile(test, _inner));
 
+  /// The longest trailing run of values [f] holds for, in source order.
+  Fx<T> takeWhileRight(bool Function(T a) f) =>
+      Fx(_$takeWhileRight(f, _inner));
+
   /// Yields values until [f] matches, including the matching element.
   Fx<T> takeUntilInclusive(bool Function(T a) f) =>
       Fx(_$takeUntilInclusive(f, _inner));
@@ -8989,6 +9576,10 @@ class Fx<T> extends Iterable<T> {
 
   /// Drops leading values while [f] holds, then yields the rest.
   Fx<T> dropWhile(bool Function(T a) f) => Fx(_$dropWhile(f, _inner));
+
+  /// Drops the longest trailing run of values [f] holds for.
+  Fx<T> dropWhileRight(bool Function(T a) f) =>
+      Fx(_$dropWhileRight(f, _inner));
 
   @override
   Fx<T> skipWhile(bool Function(T value) test) => dropWhile(test);
@@ -9141,6 +9732,20 @@ class Fx<T> extends Iterable<T> {
   /// Runs [f] for every value, forcing the pipeline.
   void each(void Function(T a) f) => _$each(f, _inner);
 
+  /// [Iterable.fold] with the element's 0-based position.
+  Acc foldWithIndex<Acc>(
+          Acc seed, Acc Function(Acc acc, T a, int index) f) =>
+      _$foldWithIndex(seed, f, _inner);
+
+  /// Folds from the last value to the first — see top-level `foldRight`.
+  Acc foldRight<Acc>(Acc seed, Acc Function(Acc acc, T a) f) =>
+      _$foldRight(seed, f, _inner);
+
+  /// [foldRight] with each value's 0-based position in the source.
+  Acc foldRightWithIndex<Acc>(
+          Acc seed, Acc Function(Acc acc, T a, int index) f) =>
+      _$foldRightWithIndex(seed, f, _inner);
+
   /// Consumes up to [n] values (all when omitted), forcing side effects.
   void consume([int? n]) => _$consume(_inner, n);
 
@@ -9233,6 +9838,11 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   FxAsync<R> map<R>(FutureOr<R> Function(T a) f) =>
       FxAsync(_$mapAsync(f, _inner));
 
+  /// [map] with the value's 0-based position in source order.
+  @pragma('vm:prefer-inline')
+  FxAsync<R> mapWithIndex<R>(FutureOr<R> Function(T a, int index) f) =>
+      FxAsync(_$mapWithIndexAsync(f, _inner));
+
   /// Identical to [map]; intended for side effects by convention.
   @pragma('vm:prefer-inline')
   FxAsync<R> mapEffect<R>(FutureOr<R> Function(T a) f) => map(f);
@@ -9242,6 +9852,12 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   FxAsync<R> flatMap<R>(FutureOr<Iterable<R>> Function(T a) f) =>
       FxAsync(_$flatMapAsync(f, _inner));
 
+  /// [flatMap] with the source value's 0-based position.
+  @pragma('vm:prefer-inline')
+  FxAsync<R> flatMapWithIndex<R>(
+          FutureOr<Iterable<R>> Function(T a, int index) f) =>
+      FxAsync(_$flatMapWithIndexAsync(f, _inner));
+
   /// Flattens nested iterables [depth] levels.
   @pragma('vm:prefer-inline')
   FxAsync<dynamic> flat([int depth = 1]) => FxAsync(_$flatAsync(_inner, depth));
@@ -9250,6 +9866,12 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   @pragma('vm:prefer-inline')
   FxAsync<T> filter(FutureOr<bool> Function(T a) f) =>
       FxAsync(_$filterAsync(f, _inner));
+
+  /// [filter] with the value's 0-based position in the input — dropped
+  /// values still advance the count.
+  @pragma('vm:prefer-inline')
+  FxAsync<T> filterWithIndex(FutureOr<bool> Function(T a, int index) f) =>
+      FxAsync(_$filterWithIndexAsync(f, _inner));
 
   /// The opposite of [filter].
   @pragma('vm:prefer-inline')
@@ -9268,6 +9890,12 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   @pragma('vm:prefer-inline')
   FxAsync<T> takeWhile(FutureOr<bool> Function(T a) f) =>
       FxAsync(_$takeWhileAsync(f, _inner));
+
+  /// The longest trailing run of values [f] holds for, in source order.
+  /// [f] is sync here — a suffix is only known once the source has ended.
+  @pragma('vm:prefer-inline')
+  FxAsync<T> takeWhileRight(bool Function(T a) f) =>
+      FxAsync(_$takeWhileRightAsync(f, _inner));
 
   /// Yields values until [f] matches, including the matching value.
   @pragma('vm:prefer-inline')
@@ -9291,6 +9919,12 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   @pragma('vm:prefer-inline')
   FxAsync<T> dropWhile(FutureOr<bool> Function(T a) f) =>
       FxAsync(_$dropWhileAsync(f, _inner));
+
+  /// Drops the longest trailing run of values [f] holds for. [f] is sync
+  /// here — a suffix is only known once the source has ended.
+  @pragma('vm:prefer-inline')
+  FxAsync<T> dropWhileRight(bool Function(T a) f) =>
+      FxAsync(_$dropWhileRightAsync(f, _inner));
 
   /// Skips values until [f] matches (dropping the match), yields the rest.
   @pragma('vm:prefer-inline')
@@ -9477,6 +10111,22 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   Future<Acc> fold<Acc>(
           FutureOr<Acc> seed, FutureOr<Acc> Function(Acc acc, T a) f) =>
       _$foldAsync(seed, f, _inner);
+
+  /// [fold] with the value's 0-based position.
+  Future<Acc> foldWithIndex<Acc>(FutureOr<Acc> seed,
+          FutureOr<Acc> Function(Acc acc, T a, int index) f) =>
+      _$foldWithIndexAsync(seed, f, _inner);
+
+  /// Folds from the last value to the first, buffering the whole chain —
+  /// see top-level `foldRightAsync`.
+  Future<Acc> foldRight<Acc>(
+          FutureOr<Acc> seed, FutureOr<Acc> Function(Acc acc, T a) f) =>
+      _$foldRightAsync(seed, f, _inner);
+
+  /// [foldRight] with each value's 0-based position in the source.
+  Future<Acc> foldRightWithIndex<Acc>(FutureOr<Acc> seed,
+          FutureOr<Acc> Function(Acc acc, T a, int index) f) =>
+      _$foldRightWithIndexAsync(seed, f, _inner);
 
   /// Groups values into lists keyed by [f].
   Future<Map<K, List<T>>> groupBy<K>(FutureOr<K> Function(T a) f) =>
@@ -9696,6 +10346,71 @@ sealed class Either<L, R> {
         Right(:final value) => f(value),
       };
 
+  /// Combines this success with [b]'s, keeping the **first** failure — the
+  /// fail-fast counterpart of `zipOrAccumulate2`.
+  ///
+  /// ```dart
+  /// parseName(form).map2(parseAge(form), User.new);
+  /// ```
+  ///
+  /// Both branches are already-evaluated [Either] values, so both ran; what
+  /// is fail-fast is the *reporting* — the leftmost [Left] is returned and
+  /// the rest are discarded. When you want every failure instead, use
+  /// `zipOrAccumulate2` inside an `accumulate` scope, which reports an
+  /// `EitherNel`. [combine] runs only when every branch is a [Right].
+  // The arities are written as a run of `is Left` checks rather than nested
+  // `flatMap`s: it makes "the leftmost Left wins" literally readable, and it
+  // allocates no closures per call.
+  Either<L, T> map2<B, T>(Either<L, B> b, T Function(R a, B b) combine) {
+    final a = this;
+    if (a is Left<L, R>) return Left(a.value);
+    if (b is Left<L, B>) return Left(b.value);
+    return Right(combine((a as Right<L, R>).value, (b as Right<L, B>).value));
+  }
+
+  /// 3-ary [map2].
+  Either<L, T> map3<B, C, T>(
+      Either<L, B> b, Either<L, C> c, T Function(R a, B b, C c) combine) {
+    final a = this;
+    if (a is Left<L, R>) return Left(a.value);
+    if (b is Left<L, B>) return Left(b.value);
+    if (c is Left<L, C>) return Left(c.value);
+    return Right(combine((a as Right<L, R>).value, (b as Right<L, B>).value,
+        (c as Right<L, C>).value));
+  }
+
+  /// 4-ary [map2].
+  Either<L, T> map4<B, C, D, T>(Either<L, B> b, Either<L, C> c, Either<L, D> d,
+      T Function(R a, B b, C c, D d) combine) {
+    final a = this;
+    if (a is Left<L, R>) return Left(a.value);
+    if (b is Left<L, B>) return Left(b.value);
+    if (c is Left<L, C>) return Left(c.value);
+    if (d is Left<L, D>) return Left(d.value);
+    return Right(combine((a as Right<L, R>).value, (b as Right<L, B>).value,
+        (c as Right<L, C>).value, (d as Right<L, D>).value));
+  }
+
+  /// 5-ary [map2]. Arity capped at 5, like `zipOrAccumulate2..5` and
+  /// `Curry2..Curry5` — beyond that, chain [flatMap] or use the `either`
+  /// builder.
+  Either<L, T> map5<B, C, D, E, T>(
+      Either<L, B> b,
+      Either<L, C> c,
+      Either<L, D> d,
+      Either<L, E> e,
+      T Function(R a, B b, C c, D d, E e) combine) {
+    final a = this;
+    if (a is Left<L, R>) return Left(a.value);
+    if (b is Left<L, B>) return Left(b.value);
+    if (c is Left<L, C>) return Left(c.value);
+    if (d is Left<L, D>) return Left(d.value);
+    if (e is Left<L, E>) return Left(e.value);
+    return Right(combine((a as Right<L, R>).value, (b as Right<L, B>).value,
+        (c as Right<L, C>).value, (d as Right<L, D>).value,
+        (e as Right<L, E>).value));
+  }
+
   /// Swaps the sides.
   Either<R, L> swap() => switch (this) {
         Left(:final value) => Right(value),
@@ -9739,10 +10454,66 @@ sealed class Either<L, R> {
         Right(:final value) => Right(value),
       };
 
+  /// Demotes a [Right] whose value fails [predicate] to a [Left] built by
+  /// [onFalse] — inline validation without a `flatMap` + `if`.
+  ///
+  /// ```dart
+  /// parseAge(s)
+  ///     .filterOrElse((n) => n >= 0, (n) => 'age cannot be $n')
+  ///     .filterOrElse((n) => n < 150, (n) => 'age $n is implausible');
+  /// ```
+  ///
+  /// A [Left] passes through untouched and [predicate] never runs. This is
+  /// the `Either`-value form of `Raise.ensure`, which does the same job
+  /// inside an `either { }` builder.
+  Either<L, R> filterOrElse(
+      bool Function(R value) predicate, L Function(R value) onFalse) {
+    if (this case Right(:final value) when !predicate(value)) {
+      return Left(onFalse(value));
+    }
+    return this;
+  }
+
+  /// Returns this when it is a [Right], otherwise the result of [other] —
+  /// "try this, and if it failed try that".
+  ///
+  /// [other] is not called on the success path, so the alternative can be an
+  /// expensive lookup. The failure is discarded; use [orElse] when the
+  /// fallback depends on what went wrong.
+  ///
+  /// ```dart
+  /// fromCache(key).alt(() => fromDisk(key)).alt(() => fromNetwork(key));
+  /// ```
+  Either<L, R> alt(Either<L, R> Function() other) => switch (this) {
+        Left() => other(),
+        Right() => this,
+      };
+
+  /// Like [alt], but [other] receives the failure and may return a different
+  /// failure type — the fallback that gets to look at what went wrong.
+  ///
+  /// ```dart
+  /// parseInt(s).orElse((e) => Left('$s is not a number ($e)'));
+  /// ```
+  ///
+  /// [recover] is the richer sibling: it runs inside a fresh raise scope, so
+  /// the handler writes straight-line Dart and raises rather than building an
+  /// `Either` by hand. Reach for [orElse] when you already *have* the
+  /// replacement `Either` and only want to swap it in.
+  Either<L2, R> orElse<L2>(Either<L2, R> Function(L left) other) =>
+      switch (this) {
+        Left(:final value) => other(value),
+        Right(:final value) => Right(value),
+      };
+
   /// Recovers from a failure inside a fresh raise scope: [transform] may
-  /// return a replacement success value or raise a new error of type `L2`.
-  /// Replaces the whole `orElse`/`handleError`/`handleErrorWith` family
-  /// (port of Arrow's `recover`).
+  /// return a replacement success value or raise a new error of type `L2`
+  /// (port of Arrow's `recover`). It stands in for the whole
+  /// `handleError`/`handleErrorWith` family — a handler that wants to fail
+  /// again just calls `r.raise`, no `Either` construction by hand.
+  ///
+  /// [orElse] is the plainer form for when the replacement is already an
+  /// `Either`, and [alt] for when the failure doesn't matter at all.
   Either<L2, R> recover<L2>(
           R Function(Raise<L2> r, L error) transform) =>
       switch (this) {
@@ -9837,6 +10608,19 @@ Iterable<B> _$flatMap<A, B>(Iterable<B> Function(A a) f, Iterable<A> iterable) =
 FxAsyncIterable<B> _$flatMapAsync<A, B>(
         FutureOr<Iterable<B>> Function(A a) f, FxAsyncIterable<A> iterable) =>
     flatMapAsync(f, iterable);
+Iterable<B> _$mapWithIndex<A, B>(
+        B Function(A a, int index) f, Iterable<A> iterable) =>
+    mapWithIndex(f, iterable);
+FxAsyncIterable<B> _$mapWithIndexAsync<A, B>(
+        FutureOr<B> Function(A a, int index) f, FxAsyncIterable<A> iterable) =>
+    mapWithIndexAsync(f, iterable);
+Iterable<B> _$flatMapWithIndex<A, B>(
+        Iterable<B> Function(A a, int index) f, Iterable<A> iterable) =>
+    flatMapWithIndex(f, iterable);
+FxAsyncIterable<B> _$flatMapWithIndexAsync<A, B>(
+        FutureOr<Iterable<B>> Function(A a, int index) f,
+        FxAsyncIterable<A> iterable) =>
+    flatMapWithIndexAsync(f, iterable);
 Iterable<B> _$scan<A, B>(
         B Function(B acc, A a) f, B seed, Iterable<A> iterable) =>
     scan(f, seed, iterable);
@@ -9861,6 +10645,13 @@ Iterable<A> _$filter<A>(bool Function(A a) f, Iterable<A> iterable) =>
 FxAsyncIterable<A> _$filterAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
     filterAsync(f, iterable);
+Iterable<A> _$filterWithIndex<A>(
+        bool Function(A a, int index) f, Iterable<A> iterable) =>
+    filterWithIndex(f, iterable);
+FxAsyncIterable<A> _$filterWithIndexAsync<A>(
+        FutureOr<bool> Function(A a, int index) f,
+        FxAsyncIterable<A> iterable) =>
+    filterWithIndexAsync(f, iterable);
 Iterable<A> _$reject<A>(bool Function(A a) f, Iterable<A> iterable) =>
     reject(f, iterable);
 FxAsyncIterable<A> _$rejectAsync<A>(
@@ -9912,6 +10703,16 @@ Iterable<A> _$takeWhile<A>(bool Function(A a) f, Iterable<A> iterable) =>
 FxAsyncIterable<A> _$takeWhileAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
     takeWhileAsync(f, iterable);
+Iterable<A> _$takeWhileRight<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    takeWhileRight(f, iterable);
+FxAsyncIterable<A> _$takeWhileRightAsync<A>(
+        bool Function(A a) f, FxAsyncIterable<A> iterable) =>
+    takeWhileRightAsync(f, iterable);
+Iterable<A> _$dropWhileRight<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    dropWhileRight(f, iterable);
+FxAsyncIterable<A> _$dropWhileRightAsync<A>(
+        bool Function(A a) f, FxAsyncIterable<A> iterable) =>
+    dropWhileRightAsync(f, iterable);
 Iterable<A> _$takeUntilInclusive<A>(
         bool Function(A a) f, Iterable<A> iterable) =>
     takeUntilInclusive(f, iterable);
@@ -10038,6 +10839,28 @@ Future<A> _$reduceAsync<A>(
 Future<Acc> _$foldAsync<A, Acc>(FutureOr<Acc> seed,
         FutureOr<Acc> Function(Acc acc, A a) f, FxAsyncIterable<A> iterable) =>
     foldAsync(seed, f, iterable);
+Acc _$foldWithIndex<A, Acc>(Acc seed,
+        Acc Function(Acc acc, A a, int index) f, Iterable<A> iterable) =>
+    foldWithIndex(seed, f, iterable);
+Future<Acc> _$foldWithIndexAsync<A, Acc>(
+        FutureOr<Acc> seed,
+        FutureOr<Acc> Function(Acc acc, A a, int index) f,
+        FxAsyncIterable<A> iterable) =>
+    foldWithIndexAsync(seed, f, iterable);
+Acc _$foldRight<A, Acc>(
+        Acc seed, Acc Function(Acc acc, A a) f, Iterable<A> iterable) =>
+    foldRight(seed, f, iterable);
+Acc _$foldRightWithIndex<A, Acc>(Acc seed,
+        Acc Function(Acc acc, A a, int index) f, Iterable<A> iterable) =>
+    foldRightWithIndex(seed, f, iterable);
+Future<Acc> _$foldRightAsync<A, Acc>(FutureOr<Acc> seed,
+        FutureOr<Acc> Function(Acc acc, A a) f, FxAsyncIterable<A> iterable) =>
+    foldRightAsync(seed, f, iterable);
+Future<Acc> _$foldRightWithIndexAsync<A, Acc>(
+        FutureOr<Acc> seed,
+        FutureOr<Acc> Function(Acc acc, A a, int index) f,
+        FxAsyncIterable<A> iterable) =>
+    foldRightWithIndexAsync(seed, f, iterable);
 num _$sum(Iterable<num> iterable) => sum(iterable);
 Future<num> _$sumAsync(FxAsyncIterable<num> iterable) => sumAsync(iterable);
 double _$average(Iterable<num> iterable) => average(iterable);

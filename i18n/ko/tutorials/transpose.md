@@ -5,8 +5,8 @@ description: FxDart transpose 튜토리얼: 개수에 상관없이 여러 이터
 heading: <code>transpose</code>
 section: 6
 crumb: transpose
-prev: zipWithIndex.html
-prevLabel: zipWithIndex
+prev: withIndex.html
+prevLabel: …WithIndex
 next: reverse.html
 nextLabel: reverse
 ---

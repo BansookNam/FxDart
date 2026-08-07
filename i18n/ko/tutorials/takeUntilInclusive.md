@@ -5,8 +5,8 @@ description: FxDart takeUntilInclusive 튜토리얼 — 처음 조건에 맞는 
 heading: <code>takeUntilInclusive</code>
 section: 5
 crumb: takeUntilInclusive
-prev: takeWhile.html
-prevLabel: takeWhile
+prev: takeWhileRight.html
+prevLabel: takeWhileRight
 next: drop.html
 nextLabel: drop
 ---

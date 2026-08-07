@@ -159,6 +159,26 @@ A `List` source is indexed from the end by both, so the predicate is
 called only on the trailing run, in reverse. That is a visible
 difference for an impure predicate, and it is documented on each.
 
+### Docs
+
+Seven new FxDart 101 pages, in English and Korean, each with three
+runnable demos: `takeWhileRight` and `dropWhileRight` in section 5,
+`…WithIndex` in section 6, `foldRight` in section 7, `mapValues` in
+section 9, predicate combinators in section 10, and `Either`
+combinators in section 13.
+
+Three of them cover a family rather than one function — `…WithIndex`
+takes all four index-aware operators, `mapValues` takes `mapKeys` and
+`mapEntries` too, and `Either` combinators covers `map2`…`map5`,
+`alt`/`orElse` and `filterOrElse`. That follows the pages that were
+already grouped this way (`predicates`, `gt · gte · lt · lte`,
+`delay & sleep`): the lesson is the family, not the entry point.
+
+`tools/build_single_file.sh` carries a hand-maintained list of `_$name`
+wrappers for every top-level function `fx.dart` reaches through an
+import prefix. Sixteen were added for the new operators — the bundle
+build fails loudly when one is missing, which is how they were found.
+
 ### Tests
 
 Line coverage stays at **100.00%** (3837/3837, up from 3607).

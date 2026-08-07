@@ -5,8 +5,8 @@ description: FxDart reduceLazy 튜토리얼: 여러 이터러블에 반복해서
 heading: <code>reduceLazy</code>
 section: 7
 crumb: reduceLazy
-prev: fold.html
-prevLabel: fold
+prev: foldRight.html
+prevLabel: foldRight
 next: sum.html
 nextLabel: sum
 ---

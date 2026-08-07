@@ -7,8 +7,8 @@ section: 9
 crumb: props
 prev: prop.html
 prevLabel: prop
-next: evolve.html
-nextLabel: evolve
+next: mapValues.html
+nextLabel: mapValues
 ---
   <p class="hero-sub">Devuelve los valores de varias claves de un <code>Map</code>, como una <code>List</code>.</p>
 

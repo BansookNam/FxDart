@@ -5,8 +5,8 @@ description: Tutorial de evolve en FxDart: transforma valores concretos de un Ma
 heading: <code>evolve</code>
 section: 9
 crumb: evolve
-prev: props.html
-prevLabel: props
+prev: mapValues.html
+prevLabel: mapValues
 next: compactObject.html
 nextLabel: compactObject
 ---

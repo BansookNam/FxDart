@@ -5,8 +5,8 @@ description: Tutorial de when en FxDart: aplica una transformación solo cuando 
 heading: <code>when</code>
 section: 10
 crumb: when
-prev: not.html
-prevLabel: not
+prev: predicateOps.html
+prevLabel: predicate combinators
 next: unless.html
 nextLabel: unless
 ---

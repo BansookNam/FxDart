@@ -5,8 +5,8 @@ description: FxDart dropUntil tutorial: skip values up to and including the firs
 heading: <code>dropUntil</code>
 section: 5
 crumb: dropUntil
-prev: dropWhile.html
-prevLabel: dropWhile
+prev: dropWhileRight.html
+prevLabel: dropWhileRight
 next: slice.html
 nextLabel: slice
 ---

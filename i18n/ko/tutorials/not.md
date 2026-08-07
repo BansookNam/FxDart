@@ -7,8 +7,8 @@ section: 10
 crumb: not
 prev: negate.html
 prevLabel: negate
-next: when.html
-nextLabel: when
+next: predicateOps.html
+nextLabel: predicate combinators
 ---
   <p class="hero-sub">그대로 넘길 수 있는 함수 형태의 불리언 부정입니다.</p>
 

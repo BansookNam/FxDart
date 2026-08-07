@@ -7,8 +7,8 @@ section: 13
 crumb: Either
 prev: typedErrors.html
 prevLabel: typed errors
-next: raise.html
-nextLabel: either &amp; Raise
+next: eitherCombinators.html
+nextLabel: Either combinators
 ---
   <p class="hero-sub">
     실패인 <code>Left(L)</code>이거나 성공인 <code>Right(R)</code>인 값 —

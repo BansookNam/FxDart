@@ -7,8 +7,8 @@ section: 7
 crumb: fold
 prev: reduce.html
 prevLabel: reduce
-next: reduceLazy.html
-nextLabel: reduceLazy
+next: foldRight.html
+nextLabel: foldRight
 ---
   <p class="hero-sub">La forma de reduce con valor inicial: siempre segura, incluso sobre un pipeline vacío.</p>
 
