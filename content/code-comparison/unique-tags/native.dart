@@ -13,6 +13,10 @@ const posts = [
 ];
 
 void main() {
-  final tags = posts.expand((p) => p.tags).toSet().toList()..sort();
+  final tags = posts
+      .expand((p) => p.tags)
+      .toSet()
+      .toList()
+    ..sort();
   print(tags.join(', '));
 }
