@@ -66,10 +66,12 @@ nextLabel: toAsync
 
   <div class="callout">
     <strong>Note:</strong> the chain is strictly unary — FxTS's mixed
-    application <code>add(1, 2)(3)</code> has no equivalent. Named/optional
-    parameters and values typed as bare <code>Function</code> don't match the
-    extensions; write a closure there. The deprecated top-level
-    <code>curry</code> stub remains only to steer FxTS migrations here.
+    application <code>add(1, 2)(3)</code> has no equivalent. Named parameters
+    and values typed as bare <code>Function</code> don't match the extensions;
+    write a closure there. Optional positional parameters <em>do</em> match,
+    but the optional slot becomes required in the chain. The deprecated
+    top-level <code>curry</code> stub remains only to steer FxTS migrations
+    here.
   </div>
 
   <div class="callout">

@@ -70,10 +70,11 @@ nextLabel: toAsync
   <div class="callout">
     <strong>Nota:</strong> la cadena es estrictamente unaria — la aplicación
     mixta de FxTS <code>add(1, 2)(3)</code> no tiene equivalente. Los parámetros
-    con nombre u opcionales y los valores tipados como <code>Function</code> a
-    secas no encajan con las extensiones; ahí escribe un closure. El stub de
-    nivel superior <code>curry</code>, ya obsoleto, solo sigue ahí para guiar
-    hasta aquí a quien migre desde FxTS.
+    con nombre y los valores tipados como <code>Function</code> a secas no
+    encajan con las extensiones; ahí escribe un closure. Los parámetros
+    posicionales opcionales <em>sí</em> encajan, pero en la cadena ese hueco
+    pasa a ser obligatorio. El stub de nivel superior <code>curry</code>, ya
+    obsoleto, solo sigue ahí para guiar hasta aquí a quien migre desde FxTS.
   </div>
 
   <div class="callout">

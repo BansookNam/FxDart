@@ -67,11 +67,12 @@ nextLabel: toAsync
 
   <div class="callout">
     <strong>참고:</strong> 연쇄는 철저히 단항입니다 — FxTS의 혼합 적용
-    <code>add(1, 2)(3)</code>에 해당하는 것은 없습니다. 명명된 매개변수나
-    선택적 매개변수, 그리고 타입이 그냥 <code>Function</code>인 값은
-    확장에 매칭되지 않으니 그런 곳에는 클로저를 쓰세요. deprecated된
-    최상위 <code>curry</code> 스텁은 FxTS 마이그레이션을 이쪽으로
-    안내하기 위해서만 남아 있습니다.
+    <code>add(1, 2)(3)</code>에 해당하는 것은 없습니다. 명명된 매개변수와
+    타입이 그냥 <code>Function</code>인 값은 확장에 매칭되지 않으니 그런
+    곳에는 클로저를 쓰세요. 선택적 위치 매개변수는 매칭<em>되지만</em>,
+    연쇄 안에서는 그 자리가 필수가 됩니다. deprecated된 최상위
+    <code>curry</code> 스텁은 FxTS 마이그레이션을 이쪽으로 안내하기
+    위해서만 남아 있습니다.
   </div>
 
   <div class="callout">
