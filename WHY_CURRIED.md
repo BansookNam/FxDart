@@ -260,13 +260,50 @@ AOT, and the web because whole-program reflection defeats tree-shaking, and the
 static-metaprogramming (macros) effort that might eventually have offered a
 compile-time alternative was discontinued in 2025.
 
-But this entry is different from the other three, because the feature would not
-buy anything. Counting parameters at runtime tells the *compiler* nothing: the
-result would be the deprecated stub again — `Function` in, `Function` out, a
-cast at every use site. What a value typed as bare `Function` would actually
-need is a **typed dynamic call**, which is dependent typing, which no
-mainstream language offers. This limitation is not waiting on a Dart feature;
-it is the reason currying belongs to static composition in the first place.
+That leaves the JIT VM, where `dart:mirrors` *does* still work — enough to build
+the FxTS semantics in full, mixed application included. This was measured rather
+than assumed, on Dart 3.12.2:
+
+```dart
+int _arity(Function f) => (reflect(f) as ClosureMirror)
+    .function.parameters.where((p) => !p.isOptional).length;
+// …accumulate arguments until the count is reached, then Function.apply.
+
+curry(add3)(1)(2)(3);             // 6   — full currying
+curry(add3)(1, 2)(3);             // 6   — mixed application
+curry(add7)(1)(2)(3)(4)(5)(6)(7); // 28  — arity 7, past the 2–5 ceiling
+```
+
+Every limitation in this document except the typing lifts. And it is still
+unusable, for two independent reasons.
+
+**It reaches one platform out of three.** fxdart targets every Dart platform —
+that is the point of a zero-dependency core library, and a Flutter release build
+or a page on this documentation site must run the same code as `dart run`:
+
+| target | result |
+|---|---|
+| `dart run` (JIT VM) | works |
+| `dart compile exe` (AOT, Flutter release) | `Error: AOT compilation failed` |
+| `dart compile js` (dart2js, and DDC for the site's playgrounds) | `Error: 'ClosureMirror' isn't a type.` |
+
+On the web the library is not merely disabled but replaced by an empty stub, so
+the type names do not resolve at all. Anything built this way could not ship in
+`lib/`, and could not even appear as a runnable snippet in a tutorial, since
+`tool/precompile_playgrounds.dart` compiles every snippet for the browser.
+
+**It gives back untyped results.** The reflective chain returns `dynamic`, so
+the analyzer accepts `String bad = curry(add3)(1)(2)(3);` without complaint and
+the program fails at runtime instead. That is the deprecated stub's ergonomics
+exactly — which is the deeper point of this section.
+
+So this entry is different from the other three. The other three name a feature
+Dart could plausibly gain; this one names a feature Dart already has on one
+platform, and having it changes nothing. Counting parameters at runtime tells
+the *compiler* nothing. What a value typed as bare `Function` would actually
+need is a **typed dynamic call**, which is dependent typing, which no mainstream
+language offers. This limitation is not waiting on a Dart feature; it is the
+reason currying belongs to static composition in the first place.
 
 ### The design is forward-compatible
 
