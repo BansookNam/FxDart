@@ -6402,7 +6402,6 @@ List<A> _sortByImpl<A>(
   final items = List.of(iterable);
   final length = items.length;
   if (length < 2) return items;
-  final keys = [for (final a in items) f(a)];
   final indices = [for (var i = 0; i < length; i++) i];
 
   // Homogeneous key types get an unboxed key array and a devirtualized
@@ -6411,43 +6410,189 @@ List<A> _sortByImpl<A>(
   // same on every path. No Int64List: the playground build targets JS.
   // Descending picks a swapped-operand comparator once per sort, so the
   // per-comparison cost is identical to ascending.
-  var allDouble = true, allInt = true, allString = true;
-  for (final k in keys) {
-    if (k is! double) allDouble = false;
-    if (k is! int) allInt = false;
-    if (k is! String) allString = false;
-    if (!(allDouble || allInt || allString)) break;
-  }
-  if (allDouble) {
+  //
+  // Keys go STRAIGHT into the typed array. Collecting them into a
+  // `List<Object?>` first — as this did until 0.8.0 — boxes every double on
+  // the way, which measured ~1.5x on a million-row `sortBy` over a double
+  // key. The type is decided by the first key; a later key that disagrees
+  // spills what has been read so far into a boxed list and finishes in the
+  // generic path, so [f] still runs exactly once per element, in order.
+  final first = f(items[0]);
+
+  if (first is double) {
     final dk = Float64List(length);
-    for (var i = 0; i < length; i++) {
-      dk[i] = keys[i] as double;
+    dk[0] = first;
+    for (var i = 1; i < length; i++) {
+      final k = f(items[i]);
+      if (k is! double) return _sortSpilled(f, items, indices, dk, i, k, desc);
+      dk[i] = k;
     }
-    indices.sort(desc
-        ? (i, j) => dk[j].compareTo(dk[i])
-        : (i, j) => dk[i].compareTo(dk[j]));
-  } else if (allInt) {
+    return _sortDoubleKeys(dk, items, desc);
+  }
+
+  if (first is int) {
     final ik = List<int>.filled(length, 0);
-    for (var i = 0; i < length; i++) {
-      ik[i] = keys[i] as int;
+    ik[0] = first;
+    for (var i = 1; i < length; i++) {
+      final k = f(items[i]);
+      if (k is! int) return _sortSpilled(f, items, indices, ik, i, k, desc);
+      ik[i] = k;
     }
     indices.sort(desc
         ? (i, j) => ik[j].compareTo(ik[i])
         : (i, j) => ik[i].compareTo(ik[j]));
-  } else if (allString) {
+    return [for (final i in indices) items[i]];
+  }
+
+  if (first is String) {
     final sk = List<String>.filled(length, '');
-    for (var i = 0; i < length; i++) {
-      sk[i] = keys[i] as String;
+    sk[0] = first;
+    for (var i = 1; i < length; i++) {
+      final k = f(items[i]);
+      if (k is! String) return _sortSpilled(f, items, indices, sk, i, k, desc);
+      sk[i] = k;
     }
     indices.sort(desc
         ? (i, j) => sk[j].compareTo(sk[i])
         : (i, j) => sk[i].compareTo(sk[j]));
-  } else {
-    indices.sort(desc
-        ? (i, j) => _compareKeys(keys[j], keys[i])
-        : (i, j) => _compareKeys(keys[i], keys[j]));
+    return [for (final i in indices) items[i]];
   }
+
+  final keys = List<Object?>.filled(length, null);
+  keys[0] = first;
+  for (var i = 1; i < length; i++) {
+    keys[i] = f(items[i]);
+  }
+  return _sortByKeys(items, indices, keys, desc);
+}
+
+/// The typed run broke at [at], where [f] returned [current] instead of the
+/// type [typed] holds. Copies the keys read so far out of [typed], keeps
+/// [current], and reads the rest — so every element's key is extracted
+/// exactly once overall.
+List<A> _sortSpilled<A>(Object? Function(A a) f, List<A> items,
+    List<int> indices, List<Object?> typed, int at, Object? current, bool desc) {
+  final keys = List<Object?>.filled(items.length, null);
+  for (var i = 0; i < at; i++) {
+    keys[i] = typed[i];
+  }
+  keys[at] = current;
+  for (var i = at + 1; i < items.length; i++) {
+    keys[i] = f(items[i]);
+  }
+  return _sortByKeys(items, indices, keys, desc);
+}
+
+List<A> _sortByKeys<A>(
+    List<A> items, List<int> indices, List<Object?> keys, bool desc) {
+  indices.sort(desc
+      ? (i, j) => _compareKeys(keys[j], keys[i])
+      : (i, j) => _compareKeys(keys[i], keys[j]));
   return [for (final i in indices) items[i]];
+}
+
+/// Sorts [items] by the unboxed keys [k], choosing a strategy from the shape
+/// of the keys.
+///
+/// A single O(n) scan first: data that is already in the requested order
+/// needs no sort at all, and data in the exact opposite order needs only a
+/// reverse. That is not a contrived case — `sortBy((d) => -d.amount)` over
+/// rows built in amount order arrives perfectly reversed, and the benchmark
+/// suite has one. Both shortcuts are O(n), so they beat any comparison sort.
+///
+/// Everything else goes to a stable bottom-up merge over the keys and the
+/// items together ([_mergeByDouble]). The decorate-sort-undecorate
+/// alternative sorts an *index* list, so every comparison does two random
+/// reads into the key array and the result is gathered through the
+/// permutation — millions of cache misses on a large sort. Merging touches
+/// both arrays sequentially.
+///
+/// The scan compares with `compareTo`, not `<=`: `0.0 <= -0.0` is true while
+/// `0.0.compareTo(-0.0)` is positive, so a `<=` scan would call an unsorted
+/// run sorted. NaN makes every comparison non-ordering, which fails both
+/// runs and falls through to the merge — where `compareTo` places it last, as
+/// before.
+List<A> _sortDoubleKeys<A>(Float64List k, List<A> items, bool desc) {
+  final n = items.length;
+  var nonDec = true, nonInc = true, strictInc = true, strictDec = true;
+  for (var i = 1; i < n; i++) {
+    final c = k[i - 1].compareTo(k[i]);
+    if (c > 0) {
+      nonDec = false;
+      strictInc = false;
+    } else if (c < 0) {
+      nonInc = false;
+      strictDec = false;
+    } else {
+      strictInc = false;
+      strictDec = false;
+    }
+    if (!nonDec && !nonInc) break;
+  }
+  // Ties are why the reverse shortcuts demand a STRICT run: reversing a run
+  // with equal keys would reverse their source order, and this sort is
+  // stable.
+  if (desc) {
+    if (nonInc) return items;
+    if (strictInc) return [for (var i = n - 1; i >= 0; i--) items[i]];
+  } else {
+    if (nonDec) return items;
+    if (strictDec) return [for (var i = n - 1; i >= 0; i--) items[i]];
+  }
+  return _mergeByDouble(k, items, desc);
+}
+
+/// Stable bottom-up merge sort of [items] by the unboxed keys [k], moving
+/// both arrays in lockstep. Stable by construction: a tie takes the left run,
+/// so equal keys keep their source order.
+List<A> _mergeByDouble<A>(Float64List k, List<A> items, bool desc) {
+  final n = items.length;
+  var srcK = k;
+  var dstK = Float64List(n);
+  var srcV = items;
+  var dstV = List<A>.of(items);
+  for (var width = 1; width < n; width <<= 1) {
+    for (var lo = 0; lo < n; lo += width << 1) {
+      var mid = lo + width;
+      if (mid > n) mid = n;
+      var hi = mid + width;
+      if (hi > n) hi = n;
+      var i = lo, j = mid, t = lo;
+      while (i < mid && j < hi) {
+        final a = srcK[i];
+        final b = srcK[j];
+        if (desc ? a.compareTo(b) >= 0 : a.compareTo(b) <= 0) {
+          dstK[t] = a;
+          dstV[t] = srcV[i];
+          i++;
+        } else {
+          dstK[t] = b;
+          dstV[t] = srcV[j];
+          j++;
+        }
+        t++;
+      }
+      while (i < mid) {
+        dstK[t] = srcK[i];
+        dstV[t] = srcV[i];
+        i++;
+        t++;
+      }
+      while (j < hi) {
+        dstK[t] = srcK[j];
+        dstV[t] = srcV[j];
+        j++;
+        t++;
+      }
+    }
+    final tk = srcK;
+    srcK = dstK;
+    dstK = tk;
+    final tv = srcV;
+    srcV = dstV;
+    dstV = tv;
+  }
+  return srcV;
 }
 
 /// Async counterpart of [sortBy].

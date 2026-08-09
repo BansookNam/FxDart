@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../assets/fxdart_single.dart?v=d3636bb1fb9235e1">
+  <link rel="prefetch" href="../assets/fxdart_single.dart?v=b4dae51ab37b09a8">
 </head>
 <body>
 <header class="site-header">
@@ -61,9 +61,18 @@ Future&lt;List&lt;T&gt;&gt; FxAsync.sortBy(Object? Function(T a) f)     // chain
     convenience sibling: instead of writing
     <code>(a, b) =&gt; a.age.compareTo(b.age)</code> yourself, you give
     <code>sortBy</code> a key extractor — <code>(a) =&gt; a['age']</code> —
-    and it builds the comparator for you, always ascending, always
-    comparing the extracted keys with <code>Comparable.compare</code>. Under
-    the hood it's literally <code>sort((a, b) =&gt; compare(f(a), f(b)), iterable)</code>.
+    and it sorts by the extracted keys, always ascending, always comparing
+    them with <code>Comparable.compare</code>.
+  </p>
+  <p>
+    It is <em>not</em> <code>sort((a, b) =&gt; compare(f(a), f(b)))</code>
+    underneath, and the difference is visible in your callback: that form
+    would call <code>f</code> twice per comparison — about
+    <code>2·n·log n</code> times. <code>sortBy</code> extracts each key
+    <strong>exactly once</strong>, then sorts by the extracted keys, so an
+    expensive key extractor costs <code>n</code> calls, not
+    <code>2·n·log n</code>. Keep <code>f</code> pure and cheap all the same:
+    the number of calls is guaranteed, the order they happen in is not.
   </p>
   <p>
     Every guarantee from <code>sort</code> carries over unchanged: the
@@ -82,7 +91,7 @@ Future&lt;List&lt;T&gt;&gt; FxAsync.sortBy(Object? Function(T a) f)     // chain
   </p>
 
   <h2>Demo 1 · Basics</h2>
-  <div class="playground" data-pg="6ccd2bfd6a46e317">
+  <div class="playground" data-pg="bcf6f79f0b63f26c">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -160,7 +169,7 @@ void main() {
   <p>Playground compiles via the DartPad compile service. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Run","pgReset":"Reset","pgCompiling":"Compiling…","pgCompileError":"Compile error","pgError":"Error","pgLoading":"Loading runtime…","pgRunning":"Running…","pgNoOutput":"(no output)","pgLoadFailed":"Could not load the FxDart library"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=d3636bb1fb9235e1";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=b4dae51ab37b09a8";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

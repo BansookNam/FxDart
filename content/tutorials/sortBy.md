@@ -20,9 +20,18 @@ nextLabel: sortByDesc
     convenience sibling: instead of writing
     <code>(a, b) =&gt; a.age.compareTo(b.age)</code> yourself, you give
     <code>sortBy</code> a key extractor — <code>(a) =&gt; a['age']</code> —
-    and it builds the comparator for you, always ascending, always
-    comparing the extracted keys with <code>Comparable.compare</code>. Under
-    the hood it's literally <code>sort((a, b) =&gt; compare(f(a), f(b)), iterable)</code>.
+    and it sorts by the extracted keys, always ascending, always comparing
+    them with <code>Comparable.compare</code>.
+  </p>
+  <p>
+    It is <em>not</em> <code>sort((a, b) =&gt; compare(f(a), f(b)))</code>
+    underneath, and the difference is visible in your callback: that form
+    would call <code>f</code> twice per comparison — about
+    <code>2·n·log n</code> times. <code>sortBy</code> extracts each key
+    <strong>exactly once</strong>, then sorts by the extracted keys, so an
+    expensive key extractor costs <code>n</code> calls, not
+    <code>2·n·log n</code>. Keep <code>f</code> pure and cheap all the same:
+    the number of calls is guaranteed, the order they happen in is not.
   </p>
   <p>
     Every guarantee from <code>sort</code> carries over unchanged: the
