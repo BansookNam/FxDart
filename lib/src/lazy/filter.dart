@@ -318,13 +318,19 @@ class _UniqIterator<A> implements Iterator<A> {
   }
 }
 
-/// Async counterpart of [uniqBy].
+/// Async counterpart of [uniqBy]. Uses then/bare pattern for sync keys.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> uniqByAsync<A, B>(
     FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) {
   return DelegateAsyncIterable(() {
     final seen = <B>{};
-    return filterAsync((A a) async => seen.add(await f(a)), iterable).iterator;
+    return filterAsync((A a) {
+      final key = f(a);
+      if (key is Future<B>) {
+        return key.then((k) => seen.add(k));
+      }
+      return seen.add(key as B);
+    }, iterable).iterator;
   });
 }
 

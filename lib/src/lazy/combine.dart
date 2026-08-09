@@ -223,12 +223,74 @@ class _ConcatIterator<A> implements Iterator<A> {
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> concatAsync<A>(
     FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) {
+  return DelegateAsyncIterable(
+      () => _ConcatAsyncIterator<A>(iterable1, iterable2));
+}
+
+class _ConcatAsyncIterator<A> with FxFastNextGate<A> implements FxFastIterator<A> {
+  _ConcatAsyncIterator(this._iterable1, this._iterable2);
+  final FxAsyncIterable<A> _iterable1;
+  final FxAsyncIterable<A> _iterable2;
+  FxAsyncIterator<A>? _left;
+  FxAsyncIterator<A>? _right;
+  FxAsyncIterator<A>? _fallback;
+  bool _leftDone = false;
+
+  @override
+  Future<IterResult<A>> next([Concurrent? concurrent]) {
+    if (_fallback == null &&
+        concurrent is Concurrent &&
+        _left == null &&
+        _right == null &&
+        !_leftDone) {
+      _fallback = _concatAsyncLegacy(_iterable1, _iterable2).iterator;
+    }
+    final fb = _fallback;
+    if (fb != null) return fb.next(concurrent);
+    return super.next(concurrent);
+  }
+
+  @override
+  FutureOr<IterResult<A>> nextOr() {
+    final fb = _fallback;
+    if (fb != null) return fb.next();
+    while (true) {
+      if (_leftDone) {
+        final r = _right ??= _iterable2.iterator;
+        if (r is FxFastIterator<A>) {
+          final ro = r.nextOr();
+          if (ro is Future<IterResult<A>>) return ro;
+          return ro;
+        }
+        return r.next();
+      }
+      final l = _left ??= _iterable1.iterator;
+      if (l is FxFastIterator<A>) {
+        final ro = l.nextOr();
+        if (ro is Future<IterResult<A>>) return ro;
+        if (ro.done) {
+          _leftDone = true;
+          continue;
+        }
+        return ro;
+      }
+      return l.next().then((r) {
+        if (r.done) {
+          _leftDone = true;
+          return nextOr();
+        }
+        return r;
+      });
+    }
+  }
+}
+
+FxAsyncIterable<A> _concatAsyncLegacy<A>(
+    FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) {
   return DelegateAsyncIterable(() {
     final left = iterable1.iterator;
     final right = iterable2.iterator;
     var leftDone = false;
-    // Pass-through (not serialized): overlapping pulls must stay parallel so
-    // `concurrent` propagates upstream, as in FxTS `concat`.
     return DelegateAsyncIterator((concurrent) async {
       if (!leftDone) {
         final result = await left.next(concurrent);
