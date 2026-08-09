@@ -4,6 +4,7 @@ import 'async_iterable.dart';
 import 'async_iterable.dart' as async_;
 import 'lazy/combine.dart' as l;
 import 'lazy/effect.dart' as l;
+import 'lazy/fast_uniq.dart';
 import 'lazy/filter.dart' as l;
 import 'lazy/map.dart' as l;
 import 'lazy/take_drop.dart' as l;
@@ -101,7 +102,15 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 
   // --- lazy operators -----------------------------------------------------
 
-  Fx<R> map<R>(R Function(T a) toElement) => Fx(l.map(toElement, _inner));
+  Fx<R> map<R>(R Function(T a) toElement) {
+    final mapped = l.map(toElement, _inner);
+    // Preserve strategy marker through chain
+    if (_inner is _FxStrategyMarker<T>) {
+      final marker = _inner as _FxStrategyMarker<T>;
+      return Fx(_FxStrategyMarker(mapped, marker.strategy) as Iterable<R>);
+    }
+    return Fx(mapped);
+  }
 
   /// [map] with the element's 0-based position — `zipWithIndex().map(...)`
   /// without the intermediate record.
@@ -112,7 +121,15 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   Fx<R> mapEffect<R>(R Function(T a) f) => map(f);
 
   /// See top-level `flatMap`; same contract as [Iterable.expand].
-  Fx<R> flatMap<R>(Iterable<R> Function(T a) f) => Fx(l.flatMap(f, _inner));
+  Fx<R> flatMap<R>(Iterable<R> Function(T a) f) {
+    final flatMapped = l.flatMap(f, _inner);
+    // Preserve strategy marker through chain
+    if (_inner is _FxStrategyMarker<T>) {
+      final marker = _inner as _FxStrategyMarker<T>;
+      return Fx(_FxStrategyMarker(flatMapped, marker.strategy) as Iterable<R>);
+    }
+    return Fx(flatMapped);
+  }
 
   /// [flatMap] with the source element's 0-based position.
   Fx<R> flatMapWithIndex<R>(Iterable<R> Function(T a, int index) f) =>
@@ -128,7 +145,15 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   Fx<dynamic> flattened([int depth = 1]) => flat(depth);
 
   /// All elements [f] returns true for.
-  Fx<T> filter(bool Function(T a) f) => Fx(l.filter(f, _inner));
+  Fx<T> filter(bool Function(T a) f) {
+    final filtered = l.filter(f, _inner);
+    // Preserve strategy marker through chain
+    if (_inner is _FxStrategyMarker<T>) {
+      final marker = _inner as _FxStrategyMarker<T>;
+      return Fx(_FxStrategyMarker(filtered, marker.strategy));
+    }
+    return Fx(filtered);
+  }
 
   /// [filter] with the element's 0-based position in the input — dropped
   /// elements still advance the count.
@@ -143,7 +168,15 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// Dart-idiomatic alias of [reject].
   Fx<T> whereNot(bool Function(T a) f) => reject(f);
 
-  Fx<T> take(int count) => Fx(l.take(count, _inner));
+  Fx<T> take(int count) {
+    final taken = l.take(count, _inner);
+    // Preserve strategy marker through chain
+    if (_inner is _FxStrategyMarker<T>) {
+      final marker = _inner as _FxStrategyMarker<T>;
+      return Fx(_FxStrategyMarker(taken, marker.strategy));
+    }
+    return Fx(taken);
+  }
 
   /// The last [count] elements.
   Fx<T> takeRight(int count) => Fx(l.takeRight(count, _inner));
@@ -203,13 +236,35 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   Fx<T> peek(void Function(T a) f) => Fx(l.peek(f, _inner));
 
   /// Distinct values, keeping the first occurrence of each.
-  Fx<T> uniq() => Fx(l.uniq(_inner));
+  Fx<T> uniq() {
+    // Use eager evaluation if strategy is fast
+    if (_inner is _FxStrategyMarker<T>) {
+      final marker = _inner as _FxStrategyMarker<T>;
+      if (marker.strategy == FxStrategy.fast) {
+        // Eager: materialize with Set-based dedup
+        return Fx(uniqEager(marker._source));
+      }
+    }
+    // Lazy: keep as iterator chain
+    return Fx(l.uniq(_inner));
+  }
 
   /// Dart-idiomatic alias of [uniq].
   Fx<T> distinct() => uniq();
 
   /// Distinct by the key [f] returns, keeping the first of each key.
-  Fx<T> uniqBy<B>(B Function(T a) f) => Fx(l.uniqBy(f, _inner));
+  Fx<T> uniqBy<B>(B Function(T a) f) {
+    // Use eager evaluation if strategy is fast
+    if (_inner is _FxStrategyMarker<T>) {
+      final marker = _inner as _FxStrategyMarker<T>;
+      if (marker.strategy == FxStrategy.fast) {
+        // Eager: materialize with Set-based dedup by key
+        return Fx(uniqByEager(f, marker._source));
+      }
+    }
+    // Lazy: keep as iterator chain
+    return Fx(l.uniqBy(f, _inner));
+  }
 
   /// Dart-idiomatic alias of [uniqBy].
   Fx<T> distinctBy<B>(B Function(T a) f) => uniqBy(f);
@@ -411,34 +466,30 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 
   /// The first element, or null if empty.
   T? get first {
+    // Keep lazy even with fast strategy - early exit is efficient
     if (_inner is _FxStrategyMarker<T>) {
-      if ((_inner as _FxStrategyMarker<T>).strategy == FxStrategy.fast) {
-        final list = (_inner as _FxStrategyMarker<T>)._source.toList();
-        return list.isEmpty ? null : list.first;
-      }
+      final marker = _inner as _FxStrategyMarker<T>;
+      return s.head(marker._source);
     }
     return s.head(_inner);
   }
 
   /// The last element, or null if empty.
   T? get last {
+    // Lazy for both strategies - materialize only if needed
     if (_inner is _FxStrategyMarker<T>) {
       final marker = _inner as _FxStrategyMarker<T>;
-      if (marker.strategy == FxStrategy.fast) {
-        final list = marker._source.toList();
-        return list.isEmpty ? null : list.last;
-      }
+      return s.last(marker._source);
     }
     return s.last(_inner);
   }
 
   /// The number of elements.
   int get length {
+    // Lazy for both strategies
     if (_inner is _FxStrategyMarker<T>) {
       final marker = _inner as _FxStrategyMarker<T>;
-      if (marker.strategy == FxStrategy.fast) {
-        return marker._source.length;
-      }
+      return s.size(marker._source);
     }
     return s.size(_inner);
   }
@@ -469,11 +520,10 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 
   /// Folds every value with [combine], starting from [initial].
   R fold<R>(R initial, R Function(R acc, T a) combine) {
+    // Lazy for both strategies
     if (_inner is _FxStrategyMarker<T>) {
       final marker = _inner as _FxStrategyMarker<T>;
-      if (marker.strategy == FxStrategy.fast) {
-        return s.fold(initial, combine, marker._source);
-      }
+      return s.fold(initial, combine, marker._source);
     }
     return s.fold(initial, combine, _inner);
   }
@@ -481,11 +531,10 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// Folds every value with [combine], starting from the first element.
   /// Throws if empty.
   T reduce(T Function(T acc, T a) combine) {
+    // Lazy for both strategies
     if (_inner is _FxStrategyMarker<T>) {
       final marker = _inner as _FxStrategyMarker<T>;
-      if (marker.strategy == FxStrategy.fast) {
-        return s.reduce(combine, marker._source);
-      }
+      return s.reduce(combine, marker._source);
     }
     return s.reduce(combine, _inner);
   }
