@@ -197,15 +197,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 10.626865671641792,
-            "minUs": 9.868131868131869,
-            "medianRssBytes": 17399808.0,
+            "medianUs": 10.884615384615385,
+            "minUs": 9.950248756218905,
+            "medianRssBytes": 17448960.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 4.391217564870259,
-            "minUs": 4.029940119760479,
-            "medianRssBytes": 17268736.0,
+            "medianUs": 4.285429141716567,
+            "minUs": 3.9500998003992014,
+            "medianRssBytes": 17252352.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -215,15 +215,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 369564.0,
-            "minUs": 343671.0,
-            "medianRssBytes": 219299840.0,
+            "medianUs": 384477.0,
+            "minUs": 320226.0,
+            "medianRssBytes": 219512832.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 100846.0,
-            "minUs": 90576.0,
-            "medianRssBytes": 210403328.0,
+            "medianUs": 96637.0,
+            "minUs": 88147.0,
+            "medianRssBytes": 209682432.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -713,15 +713,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 21.043956043956044,
-            "minUs": 18.65934065934066,
-            "medianRssBytes": 17268736.0,
+            "medianUs": 19.835164835164836,
+            "minUs": 18.547619047619047,
+            "medianRssBytes": 17301504.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 9.746268656716419,
-            "minUs": 8.82587064676617,
-            "medianRssBytes": 17383424.0,
+            "medianUs": 9.510204081632653,
+            "minUs": 8.633928571428571,
+            "medianRssBytes": 17301504.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -731,15 +731,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 261978.0,
-            "minUs": 225747.0,
-            "medianRssBytes": 283525120.0,
+            "medianUs": 220872.0,
+            "minUs": 210273.0,
+            "medianRssBytes": 285573120.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 149012.0,
-            "minUs": 122190.0,
-            "medianRssBytes": 289292288.0,
+            "medianUs": 129768.0,
+            "minUs": 115853.0,
+            "medianRssBytes": 289652736.0,
             "samples": 15
           },
           "timeWinner": "fxdart",

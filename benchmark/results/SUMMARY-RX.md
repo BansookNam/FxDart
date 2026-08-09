@@ -14,7 +14,7 @@
 | 2 | running-balance-feed | 100 | 9.4 µs | 802 ns | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 3 | expand-order-lines | 100 | 423 µs | 28 µs | **tie** | 15.6 MB | 16.6 MB | rxdart | 3 |
 | 4 | even-totals | 100 | 12 µs | 1.0 µs | **tie** | 16.6 MB | 16.4 MB | tie | 3 |
-| 5 | unique-visitors | 100 | 11 µs | 4.4 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
+| 5 | unique-visitors | 100 | 11 µs | 4.3 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
 | 6 | last-three-errors | 100 | 7.8 µs | 1.6 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 7 | empty-report-default | 100 | 6.7 µs | 1.3 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
 | 8 | clean-nullable-readings | 100 | 22 µs | 11 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
@@ -27,7 +27,7 @@
 | 15 | status-transitions | 100 | 18 µs | 4.1 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 16 | upload-batches | 100 | 36 µs | 9.5 µs | **tie** | 16.6 MB | 17.0 MB | tie | 3 |
 | 17 | spend-by-category-rx | 100 | 20 µs | 4.7 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
-| 18 | feeds-in-order | 100 | 21 µs | 9.7 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
+| 18 | feeds-in-order | 100 | 20 µs | 9.5 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 19 | tick-deltas | 100 | 78 µs | 42 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
 | 20 | align-forecast-actual | 100 | 84 µs | 43 µs | **tie** | 17.2 MB | 16.6 MB | tie | 3 |
 | 21 | sliding-average-rx | 100 | 129 µs | 62 µs | **tie** | 16.6 MB | 16.6 MB | tie | 3 |
@@ -60,7 +60,7 @@
 | 2 | running-balance-feed | 1000000 | 71.7 ms | 7.13 ms | **fxdart** | 56.0 MB | 59.9 MB | rxdart | 3 |
 | 3 | expand-order-lines | 1000000 | 3755.3 ms | 401.8 ms | **fxdart** | 487.1 MB | 489.3 MB | tie | 3 |
 | 4 | even-totals | 1000000 | 86.2 ms | 12.8 ms | **fxdart** | 24.3 MB | 21.6 MB | fxdart | 3 |
-| 5 | unique-visitors | 1000000 | 369.6 ms | 100.8 ms | **fxdart** | 209.1 MB | 200.7 MB | tie | 3 |
+| 5 | unique-visitors | 1000000 | 384.5 ms | 96.6 ms | **fxdart** | 209.3 MB | 200.0 MB | tie | 3 |
 | 6 | last-three-errors | 1000000 | 68.7 ms | 14.9 ms | **fxdart** | 111.3 MB | 107.9 MB | tie | 3 |
 | 7 | empty-report-default | 1000000 | 57.7 ms | 9.62 ms | **fxdart** | 123.6 MB | 121.3 MB | tie | 3 |
 | 8 | clean-nullable-readings | 1000000 | 218.8 ms | 132.3 ms | **fxdart** | 123.0 MB | 117.3 MB | tie | 3 |
@@ -73,7 +73,7 @@
 | 15 | status-transitions | 1000000 | 127.2 ms | 34.3 ms | **fxdart** | 84.0 MB | 88.8 MB | rxdart | 3 |
 | 16 | upload-batches | 1000000 | 296.3 ms | 102.7 ms | **fxdart** | 124.8 MB | 132.3 MB | rxdart | 3 |
 | 17 | spend-by-category-rx | 1000000 | 109.8 ms | 47.6 ms | **fxdart** | 92.4 MB | 117.2 MB | rxdart | 3 |
-| 18 | feeds-in-order | 1000000 | 262.0 ms | 149.0 ms | **fxdart** | 270.4 MB | 275.9 MB | tie | 3 |
+| 18 | feeds-in-order | 1000000 | 220.9 ms | 129.8 ms | **fxdart** | 272.3 MB | 276.2 MB | tie | 3 |
 | 19 | tick-deltas | 1000000 | 820.4 ms | 462.0 ms | **fxdart** | 161.4 MB | 163.6 MB | tie | 3 |
 | 20 | align-forecast-actual | 1000000 | 827.9 ms | 486.4 ms | **fxdart** | 206.6 MB | 220.0 MB | rxdart | 3 |
 | 21 | sliding-average-rx | 1000000 | 1110.4 ms | 676.9 ms | **fxdart** | 154.1 MB | 151.5 MB | tie | 3 |
