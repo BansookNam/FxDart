@@ -11,7 +11,7 @@ Future<void> main() async {
     n: n,
     run: () {
       // Fast path: eager evaluation avoids iterator wrapper overhead
-      final merchants = fxFast(txns)
+      final merchants = fx(txns, strategy: FxStrategy.fast)
           .map((t) => t.merchant)
           .uniq()
           .toList();

@@ -11,7 +11,7 @@ Future<void> main() async {
     n: n,
     run: () {
       // Fast path: eager evaluation for multi-operator chain
-      final context = fxFast(range(0, readings.length))
+      final context = fx(range(0, readings.length), strategy: FxStrategy.fast)
           .filter((i) => readings[i].temp > limit)
           .flatMap((i) => [i - 1, i, i + 1])
           .filter((i) => i >= 0 && i < readings.length)

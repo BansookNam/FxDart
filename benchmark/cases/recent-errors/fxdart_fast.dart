@@ -11,7 +11,7 @@ Future<void> main() async {
     n: n,
     run: () {
       // Fast path: eager evaluation for filter → uniqBy → take
-      final recent = fxFast(logs)
+      final recent = fx(logs, strategy: FxStrategy.fast)
           .filter((l) => l.level == 'ERROR')
           .uniqBy((l) => l.message)
           .take(3);
