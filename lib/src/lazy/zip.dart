@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import '../async_iterable.dart';
+import 'list_range.dart';
 import 'map.dart';
 
 /// Merges two iterables into a lazy iterable of record pairs, ending when
@@ -19,8 +20,90 @@ class _ZipIterable<A, B> extends Iterable<(A, B)> {
   final Iterable<A> _source1;
   final Iterable<B> _source2;
   @override
-  Iterator<(A, B)> get iterator =>
-      _ZipIterator(_source1.iterator, _source2.iterator);
+  Iterator<(A, B)> get iterator {
+    // A side that is a range over a backing [List] — the list itself, or a
+    // `take`/`drop` of one, which is how a sliding window is usually built —
+    // is read by index, so that side costs no iterator and no per-element
+    // virtual call. The two sides are resolved independently: shifting one
+    // input with `drop` must not cost the other its fast path.
+    final r1 = fxListRangeOf(_source1);
+    final r2 = fxListRangeOf(_source2);
+    if (r1 != null) {
+      if (r2 != null) return _ZipRangeRangeIterator(r1, r2);
+      return _ZipRangeIterIterator(r1, _source2.iterator);
+    }
+    if (r2 != null) return _ZipIterRangeIterator(_source1.iterator, r2);
+    return _ZipIterator(_source1.iterator, _source2.iterator);
+  }
+}
+
+/// Both sides indexed. One cursor walks the left range and the right one is
+/// reached through a fixed offset, so a step is a single field write.
+class _ZipRangeRangeIterator<A, B> implements Iterator<(A, B)> {
+  _ZipRangeRangeIterator(FxListRange<A> r1, FxListRange<B> r2)
+      : _l1 = r1.list,
+        _l2 = r2.list,
+        _i = r1.start,
+        _off = r2.start - r1.start,
+        _end = r1.start +
+            (r1.length < r2.length ? r1.length : r2.length);
+  final List<A> _l1;
+  final List<B> _l2;
+  final int _off;
+  final int _end;
+  int _i;
+  @override
+  late (A, B) current;
+  @override
+  bool moveNext() {
+    final i = _i;
+    if (i >= _end) return false;
+    _i = i + 1;
+    current = (_l1[i], _l2[i + _off]);
+    return true;
+  }
+}
+
+/// Left side indexed, right side pulled. The right side is pulled only when
+/// the left still has a value, matching [_ZipIterator]'s short-circuit.
+class _ZipRangeIterIterator<A, B> implements Iterator<(A, B)> {
+  _ZipRangeIterIterator(FxListRange<A> r, this._it2)
+      : _l1 = r.list,
+        _i1 = r.start,
+        _end1 = r.end;
+  final List<A> _l1;
+  int _i1;
+  final int _end1;
+  final Iterator<B> _it2;
+  @override
+  late (A, B) current;
+  @override
+  bool moveNext() {
+    if (_i1 >= _end1 || !_it2.moveNext()) return false;
+    current = (_l1[_i1++], _it2.current);
+    return true;
+  }
+}
+
+/// Left side pulled, right side indexed. The left side is pulled first, so a
+/// source with effects sees the same pull count as [_ZipIterator].
+class _ZipIterRangeIterator<A, B> implements Iterator<(A, B)> {
+  _ZipIterRangeIterator(this._it1, FxListRange<B> r)
+      : _l2 = r.list,
+        _i2 = r.start,
+        _end2 = r.end;
+  final Iterator<A> _it1;
+  final List<B> _l2;
+  int _i2;
+  final int _end2;
+  @override
+  late (A, B) current;
+  @override
+  bool moveNext() {
+    if (!_it1.moveNext() || _i2 >= _end2) return false;
+    current = (_it1.current, _l2[_i2++]);
+    return true;
+  }
 }
 
 class _ZipIterator<A, B> implements Iterator<(A, B)> {
@@ -51,8 +134,53 @@ class _Zip3Iterable<A, B, C> extends Iterable<(A, B, C)> {
   final Iterable<B> _source2;
   final Iterable<C> _source3;
   @override
-  Iterator<(A, B, C)> get iterator =>
-      _Zip3Iterator(_source1.iterator, _source2.iterator, _source3.iterator);
+  Iterator<(A, B, C)> get iterator {
+    // Same idea as [_ZipIterable], but only the all-indexed case is
+    // specialised — the seven mixed shapes would add more dispatch targets to
+    // every downstream `moveNext` than they earn back.
+    final r1 = fxListRangeOf(_source1);
+    if (r1 != null) {
+      final r2 = fxListRangeOf(_source2);
+      if (r2 != null) {
+        final r3 = fxListRangeOf(_source3);
+        if (r3 != null) return _Zip3RangeIterator(r1, r2, r3);
+      }
+    }
+    return _Zip3Iterator(_source1.iterator, _source2.iterator,
+        _source3.iterator);
+  }
+}
+
+/// All three sides indexed — one cursor plus two fixed offsets.
+class _Zip3RangeIterator<A, B, C> implements Iterator<(A, B, C)> {
+  _Zip3RangeIterator(FxListRange<A> r1, FxListRange<B> r2, FxListRange<C> r3)
+      : _l1 = r1.list,
+        _l2 = r2.list,
+        _l3 = r3.list,
+        _i = r1.start,
+        _off2 = r2.start - r1.start,
+        _off3 = r3.start - r1.start,
+        _end = r1.start +
+            (r1.length < r2.length
+                ? (r1.length < r3.length ? r1.length : r3.length)
+                : (r2.length < r3.length ? r2.length : r3.length));
+  final List<A> _l1;
+  final List<B> _l2;
+  final List<C> _l3;
+  final int _off2;
+  final int _off3;
+  final int _end;
+  int _i;
+  @override
+  late (A, B, C) current;
+  @override
+  bool moveNext() {
+    final i = _i;
+    if (i >= _end) return false;
+    _i = i + 1;
+    current = (_l1[i], _l2[i + _off2], _l3[i + _off3]);
+    return true;
+  }
 }
 
 class _Zip3Iterator<A, B, C> implements Iterator<(A, B, C)> {

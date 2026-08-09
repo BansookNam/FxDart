@@ -5,6 +5,9 @@ import 'async_iterable.dart' as async_;
 import 'lazy/combine.dart' as l;
 import 'lazy/effect.dart' as l;
 import 'lazy/filter.dart' as l;
+// Unprefixed: these names are internal plumbing and collide with no member of
+// Fx/FxAsync, so they need no `_$` wrapper in the single-file bundle.
+import 'lazy/list_range.dart';
 import 'lazy/map.dart' as l;
 import 'lazy/take_drop.dart' as l;
 import 'lazy/zip.dart' as l;
@@ -39,7 +42,7 @@ FxAsync<T> fxStream<T>(Stream<T> stream) => FxAsync(fromStream(stream));
 ///
 /// [Fx] extends [Iterable], so the whole Dart iterable API is available
 /// alongside the FxTS-named operators.
-class Fx<T> extends Iterable<T> {
+class Fx<T> extends Iterable<T> implements FxListRangeSource<T> {
   final Iterable<T> _inner;
 
   /// Wraps [_inner] without consuming it; the chain stays lazy.
@@ -47,6 +50,14 @@ class Fx<T> extends Iterable<T> {
 
   @override
   Iterator<T> get iterator => _inner.iterator;
+
+  /// Internal: see `lib/src/lazy/list_range.dart`. A chain that is nothing
+  /// more than a range over a backing [List] — `fx(xs).drop(1)` — reports
+  /// that range, so passing the chain itself to `zip`/`zip3`/`windowed` is as
+  /// fast as passing the operator's own result. Without this the wrapper
+  /// would hide the range and the fast path would depend on spelling.
+  @override
+  FxListRange<T>? get listRange => fxListRangeOf(_inner);
 
   // Pure delegation to the inner iterable — same results as the inherited
   // Iterable members, but O(1) instead of a walk when the chain wraps a
@@ -220,6 +231,13 @@ class Fx<T> extends Iterable<T> {
   /// Pairs each value with the value at the same position in [other],
   /// stopping at the shorter side.
   Fx<(T, U)> zip<U>(Iterable<U> other) => Fx(l.zip(_inner, other));
+
+  /// Three-way [zip], stopping at the shortest side.
+  ///
+  /// The same shape as `zip(a).zip(b)` without the nested record — a
+  /// three-element sliding window is `zip3(drop(1), drop(2))`.
+  Fx<(T, U, V)> zip3<U, V>(Iterable<U> other1, Iterable<V> other2) =>
+      Fx(l.zip3(_inner, other1, other2));
 
   /// Pairs each value with its index.
   Fx<(int, T)> zipWithIndex() => Fx(l.zipWithIndex(_inner));
@@ -586,6 +604,12 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   @pragma('vm:prefer-inline')
   FxAsync<(T, U)> zip<U>(FxAsyncIterable<U> other) =>
       FxAsync(l.zipAsync(_inner, other));
+
+  /// Three-way [zip], stopping at the shortest side.
+  @pragma('vm:prefer-inline')
+  FxAsync<(T, U, V)> zip3<U, V>(
+          FxAsyncIterable<U> other1, FxAsyncIterable<V> other2) =>
+      FxAsync(l.zip3Async(_inner, other1, other2));
 
   /// Pairs each value with its index.
   @pragma('vm:prefer-inline')

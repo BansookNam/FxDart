@@ -37,6 +37,13 @@ void main() {
         expect(res, equals([(0, 'a', true)]));
         expect(pulled, equals(1));
       });
+
+      test('should be reachable from the fx chain', () {
+        expect(
+          fx([1, 2, 3]).zip3(['a', 'b'], [true, false]).toList(),
+          equals([(1, 'a', true), (2, 'b', false)]),
+        );
+      });
     });
 
     group('async', () {
@@ -84,6 +91,15 @@ void main() {
           ],
         );
         expect(res, equals(['1atrue', '2bfalse']));
+      });
+
+      test('should be reachable from the fxAsync chain', () async {
+        expect(
+          await fxAsync(toAsync([1, 2, 3]))
+              .zip3(toAsync(['a', 'b']), toAsync([true, false]))
+              .toList(),
+          equals([(1, 'a', true), (2, 'b', false)]),
+        );
       });
     });
   });

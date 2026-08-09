@@ -2,6 +2,7 @@ import 'dart:async';
 
 import '../async_iterable.dart';
 import 'filter.dart';
+import 'list_range.dart';
 import 'map.dart';
 import 'zip.dart';
 
@@ -11,12 +12,25 @@ import 'zip.dart';
 Iterable<A> take<A>(int length, Iterable<A> iterable) =>
     _TakeIterable(length, iterable);
 
-class _TakeIterable<A> extends Iterable<A> {
+class _TakeIterable<A> extends Iterable<A>
+    implements FxListRangeSource<A> {
   _TakeIterable(this._length, this._source);
   final int _length;
   final Iterable<A> _source;
   @override
-  Iterator<A> get iterator => _TakeIterator(_length, _source.iterator);
+  FxListRange<A>? get listRange {
+    final r = fxListRangeOf(_source);
+    if (r == null) return null;
+    final end = _length < 0 ? r.start : r.start + _length;
+    return FxListRange(r.list, r.start, end > r.end ? r.end : end);
+  }
+
+  @override
+  Iterator<A> get iterator {
+    final r = listRange;
+    if (r != null) return FxListRangeIterator(r.list, r.start, r.end);
+    return _TakeIterator(_length, _source.iterator);
+  }
 }
 
 class _TakeIterator<A> implements Iterator<A> {
@@ -58,35 +72,24 @@ Iterable<A> takeRight<A>(int length, Iterable<A> iterable) {
   return _TakeRightIterable(length, iterable);
 }
 
-class _TakeRightIterable<A> extends Iterable<A> {
+class _TakeRightIterable<A> extends Iterable<A>
+    implements FxListRangeSource<A> {
   _TakeRightIterable(this._length, this._source);
   final int _length;
   final Iterable<A> _source;
   @override
-  Iterator<A> get iterator {
-    final source = _source;
-    if (source is List<A>) {
-      final len = source.length;
-      final start = len - _length < 0 ? 0 : len - _length;
-      return _ListRangeIterator(source, start, len);
-    }
-    return _TakeRightIterator(_length, source);
+  FxListRange<A>? get listRange {
+    final r = fxListRangeOf(_source);
+    if (r == null) return null;
+    final start = r.end - _length;
+    return FxListRange(r.list, start < r.start ? r.start : start, r.end);
   }
-}
 
-/// Indexes a [List] over `[start, end)` — no snapshot copy.
-class _ListRangeIterator<A> implements Iterator<A> {
-  _ListRangeIterator(this._list, this._i, this._end);
-  final List<A> _list;
-  int _i;
-  final int _end;
   @override
-  late A current;
-  @override
-  bool moveNext() {
-    if (_i >= _end) return false;
-    current = _list[_i++];
-    return true;
+  Iterator<A> get iterator {
+    final r = listRange;
+    if (r != null) return FxListRangeIterator(r.list, r.start, r.end);
+    return _TakeRightIterator(_length, _source);
   }
 }
 
@@ -268,7 +271,7 @@ class _TakeWhileRightIterable<A> extends Iterable<A> {
   Iterator<A> get iterator {
     final source = _source;
     if (source is List<A>) {
-      return _ListRangeIterator(source, _suffixStart(_f, source), source.length);
+      return FxListRangeIterator(source, _suffixStart(_f, source), source.length);
     }
     return _TakeWhileRightIterator(_f, _source);
   }
@@ -399,12 +402,25 @@ FxAsyncIterable<A> takeUntilAsync<A>(
 Iterable<A> drop<A>(int length, Iterable<A> iterable) =>
     _DropIterable(length, iterable);
 
-class _DropIterable<A> extends Iterable<A> {
+class _DropIterable<A> extends Iterable<A>
+    implements FxListRangeSource<A> {
   _DropIterable(this._length, this._source);
   final int _length;
   final Iterable<A> _source;
   @override
-  Iterator<A> get iterator => _DropIterator(_length, _source.iterator);
+  FxListRange<A>? get listRange {
+    final r = fxListRangeOf(_source);
+    if (r == null) return null;
+    final start = _length < 0 ? r.start : r.start + _length;
+    return FxListRange(r.list, start > r.end ? r.end : start, r.end);
+  }
+
+  @override
+  Iterator<A> get iterator {
+    final r = listRange;
+    if (r != null) return FxListRangeIterator(r.list, r.start, r.end);
+    return _DropIterator(_length, _source.iterator);
+  }
 }
 
 class _DropIterator<A> implements Iterator<A> {
@@ -452,19 +468,25 @@ Iterable<A> dropRight<A>(int length, Iterable<A> iterable) {
   return _DropRightIterable(length, iterable);
 }
 
-class _DropRightIterable<A> extends Iterable<A> {
+class _DropRightIterable<A> extends Iterable<A>
+    implements FxListRangeSource<A> {
   _DropRightIterable(this._length, this._source);
   final int _length;
   final Iterable<A> _source;
   @override
+  FxListRange<A>? get listRange {
+    final r = fxListRangeOf(_source);
+    if (r == null) return null;
+    final end = r.end - _length;
+    return FxListRange(r.list, r.start, end < r.start ? r.start : end);
+  }
+
+  @override
   Iterator<A> get iterator {
-    final source = _source;
-    if (source is List<A>) {
-      final end = source.length - _length;
-      return _ListRangeIterator(source, 0, end < 0 ? 0 : end);
-    }
-    if (_length == 0) return source.iterator;
-    return _DropRightIterator(_length, source.iterator);
+    final r = listRange;
+    if (r != null) return FxListRangeIterator(r.list, r.start, r.end);
+    if (_length == 0) return _source.iterator;
+    return _DropRightIterator(_length, _source.iterator);
   }
 }
 
@@ -621,7 +643,7 @@ class _DropWhileRightIterable<A> extends Iterable<A> {
   Iterator<A> get iterator {
     final source = _source;
     if (source is List<A>) {
-      return _ListRangeIterator(source, 0, _suffixStart(_f, source));
+      return FxListRangeIterator(source, 0, _suffixStart(_f, source));
     }
     return _DropWhileRightIterator(_f, _source.iterator);
   }
@@ -858,8 +880,62 @@ class _WindowIterable<A> extends Iterable<List<A>> {
   final bool _partial;
   final Iterable<A> _source;
   @override
-  Iterator<List<A>> get iterator =>
-      _WindowIterator(_size, _step, _partial, _source.iterator);
+  Iterator<List<A>> get iterator {
+    // Over a [List] the ring buffer earns nothing: each window is already a
+    // contiguous slice, so it can be filled straight from the backing list
+    // and the whole upstream iterator layer disappears.
+    final r = fxListRangeOf(_source);
+    if (r != null) {
+      return _WindowRangeIterator(_size, _step, _partial, r);
+    }
+    return _WindowIterator(_size, _step, _partial, _source.iterator);
+  }
+}
+
+class _WindowRangeIterator<A> implements Iterator<List<A>> {
+  _WindowRangeIterator(this._size, this._step, this._partial, FxListRange<A> r)
+      : _list = r.list,
+        _i = r.start,
+        _end = r.end,
+        _lastFull = r.end - _size;
+  final int _size;
+  final int _step;
+  final bool _partial;
+  final List<A> _list;
+  final int _end;
+
+  /// Largest start index that still has a full window behind it — the one
+  /// bound the common path has to test.
+  final int _lastFull;
+  int _i;
+  @override
+  late List<A> current;
+  @override
+  bool moveNext() {
+    final i = _i;
+    if (i <= _lastFull) {
+      current = _slice(i, _size);
+      _i = i + _step;
+      return true;
+    }
+    // Past the last full window: only `partial: true` keeps going, and every
+    // window from here on is shorter than the one before.
+    if (!_partial) return false;
+    final remaining = _end - i;
+    if (remaining <= 0) return false;
+    current = _slice(i, remaining);
+    _i = i + _step;
+    return true;
+  }
+
+  List<A> _slice(int i, int length) {
+    final list = _list;
+    final window = List<A>.filled(length, list[i]);
+    for (var k = 1; k < length; k++) {
+      window[k] = list[i + k];
+    }
+    return window;
+  }
 }
 
 class _WindowIterator<A> implements Iterator<List<A>> {

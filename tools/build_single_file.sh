@@ -18,6 +18,7 @@ FILES=(
   "lib/src/config.dart"
   "lib/src/async_iterable.dart"
   "lib/src/pipe.dart"
+  "lib/src/lazy/list_range.dart"
   "lib/src/lazy/map.dart"
   "lib/src/lazy/filter.dart"
   "lib/src/lazy/take_drop.dart"
@@ -285,6 +286,12 @@ Iterable<(A, B)> _$zip<A, B>(Iterable<A> iterable1, Iterable<B> iterable2) =>
 FxAsyncIterable<(A, B)> _$zipAsync<A, B>(
         FxAsyncIterable<A> iterable1, FxAsyncIterable<B> iterable2) =>
     zipAsync(iterable1, iterable2);
+Iterable<(A, B, C)> _$zip3<A, B, C>(Iterable<A> iterable1,
+        Iterable<B> iterable2, Iterable<C> iterable3) =>
+    zip3(iterable1, iterable2, iterable3);
+FxAsyncIterable<(A, B, C)> _$zip3Async<A, B, C>(FxAsyncIterable<A> iterable1,
+        FxAsyncIterable<B> iterable2, FxAsyncIterable<C> iterable3) =>
+    zip3Async(iterable1, iterable2, iterable3);
 Iterable<(int, A)> _$zipWithIndex<A>(Iterable<A> iterable) =>
     zipWithIndex(iterable);
 FxAsyncIterable<(int, A)> _$zipWithIndexAsync<A>(

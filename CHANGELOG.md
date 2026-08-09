@@ -1,3 +1,98 @@
+## 0.8.0
+
+### Performance — a `List` source stays a `List` through the lazy chain
+
+`take`, `drop`, `takeRight` and `dropRight` over a `List` are nothing
+more than a contiguous range of that list, but every one of them still
+wrapped the list's own iterator in another `moveNext` layer, and every
+operator downstream pulled values through it. A new internal protocol
+(`lib/src/lazy/list_range.dart`) lets an operator resolve its source to
+a `(list, start, end)` triple **once**, when the iterator is created,
+and then index the backing list directly. Ranges compose, so
+`drop(2, take(6, xs))` is one range rather than two wrapper layers, and
+`Fx` reports its own range too — `zip(fx(xs).drop(1))` is now exactly as
+fast as `zip(drop(1, xs))`, instead of quietly losing the fast path to
+the chain wrapper.
+
+Three consumers take advantage of it:
+
+- **`zip` / `zip3`** resolve each side independently, so shifting one
+  input with `drop` does not cost the other side its fast path. `zip`
+  carries indexed/pulled variants for both sides — the mixed shapes are
+  worth their dispatch, measured. `zip3` specialises only the
+  all-indexed case: its seven mixed shapes would add more targets to
+  every downstream `moveNext` than they earn back.
+- **`windowed` / `chunk`** skip the ring buffer over a list. Each window
+  is already a contiguous slice, so it is filled straight from the
+  backing list with no upstream iterator at all.
+
+The trade-off is the one `takeRight`/`dropRight` already made in 0.7.3:
+an indexed source mutated *during* iteration is not reported as a
+`ConcurrentModificationError`, and a range's bounds are the ones the
+list had when iteration started. Values, order, laziness and pull counts
+are unchanged — `zip` still pulls its left side before its right, and
+still never pulls the right side on the attempt that finds the left one
+empty. `test/lazy/list_range_test.dart` runs every affected operator
+twice, once over a `List` and once over a `sync*` source that cannot be
+a range, and asserts the two agree.
+
+Measured on `consecutive-over-limit`, the DartComparison case that builds
+a three-hour sliding window out of `zip` + `drop`, against the same
+hand-written index loop (Apple M1 Max, AOT, fresh processes per side):
+
+| N | before | after | vs. the index loop |
+|---|---|---|---|
+| 1,000,000 | 78.8 ms | **23.5 ms** | 4.79× → **1.36×** |
+| 10,000 | 764 µs | **206 µs** | 6.70× → **1.77×** (verdict *native* → *tie*) |
+| 100 | 8.6 µs | **2.8 µs** | 4.58× → **1.70×** (tie either way) |
+
+**3.35× faster**, of which ~2.0× is the fast paths and the rest is the
+example moving onto `zip3` — the nested-record repack was two thirds of
+the remaining allocation. `windowed(3)` over a list is ~1.6× faster on
+the same data.
+
+Across the full 53-case suite the median fxdart time is unchanged
+(1.006× of the previous release, i.e. inside the ~5% run-to-run noise
+floor), with 35 of 159 measurements more than 5% faster. Every apparent
+regression was re-measured individually on an idle machine and did not
+reproduce; the one that looked most real, `valid-emails`, was settled
+with a paired interleaved A/B against the previous library — **0.992×**,
+faster in 5 of 9 rounds — confirming the drift was on the native side of
+that case, not in the chain.
+
+### Added — `Fx.zip3` / `FxAsync.zip3`
+
+
+`zip3` existed as a top-level function but had no chain method, so a
+three-way zip had to be written as `zip(a).zip(b)` plus a `map` to
+unpack the nested record:
+
+```dart
+// before
+fx(xs).zip(fx(xs).drop(1)).zip(fx(xs).drop(2))
+      .map((w) => (w.$1.$1, w.$1.$2, w.$2))
+
+// now
+fx(xs).zip3(drop(1, xs), drop(2, xs))
+```
+
+Which is also the shortest way to spell a three-element sliding window
+when you want the elements as a record rather than a list — `windowed(3)`
+remains the answer when a list is what you want.
+
+### Docs
+
+The `consecutive-over-limit` comparison page moves onto `zip3`: the
+nested-record repacking `map` was ceremony forced by `zip` being binary,
+and it is gone from the English, Korean and Spanish versions along with
+the paragraph explaining it. A new paragraph says why the shifted inputs
+cost nothing — `drop(n)` over a `List` is a range of it, and `zip3`
+reads all three ranges by index.
+
+### Tests
+
+Line coverage stays at **100.00%** (3938/3938, up from 3837).
+
 ## 0.7.9
 
 ### Added — predicate combinators
