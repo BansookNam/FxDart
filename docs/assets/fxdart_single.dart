@@ -2738,6 +2738,22 @@ class _UniqByIterable<A, B> extends Iterable<A> {
   final Iterable<A> _source;
   @override
   Iterator<A> get iterator => _UniqByIterator(_f, _source.iterator);
+
+  @override
+  List<A> toList({bool growable = true}) {
+    final source = _source;
+    if (source is List<A>) {
+      final result = <A>[];
+      final seen = <B>{};
+      for (final a in source) {
+        if (seen.add(_f(a))) {
+          result.add(a);
+        }
+      }
+      return growable ? result : List<A>.from(result, growable: false);
+    }
+    return super.toList(growable: growable);
+  }
 }
 
 class _UniqByIterator<A, B> implements Iterator<A> {
@@ -2771,6 +2787,22 @@ class _UniqIterable<A> extends Iterable<A> {
   final Iterable<A> _source;
   @override
   Iterator<A> get iterator => _UniqIterator(_source.iterator);
+
+  @override
+  List<A> toList({bool growable = true}) {
+    final source = _source;
+    if (source is List<A>) {
+      final result = <A>[];
+      final seen = <A>{};
+      for (final a in source) {
+        if (seen.add(a)) {
+          result.add(a);
+        }
+      }
+      return growable ? result : List<A>.from(result, growable: false);
+    }
+    return super.toList(growable: growable);
+  }
 }
 
 class _UniqIterator<A> implements Iterator<A> {
@@ -2792,13 +2824,19 @@ class _UniqIterator<A> implements Iterator<A> {
   }
 }
 
-/// Async counterpart of [uniqBy].
+/// Async counterpart of [uniqBy]. Uses then/bare pattern for sync keys.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> uniqByAsync<A, B>(
     FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) {
   return DelegateAsyncIterable(() {
     final seen = <B>{};
-    return filterAsync((A a) async => seen.add(await f(a)), iterable).iterator;
+    return filterAsync((A a) {
+      final key = f(a);
+      if (key is Future<B>) {
+        return key.then((k) => seen.add(k));
+      }
+      return seen.add(key as B);
+    }, iterable).iterator;
   });
 }
 
@@ -3066,6 +3104,60 @@ class _TakeIterator<A> implements Iterator<A> {
 /// parallel, as in FxTS.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> takeAsync<A>(int length, FxAsyncIterable<A> iterable) {
+  return DelegateAsyncIterable(
+      () => _TakeAsyncIterator<A>(length, iterable));
+}
+
+class _TakeAsyncIterator<A> with FxFastNextGate<A> implements FxFastIterator<A> {
+  _TakeAsyncIterator(this._length, this._sourceIterable)
+      : _remaining = _length;
+  final int _length;
+  final FxAsyncIterable<A> _sourceIterable;
+  FxAsyncIterator<A>? _source;
+  FxAsyncIterator<A>? _fallback;
+  int _remaining;
+  bool _done = false;
+
+  @override
+  Future<IterResult<A>> next([Concurrent? concurrent]) {
+    if (_fallback == null &&
+        concurrent is Concurrent &&
+        _source == null &&
+        !_done) {
+      _fallback = _takeAsyncLegacy(_length, _sourceIterable).iterator;
+    }
+    final fb = _fallback;
+    if (fb != null) return fb.next(concurrent);
+    return super.next(concurrent);
+  }
+
+  @override
+  FutureOr<IterResult<A>> nextOr() {
+    final fb = _fallback;
+    if (fb != null) return fb.next();
+    if (_done || _remaining < 1) return IterResult<A>.done();
+    _remaining--;
+    final src = _source ??= _sourceIterable.iterator;
+    if (src is FxFastIterator<A>) {
+      final r = src.nextOr();
+      if (r is Future<IterResult<A>>) return r;
+      if (r.done) {
+        _done = true;
+        return IterResult<A>.done();
+      }
+      return r;
+    }
+    return src.next().then((r) {
+      if (r.done) {
+        _done = true;
+      }
+      return r;
+    });
+  }
+}
+
+FxAsyncIterable<A> _takeAsyncLegacy<A>(
+    int length, FxAsyncIterable<A> iterable) {
   return DelegateAsyncIterable(() {
     final iterator = iterable.iterator;
     var remaining = length;
@@ -4854,12 +4946,74 @@ class _ConcatIterator<A> implements Iterator<A> {
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> concatAsync<A>(
     FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) {
+  return DelegateAsyncIterable(
+      () => _ConcatAsyncIterator<A>(iterable1, iterable2));
+}
+
+class _ConcatAsyncIterator<A> with FxFastNextGate<A> implements FxFastIterator<A> {
+  _ConcatAsyncIterator(this._iterable1, this._iterable2);
+  final FxAsyncIterable<A> _iterable1;
+  final FxAsyncIterable<A> _iterable2;
+  FxAsyncIterator<A>? _left;
+  FxAsyncIterator<A>? _right;
+  FxAsyncIterator<A>? _fallback;
+  bool _leftDone = false;
+
+  @override
+  Future<IterResult<A>> next([Concurrent? concurrent]) {
+    if (_fallback == null &&
+        concurrent is Concurrent &&
+        _left == null &&
+        _right == null &&
+        !_leftDone) {
+      _fallback = _concatAsyncLegacy(_iterable1, _iterable2).iterator;
+    }
+    final fb = _fallback;
+    if (fb != null) return fb.next(concurrent);
+    return super.next(concurrent);
+  }
+
+  @override
+  FutureOr<IterResult<A>> nextOr() {
+    final fb = _fallback;
+    if (fb != null) return fb.next();
+    while (true) {
+      if (_leftDone) {
+        final r = _right ??= _iterable2.iterator;
+        if (r is FxFastIterator<A>) {
+          final ro = r.nextOr();
+          if (ro is Future<IterResult<A>>) return ro;
+          return ro;
+        }
+        return r.next();
+      }
+      final l = _left ??= _iterable1.iterator;
+      if (l is FxFastIterator<A>) {
+        final ro = l.nextOr();
+        if (ro is Future<IterResult<A>>) return ro;
+        if (ro.done) {
+          _leftDone = true;
+          continue;
+        }
+        return ro;
+      }
+      return l.next().then((r) {
+        if (r.done) {
+          _leftDone = true;
+          return nextOr();
+        }
+        return r;
+      });
+    }
+  }
+}
+
+FxAsyncIterable<A> _concatAsyncLegacy<A>(
+    FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) {
   return DelegateAsyncIterable(() {
     final left = iterable1.iterator;
     final right = iterable2.iterator;
     var leftDone = false;
-    // Pass-through (not serialized): overlapping pulls must stay parallel so
-    // `concurrent` propagates upstream, as in FxTS `concat`.
     return DelegateAsyncIterator((concurrent) async {
       if (!leftDone) {
         final result = await left.next(concurrent);
