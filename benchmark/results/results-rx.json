@@ -6,7 +6,7 @@
     "os": "macos Version 26.3 (Build 25D125)",
     "compilation": "AOT (dart compile exe), enforced per result line"
   },
-  "date": "2026-08-05",
+  "date": "2026-08-09",
   "warmup": 2,
   "itersPerRound": 5,
   "tieMarginPct": 5.0,
@@ -17,7 +17,7 @@
   ],
   "cases": {
     "even-totals": {
-      "order": 1,
+      "order": 4,
       "heading": "Total the valid even amounts",
       "async": false,
       "scales": {
@@ -25,15 +25,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 10.7,
-            "minUs": 9.324175824175825,
-            "medianRssBytes": 17825792.0,
+            "medianUs": 11.917582417582418,
+            "minUs": 9.554945054945055,
+            "medianRssBytes": 17399808.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 1.1319340329835081,
-            "minUs": 1.0495049504950495,
-            "medianRssBytes": 17055744.0,
+            "medianUs": 1.0034982508745627,
+            "minUs": 0.9045477261369316,
+            "medianRssBytes": 17203200.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -43,15 +43,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 86885.0,
-            "minUs": 85336.0,
-            "medianRssBytes": 25903104.0,
+            "medianUs": 86191.0,
+            "minUs": 84684.0,
+            "medianRssBytes": 25460736.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 13789.0,
-            "minUs": 13692.0,
-            "medianRssBytes": 22478848.0,
+            "medianUs": 12847.0,
+            "minUs": 12671.0,
+            "medianRssBytes": 22626304.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -68,15 +68,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 9.291208791208792,
-            "minUs": 7.811659192825112,
-            "medianRssBytes": 17793024.0,
+            "medianUs": 9.363636363636363,
+            "minUs": 7.381165919282512,
+            "medianRssBytes": 17317888.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 0.7946026986506747,
-            "minUs": 0.7326336831584208,
-            "medianRssBytes": 17186816.0,
+            "medianUs": 0.8015992003998001,
+            "minUs": 0.7251374312843578,
+            "medianRssBytes": 17317888.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -86,15 +86,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 72114.0,
-            "minUs": 71844.0,
-            "medianRssBytes": 59146240.0,
+            "medianUs": 71661.0,
+            "minUs": 69911.0,
+            "medianRssBytes": 58671104.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 7543.0,
-            "minUs": 6934.0,
-            "medianRssBytes": 62668800.0,
+            "medianUs": 7127.0,
+            "minUs": 6682.0,
+            "medianRssBytes": 62799872.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -109,36 +109,36 @@
       "scales": {
         "100": {
           "n": 100,
-          "roundsRun": 5,
+          "roundsRun": 3,
           "rxdart": {
-            "medianUs": 11.077922077922079,
-            "minUs": 9.558441558441558,
-            "medianRssBytes": 17399808.0,
-            "samples": 25
+            "medianUs": 10.916167664670658,
+            "minUs": 9.58682634730539,
+            "medianRssBytes": 17416192.0,
+            "samples": 15
           },
           "fxdart": {
-            "medianUs": 0.280359820089955,
-            "minUs": 0.26286856571714146,
+            "medianUs": 0.3103448275862069,
+            "minUs": 0.26636681659170414,
             "medianRssBytes": 17219584.0,
-            "samples": 25
+            "samples": 15
           },
           "timeWinner": "tie",
           "memWinner": "tie"
         },
         "full": {
           "n": 1000000,
-          "roundsRun": 5,
+          "roundsRun": 3,
           "rxdart": {
-            "medianUs": 78889.0,
-            "minUs": 77970.0,
-            "medianRssBytes": 127827968.0,
-            "samples": 25
+            "medianUs": 80244.0,
+            "minUs": 78661.0,
+            "medianRssBytes": 128090112.0,
+            "samples": 15
           },
           "fxdart": {
-            "medianUs": 901.0,
-            "minUs": 855.3333333333334,
-            "medianRssBytes": 117473280.0,
-            "samples": 25
+            "medianUs": 943.6666666666666,
+            "minUs": 878.3333333333334,
+            "medianRssBytes": 117489664.0,
+            "samples": 15
           },
           "timeWinner": "fxdart",
           "memWinner": "fxdart"
@@ -146,7 +146,7 @@
       }
     },
     "skip-warmup-readings": {
-      "order": 4,
+      "order": 9,
       "heading": "Skip the warm-up readings",
       "async": false,
       "scales": {
@@ -154,15 +154,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 27.463768115942027,
-            "minUs": 25.594202898550726,
-            "medianRssBytes": 17285120.0,
+            "medianUs": 29.493506493506494,
+            "minUs": 26.046153846153846,
+            "medianRssBytes": 17301504.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 17.93103448275862,
-            "minUs": 15.689655172413794,
-            "medianRssBytes": 17252352.0,
+            "medianUs": 18.946428571428573,
+            "minUs": 15.555555555555555,
+            "medianRssBytes": 17367040.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -172,15 +172,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 289258.0,
-            "minUs": 281719.0,
-            "medianRssBytes": 143015936.0,
+            "medianUs": 297997.0,
+            "minUs": 279626.0,
+            "medianRssBytes": 142704640.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 197059.0,
-            "minUs": 180333.0,
-            "medianRssBytes": 150962176.0,
+            "medianUs": 193213.0,
+            "minUs": 170478.0,
+            "medianRssBytes": 150798336.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -197,14 +197,14 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 12.754491017964073,
-            "minUs": 10.263736263736265,
-            "medianRssBytes": 17301504.0,
+            "medianUs": 10.626865671641792,
+            "minUs": 9.868131868131869,
+            "medianRssBytes": 17399808.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 4.634730538922156,
-            "minUs": 4.298804780876494,
+            "medianUs": 4.391217564870259,
+            "minUs": 4.029940119760479,
             "medianRssBytes": 17268736.0,
             "samples": 15
           },
@@ -215,15 +215,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 408574.0,
-            "minUs": 349227.0,
-            "medianRssBytes": 218775552.0,
+            "medianUs": 369564.0,
+            "minUs": 343671.0,
+            "medianRssBytes": 219299840.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 93444.0,
-            "minUs": 80058.0,
-            "medianRssBytes": 209879040.0,
+            "medianUs": 100846.0,
+            "minUs": 90576.0,
+            "medianRssBytes": 210403328.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -232,7 +232,7 @@
       }
     },
     "clean-nullable-readings": {
-      "order": 6,
+      "order": 8,
       "heading": "Drop the nulls, keep the values",
       "async": false,
       "scales": {
@@ -240,100 +240,14 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 24.194805194805195,
-            "minUs": 19.574257425742573,
-            "medianRssBytes": 17399808.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 11.807692307692308,
-            "minUs": 10.39010989010989,
-            "medianRssBytes": 17252352.0,
-            "samples": 15
-          },
-          "timeWinner": "tie",
-          "memWinner": "tie"
-        },
-        "full": {
-          "n": 1000000,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 215880.0,
-            "minUs": 212310.0,
-            "medianRssBytes": 128598016.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 131945.0,
-            "minUs": 125830.0,
-            "medianRssBytes": 118390784.0,
-            "samples": 15
-          },
-          "timeWinner": "fxdart",
-          "memWinner": "fxdart"
-        }
-      }
-    },
-    "last-three-errors": {
-      "order": 7,
-      "heading": "The last three errors",
-      "async": false,
-      "scales": {
-        "100": {
-          "n": 100,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 9.493273542600896,
-            "minUs": 7.542600896860987,
+            "medianUs": 21.641025641025642,
+            "minUs": 19.666666666666668,
             "medianRssBytes": 17367040.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 2.6053946053946055,
-            "minUs": 2.5254745254745257,
-            "medianRssBytes": 17235968.0,
-            "samples": 15
-          },
-          "timeWinner": "tie",
-          "memWinner": "tie"
-        },
-        "full": {
-          "n": 1000000,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 66713.0,
-            "minUs": 65953.0,
-            "medianRssBytes": 117489664.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 23647.0,
-            "minUs": 23451.0,
-            "medianRssBytes": 109412352.0,
-            "samples": 15
-          },
-          "timeWinner": "fxdart",
-          "memWinner": "fxdart"
-        }
-      }
-    },
-    "numbered-checklist": {
-      "order": 8,
-      "heading": "Number the checklist",
-      "async": false,
-      "scales": {
-        "100": {
-          "n": 100,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 21.2183908045977,
-            "minUs": 17.07547169811321,
-            "medianRssBytes": 17350656.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 12.131736526946108,
-            "minUs": 10.724550898203592,
+            "medianUs": 11.338308457711443,
+            "minUs": 10.313432835820896,
             "medianRssBytes": 17317888.0,
             "samples": 15
           },
@@ -344,15 +258,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 212858.0,
-            "minUs": 204568.0,
-            "medianRssBytes": 208011264.0,
+            "medianUs": 218837.0,
+            "minUs": 212496.0,
+            "medianRssBytes": 128974848.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 169730.0,
-            "minUs": 158903.0,
-            "medianRssBytes": 208568320.0,
+            "medianUs": 132299.0,
+            "minUs": 126458.0,
+            "medianRssBytes": 123043840.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -360,238 +274,23 @@
         }
       }
     },
-    "expand-order-lines": {
-      "order": 9,
-      "heading": "Flatten orders into lines",
+    "last-three-errors": {
+      "order": 6,
+      "heading": "The last three errors",
       "async": false,
       "scales": {
         "100": {
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 400.0,
-            "minUs": 352.8333333333333,
-            "medianRssBytes": 16252928.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 26.67391304347826,
-            "minUs": 24.282608695652176,
-            "medianRssBytes": 17252352.0,
-            "samples": 15
-          },
-          "timeWinner": "tie",
-          "memWinner": "rxdart"
-        },
-        "full": {
-          "n": 1000000,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 3736699.0,
-            "minUs": 3723529.0,
-            "medianRssBytes": 503152640.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 406097.0,
-            "minUs": 375739.0,
-            "medianRssBytes": 513032192.0,
-            "samples": 15
-          },
-          "timeWinner": "fxdart",
-          "memWinner": "tie"
-        }
-      }
-    },
-    "empty-report-default": {
-      "order": 10,
-      "heading": "A default line for an empty report",
-      "async": false,
-      "scales": {
-        "100": {
-          "n": 100,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 7.3107569721115535,
-            "minUs": 6.48605577689243,
-            "medianRssBytes": 17252352.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 2.5414585414585416,
-            "minUs": 2.2627372627372626,
-            "medianRssBytes": 17235968.0,
-            "samples": 15
-          },
-          "timeWinner": "tie",
-          "memWinner": "tie"
-        },
-        "full": {
-          "n": 1000000,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 53201.0,
-            "minUs": 52452.0,
-            "medianRssBytes": 129449984.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 19577.0,
-            "minUs": 19401.0,
-            "medianRssBytes": 127205376.0,
-            "samples": 15
-          },
-          "timeWinner": "fxdart",
-          "memWinner": "tie"
-        }
-      }
-    },
-    "upload-batches": {
-      "order": 11,
-      "heading": "Upload in batches of 4",
-      "async": false,
-      "scales": {
-        "100": {
-          "n": 100,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 35.254901960784316,
-            "minUs": 28.076923076923077,
-            "medianRssBytes": 17383424.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 11.41317365269461,
-            "minUs": 10.22754491017964,
-            "medianRssBytes": 17268736.0,
-            "samples": 15
-          },
-          "timeWinner": "tie",
-          "memWinner": "tie"
-        },
-        "full": {
-          "n": 1000000,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 298102.0,
-            "minUs": 291796.0,
-            "medianRssBytes": 134758400.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 117612.0,
-            "minUs": 113571.0,
-            "medianRssBytes": 140083200.0,
-            "samples": 15
-          },
-          "timeWinner": "fxdart",
-          "memWinner": "tie"
-        }
-      }
-    },
-    "sliding-average-rx": {
-      "order": 12,
-      "heading": "Three-reading moving average",
-      "async": false,
-      "scales": {
-        "100": {
-          "n": 100,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 109.33333333333333,
-            "minUs": 99.52941176470588,
-            "medianRssBytes": 17399808.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 65.1,
-            "minUs": 60.86666666666667,
-            "medianRssBytes": 17170432.0,
-            "samples": 15
-          },
-          "timeWinner": "tie",
-          "memWinner": "tie"
-        },
-        "full": {
-          "n": 1000000,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 1109618.0,
-            "minUs": 1094696.0,
-            "medianRssBytes": 161792000.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 704248.0,
-            "minUs": 697910.0,
-            "medianRssBytes": 159236096.0,
-            "samples": 15
-          },
-          "timeWinner": "fxdart",
-          "memWinner": "tie"
-        }
-      }
-    },
-    "tick-deltas": {
-      "order": 13,
-      "heading": "Deltas between ticks",
-      "async": false,
-      "scales": {
-        "100": {
-          "n": 100,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 82.1923076923077,
-            "minUs": 71.42307692307692,
+            "medianUs": 7.836653386454183,
+            "minUs": 7.327354260089686,
             "medianRssBytes": 17334272.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 44.41304347826087,
-            "minUs": 40.303030303030305,
-            "medianRssBytes": 17203200.0,
-            "samples": 15
-          },
-          "timeWinner": "tie",
-          "memWinner": "tie"
-        },
-        "full": {
-          "n": 1000000,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 786155.0,
-            "minUs": 776035.0,
-            "medianRssBytes": 168116224.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 472635.0,
-            "minUs": 454888.0,
-            "medianRssBytes": 170819584.0,
-            "samples": 15
-          },
-          "timeWinner": "fxdart",
-          "memWinner": "tie"
-        }
-      }
-    },
-    "status-transitions": {
-      "order": 14,
-      "heading": "Report only status changes",
-      "async": false,
-      "scales": {
-        "100": {
-          "n": 100,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 16.35820895522388,
-            "minUs": 14.574626865671641,
-            "medianRssBytes": 17793024.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 7.144638403990025,
-            "minUs": 5.11377245508982,
+            "medianUs": 1.576711644177911,
+            "minUs": 1.5157421289355322,
             "medianRssBytes": 17285120.0,
             "samples": 15
           },
@@ -602,168 +301,39 @@
           "n": 1000000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 129113.0,
-            "minUs": 123907.0,
-            "medianRssBytes": 88080384.0,
+            "medianUs": 68661.0,
+            "minUs": 65233.0,
+            "medianRssBytes": 116686848.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 48920.0,
-            "minUs": 45935.0,
-            "medianRssBytes": 93061120.0,
+            "medianUs": 14875.0,
+            "minUs": 14091.0,
+            "medianRssBytes": 113098752.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
-          "memWinner": "rxdart"
+          "memWinner": "tie"
         }
       }
     },
-    "spend-by-category-rx": {
-      "order": 15,
-      "heading": "Spend grouped by category",
+    "numbered-checklist": {
+      "order": 10,
+      "heading": "Number the checklist",
       "async": false,
       "scales": {
         "100": {
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 23.840579710144926,
-            "minUs": 18.987654320987655,
+            "medianUs": 20.583333333333332,
+            "minUs": 16.473214285714285,
             "medianRssBytes": 17416192.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 6.041958041958042,
-            "minUs": 5.502242152466367,
-            "medianRssBytes": 17285120.0,
-            "samples": 15
-          },
-          "timeWinner": "tie",
-          "memWinner": "tie"
-        },
-        "full": {
-          "n": 1000000,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 107517.0,
-            "minUs": 105871.0,
-            "medianRssBytes": 97304576.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 59812.0,
-            "minUs": 53186.0,
-            "medianRssBytes": 121503744.0,
-            "samples": 15
-          },
-          "timeWinner": "fxdart",
-          "memWinner": "rxdart"
-        }
-      }
-    },
-    "align-forecast-actual": {
-      "order": 16,
-      "heading": "Align forecast with actuals",
-      "async": false,
-      "scales": {
-        "100": {
-          "n": 100,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 85.04347826086956,
-            "minUs": 75.43478260869566,
-            "medianRssBytes": 17367040.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 46.214285714285715,
-            "minUs": 42.97727272727273,
-            "medianRssBytes": 17235968.0,
-            "samples": 15
-          },
-          "timeWinner": "tie",
-          "memWinner": "tie"
-        },
-        "full": {
-          "n": 1000000,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 825646.0,
-            "minUs": 805848.0,
-            "medianRssBytes": 218464256.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 490921.0,
-            "minUs": 480240.0,
-            "medianRssBytes": 227033088.0,
-            "samples": 15
-          },
-          "timeWinner": "fxdart",
-          "memWinner": "tie"
-        }
-      }
-    },
-    "feeds-in-order": {
-      "order": 17,
-      "heading": "Two feeds, strictly in order",
-      "async": false,
-      "scales": {
-        "100": {
-          "n": 100,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 23.180555555555557,
-            "minUs": 20.170731707317074,
-            "medianRssBytes": 17268736.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 10.483516483516484,
-            "minUs": 9.417582417582418,
-            "medianRssBytes": 17219584.0,
-            "samples": 15
-          },
-          "timeWinner": "tie",
-          "memWinner": "tie"
-        },
-        "full": {
-          "n": 1000000,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 224348.0,
-            "minUs": 209511.0,
-            "medianRssBytes": 285671424.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 133568.0,
-            "minUs": 122577.0,
-            "medianRssBytes": 290062336.0,
-            "samples": 15
-          },
-          "timeWinner": "fxdart",
-          "memWinner": "tie"
-        }
-      }
-    },
-    "bracket-the-session": {
-      "order": 18,
-      "heading": "Open and close markers",
-      "async": false,
-      "scales": {
-        "100": {
-          "n": 100,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 12.928571428571429,
-            "minUs": 10.279220779220779,
-            "medianRssBytes": 17858560.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 3.025487256371814,
-            "minUs": 2.8395802098950527,
+            "medianUs": 10.622754491017965,
+            "minUs": 9.76923076923077,
             "medianRssBytes": 17301504.0,
             "samples": 15
           },
@@ -774,40 +344,83 @@
           "n": 1000000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 98714.0,
-            "minUs": 96406.0,
-            "medianRssBytes": 129155072.0,
+            "medianUs": 216637.0,
+            "minUs": 203171.0,
+            "medianRssBytes": 205979648.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 31134.0,
-            "minUs": 28667.0,
-            "medianRssBytes": 145522688.0,
+            "medianUs": 163101.0,
+            "minUs": 149025.0,
+            "medianRssBytes": 206602240.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
-          "memWinner": "rxdart"
+          "memWinner": "tie"
         }
       }
     },
-    "dedupe-paged-feed": {
-      "order": 19,
-      "heading": "Dedupe a paged feed by id",
+    "expand-order-lines": {
+      "order": 3,
+      "heading": "Flatten orders into lines",
       "async": false,
       "scales": {
         "100": {
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 25.15277777777778,
-            "minUs": 19.95402298850575,
-            "medianRssBytes": 17350656.0,
+            "medianUs": 423.0,
+            "minUs": 352.1666666666667,
+            "medianRssBytes": 16318464.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 12.38961038961039,
-            "minUs": 11.694805194805195,
-            "medianRssBytes": 17334272.0,
+            "medianUs": 27.62686567164179,
+            "minUs": 23.666666666666668,
+            "medianRssBytes": 17399808.0,
+            "samples": 15
+          },
+          "timeWinner": "tie",
+          "memWinner": "rxdart"
+        },
+        "full": {
+          "n": 1000000,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 3755309.0,
+            "minUs": 3713030.0,
+            "medianRssBytes": 510722048.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 401822.0,
+            "minUs": 372837.0,
+            "medianRssBytes": 513015808.0,
+            "samples": 15
+          },
+          "timeWinner": "fxdart",
+          "memWinner": "tie"
+        }
+      }
+    },
+    "empty-report-default": {
+      "order": 7,
+      "heading": "A default line for an empty report",
+      "async": false,
+      "scales": {
+        "100": {
+          "n": 100,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 6.723776223776224,
+            "minUs": 6.24251497005988,
+            "medianRssBytes": 17399808.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 1.2813593203398301,
+            "minUs": 1.1744127936031985,
+            "medianRssBytes": 17317888.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -817,15 +430,402 @@
           "n": 1000000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 321834.0,
-            "minUs": 285923.0,
-            "medianRssBytes": 311099392.0,
+            "medianUs": 57712.0,
+            "minUs": 52072.0,
+            "medianRssBytes": 129581056.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 224909.0,
-            "minUs": 199331.0,
-            "medianRssBytes": 252805120.0,
+            "medianUs": 9621.0,
+            "minUs": 9198.0,
+            "medianRssBytes": 127188992.0,
+            "samples": 15
+          },
+          "timeWinner": "fxdart",
+          "memWinner": "tie"
+        }
+      }
+    },
+    "upload-batches": {
+      "order": 16,
+      "heading": "Upload in batches of 4",
+      "async": false,
+      "scales": {
+        "100": {
+          "n": 100,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 35.92857142857143,
+            "minUs": 28.19047619047619,
+            "medianRssBytes": 17432576.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 9.547085201793722,
+            "minUs": 8.550898203592814,
+            "medianRssBytes": 17874944.0,
+            "samples": 15
+          },
+          "timeWinner": "tie",
+          "memWinner": "tie"
+        },
+        "full": {
+          "n": 1000000,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 296320.0,
+            "minUs": 293342.0,
+            "medianRssBytes": 130826240.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 102745.0,
+            "minUs": 98017.0,
+            "medianRssBytes": 138674176.0,
+            "samples": 15
+          },
+          "timeWinner": "fxdart",
+          "memWinner": "rxdart"
+        }
+      }
+    },
+    "sliding-average-rx": {
+      "order": 21,
+      "heading": "Three-reading moving average",
+      "async": false,
+      "scales": {
+        "100": {
+          "n": 100,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 129.13333333333333,
+            "minUs": 103.73684210526316,
+            "medianRssBytes": 17399808.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 62.0,
+            "minUs": 57.96969696969697,
+            "medianRssBytes": 17383424.0,
+            "samples": 15
+          },
+          "timeWinner": "tie",
+          "memWinner": "tie"
+        },
+        "full": {
+          "n": 1000000,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 1110400.0,
+            "minUs": 1102038.0,
+            "medianRssBytes": 161579008.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 676893.0,
+            "minUs": 664699.0,
+            "medianRssBytes": 158875648.0,
+            "samples": 15
+          },
+          "timeWinner": "fxdart",
+          "memWinner": "tie"
+        }
+      }
+    },
+    "tick-deltas": {
+      "order": 19,
+      "heading": "Deltas between ticks",
+      "async": false,
+      "scales": {
+        "100": {
+          "n": 100,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 78.23076923076923,
+            "minUs": 73.23529411764706,
+            "medianRssBytes": 17399808.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 41.977777777777774,
+            "minUs": 39.61702127659574,
+            "medianRssBytes": 17301504.0,
+            "samples": 15
+          },
+          "timeWinner": "tie",
+          "memWinner": "tie"
+        },
+        "full": {
+          "n": 1000000,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 820367.0,
+            "minUs": 778907.0,
+            "medianRssBytes": 169246720.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 462004.0,
+            "minUs": 450860.0,
+            "medianRssBytes": 171540480.0,
+            "samples": 15
+          },
+          "timeWinner": "fxdart",
+          "memWinner": "tie"
+        }
+      }
+    },
+    "status-transitions": {
+      "order": 15,
+      "heading": "Report only status changes",
+      "async": false,
+      "scales": {
+        "100": {
+          "n": 100,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 18.29245283018868,
+            "minUs": 13.686567164179104,
+            "medianRssBytes": 17334272.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 4.095238095238095,
+            "minUs": 3.476761619190405,
+            "medianRssBytes": 17268736.0,
+            "samples": 15
+          },
+          "timeWinner": "tie",
+          "memWinner": "tie"
+        },
+        "full": {
+          "n": 1000000,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 127150.0,
+            "minUs": 123085.0,
+            "medianRssBytes": 88064000.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 34310.0,
+            "minUs": 31178.0,
+            "medianRssBytes": 93093888.0,
+            "samples": 15
+          },
+          "timeWinner": "fxdart",
+          "memWinner": "rxdart"
+        }
+      }
+    },
+    "spend-by-category-rx": {
+      "order": 17,
+      "heading": "Spend grouped by category",
+      "async": false,
+      "scales": {
+        "100": {
+          "n": 100,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 20.26388888888889,
+            "minUs": 18.633333333333333,
+            "medianRssBytes": 17432576.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 4.71571072319202,
+            "minUs": 4.43142144638404,
+            "medianRssBytes": 17285120.0,
+            "samples": 15
+          },
+          "timeWinner": "tie",
+          "memWinner": "tie"
+        },
+        "full": {
+          "n": 1000000,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 109843.0,
+            "minUs": 107841.0,
+            "medianRssBytes": 96911360.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 47563.0,
+            "minUs": 41342.0,
+            "medianRssBytes": 122863616.0,
+            "samples": 15
+          },
+          "timeWinner": "fxdart",
+          "memWinner": "rxdart"
+        }
+      }
+    },
+    "align-forecast-actual": {
+      "order": 20,
+      "heading": "Align forecast with actuals",
+      "async": false,
+      "scales": {
+        "100": {
+          "n": 100,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 84.34782608695652,
+            "minUs": 73.21739130434783,
+            "medianRssBytes": 17989632.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 43.28260869565217,
+            "minUs": 39.88095238095238,
+            "medianRssBytes": 17367040.0,
+            "samples": 15
+          },
+          "timeWinner": "tie",
+          "memWinner": "tie"
+        },
+        "full": {
+          "n": 1000000,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 827914.0,
+            "minUs": 810653.0,
+            "medianRssBytes": 216629248.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 486362.0,
+            "minUs": 473323.0,
+            "medianRssBytes": 230670336.0,
+            "samples": 15
+          },
+          "timeWinner": "fxdart",
+          "memWinner": "rxdart"
+        }
+      }
+    },
+    "feeds-in-order": {
+      "order": 18,
+      "heading": "Two feeds, strictly in order",
+      "async": false,
+      "scales": {
+        "100": {
+          "n": 100,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 21.043956043956044,
+            "minUs": 18.65934065934066,
+            "medianRssBytes": 17268736.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 9.746268656716419,
+            "minUs": 8.82587064676617,
+            "medianRssBytes": 17383424.0,
+            "samples": 15
+          },
+          "timeWinner": "tie",
+          "memWinner": "tie"
+        },
+        "full": {
+          "n": 1000000,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 261978.0,
+            "minUs": 225747.0,
+            "medianRssBytes": 283525120.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 149012.0,
+            "minUs": 122190.0,
+            "medianRssBytes": 289292288.0,
+            "samples": 15
+          },
+          "timeWinner": "fxdart",
+          "memWinner": "tie"
+        }
+      }
+    },
+    "bracket-the-session": {
+      "order": 14,
+      "heading": "Open and close markers",
+      "async": false,
+      "scales": {
+        "100": {
+          "n": 100,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 13.487012987012987,
+            "minUs": 10.288557213930348,
+            "medianRssBytes": 17481728.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 3.0359820089955023,
+            "minUs": 2.785607196401799,
+            "medianRssBytes": 17285120.0,
+            "samples": 15
+          },
+          "timeWinner": "tie",
+          "memWinner": "tie"
+        },
+        "full": {
+          "n": 1000000,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 99204.0,
+            "minUs": 97420.0,
+            "medianRssBytes": 134889472.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 30569.0,
+            "minUs": 28329.0,
+            "medianRssBytes": 147996672.0,
+            "samples": 15
+          },
+          "timeWinner": "fxdart",
+          "memWinner": "rxdart"
+        }
+      }
+    },
+    "dedupe-paged-feed": {
+      "order": 23,
+      "heading": "Dedupe a paged feed by id",
+      "async": false,
+      "scales": {
+        "100": {
+          "n": 100,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 26.041666666666668,
+            "minUs": 19.48148148148148,
+            "medianRssBytes": 17448960.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 12.545454545454545,
+            "minUs": 11.551948051948052,
+            "medianRssBytes": 17350656.0,
+            "samples": 15
+          },
+          "timeWinner": "tie",
+          "memWinner": "tie"
+        },
+        "full": {
+          "n": 1000000,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 304486.0,
+            "minUs": 285768.0,
+            "medianRssBytes": 311590912.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 214901.0,
+            "minUs": 203673.0,
+            "medianRssBytes": 252739584.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -834,7 +834,7 @@
       }
     },
     "latency-extremes": {
-      "order": 20,
+      "order": 24,
       "heading": "Fastest and slowest request",
       "async": true,
       "scales": {
@@ -842,15 +842,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 737.6666666666666,
-            "minUs": 583.0,
-            "medianRssBytes": 17268736.0,
+            "medianUs": 755.3333333333334,
+            "minUs": 606.75,
+            "medianRssBytes": 17285120.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 655.3333333333334,
-            "minUs": 601.75,
-            "medianRssBytes": 17383424.0,
+            "medianUs": 820.3333333333334,
+            "minUs": 601.0,
+            "medianRssBytes": 17874944.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -860,15 +860,15 @@
           "n": 10000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 63119.0,
-            "minUs": 60944.0,
-            "medianRssBytes": 25329664.0,
+            "medianUs": 65115.0,
+            "minUs": 60778.0,
+            "medianRssBytes": 25362432.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 63703.0,
-            "minUs": 63083.0,
-            "medianRssBytes": 25362432.0,
+            "medianUs": 65004.0,
+            "minUs": 60725.0,
+            "medianRssBytes": 25460736.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -877,7 +877,7 @@
       }
     },
     "stock-after-moves": {
-      "order": 21,
+      "order": 11,
       "heading": "Stock level after each move",
       "async": false,
       "scales": {
@@ -885,15 +885,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 391.6666666666667,
-            "minUs": 331.2857142857143,
+            "medianUs": 447.0,
+            "minUs": 328.3333333333333,
             "medianRssBytes": 15745024.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 13.993006993006993,
-            "minUs": 12.188311688311689,
-            "medianRssBytes": 17252352.0,
+            "medianUs": 12.783216783216783,
+            "minUs": 11.902597402597403,
+            "medianRssBytes": 17874944.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -903,15 +903,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 3374589.0,
-            "minUs": 3358999.0,
-            "medianRssBytes": 133169152.0,
+            "medianUs": 3470892.0,
+            "minUs": 3380889.0,
+            "medianRssBytes": 131301376.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 174860.0,
-            "minUs": 166686.0,
-            "medianRssBytes": 132513792.0,
+            "medianUs": 169680.0,
+            "minUs": 162391.0,
+            "medianRssBytes": 132349952.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -920,7 +920,7 @@
       }
     },
     "audit-with-outcomes": {
-      "order": 22,
+      "order": 13,
       "heading": "Keep values AND failures in the audit",
       "async": false,
       "scales": {
@@ -928,15 +928,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 421.8,
-            "minUs": 383.6,
-            "medianRssBytes": 17383424.0,
+            "medianUs": 473.4,
+            "minUs": 378.2,
+            "medianRssBytes": 17334272.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 99.8125,
-            "minUs": 98.5,
-            "medianRssBytes": 17170432.0,
+            "medianUs": 95.86666666666666,
+            "minUs": 92.93333333333334,
+            "medianRssBytes": 16646144.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -946,15 +946,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 4142937.0,
-            "minUs": 3985414.0,
-            "medianRssBytes": 193282048.0,
+            "medianUs": 4045985.0,
+            "minUs": 3993611.0,
+            "medianRssBytes": 191791104.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 1042002.0,
-            "minUs": 1024765.0,
-            "medianRssBytes": 193986560.0,
+            "medianUs": 999440.0,
+            "minUs": 990286.0,
+            "medianRssBytes": 200327168.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -963,7 +963,7 @@
       }
     },
     "stop-at-shutdown": {
-      "order": 23,
+      "order": 22,
       "heading": "Take until the shutdown marker, inclusive",
       "async": false,
       "scales": {
@@ -971,14 +971,14 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 19.235294117647058,
-            "minUs": 16.89622641509434,
-            "medianRssBytes": 17268736.0,
+            "medianUs": 21.942528735632184,
+            "minUs": 16.224489795918366,
+            "medianRssBytes": 17317888.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 8.781094527363184,
-            "minUs": 8.426008968609866,
+            "medianUs": 8.008968609865471,
+            "minUs": 7.309417040358745,
             "medianRssBytes": 17334272.0,
             "samples": 15
           },
@@ -989,24 +989,24 @@
           "n": 1000000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 189467.0,
-            "minUs": 186003.0,
-            "medianRssBytes": 195772416.0,
+            "medianUs": 190610.0,
+            "minUs": 185911.0,
+            "medianRssBytes": 196444160.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 121862.0,
-            "minUs": 109506.0,
-            "medianRssBytes": 200425472.0,
+            "medianUs": 110091.0,
+            "minUs": 99745.0,
+            "medianRssBytes": 211828736.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
-          "memWinner": "tie"
+          "memWinner": "rxdart"
         }
       }
     },
     "weekly-windows-report": {
-      "order": 24,
+      "order": 12,
       "heading": "Weekly totals from a daily series",
       "async": false,
       "scales": {
@@ -1014,15 +1014,15 @@
           "n": 98,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 70.17241379310344,
-            "minUs": 64.20689655172414,
+            "medianUs": 70.20689655172414,
+            "minUs": 63.357142857142854,
             "medianRssBytes": 18300928.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 6.167664670658683,
-            "minUs": 5.799401197604791,
-            "medianRssBytes": 17399808.0,
+            "medianUs": 4.077844311377246,
+            "minUs": 3.7045908183632736,
+            "medianRssBytes": 17317888.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1032,15 +1032,15 @@
           "n": 999999,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 667674.0,
-            "minUs": 662890.0,
-            "medianRssBytes": 60915712.0,
+            "medianUs": 673445.0,
+            "minUs": 660493.0,
+            "medianRssBytes": 59981824.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 63574.0,
-            "minUs": 61675.0,
-            "medianRssBytes": 84787200.0,
+            "medianUs": 44570.0,
+            "minUs": 41270.0,
+            "medianRssBytes": 84705280.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -1049,7 +1049,7 @@
       }
     },
     "price-or-fallback": {
-      "order": 25,
+      "order": 33,
       "heading": "A price, or the list price",
       "async": true,
       "scales": {
@@ -1057,15 +1057,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 552.75,
-            "minUs": 405.6,
-            "medianRssBytes": 18022400.0,
+            "medianUs": 501.25,
+            "minUs": 401.75,
+            "medianRssBytes": 18038784.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 464.25,
-            "minUs": 394.2,
-            "medianRssBytes": 17514496.0,
+            "medianUs": 494.0,
+            "minUs": 393.6,
+            "medianRssBytes": 17530880.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1075,24 +1075,24 @@
           "n": 10000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 43972.0,
-            "minUs": 41452.0,
-            "medianRssBytes": 51527680.0,
+            "medianUs": 46622.0,
+            "minUs": 41258.0,
+            "medianRssBytes": 51429376.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 44567.0,
-            "minUs": 39875.0,
-            "medianRssBytes": 54673408.0,
+            "medianUs": 42354.0,
+            "minUs": 39217.0,
+            "medianRssBytes": 54542336.0,
             "samples": 15
           },
-          "timeWinner": "tie",
+          "timeWinner": "fxdart",
           "memWinner": "rxdart"
         }
       }
     },
     "resume-with-cache": {
-      "order": 26,
+      "order": 34,
       "heading": "Resume from cache when the source dies",
       "async": true,
       "scales": {
@@ -1100,15 +1100,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 26.784615384615385,
-            "minUs": 21.142857142857142,
-            "medianRssBytes": 17334272.0,
+            "medianUs": 24.80952380952381,
+            "minUs": 21.738095238095237,
+            "medianRssBytes": 17367040.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 27.02777777777778,
-            "minUs": 24.22222222222222,
-            "medianRssBytes": 17219584.0,
+            "medianUs": 26.246376811594203,
+            "minUs": 24.208955223880597,
+            "medianRssBytes": 17383424.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1118,15 +1118,15 @@
           "n": 10000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 1842.0,
-            "minUs": 1738.5,
-            "medianRssBytes": 24330240.0,
+            "medianUs": 1864.5,
+            "minUs": 1731.0,
+            "medianRssBytes": 24379392.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 2107.0,
-            "minUs": 2022.0,
-            "medianRssBytes": 25247744.0,
+            "medianUs": 2103.0,
+            "minUs": 1950.0,
+            "medianRssBytes": 25378816.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1135,7 +1135,7 @@
       }
     },
     "retry-the-fetch": {
-      "order": 27,
+      "order": 29,
       "heading": "Retry the flaky fetch",
       "async": true,
       "scales": {
@@ -1143,15 +1143,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 578.5,
-            "minUs": 513.0,
-            "medianRssBytes": 17219584.0,
+            "medianUs": 607.3333333333334,
+            "minUs": 524.3333333333334,
+            "medianRssBytes": 17776640.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 475.75,
-            "minUs": 422.25,
-            "medianRssBytes": 17285120.0,
+            "medianUs": 508.0,
+            "minUs": 442.5,
+            "medianRssBytes": 17170432.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1161,15 +1161,15 @@
           "n": 10000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 54237.0,
-            "minUs": 52315.0,
-            "medianRssBytes": 24887296.0,
+            "medianUs": 54470.0,
+            "minUs": 50091.0,
+            "medianRssBytes": 25149440.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 48090.0,
-            "minUs": 44345.0,
-            "medianRssBytes": 25198592.0,
+            "medianUs": 46713.0,
+            "minUs": 43434.0,
+            "medianRssBytes": 25149440.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -1186,15 +1186,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 806.3333333333334,
-            "minUs": 659.6666666666666,
-            "medianRssBytes": 17367040.0,
+            "medianUs": 724.6666666666666,
+            "minUs": 578.6666666666666,
+            "medianRssBytes": 17924096.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 526.75,
-            "minUs": 469.75,
-            "medianRssBytes": 17285120.0,
+            "medianUs": 522.25,
+            "minUs": 416.75,
+            "medianRssBytes": 17317888.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1204,15 +1204,15 @@
           "n": 10000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 62967.0,
-            "minUs": 60001.0,
+            "medianUs": 60083.0,
+            "minUs": 56991.0,
             "medianRssBytes": 30736384.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 48185.0,
-            "minUs": 45868.0,
-            "medianRssBytes": 28360704.0,
+            "medianUs": 46865.0,
+            "minUs": 43460.0,
+            "medianRssBytes": 28377088.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -1221,7 +1221,7 @@
       }
     },
     "per-row-retry": {
-      "order": 29,
+      "order": 31,
       "heading": "Retry each flaky row independently",
       "async": true,
       "scales": {
@@ -1229,15 +1229,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 818.5,
-            "minUs": 646.6666666666666,
-            "medianRssBytes": 17432576.0,
+            "medianUs": 771.0,
+            "minUs": 660.0,
+            "medianRssBytes": 17448960.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 781.6666666666666,
-            "minUs": 640.6666666666666,
-            "medianRssBytes": 17481728.0,
+            "medianUs": 781.0,
+            "minUs": 702.6666666666666,
+            "medianRssBytes": 17694720.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1245,20 +1245,20 @@
         },
         "full": {
           "n": 10000,
-          "roundsRun": 5,
+          "roundsRun": 3,
           "rxdart": {
-            "medianUs": 71591.0,
-            "minUs": 66354.0,
-            "medianRssBytes": 64159744.0,
-            "samples": 25
+            "medianUs": 71086.0,
+            "minUs": 66331.0,
+            "medianRssBytes": 63635456.0,
+            "samples": 15
           },
           "fxdart": {
-            "medianUs": 70291.0,
-            "minUs": 66641.0,
-            "medianRssBytes": 42418176.0,
-            "samples": 25
+            "medianUs": 67095.0,
+            "minUs": 64731.0,
+            "medianRssBytes": 42123264.0,
+            "samples": 15
           },
-          "timeWinner": "tie",
+          "timeWinner": "fxdart",
           "memWinner": "fxdart"
         }
       }
@@ -1272,15 +1272,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 161.0909090909091,
-            "minUs": 140.5,
-            "medianRssBytes": 17416192.0,
+            "medianUs": 160.22222222222223,
+            "minUs": 140.25,
+            "medianRssBytes": 17481728.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 152.5,
-            "minUs": 126.58333333333333,
-            "medianRssBytes": 17367040.0,
+            "medianUs": 145.66666666666666,
+            "minUs": 126.3076923076923,
+            "medianRssBytes": 17481728.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1290,15 +1290,15 @@
           "n": 10000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 14767.0,
-            "minUs": 14249.0,
-            "medianRssBytes": 28934144.0,
+            "medianUs": 14599.0,
+            "minUs": 14218.0,
+            "medianRssBytes": 28737536.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 13352.0,
-            "minUs": 12754.0,
-            "medianRssBytes": 28819456.0,
+            "medianUs": 13444.0,
+            "minUs": 13043.0,
+            "medianRssBytes": 28917760.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -1307,7 +1307,7 @@
       }
     },
     "cursor-lifetime": {
-      "order": 31,
+      "order": 32,
       "heading": "A cursor's lifetime around a read",
       "async": true,
       "scales": {
@@ -1315,15 +1315,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 420.6,
-            "minUs": 301.4,
-            "medianRssBytes": 17317888.0,
+            "medianUs": 372.0,
+            "minUs": 298.1666666666667,
+            "medianRssBytes": 17399808.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 361.14285714285717,
-            "minUs": 317.0,
-            "medianRssBytes": 17907712.0,
+            "medianUs": 326.0,
+            "minUs": 318.0,
+            "medianRssBytes": 17432576.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1333,24 +1333,24 @@
           "n": 10000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 32875.0,
-            "minUs": 30690.0,
-            "medianRssBytes": 26624000.0,
+            "medianUs": 31413.0,
+            "minUs": 30199.0,
+            "medianRssBytes": 26640384.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 32998.0,
-            "minUs": 32125.0,
-            "medianRssBytes": 26755072.0,
+            "medianUs": 33741.0,
+            "minUs": 32044.0,
+            "medianRssBytes": 26705920.0,
             "samples": 15
           },
-          "timeWinner": "tie",
+          "timeWinner": "rxdart",
           "memWinner": "tie"
         }
       }
     },
     "successes-and-failures": {
-      "order": 32,
+      "order": 26,
       "heading": "Split successes from failures",
       "async": true,
       "scales": {
@@ -1358,15 +1358,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 789.5,
-            "minUs": 662.3333333333334,
-            "medianRssBytes": 17432576.0,
+            "medianUs": 752.5,
+            "minUs": 660.5,
+            "medianRssBytes": 17367040.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 392.6666666666667,
-            "minUs": 353.0,
-            "medianRssBytes": 17793024.0,
+            "medianUs": 435.8333333333333,
+            "minUs": 361.0,
+            "medianRssBytes": 17498112.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1376,15 +1376,15 @@
           "n": 10000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 70342.0,
-            "minUs": 68478.0,
-            "medianRssBytes": 26394624.0,
+            "medianUs": 67575.0,
+            "minUs": 66504.0,
+            "medianRssBytes": 26476544.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 36313.0,
-            "minUs": 34357.0,
-            "medianRssBytes": 32178176.0,
+            "medianUs": 36945.0,
+            "minUs": 35269.0,
+            "medianRssBytes": 32079872.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -1393,7 +1393,7 @@
       }
     },
     "all-validation-errors": {
-      "order": 33,
+      "order": 25,
       "heading": "Report every validation error",
       "async": false,
       "scales": {
@@ -1401,15 +1401,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 127.93333333333334,
-            "minUs": 103.88235294117646,
-            "medianRssBytes": 15974400.0,
+            "medianUs": 128.0,
+            "minUs": 106.0,
+            "medianRssBytes": 16154624.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 28.536231884057973,
-            "minUs": 25.985507246376812,
-            "medianRssBytes": 17154048.0,
+            "medianUs": 27.458333333333332,
+            "minUs": 24.61111111111111,
+            "medianRssBytes": 17235968.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1419,15 +1419,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 1122922.0,
-            "minUs": 1109481.0,
-            "medianRssBytes": 362250240.0,
+            "medianUs": 1168723.0,
+            "minUs": 1116420.0,
+            "medianRssBytes": 362004480.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 330907.0,
-            "minUs": 311367.0,
-            "medianRssBytes": 385925120.0,
+            "medianUs": 321830.0,
+            "minUs": 296614.0,
+            "medianRssBytes": 388071424.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -1436,7 +1436,7 @@
       }
     },
     "stop-after-three-failures": {
-      "order": 34,
+      "order": 27,
       "heading": "Give up after three failures",
       "async": true,
       "scales": {
@@ -1444,15 +1444,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 830.0,
-            "minUs": 661.0,
-            "medianRssBytes": 17416192.0,
+            "medianUs": 780.0,
+            "minUs": 681.3333333333334,
+            "medianRssBytes": 17629184.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 426.8333333333333,
-            "minUs": 360.5,
-            "medianRssBytes": 17416192.0,
+            "medianUs": 407.6666666666667,
+            "minUs": 370.6666666666667,
+            "medianRssBytes": 17924096.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1462,15 +1462,15 @@
           "n": 10000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 68149.0,
-            "minUs": 67019.0,
+            "medianUs": 72075.0,
+            "minUs": 66648.0,
             "medianRssBytes": 23838720.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 38790.0,
-            "minUs": 37954.0,
-            "medianRssBytes": 23166976.0,
+            "medianUs": 39746.0,
+            "minUs": 37568.0,
+            "medianRssBytes": 23871488.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -1487,15 +1487,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 776.3333333333334,
-            "minUs": 653.3333333333334,
-            "medianRssBytes": 17432576.0,
+            "medianUs": 758.6666666666666,
+            "minUs": 640.0,
+            "medianRssBytes": 17448960.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 378.0,
-            "minUs": 343.2,
-            "medianRssBytes": 17694720.0,
+            "medianUs": 390.0,
+            "minUs": 321.5,
+            "medianRssBytes": 17924096.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1505,15 +1505,15 @@
           "n": 10000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 64722.0,
-            "minUs": 61687.0,
-            "medianRssBytes": 54198272.0,
+            "medianUs": 65136.0,
+            "minUs": 61567.0,
+            "medianRssBytes": 54018048.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 34112.0,
-            "minUs": 32209.0,
-            "medianRssBytes": 23363584.0,
+            "medianUs": 33521.0,
+            "minUs": 32289.0,
+            "medianRssBytes": 23576576.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -1530,15 +1530,58 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 385.6,
-            "minUs": 326.5,
-            "medianRssBytes": 17350656.0,
+            "medianUs": 386.8333333333333,
+            "minUs": 332.4,
+            "medianRssBytes": 17383424.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 354.0,
-            "minUs": 315.0,
-            "medianRssBytes": 17448960.0,
+            "medianUs": 355.8333333333333,
+            "minUs": 322.6666666666667,
+            "medianRssBytes": 17842176.0,
+            "samples": 15
+          },
+          "timeWinner": "tie",
+          "memWinner": "tie"
+        },
+        "full": {
+          "n": 10000,
+          "roundsRun": 4,
+          "rxdart": {
+            "medianUs": 34570.0,
+            "minUs": 33304.0,
+            "medianRssBytes": 31252480.0,
+            "samples": 20
+          },
+          "fxdart": {
+            "medianUs": 34654.5,
+            "minUs": 32688.0,
+            "medianRssBytes": 23191552.0,
+            "samples": 20
+          },
+          "timeWinner": "tie",
+          "memWinner": "fxdart"
+        }
+      }
+    },
+    "dependent-calls-in-sequence": {
+      "order": 49,
+      "heading": "Each call feeds the next",
+      "async": true,
+      "scales": {
+        "100": {
+          "n": 100,
+          "roundsRun": 3,
+          "rxdart": {
+            "medianUs": 396.1666666666667,
+            "minUs": 350.8333333333333,
+            "medianRssBytes": 17252352.0,
+            "samples": 15
+          },
+          "fxdart": {
+            "medianUs": 372.6666666666667,
+            "minUs": 336.0,
+            "medianRssBytes": 17268736.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1548,59 +1591,16 @@
           "n": 10000,
           "roundsRun": 5,
           "rxdart": {
-            "medianUs": 34928.0,
-            "minUs": 33316.0,
-            "medianRssBytes": 31162368.0,
+            "medianUs": 37319.0,
+            "minUs": 35052.0,
+            "medianRssBytes": 29802496.0,
             "samples": 25
           },
           "fxdart": {
-            "medianUs": 34006.0,
-            "minUs": 32659.0,
-            "medianRssBytes": 23265280.0,
+            "medianUs": 34670.0,
+            "minUs": 33167.0,
+            "medianRssBytes": 29786112.0,
             "samples": 25
-          },
-          "timeWinner": "tie",
-          "memWinner": "fxdart"
-        }
-      }
-    },
-    "dependent-calls-in-sequence": {
-      "order": 37,
-      "heading": "Each call feeds the next",
-      "async": true,
-      "scales": {
-        "100": {
-          "n": 100,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 383.1666666666667,
-            "minUs": 354.8,
-            "medianRssBytes": 17793024.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 354.0,
-            "minUs": 334.0,
-            "medianRssBytes": 17383424.0,
-            "samples": 15
-          },
-          "timeWinner": "tie",
-          "memWinner": "tie"
-        },
-        "full": {
-          "n": 10000,
-          "roundsRun": 3,
-          "rxdart": {
-            "medianUs": 38254.0,
-            "minUs": 35899.0,
-            "medianRssBytes": 30261248.0,
-            "samples": 15
-          },
-          "fxdart": {
-            "medianUs": 35530.0,
-            "minUs": 34007.0,
-            "medianRssBytes": 30294016.0,
-            "samples": 15
           },
           "timeWinner": "fxdart",
           "memWinner": "tie"
@@ -1608,7 +1608,7 @@
       }
     },
     "crawl-the-pages": {
-      "order": 38,
+      "order": 48,
       "heading": "Crawl pages until exhausted",
       "async": true,
       "scales": {
@@ -1616,15 +1616,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 22.649350649350648,
-            "minUs": 19.302083333333332,
-            "medianRssBytes": 17416192.0,
+            "medianUs": 25.896103896103895,
+            "minUs": 22.51948051948052,
+            "medianRssBytes": 17973248.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 20.46153846153846,
-            "minUs": 17.747252747252748,
-            "medianRssBytes": 17973248.0,
+            "medianUs": 23.547619047619047,
+            "minUs": 17.940594059405942,
+            "medianRssBytes": 17416192.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1634,15 +1634,15 @@
           "n": 10000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 1730.5,
-            "minUs": 1556.5,
-            "medianRssBytes": 23674880.0,
+            "medianUs": 1770.5,
+            "minUs": 1632.0,
+            "medianRssBytes": 23789568.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 1625.5,
-            "minUs": 1445.5,
-            "medianRssBytes": 24313856.0,
+            "medianUs": 1587.0,
+            "minUs": 1444.0,
+            "medianRssBytes": 24248320.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1651,7 +1651,7 @@
       }
     },
     "tee-the-pipeline": {
-      "order": 48,
+      "order": 50,
       "heading": "One source, two independent readers",
       "async": false,
       "scales": {
@@ -1659,15 +1659,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 21.945054945054945,
-            "minUs": 15.785714285714286,
-            "medianRssBytes": 17416192.0,
+            "medianUs": 21.632183908045977,
+            "minUs": 15.735632183908047,
+            "medianRssBytes": 17924096.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 2.251497005988024,
-            "minUs": 2.115884115884116,
-            "medianRssBytes": 17203200.0,
+            "medianUs": 2.3676323676323676,
+            "minUs": 2.1008991008991007,
+            "medianRssBytes": 17268736.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1677,15 +1677,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 142409.0,
-            "minUs": 140503.0,
-            "medianRssBytes": 25509888.0,
+            "medianUs": 143357.0,
+            "minUs": 141123.0,
+            "medianRssBytes": 25542656.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 17627.0,
-            "minUs": 17301.0,
-            "medianRssBytes": 22609920.0,
+            "medianUs": 17633.0,
+            "minUs": 17476.0,
+            "medianRssBytes": 22642688.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -1694,7 +1694,7 @@
       }
     },
     "stream-into-pipeline": {
-      "order": 49,
+      "order": 37,
       "heading": "A stream feeds a typed pipeline",
       "async": true,
       "scales": {
@@ -1702,15 +1702,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 9.283582089552239,
-            "minUs": 7.8606965174129355,
-            "medianRssBytes": 17252352.0,
+            "medianUs": 9.139303482587065,
+            "minUs": 7.887892376681615,
+            "medianRssBytes": 17301504.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 9.258241758241759,
-            "minUs": 8.26865671641791,
-            "medianRssBytes": 17383424.0,
+            "medianUs": 9.923766816143498,
+            "minUs": 8.260089686098654,
+            "medianRssBytes": 17481728.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1720,15 +1720,15 @@
           "n": 10000,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 766.0,
-            "minUs": 723.3333333333334,
-            "medianRssBytes": 23953408.0,
+            "medianUs": 757.3333333333334,
+            "minUs": 720.0,
+            "medianRssBytes": 24051712.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 778.0,
-            "minUs": 721.3333333333334,
-            "medianRssBytes": 24805376.0,
+            "medianUs": 772.0,
+            "minUs": 727.0,
+            "medianRssBytes": 24887296.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1737,7 +1737,7 @@
       }
     },
     "pipeline-into-stream": {
-      "order": 50,
+      "order": 47,
       "heading": "A pipeline feeds a stream consumer",
       "async": true,
       "scales": {
@@ -1745,15 +1745,15 @@
           "n": 100,
           "roundsRun": 3,
           "rxdart": {
-            "medianUs": 409.25,
-            "minUs": 367.0,
-            "medianRssBytes": 17924096.0,
+            "medianUs": 450.6,
+            "minUs": 343.5,
+            "medianRssBytes": 17891328.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 512.5,
-            "minUs": 434.75,
-            "medianRssBytes": 17907712.0,
+            "medianUs": 406.8,
+            "minUs": 360.2,
+            "medianRssBytes": 17940480.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1761,18 +1761,18 @@
         },
         "full": {
           "n": 10000,
-          "roundsRun": 5,
+          "roundsRun": 3,
           "rxdart": {
-            "medianUs": 38449.0,
-            "minUs": 35617.0,
-            "medianRssBytes": 52887552.0,
-            "samples": 25
+            "medianUs": 38531.0,
+            "minUs": 36101.0,
+            "medianRssBytes": 53280768.0,
+            "samples": 15
           },
           "fxdart": {
-            "medianUs": 40035.0,
-            "minUs": 37475.0,
-            "medianRssBytes": 31965184.0,
-            "samples": 25
+            "medianUs": 38872.0,
+            "minUs": 37336.0,
+            "medianRssBytes": 31932416.0,
+            "samples": 15
           },
           "timeWinner": "tie",
           "memWinner": "fxdart"

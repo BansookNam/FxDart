@@ -18,6 +18,7 @@ bash tools/build_single_file.sh        # regenerate docs/assets/fxdart_single.da
 dart run tool/precompile_playgrounds.dart  # build docs/pg/ artifacts (--scope, --status, --prune, --limit, --only)
 dart run tool/rebuild_page.dart DartComparison/top-merchants.html  # after editing one page's snippets: compile + restamp + commit
 dart run benchmark/run_benchmarks.dart     # DartComparison perf benchmarks (--smoke, --rounds N, [slugs…])
+dart run benchmark/run_benchmarks.dart --rx # RxDartComparison perf benchmarks (RxDart vs FxDart)
 ```
 
 ## Architecture
@@ -39,7 +40,10 @@ Async operator callbacks in `mapAsync`-style code must stay parallel-safe: overl
 - Most of `docs/` is **generated output — never edit by hand**: every `*.html` + `sitemap.xml` (from `content/` English truth + `i18n/<locale>/` overlays, which fall back to English, via `tool/build_docs.dart`), `docs/assets/fxdart_single.dart` (from `lib/` via `tools/build_single_file.sh`), and `docs/pg/*.js.gz` (via `tool/precompile_playgrounds.dart`).
 - These files under `docs/` are **hand-maintained sources** and are meant to be edited directly: `docs/css/site.css`, `docs/js/*.js`, `docs/frame.html`, `docs/assets/logo*.png`.
 - `content/code/` (playground code) and `sig.txt` are shared across locales — **never translated**.
-- `benchmark/results/results.json` (written by `dart run benchmark/run_benchmarks.dart`, see `benchmark/README.md`) is a build_docs **input**: it renders the Benchmark bar-chart section on each DartComparison page. Benchmark cases in `benchmark/cases/<slug>/` must stay faithful to their `content/code-comparison/<slug>/` example — see `benchmark/AUTHORING.md`.
+- **Two benchmark families** exist and must be maintained separately:
+  - **DartComparison** (`docs/DartComparison/`, `benchmark/results/results.json`): native Dart vs FxDart perf comparison. Run with `dart run benchmark/run_benchmarks.dart`. Compares `benchmark/cases/<slug>/native.dart` against `benchmark/cases/<slug>/fxdart.dart`. Measures 3 scales (N=100, 10k, headline 1M or case-specific).
+  - **RxDartComparison** (`docs/RxDartComparison/`, `benchmark/results/results-rx.json`): RxDart vs FxDart perf comparison. Run with `dart run benchmark/run_benchmarks.dart --rx`. Compares `benchmark/cases/<slug>/rxdart.dart` against `benchmark/cases/<slug>/fxdart.dart`. Measures 2 scales (N=100, headline 1M for sync / case-specific for async).
+- Both result files are build_docs **inputs**, rendering Benchmark bar-chart sections on their respective comparison pages. Benchmark cases in `benchmark/cases/<slug>/` must stay faithful to their `content/code-comparison/<slug>/` and `content/code-comparison-rx/<slug>/` examples — see `benchmark/AUTHORING.md`.
 - After translating, run `dart run tool/build_docs.dart --record` to mark it current.
 - Staleness is a hash of the **English file only**, so *any* edit to it — including a
   mechanical front-matter bump applied to the overlays in the same commit — marks every
