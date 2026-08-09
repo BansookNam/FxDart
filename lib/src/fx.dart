@@ -406,6 +406,214 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 
   /// The number of values.
   int size() => s.size(_inner);
+
+  // --- Phase 1: Access Operators ---
+
+  /// The first element, or null if empty.
+  T? get first {
+    if (_inner is _FxStrategyMarker<T>) {
+      if ((_inner as _FxStrategyMarker<T>).strategy == FxStrategy.fast) {
+        final list = (_inner as _FxStrategyMarker<T>)._source.toList();
+        return list.isEmpty ? null : list.first;
+      }
+    }
+    return s.head(_inner);
+  }
+
+  /// The last element, or null if empty.
+  T? get last {
+    if (_inner is _FxStrategyMarker<T>) {
+      final marker = _inner as _FxStrategyMarker<T>;
+      if (marker.strategy == FxStrategy.fast) {
+        final list = marker._source.toList();
+        return list.isEmpty ? null : list.last;
+      }
+    }
+    return s.last(_inner);
+  }
+
+  /// The number of elements.
+  int get length {
+    if (_inner is _FxStrategyMarker<T>) {
+      final marker = _inner as _FxStrategyMarker<T>;
+      if (marker.strategy == FxStrategy.fast) {
+        return marker._source.length;
+      }
+    }
+    return s.size(_inner);
+  }
+
+  /// True if there are no elements.
+  bool get isEmpty => size() == 0;
+
+  /// True if there is at least one element.
+  bool get isNotEmpty => !isEmpty;
+
+  // --- Phase 1: Aggregation Operators ---
+
+  /// The element at [index], or null if out of bounds.
+  T? elementAt(int index) {
+    if (_inner is _FxStrategyMarker<T>) {
+      final marker = _inner as _FxStrategyMarker<T>;
+      if (marker.strategy == FxStrategy.fast) {
+        final list = marker._source.toList();
+        return index >= 0 && index < list.length ? list[index] : null;
+      }
+    }
+    try {
+      return _inner.elementAt(index);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Folds every value with [combine], starting from [initial].
+  R fold<R>(R initial, R Function(R acc, T a) combine) {
+    if (_inner is _FxStrategyMarker<T>) {
+      final marker = _inner as _FxStrategyMarker<T>;
+      if (marker.strategy == FxStrategy.fast) {
+        return s.fold(initial, combine, marker._source);
+      }
+    }
+    return s.fold(initial, combine, _inner);
+  }
+
+  /// Folds every value with [combine], starting from the first element.
+  /// Throws if empty.
+  T reduce(T Function(T acc, T a) combine) {
+    if (_inner is _FxStrategyMarker<T>) {
+      final marker = _inner as _FxStrategyMarker<T>;
+      if (marker.strategy == FxStrategy.fast) {
+        return s.reduce(combine, marker._source);
+      }
+    }
+    return s.reduce(combine, _inner);
+  }
+
+  /// The first element matching [test], or call [orElse] if none match.
+  T? firstWhere(bool Function(T) test, {T? Function()? orElse}) {
+    if (_inner is _FxStrategyMarker<T>) {
+      final marker = _inner as _FxStrategyMarker<T>;
+      if (marker.strategy == FxStrategy.fast) {
+        final found = s.find(test, marker._source);
+        return found ?? (orElse != null ? orElse() : null);
+      }
+    }
+    final found = s.find(test, _inner);
+    return found ?? (orElse != null ? orElse() : null);
+  }
+
+  /// The last element matching [test], or call [orElse] if none match.
+  T? lastWhere(bool Function(T) test, {T? Function()? orElse}) {
+    if (_inner is _FxStrategyMarker<T>) {
+      final marker = _inner as _FxStrategyMarker<T>;
+      if (marker.strategy == FxStrategy.fast) {
+        T? result;
+        for (final item in marker._source) {
+          if (test(item)) result = item;
+        }
+        return result ?? (orElse != null ? orElse() : null);
+      }
+    }
+    T? result;
+    for (final item in _inner) {
+      if (test(item)) result = item;
+    }
+    return result ?? (orElse != null ? orElse() : null);
+  }
+
+  // --- Phase 1: Predicates & String ---
+
+  /// True if [test] holds for at least one element.
+  /// Stops at first true (early exit).
+  bool any(bool Function(T) test) {
+    if (_inner is _FxStrategyMarker<T>) {
+      final marker = _inner as _FxStrategyMarker<T>;
+      if (marker.strategy == FxStrategy.fast) {
+        return s.some(test, marker._source);
+      }
+    }
+    return s.some(test, _inner);
+  }
+
+  /// True if [test] holds for every element.
+  /// Stops at first false (early exit).
+  bool all(bool Function(T) test) {
+    if (_inner is _FxStrategyMarker<T>) {
+      final marker = _inner as _FxStrategyMarker<T>;
+      if (marker.strategy == FxStrategy.fast) {
+        for (final item in marker._source) {
+          if (!test(item)) return false;
+        }
+        return true;
+      }
+    }
+    for (final item in _inner) {
+      if (!test(item)) return false;
+    }
+    return true;
+  }
+
+  /// Joins all elements into a string separated by [separator].
+  String join(String separator) {
+    if (_inner is _FxStrategyMarker<T>) {
+      final marker = _inner as _FxStrategyMarker<T>;
+      if (marker.strategy == FxStrategy.fast) {
+        return marker._source.join(separator);
+      }
+    }
+    return _inner.join(separator);
+  }
+
+  /// The maximum element using [compare] function.
+  /// If [compare] is not provided, assumes T is Comparable<T>.
+  /// Throws if empty or elements are not comparable.
+  T max([int Function(T a, T b)? compare]) {
+    final compareFn =
+        compare ?? (a, b) => (a as dynamic).compareTo(b as dynamic) as int;
+
+    if (_inner is _FxStrategyMarker<T>) {
+      final marker = _inner as _FxStrategyMarker<T>;
+      if (marker.strategy == FxStrategy.fast) {
+        var result = marker._source.first;
+        for (final item in marker._source.skip(1)) {
+          if (compareFn(item, result) > 0) result = item;
+        }
+        return result;
+      }
+    }
+
+    var result = _inner.first;
+    for (final item in _inner.skip(1)) {
+      if (compareFn(item, result) > 0) result = item;
+    }
+    return result;
+  }
+
+  /// The minimum element using [compare] function.
+  /// If [compare] is not provided, assumes T is Comparable<T>.
+  /// Throws if empty or elements are not comparable.
+  T min([int Function(T a, T b)? compare]) {
+    final compareFn =
+        compare ?? (a, b) => (a as dynamic).compareTo(b as dynamic) as int;
+
+    if (_inner is _FxStrategyMarker<T>) {
+      final marker = _inner as _FxStrategyMarker<T>;
+      if (marker.strategy == FxStrategy.fast) {
+        var result = marker._source.first;
+        for (final item in marker._source.skip(1)) {
+          if (compareFn(item, result) < 0) result = item;
+        }
+        return result;
+      }
+    }
+
+    var result = _inner.first;
+    for (final item in _inner.skip(1)) {
+      if (compareFn(item, result) < 0) result = item;
+    }
+    return result;
+  }
 }
 
 /// Numeric terminals for [Fx] chains (generic covariance makes these apply
@@ -413,19 +621,51 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 extension FxNum on Fx<num> {
   /// The sum of every value.
   @pragma('vm:prefer-inline')
-  num sum() => s.sum(_inner);
+  num sum() {
+    if (_inner is _FxStrategyMarker<num>) {
+      final marker = _inner as _FxStrategyMarker<num>;
+      if (marker.strategy == FxStrategy.fast) {
+        return s.sum(marker._source);
+      }
+    }
+    return s.sum(_inner);
+  }
 
   /// The arithmetic mean of every value.
   @pragma('vm:prefer-inline')
-  double average() => s.average(_inner);
+  double average() {
+    if (_inner is _FxStrategyMarker<num>) {
+      final marker = _inner as _FxStrategyMarker<num>;
+      if (marker.strategy == FxStrategy.fast) {
+        return s.average(marker._source);
+      }
+    }
+    return s.average(_inner);
+  }
 
   /// The smallest value.
   @pragma('vm:prefer-inline')
-  num min() => s.min(_inner);
+  num min() {
+    if (_inner is _FxStrategyMarker<num>) {
+      final marker = _inner as _FxStrategyMarker<num>;
+      if (marker.strategy == FxStrategy.fast) {
+        return s.min(marker._source);
+      }
+    }
+    return s.min(_inner);
+  }
 
   /// The largest value.
   @pragma('vm:prefer-inline')
-  num max() => s.max(_inner);
+  num max() {
+    if (_inner is _FxStrategyMarker<num>) {
+      final marker = _inner as _FxStrategyMarker<num>;
+      if (marker.strategy == FxStrategy.fast) {
+        return s.max(marker._source);
+      }
+    }
+    return s.max(_inner);
+  }
 }
 
 /// Async chainable iterable — the async half of FxTS's `fx` chain.
