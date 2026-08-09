@@ -443,6 +443,15 @@ Future<Map<K, A>> _$indexByAsync<A, K>(
     indexByAsync(f, iterable);
 Map<K, int> _$countBy<A, K>(K Function(A a) f, Iterable<A> iterable) =>
     countBy(f, iterable);
+Map<K, Acc> _$foldBy<A, K, Acc>(K Function(A a) key, Acc seed,
+        Acc Function(Acc acc, A a) f, Iterable<A> iterable) =>
+    foldBy(key, seed, f, iterable);
+Future<Map<K, Acc>> _$foldByAsync<A, K, Acc>(
+        FutureOr<K> Function(A a) key,
+        FutureOr<Acc> seed,
+        FutureOr<Acc> Function(Acc acc, A a) f,
+        FxAsyncIterable<A> iterable) =>
+    foldByAsync(key, seed, f, iterable);
 Future<Map<K, int>> _$countByAsync<A, K>(
         FutureOr<K> Function(A a) f, FxAsyncIterable<A> iterable) =>
     countByAsync(f, iterable);

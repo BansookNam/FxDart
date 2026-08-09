@@ -353,6 +353,12 @@ class Fx<T> extends Iterable<T> implements FxListRangeSource<T> {
   /// Counts how many values fall under each key [f] returns.
   Map<K, int> countBy<K>(K Function(T a) f) => s.countBy(f, _inner);
 
+  /// Folds the values under each [key] in one pass, without materializing
+  /// the groups — the aggregate-only counterpart of [groupBy].
+  Map<K, Acc> foldBy<K, Acc>(
+          K Function(T a) key, Acc seed, Acc Function(Acc acc, T a) f) =>
+      s.foldBy(key, seed, f, _inner);
+
   /// Counts the values [f] holds for — `filter` + `size` in one walk.
   int countWhere(bool Function(T a) f) => s.countWhere(f, _inner);
 
@@ -740,6 +746,12 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Counts how many values fall under each key [f] returns.
   Future<Map<K, int>> countBy<K>(FutureOr<K> Function(T a) f) =>
       s.countByAsync(f, _inner);
+
+  /// Folds the values under each [key] in one pass, without materializing
+  /// the groups — the aggregate-only counterpart of [groupBy].
+  Future<Map<K, Acc>> foldBy<K, Acc>(FutureOr<K> Function(T a) key,
+          FutureOr<Acc> seed, FutureOr<Acc> Function(Acc acc, T a) f) =>
+      s.foldByAsync(key, seed, f, _inner);
 
   /// Whether [f] holds for at least one value.
   Future<bool> some(FutureOr<bool> Function(T a) f) => s.someAsync(f, _inner);

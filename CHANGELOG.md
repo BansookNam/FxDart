@@ -60,6 +60,44 @@ with a paired interleaved A/B against the previous library — **0.992×**,
 faster in 5 of 9 rounds — confirming the drift was on the native side of
 that case, not in the chain.
 
+### Added — `foldBy`
+
+Folds the values under each key in **one pass**, without ever materializing
+the groups:
+
+```dart
+foldBy((Tx t) => t.category, 0.0, (sum, t) => sum + t.amount, txns);
+// {Food: 812.40, Transport: 96.15, …}
+```
+
+`groupBy` followed by a fold per group builds a `List` for every key first —
+allocation proportional to the input, for an answer proportional to the
+number of keys. This is what the hand-written
+`totals[k] = (totals[k] ?? 0) + v` loop does instead. Not an FxTS port; the
+shape is Kotlin's `groupingBy().fold()`. Keys come out in first-seen order,
+like `groupBy`. Sync + async + both chain methods.
+
+`groupBy` remains the answer when you want the elements themselves — the new
+operator is for when you only want the aggregate. The seed is a **value**
+shared by every key, exactly as in `fold`, so a mutable seed would be shared
+across keys; that is documented on the operator.
+
+Measured in isolation over 1,000,000 transactions into 5 categories:
+`groupBy` + per-group `fold` **50.2 ms → 20.5 ms** (3.23× → 1.32× of the
+hand-written loop). Four DartComparison examples moved onto it:
+
+| case | before | after |
+|---|---|---|
+| invoice-summary | 2.29× | **1.06×** |
+| budget-alerts | 2.50× | **1.27×** |
+| monthly-ledger-report | 1.15× | **0.56× — fxdart wins** |
+| monthly-category-report | 2.46× | 2.17× |
+
+It does not fit every grouping case, and that is worth stating: a mean needs
+sum *and* count, and carrying both in a record accumulator allocates a record
+per element — measured at 1.17× → 4.27× on `top-category-average`, which
+therefore keeps `groupBy`.
+
 ### Added — `Fx.zip3` / `FxAsync.zip3`
 
 

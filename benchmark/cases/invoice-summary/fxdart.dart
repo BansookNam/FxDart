@@ -10,9 +10,10 @@ Future<void> main() async {
     impl: 'fxdart',
     n: n,
     run: () {
-      final byCategory = fx(items).groupBy((l) => l.category);
+      final byCategory =
+      fx(items).foldBy((l) => l.category, 0.0, (s, l) => s + l.qty * l.unitPrice);
       final lines = fx(byCategory.entries)
-          .map((kv) => (kv.key, fx(kv.value).sumBy((l) => l.qty * l.unitPrice)))
+          .map((kv) => (kv.key, kv.value))
           .sortBy((row) => -row.$2)
           .map((row) => '${row.$1}: \$${row.$2.toStringAsFixed(2)}')
           .toList();
