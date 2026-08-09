@@ -264,6 +264,22 @@ class _UniqByIterable<A, B> extends Iterable<A> {
   final Iterable<A> _source;
   @override
   Iterator<A> get iterator => _UniqByIterator(_f, _source.iterator);
+
+  @override
+  List<A> toList({bool growable = true}) {
+    final source = _source;
+    if (source is List<A>) {
+      final result = <A>[];
+      final seen = <B>{};
+      for (final a in source) {
+        if (seen.add(_f(a))) {
+          result.add(a);
+        }
+      }
+      return growable ? result : List<A>.from(result, growable: false);
+    }
+    return super.toList(growable: growable);
+  }
 }
 
 class _UniqByIterator<A, B> implements Iterator<A> {
@@ -297,6 +313,22 @@ class _UniqIterable<A> extends Iterable<A> {
   final Iterable<A> _source;
   @override
   Iterator<A> get iterator => _UniqIterator(_source.iterator);
+
+  @override
+  List<A> toList({bool growable = true}) {
+    final source = _source;
+    if (source is List<A>) {
+      final result = <A>[];
+      final seen = <A>{};
+      for (final a in source) {
+        if (seen.add(a)) {
+          result.add(a);
+        }
+      }
+      return growable ? result : List<A>.from(result, growable: false);
+    }
+    return super.toList(growable: growable);
+  }
 }
 
 class _UniqIterator<A> implements Iterator<A> {

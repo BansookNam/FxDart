@@ -209,15 +209,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 1.473263368315842,
-            "minUs": 1.392303848075962,
-            "medianRssBytes": 17154048.0,
+            "medianUs": 1.4055944055944056,
+            "minUs": 1.3628185907046477,
+            "medianRssBytes": 17285120.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 2.976023976023976,
-            "minUs": 2.775224775224775,
-            "medianRssBytes": 17203200.0,
+            "medianUs": 2.8650674662668667,
+            "minUs": 2.658170914542729,
+            "medianRssBytes": 17334272.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -227,15 +227,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 151.84615384615384,
-            "minUs": 142.78571428571428,
+            "medianUs": 142.35714285714286,
+            "minUs": 138.57142857142858,
             "medianRssBytes": 17776640.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 297.0,
-            "minUs": 287.2857142857143,
-            "medianRssBytes": 17170432.0,
+            "medianUs": 284.0,
+            "minUs": 278.875,
+            "medianRssBytes": 17809408.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -245,15 +245,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 28069.0,
-            "minUs": 24849.0,
-            "medianRssBytes": 121962496.0,
+            "medianUs": 23810.0,
+            "minUs": 20985.0,
+            "medianRssBytes": 121995264.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 52201.0,
-            "minUs": 46100.0,
-            "medianRssBytes": 125648896.0,
+            "medianUs": 40652.0,
+            "minUs": 37950.0,
+            "medianRssBytes": 125517824.0,
             "samples": 15
           },
           "timeWinner": "native",
