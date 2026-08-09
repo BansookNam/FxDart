@@ -1,3 +1,42 @@
+## 0.8.1
+
+### Performance — async operators join the fast-pull protocol
+
+Three async operators (`takeAsync`, `concatAsync`, `uniqByAsync`) were
+silently capping fused chains by not implementing the internal `FxFastIterator`
+protocol — letting serial terminals like `toListAsync` skip `Future` allocation
+on synchronous pulls. Now all three implement it, and the predicate in
+`uniqByAsync` uses a then/bare pattern instead of forced `async`/`await`.
+
+* **`concatAsync`** rewrote from a forced `async` callback to a `nextOr()`
+  implementation that checks upstream iterators for `FxFastIterator` and calls
+  their `nextOr()` directly, falling back to `next()` for non-fast sources.
+* **`takeAsync`** same structural treatment: implements `FxFastIterator` and
+  delegates to upstream's `nextOr()` when available.
+* **`uniqByAsync`** changed from `(A a) async => seen.add(await f(a))` to a
+  then/bare pattern: `if (key is Future) return key.then(seen.add) else return
+  seen.add(key)`, skipping the async wrapper for sync callbacks (the common case).
+
+All three preserve `Concurrent` marker pass-through semantics by falling back to
+a legacy unfused implementation when a concurrent marker arrives on a fresh
+iterator.
+
+Measured on `paged-feeds-dedupe` (the worst async case in DartComparison,
+N=100,000): **169.2 ms → 92.7 ms (45% faster), ratio 2.06× → 1.17×** vs native.
+The two/three sync pulls per page-fetch that previously allocated a `Future` each
+now answer directly.
+
+### Performance — `uniq` gains a `toList()` fast path for List sources
+
+`_UniqIterable` and `_UniqByIterable` now bypass the generic `Iterable.toList()`
+growth-reallocation path when their source is a `List`, building the result in
+one pass with direct iteration.
+
+Measured on `first-visit-merchants` (N=1,000,000): **52.2 ms → 40.7 ms (22%
+faster), ratio 1.86× → 1.71×** vs native. The pipeline's `map` → `uniq` →
+`toList()` still pays the measured ~1.4× per-chain overhead for two operators,
+but `uniq`'s `toList` no longer adds allocation overhead.
+
 ## 0.8.0
 
 ### Breaking — `Fx` is now an extension type
