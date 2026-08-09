@@ -26,7 +26,9 @@ String money(num n) => '\$${n.toStringAsFixed(2)}';
 void main() {
   final usd = fx(txns).map((t) => (t, t.amount * rates[t.currency]!)).toList();
 
-  final catLines = fx(fx(usd).groupBy((p) => p.$1.category).entries)
+  // Flatten nested fx() wrappers: avoid re-wrapping groupBy result
+  final grouped = fx(usd).groupBy((p) => p.$1.category).entries;
+  final catLines = fx(grouped)
       .map((e) => (e.key, fx(e.value).sumBy((p) => p.$2)))
       .sortBy((c) => -c.$2)
       .map((c) => '  ${c.$1.padRight(8)} ${money(c.$2)}');

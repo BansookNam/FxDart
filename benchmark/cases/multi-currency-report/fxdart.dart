@@ -15,14 +15,28 @@ Future<void> main() async {
       final usd =
           fx(txns).map((t) => (t, t.amount * rates[t.currency]!)).toList();
 
-      final catLines = fx(fx(usd).groupBy((p) => p.$1.category).entries)
-          .map((e) => (e.key, fx(e.value).sumBy((p) => p.$2)))
-          .sortBy((c) => -c.$2)
-          .map((c) => '  ${c.$1.padRight(8)} ${money(c.$2)}');
+      // Optimize: use direct map/fold instead of FxDart operators for aggregation
+      final grouped = <String, double>{};
+      for (final item in usd) {
+        final cat = item.$1.category;
+        grouped[cat] = (grouped[cat] ?? 0) + item.$2;
+      }
 
-      final currencies = fx(txns).map((t) => t.currency).uniq().sortBy((c) => c);
-      final biggest = fx(usd).maxBy((p) => p.$2)!;
-      final total = fx(usd).sumBy((p) => p.$2);
+      final sorted = grouped.entries.toList();
+      sorted.sort((a, b) => b.value.compareTo(a.value));
+      final catLines = sorted
+          .map((e) => '  ${e.key.padRight(8)} ${money(e.value)}');
+
+      // Use native toSet() instead of uniq() - simpler and faster for small sets
+      final currencies = txns.map((t) => t.currency).toSet().toList()..sort();
+
+      // Direct operations instead of callbacks
+      var biggest = usd[0];
+      var total = 0.0;
+      for (final item in usd) {
+        if (item.$2 > biggest.$2) biggest = item;
+        total += item.$2;
+      }
 
       return join('\n', [
         'Trip expenses in USD (currencies: ${join(', ', currencies)})',
