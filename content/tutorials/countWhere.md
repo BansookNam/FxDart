@@ -5,8 +5,8 @@ description: FxDart countWhere tutorial: count the matching values in one walk â
 heading: <code>countWhere</code>
 section: 7
 crumb: countWhere
-prev: countBy.html
-prevLabel: countBy
+prev: foldBy.html
+prevLabel: foldBy
 next: sort.html
 nextLabel: sort
 ---

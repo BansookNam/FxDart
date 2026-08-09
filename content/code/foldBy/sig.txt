@@ -1,0 +1,4 @@
+Map&lt;K, Acc&gt; foldBy&lt;A, K, Acc&gt;(K Function(A a) key, Acc seed, Acc Function(Acc acc, A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;Map&lt;K, Acc&gt;&gt; foldByAsync&lt;A, K, Acc&gt;(FutureOr&lt;K&gt; Function(A a) key, FutureOr&lt;Acc&gt; seed, FutureOr&lt;Acc&gt; Function(Acc acc, A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Map&lt;K, Acc&gt; Fx.foldBy&lt;K, Acc&gt;(K Function(T a) key, Acc seed, Acc Function(Acc acc, T a) f)          // chain (sync)
+Future&lt;Map&lt;K, Acc&gt;&gt; FxAsync.foldBy&lt;K, Acc&gt;(FutureOr&lt;K&gt; Function(T a) key, FutureOr&lt;Acc&gt; seed, FutureOr&lt;Acc&gt; Function(Acc acc, T a) f)  // chain (async)

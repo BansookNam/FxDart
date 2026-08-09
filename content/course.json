@@ -325,6 +325,10 @@
       "label": "countBy"
     },
     {
+      "href": "foldBy.html",
+      "label": "foldBy"
+    },
+    {
       "href": "countWhere.html",
       "label": "countWhere"
     },

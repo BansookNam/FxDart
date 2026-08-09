@@ -7,8 +7,8 @@ section: 7
 crumb: countBy
 prev: indexBy.html
 prevLabel: indexBy
-next: countWhere.html
-nextLabel: countWhere
+next: foldBy.html
+nextLabel: foldBy
 ---
   <p class="hero-sub">Cuenta cuántos elementos caen en cada clave calculada.</p>
 
