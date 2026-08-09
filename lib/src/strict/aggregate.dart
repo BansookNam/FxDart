@@ -948,10 +948,7 @@ List<A> _sortByImpl<A>(
       if (k is! double) return _sortSpilled(f, items, indices, dk, i, k, desc);
       dk[i] = k;
     }
-    indices.sort(desc
-        ? (i, j) => dk[j].compareTo(dk[i])
-        : (i, j) => dk[i].compareTo(dk[j]));
-    return [for (final i in indices) items[i]];
+    return _sortDoubleKeys(dk, items, desc);
   }
 
   if (first is int) {
@@ -1013,6 +1010,110 @@ List<A> _sortByKeys<A>(
       ? (i, j) => _compareKeys(keys[j], keys[i])
       : (i, j) => _compareKeys(keys[i], keys[j]));
   return [for (final i in indices) items[i]];
+}
+
+/// Sorts [items] by the unboxed keys [k], choosing a strategy from the shape
+/// of the keys.
+///
+/// A single O(n) scan first: data that is already in the requested order
+/// needs no sort at all, and data in the exact opposite order needs only a
+/// reverse. That is not a contrived case — `sortBy((d) => -d.amount)` over
+/// rows built in amount order arrives perfectly reversed, and the benchmark
+/// suite has one. Both shortcuts are O(n), so they beat any comparison sort.
+///
+/// Everything else goes to a stable bottom-up merge over the keys and the
+/// items together ([_mergeByDouble]). The decorate-sort-undecorate
+/// alternative sorts an *index* list, so every comparison does two random
+/// reads into the key array and the result is gathered through the
+/// permutation — millions of cache misses on a large sort. Merging touches
+/// both arrays sequentially.
+///
+/// The scan compares with `compareTo`, not `<=`: `0.0 <= -0.0` is true while
+/// `0.0.compareTo(-0.0)` is positive, so a `<=` scan would call an unsorted
+/// run sorted. NaN makes every comparison non-ordering, which fails both
+/// runs and falls through to the merge — where `compareTo` places it last, as
+/// before.
+List<A> _sortDoubleKeys<A>(Float64List k, List<A> items, bool desc) {
+  final n = items.length;
+  var nonDec = true, nonInc = true, strictInc = true, strictDec = true;
+  for (var i = 1; i < n; i++) {
+    final c = k[i - 1].compareTo(k[i]);
+    if (c > 0) {
+      nonDec = false;
+      strictInc = false;
+    } else if (c < 0) {
+      nonInc = false;
+      strictDec = false;
+    } else {
+      strictInc = false;
+      strictDec = false;
+    }
+    if (!nonDec && !nonInc) break;
+  }
+  // Ties are why the reverse shortcuts demand a STRICT run: reversing a run
+  // with equal keys would reverse their source order, and this sort is
+  // stable.
+  if (desc) {
+    if (nonInc) return items;
+    if (strictInc) return [for (var i = n - 1; i >= 0; i--) items[i]];
+  } else {
+    if (nonDec) return items;
+    if (strictDec) return [for (var i = n - 1; i >= 0; i--) items[i]];
+  }
+  return _mergeByDouble(k, items, desc);
+}
+
+/// Stable bottom-up merge sort of [items] by the unboxed keys [k], moving
+/// both arrays in lockstep. Stable by construction: a tie takes the left run,
+/// so equal keys keep their source order.
+List<A> _mergeByDouble<A>(Float64List k, List<A> items, bool desc) {
+  final n = items.length;
+  var srcK = k;
+  var dstK = Float64List(n);
+  var srcV = items;
+  var dstV = List<A>.of(items);
+  for (var width = 1; width < n; width <<= 1) {
+    for (var lo = 0; lo < n; lo += width << 1) {
+      var mid = lo + width;
+      if (mid > n) mid = n;
+      var hi = mid + width;
+      if (hi > n) hi = n;
+      var i = lo, j = mid, t = lo;
+      while (i < mid && j < hi) {
+        final a = srcK[i];
+        final b = srcK[j];
+        if (desc ? a.compareTo(b) >= 0 : a.compareTo(b) <= 0) {
+          dstK[t] = a;
+          dstV[t] = srcV[i];
+          i++;
+        } else {
+          dstK[t] = b;
+          dstV[t] = srcV[j];
+          j++;
+        }
+        t++;
+      }
+      while (i < mid) {
+        dstK[t] = srcK[i];
+        dstV[t] = srcV[i];
+        i++;
+        t++;
+      }
+      while (j < hi) {
+        dstK[t] = srcK[j];
+        dstV[t] = srcV[j];
+        j++;
+        t++;
+      }
+    }
+    final tk = srcK;
+    srcK = dstK;
+    dstK = tk;
+    final tv = srcV;
+    srcV = dstV;
+    dstV = tv;
+  }
+  return srcV;
 }
 
 /// Async counterpart of [sortBy].
