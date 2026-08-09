@@ -1,5 +1,52 @@
 ## 0.8.0
 
+### Breaking — `Fx` is now an extension type
+
+`Fx<T>` was a class wrapping an `Iterable<T>`. It is now an **extension type**
+over the same representation:
+
+```dart
+extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> { … }
+```
+
+Every documented spelling is unchanged — `fx(xs).filter(…).map(…).toList()`
+compiles and behaves exactly as before, and `implements Iterable<T>` keeps the
+whole Dart iterable API available. What changes is that `Fx` no longer exists
+at runtime: it erases to the iterable it wraps. So `x is Fx<int>` no longer
+means anything (it is the underlying type), `Fx` cannot be extended or
+implemented, and code that relied on the wrapper's runtime identity breaks.
+
+**Why it is worth a breaking change.** As a class, `Fx<T>` carried `T` in its
+runtime type arguments, so every operator constructed inside a chain method
+was allocated with a *runtime* type argument and AOT could not specialize the
+resulting iterator's type checks — the same effect 0.7.6 documented and fixed
+for the async surface only. Measured on `dropWhile().head()` over 1,000,000
+readings: **11.6 ms as a class, 5.3 ms as an extension type**, against 5.0 ms
+for the hand-written loop. Extension *methods* on a wrapper class measured
+11.6 ms, so it is the wrapper object that costs, not the dispatch;
+`@pragma('vm:prefer-inline')` on the chain methods made no difference at all.
+
+Across the 53-case DartComparison suite: **13 cases faster, none slower.**
+Headline verdicts move to **16 fxdart / 11 tie / 26 native**, and the median
+fxdart/native time ratio goes **1.195 → 1.051**. Highlights:
+
+| case | before | after |
+|---|---|---|
+| first-over-limit | 2.37× | **1.05× (tie)** |
+| food-spending | 1.79× | **1.06×** |
+| date-window-spend | 1.38× | **0.74× (fxdart wins)** |
+| category-rank | 1.22× | **0.95× (fxdart wins)** |
+| smoothed-zone-changes | 1.20× | **0.94× (fxdart wins)** |
+| recent-errors | 2.50× | 1.61× |
+
+A side effect worth noting: erasure means an `fx(…)` chain **is** the
+underlying iterable at runtime, so the List-range protocol below sees straight
+through it. The `Fx.listRange` member added for that purpose is gone —
+unnecessary rather than removed.
+
+`FxAsync` is unchanged; async chains are dominated by per-element futures, not
+by this.
+
 ### Performance — a `List` source stays a `List` through the lazy chain
 
 `take`, `drop`, `takeRight` and `dropRight` over a `List` are nothing

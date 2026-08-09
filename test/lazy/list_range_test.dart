@@ -150,26 +150,11 @@ void main() {
       });
     });
 
-    group('the Fx wrapper does not hide a range', () {
-      // Fx delegates to an inner iterable but is not itself a List, so
-      // without FxListRangeSource on Fx these spellings would silently take
-      // the pulled path while the top-level spelling took the indexed one.
+    group('an Fx chain does not hide a range', () {
+      // Fx is an extension type, so it erases to its representation: an
+      // fx(...) chain IS the underlying iterable at runtime, and the range
+      // protocol sees straight through it with nothing to unwrap.
       final xs = [1, 2, 3, 4];
-
-      test('a chain over a List range reports it', () {
-        expect(fx(xs).listRange, isNotNull);
-        expect(fx(xs).drop(1).listRange?.start, 1);
-        expect(fx(xs).drop(1).listRange?.end, 4);
-        expect(fx(xs).drop(1).take(2).listRange?.end, 3);
-        expect(identical(fx(xs).drop(1).listRange?.list, xs), isTrue);
-      });
-
-      test('a chain that is not a range reports null', () {
-        expect(fx(xs).map((a) => a * 10).listRange, isNull);
-        expect(fx(xs).filter((a) => a.isEven).listRange, isNull);
-        expect(fx(gen(4)).listRange, isNull);
-        expect(fx(gen(4)).drop(1).listRange, isNull);
-      });
 
       test('passing the chain equals passing the operator result', () {
         expect(toList(zip(xs, fx(xs).drop(1))), toList(zip(xs, drop(1, xs))));
@@ -177,6 +162,11 @@ void main() {
             toList(zip3(xs, drop(1, xs), drop(2, xs))));
         expect(toList(windowed(2, fx(xs).drop(1))),
             toList(windowed(2, drop(1, xs))));
+      });
+
+      test('a chain of ranges composes like the top-level form', () {
+        expect(toList(zip(xs, fx(xs).drop(1).take(2))),
+            toList(zip(xs, take(2, drop(1, xs)))));
       });
 
       test('a non-range chain still zips correctly', () {

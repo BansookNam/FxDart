@@ -5,9 +5,6 @@ import 'async_iterable.dart' as async_;
 import 'lazy/combine.dart' as l;
 import 'lazy/effect.dart' as l;
 import 'lazy/filter.dart' as l;
-// Unprefixed: these names are internal plumbing and collide with no member of
-// Fx/FxAsync, so they need no `_$` wrapper in the single-file bundle.
-import 'lazy/list_range.dart';
 import 'lazy/map.dart' as l;
 import 'lazy/take_drop.dart' as l;
 import 'lazy/zip.dart' as l;
@@ -42,49 +39,27 @@ FxAsync<T> fxStream<T>(Stream<T> stream) => FxAsync(fromStream(stream));
 ///
 /// [Fx] extends [Iterable], so the whole Dart iterable API is available
 /// alongside the FxTS-named operators.
-class Fx<T> extends Iterable<T> implements FxListRangeSource<T> {
-  final Iterable<T> _inner;
-
-  /// Wraps [_inner] without consuming it; the chain stays lazy.
-  const Fx(this._inner);
-
-  @override
-  Iterator<T> get iterator => _inner.iterator;
-
-  /// Internal: see `lib/src/lazy/list_range.dart`. A chain that is nothing
-  /// more than a range over a backing [List] — `fx(xs).drop(1)` — reports
-  /// that range, so passing the chain itself to `zip`/`zip3`/`windowed` is as
-  /// fast as passing the operator's own result. Without this the wrapper
-  /// would hide the range and the fast path would depend on spelling.
-  @override
-  FxListRange<T>? get listRange => fxListRangeOf(_inner);
-
-  // Pure delegation to the inner iterable — same results as the inherited
-  // Iterable members, but O(1) instead of a walk when the chain wraps a
-  // List (`fx(list).length` was O(n) through the wrapper's iterator).
-  @override
-  int get length => _inner.length;
-  @override
-  bool get isEmpty => _inner.isEmpty;
-  @override
-  bool get isNotEmpty => _inner.isNotEmpty;
-  @override
-  T get first => _inner.first;
-  @override
-  T get last => _inner.last;
-  @override
-  T get single => _inner.single;
-  @override
-  T elementAt(int index) => _inner.elementAt(index);
-  @override
-  bool contains(Object? element) => _inner.contains(element);
+extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
+  // An EXTENSION TYPE, not a class, and that is a performance decision.
+  //
+  // As a class, `Fx<T>` was a real object carrying T in its runtime type
+  // arguments, so every operator built inside a chain method was allocated
+  // with a *runtime* type argument and AOT could not specialize its type
+  // checks — the same effect 0.7.6 documented for async. Measured on
+  // `dropWhile().head()` over 1M readings: 11.6ms as a class, 5.3ms as an
+  // extension type, against 5.0ms for the hand-written loop.
+  //
+  // An extension type erases to its representation, so `_inner` IS the chain
+  // at runtime: T is a compile-time constant at each call site, no wrapper is
+  // allocated, and operators downstream see the real iterable rather than a
+  // wrapper hiding it. `implements Iterable<T>` keeps the whole Dart iterable
+  // API available; members not redeclared below go straight to _inner.
 
   /// Applies a user-defined [converter] to the whole chain.
   R to<R>(R Function(Fx<T> iterable) converter) => converter(this);
 
   // --- lazy operators -----------------------------------------------------
 
-  @override
   Fx<R> map<R>(R Function(T a) toElement) => Fx(l.map(toElement, _inner));
 
   /// [map] with the element's 0-based position — `zipWithIndex().map(...)`
@@ -102,7 +77,6 @@ class Fx<T> extends Iterable<T> implements FxListRangeSource<T> {
   Fx<R> flatMapWithIndex<R>(Iterable<R> Function(T a, int index) f) =>
       Fx(l.flatMapWithIndex(f, _inner));
 
-  @override
   Fx<R> expand<R>(Iterable<R> Function(T element) toElements) =>
       flatMap(toElements);
 
@@ -120,7 +94,6 @@ class Fx<T> extends Iterable<T> implements FxListRangeSource<T> {
   Fx<T> filterWithIndex(bool Function(T a, int index) f) =>
       Fx(l.filterWithIndex(f, _inner));
 
-  @override
   Fx<T> where(bool Function(T element) test) => filter(test);
 
   /// The opposite of [filter].
@@ -129,7 +102,6 @@ class Fx<T> extends Iterable<T> implements FxListRangeSource<T> {
   /// Dart-idiomatic alias of [reject].
   Fx<T> whereNot(bool Function(T a) f) => reject(f);
 
-  @override
   Fx<T> take(int count) => Fx(l.take(count, _inner));
 
   /// The last [count] elements.
@@ -138,7 +110,6 @@ class Fx<T> extends Iterable<T> implements FxListRangeSource<T> {
   /// Dart-idiomatic alias of [takeRight].
   Fx<T> takeLast(int count) => takeRight(count);
 
-  @override
   Fx<T> takeWhile(bool Function(T value) test) => Fx(l.takeWhile(test, _inner));
 
   /// The longest trailing run of values [f] holds for, in source order.
@@ -156,7 +127,6 @@ class Fx<T> extends Iterable<T> implements FxListRangeSource<T> {
   /// Skips the first [count] values.
   Fx<T> drop(int count) => Fx(l.drop(count, _inner));
 
-  @override
   Fx<T> skip(int count) => drop(count);
 
   /// Drops the last [count] values.
@@ -169,7 +139,6 @@ class Fx<T> extends Iterable<T> implements FxListRangeSource<T> {
   Fx<T> dropWhileRight(bool Function(T a) f) =>
       Fx(l.dropWhileRight(f, _inner));
 
-  @override
   Fx<T> skipWhile(bool Function(T value) test) => dropWhile(test);
 
   /// Skips values until [f] matches (dropping the match), yields the rest.
@@ -321,7 +290,6 @@ class Fx<T> extends Iterable<T> implements FxListRangeSource<T> {
   // --- terminal operators -------------------------------------------------
 
   /// Materializes the pipeline into a [List] (Dart's `Iterable.toList`).
-  @override
   List<T> toList({bool growable = true}) => _inner.toList(growable: growable);
 
   /// Runs [f] for every value, forcing the pipeline.

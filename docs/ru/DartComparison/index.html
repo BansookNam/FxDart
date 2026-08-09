@@ -124,21 +124,21 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/countBy.html">countBy</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="true" data-speed="tie" data-fns="toAsync map">
+    <li data-verdict="fxdart" data-async="true" data-speed="fxdart" data-fns="toAsync map">
       <a class="cmp-row" href="sequential-configs.html">
         <span class="cmp-num">3</span>
         <span class="cmp-row-body">
-          <strong>Load three remote configs in order</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ Скорость одинакова</span>
+          <strong>Load three remote configs in order</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart быстрее</span>
           <span class="dim">Sequential async fetches — a plain await-in-loop in Dart vs toAsync + map in FxDart, one word away from bounded concurrency.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="false" data-speed="native" data-fns="filter averageBy">
+    <li data-verdict="tie" data-async="false" data-speed="fxdart" data-fns="filter averageBy">
       <a class="cmp-row" href="average-basket.html">
         <span class="cmp-num">4</span>
         <span class="cmp-row-body">
-          <strong>Average order value over $100</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-speed speed-native">⚡ Нативный быстрее</span>
+          <strong>Average order value over $100</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart быстрее</span>
           <span class="dim">Mean total of large orders — where/map/average with package:collection vs filter + averageBy in FxDart.</span>
         </span>
       </a>
@@ -174,11 +174,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="filter sumBy">
+    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="filter sumBy">
       <a class="cmp-row" href="food-spending.html">
         <span class="cmp-num">8</span>
         <span class="cmp-row-body">
-          <strong>Food spending this month</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-native">⚡ Нативный быстрее</span>
+          <strong>Food spending this month</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-tie">⚡ Скорость одинакова</span>
           <span class="dim">Total one category of a ledger — a where/fold chain in plain Dart vs filter + sumBy in FxDart.</span>
         </span>
       </a>
@@ -194,11 +194,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/uniq.html">uniq</a></li></ul>
     </li>
-    <li data-verdict="native" data-async="false" data-speed="native" data-fns="dropWhile head">
+    <li data-verdict="native" data-async="false" data-speed="tie" data-fns="dropWhile head">
       <a class="cmp-row" href="first-over-limit.html">
         <span class="cmp-num">10</span>
         <span class="cmp-row-body">
-          <strong>First sensor reading over the limit</strong> <span class="badge verdict-native">Native is fine</span> <span class="badge badge-speed speed-native">⚡ Нативный быстрее</span>
+          <strong>First sensor reading over the limit</strong> <span class="badge verdict-native">Native is fine</span> <span class="badge badge-speed speed-tie">⚡ Скорость одинакова</span>
           <span class="dim">Find the first temperature above a threshold — skipWhile + firstOrNull in plain Dart vs dropWhile + head in FxDart.</span>
         </span>
       </a>
@@ -241,11 +241,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/partition.html">partition</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="native" data-async="false" data-speed="native" data-fns="map filter take">
+    <li data-verdict="native" data-async="false" data-speed="tie" data-fns="map filter take">
       <a class="cmp-row" href="valid-emails.html">
         <span class="cmp-num">14</span>
         <span class="cmp-row-body">
-          <strong>First 5 valid emails, normalized</strong> <span class="badge verdict-native">Native is fine</span> <span class="badge badge-speed speed-native">⚡ Нативный быстрее</span>
+          <strong>First 5 valid emails, normalized</strong> <span class="badge verdict-native">Native is fine</span> <span class="badge badge-speed speed-tie">⚡ Скорость одинакова</span>
           <span class="dim">Trim, lowercase, validate, take five — map/where/take in plain Dart vs map + filter + take in FxDart. Plain Dart is every bit as clean here.</span>
         </span>
       </a>
@@ -271,21 +271,21 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="groupBy map maxBy">
+    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="groupBy map maxBy">
       <a class="cmp-row" href="top-category-average.html">
         <span class="cmp-num">17</span>
         <span class="cmp-row-body">
-          <strong>Category with highest average expense</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-native">⚡ Нативный быстрее</span>
+          <strong>Category with highest average expense</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-tie">⚡ Скорость одинакова</span>
           <span class="dim">Group expenses and find the priciest category per transaction — collection groupBy + maxBy nested calls in plain Dart vs one FxDart chain.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="false" data-speed="native" data-fns="dropWhile takeWhile sumBy">
+    <li data-verdict="tie" data-async="false" data-speed="fxdart" data-fns="dropWhile takeWhile sumBy">
       <a class="cmp-row" href="date-window-spend.html">
         <span class="cmp-num">18</span>
         <span class="cmp-row-body">
-          <strong>Spending inside a date window</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-speed speed-native">⚡ Нативный быстрее</span>
+          <strong>Spending inside a date window</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart быстрее</span>
           <span class="dim">Sum a slice of a date-sorted ledger — skipWhile/takeWhile/fold in plain Dart vs dropWhile + takeWhile + sumBy in FxDart. Native holds up well.</span>
         </span>
       </a>
@@ -358,11 +358,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/entries.html">entries</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="chunk map averageBy zipWithIndex join">
+    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="chunk map averageBy zipWithIndex join">
       <a class="cmp-row" href="weekly-sensor-averages.html">
         <span class="cmp-num">25</span>
         <span class="cmp-row-body">
-          <strong>Weekly averages from daily readings</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-native">⚡ Нативный быстрее</span>
+          <strong>Weekly averages from daily readings</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-tie">⚡ Скорость одинакова</span>
           <span class="dim">Fold 21 daily readings into 3 weekly averages — index arithmetic and sublist in plain Dart vs chunk + averageBy + zipWithIndex in FxDart.</span>
         </span>
       </a>
@@ -425,11 +425,11 @@
   <h2>Part 4 · Six to ten functions</h2>
   <p class="dim">Full workflows, most with bounded concurrency — the part native Dart cannot express cleanly.</p>
   <ol class="cmp-list">
-    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="map groupBy sumBy sortBy uniq maxBy join">
+    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="map groupBy sumBy sortBy uniq maxBy join">
       <a class="cmp-row" href="multi-currency-report.html">
         <span class="cmp-num">31</span>
         <span class="cmp-row-body">
-          <strong>Multi-currency expense report</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart быстрее</span>
+          <strong>Multi-currency expense report</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-native">⚡ Нативный быстрее</span>
           <span class="dim">Normalize a trip ledger to USD with fixed rates, then group, rank, and summarize — one pipeline per report line vs fold/reduce boilerplate.</span>
         </span>
       </a>
@@ -465,11 +465,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="groupBy range map sumBy chunk zipWithIndex join">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="groupBy range map sumBy chunk zipWithIndex join">
       <a class="cmp-row" href="sparse-timeseries.html">
         <span class="cmp-num">35</span>
         <span class="cmp-row-body">
-          <strong>Fill gaps in a sparse time series</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-native">⚡ Нативный быстрее</span>
+          <strong>Fill gaps in a sparse time series</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart быстрее</span>
           <span class="dim">Days with no transactions become 0.00, then weekly rows with totals — range + groupBy + chunk as one flow vs a counting loop and slices.</span>
         </span>
       </a>
@@ -545,11 +545,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="windowed average uniqAdjacent pairwise ifEmpty map">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="windowed average uniqAdjacent pairwise ifEmpty map">
       <a class="cmp-row" href="smoothed-zone-changes.html">
         <span class="cmp-num">43</span>
         <span class="cmp-row-body">
-          <strong>Smoothed zone changes</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-native">⚡ Нативный быстрее</span>
+          <strong>Smoothed zone changes</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart быстрее</span>
           <span class="dim">Moving average, zone runs, transition alerts — three index loops with mutable carry in plain Dart vs windowed → uniqAdjacentBy → pairwise in FxDart.</span>
         </span>
       </a>
@@ -585,11 +585,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/delay.html">delay</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="filter groupedBy map sumBy sortByDesc take">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="filter groupedBy map sumBy sortByDesc take">
       <a class="cmp-row" href="category-rank.html">
         <span class="cmp-num">47</span>
         <span class="cmp-row-body">
-          <strong>Rank the month by category</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-native">⚡ Нативный быстрее</span>
+          <strong>Rank the month by category</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart быстрее</span>
           <span class="dim">Group, total, and rank spending — groupListsBy plus a comparator swap in plain Dart vs one groupedBy → sortByDesc chain in FxDart.</span>
         </span>
       </a>

@@ -22,10 +22,11 @@ const readings = [
 ];
 
 void main() {
-  final context = fx(readings)
-      .zipWithIndex()
-      .filter((p) => p.$2.temp > limit)
-      .flatMap((p) => [p.$1 - 1, p.$1, p.$1 + 1])
+  // Walk the INDICES, not the readings: an anomaly is rare, so pairing every
+  // reading with its index would allocate a record per element to keep a few.
+  final context = fx(range(0, readings.length))
+      .filter((i) => readings[i].temp > limit)
+      .flatMap((i) => [i - 1, i, i + 1])
       .filter((i) => i >= 0 && i < readings.length)
       .uniq()
       .map((i) {
