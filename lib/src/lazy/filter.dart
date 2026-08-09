@@ -361,7 +361,7 @@ FxAsyncIterable<A> uniqByAsync<A, B>(
       if (key is Future<B>) {
         return key.then((k) => seen.add(k));
       }
-      return seen.add(key as B);
+      return seen.add(key);
     }, iterable).iterator;
   });
 }
