@@ -6285,6 +6285,71 @@ Future<Map<K, int>> countByAsync<A, K>(
   return result;
 }
 
+/// Folds the values under each key [key] returns, in **one pass**, without
+/// ever materializing the groups.
+///
+/// `groupBy` followed by a fold per group builds a `List` for every key first
+/// — allocation proportional to the input for an answer proportional to the
+/// number of keys. [foldBy] accumulates straight into the result map, which
+/// is what the hand-written `totals[k] = (totals[k] ?? 0) + v` loop does:
+///
+/// ```dart
+/// foldBy((Tx t) => t.category, 0.0, (sum, t) => sum + t.amount, txns);
+/// // {Food: 812.40, Transport: 96.15, …}
+/// ```
+///
+/// Not an FxTS port; the shape is Kotlin's `groupingBy().fold()`. Keys appear
+/// in first-seen order, like [groupBy]. Reach for [groupBy] when you actually
+/// want the elements — this is for when you only want the aggregate.
+///
+/// [seed] is a **value**, shared as the starting point for every key, exactly
+/// as in [fold]. A mutable seed would therefore be shared across keys: fold
+/// into new values (`sum + t.amount`), or use [groupBy] if you need to
+/// accumulate into a mutable structure per group.
+Map<K, Acc> foldBy<A, K, Acc>(K Function(A a) key, Acc seed,
+    Acc Function(Acc acc, A a) f, Iterable<A> iterable) {
+  final result = <K, Acc>{};
+  // Read-modify-write instead of Map.update or putIfAbsent, both of which
+  // allocate a closure per element (see [countBy], [groupBy]).
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      final a = iterable[i];
+      final k = key(a);
+      final acc = result[k];
+      // The containsKey probe only runs when the stored value is null, which
+      // is impossible unless Acc itself is nullable.
+      result[k] =
+          f(acc == null && !result.containsKey(k) ? seed : acc as Acc, a);
+    }
+    return result;
+  }
+  for (final a in iterable) {
+    final k = key(a);
+    final acc = result[k];
+    result[k] = f(acc == null && !result.containsKey(k) ? seed : acc as Acc, a);
+  }
+  return result;
+}
+
+/// Async counterpart of [foldBy]. [key] and [f] may each return a [Future];
+/// values are folded in source order.
+Future<Map<K, Acc>> foldByAsync<A, K, Acc>(
+    FutureOr<K> Function(A a) key,
+    FutureOr<Acc> seed,
+    FutureOr<Acc> Function(Acc acc, A a) f,
+    FxAsyncIterable<A> iterable) async {
+  final result = <K, Acc>{};
+  final start = await seed;
+  await eachAsync((A a) async {
+    final k = await key(a);
+    final acc = result[k];
+    result[k] =
+        await f(acc == null && !result.containsKey(k) ? start : acc as Acc, a);
+  }, iterable);
+  return result;
+}
+
 /// Returns a **new** sorted list ordered by the comparator [f].
 ///
 /// Port of FxTS `sort`. Unlike the TS version (which mutates arrays in
@@ -10044,6 +10109,12 @@ class Fx<T> extends Iterable<T> implements FxListRangeSource<T> {
   /// Counts how many values fall under each key [f] returns.
   Map<K, int> countBy<K>(K Function(T a) f) => _$countBy(f, _inner);
 
+  /// Folds the values under each [key] in one pass, without materializing
+  /// the groups — the aggregate-only counterpart of [groupBy].
+  Map<K, Acc> foldBy<K, Acc>(
+          K Function(T a) key, Acc seed, Acc Function(Acc acc, T a) f) =>
+      _$foldBy(key, seed, f, _inner);
+
   /// Counts the values [f] holds for — `filter` + `size` in one walk.
   int countWhere(bool Function(T a) f) => _$countWhere(f, _inner);
 
@@ -10431,6 +10502,12 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Counts how many values fall under each key [f] returns.
   Future<Map<K, int>> countBy<K>(FutureOr<K> Function(T a) f) =>
       _$countByAsync(f, _inner);
+
+  /// Folds the values under each [key] in one pass, without materializing
+  /// the groups — the aggregate-only counterpart of [groupBy].
+  Future<Map<K, Acc>> foldBy<K, Acc>(FutureOr<K> Function(T a) key,
+          FutureOr<Acc> seed, FutureOr<Acc> Function(Acc acc, T a) f) =>
+      _$foldByAsync(key, seed, f, _inner);
 
   /// Whether [f] holds for at least one value.
   Future<bool> some(FutureOr<bool> Function(T a) f) => _$someAsync(f, _inner);
@@ -11204,6 +11281,15 @@ Future<Map<K, A>> _$indexByAsync<A, K>(
     indexByAsync(f, iterable);
 Map<K, int> _$countBy<A, K>(K Function(A a) f, Iterable<A> iterable) =>
     countBy(f, iterable);
+Map<K, Acc> _$foldBy<A, K, Acc>(K Function(A a) key, Acc seed,
+        Acc Function(Acc acc, A a) f, Iterable<A> iterable) =>
+    foldBy(key, seed, f, iterable);
+Future<Map<K, Acc>> _$foldByAsync<A, K, Acc>(
+        FutureOr<K> Function(A a) key,
+        FutureOr<Acc> seed,
+        FutureOr<Acc> Function(Acc acc, A a) f,
+        FxAsyncIterable<A> iterable) =>
+    foldByAsync(key, seed, f, iterable);
 Future<Map<K, int>> _$countByAsync<A, K>(
         FutureOr<K> Function(A a) f, FxAsyncIterable<A> iterable) =>
     countByAsync(f, iterable);

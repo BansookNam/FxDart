@@ -23,9 +23,9 @@ const txns = [
 const budgets = {'Food': 120.0, 'Transport': 40.0, 'Fun': 30.0, 'Bills': 90.0};
 
 void main() {
-  final byCategory = fx(txns).groupBy((t) => t.category);
-  final alerts = fx(byCategory.entries)
-      .map((kv) => (kv.key, kv.value.fold(0.0, (sum, t) => sum + t.amount)))
+  final spent = fx(txns).foldBy((t) => t.category, 0.0, (sum, t) => sum + t.amount);
+  final alerts = fx(spent.entries)
+      .map((kv) => (kv.key, kv.value))
       .filter((row) => row.$2 > budgets[row.$1]!)
       .sortBy((row) => budgets[row.$1]! - row.$2) // most over first
       .map((row) => '${row.$1}: \$${row.$2.toStringAsFixed(2)} spent, '

@@ -27,13 +27,15 @@ void main() {
   final spend = fx(txns).filter((t) => t.category != 'Income').toList();
   final total = fx(spend).sumBy((t) => t.amount);
 
-  final catLines = fx(fx(spend).groupBy((t) => t.category).entries)
-      .map((e) => (e.key, fx(e.value).sumBy((t) => t.amount)))
+  final catLines = fx(
+          fx(spend).foldBy((t) => t.category, 0.0, (s, t) => s + t.amount).entries)
+      .map((e) => (e.key, e.value))
       .sortBy((c) => -c.$2)
       .map((c) => '  ${c.$1.padRight(10)} ${money(c.$2)}');
 
-  final merchantLines = fx(fx(spend).groupBy((t) => t.merchant).entries)
-      .map((e) => (e.key, fx(e.value).sumBy((t) => t.amount)))
+  final merchantLines = fx(
+          fx(spend).foldBy((t) => t.merchant, 0.0, (s, t) => s + t.amount).entries)
+      .map((e) => (e.key, e.value))
       .sortBy((m) => -m.$2)
       .take(3)
       .zipWithIndex()

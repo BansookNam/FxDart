@@ -24,9 +24,9 @@ const txns = [
 void main() {
   final byCategory = fx(txns)
       .filter((t) => t.date.startsWith('2026-07'))
-      .groupBy((t) => t.category);
+      .foldBy((t) => t.category, 0.0, (sum, t) => sum + t.amount);
   final report = fx(byCategory.entries)
-      .map((kv) => (kv.key, kv.value.fold(0.0, (sum, t) => sum + t.amount)))
+      .map((kv) => (kv.key, kv.value))
       .sortBy((row) => -row.$2)
       .map((row) => '${row.$1}: \$${row.$2.toStringAsFixed(2)}')
       .join('\n');
