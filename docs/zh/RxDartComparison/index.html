@@ -473,31 +473,31 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/timeout.html">timeout</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="true" data-speed="tie" data-fns="fx toAsync retry concurrent">
+    <li data-verdict="fxdart" data-async="true" data-speed="fxdart" data-fns="fx toAsync retry concurrent">
       <a class="cmp-row" href="per-row-retry.html">
         <span class="cmp-num">31</span>
         <span class="cmp-row-body">
-          <strong>Retry each flaky row independently</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 速度相同</span>
+          <strong>Retry each flaky row independently</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart 更快</span>
           <span class="dim">Six flaky import rows, two attempts each, three in flight — flatMap emits in completion order, mapRetry under concurrent keeps source order.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/retry.html">retry</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="true" data-speed="tie" data-fns="fx using toAsync toList">
+    <li data-verdict="tie" data-async="true" data-speed="rxdart" data-fns="fx using toAsync toList">
       <a class="cmp-row" href="cursor-lifetime.html">
         <span class="cmp-num">32</span>
         <span class="cmp-row-body">
-          <strong>A cursor's lifetime around a read</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 速度相同</span>
+          <strong>A cursor's lifetime around a read</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-rxdart">⚡ RxDart 更快</span>
           <span class="dim">Open a cursor, read five rows, guarantee the close — Rx.using around a stream vs usingAsync around a lazy pull, two ports of one idea.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/using.html">using</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/toList.html">toList</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="true" data-speed="tie" data-fns="fx toAsync map ifEmpty">
+    <li data-verdict="fxdart" data-async="true" data-speed="fxdart" data-fns="fx toAsync map ifEmpty">
       <a class="cmp-row" href="price-or-fallback.html">
         <span class="cmp-num">33</span>
         <span class="cmp-row-body">
-          <strong>A price, or the list price</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 速度相同</span>
+          <strong>A price, or the list price</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart 更快</span>
           <span class="dim">A promo price where one exists, the list price where none does — per-item recovery as inner streams vs a try/catch right beside the call.</span>
         </span>
       </a>

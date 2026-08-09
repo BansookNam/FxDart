@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=b4dae51ab37b09a8">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=24b1aeb3f05a1a37">
 </head>
 <body>
 <header class="site-header">
@@ -124,7 +124,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="b6a67c8bb0ba471b">
+      <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -199,7 +199,7 @@ Future<void> main() async {
   </p>
   <section class="cmp-bench">
   <h2>Benchmark</h2>
-  <p class="dim bench-meta">Apple M1 Max, 32 GB RAM · Dart 3.12.2 (AOT-compiled) · 2026-08-05</p>
+  <p class="dim bench-meta">Apple M1 Max, 32 GB RAM · Dart 3.12.2 (AOT-compiled) · 2026-08-09</p>
   <p class="dim bench-note bench-async-note">Caso async: la escala principal es N = 10,000, no 1,000,000. Cada elemento cuesta una vuelta del event loop en ambos lados, así que un millón de awaits reales mediría el event loop de Dart durante minutos — no el pipeline. Los retardos son de longitud cero y se conserva el límite de concurrencia del ejemplo; lo que comparan las barras es la maquinaria del pipeline.</p>
   <div class="bench-scales">
   <div class="bench-scale">
@@ -208,42 +208,42 @@ Future<void> main() async {
       <h4>Tiempo <span class="badge verdict-tie">Empate</span></h4>
       <div class="bench-row">
         <span class="bench-name">RxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">819 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:98.7%"></span></span>
+        <span class="bench-val">771 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:95.5%"></span></span>
-        <span class="bench-val">782 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">781 µs</span>
       </div>
     </div>
     <div class="bench-metric">
       <h4>Memoria pico <span class="badge verdict-tie">Empate</span></h4>
       <div class="bench-row">
         <span class="bench-name">RxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:99.7%"></span></span>
+        <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:98.6%"></span></span>
         <span class="bench-val">16.6 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">16.7 MB</span>
+        <span class="bench-val">16.9 MB</span>
       </div>
     </div>
   </div>
   <div class="bench-scale">
     <h3>N = 10,000</h3>
     <div class="bench-metric">
-      <h4>Tiempo <span class="badge verdict-tie">Empate</span></h4>
+      <h4>Tiempo <span class="badge verdict-fxdart">Gana FxDart</span></h4>
       <div class="bench-row">
         <span class="bench-name">RxDart</span>
         <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">71.6 ms</span>
+        <span class="bench-val">71.1 ms</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:98.2%"></span></span>
-        <span class="bench-val">70.3 ms</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:94.4%"></span></span>
+        <span class="bench-val">67.1 ms</span>
       </div>
     </div>
     <div class="bench-metric">
@@ -251,12 +251,12 @@ Future<void> main() async {
       <div class="bench-row">
         <span class="bench-name">RxDart</span>
         <span class="bench-track"><span class="bench-bar bench-rxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">61.2 MB</span>
+        <span class="bench-val">60.7 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:66.1%"></span></span>
-        <span class="bench-val">40.5 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:66.2%"></span></span>
+        <span class="bench-val">40.2 MB</span>
       </div>
     </div>
   </div>
@@ -274,7 +274,7 @@ Future<void> main() async {
   <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=b4dae51ab37b09a8";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=24b1aeb3f05a1a37";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
