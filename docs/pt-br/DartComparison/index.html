@@ -144,21 +144,21 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/averageBy.html">averageBy</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="chunk map">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="chunk map">
       <a class="cmp-row" href="paginate-users.html">
         <span class="cmp-num">5</span>
         <span class="cmp-row-body">
-          <strong>Batch users into pages of 10</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-native">⚡ Nativo mais rápido</span>
+          <strong>Batch users into pages of 10</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart mais rápido</span>
           <span class="dim">Split a user list into fixed-size pages — slices from package:collection vs chunk + map in FxDart.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="false" data-speed="native" data-fns="zipWithIndex map">
+    <li data-verdict="tie" data-async="false" data-speed="tie" data-fns="zipWithIndex map">
       <a class="cmp-row" href="rank-labels.html">
         <span class="cmp-num">6</span>
         <span class="cmp-row-body">
-          <strong>Rank labels for a leaderboard</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-speed speed-native">⚡ Nativo mais rápido</span>
+          <strong>Rank labels for a leaderboard</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-speed speed-tie">⚡ Mesma velocidade</span>
           <span class="dim">Number a sorted leaderboard 1..n — Dart 3 indexed records vs zipWithIndex + map in FxDart.</span>
         </span>
       </a>
@@ -241,11 +241,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/partition.html">partition</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="native" data-async="false" data-speed="tie" data-fns="map filter take">
+    <li data-verdict="native" data-async="false" data-speed="native" data-fns="map filter take">
       <a class="cmp-row" href="valid-emails.html">
         <span class="cmp-num">14</span>
         <span class="cmp-row-body">
-          <strong>First 5 valid emails, normalized</strong> <span class="badge verdict-native">Native is fine</span> <span class="badge badge-speed speed-tie">⚡ Mesma velocidade</span>
+          <strong>First 5 valid emails, normalized</strong> <span class="badge verdict-native">Native is fine</span> <span class="badge badge-speed speed-native">⚡ Nativo mais rápido</span>
           <span class="dim">Trim, lowercase, validate, take five — map/where/take in plain Dart vs map + filter + take in FxDart. Plain Dart is every bit as clean here.</span>
         </span>
       </a>
@@ -408,15 +408,15 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="zip drop filter map join">
+    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="zip3 drop filter map join">
       <a class="cmp-row" href="consecutive-over-limit.html">
         <span class="cmp-num">30</span>
         <span class="cmp-row-body">
           <strong>Three consecutive readings over the limit</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-native">⚡ Nativo mais rápido</span>
-          <span class="dim">Find every 3-hour window of CO2 readings all over 1000 ppm — an index loop in plain Dart vs a sliding window built from zip + drop in FxDart.</span>
+          <span class="dim">Find every 3-hour window of CO2 readings all over 1000 ppm — an index loop in plain Dart vs a sliding window built from zip3 + drop in FxDart.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/zip.html">zip</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/zip3.html">zip3</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
   </ol>
   </section>
@@ -435,11 +435,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="filter sortBy scan drop zip takeWhile map sumBy join">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="filter sortBy scan drop zip takeWhile map sumBy join">
       <a class="cmp-row" href="restock-plan.html">
         <span class="cmp-num">32</span>
         <span class="cmp-row-body">
-          <strong>Inventory restock plan</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-tie">⚡ Mesma velocidade</span>
+          <strong>Inventory restock plan</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart mais rápido</span>
           <span class="dim">Prioritize below-threshold items and cut the order list at a budget — scan + zip + takeWhile as data flow vs a mutable running total and break.</span>
         </span>
       </a>

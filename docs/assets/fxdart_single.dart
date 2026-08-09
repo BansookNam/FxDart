@@ -1593,6 +1593,73 @@ dynamic pipe(dynamic a, List<Function> fns) {
 /// Port of FxTS `pipeLazy`, with the same dynamic-typing caveat as [pipe].
 dynamic Function(dynamic a) pipeLazy(List<Function> fns) => (a) => pipe(a, fns);
 
+// ---- lib/src/lazy/list_range.dart ----
+/// Internal plumbing that lets operators recognise when an upstream lazy
+/// iterable is nothing more than a contiguous range of a backing [List], and
+/// index that list directly instead of pulling values through a chain of
+/// iterators.
+///
+/// Nothing here is exported from `package:fxdart` — it is an implementation
+/// detail shared by `take_drop.dart` and `zip.dart`. The names carry an `Fx`
+/// prefix (rather than `_`) only because Dart privacy is per-file and the web
+/// playground bundle concatenates every source file into one library, so
+/// cross-file internals must still have unique top-level names.
+
+/// A contiguous `[start, end)` range of [list].
+///
+/// Resolved once, when an iterator is created — never per element.
+class FxListRange<A> {
+  const FxListRange(this.list, this.start, this.end);
+
+  final List<A> list;
+  final int start;
+  final int end;
+
+  int get length => end - start;
+}
+
+/// Implemented by lazy iterables that are *sometimes* a plain range over a
+/// [List] — `take`, `drop`, `takeRight`, `dropRight` are, as long as whatever
+/// they wrap is one too.
+abstract class FxListRangeSource<A> {
+  /// The range this iterable covers, or null when the ultimate source is not
+  /// a [List] (a generator, a `map`, a `Set`, …) and must be pulled instead.
+  FxListRange<A>? get listRange;
+}
+
+/// [iterable] viewed as a range over a backing [List], or null if it is not
+/// one.
+///
+/// Indexing that list is faster than iterating it — one bounds check per
+/// element instead of a virtual `moveNext` per pipeline layer plus the growth
+/// guard `List`'s own iterator performs. The trade-off, already made by
+/// `takeRight`/`dropRight`, is that a source mutated *during* iteration is not
+/// reported as a `ConcurrentModificationError`; the range's bounds are those
+/// the list had when iteration started.
+FxListRange<A>? fxListRangeOf<A>(Iterable<A> iterable) {
+  if (iterable is List<A>) return FxListRange(iterable, 0, iterable.length);
+  if (iterable is FxListRangeSource<A>) {
+    return (iterable as FxListRangeSource<A>).listRange;
+  }
+  return null;
+}
+
+/// Walks `list[start..end)` by index.
+class FxListRangeIterator<A> implements Iterator<A> {
+  FxListRangeIterator(this._list, this._i, this._end);
+  final List<A> _list;
+  int _i;
+  final int _end;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    if (_i >= _end) return false;
+    current = _list[_i++];
+    return true;
+  }
+}
+
 // ---- lib/src/lazy/map.dart ----
 
 
@@ -2959,12 +3026,25 @@ FxAsyncIterable<A> intersectionAsync<A>(
 Iterable<A> take<A>(int length, Iterable<A> iterable) =>
     _TakeIterable(length, iterable);
 
-class _TakeIterable<A> extends Iterable<A> {
+class _TakeIterable<A> extends Iterable<A>
+    implements FxListRangeSource<A> {
   _TakeIterable(this._length, this._source);
   final int _length;
   final Iterable<A> _source;
   @override
-  Iterator<A> get iterator => _TakeIterator(_length, _source.iterator);
+  FxListRange<A>? get listRange {
+    final r = fxListRangeOf(_source);
+    if (r == null) return null;
+    final end = _length < 0 ? r.start : r.start + _length;
+    return FxListRange(r.list, r.start, end > r.end ? r.end : end);
+  }
+
+  @override
+  Iterator<A> get iterator {
+    final r = listRange;
+    if (r != null) return FxListRangeIterator(r.list, r.start, r.end);
+    return _TakeIterator(_length, _source.iterator);
+  }
 }
 
 class _TakeIterator<A> implements Iterator<A> {
@@ -3006,35 +3086,24 @@ Iterable<A> takeRight<A>(int length, Iterable<A> iterable) {
   return _TakeRightIterable(length, iterable);
 }
 
-class _TakeRightIterable<A> extends Iterable<A> {
+class _TakeRightIterable<A> extends Iterable<A>
+    implements FxListRangeSource<A> {
   _TakeRightIterable(this._length, this._source);
   final int _length;
   final Iterable<A> _source;
   @override
-  Iterator<A> get iterator {
-    final source = _source;
-    if (source is List<A>) {
-      final len = source.length;
-      final start = len - _length < 0 ? 0 : len - _length;
-      return _ListRangeIterator(source, start, len);
-    }
-    return _TakeRightIterator(_length, source);
+  FxListRange<A>? get listRange {
+    final r = fxListRangeOf(_source);
+    if (r == null) return null;
+    final start = r.end - _length;
+    return FxListRange(r.list, start < r.start ? r.start : start, r.end);
   }
-}
 
-/// Indexes a [List] over `[start, end)` — no snapshot copy.
-class _ListRangeIterator<A> implements Iterator<A> {
-  _ListRangeIterator(this._list, this._i, this._end);
-  final List<A> _list;
-  int _i;
-  final int _end;
   @override
-  late A current;
-  @override
-  bool moveNext() {
-    if (_i >= _end) return false;
-    current = _list[_i++];
-    return true;
+  Iterator<A> get iterator {
+    final r = listRange;
+    if (r != null) return FxListRangeIterator(r.list, r.start, r.end);
+    return _TakeRightIterator(_length, _source);
   }
 }
 
@@ -3216,7 +3285,7 @@ class _TakeWhileRightIterable<A> extends Iterable<A> {
   Iterator<A> get iterator {
     final source = _source;
     if (source is List<A>) {
-      return _ListRangeIterator(source, _suffixStart(_f, source), source.length);
+      return FxListRangeIterator(source, _suffixStart(_f, source), source.length);
     }
     return _TakeWhileRightIterator(_f, _source);
   }
@@ -3347,12 +3416,25 @@ FxAsyncIterable<A> takeUntilAsync<A>(
 Iterable<A> drop<A>(int length, Iterable<A> iterable) =>
     _DropIterable(length, iterable);
 
-class _DropIterable<A> extends Iterable<A> {
+class _DropIterable<A> extends Iterable<A>
+    implements FxListRangeSource<A> {
   _DropIterable(this._length, this._source);
   final int _length;
   final Iterable<A> _source;
   @override
-  Iterator<A> get iterator => _DropIterator(_length, _source.iterator);
+  FxListRange<A>? get listRange {
+    final r = fxListRangeOf(_source);
+    if (r == null) return null;
+    final start = _length < 0 ? r.start : r.start + _length;
+    return FxListRange(r.list, start > r.end ? r.end : start, r.end);
+  }
+
+  @override
+  Iterator<A> get iterator {
+    final r = listRange;
+    if (r != null) return FxListRangeIterator(r.list, r.start, r.end);
+    return _DropIterator(_length, _source.iterator);
+  }
 }
 
 class _DropIterator<A> implements Iterator<A> {
@@ -3400,19 +3482,25 @@ Iterable<A> dropRight<A>(int length, Iterable<A> iterable) {
   return _DropRightIterable(length, iterable);
 }
 
-class _DropRightIterable<A> extends Iterable<A> {
+class _DropRightIterable<A> extends Iterable<A>
+    implements FxListRangeSource<A> {
   _DropRightIterable(this._length, this._source);
   final int _length;
   final Iterable<A> _source;
   @override
+  FxListRange<A>? get listRange {
+    final r = fxListRangeOf(_source);
+    if (r == null) return null;
+    final end = r.end - _length;
+    return FxListRange(r.list, r.start, end < r.start ? r.start : end);
+  }
+
+  @override
   Iterator<A> get iterator {
-    final source = _source;
-    if (source is List<A>) {
-      final end = source.length - _length;
-      return _ListRangeIterator(source, 0, end < 0 ? 0 : end);
-    }
-    if (_length == 0) return source.iterator;
-    return _DropRightIterator(_length, source.iterator);
+    final r = listRange;
+    if (r != null) return FxListRangeIterator(r.list, r.start, r.end);
+    if (_length == 0) return _source.iterator;
+    return _DropRightIterator(_length, _source.iterator);
   }
 }
 
@@ -3569,7 +3657,7 @@ class _DropWhileRightIterable<A> extends Iterable<A> {
   Iterator<A> get iterator {
     final source = _source;
     if (source is List<A>) {
-      return _ListRangeIterator(source, 0, _suffixStart(_f, source));
+      return FxListRangeIterator(source, 0, _suffixStart(_f, source));
     }
     return _DropWhileRightIterator(_f, _source.iterator);
   }
@@ -3806,8 +3894,62 @@ class _WindowIterable<A> extends Iterable<List<A>> {
   final bool _partial;
   final Iterable<A> _source;
   @override
-  Iterator<List<A>> get iterator =>
-      _WindowIterator(_size, _step, _partial, _source.iterator);
+  Iterator<List<A>> get iterator {
+    // Over a [List] the ring buffer earns nothing: each window is already a
+    // contiguous slice, so it can be filled straight from the backing list
+    // and the whole upstream iterator layer disappears.
+    final r = fxListRangeOf(_source);
+    if (r != null) {
+      return _WindowRangeIterator(_size, _step, _partial, r);
+    }
+    return _WindowIterator(_size, _step, _partial, _source.iterator);
+  }
+}
+
+class _WindowRangeIterator<A> implements Iterator<List<A>> {
+  _WindowRangeIterator(this._size, this._step, this._partial, FxListRange<A> r)
+      : _list = r.list,
+        _i = r.start,
+        _end = r.end,
+        _lastFull = r.end - _size;
+  final int _size;
+  final int _step;
+  final bool _partial;
+  final List<A> _list;
+  final int _end;
+
+  /// Largest start index that still has a full window behind it — the one
+  /// bound the common path has to test.
+  final int _lastFull;
+  int _i;
+  @override
+  late List<A> current;
+  @override
+  bool moveNext() {
+    final i = _i;
+    if (i <= _lastFull) {
+      current = _slice(i, _size);
+      _i = i + _step;
+      return true;
+    }
+    // Past the last full window: only `partial: true` keeps going, and every
+    // window from here on is shorter than the one before.
+    if (!_partial) return false;
+    final remaining = _end - i;
+    if (remaining <= 0) return false;
+    current = _slice(i, remaining);
+    _i = i + _step;
+    return true;
+  }
+
+  List<A> _slice(int i, int length) {
+    final list = _list;
+    final window = List<A>.filled(length, list[i]);
+    for (var k = 1; k < length; k++) {
+      window[k] = list[i + k];
+    }
+    return window;
+  }
 }
 
 class _WindowIterator<A> implements Iterator<List<A>> {
@@ -4155,8 +4297,90 @@ class _ZipIterable<A, B> extends Iterable<(A, B)> {
   final Iterable<A> _source1;
   final Iterable<B> _source2;
   @override
-  Iterator<(A, B)> get iterator =>
-      _ZipIterator(_source1.iterator, _source2.iterator);
+  Iterator<(A, B)> get iterator {
+    // A side that is a range over a backing [List] — the list itself, or a
+    // `take`/`drop` of one, which is how a sliding window is usually built —
+    // is read by index, so that side costs no iterator and no per-element
+    // virtual call. The two sides are resolved independently: shifting one
+    // input with `drop` must not cost the other its fast path.
+    final r1 = fxListRangeOf(_source1);
+    final r2 = fxListRangeOf(_source2);
+    if (r1 != null) {
+      if (r2 != null) return _ZipRangeRangeIterator(r1, r2);
+      return _ZipRangeIterIterator(r1, _source2.iterator);
+    }
+    if (r2 != null) return _ZipIterRangeIterator(_source1.iterator, r2);
+    return _ZipIterator(_source1.iterator, _source2.iterator);
+  }
+}
+
+/// Both sides indexed. One cursor walks the left range and the right one is
+/// reached through a fixed offset, so a step is a single field write.
+class _ZipRangeRangeIterator<A, B> implements Iterator<(A, B)> {
+  _ZipRangeRangeIterator(FxListRange<A> r1, FxListRange<B> r2)
+      : _l1 = r1.list,
+        _l2 = r2.list,
+        _i = r1.start,
+        _off = r2.start - r1.start,
+        _end = r1.start +
+            (r1.length < r2.length ? r1.length : r2.length);
+  final List<A> _l1;
+  final List<B> _l2;
+  final int _off;
+  final int _end;
+  int _i;
+  @override
+  late (A, B) current;
+  @override
+  bool moveNext() {
+    final i = _i;
+    if (i >= _end) return false;
+    _i = i + 1;
+    current = (_l1[i], _l2[i + _off]);
+    return true;
+  }
+}
+
+/// Left side indexed, right side pulled. The right side is pulled only when
+/// the left still has a value, matching [_ZipIterator]'s short-circuit.
+class _ZipRangeIterIterator<A, B> implements Iterator<(A, B)> {
+  _ZipRangeIterIterator(FxListRange<A> r, this._it2)
+      : _l1 = r.list,
+        _i1 = r.start,
+        _end1 = r.end;
+  final List<A> _l1;
+  int _i1;
+  final int _end1;
+  final Iterator<B> _it2;
+  @override
+  late (A, B) current;
+  @override
+  bool moveNext() {
+    if (_i1 >= _end1 || !_it2.moveNext()) return false;
+    current = (_l1[_i1++], _it2.current);
+    return true;
+  }
+}
+
+/// Left side pulled, right side indexed. The left side is pulled first, so a
+/// source with effects sees the same pull count as [_ZipIterator].
+class _ZipIterRangeIterator<A, B> implements Iterator<(A, B)> {
+  _ZipIterRangeIterator(this._it1, FxListRange<B> r)
+      : _l2 = r.list,
+        _i2 = r.start,
+        _end2 = r.end;
+  final Iterator<A> _it1;
+  final List<B> _l2;
+  int _i2;
+  final int _end2;
+  @override
+  late (A, B) current;
+  @override
+  bool moveNext() {
+    if (!_it1.moveNext() || _i2 >= _end2) return false;
+    current = (_it1.current, _l2[_i2++]);
+    return true;
+  }
 }
 
 class _ZipIterator<A, B> implements Iterator<(A, B)> {
@@ -4187,8 +4411,53 @@ class _Zip3Iterable<A, B, C> extends Iterable<(A, B, C)> {
   final Iterable<B> _source2;
   final Iterable<C> _source3;
   @override
-  Iterator<(A, B, C)> get iterator =>
-      _Zip3Iterator(_source1.iterator, _source2.iterator, _source3.iterator);
+  Iterator<(A, B, C)> get iterator {
+    // Same idea as [_ZipIterable], but only the all-indexed case is
+    // specialised — the seven mixed shapes would add more dispatch targets to
+    // every downstream `moveNext` than they earn back.
+    final r1 = fxListRangeOf(_source1);
+    if (r1 != null) {
+      final r2 = fxListRangeOf(_source2);
+      if (r2 != null) {
+        final r3 = fxListRangeOf(_source3);
+        if (r3 != null) return _Zip3RangeIterator(r1, r2, r3);
+      }
+    }
+    return _Zip3Iterator(_source1.iterator, _source2.iterator,
+        _source3.iterator);
+  }
+}
+
+/// All three sides indexed — one cursor plus two fixed offsets.
+class _Zip3RangeIterator<A, B, C> implements Iterator<(A, B, C)> {
+  _Zip3RangeIterator(FxListRange<A> r1, FxListRange<B> r2, FxListRange<C> r3)
+      : _l1 = r1.list,
+        _l2 = r2.list,
+        _l3 = r3.list,
+        _i = r1.start,
+        _off2 = r2.start - r1.start,
+        _off3 = r3.start - r1.start,
+        _end = r1.start +
+            (r1.length < r2.length
+                ? (r1.length < r3.length ? r1.length : r3.length)
+                : (r2.length < r3.length ? r2.length : r3.length));
+  final List<A> _l1;
+  final List<B> _l2;
+  final List<C> _l3;
+  final int _off2;
+  final int _off3;
+  final int _end;
+  int _i;
+  @override
+  late (A, B, C) current;
+  @override
+  bool moveNext() {
+    final i = _i;
+    if (i >= _end) return false;
+    _i = i + 1;
+    current = (_l1[i], _l2[i + _off2], _l3[i + _off3]);
+    return true;
+  }
 }
 
 class _Zip3Iterator<A, B, C> implements Iterator<(A, B, C)> {
@@ -9433,6 +9702,8 @@ class FxSubscriptions {
 
 // ---- lib/src/fx.dart (transformed: l./s./async_. -> _$NAME) ----
 
+// Unprefixed: these names are internal plumbing and collide with no member of
+// Fx/FxAsync, so they need no `_$` wrapper in the single-file bundle.
 
 /// Wraps an [Iterable] (or anything convertible) in a lazy, chainable [Fx].
 ///
@@ -9462,7 +9733,7 @@ FxAsync<T> fxStream<T>(Stream<T> stream) => FxAsync(fromStream(stream));
 ///
 /// [Fx] extends [Iterable], so the whole Dart iterable API is available
 /// alongside the FxTS-named operators.
-class Fx<T> extends Iterable<T> {
+class Fx<T> extends Iterable<T> implements FxListRangeSource<T> {
   final Iterable<T> _inner;
 
   /// Wraps [_inner] without consuming it; the chain stays lazy.
@@ -9470,6 +9741,14 @@ class Fx<T> extends Iterable<T> {
 
   @override
   Iterator<T> get iterator => _inner.iterator;
+
+  /// Internal: see `lib/src/lazy/list_range.dart`. A chain that is nothing
+  /// more than a range over a backing [List] — `fx(xs).drop(1)` — reports
+  /// that range, so passing the chain itself to `zip`/`zip3`/`windowed` is as
+  /// fast as passing the operator's own result. Without this the wrapper
+  /// would hide the range and the fast path would depend on spelling.
+  @override
+  FxListRange<T>? get listRange => fxListRangeOf(_inner);
 
   // Pure delegation to the inner iterable — same results as the inherited
   // Iterable members, but O(1) instead of a walk when the chain wraps a
@@ -9643,6 +9922,13 @@ class Fx<T> extends Iterable<T> {
   /// Pairs each value with the value at the same position in [other],
   /// stopping at the shorter side.
   Fx<(T, U)> zip<U>(Iterable<U> other) => Fx(_$zip(_inner, other));
+
+  /// Three-way [zip], stopping at the shortest side.
+  ///
+  /// The same shape as `zip(a).zip(b)` without the nested record — a
+  /// three-element sliding window is `zip3(drop(1), drop(2))`.
+  Fx<(T, U, V)> zip3<U, V>(Iterable<U> other1, Iterable<V> other2) =>
+      Fx(_$zip3(_inner, other1, other2));
 
   /// Pairs each value with its index.
   Fx<(int, T)> zipWithIndex() => Fx(_$zipWithIndex(_inner));
@@ -10009,6 +10295,12 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   @pragma('vm:prefer-inline')
   FxAsync<(T, U)> zip<U>(FxAsyncIterable<U> other) =>
       FxAsync(_$zipAsync(_inner, other));
+
+  /// Three-way [zip], stopping at the shortest side.
+  @pragma('vm:prefer-inline')
+  FxAsync<(T, U, V)> zip3<U, V>(
+          FxAsyncIterable<U> other1, FxAsyncIterable<V> other2) =>
+      FxAsync(_$zip3Async(_inner, other1, other2));
 
   /// Pairs each value with its index.
   @pragma('vm:prefer-inline')
@@ -10755,6 +11047,12 @@ Iterable<(A, B)> _$zip<A, B>(Iterable<A> iterable1, Iterable<B> iterable2) =>
 FxAsyncIterable<(A, B)> _$zipAsync<A, B>(
         FxAsyncIterable<A> iterable1, FxAsyncIterable<B> iterable2) =>
     zipAsync(iterable1, iterable2);
+Iterable<(A, B, C)> _$zip3<A, B, C>(Iterable<A> iterable1,
+        Iterable<B> iterable2, Iterable<C> iterable3) =>
+    zip3(iterable1, iterable2, iterable3);
+FxAsyncIterable<(A, B, C)> _$zip3Async<A, B, C>(FxAsyncIterable<A> iterable1,
+        FxAsyncIterable<B> iterable2, FxAsyncIterable<C> iterable3) =>
+    zip3Async(iterable1, iterable2, iterable3);
 Iterable<(int, A)> _$zipWithIndex<A>(Iterable<A> iterable) =>
     zipWithIndex(iterable);
 FxAsyncIterable<(int, A)> _$zipWithIndexAsync<A>(

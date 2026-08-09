@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Three consecutive readings over the limit — Dart vs FxDart</title>
-  <meta name="description" content="Find every 3-hour window of CO2 readings all over 1000 ppm — an index loop in plain Dart vs a sliding window built from zip + drop in FxDart.">
+  <meta name="description" content="Find every 3-hour window of CO2 readings all over 1000 ppm — an index loop in plain Dart vs a sliding window built from zip3 + drop in FxDart.">
   <link rel="canonical" href="https://bansooknam.github.io/FxDart/DartComparison/consecutive-over-limit.html">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/consecutive-over-limit.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/consecutive-over-limit.html">
@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=1af5c01d072924d4">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=a851ca0955bb0e8a">
 </head>
 <body>
 <header class="site-header">
@@ -51,7 +51,7 @@
   <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #30 · <strong>Three consecutive readings over the limit</strong></p>
   <h1>Three consecutive readings over the limit</h1>
   <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/zip.html">zip</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/zip3.html">zip3</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
   <h2>Requirement</h2>
   <p>
     Hourly CO2 readings for one day. Flag every window of
@@ -113,7 +113,7 @@ void main() {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="905e30c75bba2d30">
+      <div class="playground" data-pg="786fe2808543a609">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -140,9 +140,7 @@ const readings = [
 void main() {
   // Sliding window of 3: the list zipped with itself shifted by 1 and 2.
   final alerts = fx(readings)
-      .zip(fx(readings).drop(1))
-      .zip(fx(readings).drop(2))
-      .map((w) => (w.$1.$1, w.$1.$2, w.$2))
+      .zip3(drop(1, readings), drop(2, readings))
       .filter((t) => t.$1.ppm > 1000 && t.$2.ppm > 1000 && t.$3.ppm > 1000)
       .map((t) => '${t.$1.hour}–${t.$3.hour}')
       .join('\n');
@@ -160,13 +158,20 @@ void main() {
     loop with an <code>i + 2 &lt; length</code> bound and three manual
     lookups — correct, but every piece of it is bookkeeping a reader must
     check. The FxDart version builds the window as <em>data</em>:
-    <code><a href="../tutorials/zip.html">zip</a></code> the list with itself shifted by one and by two
+    <code><a href="../tutorials/zip3.html">zip3</a></code> the list with itself shifted by one and by two
     (<code>drop(1)</code>, <code>drop(2)</code>), and each element becomes
     a (reading, next, next-next) triple — no indices anywhere.
-    <code><a href="../tutorials/zip.html">zip</a></code> stopping at the shortest input is exactly the
+    <code><a href="../tutorials/zip3.html">zip3</a></code> stopping at the shortest input is exactly the
     window-fits-entirely rule the loop encodes as its bound. Widening the
-    window to 4 hours is one more <code><a href="../tutorials/zip.html">zip</a></code> line, not a re-audit of
-    the arithmetic.
+    window to 4 hours is one more shifted input, not a re-audit of the
+    arithmetic.
+  </p>
+  <p>
+    The shifted inputs are not copies. <code>drop(n)</code> over a
+    <code>List</code> is a <em>range</em> of that list, and
+    <code><a href="../tutorials/zip3.html">zip3</a></code> reads all three ranges by index — so the pipeline
+    walks the readings once and allocates one triple per window, which is
+    why its bar sits close to the loop rather than at a multiple of it.
   </p>
   <section class="cmp-bench">
   <h2>Benchmark</h2>
@@ -178,50 +183,50 @@ void main() {
       <h4>Time <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:21.9%"></span></span>
-        <span class="bench-val">1.9 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:62.5%"></span></span>
+        <span class="bench-val">1.8 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">8.6 µs</span>
+        <span class="bench-val">2.8 µs</span>
       </div>
     </div>
     <div class="bench-metric">
       <h4>Peak memory <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:99.6%"></span></span>
-        <span class="bench-val">16.4 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
+        <span class="bench-val">16.9 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">16.5 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:98.0%"></span></span>
+        <span class="bench-val">16.6 MB</span>
       </div>
     </div>
   </div>
   <div class="bench-scale">
     <h3>N = 10,000</h3>
     <div class="bench-metric">
-      <h4>Time <span class="badge verdict-native">Native wins</span></h4>
+      <h4>Time <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:14.9%"></span></span>
-        <span class="bench-val">114 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:57.3%"></span></span>
+        <span class="bench-val">121 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">764 µs</span>
+        <span class="bench-val">212 µs</span>
       </div>
     </div>
     <div class="bench-metric">
       <h4>Peak memory <span class="badge verdict-native">Native wins</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:87.6%"></span></span>
-        <span class="bench-val">20.6 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:87.1%"></span></span>
+        <span class="bench-val">20.5 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
@@ -236,26 +241,26 @@ void main() {
       <h4>Time <span class="badge verdict-native">Native wins</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:20.9%"></span></span>
-        <span class="bench-val">16.4 ms</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:74.4%"></span></span>
+        <span class="bench-val">17.1 ms</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">78.8 ms</span>
+        <span class="bench-val">23.0 ms</span>
       </div>
     </div>
     <div class="bench-metric">
       <h4>Peak memory <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">149.8 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:98.8%"></span></span>
+        <span class="bench-val">149.6 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:99.0%"></span></span>
-        <span class="bench-val">148.3 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">151.5 MB</span>
       </div>
     </div>
   </div>
@@ -273,7 +278,7 @@ void main() {
   <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 运行","pgReset":"重置","pgCompiling":"编译中…","pgCompileError":"编译错误","pgError":"错误","pgLoading":"正在加载运行时…","pgRunning":"运行中…","pgNoOutput":"（无输出）","pgLoadFailed":"无法加载 FxDart 库"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=1af5c01d072924d4";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=a851ca0955bb0e8a";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

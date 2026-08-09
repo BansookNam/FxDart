@@ -143,21 +143,21 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/averageBy.html">averageBy</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="chunk map">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="chunk map">
       <a class="cmp-row" href="paginate-users.html">
         <span class="cmp-num">5</span>
         <span class="cmp-row-body">
-          <strong>사용자를 10명씩 페이지로 나누기</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-speed speed-native">⚡ 네이티브가 더 빠름</span>
+          <strong>사용자를 10명씩 페이지로 나누기</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart가 더 빠름</span>
           <span class="dim">사용자 목록을 고정 크기 페이지로 나눕니다 — package:collection의 slices와 FxDart의 chunk + map을 비교합니다.</span>
         </span>
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="false" data-speed="native" data-fns="zipWithIndex map">
+    <li data-verdict="tie" data-async="false" data-speed="tie" data-fns="zipWithIndex map">
       <a class="cmp-row" href="rank-labels.html">
         <span class="cmp-num">6</span>
         <span class="cmp-row-body">
-          <strong>리더보드 순위 라벨</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-speed speed-native">⚡ 네이티브가 더 빠름</span>
+          <strong>리더보드 순위 라벨</strong> <span class="badge verdict-tie">우열 없음</span> <span class="badge badge-speed speed-tie">⚡ 속도 동일</span>
           <span class="dim">정렬된 리더보드에 1부터 n까지 번호를 매깁니다 — Dart 3의 indexed 레코드와 FxDart의 zipWithIndex + map을 비교합니다.</span>
         </span>
       </a>
@@ -240,11 +240,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/partition.html">partition</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="native" data-async="false" data-speed="tie" data-fns="map filter take">
+    <li data-verdict="native" data-async="false" data-speed="native" data-fns="map filter take">
       <a class="cmp-row" href="valid-emails.html">
         <span class="cmp-num">14</span>
         <span class="cmp-row-body">
-          <strong>정규화한 유효 이메일 상위 5개</strong> <span class="badge verdict-native">네이티브로 충분</span> <span class="badge badge-speed speed-tie">⚡ 속도 동일</span>
+          <strong>정규화한 유효 이메일 상위 5개</strong> <span class="badge verdict-native">네이티브로 충분</span> <span class="badge badge-speed speed-native">⚡ 네이티브가 더 빠름</span>
           <span class="dim">다듬고, 소문자로 바꾸고, 유효성을 검사한 뒤 다섯 개를 취합니다 — 순수 Dart의 map/where/take와 FxDart의 map + filter + take를 비교합니다. 이 경우 순수 Dart도 똑같이 깔끔합니다.</span>
         </span>
       </a>
@@ -407,15 +407,15 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="zip drop filter map join">
+    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="zip3 drop filter map join">
       <a class="cmp-row" href="consecutive-over-limit.html">
         <span class="cmp-num">30</span>
         <span class="cmp-row-body">
           <strong>한계를 세 번 연속 초과한 측정값</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-speed speed-native">⚡ 네이티브가 더 빠름</span>
-          <span class="dim">CO2 측정값이 세 시간 연속으로 1000 ppm을 넘는 구간을 모두 찾습니다 — 순수 Dart의 인덱스 루프와 FxDart의 zip + drop으로 만든 슬라이딩 윈도우를 비교합니다.</span>
+          <span class="dim">CO2 측정값이 세 시간 연속으로 1000 ppm을 넘는 구간을 모두 찾습니다 — 순수 Dart의 인덱스 루프와 FxDart의 zip3 + drop으로 만든 슬라이딩 윈도우를 비교합니다.</span>
         </span>
       </a>
-      <ul class="fn-list cmp-fns"><li><a href="../tutorials/zip.html">zip</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
+      <ul class="fn-list cmp-fns"><li><a href="../tutorials/zip3.html">zip3</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
   </ol>
   </section>
@@ -434,11 +434,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="filter sortBy scan drop zip takeWhile map sumBy join">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="filter sortBy scan drop zip takeWhile map sumBy join">
       <a class="cmp-row" href="restock-plan.html">
         <span class="cmp-num">32</span>
         <span class="cmp-row-body">
-          <strong>재고 재주문 계획</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-speed speed-tie">⚡ 속도 동일</span>
+          <strong>재고 재주문 계획</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart가 더 빠름</span>
           <span class="dim">기준치 미달 품목의 우선순위를 정하고 예산선에서 주문 목록을 잘라냅니다 — 데이터 흐름으로서의 scan + zip + takeWhile 대 가변 누적 합계와 break.</span>
         </span>
       </a>

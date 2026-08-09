@@ -1,11 +1,11 @@
 ---
 slug: consecutive-over-limit
 title: 한계를 세 번 연속 초과한 측정값 — Dart vs FxDart
-description: CO2 측정값이 세 시간 연속으로 1000 ppm을 넘는 구간을 모두 찾습니다 — 순수 Dart의 인덱스 루프와 FxDart의 zip + drop으로 만든 슬라이딩 윈도우를 비교합니다.
+description: CO2 측정값이 세 시간 연속으로 1000 ppm을 넘는 구간을 모두 찾습니다 — 순수 Dart의 인덱스 루프와 FxDart의 zip3 + drop으로 만든 슬라이딩 윈도우를 비교합니다.
 heading: 한계를 세 번 연속 초과한 측정값
 order: 30
 tier: 3
-functions: zip, drop, filter, map, join
+functions: zip3, drop, filter, map, join
 domain: sensors
 verdict: fxdart
 async: false
@@ -33,10 +33,18 @@ async: false
     사람이 직접 확인해야 하는 부기 작업입니다. FxDart 버전은 윈도우
     자체를 <em>데이터</em>로 만듭니다: 리스트를 자기 자신과 하나씩,
     둘씩 밀어서(<code>drop(1)</code>, <code>drop(2)</code>)
-    <code>zip</code>하면, 각 원소가 (현재값, 다음값, 다다음값) 삼중항이
-    됩니다 — 인덱스는 어디에도 없습니다. <code>zip</code>이 가장 짧은
+    <code>zip3</code>하면, 각 원소가 (현재값, 다음값, 다다음값) 삼중항이
+    됩니다 — 인덱스는 어디에도 없습니다. <code>zip3</code>이 가장 짧은
     입력에서 멈추는 성질이 바로 루프가 경계 조건으로 인코딩했던
     "윈도우가 완전히 들어맞아야 한다"는 규칙 그 자체입니다. 윈도우를
-    4시간으로 넓히는 일은 <code>zip</code> 줄 하나를 더 추가하는
-    것일 뿐, 산술식을 다시 검토할 필요가 없습니다.
+    4시간으로 넓히는 일은 밀어 넣는 입력을 하나 더 추가하는 것일 뿐,
+    산술식을 다시 검토할 필요가 없습니다.
+  </p>
+  <p>
+    밀어 넣은 입력들은 복사본이 아닙니다. <code>List</code>에 대한
+    <code>drop(n)</code>은 그 리스트의 <em>구간</em>이고,
+    <code>zip3</code>은 세 구간을 모두 인덱스로 읽습니다 — 그래서 이
+    파이프라인은 측정값을 한 번만 훑고 윈도우당 삼중항 하나만
+    할당합니다. 막대그래프가 루프의 몇 배가 아니라 루프에 가깝게
+    붙어 있는 이유가 이것입니다.
   </p>
