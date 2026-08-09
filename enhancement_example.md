@@ -84,3 +84,35 @@ moved to **16 fxdart / 11 tie / 26 native**; median fx/native **1.195 -> 1.051**
   indexed loop.
 - **`first-over-limit` 2.37x -> 1.05x (tie)** and **`food-spending` 1.79x -> 1.06x**
   came entirely from the extension type, with no example change.
+
+## 0.8.0 — `sortBy` picks a strategy from the key shape
+
+`sortBy` over a double key ran decorate-sort-undecorate unconditionally: it
+sorted an *index* list, so every comparison did two random reads into the key
+array and the result was gathered back through the permutation. It now scans
+the keys once (O(n)) and picks: already ordered returns as-is, exactly
+reversed reverses, anything else takes a stable dual-array merge.
+
+| case | before | after | fxdart ms |
+|---|---|---|---|
+| paginated-products | 1.81x | **1.25x** | 188.2 -> 128.4 |
+| top-expenses | 0.65x | **0.42x** | 337.9 -> 218.0 |
+| ledger-diff | 1.42x | **1.30x** | 343.9 -> 330.7 |
+| price-drop-detection | 0.58x | **0.56x** | 712.0 -> 676.8 |
+
+The ordered shortcut is why `price-drop-detection` ended up *faster than
+before*: its keys arrive perfectly reversed, so it now costs O(n).
+
+Scope: the double-key path only. int / String / generic keys keep DSU, so
+tie stability currently holds on one path and not the others — a wart, and
+the reason stability is not documented as a guarantee yet.
+
+### Also tried and reverted
+
+- **Non-adaptive dual-array merge** (no shape scan). Won big on random data
+  but was a **2.5x regression** on `price-drop-detection`, whose keys arrive
+  reverse-ordered — the worst case for a merge, the best for quicksort.
+  The shape scan exists because of this.
+- **`uniq().toList()` fusion.** No measurable effect (51.5 -> 51.7 ms on
+  `first-visit-merchants`). The cost there is the `map` layer's per-element
+  iterator, not `uniq`.
