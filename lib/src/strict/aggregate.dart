@@ -923,7 +923,6 @@ List<A> _sortByImpl<A>(
   final items = List.of(iterable);
   final length = items.length;
   if (length < 2) return items;
-  final keys = [for (final a in items) f(a)];
   final indices = [for (var i = 0; i < length; i++) i];
 
   // Homogeneous key types get an unboxed key array and a devirtualized
@@ -932,42 +931,87 @@ List<A> _sortByImpl<A>(
   // same on every path. No Int64List: the playground build targets JS.
   // Descending picks a swapped-operand comparator once per sort, so the
   // per-comparison cost is identical to ascending.
-  var allDouble = true, allInt = true, allString = true;
-  for (final k in keys) {
-    if (k is! double) allDouble = false;
-    if (k is! int) allInt = false;
-    if (k is! String) allString = false;
-    if (!(allDouble || allInt || allString)) break;
-  }
-  if (allDouble) {
+  //
+  // Keys go STRAIGHT into the typed array. Collecting them into a
+  // `List<Object?>` first — as this did until 0.8.0 — boxes every double on
+  // the way, which measured ~1.5x on a million-row `sortBy` over a double
+  // key. The type is decided by the first key; a later key that disagrees
+  // spills what has been read so far into a boxed list and finishes in the
+  // generic path, so [f] still runs exactly once per element, in order.
+  final first = f(items[0]);
+
+  if (first is double) {
     final dk = Float64List(length);
-    for (var i = 0; i < length; i++) {
-      dk[i] = keys[i] as double;
+    dk[0] = first;
+    for (var i = 1; i < length; i++) {
+      final k = f(items[i]);
+      if (k is! double) return _sortSpilled(f, items, indices, dk, i, k, desc);
+      dk[i] = k;
     }
     indices.sort(desc
         ? (i, j) => dk[j].compareTo(dk[i])
         : (i, j) => dk[i].compareTo(dk[j]));
-  } else if (allInt) {
+    return [for (final i in indices) items[i]];
+  }
+
+  if (first is int) {
     final ik = List<int>.filled(length, 0);
-    for (var i = 0; i < length; i++) {
-      ik[i] = keys[i] as int;
+    ik[0] = first;
+    for (var i = 1; i < length; i++) {
+      final k = f(items[i]);
+      if (k is! int) return _sortSpilled(f, items, indices, ik, i, k, desc);
+      ik[i] = k;
     }
     indices.sort(desc
         ? (i, j) => ik[j].compareTo(ik[i])
         : (i, j) => ik[i].compareTo(ik[j]));
-  } else if (allString) {
+    return [for (final i in indices) items[i]];
+  }
+
+  if (first is String) {
     final sk = List<String>.filled(length, '');
-    for (var i = 0; i < length; i++) {
-      sk[i] = keys[i] as String;
+    sk[0] = first;
+    for (var i = 1; i < length; i++) {
+      final k = f(items[i]);
+      if (k is! String) return _sortSpilled(f, items, indices, sk, i, k, desc);
+      sk[i] = k;
     }
     indices.sort(desc
         ? (i, j) => sk[j].compareTo(sk[i])
         : (i, j) => sk[i].compareTo(sk[j]));
-  } else {
-    indices.sort(desc
-        ? (i, j) => _compareKeys(keys[j], keys[i])
-        : (i, j) => _compareKeys(keys[i], keys[j]));
+    return [for (final i in indices) items[i]];
   }
+
+  final keys = List<Object?>.filled(length, null);
+  keys[0] = first;
+  for (var i = 1; i < length; i++) {
+    keys[i] = f(items[i]);
+  }
+  return _sortByKeys(items, indices, keys, desc);
+}
+
+/// The typed run broke at [at], where [f] returned [current] instead of the
+/// type [typed] holds. Copies the keys read so far out of [typed], keeps
+/// [current], and reads the rest — so every element's key is extracted
+/// exactly once overall.
+List<A> _sortSpilled<A>(Object? Function(A a) f, List<A> items,
+    List<int> indices, List<Object?> typed, int at, Object? current, bool desc) {
+  final keys = List<Object?>.filled(items.length, null);
+  for (var i = 0; i < at; i++) {
+    keys[i] = typed[i];
+  }
+  keys[at] = current;
+  for (var i = at + 1; i < items.length; i++) {
+    keys[i] = f(items[i]);
+  }
+  return _sortByKeys(items, indices, keys, desc);
+}
+
+List<A> _sortByKeys<A>(
+    List<A> items, List<int> indices, List<Object?> keys, bool desc) {
+  indices.sort(desc
+      ? (i, j) => _compareKeys(keys[j], keys[i])
+      : (i, j) => _compareKeys(keys[i], keys[j]));
   return [for (final i in indices) items[i]];
 }
 
