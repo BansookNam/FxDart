@@ -53,6 +53,17 @@ nextLabel: pipe
     pipelines instead.
   </p>
 
+  <div class="callout">
+    <strong>0.8.0 breaking change:</strong>
+    <code>Fx&lt;T&gt;</code> is now an <strong>extension type</strong> that
+    erases to the wrapped <code>Iterable&lt;T&gt;</code> at runtime. All
+    documented APIs stay identical — chains work exactly as before. What breaks:
+    <code>x is Fx&lt;T&gt;</code> checks (the type doesn't exist at runtime),
+    and code that tried to extend or implement <code>Fx</code> directly (use the
+    top-level functions instead). If you're using <code>fx()</code> the normal
+    way, your code needs no changes.
+  </div>
+
   <h2>Demo 1 · Nothing runs until the terminal op</h2>
   <p>Watch <code>calls</code> stay at 0 right after building the chain, then
     jump once <code>toList()</code> actually pulls the 5 values:</p>
