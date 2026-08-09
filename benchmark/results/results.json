@@ -6,7 +6,7 @@
     "os": "macos Version 26.3 (Build 25D125)",
     "compilation": "AOT (dart compile exe), enforced per result line"
   },
-  "date": "2026-08-09",
+  "date": "2026-08-10",
   "warmup": 2,
   "itersPerRound": 5,
   "tieMarginPct": 5.0,
@@ -26,15 +26,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 1.1108891108891108,
-            "minUs": 1.020979020979021,
-            "medianRssBytes": 17186816.0,
+            "medianUs": 1.11944027986007,
+            "minUs": 1.0279860069965017,
+            "medianRssBytes": 17317888.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 1.03848075962019,
-            "minUs": 0.9690154922538731,
-            "medianRssBytes": 17154048.0,
+            "medianUs": 1.0099950024987505,
+            "minUs": 0.9600199900049975,
+            "medianRssBytes": 17219584.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -44,15 +44,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 128.4375,
-            "minUs": 121.0,
-            "medianRssBytes": 17678336.0,
+            "medianUs": 128.0625,
+            "minUs": 120.4375,
+            "medianRssBytes": 17727488.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 128.8125,
-            "minUs": 127.9375,
-            "medianRssBytes": 16236544.0,
+            "medianUs": 128.1875,
+            "minUs": 122.88235294117646,
+            "medianRssBytes": 16367616.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -62,15 +62,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 12385.0,
-            "minUs": 12179.0,
-            "medianRssBytes": 94732288.0,
+            "medianUs": 12531.0,
+            "minUs": 12190.0,
+            "medianRssBytes": 94978048.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 13506.0,
-            "minUs": 13189.0,
-            "medianRssBytes": 89030656.0,
+            "medianUs": 13361.0,
+            "minUs": 13042.0,
+            "medianRssBytes": 89128960.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -87,15 +87,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 19.75,
-            "minUs": 18.14851485148515,
-            "medianRssBytes": 17235968.0,
+            "medianUs": 20.12087912087912,
+            "minUs": 18.40566037735849,
+            "medianRssBytes": 17285120.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 22.736263736263737,
-            "minUs": 20.47252747252747,
-            "medianRssBytes": 17268736.0,
+            "medianUs": 23.530864197530864,
+            "minUs": 20.404761904761905,
+            "medianRssBytes": 17383424.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -105,15 +105,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 1906.0,
-            "minUs": 1853.0,
-            "medianRssBytes": 25133056.0,
+            "medianUs": 1948.0,
+            "minUs": 1842.0,
+            "medianRssBytes": 25198592.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 2064.0,
-            "minUs": 2003.0,
-            "medianRssBytes": 24772608.0,
+            "medianUs": 2212.0,
+            "minUs": 2009.0,
+            "medianRssBytes": 24920064.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -123,15 +123,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 242052.0,
-            "minUs": 235469.0,
-            "medianRssBytes": 192053248.0,
+            "medianUs": 264833.0,
+            "minUs": 236661.0,
+            "medianRssBytes": 195985408.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 273890.0,
-            "minUs": 261059.0,
-            "medianRssBytes": 194478080.0,
+            "medianUs": 300723.0,
+            "minUs": 261606.0,
+            "medianRssBytes": 193675264.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -148,15 +148,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 19.297619047619047,
-            "minUs": 18.019801980198018,
-            "medianRssBytes": 17268736.0,
+            "medianUs": 19.57894736842105,
+            "minUs": 17.775862068965516,
+            "medianRssBytes": 17301504.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 6.437810945273632,
-            "minUs": 5.6318407960199,
-            "medianRssBytes": 17301504.0,
+            "medianUs": 5.804195804195804,
+            "minUs": 5.549800796812749,
+            "medianRssBytes": 17383424.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -166,15 +166,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 3305.0,
-            "minUs": 3153.0,
-            "medianRssBytes": 24199168.0,
+            "medianUs": 3472.0,
+            "minUs": 3180.0,
+            "medianRssBytes": 24281088.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 929.0,
-            "minUs": 846.5,
-            "medianRssBytes": 23085056.0,
+            "medianUs": 921.0,
+            "minUs": 871.0,
+            "medianRssBytes": 23134208.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -184,15 +184,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 516197.0,
-            "minUs": 506360.0,
-            "medianRssBytes": 131530752.0,
+            "medianUs": 530242.0,
+            "minUs": 518890.0,
+            "medianRssBytes": 133332992.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 217981.0,
-            "minUs": 211926.0,
-            "medianRssBytes": 142852096.0,
+            "medianUs": 227446.0,
+            "minUs": 213805.0,
+            "medianRssBytes": 144195584.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -209,14 +209,14 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 1.3938030984507745,
-            "minUs": 1.353823088455772,
-            "medianRssBytes": 17301504.0,
+            "medianUs": 1.4727636181909045,
+            "minUs": 1.341329335332334,
+            "medianRssBytes": 17252352.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 2.7736131934032984,
-            "minUs": 2.6701649175412294,
+            "medianUs": 2.823088455772114,
+            "minUs": 2.7286356821589206,
             "medianRssBytes": 17301504.0,
             "samples": 15
           },
@@ -227,15 +227,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 147.07692307692307,
-            "minUs": 138.85714285714286,
-            "medianRssBytes": 17842176.0,
+            "medianUs": 150.84615384615384,
+            "minUs": 144.23076923076923,
+            "medianRssBytes": 17793024.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 279.7142857142857,
-            "minUs": 276.14285714285717,
-            "medianRssBytes": 17350656.0,
+            "medianUs": 298.14285714285717,
+            "minUs": 288.0,
+            "medianRssBytes": 17301504.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -245,15 +245,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 22200.0,
-            "minUs": 20774.0,
-            "medianRssBytes": 122585088.0,
+            "medianUs": 25945.0,
+            "minUs": 22348.0,
+            "medianRssBytes": 121946112.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 41786.0,
-            "minUs": 38467.0,
-            "medianRssBytes": 125796352.0,
+            "medianUs": 54239.0,
+            "minUs": 46536.0,
+            "medianRssBytes": 125698048.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -270,15 +270,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 1.9250374812593702,
-            "minUs": 1.826086956521739,
-            "medianRssBytes": 17317888.0,
+            "medianUs": 1.996003996003996,
+            "minUs": 1.849150849150849,
+            "medianRssBytes": 17432576.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 1.071464267866067,
-            "minUs": 1.047976011994003,
-            "medianRssBytes": 17203200.0,
+            "medianUs": 1.0844577711144427,
+            "minUs": 1.0279860069965017,
+            "medianRssBytes": 16646144.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -288,15 +288,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 186.0,
-            "minUs": 169.16666666666666,
-            "medianRssBytes": 20070400.0,
+            "medianUs": 179.83333333333334,
+            "minUs": 169.5,
+            "medianRssBytes": 20086784.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 103.1,
-            "minUs": 101.65,
-            "medianRssBytes": 16007168.0,
+            "medianUs": 102.5,
+            "minUs": 98.76190476190476,
+            "medianRssBytes": 16039936.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -306,15 +306,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 17443.0,
-            "minUs": 17011.0,
-            "medianRssBytes": 78839808.0,
+            "medianUs": 17646.0,
+            "minUs": 17043.0,
+            "medianRssBytes": 78872576.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 10226.0,
-            "minUs": 10150.0,
-            "medianRssBytes": 76431360.0,
+            "medianUs": 10111.0,
+            "minUs": 9943.0,
+            "medianRssBytes": 76464128.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -331,15 +331,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 0.960519740129935,
-            "minUs": 0.8900549725137431,
-            "medianRssBytes": 17170432.0,
+            "medianUs": 0.9455272363818091,
+            "minUs": 0.9015492253873063,
+            "medianRssBytes": 17203200.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 0.9715142428785607,
-            "minUs": 0.8990504747626187,
-            "medianRssBytes": 17285120.0,
+            "medianUs": 0.9975012493753124,
+            "minUs": 0.9230384807596201,
+            "medianRssBytes": 17219584.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -349,15 +349,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 53.285714285714285,
-            "minUs": 53.035714285714285,
-            "medianRssBytes": 15990784.0,
+            "medianUs": 54.3421052631579,
+            "minUs": 53.63157894736842,
+            "medianRssBytes": 16056320.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 56.5,
-            "minUs": 56.0,
-            "medianRssBytes": 16105472.0,
+            "medianUs": 57.23529411764706,
+            "minUs": 56.77142857142857,
+            "medianRssBytes": 16039936.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -367,15 +367,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 5028.0,
-            "minUs": 4964.0,
-            "medianRssBytes": 122716160.0,
+            "medianUs": 4972.0,
+            "minUs": 4887.0,
+            "medianRssBytes": 122896384.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 5297.0,
-            "minUs": 5204.0,
-            "medianRssBytes": 123011072.0,
+            "medianUs": 5227.0,
+            "minUs": 5193.0,
+            "medianRssBytes": 123092992.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -392,33 +392,33 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 3.7736131934032984,
-            "minUs": 3.2758620689655173,
-            "medianRssBytes": 17301504.0,
+            "medianUs": 3.740518962075848,
+            "minUs": 3.287856071964018,
+            "medianRssBytes": 17367040.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 3.1934032983508245,
-            "minUs": 3.0689655172413794,
-            "medianRssBytes": 17252352.0,
+            "medianUs": 3.319201995012469,
+            "minUs": 3.0119940029985006,
+            "medianRssBytes": 16318464.0,
             "samples": 15
           },
           "timeWinner": "tie",
-          "memWinner": "tie"
+          "memWinner": "fxdart"
         },
         "10000": {
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 350.5,
-            "minUs": 325.3333333333333,
-            "medianRssBytes": 19693568.0,
+            "medianUs": 352.6666666666667,
+            "minUs": 324.6666666666667,
+            "medianRssBytes": 19775488.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 316.2857142857143,
-            "minUs": 310.85714285714283,
-            "medianRssBytes": 14925824.0,
+            "medianUs": 319.42857142857144,
+            "minUs": 309.2857142857143,
+            "medianRssBytes": 14827520.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -428,15 +428,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 46755.0,
-            "minUs": 44008.0,
-            "medianRssBytes": 77774848.0,
+            "medianUs": 50641.0,
+            "minUs": 38210.0,
+            "medianRssBytes": 82493440.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 31671.0,
-            "minUs": 31105.0,
-            "medianRssBytes": 47087616.0,
+            "medianUs": 33181.0,
+            "minUs": 31580.0,
+            "medianRssBytes": 47038464.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -453,15 +453,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 7.506726457399103,
-            "minUs": 7.063745019920319,
-            "medianRssBytes": 17317888.0,
+            "medianUs": 7.633466135458168,
+            "minUs": 7.136363636363637,
+            "medianRssBytes": 17432576.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 6.960159362549801,
-            "minUs": 6.292307692307692,
-            "medianRssBytes": 17219584.0,
+            "medianUs": 6.392215568862276,
+            "minUs": 6.227544910179641,
+            "medianRssBytes": 17252352.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -471,15 +471,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 770.3333333333334,
-            "minUs": 697.0,
-            "medianRssBytes": 24018944.0,
+            "medianUs": 766.6666666666666,
+            "minUs": 686.3333333333334,
+            "medianRssBytes": 24117248.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 663.0,
-            "minUs": 605.3333333333334,
-            "medianRssBytes": 24494080.0,
+            "medianUs": 675.6666666666666,
+            "minUs": 618.6666666666666,
+            "medianRssBytes": 24559616.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -489,15 +489,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 82153.0,
-            "minUs": 79321.0,
-            "medianRssBytes": 128696320.0,
+            "medianUs": 82281.0,
+            "minUs": 79059.0,
+            "medianRssBytes": 133267456.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 75249.0,
-            "minUs": 72272.0,
-            "medianRssBytes": 132825088.0,
+            "medianUs": 78249.0,
+            "minUs": 73729.0,
+            "medianRssBytes": 133103616.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -514,15 +514,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 15.097014925373134,
-            "minUs": 13.156716417910447,
-            "medianRssBytes": 17186816.0,
+            "medianUs": 14.817460317460318,
+            "minUs": 13.440298507462687,
+            "medianRssBytes": 17809408.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 14.73728813559322,
-            "minUs": 13.126865671641792,
-            "medianRssBytes": 17252352.0,
+            "medianUs": 16.723880597014926,
+            "minUs": 13.208955223880597,
+            "medianRssBytes": 17285120.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -532,15 +532,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 1587.5,
-            "minUs": 1420.0,
-            "medianRssBytes": 36438016.0,
+            "medianUs": 1557.5,
+            "minUs": 1393.0,
+            "medianRssBytes": 36487168.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 1668.5,
-            "minUs": 1507.5,
-            "medianRssBytes": 39550976.0,
+            "medianUs": 1706.5,
+            "minUs": 1440.0,
+            "medianRssBytes": 39567360.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -550,15 +550,15 @@
           "n": 1000000,
           "roundsRun": 5,
           "native": {
-            "medianUs": 208462.0,
-            "minUs": 196942.0,
-            "medianRssBytes": 252575744.0,
+            "medianUs": 208169.0,
+            "minUs": 195888.0,
+            "medianRssBytes": 252641280.0,
             "samples": 25
           },
           "fxdart": {
-            "medianUs": 215358.0,
-            "minUs": 204185.0,
-            "medianRssBytes": 233832448.0,
+            "medianUs": 216388.0,
+            "minUs": 204180.0,
+            "medianRssBytes": 234012672.0,
             "samples": 25
           },
           "timeWinner": "tie",
@@ -575,15 +575,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 375.2,
-            "minUs": 300.6,
-            "medianRssBytes": 17252352.0,
+            "medianUs": 373.6,
+            "minUs": 314.2,
+            "medianRssBytes": 17219584.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 343.14285714285717,
-            "minUs": 300.2857142857143,
-            "medianRssBytes": 17399808.0,
+            "medianUs": 321.14285714285717,
+            "minUs": 298.0,
+            "medianRssBytes": 17432576.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -591,38 +591,38 @@
         },
         "10000": {
           "n": 10000,
-          "roundsRun": 3,
+          "roundsRun": 5,
           "native": {
-            "medianUs": 31868.0,
-            "minUs": 30234.0,
-            "medianRssBytes": 53100544.0,
-            "samples": 15
+            "medianUs": 33856.0,
+            "minUs": 30406.0,
+            "medianRssBytes": 53116928.0,
+            "samples": 25
           },
           "fxdart": {
-            "medianUs": 32205.0,
-            "minUs": 30939.0,
-            "medianRssBytes": 52805632.0,
-            "samples": 15
+            "medianUs": 34286.0,
+            "minUs": 30109.0,
+            "medianRssBytes": 53215232.0,
+            "samples": 25
           },
           "timeWinner": "tie",
           "memWinner": "tie"
         },
         "full": {
           "n": 100000,
-          "roundsRun": 3,
+          "roundsRun": 5,
           "native": {
-            "medianUs": 350068.0,
-            "minUs": 328690.0,
-            "medianRssBytes": 87244800.0,
-            "samples": 15
+            "medianUs": 364810.0,
+            "minUs": 331507.0,
+            "medianRssBytes": 86884352.0,
+            "samples": 25
           },
           "fxdart": {
-            "medianUs": 331408.0,
-            "minUs": 327661.0,
-            "medianRssBytes": 86032384.0,
-            "samples": 15
+            "medianUs": 357728.0,
+            "minUs": 332532.0,
+            "medianRssBytes": 85934080.0,
+            "samples": 25
           },
-          "timeWinner": "fxdart",
+          "timeWinner": "tie",
           "memWinner": "tie"
         }
       }
@@ -636,15 +636,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 24.51948051948052,
-            "minUs": 22.194805194805195,
-            "medianRssBytes": 17825792.0,
+            "medianUs": 25.826666666666668,
+            "minUs": 22.413333333333334,
+            "medianRssBytes": 17416192.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 143.13333333333333,
-            "minUs": 135.0,
-            "medianRssBytes": 18038784.0,
+            "medianUs": 151.86666666666667,
+            "minUs": 136.26666666666668,
+            "medianRssBytes": 18055168.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -654,15 +654,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 707.25,
-            "minUs": 636.5,
-            "medianRssBytes": 24657920.0,
+            "medianUs": 679.75,
+            "minUs": 652.0,
+            "medianRssBytes": 24166400.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 605.25,
-            "minUs": 548.75,
-            "medianRssBytes": 24739840.0,
+            "medianUs": 573.5,
+            "minUs": 531.5,
+            "medianRssBytes": 24772608.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -672,15 +672,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 125551.0,
-            "minUs": 109249.0,
-            "medianRssBytes": 144539648.0,
+            "medianUs": 118394.0,
+            "minUs": 112174.0,
+            "medianRssBytes": 144588800.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 61249.0,
-            "minUs": 49055.0,
-            "medianRssBytes": 124534784.0,
+            "medianUs": 62118.0,
+            "minUs": 47315.0,
+            "medianRssBytes": 124141568.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -697,15 +697,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 1.0514742628685658,
-            "minUs": 0.9895052473763118,
-            "medianRssBytes": 17252352.0,
+            "medianUs": 1.0834582708645677,
+            "minUs": 0.9970014992503748,
+            "medianRssBytes": 17334272.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 1.97002997002997,
-            "minUs": 1.7972027972027973,
-            "medianRssBytes": 17219584.0,
+            "medianUs": 1.962037962037962,
+            "minUs": 1.7842157842157842,
+            "medianRssBytes": 17252352.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -715,15 +715,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 90.72727272727273,
-            "minUs": 85.78260869565217,
-            "medianRssBytes": 16580608.0,
+            "medianUs": 88.72727272727273,
+            "minUs": 85.65217391304348,
+            "medianRssBytes": 16596992.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 154.0,
-            "minUs": 147.5,
-            "medianRssBytes": 16515072.0,
+            "medianUs": 148.57142857142858,
+            "minUs": 146.71428571428572,
+            "medianRssBytes": 16596992.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -733,15 +733,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 10817.0,
-            "minUs": 10332.0,
-            "medianRssBytes": 119029760.0,
+            "medianUs": 10328.0,
+            "minUs": 10101.0,
+            "medianRssBytes": 118751232.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 16712.0,
-            "minUs": 16496.0,
-            "medianRssBytes": 119603200.0,
+            "medianUs": 16465.0,
+            "minUs": 16272.0,
+            "medianRssBytes": 119324672.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -758,15 +758,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 1.825087456271864,
-            "minUs": 1.7242757242757243,
+            "medianUs": 1.9415292353823088,
+            "minUs": 1.68215892053973,
             "medianRssBytes": 17268736.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 1.4905094905094904,
-            "minUs": 1.3806193806193807,
-            "medianRssBytes": 17203200.0,
+            "medianUs": 1.4857571214392804,
+            "minUs": 1.3483258370814593,
+            "medianRssBytes": 17317888.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -776,15 +776,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 151.21428571428572,
-            "minUs": 143.71428571428572,
-            "medianRssBytes": 21774336.0,
+            "medianUs": 153.5,
+            "minUs": 142.08333333333334,
+            "medianRssBytes": 21757952.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 112.47368421052632,
-            "minUs": 110.63157894736842,
-            "medianRssBytes": 16318464.0,
+            "medianUs": 110.57894736842105,
+            "minUs": 108.15789473684211,
+            "medianRssBytes": 16416768.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -794,15 +794,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 15227.0,
-            "minUs": 14787.0,
-            "medianRssBytes": 131923968.0,
+            "medianUs": 14988.0,
+            "minUs": 14598.0,
+            "medianRssBytes": 131825664.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 11574.0,
-            "minUs": 11372.0,
-            "medianRssBytes": 125468672.0,
+            "medianUs": 11435.0,
+            "minUs": 11318.0,
+            "medianRssBytes": 124780544.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -819,15 +819,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 55.14705882352941,
-            "minUs": 50.486486486486484,
-            "medianRssBytes": 17252352.0,
+            "medianUs": 54.0,
+            "minUs": 50.52777777777778,
+            "medianRssBytes": 17334272.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 47.69047619047619,
-            "minUs": 44.31578947368421,
-            "medianRssBytes": 17285120.0,
+            "medianUs": 48.853658536585364,
+            "minUs": 45.21951219512195,
+            "medianRssBytes": 17317888.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -837,15 +837,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 1224.5,
-            "minUs": 1160.0,
-            "medianRssBytes": 21626880.0,
+            "medianUs": 1211.0,
+            "minUs": 1161.5,
+            "medianRssBytes": 21643264.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 970.6666666666666,
-            "minUs": 903.3333333333334,
-            "medianRssBytes": 24281088.0,
+            "medianUs": 949.3333333333334,
+            "minUs": 916.6666666666666,
+            "medianRssBytes": 24330240.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -855,15 +855,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 108180.0,
-            "minUs": 106965.0,
-            "medianRssBytes": 169558016.0,
+            "medianUs": 109415.0,
+            "minUs": 107148.0,
+            "medianRssBytes": 169345024.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 82030.0,
-            "minUs": 80776.0,
-            "medianRssBytes": 169738240.0,
+            "medianUs": 82211.0,
+            "minUs": 80513.0,
+            "medianRssBytes": 169590784.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -880,15 +880,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 21.93103448275862,
-            "minUs": 19.813186813186814,
-            "medianRssBytes": 17154048.0,
+            "medianUs": 22.483516483516482,
+            "minUs": 20.32967032967033,
+            "medianRssBytes": 17219584.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 19.25,
-            "minUs": 17.366071428571427,
-            "medianRssBytes": 17268736.0,
+            "medianUs": 19.168316831683168,
+            "minUs": 17.336633663366335,
+            "medianRssBytes": 17399808.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -898,15 +898,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 2142.0,
-            "minUs": 1989.0,
-            "medianRssBytes": 24412160.0,
+            "medianUs": 2146.0,
+            "minUs": 1999.0,
+            "medianRssBytes": 24526848.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 1847.5,
-            "minUs": 1714.0,
-            "medianRssBytes": 23986176.0,
+            "medianUs": 1798.5,
+            "minUs": 1717.0,
+            "medianRssBytes": 24100864.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -916,15 +916,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 252775.0,
-            "minUs": 245216.0,
-            "medianRssBytes": 185106432.0,
+            "medianUs": 257713.0,
+            "minUs": 246878.0,
+            "medianRssBytes": 189972480.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 229422.0,
-            "minUs": 219902.0,
-            "medianRssBytes": 186679296.0,
+            "medianUs": 229436.0,
+            "minUs": 216760.0,
+            "medianRssBytes": 187678720.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -941,15 +941,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 18.933962264150942,
-            "minUs": 17.462264150943398,
-            "medianRssBytes": 17186816.0,
+            "medianUs": 18.821782178217823,
+            "minUs": 17.306930693069308,
+            "medianRssBytes": 17268736.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 20.833333333333332,
-            "minUs": 19.114583333333332,
-            "medianRssBytes": 17235968.0,
+            "medianUs": 20.802083333333332,
+            "minUs": 19.29245283018868,
+            "medianRssBytes": 17367040.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -959,15 +959,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 1912.5,
-            "minUs": 1732.0,
+            "medianUs": 1864.0,
+            "minUs": 1736.0,
             "medianRssBytes": 23740416.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 2152.0,
-            "minUs": 1897.0,
-            "medianRssBytes": 23855104.0,
+            "medianUs": 2113.0,
+            "minUs": 1902.0,
+            "medianRssBytes": 23986176.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -977,15 +977,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 222593.0,
-            "minUs": 217094.0,
-            "medianRssBytes": 134103040.0,
+            "medianUs": 221540.0,
+            "minUs": 212268.0,
+            "medianRssBytes": 131678208.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 247239.0,
-            "minUs": 235994.0,
-            "medianRssBytes": 133955584.0,
+            "medianUs": 244685.0,
+            "minUs": 233876.0,
+            "medianRssBytes": 130334720.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -1002,15 +1002,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 5.889221556886228,
-            "minUs": 5.246882793017456,
-            "medianRssBytes": 17154048.0,
+            "medianUs": 5.934131736526946,
+            "minUs": 5.227091633466135,
+            "medianRssBytes": 17268736.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 7.433566433566433,
-            "minUs": 6.465034965034965,
-            "medianRssBytes": 17301504.0,
+            "medianUs": 7.265734265734266,
+            "minUs": 6.493006993006993,
+            "medianRssBytes": 17416192.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1020,15 +1020,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 532.0,
-            "minUs": 491.25,
-            "medianRssBytes": 24641536.0,
+            "medianUs": 515.4,
+            "minUs": 474.0,
+            "medianRssBytes": 24707072.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 628.6666666666666,
-            "minUs": 561.0,
-            "medianRssBytes": 24805376.0,
+            "medianUs": 611.3333333333334,
+            "minUs": 557.0,
+            "medianRssBytes": 24920064.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1038,19 +1038,19 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 64456.0,
-            "minUs": 52788.0,
-            "medianRssBytes": 170704896.0,
+            "medianUs": 65535.0,
+            "minUs": 51859.0,
+            "medianRssBytes": 170688512.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 73915.0,
-            "minUs": 65642.0,
-            "medianRssBytes": 162824192.0,
+            "medianUs": 76337.0,
+            "minUs": 65267.0,
+            "medianRssBytes": 183107584.0,
             "samples": 15
           },
           "timeWinner": "native",
-          "memWinner": "tie"
+          "memWinner": "native"
         }
       }
     },
@@ -1063,15 +1063,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 7.937219730941704,
-            "minUs": 6.709163346613546,
-            "medianRssBytes": 17334272.0,
+            "medianUs": 7.378486055776892,
+            "minUs": 6.717131474103586,
+            "medianRssBytes": 17350656.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 7.808764940239044,
-            "minUs": 6.50597609561753,
-            "medianRssBytes": 17825792.0,
+            "medianUs": 6.872509960159363,
+            "minUs": 6.374501992031872,
+            "medianRssBytes": 17383424.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1081,15 +1081,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 349.5,
-            "minUs": 320.85714285714283,
-            "medianRssBytes": 23937024.0,
+            "medianUs": 350.85714285714283,
+            "minUs": 320.14285714285717,
+            "medianRssBytes": 23511040.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 355.1666666666667,
-            "minUs": 330.85714285714283,
-            "medianRssBytes": 24051712.0,
+            "medianUs": 351.14285714285717,
+            "minUs": 324.2857142857143,
+            "medianRssBytes": 23576576.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1097,18 +1097,18 @@
         },
         "full": {
           "n": 1000000,
-          "roundsRun": 4,
+          "roundsRun": 3,
           "native": {
-            "medianUs": 66212.0,
-            "minUs": 53121.0,
-            "medianRssBytes": 141336576.0,
-            "samples": 20
+            "medianUs": 60894.0,
+            "minUs": 51723.0,
+            "medianRssBytes": 139788288.0,
+            "samples": 15
           },
           "fxdart": {
-            "medianUs": 65856.5,
-            "minUs": 58242.0,
-            "medianRssBytes": 139476992.0,
-            "samples": 20
+            "medianUs": 61361.0,
+            "minUs": 51372.0,
+            "medianRssBytes": 139788288.0,
+            "samples": 15
           },
           "timeWinner": "tie",
           "memWinner": "tie"
@@ -1124,15 +1124,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 4.952618453865337,
-            "minUs": 4.511221945137157,
-            "medianRssBytes": 17137664.0,
+            "medianUs": 5.087281795511222,
+            "minUs": 4.55860349127182,
+            "medianRssBytes": 17252352.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 4.8982035928143715,
-            "minUs": 4.491017964071856,
-            "medianRssBytes": 17219584.0,
+            "medianUs": 4.872817955112219,
+            "minUs": 4.371571072319202,
+            "medianRssBytes": 17301504.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1142,15 +1142,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 549.0,
-            "minUs": 519.3333333333334,
-            "medianRssBytes": 20889600.0,
+            "medianUs": 555.3333333333334,
+            "minUs": 528.6666666666666,
+            "medianRssBytes": 20955136.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 525.3333333333334,
-            "minUs": 506.3333333333333,
-            "medianRssBytes": 21004288.0,
+            "medianUs": 521.0,
+            "minUs": 503.3333333333333,
+            "medianRssBytes": 21020672.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1160,15 +1160,15 @@
           "n": 1000000,
           "roundsRun": 5,
           "native": {
-            "medianUs": 72624.0,
-            "minUs": 59035.0,
-            "medianRssBytes": 182910976.0,
+            "medianUs": 71064.0,
+            "minUs": 57719.0,
+            "medianRssBytes": 183058432.0,
             "samples": 25
           },
           "fxdart": {
-            "medianUs": 70345.0,
-            "minUs": 57065.0,
-            "medianRssBytes": 183582720.0,
+            "medianUs": 68710.0,
+            "minUs": 56316.0,
+            "medianRssBytes": 184074240.0,
             "samples": 25
           },
           "timeWinner": "tie",
@@ -1185,15 +1185,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 335.4,
-            "minUs": 295.2,
-            "medianRssBytes": 17186816.0,
+            "medianUs": 342.3333333333333,
+            "minUs": 284.3333333333333,
+            "medianRssBytes": 17317888.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 386.5,
-            "minUs": 343.3333333333333,
-            "medianRssBytes": 17383424.0,
+            "medianUs": 410.8,
+            "minUs": 345.6,
+            "medianRssBytes": 17956864.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1203,15 +1203,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 31303.0,
-            "minUs": 29831.0,
-            "medianRssBytes": 27246592.0,
+            "medianUs": 30205.0,
+            "minUs": 29173.0,
+            "medianRssBytes": 27639808.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 35526.0,
-            "minUs": 34655.0,
-            "medianRssBytes": 23330816.0,
+            "medianUs": 35591.0,
+            "minUs": 33839.0,
+            "medianRssBytes": 23298048.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -1221,15 +1221,15 @@
           "n": 100000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 312399.0,
-            "minUs": 306684.0,
-            "medianRssBytes": 51593216.0,
+            "medianUs": 301420.0,
+            "minUs": 295918.0,
+            "medianRssBytes": 51675136.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 356250.0,
-            "minUs": 349131.0,
-            "medianRssBytes": 52805632.0,
+            "medianUs": 344732.0,
+            "minUs": 335745.0,
+            "medianRssBytes": 52854784.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -1246,15 +1246,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 2.070929070929071,
-            "minUs": 1.9290709290709291,
-            "medianRssBytes": 17367040.0,
+            "medianUs": 2.7824351297405188,
+            "minUs": 1.8725637181409296,
+            "medianRssBytes": 17350656.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 6.032934131736527,
-            "minUs": 5.7395209580838324,
-            "medianRssBytes": 17301504.0,
+            "medianUs": 6.497005988023952,
+            "minUs": 5.790419161676646,
+            "medianRssBytes": 17268736.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1264,15 +1264,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 106.21052631578948,
-            "minUs": 104.61111111111111,
-            "medianRssBytes": 17842176.0,
+            "medianUs": 107.47368421052632,
+            "minUs": 104.84210526315789,
+            "medianRssBytes": 17858560.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 171.75,
-            "minUs": 167.83333333333334,
-            "medianRssBytes": 17776640.0,
+            "medianUs": 173.0909090909091,
+            "minUs": 166.16666666666666,
+            "medianRssBytes": 17809408.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1282,15 +1282,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 11559.0,
-            "minUs": 11329.0,
-            "medianRssBytes": 125337600.0,
+            "medianUs": 11466.0,
+            "minUs": 11279.0,
+            "medianRssBytes": 125272064.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 17454.0,
-            "minUs": 17290.0,
-            "medianRssBytes": 125894656.0,
+            "medianUs": 17380.0,
+            "minUs": 17155.0,
+            "medianRssBytes": 125878272.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -1307,15 +1307,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 6.121951219512195,
-            "minUs": 5.634146341463414,
-            "medianRssBytes": 17317888.0,
+            "medianUs": 5.846153846153846,
+            "minUs": 5.34965034965035,
+            "medianRssBytes": 17743872.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 6.840796019900497,
-            "minUs": 6.164179104477612,
-            "medianRssBytes": 17367040.0,
+            "medianUs": 6.345291479820628,
+            "minUs": 6.107569721115538,
+            "medianRssBytes": 17350656.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1325,15 +1325,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 816.6666666666666,
-            "minUs": 785.0,
-            "medianRssBytes": 18612224.0,
+            "medianUs": 871.3333333333334,
+            "minUs": 778.0,
+            "medianRssBytes": 18579456.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 828.5,
-            "minUs": 783.0,
-            "medianRssBytes": 21889024.0,
+            "medianUs": 814.5,
+            "minUs": 778.0,
+            "medianRssBytes": 21856256.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1343,15 +1343,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 103046.0,
-            "minUs": 102128.0,
-            "medianRssBytes": 186384384.0,
+            "medianUs": 103567.0,
+            "minUs": 102197.0,
+            "medianRssBytes": 186335232.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 128376.0,
-            "minUs": 124252.0,
-            "medianRssBytes": 218251264.0,
+            "medianUs": 127915.0,
+            "minUs": 122792.0,
+            "medianRssBytes": 218677248.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -1368,15 +1368,15 @@
           "n": 98,
           "roundsRun": 3,
           "native": {
-            "medianUs": 3.8204488778054864,
-            "minUs": 3.6197604790419162,
-            "medianRssBytes": 17235968.0,
+            "medianUs": 3.748502994011976,
+            "minUs": 3.626746506986028,
+            "medianRssBytes": 17317888.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 5.134328358208955,
-            "minUs": 4.353233830845771,
-            "medianRssBytes": 17252352.0,
+            "medianUs": 4.529940119760479,
+            "minUs": 4.404191616766467,
+            "medianRssBytes": 17448960.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1386,15 +1386,15 @@
           "n": 9996,
           "roundsRun": 3,
           "native": {
-            "medianUs": 400.25,
-            "minUs": 342.0,
-            "medianRssBytes": 23838720.0,
+            "medianUs": 399.0,
+            "minUs": 347.5,
+            "medianRssBytes": 23855104.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 466.25,
-            "minUs": 410.75,
-            "medianRssBytes": 23822336.0,
+            "medianUs": 462.5,
+            "minUs": 411.5,
+            "medianRssBytes": 23887872.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1402,21 +1402,21 @@
         },
         "full": {
           "n": 999999,
-          "roundsRun": 3,
+          "roundsRun": 5,
           "native": {
-            "medianUs": 51458.0,
-            "minUs": 46070.0,
-            "medianRssBytes": 103759872.0,
-            "samples": 15
+            "medianUs": 50684.0,
+            "minUs": 46558.0,
+            "medianRssBytes": 100499456.0,
+            "samples": 25
           },
           "fxdart": {
-            "medianUs": 60423.0,
-            "minUs": 50339.0,
-            "medianRssBytes": 101285888.0,
-            "samples": 15
+            "medianUs": 48820.0,
+            "minUs": 46826.0,
+            "medianRssBytes": 152649728.0,
+            "samples": 25
           },
-          "timeWinner": "native",
-          "memWinner": "tie"
+          "timeWinner": "tie",
+          "memWinner": "native"
         }
       }
     },
@@ -1429,15 +1429,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 1.8040979510244877,
-            "minUs": 1.632183908045977,
-            "medianRssBytes": 17268736.0,
+            "medianUs": 1.9520479520479521,
+            "minUs": 1.5972013993003498,
+            "medianRssBytes": 17219584.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 2.846307385229541,
-            "minUs": 2.684630738522954,
-            "medianRssBytes": 17235968.0,
+            "medianUs": 2.849150849150849,
+            "minUs": 2.6573426573426575,
+            "medianRssBytes": 17252352.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1447,15 +1447,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 118.61111111111111,
-            "minUs": 109.05555555555556,
-            "medianRssBytes": 21643264.0,
+            "medianUs": 117.33333333333333,
+            "minUs": 106.94117647058823,
+            "medianRssBytes": 21889024.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 205.2,
-            "minUs": 189.2,
-            "medianRssBytes": 24723456.0,
+            "medianUs": 194.6,
+            "minUs": 184.4,
+            "medianRssBytes": 24674304.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1465,15 +1465,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 17832.0,
-            "minUs": 12849.0,
-            "medianRssBytes": 157351936.0,
+            "medianUs": 16679.0,
+            "minUs": 12600.0,
+            "medianRssBytes": 157384704.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 22894.0,
-            "minUs": 21025.0,
-            "medianRssBytes": 158597120.0,
+            "medianUs": 22515.0,
+            "minUs": 21337.0,
+            "medianRssBytes": 156090368.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -1490,15 +1490,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 3.3823088455772115,
-            "minUs": 3.0674662668665666,
-            "medianRssBytes": 17809408.0,
+            "medianUs": 3.6087824351297404,
+            "minUs": 3.059880239520958,
+            "medianRssBytes": 17334272.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 4.908183632734531,
-            "minUs": 4.293413173652695,
-            "medianRssBytes": 17367040.0,
+            "medianUs": 4.7007481296758105,
+            "minUs": 4.249376558603491,
+            "medianRssBytes": 17448960.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1508,15 +1508,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 185.75,
-            "minUs": 172.08333333333334,
-            "medianRssBytes": 22904832.0,
+            "medianUs": 179.66666666666666,
+            "minUs": 168.75,
+            "medianRssBytes": 23003136.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 234.22222222222223,
-            "minUs": 217.88888888888889,
-            "medianRssBytes": 20512768.0,
+            "medianUs": 240.11111111111111,
+            "minUs": 216.33333333333334,
+            "medianRssBytes": 20578304.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1526,15 +1526,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 21678.0,
-            "minUs": 21374.0,
-            "medianRssBytes": 94715904.0,
+            "medianUs": 21744.0,
+            "minUs": 21390.0,
+            "medianRssBytes": 94601216.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 27656.0,
-            "minUs": 27143.0,
-            "medianRssBytes": 94453760.0,
+            "medianUs": 27481.0,
+            "minUs": 27032.0,
+            "medianRssBytes": 94519296.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -1551,15 +1551,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 21.395833333333332,
-            "minUs": 20.333333333333332,
-            "medianRssBytes": 17711104.0,
+            "medianUs": 22.724137931034484,
+            "minUs": 20.322916666666668,
+            "medianRssBytes": 17743872.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 30.015873015873016,
-            "minUs": 26.971014492753625,
-            "medianRssBytes": 17301504.0,
+            "medianUs": 31.19672131147541,
+            "minUs": 27.285714285714285,
+            "medianRssBytes": 17350656.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1569,37 +1569,37 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 2322.0,
-            "minUs": 2244.0,
-            "medianRssBytes": 24592384.0,
+            "medianUs": 2344.0,
+            "minUs": 2228.0,
+            "medianRssBytes": 24657920.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 3006.0,
-            "minUs": 2837.0,
-            "medianRssBytes": 26542080.0,
+            "medianUs": 2926.0,
+            "minUs": 2794.0,
+            "medianRssBytes": 26558464.0,
             "samples": 15
           },
-          "timeWinner": "native",
+          "timeWinner": "tie",
           "memWinner": "native"
         },
         "full": {
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 554990.0,
-            "minUs": 529826.0,
-            "medianRssBytes": 243826688.0,
+            "medianUs": 534073.0,
+            "minUs": 507620.0,
+            "medianRssBytes": 243253248.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 666795.0,
-            "minUs": 651458.0,
-            "medianRssBytes": 247365632.0,
+            "medianUs": 652070.0,
+            "minUs": 631059.0,
+            "medianRssBytes": 308068352.0,
             "samples": 15
           },
           "timeWinner": "native",
-          "memWinner": "tie"
+          "memWinner": "native"
         }
       }
     },
@@ -1612,15 +1612,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 4.119760479041916,
-            "minUs": 3.7961019490254873,
-            "medianRssBytes": 17285120.0,
+            "medianUs": 4.225548902195609,
+            "minUs": 3.7604790419161676,
+            "medianRssBytes": 17416192.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 9.681614349775785,
-            "minUs": 9.129353233830846,
-            "medianRssBytes": 17301504.0,
+            "medianUs": 9.461883408071749,
+            "minUs": 9.035874439461884,
+            "medianRssBytes": 17432576.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1630,15 +1630,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 242.77777777777777,
-            "minUs": 217.3,
-            "medianRssBytes": 23494656.0,
+            "medianUs": 240.8,
+            "minUs": 215.2,
+            "medianRssBytes": 23543808.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 253.625,
-            "minUs": 238.0,
-            "medianRssBytes": 19922944.0,
+            "medianUs": 257.625,
+            "minUs": 237.625,
+            "medianRssBytes": 20004864.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1648,15 +1648,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 25104.0,
-            "minUs": 24663.0,
-            "medianRssBytes": 93503488.0,
+            "medianUs": 25080.0,
+            "minUs": 24585.0,
+            "medianRssBytes": 93847552.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 27428.0,
-            "minUs": 26984.0,
-            "medianRssBytes": 94519296.0,
+            "medianUs": 27475.0,
+            "minUs": 27048.0,
+            "medianRssBytes": 95404032.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -1673,15 +1673,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 4.251497005988024,
-            "minUs": 3.6706586826347305,
-            "medianRssBytes": 17268736.0,
+            "medianUs": 4.37125748502994,
+            "minUs": 3.662674650698603,
+            "medianRssBytes": 17317888.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 5.3915211970074814,
-            "minUs": 4.897755610972569,
-            "medianRssBytes": 17252352.0,
+            "medianUs": 5.366533864541832,
+            "minUs": 4.793017456359102,
+            "medianRssBytes": 17301504.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1691,15 +1691,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 258.0,
-            "minUs": 231.5,
-            "medianRssBytes": 20578304.0,
+            "medianUs": 259.5,
+            "minUs": 233.75,
+            "medianRssBytes": 20594688.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 265.25,
-            "minUs": 237.75,
-            "medianRssBytes": 20561920.0,
+            "medianUs": 259.5,
+            "minUs": 240.0,
+            "medianRssBytes": 20512768.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1709,15 +1709,15 @@
           "n": 1000000,
           "roundsRun": 5,
           "native": {
-            "medianUs": 24099.0,
-            "minUs": 23680.0,
-            "medianRssBytes": 111525888.0,
+            "medianUs": 24368.0,
+            "minUs": 23730.0,
+            "medianRssBytes": 111280128.0,
             "samples": 25
           },
           "fxdart": {
-            "medianUs": 24789.0,
-            "minUs": 24220.0,
-            "medianRssBytes": 111640576.0,
+            "medianUs": 25266.0,
+            "minUs": 24516.0,
+            "medianRssBytes": 111427584.0,
             "samples": 25
           },
           "timeWinner": "tie",
@@ -1734,15 +1734,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 41.183673469387756,
-            "minUs": 36.4375,
-            "medianRssBytes": 17219584.0,
+            "medianUs": 41.23809523809524,
+            "minUs": 36.857142857142854,
+            "medianRssBytes": 17842176.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 42.1063829787234,
-            "minUs": 36.714285714285715,
-            "medianRssBytes": 17416192.0,
+            "medianUs": 40.93617021276596,
+            "minUs": 36.8936170212766,
+            "medianRssBytes": 17317888.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1752,15 +1752,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 4038.0,
-            "minUs": 3708.0,
-            "medianRssBytes": 42188800.0,
+            "medianUs": 4153.0,
+            "minUs": 3598.0,
+            "medianRssBytes": 42221568.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 3951.0,
-            "minUs": 3798.0,
-            "medianRssBytes": 37699584.0,
+            "medianUs": 4006.0,
+            "minUs": 3704.0,
+            "medianRssBytes": 37781504.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1770,15 +1770,15 @@
           "n": 1000000,
           "roundsRun": 5,
           "native": {
-            "medianUs": 1012784.0,
-            "minUs": 972040.0,
-            "medianRssBytes": 339066880.0,
+            "medianUs": 1025316.0,
+            "minUs": 962915.0,
+            "medianRssBytes": 342851584.0,
             "samples": 25
           },
           "fxdart": {
-            "medianUs": 1006048.0,
-            "minUs": 989830.0,
-            "medianRssBytes": 348798976.0,
+            "medianUs": 1021868.0,
+            "minUs": 980548.0,
+            "medianRssBytes": 350945280.0,
             "samples": 25
           },
           "timeWinner": "tie",
@@ -1795,15 +1795,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 200.625,
-            "minUs": 165.0,
-            "medianRssBytes": 17334272.0,
+            "medianUs": 213.88888888888889,
+            "minUs": 169.11111111111111,
+            "medianRssBytes": 17399808.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 246.375,
-            "minUs": 197.77777777777777,
-            "medianRssBytes": 18038784.0,
+            "medianUs": 243.33333333333334,
+            "minUs": 201.55555555555554,
+            "medianRssBytes": 17498112.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1813,15 +1813,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 18461.0,
-            "minUs": 17071.0,
+            "medianUs": 20333.0,
+            "minUs": 18633.0,
             "medianRssBytes": 51707904.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 22986.0,
-            "minUs": 20746.0,
-            "medianRssBytes": 52772864.0,
+            "medianUs": 24451.0,
+            "minUs": 20977.0,
+            "medianRssBytes": 52428800.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -1831,15 +1831,15 @@
           "n": 100000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 204070.0,
-            "minUs": 194270.0,
-            "medianRssBytes": 85360640.0,
+            "medianUs": 210679.0,
+            "minUs": 199613.0,
+            "medianRssBytes": 85426176.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 261351.0,
-            "minUs": 236663.0,
-            "medianRssBytes": 85475328.0,
+            "medianUs": 237834.0,
+            "minUs": 227718.0,
+            "medianRssBytes": 84967424.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -1856,14 +1856,14 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 22.264367816091955,
-            "minUs": 20.04597701149425,
-            "medianRssBytes": 17448960.0,
+            "medianUs": 24.4025974025974,
+            "minUs": 20.379310344827587,
+            "medianRssBytes": 18006016.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 30.948275862068964,
-            "minUs": 28.879310344827587,
+            "medianUs": 31.142857142857142,
+            "minUs": 29.476190476190474,
             "medianRssBytes": 17383424.0,
             "samples": 15
           },
@@ -1874,15 +1874,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 913.0,
-            "minUs": 831.5,
-            "medianRssBytes": 24100864.0,
+            "medianUs": 924.0,
+            "minUs": 824.5,
+            "medianRssBytes": 24199168.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 672.75,
-            "minUs": 628.25,
-            "medianRssBytes": 24133632.0,
+            "medianUs": 661.75,
+            "minUs": 623.75,
+            "medianRssBytes": 23969792.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1892,15 +1892,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 155546.0,
-            "minUs": 128545.0,
-            "medianRssBytes": 174473216.0,
+            "medianUs": 142604.0,
+            "minUs": 128914.0,
+            "medianRssBytes": 175112192.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 71591.0,
-            "minUs": 69964.0,
-            "medianRssBytes": 125927424.0,
+            "medianUs": 72919.0,
+            "minUs": 71338.0,
+            "medianRssBytes": 125943808.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -1917,15 +1917,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 40.916666666666664,
-            "minUs": 36.775510204081634,
-            "medianRssBytes": 17301504.0,
+            "medianUs": 40.888888888888886,
+            "minUs": 36.977777777777774,
+            "medianRssBytes": 17334272.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 43.28888888888889,
-            "minUs": 37.15,
-            "medianRssBytes": 17432576.0,
+            "medianUs": 42.77777777777778,
+            "minUs": 39.333333333333336,
+            "medianRssBytes": 17858560.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1935,15 +1935,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 2289.0,
-            "minUs": 2259.0,
-            "medianRssBytes": 18792448.0,
+            "medianUs": 2321.0,
+            "minUs": 2253.0,
+            "medianRssBytes": 18497536.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 2372.0,
-            "minUs": 2185.0,
-            "medianRssBytes": 18972672.0,
+            "medianUs": 2448.0,
+            "minUs": 2197.0,
+            "medianRssBytes": 18956288.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1953,15 +1953,15 @@
           "n": 1000000,
           "roundsRun": 5,
           "native": {
-            "medianUs": 793019.0,
-            "minUs": 693050.0,
-            "medianRssBytes": 250183680.0,
+            "medianUs": 767183.0,
+            "minUs": 681651.0,
+            "medianRssBytes": 251183104.0,
             "samples": 25
           },
           "fxdart": {
-            "medianUs": 802673.0,
-            "minUs": 724037.0,
-            "medianRssBytes": 250314752.0,
+            "medianUs": 760501.0,
+            "minUs": 683741.0,
+            "medianRssBytes": 250560512.0,
             "samples": 25
           },
           "timeWinner": "tie",
@@ -1978,15 +1978,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 51.282051282051285,
-            "minUs": 47.73684210526316,
-            "medianRssBytes": 17399808.0,
+            "medianUs": 51.45,
+            "minUs": 46.16129032258065,
+            "medianRssBytes": 17416192.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 36.45454545454545,
-            "minUs": 34.09756097560975,
-            "medianRssBytes": 17301504.0,
+            "medianUs": 38.64150943396226,
+            "minUs": 33.79245283018868,
+            "medianRssBytes": 17448960.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1996,15 +1996,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 7141.0,
-            "minUs": 6955.0,
-            "medianRssBytes": 38977536.0,
+            "medianUs": 7159.0,
+            "minUs": 6813.0,
+            "medianRssBytes": 38928384.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 3823.0,
-            "minUs": 3392.0,
-            "medianRssBytes": 36077568.0,
+            "medianUs": 3664.0,
+            "minUs": 3387.0,
+            "medianRssBytes": 36257792.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -2014,15 +2014,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 1208183.0,
-            "minUs": 1180189.0,
-            "medianRssBytes": 412794880.0,
+            "medianUs": 1184301.0,
+            "minUs": 1138695.0,
+            "medianRssBytes": 411353088.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 676837.0,
-            "minUs": 638463.0,
-            "medianRssBytes": 467058688.0,
+            "medianUs": 644706.0,
+            "minUs": 601229.0,
+            "medianRssBytes": 465420288.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -2039,15 +2039,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 1.5112443778110944,
-            "minUs": 1.3448275862068966,
-            "medianRssBytes": 17317888.0,
+            "medianUs": 1.5454545454545454,
+            "minUs": 1.3918040979510244,
+            "medianRssBytes": 17498112.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 2.7372627372627374,
-            "minUs": 2.4745254745254743,
-            "medianRssBytes": 17334272.0,
+            "medianUs": 2.739260739260739,
+            "minUs": 2.4705294705294705,
+            "medianRssBytes": 17432576.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -2057,14 +2057,14 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 95.4,
-            "minUs": 90.5,
-            "medianRssBytes": 19202048.0,
+            "medianUs": 95.0,
+            "minUs": 87.82352941176471,
+            "medianRssBytes": 19103744.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 195.8,
-            "minUs": 176.0,
+            "medianUs": 200.4,
+            "minUs": 179.8181818181818,
             "medianRssBytes": 24133632.0,
             "samples": 15
           },
@@ -2075,15 +2075,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 12177.0,
-            "minUs": 11089.0,
-            "medianRssBytes": 138657792.0,
+            "medianUs": 12811.0,
+            "minUs": 12203.0,
+            "medianRssBytes": 138838016.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 20560.0,
-            "minUs": 19637.0,
-            "medianRssBytes": 142000128.0,
+            "medianUs": 21065.0,
+            "minUs": 19954.0,
+            "medianRssBytes": 142114816.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2100,15 +2100,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 29.88888888888889,
-            "minUs": 26.037037037037038,
-            "medianRssBytes": 17285120.0,
+            "medianUs": 27.686567164179106,
+            "minUs": 25.615384615384617,
+            "medianRssBytes": 17317888.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 31.671641791044777,
-            "minUs": 27.582089552238806,
-            "medianRssBytes": 17350656.0,
+            "medianUs": 33.806451612903224,
+            "minUs": 27.825396825396826,
+            "medianRssBytes": 17432576.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -2118,15 +2118,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 470.2,
-            "minUs": 428.8,
-            "medianRssBytes": 24133632.0,
+            "medianUs": 463.2,
+            "minUs": 419.2,
+            "medianRssBytes": 24068096.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 445.6,
-            "minUs": 419.6,
-            "medianRssBytes": 21299200.0,
+            "medianUs": 442.6,
+            "minUs": 399.0,
+            "medianRssBytes": 21381120.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -2136,15 +2136,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 59122.0,
-            "minUs": 54836.0,
-            "medianRssBytes": 130056192.0,
+            "medianUs": 57574.0,
+            "minUs": 53176.0,
+            "medianRssBytes": 131317760.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 48990.0,
-            "minUs": 42802.0,
-            "medianRssBytes": 150831104.0,
+            "medianUs": 48872.0,
+            "minUs": 44830.0,
+            "medianRssBytes": 152272896.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -2161,15 +2161,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 34.84905660377358,
-            "minUs": 30.528301886792452,
-            "medianRssBytes": 17465344.0,
+            "medianUs": 33.85245901639344,
+            "minUs": 31.79310344827586,
+            "medianRssBytes": 17367040.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 76.67857142857143,
-            "minUs": 71.4074074074074,
-            "medianRssBytes": 16941056.0,
+            "medianUs": 49.575,
+            "minUs": 46.58620689655172,
+            "medianRssBytes": 17235968.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -2179,33 +2179,33 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 2661.0,
-            "minUs": 2505.0,
-            "medianRssBytes": 23101440.0,
+            "medianUs": 2612.0,
+            "minUs": 2495.0,
+            "medianRssBytes": 23003136.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 6142.0,
-            "minUs": 6011.0,
-            "medianRssBytes": 20070400.0,
+            "medianUs": 4279.0,
+            "minUs": 4084.0,
+            "medianRssBytes": 23494656.0,
             "samples": 15
           },
           "timeWinner": "native",
-          "memWinner": "fxdart"
+          "memWinner": "tie"
         },
         "full": {
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 367357.0,
-            "minUs": 321813.0,
-            "medianRssBytes": 230703104.0,
+            "medianUs": 378319.0,
+            "minUs": 322367.0,
+            "medianRssBytes": 233373696.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 671337.0,
-            "minUs": 652435.0,
-            "medianRssBytes": 206618624.0,
+            "medianUs": 483448.0,
+            "minUs": 457571.0,
+            "medianRssBytes": 209534976.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2222,15 +2222,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 11.208791208791208,
-            "minUs": 9.796610169491526,
-            "medianRssBytes": 17268736.0,
+            "medianUs": 10.873626373626374,
+            "minUs": 9.725274725274724,
+            "medianRssBytes": 17465344.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 9.099502487562189,
-            "minUs": 8.131868131868131,
-            "medianRssBytes": 17367040.0,
+            "medianUs": 8.985074626865671,
+            "minUs": 8.074626865671641,
+            "medianRssBytes": 17416192.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -2240,14 +2240,14 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 1236.5,
-            "minUs": 1225.0,
-            "medianRssBytes": 18235392.0,
+            "medianUs": 1277.5,
+            "minUs": 1236.5,
+            "medianRssBytes": 18251776.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 1097.5,
-            "minUs": 1060.0,
+            "medianUs": 1115.5,
+            "minUs": 1081.0,
             "medianRssBytes": 21348352.0,
             "samples": 15
           },
@@ -2256,20 +2256,20 @@
         },
         "full": {
           "n": 1000000,
-          "roundsRun": 3,
+          "roundsRun": 5,
           "native": {
-            "medianUs": 221879.0,
-            "minUs": 215487.0,
-            "medianRssBytes": 181829632.0,
-            "samples": 15
+            "medianUs": 224614.0,
+            "minUs": 211347.0,
+            "medianRssBytes": 181993472.0,
+            "samples": 25
           },
           "fxdart": {
-            "medianUs": 208367.0,
-            "minUs": 187804.0,
-            "medianRssBytes": 205881344.0,
-            "samples": 15
+            "medianUs": 223105.0,
+            "minUs": 194573.0,
+            "medianRssBytes": 201146368.0,
+            "samples": 25
           },
-          "timeWinner": "fxdart",
+          "timeWinner": "tie",
           "memWinner": "native"
         }
       }
@@ -2283,15 +2283,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 21.0989010989011,
-            "minUs": 18.792079207920793,
-            "medianRssBytes": 17350656.0,
+            "medianUs": 21.021978021978022,
+            "minUs": 19.494505494505493,
+            "medianRssBytes": 17940480.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 29.714285714285715,
-            "minUs": 27.38095238095238,
-            "medianRssBytes": 17383424.0,
+            "medianUs": 30.317460317460316,
+            "minUs": 27.44,
+            "medianRssBytes": 17367040.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -2301,15 +2301,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 1395.5,
-            "minUs": 1320.5,
-            "medianRssBytes": 18743296.0,
+            "medianUs": 1386.0,
+            "minUs": 1311.0,
+            "medianRssBytes": 18874368.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 2171.0,
-            "minUs": 2103.0,
-            "medianRssBytes": 22413312.0,
+            "medianUs": 2117.0,
+            "minUs": 2008.0,
+            "medianRssBytes": 22478848.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2319,15 +2319,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 176623.0,
-            "minUs": 163835.0,
-            "medianRssBytes": 248807424.0,
+            "medianUs": 175654.0,
+            "minUs": 162738.0,
+            "medianRssBytes": 249643008.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 261719.0,
-            "minUs": 244931.0,
-            "medianRssBytes": 251756544.0,
+            "medianUs": 259075.0,
+            "minUs": 247209.0,
+            "medianRssBytes": 250871808.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2344,14 +2344,14 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 17.134920634920636,
-            "minUs": 15.603174603174603,
+            "medianUs": 16.563492063492063,
+            "minUs": 15.896825396825397,
             "medianRssBytes": 17383424.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 19.802197802197803,
-            "minUs": 18.26732673267327,
+            "medianUs": 19.59433962264151,
+            "minUs": 18.433962264150942,
             "medianRssBytes": 17334272.0,
             "samples": 15
           },
@@ -2362,15 +2362,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 1846.0,
-            "minUs": 1774.5,
-            "medianRssBytes": 19038208.0,
+            "medianUs": 1907.5,
+            "minUs": 1803.5,
+            "medianRssBytes": 19120128.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 2125.0,
-            "minUs": 1985.0,
-            "medianRssBytes": 22315008.0,
+            "medianUs": 2047.0,
+            "minUs": 1950.0,
+            "medianRssBytes": 21708800.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -2380,15 +2380,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 211100.0,
-            "minUs": 199126.0,
-            "medianRssBytes": 199049216.0,
+            "medianUs": 207680.0,
+            "minUs": 200117.0,
+            "medianRssBytes": 185942016.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 281827.0,
-            "minUs": 253828.0,
-            "medianRssBytes": 220119040.0,
+            "medianUs": 281909.0,
+            "minUs": 268526.0,
+            "medianRssBytes": 229851136.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2405,15 +2405,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 22.119402985074625,
-            "minUs": 20.26865671641791,
-            "medianRssBytes": 17334272.0,
+            "medianUs": 21.816091954022987,
+            "minUs": 20.226190476190474,
+            "medianRssBytes": 17465344.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 31.095238095238095,
-            "minUs": 27.03076923076923,
-            "medianRssBytes": 17252352.0,
+            "medianUs": 29.873015873015873,
+            "minUs": 27.11111111111111,
+            "medianRssBytes": 17416192.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -2423,15 +2423,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 2424.0,
-            "minUs": 2331.0,
-            "medianRssBytes": 27410432.0,
+            "medianUs": 2630.0,
+            "minUs": 2356.0,
+            "medianRssBytes": 27426816.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 3619.0,
-            "minUs": 3232.0,
-            "medianRssBytes": 32669696.0,
+            "medianUs": 3530.0,
+            "minUs": 3238.0,
+            "medianRssBytes": 32800768.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2441,19 +2441,19 @@
           "n": 500000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 253827.0,
-            "minUs": 239503.0,
-            "medianRssBytes": 264372224.0,
+            "medianUs": 234268.0,
+            "minUs": 215137.0,
+            "medianRssBytes": 185614336.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 330704.0,
-            "minUs": 314490.0,
-            "medianRssBytes": 178241536.0,
+            "medianUs": 317983.0,
+            "minUs": 303487.0,
+            "medianRssBytes": 178388992.0,
             "samples": 15
           },
           "timeWinner": "native",
-          "memWinner": "fxdart"
+          "memWinner": "tie"
         }
       }
     },
@@ -2466,15 +2466,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 314.42857142857144,
-            "minUs": 265.42857142857144,
-            "medianRssBytes": 17301504.0,
+            "medianUs": 307.85714285714283,
+            "minUs": 268.7142857142857,
+            "medianRssBytes": 17317888.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 328.42857142857144,
-            "minUs": 286.42857142857144,
-            "medianRssBytes": 17416192.0,
+            "medianUs": 343.42857142857144,
+            "minUs": 293.4,
+            "medianRssBytes": 17973248.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -2484,15 +2484,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 29939.0,
-            "minUs": 28618.0,
-            "medianRssBytes": 54362112.0,
+            "medianUs": 28842.0,
+            "minUs": 27911.0,
+            "medianRssBytes": 54312960.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 31857.0,
-            "minUs": 30188.0,
-            "medianRssBytes": 33603584.0,
+            "medianUs": 31092.0,
+            "minUs": 29674.0,
+            "medianRssBytes": 33570816.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2500,20 +2500,20 @@
         },
         "full": {
           "n": 100000,
-          "roundsRun": 5,
+          "roundsRun": 3,
           "native": {
-            "medianUs": 333025.0,
-            "minUs": 307401.0,
-            "medianRssBytes": 83673088.0,
-            "samples": 25
+            "medianUs": 305660.0,
+            "minUs": 297122.0,
+            "medianRssBytes": 83771392.0,
+            "samples": 15
           },
           "fxdart": {
-            "medianUs": 335733.0,
-            "minUs": 325339.0,
-            "medianRssBytes": 84131840.0,
-            "samples": 25
+            "medianUs": 327247.0,
+            "minUs": 316478.0,
+            "medianRssBytes": 84049920.0,
+            "samples": 15
           },
-          "timeWinner": "tie",
+          "timeWinner": "native",
           "memWinner": "tie"
         }
       }
@@ -2527,15 +2527,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 514.75,
-            "minUs": 459.5,
-            "medianRssBytes": 17203200.0,
+            "medianUs": 621.6666666666666,
+            "minUs": 477.75,
+            "medianRssBytes": 17252352.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 794.6666666666666,
-            "minUs": 692.6666666666666,
-            "medianRssBytes": 17842176.0,
+            "medianUs": 837.0,
+            "minUs": 675.3333333333334,
+            "medianRssBytes": 17973248.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -2545,15 +2545,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 50091.0,
-            "minUs": 47323.0,
-            "medianRssBytes": 30867456.0,
+            "medianUs": 48558.0,
+            "minUs": 47471.0,
+            "medianRssBytes": 30457856.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 72607.0,
-            "minUs": 69419.0,
-            "medianRssBytes": 25870336.0,
+            "medianUs": 70511.0,
+            "minUs": 69398.0,
+            "medianRssBytes": 25919488.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2563,15 +2563,15 @@
           "n": 100000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 503213.0,
-            "minUs": 495774.0,
-            "medianRssBytes": 58966016.0,
+            "medianUs": 493945.0,
+            "minUs": 486123.0,
+            "medianRssBytes": 58802176.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 724877.0,
-            "minUs": 716777.0,
-            "medianRssBytes": 52969472.0,
+            "medianUs": 710662.0,
+            "minUs": 701399.0,
+            "medianRssBytes": 52461568.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2588,15 +2588,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 451.6,
-            "minUs": 359.0,
-            "medianRssBytes": 17350656.0,
+            "medianUs": 401.25,
+            "minUs": 330.8,
+            "medianRssBytes": 17334272.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 408.6,
-            "minUs": 348.8,
-            "medianRssBytes": 17940480.0,
+            "medianUs": 371.3333333333333,
+            "minUs": 344.1666666666667,
+            "medianRssBytes": 17989632.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -2604,18 +2604,18 @@
         },
         "10000": {
           "n": 10000,
-          "roundsRun": 5,
+          "roundsRun": 4,
           "native": {
-            "medianUs": 37176.0,
-            "minUs": 35196.0,
-            "medianRssBytes": 51527680.0,
-            "samples": 25
+            "medianUs": 36411.0,
+            "minUs": 33611.0,
+            "medianRssBytes": 51453952.0,
+            "samples": 20
           },
           "fxdart": {
-            "medianUs": 36196.0,
-            "minUs": 34922.0,
-            "medianRssBytes": 32440320.0,
-            "samples": 25
+            "medianUs": 36891.0,
+            "minUs": 34424.0,
+            "medianRssBytes": 32407552.0,
+            "samples": 20
           },
           "timeWinner": "tie",
           "memWinner": "fxdart"
@@ -2624,15 +2624,15 @@
           "n": 100000,
           "roundsRun": 5,
           "native": {
-            "medianUs": 387865.0,
-            "minUs": 371646.0,
-            "medianRssBytes": 84869120.0,
+            "medianUs": 368067.0,
+            "minUs": 350999.0,
+            "medianRssBytes": 85016576.0,
             "samples": 25
           },
           "fxdart": {
-            "medianUs": 372297.0,
-            "minUs": 359058.0,
-            "medianRssBytes": 84852736.0,
+            "medianUs": 369169.0,
+            "minUs": 351375.0,
+            "medianRssBytes": 84787200.0,
             "samples": 25
           },
           "timeWinner": "tie",
@@ -2649,15 +2649,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 34.63636363636363,
-            "minUs": 30.26923076923077,
-            "medianRssBytes": 17350656.0,
+            "medianUs": 36.37735849056604,
+            "minUs": 30.903846153846153,
+            "medianRssBytes": 17989632.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 56.529411764705884,
-            "minUs": 47.44117647058823,
-            "medianRssBytes": 17891328.0,
+            "medianUs": 54.911764705882355,
+            "minUs": 48.26470588235294,
+            "medianRssBytes": 17514496.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -2667,15 +2667,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 3162.0,
-            "minUs": 3016.0,
-            "medianRssBytes": 24690688.0,
+            "medianUs": 3281.0,
+            "minUs": 3117.0,
+            "medianRssBytes": 24887296.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 4787.0,
-            "minUs": 4647.0,
-            "medianRssBytes": 26165248.0,
+            "medianUs": 4971.0,
+            "minUs": 4752.0,
+            "medianRssBytes": 26755072.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2685,15 +2685,15 @@
           "n": 100000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 32417.0,
-            "minUs": 31839.0,
-            "medianRssBytes": 78331904.0,
+            "medianUs": 32457.0,
+            "minUs": 31400.0,
+            "medianRssBytes": 78708736.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 48524.0,
-            "minUs": 47024.0,
-            "medianRssBytes": 79413248.0,
+            "medianUs": 48657.0,
+            "minUs": 47246.0,
+            "medianRssBytes": 79527936.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2710,33 +2710,33 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 147.0,
-            "minUs": 127.07142857142857,
-            "medianRssBytes": 17186816.0,
+            "medianUs": 151.57142857142858,
+            "minUs": 127.07692307692308,
+            "medianRssBytes": 17203200.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 228.0909090909091,
-            "minUs": 169.375,
-            "medianRssBytes": 18137088.0,
+            "medianUs": 187.7,
+            "minUs": 164.08333333333334,
+            "medianRssBytes": 17760256.0,
             "samples": 15
           },
           "timeWinner": "tie",
-          "memWinner": "native"
+          "memWinner": "tie"
         },
         "10000": {
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 13577.0,
-            "minUs": 12700.0,
-            "medianRssBytes": 25182208.0,
+            "medianUs": 12981.0,
+            "minUs": 12287.0,
+            "medianRssBytes": 25198592.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 17156.0,
-            "minUs": 16252.0,
-            "medianRssBytes": 29835264.0,
+            "medianUs": 16108.0,
+            "minUs": 15674.0,
+            "medianRssBytes": 29392896.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2746,19 +2746,19 @@
           "n": 100000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 134707.0,
-            "minUs": 129075.0,
-            "medianRssBytes": 80052224.0,
+            "medianUs": 140901.0,
+            "minUs": 133546.0,
+            "medianRssBytes": 79921152.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 176371.0,
-            "minUs": 166888.0,
-            "medianRssBytes": 84541440.0,
+            "medianUs": 185967.0,
+            "minUs": 171425.0,
+            "medianRssBytes": 83804160.0,
             "samples": 15
           },
           "timeWinner": "native",
-          "memWinner": "native"
+          "memWinner": "tie"
         }
       }
     },
@@ -2771,15 +2771,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 392.6666666666667,
-            "minUs": 326.4,
-            "medianRssBytes": 17285120.0,
+            "medianUs": 364.1666666666667,
+            "minUs": 313.4,
+            "medianRssBytes": 17350656.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 463.0,
-            "minUs": 373.5,
-            "medianRssBytes": 17416192.0,
+            "medianUs": 472.8,
+            "minUs": 368.2,
+            "medianRssBytes": 17973248.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -2789,15 +2789,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 34797.0,
-            "minUs": 32327.0,
-            "medianRssBytes": 53379072.0,
+            "medianUs": 35910.0,
+            "minUs": 33642.0,
+            "medianRssBytes": 53280768.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 39982.0,
-            "minUs": 37407.0,
-            "medianRssBytes": 34619392.0,
+            "medianUs": 41990.0,
+            "minUs": 40639.0,
+            "medianRssBytes": 34439168.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2807,15 +2807,15 @@
           "n": 100000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 365722.0,
-            "minUs": 354318.0,
-            "medianRssBytes": 85065728.0,
+            "medianUs": 370308.0,
+            "minUs": 333209.0,
+            "medianRssBytes": 85082112.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 407774.0,
-            "minUs": 393875.0,
-            "medianRssBytes": 126664704.0,
+            "medianUs": 414329.0,
+            "minUs": 389181.0,
+            "medianRssBytes": 130711552.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2832,14 +2832,14 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 87.82608695652173,
-            "minUs": 73.38888888888889,
-            "medianRssBytes": 17301504.0,
+            "medianUs": 82.75,
+            "minUs": 78.125,
+            "medianRssBytes": 17334272.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 113.63636363636364,
-            "minUs": 86.9090909090909,
+            "medianUs": 95.66666666666667,
+            "minUs": 85.83333333333333,
             "medianRssBytes": 17481728.0,
             "samples": 15
           },
@@ -2850,15 +2850,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 7563.0,
-            "minUs": 7275.0,
-            "medianRssBytes": 45252608.0,
+            "medianUs": 8241.0,
+            "minUs": 7642.0,
+            "medianRssBytes": 45187072.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 8387.0,
-            "minUs": 7978.0,
-            "medianRssBytes": 25722880.0,
+            "medianUs": 9069.0,
+            "minUs": 8402.0,
+            "medianRssBytes": 25755648.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2868,15 +2868,15 @@
           "n": 100000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 76666.0,
-            "minUs": 74125.0,
-            "medianRssBytes": 77185024.0,
+            "medianUs": 88805.0,
+            "minUs": 79265.0,
+            "medianRssBytes": 77217792.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 86228.0,
-            "minUs": 82822.0,
-            "medianRssBytes": 77545472.0,
+            "medianUs": 103059.0,
+            "minUs": 94770.0,
+            "medianRssBytes": 78069760.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2893,15 +2893,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 32.411764705882355,
-            "minUs": 27.392156862745097,
-            "medianRssBytes": 17448960.0,
+            "medianUs": 31.37704918032787,
+            "minUs": 25.88888888888889,
+            "medianRssBytes": 17547264.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 33.94642857142857,
-            "minUs": 28.732142857142858,
-            "medianRssBytes": 17580032.0,
+            "medianUs": 32.86842105263158,
+            "minUs": 28.431818181818183,
+            "medianRssBytes": 17514496.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -2911,15 +2911,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 4780.0,
-            "minUs": 4079.0,
-            "medianRssBytes": 24231936.0,
+            "medianUs": 4337.0,
+            "minUs": 4029.0,
+            "medianRssBytes": 24297472.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 3367.0,
-            "minUs": 3163.0,
-            "medianRssBytes": 25657344.0,
+            "medianUs": 3062.0,
+            "minUs": 2862.0,
+            "medianRssBytes": 25575424.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -2929,15 +2929,15 @@
           "n": 100000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 52380.0,
-            "minUs": 50200.0,
+            "medianUs": 49702.0,
+            "minUs": 48652.0,
             "medianRssBytes": 58966016.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 33881.0,
-            "minUs": 32843.0,
-            "medianRssBytes": 61587456.0,
+            "medianUs": 33127.0,
+            "minUs": 30700.0,
+            "medianRssBytes": 61390848.0,
             "samples": 15
           },
           "timeWinner": "fxdart",
@@ -2954,15 +2954,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 52.58536585365854,
-            "minUs": 46.333333333333336,
-            "medianRssBytes": 17219584.0,
+            "medianUs": 52.325,
+            "minUs": 44.76923076923077,
+            "medianRssBytes": 17268736.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 74.73913043478261,
-            "minUs": 63.32,
-            "medianRssBytes": 17924096.0,
+            "medianUs": 86.5,
+            "minUs": 58.74193548387097,
+            "medianRssBytes": 17498112.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -2972,15 +2972,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 4702.0,
-            "minUs": 4350.0,
-            "medianRssBytes": 24559616.0,
+            "medianUs": 4950.0,
+            "minUs": 4553.0,
+            "medianRssBytes": 24641536.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 6901.0,
-            "minUs": 6367.0,
-            "medianRssBytes": 24772608.0,
+            "medianUs": 6672.0,
+            "minUs": 5748.0,
+            "medianRssBytes": 24346624.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2990,15 +2990,15 @@
           "n": 100000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 48424.0,
-            "minUs": 46218.0,
-            "medianRssBytes": 55361536.0,
+            "medianUs": 48682.0,
+            "minUs": 46172.0,
+            "medianRssBytes": 55607296.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 70545.0,
-            "minUs": 66165.0,
-            "medianRssBytes": 61964288.0,
+            "medianUs": 65435.0,
+            "minUs": 60161.0,
+            "medianRssBytes": 60555264.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -3015,15 +3015,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 396.75,
-            "minUs": 327.0,
-            "medianRssBytes": 17367040.0,
+            "medianUs": 372.8333333333333,
+            "minUs": 342.8333333333333,
+            "medianRssBytes": 17399808.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 466.5,
-            "minUs": 363.25,
-            "medianRssBytes": 17973248.0,
+            "medianUs": 416.0,
+            "minUs": 374.1666666666667,
+            "medianRssBytes": 18137088.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -3033,15 +3033,15 @@
           "n": 10000,
           "roundsRun": 5,
           "native": {
-            "medianUs": 327645.0,
-            "minUs": 323040.0,
-            "medianRssBytes": 52281344.0,
+            "medianUs": 325170.0,
+            "minUs": 318342.0,
+            "medianRssBytes": 52379648.0,
             "samples": 25
           },
           "fxdart": {
-            "medianUs": 333122.0,
-            "minUs": 330285.0,
-            "medianRssBytes": 52690944.0,
+            "medianUs": 331100.0,
+            "minUs": 323827.0,
+            "medianRssBytes": 52576256.0,
             "samples": 25
           },
           "timeWinner": "tie",
@@ -3051,15 +3051,15 @@
           "n": 20000,
           "roundsRun": 5,
           "native": {
-            "medianUs": 1205996.0,
-            "minUs": 1200913.0,
-            "medianRssBytes": 55640064.0,
+            "medianUs": 1208866.0,
+            "minUs": 1187446.0,
+            "medianRssBytes": 55164928.0,
             "samples": 25
           },
           "fxdart": {
-            "medianUs": 1218813.0,
-            "minUs": 1211110.0,
-            "medianRssBytes": 57409536.0,
+            "medianUs": 1210429.0,
+            "minUs": 1185010.0,
+            "medianRssBytes": 57212928.0,
             "samples": 25
           },
           "timeWinner": "tie",
@@ -3076,15 +3076,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 3.906187624750499,
-            "minUs": 3.502994011976048,
-            "medianRssBytes": 17235968.0,
+            "medianUs": 3.758483033932136,
+            "minUs": 3.500998003992016,
+            "medianRssBytes": 17268736.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 15.73015873015873,
-            "minUs": 14.494252873563218,
-            "medianRssBytes": 16777216.0,
+            "medianUs": 15.626984126984127,
+            "minUs": 15.071428571428571,
+            "medianRssBytes": 17285120.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -3094,15 +3094,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 287.75,
-            "minUs": 268.25,
-            "medianRssBytes": 18071552.0,
+            "medianUs": 289.3333333333333,
+            "minUs": 274.0,
+            "medianRssBytes": 18382848.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 315.42857142857144,
-            "minUs": 281.2857142857143,
-            "medianRssBytes": 18776064.0,
+            "medianUs": 299.14285714285717,
+            "minUs": 280.85714285714283,
+            "medianRssBytes": 18792448.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -3112,15 +3112,15 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 35582.0,
-            "minUs": 34790.0,
-            "medianRssBytes": 153944064.0,
+            "medianUs": 34928.0,
+            "minUs": 33305.0,
+            "medianRssBytes": 154058752.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 35433.0,
-            "minUs": 33930.0,
-            "medianRssBytes": 154894336.0,
+            "medianUs": 34870.0,
+            "minUs": 32482.0,
+            "medianRssBytes": 153010176.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -3137,15 +3137,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 335.7142857142857,
-            "minUs": 289.8,
-            "medianRssBytes": 17268736.0,
+            "medianUs": 373.2,
+            "minUs": 312.5,
+            "medianRssBytes": 17350656.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 403.2,
-            "minUs": 347.8,
-            "medianRssBytes": 17465344.0,
+            "medianUs": 415.2,
+            "minUs": 399.8,
+            "medianRssBytes": 17432576.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -3155,15 +3155,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 30960.0,
-            "minUs": 29591.0,
-            "medianRssBytes": 51281920.0,
+            "medianUs": 32885.0,
+            "minUs": 30439.0,
+            "medianRssBytes": 51134464.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 36653.0,
-            "minUs": 33740.0,
-            "medianRssBytes": 32342016.0,
+            "medianUs": 38444.0,
+            "minUs": 35875.0,
+            "medianRssBytes": 32079872.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -3173,15 +3173,15 @@
           "n": 100000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 314113.0,
-            "minUs": 307530.0,
-            "medianRssBytes": 84836352.0,
+            "medianUs": 329546.0,
+            "minUs": 298883.0,
+            "medianRssBytes": 84656128.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 364609.0,
-            "minUs": 354704.0,
-            "medianRssBytes": 84492288.0,
+            "medianUs": 380712.0,
+            "minUs": 354453.0,
+            "medianRssBytes": 84688896.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -3198,15 +3198,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 1.9230384807596201,
-            "minUs": 1.7336331834082959,
-            "medianRssBytes": 17235968.0,
+            "medianUs": 1.8181818181818181,
+            "minUs": 1.7682317682317683,
+            "medianRssBytes": 17301504.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 4.134663341645886,
-            "minUs": 3.8728179551122195,
-            "medianRssBytes": 17350656.0,
+            "medianUs": 4.231920199501247,
+            "minUs": 3.8703241895261846,
+            "medianRssBytes": 17383424.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -3216,15 +3216,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 173.1818181818182,
-            "minUs": 164.2,
-            "medianRssBytes": 23052288.0,
+            "medianUs": 187.8181818181818,
+            "minUs": 160.54545454545453,
+            "medianRssBytes": 23101440.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 410.0,
-            "minUs": 351.5,
-            "medianRssBytes": 23871488.0,
+            "medianUs": 412.75,
+            "minUs": 356.25,
+            "medianRssBytes": 23953408.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -3232,20 +3232,20 @@
         },
         "full": {
           "n": 1000000,
-          "roundsRun": 5,
+          "roundsRun": 3,
           "native": {
-            "medianUs": 39216.0,
-            "minUs": 21488.0,
-            "medianRssBytes": 256884736.0,
-            "samples": 25
+            "medianUs": 48480.0,
+            "minUs": 32449.0,
+            "medianRssBytes": 201310208.0,
+            "samples": 15
           },
           "fxdart": {
-            "medianUs": 38207.0,
-            "minUs": 36926.0,
-            "medianRssBytes": 85983232.0,
-            "samples": 25
+            "medianUs": 39881.0,
+            "minUs": 37615.0,
+            "medianRssBytes": 86081536.0,
+            "samples": 15
           },
-          "timeWinner": "tie",
+          "timeWinner": "fxdart",
           "memWinner": "fxdart"
         }
       }

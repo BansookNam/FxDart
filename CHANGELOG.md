@@ -12,11 +12,13 @@ replacing FxDart operators with direct operations in hot paths, while
 maintaining FxDart's clarity in other areas:
 
 * **`multi-currency-report`** (the #3 slowest case): 
-  - Before: 5735 ms (1.84× vs native 3110 ms)
-  - After: 3941 ms (1.27× vs native) — **31% faster**
+  - Before: 671.3 ms (1.83× vs native 367.4 ms)
+  - After: 483.4 ms (1.28× vs native 378.3 ms) — **28% faster** ✅
   - Approach: Direct map aggregation instead of `groupBy().sumBy()`, 
     direct loops instead of `maxBy()`/`sumBy()` callbacks, `toSet().sort()` 
     instead of `uniq().sortBy()`
+  - Verification: Full 53-case DartComparison suite—no regressions, 
+    5 other cases improved as side benefits
 
 The optimization technique is broadly applicable to any case where:
 1. Callback-heavy aggregation dominates runtime (>50% of time)
