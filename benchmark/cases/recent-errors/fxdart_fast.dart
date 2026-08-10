@@ -10,8 +10,8 @@ Future<void> main() async {
     impl: 'fxdart-fast',
     n: n,
     run: () {
-      // Fast path: eager evaluation for filter → uniqBy → take
-      final recent = fx(logs, strategy: FxStrategy.fast)
+      // Explicit opt-in: fxFast uses eager uniqBy for dedup patterns
+      final recent = fxFast(logs)
           .filter((l) => l.level == 'ERROR')
           .uniqBy((l) => l.message)
           .take(3);

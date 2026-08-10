@@ -218,7 +218,7 @@ Future<void> main() async {
   </p>
   <section class="cmp-bench">
   <h2>벤치마크</h2>
-  <p class="dim bench-meta">Apple M1 Max, 32 GB RAM · Dart 3.12.2 (AOT-compiled) · 2026-08-09</p>
+  <p class="dim bench-meta">Apple M1 Max, 32 GB RAM · Dart 3.12.2 (AOT-compiled) · 2026-08-10</p>
   <p class="dim bench-note bench-async-note">비동기 예제입니다. 대표 스케일이 1,000,000이 아니라 N = 100,000인 이유 — 원소 하나마다 양쪽 모두 이벤트 루프를 한 바퀴 돌아야 하므로, 실제 await 백만 번은 파이프라인이 아니라 Dart 이벤트 루프를 몇 분씩 재게 됩니다. 지연은 0으로 두고 예제의 동시성 제한은 그대로 유지합니다. 막대가 비교하는 것은 파이프라인 기계 장치 자체입니다.</p>
   <div class="bench-scales">
   <div class="bench-scale">
@@ -228,41 +228,41 @@ Future<void> main() async {
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">452 µs</span>
+        <span class="bench-val">446 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:90.5%"></span></span>
-        <span class="bench-val">409 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:99.3%"></span></span>
+        <span class="bench-val">443 µs</span>
       </div>
     </div>
     <div class="bench-metric">
       <h4>최대 메모리 <span class="badge verdict-tie">무승부</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:96.7%"></span></span>
-        <span class="bench-val">16.5 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:96.4%"></span></span>
+        <span class="bench-val">16.6 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">17.1 MB</span>
+        <span class="bench-val">17.3 MB</span>
       </div>
     </div>
   </div>
   <div class="bench-scale">
     <h3>N = 10,000</h3>
     <div class="bench-metric">
-      <h4>시간 <span class="badge verdict-tie">무승부</span></h4>
+      <h4>시간 <span class="badge verdict-native">네이티브 승</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">37.2 ms</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:95.1%"></span></span>
+        <span class="bench-val">40.4 ms</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:97.4%"></span></span>
-        <span class="bench-val">36.2 ms</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">42.5 ms</span>
       </div>
     </div>
     <div class="bench-metric">
@@ -270,12 +270,12 @@ Future<void> main() async {
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">49.1 MB</span>
+        <span class="bench-val">49.0 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:63.0%"></span></span>
-        <span class="bench-val">30.9 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:63.2%"></span></span>
+        <span class="bench-val">31.0 MB</span>
       </div>
     </div>
   </div>
@@ -286,12 +286,12 @@ Future<void> main() async {
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">387.9 ms</span>
+        <span class="bench-val">367.1 ms</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:96.0%"></span></span>
-        <span class="bench-val">372.3 ms</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:99.7%"></span></span>
+        <span class="bench-val">366.2 ms</span>
       </div>
     </div>
     <div class="bench-metric">
@@ -299,12 +299,12 @@ Future<void> main() async {
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">80.9 MB</span>
+        <span class="bench-val">81.1 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">80.9 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:99.5%"></span></span>
+        <span class="bench-val">80.7 MB</span>
       </div>
     </div>
   </div>

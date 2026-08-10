@@ -10,8 +10,8 @@ Future<void> main() async {
     impl: 'fxdart-fast',
     n: n,
     run: () {
-      // Fast path: eager evaluation avoids iterator wrapper overhead
-      final merchants = fx(txns, strategy: FxStrategy.fast)
+      // Explicit opt-in: fxFast uses eager uniq for dedup-heavy patterns
+      final merchants = fxFast(txns)
           .map((t) => t.merchant)
           .uniq()
           .toList();

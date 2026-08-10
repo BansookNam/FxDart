@@ -10,8 +10,8 @@ Future<void> main() async {
     impl: 'fxdart-fast',
     n: n,
     run: () {
-      // Fast path: eager evaluation for multi-operator chain
-      final context = fx(range(0, readings.length), strategy: FxStrategy.fast)
+      // Explicit opt-in: fxFast uses eager uniq in multi-operator chain
+      final context = fxFast(range(0, readings.length))
           .filter((i) => readings[i].temp > limit)
           .flatMap((i) => [i - 1, i, i + 1])
           .filter((i) => i >= 0 && i < readings.length)
