@@ -24,7 +24,7 @@ export 'src/async_iterable.dart'
         concurrentAsync,
         concurrentPoolAsync;
 export 'src/config.dart' show FxDart, FxConfig;
-export 'src/fx.dart' show fx, fxAsync, fxStream, Fx, FxAsync, FxNum, FxAsyncNum, FxStrategy;
+export 'src/fx.dart' show fx, fxAsync, fxStream, Fx, FxAsync, FxNum, FxAsyncNum;
 export 'src/fx_fast.dart' show fxFast, FxFast;
 export 'src/lazy/fast_uniq.dart' show uniqEager, uniqByEager, uniqBounded, uniqByBounded;
 export 'src/dart_aliases.dart';
