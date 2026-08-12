@@ -188,6 +188,17 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// Dart-idiomatic alias of [uniqBy].
   Fx<T> distinctBy<B>(B Function(T a) f) => uniqBy(f);
 
+  /// Strict [uniq]: dedups now, into a `List`, instead of lazily on iteration.
+  ///
+  /// The chain continues, so the result is still an [Fx] — but everything
+  /// upstream has already run, and a downstream `take`/`first` can no longer
+  /// cut it short. See [l.uniqStrict]; prefer plain [uniq] unless the deduped
+  /// list is the goal or the chain is iterated more than once.
+  Fx<T> uniqStrict() => Fx(l.uniqStrict(_inner));
+
+  /// Strict [uniqBy] — see [uniqStrict] for the trade-off.
+  Fx<T> uniqByStrict<B>(B Function(T a) f) => Fx(l.uniqByStrict(f, _inner));
+
   /// Drops values equal to their predecessor, keeping the first of each run.
   Fx<T> uniqAdjacent() => Fx(l.uniqAdjacent(_inner));
 

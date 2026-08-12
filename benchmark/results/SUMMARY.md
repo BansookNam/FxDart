@@ -2,7 +2,7 @@
 
 - **Machine:** Apple M1 Max, 32 GB RAM
 - **Dart:** 3.12.2 (macos Version 26.3 (Build 25D125)), AOT-compiled
-- **Date:** 2026-08-10
+- **Date:** 2026-08-12
 - **Method:** per side and N-scale, fresh process × rounds, 2 warmup + 5 measured iterations per process (small N auto-batched to ≥2 ms samples); median reported. Ties — within 5.0% of each other, or within 0.6 ms absolute (beneath human perception) — with close relative races re-run up to 5 rounds.
 - Memory is peak process RSS — the runtime and the dataset are identical on both sides, so the *difference* is what the pipeline itself holds onto. At small N it is all runtime baseline; expect ties.
 
@@ -18,7 +18,7 @@
 | 6 | rank-labels | 100 | 15 µs | 15 µs | **tie** | 16.9 MB | 16.5 MB | tie | 3 |
 | 7 | running-balance | 100 | 20 µs | 23 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
 | 8 | food-spending | 100 | 1.1 µs | 1.1 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
-| 9 | first-visit-merchants | 100 | 1.5 µs | 2.9 µs | **tie** | 16.5 MB | 16.4 MB | tie | 5 |
+| 9 | first-visit-merchants | 100 | 1.7 µs | 2.6 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
 | 10 | first-over-limit | 100 | 965 ns | 1.0 µs | **tie** | 16.4 MB | 16.4 MB | tie | 3 |
 | 11 | top-merchants | 100 | 25 µs | 138 µs | **tie** | 17.0 MB | 17.1 MB | tie | 3 |
 | 12 | unique-tags | 100 | 53 µs | 52 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
@@ -29,7 +29,7 @@
 | 17 | top-category-average | 100 | 6.9 µs | 7.3 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
 | 18 | date-window-spend | 100 | 1.7 µs | 1.4 µs | **tie** | 16.5 MB | 16.4 MB | tie | 3 |
 | 19 | sensor-anomalies | 100 | 6.1 µs | 6.8 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
-| 20 | recent-errors | 100 | 1.1 µs | 1.9 µs | **tie** | 16.5 MB | 16.5 MB | tie | 5 |
+| 20 | recent-errors | 100 | 1.3 µs | 2.0 µs | **tie** | 16.4 MB | 16.4 MB | tie | 3 |
 | 21 | duplicate-transactions | 100 | 42 µs | 42 µs | **tie** | 17.0 MB | 16.5 MB | tie | 3 |
 | 22 | no-spend-streak | 100 | 3.9 µs | 5.5 µs | **tie** | 16.5 MB | 16.4 MB | tie | 3 |
 | 23 | concurrent-enrichment (async) | 100 | 180 µs | 211 µs | **tie** | 16.6 MB | 16.7 MB | tie | 3 |
@@ -51,7 +51,7 @@
 | 39 | alert-digest | 100 | 21 µs | 31 µs | **tie** | 16.6 MB | 16.6 MB | tie | 3 |
 | 40 | latency-percentiles | 100 | 17 µs | 19 µs | **tie** | 16.6 MB | 16.6 MB | tie | 3 |
 | 41 | paged-feeds-dedupe (async) | 100 | 83 µs | 103 µs | **tie** | 16.5 MB | 16.7 MB | tie | 3 |
-| 42 | anomaly-context | 100 | 1.5 µs | 3.9 µs | **tie** | 16.6 MB | 16.5 MB | tie | 5 |
+| 42 | anomaly-context | 100 | 1.7 µs | 2.9 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 43 | smoothed-zone-changes | 100 | 1.9 µs | 4.7 µs | **tie** | 16.5 MB | 17.1 MB | tie | 3 |
 | 44 | stream-windowed-alerts (async) | 100 | 31 µs | 53 µs | **tie** | 16.6 MB | 17.1 MB | tie | 3 |
 | 45 | live-search (async) | 100 | 47 µs | 65 µs | **tie** | 16.5 MB | 16.7 MB | tie | 3 |
@@ -76,7 +76,7 @@
 | 6 | rank-labels | 10000 | 1.56 ms | 1.65 ms | **tie** | 34.8 MB | 37.7 MB | native | 3 |
 | 7 | running-balance | 10000 | 1.97 ms | 2.15 ms | **tie** | 24.0 MB | 23.7 MB | tie | 3 |
 | 8 | food-spending | 10000 | 134 µs | 123 µs | **tie** | 16.9 MB | 15.6 MB | fxdart | 3 |
-| 9 | first-visit-merchants | 10000 | 147 µs | 290 µs | **tie** | 17.0 MB | 16.8 MB | tie | 5 |
+| 9 | first-visit-merchants | 10000 | 145 µs | 251 µs | **tie** | 16.9 MB | 17.0 MB | tie | 3 |
 | 10 | first-over-limit | 10000 | 55 µs | 57 µs | **tie** | 15.3 MB | 15.3 MB | tie | 3 |
 | 11 | top-merchants | 10000 | 724 µs | 572 µs | **tie** | 23.0 MB | 23.6 MB | tie | 3 |
 | 12 | unique-tags | 10000 | 1.19 ms | 949 µs | **tie** | 20.7 MB | 23.3 MB | native | 3 |
@@ -87,7 +87,7 @@
 | 17 | top-category-average | 10000 | 351 µs | 355 µs | **tie** | 22.5 MB | 22.5 MB | tie | 3 |
 | 18 | date-window-spend | 10000 | 154 µs | 113 µs | **tie** | 20.8 MB | 15.6 MB | fxdart | 3 |
 | 19 | sensor-anomalies | 10000 | 519 µs | 614 µs | **tie** | 23.6 MB | 23.7 MB | tie | 3 |
-| 20 | recent-errors | 10000 | 92 µs | 157 µs | **tie** | 15.9 MB | 15.9 MB | tie | 5 |
+| 20 | recent-errors | 10000 | 89 µs | 147 µs | **tie** | 15.8 MB | 15.8 MB | tie | 3 |
 | 21 | duplicate-transactions | 10000 | 3.99 ms | 4.06 ms | **tie** | 40.3 MB | 36.0 MB | fxdart | 3 |
 | 22 | no-spend-streak | 10000 | 252 µs | 262 µs | **tie** | 19.7 MB | 19.6 MB | tie | 3 |
 | 23 | concurrent-enrichment (async) | 10000 | 17.4 ms | 19.9 ms | **native** | 49.3 MB | 50.3 MB | tie | 3 |
@@ -109,7 +109,7 @@
 | 39 | alert-digest | 10000 | 1.39 ms | 2.12 ms | **native** | 18.0 MB | 21.4 MB | native | 3 |
 | 40 | latency-percentiles | 10000 | 1.85 ms | 2.00 ms | **tie** | 18.2 MB | 20.7 MB | native | 3 |
 | 41 | paged-feeds-dedupe (async) | 10000 | 7.54 ms | 8.41 ms | **native** | 43.3 MB | 24.6 MB | fxdart | 3 |
-| 42 | anomaly-context | 10000 | 96 µs | 302 µs | **tie** | 18.1 MB | 21.1 MB | native | 5 |
+| 42 | anomaly-context | 10000 | 93 µs | 192 µs | **tie** | 18.4 MB | 23.0 MB | native | 3 |
 | 43 | smoothed-zone-changes | 10000 | 174 µs | 410 µs | **tie** | 22.0 MB | 22.7 MB | tie | 3 |
 | 44 | stream-windowed-alerts (async) | 10000 | 3.04 ms | 4.63 ms | **native** | 23.7 MB | 25.3 MB | native | 3 |
 | 45 | live-search (async) | 10000 | 4.44 ms | 5.90 ms | **native** | 23.5 MB | 23.7 MB | tie | 3 |
@@ -134,7 +134,7 @@
 | 6 | rank-labels | 1000000 | 207.2 ms | 214.7 ms | **tie** | 240.9 MB | 223.0 MB | fxdart | 5 |
 | 7 | running-balance | 1000000 | 240.8 ms | 275.5 ms | **native** | 186.7 MB | 185.0 MB | tie | 3 |
 | 8 | food-spending | 1000000 | 12.4 ms | 13.3 ms | **native** | 90.3 MB | 84.7 MB | fxdart | 3 |
-| 9 | first-visit-merchants | 1000000 | 33.0 ms | 51.5 ms | **native** | 116.0 MB | 119.9 MB | tie | 5 |
+| 9 | first-visit-merchants | 1000000 | 24.6 ms | 42.5 ms | **native** | 115.9 MB | 116.6 MB | tie | 3 |
 | 10 | first-over-limit | 1000000 | 5.01 ms | 5.35 ms | **tie** | 117.0 MB | 117.6 MB | tie | 3 |
 | 11 | top-merchants | 1000000 | 120.9 ms | 59.3 ms | **fxdart** | 137.7 MB | 118.4 MB | fxdart | 3 |
 | 12 | unique-tags | 1000000 | 107.5 ms | 81.8 ms | **fxdart** | 161.8 MB | 161.6 MB | tie | 3 |
@@ -145,7 +145,7 @@
 | 17 | top-category-average | 1000000 | 61.1 ms | 66.0 ms | **native** | 134.1 MB | 135.0 MB | tie | 3 |
 | 18 | date-window-spend | 1000000 | 14.8 ms | 11.4 ms | **fxdart** | 126.3 MB | 119.5 MB | fxdart | 3 |
 | 19 | sensor-anomalies | 1000000 | 63.2 ms | 76.4 ms | **native** | 162.5 MB | 156.5 MB | tie | 3 |
-| 20 | recent-errors | 1000000 | 10.6 ms | 16.9 ms | **native** | 113.8 MB | 113.4 MB | tie | 5 |
+| 20 | recent-errors | 1000000 | 10.4 ms | 16.2 ms | **native** | 113.8 MB | 114.1 MB | tie | 3 |
 | 21 | duplicate-transactions | 1000000 | 920.7 ms | 907.4 ms | **tie** | 324.3 MB | 331.2 MB | tie | 5 |
 | 22 | no-spend-streak | 1000000 | 23.6 ms | 24.2 ms | **tie** | 105.7 MB | 106.2 MB | tie | 5 |
 | 23 | concurrent-enrichment (async) | 100000 | 186.9 ms | 213.3 ms | **native** | 81.4 MB | 81.5 MB | tie | 3 |
@@ -167,7 +167,7 @@
 | 39 | alert-digest | 1000000 | 165.8 ms | 244.3 ms | **native** | 239.8 MB | 126.5 MB | fxdart | 3 |
 | 40 | latency-percentiles | 1000000 | 195.4 ms | 271.9 ms | **native** | 232.3 MB | 221.2 MB | fxdart | 3 |
 | 41 | paged-feeds-dedupe (async) | 100000 | 78.5 ms | 91.3 ms | **native** | 73.6 MB | 74.0 MB | tie | 3 |
-| 42 | anomaly-context | 1000000 | 12.4 ms | 32.0 ms | **native** | 131.8 MB | 135.6 MB | tie | 5 |
+| 42 | anomaly-context | 1000000 | 11.8 ms | 19.9 ms | **native** | 132.3 MB | 135.6 MB | tie | 3 |
 | 43 | smoothed-zone-changes | 1000000 | 38.1 ms | 36.6 ms | **tie** | 199.4 MB | 82.3 MB | fxdart | 5 |
 | 44 | stream-windowed-alerts (async) | 100000 | 31.5 ms | 46.7 ms | **native** | 75.2 MB | 75.7 MB | tie | 3 |
 | 45 | live-search (async) | 100000 | 43.8 ms | 58.9 ms | **native** | 52.8 MB | 57.7 MB | native | 3 |

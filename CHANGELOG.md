@@ -1,5 +1,50 @@
 ## 0.8.1
 
+### Added — `uniqStrict` / `uniqByStrict`
+
+Strict (non-lazy) counterparts of `uniq` / `uniqBy`, as top-level functions and
+as `Fx.uniqStrict()` / `Fx.uniqByStrict()`. They dedup the whole iterable
+immediately and return a `List`, producing the same elements in the same order
+as `uniq(...).toList()`. What differs is *when* the work happens:
+
+* The upstream runs once, at the call, rather than on each iteration of the
+  result — so a chain iterated more than once pays for it once.
+* Nothing downstream can cut the work short. `uniq(xs).take(3)` stops the
+  upstream after 3 distinct values; `uniqStrict(xs).take(3)` dedups all of `xs`
+  first. Not for use ahead of a short-circuiting consumer, and never on an
+  unbounded iterable.
+
+Lazy `uniq` remains the default and is the right choice for most chains.
+
+### Performance — `uniq` / `uniqBy` terminal fusion
+
+`uniq(...).toList()` and `uniqBy(...).toList()` now fuse the dedup loop with
+their own accumulation for **any** source. Previously the fused path was
+guarded on the source being a `List`, so it never fired for the common case of
+a `map`/`filter` upstream, and the chain fell back to one iterator hop per
+element plus a separate growth pass.
+
+* **`first-visit-merchants`** at N=1,000,000: 46.3 ms → 42.0 ms (**~10%**),
+  measured against the published 0.8.0 tree, 30 interleaved iterations per side.
+* `recent-errors` and `anomaly-context` are unchanged — neither chain ends in
+  `uniq().toList()`.
+
+Behaviour is identical; a `toList()` consumes the whole iterable regardless, so
+nothing is evaluated that the lazy path would have skipped.
+
+### Removed — `fxFast` / `FxFast` (never published)
+
+The experimental hybrid chain added during 0.8.1 development is removed, along
+with `uniqEager`, `uniqByEager`, `uniqBounded`, and `uniqByBounded`. None of
+these appeared in a published release, so no released API is affected.
+
+Measured against the published 0.8.0 tree it was ~11% faster on
+`first-visit-merchants` and a tie on the other two cases it targeted — a win
+now covered by the terminal fusion above, without a second chain type that
+implemented 7 of `Fx`'s methods and whose name implied it should always be
+preferred. Where its eager semantics are genuinely wanted, `uniqStrict` /
+`uniqByStrict` provide them on the regular `Fx`.
+
 ### Performance — hot-path aggregation optimization
 
 The DartComparison benchmark revealed that callback overhead in aggregation 

@@ -265,20 +265,21 @@ class _UniqByIterable<A, B> extends Iterable<A> {
   @override
   Iterator<A> get iterator => _UniqByIterator(_f, _source.iterator);
 
+  /// Fuses the dedup loop with its own accumulation: one pass with `Set.add`
+  /// + `List.add`, instead of a [_UniqByIterator.moveNext] per element and a
+  /// separate growth pass in `super.toList`. Valid for any source — a `toList`
+  /// consumes the whole iterable regardless, so nothing is evaluated that the
+  /// lazy path would have skipped.
   @override
   List<A> toList({bool growable = true}) {
-    final source = _source;
-    if (source is List<A>) {
-      final result = <A>[];
-      final seen = <B>{};
-      for (final a in source) {
-        if (seen.add(_f(a))) {
-          result.add(a);
-        }
+    final result = <A>[];
+    final seen = <B>{};
+    for (final a in _source) {
+      if (seen.add(_f(a))) {
+        result.add(a);
       }
-      return growable ? result : List<A>.from(result, growable: false);
     }
-    return super.toList(growable: growable);
+    return growable ? result : List<A>.from(result, growable: false);
   }
 }
 
@@ -314,20 +315,18 @@ class _UniqIterable<A> extends Iterable<A> {
   @override
   Iterator<A> get iterator => _UniqIterator(_source.iterator);
 
+  /// Fuses the dedup loop with its own accumulation — see
+  /// [_UniqByIterable.toList].
   @override
   List<A> toList({bool growable = true}) {
-    final source = _source;
-    if (source is List<A>) {
-      final result = <A>[];
-      final seen = <A>{};
-      for (final a in source) {
-        if (seen.add(a)) {
-          result.add(a);
-        }
+    final result = <A>[];
+    final seen = <A>{};
+    for (final a in _source) {
+      if (seen.add(a)) {
+        result.add(a);
       }
-      return growable ? result : List<A>.from(result, growable: false);
     }
-    return super.toList(growable: growable);
+    return growable ? result : List<A>.from(result, growable: false);
   }
 }
 
@@ -348,6 +347,42 @@ class _UniqIterator<A> implements Iterator<A> {
     }
     return false;
   }
+}
+
+/// Strict (non-lazy) [uniq]: dedups the whole of [iterable] immediately and
+/// returns the result as a `List`.
+///
+/// Same elements in the same order as `uniq(...).toList()`. The difference is
+/// *when* and *how much* work happens:
+///
+/// * The upstream runs once, here, rather than on each iteration of the
+///   result — so a chain that is iterated more than once pays for it once,
+///   and any side effects in the upstream happen at this call.
+/// * Nothing downstream can cut the work short. `uniq(xs).take(3)` stops the
+///   upstream after 3 distinct values; `uniqStrict(xs).take(3)` dedups all of
+///   `xs` first. Never use this ahead of a short-circuiting consumer, and
+///   never on an unbounded iterable — it will not terminate.
+///
+/// Prefer lazy [uniq] by default; it already fuses into a single loop when
+/// the chain ends in `.toList()`. Reach for this only when the deduped list
+/// is itself the thing you want, or is iterated repeatedly.
+List<A> uniqStrict<A>(Iterable<A> iterable) {
+  final result = <A>[];
+  final seen = <A>{};
+  for (final a in iterable) {
+    if (seen.add(a)) result.add(a);
+  }
+  return result;
+}
+
+/// Strict (non-lazy) [uniqBy] — see [uniqStrict] for the trade-off.
+List<A> uniqByStrict<A, B>(B Function(A a) f, Iterable<A> iterable) {
+  final result = <A>[];
+  final seen = <B>{};
+  for (final a in iterable) {
+    if (seen.add(f(a))) result.add(a);
+  }
+  return result;
 }
 
 /// Async counterpart of [uniqBy]. Uses then/bare pattern for sync keys.
