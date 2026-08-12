@@ -69,6 +69,13 @@ void main() {
       );
     });
 
+    test('lazy uniq().toList(growable: false) fuses into a fixed list', () {
+      final res = uniq(map((int a) => a % 3, [1, 2, 3, 4, 5, 6]))
+          .toList(growable: false);
+      expect(res, equals([1, 2, 0]));
+      expect(() => res.add(9), throwsUnsupportedError);
+    });
+
     test('does NOT short-circuit a downstream take', () {
       var scanned = 0;
       Iterable<int> counted() => map((int a) {
@@ -118,6 +125,13 @@ void main() {
           .map((s) => s.toUpperCase())
           .toList();
       expect(res, equals(['A', 'BB', 'DDD']));
+    });
+
+    test('lazy uniqBy().toList(growable: false) fuses into a fixed list', () {
+      final res = uniqBy((String s) => s.length, ['a', 'bb', 'c', 'ddd'])
+          .toList(growable: false);
+      expect(res, equals(['a', 'bb', 'ddd']));
+      expect(() => res.add('x'), throwsUnsupportedError);
     });
 
     test('key function runs exactly once per element', () {

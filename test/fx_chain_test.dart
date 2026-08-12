@@ -98,6 +98,84 @@ void main() {
       expect(fx([1, 2, 3]).size(), equals(3));
     });
 
+    test('fold should accumulate from a seed', () {
+      expect(fx([1, 2, 3]).fold(10, (acc, a) => acc + a), equals(16));
+      expect(fx(<int>[]).fold(10, (acc, a) => acc + a), equals(10));
+      expect(fx(['a', 'b']).fold('', (acc, a) => '$acc$a'), equals('ab'));
+    });
+
+    group('firstWhere', () {
+      test('returns the first match', () {
+        expect(fx([1, 2, 3, 4]).firstWhere((a) => a.isEven), equals(2));
+      });
+
+      test('returns null when nothing matches and no orElse is given', () {
+        expect(fx([1, 3]).firstWhere((a) => a.isEven), isNull);
+      });
+
+      test('calls orElse when nothing matches', () {
+        expect(fx([1, 3]).firstWhere((a) => a.isEven, orElse: () => -1),
+            equals(-1));
+      });
+
+      test('does not call orElse when a match is found', () {
+        var called = false;
+        final r = fx([2]).firstWhere((a) => a.isEven, orElse: () {
+          called = true;
+          return -1;
+        });
+        expect(r, equals(2));
+        expect(called, isFalse);
+      });
+    });
+
+    group('lastWhere', () {
+      test('returns the last match, not the first', () {
+        expect(fx([1, 2, 3, 4]).lastWhere((a) => a.isEven), equals(4));
+      });
+
+      test('returns null when nothing matches and no orElse is given', () {
+        expect(fx([1, 3]).lastWhere((a) => a.isEven), isNull);
+      });
+
+      test('calls orElse when nothing matches', () {
+        expect(
+            fx([1, 3]).lastWhere((a) => a.isEven, orElse: () => -1), equals(-1));
+      });
+
+      test('scans every element (no early exit)', () {
+        var seen = 0;
+        fx([1, 2, 3, 4]).lastWhere((a) {
+          seen++;
+          return a.isEven;
+        });
+        expect(seen, equals(4));
+      });
+    });
+
+    group('all', () {
+      test('is true when every element passes', () {
+        expect(fx([2, 4, 6]).all((a) => a.isEven), isTrue);
+      });
+
+      test('is false when any element fails', () {
+        expect(fx([2, 3, 4]).all((a) => a.isEven), isFalse);
+      });
+
+      test('is vacuously true for an empty chain', () {
+        expect(fx(<int>[]).all((a) => a.isEven), isTrue);
+      });
+
+      test('stops at the first failure', () {
+        var seen = 0;
+        fx([1, 2, 3]).all((a) {
+          seen++;
+          return a.isOdd;
+        });
+        expect(seen, equals(2));
+      });
+    });
+
     group('FxNum', () {
       test('sum should add the elements', () {
         expect(fx(<num>[1, 2, 3]).sum(), equals(6));

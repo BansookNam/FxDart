@@ -67,6 +67,19 @@ void main() {
         expect(res3, equals([1, 2, 3, 4]));
       });
 
+      test('should await a key callback that returns a Future', () async {
+        final res = await toListAsync(uniqByAsync(
+            (int a) async => a % 3, toAsync([1, 2, 3, 4, 5, 6, 7])));
+        expect(res, equals([1, 2, 3]));
+      });
+
+      test('should handle a key callback that is sometimes async', () async {
+        final res = await toListAsync(uniqByAsync(
+            (int a) => a.isEven ? Future.value(a % 3) : a % 3,
+            toAsync([1, 2, 3, 4, 5, 6])));
+        expect(res, equals([1, 2, 3]));
+      });
+
       test('should be able to be used in the pipeline', () async {
         final res = await fx([1, 2, 3, 4, 4, 2])
             .toAsync()
