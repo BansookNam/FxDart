@@ -1,13 +1,13 @@
 name: fxdart
 description: A functional programming library for Dart, ported from FxTS. Lazy evaluation, concurrent async iteration, and pipeline-style composition.
-version: 0.8.0
+version: 0.8.1
 homepage: https://github.com/bansooknam/fxDart
 repository: https://github.com/bansooknam/fxDart
 
 # pub.dev builds the package thumbnail (100x100 in search, 190x190 on the
 # package page) from the first entry here.
 screenshots:
-  - description: 'The fxdart mark: a dart in flight whose shaft is a lazy pipeline, carrying elements one at a time toward the arrowhead that pulls them.'
+  - description: 'The fxdart mark: an "Fx" pierced by a dart in flight, fletching to arrowhead — the lazy pipeline, pulled forward one element at a time.'
     path: screenshots/logo.webp
 
 executables:
