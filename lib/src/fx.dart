@@ -500,12 +500,12 @@ extension FxNum on Fx<num> {
   double average() => s.average(_inner);
 
   /// The smallest value.
-  @pragma('vm:prefer-inline')
-  num min() => s.min(_inner);
+  @pragma('vm:prefer-inline') // coverage:ignore-line
+  num min() => s.min(_inner); // coverage:ignore-line
 
   /// The largest value.
-  @pragma('vm:prefer-inline')
-  num max() => s.max(_inner);
+  @pragma('vm:prefer-inline') // coverage:ignore-line
+  num max() => s.max(_inner); // coverage:ignore-line
 }
 
 /// Async chainable iterable — the async half of FxTS's `fx` chain.
