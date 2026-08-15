@@ -270,13 +270,24 @@ class _UniqByIterable<A, B> extends Iterable<A> {
   /// separate growth pass in `super.toList`. Valid for any source — a `toList`
   /// consumes the whole iterable regardless, so nothing is evaluated that the
   /// lazy path would have skipped.
+  ///
+  /// The seen set is `Set<Object?>` and a `List` source is indexed rather than
+  /// iterated, for the reasons given on `_MapUniqIterable.toList`.
   @override
   List<A> toList({bool growable = true}) {
     final result = <A>[];
-    final seen = <B>{};
-    for (final a in _source) {
-      if (seen.add(_f(a))) {
-        result.add(a);
+    final seen = <Object?>{};
+    final f = _f;
+    final source = _source;
+    if (source is List<A>) {
+      final length = source.length;
+      for (var i = 0; i < length; i++) {
+        final a = source[i];
+        if (seen.add(f(a))) result.add(a);
+      }
+    } else {
+      for (final a in source) {
+        if (seen.add(f(a))) result.add(a);
       }
     }
     return growable ? result : List<A>.from(result, growable: false);
@@ -287,7 +298,7 @@ class _UniqByIterator<A, B> implements Iterator<A> {
   _UniqByIterator(this._f, this._it);
   final B Function(A) _f;
   final Iterator<A> _it;
-  final _seen = <B>{};
+  final _seen = <Object?>{};
   @override
   late A current;
   @override
@@ -307,7 +318,18 @@ class _UniqByIterator<A, B> implements Iterator<A> {
 ///
 /// Port of FxTS `uniq`. Dedicated iterator (not `uniqBy(identity)`) — the
 /// identity-key closure would cost an indirect call per element.
-Iterable<A> uniq<A>(Iterable<A> iterable) => _UniqIterable(iterable);
+///
+/// A stage that can absorb this one (`map`, today) builds the fused node
+/// itself; see [FxUniqFusable] for why the choice is made here and not by
+/// inspecting the source in [_UniqIterable].
+Iterable<A> uniq<A>(Iterable<A> iterable) {
+  // Cast, not promotion: FxUniqFusable is not a subtype of Iterable, so the
+  // type test alone does not promote (same shape as fxListRangeOf).
+  if (iterable is FxUniqFusable<A>) {
+    return (iterable as FxUniqFusable<A>).fxFuseUniq();
+  }
+  return _UniqIterable(iterable);
+}
 
 class _UniqIterable<A> extends Iterable<A> {
   _UniqIterable(this._source);
@@ -320,10 +342,17 @@ class _UniqIterable<A> extends Iterable<A> {
   @override
   List<A> toList({bool growable = true}) {
     final result = <A>[];
-    final seen = <A>{};
-    for (final a in _source) {
-      if (seen.add(a)) {
-        result.add(a);
+    final seen = <Object?>{};
+    final source = _source;
+    if (source is List<A>) {
+      final length = source.length;
+      for (var i = 0; i < length; i++) {
+        final a = source[i];
+        if (seen.add(a)) result.add(a);
+      }
+    } else {
+      for (final a in source) {
+        if (seen.add(a)) result.add(a);
       }
     }
     return growable ? result : List<A>.from(result, growable: false);
@@ -333,7 +362,7 @@ class _UniqIterable<A> extends Iterable<A> {
 class _UniqIterator<A> implements Iterator<A> {
   _UniqIterator(this._it);
   final Iterator<A> _it;
-  final Set<A> _seen = {};
+  final Set<Object?> _seen = {};
   @override
   late A current;
   @override
@@ -366,24 +395,11 @@ class _UniqIterator<A> implements Iterator<A> {
 /// Prefer lazy [uniq] by default; it already fuses into a single loop when
 /// the chain ends in `.toList()`. Reach for this only when the deduped list
 /// is itself the thing you want, or is iterated repeatedly.
-List<A> uniqStrict<A>(Iterable<A> iterable) {
-  final result = <A>[];
-  final seen = <A>{};
-  for (final a in iterable) {
-    if (seen.add(a)) result.add(a);
-  }
-  return result;
-}
+List<A> uniqStrict<A>(Iterable<A> iterable) => _UniqIterable(iterable).toList();
 
 /// Strict (non-lazy) [uniqBy] — see [uniqStrict] for the trade-off.
-List<A> uniqByStrict<A, B>(B Function(A a) f, Iterable<A> iterable) {
-  final result = <A>[];
-  final seen = <B>{};
-  for (final a in iterable) {
-    if (seen.add(f(a))) result.add(a);
-  }
-  return result;
-}
+List<A> uniqByStrict<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    _UniqByIterable(f, iterable).toList();
 
 /// Async counterpart of [uniqBy]. Uses then/bare pattern for sync keys.
 @pragma('vm:prefer-inline')

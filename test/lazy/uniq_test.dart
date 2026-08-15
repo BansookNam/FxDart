@@ -33,6 +33,19 @@ void main() {
             ]));
       });
 
+      test('should dedup a non-List source, which toList cannot index', () {
+        Iterable<int> generated() sync* {
+          yield 1;
+          yield 2;
+          yield 1;
+          yield 3;
+          yield 2;
+        }
+
+        expect(uniq(generated()).toList(), equals([1, 2, 3]));
+        expect(uniq(generated()).toList(growable: false), equals([1, 2, 3]));
+      });
+
       test('should be able to be used in the pipeline', () {
         final res = fx([1, 2, 3, 4, 4, 2])
             .map((a) => a + 10)

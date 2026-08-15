@@ -1,3 +1,49 @@
+## 0.8.2
+
+No API changes. Two changes to how `uniq` executes, both invisible to calling
+code.
+
+### Performance — `map().uniq()` compiles to a single stage
+
+`map(...)` followed by `uniq()` now builds one fused stage instead of two
+chained ones. The old pair spent more time on the hand-off than on the work:
+each stage holds its upstream as a bare `Iterator<A>`, so the per-element
+`moveNext`/`current` call site sees every iterator in the program and cannot be
+devirtualized. Fused, mapping, dedup and accumulation happen in one loop that
+indexes a `List` source directly, leaving your callback as the only indirect
+call per element.
+
+Laziness is unchanged: the callback still runs once per element consumed, the
+seen set is still per-iteration, and a downstream `take` still cuts the source
+short.
+
+### Performance — dedup sets no longer type-check every element
+
+The `uniq` family kept its seen set as `Set<B>`, where `B` is a runtime type
+argument — so every insert paid a covariant parameter check, once per *source*
+element. The sets are now `Set<Object?>`; membership is `hashCode`/`==` either
+way, so results are identical.
+
+The unfused `uniq`/`uniqBy` paths also index a `List` source instead of
+iterating it, and `uniqStrict`/`uniqByStrict` now delegate to them rather than
+carrying a second copy of the same loop.
+
+* **`first-visit-merchants`** at N=1,000,000: 42.5 ms → 26.8 ms
+  (**−37%**), taking the chain from 1.73× to 1.12× the equivalent hand-written
+  loop. Fusion accounts for 1.73× → ~1.16× and the type-check removal for the
+  rest, each confirmed by a paired interleaved A/B against separately compiled
+  AOT binaries.
+* No other case moved beyond the harness's ~5% noise floor. Across the 53-case
+  suite, the two largest apparent shifts moved on the native side too — neither
+  case uses `uniq` — and the count of cases slower than 1.15× went 18 → 17.
+
+### Behaviour note
+
+Because the fused `toList()` fixes the source length before the pass, a `List`
+mutated by the mapping callback mid-pass is no longer reported as a
+`ConcurrentModificationError` — the same trade-off `takeRight`/`dropRight`
+already make.
+
 ## 0.8.1
 
 ### Added — `uniqStrict` / `uniqByStrict`

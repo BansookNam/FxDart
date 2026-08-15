@@ -29,6 +29,22 @@ void main() {
         expect(res3.toList(), equals([1, 2, 3, 4]));
       });
 
+      test('should dedup a non-List source, which toList cannot index', () {
+        Iterable<int> generated() sync* {
+          yield 11;
+          yield 22;
+          yield 31;
+          yield 42;
+        }
+
+        // Keyed on the last digit, so the 3rd and 4th elements are dropped.
+        expect(uniqBy((int a) => a % 10, generated()).toList(),
+            equals([11, 22]));
+        expect(
+            uniqBy((int a) => a % 10, generated()).toList(growable: false),
+            equals([11, 22]));
+      });
+
       test('should be able to be used in the pipeline', () {
         final res = fx([1, 2, 3, 4, 4, 2])
             .map((a) => a + 10)

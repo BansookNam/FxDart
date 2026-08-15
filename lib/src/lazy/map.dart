@@ -20,12 +20,41 @@ import '../async_iterable.dart';
 Iterable<B> map<A, B>(B Function(A a) f, Iterable<A> iterable) =>
     _MapIterable(f, iterable);
 
-class _MapIterable<A, B> extends Iterable<B> {
+/// Implemented by a lazy stage that can absorb a following `uniq` into its
+/// own loop instead of being pulled through an [Iterator] by it.
+///
+/// The pull protocol costs two virtual calls per element per stage boundary
+/// (`moveNext` + `current`), and the inner one is megamorphic — a stage holds
+/// its upstream as a bare `Iterator<A>`, so the call site sees every iterator
+/// in the program. On the `first-visit-merchants` benchmark
+/// (`map().uniq().toList()` over 1M transactions) that boundary, not the work,
+/// was most of fxdart's 1.89x against the equivalent hand-written loop:
+/// fusing the two stages took it to 1.16x, and dropping the seen set's
+/// per-element covariance check (see `_MapUniqIterable.toList`) to 1.11x.
+/// What is left is the user's callback, the one indirect call per element that
+/// no amount of fusing can remove.
+///
+/// The fused node has to be built *by the mapping stage*, which is why this
+/// is a method on it rather than a type test at the `uniq` call site: the
+/// element type of the stage's own source is not nameable from downstream,
+/// and recovering it there (a generic-method handshake, or erasing to
+/// `Object?` and casting per element) costs back most of what fusion wins.
+abstract class FxUniqFusable<B> {
+  /// This stage followed by `uniq`, as a single stage.
+  ///
+  /// Same elements, order, and laziness as `uniq(this)` — including a seen-set
+  /// per iteration, and the transform running once per element consumed.
+  Iterable<B> fxFuseUniq();
+}
+
+class _MapIterable<A, B> extends Iterable<B> implements FxUniqFusable<B> {
   _MapIterable(this._f, this._source);
   final B Function(A) _f;
   final Iterable<A> _source;
   @override
   Iterator<B> get iterator => _MapIterator(_f, _source.iterator);
+  @override
+  Iterable<B> fxFuseUniq() => _MapUniqIterable(_f, _source);
   @override
   List<B> toList({bool growable = true}) {
     final source = _source;
@@ -56,6 +85,75 @@ class _MapIterator<A, B> implements Iterator<B> {
     if (_it.moveNext()) {
       current = _f(_it.current);
       return true;
+    }
+    return false;
+  }
+}
+
+/// `map(f, source)` followed by `uniq()`, as one stage — see [FxUniqFusable].
+///
+/// Lazily equivalent to both halves it replaces: [_f] runs once per element
+/// consumed, the seen set is per-iteration, and a downstream `take` still cuts
+/// the source short.
+class _MapUniqIterable<A, B> extends Iterable<B> {
+  _MapUniqIterable(this._f, this._source);
+  final B Function(A) _f;
+  final Iterable<A> _source;
+
+  @override
+  Iterator<B> get iterator => _MapUniqIterator(_f, _source.iterator);
+
+  /// The point of the fusion: mapping, dedup, and accumulation in one loop.
+  /// A `toList` consumes everything anyway, so indexing a `List` source costs
+  /// nothing in laziness and skips the iterator entirely — leaving [_f] as the
+  /// only call the compiler cannot inline.
+  ///
+  /// [_f] and the length are copied into locals first, so neither is reloaded
+  /// through the receiver on every iteration. Fixing the length is the same
+  /// trade-off `takeRight`/`dropRight` and [FxListRange] already make — a
+  /// source mutated by [_f] mid-pass is not reported as a
+  /// `ConcurrentModificationError`.
+  @override
+  List<B> toList({bool growable = true}) {
+    final result = <B>[];
+    // `Set<Object?>`, not `Set<B>`: B is a runtime type argument here, so
+    // every `add` on a `Set<B>` pays a covariant parameter check — once per
+    // source element, against once per *distinct* element for `result.add`.
+    // Membership is `hashCode`/`==` either way, so the dedup is unchanged.
+    final seen = <Object?>{};
+    final f = _f;
+    final source = _source;
+    if (source is List<A>) {
+      final length = source.length;
+      for (var i = 0; i < length; i++) {
+        final v = f(source[i]);
+        if (seen.add(v)) result.add(v);
+      }
+    } else {
+      for (final a in source) {
+        final v = f(a);
+        if (seen.add(v)) result.add(v);
+      }
+    }
+    return growable ? result : List<B>.from(result, growable: false);
+  }
+}
+
+class _MapUniqIterator<A, B> implements Iterator<B> {
+  _MapUniqIterator(this._f, this._it);
+  final B Function(A) _f;
+  final Iterator<A> _it;
+  final _seen = <Object?>{};
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final v = _f(_it.current);
+      if (_seen.add(v)) {
+        current = v;
+        return true;
+      }
     }
     return false;
   }
