@@ -1,7 +1,16 @@
 ## 0.8.2
 
-No API changes. Two changes to how `uniq` executes, both invisible to calling
-code.
+### Fixed — `Fx.join()` without a separator
+
+`fx(xs).join()` did not compile: `Fx.join` took a *required* separator, and
+redeclaring a member on an extension type **replaces** the interface member
+rather than overriding it, so `Iterable.join`'s default never applied. The
+separator is optional again and defaults to `''`, matching `Iterable.join`.
+Regression from 0.8.0, where `Fx` became an extension type; it also broke the
+`join` and `repeat` playground demos on the docs site.
+
+Below that, two changes to how `uniq` executes — both invisible to calling
+code, neither an API change.
 
 ### Performance — `map().uniq()` compiles to a single stage
 

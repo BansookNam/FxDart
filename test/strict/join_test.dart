@@ -45,6 +45,14 @@ void main() {
         expect(res, equals('12-14-16'));
       });
 
+      test('should default the separator to empty, as Iterable.join does', () {
+        // Fx redeclares join, which on an extension type replaces rather than
+        // overrides Iterable.join — so the default has to survive here.
+        expect(fx([1, 2, 3]).join(), equals('123'));
+        expect(fx(<int>[]).join(), equals(''));
+        expect(fx(repeat(4, '-')).join(), equals('----'));
+      });
+
       test('should return an empty string when it is an empty array', () {
         expect(join('~', <int>[]), equals(''));
       });

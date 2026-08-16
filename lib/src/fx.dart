@@ -459,7 +459,12 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   }
 
   /// Joins all elements into a string separated by [separator].
-  String join(String separator) => _inner.join(separator);
+  ///
+  /// [separator] is optional, matching `Iterable.join`. It has to be spelled
+  /// out here: redeclaring a member on an extension type *replaces* the one
+  /// from the implemented interface rather than overriding it, so a required
+  /// parameter would make `fx(xs).join()` stop compiling.
+  String join([String separator = '']) => _inner.join(separator);
 
   /// The maximum element using [compare] function.
   /// If [compare] is not provided, assumes T is Comparable<T>.
