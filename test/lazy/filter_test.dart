@@ -14,6 +14,22 @@ void main() {
         expect(res, equals([2, 4, 6, 8]));
       });
 
+      test('toList takes the pulled path when the source is not a List', () {
+        // A List source is handed to the SDK's where().toList(); anything else
+        // falls through to the inherited toList. Both must agree.
+        Iterable<int> generated() sync* {
+          for (var i = 1; i < 10; i++) {
+            yield i;
+          }
+        }
+
+        expect(filter(mod, generated()).toList(), equals([2, 4, 6, 8]));
+        expect(filter(mod, generated()).toList(growable: false),
+            equals([2, 4, 6, 8]));
+        expect(filter(mod, [1, 2, 3, 4, 5, 6, 7, 8, 9]).toList(),
+            equals(filter(mod, generated()).toList()));
+      });
+
       test('should be able to handle an error', () {
         expect(
           () => toList(filter<int>((a) => throw 'err', range(1, 10))),

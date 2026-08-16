@@ -9,6 +9,51 @@ separator is optional again and defaults to `''`, matching `Iterable.join`.
 Regression from 0.8.0, where `Fx` became an extension type; it also broke the
 `join` and `repeat` playground demos on the docs site.
 
+### Performance — `map`/`filter`/`mapWithIndex` `.toList()` hand a `List` source to the SDK
+
+Filling a pre-sized list from package code costs a **covariant store check per
+element**: `List<B>.operator[]=` takes a covariant parameter, and inside a
+generic stage `B` is a runtime type argument, so the check cannot be elided.
+For a **record** type — structural, so the test is not a class-id compare — it
+was catastrophic. Mapping 1,000,000 rows to `(Tx, double)`:
+
+| strategy | time |
+|---|---|
+| pre-sized fill (0.8.1) | 394 ms |
+| `List.generate` | 219 ms |
+| inherited `toList` | 220 ms |
+| **hand-off to the SDK (0.8.2)** | **65 ms** |
+| plain Dart `xs.map(...).toList()` | 70 ms |
+
+Producing the records was never the cost — draining the same chain with a
+`for`-in is 8 ms. `source.map(_f)` returns an SDK `MappedListIterable`, which
+the SDK knows has an efficient length, so its `toList` pre-allocates and
+bulk-fills with internal *unchecked* stores that package code cannot reach.
+`filter` had no `toList` override at all and now gets the same treatment
+(24.4 ms → 16.9 ms at 1M, against 11.6 ms for a hand-written loop).
+
+* **`multi-currency-report`** at N=1,000,000: **664 ms → 353 ms**, against
+  348 ms native — from the widest gap in the suite to a tie.
+
+Callbacks still run exactly once per element, in order.
+
+### Performance — `maxBy` / `minBy` compare `num` keys directly
+
+`_compareKeys` tested `is Comparable` twice, cast twice and dispatched through
+`Comparable.compare` for every element. `num` — the overwhelmingly common key
+kind — now short-circuits: `maxBy` over 1M readings keyed by a `double` goes
+**8.9 ms → 6.3 ms** (2.1 ms for a hand-written `reduce`). What remains is the
+key extractor's closure call and boxing each key into the `Object?` the
+signature takes, neither removable without changing the public shape.
+
+### Performance — `concurrent(1)` skips the batching machinery
+
+A concurrency of one is a serial pull, so the ordered batch, the `prev` future
+chain, the per-batch `List.generate`/`List.filled` and the settlement queue all
+exist to reorder pulls that can never overlap. `concurrentAsync` now forwards
+straight to the upstream iterator when `length == 1`, still passing the
+`Concurrent.of(1)` marker upstream. **`rate-limited-import` 1.30× → 1.23×.**
+
 Below that, two changes to how `uniq` executes — both invisible to calling
 code, neither an API change.
 
@@ -52,6 +97,40 @@ Because the fused `toList()` fixes the source length before the pass, a `List`
 mutated by the mapping callback mid-pass is no longer reported as a
 `ConcurrentModificationError` — the same trade-off `takeRight`/`dropRight`
 already make.
+
+### Where the suite stands
+
+Both benchmark families re-measured on 2026-08-17 (AOT, interleaved sides).
+
+* **RxDartComparison: 0 of 41 cases exceed 1.2×** at any scale — fxdart wins
+  34, ties 5, RxDart wins 2. The Rx numbers had not been re-measured since
+  2026-08-09 and were three releases stale.
+* **DartComparison: 14 of 53 exceed 1.2×** against a hand-written imperative
+  loop. `multi-currency-report` left that list; `first-visit-merchants` left it
+  in the previous pass.
+
+The remaining fourteen are documented rather than hidden. Roughly half are
+await-bound async cases where one future per element is irreducible for a pull
+protocol; the rest pay for a record per element (`consecutive-over-limit`
+allocates 1,000,000 3-tuples and discards nearly all of them) or for a lazy
+stage boundary the shape genuinely needs. A new
+[Writing fast pipelines](https://bansook.xyz/FxDart/tutorials/performance.html)
+lesson covers the shapes that avoid those costs.
+
+### Tooling
+
+Two bugs this cycle — `Fx.join()` and a playground bundle that failed to
+analyze — both shipped and sat for two releases because only a manual deploy
+exercised them. CI now runs `dart analyze` over `lib`/`test`/`tool`/`benchmark`,
+rebuilds the playground bundle and asserts the committed copy is current, and
+checks that every benchmark case still uses the same operators as the example
+it claims to measure. A new `test/api_surface_test.dart` calls every
+`Fx`/`FxAsync` member in its bare, all-defaults form — the shape line coverage
+structurally cannot see.
+
+`multi-currency-report`'s benchmark case had been rewritten to avoid fxdart
+entirely (raw loops, `toSet()`); it is restored to the published pipeline, and
+the faithfulness check now fails CI on that class of drift.
 
 ## 0.8.1
 
