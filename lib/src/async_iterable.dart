@@ -1122,6 +1122,20 @@ FxAsyncIterable<A> concurrentAsync<A>(int length, FxAsyncIterable<A> iterable) {
   if (length < 1) {
     throw RangeError("'length' must be positive integer");
   }
+  if (length == 1) {
+    // A concurrency of one is a serial pull, so none of the machinery below
+    // buys anything: the ordered batch, the `prev` future chain, the
+    // per-batch List.generate/List.filled and the settlement queue all exist
+    // to reorder overlapping pulls, and with one in flight there is nothing
+    // to reorder. Forwarding keeps the `Concurrent.of(1)` marker travelling
+    // upstream, so any stage that adapts to a concurrent consumer still sees
+    // the same signal it did before.
+    return DelegateAsyncIterable(() {
+      final iterator = iterable.iterator;
+      return DelegateAsyncIterator(
+          (concurrent) => iterator.next(concurrent ?? Concurrent.of(1)));
+    });
+  }
   return DelegateAsyncIterable(() {
     final iterator = iterable.iterator;
     final buffer = <Settled<IterResult<A>>>[];

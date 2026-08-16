@@ -2,6 +2,57 @@ import 'package:fxdart/fxdart.dart';
 import 'package:test/test.dart';
 
 void main() {
+  group('concurrent(1)', () {
+    // A concurrency of one takes a dedicated forwarding path that skips the
+    // ordered-batch machinery entirely; these pin that it behaves exactly
+    // like the general path did.
+    test('yields every element, in order', () async {
+      final res = concurrentAsync(1, toAsync([1, 2, 3, 4]));
+      expect(await toListAsync(res), equals([1, 2, 3, 4]));
+    });
+
+    test('runs serially — one in flight at a time', () async {
+      var inFlight = 0;
+      var maxInFlight = 0;
+      final res = fx([1, 2, 3, 4]).toAsync().map((a) async {
+        inFlight++;
+        maxInFlight = maxInFlight > inFlight ? maxInFlight : inFlight;
+        await delay(const Duration(milliseconds: 20), a);
+        inFlight--;
+        return a;
+      }).concurrent(1);
+
+      expect(await res.toList(), equals([1, 2, 3, 4]));
+      expect(maxInFlight, equals(1));
+    });
+
+    test('propagates an error from upstream', () async {
+      final res = concurrentAsync(
+          1,
+          toAsync(() sync* {
+            yield Future.value(1);
+            yield Future<int>.error(StateError('boom'));
+          }()));
+      expect(toListAsync(res), throwsStateError);
+    });
+
+    test('an empty source completes empty', () async {
+      expect(await toListAsync(concurrentAsync(1, toAsync(<int>[]))),
+          equals(<int>[]));
+    });
+
+    test('a downstream take still cuts the source short', () async {
+      var pulled = 0;
+      final res = fx([1, 2, 3, 4, 5])
+          .toAsync()
+          .peek((_) => pulled++)
+          .concurrent(1)
+          .take(2);
+      expect(await res.toList(), equals([1, 2]));
+      expect(pulled, lessThan(5));
+    });
+  });
+
   group('concurrent', () {
     test("should be consumed 'FxAsyncIterable' concurrently", () async {
       final res = concurrentAsync(2, toAsync(() sync* {
