@@ -476,11 +476,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/timeout.html">timeout</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="true" data-speed="fxdart" data-fns="fx toAsync retry concurrent">
+    <li data-verdict="fxdart" data-async="true" data-speed="tie" data-fns="fx toAsync retry concurrent">
       <a class="cmp-row" href="per-row-retry.html">
         <span class="cmp-num">31</span>
         <span class="cmp-row-body">
-          <strong>Reintentar cada fila inestable por separado</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart más rápido</span>
+          <strong>Reintentar cada fila inestable por separado</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ Misma velocidad</span>
           <span class="dim">Seis filas de importación inestables, dos intentos cada una, tres en vuelo — flatMap emite en orden de terminación, mapRetry bajo concurrent conserva el orden de origen.</span>
         </span>
       </a>
@@ -496,11 +496,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/using.html">using</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/toList.html">toList</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="true" data-speed="fxdart" data-fns="fx toAsync map ifEmpty">
+    <li data-verdict="fxdart" data-async="true" data-speed="tie" data-fns="fx toAsync map ifEmpty">
       <a class="cmp-row" href="price-or-fallback.html">
         <span class="cmp-num">33</span>
         <span class="cmp-row-body">
-          <strong>Un precio, o el precio de lista</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart más rápido</span>
+          <strong>Un precio, o el precio de lista</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ Misma velocidad</span>
           <span class="dim">Un precio promocional donde exista, el precio de lista donde no — recuperación por elemento como streams internos frente a un try/catch justo al lado de la llamada.</span>
         </span>
       </a>
@@ -663,11 +663,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/takeWhile.html">takeWhile</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="true" data-speed="fxdart" data-fns="fx toAsync map scan">
+    <li data-verdict="tie" data-async="true" data-speed="tie" data-fns="fx toAsync map scan">
       <a class="cmp-row" href="dependent-calls-in-sequence.html">
         <span class="cmp-num">49</span>
         <span class="cmp-row-body">
-          <strong>Cada llamada alimenta la siguiente</strong> <span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart más rápido</span>
+          <strong>Cada llamada alimenta la siguiente</strong> <span class="badge verdict-tie">Empate</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ Misma velocidad</span>
           <span class="dim">Cuatro llamadas a la API donde cada respuesta siembra la petición siguiente — scan enhebra el estado por el pipeline; asyncMap se cierra sobre un token mutable.</span>
         </span>
       </a>

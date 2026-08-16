@@ -5,6 +5,9 @@
 //   dart run benchmark/run_benchmarks.dart --rounds 3   # base rounds (default 3)
 //   dart run benchmark/run_benchmarks.dart --smoke      # 1 iteration, no warmup (sanity only)
 //   dart run benchmark/run_benchmarks.dart --scales 100,full
+//   dart run benchmark/run_benchmarks.dart --cooldown 12  # idle between blocks
+//                                            so thermal throttling does not
+//                                            land on the later cases only
 //   dart run benchmark/run_benchmarks.dart --report-only # re-derive verdicts +
 //                                            reports from results.json without
 //                                            re-measuring (after a rule change)
@@ -43,6 +46,16 @@ const tieMarginPct = 5.0;
 /// N=100 gap measured is ~0.55 ms, an async retry case).
 const tieAbsMs = 0.6;
 const maxRounds = 5;
+
+/// Idle pause after each case×scale block, from `--cooldown <seconds>`.
+///
+/// A full suite is ~20 minutes of near-continuous 100% CPU, which is long
+/// enough for the machine to reach a thermal limit and start clocking down —
+/// and because cases run in a fixed order, the later ones absorb most of it.
+/// Interleaving the two sides keeps a *single* case fair regardless, but it
+/// does nothing for comparability across the run. Pausing between blocks lets
+/// the package cool so every case is measured under similar conditions.
+Duration _cooldown = Duration.zero;
 
 /// The two benchmark families share this runner; `--rx` selects the second.
 /// The rx family runs only N=100 and the headline (its async cases declare a
@@ -109,6 +122,8 @@ Future<void> main(List<String> args) async {
         smoke = true;
       case '--scales':
         scalesArg = args[++i].split(',');
+      case '--cooldown':
+        _cooldown = Duration(seconds: int.parse(args[++i]));
       default:
         onlySlugs.add(args[i]);
     }
@@ -138,7 +153,9 @@ Future<void> main(List<String> args) async {
       'Dart ${machine['dart']}');
   stdout.writeln('Cases: ${caseDirs.length}, scales: ${scales.join('/')}, '
       'base rounds: $rounds (tie margin ${tieMarginPct.toStringAsFixed(0)}% '
-      '→ up to $maxRounds rounds)\n');
+      '→ up to $maxRounds rounds)'
+      '${_cooldown > Duration.zero ? ', cooldown ${_cooldown.inSeconds}s '
+          'between blocks' : ''}\n');
 
   await _compileAll(caseDirs);
 
@@ -163,6 +180,7 @@ Future<void> main(List<String> args) async {
     for (final scale in scales) {
       try {
         final r = await _runCase(slug, scale, rounds, smoke);
+        if (_cooldown > Duration.zero) await Future<void>.delayed(_cooldown);
         scaleResults[scale] = r.toJson();
         lineParts.add('${scale == 'full' ? 'N=${r.n}' : 'N=$scale'} '
             '${_fmtUs(r.left.medianUs)}/${_fmtUs(r.fxdart.medianUs)}'
