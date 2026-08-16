@@ -2,7 +2,7 @@
 
 - **Machine:** Apple M1 Max, 32 GB RAM
 - **Dart:** 3.12.2 (macos Version 26.3 (Build 25D125)), AOT-compiled
-- **Date:** 2026-08-16
+- **Date:** 2026-08-17
 - **Method:** per side and N-scale, fresh process × rounds, 2 warmup + 5 measured iterations per process (small N auto-batched to ≥2 ms samples); median reported. Ties — within 5.0% of each other, or within 0.6 ms absolute (beneath human perception) — with close relative races re-run up to 5 rounds.
 - Memory is peak process RSS — the runtime and the dataset are identical on both sides, so the *difference* is what the pipeline itself holds onto. At small N it is all runtime baseline; expect ties.
 
@@ -40,7 +40,7 @@
 | 28 | budget-alerts | 100 | 3.2 µs | 4.7 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 29 | monthly-category-report | 100 | 2.3 µs | 6.8 µs | **tie** | 16.5 MB | 16.4 MB | tie | 3 |
 | 30 | consecutive-over-limit | 100 | 2.0 µs | 3.1 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
-| 31 | multi-currency-report | 100 | 38 µs | 46 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
+| 31 | multi-currency-report | 100 | 34 µs | 76 µs | **tie** | 16.6 MB | 16.0 MB | tie | 5 |
 | 32 | restock-plan | 100 | 11 µs | 9.5 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 33 | price-lookup-fallback (async) | 100 | 390 µs | 405 µs | **tie** | 16.5 MB | 17.1 MB | tie | 3 |
 | 34 | monthly-ledger-report | 100 | 25 µs | 31 µs | **tie** | 17.1 MB | 16.3 MB | tie | 3 |
@@ -98,7 +98,7 @@
 | 28 | budget-alerts | 10000 | 185 µs | 237 µs | **tie** | 21.8 MB | 19.5 MB | fxdart | 3 |
 | 29 | monthly-category-report | 10000 | 120 µs | 174 µs | **tie** | 17.0 MB | 16.9 MB | tie | 3 |
 | 30 | consecutive-over-limit | 10000 | 118 µs | 219 µs | **tie** | 20.9 MB | 23.5 MB | native | 3 |
-| 31 | multi-currency-report | 10000 | 2.64 ms | 4.18 ms | **native** | 21.9 MB | 22.4 MB | tie | 3 |
+| 31 | multi-currency-report | 10000 | 2.65 ms | 6.22 ms | **native** | 22.0 MB | 19.1 MB | fxdart | 5 |
 | 32 | restock-plan | 10000 | 1.28 ms | 1.10 ms | **tie** | 17.6 MB | 20.8 MB | native | 3 |
 | 33 | price-lookup-fallback (async) | 10000 | 34.4 ms | 34.5 ms | **tie** | 49.0 MB | 30.6 MB | fxdart | 4 |
 | 34 | monthly-ledger-report | 10000 | 940 µs | 688 µs | **tie** | 23.0 MB | 22.8 MB | tie | 3 |
@@ -156,7 +156,7 @@
 | 28 | budget-alerts | 1000000 | 21.2 ms | 26.8 ms | **native** | 90.3 MB | 90.0 MB | tie | 3 |
 | 29 | monthly-category-report | 1000000 | 11.2 ms | 17.2 ms | **native** | 119.5 MB | 119.3 MB | tie | 3 |
 | 30 | consecutive-over-limit | 1000000 | 16.5 ms | 23.8 ms | **native** | 150.3 MB | 151.3 MB | tie | 3 |
-| 31 | multi-currency-report | 1000000 | 314.3 ms | 452.7 ms | **native** | 218.1 MB | 199.7 MB | fxdart | 3 |
+| 31 | multi-currency-report | 1000000 | 344.2 ms | 664.2 ms | **native** | 223.4 MB | 196.6 MB | fxdart | 5 |
 | 32 | restock-plan | 1000000 | 212.9 ms | 192.9 ms | **fxdart** | 173.4 MB | 193.3 MB | native | 3 |
 | 33 | price-lookup-fallback (async) | 100000 | 350.0 ms | 349.7 ms | **tie** | 80.9 MB | 80.8 MB | tie | 3 |
 | 34 | monthly-ledger-report | 1000000 | 146.5 ms | 73.6 ms | **fxdart** | 167.4 MB | 131.5 MB | fxdart | 3 |
