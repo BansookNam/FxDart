@@ -19,6 +19,19 @@ class _FilterIterable<A> extends Iterable<A> {
   final Iterable<A> _source;
   @override
   Iterator<A> get iterator => _FilterIterator(_f, _source.iterator);
+
+  /// Hands a `List` source to the SDK's `where().toList()`, for the reason
+  /// given on `_MapIterable.toList`: accumulating here costs a covariant
+  /// check on every `add`, and pulls each element through [_FilterIterator]
+  /// as well. [_f] still runs exactly once per element, in order.
+  @override
+  List<A> toList({bool growable = true}) {
+    final source = _source;
+    if (source is List<A>) {
+      return source.where(_f).toList(growable: growable);
+    }
+    return super.toList(growable: growable);
+  }
 }
 
 class _FilterIterator<A> implements Iterator<A> {
