@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>uniqStrict — FxDart 101</title>
+  <meta name="description" content="FxDart uniqStrict tutorial: dedupe eagerly into a List instead of lazily, and when that trade is worth making, with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/uniqStrict.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/uniqStrict.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/uniqStrict.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/uniqStrict.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/uniqStrict.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/uniqStrict.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/uniqStrict.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/uniqStrict.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/uniqStrict.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8619485f6d7b022d">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">ホーム</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API チュートリアル</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="言語">
+      <span class="lang-label">言語</span>
+      <ul>
+        <li><a href="../../tutorials/uniqStrict.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/uniqStrict.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/uniqStrict.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../../ja/tutorials/uniqStrict.html" hreflang="ja" lang="ja" aria-current="page">日本語</a></li>
+        <li><a href="../../es/tutorials/uniqStrict.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/uniqStrict.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/uniqStrict.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">このページはまだ翻訳されていないため、英語で表示されます。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">翻訳に参加する</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › セクション 4 · フィルタリング &amp; 重複除去 › <strong>uniqStrict</strong></p>
+  <h1><code>uniqStrict</code></h1>
+  <p class="hero-sub">Dedupes the whole iterable immediately and returns a <code>List</code> — the eager counterpart of <code>distinct</code>.</p>
+
+  <div class="signature">List&lt;A&gt; uniqStrict&lt;A&gt;(Iterable&lt;A&gt; iterable)
+List&lt;A&gt; uniqByStrict&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.uniqStrict()        // chain
+Fx&lt;T&gt; Fx.uniqByStrict&lt;B&gt;(B Function(T a) f)</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>uniqStrict</code> produces exactly the same elements, in the same
+    order, as <a href="uniq.html"><code>distinct</code></a> followed by
+    <code>toList()</code>. What differs is <em>when</em> the work happens and
+    who can stop it. <code>uniqByStrict</code> is the same deal for
+    <a href="uniqBy.html"><code>distinctBy</code></a>: dedupe on a computed
+    key, eagerly.
+  </p>
+  <p>
+    A lazy chain re-runs its upstream on every iteration. Iterate
+    <code>distinct(...)</code> twice and the source is walked twice. The strict
+    form walks it once, at the call, and hands you a <code>List</code> — so a
+    result you are going to index, measure, or scan more than once costs you
+    one pass instead of <em>n</em>. Demo 2 counts the callbacks to make this
+    concrete.
+  </p>
+  <p>
+    The price is that nothing downstream can cut the work short.
+    <code>distinct(xs).take(3)</code> stops pulling <code>xs</code> as soon as
+    3 distinct values have appeared; <code>uniqStrict(xs).take(3)</code> dedupes
+    all of <code>xs</code> first and then takes 3. Never put the strict form
+    ahead of a short-circuiting consumer, and never point it at an unbounded
+    iterable — it will not terminate.
+  </p>
+  <div class="callout">
+    <strong>Default to lazy.</strong> <code>distinct(...).toList()</code>
+    already runs the dedupe and the accumulation as a single pass, so it is not
+    paying for laziness. Reach for <code>uniqStrict</code> only when the deduped
+    <code>List</code> is itself the thing you want, or when it is iterated more
+    than once.
+  </div>
+
+  <h2>Demo 1 · Basics</h2>
+  <div class="playground" data-pg="e0129d7366c49b64">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // Data-first form: dedups now, and hands back a real List.
+  final ids = uniqStrict([3, 1, 3, 2, 1, 2]);
+  print(ids); // [3, 1, 2]
+  print(ids.length); // 3  -- a List, so .length/[i] work right away
+  print(ids[0]); // 3
+
+  // Same elements, same order as the lazy version.
+  print(toList(distinct([3, 1, 3, 2, 1, 2]))); // [3, 1, 2]
+
+  // uniqByStrict dedups on a computed key instead of the whole value.
+  final orders = [
+    ('ann', 12.0),
+    ('bob', 8.0),
+    ('ann', 30.0),
+  ];
+  print(uniqByStrict((o) => o.$1, orders)); // [(ann, 12.0), (bob, 8.0)]
+
+  // Chain form:
+  print(fx([3, 1, 3, 2]).uniqStrict().toList()); // [3, 1, 2]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · When it pays, and what it costs</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+// The whole point of the strict form: WHEN the upstream runs.
+void main() {
+  final ids = [3, 1, 3, 2, 1, 2];
+
+  // Lazy: nothing has run yet, and the upstream re-runs on every iteration.
+  var lazyCalls = 0;
+  final lazy = fx(ids).map((a) {
+    lazyCalls++;
+    return a;
+  }).distinct();
+  print('lazy, before iterating: $lazyCalls'); // 0
+  print(lazy.toList()); // [3, 1, 2]
+  print(lazy.toList()); // [3, 1, 2]
+  print('lazy, after 2 passes: $lazyCalls'); // 12 -- ran twice
+
+  // Strict: the upstream runs once, right here at the call.
+  var strictCalls = 0;
+  final strict = fx(ids).map((a) {
+    strictCalls++;
+    return a;
+  }).uniqStrict();
+  print('strict, before iterating: $strictCalls'); // 6 -- already done
+  print(strict.toList()); // [3, 1, 2]
+  print(strict.toList()); // [3, 1, 2]
+  print('strict, after 2 passes: $strictCalls'); // 6 -- still once
+
+  // The trade-off: nothing downstream can cut a strict pass short.
+  var lazyScanned = 0;
+  fx(ids).map((a) {
+    lazyScanned++;
+    return a;
+  }).distinct().take(2).toList();
+  print('lazy + take(2) scanned: $lazyScanned'); // 2 -- stopped early
+
+  var strictScanned = 0;
+  fx(ids).map((a) {
+    strictScanned++;
+    return a;
+  }).uniqStrict().take(2).toList();
+  print('strict + take(2) scanned: $strictScanned'); // 6 -- scanned it all
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: use <code>uniqByStrict</code> to keep each visitor's first
+    visit, as a <code>List</code> you can index without iterating again.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final visits = [
+    ('ann', '09:01'),
+    ('bob', '09:04'),
+    ('ann', '09:20'),
+    ('cid', '09:31'),
+    ('bob', '09:40'),
+  ];
+
+  // TODO: use uniqByStrict to keep each visitor's FIRST visit, as a List you
+  // can index and take a length from without iterating again.
+  final firstVisits = visits;
+
+  print(firstVisits.length); // want: 3
+  print(firstVisits.first); // want: (ann, 09:01)
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="uniq.html"><code>distinct</code></a> — the lazy default ·
+    <a href="uniqBy.html"><code>distinctBy</code></a> — dedupe by a computed key ·
+    <a href="uniqAdjacent.html"><code>uniqAdjacent</code></a> — drop only adjacent duplicates ·
+    <a href="toList.html"><code>toList</code></a> — materialize any chain
+  </div>
+
+  <nav class="tut-nav">
+    <a href="uniqBy.html">← 前: distinctBy</a>
+    <a href="uniqAdjacent.html">次: uniqAdjacent →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart は <a href="https://github.com/marpple/FxTS">FxTS</a> の移植プロジェクトです。このライブラリの土台となったアイデア、セマンティクス、テストスイートを生み出した <strong>Indong Yoo</strong> 氏（Marpple CTO）と FxTS チームに深く感謝します。</p>
+  <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8619485f6d7b022d";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

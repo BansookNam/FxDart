@@ -196,6 +196,9 @@ Iterable<A> _$uniqBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
 FxAsyncIterable<A> _$uniqByAsync<A, B>(
         FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
     uniqByAsync(f, iterable);
+List<A> _$uniqStrict<A>(Iterable<A> iterable) => uniqStrict(iterable);
+List<A> _$uniqByStrict<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    uniqByStrict(f, iterable);
 Iterable<A> _$differenceBy<A, B>(
         B Function(A a) f, Iterable<A> iterable1, Iterable<A> iterable2) =>
     differenceBy(f, iterable1, iterable2);
@@ -363,6 +366,11 @@ FxAsyncIterable<A> _$timeoutAsync<A>(
 List<A> _$toList<A>(Iterable<A> iterable) => toList(iterable);
 Future<List<A>> _$toListAsync<A>(FxAsyncIterable<A> iterable) =>
     toListAsync(iterable);
+A _$reduce<A>(A Function(A acc, A a) f, Iterable<A> iterable) =>
+    reduce(f, iterable);
+Acc _$fold<A, Acc>(
+        Acc seed, Acc Function(Acc acc, A a) f, Iterable<A> iterable) =>
+    fold(seed, f, iterable);
 void _$each<A>(void Function(A a) f, Iterable<A> iterable) => each(f, iterable);
 Future<void> _$eachAsync<A>(
         FutureOr<void> Function(A a) f, FxAsyncIterable<A> iterable) =>
@@ -503,6 +511,7 @@ Future<(R1, R2)> _$teeAsync<A, R1, R2>(FxAsyncIterable<A> iterable,
 // strict/access.dart
 A? _$head<A>(Iterable<A> iterable) => head(iterable);
 Future<A?> _$headAsync<A>(FxAsyncIterable<A> iterable) => headAsync(iterable);
+A? _$last<A>(Iterable<A> iterable) => last(iterable);
 Future<A?> _$lastAsync<A>(FxAsyncIterable<A> iterable) => lastAsync(iterable);
 A? _$find<A>(bool Function(A a) f, Iterable<A> iterable) => find(f, iterable);
 Future<A?> _$findAsync<A>(

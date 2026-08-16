@@ -19,10 +19,19 @@ nextLabel: sortByDesc
     <code>sortBy</code>는 <code><a href="sort.html">sort</a></code>의
     편의 버전입니다. <code>(a, b) =&gt; a.age.compareTo(b.age)</code>를
     직접 쓰는 대신 <code>sortBy</code>에 키 추출 함수 —
-    <code>(a) =&gt; a['age']</code> — 를 넘기면, 비교자를 대신 만들어
-    줍니다. 언제나 오름차순이고, 언제나 추출한 키를
-    <code>Comparable.compare</code>로 비교합니다. 내부적으로는 말
-    그대로 <code>sort((a, b) =&gt; compare(f(a), f(b)), iterable)</code>입니다.
+    <code>(a) =&gt; a['age']</code> — 를 넘기면 추출한 키를 기준으로
+    정렬합니다. 언제나 오름차순이고, 언제나 추출한 키를
+    <code>Comparable.compare</code>로 비교합니다.
+  </p>
+  <p>
+    내부가 <code>sort((a, b) =&gt; compare(f(a), f(b)))</code>인 것은
+    <em>아니며</em>, 그 차이는 여러분의 콜백에서 그대로 드러납니다. 그
+    형태라면 비교할 때마다 <code>f</code>를 두 번씩, 대략
+    <code>2·n·log n</code>번 호출하게 됩니다. <code>sortBy</code>는 각 키를
+    <strong>정확히 한 번</strong>만 추출한 뒤 그 키로 정렬하므로, 비싼 키
+    추출 함수라도 <code>2·n·log n</code>번이 아니라 <code>n</code>번만
+    호출됩니다. 그래도 <code>f</code>는 순수하고 가볍게 유지하세요 — 호출
+    횟수는 보장되지만, 호출되는 순서는 보장되지 않습니다.
   </p>
   <p>
     <code>sort</code>의 보장은 하나도 빠짐없이 그대로 적용됩니다.

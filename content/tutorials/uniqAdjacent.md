@@ -5,8 +5,8 @@ description: FxDart uniqAdjacent tutorial: drop only adjacent duplicates — sta
 heading: <code>uniqAdjacent</code>
 section: 4
 crumb: uniqAdjacent
-prev: uniqBy.html
-prevLabel: distinctBy
+prev: uniqStrict.html
+prevLabel: uniqStrict
 next: difference.html
 nextLabel: difference
 ---

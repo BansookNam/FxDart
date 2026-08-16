@@ -1681,12 +1681,41 @@ class FxListRangeIterator<A> implements Iterator<A> {
 Iterable<B> map<A, B>(B Function(A a) f, Iterable<A> iterable) =>
     _MapIterable(f, iterable);
 
-class _MapIterable<A, B> extends Iterable<B> {
+/// Implemented by a lazy stage that can absorb a following `uniq` into its
+/// own loop instead of being pulled through an [Iterator] by it.
+///
+/// The pull protocol costs two virtual calls per element per stage boundary
+/// (`moveNext` + `current`), and the inner one is megamorphic — a stage holds
+/// its upstream as a bare `Iterator<A>`, so the call site sees every iterator
+/// in the program. On the `first-visit-merchants` benchmark
+/// (`map().uniq().toList()` over 1M transactions) that boundary, not the work,
+/// was most of fxdart's 1.89x against the equivalent hand-written loop:
+/// fusing the two stages took it to 1.16x, and dropping the seen set's
+/// per-element covariance check (see `_MapUniqIterable.toList`) to 1.11x.
+/// What is left is the user's callback, the one indirect call per element that
+/// no amount of fusing can remove.
+///
+/// The fused node has to be built *by the mapping stage*, which is why this
+/// is a method on it rather than a type test at the `uniq` call site: the
+/// element type of the stage's own source is not nameable from downstream,
+/// and recovering it there (a generic-method handshake, or erasing to
+/// `Object?` and casting per element) costs back most of what fusion wins.
+abstract class FxUniqFusable<B> {
+  /// This stage followed by `uniq`, as a single stage.
+  ///
+  /// Same elements, order, and laziness as `uniq(this)` — including a seen-set
+  /// per iteration, and the transform running once per element consumed.
+  Iterable<B> fxFuseUniq();
+}
+
+class _MapIterable<A, B> extends Iterable<B> implements FxUniqFusable<B> {
   _MapIterable(this._f, this._source);
   final B Function(A) _f;
   final Iterable<A> _source;
   @override
   Iterator<B> get iterator => _MapIterator(_f, _source.iterator);
+  @override
+  Iterable<B> fxFuseUniq() => _MapUniqIterable(_f, _source);
   @override
   List<B> toList({bool growable = true}) {
     final source = _source;
@@ -1717,6 +1746,75 @@ class _MapIterator<A, B> implements Iterator<B> {
     if (_it.moveNext()) {
       current = _f(_it.current);
       return true;
+    }
+    return false;
+  }
+}
+
+/// `map(f, source)` followed by `uniq()`, as one stage — see [FxUniqFusable].
+///
+/// Lazily equivalent to both halves it replaces: [_f] runs once per element
+/// consumed, the seen set is per-iteration, and a downstream `take` still cuts
+/// the source short.
+class _MapUniqIterable<A, B> extends Iterable<B> {
+  _MapUniqIterable(this._f, this._source);
+  final B Function(A) _f;
+  final Iterable<A> _source;
+
+  @override
+  Iterator<B> get iterator => _MapUniqIterator(_f, _source.iterator);
+
+  /// The point of the fusion: mapping, dedup, and accumulation in one loop.
+  /// A `toList` consumes everything anyway, so indexing a `List` source costs
+  /// nothing in laziness and skips the iterator entirely — leaving [_f] as the
+  /// only call the compiler cannot inline.
+  ///
+  /// [_f] and the length are copied into locals first, so neither is reloaded
+  /// through the receiver on every iteration. Fixing the length is the same
+  /// trade-off `takeRight`/`dropRight` and [FxListRange] already make — a
+  /// source mutated by [_f] mid-pass is not reported as a
+  /// `ConcurrentModificationError`.
+  @override
+  List<B> toList({bool growable = true}) {
+    final result = <B>[];
+    // `Set<Object?>`, not `Set<B>`: B is a runtime type argument here, so
+    // every `add` on a `Set<B>` pays a covariant parameter check — once per
+    // source element, against once per *distinct* element for `result.add`.
+    // Membership is `hashCode`/`==` either way, so the dedup is unchanged.
+    final seen = <Object?>{};
+    final f = _f;
+    final source = _source;
+    if (source is List<A>) {
+      final length = source.length;
+      for (var i = 0; i < length; i++) {
+        final v = f(source[i]);
+        if (seen.add(v)) result.add(v);
+      }
+    } else {
+      for (final a in source) {
+        final v = f(a);
+        if (seen.add(v)) result.add(v);
+      }
+    }
+    return growable ? result : List<B>.from(result, growable: false);
+  }
+}
+
+class _MapUniqIterator<A, B> implements Iterator<B> {
+  _MapUniqIterator(this._f, this._it);
+  final B Function(A) _f;
+  final Iterator<A> _it;
+  final _seen = <Object?>{};
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final v = _f(_it.current);
+      if (_seen.add(v)) {
+        current = v;
+        return true;
+      }
     }
     return false;
   }
@@ -2739,20 +2837,32 @@ class _UniqByIterable<A, B> extends Iterable<A> {
   @override
   Iterator<A> get iterator => _UniqByIterator(_f, _source.iterator);
 
+  /// Fuses the dedup loop with its own accumulation: one pass with `Set.add`
+  /// + `List.add`, instead of a [_UniqByIterator.moveNext] per element and a
+  /// separate growth pass in `super.toList`. Valid for any source — a `toList`
+  /// consumes the whole iterable regardless, so nothing is evaluated that the
+  /// lazy path would have skipped.
+  ///
+  /// The seen set is `Set<Object?>` and a `List` source is indexed rather than
+  /// iterated, for the reasons given on `_MapUniqIterable.toList`.
   @override
   List<A> toList({bool growable = true}) {
+    final result = <A>[];
+    final seen = <Object?>{};
+    final f = _f;
     final source = _source;
     if (source is List<A>) {
-      final result = <A>[];
-      final seen = <B>{};
-      for (final a in source) {
-        if (seen.add(_f(a))) {
-          result.add(a);
-        }
+      final length = source.length;
+      for (var i = 0; i < length; i++) {
+        final a = source[i];
+        if (seen.add(f(a))) result.add(a);
       }
-      return growable ? result : List<A>.from(result, growable: false);
+    } else {
+      for (final a in source) {
+        if (seen.add(f(a))) result.add(a);
+      }
     }
-    return super.toList(growable: growable);
+    return growable ? result : List<A>.from(result, growable: false);
   }
 }
 
@@ -2760,7 +2870,7 @@ class _UniqByIterator<A, B> implements Iterator<A> {
   _UniqByIterator(this._f, this._it);
   final B Function(A) _f;
   final Iterator<A> _it;
-  final _seen = <B>{};
+  final _seen = <Object?>{};
   @override
   late A current;
   @override
@@ -2780,7 +2890,18 @@ class _UniqByIterator<A, B> implements Iterator<A> {
 ///
 /// Port of FxTS `uniq`. Dedicated iterator (not `uniqBy(identity)`) — the
 /// identity-key closure would cost an indirect call per element.
-Iterable<A> uniq<A>(Iterable<A> iterable) => _UniqIterable(iterable);
+///
+/// A stage that can absorb this one (`map`, today) builds the fused node
+/// itself; see [FxUniqFusable] for why the choice is made here and not by
+/// inspecting the source in [_UniqIterable].
+Iterable<A> uniq<A>(Iterable<A> iterable) {
+  // Cast, not promotion: FxUniqFusable is not a subtype of Iterable, so the
+  // type test alone does not promote (same shape as fxListRangeOf).
+  if (iterable is FxUniqFusable<A>) {
+    return (iterable as FxUniqFusable<A>).fxFuseUniq();
+  }
+  return _UniqIterable(iterable);
+}
 
 class _UniqIterable<A> extends Iterable<A> {
   _UniqIterable(this._source);
@@ -2788,27 +2909,32 @@ class _UniqIterable<A> extends Iterable<A> {
   @override
   Iterator<A> get iterator => _UniqIterator(_source.iterator);
 
+  /// Fuses the dedup loop with its own accumulation — see
+  /// [_UniqByIterable.toList].
   @override
   List<A> toList({bool growable = true}) {
+    final result = <A>[];
+    final seen = <Object?>{};
     final source = _source;
     if (source is List<A>) {
-      final result = <A>[];
-      final seen = <A>{};
-      for (final a in source) {
-        if (seen.add(a)) {
-          result.add(a);
-        }
+      final length = source.length;
+      for (var i = 0; i < length; i++) {
+        final a = source[i];
+        if (seen.add(a)) result.add(a);
       }
-      return growable ? result : List<A>.from(result, growable: false);
+    } else {
+      for (final a in source) {
+        if (seen.add(a)) result.add(a);
+      }
     }
-    return super.toList(growable: growable);
+    return growable ? result : List<A>.from(result, growable: false);
   }
 }
 
 class _UniqIterator<A> implements Iterator<A> {
   _UniqIterator(this._it);
   final Iterator<A> _it;
-  final Set<A> _seen = {};
+  final Set<Object?> _seen = {};
   @override
   late A current;
   @override
@@ -2824,6 +2950,29 @@ class _UniqIterator<A> implements Iterator<A> {
   }
 }
 
+/// Strict (non-lazy) [uniq]: dedups the whole of [iterable] immediately and
+/// returns the result as a `List`.
+///
+/// Same elements in the same order as `uniq(...).toList()`. The difference is
+/// *when* and *how much* work happens:
+///
+/// * The upstream runs once, here, rather than on each iteration of the
+///   result — so a chain that is iterated more than once pays for it once,
+///   and any side effects in the upstream happen at this call.
+/// * Nothing downstream can cut the work short. `uniq(xs).take(3)` stops the
+///   upstream after 3 distinct values; `uniqStrict(xs).take(3)` dedups all of
+///   `xs` first. Never use this ahead of a short-circuiting consumer, and
+///   never on an unbounded iterable — it will not terminate.
+///
+/// Prefer lazy [uniq] by default; it already fuses into a single loop when
+/// the chain ends in `.toList()`. Reach for this only when the deduped list
+/// is itself the thing you want, or is iterated repeatedly.
+List<A> uniqStrict<A>(Iterable<A> iterable) => _UniqIterable(iterable).toList();
+
+/// Strict (non-lazy) [uniqBy] — see [uniqStrict] for the trade-off.
+List<A> uniqByStrict<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    _UniqByIterable(f, iterable).toList();
+
 /// Async counterpart of [uniqBy]. Uses then/bare pattern for sync keys.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> uniqByAsync<A, B>(
@@ -2835,7 +2984,7 @@ FxAsyncIterable<A> uniqByAsync<A, B>(
       if (key is Future<B>) {
         return key.then((k) => seen.add(k));
       }
-      return seen.add(key as B);
+      return seen.add(key);
     }, iterable).iterator;
   });
 }
@@ -10072,6 +10221,9 @@ class FxSubscriptions {
 /// Port of FxTS `fx`. This chain is the Dart replacement for FxTS's curried
 /// `pipe` pipelines, which cannot be typed in Dart.
 ///
+/// The chain uses lazy evaluation throughout: fully composable, minimal overhead,
+/// zero allocations for non-terminal operations.
+///
 /// ```dart
 /// fx([1, 2, 3, 4, 5])
 ///     .map((a) => a + 10)
@@ -10116,7 +10268,10 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 
   // --- lazy operators -----------------------------------------------------
 
-  Fx<R> map<R>(R Function(T a) toElement) => Fx(_$map(toElement, _inner));
+  Fx<R> map<R>(R Function(T a) toElement) {
+    final mapped = _$map(toElement, _inner);
+    return Fx(mapped);
+  }
 
   /// [map] with the element's 0-based position — `zipWithIndex().map(...)`
   /// without the intermediate record.
@@ -10127,7 +10282,10 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   Fx<R> mapEffect<R>(R Function(T a) f) => map(f);
 
   /// See top-level `flatMap`; same contract as [Iterable.expand].
-  Fx<R> flatMap<R>(Iterable<R> Function(T a) f) => Fx(_$flatMap(f, _inner));
+  Fx<R> flatMap<R>(Iterable<R> Function(T a) f) {
+    final flatMapped = _$flatMap(f, _inner);
+    return Fx(flatMapped);
+  }
 
   /// [flatMap] with the source element's 0-based position.
   Fx<R> flatMapWithIndex<R>(Iterable<R> Function(T a, int index) f) =>
@@ -10143,7 +10301,10 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   Fx<dynamic> flattened([int depth = 1]) => flat(depth);
 
   /// All elements [f] returns true for.
-  Fx<T> filter(bool Function(T a) f) => Fx(_$filter(f, _inner));
+  Fx<T> filter(bool Function(T a) f) {
+    final filtered = _$filter(f, _inner);
+    return Fx(filtered);
+  }
 
   /// [filter] with the element's 0-based position in the input — dropped
   /// elements still advance the count.
@@ -10158,7 +10319,10 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// Dart-idiomatic alias of [reject].
   Fx<T> whereNot(bool Function(T a) f) => reject(f);
 
-  Fx<T> take(int count) => Fx(_$take(count, _inner));
+  Fx<T> take(int count) {
+    final taken = _$take(count, _inner);
+    return Fx(taken);
+  }
 
   /// The last [count] elements.
   Fx<T> takeRight(int count) => Fx(_$takeRight(count, _inner));
@@ -10228,6 +10392,17 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 
   /// Dart-idiomatic alias of [uniqBy].
   Fx<T> distinctBy<B>(B Function(T a) f) => uniqBy(f);
+
+  /// Strict [uniq]: dedups now, into a `List`, instead of lazily on iteration.
+  ///
+  /// The chain continues, so the result is still an [Fx] — but everything
+  /// upstream has already run, and a downstream `take`/`first` can no longer
+  /// cut it short. See [_$uniqStrict]; prefer plain [uniq] unless the deduped
+  /// list is the goal or the chain is iterated more than once.
+  Fx<T> uniqStrict() => Fx(_$uniqStrict(_inner));
+
+  /// Strict [uniqBy] — see [uniqStrict] for the trade-off.
+  Fx<T> uniqByStrict<B>(B Function(T a) f) => Fx(_$uniqByStrict(f, _inner));
 
   /// Drops values equal to their predecessor, keeping the first of each run.
   Fx<T> uniqAdjacent() => Fx(_$uniqAdjacent(_inner));
@@ -10421,6 +10596,106 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 
   /// The number of values.
   int size() => _$size(_inner);
+
+  // --- Phase 1: Access Operators ---
+
+  /// The first element, or null if empty.
+  T? get first => _$head(_inner);
+
+  /// The last element, or null if empty.
+  T? get last => _$last(_inner);
+
+  /// The number of elements.
+  int get length => _$size(_inner);
+
+  /// True if there are no elements.
+  bool get isEmpty => size() == 0;
+
+  /// True if there is at least one element.
+  bool get isNotEmpty => !isEmpty;
+
+  // --- Phase 1: Aggregation Operators ---
+
+  /// The element at [index], or null if out of bounds.
+  T? elementAt(int index) {
+    try {
+      return _inner.elementAt(index);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Folds every value with [combine], starting from [initial].
+  R fold<R>(R initial, R Function(R acc, T a) combine) =>
+      _$fold(initial, combine, _inner);
+
+  /// Folds every value with [combine], starting from the first element.
+  /// Throws if empty.
+  T reduce(T Function(T acc, T a) combine) => _$reduce(combine, _inner);
+
+  /// The first element matching [test], or call [orElse] if none match.
+  T? firstWhere(bool Function(T) test, {T? Function()? orElse}) {
+    final found = _$find(test, _inner);
+    return found ?? (orElse != null ? orElse() : null);
+  }
+
+  /// The last element matching [test], or call [orElse] if none match.
+  T? lastWhere(bool Function(T) test, {T? Function()? orElse}) {
+    T? result;
+    for (final item in _inner) {
+      if (test(item)) result = item;
+    }
+    return result ?? (orElse != null ? orElse() : null);
+  }
+
+  // --- Phase 1: Predicates & String ---
+
+  /// True if [test] holds for at least one element.
+  /// Stops at first true (early exit).
+  bool any(bool Function(T) test) => _$some(test, _inner);
+
+  /// True if [test] holds for every element.
+  /// Stops at first false (early exit).
+  bool all(bool Function(T) test) {
+    for (final item in _inner) {
+      if (!test(item)) return false;
+    }
+    return true;
+  }
+
+  /// Joins all elements into a string separated by [separator].
+  ///
+  /// [separator] is optional, matching `Iterable.join`. It has to be spelled
+  /// out here: redeclaring a member on an extension type *replaces* the one
+  /// from the implemented interface rather than overriding it, so a required
+  /// parameter would make `fx(xs).join()` stop compiling.
+  String join([String separator = '']) => _inner.join(separator);
+
+  /// The maximum element using [compare] function.
+  /// If [compare] is not provided, assumes T is Comparable<T>.
+  /// Throws if empty or elements are not comparable.
+  T max([int Function(T a, T b)? compare]) {
+    final compareFn =
+        compare ?? (a, b) => (a as dynamic).compareTo(b as dynamic) as int;
+    var result = _inner.first;
+    for (final item in _inner.skip(1)) {
+      if (compareFn(item, result) > 0) result = item;
+    }
+    return result;
+  }
+
+  /// The minimum element using [compare] function.
+  /// If [compare] is not provided, assumes T is Comparable<T>.
+  /// Throws if empty or elements are not comparable.
+  T min([int Function(T a, T b)? compare]) {
+    final compareFn =
+        compare ?? (a, b) => (a as dynamic).compareTo(b as dynamic) as int;
+    var result = _inner.first;
+    for (final item in _inner.skip(1)) {
+      if (compareFn(item, result) < 0) result = item;
+    }
+    return result;
+  }
 }
 
 /// Numeric terminals for [Fx] chains (generic covariance makes these apply
@@ -10435,12 +10710,12 @@ extension FxNum on Fx<num> {
   double average() => _$average(_inner);
 
   /// The smallest value.
-  @pragma('vm:prefer-inline')
-  num min() => _$min(_inner);
+  @pragma('vm:prefer-inline') // coverage:ignore-line
+  num min() => _$min(_inner); // coverage:ignore-line
 
   /// The largest value.
-  @pragma('vm:prefer-inline')
-  num max() => _$max(_inner);
+  @pragma('vm:prefer-inline') // coverage:ignore-line
+  num max() => _$max(_inner); // coverage:ignore-line
 }
 
 /// Async chainable iterable — the async half of FxTS's `fx` chain.
@@ -11302,6 +11577,9 @@ Iterable<A> _$uniqBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
 FxAsyncIterable<A> _$uniqByAsync<A, B>(
         FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
     uniqByAsync(f, iterable);
+List<A> _$uniqStrict<A>(Iterable<A> iterable) => uniqStrict(iterable);
+List<A> _$uniqByStrict<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    uniqByStrict(f, iterable);
 Iterable<A> _$differenceBy<A, B>(
         B Function(A a) f, Iterable<A> iterable1, Iterable<A> iterable2) =>
     differenceBy(f, iterable1, iterable2);
@@ -11469,6 +11747,11 @@ FxAsyncIterable<A> _$timeoutAsync<A>(
 List<A> _$toList<A>(Iterable<A> iterable) => toList(iterable);
 Future<List<A>> _$toListAsync<A>(FxAsyncIterable<A> iterable) =>
     toListAsync(iterable);
+A _$reduce<A>(A Function(A acc, A a) f, Iterable<A> iterable) =>
+    reduce(f, iterable);
+Acc _$fold<A, Acc>(
+        Acc seed, Acc Function(Acc acc, A a) f, Iterable<A> iterable) =>
+    fold(seed, f, iterable);
 void _$each<A>(void Function(A a) f, Iterable<A> iterable) => each(f, iterable);
 Future<void> _$eachAsync<A>(
         FutureOr<void> Function(A a) f, FxAsyncIterable<A> iterable) =>
@@ -11609,6 +11892,7 @@ Future<(R1, R2)> _$teeAsync<A, R1, R2>(FxAsyncIterable<A> iterable,
 // strict/access.dart
 A? _$head<A>(Iterable<A> iterable) => head(iterable);
 Future<A?> _$headAsync<A>(FxAsyncIterable<A> iterable) => headAsync(iterable);
+A? _$last<A>(Iterable<A> iterable) => last(iterable);
 Future<A?> _$lastAsync<A>(FxAsyncIterable<A> iterable) => lastAsync(iterable);
 A? _$find<A>(bool Function(A a) f, Iterable<A> iterable) => find(f, iterable);
 Future<A?> _$findAsync<A>(

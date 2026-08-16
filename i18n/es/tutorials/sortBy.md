@@ -20,9 +20,18 @@ nextLabel: sortByDesc
     <code><a href="sort.html">sort</a></code>: en lugar de escribir tú
     <code>(a, b) =&gt; a.age.compareTo(b.age)</code>, le das a
     <code>sortBy</code> un extractor de clave — <code>(a) =&gt; a['age']</code> —
-    y construye el comparador por ti, siempre ascendente, comparando
-    siempre las claves extraídas con <code>Comparable.compare</code>. Por
-    debajo es literalmente <code>sort((a, b) =&gt; compare(f(a), f(b)), iterable)</code>.
+    y ordena por las claves extraídas, siempre de forma ascendente, comparándolas
+    siempre con <code>Comparable.compare</code>.
+  </p>
+  <p>
+    Por debajo <em>no</em> es <code>sort((a, b) =&gt; compare(f(a), f(b)))</code>,
+    y la diferencia se nota en tu callback: esa forma llamaría a <code>f</code>
+    dos veces por comparación, unas <code>2·n·log n</code> veces.
+    <code>sortBy</code> extrae cada clave <strong>exactamente una vez</strong> y
+    después ordena por las claves extraídas, así que un extractor costoso cuesta
+    <code>n</code> llamadas, no <code>2·n·log n</code>. Aun así, mantén
+    <code>f</code> pura y barata: el número de llamadas está garantizado, el
+    orden en que ocurren no.
   </p>
   <p>
     Todas las garantías de <code>sort</code> se mantienen sin cambios: el

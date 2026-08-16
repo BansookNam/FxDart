@@ -5,8 +5,8 @@ description: FxDart uniqAdjacent 튜토리얼: 인접한 중복만 제거하기 
 heading: <code>uniqAdjacent</code>
 section: 4
 crumb: uniqAdjacent
-prev: uniqBy.html
-prevLabel: distinctBy
+prev: uniqStrict.html
+prevLabel: uniqStrict
 next: difference.html
 nextLabel: difference
 ---

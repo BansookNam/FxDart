@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=24b1aeb3f05a1a37">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8619485f6d7b022d">
 </head>
 <body>
 <header class="site-header">
@@ -46,7 +46,6 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">이 번역은 최신 내용이 아닐 수 있습니다 — 번역된 이후 영어 원문이 변경되었습니다. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">번역에 참여하기</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 7 · 집계 › <strong>sortBy</strong></p>
   <h1><code>sortBy</code></h1>
   <p class="hero-sub">비교자를 손으로 작성하는 대신, 추출한 키를 기준으로 오름차순 정렬합니다.</p>
@@ -61,10 +60,19 @@ Future&lt;List&lt;T&gt;&gt; FxAsync.sortBy(Object? Function(T a) f)     // chain
     <code>sortBy</code>는 <code><a href="sort.html">sort</a></code>의
     편의 버전입니다. <code>(a, b) =&gt; a.age.compareTo(b.age)</code>를
     직접 쓰는 대신 <code>sortBy</code>에 키 추출 함수 —
-    <code>(a) =&gt; a['age']</code> — 를 넘기면, 비교자를 대신 만들어
-    줍니다. 언제나 오름차순이고, 언제나 추출한 키를
-    <code>Comparable.compare</code>로 비교합니다. 내부적으로는 말
-    그대로 <code>sort((a, b) =&gt; compare(f(a), f(b)), iterable)</code>입니다.
+    <code>(a) =&gt; a['age']</code> — 를 넘기면 추출한 키를 기준으로
+    정렬합니다. 언제나 오름차순이고, 언제나 추출한 키를
+    <code>Comparable.compare</code>로 비교합니다.
+  </p>
+  <p>
+    내부가 <code>sort((a, b) =&gt; compare(f(a), f(b)))</code>인 것은
+    <em>아니며</em>, 그 차이는 여러분의 콜백에서 그대로 드러납니다. 그
+    형태라면 비교할 때마다 <code>f</code>를 두 번씩, 대략
+    <code>2·n·log n</code>번 호출하게 됩니다. <code>sortBy</code>는 각 키를
+    <strong>정확히 한 번</strong>만 추출한 뒤 그 키로 정렬하므로, 비싼 키
+    추출 함수라도 <code>2·n·log n</code>번이 아니라 <code>n</code>번만
+    호출됩니다. 그래도 <code>f</code>는 순수하고 가볍게 유지하세요 — 호출
+    횟수는 보장되지만, 호출되는 순서는 보장되지 않습니다.
   </p>
   <p>
     <code>sort</code>의 보장은 하나도 빠짐없이 그대로 적용됩니다.
@@ -83,7 +91,7 @@ Future&lt;List&lt;T&gt;&gt; FxAsync.sortBy(Object? Function(T a) f)     // chain
   </p>
 
   <h2>데모 1 · 기본</h2>
-  <div class="playground">
+  <div class="playground" data-pg="528d95c122a937a5">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -161,7 +169,7 @@ void main() {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=24b1aeb3f05a1a37";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8619485f6d7b022d";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

@@ -1,0 +1,4 @@
+List&lt;A&gt; uniqStrict&lt;A&gt;(Iterable&lt;A&gt; iterable)
+List&lt;A&gt; uniqByStrict&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx.uniqStrict()        // chain
+Fx&lt;T&gt; Fx.uniqByStrict&lt;B&gt;(B Function(T a) f)

@@ -51,6 +51,17 @@ nextLabel: pipe
     살아 있는 파이프라인을 얻는 방법입니다.
   </p>
 
+  <div class="callout">
+    <strong>0.8.0 파괴적 변경:</strong>
+    <code>Fx&lt;T&gt;</code>는 이제 <strong>확장 타입</strong>이며, 런타임에는
+    감싸고 있던 <code>Iterable&lt;T&gt;</code>로 소거됩니다. 문서화된 API는
+    모두 그대로이고 체인도 이전과 똑같이 동작합니다. 깨지는 것은
+    <code>x is Fx&lt;T&gt;</code> 검사(런타임에 그 타입이 존재하지 않습니다),
+    그리고 <code>Fx</code>를 직접 extend하거나 implement하려던 코드입니다(대신
+    최상위 함수를 쓰세요). <code>fx()</code>를 평범하게 쓰고 있다면 고칠 것은
+    없습니다.
+  </div>
+
   <h2>데모 1 · 종결 연산자 전까지는 아무것도 실행되지 않습니다</h2>
   <p>체인을 만든 직후에는 <code>calls</code>가 0에 머물러 있다가,
     <code>toList()</code>가 실제로 값 5개를 끌어당기는 순간 올라가는 것을 보세요.</p>

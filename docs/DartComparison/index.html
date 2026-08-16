@@ -239,11 +239,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/partition.html">partition</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="native" data-async="false" data-speed="fxdart" data-fns="map filter take">
+    <li data-verdict="native" data-async="false" data-speed="tie" data-fns="map filter take">
       <a class="cmp-row" href="valid-emails.html">
         <span class="cmp-num">14</span>
         <span class="cmp-row-body">
-          <strong>First 5 valid emails, normalized</strong> <span class="badge verdict-native">Native is fine</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart faster</span>
+          <strong>First 5 valid emails, normalized</strong> <span class="badge verdict-native">Native is fine</span> <span class="badge badge-speed speed-tie">⚡ Same speed</span>
           <span class="dim">Trim, lowercase, validate, take five — map/where/take in plain Dart vs map + filter + take in FxDart. Plain Dart is every bit as clean here.</span>
         </span>
       </a>
@@ -269,11 +269,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="groupBy map maxBy">
+    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="groupBy map maxBy">
       <a class="cmp-row" href="top-category-average.html">
         <span class="cmp-num">17</span>
         <span class="cmp-row-body">
-          <strong>Category with highest average expense</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-native">⚡ Native faster</span>
+          <strong>Category with highest average expense</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-tie">⚡ Same speed</span>
           <span class="dim">Group expenses and find the priciest category per transaction — collection groupBy + maxBy nested calls in plain Dart vs one FxDart chain.</span>
         </span>
       </a>
@@ -433,11 +433,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="filter sortBy scan drop zip takeWhile map sumBy join">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="filter sortBy scan drop zip takeWhile map sumBy join">
       <a class="cmp-row" href="restock-plan.html">
         <span class="cmp-num">32</span>
         <span class="cmp-row-body">
-          <strong>Inventory restock plan</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-tie">⚡ Same speed</span>
+          <strong>Inventory restock plan</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart faster</span>
           <span class="dim">Prioritize below-threshold items and cut the order list at a budget — scan + zip + takeWhile as data flow vs a mutable running total and break.</span>
         </span>
       </a>
@@ -543,11 +543,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="windowed average uniqAdjacent pairwise ifEmpty map">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="windowed average uniqAdjacent pairwise ifEmpty map">
       <a class="cmp-row" href="smoothed-zone-changes.html">
         <span class="cmp-num">43</span>
         <span class="cmp-row-body">
-          <strong>Smoothed zone changes</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-tie">⚡ Same speed</span>
+          <strong>Smoothed zone changes</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart faster</span>
           <span class="dim">Moving average, zone runs, transition alerts — three index loops with mutable carry in plain Dart vs windowed → uniqAdjacentBy → pairwise in FxDart.</span>
         </span>
       </a>
@@ -603,11 +603,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/attach.html">attach</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/countWhere.html">countWhere</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="true" data-speed="tie" data-fns="filter sortBy toAsync map concurrent join">
+    <li data-verdict="fxdart" data-async="true" data-speed="native" data-fns="filter sortBy toAsync map concurrent join">
       <a class="cmp-row" href="concurrent-profile-fetch.html">
         <span class="cmp-num">49</span>
         <span class="cmp-row-body">
-          <strong>Fetch 10 profiles, 3 at a time</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ Same speed</span>
+          <strong>Fetch 10 profiles, 3 at a time</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-native">⚡ Native faster</span>
           <span class="dim">Sync prep flowing straight into bounded concurrency — filter and sort, then toAsync + map + concurrent(3), vs a hand-rolled worker pool.</span>
         </span>
       </a>

@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=24b1aeb3f05a1a37">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=8619485f6d7b022d">
 </head>
 <body>
 <header class="site-header">
@@ -46,7 +46,6 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta traducción puede estar desactualizada: la página en inglés cambió después de escribirse. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 1 · Primeros pasos › <strong>fx</strong></p>
   <h1><code>fx</code></h1>
   <p class="hero-sub">Envuelve una secuencia en un pipeline perezoso y encadenable: el corazón tipado de FxDart.</p>
@@ -96,10 +95,22 @@ FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)</div>
     FxDart de ofrecer pipelines totalmente tipados y con autocompletado.
   </p>
 
+  <div class="callout">
+    <strong>Cambio incompatible en 0.8.0:</strong>
+    <code>Fx&lt;T&gt;</code> ahora es un <strong>extension type</strong> que en
+    tiempo de ejecución se borra al <code>Iterable&lt;T&gt;</code> que envuelve.
+    Todas las APIs documentadas siguen igual: las cadenas funcionan exactamente
+    como antes. Lo que se rompe: las comprobaciones
+    <code>x is Fx&lt;T&gt;</code> (el tipo no existe en tiempo de ejecución) y el
+    código que intentaba extender o implementar <code>Fx</code> directamente (usa
+    las funciones de nivel superior en su lugar). Si usas <code>fx()</code> de la
+    forma habitual, no tienes que cambiar nada.
+  </div>
+
   <h2>Demo 1 · Nada se ejecuta hasta el operador terminal</h2>
   <p>Fíjate en que <code>calls</code> se queda en 0 justo después de construir la cadena, y
     salta en cuanto <code>toList()</code> tira de verdad de los 5 valores:</p>
-  <div class="playground">
+  <div class="playground" data-pg="506c345bd4bb39da">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -190,7 +201,7 @@ void main() {
   <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=24b1aeb3f05a1a37";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=8619485f6d7b022d";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

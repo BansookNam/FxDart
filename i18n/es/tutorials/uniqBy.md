@@ -7,8 +7,8 @@ section: 4
 crumb: distinctBy
 prev: uniq.html
 prevLabel: uniq
-next: uniqAdjacent.html
-nextLabel: uniqAdjacent
+next: uniqStrict.html
+nextLabel: uniqStrict
 ---
   <p class="hero-sub">Elimina duplicados según lo que determine una función de clave, en lugar de por igualdad de valores.</p>
 

@@ -53,6 +53,18 @@ nextLabel: pipe
     FxDart de ofrecer pipelines totalmente tipados y con autocompletado.
   </p>
 
+  <div class="callout">
+    <strong>Cambio incompatible en 0.8.0:</strong>
+    <code>Fx&lt;T&gt;</code> ahora es un <strong>extension type</strong> que en
+    tiempo de ejecución se borra al <code>Iterable&lt;T&gt;</code> que envuelve.
+    Todas las APIs documentadas siguen igual: las cadenas funcionan exactamente
+    como antes. Lo que se rompe: las comprobaciones
+    <code>x is Fx&lt;T&gt;</code> (el tipo no existe en tiempo de ejecución) y el
+    código que intentaba extender o implementar <code>Fx</code> directamente (usa
+    las funciones de nivel superior en su lugar). Si usas <code>fx()</code> de la
+    forma habitual, no tienes que cambiar nada.
+  </div>
+
   <h2>Demo 1 · Nada se ejecuta hasta el operador terminal</h2>
   <p>Fíjate en que <code>calls</code> se queda en 0 justo después de construir la cadena, y
     salta en cuanto <code>toList()</code> tira de verdad de los 5 valores:</p>
