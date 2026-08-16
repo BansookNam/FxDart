@@ -55,20 +55,29 @@ class _MapIterable<A, B> extends Iterable<B> implements FxUniqFusable<B> {
   Iterator<B> get iterator => _MapIterator(_f, _source.iterator);
   @override
   Iterable<B> fxFuseUniq() => _MapUniqIterable(_f, _source);
+  /// Hands a `List` source to the SDK's own `map().toList()` rather than
+  /// filling a pre-sized list here.
+  ///
+  /// Filling one from package code costs a **covariant store check per
+  /// element**: `List<B>.operator[]=` takes a covariant parameter, and here `B`
+  /// is a runtime type argument, so the check cannot be elided. For a record
+  /// type — structural, so the test is not a class-id compare — that was
+  /// catastrophic. Measured at N=1,000,000 mapping to `(Tx, double)`:
+  /// pre-sized fill 394 ms, `List.generate` 219 ms, inherited `toList` 220 ms,
+  /// **this 65 ms**, against 70 ms for the same `txns.map(...).toList()` in
+  /// plain Dart. Producing the records is not the cost — draining the same
+  /// chain with a `for-in` is 8 ms.
+  ///
+  /// `source.map(_f)` returns an SDK `MappedListIterable`, which the SDK knows
+  /// has an efficient length, so `toList` pre-allocates and bulk-fills with
+  /// internal *unchecked* stores that package code cannot reach.
+  ///
+  /// [_f] still runs exactly once per element, in order.
   @override
   List<B> toList({bool growable = true}) {
     final source = _source;
-    // A List source maps into a pre-sized list — the inherited toList grows
-    // and recopies ~log n times. [_f] still runs exactly once per element,
-    // in order.
     if (source is List<A>) {
-      final length = source.length;
-      if (length == 0) return growable ? <B>[] : List<B>.empty();
-      final out = List<B>.filled(length, _f(source[0]), growable: growable);
-      for (var i = 1; i < length; i++) {
-        out[i] = _f(source[i]);
-      }
-      return out;
+      return source.map(_f).toList(growable: growable);
     }
     return super.toList(growable: growable);
   }
@@ -183,15 +192,14 @@ class _MapWithIndexIterable<A, B> extends Iterable<B> {
   @override
   List<B> toList({bool growable = true}) {
     final source = _source;
-    // Pre-sized from a List source, as in [_MapIterable.toList].
+    // Same SDK hand-off as [_MapIterable.toList], and for the same reason —
+    // a pre-sized fill here pays a covariant store check per element. There is
+    // no SDK `mapWithIndex`, so the index rides along in the closure; `toList`
+    // makes exactly one in-order pass, so the counter stays in step.
     if (source is List<A>) {
-      final length = source.length;
-      if (length == 0) return growable ? <B>[] : List<B>.empty();
-      final out = List<B>.filled(length, _f(source[0], 0), growable: growable);
-      for (var i = 1; i < length; i++) {
-        out[i] = _f(source[i], i);
-      }
-      return out;
+      final f = _f;
+      var i = 0;
+      return source.map((a) => f(a, i++)).toList(growable: growable);
     }
     return super.toList(growable: growable);
   }
