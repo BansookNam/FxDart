@@ -5,8 +5,8 @@ description: FxDart range 튜토리얼: 위로도 아래로도 셀 수 있는 �
 heading: <code>range</code>
 section: 2
 crumb: range
-prev: consume.html
-prevLabel: consume
+prev: performance.html
+prevLabel: performance
 next: repeat.html
 nextLabel: repeat
 ---

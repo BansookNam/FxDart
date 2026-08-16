@@ -423,11 +423,11 @@
   <h2>Part 4 · Six to ten functions</h2>
   <p class="dim">Full workflows, most with bounded concurrency — the part native Dart cannot express cleanly.</p>
   <ol class="cmp-list">
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="map groupBy sumBy sortBy uniq maxBy join">
+    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="map groupBy sumBy sortBy uniq maxBy join">
       <a class="cmp-row" href="multi-currency-report.html">
         <span class="cmp-num">31</span>
         <span class="cmp-row-body">
-          <strong>Multi-currency expense report</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-native">⚡ Native faster</span>
+          <strong>Multi-currency expense report</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-tie">⚡ Same speed</span>
           <span class="dim">Normalize a trip ledger to USD with fixed rates, then group, rank, and summarize — one pipeline per report line vs fold/reduce boilerplate.</span>
         </span>
       </a>
@@ -543,11 +543,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="windowed average uniqAdjacent pairwise ifEmpty map">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="windowed average uniqAdjacent pairwise ifEmpty map">
       <a class="cmp-row" href="smoothed-zone-changes.html">
         <span class="cmp-num">43</span>
         <span class="cmp-row-body">
-          <strong>Smoothed zone changes</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-tie">⚡ Same speed</span>
+          <strong>Smoothed zone changes</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart faster</span>
           <span class="dim">Moving average, zone runs, transition alerts — three index loops with mutable carry in plain Dart vs windowed → uniqAdjacentBy → pairwise in FxDart.</span>
         </span>
       </a>
@@ -583,11 +583,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/delay.html">delay</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="filter groupedBy map sumBy sortByDesc take">
+    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="filter groupedBy map sumBy sortByDesc take">
       <a class="cmp-row" href="category-rank.html">
         <span class="cmp-num">47</span>
         <span class="cmp-row-body">
-          <strong>Rank the month by category</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart faster</span>
+          <strong>Rank the month by category</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-tie">⚡ Same speed</span>
           <span class="dim">Group, total, and rank spending — groupListsBy plus a comparator swap in plain Dart vs one groupedBy → sortByDesc chain in FxDart.</span>
         </span>
       </a>

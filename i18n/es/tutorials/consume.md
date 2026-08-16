@@ -7,8 +7,8 @@ section: 1
 crumb: consume
 prev: each.html
 prevLabel: each
-next: range.html
-nextLabel: range
+next: performance.html
+nextLabel: performance
 ---
   <p class="hero-sub">Tira de los valores a través de una cadena y los descarta — solo por sus efectos secundarios, con tope opcional.</p>
 

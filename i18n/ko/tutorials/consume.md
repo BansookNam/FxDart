@@ -7,8 +7,8 @@ section: 1
 crumb: consume
 prev: each.html
 prevLabel: each
-next: range.html
-nextLabel: range
+next: performance.html
+nextLabel: performance
 ---
   <p class="hero-sub">체인을 통해 값을 끌어당긴 뒤 그대로 버립니다 — 부수 효과만을 위한 연산자이며, 개수를 제한할 수도 있습니다.</p>
 

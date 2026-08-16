@@ -425,11 +425,11 @@
   <h2>Parte 4 · De seis a diez funciones</h2>
   <p class="dim">Flujos de trabajo completos, casi todos con concurrencia acotada: la parte que Dart nativo no sabe expresar con elegancia.</p>
   <ol class="cmp-list">
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="map groupBy sumBy sortBy uniq maxBy join">
+    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="map groupBy sumBy sortBy uniq maxBy join">
       <a class="cmp-row" href="multi-currency-report.html">
         <span class="cmp-num">31</span>
         <span class="cmp-row-body">
-          <strong>Informe de gastos multidivisa</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-native">⚡ Nativo más rápido</span>
+          <strong>Informe de gastos multidivisa</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-tie">⚡ Misma velocidad</span>
           <span class="dim">Normaliza a USD el libro de cuentas de un viaje con tipos fijos y luego agrupa, ordena y resume — un pipeline por línea de informe frente al boilerplate de fold/reduce.</span>
         </span>
       </a>
@@ -545,11 +545,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="windowed average uniqAdjacent pairwise ifEmpty map">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="windowed average uniqAdjacent pairwise ifEmpty map">
       <a class="cmp-row" href="smoothed-zone-changes.html">
         <span class="cmp-num">43</span>
         <span class="cmp-row-body">
-          <strong>Cambios de zona suavizados</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-tie">⚡ Misma velocidad</span>
+          <strong>Cambios de zona suavizados</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart más rápido</span>
           <span class="dim">Media móvil, rachas de zona y alertas de transición — tres bucles con estado mutable en Dart puro vs windowed → uniqAdjacentBy → pairwise en FxDart.</span>
         </span>
       </a>
@@ -585,11 +585,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/delay.html">delay</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/drop.html">drop</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="filter groupedBy map sumBy sortByDesc take">
+    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="filter groupedBy map sumBy sortByDesc take">
       <a class="cmp-row" href="category-rank.html">
         <span class="cmp-num">47</span>
         <span class="cmp-row-body">
-          <strong>Ranking del mes por categoría</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart más rápido</span>
+          <strong>Ranking del mes por categoría</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-tie">⚡ Misma velocidad</span>
           <span class="dim">Agrupar, totalizar y rankear el gasto — groupListsBy más el volteo del comparador en Dart nativo frente a una sola cadena groupedBy → sortByDesc en FxDart.</span>
         </span>
       </a>

@@ -5,8 +5,8 @@ description: FxDart range tutorial: a lazy sequence of integers, counting up or 
 heading: <code>range</code>
 section: 2
 crumb: range
-prev: consume.html
-prevLabel: consume
+prev: performance.html
+prevLabel: performance
 next: repeat.html
 nextLabel: repeat
 ---

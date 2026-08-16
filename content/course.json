@@ -23,6 +23,10 @@
     {
       "href": "consume.html",
       "label": "consume"
+    },
+    {
+      "href": "performance.html",
+      "label": "writing fast pipelines"
     }
   ],
   "2": [

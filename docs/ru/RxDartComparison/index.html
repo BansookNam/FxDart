@@ -396,11 +396,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/uniqBy.html">uniqBy</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="true" data-speed="tie" data-fns="fx toAsync min max">
+    <li data-verdict="tie" data-async="true" data-speed="fxdart" data-fns="fx toAsync min max">
       <a class="cmp-row" href="latency-extremes.html">
         <span class="cmp-num">24</span>
         <span class="cmp-row-body">
-          <strong>Fastest and slowest request</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ Скорость одинакова</span>
+          <strong>Fastest and slowest request</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart быстрее</span>
           <span class="dim">Probe eight endpoints asynchronously and print the min and max latency — Future-returning reductions on both sides, one fresh pass each.</span>
         </span>
       </a>
@@ -473,11 +473,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/timeout.html">timeout</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="true" data-speed="tie" data-fns="fx toAsync retry concurrent">
+    <li data-verdict="fxdart" data-async="true" data-speed="fxdart" data-fns="fx toAsync retry concurrent">
       <a class="cmp-row" href="per-row-retry.html">
         <span class="cmp-num">31</span>
         <span class="cmp-row-body">
-          <strong>Retry each flaky row independently</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ Скорость одинакова</span>
+          <strong>Retry each flaky row independently</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart быстрее</span>
           <span class="dim">Six flaky import rows, two attempts each, three in flight — flatMap emits in completion order, mapRetry under concurrent keeps source order.</span>
         </span>
       </a>
@@ -640,11 +640,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fxEvents.html">fxEvents</a></li><li><a href="../tutorials/race.html">race</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="true" data-speed="tie" data-fns="fx toAsync mapConcurrent chunk streams">
+    <li data-verdict="tie" data-async="true" data-speed="rxdart" data-fns="fx toAsync mapConcurrent chunk streams">
       <a class="cmp-row" href="pipeline-into-stream.html">
         <span class="cmp-num">47</span>
         <span class="cmp-row-body">
-          <strong>A pipeline feeds a stream consumer</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ Скорость одинакова</span>
+          <strong>A pipeline feeds a stream consumer</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-rxdart">⚡ RxDart быстрее</span>
           <span class="dim">An ordered mapConcurrent fetch hands its results to a stream consumer via toStream — the bridge crossed in the other direction.</span>
         </span>
       </a>
@@ -660,11 +660,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/fx.html">fx</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/takeWhile.html">takeWhile</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="true" data-speed="tie" data-fns="fx toAsync map scan">
+    <li data-verdict="tie" data-async="true" data-speed="fxdart" data-fns="fx toAsync map scan">
       <a class="cmp-row" href="dependent-calls-in-sequence.html">
         <span class="cmp-num">49</span>
         <span class="cmp-row-body">
-          <strong>Each call feeds the next</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ Скорость одинакова</span>
+          <strong>Each call feeds the next</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart быстрее</span>
           <span class="dim">Four API calls where each response seeds the next request — scan threads the state through the pipeline; asyncMap closes over a mutable token.</span>
         </span>
       </a>

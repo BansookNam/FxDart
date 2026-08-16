@@ -7,8 +7,8 @@ section: 1
 crumb: consume
 prev: each.html
 prevLabel: each
-next: range.html
-nextLabel: range
+next: performance.html
+nextLabel: performance
 ---
   <p class="hero-sub">Pulls values through a chain and throws them away — for side effects only, optionally capped.</p>
 

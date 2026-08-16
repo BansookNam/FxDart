@@ -5,8 +5,8 @@ description: Tutorial de range en FxDart: una secuencia perezosa de enteros, asc
 heading: <code>range</code>
 section: 2
 crumb: range
-prev: consume.html
-prevLabel: consume
+prev: performance.html
+prevLabel: performance
 next: repeat.html
 nextLabel: repeat
 ---
