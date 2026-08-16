@@ -5,8 +5,6 @@
 // second by feeding the operators a hand-rolled iterator that implements only
 // the public FxAsyncIterator protocol, and drive the Concurrent fallback that
 // each operator installs when a concurrency marker arrives.
-import 'dart:async';
-
 import 'package:fxdart/fxdart.dart';
 import 'package:fxdart/src/async_iterable.dart'
     show DelegateAsyncIterable, DelegateAsyncIterator, FxFastIterator;

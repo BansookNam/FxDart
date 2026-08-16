@@ -1,0 +1,61 @@
+# Guards the things `coverage.yml` structurally cannot.
+#
+# Two bugs shipped and sat for two releases each because nothing but a manual
+# `./deploy.sh` ever exercised them:
+#
+#   * `fx(xs).join()` stopped compiling in 0.8.0 — redeclaring a member on an
+#     extension type replaces the interface member, so `Iterable.join`'s
+#     default was lost. Coverage stayed at 100% throughout, because every test
+#     passed a separator. `test/api_surface_test.dart` now calls every member
+#     in its bare form, so the *test suite* catches it — but the analyzer step
+#     below is what catches the same class of break in the merged bundle.
+#   * The playground bundle (`docs/assets/fxdart_single.dart`) failed to
+#     analyze from 0.8.1, because `tools/build_single_file.sh` keeps a
+#     hand-maintained `_$NAME` wrapper list that `uniqStrict`/`uniqByStrict`
+#     were never added to. Only a deploy ran it.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Analyze library
+        run: dart analyze lib
+
+      - name: Analyze tests and tooling
+        run: dart analyze test tool benchmark
+
+      # Regenerates the single-file playground build and analyzes it. This is
+      # the only check that sees wrapper drift in tools/build_single_file.sh.
+      - name: Build and analyze the playground bundle
+        run: bash tools/build_single_file.sh
+
+      # The bundle is generated output committed to the repo; if this step
+      # leaves a diff, docs/assets/fxdart_single.dart is stale on main.
+      - name: Bundle is up to date
+        run: git diff --exit-code -- docs/assets/fxdart_single.dart
+
+      # AUTHORING.md's first rule: a benchmark case must measure the same
+      # pipeline its published example shows.
+      - name: Benchmark cases match their examples
+        run: dart run tool/check_benchmark_faithfulness.dart
+
+      # Deliberately NOT running `run_benchmarks.dart --smoke` here: it
+      # AOT-compiles all 94 case binaries (minutes) and, smoke or not, rewrites
+      # benchmark/results/*.json — a tracked file the docs render from. The
+      # `dart analyze benchmark` step above already catches a case that stops
+      # compiling; checksum agreement is verified when a real run is made.
