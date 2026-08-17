@@ -53,6 +53,77 @@ Async operator callbacks in `mapAsync`-style code must stay parallel-safe: overl
   since recording is what silences a *genuine* staleness too.
 - `deploy.sh` stages only docs-related paths (`docs content i18n tool tools deploy.sh DEPLOY.md`) — commit `lib/`/`test/` changes separately first.
 
+### Theory textbook (content/theory/ → docs/theory/)
+
+A paged book viewer — the FP theory companion to 101, modelled on the
+`fxdart-book` manuscript format. Sources:
+
+- `content/theory/book.md` — front-matter pages (preface). `content/theory/NN-slug.md`
+  — one chapter each, with front matter `slug`, `chapter`, `part`, `title`,
+  `description`. `content/theory/parts.json` — part titles (translated like
+  `sections.json`). `content/theory/diagrams/*.svg` — figures, **shared across
+  locales, never translated**, inlined at build time with ids namespaced.
+- `tool/theory_markdown.dart` converts a chapter to *blocks*; the whole book
+  renders into one page per locale (`docs/theory/index.html`, `docs/ko/theory/…`).
+  Pagination is **runtime** work: `docs/js/theorybook.js` measures blocks against
+  the real page box and flows them, because page capacity depends on the viewport.
+  `docs/js/theorybook.js` + `docs/css/theorybook.css` are hand-maintained.
+- The viewer renders **only the current spread** — two `.page-slot` divs, no 3D,
+  no stacked sheets. An earlier version flipped every page in 3D; at 300 pages
+  the compositor bled stale layers through the current spread (page 6 visible
+  under an "8–9" indicator) and no z-index scheme fixed it. Turning a page is
+  now a synchronous re-render (~0.4ms), so the DOM holds two pages and what is
+  on screen always matches the indicator. Do not reintroduce the flip.
+- Blocks taller than a page are **split** before the flow: listings by line
+  (continuation marked `⋯`, the whole program kept on the wrapper's `data-src`
+  so ▶ Run still compiles the full file), tables by row with the header
+  repeated, lists and blockquotes by item. Anything measured must be measured in
+  its final form — labels, markers and attributes that affect height go on
+  *before* the fit check, or the page renders taller than it measured.
+- The book page is **standalone by design** — it links `css/theorybook.css` and
+  nothing else (no `site.css`, no site header, no footer), fills the viewport,
+  and is left through the ✕ close button (locale-root-relative, back to 101);
+  the bottom HUD carries the page indicator, Contents and the language links.
+  That isolation is deliberate: sharing chrome with the site meant the site's
+  theme tokens repainted the paper, and the header's height (which changes when
+  the nav wraps) decided whether the page scrolled the nav out of view. Keep the
+  page self-contained — every style it needs belongs in `theorybook.css`.
+- Markdown extras: ```` ```dart run ```` marks a listing runnable (adds ▶ Run;
+  the viewer wraps a snippet with no `main` and prepends the fxdart import).
+  A `> 🎓 …` quote is a depth box, `> **In this chapter**` the goals box, an
+  all-italic line a figure caption. `## Exercises` starts on a recto and
+  `## Solutions` after a page turn, so answers cannot be seen from the questions.
+- **Code blocks are locale-invariant** — the ko overlay carries the English
+  listing verbatim (comments included); only prose is translated.
+- `dart run tool/check_theory.dart [NN …]` is the gate for any edit: it runs
+  every ```` ```dart run ```` listing against this package, prints its real
+  output (paste it back into the prose), and enforces the ≤ 66-column rule that
+  keeps listings from wrapping in the page box. The book asserts what programs
+  print, so a failing listing is a factual error, not a style nit.
+- Running uses the 101 playground engine: `docs/js/playground.js` exposes
+  `window.FxDartPlayground.run(source, handlers, {prebuiltId})`, so compile
+  caching, the DDC runtime download and frame lifetime are shared with the
+  tutorials' playgrounds.
+- **Book listings are precompiled.** Every listing is a complete program, so the
+  text between the fences is exactly what compiles: `playground_source.dart`
+  enumerates them (`theoryListings`), `precompile_playgrounds.dart` builds
+  `docs/pg/<id>.js.gz`, and build_docs stamps `data-pg` on the runwrap. A warm
+  run then prints in ~200ms instead of ~2.5s. They count as first-on-page, so
+  the default `PG_SCOPE=first` covers them; after editing any listing run
+  `dart run tool/precompile_playgrounds.dart --only=content/theory` (74
+  compiles, ~1 min, ~8MB).
+- **✎ Edit** opens the whole program in an overlay editor (a page is a fixed
+  box, so typing cannot happen in place). Edits live in a JS map keyed by
+  chapter+listing — never in the DOM, which is re-rendered on every page turn —
+  are badged on the printed listing, and bypass the artifact so the edited text
+  is compiled.
+- Reading position is stored in the location hash as `#ch7-3` (chapter 7, its
+  third page), never as a page number: page numbers differ per translation.
+  The language links carry that anchor, so switching locale mid-book lands on
+  the same content in the other edition.
+- The writing plan (chapter list, per-chapter briefs, conventions) is
+  `content/theory/PLAN.md`.
+
 ### Playground execution path
 
 A Run resolves the snippet's JS from the cheapest available source: a build-time

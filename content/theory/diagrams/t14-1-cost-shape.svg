@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 220" font-family="system-ui, sans-serif">
+  <style>
+    text{fill:var(--fp-ink,#26283B);font-size:12.5px}
+    .lbl{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;fill:var(--fp-op,#6C5CE7)}
+    .panel{fill:var(--fp-bg,#F0F1F6)}
+    .note{font-size:11.5px;opacity:.72}
+    .bad{fill:var(--fp-err,#E5484D)}
+    .good{fill:var(--fp-ok,#2F9E68)}
+    .neutral{fill:var(--fp-lazy,#9CA3AF)}
+    .axis{stroke:var(--fp-ink,#26283B);stroke-width:1.4;opacity:.5}
+    .code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
+  </style>
+
+  <text x="14" y="20" class="lbl">three forces set the ratio</text>
+
+  <!-- baseline axis -->
+  <line class="axis" x1="150" y1="34" x2="150" y2="176"/>
+  <text x="150" y="192" text-anchor="middle" class="note">1.0× (tie)</text>
+
+  <!-- indirection -->
+  <text x="14" y="56" class="note">indirection</text>
+  <rect class="bad" x="150" y="42" width="120" height="20" rx="4"/>
+  <text x="280" y="57" class="note">fixed tax: per element, per stage</text>
+
+  <!-- allocation -->
+  <text x="14" y="96" class="note">allocation</text>
+  <rect class="bad" x="150" y="82" width="70" height="20" rx="4"/>
+  <rect class="good" x="80" y="82" width="70" height="20" rx="4"/>
+  <text x="280" y="97" class="note">either way: whoever builds intermediates pays</text>
+
+  <!-- refused work -->
+  <text x="14" y="136" class="note">refused work</text>
+  <rect class="good" x="30" y="122" width="120" height="20" rx="4"/>
+  <text x="280" y="137" class="note">rebate: take / first / find stop the pull early</text>
+
+  <!-- net -->
+  <text x="14" y="176" class="note">net (median)</text>
+  <rect class="neutral" x="150" y="162" width="14" height="20" rx="4"/>
+  <text x="280" y="177" class="note">1.06× across 53 tasks — 38 of them ties</text>
+
+  <rect class="panel" x="14" y="200" width="538" height="0" rx="8"/>
+</svg>

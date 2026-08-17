@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 225" font-family="system-ui, sans-serif">
+  <style>
+    text{fill:var(--fp-ink,#26283B);font-size:12.5px}
+    .code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;fill:var(--fp-op,#6C5CE7)}
+    .lbl{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;fill:var(--fp-op,#6C5CE7)}
+    .panel{fill:var(--fp-bg,#F0F1F6)}
+    .node{fill:#fff;stroke:var(--fp-ink,#26283B);stroke-width:1.8}
+    .note{font-size:11.5px;opacity:.72}
+    .flow{stroke:var(--fp-op,#6C5CE7);stroke-width:2;fill:none}
+    .err{stroke:var(--fp-err,#E5484D);stroke-width:2;fill:none}
+  </style>
+  <defs>
+    <marker id="a18" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--fp-op,#6C5CE7)"/>
+    </marker>
+    <marker id="a18e" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--fp-err,#E5484D)"/>
+    </marker>
+  </defs>
+
+  <!-- the question -->
+  <rect class="node" x="14" y="76" width="164" height="52" rx="10"/>
+  <text x="96" y="98" text-anchor="middle" class="note">can the caller do</text>
+  <text x="96" y="114" text-anchor="middle" class="note">something specific?</text>
+
+  <!-- yes branch -->
+  <path class="flow" d="M182 90 C 220 90, 220 52, 258 52" marker-end="url(#a18)"/>
+  <text x="212" y="62" class="note">yes</text>
+  <rect class="panel" x="266" y="24" width="286" height="58" rx="10"/>
+  <text x="280" y="44" class="lbl">put it in the return type</text>
+  <text x="280" y="64" class="code">Either&lt;E, A&gt;</text>
+  <text x="370" y="64" class="note">reason matters</text>
+  <text x="470" y="64" class="code">A?</text>
+  <text x="494" y="64" class="note">it does not</text>
+
+  <!-- no branch -->
+  <path class="err" d="M182 114 C 220 114, 220 152, 258 152" marker-end="url(#a18e)"/>
+  <text x="212" y="146" class="note">no</text>
+  <rect class="panel" x="266" y="124" width="286" height="58" rx="10"/>
+  <text x="280" y="144" class="lbl">leave it in the throw channel</text>
+  <text x="280" y="164" class="code">throw</text>
+  <text x="330" y="164" class="note">bug, broken invariant, environment</text>
+
+  <rect class="panel" x="14" y="192" width="538" height="26" rx="8"/>
+  <text x="28" y="209" class="note">Either says what this function models — never that nothing else can throw</text>
+</svg>

@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 235" font-family="system-ui, sans-serif">
+  <style>
+    .value{fill:var(--fp-value,#3B82F6)}
+    text{fill:var(--fp-ink,#26283B);font-size:12.5px}
+    .code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;fill:var(--fp-op,#6C5CE7)}
+    .lbl{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;fill:var(--fp-op,#6C5CE7)}
+    .panel{fill:var(--fp-bg,#F0F1F6)}
+    .node{fill:#fff;stroke:var(--fp-op,#6C5CE7);stroke-width:2}
+    .box{fill:none;stroke:var(--fp-ink,#26283B);stroke-width:2}
+    .note{font-size:11.5px;opacity:.72}
+    .err{stroke:var(--fp-err,#E5484D)}
+  </style>
+  <defs>
+    <marker id="a7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--fp-op,#6C5CE7)"/>
+    </marker>
+  </defs>
+
+  <!-- plain composition -->
+  <rect class="panel" x="8" y="8" width="544" height="76" rx="10"/>
+  <text x="22" y="28" class="lbl">plain functions — they click</text>
+  <circle class="value" cx="40" cy="58" r="9"/>
+  <path d="M54 58 H88" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a7)"/>
+  <rect class="node" x="96" y="42" width="76" height="32" rx="8"/>
+  <text x="134" y="63" text-anchor="middle" class="code">f</text>
+  <path d="M178 58 H210" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a7)"/>
+  <circle class="value" cx="226" cy="58" r="9"/>
+  <path d="M240 58 H272" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a7)"/>
+  <rect class="node" x="280" y="42" width="76" height="32" rx="8"/>
+  <text x="318" y="63" text-anchor="middle" class="code">g</text>
+  <path d="M362 58 H394" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a7)"/>
+  <circle class="value" cx="410" cy="58" r="9"/>
+  <text x="544" y="62" text-anchor="end" class="note">B out, B in — no adapter needed</text>
+
+  <!-- effectful mismatch -->
+  <rect class="panel" x="8" y="96" width="544" height="60" rx="10"/>
+  <text x="22" y="116" class="lbl">effectful functions — they do not</text>
+  <rect class="node" x="26" y="122" width="86" height="26" rx="8"/>
+  <text x="69" y="140" text-anchor="middle" class="code">parseId</text>
+  <path d="M118 135 H150" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a7)"/>
+  <rect class="box" x="158" y="122" width="46" height="26" rx="7"/>
+  <circle class="value" cx="181" cy="135" r="7"/>
+  <path d="M212 122 l24 26 M236 122 l-24 26" class="err" stroke-width="2.4" stroke-linecap="round"/>
+  <rect class="node" x="252" y="122" width="86" height="26" rx="8"/>
+  <text x="295" y="140" text-anchor="middle" class="code">loadUser</text>
+  <text x="352" y="139" class="note">wants a bare int, is handed a box</text>
+
+  <!-- kleisli -->
+  <rect class="panel" x="8" y="168" width="544" height="60" rx="10"/>
+  <text x="22" y="188" class="lbl">kleisli — flatMap is the adapter</text>
+  <rect class="node" x="26" y="194" width="86" height="26" rx="8"/>
+  <text x="69" y="212" text-anchor="middle" class="code">parseId</text>
+  <path d="M118 207 H146" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a7)"/>
+  <rect class="box" x="154" y="194" width="72" height="26" rx="7"/>
+  <text x="190" y="211" text-anchor="middle" class="code">flatMap</text>
+  <path d="M232 207 H260" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a7)"/>
+  <rect class="node" x="268" y="194" width="86" height="26" rx="8"/>
+  <text x="311" y="212" text-anchor="middle" class="code">loadUser</text>
+  <path d="M360 207 H388" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a7)"/>
+  <rect class="box" x="396" y="194" width="46" height="26" rx="7"/>
+  <circle class="value" cx="419" cy="207" r="7"/>
+  <text x="544" y="211" text-anchor="end" class="note">one box out, depth still 1</text>
+</svg>

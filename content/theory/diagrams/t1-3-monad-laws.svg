@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 300" font-family="system-ui, sans-serif">
+  <style>
+    .value{fill:var(--fp-value,#3B82F6)}
+    text{fill:var(--fp-ink,#26283B);font-size:13px}
+    .code{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;fill:var(--fp-op,#6C5CE7)}
+    .law{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;fill:var(--fp-op,#6C5CE7)}
+    .eq{font-size:22px;font-weight:700;fill:var(--fp-ink,#26283B)}
+    .panel{fill:var(--fp-bg,#F0F1F6);stroke:none}
+    .node{fill:#fff;stroke:var(--fp-ink,#26283B);stroke-width:2}
+    .note{font-size:11.5px;opacity:.7}
+  </style>
+  <defs>
+    <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--fp-op,#6C5CE7)"/>
+    </marker>
+  </defs>
+
+  <!-- 1. left identity -->
+  <rect class="panel" x="8" y="8" width="544" height="82" rx="10"/>
+  <text x="22" y="28" class="law">1 · left identity</text>
+  <g>
+    <circle class="value" cx="40" cy="60" r="11"/>
+    <text x="40" y="82" text-anchor="middle" class="note">a</text>
+    <path d="M56 60 H104" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a3)"/>
+    <text x="80" y="52" text-anchor="middle" class="code">of</text>
+    <rect class="node" x="112" y="46" width="34" height="28" rx="7"/>
+    <circle class="value" cx="129" cy="60" r="8"/>
+    <path d="M152 60 H212" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a3)"/>
+    <text x="182" y="52" text-anchor="middle" class="code">flatMap f</text>
+    <rect class="node" x="220" y="46" width="34" height="28" rx="7"/>
+    <circle class="value" cx="237" cy="60" r="8"/>
+  </g>
+  <text x="286" y="68" text-anchor="middle" class="eq">=</text>
+  <g>
+    <circle class="value" cx="330" cy="60" r="11"/>
+    <text x="330" y="82" text-anchor="middle" class="note">a</text>
+    <path d="M346 60 H414" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a3)"/>
+    <text x="380" y="52" text-anchor="middle" class="code">f</text>
+    <rect class="node" x="422" y="46" width="34" height="28" rx="7"/>
+    <circle class="value" cx="439" cy="60" r="8"/>
+    <text x="544" y="64" text-anchor="end" class="note">just call it</text>
+  </g>
+
+  <!-- 2. right identity -->
+  <rect class="panel" x="8" y="102" width="544" height="82" rx="10"/>
+  <text x="22" y="122" class="law">2 · right identity</text>
+  <g>
+    <rect class="node" x="30" y="140" width="34" height="28" rx="7"/>
+    <circle class="value" cx="47" cy="154" r="8"/>
+    <text x="47" y="176" text-anchor="middle" class="note">m</text>
+    <path d="M70 154 H160" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a3)"/>
+    <text x="115" y="146" text-anchor="middle" class="code">flatMap of</text>
+    <rect class="node" x="168" y="140" width="34" height="28" rx="7"/>
+    <circle class="value" cx="185" cy="154" r="8"/>
+  </g>
+  <text x="286" y="162" text-anchor="middle" class="eq">=</text>
+  <g>
+    <rect class="node" x="330" y="140" width="34" height="28" rx="7"/>
+    <circle class="value" cx="347" cy="154" r="8"/>
+    <text x="347" y="176" text-anchor="middle" class="note">m</text>
+    <text x="544" y="158" text-anchor="end" class="note">a no-op step is invisible</text>
+  </g>
+
+  <!-- 3. associativity -->
+  <rect class="panel" x="8" y="196" width="544" height="96" rx="10"/>
+  <text x="22" y="216" class="law">3 · associativity</text>
+  <g>
+    <rect class="node" x="30" y="236" width="30" height="26" rx="7"/>
+    <circle class="value" cx="45" cy="249" r="7"/>
+    <path d="M66 249 H112" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a3)"/>
+    <text x="89" y="241" text-anchor="middle" class="code">f</text>
+    <rect class="node" x="120" y="236" width="30" height="26" rx="7"/>
+    <circle class="value" cx="135" cy="249" r="7"/>
+    <path d="M156 249 H202" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a3)"/>
+    <text x="179" y="241" text-anchor="middle" class="code">g</text>
+    <rect class="node" x="210" y="236" width="30" height="26" rx="7"/>
+    <circle class="value" cx="225" cy="249" r="7"/>
+    <path d="M30 272 H150" stroke="var(--fp-ink,#26283B)" stroke-width="1.6" opacity=".5" fill="none"/>
+    <path d="M30 272 V266 M150 272 V266" stroke="var(--fp-ink,#26283B)" stroke-width="1.6" opacity=".5"/>
+    <text x="90" y="286" text-anchor="middle" class="note">group here</text>
+  </g>
+  <text x="286" y="256" text-anchor="middle" class="eq">=</text>
+  <g>
+    <rect class="node" x="330" y="236" width="30" height="26" rx="7"/>
+    <circle class="value" cx="345" cy="249" r="7"/>
+    <path d="M366 249 H412" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a3)"/>
+    <text x="389" y="241" text-anchor="middle" class="code">f</text>
+    <rect class="node" x="420" y="236" width="30" height="26" rx="7"/>
+    <circle class="value" cx="435" cy="249" r="7"/>
+    <path d="M456 249 H502" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a3)"/>
+    <text x="479" y="241" text-anchor="middle" class="code">g</text>
+    <rect class="node" x="510" y="236" width="30" height="26" rx="7"/>
+    <circle class="value" cx="525" cy="249" r="7"/>
+    <path d="M420 272 H540" stroke="var(--fp-ink,#26283B)" stroke-width="1.6" opacity=".5" fill="none"/>
+    <path d="M420 272 V266 M540 272 V266" stroke="var(--fp-ink,#26283B)" stroke-width="1.6" opacity=".5"/>
+    <text x="480" y="286" text-anchor="middle" class="note">or here</text>
+  </g>
+</svg>

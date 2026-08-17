@@ -157,6 +157,13 @@ th { background: var(--bg-soft); }
 }
 .demo-cta.cta-compare-rx:hover { box-shadow: 0 6px 24px rgba(214, 51, 108, 0.5); }
 
+/* deep-indigo variant for the theory textbook (docs/theory/) */
+.demo-cta.cta-theory {
+  background: linear-gradient(135deg, #5a4fd6, #372a96);
+  box-shadow: 0 4px 18px rgba(90, 79, 214, 0.35);
+}
+.demo-cta.cta-theory:hover { box-shadow: 0 6px 24px rgba(90, 79, 214, 0.5); }
+
 /* pros / cons */
 .proscons { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 @media (max-width: 640px) { .proscons { grid-template-columns: 1fr; } }

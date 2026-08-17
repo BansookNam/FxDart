@@ -1681,6 +1681,16 @@
     <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/zipWithIndex.html"/>
   </url>
   <url>
+    <loc>https://bansooknam.github.io/FxDart/theory/index.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/theory/index.html"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/theory/index.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/theory/index.html"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/theory/index.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/theory/index.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/theory/index.html"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/theory/index.html"/>
+  </url>
+  <url>
     <loc>https://bansooknam.github.io/FxDart/DartComparison/index.html</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/DartComparison/index.html"/>
     <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/DartComparison/index.html"/>
@@ -4409,6 +4419,16 @@
     <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/zipWithIndex.html"/>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/zipWithIndex.html"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/zipWithIndex.html"/>
+  </url>
+  <url>
+    <loc>https://bansooknam.github.io/FxDart/ko/theory/index.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/theory/index.html"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/theory/index.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/theory/index.html"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/theory/index.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/theory/index.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/theory/index.html"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/theory/index.html"/>
   </url>
   <url>
     <loc>https://bansooknam.github.io/FxDart/ko/DartComparison/index.html</loc>

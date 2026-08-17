@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 225" font-family="system-ui, sans-serif">
+  <style>
+    text{fill:var(--fp-ink,#26283B);font-size:12.5px}
+    .code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;fill:var(--fp-op,#6C5CE7)}
+    .lbl{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;fill:var(--fp-op,#6C5CE7)}
+    .panel{fill:var(--fp-bg,#F0F1F6)}
+    .node{fill:#fff;stroke:var(--fp-ink,#26283B);stroke-width:1.8}
+    .note{font-size:11.5px;opacity:.72}
+    .errfill{fill:var(--fp-err,#E5484D)}
+    .okfill{fill:var(--fp-ok,#2F9E68)}
+    .flow{stroke:var(--fp-op,#6C5CE7);stroke-width:1.8;fill:none}
+    .bucket{fill:none;stroke:var(--fp-err,#E5484D);stroke-width:2}
+  </style>
+  <defs>
+    <marker id="a17" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--fp-op,#6C5CE7)"/>
+    </marker>
+  </defs>
+
+  <rect class="panel" x="8" y="8" width="290" height="150" rx="10"/>
+  <text x="22" y="28" class="lbl">independent — all run</text>
+  <g>
+    <rect class="node" x="26" y="40" width="150" height="26" rx="6"/>
+    <text x="36" y="58" class="code">accumulating(email)</text>
+    <rect class="errfill" x="186" y="45" width="16" height="16" rx="3"/>
+    <path d="M190 49 l8 8 M198 49 l-8 8" stroke="#fff" stroke-width="1.9" stroke-linecap="round"/>
+  </g>
+  <g>
+    <rect class="node" x="26" y="78" width="150" height="26" rx="6"/>
+    <text x="36" y="96" class="code">accumulating(age)</text>
+    <rect class="errfill" x="186" y="83" width="16" height="16" rx="3"/>
+    <path d="M190 87 l8 8 M198 87 l-8 8" stroke="#fff" stroke-width="1.9" stroke-linecap="round"/>
+  </g>
+  <g>
+    <rect class="node" x="26" y="116" width="150" height="26" rx="6"/>
+    <text x="36" y="134" class="code">accumulating(plan)</text>
+    <circle class="okfill" cx="194" cy="129" r="8"/>
+    <path d="M190 129 l3 4 l6 -8" stroke="#fff" stroke-width="1.9" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- bucket -->
+  <path class="flow" d="M210 53 C 240 53, 240 88, 262 88" marker-end="url(#a17)"/>
+  <path class="flow" d="M210 91 H262" marker-end="url(#a17)"/>
+  <rect class="bucket" x="272" y="62" width="86" height="56" rx="8"/>
+  <text x="315" y="86" text-anchor="middle" class="note">error bucket</text>
+  <text x="315" y="104" text-anchor="middle" class="code">Nel&lt;E&gt;</text>
+
+  <!-- dependent -->
+  <rect class="panel" x="372" y="8" width="180" height="150" rx="10"/>
+  <text x="386" y="28" class="lbl">dependent</text>
+  <rect class="node" x="386" y="46" width="150" height="44" rx="6"/>
+  <text x="396" y="64" class="code">dependent(rule)</text>
+  <text x="396" y="80" class="note">reads other values</text>
+  <path class="flow" d="M362 90 H380" marker-end="url(#a17)"/>
+  <text x="386" y="112" class="note">bucket empty → runs</text>
+  <text x="386" y="130" class="note">bucket full → skipped</text>
+
+  <rect class="panel" x="8" y="168" width="544" height="48" rx="10"/>
+  <text x="24" y="190" class="note">all-empty bucket → Right(value built from every branch)</text>
+  <text x="24" y="208" class="note">any errors → Left(every reason, in branch order)</text>
+</svg>

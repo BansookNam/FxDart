@@ -104,6 +104,18 @@ class Snippet {
   final bool isFirstOnPage;
 }
 
+/// The runnable listings of one theory chapter, in reading order.
+///
+/// The book's listings live inside the manuscript rather than in their own
+/// files, and each one is already a complete program (`tool/check_theory.dart`
+/// runs them as-is), so the text between the fences is exactly what the
+/// browser compiles — no wrapping, no divergence between what is precompiled
+/// and what a reader's ▶ Run would produce.
+final _runFence = RegExp(r'```dart run\n(.*?)```', dotAll: true);
+
+List<String> theoryListings(String markdown) =>
+    _runFence.allMatches(markdown).map((m) => snippetCode(m.group(1)!)).toList();
+
 /// Every playground snippet on the site, in a stable order.
 List<Snippet> snippets(String root) {
   final found = <Snippet>[];
@@ -150,6 +162,30 @@ List<Snippet> snippets(String root) {
       for (final name in sides) {
         final path = 'content/$dir/$slug/$name';
         if (File('$root/$path').existsSync()) add(path, isFirstOnPage: true);
+      }
+    }
+  }
+
+  // The theory book. Every listing counts as first-on-page: the book is a
+  // single document a reader walks straight through, so "the one they hit
+  // first" is meaningless — waiting on a compile at chapter 12 is exactly as
+  // bad as waiting at chapter 1.
+  final theoryDir = Directory('$root/content/theory');
+  if (theoryDir.existsSync()) {
+    final files = theoryDir
+        .listSync()
+        .whereType<File>()
+        .map((f) => f.path.split(Platform.pathSeparator).last)
+        .where((n) => RegExp(r'^\d\d-[a-z0-9-]+\.md$').hasMatch(n))
+        .toList()
+      ..sort();
+    for (final name in files) {
+      final listings =
+          theoryListings(File('$root/content/theory/$name').readAsStringSync());
+      for (var i = 0; i < listings.length; i++) {
+        found.add(Snippet('content/theory/$name#${i + 1}', listings[i],
+            playgroundId(root, listings[i]),
+            isFirstOnPage: true));
       }
     }
   }

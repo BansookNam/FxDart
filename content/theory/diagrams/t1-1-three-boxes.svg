@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 300" font-family="system-ui, sans-serif">
+  <style>
+    .value{fill:var(--fp-value,#3B82F6)}
+    .op{fill:var(--fp-op,#6C5CE7)}
+    .ok{fill:var(--fp-ok,#2F9E68)}
+    .err{fill:var(--fp-err,#E5484D)}
+    .time{fill:var(--fp-time,#F59E0B)}
+    .bg{fill:var(--fp-bg,#F0F1F6)}
+    text{fill:var(--fp-ink,#26283B);font-size:15px}
+    .lbl{font-size:13px;fill:var(--fp-op,#6C5CE7);font-weight:700}
+    .name{font-weight:700}
+    .box{fill:var(--fp-bg,#F0F1F6);stroke:var(--fp-ink,#26283B);stroke-width:2.5}
+  </style>
+  <defs>
+    <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--fp-op,#6C5CE7)"/>
+    </marker>
+  </defs>
+
+  <!-- ports legend: the same two arrows sit on all three boxes -->
+  <text x="280" y="20" text-anchor="middle" class="lbl">of : A → M&lt;A&gt;</text>
+  <text x="280" y="288" text-anchor="middle" class="lbl">flatMap : M&lt;A&gt; × (A → M&lt;B&gt;) → M&lt;B&gt;</text>
+
+  <!-- List -->
+  <g>
+    <line x1="85" y1="30" x2="85" y2="72" stroke="var(--fp-op,#6C5CE7)" stroke-width="2.5" marker-end="url(#a1)"/>
+    <rect class="box" x="20" y="78" width="130" height="92" rx="12"/>
+    <line x1="63" y1="78" x2="63" y2="170" stroke="var(--fp-ink,#26283B)" stroke-width="1.4" opacity=".35"/>
+    <line x1="107" y1="78" x2="107" y2="170" stroke="var(--fp-ink,#26283B)" stroke-width="1.4" opacity=".35"/>
+    <circle class="value" cx="41" cy="124" r="13"/>
+    <circle class="value" cx="85" cy="124" r="13"/>
+    <circle class="value" cx="129" cy="124" r="13"/>
+    <line x1="85" y1="176" x2="85" y2="218" stroke="var(--fp-op,#6C5CE7)" stroke-width="2.5" marker-end="url(#a1)"/>
+    <text x="85" y="242" text-anchor="middle" class="name">List&lt;A&gt;</text>
+  </g>
+
+  <!-- Future -->
+  <g>
+    <line x1="280" y1="30" x2="280" y2="72" stroke="var(--fp-op,#6C5CE7)" stroke-width="2.5" marker-end="url(#a1)"/>
+    <rect class="box" x="215" y="78" width="130" height="92" rx="12"/>
+    <circle class="value" cx="266" cy="124" r="13" opacity=".32"/>
+    <circle class="time" cx="313" cy="103" r="15"/>
+    <path d="M313 103 V94 M313 103 H320" stroke="#26283B" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <text x="266" y="152" text-anchor="middle" font-size="11" opacity=".7">not yet</text>
+    <line x1="280" y1="176" x2="280" y2="218" stroke="var(--fp-op,#6C5CE7)" stroke-width="2.5" marker-end="url(#a1)"/>
+    <text x="280" y="242" text-anchor="middle" class="name">Future&lt;A&gt;</text>
+  </g>
+
+  <!-- Either -->
+  <g>
+    <line x1="475" y1="30" x2="475" y2="72" stroke="var(--fp-op,#6C5CE7)" stroke-width="2.5" marker-end="url(#a1)"/>
+    <rect class="box" x="410" y="78" width="130" height="92" rx="12"/>
+    <line x1="475" y1="78" x2="475" y2="170" stroke="var(--fp-ink,#26283B)" stroke-width="1.4" opacity=".35"/>
+    <rect class="err" x="429" y="112" width="24" height="24" rx="4"/>
+    <path d="M435 118 l12 12 M447 118 l-12 12" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+    <circle class="ok" cx="509" cy="124" r="13"/>
+    <path d="M503 124 l4 5 l8 -10" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="441" y="152" text-anchor="middle" font-size="11" opacity=".7">Left</text>
+    <text x="509" y="152" text-anchor="middle" font-size="11" opacity=".7">Right</text>
+    <line x1="475" y1="176" x2="475" y2="218" stroke="var(--fp-op,#6C5CE7)" stroke-width="2.5" marker-end="url(#a1)"/>
+    <text x="475" y="242" text-anchor="middle" class="name">Either&lt;E, A&gt;</text>
+  </g>
+</svg>

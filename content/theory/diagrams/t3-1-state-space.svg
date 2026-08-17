@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 230" font-family="system-ui, sans-serif">
+  <style>
+    text{fill:var(--fp-ink,#26283B);font-size:12.5px}
+    .lbl{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;fill:var(--fp-op,#6C5CE7)}
+    .note{font-size:11.5px;opacity:.72}
+    .cell{fill:var(--fp-bg,#F0F1F6);stroke:var(--fp-lazy,#9CA3AF);stroke-width:1}
+    .good{fill:var(--fp-ok,#2F9E68)}
+    .code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px}
+  </style>
+
+  <text x="14" y="20" class="lbl">product of 4 flags — 16 states</text>
+  <text x="330" y="20" class="lbl">the domain — 4 states</text>
+
+  <!-- 4x4 grid: only the diagonal is meaningful -->
+  <g>
+    <g>
+      <rect class="cell" x="14" y="34" width="46" height="34" rx="4"/>
+      <rect class="cell" x="64" y="34" width="46" height="34" rx="4"/>
+      <rect class="cell" x="114" y="34" width="46" height="34" rx="4"/>
+      <rect class="cell" x="164" y="34" width="46" height="34" rx="4"/>
+      <rect class="cell" x="14" y="72" width="46" height="34" rx="4"/>
+      <rect class="cell" x="64" y="72" width="46" height="34" rx="4"/>
+      <rect class="cell" x="114" y="72" width="46" height="34" rx="4"/>
+      <rect class="cell" x="164" y="72" width="46" height="34" rx="4"/>
+      <rect class="cell" x="14" y="110" width="46" height="34" rx="4"/>
+      <rect class="cell" x="64" y="110" width="46" height="34" rx="4"/>
+      <rect class="cell" x="114" y="110" width="46" height="34" rx="4"/>
+      <rect class="cell" x="164" y="110" width="46" height="34" rx="4"/>
+      <rect class="cell" x="14" y="148" width="46" height="34" rx="4"/>
+      <rect class="cell" x="64" y="148" width="46" height="34" rx="4"/>
+      <rect class="cell" x="114" y="148" width="46" height="34" rx="4"/>
+      <rect class="cell" x="164" y="148" width="46" height="34" rx="4"/>
+    </g>
+    <!-- the four that mean something -->
+    <circle class="good" cx="37" cy="51" r="8"/>
+    <circle class="good" cx="87" cy="89" r="8"/>
+    <circle class="good" cx="137" cy="127" r="8"/>
+    <circle class="good" cx="187" cy="165" r="8"/>
+    <text x="14" y="202" class="note">green = meaningful · grey = nonsense that compiles</text>
+  </g>
+
+  <!-- the sum type -->
+  <g>
+    <rect class="cell" x="330" y="34" width="216" height="30" rx="6"/>
+    <text x="340" y="54" class="code">Loading</text>
+    <rect class="cell" x="330" y="70" width="216" height="30" rx="6"/>
+    <text x="340" y="90" class="code">Loaded(String data)</text>
+    <rect class="cell" x="330" y="106" width="216" height="30" rx="6"/>
+    <text x="340" y="126" class="code">Failed(String message)</text>
+    <rect class="cell" x="330" y="142" width="216" height="30" rx="6"/>
+    <text x="340" y="162" class="code">Cancelled</text>
+    <circle class="good" cx="536" cy="49" r="5"/>
+    <circle class="good" cx="536" cy="85" r="5"/>
+    <circle class="good" cx="536" cy="121" r="5"/>
+    <circle class="good" cx="536" cy="157" r="5"/>
+    <text x="330" y="202" class="note">every state is meaningful; switch is exhaustive</text>
+  </g>
+</svg>

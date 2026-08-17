@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 240" font-family="system-ui, sans-serif">
+  <style>
+    text{fill:var(--fp-ink,#26283B);font-size:12.5px}
+    .code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;fill:var(--fp-op,#6C5CE7)}
+    .lbl{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;fill:var(--fp-op,#6C5CE7)}
+    .floor{fill:var(--fp-bg,#F0F1F6);stroke:var(--fp-op,#6C5CE7);stroke-width:1.6}
+    .beam{fill:none;stroke:var(--fp-lazy,#9CA3AF);stroke-width:2.4;stroke-dasharray:7 5}
+    .note{font-size:11.5px;opacity:.72}
+    .col{fill:#fff;stroke:var(--fp-ink,#26283B);stroke-width:1.6}
+  </style>
+
+  <text x="14" y="20" class="lbl">one statement per type…</text>
+  <text x="330" y="20" class="lbl">…the beam that would say it once</text>
+
+  <!-- three columns, four floors each -->
+  <g>
+    <rect class="col" x="20" y="34" width="86" height="150" rx="6"/>
+    <text x="63" y="200" text-anchor="middle" class="code">Either</text>
+    <rect class="col" x="118" y="34" width="86" height="150" rx="6"/>
+    <text x="161" y="200" text-anchor="middle" class="code">Fx</text>
+    <rect class="col" x="216" y="34" width="86" height="150" rx="6"/>
+    <text x="259" y="200" text-anchor="middle" class="code">Future</text>
+  </g>
+  <g>
+    <rect class="floor" x="26" y="44" width="74" height="26" rx="5"/>
+    <text x="63" y="61" text-anchor="middle" class="note">traverse</text>
+    <rect class="floor" x="26" y="78" width="74" height="26" rx="5"/>
+    <text x="63" y="95" text-anchor="middle" class="note">monad</text>
+    <rect class="floor" x="26" y="112" width="74" height="26" rx="5"/>
+    <text x="63" y="129" text-anchor="middle" class="note">applicative</text>
+    <rect class="floor" x="26" y="146" width="74" height="26" rx="5"/>
+    <text x="63" y="163" text-anchor="middle" class="note">functor</text>
+
+    <rect class="floor" x="124" y="44" width="74" height="26" rx="5"/>
+    <text x="161" y="61" text-anchor="middle" class="note">traverse</text>
+    <rect class="floor" x="124" y="78" width="74" height="26" rx="5"/>
+    <text x="161" y="95" text-anchor="middle" class="note">monad</text>
+    <rect class="floor" x="124" y="112" width="74" height="26" rx="5"/>
+    <text x="161" y="129" text-anchor="middle" class="note">applicative</text>
+    <rect class="floor" x="124" y="146" width="74" height="26" rx="5"/>
+    <text x="161" y="163" text-anchor="middle" class="note">functor</text>
+
+    <rect class="floor" x="222" y="44" width="74" height="26" rx="5"/>
+    <text x="259" y="61" text-anchor="middle" class="note">traverse</text>
+    <rect class="floor" x="222" y="78" width="74" height="26" rx="5"/>
+    <text x="259" y="95" text-anchor="middle" class="note">monad</text>
+    <rect class="floor" x="222" y="112" width="74" height="26" rx="5"/>
+    <text x="259" y="129" text-anchor="middle" class="note">applicative</text>
+    <rect class="floor" x="222" y="146" width="74" height="26" rx="5"/>
+    <text x="259" y="163" text-anchor="middle" class="note">functor</text>
+  </g>
+
+  <!-- the missing beam -->
+  <path class="beam" d="M330 44 H548 M330 78 H548 M330 112 H548 M330 146 H548"/>
+  <text x="336" y="60" class="code">Monad&lt;M&gt; { M&lt;A&gt; of(A a); … }</text>
+  <text x="336" y="94" class="note">needs a parameter of kind * → *</text>
+  <text x="336" y="128" class="note">Dart parameters are all kind *</text>
+  <text x="336" y="162" class="note">so the beam cannot be declared</text>
+  <text x="336" y="200" class="note">grey dashes = what a higher-kinded language writes once</text>
+</svg>

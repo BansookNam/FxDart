@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 215" font-family="system-ui, sans-serif">
+  <style>
+    text{fill:var(--fp-ink,#26283B);font-size:12.5px}
+    .lbl{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;fill:var(--fp-op,#6C5CE7)}
+    .panel{fill:var(--fp-bg,#F0F1F6)}
+    .node{fill:#fff;stroke:var(--fp-ink,#26283B);stroke-width:1.8}
+    .note{font-size:11.5px;opacity:.72}
+    .ok{fill:var(--fp-ok,#2F9E68)}
+    .neutral{fill:var(--fp-lazy,#9CA3AF)}
+    .code{font-family:ui-monospace,Menlo,monospace;font-size:11px;fill:var(--fp-op,#6C5CE7)}
+  </style>
+
+  <text x="14" y="20" class="lbl">ask four questions first</text>
+
+  <g>
+    <rect class="node" x="14" y="32" width="330" height="26" rx="6"/>
+    <text x="26" y="50" class="note">1 · does something get discarded? (take, first, filter)</text>
+    <circle class="ok" cx="360" cy="45" r="8"/>
+    <text x="376" y="49" class="code">laziness pays</text>
+  </g>
+  <g>
+    <rect class="node" x="14" y="66" width="330" height="26" rx="6"/>
+    <text x="26" y="84" class="note">2 · is there waiting? (independent IO)</text>
+    <circle class="ok" cx="360" cy="79" r="8"/>
+    <text x="376" y="83" class="code">concurrent(n) pays</text>
+  </g>
+  <g>
+    <rect class="node" x="14" y="100" width="330" height="26" rx="6"/>
+    <text x="26" y="118" class="note">3 · are failures data the caller acts on?</text>
+    <circle class="ok" cx="360" cy="113" r="8"/>
+    <text x="376" y="117" class="code">typed errors pay</text>
+  </g>
+  <g>
+    <rect class="node" x="14" y="134" width="330" height="26" rx="6"/>
+    <text x="26" y="152" class="note">4 · would the loop need a comment?</text>
+    <circle class="ok" cx="360" cy="147" r="8"/>
+    <text x="376" y="151" class="code">clarity pays</text>
+  </g>
+
+  <rect class="panel" x="14" y="172" width="538" height="36" rx="8"/>
+  <circle class="neutral" cx="34" cy="190" r="8"/>
+  <text x="50" y="194" class="note">zero yeses → write the loop. That is a normal answer, not a failure of nerve.</text>
+</svg>

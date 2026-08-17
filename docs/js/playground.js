@@ -430,6 +430,67 @@
     if (activeFrame === f) { activeFrame.destroy(); activeFrame = null; }
   }
 
+  // --- running arbitrary source ---------------------------------------------
+
+  function viaCompiler(code) {
+    // The "native Dart" panels on comparison pages never import fxdart —
+    // they compile as-is, with no library merge and no line offset.
+    var built = needsLib(code)
+      ? getLib().then(function (lib) { return buildSource(lib, code); })
+      : Promise.resolve({ source: code, offset: 0 });
+    return built.then(function (b) {
+      return compile(b.source).then(function (js) {
+        return { js: js, offset: b.offset };
+      }, function (err) {
+        err.offset = b.offset;
+        throw err;
+      });
+    });
+  }
+
+  // Public entry point for other pages that need to run Dart but do not want
+  // an editor — the theory book's ▶ Run buttons (js/theorybook.js) are the
+  // first caller. Compiling, caching, the 17MB runtime and frame lifetime are
+  // all shared with the playgrounds, so a reader pays for them once per visit.
+  function runProgram(code, handlers, opts) {
+    var h = handlers || {};
+    var o = opts || {};
+    var f = acquireFrame();
+    var finished = false;
+    function fail(message) {
+      if (finished) return;
+      finished = true;
+      releaseFrame(f);
+      if (h.onError) h.onError(message);
+    }
+    f.onOutput = function (d) {
+      if (d.type === 'started') { if (h.onStart) h.onStart(); }
+      else if (d.type === 'stdout') { if (h.onOutput) h.onOutput(d.message, false); }
+      else if (d.type === 'stderr') { if (h.onOutput) h.onOutput(d.message, true); }
+      else if (d.type === 'done') { if (h.onDone) h.onDone(); }
+    };
+    // Same ladder as the editors: a build-time artifact when the caller has
+    // one and the code is untouched, otherwise a compile.
+    var resolved = o.prebuiltId
+      ? fetchPrebuilt(o.prebuiltId)
+          .then(function (js) { return { js: js, offset: 0 }; })
+          .catch(function () { return viaCompiler(code); })
+      : viaCompiler(code);
+
+    resolved.then(function (res) {
+      return f.warm().then(function () { f.execute(res.js); });
+    }).catch(function (err) {
+      var message = String(err && err.message ? err.message : err);
+      fail(err && err.name === 'CompileError'
+        ? t('pgCompileError', 'Compile error') + '\n' +
+          remapErrors(message, err.offset || 0)
+        : message);
+    });
+    return { stop: function () { releaseFrame(f); } };
+  }
+
+  window.FxDartPlayground = { run: runProgram, prewarm: prewarm };
+
   // --- UI -------------------------------------------------------------------
 
   function el(tag, cls, text) {
@@ -499,22 +560,6 @@
           .catch(function () { return viaCompiler(code); });
       }
       return viaCompiler(code);
-    }
-
-    function viaCompiler(code) {
-      // The "native Dart" panels on comparison pages never import fxdart —
-      // they compile as-is, with no library merge and no line offset.
-      var built = needsLib(code)
-        ? getLib().then(function (lib) { return buildSource(lib, code); })
-        : Promise.resolve({ source: code, offset: 0 });
-      return built.then(function (b) {
-        return compile(b.source).then(function (js) {
-          return { js: js, offset: b.offset };
-        }, function (err) {
-          err.offset = b.offset;
-          throw err;
-        });
-      });
     }
 
     function finish() {

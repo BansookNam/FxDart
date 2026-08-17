@@ -218,5 +218,50 @@
   "@pgNoOutput": { "description": "Shown in the playground console when a snippet ran but printed nothing. Keep the parentheses." },
 
   "pgLoadFailed": "Could not load the FxDart library",
-  "@pgLoadFailed": { "description": "Playground error when the bundled library fails to fetch. 'FxDart' is the product name." }
+  "@pgLoadFailed": { "description": "Playground error when the bundled library fails to fetch. 'FxDart' is the product name." },
+
+  "navTheory": "Theory",
+  "@navTheory": { "description": "Top nav link to the functional programming theory textbook." },
+
+  "theoryTitle": "Functional Programming Theory",
+  "@theoryTitle": { "description": "Title of the theory textbook, shown on its cover and title page." },
+
+  "theorySubtitle": "The ideas behind the pipeline — for working Dart developers",
+  "@theorySubtitle": { "description": "Subtitle under the textbook title on the cover. 'Dart' is a product name." },
+
+  "theoryByline": "FxDart 101 · fxdart.dev",
+  "@theoryByline": { "description": "Byline at the foot of the book cover. Not prose — leave as is." },
+
+  "theoryToc": "Contents",
+  "@theoryToc": { "description": "Table of contents: the heading on the contents page and the label of the button that jumps to it." },
+
+  "theoryPrev": "Previous page",
+  "@theoryPrev": { "description": "Accessible label of the button that turns one page back." },
+
+  "theoryNext": "Next page",
+  "@theoryNext": { "description": "Accessible label of the button that turns one page forward." },
+
+  "theoryRun": "▶ Run",
+  "@theoryRun": { "description": "Button that compiles and runs a code listing in the textbook. Keep the ▶ glyph." },
+
+  "theoryOutput": "Output",
+  "@theoryOutput": { "description": "Title of the popover showing what a listing printed." },
+
+  "theoryClose": "Close",
+  "@theoryClose": { "description": "Accessible label of the button that dismisses the output popover." },
+
+  "theoryRunUnavailable": "The run engine could not be loaded — reload the page to try again.",
+  "@theoryRunUnavailable": { "description": "Shown instead of output when the playground engine script failed to load." },
+
+  "theoryEdit": "\u270E Edit",
+  "@theoryEdit": { "description": "Button that opens a textbook listing in the editor overlay so the reader can change it and run it. Keep the pencil glyph." },
+
+  "theoryEditTitle": "Edit and run",
+  "@theoryEditTitle": { "description": "Title of the editor overlay in the textbook." },
+
+  "theoryReset": "Reset",
+  "@theoryReset": { "description": "Button that restores a listing the reader edited back to the published text." },
+
+  "theoryEdited": "edited",
+  "@theoryEdited": { "description": "Badge on a textbook listing the reader has changed. Lowercase, very short." }
 }

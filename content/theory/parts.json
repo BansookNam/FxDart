@@ -1,0 +1,14 @@
+{
+  "part1": "Part I · Shapes you already use",
+  "part1Blurb": "The structures hiding in code you write every day — and the vocabulary that names them.",
+  "part2": "Part II · The tower",
+  "part2Blurb": "Functor, applicative, monad, monoid: what each one buys, and what it costs.",
+  "part3": "Part III · Evaluation",
+  "part3Blurb": "Laziness, pull versus push, and concurrency as an effect.",
+  "part4": "Part IV · Failure",
+  "part4Blurb": "Typed errors, short-circuiting, accumulation, and the honest boundary with exceptions.",
+  "part5": "Part V · Laws and lineage",
+  "part5Blurb": "Equational reasoning, category theory in the right dose, and where these ideas came from.",
+  "part6": "Appendices",
+  "part6Blurb": "Reference: every term, every law, and where to read more."
+}

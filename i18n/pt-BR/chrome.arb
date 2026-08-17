@@ -27,5 +27,13 @@
   "cmpSpeedTie": "Mesma velocidade",
   "cmpSpeedNative": "Nativo mais rápido",
   "cmpSpeedRxdart": "RxDart mais rápido",
-  "cmpSpeedLegend": "Duas perspectivas por exemplo: o selo preenchido julga o código — qual versão é mais agradável de escrever e ler. O selo ⚡ contornado relata a medição — o vencedor em tempo de execução no maior tamanho do benchmark, compilado AOT; a seção Benchmark de cada página traz as barras completas."
+  "cmpSpeedLegend": "Duas perspectivas por exemplo: o selo preenchido julga o código — qual versão é mais agradável de escrever e ler. O selo ⚡ contornado relata a medição — o vencedor em tempo de execução no maior tamanho do benchmark, compilado AOT; a seção Benchmark de cada página traz as barras completas.",
+  "navTheory": "Teoria",
+  "theoryToc": "Sumário",
+  "theoryRun": "▶ Executar",
+  "theoryOutput": "Saída",
+  "theoryEdit": "✎ Editar",
+  "theoryEditTitle": "Editar e executar",
+  "theoryReset": "Redefinir",
+  "theoryEdited": "editado"
 }

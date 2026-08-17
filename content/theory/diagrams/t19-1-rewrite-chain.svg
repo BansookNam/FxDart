@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 215" font-family="system-ui, sans-serif">
+  <style>
+    text{fill:var(--fp-ink,#26283B);font-size:12.5px}
+    .code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
+    .lbl{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;fill:var(--fp-op,#6C5CE7)}
+    .panel{fill:var(--fp-bg,#F0F1F6)}
+    .node{fill:#fff;stroke:var(--fp-ink,#26283B);stroke-width:1.8}
+    .note{font-size:11px;opacity:.72}
+    .law{font-size:11px;fill:var(--fp-op,#6C5CE7)}
+    .flow{stroke:var(--fp-op,#6C5CE7);stroke-width:2;fill:none}
+    .stop{stroke:var(--fp-err,#E5484D);stroke-width:2;fill:none}
+  </style>
+  <defs>
+    <marker id="a19" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--fp-op,#6C5CE7)"/>
+    </marker>
+  </defs>
+
+  <text x="14" y="20" class="lbl">each rewrite carries a name</text>
+
+  <rect class="node" x="14" y="32" width="200" height="26" rx="6"/>
+  <text x="24" y="50" class="code">.map(id).map(f).map(g)</text>
+
+  <path class="flow" d="M114 62 V80" marker-end="url(#a19)"/>
+  <text x="126" y="76" class="law">functor identity</text>
+
+  <rect class="node" x="14" y="86" width="200" height="26" rx="6"/>
+  <text x="24" y="104" class="code">.map(f).map(g)</text>
+
+  <path class="flow" d="M114 116 V134" marker-end="url(#a19)"/>
+  <text x="126" y="130" class="law">functor composition</text>
+
+  <rect class="node" x="14" y="140" width="200" height="26" rx="6"/>
+  <text x="24" y="158" class="code">.map(g ∘ f)</text>
+
+  <!-- the refused move -->
+  <rect class="panel" x="300" y="32" width="252" height="134" rx="10"/>
+  <text x="314" y="52" class="lbl">the move you must not make</text>
+  <rect class="node" x="314" y="64" width="224" height="26" rx="6"/>
+  <text x="324" y="82" class="code">.map(f).filter(p)</text>
+  <path class="stop" d="M426 94 V112"/>
+  <path class="stop" d="M416 104 l20 0 M426 94 l0 18"/>
+  <path d="M416 100 l20 12 M436 100 l-20 12" stroke="var(--fp-err,#E5484D)" stroke-width="2"/>
+  <rect class="node" x="314" y="122" width="224" height="26" rx="6" stroke="var(--fp-lazy,#9CA3AF)"/>
+  <text x="324" y="140" class="code">.filter(p).map(f)</text>
+  <text x="314" y="162" class="note">p reads the mapped value — no law licenses it</text>
+
+  <rect class="panel" x="14" y="180" width="538" height="28" rx="8"/>
+  <text x="28" y="198" class="note">if you cannot name the law, you are not refactoring — you are guessing</text>
+</svg>

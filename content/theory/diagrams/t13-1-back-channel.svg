@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 230" font-family="system-ui, sans-serif">
+  <style>
+    .value{fill:var(--fp-value,#3B82F6)}
+    text{fill:var(--fp-ink,#26283B);font-size:12.5px}
+    .code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;fill:var(--fp-op,#6C5CE7)}
+    .lbl{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;fill:var(--fp-op,#6C5CE7)}
+    .panel{fill:var(--fp-bg,#F0F1F6)}
+    .node{fill:#fff;stroke:var(--fp-ink,#26283B);stroke-width:2}
+    .note{font-size:11.5px;opacity:.72}
+    .marble{fill:#fff;font-size:10px;font-weight:700;text-anchor:middle}
+    .time{fill:var(--fp-time,#F59E0B)}
+  </style>
+  <defs>
+    <marker id="a13u" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--fp-op,#6C5CE7)"/>
+    </marker>
+    <marker id="a13d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--fp-value,#3B82F6)"/>
+    </marker>
+  </defs>
+
+  <rect class="panel" x="8" y="8" width="544" height="140" rx="10"/>
+  <text x="22" y="28" class="lbl">the request travels up; the values come down in order</text>
+
+  <rect class="node" x="26" y="60" width="92" height="38" rx="8"/>
+  <text x="72" y="84" text-anchor="middle" class="code">source</text>
+  <rect class="node" x="160" y="60" width="110" height="38" rx="8"/>
+  <text x="215" y="84" text-anchor="middle" class="code">map(fetch)</text>
+  <rect class="node" x="312" y="60" width="120" height="38" rx="8"/>
+  <text x="372" y="84" text-anchor="middle" class="code">concurrent(3)</text>
+  <rect class="node" x="452" y="60" width="80" height="38" rx="8"/>
+  <text x="492" y="84" text-anchor="middle" class="code">toList</text>
+
+  <!-- upstream request -->
+  <path d="M446 52 H278" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" fill="none" marker-end="url(#a13u)"/>
+  <path d="M306 52 H126" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" fill="none" marker-end="url(#a13u)"/>
+  <text x="300" y="44" text-anchor="middle" class="note">next(concurrent: 3)</text>
+
+  <!-- downstream values -->
+  <path d="M124 112 H154" stroke="var(--fp-value,#3B82F6)" stroke-width="2" marker-end="url(#a13d)"/>
+  <path d="M276 112 H306" stroke="var(--fp-value,#3B82F6)" stroke-width="2" marker-end="url(#a13d)"/>
+  <path d="M438 112 H446" stroke="var(--fp-value,#3B82F6)" stroke-width="2" marker-end="url(#a13d)"/>
+  <circle class="value" cx="470" cy="112" r="10"/><text class="marble" x="470" y="116">1</text>
+  <circle class="value" cx="496" cy="112" r="10"/><text class="marble" x="496" y="116">2</text>
+  <circle class="value" cx="522" cy="112" r="10"/><text class="marble" x="522" y="116">3</text>
+
+  <!-- three in flight -->
+  <g>
+    <circle class="time" cx="185" cy="130" r="9"/><text class="marble" x="185" y="134">1</text>
+    <circle class="time" cx="215" cy="130" r="9"/><text class="marble" x="215" y="134">2</text>
+    <circle class="time" cx="245" cy="130" r="9"/><text class="marble" x="245" y="134">3</text>
+    <text x="215" y="148" text-anchor="middle" class="note">three fetches in flight</text>
+  </g>
+
+  <rect class="panel" x="8" y="160" width="544" height="62" rx="10"/>
+  <text x="22" y="180" class="lbl">what changes, and what does not</text>
+  <text x="28" y="200" class="note">changed: when each element is computed, and how long the whole takes</text>
+  <text x="28" y="216" class="note">unchanged: which elements, their values, and the order they arrive in</text>
+</svg>

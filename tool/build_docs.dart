@@ -18,6 +18,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'playground_source.dart' as pg;
+import 'theory_markdown.dart';
 
 const siteBase = 'https://bansooknam.github.io/FxDart';
 const codemirror = 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16';
@@ -63,6 +64,12 @@ void main(List<String> args) {
           _renderTutorial(locale, locales, chrome, page, sections);
       pages.add(_PageRef(locale, 'tutorials/$slug.html', page.translated));
     }
+
+    // The theory textbook — one page carrying the whole book.
+    final theoryBook = _loadPage('theory/book.md', locale);
+    written[_out(locale, 'theory/index.html')] =
+        _renderTheoryBook(locale, locales, chrome, theoryBook);
+    pages.add(_PageRef(locale, 'theory/index.html', theoryBook.translated));
 
     // The comparison families: Dart vs FxDart, RxDart vs FxDart.
     for (final family in _cmpFamilies) {
@@ -126,6 +133,8 @@ void main(List<String> args) {
 List<String> _translatable() => [
       'pages/index.md',
       'pages/101.md',
+      'theory/book.md',
+      for (final f in _theoryChapterFiles()) 'theory/${f.split('/').last}',
       for (final family in _cmpFamilies) family.indexMd,
       for (final f in _tutorialFiles()) 'tutorials/${f.split('/').last}',
       for (final family in _cmpFamilies)
@@ -511,6 +520,7 @@ String _header(
     <nav>
       <a href="${p}index.html"${cls('home')}>${chrome['navHome']}</a>
       <a href="${p}101/index.html"${cls('101')}>${chrome['nav101']}</a>
+      <a href="${p}theory/index.html"${cls('theory')}>${chrome['navTheory']}</a>
       <a href="${p}DartComparison/index.html"${cls('compare')}>${chrome['navCompare']}</a>
       <a href="${p}RxDartComparison/index.html"${cls('compareRx')}>${chrome['navCompareRx']}</a>
       <a href="$apiHref">${chrome['navApi']}</a>
@@ -700,6 +710,212 @@ String _renderTutorial(
     ..writeln('</main>')
     ..write(_footer(chrome))
     ..write(_scripts(locale, chrome, depth));
+  return b.toString();
+}
+
+// --- theory textbook ----------------------------------------------------------
+//
+// content/theory/ holds a book: `book.md` (the preface pages) plus numbered
+// chapter files. Unlike the rest of the site it renders to a *single* page —
+// docs/theory/index.html — because the reader turns pages inside it rather
+// than navigating between URLs. tool/theory_markdown.dart converts the
+// manuscript to blocks; docs/js/theorybook.js flows them into pages at
+// runtime, where the viewport size is finally known.
+
+/// Chapter manuscripts, in reading order. Only `NN-slug.md` counts — `book.md`
+/// is the preface and `PLAN.md` is the writing plan, neither of which is a
+/// chapter.
+List<String> _theoryChapterFiles() {
+  final dir = Directory('$root/content/theory');
+  if (!dir.existsSync()) return const [];
+  final chapter = RegExp(r'^\d\d-[a-z0-9-]+\.md$');
+  return (dir.listSync().whereType<File>().toList()
+        ..sort((a, b) => a.path.compareTo(b.path)))
+      .map((f) => f.path)
+      .where((p) => chapter.hasMatch(p.split('/').last))
+      .toList();
+}
+
+/// `data-pg="<id>"` for a book listing that has a precompiled artifact, so the
+/// reader's ▶ Run fetches ~60KB of gzipped JS instead of waiting on a compile.
+/// Empty when the artifact is missing — the run path then falls back to the
+/// compile service exactly as before.
+String _theoryArtifactAttr(String code) {
+  if (!File('$root/${pg.libraryPath}').existsSync()) return '';
+  final id = pg.playgroundId(root, code);
+  return File(pg.artifactPath(root, id)).existsSync() ? ' data-pg="$id"' : '';
+}
+
+/// Part titles, translated like sections.json. Keys are the part number and
+/// `<n>Blurb`; a chapter's `part:` front matter selects one.
+Map<String, String> _loadTheoryParts(Locale locale) {
+  final base = Map<String, String>.from(_loadJson('$root/content/theory/parts.json'));
+  if (locale.isBase) return base;
+  final f = File('$root/i18n/${locale.code}/theory/parts.json');
+  if (!f.existsSync()) return base;
+  return base..addAll(Map<String, String>.from(jsonDecode(f.readAsStringSync())));
+}
+
+String _renderTheoryBook(
+  Locale locale,
+  List<Locale> locales,
+  Map<String, String> chrome,
+  Page book,
+) {
+  final depth = locale.depth + 1;
+  final p = _rel(depth);
+  final parts = _loadTheoryParts(locale);
+  final diagrams = '$root/content/theory/diagrams';
+
+  final blocks = <String>[];
+
+  // Preface: the pages before chapter 1. Chapter 0 never prints a number.
+  blocks.add('<div class="title-page">'
+      '<h1>${chrome['theoryTitle']}</h1>'
+      '<p class="sub">${chrome['theorySubtitle']}</p>'
+      '<p class="byline">${chrome['theoryByline']}</p></div>');
+  blocks.addAll(convertChapter(book.body,
+          number: 0, title: chrome['theoryTitle'] ?? '', diagramsDir: diagrams)
+      .blocks);
+
+  var lastPart = '';
+  for (final file in _theoryChapterFiles()) {
+    final rel = 'theory/${file.split('/').last}';
+    final page = _loadPage(rel, locale);
+    final part = page.get('part');
+    final newPart = part.isNotEmpty && part != lastPart;
+    if (newPart) lastPart = part;
+    blocks.addAll(convertChapter(
+      page.body,
+      number: int.parse(page.get('chapter')),
+      title: page.get('title'),
+      diagramsDir: diagrams,
+      partLabel: newPart ? parts['part$part'] : null,
+      partBlurb: newPart ? parts['part${part}Blurb'] : null,
+      artifact: _theoryArtifactAttr,
+    ).blocks);
+  }
+
+  final strings = {
+    'toc': chrome['theoryToc'] ?? 'Contents',
+    'run': chrome['theoryRun'] ?? '▶ Run',
+    'output': chrome['theoryOutput'] ?? 'Output',
+    'close': chrome['theoryClose'] ?? 'Close',
+    'compiling': chrome['pgCompiling'] ?? 'Compiling…',
+    'running': chrome['pgRunning'] ?? 'Running…',
+    'noOutput': chrome['pgNoOutput'] ?? '(no output)',
+    'runUnavailable': chrome['theoryRunUnavailable'] ?? '',
+    'edit': chrome['theoryEdit'] ?? '✎ Edit',
+    'editTitle': chrome['theoryEditTitle'] ?? 'Edit and run',
+    'reset': chrome['theoryReset'] ?? 'Reset',
+    'edited': chrome['theoryEdited'] ?? 'edited',
+  };
+  final pgStrings = {
+    for (final k in const ['pgCompileError', 'pgError', 'pgLoadFailed'])
+      k: chrome[k] ?? '',
+  };
+
+  // The book is a standalone document: no site.css, no site header, no shared
+  // scripts beyond the playground engine. It fills the viewport and owns every
+  // pixel, which is what keeps the site's theme tokens, nav and layout out of
+  // the page box — the reader leaves through the close button.
+  final b = StringBuffer()
+    ..writeln('<!DOCTYPE html>')
+    ..writeln('<html lang="${locale.code}"'
+        '${locale.dir == 'rtl' ? ' dir="rtl"' : ''}>')
+    ..writeln('<head>')
+    ..writeln('  <meta charset="utf-8">')
+    ..writeln('  <meta name="viewport" content="width=device-width, '
+        'initial-scale=1">')
+    ..writeln('  <title>${book.get('title')}</title>')
+    ..writeln('  <meta name="description" content="${book.get('description')}">');
+  if (!book.translated) {
+    b.writeln('  <link rel="canonical" '
+        'href="${_url(locales.first, 'theory/index.html')}">');
+  }
+  for (final l in locales) {
+    b.writeln('  <link rel="alternate" hreflang="${l.code}" '
+        'href="${_url(l, 'theory/index.html')}">');
+  }
+  b
+    ..writeln('  <link rel="alternate" hreflang="x-default" '
+        'href="${_url(locales.first, 'theory/index.html')}">')
+    ..writeln('  <link rel="stylesheet" href="${p}css/theorybook.css">')
+    ..writeln('  <link rel="preconnect" href="$dartpad" crossorigin>')
+    ..writeln('  <link rel="prefetch" href="$p${_libUrl()}">')
+    ..writeln('</head>')
+    ..writeln('<body class="book-standalone">')
+    ..writeln('  <div id="book-stage">')
+    ..writeln('    <div id="scaler">')
+    ..writeln('      <div id="book">')
+    ..writeln('        <div class="board"></div>')
+    ..writeln('        <div id="sheets"></div>')
+    ..writeln('        <div class="spine"></div>')
+    ..writeln('      </div>')
+    ..writeln('    </div>')
+    // Locale-root-relative, like the site nav: closing the Korean book must
+    // land on the Korean course, not drop the reader into English.
+    ..writeln('    <a id="book-close" '
+        'href="${_rel(depth - locale.depth)}101/index.html" '
+        'aria-label="${chrome['theoryClose']}" '
+        'title="${chrome['theoryClose']}">✕</a>')
+    ..writeln('    <button id="nav-prev" class="book-nav" type="button" '
+        'aria-label="${chrome['theoryPrev']}">‹</button>')
+    ..writeln('    <button id="nav-next" class="book-nav" type="button" '
+        'aria-label="${chrome['theoryNext']}">›</button>')
+    ..writeln('    <div id="book-hud">')
+    ..writeln('      <span id="page-indicator"></span>')
+    ..writeln('      <button id="toc-btn" type="button">'
+        '${chrome['theoryToc']}</button>');
+  // The standalone page has no room for the site's translation banner, but a
+  // reader handed an English book inside a localized shell still deserves to
+  // be told why.
+  if (!book.translated || book.stale) {
+    final message = book.translated ? chrome['outdated'] : chrome['untranslated'];
+    b.writeln('      <a class="book-note" href="${chrome['contributeUrl']}">'
+        '$message</a>');
+  }
+  b.writeln('      <nav class="book-langs" '
+      'aria-label="${chrome['langLabel']}">');
+  for (final l in locales) {
+    final href =
+        '${_rel(depth)}${l.isBase ? '' : '${l.path}/'}theory/index.html';
+    b.writeln('        <a href="$href" hreflang="${l.code}" lang="${l.code}"'
+        '${l.code == locale.code ? ' aria-current="page"' : ''}>'
+        '${l.name}</a>');
+  }
+  b
+    ..writeln('      </nav>')
+    ..writeln('    </div>')
+    ..writeln('  </div>')
+    ..writeln('  <template id="cover-art">')
+    ..writeln('    <div class="hc-face hc-front"><div class="hc-frame">')
+    ..writeln('      <div class="hc-mark">FXDART 101</div>')
+    ..writeln('      <h1>${chrome['theoryTitle']}</h1>')
+    ..writeln('      <div class="sub">${chrome['theorySubtitle']}</div>')
+    ..writeln('      <div class="author">${chrome['theoryByline']}</div>')
+    ..writeln('    </div></div>')
+    ..writeln('  </template>')
+    // Without JS the book cannot paginate, so the manuscript is simply shown
+    // as one long page — every word stays readable (and indexable).
+    ..writeln('  <noscript><style>#book-stage{display:none}'
+        '#source{display:block;max-width:46rem;margin:2rem auto;'
+        'padding:1.5rem 1.75rem;background:var(--paper);color:var(--fp-ink);'
+        'border-radius:10px}'
+        '</style></noscript>')
+    ..writeln('  <div id="source">');
+  for (final block in blocks) {
+    b.writeln('    $block');
+  }
+  b
+    ..writeln('  </div>')
+    ..writeln('<script>window.FXDART_I18N = ${jsonEncode(pgStrings)};')
+    ..writeln('window.FXDART_LIB = ${jsonEncode(_libUrl())};')
+    ..writeln('window.FXDART_THEORY = ${jsonEncode(strings)};</script>')
+    ..writeln('<script src="${p}js/playground.js" defer></script>')
+    ..writeln('<script src="${p}js/theorybook.js" defer></script>')
+    ..writeln('</body>')
+    ..writeln('</html>');
   return b.toString();
 }
 

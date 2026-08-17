@@ -71,5 +71,20 @@
   "cmpSpeedTie": "속도 동일",
   "cmpSpeedNative": "네이티브가 더 빠름",
   "cmpSpeedRxdart": "RxDart가 더 빠름",
-  "cmpSpeedLegend": "예제마다 두 가지 관점을 보여줍니다. 채워진 배지는 코드에 대한 판정 — 어느 쪽이 더 쓰고 읽기 좋은가입니다. 테두리만 있는 ⚡ 배지는 측정 결과 — 가장 큰 벤치마크 크기에서 AOT 컴파일로 실측한 실행 시간 승자이며, 전체 그래프는 각 페이지의 벤치마크 섹션에 있습니다."
+  "cmpSpeedLegend": "예제마다 두 가지 관점을 보여줍니다. 채워진 배지는 코드에 대한 판정 — 어느 쪽이 더 쓰고 읽기 좋은가입니다. 테두리만 있는 ⚡ 배지는 측정 결과 — 가장 큰 벤치마크 크기에서 AOT 컴파일로 실측한 실행 시간 승자이며, 전체 그래프는 각 페이지의 벤치마크 섹션에 있습니다.",
+  "navTheory": "이론",
+  "theoryTitle": "함수형 프로그래밍 이론",
+  "theorySubtitle": "파이프라인 뒤에 있는 생각들 — 현업 Dart 개발자를 위한 교과서",
+  "theoryByline": "FxDart 101 · fxdart.dev",
+  "theoryToc": "차례",
+  "theoryPrev": "이전 쪽",
+  "theoryNext": "다음 쪽",
+  "theoryRun": "▶ 실행",
+  "theoryOutput": "출력",
+  "theoryClose": "닫기",
+  "theoryRunUnavailable": "실행 엔진을 불러오지 못했습니다 — 페이지를 새로고침한 뒤 다시 시도해 주세요.",
+  "theoryEdit": "✎ 편집",
+  "theoryEditTitle": "고쳐서 실행하기",
+  "theoryReset": "되돌리기",
+  "theoryEdited": "수정됨"
 }

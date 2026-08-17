@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 250" font-family="system-ui, sans-serif">
+  <style>
+    .value{fill:var(--fp-value,#3B82F6)}
+    text{fill:var(--fp-ink,#26283B);font-size:12.5px}
+    .code{font-family:ui-monospace,Menlo,monospace;font-size:12px;fill:var(--fp-op,#6C5CE7)}
+    .lbl{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;fill:var(--fp-op,#6C5CE7)}
+    .box{fill:#fff;stroke:var(--fp-op,#6C5CE7);stroke-width:2}
+    .wrap{fill:none;stroke:var(--fp-ink,#26283B);stroke-width:1.6;stroke-dasharray:5 4}
+    .note{font-size:11.5px;opacity:.72}
+  </style>
+  <defs>
+    <marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--fp-op,#6C5CE7)"/>
+    </marker>
+  </defs>
+
+  <!-- composition -->
+  <text x="14" y="20" class="lbl">composition — two machines, one seam</text>
+  <circle class="value" cx="30" cy="62" r="10"/>
+  <path d="M44 62 H74" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a4)"/>
+  <rect class="box" x="82" y="44" width="86" height="36" rx="8"/>
+  <text x="125" y="67" text-anchor="middle" class="code">trim</text>
+  <path d="M172 62 H206" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a4)"/>
+  <circle class="value" cx="222" cy="62" r="8" opacity=".45"/>
+  <path d="M234 62 H268" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a4)"/>
+  <rect class="box" x="276" y="44" width="86" height="36" rx="8"/>
+  <text x="319" y="67" text-anchor="middle" class="code">upper</text>
+  <path d="M366 62 H400" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a4)"/>
+  <circle class="value" cx="416" cy="62" r="10"/>
+  <rect class="wrap" x="72" y="32" width="300" height="60" rx="12"/>
+  <text x="222" y="108" text-anchor="middle" class="note">pipe1(trim, upper) — the seam is now internal</text>
+
+  <!-- currying -->
+  <text x="14" y="152" class="lbl">currying — one machine, two doors</text>
+  <g>
+    <rect class="box" x="24" y="168" width="150" height="52" rx="8"/>
+    <text x="99" y="190" text-anchor="middle" class="code">addTwo(a, b)</text>
+    <text x="99" y="208" text-anchor="middle" class="note">two inputs at once</text>
+  </g>
+  <text x="196" y="200" class="note">≅</text>
+  <g>
+    <rect class="box" x="230" y="168" width="120" height="52" rx="8"/>
+    <text x="290" y="190" text-anchor="middle" class="code">addTwo.curried(a)</text>
+    <text x="290" y="208" text-anchor="middle" class="note">returns a function</text>
+    <path d="M356 194 H386" stroke="var(--fp-op,#6C5CE7)" stroke-width="2" marker-end="url(#a4)"/>
+    <rect class="box" x="394" y="168" width="146" height="52" rx="8"/>
+    <text x="467" y="190" text-anchor="middle" class="code">(b) =&gt; a + b</text>
+    <text x="467" y="208" text-anchor="middle" class="note">waiting for the rest</text>
+  </g>
+</svg>

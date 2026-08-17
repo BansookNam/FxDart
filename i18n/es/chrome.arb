@@ -71,5 +71,13 @@
   "cmpSpeedTie": "Misma velocidad",
   "cmpSpeedNative": "Nativo más rápido",
   "cmpSpeedRxdart": "RxDart más rápido",
-  "cmpSpeedLegend": "Dos perspectivas por ejemplo: la insignia rellena juzga el código — qué versión es más agradable de escribir y leer. La insignia ⚡ con contorno informa la medición — el ganador en tiempo de ejecución al mayor tamaño del benchmark, compilado AOT; la sección Benchmark de cada página tiene las barras completas."
+  "cmpSpeedLegend": "Dos perspectivas por ejemplo: la insignia rellena juzga el código — qué versión es más agradable de escribir y leer. La insignia ⚡ con contorno informa la medición — el ganador en tiempo de ejecución al mayor tamaño del benchmark, compilado AOT; la sección Benchmark de cada página tiene las barras completas.",
+  "navTheory": "Teoría",
+  "theoryToc": "Índice",
+  "theoryRun": "▶ Ejecutar",
+  "theoryOutput": "Salida",
+  "theoryEdit": "✎ Editar",
+  "theoryEditTitle": "Editar y ejecutar",
+  "theoryReset": "Restablecer",
+  "theoryEdited": "editado"
 }

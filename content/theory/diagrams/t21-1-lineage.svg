@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 215" font-family="system-ui, sans-serif">
+  <style>
+    text{fill:var(--fp-ink,#26283B);font-size:12.5px}
+    .code{font-family:ui-monospace,Menlo,monospace;font-size:11px;fill:var(--fp-op,#6C5CE7)}
+    .lbl{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;fill:var(--fp-op,#6C5CE7)}
+    .node{fill:#fff;stroke:var(--fp-ink,#26283B);stroke-width:2}
+    .panel{fill:var(--fp-bg,#F0F1F6)}
+    .note{font-size:11px;opacity:.72}
+    .flow{stroke:var(--fp-op,#6C5CE7);stroke-width:2;fill:none}
+    .lost{font-size:10.5px;fill:var(--fp-err,#E5484D)}
+  </style>
+  <defs>
+    <marker id="a21" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--fp-op,#6C5CE7)"/>
+    </marker>
+  </defs>
+
+  <text x="14" y="20" class="lbl">the ideas travel; the mechanisms are rebuilt</text>
+
+  <rect class="node" x="14" y="34" width="96" height="40" rx="8"/>
+  <text x="62" y="52" text-anchor="middle" class="code">Haskell</text>
+  <text x="62" y="67" text-anchor="middle" class="note">laws, do</text>
+
+  <path class="flow" d="M114 54 H150" marker-end="url(#a21)"/>
+
+  <rect class="node" x="156" y="34" width="96" height="40" rx="8"/>
+  <text x="204" y="52" text-anchor="middle" class="code">Scala / Cats</text>
+  <text x="204" y="67" text-anchor="middle" class="note">for, HKT</text>
+
+  <path class="flow" d="M256 54 H292" marker-end="url(#a21)"/>
+
+  <rect class="node" x="298" y="34" width="112" height="40" rx="8"/>
+  <text x="354" y="52" text-anchor="middle" class="code">Kotlin / Arrow 2</text>
+  <text x="354" y="67" text-anchor="middle" class="note">Raise scope</text>
+
+  <path class="flow" d="M354 80 V126" marker-end="url(#a21)"/>
+
+  <rect class="node" x="14" y="112" width="150" height="40" rx="8"/>
+  <text x="89" y="130" text-anchor="middle" class="code">FxTS (TypeScript)</text>
+  <text x="89" y="145" text-anchor="middle" class="note">lazy pipe, concurrent(n)</text>
+
+  <path class="flow" d="M164 132 H262" marker-end="url(#a21)"/>
+
+  <rect class="node" x="270" y="112" width="170" height="40" rx="8" stroke="var(--fp-op,#6C5CE7)"/>
+  <text x="355" y="130" text-anchor="middle" class="code">FxDart</text>
+  <text x="355" y="145" text-anchor="middle" class="note">pipelines + typed errors</text>
+
+  <rect class="panel" x="14" y="164" width="538" height="44" rx="10"/>
+  <text x="28" y="182" class="lbl">dropped at each border</text>
+  <text x="28" y="200" class="lost">purity &amp; laziness · transformers · HKT abstraction · curried pipe</text>
+</svg>

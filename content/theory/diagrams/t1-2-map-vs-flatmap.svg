@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 260" font-family="system-ui, sans-serif">
+  <style>
+    .value{fill:var(--fp-value,#3B82F6)}
+    .op{fill:var(--fp-op,#6C5CE7)}
+    text{fill:var(--fp-ink,#26283B);font-size:14px}
+    .code{font-family:ui-monospace,Menlo,monospace;font-size:13px;fill:var(--fp-op,#6C5CE7);font-weight:700}
+    .outer{fill:none;stroke:var(--fp-ink,#26283B);stroke-width:2.5}
+    .inner{fill:var(--fp-bg,#F0F1F6);stroke:var(--fp-ink,#26283B);stroke-width:1.6}
+    .note{font-size:12px;opacity:.72}
+    .marble{fill:#fff;font-size:11px;font-weight:700;text-anchor:middle}
+  </style>
+  <defs>
+    <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--fp-op,#6C5CE7)"/>
+    </marker>
+  </defs>
+
+  <!-- source list, shared by both rows -->
+  <text x="14" y="26" class="note">source</text>
+  <rect class="outer" x="14" y="34" width="104" height="46" rx="10"/>
+  <circle class="value" cx="42" cy="57" r="13"/><text class="marble" x="42" y="61">1</text>
+  <circle class="value" cx="70" cy="57" r="13"/><text class="marble" x="70" y="61">2</text>
+  <circle class="value" cx="98" cy="57" r="13"/><text class="marble" x="98" y="61">3</text>
+
+  <!-- map row -->
+  <path d="M124 57 H208" stroke="var(--fp-op,#6C5CE7)" stroke-width="2.5" fill="none" marker-end="url(#a2)"/>
+  <text x="166" y="46" text-anchor="middle" class="code">map</text>
+  <rect class="outer" x="220" y="26" width="248" height="62" rx="10"/>
+  <g>
+    <rect class="inner" x="232" y="36" width="72" height="42" rx="8"/>
+    <circle class="value" cx="252" cy="57" r="11"/><text class="marble" x="252" y="61">1</text>
+    <circle class="value" cx="284" cy="57" r="11"/><text class="marble" x="284" y="61" font-size="9">10</text>
+  </g>
+  <g>
+    <rect class="inner" x="312" y="36" width="72" height="42" rx="8"/>
+    <circle class="value" cx="332" cy="57" r="11"/><text class="marble" x="332" y="61">2</text>
+    <circle class="value" cx="364" cy="57" r="11"/><text class="marble" x="364" y="61" font-size="9">20</text>
+  </g>
+  <g>
+    <rect class="inner" x="392" y="36" width="64" height="42" rx="8"/>
+    <circle class="value" cx="410" cy="57" r="11"/><text class="marble" x="410" y="61">3</text>
+    <circle class="value" cx="438" cy="57" r="11"/><text class="marble" x="438" y="61" font-size="9">30</text>
+  </g>
+  <text x="480" y="61" class="note">two layers</text>
+
+  <!-- divider -->
+  <line x1="14" y1="120" x2="546" y2="120" stroke="var(--fp-ink,#26283B)" stroke-width="1" opacity=".18"/>
+
+  <!-- flatMap row -->
+  <rect class="outer" x="14" y="168" width="104" height="46" rx="10"/>
+  <circle class="value" cx="42" cy="191" r="13"/><text class="marble" x="42" y="195">1</text>
+  <circle class="value" cx="70" cy="191" r="13"/><text class="marble" x="70" y="195">2</text>
+  <circle class="value" cx="98" cy="191" r="13"/><text class="marble" x="98" y="195">3</text>
+
+  <path d="M124 191 H208" stroke="var(--fp-op,#6C5CE7)" stroke-width="2.5" fill="none" marker-end="url(#a2)"/>
+  <text x="166" y="180" text-anchor="middle" class="code">flatMap</text>
+  <rect class="outer" x="220" y="168" width="248" height="46" rx="10"/>
+  <circle class="value" cx="246" cy="191" r="12"/><text class="marble" x="246" y="195">1</text>
+  <circle class="value" cx="282" cy="191" r="12"/><text class="marble" x="282" y="195" font-size="9">10</text>
+  <circle class="value" cx="318" cy="191" r="12"/><text class="marble" x="318" y="195">2</text>
+  <circle class="value" cx="354" cy="191" r="12"/><text class="marble" x="354" y="195" font-size="9">20</text>
+  <circle class="value" cx="390" cy="191" r="12"/><text class="marble" x="390" y="195">3</text>
+  <circle class="value" cx="426" cy="191" r="12"/><text class="marble" x="426" y="195" font-size="9">30</text>
+  <text x="480" y="195" class="note">one layer</text>
+
+  <text x="280" y="242" text-anchor="middle" class="note">
+    same function applied — the difference is whether the layers are joined
+  </text>
+</svg>

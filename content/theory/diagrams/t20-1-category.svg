@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 215" font-family="system-ui, sans-serif">
+  <style>
+    text{fill:var(--fp-ink,#26283B);font-size:12.5px}
+    .code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;fill:var(--fp-op,#6C5CE7)}
+    .lbl{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;fill:var(--fp-op,#6C5CE7)}
+    .panel{fill:var(--fp-bg,#F0F1F6)}
+    .obj{fill:#fff;stroke:var(--fp-ink,#26283B);stroke-width:2}
+    .note{font-size:11.5px;opacity:.72}
+    .arr{stroke:var(--fp-op,#6C5CE7);stroke-width:2;fill:none}
+  </style>
+  <defs>
+    <marker id="a20" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--fp-op,#6C5CE7)"/>
+    </marker>
+  </defs>
+
+  <text x="14" y="20" class="lbl">objects and arrows — nothing else</text>
+
+  <!-- triangle of objects -->
+  <circle class="obj" cx="80" cy="86" r="26"/>
+  <text x="80" y="91" text-anchor="middle" class="code">A</text>
+  <circle class="obj" cx="230" cy="86" r="26"/>
+  <text x="230" y="91" text-anchor="middle" class="code">B</text>
+  <circle class="obj" cx="155" cy="176" r="26"/>
+  <text x="155" y="181" text-anchor="middle" class="code">C</text>
+
+  <path class="arr" d="M108 86 H198" marker-end="url(#a20)"/>
+  <text x="153" y="76" text-anchor="middle" class="code">f</text>
+  <path class="arr" d="M224 112 L182 156" marker-end="url(#a20)"/>
+  <text x="216" y="140" class="code">g</text>
+  <path class="arr" d="M86 112 L128 156" marker-end="url(#a20)"/>
+  <text x="82" y="142" text-anchor="end" class="code">g ∘ f</text>
+
+  <!-- identity loops -->
+  <path class="arr" d="M80 60 a20 16 0 1 1 -0.1 0" marker-end="url(#a20)"/>
+  <text x="80" y="34" text-anchor="middle" class="code">id</text>
+
+  <!-- laws -->
+  <rect class="panel" x="300" y="34" width="252" height="140" rx="10"/>
+  <text x="314" y="54" class="lbl">two laws</text>
+  <text x="314" y="80" class="code">(h ∘ g) ∘ f = h ∘ (g ∘ f)</text>
+  <text x="314" y="98" class="note">associativity</text>
+  <text x="314" y="126" class="code">id ∘ f = f = f ∘ id</text>
+  <text x="314" y="144" class="note">identity</text>
+  <text x="314" y="166" class="note">Dart: types are objects, functions are arrows</text>
+</svg>

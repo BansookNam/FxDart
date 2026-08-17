@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 210" font-family="system-ui, sans-serif">
+  <style>
+    text{fill:var(--fp-ink,#26283B);font-size:12.5px}
+    .code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;fill:var(--fp-op,#6C5CE7)}
+    .lbl{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;fill:var(--fp-op,#6C5CE7)}
+    .ok{stroke:var(--fp-ok,#2F9E68);stroke-width:3;fill:none}
+    .err{stroke:var(--fp-err,#E5484D);stroke-width:3;fill:none}
+    .node{fill:#fff;stroke:var(--fp-ink,#26283B);stroke-width:2}
+    .note{font-size:11.5px;opacity:.72}
+    .okfill{fill:var(--fp-ok,#2F9E68)}
+    .errfill{fill:var(--fp-err,#E5484D)}
+  </style>
+  <defs>
+    <marker id="a16" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--fp-ok,#2F9E68)"/>
+    </marker>
+    <marker id="a16e" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--fp-err,#E5484D)"/>
+    </marker>
+  </defs>
+
+  <text x="14" y="22" class="lbl">two tracks, one direction</text>
+
+  <!-- success track -->
+  <path class="ok" d="M20 66 H120"/>
+  <path class="ok" d="M186 66 H262"/>
+  <path class="ok" d="M328 66 H480" marker-end="url(#a16)"/>
+  <circle class="okfill" cx="26" cy="66" r="7"/>
+  <path d="M22 66 l3 4 l6 -8" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+
+  <!-- failure track -->
+  <path class="err" d="M20 150 H480" marker-end="url(#a16e)"/>
+
+  <!-- switches -->
+  <rect class="node" x="120" y="50" width="66" height="32" rx="8"/>
+  <text x="153" y="70" text-anchor="middle" class="code">step 1</text>
+  <rect class="node" x="262" y="50" width="66" height="32" rx="8"/>
+  <text x="295" y="70" text-anchor="middle" class="code">step 2</text>
+
+  <!-- diversions -->
+  <path class="err" d="M153 84 C 153 116, 170 150, 200 150"/>
+  <path class="err" d="M295 84 C 295 116, 312 150, 342 150"/>
+  <text x="176" y="106" class="note">Left</text>
+  <text x="318" y="106" class="note">Left</text>
+
+  <!-- labels -->
+  <text x="490" y="70" class="note">Right</text>
+  <text x="490" y="154" class="note">Left</text>
+  <text x="20" y="176" class="note">once on the red track, every later map and flatMap is a no-op</text>
+
+  <!-- mapLeft -->
+  <rect class="node" x="380" y="134" width="72" height="32" rx="8" stroke="var(--fp-err,#E5484D)"/>
+  <text x="416" y="154" text-anchor="middle" class="code">mapLeft</text>
+  <text x="20" y="196" class="note">mapLeft is the only operation that touches it — that is how error types compose</text>
+</svg>
