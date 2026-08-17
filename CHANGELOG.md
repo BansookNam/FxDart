@@ -1,3 +1,26 @@
+## 0.8.3
+
+### Fixed — `Comparable<T>` swallowed by dartdoc in `Fx.max` / `Fx.min`
+
+Both doc comments wrote `Comparable<T>` bare. Doc comments are rendered as
+HTML, so `<T>` was parsed as an unknown tag and dropped — the published API
+docs read "assumes T is Comparable." — and the analyzer's
+`unintended_html_in_doc_comment` lint fired on both lines. They are now
+spelled `` `Comparable<T>` ``.
+
+### Chore — the tree is formatted for the current Dart formatter
+
+`lib/`, `test/`, `bin/`, `example/`, and `benchmark/` were still in the
+pre-3.7 short style, so 25 files did not match `dart format` under the SDK
+pub.dev analyses with. Together with the two doc-comment lints above, those
+were the 27 findings behind 0.8.2's **40/50** on pub.dev's *Pass static
+analysis*; the check is now **50/50**. Two `if` statements that the reformat
+spread onto their own line also gained the braces
+`curly_braces_in_flow_control_structures` wants.
+
+Whitespace and braces only — no API or behaviour change, and the full suite
+(1931 tests) passes unchanged.
+
 ## 0.8.2
 
 ### Fixed — `Fx.join()` without a separator
