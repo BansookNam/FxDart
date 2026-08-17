@@ -66,7 +66,46 @@ Future<void> main(List<String> args) async {
   }
 
   scratch.deleteSync(recursive: true);
+
+  // Translations copy every listing verbatim — a second copy of a program
+  // drifts, and only the English one is executed above. Anything else in a
+  // translated chapter is prose and may differ freely.
+  var drifted = 0;
+  final i18nRoot = Directory('${Directory.current.path}/i18n');
+  if (i18nRoot.existsSync()) {
+    for (final path in files) {
+      final name = path.split('/').last;
+      final english = _fences(File(path).readAsStringSync());
+      for (final locale in i18nRoot.listSync().whereType<Directory>()) {
+        final f = File('${locale.path}/theory/$name');
+        if (!f.existsSync()) continue;
+        final other = _fences(f.readAsStringSync());
+        final tag = '${locale.path.split('/').last}/$name';
+        if (other.length != english.length) {
+          drifted++;
+          stdout.writeln('DRIFT $tag: ${other.length} code blocks, '
+              'English has ${english.length}');
+          continue;
+        }
+        for (var i = 0; i < english.length; i++) {
+          if (other[i] != english[i]) {
+            drifted++;
+            stdout.writeln('DRIFT $tag block ${i + 1}: differs from English');
+          }
+        }
+      }
+    }
+  }
+
   stdout.writeln('\n$ran listings run, $failures failed, '
-      '$wide lines over $maxColumns columns');
-  if (failures > 0 || wide > 0) exit(1);
+      '$wide lines over $maxColumns columns, $drifted translated blocks '
+      'out of sync');
+  if (failures > 0 || wide > 0 || drifted > 0) exit(1);
 }
+
+/// Every fenced block of a manuscript, info string included.
+List<String> _fences(String source) => RegExp(r'```([a-z ]*)\n(.*?)```',
+        dotAll: true)
+    .allMatches(source)
+    .map((m) => '${m.group(1)!.trim()}\n${m.group(2)!}')
+    .toList();

@@ -1,9 +1,9 @@
 # Functional Programming Theory — content plan
 
-Status: **complete in English — 22 chapters + 3 appendices, 270 pages.**
+Status: **complete in English and Korean — 22 chapters + 3 appendices.**
 74 runnable listings, all verified by `dart run tool/check_theory.dart`;
-24 figures. Korean covers the preface and Chapter 1; Chapters 2–22 and the
-appendices are the remaining translation work.
+24 figures. Korean is 100% (299/299 site-wide) and its listings are checked
+byte-for-byte against the English source on every run of the checker.
 
 This file is the working plan for the theory textbook at `docs/theory/`
 (sources in `content/theory/`, viewer described in the root `CLAUDE.md`).
@@ -125,9 +125,9 @@ Rules of thumb: a figure ≈ ⅔ page, a 25-line listing ≈ ⅔ page, a depth b
 
 ### i18n
 
-- English is the source of truth. `i18n/ko/theory/` currently holds the
-  preface and Chapter 1; the ko preface says so, and the rest of the book
-  renders in English inside the Korean shell until the translation lands. Other locales fall back to English with the standard
+- English is the source of truth; `i18n/ko/theory/` is a complete translation.
+  `tool/check_theory.dart` fails if any translated chapter's fenced blocks
+  differ from the English ones — prose is translated, programs never are. Other locales fall back to English with the standard
   "not yet translated" banner; their chrome (nav, Contents, ▶ Run, Output) is
   translated so the viewer is not half-English.
 - Front matter: only `title` and `description` may differ per locale. `slug`,
@@ -238,10 +238,6 @@ factual error in the prose.
 
 Known gaps, in the order they will start to matter:
 
-- **Korean translation of Chapters 2–22 and the appendices.** The ko shell,
-  chrome, preface and Chapter 1 are done; the rest renders in English. Prose
-  only — listings are copied verbatim, so a translated chapter must keep every
-  ```` ```dart ```` block byte-identical to the English source.
 
 - **Mobile.** The viewer scales the whole spread to fit, so a phone gets a
   legible-but-small two-page spread. A single-page mode (one page per turn
@@ -262,7 +258,8 @@ Known gaps, in the order they will start to matter:
   Section-level anchors are not routed yet (headings do carry `id="chN-slug"`,
   but the slug is empty for non-Latin headings, so it cannot be shared across
   translations).
-- **More locales.** ko is complete; zh-Hans/ja/es/pt-BR/ru have chrome only.
+- **More locales.** en and ko are complete books; zh-Hans/ja/es/pt-BR/ru have
+  translated chrome and render the English text with a notice in the HUD.
 - **Cross-links.** Chapters reference each other by number in prose; only
   `#chN` deep links are wired. Turning those references into links, and linking
   the relevant tutorials into the book (and back), is a mechanical pass worth

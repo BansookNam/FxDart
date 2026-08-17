@@ -94,7 +94,9 @@ A paged book viewer — the FP theory companion to 101, modelled on the
   all-italic line a figure caption. `## Exercises` starts on a recto and
   `## Solutions` after a page turn, so answers cannot be seen from the questions.
 - **Code blocks are locale-invariant** — the ko overlay carries the English
-  listing verbatim (comments included); only prose is translated.
+  listing verbatim (comments included); only prose is translated. The checker
+  enforces it: a translated chapter whose fenced blocks differ from English
+  fails the run.
 - `dart run tool/check_theory.dart [NN …]` is the gate for any edit: it runs
   every ```` ```dart run ```` listing against this package, prints its real
   output (paste it back into the prose), and enforces the ≤ 66-column rule that
