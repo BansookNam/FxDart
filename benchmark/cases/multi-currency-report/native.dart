@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 
 import '../../harness.dart';
 import 'data.dart';
@@ -14,12 +13,13 @@ Future<void> main() async {
     run: () {
       final usd = txns.map((t) => (t, t.amount * rates[t.currency]!)).toList();
 
-      final catLines = usd
-          .groupListsBy((p) => p.$1.category)
-          .entries
-          .map((e) => (e.key, e.value.fold(0.0, (s, p) => s + p.$2)))
-          .sortedBy<num>((c) => -c.$2)
-          .map((c) => '  ${c.$1.padRight(8)} ${money(c.$2)}');
+      final byCategory = <String, double>{};
+      for (final p in usd) {
+        byCategory[p.$1.category] = (byCategory[p.$1.category] ?? 0) + p.$2;
+      }
+      final catLines = (byCategory.entries.toList()
+            ..sort((a, b) => b.value.compareTo(a.value)))
+          .map((e) => '  ${e.key.padRight(8)} ${money(e.value)}');
 
       final currencies = txns.map((t) => t.currency).toSet().toList()..sort();
       final biggest = usd.reduce((a, b) => a.$2 >= b.$2 ? a : b);

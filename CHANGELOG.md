@@ -98,6 +98,21 @@ mutated by the mapping callback mid-pass is no longer reported as a
 `ConcurrentModificationError` — the same trade-off `takeRight`/`dropRight`
 already make.
 
+### Docs — `multi-currency-report` now uses `foldBy`
+
+The example computed its per-category totals with `groupBy` + `sumBy`, which
+builds a `List` of every transaction under each category and then folds it
+away — allocation proportional to the **input**, for an answer proportional to
+the **number of categories**. It now uses `foldBy`, which accumulates straight
+into the result map; the native side was rewritten to the equivalent map
+accumulator, so the comparison stays like-for-like.
+
+At N=1,000,000 this made **both** sides ~2.7× faster — native 347.6 ms →
+128.2 ms, fxdart 353.1 ms → 132.0 ms — and the verdict stays a tie. The output
+is byte-identical. This is the advice in the new
+[Writing fast pipelines](https://bansook.xyz/FxDart/tutorials/performance.html)
+lesson, applied to the example that most needed it.
+
 ### Where the suite stands
 
 Both benchmark families re-measured on 2026-08-17 (AOT, interleaved sides).

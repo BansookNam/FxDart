@@ -40,7 +40,7 @@
 | 28 | budget-alerts | 100 | 3.3 µs | 4.5 µs | **tie** | 16.5 MB | 16.4 MB | tie | 3 |
 | 29 | monthly-category-report | 100 | 2.0 µs | 6.1 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 30 | consecutive-over-limit | 100 | 1.8 µs | 2.9 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
-| 31 | multi-currency-report | 100 | 33 µs | 40 µs | **tie** | 16.7 MB | 16.5 MB | tie | 3 |
+| 31 | multi-currency-report | 100 | 11 µs | 13 µs | **tie** | 16.5 MB | 16.6 MB | tie | 8 |
 | 32 | restock-plan | 100 | 10 µs | 9.3 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 33 | price-lookup-fallback (async) | 100 | 410 µs | 416 µs | **tie** | 16.5 MB | 17.1 MB | tie | 3 |
 | 34 | monthly-ledger-report | 100 | 22 µs | 31 µs | **tie** | 16.7 MB | 16.5 MB | tie | 3 |
@@ -98,7 +98,7 @@
 | 28 | budget-alerts | 10000 | 180 µs | 241 µs | **tie** | 21.8 MB | 19.5 MB | fxdart | 3 |
 | 29 | monthly-category-report | 10000 | 106 µs | 174 µs | **tie** | 17.0 MB | 17.0 MB | tie | 3 |
 | 30 | consecutive-over-limit | 10000 | 117 µs | 209 µs | **tie** | 21.0 MB | 23.5 MB | native | 3 |
-| 31 | multi-currency-report | 10000 | 2.66 ms | 2.69 ms | **tie** | 22.0 MB | 19.2 MB | fxdart | 3 |
+| 31 | multi-currency-report | 10000 | 726 µs | 950 µs | **tie** | 23.5 MB | 22.9 MB | tie | 8 |
 | 32 | restock-plan | 10000 | 1.26 ms | 1.10 ms | **tie** | 17.5 MB | 20.8 MB | native | 3 |
 | 33 | price-lookup-fallback (async) | 10000 | 37.3 ms | 37.3 ms | **tie** | 48.9 MB | 30.7 MB | fxdart | 3 |
 | 34 | monthly-ledger-report | 10000 | 901 µs | 711 µs | **tie** | 23.4 MB | 22.2 MB | fxdart | 3 |
@@ -156,7 +156,7 @@
 | 28 | budget-alerts | 1000000 | 21.5 ms | 27.4 ms | **native** | 89.6 MB | 89.6 MB | tie | 3 |
 | 29 | monthly-category-report | 1000000 | 11.4 ms | 17.4 ms | **native** | 119.7 MB | 119.7 MB | tie | 3 |
 | 30 | consecutive-over-limit | 1000000 | 17.1 ms | 22.9 ms | **native** | 150.0 MB | 148.3 MB | tie | 3 |
-| 31 | multi-currency-report | 1000000 | 347.6 ms | 353.1 ms | **tie** | 219.5 MB | 197.5 MB | fxdart | 5 |
+| 31 | multi-currency-report | 1000000 | 128.2 ms | 132.0 ms | **tie** | 205.1 MB | 189.3 MB | fxdart | 8 |
 | 32 | restock-plan | 1000000 | 218.4 ms | 203.9 ms | **fxdart** | 173.5 MB | 186.2 MB | native | 3 |
 | 33 | price-lookup-fallback (async) | 100000 | 364.6 ms | 373.8 ms | **tie** | 80.8 MB | 80.6 MB | tie | 5 |
 | 34 | monthly-ledger-report | 1000000 | 135.6 ms | 77.2 ms | **fxdart** | 148.0 MB | 120.6 MB | fxdart | 3 |

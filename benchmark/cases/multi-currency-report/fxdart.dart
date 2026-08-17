@@ -20,11 +20,11 @@ Future<void> main() async {
       final usd =
           fx(txns).map((t) => (t, t.amount * rates[t.currency]!)).toList();
 
-      final grouped = fx(usd).groupBy((p) => p.$1.category).entries;
-      final catLines = fx(grouped)
-          .map((e) => (e.key, fx(e.value).sumBy((p) => p.$2)))
-          .sortBy((c) => -c.$2)
-          .map((c) => '  ${c.$1.padRight(8)} ${money(c.$2)}');
+      final byCategory =
+          fx(usd).foldBy((p) => p.$1.category, 0.0, (s, p) => s + p.$2);
+      final catLines = fx(byCategory.entries)
+          .sortBy((e) => -e.value)
+          .map((e) => '  ${e.key.padRight(8)} ${money(e.value)}');
 
       final currencies = fx(txns).map((t) => t.currency).uniq().sortBy((c) => c);
       final biggest = fx(usd).maxBy((p) => p.$2)!;

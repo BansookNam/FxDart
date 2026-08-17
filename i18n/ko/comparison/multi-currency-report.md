@@ -5,7 +5,7 @@ description: 고정 환율로 여행 가계부를 USD로 정규화한 다음 그
 heading: 다중 통화 지출 리포트
 order: 31
 tier: 4
-functions: map, groupBy, sumBy, sortBy, uniq, maxBy, join
+functions: map, foldBy, sumBy, sortBy, uniq, maxBy, join
 domain: transactions
 verdict: fxdart
 async: false
@@ -29,14 +29,26 @@ async: false
   <p>
     먼저 정규화하는 것 — 각 거래를 <code>(tx, usd)</code> 쌍으로
     <code>map</code>하는 것 — 은 이후의 모든 질문이 하나의 리스트 위에서
-    돌아가게 해 줍니다: 내역에는 <code>groupBy</code> +
-    <code>sumBy</code> + <code>sortBy</code>, 통화 목록에는
-    <code>uniq</code>, 요약 줄에는 <code>maxBy</code>와
-    <code>sumBy</code>. 리포트의 각 줄은 자신의 집계 방식을 이름으로
-    드러내는 짧은 파이프라인 하나입니다. 네이티브 버전은 똑같은 동작을
-    하지만 그 어휘가 없습니다: 모든 합계는 초기값을 가진
-    <code>fold</code>이고, 최댓값은 직접 작성한 <code>reduce</code>
-    비교자이며, 통화 목록에는 <code>toSet().toList()..sort()</code>
-    조합이 필요합니다. 어려운 부분은 없습니다 — 다만 코드량이 더 많고,
-    그 코드가 의미를 덜 말해 줄 뿐입니다.
+    돌아가게 해 줍니다: 내역에는 <code>foldBy</code> +
+    <code>sortBy</code>, 통화 목록에는 <code>uniq</code>, 요약 줄에는
+    <code>maxBy</code>와 <code>sumBy</code>. 리포트의 각 줄은 자신의 집계
+    방식을 이름으로 드러내는 짧은 파이프라인 하나입니다. 네이티브 버전은
+    똑같은 동작을 하지만 그 어휘가 없습니다: 카테고리별 합계는 직접 굴린 맵
+    누적기이고, 정렬에는 비교자를 일일이 써 줘야 하며, 최댓값은
+    <code>reduce</code> 비교자, 통화 목록에는
+    <code>toSet().toList()..sort()</code> 조합이 필요합니다. 어려운 부분은
+    없습니다 — 다만 코드량이 더 많고, 그 코드가 의미를 덜 말해 줄 뿐입니다.
+  </p>
+  <p>
+    집계에 <code>groupBy</code> + <code>sumBy</code>가 아니라
+    <code>foldBy</code>를 쓴 것은 의도적이며, 잠깐 짚고 갈 만합니다. 여기서
+    원하는 답은 <em>카테고리마다 숫자 하나</em>입니다. 그러니 먼저 그룹으로
+    묶으면 카테고리별로 모든 거래의 <code>List</code>를 만들었다가 곧바로
+    접어서 없애게 됩니다 — 답은 카테고리 개수에 비례하는데, 할당은 입력에
+    비례하는 셈이죠. <code>foldBy</code>는 결과 맵에 곧장 누적하는데, 이는
+    옆에 있는 네이티브 반복문이 하는 일과 정확히 같습니다. 백만 행짜리
+    원장에서는 이 선택 하나가 <em>양쪽 모두</em>에서 약 2.5배의 차이를
+    만듭니다.
+    <a href="../tutorials/performance.html">빠른 파이프라인 작성하기</a>를
+    보세요. 정말로 구성원이 필요할 때만 <code>groupBy</code>를 쓰세요.
   </p>

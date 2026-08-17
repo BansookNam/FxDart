@@ -5,7 +5,7 @@ description: Normaliza a USD el libro de cuentas de un viaje con tipos fijos y l
 heading: Informe de gastos multidivisa
 order: 31
 tier: 4
-functions: map, groupBy, sumBy, sortBy, uniq, maxBy, join
+functions: map, foldBy, sumBy, sortBy, uniq, maxBy, join
 domain: transactions
 verdict: fxdart
 async: false
@@ -30,15 +30,29 @@ async: false
   <p>
     Normalizar primero —<code>map</code> de cada transacción a un par
     <code>(tx, usd)</code>— permite que todas las preguntas posteriores
-    se resuelvan sobre una sola lista: <code>groupBy</code> +
-    <code>sumBy</code> + <code>sortBy</code> para el desglose,
-    <code>uniq</code> para la lista de divisas, <code>maxBy</code> y
-    <code>sumBy</code> para las líneas de resumen. Cada línea del informe
-    es un pipeline corto que da nombre a su agregación. La versión nativa
-    hace exactamente los mismos movimientos, pero sin el vocabulario: cada
-    suma es un <code>fold</code> con valor inicial, el máximo es un
-    comparador de <code>reduce</code> escrito a mano y la lista de divisas
-    necesita el baile de <code>toSet().toList()..sort()</code>. Nada de
-    esto es difícil —simplemente hay más de todo, y menos de todo dice lo
-    que significa.
+    se resuelvan sobre una sola lista: <code>foldBy</code> +
+    <code>sortBy</code> para el desglose, <code>uniq</code> para la lista de
+    divisas, <code>maxBy</code> y <code>sumBy</code> para las líneas de
+    resumen. Cada línea del informe es un pipeline corto que da nombre a su
+    agregación. La versión nativa hace exactamente los mismos movimientos,
+    pero sin el vocabulario: los totales por categoría son un acumulador de
+    mapa hecho a mano, la ordenación necesita un comparador escrito a mano, el
+    máximo es un comparador de <code>reduce</code> y la lista de divisas
+    necesita el baile de <code>toSet().toList()..sort()</code>. Nada de esto
+    es difícil —simplemente hay más de todo, y menos de todo dice lo que
+    significa.
+  </p>
+  <p>
+    Que la agregación sea <code>foldBy</code> y no
+    <code>groupBy</code> + <code>sumBy</code> es deliberado, y merece un
+    momento. Aquí la respuesta es <em>un número por categoría</em>, así que
+    agrupar primero construiría una <code>List</code> con todas las
+    transacciones de cada categoría para luego plegarla y tirarla —asignación
+    proporcional a la entrada, para una respuesta proporcional al número de
+    categorías—. <code>foldBy</code> acumula directamente en el mapa de
+    resultado, que es exactamente lo que hace el bucle nativo de al lado. Sobre
+    un libro mayor de un millón de filas, esa única decisión vale unas 2,5× en
+    <em>ambos</em> lados; mira
+    <a href="../tutorials/performance.html">Escribir pipelines rápidos</a>.
+    Recurre a <code>groupBy</code> cuando de verdad quieras los miembros.
   </p>
