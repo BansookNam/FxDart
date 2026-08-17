@@ -49,7 +49,7 @@
   <p class="breadcrumb"><a href="../DartComparison/index.html">Dart vs FxDart</a> › #31 · <strong>Multi-currency expense report</strong></p>
   <h1>Multi-currency expense report</h1>
   <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/foldBy.html">foldBy</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
   <h2>Requirement</h2>
   <p>
     A trip ledger (data in the code) mixes EUR, GBP, JPY, and USD amounts.
@@ -74,10 +74,8 @@ Total: $465.72</pre>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
       <h3>Native Dart</h3>
-      <div class="playground" data-pg="acb8517abe98db62">
+      <div class="playground" data-pg="19dc49c056c7ea2e">
 <textarea>
-import 'package:collection/collection.dart';
-
 class Tx {
   final String date;
   final String category;
@@ -104,12 +102,13 @@ String money(num n) => '\$${n.toStringAsFixed(2)}';
 void main() {
   final usd = txns.map((t) => (t, t.amount * rates[t.currency]!)).toList();
 
-  final catLines = usd
-      .groupListsBy((p) => p.$1.category)
-      .entries
-      .map((e) => (e.key, e.value.fold(0.0, (s, p) => s + p.$2)))
-      .sortedBy<num>((c) => -c.$2)
-      .map((c) => '  ${c.$1.padRight(8)} ${money(c.$2)}');
+  final byCategory = <String, double>{};
+  for (final p in usd) {
+    byCategory[p.$1.category] = (byCategory[p.$1.category] ?? 0) + p.$2;
+  }
+  final catLines = (byCategory.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value)))
+      .map((e) => '  ${e.key.padRight(8)} ${money(e.value)}');
 
   final currencies = txns.map((t) => t.currency).toSet().toList()..sort();
   final biggest = usd.reduce((a, b) => a.$2 >= b.$2 ? a : b);
@@ -128,7 +127,7 @@ void main() {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="7744419f3e1826c6">
+      <div class="playground" data-pg="f9a182dd9d075500">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -158,12 +157,13 @@ String money(num n) => '\$${n.toStringAsFixed(2)}';
 void main() {
   final usd = fx(txns).map((t) => (t, t.amount * rates[t.currency]!)).toList();
 
-  // Flatten nested fx() wrappers: avoid re-wrapping groupBy result
-  final grouped = fx(usd).groupBy((p) => p.$1.category).entries;
-  final catLines = fx(grouped)
-      .map((e) => (e.key, fx(e.value).sumBy((p) => p.$2)))
-      .sortBy((c) => -c.$2)
-      .map((c) => '  ${c.$1.padRight(8)} ${money(c.$2)}');
+  // foldBy, not groupBy + sumBy: the answer is one number per category, so
+  // there is no reason to build a list of every transaction per category
+  // first and then throw it away.
+  final byCategory = fx(usd).foldBy((p) => p.$1.category, 0.0, (s, p) => s + p.$2);
+  final catLines = fx(byCategory.entries)
+      .sortBy((e) => -e.value)
+      .map((e) => '  ${e.key.padRight(8)} ${money(e.value)}');
 
   final currencies = fx(txns).map((t) => t.currency).uniq().sortBy((c) => c);
   final biggest = fx(usd).maxBy((p) => p.$2)!;
@@ -186,15 +186,28 @@ void main() {
   <p>
     Normalizing first — <code><a href="../tutorials/map.html">map</a></code> each transaction to a
     <code>(tx, usd)</code> pair — lets every later question run over one
-    list: <code><a href="../tutorials/groupBy.html">groupBy</a></code> + <code><a href="../tutorials/sumBy.html">sumBy</a></code> + <code><a href="../tutorials/sortBy.html">sortBy</a></code>
-    for the breakdown, <code><a href="../tutorials/uniq.html">uniq</a></code> for the currency list,
-    <code><a href="../tutorials/maxBy.html">maxBy</a></code> and <code><a href="../tutorials/sumBy.html">sumBy</a></code> for the summary lines. Each
-    report line is one short pipeline that names its aggregation. The native
-    version makes the identical moves but without the vocabulary: every sum
-    is a seeded <code>fold</code>, the maximum is a hand-written
-    <code>reduce</code> comparator, and the currency list needs the
-    <code>toSet().toList()..sort()</code> shuffle. Nothing is hard — there
+    list: <code><a href="../tutorials/foldBy.html">foldBy</a></code> + <code><a href="../tutorials/sortBy.html">sortBy</a></code> for the breakdown,
+    <code><a href="../tutorials/uniq.html">uniq</a></code> for the currency list, <code><a href="../tutorials/maxBy.html">maxBy</a></code> and
+    <code><a href="../tutorials/sumBy.html">sumBy</a></code> for the summary lines. Each report line is one short
+    pipeline that names its aggregation. The native version makes the
+    identical moves but without the vocabulary: the per-category totals are a
+    hand-rolled map accumulator, the sort needs a comparator spelled out, the
+    maximum is a <code>reduce</code> comparator, and the currency list needs
+    the <code>toSet().toList()..sort()</code> shuffle. Nothing is hard — there
     is just more of it, and less of it says what it means.
+  </p>
+  <p>
+    The aggregation is <code><a href="../tutorials/foldBy.html">foldBy</a></code> rather than
+    <code>groupBy</code> + <code><a href="../tutorials/sumBy.html">sumBy</a></code> on purpose, and it is worth a
+    moment. The answer here is <em>one number per category</em>, so grouping
+    first would build a <code>List</code> of every transaction under each
+    category and then immediately fold it away — allocation proportional to the
+    input, for an answer proportional to the number of categories.
+    <code><a href="../tutorials/foldBy.html">foldBy</a></code> accumulates straight into the result map, which is
+    exactly what the native loop beside it does. On a million-row ledger that
+    single choice is worth roughly 2.5× on <em>both</em> sides; see
+    <a href="../tutorials/performance.html">Writing fast pipelines</a>. Reach
+    for <code>groupBy</code> when you actually want the members.
   </p>
   <section class="cmp-bench">
   <h2>Benchmark</h2>
@@ -206,26 +219,26 @@ void main() {
       <h4>Time <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:84.0%"></span></span>
-        <span class="bench-val">33 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:78.3%"></span></span>
+        <span class="bench-val">11 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">40 µs</span>
+        <span class="bench-val">13 µs</span>
       </div>
     </div>
     <div class="bench-metric">
       <h4>Peak memory <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">16.7 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:99.8%"></span></span>
+        <span class="bench-val">16.5 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:99.2%"></span></span>
-        <span class="bench-val">16.5 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">16.6 MB</span>
       </div>
     </div>
   </div>
@@ -235,26 +248,26 @@ void main() {
       <h4>Time <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:98.8%"></span></span>
-        <span class="bench-val">2.66 ms</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:76.4%"></span></span>
+        <span class="bench-val">726 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">2.69 ms</span>
+        <span class="bench-val">950 µs</span>
       </div>
     </div>
     <div class="bench-metric">
-      <h4>Peak memory <span class="badge verdict-fxdart">FxDart wins</span></h4>
+      <h4>Peak memory <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">22.0 MB</span>
+        <span class="bench-val">23.5 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:87.0%"></span></span>
-        <span class="bench-val">19.2 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:97.5%"></span></span>
+        <span class="bench-val">22.9 MB</span>
       </div>
     </div>
   </div>
@@ -264,13 +277,13 @@ void main() {
       <h4>Time <span class="badge verdict-tie">Tie</span></h4>
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:98.5%"></span></span>
-        <span class="bench-val">347.6 ms</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:97.1%"></span></span>
+        <span class="bench-val">128.2 ms</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">353.1 ms</span>
+        <span class="bench-val">132.0 ms</span>
       </div>
     </div>
     <div class="bench-metric">
@@ -278,12 +291,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">219.5 MB</span>
+        <span class="bench-val">205.1 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:89.9%"></span></span>
-        <span class="bench-val">197.5 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:92.3%"></span></span>
+        <span class="bench-val">189.3 MB</span>
       </div>
     </div>
   </div>

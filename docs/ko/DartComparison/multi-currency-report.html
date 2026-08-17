@@ -49,7 +49,7 @@
   <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #31 · <strong>다중 통화 지출 리포트</strong></p>
   <h1>다중 통화 지출 리포트</h1>
   <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/foldBy.html">foldBy</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
   <h2>요구사항</h2>
   <p>
     여행 가계부(데이터는 코드에 있음)에는 EUR, GBP, JPY, USD 금액이
@@ -75,10 +75,8 @@ Total: $465.72</pre>
   <div class="comparison">
     <section class="cmp-panel cmp-native">
       <h3>네이티브 Dart</h3>
-      <div class="playground" data-pg="acb8517abe98db62">
+      <div class="playground" data-pg="19dc49c056c7ea2e">
 <textarea>
-import 'package:collection/collection.dart';
-
 class Tx {
   final String date;
   final String category;
@@ -105,12 +103,13 @@ String money(num n) => '\$${n.toStringAsFixed(2)}';
 void main() {
   final usd = txns.map((t) => (t, t.amount * rates[t.currency]!)).toList();
 
-  final catLines = usd
-      .groupListsBy((p) => p.$1.category)
-      .entries
-      .map((e) => (e.key, e.value.fold(0.0, (s, p) => s + p.$2)))
-      .sortedBy<num>((c) => -c.$2)
-      .map((c) => '  ${c.$1.padRight(8)} ${money(c.$2)}');
+  final byCategory = <String, double>{};
+  for (final p in usd) {
+    byCategory[p.$1.category] = (byCategory[p.$1.category] ?? 0) + p.$2;
+  }
+  final catLines = (byCategory.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value)))
+      .map((e) => '  ${e.key.padRight(8)} ${money(e.value)}');
 
   final currencies = txns.map((t) => t.currency).toSet().toList()..sort();
   final biggest = usd.reduce((a, b) => a.$2 >= b.$2 ? a : b);
@@ -129,7 +128,7 @@ void main() {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="7744419f3e1826c6">
+      <div class="playground" data-pg="f9a182dd9d075500">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -159,12 +158,13 @@ String money(num n) => '\$${n.toStringAsFixed(2)}';
 void main() {
   final usd = fx(txns).map((t) => (t, t.amount * rates[t.currency]!)).toList();
 
-  // Flatten nested fx() wrappers: avoid re-wrapping groupBy result
-  final grouped = fx(usd).groupBy((p) => p.$1.category).entries;
-  final catLines = fx(grouped)
-      .map((e) => (e.key, fx(e.value).sumBy((p) => p.$2)))
-      .sortBy((c) => -c.$2)
-      .map((c) => '  ${c.$1.padRight(8)} ${money(c.$2)}');
+  // foldBy, not groupBy + sumBy: the answer is one number per category, so
+  // there is no reason to build a list of every transaction per category
+  // first and then throw it away.
+  final byCategory = fx(usd).foldBy((p) => p.$1.category, 0.0, (s, p) => s + p.$2);
+  final catLines = fx(byCategory.entries)
+      .sortBy((e) => -e.value)
+      .map((e) => '  ${e.key.padRight(8)} ${money(e.value)}');
 
   final currencies = fx(txns).map((t) => t.currency).uniq().sortBy((c) => c);
   final biggest = fx(usd).maxBy((p) => p.$2)!;
@@ -187,16 +187,28 @@ void main() {
   <p>
     먼저 정규화하는 것 — 각 거래를 <code>(tx, usd)</code> 쌍으로
     <code><a href="../tutorials/map.html">map</a></code>하는 것 — 은 이후의 모든 질문이 하나의 리스트 위에서
-    돌아가게 해 줍니다: 내역에는 <code><a href="../tutorials/groupBy.html">groupBy</a></code> +
-    <code><a href="../tutorials/sumBy.html">sumBy</a></code> + <code><a href="../tutorials/sortBy.html">sortBy</a></code>, 통화 목록에는
-    <code><a href="../tutorials/uniq.html">uniq</a></code>, 요약 줄에는 <code><a href="../tutorials/maxBy.html">maxBy</a></code>와
-    <code><a href="../tutorials/sumBy.html">sumBy</a></code>. 리포트의 각 줄은 자신의 집계 방식을 이름으로
-    드러내는 짧은 파이프라인 하나입니다. 네이티브 버전은 똑같은 동작을
-    하지만 그 어휘가 없습니다: 모든 합계는 초기값을 가진
-    <code>fold</code>이고, 최댓값은 직접 작성한 <code>reduce</code>
-    비교자이며, 통화 목록에는 <code>toSet().toList()..sort()</code>
-    조합이 필요합니다. 어려운 부분은 없습니다 — 다만 코드량이 더 많고,
-    그 코드가 의미를 덜 말해 줄 뿐입니다.
+    돌아가게 해 줍니다: 내역에는 <code><a href="../tutorials/foldBy.html">foldBy</a></code> +
+    <code><a href="../tutorials/sortBy.html">sortBy</a></code>, 통화 목록에는 <code><a href="../tutorials/uniq.html">uniq</a></code>, 요약 줄에는
+    <code><a href="../tutorials/maxBy.html">maxBy</a></code>와 <code><a href="../tutorials/sumBy.html">sumBy</a></code>. 리포트의 각 줄은 자신의 집계
+    방식을 이름으로 드러내는 짧은 파이프라인 하나입니다. 네이티브 버전은
+    똑같은 동작을 하지만 그 어휘가 없습니다: 카테고리별 합계는 직접 굴린 맵
+    누적기이고, 정렬에는 비교자를 일일이 써 줘야 하며, 최댓값은
+    <code>reduce</code> 비교자, 통화 목록에는
+    <code>toSet().toList()..sort()</code> 조합이 필요합니다. 어려운 부분은
+    없습니다 — 다만 코드량이 더 많고, 그 코드가 의미를 덜 말해 줄 뿐입니다.
+  </p>
+  <p>
+    집계에 <code>groupBy</code> + <code><a href="../tutorials/sumBy.html">sumBy</a></code>가 아니라
+    <code><a href="../tutorials/foldBy.html">foldBy</a></code>를 쓴 것은 의도적이며, 잠깐 짚고 갈 만합니다. 여기서
+    원하는 답은 <em>카테고리마다 숫자 하나</em>입니다. 그러니 먼저 그룹으로
+    묶으면 카테고리별로 모든 거래의 <code>List</code>를 만들었다가 곧바로
+    접어서 없애게 됩니다 — 답은 카테고리 개수에 비례하는데, 할당은 입력에
+    비례하는 셈이죠. <code><a href="../tutorials/foldBy.html">foldBy</a></code>는 결과 맵에 곧장 누적하는데, 이는
+    옆에 있는 네이티브 반복문이 하는 일과 정확히 같습니다. 백만 행짜리
+    원장에서는 이 선택 하나가 <em>양쪽 모두</em>에서 약 2.5배의 차이를
+    만듭니다.
+    <a href="../tutorials/performance.html">빠른 파이프라인 작성하기</a>를
+    보세요. 정말로 구성원이 필요할 때만 <code>groupBy</code>를 쓰세요.
   </p>
   <section class="cmp-bench">
   <h2>벤치마크</h2>
@@ -208,26 +220,26 @@ void main() {
       <h4>시간 <span class="badge verdict-tie">무승부</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:84.0%"></span></span>
-        <span class="bench-val">33 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:78.3%"></span></span>
+        <span class="bench-val">11 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">40 µs</span>
+        <span class="bench-val">13 µs</span>
       </div>
     </div>
     <div class="bench-metric">
       <h4>최대 메모리 <span class="badge verdict-tie">무승부</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">16.7 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:99.8%"></span></span>
+        <span class="bench-val">16.5 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:99.2%"></span></span>
-        <span class="bench-val">16.5 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
+        <span class="bench-val">16.6 MB</span>
       </div>
     </div>
   </div>
@@ -237,26 +249,26 @@ void main() {
       <h4>시간 <span class="badge verdict-tie">무승부</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:98.8%"></span></span>
-        <span class="bench-val">2.66 ms</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:76.4%"></span></span>
+        <span class="bench-val">726 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">2.69 ms</span>
+        <span class="bench-val">950 µs</span>
       </div>
     </div>
     <div class="bench-metric">
-      <h4>최대 메모리 <span class="badge verdict-fxdart">FxDart 승</span></h4>
+      <h4>최대 메모리 <span class="badge verdict-tie">무승부</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">22.0 MB</span>
+        <span class="bench-val">23.5 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:87.0%"></span></span>
-        <span class="bench-val">19.2 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:97.5%"></span></span>
+        <span class="bench-val">22.9 MB</span>
       </div>
     </div>
   </div>
@@ -266,13 +278,13 @@ void main() {
       <h4>시간 <span class="badge verdict-tie">무승부</span></h4>
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
-        <span class="bench-track"><span class="bench-bar bench-native" style="width:98.5%"></span></span>
-        <span class="bench-val">347.6 ms</span>
+        <span class="bench-track"><span class="bench-bar bench-native" style="width:97.1%"></span></span>
+        <span class="bench-val">128.2 ms</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
         <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:100.0%"></span></span>
-        <span class="bench-val">353.1 ms</span>
+        <span class="bench-val">132.0 ms</span>
       </div>
     </div>
     <div class="bench-metric">
@@ -280,12 +292,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">네이티브 Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">219.5 MB</span>
+        <span class="bench-val">205.1 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:89.9%"></span></span>
-        <span class="bench-val">197.5 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:92.3%"></span></span>
+        <span class="bench-val">189.3 MB</span>
       </div>
     </div>
   </div>
