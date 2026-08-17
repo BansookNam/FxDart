@@ -29,8 +29,8 @@ nextLabel: countWhere
     asignación proporcional a la <strong>entrada</strong> para una respuesta
     proporcional al <strong>número de claves</strong>. Si lo único que quieres es
     el total por categoría, esas listas se construyen y se tiran.
-    <code>foldBy</code> acumula directamente en el mapa de resultado, que es
-    exactamente lo que hace el bucle escrito a mano:
+    <code>foldBy</code> acumula directamente en el mapa de resultado, como el
+    bucle escrito a mano:
   </p>
   <pre><code>// lo que escribirías a mano
 for (final t in txns) {
@@ -40,11 +40,25 @@ for (final t in txns) {
 // lo mismo, con nombre
 foldBy((Tx t) =&gt; t.category, 0.0, (sum, t) =&gt; sum + t.amount, txns);</code></pre>
   <p>
-    Sobre un millón de transacciones repartidas en cinco categorías, esa
-    diferencia se midió como una bajada de <strong>3,2× a 1,3×</strong> respecto
-    del bucle escrito a mano. Varios de los ejemplos de
+    Sobre un millón de transacciones repartidas en cinco categorías, agrupar
+    primero cuesta <strong>2,7×</strong> el bucle escrito a mano.
+    <code>foldBy</code> cuesta <strong>0,91×</strong> — es algo <em>más
+    rápido</em> que el bucle que tiene al lado, y no es un artefacto de
+    redondeo. El bucle lee el mapa y luego lo reescribe, así que cada
+    transacción calcula el hash de su categoría dos veces;
+    <code>foldBy</code> acumula en una celda mutable alojada en el mapa, de modo
+    que este se escribe una vez por <em>categoría</em> y no una vez por
+    transacción. Varios de los ejemplos de
     <a href="../DartComparison/index.html">Dart vs FxDart</a> se pasaron a él
     justo por eso.
+  </p>
+  <p>
+    No leas demasiado en ese margen: aquí el callback del fold es una suma, así
+    que el mapa es casi todo el trabajo. Con un acumulador más pesado el ahorro
+    sigue ahí, pero desaparece dentro del coste del propio callback — mira la
+    nota sobre records al final. La razón para elegir <code>foldBy</code> es que
+    dice lo que quieres decir; ser una pizca más rápido que el bucle es una
+    ventaja añadida, no el argumento.
   </p>
   <p>
     Las claves salen en el <strong>orden en que aparecen por primera vez</strong>,

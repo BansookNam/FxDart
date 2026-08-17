@@ -75,6 +75,18 @@ Future&lt;Map&lt;K, int&gt;&gt; FxAsync.countBy&lt;K&gt;(FutureOr&lt;K&gt; Funct
     never allocates the intermediate lists.
   </p>
   <p>
+    It is also cheaper than the loop you would write instead. The obvious
+    version, <code>counts[k] = (counts[k] ?? 0) + 1</code>, touches the hash map
+    <strong>twice</strong> per element — once to read, once to write back — and
+    when all you are doing is counting, the map is essentially the whole cost.
+    <code>countBy</code> counts into a mutable cell held in the map, so the map
+    is written once per <em>distinct key</em> instead of once per element:
+    about <strong>1.5× faster</strong> than the hand loop on a million
+    elements, and the margin holds from a handful of keys up to tens of
+    thousands. <a href="../DartComparison/top-log-level.html">Most frequent log
+    level</a> works the number through end to end.
+  </p>
+  <p>
     As always, it's a terminal — nothing upstream runs until <code>countBy</code> pulls it.
   </p>
 

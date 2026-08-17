@@ -69,8 +69,8 @@ Future&lt;Map&lt;K, Acc&gt;&gt; FxAsync.foldBy&lt;K, Acc&gt;(FutureOr&lt;K&gt; F
     방식은 먼저 키마다 <code>List</code>를 만들어야 합니다. 답은
     <strong>키 개수</strong>에 비례하는데, 할당은 <strong>입력</strong>에
     비례하는 셈입니다. 카테고리별 합계만 원한다면 그 리스트들은 만들어졌다가
-    그대로 버려집니다. <code>foldBy</code>는 결과 맵에 곧바로 누적하는데,
-    이는 손으로 짠 반복문이 하는 일과 정확히 같습니다.
+    그대로 버려집니다. <code>foldBy</code>는 손으로 짠 반복문처럼 결과 맵에
+    곧바로 누적합니다.
   </p>
   <pre><code>// 손으로 짠다면 이렇게
 for (final t in txns) {
@@ -80,10 +80,21 @@ for (final t in txns) {
 // 같은 일에 이름을 붙인 것
 foldBy((Tx t) =&gt; t.category, 0.0, (sum, t) =&gt; sum + t.amount, txns);</code></pre>
   <p>
-    카테고리 다섯 개에 걸친 백만 건의 거래에서, 이 차이는 손으로 짠 반복문
-    대비 <strong>3.2배에서 1.3배로</strong> 측정되었습니다.
+    카테고리 다섯 개에 걸친 백만 건의 거래에서, 먼저 그룹으로 묶는 방식은
+    손으로 짠 반복문의 <strong>2.7배</strong>가 듭니다. <code>foldBy</code>는
+    <strong>0.91배</strong>입니다 — 바로 옆의 반복문보다 조금 <em>빠르고</em>,
+    반올림 착시가 아닙니다. 반복문은 맵을 읽고 다시 쓰므로 거래마다 카테고리를
+    두 번 해시합니다. <code>foldBy</code>는 맵 안에 세워 둔 가변 셀에
+    누적하므로, 맵은 거래마다가 아니라 <em>카테고리마다</em> 한 번 쓰입니다.
     <a href="../DartComparison/index.html">Dart vs FxDart</a> 예제 중 여럿이
     바로 이 이유로 이 함수로 옮겨 갔습니다.
+  </p>
+  <p>
+    다만 그 차이를 과대 해석하지는 마세요. 여기서 접기 콜백은 덧셈 하나라
+    맵이 작업의 대부분입니다. 누산기가 무거워지면 절약은 그대로지만 콜백
+    자신의 비용에 묻힙니다 — 맨 아래 레코드에 관한 메모를 보세요.
+    <code>foldBy</code>에 손을 뻗는 이유는 뜻하는 바를 그대로 말해 주기
+    때문이고, 반복문보다 조금 빠른 것은 논거가 아니라 덤입니다.
   </p>
   <p>
     키는 <code>groupBy</code>와 마찬가지로 <strong>처음 등장한 순서</strong>로
