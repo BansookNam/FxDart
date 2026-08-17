@@ -23,9 +23,9 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = fx(given)
-            .filter((a) => a.category != 'clothes')
-            .countBy((a) => a.category);
+        final res = fx(
+          given,
+        ).filter((a) => a.category != 'clothes').countBy((a) => a.category);
         expect(res, equals(then2));
       });
     });

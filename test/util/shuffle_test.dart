@@ -37,32 +37,29 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = pipe([
-          1,
-          2,
-          3,
-          4,
-          5,
-          6
-        ], [
-          (List<int> a) => shuffle(a),
-          (List<int> a) => toList(a),
-        ]) as List;
+        final res =
+            pipe(
+                  [1, 2, 3, 4, 5, 6],
+                  [(List<int> a) => shuffle(a), (List<int> a) => toList(a)],
+                )
+                as List;
         expect(res.length, equals(6));
         expect(toList(res)..sort(), equals([1, 2, 3, 4, 5, 6]));
       });
 
       test(
-          'should produce different results on multiple calls (statistical test)',
-          () {
-        final input = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        final results = [for (var i = 0; i < 50; i++) shuffle(input)];
+        'should produce different results on multiple calls (statistical test)',
+        () {
+          final input = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+          final results = [for (var i = 0; i < 50; i++) shuffle(input)];
 
-        final first = results.first.join(',');
-        final allIdentical =
-            results.every((result) => result.join(',') == first);
-        expect(allIdentical, isFalse);
-      });
+          final first = results.first.join(',');
+          final allIdentical = results.every(
+            (result) => result.join(',') == first,
+          );
+          expect(allIdentical, isFalse);
+        },
+      );
 
       test('should return consistent results with the same seed', () {
         final input = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -92,8 +89,11 @@ void main() {
         final input = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         // At least one of a few seeds must produce an order different from
         // the original (all identical is astronomically unlikely).
-        final anyReordered = [42, 123, 999]
-            .any((seed) => shuffle(input, seed).join(',') != input.join(','));
+        final anyReordered = [
+          42,
+          123,
+          999,
+        ].any((seed) => shuffle(input, seed).join(',') != input.join(','));
         expect(anyReordered, isTrue);
       });
 
@@ -114,14 +114,18 @@ void main() {
         final input = [1, 2, 3, 4, 5, 6];
         const seed = 42;
 
-        final res1 = pipe(input, [
-          (List<int> arr) => shuffle(arr, seed),
-          (List<int> arr) => toList(arr),
-        ]) as List;
-        final res2 = pipe(input, [
-          (List<int> arr) => shuffle(arr, seed),
-          (List<int> arr) => toList(arr),
-        ]) as List;
+        final res1 =
+            pipe(input, [
+                  (List<int> arr) => shuffle(arr, seed),
+                  (List<int> arr) => toList(arr),
+                ])
+                as List;
+        final res2 =
+            pipe(input, [
+                  (List<int> arr) => shuffle(arr, seed),
+                  (List<int> arr) => toList(arr),
+                ])
+                as List;
 
         expect(res1, equals(res2));
         expect(res1.length, equals(6));
@@ -147,36 +151,36 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () async {
-        final res = await pipe([
-          1,
-          2,
-          3,
-          4,
-          5,
-          6
-        ], [
-          (List<int> a) => toAsync(a),
-          (FxAsyncIterable<int> a) => shuffleAsync(a),
-          (List<int> a) => toList(a),
-        ]) as List;
+        final res =
+            await pipe(
+                  [1, 2, 3, 4, 5, 6],
+                  [
+                    (List<int> a) => toAsync(a),
+                    (FxAsyncIterable<int> a) => shuffleAsync(a),
+                    (List<int> a) => toList(a),
+                  ],
+                )
+                as List;
         expect(res.length, equals(6));
         expect(toList(res)..sort(), equals([1, 2, 3, 4, 5, 6]));
       });
 
       test(
-          'should produce different results on multiple calls (statistical test)',
-          () async {
-        final input = [1, 2, 3, 4, 5, 6, 7, 8];
-        final results = <List<int>>[];
-        for (var i = 0; i < 20; i++) {
-          results.add(await shuffleAsync(toAsync(input)));
-        }
+        'should produce different results on multiple calls (statistical test)',
+        () async {
+          final input = [1, 2, 3, 4, 5, 6, 7, 8];
+          final results = <List<int>>[];
+          for (var i = 0; i < 20; i++) {
+            results.add(await shuffleAsync(toAsync(input)));
+          }
 
-        final first = results.first.join(',');
-        final allIdentical =
-            results.every((result) => result.join(',') == first);
-        expect(allIdentical, isFalse);
-      });
+          final first = results.first.join(',');
+          final allIdentical = results.every(
+            (result) => result.join(',') == first,
+          );
+          expect(allIdentical, isFalse);
+        },
+      );
 
       test('should return consistent results with the same seed', () async {
         final input = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -193,7 +197,9 @@ void main() {
       test('should match the sync seeded order', () async {
         final input = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         expect(
-            await shuffleAsync(toAsync(input), 42), equals(shuffle(input, 42)));
+          await shuffleAsync(toAsync(input), 42),
+          equals(shuffle(input, 42)),
+        );
       });
 
       test('should return different results with different seeds', () async {
@@ -220,16 +226,20 @@ void main() {
         final input = [1, 2, 3, 4, 5, 6];
         const seed = 42;
 
-        final res1 = await pipe(input, [
-          (List<int> a) => toAsync(a),
-          (FxAsyncIterable<int> a) => shuffleAsync(a, seed),
-          (List<int> a) => toList(a),
-        ]) as List;
-        final res2 = await pipe(input, [
-          (List<int> a) => toAsync(a),
-          (FxAsyncIterable<int> a) => shuffleAsync(a, seed),
-          (List<int> a) => toList(a),
-        ]) as List;
+        final res1 =
+            await pipe(input, [
+                  (List<int> a) => toAsync(a),
+                  (FxAsyncIterable<int> a) => shuffleAsync(a, seed),
+                  (List<int> a) => toList(a),
+                ])
+                as List;
+        final res2 =
+            await pipe(input, [
+                  (List<int> a) => toAsync(a),
+                  (FxAsyncIterable<int> a) => shuffleAsync(a, seed),
+                  (List<int> a) => toList(a),
+                ])
+                as List;
 
         expect(res1, equals(res2));
         expect(res1.length, equals(6));

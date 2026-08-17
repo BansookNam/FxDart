@@ -14,7 +14,9 @@ class Req {
 // endpoint keeps enough samples that the per-endpoint p95s stay distinct at
 // small N — verified for this seed at N=100/10,000/1,000,000.
 final _endpoints = List<String>.generate(
-    (n ~/ 500).clamp(4, 20).toInt(), (i) => '/ep${i.toString().padLeft(2, '0')}');
+  (n ~/ 500).clamp(4, 20).toInt(),
+  (i) => '/ep${i.toString().padLeft(2, '0')}',
+);
 
 List<Req> makeReqs() {
   final rng = Lcg(5);

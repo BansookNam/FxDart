@@ -10,13 +10,10 @@ Future<void> main() async {
     impl: 'fxdart',
     n: n,
     run: () {
-      final report = fx(temps)
-          .windowed(3)
-          .map((w) {
-            final values = w.map((t) => t.toStringAsFixed(1)).join(' ');
-            return '$values -> avg ${average(w).toStringAsFixed(1)}';
-          })
-          .toList();
+      final report = fx(temps).windowed(3).map((w) {
+        final values = w.map((t) => t.toStringAsFixed(1)).join(' ');
+        return '$values -> avg ${average(w).toStringAsFixed(1)}';
+      }).toList();
       return '${report.length}|${report.first}|${report.last}';
     },
   );

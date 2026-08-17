@@ -10,9 +10,9 @@ Future<void> main() async {
     impl: 'rxdart',
     n: n,
     run: () async {
-      final balances = await Stream.fromIterable(moves)
-          .scan<int>((acc, move, _) => acc + move, 0)
-          .toList();
+      final balances = await Stream.fromIterable(
+        moves,
+      ).scan<int>((acc, move, _) => acc + move, 0).toList();
       return '${balances.length}|${balances.first}|${balances.last}';
     },
   );

@@ -14,8 +14,9 @@ Future<void> main() async {
       // is adjacent-only); "same visitor" is spelled as equals + hashCode.
       final firstSeen = await Stream.fromIterable(visits)
           .distinctUnique(
-              equals: (a, b) => a.user == b.user,
-              hashCode: (v) => v.user.hashCode)
+            equals: (a, b) => a.user == b.user,
+            hashCode: (v) => v.user.hashCode,
+          )
           .map((v) => '${v.user} — first visit ${v.at}')
           .toList();
       return '${firstSeen.length}|${firstSeen.first}|${firstSeen.last}';

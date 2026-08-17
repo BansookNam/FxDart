@@ -11,8 +11,10 @@ int maxInFlight = 0;
 Future<(int, double)> importBatch(List<Txn> batch) async {
   inFlight++;
   if (inFlight > maxInFlight) maxInFlight = inFlight;
-  final ack = await delay(Duration.zero,
-      (batch.length, fx(batch).sumBy((t) => t.amount).toDouble()));
+  final ack = await delay(Duration.zero, (
+    batch.length,
+    fx(batch).sumBy((t) => t.amount).toDouble(),
+  ));
   inFlight--;
   return ack;
 }
@@ -30,8 +32,12 @@ Future<void> main() async {
           .toAsync()
           .map(importBatch)
           .concurrent(1)
-          .scan((acc, b) => (acc.$1 + 1, b.$1, b.$2, acc.$4 + b.$2),
-              (0, 0, 0.0, 0.0))
+          .scan((acc, b) => (acc.$1 + 1, b.$1, b.$2, acc.$4 + b.$2), (
+            0,
+            0,
+            0.0,
+            0.0,
+          ))
           .drop(1) // drop the scan seed
           .toList();
       final last = report.last;

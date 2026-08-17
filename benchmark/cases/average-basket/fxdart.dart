@@ -10,9 +10,9 @@ Future<void> main() async {
     impl: 'fxdart',
     n: n,
     run: () {
-      final avg = fx(orders)
-          .filter((o) => o.total > 100)
-          .averageBy((o) => o.total);
+      final avg = fx(
+        orders,
+      ).filter((o) => o.total > 100).averageBy((o) => o.total);
       return avg.toStringAsFixed(2);
     },
   );

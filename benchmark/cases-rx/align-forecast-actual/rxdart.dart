@@ -16,9 +16,9 @@ Future<void> main() async {
     impl: 'rxdart',
     n: n,
     run: () async {
-      final days = await Stream.fromIterable(forecast)
-          .zipWith(Stream.fromIterable(actual), line)
-          .toList();
+      final days = await Stream.fromIterable(
+        forecast,
+      ).zipWith(Stream.fromIterable(actual), line).toList();
       return '${days.length}|${days.first}|${days.last}';
     },
   );

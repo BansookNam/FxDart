@@ -99,23 +99,42 @@ void main() {
     });
 
     test('composes in an fx chain', () {
-      final res =
-          fx([-4, -3, -2, 1, 2, 3, 4]).filter(isEven.and(isPositive)).toList();
+      final res = fx([
+        -4,
+        -3,
+        -2,
+        1,
+        2,
+        3,
+        4,
+      ]).filter(isEven.and(isPositive)).toList();
       expect(res, equals([2, 4]));
     });
 
     test('composes in reject / takeWhile / dropWhile', () {
-      expect(fx([1, 2, 3, 4]).reject(isEven.or(isPositive)).toList(),
-          equals(<int>[]));
-      expect(fx([2, 4, 5, 6]).takeWhile(isEven.and(isPositive)).toList(),
-          equals([2, 4]));
-      expect(fx([2, 4, 5, 6]).dropWhile(isEven.and(isPositive)).toList(),
-          equals([5, 6]));
+      expect(
+        fx([1, 2, 3, 4]).reject(isEven.or(isPositive)).toList(),
+        equals(<int>[]),
+      );
+      expect(
+        fx([2, 4, 5, 6]).takeWhile(isEven.and(isPositive)).toList(),
+        equals([2, 4]),
+      );
+      expect(
+        fx([2, 4, 5, 6]).dropWhile(isEven.and(isPositive)).toList(),
+        equals([5, 6]),
+      );
     });
 
     test('works with the top-level operators', () {
-      final res = toList(filter(isEven.contramap<String>((s) => s.length),
-          ['a', 'ab', 'abc', 'abcd']));
+      final res = toList(
+        filter(isEven.contramap<String>((s) => s.length), [
+          'a',
+          'ab',
+          'abc',
+          'abcd',
+        ]),
+      );
       expect(res, equals(['ab', 'abcd']));
     });
   });

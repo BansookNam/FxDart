@@ -26,11 +26,11 @@ List<(String, List<({String sku, double list})>)> makeOrders() =>
         List.generate(linesPerOrder, (j) {
           final id = o * linesPerOrder + j;
           return (sku: 'SKU-$id', list: listPriceFor(id));
-        })
+        }),
       );
     });
 
 Map<String, double> makePromoPrices() => {
-      for (var id = 0; id < n; id++)
-        if (id % 7 != 3) 'SKU-$id': promoPriceFor(id),
-    };
+  for (var id = 0; id < n; id++)
+    if (id % 7 != 3) 'SKU-$id': promoPriceFor(id),
+};

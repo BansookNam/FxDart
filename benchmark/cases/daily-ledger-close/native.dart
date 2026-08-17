@@ -52,11 +52,13 @@ Future<void> main() async {
 
       final byCategory = spending.groupListsBy((e) => e.categoryId);
       final top = byCategory.entries
-          .map((kv) => (
-                kv.key,
-                kv.value.fold(0.0, (sum, e) => sum + e.amount),
-                kv.value.length
-              ))
+          .map(
+            (kv) => (
+              kv.key,
+              kv.value.fold(0.0, (sum, e) => sum + e.amount),
+              kv.value.length,
+            ),
+          )
           .sortedBy<num>((c) => -c.$2)
           .take(3);
 

@@ -12,10 +12,9 @@ Future<void> main() async {
     impl: 'fxdart',
     n: n,
     run: () {
-      final top = fx(txns)
-          .groupedBy((t) => t.merchant)
-          .sortByDesc((g) => total(g.items))
-          .take(5);
+      final top = fx(
+        txns,
+      ).groupedBy((t) => t.merchant).sortByDesc((g) => total(g.items)).take(5);
       return top
           .map((g) => '${g.key}:${total(g.items).toStringAsFixed(2)}')
           .join('|');

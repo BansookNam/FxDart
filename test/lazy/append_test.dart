@@ -10,10 +10,12 @@ void main() {
         expect(toList(append('c', ['a', 'b'])), equals(['a', 'b', 'c']));
       });
 
-      test('should be contained the contents of the given element - string',
-          () {
-        expect(toList(append('c', 'ab'.split(''))), equals(['a', 'b', 'c']));
-      });
+      test(
+        'should be contained the contents of the given element - string',
+        () {
+          expect(toList(append('c', 'ab'.split(''))), equals(['a', 'b', 'c']));
+        },
+      );
 
       test('should be able to be used in the pipeline', () {
         final res = fx(range(1, 4)).append(4).append(5).append(6).toList();
@@ -33,22 +35,28 @@ void main() {
       });
 
       test('should be able to append a Future element', () async {
-        final res = await toListAsync(appendAsync(
-            delay(const Duration(milliseconds: 100), 4), toAsync([1, 2, 3])));
+        final res = await toListAsync(
+          appendAsync(
+            delay(const Duration(milliseconds: 100), 4),
+            toAsync([1, 2, 3]),
+          ),
+        );
         expect(res, equals([1, 2, 3, 4]));
       });
 
       test('should be able to be used chaining method in the `fx`', () async {
-        final res =
-            await fx(range(1, 4)).toAsync().append(4).append(5).toList();
+        final res = await fx(
+          range(1, 4),
+        ).toAsync().append(4).append(5).toList();
         expect(res, equals([1, 2, 3, 4, 5]));
       });
 
       test('should be appended sequentially', () async {
         Future<void> chained = Future.value();
         Future<int> chain(int v) {
-          final next =
-              chained.then((_) => delay(const Duration(milliseconds: 50), v));
+          final next = chained.then(
+            (_) => delay(const Duration(milliseconds: 50), v),
+          );
           chained = next;
           return next;
         }
@@ -75,13 +83,15 @@ void main() {
         expect(sw.elapsedMilliseconds, lessThan(250));
       });
 
-      test('should be passed concurrent object when job works concurrently',
-          () async {
-        final mock = ConcurrentMock<int>();
-        final it = appendAsync(1, mock).iterator;
-        await it.next(Concurrent.of(2));
-        expect(mock.received?.length, equals(2));
-      });
+      test(
+        'should be passed concurrent object when job works concurrently',
+        () async {
+          final mock = ConcurrentMock<int>();
+          final it = appendAsync(1, mock).iterator;
+          await it.next(Concurrent.of(2));
+          expect(mock.received?.length, equals(2));
+        },
+      );
     });
   });
 }

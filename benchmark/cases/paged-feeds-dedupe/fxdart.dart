@@ -23,11 +23,9 @@ Future<void> main() async {
     n: n,
     run: () async {
       pagesFetched = 0;
-      final events = await drain(primary)
-          .concat(drain(replica))
-          .uniqBy((e) => e.id)
-          .take(takeN)
-          .toList();
+      final events = await drain(
+        primary,
+      ).concat(drain(replica)).uniqBy((e) => e.id).take(takeN).toList();
       return '${events.length}|${events.first.id}|${events.last.id}'
           '|pages=$pagesFetched';
     },

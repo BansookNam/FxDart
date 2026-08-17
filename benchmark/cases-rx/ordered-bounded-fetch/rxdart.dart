@@ -26,9 +26,9 @@ Future<void> main() async {
       // tag each result with its id and sort to recover the source order.
       final tagged = await Stream.fromIterable(userIds)
           .flatMap(
-              (id) =>
-                  Rx.fromCallable(() => fetchProfile(id)).map((p) => (id, p)),
-              maxConcurrent: 4)
+            (id) => Rx.fromCallable(() => fetchProfile(id)).map((p) => (id, p)),
+            maxConcurrent: 4,
+          )
           .toList();
 
       tagged.sort((a, b) => a.$1.compareTo(b.$1));

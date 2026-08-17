@@ -21,15 +21,21 @@ class Tx {
 }
 
 const _descs = [
-  'Rent', 'Cafe Aroma', 'Metro card', 'Cinema',
-  'Green Grocer', 'Noodle Bar', 'Pharmacy', 'Book Nook',
+  'Rent',
+  'Cafe Aroma',
+  'Metro card',
+  'Cinema',
+  'Green Grocer',
+  'Noodle Bar',
+  'Pharmacy',
+  'Book Nook',
 ];
 
 Tx _tx(int i) => Tx(
-      't${i.toString().padLeft(7, '0')}',
-      _descs[i % _descs.length],
-      (100 + (i * 37) % 9900) / 100,
-    );
+  't${i.toString().padLeft(7, '0')}',
+  _descs[i % _descs.length],
+  (100 + (i * 37) % 9900) / 100,
+);
 
 List<Tx> makeBefore() => List.generate(n, (i) => _tx(i));
 List<Tx> makeAfter() => List.generate(n, (i) => _tx(i + _shift));

@@ -13,9 +13,9 @@ Future<void> main() async {
       var examined = 0;
       // firstWhere resolves on the first match and cancels the subscription —
       // the doOnData tap counts how many events actually flowed before that.
-      final hit = await Stream.fromIterable(txns)
-          .doOnData((_) => examined++)
-          .firstWhere((t) => t.amount > budget);
+      final hit = await Stream.fromIterable(
+        txns,
+      ).doOnData((_) => examined++).firstWhere((t) => t.amount > budget);
       return '${hit.id}|${hit.amount}|$examined';
     },
   );

@@ -11,10 +11,9 @@ Future<void> main() async {
     n: n,
     run: () {
       // zipWithIndex pairs each element with its position: (index, value).
-      final numbered = fx(steps)
-          .zipWithIndex()
-          .map((e) => '${e.$1 + 1}. ${e.$2}')
-          .toList();
+      final numbered = fx(
+        steps,
+      ).zipWithIndex().map((e) => '${e.$1 + 1}. ${e.$2}').toList();
       return '${numbered.length}|${numbered.first}|${numbered.last}';
     },
   );

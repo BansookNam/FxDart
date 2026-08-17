@@ -12,8 +12,14 @@ class LogEntry {
 }
 
 const _messages = [
-  'server started', 'disk 80% full', 'user login', 'payment timeout',
-  'slow query 1.2s', 'retrying webhook', 'cache warmed', 'disk 85% full',
+  'server started',
+  'disk 80% full',
+  'user login',
+  'payment timeout',
+  'slow query 1.2s',
+  'retrying webhook',
+  'cache warmed',
+  'disk 85% full',
 ];
 
 List<LogEntry> makeLogs() {
@@ -23,10 +29,10 @@ List<LogEntry> makeLogs() {
     final level = r < 45
         ? 'INFO'
         : r < 75
-            ? 'WARN'
-            : r < 90
-                ? 'DEBUG'
-                : 'ERROR';
+        ? 'WARN'
+        : r < 90
+        ? 'DEBUG'
+        : 'ERROR';
     return LogEntry(level, _messages[rng.nextInt(_messages.length)]);
   });
 }

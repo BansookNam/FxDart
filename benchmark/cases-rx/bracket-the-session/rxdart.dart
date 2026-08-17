@@ -9,10 +9,9 @@ Future<void> main() async {
     impl: 'rxdart',
     n: n,
     run: () async {
-      final lines = await Stream.fromIterable(events)
-          .startWith('== SESSION OPEN ==')
-          .endWith('== SESSION CLOSE ==')
-          .toList();
+      final lines = await Stream.fromIterable(
+        events,
+      ).startWith('== SESSION OPEN ==').endWith('== SESSION CLOSE ==').toList();
       return '${lines.length}|${lines.first}|${lines[1]}|${lines[n]}|${lines.last}';
     },
   );

@@ -20,17 +20,14 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = pipe([
-          '1',
-          '2',
-          '3',
-          '4',
-          '5'
-        ], [
-          (Iterable<String> a) => map(int.parse, a),
-          (Iterable<int> a) => filter((int n) => n % 2 == 1, a),
-          reduceLazy(addNumber, 0),
-        ]);
+        final res = pipe(
+          ['1', '2', '3', '4', '5'],
+          [
+            (Iterable<String> a) => map(int.parse, a),
+            (Iterable<int> a) => filter((int n) => n % 2 == 1, a),
+            reduceLazy(addNumber, 0),
+          ],
+        );
         expect(res, equals(1 + 3 + 5));
       });
     });

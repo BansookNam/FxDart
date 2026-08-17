@@ -15,8 +15,18 @@ class User {
 }
 
 const _names = [
-  'Ada', 'Bram', 'Chidi', 'Dana', 'Eli', 'Fay',
-  'Gus', 'Hana', 'Ines', 'Jun', 'Kira', 'Liam',
+  'Ada',
+  'Bram',
+  'Chidi',
+  'Dana',
+  'Eli',
+  'Fay',
+  'Gus',
+  'Hana',
+  'Ines',
+  'Jun',
+  'Kira',
+  'Liam',
 ];
 
 // Ids are a shuffled bijection on [1, n] (like the example's unsorted user

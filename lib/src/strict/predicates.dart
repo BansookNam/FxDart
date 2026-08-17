@@ -80,7 +80,8 @@ extension FxPredicateOps<T> on bool Function(T) {
   ///
   /// The extension-getter form of the top-level `negate` — `isEven.negate`
   /// and `negate(isEven)` are the same function.
-  bool Function(T) get negate => (a) => !this(a);
+  bool Function(T) get negate =>
+      (a) => !this(a);
 
   /// True when both this predicate and [other] hold. [other] is not called
   /// when this one already fails.
@@ -89,11 +90,13 @@ extension FxPredicateOps<T> on bool Function(T) {
 
   /// True when this predicate or [other] holds. [other] is not called when
   /// this one already succeeds.
-  bool Function(T) or(bool Function(T a) other) => (a) => this(a) || other(a);
+  bool Function(T) or(bool Function(T a) other) =>
+      (a) => this(a) || other(a);
 
   /// True when exactly one of this predicate and [other] holds. Both are
   /// always called — there is nothing to short-circuit.
-  bool Function(T) xor(bool Function(T a) other) => (a) => this(a) ^ other(a);
+  bool Function(T) xor(bool Function(T a) other) =>
+      (a) => this(a) ^ other(a);
 
   /// Moves this predicate onto a different input type by running [f] first
   /// — `map` for the *argument* rather than the result, which is why it is
@@ -103,5 +106,6 @@ extension FxPredicateOps<T> on bool Function(T) {
   /// final hasEvenLength = isEven.contramap<String>((s) => s.length);
   /// hasEvenLength('abcd'); // true
   /// ```
-  bool Function(A) contramap<A>(T Function(A a) f) => (a) => this(f(a));
+  bool Function(A) contramap<A>(T Function(A a) f) =>
+      (a) => this(f(a));
 }

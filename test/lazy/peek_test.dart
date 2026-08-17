@@ -15,10 +15,15 @@ void main() {
 
       test('should be able to be used in the pipeline', () {
         var sum = 0;
-        final res = toList(map(
+        final res = toList(
+          map(
             (int a) => a + 10,
-            peek((int a) => sum = sum + a,
-                map((int a) => a + 10, [1, 2, 3, 4]))));
+            peek(
+              (int a) => sum = sum + a,
+              map((int a) => a + 10, [1, 2, 3, 4]),
+            ),
+          ),
+        );
         expect(sum, equals(50));
         expect(res, equals([21, 22, 23, 24]));
       });
@@ -38,17 +43,18 @@ void main() {
       test('should be able to handle an error', () {
         final res = <int>[];
         expect(
-            () => fx([1, 2, 3, 4])
-                .map((a) => a + 10)
-                .peek((a) {
-                  if (a == 13) {
-                    throw StateError('err');
-                  }
-                  res.add(a);
-                })
-                .map((a) => a + 10)
-                .toList(),
-            throwsStateError);
+          () => fx([1, 2, 3, 4])
+              .map((a) => a + 10)
+              .peek((a) {
+                if (a == 13) {
+                  throw StateError('err');
+                }
+                res.add(a);
+              })
+              .map((a) => a + 10)
+              .toList(),
+          throwsStateError,
+        );
         expect(res, equals([11, 12]));
       });
     });
@@ -56,8 +62,10 @@ void main() {
     group('async', () {
       test('should be called the provided callback', () async {
         var sum = 0;
-        await eachAsync((int _) {},
-            peekAsync((int a) => sum = sum + a, toAsync([1, 2, 3, 4])));
+        await eachAsync(
+          (int _) {},
+          peekAsync((int a) => sum = sum + a, toAsync([1, 2, 3, 4])),
+        );
         expect(sum, equals(10));
       });
 
@@ -91,13 +99,15 @@ void main() {
         expect(res, equals([11, 12]));
       });
 
-      test('should be passed concurrent object when job works concurrently',
-          () async {
-        final mock = ConcurrentMock<int>();
-        final it = peekAsync((int a) => a, mock).iterator;
-        await it.next(Concurrent.of(2));
-        expect(mock.received?.length, equals(2));
-      });
+      test(
+        'should be passed concurrent object when job works concurrently',
+        () async {
+          final mock = ConcurrentMock<int>();
+          final it = peekAsync((int a) => a, mock).iterator;
+          await it.next(Concurrent.of(2));
+          expect(mock.received?.length, equals(2));
+        },
+      );
     });
   });
 }

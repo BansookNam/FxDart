@@ -186,20 +186,28 @@ void main() {
     test('report keeps structural problems fail-fast', () {
       // With the wrong number of cells there are no columns to report on,
       // so accumulation would be meaningless.
-      final p = parse('${_header}2026-07-03,expense\n', mode: ImportMode.report);
+      final p = parse(
+        '${_header}2026-07-03,expense\n',
+        mode: ImportMode.report,
+      );
       final fields = p.issues!.head.fields.toList();
       expect(fields, hasLength(1));
       expect(fields.single.field, 'row');
       expect(fields.single.detail, contains('expected 7 columns, got 2'));
     });
 
-    test('report skips the type-dependent amount rule when the type is bad', () {
-      // `bill needs an amount` cannot be decided while the type cell is
-      // unreadable — the dependent branch is guarded by acc.hasErrors.
-      final p = parse('${_header}2026-07-03,magic,X,Dining,,,no\n',
-          mode: ImportMode.report);
-      expect(p.issues!.head.fields.toList().map((f) => f.field), ['type']);
-    });
+    test(
+      'report skips the type-dependent amount rule when the type is bad',
+      () {
+        // `bill needs an amount` cannot be decided while the type cell is
+        // unreadable — the dependent branch is guarded by acc.hasErrors.
+        final p = parse(
+          '${_header}2026-07-03,magic,X,Dining,,,no\n',
+          mode: ImportMode.report,
+        );
+        expect(p.issues!.head.fields.toList().map((f) => f.field), ['type']);
+      },
+    );
 
     test('a clean file behaves identically in all three modes', () {
       const clean = '${_header}2026-07-03,expense,Coffee,Dining,4.50,,no\n';

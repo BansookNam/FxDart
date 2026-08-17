@@ -14,8 +14,10 @@ void main() {
     test('builds one stage, not a uniq wrapping a map', () {
       // White-box: nothing else here fails if the two stages stop fusing, and
       // a silent un-fusing is a ~1.9x regression on a large source.
-      expect(uniq(map((int a) => a % 3, [1, 2, 3])).runtimeType.toString(),
-          startsWith('_MapUniq'));
+      expect(
+        uniq(map((int a) => a % 3, [1, 2, 3])).runtimeType.toString(),
+        startsWith('_MapUniq'),
+      );
       // A source that cannot absorb it still gets the plain uniq stage.
       expect(uniq([1, 2, 3]).runtimeType.toString(), startsWith('_Uniq'));
     });
@@ -30,16 +32,22 @@ void main() {
     });
 
     test('dedups the mapped value, not the source element', () {
-      expect(fx([1, 2, 3, 4, 5, 6]).map((a) => a % 3).uniq().toList(),
-          [1, 2, 0]);
+      expect(fx([1, 2, 3, 4, 5, 6]).map((a) => a % 3).uniq().toList(), [
+        1,
+        2,
+        0,
+      ]);
     });
 
     test('runs the callback once per element consumed, in order', () {
       final seen = <int>[];
-      final result = fx([1, 2, 2, 3, 1]).map((a) {
-        seen.add(a);
-        return a * 10;
-      }).uniq().toList();
+      final result = fx([1, 2, 2, 3, 1])
+          .map((a) {
+            seen.add(a);
+            return a * 10;
+          })
+          .uniq()
+          .toList();
 
       expect(result, [10, 20, 30]);
       expect(seen, [1, 2, 2, 3, 1], reason: 'once per source element');
@@ -47,13 +55,21 @@ void main() {
 
     test('stays lazy: a downstream take cuts the source short', () {
       final seen = <int>[];
-      final result = fx([1, 1, 2, 2, 3, 4, 5]).map((a) {
-        seen.add(a);
-        return a;
-      }).uniq().take(2).toList();
+      final result = fx([1, 1, 2, 2, 3, 4, 5])
+          .map((a) {
+            seen.add(a);
+            return a;
+          })
+          .uniq()
+          .take(2)
+          .toList();
 
       expect(result, [1, 2]);
-      expect(seen, [1, 1, 2], reason: 'stops as soon as the 2nd distinct lands');
+      expect(seen, [
+        1,
+        1,
+        2,
+      ], reason: 'stops as soon as the 2nd distinct lands');
     });
 
     test('the seen set is per-iteration, so it can be iterated twice', () {
@@ -86,15 +102,16 @@ void main() {
     });
 
     test('toList(growable: false) returns a fixed-length list', () {
-      final result =
-          fx([1, 2, 2]).map((a) => a).uniq().toList(growable: false);
+      final result = fx([1, 2, 2]).map((a) => a).uniq().toList(growable: false);
       expect(result, [1, 2]);
       expect(() => result.add(3), throwsUnsupportedError);
     });
 
     test('distinct() is the same stage as uniq()', () {
-      expect(fx([1, 2, 2, 3]).map((a) => a * 2).distinct().toList(),
-          fx([1, 2, 2, 3]).map((a) => a * 2).uniq().toList());
+      expect(
+        fx([1, 2, 2, 3]).map((a) => a * 2).distinct().toList(),
+        fx([1, 2, 2, 3]).map((a) => a * 2).uniq().toList(),
+      );
     });
 
     test('keeps identity-unequal values that compare unequal', () {

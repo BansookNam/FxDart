@@ -136,26 +136,33 @@ Future<void> main(List<String> args) async {
   }
 
   final meta = _loadMeta();
-  final caseDirs = Directory('$root/benchmark/${_fam.casesDir}')
-      .listSync()
-      .whereType<Directory>()
-      .map((d) => d.path.split(Platform.pathSeparator).last)
-      .where((s) => onlySlugs.isEmpty || onlySlugs.contains(s))
-      .toList()
-    ..sort((a, b) => (meta[a]?.order ?? 999).compareTo(meta[b]?.order ?? 999));
+  final caseDirs =
+      Directory('$root/benchmark/${_fam.casesDir}')
+          .listSync()
+          .whereType<Directory>()
+          .map((d) => d.path.split(Platform.pathSeparator).last)
+          .where((s) => onlySlugs.isEmpty || onlySlugs.contains(s))
+          .toList()
+        ..sort(
+          (a, b) => (meta[a]?.order ?? 999).compareTo(meta[b]?.order ?? 999),
+        );
   if (caseDirs.isEmpty) {
     stderr.writeln('no benchmark cases matched ${onlySlugs.join(', ')}');
     exit(1);
   }
 
   final machine = _machineInfo();
-  stdout.writeln('Machine: ${machine['cpu']}, ${machine['ramGb']} GB RAM, '
-      'Dart ${machine['dart']}');
-  stdout.writeln('Cases: ${caseDirs.length}, scales: ${scales.join('/')}, '
-      'base rounds: $rounds (tie margin ${tieMarginPct.toStringAsFixed(0)}% '
-      '→ up to $maxRounds rounds)'
-      '${_cooldown > Duration.zero ? ', cooldown ${_cooldown.inSeconds}s '
-          'between blocks' : ''}\n');
+  stdout.writeln(
+    'Machine: ${machine['cpu']}, ${machine['ramGb']} GB RAM, '
+    'Dart ${machine['dart']}',
+  );
+  stdout.writeln(
+    'Cases: ${caseDirs.length}, scales: ${scales.join('/')}, '
+    'base rounds: $rounds (tie margin ${tieMarginPct.toStringAsFixed(0)}% '
+    '→ up to $maxRounds rounds)'
+    '${_cooldown > Duration.zero ? ', cooldown ${_cooldown.inSeconds}s '
+              'between blocks' : ''}\n',
+  );
 
   await _compileAll(caseDirs);
 
@@ -167,7 +174,9 @@ Future<void> main(List<String> args) async {
     try {
       final existing = jsonDecode(outFile.readAsStringSync());
       cases.addAll((existing['cases'] as Map).cast<String, Object?>());
-    } catch (_) {/* corrupt or old-format file — start fresh */}
+    } catch (_) {
+      /* corrupt or old-format file — start fresh */
+    }
   }
   var failures = 0;
   for (final slug in caseDirs) {
@@ -182,9 +191,11 @@ Future<void> main(List<String> args) async {
         final r = await _runCase(slug, scale, rounds, smoke);
         if (_cooldown > Duration.zero) await Future<void>.delayed(_cooldown);
         scaleResults[scale] = r.toJson();
-        lineParts.add('${scale == 'full' ? 'N=${r.n}' : 'N=$scale'} '
-            '${_fmtUs(r.left.medianUs)}/${_fmtUs(r.fxdart.medianUs)}'
-            '→${r.timeWinner}');
+        lineParts.add(
+          '${scale == 'full' ? 'N=${r.n}' : 'N=$scale'} '
+          '${_fmtUs(r.left.medianUs)}/${_fmtUs(r.fxdart.medianUs)}'
+          '→${r.timeWinner}',
+        );
       } catch (e) {
         failures++;
         scaleResults[scale] = {'error': '$e'};
@@ -203,21 +214,29 @@ Future<void> main(List<String> args) async {
   final results = {
     'machine': machine,
     'date': DateTime.now().toIso8601String().substring(0, 10),
-    'warmup': smoke ? 0 : int.parse(Platform.environment['BENCH_WARMUP'] ?? '2'),
-    'itersPerRound':
-        smoke ? 1 : int.parse(Platform.environment['BENCH_ITERS'] ?? '5'),
+    'warmup': smoke
+        ? 0
+        : int.parse(Platform.environment['BENCH_WARMUP'] ?? '2'),
+    'itersPerRound': smoke
+        ? 1
+        : int.parse(Platform.environment['BENCH_ITERS'] ?? '5'),
     'tieMarginPct': tieMarginPct,
     'tieAbsMs': tieAbsMs,
     'scales': scales,
     'cases': cases,
   };
-  final outDir = Directory('$root/benchmark/results')..createSync(recursive: true);
-  File('${outDir.path}/${_fam.resultsFile}')
-      .writeAsStringSync(const JsonEncoder.withIndent('  ').convert(results));
-  File('${outDir.path}/${_fam.summaryFile}')
-      .writeAsStringSync(_summaryMd(results, meta));
-  stdout.writeln('\nWrote benchmark/results/${_fam.resultsFile} '
-      'and ${_fam.summaryFile}');
+  final outDir = Directory('$root/benchmark/results')
+    ..createSync(recursive: true);
+  File(
+    '${outDir.path}/${_fam.resultsFile}',
+  ).writeAsStringSync(const JsonEncoder.withIndent('  ').convert(results));
+  File(
+    '${outDir.path}/${_fam.summaryFile}',
+  ).writeAsStringSync(_summaryMd(results, meta));
+  stdout.writeln(
+    '\nWrote benchmark/results/${_fam.resultsFile} '
+    'and ${_fam.summaryFile}',
+  );
   if (failures > 0) {
     stderr.writeln('$failures case×scale run(s) failed');
     exit(1);
@@ -230,24 +249,31 @@ Future<void> main(List<String> args) async {
 void _reportOnly() {
   final f = File('$root/benchmark/results/${_fam.resultsFile}');
   if (!f.existsSync()) {
-    stderr.writeln('no benchmark/results/${_fam.resultsFile} to re-report from');
+    stderr.writeln(
+      'no benchmark/results/${_fam.resultsFile} to re-report from',
+    );
     exit(1);
   }
   final results = jsonDecode(f.readAsStringSync()) as Map<String, dynamic>;
   var flips = 0;
   for (final c in (results['cases'] as Map<String, dynamic>).values) {
-    final scales = (c as Map<String, dynamic>)['scales'] as Map<String, dynamic>?;
+    final scales =
+        (c as Map<String, dynamic>)['scales'] as Map<String, dynamic>?;
     if (scales == null) continue;
     for (final s in scales.values) {
       final sm = s as Map<String, dynamic>;
       if (sm.containsKey('error')) continue;
       final nat = sm[_fam.left] as Map<String, dynamic>;
       final fx = sm['fxdart'] as Map<String, dynamic>;
-      final time = _verdict((nat['medianUs'] as num).toDouble(),
-          (fx['medianUs'] as num).toDouble(),
-          absFloor: tieAbsMs * 1000.0);
-      final mem = _verdict((nat['medianRssBytes'] as num).toDouble(),
-          (fx['medianRssBytes'] as num).toDouble());
+      final time = _verdict(
+        (nat['medianUs'] as num).toDouble(),
+        (fx['medianUs'] as num).toDouble(),
+        absFloor: tieAbsMs * 1000.0,
+      );
+      final mem = _verdict(
+        (nat['medianRssBytes'] as num).toDouble(),
+        (fx['medianRssBytes'] as num).toDouble(),
+      );
       if (time != sm['timeWinner'] || mem != sm['memWinner']) flips++;
       sm['timeWinner'] = time;
       sm['memWinner'] = mem;
@@ -256,26 +282,30 @@ void _reportOnly() {
   results['tieMarginPct'] = tieMarginPct;
   results['tieAbsMs'] = tieAbsMs;
   f.writeAsStringSync(const JsonEncoder.withIndent('  ').convert(results));
-  File('$root/benchmark/results/${_fam.summaryFile}')
-      .writeAsStringSync(_summaryMd(results, _loadMeta()));
-  stdout.writeln('Re-derived verdicts under current rules '
-      '($flips case×scale verdict(s) changed); rewrote results.json and '
-      'SUMMARY.md');
+  File(
+    '$root/benchmark/results/${_fam.summaryFile}',
+  ).writeAsStringSync(_summaryMd(results, _loadMeta()));
+  stdout.writeln(
+    'Re-derived verdicts under current rules '
+    '($flips case×scale verdict(s) changed); rewrote results.json and '
+    'SUMMARY.md',
+  );
 }
 
 class _SideStats {
   _SideStats(this.iterUs, this.rssBytes);
-  final List<double> iterUs; // pooled across rounds, per-run µs (batch-averaged)
+  final List<double>
+  iterUs; // pooled across rounds, per-run µs (batch-averaged)
   final List<int> rssBytes; // one per round
 
   double get medianUs => _median(iterUs);
   double get medianRss => _median(rssBytes);
   Map<String, Object?> toJson() => {
-        'medianUs': medianUs,
-        'minUs': (iterUs.toList()..sort()).first,
-        'medianRssBytes': medianRss,
-        'samples': iterUs.length,
-      };
+    'medianUs': medianUs,
+    'minUs': (iterUs.toList()..sort()).first,
+    'medianRssBytes': medianRss,
+    'samples': iterUs.length,
+  };
 }
 
 class _ScaleResult {
@@ -290,13 +320,13 @@ class _ScaleResult {
   String get memWinner => _verdict(left.medianRss, fxdart.medianRss);
 
   Map<String, Object?> toJson() => {
-        'n': n,
-        'roundsRun': roundsRun,
-        _fam.left: left.toJson(),
-        'fxdart': fxdart.toJson(),
-        'timeWinner': timeWinner,
-        'memWinner': memWinner,
-      };
+    'n': n,
+    'roundsRun': roundsRun,
+    _fam.left: left.toJson(),
+    'fxdart': fxdart.toJson(),
+    'timeWinner': timeWinner,
+    'memWinner': memWinner,
+  };
 }
 
 String _verdict(double a, double b, {double absFloor = 0}) {
@@ -307,11 +337,12 @@ String _verdict(double a, double b, {double absFloor = 0}) {
 }
 
 Future<_ScaleResult> _runCase(
-    String slug, String scale, int baseRounds, bool smoke) async {
-  final sides = {
-    _fam.left: _SideStats([], []),
-    'fxdart': _SideStats([], []),
-  };
+  String slug,
+  String scale,
+  int baseRounds,
+  bool smoke,
+) async {
+  final sides = {_fam.left: _SideStats([], []), 'fxdart': _SideStats([], [])};
   int? n;
   final checksums = <String, String>{};
 
@@ -331,29 +362,38 @@ Future<_ScaleResult> _runCase(
       }
       final line = (res.stdout as String)
           .split('\n')
-          .lastWhere((l) => l.startsWith(resultPrefix),
-              orElse: () => throw StateError('$impl printed no result line'));
+          .lastWhere(
+            (l) => l.startsWith(resultPrefix),
+            orElse: () => throw StateError('$impl printed no result line'),
+          );
       final r =
-          jsonDecode(line.substring(resultPrefix.length)) as Map<String, dynamic>;
+          jsonDecode(line.substring(resultPrefix.length))
+              as Map<String, dynamic>;
       if (r['aot'] != true) {
-        throw StateError('$impl reported a JIT (non-AOT) measurement — '
-            'results must come from the compiled binaries in benchmark/.build/');
+        throw StateError(
+          '$impl reported a JIT (non-AOT) measurement — '
+          'results must come from the compiled binaries in benchmark/.build/',
+        );
       }
       n = r['n'] as int;
       final prev = checksums[impl];
       final sum = r['checksum'] as String;
       if (prev != null && prev != sum) {
-        throw StateError('$impl checksum changed between rounds ($prev → $sum)');
+        throw StateError(
+          '$impl checksum changed between rounds ($prev → $sum)',
+        );
       }
       checksums[impl] = sum;
-      sides[impl]!
-          .iterUs
-          .addAll((r['iterUs'] as List).map((v) => (v as num).toDouble()));
+      sides[impl]!.iterUs.addAll(
+        (r['iterUs'] as List).map((v) => (v as num).toDouble()),
+      );
       sides[impl]!.rssBytes.add(r['maxRssBytes'] as int);
     }
     if (checksums.length == 2 && checksums[_fam.left] != checksums['fxdart']) {
-      throw StateError('checksum mismatch at N-scale $scale: '
-          '${_fam.left}=${checksums[_fam.left]} fxdart=${checksums['fxdart']}');
+      throw StateError(
+        'checksum mismatch at N-scale $scale: '
+        '${_fam.left}=${checksums[_fam.left]} fxdart=${checksums['fxdart']}',
+      );
     }
   }
 
@@ -404,10 +444,9 @@ Future<void> _compileAll(List<String> slugs) async {
     if (!out.existsSync()) return true;
     final built = out.lastModifiedSync();
     if (j.$2 == 'fxdart' && libTouched.isAfter(built)) return true;
-    final deps = Directory('$root/benchmark/${_fam.casesDir}/${j.$1}')
-        .listSync()
-        .whereType<File>()
-        .followedBy([harness]);
+    final deps = Directory(
+      '$root/benchmark/${_fam.casesDir}/${j.$1}',
+    ).listSync().whereType<File>().followedBy([harness]);
     return deps.any((f) => f.lastModifiedSync().isAfter(built));
   }).toList();
   if (pending.isEmpty) return;
@@ -418,11 +457,13 @@ Future<void> _compileAll(List<String> slugs) async {
   Future<void> worker() async {
     while (next < pending.length) {
       final (slug, impl) = pending[next++];
-      final res = await Process.run(
-        Platform.executable,
-        ['compile', 'exe', '$root/benchmark/${_fam.casesDir}/$slug/$impl.dart', '-o', _binPath(slug, impl)],
-        workingDirectory: root,
-      );
+      final res = await Process.run(Platform.executable, [
+        'compile',
+        'exe',
+        '$root/benchmark/${_fam.casesDir}/$slug/$impl.dart',
+        '-o',
+        _binPath(slug, impl),
+      ], workingDirectory: root);
       if (res.exitCode != 0) {
         failed.add('$slug/$impl: ${res.stderr}');
       }
@@ -480,7 +521,8 @@ String _fmtUs(double us) {
   return '${(us / 1000).toStringAsFixed(us < 10000 ? 2 : 1)} ms';
 }
 
-String _fmtMb(double bytes) => '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+String _fmtMb(double bytes) =>
+    '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
 
 String _summaryMd(Map<String, Object?> results, Map<String, _Meta> meta) {
   final machine = results['machine'] as Map<String, Object?>;
@@ -492,37 +534,48 @@ String _summaryMd(Map<String, Object?> results, Map<String, _Meta> meta) {
     ..writeln('- **Machine:** ${machine['cpu']}, ${machine['ramGb']} GB RAM')
     ..writeln('- **Dart:** ${machine['dart']} (${machine['os']}), AOT-compiled')
     ..writeln('- **Date:** ${results['date']}')
-    ..writeln('- **Method:** per side and N-scale, fresh process × rounds, '
-        '${results['warmup']} warmup + ${results['itersPerRound']} measured '
-        'iterations per process (small N auto-batched to ≥2 ms samples); '
-        'median reported. Ties — within ${results['tieMarginPct']}% of each '
-        'other, or within ${results['tieAbsMs'] ?? tieAbsMs} ms absolute '
-        '(beneath human perception) — with close relative races re-run up to '
-        '$maxRounds rounds.')
-    ..writeln('- Memory is peak process RSS — the runtime and the dataset are '
-        'identical on both sides, so the *difference* is what the pipeline '
-        'itself holds onto. At small N it is all runtime baseline; expect '
-        'ties.');
+    ..writeln(
+      '- **Method:** per side and N-scale, fresh process × rounds, '
+      '${results['warmup']} warmup + ${results['itersPerRound']} measured '
+      'iterations per process (small N auto-batched to ≥2 ms samples); '
+      'median reported. Ties — within ${results['tieMarginPct']}% of each '
+      'other, or within ${results['tieAbsMs'] ?? tieAbsMs} ms absolute '
+      '(beneath human perception) — with close relative races re-run up to '
+      '$maxRounds rounds.',
+    )
+    ..writeln(
+      '- Memory is peak process RSS — the runtime and the dataset are '
+      'identical on both sides, so the *difference* is what the pipeline '
+      'itself holds onto. At small N it is all runtime baseline; expect '
+      'ties.',
+    );
   final rows = cases.entries.toList()
-    ..sort((a, b) =>
-        (meta[a.key]?.order ?? 999).compareTo(meta[b.key]?.order ?? 999));
+    ..sort(
+      (a, b) =>
+          (meta[a.key]?.order ?? 999).compareTo(meta[b.key]?.order ?? 999),
+    );
   for (final scale in scales) {
     b
       ..writeln()
-      ..writeln(scale == 'full'
-          ? '## Headline N (1M sync / case-specific async)'
-          : '## N = $scale')
+      ..writeln(
+        scale == 'full'
+            ? '## Headline N (1M sync / case-specific async)'
+            : '## N = $scale',
+      )
       ..writeln()
-      ..writeln('| # | Case | N | ${_fam.left} time | FxDart time | '
-          'Time winner | ${_fam.left} mem | FxDart mem | Mem winner | '
-          'Rounds |')
+      ..writeln(
+        '| # | Case | N | ${_fam.left} time | FxDart time | '
+        'Time winner | ${_fam.left} mem | FxDart mem | Mem winner | '
+        'Rounds |',
+      )
       ..writeln('|--:|------|--:|--:|--:|:-:|--:|--:|:-:|--:|');
     for (final e in rows) {
       final c = e.value as Map<String, Object?>;
       final s = (c['scales'] as Map<String, Object?>)[scale];
       if (s == null) continue;
       final sm = s as Map<String, Object?>;
-      final label = '${c['order']} | ${e.key}'
+      final label =
+          '${c['order']} | ${e.key}'
           '${c['async'] == true ? ' (async)' : ''}';
       if (sm.containsKey('error')) {
         b.writeln('| $label | — | FAILED: ${sm['error']} ||||||');
@@ -530,15 +583,17 @@ String _summaryMd(Map<String, Object?> results, Map<String, _Meta> meta) {
       }
       final nat = sm[_fam.left] as Map<String, Object?>;
       final fx = sm['fxdart'] as Map<String, Object?>;
-      b.writeln('| $label '
-          '| ${sm['n']} '
-          '| ${_fmtUs((nat['medianUs'] as num).toDouble())} '
-          '| ${_fmtUs((fx['medianUs'] as num).toDouble())} '
-          '| **${sm['timeWinner']}** '
-          '| ${_fmtMb((nat['medianRssBytes'] as num).toDouble())} '
-          '| ${_fmtMb((fx['medianRssBytes'] as num).toDouble())} '
-          '| ${sm['memWinner']} '
-          '| ${sm['roundsRun']} |');
+      b.writeln(
+        '| $label '
+        '| ${sm['n']} '
+        '| ${_fmtUs((nat['medianUs'] as num).toDouble())} '
+        '| ${_fmtUs((fx['medianUs'] as num).toDouble())} '
+        '| **${sm['timeWinner']}** '
+        '| ${_fmtMb((nat['medianRssBytes'] as num).toDouble())} '
+        '| ${_fmtMb((fx['medianRssBytes'] as num).toDouble())} '
+        '| ${sm['memWinner']} '
+        '| ${sm['roundsRun']} |',
+      );
     }
   }
   return b.toString();
@@ -562,9 +617,10 @@ Map<String, Object?> _machineInfo() {
   } else if (Platform.isLinux) {
     final info = File('/proc/cpuinfo');
     if (info.existsSync()) {
-      cpu = RegExp(r'model name\s*:\s*(.*)')
-              .firstMatch(info.readAsStringSync())
-              ?.group(1) ??
+      cpu =
+          RegExp(
+            r'model name\s*:\s*(.*)',
+          ).firstMatch(info.readAsStringSync())?.group(1) ??
           'unknown';
     }
   }

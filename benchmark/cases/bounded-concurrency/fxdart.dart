@@ -21,8 +21,9 @@ Future<void> main() async {
     n: n,
     run: () async {
       maxInFlight = 0;
-      final profiles =
-          await fx(userIds).toAsync().map(fetchProfile).concurrent(2).toList();
+      final profiles = await fx(
+        userIds,
+      ).toAsync().map(fetchProfile).concurrent(2).toList();
       return '${profiles.length}|${profiles.last}|max=$maxInFlight';
     },
   );

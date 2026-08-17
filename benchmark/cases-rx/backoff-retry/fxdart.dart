@@ -33,12 +33,16 @@ Future<void> main() async {
       for (final id in rateIds) {
         // Backoff is the delay hook: it receives the failure count (1, 2, …)
         // and returns how long to wait before the next attempt.
-        final payload = await retry(3, () => fetchRates(id), delay: (failed) {
-          final ms = 40 * failed;
-          backoffMs.add(ms);
-          // Chosen backoff recorded; the wait itself is zeroed (AUTHORING).
-          return Duration.zero;
-        });
+        final payload = await retry(
+          3,
+          () => fetchRates(id),
+          delay: (failed) {
+            final ms = 40 * failed;
+            backoffMs.add(ms);
+            // Chosen backoff recorded; the wait itself is zeroed (AUTHORING).
+            return Duration.zero;
+          },
+        );
         served++;
         last = payload;
       }

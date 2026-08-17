@@ -31,40 +31,48 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = indexBy((Obj a) => a.category,
-            filter((Obj a) => a.category != 'clothes', given));
+        final res = indexBy(
+          (Obj a) => a.category,
+          filter((Obj a) => a.category != 'clothes', given),
+        );
         expect(res, equals(then2));
       });
 
       test('should be able to be used as a chaining method in the `fx`', () {
-        final res = fx(given)
-            .filter((a) => a.category != 'clothes')
-            .indexBy((a) => a.category);
+        final res = fx(
+          given,
+        ).filter((a) => a.category != 'clothes').indexBy((a) => a.category);
         expect(res, equals(then2));
       });
     });
 
     group('async', () {
-      test("should be grouped index by the callback to given 'AsyncIterable'",
-          () async {
-        final res = await indexByAsync((Obj a) => a.category, toAsync(given));
-        expect(res, equals(then1));
-      });
+      test(
+        "should be grouped index by the callback to given 'AsyncIterable'",
+        () async {
+          final res = await indexByAsync((Obj a) => a.category, toAsync(given));
+          expect(res, equals(then1));
+        },
+      );
 
       test('should be able to be used in the pipeline', () async {
-        final res = await indexByAsync((Obj a) => a.category,
-            filterAsync((Obj a) => a.category != 'clothes', toAsync(given)));
+        final res = await indexByAsync(
+          (Obj a) => a.category,
+          filterAsync((Obj a) => a.category != 'clothes', toAsync(given)),
+        );
         expect(res, equals(then2));
       });
 
-      test('should be able to be used as a chaining method in the `fx`',
-          () async {
-        final res = await fx(given)
-            .toAsync()
-            .filter((a) => a.category != 'clothes')
-            .indexBy((a) => a.category);
-        expect(res, equals(then2));
-      });
+      test(
+        'should be able to be used as a chaining method in the `fx`',
+        () async {
+          final res = await fx(given)
+              .toAsync()
+              .filter((a) => a.category != 'clothes')
+              .indexBy((a) => a.category);
+          expect(res, equals(then2));
+        },
+      );
     });
 
     group('enum and union types', () {
@@ -83,12 +91,13 @@ void main() {
             .toList();
 
         expect(
-            entriesResult,
-            equals([
-              (role: UserRole.admin, userName: 'Alice', userId: 1),
-              (role: UserRole.user, userName: 'Charlie', userId: 3),
-              (role: UserRole.guest, userName: 'Dave', userId: 4),
-            ]));
+          entriesResult,
+          equals([
+            (role: UserRole.admin, userName: 'Alice', userId: 1),
+            (role: UserRole.user, userName: 'Charlie', userId: 3),
+            (role: UserRole.guest, userName: 'Dave', userId: 4),
+          ]),
+        );
 
         final roles = usersByRole.keys.toList();
         expect(roles, equals([UserRole.admin, UserRole.user, UserRole.guest]));
@@ -108,20 +117,23 @@ void main() {
         final tasksByPriority = indexBy((task) => task.priority, tasks);
 
         final result = fx(entries(tasksByPriority))
-            .map((e) => (
-                  priority: e.$1,
-                  taskTitle: e.$2.title,
-                  isHighPriority: e.$1 == 'high',
-                ))
+            .map(
+              (e) => (
+                priority: e.$1,
+                taskTitle: e.$2.title,
+                isHighPriority: e.$1 == 'high',
+              ),
+            )
             .toList();
 
         expect(
-            result,
-            equals([
-              (priority: 'low', taskTitle: 'Task 1', isHighPriority: false),
-              (priority: 'high', taskTitle: 'Task 4', isHighPriority: true),
-              (priority: 'medium', taskTitle: 'Task 3', isHighPriority: false),
-            ]));
+          result,
+          equals([
+            (priority: 'low', taskTitle: 'Task 1', isHighPriority: false),
+            (priority: 'high', taskTitle: 'Task 4', isHighPriority: true),
+            (priority: 'medium', taskTitle: 'Task 3', isHighPriority: false),
+          ]),
+        );
       });
 
       test('should handle numeric keys', () {
@@ -137,11 +149,12 @@ void main() {
         final result = indexBy((item) => item.status, items);
 
         expect(
-            result,
-            equals({
-              pending: (id: 3, status: pending),
-              active: (id: 2, status: active),
-            }));
+          result,
+          equals({
+            pending: (id: 3, status: pending),
+            active: (id: 2, status: active),
+          }),
+        );
         expect(result.keys.length, equals(2));
       });
 
@@ -152,15 +165,18 @@ void main() {
           (name: 'item3', status: 'active'), // overwrites item1
         ];
 
-        final result =
-            await indexByAsync((item) async => item.status, toAsync(items));
+        final result = await indexByAsync(
+          (item) async => item.status,
+          toAsync(items),
+        );
 
         expect(
-            result,
-            equals({
-              'active': (name: 'item3', status: 'active'),
-              'inactive': (name: 'item2', status: 'inactive'),
-            }));
+          result,
+          equals({
+            'active': (name: 'item3', status: 'active'),
+            'inactive': (name: 'item2', status: 'inactive'),
+          }),
+        );
       });
     });
   });

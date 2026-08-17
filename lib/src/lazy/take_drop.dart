@@ -12,8 +12,7 @@ import 'zip.dart';
 Iterable<A> take<A>(int length, Iterable<A> iterable) =>
     _TakeIterable(length, iterable);
 
-class _TakeIterable<A> extends Iterable<A>
-    implements FxListRangeSource<A> {
+class _TakeIterable<A> extends Iterable<A> implements FxListRangeSource<A> {
   _TakeIterable(this._length, this._source);
   final int _length;
   final Iterable<A> _source;
@@ -52,13 +51,13 @@ class _TakeIterator<A> implements Iterator<A> {
 /// parallel, as in FxTS.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> takeAsync<A>(int length, FxAsyncIterable<A> iterable) {
-  return DelegateAsyncIterable(
-      () => _TakeAsyncIterator<A>(length, iterable));
+  return DelegateAsyncIterable(() => _TakeAsyncIterator<A>(length, iterable));
 }
 
-class _TakeAsyncIterator<A> with FxFastNextGate<A> implements FxFastIterator<A> {
-  _TakeAsyncIterator(this._length, this._sourceIterable)
-      : _remaining = _length;
+class _TakeAsyncIterator<A>
+    with FxFastNextGate<A>
+    implements FxFastIterator<A> {
+  _TakeAsyncIterator(this._length, this._sourceIterable) : _remaining = _length;
   final int _length;
   final FxAsyncIterable<A> _sourceIterable;
   FxAsyncIterator<A>? _source;
@@ -105,7 +104,9 @@ class _TakeAsyncIterator<A> with FxFastNextGate<A> implements FxFastIterator<A> 
 }
 
 FxAsyncIterable<A> _takeAsyncLegacy<A>(
-    int length, FxAsyncIterable<A> iterable) {
+  int length,
+  FxAsyncIterable<A> iterable,
+) {
   return DelegateAsyncIterable(() {
     final iterator = iterable.iterator;
     var remaining = length;
@@ -250,7 +251,9 @@ class _TakeWhileIterator<A> implements Iterator<A> {
 /// Async counterpart of [takeWhile].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> takeWhileAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   // Fused-stage form; a Concurrent marker falls back to
   // [_takeWhileAsyncLegacy]'s dispatch layering.
   final stage = FxTakeWhileStage((v) => f(v as A));
@@ -258,15 +261,20 @@ FxAsyncIterable<A> takeWhileAsync<A>(
     final source = iterable.source;
     final stages = iterable.stages;
     final legacy = iterable.legacy;
-    return FxFusedAsyncIterable<A>(
-        source, [...stages, stage], () => _takeWhileAsyncLegacy(f, legacy()));
+    return FxFusedAsyncIterable<A>(source, [
+      ...stages,
+      stage,
+    ], () => _takeWhileAsyncLegacy(f, legacy()));
   }
-  return FxFusedAsyncIterable<A>(
-      iterable, [stage], () => _takeWhileAsyncLegacy(f, iterable));
+  return FxFusedAsyncIterable<A>(iterable, [
+    stage,
+  ], () => _takeWhileAsyncLegacy(f, iterable));
 }
 
 FxAsyncIterable<A> _takeWhileAsyncLegacy<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var end = false;
@@ -325,7 +333,11 @@ class _TakeWhileRightIterable<A> extends Iterable<A> {
   Iterator<A> get iterator {
     final source = _source;
     if (source is List<A>) {
-      return FxListRangeIterator(source, _suffixStart(_f, source), source.length);
+      return FxListRangeIterator(
+        source,
+        _suffixStart(_f, source),
+        source.length,
+      );
     }
     return _TakeWhileRightIterator(_f, _source);
   }
@@ -364,7 +376,9 @@ class _TakeWhileRightIterator<A> implements Iterator<A> {
 /// Async counterpart of [takeWhileRight].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> takeWhileRightAsync<A>(
-    bool Function(A a) f, FxAsyncIterable<A> iterable) {
+  bool Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     Iterator<A>? tail;
@@ -388,8 +402,7 @@ FxAsyncIterable<A> takeWhileRightAsync<A>(
 /// **including** the element that matched.
 ///
 /// Port of FxTS `takeUntilInclusive`.
-Iterable<A> takeUntilInclusive<A>(
-        bool Function(A a) f, Iterable<A> iterable) =>
+Iterable<A> takeUntilInclusive<A>(bool Function(A a) f, Iterable<A> iterable) =>
     _TakeUntilInclusiveIterable(f, iterable);
 
 class _TakeUntilInclusiveIterable<A> extends Iterable<A> {
@@ -420,7 +433,9 @@ class _TakeUntilInclusiveIterator<A> implements Iterator<A> {
 /// Async counterpart of [takeUntilInclusive].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> takeUntilInclusiveAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var end = false;
@@ -447,8 +462,9 @@ Iterable<A> takeUntil<A>(bool Function(A a) f, Iterable<A> iterable) =>
 @Deprecated('Use takeUntilInclusiveAsync instead')
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> takeUntilAsync<A>(
-        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    takeUntilInclusiveAsync(f, iterable);
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => takeUntilInclusiveAsync(f, iterable);
 
 /// Returns an iterable that skips the first [length] values.
 ///
@@ -456,8 +472,7 @@ FxAsyncIterable<A> takeUntilAsync<A>(
 Iterable<A> drop<A>(int length, Iterable<A> iterable) =>
     _DropIterable(length, iterable);
 
-class _DropIterable<A> extends Iterable<A>
-    implements FxListRangeSource<A> {
+class _DropIterable<A> extends Iterable<A> implements FxListRangeSource<A> {
   _DropIterable(this._length, this._source);
   final int _length;
   final Iterable<A> _source;
@@ -648,24 +663,26 @@ class _DropWhileIterator<A> implements Iterator<A> {
 /// Async counterpart of [dropWhile].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> dropWhileAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var dropping = true;
     return SerialAsyncIterator((concurrent) {
       Future<IterResult<A>> loop() => iterator.next(concurrent).then((result) {
-            if (result.done) return IterResult<A>.done();
-            if (!dropping) return result;
-            final drop = f(result.value);
-            FutureOr<IterResult<A>> decide(bool d) {
-              if (d) return loop();
-              dropping = false;
-              return result;
-            }
+        if (result.done) return IterResult<A>.done();
+        if (!dropping) return result;
+        final drop = f(result.value);
+        FutureOr<IterResult<A>> decide(bool d) {
+          if (d) return loop();
+          dropping = false;
+          return result;
+        }
 
-            if (drop is Future<bool>) return drop.then(decide);
-            return decide(drop);
-          });
+        if (drop is Future<bool>) return drop.then(decide);
+        return decide(drop);
+      });
       return loop();
     });
   });
@@ -750,7 +767,9 @@ class _DropWhileRightIterator<A> implements Iterator<A> {
 /// Async counterpart of [dropWhileRight].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> dropWhileRightAsync<A>(
-    bool Function(A a) f, FxAsyncIterable<A> iterable) {
+  bool Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     Iterator<A>? head;
@@ -807,24 +826,26 @@ class _DropUntilIterator<A> implements Iterator<A> {
 /// Async counterpart of [dropUntil].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> dropUntilAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var dropping = true;
     return SerialAsyncIterator((concurrent) {
       if (!dropping) return iterator.next(concurrent);
       Future<IterResult<A>> loop() => iterator.next(concurrent).then((result) {
-            if (result.done) return IterResult<A>.done();
-            final match = f(result.value);
-            FutureOr<IterResult<A>> decide(bool m) {
-              if (!m) return loop();
-              dropping = false;
-              return iterator.next(concurrent);
-            }
+        if (result.done) return IterResult<A>.done();
+        final match = f(result.value);
+        FutureOr<IterResult<A>> decide(bool m) {
+          if (!m) return loop();
+          dropping = false;
+          return iterator.next(concurrent);
+        }
 
-            if (match is Future<bool>) return match.then(decide);
-            return decide(match);
-          });
+        if (match is Future<bool>) return match.then(decide);
+        return decide(match);
+      });
       return loop();
     });
   });
@@ -871,8 +892,11 @@ class _SliceIterator<A> implements Iterator<A> {
 
 /// Async counterpart of [slice].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> sliceAsync<A>(int start, FxAsyncIterable<A> iterable,
-    [int? end]) {
+FxAsyncIterable<A> sliceAsync<A>(
+  int start,
+  FxAsyncIterable<A> iterable, [
+  int? end,
+]) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var i = 0;
@@ -895,8 +919,9 @@ FxAsyncIterable<A> sliceAsync<A>(int start, FxAsyncIterable<A> iterable,
 /// Port of FxTS `chunk`. Equivalent to
 /// `windowed(size, iterable, step: size, partial: true)`, except that a
 /// non-positive [size] yields nothing instead of throwing.
-Iterable<List<A>> chunk<A>(int size, Iterable<A> iterable) =>
-    size < 1 ? Iterable<List<A>>.empty() : _WindowIterable(size, size, true, iterable);
+Iterable<List<A>> chunk<A>(int size, Iterable<A> iterable) => size < 1
+    ? Iterable<List<A>>.empty()
+    : _WindowIterable(size, size, true, iterable);
 
 /// Returns an iterable of sliding windows over [iterable]: lists of [size]
 /// consecutive elements, each window starting [step] elements after the
@@ -912,8 +937,12 @@ Iterable<List<A>> chunk<A>(int size, Iterable<A> iterable) =>
 /// windowed(3, [1, 2, 3, 4, 5], step: 2);       // ([1, 2, 3], [3, 4, 5])
 /// windowed(3, [1, 2, 3, 4, 5], partial: true); // (..., [3, 4, 5], [4, 5], [5])
 /// ```
-Iterable<List<A>> windowed<A>(int size, Iterable<A> iterable,
-    {int step = 1, bool partial = false}) {
+Iterable<List<A>> windowed<A>(
+  int size,
+  Iterable<A> iterable, {
+  int step = 1,
+  bool partial = false,
+}) {
   _checkWindow(size, step);
   return _WindowIterable(size, step, partial, iterable);
 }
@@ -948,10 +977,10 @@ class _WindowIterable<A> extends Iterable<List<A>> {
 
 class _WindowRangeIterator<A> implements Iterator<List<A>> {
   _WindowRangeIterator(this._size, this._step, this._partial, FxListRange<A> r)
-      : _list = r.list,
-        _i = r.start,
-        _end = r.end,
-        _lastFull = r.end - _size;
+    : _list = r.list,
+      _i = r.start,
+      _end = r.end,
+      _lastFull = r.end - _size;
   final int _size;
   final int _step;
   final bool _partial;
@@ -1089,14 +1118,22 @@ FxAsyncIterable<List<A>> chunkAsync<A>(int size, FxAsyncIterable<A> iterable) {
 
 /// Async counterpart of [windowed].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<List<A>> windowedAsync<A>(int size, FxAsyncIterable<A> iterable,
-    {int step = 1, bool partial = false}) {
+FxAsyncIterable<List<A>> windowedAsync<A>(
+  int size,
+  FxAsyncIterable<A> iterable, {
+  int step = 1,
+  bool partial = false,
+}) {
   _checkWindow(size, step);
   return _windowedAsync(size, step, partial, iterable);
 }
 
 FxAsyncIterable<List<A>> _windowedAsync<A>(
-    int size, int step, bool partial, FxAsyncIterable<A> iterable) {
+  int size,
+  int step,
+  bool partial,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var carry = <A>[];
@@ -1273,7 +1310,9 @@ class _SplitIterator implements Iterator<String> {
 /// Async counterpart of [split].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<String> splitAsync(
-    String sep, FxAsyncIterable<String> iterable) {
+  String sep,
+  FxAsyncIterable<String> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var acc = '';
@@ -1314,6 +1353,9 @@ Iterable<B> compress<B>(List<bool> selectors, Iterable<B> iterable) =>
 /// Async counterpart of [compress].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<B> compressAsync<B>(
-        List<bool> selectors, FxAsyncIterable<B> iterable) =>
-    mapAsync((r) => r.$2,
-        filterAsync((r) => r.$1, zipAsync(toAsync(selectors), iterable)));
+  List<bool> selectors,
+  FxAsyncIterable<B> iterable,
+) => mapAsync(
+  (r) => r.$2,
+  filterAsync((r) => r.$1, zipAsync(toAsync(selectors), iterable)),
+);

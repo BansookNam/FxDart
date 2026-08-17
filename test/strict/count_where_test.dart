@@ -27,9 +27,11 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () {
-        final n = fx(['apple', 'fig', 'banana'])
-            .map((s) => s.length)
-            .countWhere((len) => len > 3);
+        final n = fx([
+          'apple',
+          'fig',
+          'banana',
+        ]).map((s) => s.length).countWhere((len) => len > 3);
         expect(n, equals(2));
       });
     });
@@ -37,20 +39,25 @@ void main() {
     group('async', () {
       test('should count the matching values', () async {
         expect(
-            await countWhereAsync((int n) async => n.isEven, toAsync([1, 2, 4])),
-            equals(2));
+          await countWhereAsync((int n) async => n.isEven, toAsync([1, 2, 4])),
+          equals(2),
+        );
       });
 
       test('should return 0 for an empty iterable', () async {
-        expect(await countWhereAsync((int n) => n > 0, toAsync(<int>[])),
-            equals(0));
+        expect(
+          await countWhereAsync((int n) => n > 0, toAsync(<int>[])),
+          equals(0),
+        );
       });
 
       test('should be able to be used in the pipeline', () async {
-        final n = await fx([1, 2, 3, 4])
-            .toAsync()
-            .map((n) => n * 2)
-            .countWhere((n) => n > 4);
+        final n = await fx([
+          1,
+          2,
+          3,
+          4,
+        ]).toAsync().map((n) => n * 2).countWhere((n) => n > 4);
         expect(n, equals(2));
       });
     });

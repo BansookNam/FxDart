@@ -15,7 +15,8 @@ final n = caseN(1000000);
 const _badValues = ['four', '', 'n/a'];
 
 List<String> makeLines() => List.generate(
-    n,
-    (i) => i % 7 == 3
-        ? 'key$i=${_badValues[i % _badValues.length]}'
-        : 'key$i=${(i * 37) % 10000}');
+  n,
+  (i) => i % 7 == 3
+      ? 'key$i=${_badValues[i % _badValues.length]}'
+      : 'key$i=${(i * 37) % 10000}',
+);

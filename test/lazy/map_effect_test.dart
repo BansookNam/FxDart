@@ -40,10 +40,12 @@ void main() {
 
       test('should support an asynchronous function', () async {
         final seen = <int>[];
-        final res = await toListAsync(mapEffectAsync((int a) async {
-          seen.add(a);
-          return a;
-        }, toAsync([1, 2, 3])));
+        final res = await toListAsync(
+          mapEffectAsync((int a) async {
+            seen.add(a);
+            return a;
+          }, toAsync([1, 2, 3])),
+        );
         expect(res, equals([1, 2, 3]));
         expect(seen, equals([1, 2, 3]));
       });

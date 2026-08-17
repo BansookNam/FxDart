@@ -22,14 +22,17 @@ Future<void> main() async {
       // Failures must become data before scan can count them — each probe
       // gets an inner stream that recovers the error as a marker value.
       final states = await Stream.fromIterable(probeIds)
-          .asyncExpand((id) => Rx.fromCallable(() async {
-                await probe(id);
-                return true;
-              }).onErrorReturn(false))
+          .asyncExpand(
+            (id) => Rx.fromCallable(() async {
+              await probe(id);
+              return true;
+            }).onErrorReturn(false),
+          )
           .scan<({int done, int fails})>(
-              (acc, ok, _) =>
-                  (done: acc.done + 1, fails: acc.fails + (ok ? 0 : 1)),
-              (done: 0, fails: 0))
+            (acc, ok, _) =>
+                (done: acc.done + 1, fails: acc.fails + (ok ? 0 : 1)),
+            (done: 0, fails: 0),
+          )
           .takeWhileInclusive((s) => s.fails < 3)
           .toList();
 

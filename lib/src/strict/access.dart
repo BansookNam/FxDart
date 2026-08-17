@@ -96,8 +96,9 @@ A? find<A>(bool Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [find].
 Future<A?> findAsync<A>(
-        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    headAsync(filterAsync(f, iterable));
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => headAsync(filterAsync(f, iterable));
 
 /// Returns the index of the first element [f] returns true for, or `-1`.
 ///
@@ -122,7 +123,9 @@ int findIndex<A>(bool Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [findIndex].
 Future<int> findIndexAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   final result = await findAsync((r) => f(r.$2), zipWithIndexAsync(iterable));
   return result == null ? -1 : result.$1;
 }
@@ -149,7 +152,9 @@ bool every<A>(bool Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [every].
 Future<bool> everyAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   final iterator = iterable.iterator;
   while (true) {
     final r = await iterator.next();
@@ -171,7 +176,9 @@ bool some<A>(bool Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [some].
 Future<bool> someAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   final iterator = iterable.iterator;
   while (true) {
     final r = await iterator.next();

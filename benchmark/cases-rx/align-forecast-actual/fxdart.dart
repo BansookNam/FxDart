@@ -16,10 +16,9 @@ Future<void> main() async {
     impl: 'fxdart',
     n: n,
     run: () {
-      final days = fx(forecast)
-          .zip(actual)
-          .map((p) => line(p.$1, p.$2))
-          .toList();
+      final days = fx(
+        forecast,
+      ).zip(actual).map((p) => line(p.$1, p.$2)).toList();
       return '${days.length}|${days.first}|${days.last}';
     },
   );

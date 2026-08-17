@@ -29,14 +29,10 @@ class IterResult<T> {
   final T? _value;
 
   /// A terminal result — the iterator has no more values.
-  const IterResult.done()
-      : done = true,
-        _value = null;
+  const IterResult.done() : done = true, _value = null;
 
   /// A result carrying the next [value].
-  const IterResult.value(T value)
-      : done = false,
-        _value = value;
+  const IterResult.value(T value) : done = false, _value = value;
 
   /// The yielded value. Only valid when [done] is false.
   T get value => _value as T;
@@ -106,8 +102,9 @@ class SerialAsyncIterator<T> implements FxAsyncIterator<T> {
   @override
   Future<IterResult<T>> next([Concurrent? concurrent]) {
     final prev = _inFlight;
-    final result =
-        prev == null ? _inner(concurrent) : prev.then((_) => _inner(concurrent));
+    final result = prev == null
+        ? _inner(concurrent)
+        : prev.then((_) => _inner(concurrent));
     late final Future<void> gate;
     void clear() {
       if (identical(_inFlight, gate)) _inFlight = null;
@@ -126,7 +123,8 @@ class SerialAsyncIterator<T> implements FxAsyncIterator<T> {
 /// An empty async iterable.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<T> asyncEmpty<T>() => DelegateAsyncIterable(
-    () => DelegateAsyncIterator((_) async => IterResult<T>.done()));
+  () => DelegateAsyncIterator((_) async => IterResult<T>.done()),
+);
 
 // --- why the operator factories are `vm:prefer-inline` --------------------
 //
@@ -339,9 +337,9 @@ final class FxScanLink extends FxLink {
 /// A fused run of stages over one [source].
 class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
   FxFusedAsyncIterable(this.source, this.stages, this.legacy)
-      : oneToOne = _oneToOne(stages),
-        scanIndex = _scanIndex(stages),
-        links = _compile(stages);
+    : oneToOne = _oneToOne(stages),
+      scanIndex = _scanIndex(stages),
+      links = _compile(stages);
 
   /// The pre-stage upstream.
   final FxAsyncIterable<Object?> source;
@@ -478,8 +476,9 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
     final src = _source!;
     if (_iterable.oneToOne) {
       if (_ended) return IterResult<T>.done();
-      final FutureOr<IterResult<Object?>> r =
-          src is FxFastIterator<Object?> ? src.nextOr() : src.next();
+      final FutureOr<IterResult<Object?>> r = src is FxFastIterator<Object?>
+          ? src.nextOr()
+          : src.next();
       if (r is Future<IterResult<Object?>>) {
         return r.then((rr) {
           if (rr.done) {
@@ -497,8 +496,9 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
     }
     while (true) {
       if (_ended) return IterResult<T>.done();
-      final FutureOr<IterResult<Object?>> r =
-          src is FxFastIterator<Object?> ? src.nextOr() : src.next();
+      final FutureOr<IterResult<Object?>> r = src is FxFastIterator<Object?>
+          ? src.nextOr()
+          : src.next();
       if (r is Future<IterResult<Object?>>) {
         return r.then((rr) {
           final out = _apply(rr);
@@ -583,7 +583,8 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
         if (k is Future<bool>) {
           final vv = v;
           return k.then<IterResult<T>?>(
-              (kk) => kk ? _applyFrom(vv, next) : null);
+            (kk) => kk ? _applyFrom(vv, next) : null,
+          );
         }
         if (!k) return null;
       } else {
@@ -637,7 +638,9 @@ class FxStreamSourceIterable<T> implements FxAsyncIterable<T> {
 /// path for a terminal that consumes everything. Returns null when the
 /// chain isn't stream-sourced; [emit] may return a Future to pause on.
 Future<void>? fxStreamDrive<T>(
-    FxAsyncIterable<T> iterable, FutureOr<void> Function(T value) emit) {
+  FxAsyncIterable<T> iterable,
+  FutureOr<void> Function(T value) emit,
+) {
   final Stream<Object?> stream;
   final FxLink? links;
   if (iterable is FxFusedAsyncIterable<T>) {
@@ -715,26 +718,30 @@ Future<void>? fxStreamDrive<T>(
     return emit(v as T);
   }
 
-  sub = stream.listen((value) {
-    final FutureOr<void> r;
-    try {
-      r = apply(value, links);
-    } catch (e, st) {
-      fail(e, st);
-      return;
-    }
-    if (r is Future) {
-      sub.pause();
-      r.then((_) {
-        if (!terminated) sub.resume();
-      }, onError: fail);
-    }
-  }, onError: fail, onDone: () {
-    if (!terminated) {
-      terminated = true;
-      completer.complete();
-    }
-  });
+  sub = stream.listen(
+    (value) {
+      final FutureOr<void> r;
+      try {
+        r = apply(value, links);
+      } catch (e, st) {
+        fail(e, st);
+        return;
+      }
+      if (r is Future) {
+        sub.pause();
+        r.then((_) {
+          if (!terminated) sub.resume();
+        }, onError: fail);
+      }
+    },
+    onError: fail,
+    onDone: () {
+      if (!terminated) {
+        terminated = true;
+        completer.complete();
+      }
+    },
+  );
   return completer.future;
 }
 
@@ -755,7 +762,9 @@ Future<void>? fxStreamDrive<T>(
 /// fused run. The [Concurrent] back-channel is never involved: the terminals
 /// that use this pull serially and never pass a marker.
 Future<void>? fxFusedDrive<T>(
-    FxAsyncIterable<T> iterable, FutureOr<void> Function(T value) emit) {
+  FxAsyncIterable<T> iterable,
+  FutureOr<void> Function(T value) emit,
+) {
   if (iterable is! FxFusedAsyncIterable<T>) return null;
   final links = iterable.links;
   final upstream = iterable.source;
@@ -950,6 +959,7 @@ class _StreamBridgeIterator<T> implements FxFastIterator<T> {
     if (_done) return IterResult<T>.done();
     return next();
   }
+
   final Stream<T> _stream;
   StreamSubscription<T>? _sub;
   final List<Completer<IterResult<T>>> _waiters = [];
@@ -968,31 +978,35 @@ class _StreamBridgeIterator<T> implements FxFastIterator<T> {
     _waiters.add(completer);
     final sub = _sub;
     if (sub == null) {
-      _sub = _stream.listen((value) {
-        if (_waiters.isEmpty) {
-          _buffered.add(value);
-          if (!_sub!.isPaused) _sub!.pause();
-          return;
-        }
-        _waiters.removeAt(0).complete(IterResult.value(value));
-        if (_waiters.isEmpty && !_sub!.isPaused) _sub!.pause();
-      }, onError: (Object e, StackTrace st) {
-        // Mirror StreamIterator: the pull that meets the error gets it, and
-        // the iteration is over.
-        _done = true;
-        _sub!.cancel();
-        if (_waiters.isNotEmpty) {
-          _waiters.removeAt(0).completeError(e, st);
-        }
-        while (_waiters.isNotEmpty) {
-          _waiters.removeAt(0).complete(IterResult<T>.done());
-        }
-      }, onDone: () {
-        _done = true;
-        while (_waiters.isNotEmpty) {
-          _waiters.removeAt(0).complete(IterResult<T>.done());
-        }
-      });
+      _sub = _stream.listen(
+        (value) {
+          if (_waiters.isEmpty) {
+            _buffered.add(value);
+            if (!_sub!.isPaused) _sub!.pause();
+            return;
+          }
+          _waiters.removeAt(0).complete(IterResult.value(value));
+          if (_waiters.isEmpty && !_sub!.isPaused) _sub!.pause();
+        },
+        onError: (Object e, StackTrace st) {
+          // Mirror StreamIterator: the pull that meets the error gets it, and
+          // the iteration is over.
+          _done = true;
+          _sub!.cancel();
+          if (_waiters.isNotEmpty) {
+            _waiters.removeAt(0).completeError(e, st);
+          }
+          while (_waiters.isNotEmpty) {
+            _waiters.removeAt(0).complete(IterResult<T>.done());
+          }
+        },
+        onDone: () {
+          _done = true;
+          while (_waiters.isNotEmpty) {
+            _waiters.removeAt(0).complete(IterResult<T>.done());
+          }
+        },
+      );
     } else if (_waiters.length == 1 && sub.isPaused) {
       sub.resume();
     }
@@ -1133,7 +1147,8 @@ FxAsyncIterable<A> concurrentAsync<A>(int length, FxAsyncIterable<A> iterable) {
     return DelegateAsyncIterable(() {
       final iterator = iterable.iterator;
       return DelegateAsyncIterator(
-          (concurrent) => iterator.next(concurrent ?? Concurrent.of(1)));
+        (concurrent) => iterator.next(concurrent ?? Concurrent.of(1)),
+      );
     });
   }
   return DelegateAsyncIterable(() {
@@ -1181,8 +1196,10 @@ FxAsyncIterable<A> concurrentAsync<A>(int length, FxAsyncIterable<A> iterable) {
         // List.generate first so a synchronous throw from a pull
         // propagates synchronously, exactly as it did through settleAll.
         final pulls = List.generate(
-            length, (_) => iterator.next(Concurrent.of(length)),
-            growable: false);
+          length,
+          (_) => iterator.next(Concurrent.of(length)),
+          growable: false,
+        );
         pending = true;
         final batch = List<Settled<IterResult<A>>?>.filled(length, null);
         var remaining = length;
@@ -1194,9 +1211,11 @@ FxAsyncIterable<A> concurrentAsync<A>(int length, FxAsyncIterable<A> iterable) {
 
         for (var i = 0; i < length; i++) {
           final slot = i;
-          pulls[i].then((v) => settle(slot, Fulfilled(v)),
-              onError: (Object e, StackTrace st) =>
-                  settle(slot, Rejected<IterResult<A>>(e, st)));
+          pulls[i].then(
+            (v) => settle(slot, Fulfilled(v)),
+            onError: (Object e, StackTrace st) =>
+                settle(slot, Rejected<IterResult<A>>(e, st)),
+          );
         }
         prev = prev.then((_) => batchDone.future).then((_) {
           for (final item in batch) {
@@ -1285,7 +1304,9 @@ _PoolFifo<E> _poolFifo<E>() => FxDart.config.optimizeMemoryForConcurrentPool
 /// Port of FxTS `concurrentPool`.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> concurrentPoolAsync<A>(
-    int length, FxAsyncIterable<A> iterable) {
+  int length,
+  FxAsyncIterable<A> iterable,
+) {
   if (length < 1) {
     throw RangeError("'length' must be positive integer");
   }
@@ -1345,22 +1366,27 @@ FxAsyncIterator<A> _poolIterator<A>(int length, FxAsyncIterable<A> iterable) {
       // even a one-pull-at-a-time terminal like toList overlaps the work.
       while (!sourceDone && !failed && inFlight < length) {
         inFlight++;
-        iterator.next(Concurrent.of(length)).then((result) {
-          inFlight--;
-          if (result.done) {
-            sourceDone = true;
-          } else {
-            ready.add(Fulfilled(result));
-          }
-          drain();
-          fill();
-        }, onError: (Object e, StackTrace st) {
-          inFlight--;
-          failed = true;
-          sourceDone = true;
-          ready.add(Rejected<IterResult<A>>(e, st));
-          drain();
-        });
+        iterator
+            .next(Concurrent.of(length))
+            .then(
+              (result) {
+                inFlight--;
+                if (result.done) {
+                  sourceDone = true;
+                } else {
+                  ready.add(Fulfilled(result));
+                }
+                drain();
+                fill();
+              },
+              onError: (Object e, StackTrace st) {
+                inFlight--;
+                failed = true;
+                sourceDone = true;
+                ready.add(Rejected<IterResult<A>>(e, st));
+                drain();
+              },
+            );
       }
     };
 
@@ -1391,7 +1417,9 @@ FxAsyncIterator<A> _poolIterator<A>(int length, FxAsyncIterable<A> iterable) {
 /// buffer, which fills the same way while a slow consumer is away). Returns
 /// null when [iterable] is not a pool.
 Future<void>? fxPoolDrive<T>(
-    FxAsyncIterable<T> iterable, FutureOr<void> Function(T value) emit) {
+  FxAsyncIterable<T> iterable,
+  FutureOr<void> Function(T value) emit,
+) {
   if (iterable is! FxConcurrentPoolIterable<T>) return null;
   final length = iterable.length;
   final iterator = iterable.source.iterator;
@@ -1469,19 +1497,24 @@ Future<void>? fxPoolDrive<T>(
     // regardless of how fast [emit] is consuming them.
     while (!terminated && !sourceDone && inFlight < length) {
       inFlight++;
-      iterator.next(Concurrent.of(length)).then((result) {
-        inFlight--;
-        if (result.done) {
-          sourceDone = true;
-          if (!terminated) finishIfDone();
-          return;
-        }
-        settle(Fulfilled(result.value));
-      }, onError: (Object e, StackTrace st) {
-        inFlight--;
-        sourceDone = true;
-        settle(Rejected<T>(e, st));
-      });
+      iterator
+          .next(Concurrent.of(length))
+          .then(
+            (result) {
+              inFlight--;
+              if (result.done) {
+                sourceDone = true;
+                if (!terminated) finishIfDone();
+                return;
+              }
+              settle(Fulfilled(result.value));
+            },
+            onError: (Object e, StackTrace st) {
+              inFlight--;
+              sourceDone = true;
+              settle(Rejected<T>(e, st));
+            },
+          );
     }
   };
 
@@ -1502,9 +1535,11 @@ FxAsyncIterable<B> dispatchAsync<A, B>(
   return DelegateAsyncIterable(() {
     FxAsyncIterator<B>? inner;
     return DelegateAsyncIterator((concurrent) {
-      inner ??= build(concurrent is Concurrent
-          ? concurrentAsync(concurrent.length, upstream)
-          : upstream);
+      inner ??= build(
+        concurrent is Concurrent
+            ? concurrentAsync(concurrent.length, upstream)
+            : upstream,
+      );
       return inner!.next(concurrent);
     });
   });

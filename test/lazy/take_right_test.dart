@@ -19,30 +19,27 @@ void main() {
         expect(toList(takeRight(5, [1, 2, 3, 4])), equals([1, 2, 3, 4]));
       });
 
-      test('should take from a lazy (non-list) source via the ring buffer',
-          () {
+      test('should take from a lazy (non-list) source via the ring buffer', () {
         final lazy = [1, 2, 3, 4].where((_) => true);
         expect(toList(takeRight(0, lazy)), equals(<int>[]));
         expect(toList(takeRight(2, lazy)), equals([3, 4]));
         expect(toList(takeRight(5, lazy)), equals([1, 2, 3, 4]));
-        expect(toList(takeRight(2, <int>[].where((_) => true))),
-            equals(<int>[]));
+        expect(
+          toList(takeRight(2, <int>[].where((_) => true))),
+          equals(<int>[]),
+        );
       });
 
       test('should be able to be used in the pipeline', () {
-        final res1 = pipe([
-          1,
-          2,
-          3,
-          4,
-          5,
-          6
-        ], [
-          (v) => map((int a) => a + 10, v),
-          (v) => filter((int a) => a % 2 == 0, v),
-          (v) => takeRight(2, v),
-          (v) => toList(v),
-        ]);
+        final res1 = pipe(
+          [1, 2, 3, 4, 5, 6],
+          [
+            (v) => map((int a) => a + 10, v),
+            (v) => filter((int a) => a % 2 == 0, v),
+            (v) => takeRight(2, v),
+            (v) => toList(v),
+          ],
+        );
 
         expect(res1, equals([14, 16]));
       });
@@ -70,26 +67,36 @@ void main() {
         }
         expect(res, equals([4]));
 
-        expect(await toListAsync(takeRightAsync(0, toAsync([1, 2, 3, 4]))),
-            equals([]));
-        expect(await toListAsync(takeRightAsync(1, toAsync([1, 2, 3, 4]))),
-            equals([4]));
-        expect(await toListAsync(takeRightAsync(2, toAsync([1, 2, 3, 4]))),
-            equals([3, 4]));
-        expect(await toListAsync(takeRightAsync(3, toAsync([1, 2, 3, 4]))),
-            equals([2, 3, 4]));
-        expect(await toListAsync(takeRightAsync(4, toAsync([1, 2, 3, 4]))),
-            equals([1, 2, 3, 4]));
-        expect(await toListAsync(takeRightAsync(5, toAsync([1, 2, 3, 4]))),
-            equals([1, 2, 3, 4]));
+        expect(
+          await toListAsync(takeRightAsync(0, toAsync([1, 2, 3, 4]))),
+          equals([]),
+        );
+        expect(
+          await toListAsync(takeRightAsync(1, toAsync([1, 2, 3, 4]))),
+          equals([4]),
+        );
+        expect(
+          await toListAsync(takeRightAsync(2, toAsync([1, 2, 3, 4]))),
+          equals([3, 4]),
+        );
+        expect(
+          await toListAsync(takeRightAsync(3, toAsync([1, 2, 3, 4]))),
+          equals([2, 3, 4]),
+        );
+        expect(
+          await toListAsync(takeRightAsync(4, toAsync([1, 2, 3, 4]))),
+          equals([1, 2, 3, 4]),
+        );
+        expect(
+          await toListAsync(takeRightAsync(5, toAsync([1, 2, 3, 4]))),
+          equals([1, 2, 3, 4]),
+        );
       });
 
       test('should be able to be used in the pipeline', () async {
-        final res1 = await fxAsync(toAsync([1, 2, 3, 4, 5, 6]))
-            .map((a) => a + 10)
-            .filter((a) => a % 2 == 0)
-            .takeRight(2)
-            .toList();
+        final res1 = await fxAsync(
+          toAsync([1, 2, 3, 4, 5, 6]),
+        ).map((a) => a + 10).filter((a) => a % 2 == 0).takeRight(2).toList();
 
         expect(res1, equals([14, 16]));
       });

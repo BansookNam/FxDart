@@ -23,11 +23,9 @@ Future<void> main() async {
       // Two attempts per row, three rows in flight — each in-flight row
       // retries independently, and mapRetry under concurrent yields in
       // SOURCE order by construction.
-      final results = await fx(rows)
-          .toAsync()
-          .mapRetry(2, importRow)
-          .concurrent(3)
-          .toList();
+      final results = await fx(
+        rows,
+      ).toAsync().mapRetry(2, importRow).concurrent(3).toList();
       var attempts = 0;
       for (final a in attemptsByRow.values) {
         attempts += a;

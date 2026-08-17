@@ -43,4 +43,5 @@ dynamic pipe(dynamic a, List<Function> fns) {
 /// Returns a function that pipes its argument through [fns].
 ///
 /// Port of FxTS `pipeLazy`, with the same dynamic-typing caveat as [pipe].
-dynamic Function(dynamic a) pipeLazy(List<Function> fns) => (a) => pipe(a, fns);
+dynamic Function(dynamic a) pipeLazy(List<Function> fns) =>
+    (a) => pipe(a, fns);

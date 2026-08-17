@@ -14,7 +14,21 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = pipe([
+        final res = pipe(
+          [1, 2, 3, 4, 5, 6, 7, 8],
+          [
+            (v) => map((int a) => a + 10, v),
+            (v) => filter((int a) => a % 2 == 0, v),
+            (v) => drop(2, v),
+            (v) => toList(v),
+          ],
+        );
+
+        expect(res, equals([16, 18]));
+      });
+
+      test('should be able to be used as a chaining method in the `fx`', () {
+        final res = fx([
           1,
           2,
           3,
@@ -22,23 +36,8 @@ void main() {
           5,
           6,
           7,
-          8
-        ], [
-          (v) => map((int a) => a + 10, v),
-          (v) => filter((int a) => a % 2 == 0, v),
-          (v) => drop(2, v),
-          (v) => toList(v),
-        ]);
-
-        expect(res, equals([16, 18]));
-      });
-
-      test('should be able to be used as a chaining method in the `fx`', () {
-        final res = fx([1, 2, 3, 4, 5, 6, 7, 8])
-            .map((a) => a + 10)
-            .filter((a) => a % 2 == 0)
-            .drop(2)
-            .toList();
+          8,
+        ]).map((a) => a + 10).filter((a) => a % 2 == 0).drop(2).toList();
 
         expect(res, equals([16, 18]));
       });
@@ -55,30 +54,30 @@ void main() {
         }
         expect(acc, equals([3, 4, 5]));
 
-        expect(await toListAsync(dropAsync(0, toAsync([1, 2, 3, 4, 5]))),
-            equals([1, 2, 3, 4, 5]));
+        expect(
+          await toListAsync(dropAsync(0, toAsync([1, 2, 3, 4, 5]))),
+          equals([1, 2, 3, 4, 5]),
+        );
       });
 
       test('should be able to be used in the pipeline', () async {
-        final res = await fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8]))
-            .map((a) => a + 10)
-            .filter((a) => a % 2 == 0)
-            .drop(2)
-            .toList();
+        final res = await fxAsync(
+          toAsync([1, 2, 3, 4, 5, 6, 7, 8]),
+        ).map((a) => a + 10).filter((a) => a % 2 == 0).drop(2).toList();
 
         expect(res, equals([16, 18]));
       });
 
-      test('should be able to be used as a chaining method in the `fx`',
-          () async {
-        final res = await fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8]))
-            .map((a) => a + 10)
-            .filter((a) => a % 2 == 0)
-            .drop(2)
-            .toList();
+      test(
+        'should be able to be used as a chaining method in the `fx`',
+        () async {
+          final res = await fxAsync(
+            toAsync([1, 2, 3, 4, 5, 6, 7, 8]),
+          ).map((a) => a + 10).filter((a) => a % 2 == 0).drop(2).toList();
 
-        expect(res, equals([16, 18]));
-      });
+          expect(res, equals([16, 18]));
+        },
+      );
 
       test('should be discarded elements by length concurrently', () async {
         final sw = Stopwatch()..start();
@@ -97,44 +96,46 @@ void main() {
 
       test('should be able to handle an error when asynchronous', () async {
         await expectLater(
-          fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
-              .filter((a) => throw Exception('err'))
-              .drop(2)
-              .toList(),
-          throwsException,
-        );
-      });
-
-      test('should be able to handle an error when working concurrent',
-          () async {
-        await expectLater(
-          fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
-              .filter((a) {
-                if (a == 1) throw Exception('err');
-                return true;
-              })
-              .drop(2)
-              .concurrent(3)
-              .toList(),
+          fxAsync(
+            toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+          ).filter((a) => throw Exception('err')).drop(2).toList(),
           throwsException,
         );
       });
 
       test(
-          'should be able to handle an error when working concurrent - Future.error',
-          () async {
-        await expectLater(
-          fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
-              .map((a) {
-                if (a < 3) return Future<int>.error(Exception('err'));
-                return a;
-              })
-              .drop(2)
-              .concurrent(3)
-              .toList(),
-          throwsException,
-        );
-      });
+        'should be able to handle an error when working concurrent',
+        () async {
+          await expectLater(
+            fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+                .filter((a) {
+                  if (a == 1) throw Exception('err');
+                  return true;
+                })
+                .drop(2)
+                .concurrent(3)
+                .toList(),
+            throwsException,
+          );
+        },
+      );
+
+      test(
+        'should be able to handle an error when working concurrent - Future.error',
+        () async {
+          await expectLater(
+            fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+                .map((a) {
+                  if (a < 3) return Future<int>.error(Exception('err'));
+                  return a;
+                })
+                .drop(2)
+                .concurrent(3)
+                .toList(),
+            throwsException,
+          );
+        },
+      );
     });
   });
 }

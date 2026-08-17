@@ -5,8 +5,10 @@ void main() {
   group('attach', () {
     group('sync', () {
       test('should pair each element with the derived value', () {
-        expect(attach((String w) => w.length, ['a', 'bb', 'ccc']).toList(),
-            equals([('a', 1), ('bb', 2), ('ccc', 3)]));
+        expect(
+          attach((String w) => w.length, ['a', 'bb', 'ccc']).toList(),
+          equals([('a', 1), ('bb', 2), ('ccc', 3)]),
+        );
       });
 
       test('should stay lazy', () {
@@ -37,7 +39,8 @@ void main() {
     group('async', () {
       test('should pair each element with the awaited result', () async {
         final result = await toListAsync(
-            attachAsync((int n) async => n * 10, toAsync([1, 2, 3])));
+          attachAsync((int n) async => n * 10, toAsync([1, 2, 3])),
+        );
         expect(result, equals([(1, 10), (2, 20), (3, 30)]));
       });
 
@@ -55,25 +58,26 @@ void main() {
             })
             .concurrent(3)
             .toList();
-        expect(result,
-            equals([(1, 10), (2, 20), (3, 30), (4, 40), (5, 50), (6, 60)]));
+        expect(
+          result,
+          equals([(1, 10), (2, 20), (3, 30), (4, 40), (5, 50), (6, 60)]),
+        );
         expect(maxInFlight, equals(3));
       });
 
       test('should keep the input beside a nullable result', () async {
         Future<int?> lookup(String sku) async => sku == 'a' ? 1 : null;
-        final result = await fx(['a', 'b'])
-            .toAsync()
-            .attach(lookup)
-            .map((r) => (r.$1, r.$2 ?? -1))
-            .toList();
+        final result = await fx([
+          'a',
+          'b',
+        ]).toAsync().attach(lookup).map((r) => (r.$1, r.$2 ?? -1)).toList();
         expect(result, equals([('a', 1), ('b', -1)]));
       });
 
       test('should be able to be used in the pipeline', () async {
-        final result = await fxStream(Stream.fromIterable(['a', 'bb']))
-            .attach((w) async => w.length)
-            .toList();
+        final result = await fxStream(
+          Stream.fromIterable(['a', 'bb']),
+        ).attach((w) async => w.length).toList();
         expect(result, equals([('a', 1), ('bb', 2)]));
       });
     });

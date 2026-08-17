@@ -21,20 +21,16 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () {
-        final res1 = pipe([
-          1,
-          2,
-          3,
-          4
-        ], [
-          (v) => reject((int a) => a % 2 == 0, v),
-          (v) => toList(v),
-        ]);
+        final res1 = pipe(
+          [1, 2, 3, 4],
+          [(v) => reject((int a) => a % 2 == 0, v), (v) => toList(v)],
+        );
 
         expect(res1, equals([1, 3]));
 
-        final res2 =
-            toList(reject<int?>((a) => a != null, [1, 2, null, 3, null, 4]));
+        final res2 = toList(
+          reject<int?>((a) => a != null, [1, 2, null, 3, null, 4]),
+        );
 
         expect(res2, equals([null, null]));
       });
@@ -54,27 +50,35 @@ void main() {
 
       test('should be able to handle an error', () async {
         await expectLater(
-          toListAsync(rejectAsync<int>(
-              (a) => throw Exception('err'), toAsync(range(1, 10)))),
+          toListAsync(
+            rejectAsync<int>(
+              (a) => throw Exception('err'),
+              toAsync(range(1, 10)),
+            ),
+          ),
           throwsException,
         );
       });
 
       test(
-          'should be able to handle an error when the callback is asynchronous',
-          () async {
-        await expectLater(
-          toListAsync(rejectAsync<int>(
-              (a) => Future<bool>.error(Exception('err')),
-              toAsync(range(1, 10)))),
-          throwsException,
-        );
-      });
+        'should be able to handle an error when the callback is asynchronous',
+        () async {
+          await expectLater(
+            toListAsync(
+              rejectAsync<int>(
+                (a) => Future<bool>.error(Exception('err')),
+                toAsync(range(1, 10)),
+              ),
+            ),
+            throwsException,
+          );
+        },
+      );
 
       test('should be able to be used in the pipeline', () async {
-        final res = await fxAsync(toAsync([1, 2, 3, 4]))
-            .reject((a) => a % 2 == 0)
-            .toList();
+        final res = await fxAsync(
+          toAsync([1, 2, 3, 4]),
+        ).reject((a) => a % 2 == 0).toList();
 
         expect(res, equals([1, 3]));
       });

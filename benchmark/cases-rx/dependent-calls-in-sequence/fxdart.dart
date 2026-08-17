@@ -20,8 +20,9 @@ Future<void> main() async {
       final log = await fx(steps)
           .toAsync()
           .scan<(String, String)>(
-              (acc, step) async => (step, await call('$step(${acc.$2})')),
-              ('', 'guest'))
+            (acc, step) async => (step, await call('$step(${acc.$2})')),
+            ('', 'guest'),
+          )
           .map((r) => '${r.$1} -> ${r.$2}')
           .toList();
       // scan emits its seed first — drop it, as the example does.

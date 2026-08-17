@@ -26,8 +26,13 @@ Future<void> main() async {
           .toAsync()
           .attach((s) => livePrice(s.sku))
           .concurrent(3)
-          .map((r) =>
-              (qty: r.$1.qty, price: r.$2 ?? r.$1.bookPrice, fb: r.$2 == null))
+          .map(
+            (r) => (
+              qty: r.$1.qty,
+              price: r.$2 ?? r.$1.bookPrice,
+              fb: r.$2 == null,
+            ),
+          )
           .toList();
       final total = fx(repriced).sumBy((r) => r.qty * r.price);
       final fallbacks = fx(repriced).countWhere((r) => r.fb);

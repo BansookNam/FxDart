@@ -11,12 +11,24 @@ final n = caseN(1000000);
 final takeLimit = n ~/ 2;
 
 const _users = [
-  'ada', 'grace', 'lin', 'ken', 'dennis',
-  'barbara', 'alan', 'edsger', 'john', 'tony',
+  'ada',
+  'grace',
+  'lin',
+  'ken',
+  'dennis',
+  'barbara',
+  'alan',
+  'edsger',
+  'john',
+  'tony',
 ];
 const _domains = [
-  'example.com', 'hopper.dev', 'lang.org',
-  'unix.org', 'types.edu', 'mail.net',
+  'example.com',
+  'hopper.dev',
+  'lang.org',
+  'unix.org',
+  'types.edu',
+  'mail.net',
 ];
 const _badDomains = ['nodot', 'missingtld']; // has '@' but no '.'
 

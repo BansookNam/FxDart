@@ -5,8 +5,11 @@ void main() {
   group('flattenOrAccumulate', () {
     group('sync', () {
       test('should collect every success when nothing failed', () {
-        final result = flattenOrAccumulate<String, int>(
-            [const Right(1), const Right(2), const Right(3)]);
+        final result = flattenOrAccumulate<String, int>([
+          const Right(1),
+          const Right(2),
+          const Right(3),
+        ]);
         expect(result.getOrNull(), equals([1, 2, 3]));
       });
 
@@ -31,11 +34,14 @@ void main() {
           const Left('e1'),
           const Left('e2'),
         ];
-        final handRolled = fx(verdicts)
-            .mapOrAccumulate<String, int>((r, verdict) => r.bind(verdict));
+        final handRolled = fx(
+          verdicts,
+        ).mapOrAccumulate<String, int>((r, verdict) => r.bind(verdict));
         final combined = flattenOrAccumulate(verdicts);
-        expect(combined.leftOrNull()!.deepEquals(handRolled.leftOrNull()!),
-            isTrue);
+        expect(
+          combined.leftOrNull()!.deepEquals(handRolled.leftOrNull()!),
+          isTrue,
+        );
       });
 
       test('should be fail-slow where sequence is fail-fast', () {
@@ -45,16 +51,22 @@ void main() {
           const Left('b'),
         ];
         expect(fx(verdicts).sequence().leftOrNull(), equals('a'));
-        expect(fx(verdicts).flattenOrAccumulate().leftOrNull()!.toList(),
-            equals(['a', 'b']));
+        expect(
+          fx(verdicts).flattenOrAccumulate().leftOrNull()!.toList(),
+          equals(['a', 'b']),
+        );
       });
 
       test('should be able to be used as a chain terminal', () {
         Either<String, int> parse(String s) => either<String, int>(
-            (r) => r.ensureNotNull(int.tryParse(s), () => 'bad: $s'));
-        final result = fx(['1', 'x', '3', 'y'])
-            .map(parse)
-            .flattenOrAccumulate();
+          (r) => r.ensureNotNull(int.tryParse(s), () => 'bad: $s'),
+        );
+        final result = fx([
+          '1',
+          'x',
+          '3',
+          'y',
+        ]).map(parse).flattenOrAccumulate();
         expect(result.leftOrNull()!.toList(), equals(['bad: x', 'bad: y']));
       });
     });
@@ -62,7 +74,8 @@ void main() {
     group('async', () {
       test('should collect every success when nothing failed', () async {
         final result = await flattenOrAccumulateAsync<String, int>(
-            toAsync([const Right(1), const Right(2)]));
+          toAsync([const Right(1), const Right(2)]),
+        );
         expect(result.getOrNull(), equals([1, 2]));
       });
 
@@ -72,10 +85,7 @@ void main() {
           const Left('first'),
           const Right(1),
           const Left('last'),
-        ])
-            .toAsync()
-            .peek((_) => pulled++)
-            .flattenOrAccumulate();
+        ]).toAsync().peek((_) => pulled++).flattenOrAccumulate();
         expect(pulled, equals(3));
         expect(result.leftOrNull()!.toList(), equals(['first', 'last']));
       });
@@ -83,13 +93,17 @@ void main() {
       test('should be able to be used as a chain terminal', () async {
         final result = await fx([1, -2, 3, -4])
             .toAsync()
-            .map((n) => either<String, int>((r) {
-                  r.ensure(n > 0, () => '$n is negative');
-                  return n;
-                }))
+            .map(
+              (n) => either<String, int>((r) {
+                r.ensure(n > 0, () => '$n is negative');
+                return n;
+              }),
+            )
             .flattenOrAccumulate();
-        expect(result.leftOrNull()!.toList(),
-            equals(['-2 is negative', '-4 is negative']));
+        expect(
+          result.leftOrNull()!.toList(),
+          equals(['-2 is negative', '-4 is negative']),
+        );
       });
     });
   });

@@ -19,8 +19,9 @@ Future<void> main() async {
       // The pipeline fetches 2 at a time in order, pairs the results with
       // chunk(2) — fxdart's bufferCount — and toStream() hands the batches
       // to any stream consumer.
-      final stream =
-          fx(orderIds).toAsync().mapConcurrent(2, fetchStatus).chunk(2).toStream();
+      final stream = fx(
+        orderIds,
+      ).toAsync().mapConcurrent(2, fetchStatus).chunk(2).toStream();
       final batches = <List<String>>[];
       await for (final b in stream) {
         batches.add(b);

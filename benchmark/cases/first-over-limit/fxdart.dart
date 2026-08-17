@@ -15,7 +15,7 @@ Future<void> main() async {
       return first == null
           ? 'No reading over ${limit.toStringAsFixed(1)} C'
           : 'First over ${limit.toStringAsFixed(1)} C: '
-              '${first.time} at ${first.celsius.toStringAsFixed(1)} C';
+                '${first.time} at ${first.celsius.toStringAsFixed(1)} C';
     },
   );
 }

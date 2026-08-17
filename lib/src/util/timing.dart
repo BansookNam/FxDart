@@ -11,7 +11,7 @@ class Debounced<T> {
   Timer? _timer;
 
   Debounced._(this._func, this._wait, {required bool leading})
-      : _leading = leading;
+    : _leading = leading;
 
   /// Registers a call with [arg], (re)starting the wait window. The wrapped
   /// function runs on the trailing edge (or immediately, once per idle
@@ -42,9 +42,11 @@ class Debounced<T> {
 /// edge instead.
 ///
 /// Port of FxTS `debounce` (`Util/debounce.ts`).
-Debounced<T> debounce<T>(void Function(T arg) func, Duration wait,
-        {bool leading = false}) =>
-    Debounced._(func, wait, leading: leading);
+Debounced<T> debounce<T>(
+  void Function(T arg) func,
+  Duration wait, {
+  bool leading = false,
+}) => Debounced._(func, wait, leading: leading);
 
 /// A throttled function, as returned by [throttle].
 class Throttled<T> {
@@ -57,10 +59,13 @@ class Throttled<T> {
   T? _lastArg;
   bool _hasPendingArg = false;
 
-  Throttled._(this._func, this._wait,
-      {required bool leading, required bool trailing})
-      : _leading = leading,
-        _trailing = trailing;
+  Throttled._(
+    this._func,
+    this._wait, {
+    required bool leading,
+    required bool trailing,
+  }) : _leading = leading,
+       _trailing = trailing;
 
   /// Registers a call with [arg]. The wrapped function runs at most once per
   /// [wait] window — on the leading edge, the trailing edge, or both, per the
@@ -128,6 +133,9 @@ class Throttled<T> {
 /// Creates a throttled function that invokes [func] at most once per [wait].
 ///
 /// Port of FxTS `throttle` (`Util/throttle.ts`).
-Throttled<T> throttle<T>(void Function(T arg) func, Duration wait,
-        {bool leading = true, bool trailing = true}) =>
-    Throttled._(func, wait, leading: leading, trailing: trailing);
+Throttled<T> throttle<T>(
+  void Function(T arg) func,
+  Duration wait, {
+  bool leading = true,
+  bool trailing = true,
+}) => Throttled._(func, wait, leading: leading, trailing: trailing);

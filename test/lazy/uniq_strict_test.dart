@@ -4,8 +4,10 @@ import 'package:test/test.dart';
 void main() {
   group('uniqStrict', () {
     test('removes duplicates, keeping the first occurrence', () {
-      expect(uniqStrict('marpple'.split('')),
-          equals(['m', 'a', 'r', 'p', 'l', 'e']));
+      expect(
+        uniqStrict('marpple'.split('')),
+        equals(['m', 'a', 'r', 'p', 'l', 'e']),
+      );
       expect(uniqStrict([1, 2, 3, 4]), equals([1, 2, 3, 4]));
       expect(uniqStrict(<int>[]), equals(<int>[]));
     });
@@ -33,10 +35,12 @@ void main() {
 
     test('evaluates the upstream once, at the call', () {
       var calls = 0;
-      final chain = uniqStrict(map((int a) {
-        calls++;
-        return a % 3;
-      }, [1, 2, 3, 4, 5, 6]));
+      final chain = uniqStrict(
+        map((int a) {
+          calls++;
+          return a % 3;
+        }, [1, 2, 3, 4, 5, 6]),
+      );
       expect(calls, equals(6), reason: 'upstream ran eagerly');
       chain.toList();
       chain.toList();
@@ -45,10 +49,12 @@ void main() {
 
     test('by contrast, lazy uniq re-runs the upstream per iteration', () {
       var calls = 0;
-      final lazy = uniq(map((int a) {
-        calls++;
-        return a % 3;
-      }, [1, 2, 3, 4, 5, 6]));
+      final lazy = uniq(
+        map((int a) {
+          calls++;
+          return a % 3;
+        }, [1, 2, 3, 4, 5, 6]),
+      );
       expect(calls, equals(0));
       lazy.toList();
       lazy.toList();
@@ -56,8 +62,14 @@ void main() {
     });
 
     test('works in an Fx chain via uniqStrict()', () {
-      final res =
-          fx([1, 2, 3, 4, 4, 2]).map((a) => a + 10).uniqStrict().toList();
+      final res = fx([
+        1,
+        2,
+        3,
+        4,
+        4,
+        2,
+      ]).map((a) => a + 10).uniqStrict().toList();
       expect(res, equals([11, 12, 13, 14]));
     });
 
@@ -70,8 +82,9 @@ void main() {
     });
 
     test('lazy uniq().toList(growable: false) fuses into a fixed list', () {
-      final res = uniq(map((int a) => a % 3, [1, 2, 3, 4, 5, 6]))
-          .toList(growable: false);
+      final res = uniq(
+        map((int a) => a % 3, [1, 2, 3, 4, 5, 6]),
+      ).toList(growable: false);
       expect(res, equals([1, 2, 0]));
       expect(() => res.add(9), throwsUnsupportedError);
     });
@@ -79,9 +92,9 @@ void main() {
     test('does NOT short-circuit a downstream take', () {
       var scanned = 0;
       Iterable<int> counted() => map((int a) {
-            scanned++;
-            return a;
-          }, range(0, 1000));
+        scanned++;
+        return a;
+      }, range(0, 1000));
 
       scanned = 0;
       fx(counted()).uniq().take(3).toList();
@@ -92,8 +105,11 @@ void main() {
       final strictScanned = scanned;
 
       expect(lazyScanned, equals(3));
-      expect(strictScanned, equals(1000),
-          reason: 'strict dedups everything before take sees it');
+      expect(
+        strictScanned,
+        equals(1000),
+        reason: 'strict dedups everything before take sees it',
+      );
     });
   });
 
@@ -120,16 +136,22 @@ void main() {
     });
 
     test('works in an Fx chain via uniqByStrict()', () {
-      final res = fx(['a', 'bb', 'c', 'ddd'])
-          .uniqByStrict((s) => s.length)
-          .map((s) => s.toUpperCase())
-          .toList();
+      final res = fx([
+        'a',
+        'bb',
+        'c',
+        'ddd',
+      ]).uniqByStrict((s) => s.length).map((s) => s.toUpperCase()).toList();
       expect(res, equals(['A', 'BB', 'DDD']));
     });
 
     test('lazy uniqBy().toList(growable: false) fuses into a fixed list', () {
-      final res = uniqBy((String s) => s.length, ['a', 'bb', 'c', 'ddd'])
-          .toList(growable: false);
+      final res = uniqBy((String s) => s.length, [
+        'a',
+        'bb',
+        'c',
+        'ddd',
+      ]).toList(growable: false);
       expect(res, equals(['a', 'bb', 'ddd']));
       expect(() => res.add('x'), throwsUnsupportedError);
     });

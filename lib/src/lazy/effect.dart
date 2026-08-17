@@ -16,10 +16,13 @@ import 'map.dart';
 /// final user = await retry(3, () => api.fetchUser(id),
 ///     delay: (failed) => Duration(milliseconds: 100 * failed));
 /// ```
-Future<T> retry<T>(int attempts, FutureOr<T> Function() f,
-    {Duration Function(int failed)? delay}) async {
+Future<T> retry<T>(
+  int attempts,
+  FutureOr<T> Function() f, {
+  Duration Function(int failed)? delay,
+}) async {
   _checkAttempts(attempts);
-  for (var attempt = 1;; attempt++) {
+  for (var attempt = 1; ; attempt++) {
     try {
       return await f();
     } catch (_) {
@@ -53,8 +56,11 @@ void _checkAttempts(int attempts) {
 /// ```
 @pragma('vm:prefer-inline')
 FxAsyncIterable<R> mapRetryAsync<A, R>(
-    int attempts, FutureOr<R> Function(A a) f, FxAsyncIterable<A> iterable,
-    {Duration Function(int failed)? delay}) {
+  int attempts,
+  FutureOr<R> Function(A a) f,
+  FxAsyncIterable<A> iterable, {
+  Duration Function(int failed)? delay,
+}) {
   _checkAttempts(attempts);
   return mapAsync((A a) => retry(attempts, () => f(a), delay: delay), iterable);
 }
@@ -75,9 +81,12 @@ FxAsyncIterable<R> mapRetryAsync<A, R>(
 /// ```
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> timeoutAsync<A>(
-    Duration limit, FxAsyncIterable<A> iterable) {
+  Duration limit,
+  FxAsyncIterable<A> iterable,
+) {
   return DelegateAsyncIterable(
-      () => _TimeoutAsyncIterator(limit, iterable.iterator));
+    () => _TimeoutAsyncIterator(limit, iterable.iterator),
+  );
 }
 
 class _TimeoutAsyncIterator<A> implements FxFastIterator<A> {
@@ -118,9 +127,11 @@ class _TimeoutAsyncIterator<A> implements FxFastIterator<A> {
 ///   (file) => file.closeSync(),
 /// );
 /// ```
-Iterable<T> using<R, T>(R Function() acquire,
-        Iterable<T> Function(R resource) use, void Function(R resource) release) =>
-    _UsingIterable(acquire, use, release);
+Iterable<T> using<R, T>(
+  R Function() acquire,
+  Iterable<T> Function(R resource) use,
+  void Function(R resource) release,
+) => _UsingIterable(acquire, use, release);
 
 class _UsingIterable<R, T> extends Iterable<T> {
   _UsingIterable(this._acquire, this._use, this._release);
@@ -181,10 +192,13 @@ class _UsingIterator<R, T> implements Iterator<T> {
 /// The same abandonment caveat as [using] applies.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<T> usingAsync<R, T>(
-    FutureOr<R> Function() acquire,
-    FxAsyncIterable<T> Function(R resource) use,
-    FutureOr<void> Function(R resource) release) {
-  return DelegateAsyncIterable(() => _UsingAsyncIterator(acquire, use, release));
+  FutureOr<R> Function() acquire,
+  FxAsyncIterable<T> Function(R resource) use,
+  FutureOr<void> Function(R resource) release,
+) {
+  return DelegateAsyncIterable(
+    () => _UsingAsyncIterator(acquire, use, release),
+  );
 }
 
 /// The [usingAsync] iterator. Public `next` stays a pass-through (as
@@ -212,18 +226,21 @@ class _UsingAsyncIterator<R, T> implements FxFastIterator<T> {
         return _iterator = _use(r).iterator;
       });
 
-  Future<IterResult<T>> _settle(Future<IterResult<T>> pull) =>
-      pull.then((result) {
-        if (!result.done) return result;
-        _done = true;
-        return _releaseOnce().then((_) => result);
-      }, onError: (Object e, StackTrace st) {
-        _done = true;
-        // When acquire itself failed there is no resource to release.
-        if (!_acquired) Error.throwWithStackTrace(e, st);
-        return _releaseOnce()
-            .then<IterResult<T>>((_) => Error.throwWithStackTrace(e, st));
-      });
+  Future<IterResult<T>> _settle(Future<IterResult<T>> pull) => pull.then(
+    (result) {
+      if (!result.done) return result;
+      _done = true;
+      return _releaseOnce().then((_) => result);
+    },
+    onError: (Object e, StackTrace st) {
+      _done = true;
+      // When acquire itself failed there is no resource to release.
+      if (!_acquired) Error.throwWithStackTrace(e, st);
+      return _releaseOnce().then<IterResult<T>>(
+        (_) => Error.throwWithStackTrace(e, st),
+      );
+    },
+  );
 
   @override
   Future<IterResult<T>> next([Concurrent? concurrent]) {
@@ -247,8 +264,9 @@ class _UsingAsyncIterator<R, T> implements FxFastIterator<T> {
     } catch (e, st) {
       _done = true;
       if (!_acquired) rethrow;
-      return _releaseOnce()
-          .then<IterResult<T>>((_) => Error.throwWithStackTrace(e, st));
+      return _releaseOnce().then<IterResult<T>>(
+        (_) => Error.throwWithStackTrace(e, st),
+      );
     }
     if (r is Future<IterResult<T>>) return _settle(r);
     if (!r.done) return r;

@@ -23,14 +23,18 @@ const _rareError = 'disk quota exceeded';
 final _rareErrorIndex = n - (n ~/ 10).clamp(1, 1000);
 
 const _infoMessages = [
-  'checkout started', 'cache warmed', 'server started', 'retrying request',
+  'checkout started',
+  'cache warmed',
+  'server started',
+  'retrying request',
 ];
 
 List<Log> makeLogs() {
   final rng = Lcg(2);
   return List.generate(n, (i) {
     final minutes = (n - 1 - i) % 1440;
-    final time = '${(minutes ~/ 60).toString().padLeft(2, '0')}:'
+    final time =
+        '${(minutes ~/ 60).toString().padLeft(2, '0')}:'
         '${(minutes % 60).toString().padLeft(2, '0')}';
     if (i == _rareErrorIndex) return Log(time, 'ERROR', _rareError);
     final level = ['INFO', 'WARN', 'ERROR'][rng.nextInt(3)];

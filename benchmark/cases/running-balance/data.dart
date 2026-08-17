@@ -11,8 +11,16 @@ class Tx {
 }
 
 const _labels = [
-  'Salary', 'Rent', 'Green Grocer', 'Refund', 'Electric Co',
-  'Cafe Aroma', 'Metro', 'Taxi', 'Book Nook', 'Gym One',
+  'Salary',
+  'Rent',
+  'Green Grocer',
+  'Refund',
+  'Electric Co',
+  'Cafe Aroma',
+  'Metro',
+  'Taxi',
+  'Book Nook',
+  'Gym One',
 ];
 
 List<Tx> makeTxns() {

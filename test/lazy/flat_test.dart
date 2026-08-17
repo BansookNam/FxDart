@@ -11,7 +11,7 @@ void main() {
           3,
           4,
           5,
-          [6, 7]
+          [6, 7],
         ])) {
           acc.add(a);
         }
@@ -26,24 +26,27 @@ void main() {
             [
               6,
               7,
-              [8, 9]
-            ]
-          ], 2)
+              [8, 9],
+            ],
+          ], 2),
         ];
         expect(res, equals([1, 2, 3, 4, 5, 6, 7, 8, 9]));
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = pipe([
-          1,
-          2,
-          3,
-          [4, 5]
-        ], [
-          (v) => flat(v),
-          (v) => map((a) => (a as int) + 10, v),
-          (v) => toList(v),
-        ]);
+        final res = pipe(
+          [
+            1,
+            2,
+            3,
+            [4, 5],
+          ],
+          [
+            (v) => flat(v),
+            (v) => map((a) => (a as int) + 10, v),
+            (v) => toList(v),
+          ],
+        );
 
         expect(res, equals([11, 12, 13, 14, 15]));
       });
@@ -53,7 +56,7 @@ void main() {
           1,
           2,
           3,
-          [4, 5]
+          [4, 5],
         ]).flat().map((a) => (a as int) + 10).toList();
 
         expect(res, equals([11, 12, 13, 14, 15]));
@@ -63,13 +66,15 @@ void main() {
     group('async', () {
       test('should be flattened', () async {
         final acc = <dynamic>[];
-        final it = flatAsync(toAsync<dynamic>([
-          [1, 2],
-          3,
-          4,
-          5,
-          [6, 7]
-        ])).iterator;
+        final it = flatAsync(
+          toAsync<dynamic>([
+            [1, 2],
+            3,
+            4,
+            5,
+            [6, 7],
+          ]),
+        ).iterator;
         while (true) {
           final r = await it.next();
           if (r.done) break;
@@ -77,7 +82,8 @@ void main() {
         }
         expect(acc, equals([1, 2, 3, 4, 5, 6, 7]));
 
-        final res = await toListAsync(flatAsync(
+        final res = await toListAsync(
+          flatAsync(
             toAsync<dynamic>([
               [1, 2],
               3,
@@ -86,50 +92,63 @@ void main() {
               [
                 6,
                 7,
-                [8, 9]
-              ]
+                [8, 9],
+              ],
             ]),
-            2));
+            2,
+          ),
+        );
         expect(res, equals([1, 2, 3, 4, 5, 6, 7, 8, 9]));
       });
 
       test('should be able to be used in the pipeline', () async {
-        final res = await fxAsync(flatAsync(toAsync<dynamic>([
-          1,
-          2,
-          3,
-          [4, 5]
-        ]))).map((a) => (a as int) + 10).toList();
+        final res = await fxAsync(
+          flatAsync(
+            toAsync<dynamic>([
+              1,
+              2,
+              3,
+              [4, 5],
+            ]),
+          ),
+        ).map((a) => (a as int) + 10).toList();
 
         expect(res, equals([11, 12, 13, 14, 15]));
       });
 
-      test('should be able to be used as a chaining method in the `fx`',
-          () async {
-        final res = await fxAsync(toAsync<dynamic>([
-          1,
-          2,
-          3,
-          [4, 5]
-        ])).flat().map((a) => (a as int) + 10).toList();
+      test(
+        'should be able to be used as a chaining method in the `fx`',
+        () async {
+          final res = await fxAsync(
+            toAsync<dynamic>([
+              1,
+              2,
+              3,
+              [4, 5],
+            ]),
+          ).flat().map((a) => (a as int) + 10).toList();
 
-        expect(res, equals([11, 12, 13, 14, 15]));
-      });
+          expect(res, equals([11, 12, 13, 14, 15]));
+        },
+      );
 
       test('should be flattened concurrently', () async {
-        final res = fxAsync(toAsync<List<int>>([
-          [1],
-          [2],
-          [3, 4],
-          [5, 6],
-          [7, 8, 9, 10],
-          [11, 12],
-          [13],
-          [14],
-        ]))
-            .map((a) => delay(const Duration(milliseconds: 50), a))
-            .flat()
-            .concurrent(3);
+        final res =
+            fxAsync(
+                  toAsync<List<int>>([
+                    [1],
+                    [2],
+                    [3, 4],
+                    [5, 6],
+                    [7, 8, 9, 10],
+                    [11, 12],
+                    [13],
+                    [14],
+                  ]),
+                )
+                .map((a) => delay(const Duration(milliseconds: 50), a))
+                .flat()
+                .concurrent(3);
 
         final it = res.iterator;
         expect((await it.next()).value, equals(1));
@@ -147,52 +166,52 @@ void main() {
               [1, 2],
               [3, 4],
               [5, 6],
-              [7, 8]
+              [7, 8],
             ],
             1,
             1,
-            [1, 2, 3, 4, 5, 6, 7, 8]
+            [1, 2, 3, 4, 5, 6, 7, 8],
           ),
           (
             [
               [1, 2],
               [3, 4],
               [5, 6],
-              [7, 8]
+              [7, 8],
             ],
             1,
             3,
-            [1, 2, 3, 4, 5, 6, 7, 8]
+            [1, 2, 3, 4, 5, 6, 7, 8],
           ),
           (
             [
               [1, 2],
               [3, 4],
               [5, 6],
-              [7, 8]
+              [7, 8],
             ],
             1,
             4,
-            [1, 2, 3, 4, 5, 6, 7, 8]
+            [1, 2, 3, 4, 5, 6, 7, 8],
           ),
           (
             [
               [
                 1,
-                [2]
+                [2],
               ],
               [
                 3,
-                [4]
+                [4],
               ],
               [
                 5,
-                [6]
+                [6],
               ],
               [
                 7,
-                [8]
-              ]
+                [8],
+              ],
             ],
             1,
             4,
@@ -204,44 +223,31 @@ void main() {
               5,
               [6],
               7,
-              [8]
-            ]
+              [8],
+            ],
           ),
           (
             [
               [
                 1,
-                [2]
+                [2],
               ],
               [
                 3,
-                [4]
+                [4],
               ],
               [
                 5,
-                [6]
+                [6],
               ],
               [
                 7,
-                [8]
-              ]
+                [8],
+              ],
             ],
             2,
             4,
-            [1, 2, 3, 4, 5, 6, 7, 8]
-          ),
-          (
-            [
-              [1],
-              [2, 3],
-              [4],
-              [5, 6],
-              [7],
-              [8, 9]
-            ],
-            1,
-            2,
-            [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            [1, 2, 3, 4, 5, 6, 7, 8],
           ),
           (
             [
@@ -251,11 +257,24 @@ void main() {
               [5, 6],
               [7],
               [8, 9],
-              [10]
             ],
             1,
             2,
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            [1, 2, 3, 4, 5, 6, 7, 8, 9],
+          ),
+          (
+            [
+              [1],
+              [2, 3],
+              [4],
+              [5, 6],
+              [7],
+              [8, 9],
+              [10],
+            ],
+            1,
+            2,
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
           ),
           (
             [
@@ -263,32 +282,32 @@ void main() {
               [2, 3, 4],
               [5, 6],
               [7, 8, 9, 10],
-              [11, 12]
+              [11, 12],
             ],
             1,
             3,
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
           ),
           (
             [
               [1],
               [
                 [
-                  [2]
+                  [2],
                 ],
                 3,
-                4
+                4,
               ],
               [
                 5,
                 [
                   [
-                    [6]
-                  ]
-                ]
+                    [6],
+                  ],
+                ],
               ],
               [7, 8, 9, 10],
-              [11, 12]
+              [11, 12],
             ],
             2,
             3,
@@ -299,15 +318,15 @@ void main() {
               4,
               5,
               [
-                [6]
+                [6],
               ],
               7,
               8,
               9,
               10,
               11,
-              12
-            ]
+              12,
+            ],
           ),
         ];
 
@@ -337,19 +356,23 @@ void main() {
       });
 
       test('should be flattened concurrently with filter', () async {
-        final res = await fxAsync(flatAsync(
-                toAsync<dynamic>([
-                  [1],
-                  [2],
-                  [3],
-                  [4]
-                ]),
-                2))
-            .map((a) => delay(const Duration(milliseconds: 50), a))
-            .filter((a) => (a as int) % 2 == 0)
-            .take(2)
-            .concurrent(4)
-            .toList();
+        final res =
+            await fxAsync(
+                  flatAsync(
+                    toAsync<dynamic>([
+                      [1],
+                      [2],
+                      [3],
+                      [4],
+                    ]),
+                    2,
+                  ),
+                )
+                .map((a) => delay(const Duration(milliseconds: 50), a))
+                .filter((a) => (a as int) % 2 == 0)
+                .take(2)
+                .concurrent(4)
+                .toList();
 
         expect(res, equals([2, 4]));
       });
@@ -372,12 +395,14 @@ void main() {
 
       test('should be able to handle errors', () async {
         await expectLater(
-          fxAsync(toAsync([
-            [1, 2, 3],
-            [1, 2, 3],
-            [1, 2, 3],
-            [1, 2, 3],
-          ]))
+          fxAsync(
+                toAsync([
+                  [1, 2, 3],
+                  [1, 2, 3],
+                  [1, 2, 3],
+                  [1, 2, 3],
+                ]),
+              )
               .map<List<int>>((a) async {
                 await delay(const Duration(milliseconds: 50), a);
                 throw Exception('err');

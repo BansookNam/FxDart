@@ -61,21 +61,23 @@ void main() {
       await b.close();
     });
 
-    test('cancelAll on an empty bag is a no-op, and the bag is reusable',
-        () async {
-      final bag = FxSubscriptions();
-      await bag.cancelAll();
+    test(
+      'cancelAll on an empty bag is a no-op, and the bag is reusable',
+      () async {
+        final bag = FxSubscriptions();
+        await bag.cancelAll();
 
-      final c = StreamController<int>();
-      final seen = <int>[];
-      bag.add(c.stream.listen(seen.add));
-      c.add(1);
-      await Future<void>.delayed(Duration.zero);
-      expect(seen, equals([1]));
+        final c = StreamController<int>();
+        final seen = <int>[];
+        bag.add(c.stream.listen(seen.add));
+        c.add(1);
+        await Future<void>.delayed(Duration.zero);
+        expect(seen, equals([1]));
 
-      await bag.cancelAll();
-      await c.close();
-    });
+        await bag.cancelAll();
+        await c.close();
+      },
+    );
 
     test('pauseAll buffers and resumeAll releases', () async {
       final bag = FxSubscriptions();

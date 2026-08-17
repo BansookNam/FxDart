@@ -30,14 +30,12 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () {
-        final result = pipe({
-          'a': 1,
-          'b': '2',
-          'c': true,
-          'd': null
-        }, [
-          matches({'a': 1, 'b': '2'}),
-        ]);
+        final result = pipe(
+          {'a': 1, 'b': '2', 'c': true, 'd': null},
+          [
+            matches({'a': 1, 'b': '2'}),
+          ],
+        );
         expect(result, isTrue);
       });
     });
@@ -92,10 +90,9 @@ void main() {
       });
 
       test('should work with filter in fx chain', () {
-        final result = fx(users)
-            .filter(matches({'active': true}))
-            .map((u) => u['id'])
-            .toList();
+        final result = fx(
+          users,
+        ).filter(matches({'active': true})).map((u) => u['id']).toList();
         expect(result, equals([1, 3]));
       });
     });
@@ -155,32 +152,35 @@ void main() {
             'id': 1,
             'user': {
               'name': 'John',
-              'profile': {'age': 30}
-            }
+              'profile': {'age': 30},
+            },
           },
           {
             'id': 2,
             'user': {
               'name': 'Jane',
-              'profile': {'age': 25}
-            }
+              'profile': {'age': 25},
+            },
           },
           {
             'id': 3,
             'user': {
               'name': 'Bob',
-              'profile': {'age': 30}
-            }
+              'profile': {'age': 30},
+            },
           },
         ];
 
-        final result = toList(filter(
+        final result = toList(
+          filter(
             matches({
               'user': {
-                'profile': {'age': 30}
-              }
+                'profile': {'age': 30},
+              },
             }),
-            data));
+            data,
+          ),
+        );
 
         expect(result, equals([data[0], data[2]]));
       });
@@ -189,23 +189,26 @@ void main() {
         final data = [
           {
             'id': 1,
-            'tags': ['a', 'b']
+            'tags': ['a', 'b'],
           },
           {
             'id': 2,
-            'tags': ['c', 'd']
+            'tags': ['c', 'd'],
           },
           {
             'id': 3,
-            'tags': ['a', 'b']
+            'tags': ['a', 'b'],
           },
         ];
 
-        final result = toList(filter(
+        final result = toList(
+          filter(
             matches({
-              'tags': ['a', 'b']
+              'tags': ['a', 'b'],
             }),
-            data));
+            data,
+          ),
+        );
 
         expect(result, equals([data[0], data[2]]));
       });
@@ -216,62 +219,68 @@ void main() {
             'id': 1,
             'items': [
               {'x': 1},
-              {'x': 2}
-            ]
+              {'x': 2},
+            ],
           },
           {
             'id': 2,
             'items': [
               {'x': 3},
-              {'x': 4}
-            ]
+              {'x': 4},
+            ],
           },
           {
             'id': 3,
             'items': [
               {'x': 1},
-              {'x': 2}
-            ]
+              {'x': 2},
+            ],
           },
         ];
 
-        final result = toList(filter(
+        final result = toList(
+          filter(
             matches({
               'items': [
                 {'x': 1},
-                {'x': 2}
-              ]
+                {'x': 2},
+              ],
             }),
-            data));
+            data,
+          ),
+        );
 
         expect(result, equals([data[0], data[2]]));
       });
 
       test('should return false for non-matching nested maps', () {
         final matcher = matches({
-          'user': {'name': 'John'}
+          'user': {'name': 'John'},
         });
         expect(
-            matcher({
-              'user': {'name': 'Jane'}
-            }),
-            isFalse);
+          matcher({
+            'user': {'name': 'Jane'},
+          }),
+          isFalse,
+        );
       });
 
       test('should return false for non-matching lists', () {
         final matcher = matches({
-          'tags': ['a', 'b']
+          'tags': ['a', 'b'],
         });
         expect(
-            matcher({
-              'tags': ['a', 'c']
-            }),
-            isFalse);
+          matcher({
+            'tags': ['a', 'c'],
+          }),
+          isFalse,
+        );
         expect(
-            matcher({
-              'tags': ['a']
-            }),
-            isFalse);
+          matcher({
+            'tags': ['a'],
+          }),
+          isFalse,
+        );
       });
 
       test('should match DateTime objects', () {
@@ -284,7 +293,9 @@ void main() {
         final result = find(matches({'created': date}), data);
 
         expect(
-            result, equals({'id': 1, 'created': DateTime.parse('2024-01-01')}));
+          result,
+          equals({'id': 1, 'created': DateTime.parse('2024-01-01')}),
+        );
       });
     });
 
@@ -314,23 +325,31 @@ void main() {
         expect(matcher({'a': 2}), isFalse);
       });
 
-      test('should return false when nil pattern is matched against non-nil',
-          () {
-        expect(matches(null)({'a': 1}), isFalse);
-      });
+      test(
+        'should return false when nil pattern is matched against non-nil',
+        () {
+          expect(matches(null)({'a': 1}), isFalse);
+        },
+      );
     });
 
     group('consistency with isMatch', () {
       test('should produce the same result as isMatch(input, pattern)', () {
         final superset = {'a': 1, 'b': 2};
         expect(
-            matches({'a': 1})(superset), equals(isMatch(superset, {'a': 1})));
+          matches({'a': 1})(superset),
+          equals(isMatch(superset, {'a': 1})),
+        );
         expect(
-            matches({'a': 1})({'a': 2}), equals(isMatch({'a': 2}, {'a': 1})));
+          matches({'a': 1})({'a': 2}),
+          equals(isMatch({'a': 2}, {'a': 1})),
+        );
         expect(
-            matches(DateTime.parse('2024-01-01'))(DateTime.parse('2025-01-01')),
-            equals(isMatch(
-                DateTime.parse('2025-01-01'), DateTime.parse('2024-01-01'))));
+          matches(DateTime.parse('2024-01-01'))(DateTime.parse('2025-01-01')),
+          equals(
+            isMatch(DateTime.parse('2025-01-01'), DateTime.parse('2024-01-01')),
+          ),
+        );
       });
     });
   });

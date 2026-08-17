@@ -15,26 +15,31 @@ void main() {
       });
 
       test('should drop from a lazy (non-list) source', () {
-        expect(toList(dropRight(2, [1, 2, 3, 4, 5].where((_) => true))),
-            equals([1, 2, 3]));
-        expect(toList(dropRight(9, [1, 2, 3].where((_) => true))),
-            equals(<int>[]));
-        expect(toList(dropRight(0, [1, 2].where((_) => true))),
-            equals([1, 2]));
+        expect(
+          toList(dropRight(2, [1, 2, 3, 4, 5].where((_) => true))),
+          equals([1, 2, 3]),
+        );
+        expect(
+          toList(dropRight(9, [1, 2, 3].where((_) => true))),
+          equals(<int>[]),
+        );
+        expect(toList(dropRight(0, [1, 2].where((_) => true))), equals([1, 2]));
       });
 
-      test('streams through a delay line: only pulls what it emits + length',
-          () {
-        // The old implementation materialized the whole source on the first
-        // pull; the delay line keeps take(2, dropRight(2, ...)) at 4 pulls.
-        var pulled = 0;
-        final source = range(0, 1000).map((a) {
-          pulled++;
-          return a;
-        });
-        expect(toList(take(2, dropRight(2, source))), equals([0, 1]));
-        expect(pulled, equals(4));
-      });
+      test(
+        'streams through a delay line: only pulls what it emits + length',
+        () {
+          // The old implementation materialized the whole source on the first
+          // pull; the delay line keeps take(2, dropRight(2, ...)) at 4 pulls.
+          var pulled = 0;
+          final source = range(0, 1000).map((a) {
+            pulled++;
+            return a;
+          });
+          expect(toList(take(2, dropRight(2, source))), equals([0, 1]));
+          expect(pulled, equals(4));
+        },
+      );
 
       test('should throw eagerly on a negative length', () {
         expect(() => dropRight(-1, [1, 2, 3]), throwsRangeError);
@@ -50,21 +55,15 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = pipe([
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8
-        ], [
-          (v) => map((int a) => a + 10, v),
-          (v) => filter((int a) => a % 2 == 0, v),
-          (v) => dropRight(2, v),
-          (v) => toList(v),
-        ]);
+        final res = pipe(
+          [1, 2, 3, 4, 5, 6, 7, 8],
+          [
+            (v) => map((int a) => a + 10, v),
+            (v) => filter((int a) => a % 2 == 0, v),
+            (v) => dropRight(2, v),
+            (v) => toList(v),
+          ],
+        );
 
         expect(res, equals([12, 14]));
       });
@@ -81,16 +80,16 @@ void main() {
         }
         expect(acc, equals([1, 2, 3]));
 
-        expect(await toListAsync(dropRightAsync(0, toAsync([1, 2, 3, 4, 5]))),
-            equals([1, 2, 3, 4, 5]));
+        expect(
+          await toListAsync(dropRightAsync(0, toAsync([1, 2, 3, 4, 5]))),
+          equals([1, 2, 3, 4, 5]),
+        );
       });
 
       test('should be able to be used in the pipeline', () async {
-        final res = await fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8]))
-            .map((a) => a + 10)
-            .filter((a) => a % 2 == 0)
-            .dropRight(2)
-            .toList();
+        final res = await fxAsync(
+          toAsync([1, 2, 3, 4, 5, 6, 7, 8]),
+        ).map((a) => a + 10).filter((a) => a % 2 == 0).dropRight(2).toList();
 
         expect(res, equals([12, 14]));
       });
@@ -112,44 +111,46 @@ void main() {
 
       test('should be able to handle an error when asynchronous', () async {
         await expectLater(
-          fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
-              .filter((a) => throw Exception('err'))
-              .dropRight(2)
-              .toList(),
-          throwsException,
-        );
-      });
-
-      test('should be able to handle an error when working concurrent',
-          () async {
-        await expectLater(
-          fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
-              .filter((a) {
-                if (a == 1) throw Exception('err');
-                return true;
-              })
-              .dropRight(2)
-              .concurrent(3)
-              .toList(),
+          fxAsync(
+            toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+          ).filter((a) => throw Exception('err')).dropRight(2).toList(),
           throwsException,
         );
       });
 
       test(
-          'should be able to handle an error when working concurrent - Future.error',
-          () async {
-        await expectLater(
-          fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
-              .map((a) {
-                if (a < 3) return Future<int>.error(Exception('err'));
-                return a;
-              })
-              .dropRight(2)
-              .concurrent(3)
-              .toList(),
-          throwsException,
-        );
-      });
+        'should be able to handle an error when working concurrent',
+        () async {
+          await expectLater(
+            fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+                .filter((a) {
+                  if (a == 1) throw Exception('err');
+                  return true;
+                })
+                .dropRight(2)
+                .concurrent(3)
+                .toList(),
+            throwsException,
+          );
+        },
+      );
+
+      test(
+        'should be able to handle an error when working concurrent - Future.error',
+        () async {
+          await expectLater(
+            fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+                .map((a) {
+                  if (a < 3) return Future<int>.error(Exception('err'));
+                  return a;
+                })
+                .dropRight(2)
+                .concurrent(3)
+                .toList(),
+            throwsException,
+          );
+        },
+      );
     });
   });
 }

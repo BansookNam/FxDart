@@ -77,31 +77,35 @@ void main() {
       });
 
       test(
-          'a fork created in the middle of iterable progress still sees the full sequence',
-          () {
-        // Dart forks share one buffered iteration per iterable object and
-        // always replay from the beginning of that buffer (unlike JS, where
-        // fork(iterator) continues from the iterator's current position).
-        final arr = map((int a) => a + 10, [1, 2, 3]);
+        'a fork created in the middle of iterable progress still sees the full sequence',
+        () {
+          // Dart forks share one buffered iteration per iterable object and
+          // always replay from the beginning of that buffer (unlike JS, where
+          // fork(iterator) continues from the iterator's current position).
+          final arr = map((int a) => a + 10, [1, 2, 3]);
 
-        final iter1 = fork(arr).iterator;
-        expect(iter1.moveNext(), isTrue);
-        expect(iter1.current, equals(11));
+          final iter1 = fork(arr).iterator;
+          expect(iter1.moveNext(), isTrue);
+          expect(iter1.current, equals(11));
 
-        final iter2 = fork(arr).iterator;
-        expect(iter2.moveNext(), isTrue);
-        expect(iter2.current, equals(11));
-        expect(iter2.moveNext(), isTrue);
-        expect(iter2.current, equals(12));
+          final iter2 = fork(arr).iterator;
+          expect(iter2.moveNext(), isTrue);
+          expect(iter2.current, equals(11));
+          expect(iter2.moveNext(), isTrue);
+          expect(iter2.current, equals(12));
 
-        expect(iter1.moveNext(), isTrue);
-        expect(iter1.current, equals(12));
-      });
+          expect(iter1.moveNext(), isTrue);
+          expect(iter1.current, equals(12));
+        },
+      );
 
-      test('original iterator advances alongside forks (JS iterator identity)',
-          () {},
-          skip: 'JS-specific: Dart iterables restart per iterator; the '
-              'original cannot be consumed as a shared cursor');
+      test(
+        'original iterator advances alongside forks (JS iterator identity)',
+        () {},
+        skip:
+            'JS-specific: Dart iterables restart per iterator; the '
+            'original cannot be consumed as a shared cursor',
+      );
     });
 
     group('async', () {
@@ -160,29 +164,33 @@ void main() {
         expect((await iter2.next()).done, isTrue);
       });
 
-      test('forked iterables should each be fully consumable with concurrent',
-          () async {
-        final iter = mapAsync(
+      test(
+        'forked iterables should each be fully consumable with concurrent',
+        () async {
+          final iter = mapAsync(
             (int a) => delay(const Duration(milliseconds: 50), a),
-            toAsync(range(10)));
+            toAsync(range(10)),
+          );
 
-        final forked1 = forkAsync(iter);
-        final forked2 = forkAsync(iter);
+          final forked1 = forkAsync(iter);
+          final forked2 = forkAsync(iter);
 
-        final arr1 = await toListAsync(concurrentAsync(5, forked1));
-        expect(arr1, equals([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]));
+          final arr1 = await toListAsync(concurrentAsync(5, forked1));
+          expect(arr1, equals([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]));
 
-        // The second fork replays the shared buffer without re-evaluating.
-        final sw = Stopwatch()..start();
-        final arr2 = await toListAsync(concurrentAsync(5, forked2));
-        expect(arr2, equals([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]));
-        expect(sw.elapsedMilliseconds, lessThan(200));
-      });
+          // The second fork replays the shared buffer without re-evaluating.
+          final sw = Stopwatch()..start();
+          final arr2 = await toListAsync(concurrentAsync(5, forked2));
+          expect(arr2, equals([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]));
+          expect(sw.elapsedMilliseconds, lessThan(200));
+        },
+      );
 
       test('forked iterable should be consumed concurrently', () async {
         final iter = mapAsync(
-            (int a) => delay(const Duration(milliseconds: 100), a),
-            toAsync(range(10)));
+          (int a) => delay(const Duration(milliseconds: 100), a),
+          toAsync(range(10)),
+        );
 
         final forked = forkAsync(iter);
         final sw = Stopwatch()..start();
@@ -194,52 +202,55 @@ void main() {
     });
 
     group('error propagation', () {
-      test('should propagate errors from sync iterator to all forked iterators',
-          () {
-        final errorIterable = () sync* {
-          yield 1;
-          yield 2;
-          throw StateError('sync error');
-        }();
+      test(
+        'should propagate errors from sync iterator to all forked iterators',
+        () {
+          final errorIterable = () sync* {
+            yield 1;
+            yield 2;
+            throw StateError('sync error');
+          }();
 
-        final iter1 = fork(errorIterable).iterator;
-        final iter2 = fork(errorIterable).iterator;
+          final iter1 = fork(errorIterable).iterator;
+          final iter2 = fork(errorIterable).iterator;
 
-        expect(iter1.moveNext(), isTrue);
-        expect(iter1.current, equals(1));
-        expect(iter2.moveNext(), isTrue);
-        expect(iter2.current, equals(1));
+          expect(iter1.moveNext(), isTrue);
+          expect(iter1.current, equals(1));
+          expect(iter2.moveNext(), isTrue);
+          expect(iter2.current, equals(1));
 
-        expect(iter1.moveNext(), isTrue);
-        expect(iter1.current, equals(2));
+          expect(iter1.moveNext(), isTrue);
+          expect(iter1.current, equals(2));
 
-        expect(() => iter1.moveNext(), throwsStateError);
-        expect(iter2.moveNext(), isTrue);
-        expect(iter2.current, equals(2));
-        expect(() => iter2.moveNext(), throwsStateError);
-      });
+          expect(() => iter1.moveNext(), throwsStateError);
+          expect(iter2.moveNext(), isTrue);
+          expect(iter2.current, equals(2));
+          expect(() => iter2.moveNext(), throwsStateError);
+        },
+      );
 
       test(
-          'should propagate errors from async iterator to all forked iterators',
-          () async {
-        final errorIterable = toAsync(() sync* {
-          yield Future.value(1);
-          yield Future.value(2);
-          yield Future<int>.error(StateError('async error'));
-        }());
+        'should propagate errors from async iterator to all forked iterators',
+        () async {
+          final errorIterable = toAsync(() sync* {
+            yield Future.value(1);
+            yield Future.value(2);
+            yield Future<int>.error(StateError('async error'));
+          }());
 
-        final iter1 = forkAsync(errorIterable).iterator;
-        final iter2 = forkAsync(errorIterable).iterator;
+          final iter1 = forkAsync(errorIterable).iterator;
+          final iter2 = forkAsync(errorIterable).iterator;
 
-        expect((await iter1.next()).value, equals(1));
-        expect((await iter2.next()).value, equals(1));
+          expect((await iter1.next()).value, equals(1));
+          expect((await iter2.next()).value, equals(1));
 
-        expect((await iter1.next()).value, equals(2));
+          expect((await iter1.next()).value, equals(2));
 
-        await expectLater(iter1.next(), throwsStateError);
-        expect((await iter2.next()).value, equals(2));
-        await expectLater(iter2.next(), throwsStateError);
-      });
+          await expectLater(iter1.next(), throwsStateError);
+          expect((await iter2.next()).value, equals(2));
+          await expectLater(iter2.next(), throwsStateError);
+        },
+      );
     });
 
     group('memory optimization', () {
@@ -276,38 +287,40 @@ void main() {
         expect(results3[499], equals(500));
       });
 
-      test('should handle large datasets with multiple forks (async)',
-          () async {
-        final arr = mapAsync((int a) => a + 1, toAsync(range(200)));
+      test(
+        'should handle large datasets with multiple forks (async)',
+        () async {
+          final arr = mapAsync((int a) => a + 1, toAsync(range(200)));
 
-        final fork1 = forkAsync(arr).iterator;
-        final fork2 = forkAsync(arr).iterator;
+          final fork1 = forkAsync(arr).iterator;
+          final fork2 = forkAsync(arr).iterator;
 
-        final results1 = <int>[];
-        for (var i = 0; i < 50; i++) {
-          results1.add((await fork1.next()).value);
-        }
+          final results1 = <int>[];
+          for (var i = 0; i < 50; i++) {
+            results1.add((await fork1.next()).value);
+          }
 
-        final results2 = <int>[];
-        var result = await fork2.next();
-        while (!result.done) {
-          results2.add(result.value);
-          result = await fork2.next();
-        }
+          final results2 = <int>[];
+          var result = await fork2.next();
+          while (!result.done) {
+            results2.add(result.value);
+            result = await fork2.next();
+          }
 
-        var result1 = await fork1.next();
-        while (!result1.done) {
-          results1.add(result1.value);
-          result1 = await fork1.next();
-        }
+          var result1 = await fork1.next();
+          while (!result1.done) {
+            results1.add(result1.value);
+            result1 = await fork1.next();
+          }
 
-        expect(results1.length, equals(200));
-        expect(results1[0], equals(1));
-        expect(results1[199], equals(200));
-        expect(results2.length, equals(200));
-        expect(results2[0], equals(1));
-        expect(results2[199], equals(200));
-      });
+          expect(results1.length, equals(200));
+          expect(results1[0], equals(1));
+          expect(results1[199], equals(200));
+          expect(results2.length, equals(200));
+          expect(results2[0], equals(1));
+          expect(results2[199], equals(200));
+        },
+      );
 
       test('should remove fork from tracking when completed (sync)', () {
         final arr = [1, 2, 3];

@@ -42,14 +42,17 @@ void main() {
       test('should be consumed the given number', () async {
         final seen = <int>[];
         await consumeAsync(
-            peekAsync((a) => seen.add(a), toAsync([1, 2, 3, 4, 5])), 2);
+          peekAsync((a) => seen.add(a), toAsync([1, 2, 3, 4, 5])),
+          2,
+        );
         expect(seen, equals([1, 2]));
       });
 
       test('should consume everything when n is omitted', () async {
         final seen = <int>[];
         await consumeAsync(
-            peekAsync((a) => seen.add(a), toAsync([1, 2, 3, 4, 5])));
+          peekAsync((a) => seen.add(a), toAsync([1, 2, 3, 4, 5])),
+        );
         expect(seen, equals([1, 2, 3, 4, 5]));
       });
 

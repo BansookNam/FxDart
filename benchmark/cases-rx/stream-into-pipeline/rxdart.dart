@@ -16,7 +16,8 @@ Future<void> main() async {
       // The stream is the model: filter-and-format in one rxdart operator.
       final warnings = await logFeed()
           .mapNotNull(
-              (line) => line.startsWith('warn') ? line.toUpperCase() : null)
+            (line) => line.startsWith('warn') ? line.toUpperCase() : null,
+          )
           .toList();
       return '${warnings.length}|${warnings.last}';
     },

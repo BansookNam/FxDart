@@ -11,14 +11,17 @@ void main() {
 
       test('should return Left when the block raises', () {
         final result = eitherCatching<String, int>(
-            (r) => r.raise('typed'), (e, _) => 'thrown: $e');
+          (r) => r.raise('typed'),
+          (e, _) => 'thrown: $e',
+        );
         expect(result, equals(const Left<String, int>('typed')));
       });
 
       test('should hand a thrown exception to onThrow', () {
         final result = eitherCatching<String, int>(
-            (r) => throw const FormatException('bad'),
-            (e, _) => 'caught: ${(e as FormatException).message}');
+          (r) => throw const FormatException('bad'),
+          (e, _) => 'caught: ${(e as FormatException).message}',
+        );
         expect(result, equals(const Left<String, int>('caught: bad')));
       });
 
@@ -46,12 +49,13 @@ void main() {
 
       test('should replace the either + catching envelope', () {
         Either<String, int> viaEnvelope(String raw) => either<String, int>(
-              (r) => catching(
-                () => int.parse(raw) * 2,
-                (e, _) => r.raise('unparseable'),
-              ),
-            );
-        Either<String, int> viaCombined(String raw) => eitherCatching<String, int>(
+          (r) => catching(
+            () => int.parse(raw) * 2,
+            (e, _) => r.raise('unparseable'),
+          ),
+        );
+        Either<String, int> viaCombined(String raw) =>
+            eitherCatching<String, int>(
               (r) => int.parse(raw) * 2,
               (e, _) => 'unparseable',
             );
@@ -77,29 +81,35 @@ void main() {
         expect(result, equals(const Left<String, int>('typed')));
       });
 
-      test('should hand an exception thrown after an await to onThrow',
-          () async {
-        final result = await eitherCatchingAsync<String, int>((r) async {
-          await Future.delayed(Duration.zero);
-          throw StateError('boom');
-        }, (e, _) async => 'caught');
-        expect(result, equals(const Left<String, int>('caught')));
-      });
+      test(
+        'should hand an exception thrown after an await to onThrow',
+        () async {
+          final result = await eitherCatchingAsync<String, int>((r) async {
+            await Future.delayed(Duration.zero);
+            throw StateError('boom');
+          }, (e, _) async => 'caught');
+          expect(result, equals(const Left<String, int>('caught')));
+        },
+      );
 
-      test('should rethrow a foreign scope signal instead of catching it',
-          () async {
-        var onThrowRan = false;
-        final outer = await eitherAsync<String, int>((outerR) async {
-          await eitherCatchingAsync<int, int>(
-              (_) async => outerR.raise('outer'), (e, _) {
-            onThrowRan = true;
-            return -1;
+      test(
+        'should rethrow a foreign scope signal instead of catching it',
+        () async {
+          var onThrowRan = false;
+          final outer = await eitherAsync<String, int>((outerR) async {
+            await eitherCatchingAsync<int, int>(
+              (_) async => outerR.raise('outer'),
+              (e, _) {
+                onThrowRan = true;
+                return -1;
+              },
+            );
+            return 0;
           });
-          return 0;
-        });
-        expect(outer, equals(const Left<String, int>('outer')));
-        expect(onThrowRan, isFalse);
-      });
+          expect(outer, equals(const Left<String, int>('outer')));
+          expect(onThrowRan, isFalse);
+        },
+      );
     });
   });
 }

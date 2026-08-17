@@ -4,13 +4,17 @@ import 'package:test/test.dart';
 void main() {
   group('mapValues', () {
     test('runs every value through the callback', () {
-      expect(mapValues((int n) => n * 2, {'a': 1, 'b': 2}),
-          equals({'a': 2, 'b': 4}));
+      expect(
+        mapValues((int n) => n * 2, {'a': 1, 'b': 2}),
+        equals({'a': 2, 'b': 4}),
+      );
     });
 
     test('can change the value type', () {
-      expect(mapValues((int n) => 'v$n', {'a': 1, 'b': 2}),
-          equals({'a': 'v1', 'b': 'v2'}));
+      expect(
+        mapValues((int n) => 'v$n', {'a': 1, 'b': 2}),
+        equals({'a': 'v1', 'b': 'v2'}),
+      );
     });
 
     test('leaves the keys alone and keeps insertion order', () {
@@ -26,20 +30,26 @@ void main() {
     });
 
     test('handles an empty map', () {
-      expect(mapValues((int n) => n * 2, <String, int>{}),
-          equals(<String, int>{}));
+      expect(
+        mapValues((int n) => n * 2, <String, int>{}),
+        equals(<String, int>{}),
+      );
     });
   });
 
   group('mapKeys', () {
     test('runs every key through the callback', () {
-      expect(mapKeys((String k) => k.toUpperCase(), {'a': 1, 'b': 2}),
-          equals({'A': 1, 'B': 2}));
+      expect(
+        mapKeys((String k) => k.toUpperCase(), {'a': 1, 'b': 2}),
+        equals({'A': 1, 'B': 2}),
+      );
     });
 
     test('can change the key type', () {
-      expect(mapKeys((String k) => k.length, {'a': 1, 'bb': 2}),
-          equals({1: 1, 2: 2}));
+      expect(
+        mapKeys((String k) => k.length, {'a': 1, 'bb': 2}),
+        equals({1: 1, 2: 2}),
+      );
     });
 
     test('on a collision the last key in iteration order wins', () {
@@ -51,8 +61,10 @@ void main() {
 
   group('mapEntries', () {
     test('transforms key and value together', () {
-      final res =
-          mapEntries((e) => (e.$1.toUpperCase(), e.$2 * 2), {'a': 1, 'b': 2});
+      final res = mapEntries((e) => (e.$1.toUpperCase(), e.$2 * 2), {
+        'a': 1,
+        'b': 2,
+      });
       expect(res, equals({'A': 2, 'B': 4}));
     });
 
@@ -68,23 +80,31 @@ void main() {
 
     test('generalises mapValues and mapKeys', () {
       final source = {'a': 1, 'b': 2};
-      expect(mapEntries((e) => (e.$1, e.$2 * 2), source),
-          equals(mapValues((int n) => n * 2, source)));
-      expect(mapEntries((e) => (e.$1.toUpperCase(), e.$2), source),
-          equals(mapKeys((String k) => k.toUpperCase(), source)));
+      expect(
+        mapEntries((e) => (e.$1, e.$2 * 2), source),
+        equals(mapValues((int n) => n * 2, source)),
+      );
+      expect(
+        mapEntries((e) => (e.$1.toUpperCase(), e.$2), source),
+        equals(mapKeys((String k) => k.toUpperCase(), source)),
+      );
     });
   });
 
   group('pickBy as the key-aware filter', () {
     test('filters by value or by key through the same record', () {
       expect(pickBy((e) => e.$2 > 1, {'a': 1, 'b': 2}), equals({'b': 2}));
-      expect(pickBy((e) => e.$1.startsWith('a'), {'a': 1, 'b': 2}),
-          equals({'a': 1}));
+      expect(
+        pickBy((e) => e.$1.startsWith('a'), {'a': 1, 'b': 2}),
+        equals({'a': 1}),
+      );
     });
 
     test('composes with mapValues', () {
-      final res = mapValues((int n) => n * 10, pickBy((e) => e.$2.isEven,
-          {'a': 1, 'b': 2, 'c': 3, 'd': 4}));
+      final res = mapValues(
+        (int n) => n * 10,
+        pickBy((e) => e.$2.isEven, {'a': 1, 'b': 2, 'c': 3, 'd': 4}),
+      );
       expect(res, equals({'b': 20, 'd': 40}));
     });
   });

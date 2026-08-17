@@ -18,8 +18,10 @@ void main() {
       });
 
       test('should sort the elements (string chars)', () {
-        expect(sort(sortFn, 'bcdaef'.split('')),
-            equals(['a', 'b', 'c', 'd', 'e', 'f']));
+        expect(
+          sort(sortFn, 'bcdaef'.split('')),
+          equals(['a', 'b', 'c', 'd', 'e', 'f']),
+        );
       });
 
       test('should not mutate the original list', () {
@@ -30,17 +32,13 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = pipe([
-          3,
-          4,
-          1,
-          2,
-          5,
-          2
-        ], [
-          (Iterable<int> a) => filter((int n) => n % 2 != 0, a),
-          (Iterable<int> a) => sort(sortFn, a),
-        ]);
+        final res = pipe(
+          [3, 4, 1, 2, 5, 2],
+          [
+            (Iterable<int> a) => filter((int n) => n % 2 != 0, a),
+            (Iterable<int> a) => sort(sortFn, a),
+          ],
+        );
         expect(res, equals([1, 3, 5]));
       });
     });
@@ -48,32 +46,34 @@ void main() {
     group('async', () {
       test('should sort the elements (empty)', () async {
         expect(
-            await sortAsync(sortFn, toAsync(<Object?>[])), equals(<Object?>[]));
+          await sortAsync(sortFn, toAsync(<Object?>[])),
+          equals(<Object?>[]),
+        );
       });
 
       test('should sort the elements (numbers)', () async {
-        expect(await sortAsync(sortFn, toAsync([3, 4, 1, 2, 5, 2])),
-            equals([1, 2, 2, 3, 4, 5]));
+        expect(
+          await sortAsync(sortFn, toAsync([3, 4, 1, 2, 5, 2])),
+          equals([1, 2, 2, 3, 4, 5]),
+        );
       });
 
       test('should sort the elements (string chars)', () async {
-        expect(await sortAsync(sortFn, toAsync('bcdaef'.split(''))),
-            equals(['a', 'b', 'c', 'd', 'e', 'f']));
+        expect(
+          await sortAsync(sortFn, toAsync('bcdaef'.split(''))),
+          equals(['a', 'b', 'c', 'd', 'e', 'f']),
+        );
       });
 
       test('should be able to be used in the pipeline', () async {
-        final res = await pipe([
-          3,
-          4,
-          1,
-          2,
-          5,
-          2
-        ], [
-          (List<int> a) => toAsync(a),
-          (FxAsyncIterable<int> a) => filterAsync((int n) => n % 2 != 0, a),
-          (FxAsyncIterable<int> a) => sortAsync(sortFn, a),
-        ]);
+        final res = await pipe(
+          [3, 4, 1, 2, 5, 2],
+          [
+            (List<int> a) => toAsync(a),
+            (FxAsyncIterable<int> a) => filterAsync((int n) => n % 2 != 0, a),
+            (FxAsyncIterable<int> a) => sortAsync(sortFn, a),
+          ],
+        );
         expect(res, equals([1, 3, 5]));
       });
     });

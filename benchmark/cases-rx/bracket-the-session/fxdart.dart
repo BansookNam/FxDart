@@ -9,10 +9,9 @@ Future<void> main() async {
     impl: 'fxdart',
     n: n,
     run: () {
-      final lines = fx(events)
-          .prepend('== SESSION OPEN ==')
-          .append('== SESSION CLOSE ==')
-          .toList();
+      final lines = fx(
+        events,
+      ).prepend('== SESSION OPEN ==').append('== SESSION CLOSE ==').toList();
       return '${lines.length}|${lines.first}|${lines[1]}|${lines[n]}|${lines.last}';
     },
   );

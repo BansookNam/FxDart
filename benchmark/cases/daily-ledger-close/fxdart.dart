@@ -25,8 +25,9 @@ Future<void> main() async {
     n: n,
     run: () async {
       maxInFlight = 0;
-      final entries =
-          await fx(ids).toAsync().map(loadEntry).concurrent(3).toList();
+      final entries = await fx(
+        ids,
+      ).toAsync().map(loadEntry).concurrent(3).toList();
 
       final (income, spending) = fx(entries)
           .filter((e) => e.date.year == 2026 && e.date.month == 7)
@@ -36,15 +37,17 @@ Future<void> main() async {
 
       final byCategory = fx(spending).groupBy((e) => e.categoryId);
       final top = fx(byCategory.entries)
-          .map((kv) =>
-              (kv.key, fx(kv.value).sumBy((e) => e.amount), kv.value.length))
+          .map(
+            (kv) =>
+                (kv.key, fx(kv.value).sumBy((e) => e.amount), kv.value.length),
+          )
           .sortBy((c) => -c.$2)
           .take(3)
           .toList();
 
-      final topStr = fx(top)
-          .map((c) => '${c.$1}:${c.$2.toStringAsFixed(2)}:${c.$3}')
-          .join(',');
+      final topStr = fx(
+        top,
+      ).map((c) => '${c.$1}:${c.$2.toStringAsFixed(2)}:${c.$3}').join(',');
       return '${entries.length}|earned=${earned.toStringAsFixed(2)}'
           '|spent=${spent.toStringAsFixed(2)}|top=$topStr|max=$maxInFlight';
     },

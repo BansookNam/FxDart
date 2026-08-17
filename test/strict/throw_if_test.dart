@@ -17,7 +17,9 @@ void main() {
     test('if return of predicate is false', () {
       const input = 10;
       expect(
-          throwIf<Object>(isString, (v) => Exception('$v'), input), equals(10));
+        throwIf<Object>(isString, (v) => Exception('$v'), input),
+        equals(10),
+      );
     });
   });
 }

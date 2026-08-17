@@ -5,11 +5,13 @@ import 'package:test/test.dart' hide isEmpty, isNull, isNotNull, isList, isMap;
 // call sites take a single iterable argument instead).
 void main() {
   group('juxt', () {
-    test('should return an empty array when the list of functions is absent',
-        () {
-      final res = juxt<int, Object?>([])(0);
-      expect(res, equals(<Object?>[]));
-    });
+    test(
+      'should return an empty array when the list of functions is absent',
+      () {
+        final res = juxt<int, Object?>([])(0);
+        expect(res, equals(<Object?>[]));
+      },
+    );
 
     test('should apply a list of functions to a value', () {
       final res = juxt<Iterable<num>, num>([min, max])([1, 2, 3, -4, 5, 6, 7]);

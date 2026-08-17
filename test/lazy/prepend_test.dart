@@ -9,8 +9,10 @@ void main() {
       });
 
       test('should be prepended to a lazy iterable', () {
-        expect(toList(prepend('a', ['b', 'c'].where((_) => true))),
-            equals(['a', 'b', 'c']));
+        expect(
+          toList(prepend('a', ['b', 'c'].where((_) => true))),
+          equals(['a', 'b', 'c']),
+        );
       });
 
       test('should be able to be used in the pipeline', () {
@@ -21,16 +23,21 @@ void main() {
 
     group('async', () {
       test('should be prepended the contents of the given element', () async {
-        final res = await toListAsync(prependAsync(
-            delay(const Duration(milliseconds: 100), 1), toAsync([2, 3, 4])));
+        final res = await toListAsync(
+          prependAsync(
+            delay(const Duration(milliseconds: 100), 1),
+            toAsync([2, 3, 4]),
+          ),
+        );
         expect(res, equals([1, 2, 3, 4]));
       });
 
       test('should be prepend the given element sequentially', () async {
         Future<void> chained = Future.value();
         Future<int> chain(int v) {
-          final next =
-              chained.then((_) => delay(const Duration(milliseconds: 50), v));
+          final next = chained.then(
+            (_) => delay(const Duration(milliseconds: 50), v),
+          );
           chained = next;
           return next;
         }

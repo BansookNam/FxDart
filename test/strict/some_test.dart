@@ -25,90 +25,94 @@ void main() {
       }
 
       test('should be able to be used in the pipeline', () {
-        final res1 = pipe([
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9
-        ], [
-          (Iterable<int> a) => filter((int n) => n % 2 == 0, a),
-          (Iterable<int> a) => some((int n) => n % 2 == 0, a),
-        ]);
+        final res1 = pipe(
+          [1, 2, 3, 4, 5, 6, 7, 8, 9],
+          [
+            (Iterable<int> a) => filter((int n) => n % 2 == 0, a),
+            (Iterable<int> a) => some((int n) => n % 2 == 0, a),
+          ],
+        );
         expect(res1, equals(true));
 
-        final res2 = pipe([
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9
-        ], [
-          (Iterable<int> a) => map((int n) => n + 10, a),
-          (Iterable<int> a) => some((int n) => n > 10, a),
-        ]);
+        final res2 = pipe(
+          [1, 2, 3, 4, 5, 6, 7, 8, 9],
+          [
+            (Iterable<int> a) => map((int n) => n + 10, a),
+            (Iterable<int> a) => some((int n) => n > 10, a),
+          ],
+        );
         expect(res2, equals(true));
 
-        final res3 = pipe([
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9
-        ], [
-          (Iterable<int> a) => map((int n) => n + 10, a),
-          (Iterable<int> a) => some((int n) => n < 10, a),
-        ]);
+        final res3 = pipe(
+          [1, 2, 3, 4, 5, 6, 7, 8, 9],
+          [
+            (Iterable<int> a) => map((int n) => n + 10, a),
+            (Iterable<int> a) => some((int n) => n < 10, a),
+          ],
+        );
         expect(res3, equals(false));
 
-        final res4 = pipe([
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9
-        ], [
-          (Iterable<int> a) => map((int n) => n + 10, a),
-          (Iterable<int> a) => some((int n) => n < 15, a),
-        ]);
+        final res4 = pipe(
+          [1, 2, 3, 4, 5, 6, 7, 8, 9],
+          [
+            (Iterable<int> a) => map((int n) => n + 10, a),
+            (Iterable<int> a) => some((int n) => n < 15, a),
+          ],
+        );
         expect(res4, equals(true));
       });
 
       test('should be able to be used as a chaining method in the `fx`', () {
-        final res1 = fx([1, 2, 3, 4, 5, 6, 7, 8, 9])
-            .filter((a) => a % 2 == 0)
-            .some((a) => a % 2 == 0);
+        final res1 = fx([
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+        ]).filter((a) => a % 2 == 0).some((a) => a % 2 == 0);
         expect(res1, equals(true));
 
-        final res2 = fx([1, 2, 3, 4, 5, 6, 7, 8, 9])
-            .map((a) => a + 10)
-            .some((a) => a > 10);
+        final res2 = fx([
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+        ]).map((a) => a + 10).some((a) => a > 10);
         expect(res2, equals(true));
 
-        final res3 = fx([1, 2, 3, 4, 5, 6, 7, 8, 9])
-            .map((a) => a + 10)
-            .some((a) => a < 10);
+        final res3 = fx([
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+        ]).map((a) => a + 10).some((a) => a < 10);
         expect(res3, equals(false));
 
-        final res4 = fx([1, 2, 3, 4, 5, 6, 7, 8, 9])
-            .map((a) => a + 10)
-            .some((a) => a < 15);
+        final res4 = fx([
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+        ]).map((a) => a + 10).some((a) => a < 15);
         expect(res4, equals(true));
       });
     });
@@ -123,10 +127,12 @@ void main() {
       ];
 
       for (final (f, iterable, result) in syncCases) {
-        test('should return $result for $iterable with a synchronous predicate',
-            () async {
-          expect(await someAsync(f, toAsync(iterable)), equals(result));
-        });
+        test(
+          'should return $result for $iterable with a synchronous predicate',
+          () async {
+            expect(await someAsync(f, toAsync(iterable)), equals(result));
+          },
+        );
       }
 
       final asyncCases = <(Future<bool> Function(int), List<int>, bool)>[
@@ -139,10 +145,11 @@ void main() {
 
       for (final (f, iterable, result) in asyncCases) {
         test(
-            'should return $result for $iterable with an asynchronous predicate',
-            () async {
-          expect(await someAsync(f, toAsync(iterable)), equals(result));
-        });
+          'should return $result for $iterable with an asynchronous predicate',
+          () async {
+            expect(await someAsync(f, toAsync(iterable)), equals(result));
+          },
+        );
       }
 
       test('should be able to be used in the pipeline', () async {
@@ -173,28 +180,30 @@ void main() {
         expect(res4, equals(true));
       });
 
-      test('should be able to be used as a chaining method in the `fx`',
-          () async {
-        final res1 = await fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9]))
-            .filter((a) => a % 2 == 0)
-            .some((a) => a % 2 == 0);
-        expect(res1, equals(true));
+      test(
+        'should be able to be used as a chaining method in the `fx`',
+        () async {
+          final res1 = await fxAsync(
+            toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+          ).filter((a) => a % 2 == 0).some((a) => a % 2 == 0);
+          expect(res1, equals(true));
 
-        final res2 = await fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9]))
-            .map((a) => a + 10)
-            .some((a) => a > 10);
-        expect(res2, equals(true));
+          final res2 = await fxAsync(
+            toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+          ).map((a) => a + 10).some((a) => a > 10);
+          expect(res2, equals(true));
 
-        final res3 = await fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9]))
-            .map((a) => a + 10)
-            .some((a) => Future.value(a < 10));
-        expect(res3, equals(false));
+          final res3 = await fxAsync(
+            toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+          ).map((a) => a + 10).some((a) => Future.value(a < 10));
+          expect(res3, equals(false));
 
-        final res4 = await fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9]))
-            .map((a) => a + 10)
-            .some((a) => Future.value(a < 15));
-        expect(res4, equals(true));
-      });
+          final res4 = await fxAsync(
+            toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+          ).map((a) => a + 10).some((a) => Future.value(a < 15));
+          expect(res4, equals(true));
+        },
+      );
     });
   });
 }

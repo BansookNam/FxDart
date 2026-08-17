@@ -63,18 +63,20 @@ class FxEvents<T> {
         return;
       }
       for (var i = 0; i < list.length; i++) {
-        subs.add(list[i].listen(
-          (v) => claim(i, () => out.add(v)),
-          onError: (Object e, StackTrace st) =>
-              claim(i, () => out.addError(e, st)),
-          onDone: () {
-            if (winner == i) {
-              out.close();
-            } else if (winner == -1 && ++done == list.length) {
-              out.close();
-            }
-          },
-        ));
+        subs.add(
+          list[i].listen(
+            (v) => claim(i, () => out.add(v)),
+            onError: (Object e, StackTrace st) =>
+                claim(i, () => out.addError(e, st)),
+            onDone: () {
+              if (winner == i) {
+                out.close();
+              } else if (winner == -1 && ++done == list.length) {
+                out.close();
+              }
+            },
+          ),
+        );
       }
       out.onCancel = () => Future.wait(subs.map((s) => s.cancel()));
     };
@@ -93,9 +95,15 @@ class FxEvents<T> {
         return;
       }
       for (final s in list) {
-        subs.add(s.listen(out.add, onError: out.addError, onDone: () {
-          if (++done == list.length) out.close();
-        }));
+        subs.add(
+          s.listen(
+            out.add,
+            onError: out.addError,
+            onDone: () {
+              if (++done == list.length) out.close();
+            },
+          ),
+        );
       }
       out.onCancel = () => Future.wait(subs.map((s) => s.cancel()));
     };
@@ -123,7 +131,9 @@ class FxEvents<T> {
   /// events — no further pair can ever be formed. An empty [sources]
   /// closes immediately.
   static FxEvents<R> zip<T, R>(
-      Iterable<Stream<T>> sources, R Function(List<T> values) combine) {
+    Iterable<Stream<T>> sources,
+    R Function(List<T> values) combine,
+  ) {
     final list = List.of(sources);
     final out = StreamController<R>();
     final subs = <StreamSubscription<T>>[];
@@ -152,13 +162,19 @@ class FxEvents<T> {
 
       for (var i = 0; i < list.length; i++) {
         final index = i;
-        subs.add(list[i].listen((v) {
-          buffers[index].add(v);
-          pump();
-        }, onError: out.addError, onDone: () {
-          closed[index] = true;
-          pump();
-        }));
+        subs.add(
+          list[i].listen(
+            (v) {
+              buffers[index].add(v);
+              pump();
+            },
+            onError: out.addError,
+            onDone: () {
+              closed[index] = true;
+              pump();
+            },
+          ),
+        );
       }
       out.onCancel = () => Future.wait(subs.map((s) => s.cancel()));
     };
@@ -186,16 +202,24 @@ class FxEvents<T> {
 
       for (var i = 0; i < list.length; i++) {
         final index = i;
-        subs.add(list[i].listen((v) {
-          if (!has[index]) {
-            has[index] = true;
-            seen++;
-          }
-          latest[index] = v;
-          if (seen == list.length) out.add([for (final v in latest) v as T]);
-        }, onError: out.addError, onDone: () {
-          if (++done == list.length) out.close();
-        }));
+        subs.add(
+          list[i].listen(
+            (v) {
+              if (!has[index]) {
+                has[index] = true;
+                seen++;
+              }
+              latest[index] = v;
+              if (seen == list.length) {
+                out.add([for (final v in latest) v as T]);
+              }
+            },
+            onError: out.addError,
+            onDone: () {
+              if (++done == list.length) out.close();
+            },
+          ),
+        );
       }
       out.onCancel = () => Future.wait(subs.map((s) => s.cancel()));
     };
@@ -225,17 +249,23 @@ class FxEvents<T> {
 
       for (var i = 0; i < list.length; i++) {
         final index = i;
-        subs.add(list[i].listen((v) {
-          last[index] = v;
-          has[index] = true;
-        }, onError: out.addError, onDone: () {
-          if (++done == list.length) {
-            if (!has.contains(false)) {
-              out.add([for (final v in last) v as T]);
-            }
-            out.close();
-          }
-        }));
+        subs.add(
+          list[i].listen(
+            (v) {
+              last[index] = v;
+              has[index] = true;
+            },
+            onError: out.addError,
+            onDone: () {
+              if (++done == list.length) {
+                if (!has.contains(false)) {
+                  out.add([for (final v in last) v as T]);
+                }
+                out.close();
+              }
+            },
+          ),
+        );
       }
       out.onCancel = () => Future.wait(subs.map((s) => s.cancel()));
     };
@@ -266,18 +296,22 @@ class FxEvents<T> {
             ..close();
           return;
         }
-        sub = source.listen(out.add, onError: (Object e, StackTrace st) {
-          sub!.cancel();
-          sub = null;
-          if (count != null && retries >= count) {
-            out
-              ..addError(e, st)
-              ..close();
-            return;
-          }
-          retries++;
-          attempt();
-        }, onDone: out.close);
+        sub = source.listen(
+          out.add,
+          onError: (Object e, StackTrace st) {
+            sub!.cancel();
+            sub = null;
+            if (count != null && retries >= count) {
+              out
+                ..addError(e, st)
+                ..close();
+              return;
+            }
+            retries++;
+            attempt();
+          },
+          onDone: out.close,
+        );
       }
 
       attempt();
@@ -301,17 +335,21 @@ class FxEvents<T> {
     out.onListen = () {
       late final StreamSubscription<T> sourceSub;
       late final StreamSubscription<void> triggerSub;
-      sourceSub = _inner.listen(out.add, onError: out.addError, onDone: () {
-        triggerSub.cancel();
-        out.close();
-      });
+      sourceSub = _inner.listen(
+        out.add,
+        onError: out.addError,
+        onDone: () {
+          triggerSub.cancel();
+          out.close();
+        },
+      );
       triggerSub = trigger.listen((_) {
         sourceSub.cancel();
         triggerSub.cancel();
         out.close();
       }, onError: out.addError);
-      out.onCancel =
-          () => Future.wait([sourceSub.cancel(), triggerSub.cancel()]);
+      out.onCancel = () =>
+          Future.wait([sourceSub.cancel(), triggerSub.cancel()]);
     };
     return FxEvents(out.stream);
   }
@@ -328,18 +366,22 @@ class FxEvents<T> {
       var open = false;
       late final StreamSubscription<T> sourceSub;
       late final StreamSubscription<void> triggerSub;
-      sourceSub = _inner.listen((v) {
-        if (open) out.add(v);
-      }, onError: out.addError, onDone: () {
-        triggerSub.cancel();
-        out.close();
-      });
+      sourceSub = _inner.listen(
+        (v) {
+          if (open) out.add(v);
+        },
+        onError: out.addError,
+        onDone: () {
+          triggerSub.cancel();
+          out.close();
+        },
+      );
       triggerSub = trigger.listen((_) {
         open = true;
         triggerSub.cancel();
       }, onError: out.addError);
-      out.onCancel =
-          () => Future.wait([sourceSub.cancel(), triggerSub.cancel()]);
+      out.onCancel = () =>
+          Future.wait([sourceSub.cancel(), triggerSub.cancel()]);
     };
     return FxEvents(out.stream);
   }
@@ -355,19 +397,23 @@ class FxEvents<T> {
       Timer? timer;
       late T pending;
       var hasPending = false;
-      final sub = _inner.listen((v) {
-        pending = v;
-        hasPending = true;
-        timer?.cancel();
-        timer = Timer(window, () {
-          hasPending = false;
-          out.add(pending);
-        });
-      }, onError: out.addError, onDone: () {
-        timer?.cancel();
-        if (hasPending) out.add(pending);
-        out.close();
-      });
+      final sub = _inner.listen(
+        (v) {
+          pending = v;
+          hasPending = true;
+          timer?.cancel();
+          timer = Timer(window, () {
+            hasPending = false;
+            out.add(pending);
+          });
+        },
+        onError: out.addError,
+        onDone: () {
+          timer?.cancel();
+          if (hasPending) out.add(pending);
+          out.close();
+        },
+      );
       out
         ..onPause = sub.pause
         ..onResume = sub.resume
@@ -383,8 +429,11 @@ class FxEvents<T> {
   /// ([leading], on by default), and with [trailing] the newest event seen
   /// during the window is emitted when it ends (or when the source closes
   /// mid-window).
-  FxEvents<T> throttle(Duration window,
-      {bool leading = true, bool trailing = false}) {
+  FxEvents<T> throttle(
+    Duration window, {
+    bool leading = true,
+    bool trailing = false,
+  }) {
     final out = StreamController<T>();
     out.onListen = () {
       Timer? timer;
@@ -401,25 +450,29 @@ class FxEvents<T> {
         if (closed) out.close();
       }
 
-      final sub = _inner.listen((v) {
-        if (timer == null) {
-          timer = Timer(window, endWindow);
-          if (leading) {
-            out.add(v);
-            return;
+      final sub = _inner.listen(
+        (v) {
+          if (timer == null) {
+            timer = Timer(window, endWindow);
+            if (leading) {
+              out.add(v);
+              return;
+            }
           }
-        }
-        pending = v;
-        hasPending = trailing;
-      }, onError: out.addError, onDone: () {
-        closed = true;
-        // A trailing value still waiting on its window is delivered before
-        // the close; without one, close immediately.
-        if (timer == null || !(trailing && hasPending)) {
-          timer?.cancel();
-          out.close();
-        }
-      });
+          pending = v;
+          hasPending = trailing;
+        },
+        onError: out.addError,
+        onDone: () {
+          closed = true;
+          // A trailing value still waiting on its window is delivered before
+          // the close; without one, close immediately.
+          if (timer == null || !(trailing && hasPending)) {
+            timer?.cancel();
+            out.close();
+          }
+        },
+      );
       out
         ..onPause = sub.pause
         ..onResume = sub.resume
@@ -441,13 +494,17 @@ class FxEvents<T> {
       var hasNew = false;
       late final StreamSubscription<T> sourceSub;
       late final StreamSubscription<void> triggerSub;
-      sourceSub = _inner.listen((v) {
-        latest = v;
-        hasNew = true;
-      }, onError: out.addError, onDone: () {
-        triggerSub.cancel();
-        out.close();
-      });
+      sourceSub = _inner.listen(
+        (v) {
+          latest = v;
+          hasNew = true;
+        },
+        onError: out.addError,
+        onDone: () {
+          triggerSub.cancel();
+          out.close();
+        },
+      );
       triggerSub = trigger.listen((_) {
         if (hasNew) {
           hasNew = false;
@@ -483,18 +540,22 @@ class FxEvents<T> {
         if (closed && timers.isEmpty) out.close();
       }
 
-      final sub = _inner.listen((v) {
-        late final Timer timer;
-        timer = Timer(duration, () {
-          timers.remove(timer);
-          out.add(v);
+      final sub = _inner.listen(
+        (v) {
+          late final Timer timer;
+          timer = Timer(duration, () {
+            timers.remove(timer);
+            out.add(v);
+            settle();
+          });
+          timers.add(timer);
+        },
+        onError: out.addError,
+        onDone: () {
+          closed = true;
           settle();
-        });
-        timers.add(timer);
-      }, onError: out.addError, onDone: () {
-        closed = true;
-        settle();
-      });
+        },
+      );
       out.onCancel = () {
         for (final t in timers) {
           t.cancel();
@@ -534,13 +595,17 @@ class FxEvents<T> {
         });
       }
 
-      final sub = _inner.listen((v) {
-        queue.add(v);
-        if (timer == null) pump();
-      }, onError: out.addError, onDone: () {
-        closed = true;
-        settle();
-      });
+      final sub = _inner.listen(
+        (v) {
+          queue.add(v);
+          if (timer == null) pump();
+        },
+        onError: out.addError,
+        onDone: () {
+          closed = true;
+          settle();
+        },
+      );
       out.onCancel = () {
         timer?.cancel();
         return sub.cancel();
@@ -563,16 +628,20 @@ class FxEvents<T> {
     final out = StreamController<List<T>>();
     out.onListen = () {
       var batch = <T>[];
-      final sub = _inner.listen((v) {
-        batch.add(v);
-        if (batch.length == count) {
-          out.add(batch);
-          batch = <T>[];
-        }
-      }, onError: out.addError, onDone: () {
-        if (batch.isNotEmpty) out.add(batch);
-        out.close();
-      });
+      final sub = _inner.listen(
+        (v) {
+          batch.add(v);
+          if (batch.length == count) {
+            out.add(batch);
+            batch = <T>[];
+          }
+        },
+        onError: out.addError,
+        onDone: () {
+          if (batch.isNotEmpty) out.add(batch);
+          out.close();
+        },
+      );
       out
         ..onPause = sub.pause
         ..onResume = sub.resume
@@ -593,20 +662,23 @@ class FxEvents<T> {
       var batch = <T>[];
       late final StreamSubscription<T> sourceSub;
       late final StreamSubscription<void> triggerSub;
-      sourceSub = _inner.listen((v) => batch.add(v), onError: out.addError,
-          onDone: () {
-        triggerSub.cancel();
-        if (batch.isNotEmpty) out.add(batch);
-        out.close();
-      });
+      sourceSub = _inner.listen(
+        (v) => batch.add(v),
+        onError: out.addError,
+        onDone: () {
+          triggerSub.cancel();
+          if (batch.isNotEmpty) out.add(batch);
+          out.close();
+        },
+      );
       triggerSub = trigger.listen((_) {
         if (batch.isNotEmpty) {
           out.add(batch);
           batch = <T>[];
         }
       }, onError: out.addError);
-      out.onCancel =
-          () => Future.wait([sourceSub.cancel(), triggerSub.cancel()]);
+      out.onCancel = () =>
+          Future.wait([sourceSub.cancel(), triggerSub.cancel()]);
     };
     return FxEvents(out.stream);
   }
@@ -628,12 +700,15 @@ class FxEvents<T> {
       }
 
       final timer = Timer.periodic(window, (_) => flush());
-      final sub = _inner.listen((v) => batch.add(v), onError: out.addError,
-          onDone: () {
-        timer.cancel();
-        flush();
-        out.close();
-      });
+      final sub = _inner.listen(
+        (v) => batch.add(v),
+        onError: out.addError,
+        onDone: () {
+          timer.cancel();
+          flush();
+          out.close();
+        },
+      );
       out
         ..onPause = sub.pause
         ..onResume = sub.resume
@@ -651,7 +726,9 @@ class FxEvents<T> {
   /// values — once both sides have produced at least one. Closes when both
   /// sides have closed.
   FxEvents<R> combineLatest<U, R>(
-      Stream<U> other, R Function(T a, U b) combine) {
+    Stream<U> other,
+    R Function(T a, U b) combine,
+  ) {
     final out = StreamController<R>();
     out.onListen = () {
       late T a;
@@ -666,16 +743,24 @@ class FxEvents<T> {
         if (++done == 2) out.close();
       }
 
-      final subA = _inner.listen((v) {
-        a = v;
-        hasA = true;
-        emit();
-      }, onError: out.addError, onDone: onDone);
-      final subB = other.listen((v) {
-        b = v;
-        hasB = true;
-        emit();
-      }, onError: out.addError, onDone: onDone);
+      final subA = _inner.listen(
+        (v) {
+          a = v;
+          hasA = true;
+          emit();
+        },
+        onError: out.addError,
+        onDone: onDone,
+      );
+      final subB = other.listen(
+        (v) {
+          b = v;
+          hasB = true;
+          emit();
+        },
+        onError: out.addError,
+        onDone: onDone,
+      );
       out.onCancel = () => Future.wait([subA.cancel(), subB.cancel()]);
     };
     return FxEvents(out.stream);
@@ -685,7 +770,9 @@ class FxEvents<T> {
   /// [other] — source events before [other] has spoken are dropped. Closes
   /// when the source closes; [other]'s close is ignored.
   FxEvents<R> withLatestFrom<U, R>(
-      Stream<U> other, R Function(T a, U b) combine) {
+    Stream<U> other,
+    R Function(T a, U b) combine,
+  ) {
     final out = StreamController<R>();
     out.onListen = () {
       late U latest;
@@ -695,14 +782,17 @@ class FxEvents<T> {
         hasLatest = true;
       }, onError: out.addError);
       late final StreamSubscription<T> sourceSub;
-      sourceSub = _inner.listen((v) {
-        if (hasLatest) out.add(combine(v, latest));
-      }, onError: out.addError, onDone: () {
-        otherSub.cancel();
-        out.close();
-      });
-      out.onCancel = () =>
-          Future.wait([sourceSub.cancel(), otherSub.cancel()]);
+      sourceSub = _inner.listen(
+        (v) {
+          if (hasLatest) out.add(combine(v, latest));
+        },
+        onError: out.addError,
+        onDone: () {
+          otherSub.cancel();
+          out.close();
+        },
+      );
+      out.onCancel = () => Future.wait([sourceSub.cancel(), otherSub.cancel()]);
     };
     return FxEvents(out.stream);
   }
@@ -729,20 +819,28 @@ class FxEvents<T> {
         }
       }
 
-      final subA = _inner.listen((v) {
-        bufferA.add(v);
-        pump();
-      }, onError: out.addError, onDone: () {
-        closedA = true;
-        pump();
-      });
-      final subB = other.listen((v) {
-        bufferB.add(v);
-        pump();
-      }, onError: out.addError, onDone: () {
-        closedB = true;
-        pump();
-      });
+      final subA = _inner.listen(
+        (v) {
+          bufferA.add(v);
+          pump();
+        },
+        onError: out.addError,
+        onDone: () {
+          closedA = true;
+          pump();
+        },
+      );
+      final subB = other.listen(
+        (v) {
+          bufferB.add(v);
+          pump();
+        },
+        onError: out.addError,
+        onDone: () {
+          closedB = true;
+          pump();
+        },
+      );
       out.onCancel = () => Future.wait([subA.cancel(), subB.cancel()]);
     };
     return FxEvents(out.stream);
@@ -770,29 +868,37 @@ class FxEvents<T> {
     out.onListen = () {
       StreamSubscription<R>? innerSub;
       var outerDone = false;
-      final sub = _inner.listen((v) {
-        innerSub?.cancel();
-        final Stream<R> inner;
-        try {
-          inner = f(v);
-        } catch (e, st) {
-          out.addError(e, st);
-          return;
-        }
-        late final StreamSubscription<R> s;
-        s = inner.listen(out.add, onError: out.addError, onDone: () {
-          if (identical(innerSub, s)) {
-            innerSub = null;
-            if (outerDone) out.close();
+      final sub = _inner.listen(
+        (v) {
+          innerSub?.cancel();
+          final Stream<R> inner;
+          try {
+            inner = f(v);
+          } catch (e, st) {
+            out.addError(e, st);
+            return;
           }
-        });
-        innerSub = s;
-      }, onError: out.addError, onDone: () {
-        outerDone = true;
-        if (innerSub == null) out.close();
-      });
-      out.onCancel = () => Future.wait(
-          [sub.cancel(), if (innerSub != null) innerSub!.cancel()]);
+          late final StreamSubscription<R> s;
+          s = inner.listen(
+            out.add,
+            onError: out.addError,
+            onDone: () {
+              if (identical(innerSub, s)) {
+                innerSub = null;
+                if (outerDone) out.close();
+              }
+            },
+          );
+          innerSub = s;
+        },
+        onError: out.addError,
+        onDone: () {
+          outerDone = true;
+          if (innerSub == null) out.close();
+        },
+      );
+      out.onCancel = () =>
+          Future.wait([sub.cancel(), if (innerSub != null) innerSub!.cancel()]);
     };
     return FxEvents(out.stream);
   }
@@ -832,26 +938,34 @@ class FxEvents<T> {
           return;
         }
         late final StreamSubscription<R> s;
-        s = inner.listen(out.add, onError: out.addError, onDone: () {
-          inners.remove(s);
-          if (waiting.isNotEmpty) start(waiting.removeAt(0));
-          settle();
-        });
+        s = inner.listen(
+          out.add,
+          onError: out.addError,
+          onDone: () {
+            inners.remove(s);
+            if (waiting.isNotEmpty) start(waiting.removeAt(0));
+            settle();
+          },
+        );
         inners.add(s);
       }
 
-      final sub = _inner.listen((v) {
-        if (concurrent != null && inners.length >= concurrent) {
-          waiting.add(v);
-        } else {
-          start(v);
-        }
-      }, onError: out.addError, onDone: () {
-        outerDone = true;
-        settle();
-      });
-      out.onCancel = () => Future.wait(
-          [sub.cancel(), for (final s in inners) s.cancel()]);
+      final sub = _inner.listen(
+        (v) {
+          if (concurrent != null && inners.length >= concurrent) {
+            waiting.add(v);
+          } else {
+            start(v);
+          }
+        },
+        onError: out.addError,
+        onDone: () {
+          outerDone = true;
+          settle();
+        },
+      );
+      out.onCancel = () =>
+          Future.wait([sub.cancel(), for (final s in inners) s.cancel()]);
     };
     return FxEvents(out.stream);
   }
@@ -878,25 +992,33 @@ class FxEvents<T> {
     out.onListen = () {
       StreamSubscription<R>? innerSub;
       var outerDone = false;
-      final sub = _inner.listen((v) {
-        if (innerSub != null) return;
-        final Stream<R> inner;
-        try {
-          inner = f(v);
-        } catch (e, st) {
-          out.addError(e, st);
-          return;
-        }
-        innerSub = inner.listen(out.add, onError: out.addError, onDone: () {
-          innerSub = null;
-          if (outerDone) out.close();
-        });
-      }, onError: out.addError, onDone: () {
-        outerDone = true;
-        if (innerSub == null) out.close();
-      });
-      out.onCancel = () => Future.wait(
-          [sub.cancel(), if (innerSub != null) innerSub!.cancel()]);
+      final sub = _inner.listen(
+        (v) {
+          if (innerSub != null) return;
+          final Stream<R> inner;
+          try {
+            inner = f(v);
+          } catch (e, st) {
+            out.addError(e, st);
+            return;
+          }
+          innerSub = inner.listen(
+            out.add,
+            onError: out.addError,
+            onDone: () {
+              innerSub = null;
+              if (outerDone) out.close();
+            },
+          );
+        },
+        onError: out.addError,
+        onDone: () {
+          outerDone = true;
+          if (innerSub == null) out.close();
+        },
+      );
+      out.onCancel = () =>
+          Future.wait([sub.cancel(), if (innerSub != null) innerSub!.cancel()]);
     };
     return FxEvents(out.stream);
   }
@@ -911,9 +1033,11 @@ class FxEvents<T> {
   FxEvents<T> onErrorReturn(T value) {
     final out = StreamController<T>();
     out.onListen = () {
-      final sub = _inner.listen(out.add,
-          onError: (Object _, StackTrace __) => out.add(value),
-          onDone: out.close);
+      final sub = _inner.listen(
+        out.add,
+        onError: (Object _, StackTrace __) => out.add(value),
+        onDone: out.close,
+      );
       out
         ..onPause = sub.pause
         ..onResume = sub.resume
@@ -930,30 +1054,38 @@ class FxEvents<T> {
   /// error thrown by [f] itself. fxdart events layer, after Rx's
   /// `onErrorResume`.
   FxEvents<T> onErrorResume(
-      Stream<T> Function(Object error, StackTrace stackTrace) f) {
+    Stream<T> Function(Object error, StackTrace stackTrace) f,
+  ) {
     final out = StreamController<T>();
     out.onListen = () {
       StreamSubscription<T>? sourceSub;
       StreamSubscription<T>? fallbackSub;
-      sourceSub = _inner.listen(out.add, onError: (Object e, StackTrace st) {
-        sourceSub!.cancel();
-        sourceSub = null;
-        final Stream<T> fallback;
-        try {
-          fallback = f(e, st);
-        } catch (e2, st2) {
-          out
-            ..addError(e2, st2)
-            ..close();
-          return;
-        }
-        fallbackSub =
-            fallback.listen(out.add, onError: out.addError, onDone: out.close);
-      }, onDone: out.close);
+      sourceSub = _inner.listen(
+        out.add,
+        onError: (Object e, StackTrace st) {
+          sourceSub!.cancel();
+          sourceSub = null;
+          final Stream<T> fallback;
+          try {
+            fallback = f(e, st);
+          } catch (e2, st2) {
+            out
+              ..addError(e2, st2)
+              ..close();
+            return;
+          }
+          fallbackSub = fallback.listen(
+            out.add,
+            onError: out.addError,
+            onDone: out.close,
+          );
+        },
+        onDone: out.close,
+      );
       out.onCancel = () => Future.wait([
-            if (sourceSub != null) sourceSub!.cancel(),
-            if (fallbackSub != null) fallbackSub!.cancel(),
-          ]);
+        if (sourceSub != null) sourceSub!.cancel(),
+        if (fallbackSub != null) fallbackSub!.cancel(),
+      ]);
     };
     return FxEvents(out.stream);
   }
@@ -965,8 +1097,11 @@ class FxEvents<T> {
     final out = StreamController<T>();
     out.onListen = () {
       out.add(value);
-      final sub =
-          _inner.listen(out.add, onError: out.addError, onDone: out.close);
+      final sub = _inner.listen(
+        out.add,
+        onError: out.addError,
+        onDone: out.close,
+      );
       out
         ..onPause = sub.pause
         ..onResume = sub.resume
@@ -1002,25 +1137,35 @@ class FxEvents<T> {
   FxEvents<T> share() {
     late final StreamController<T> out;
     StreamSubscription<T>? sub;
-    out = StreamController<T>.broadcast(onListen: () {
-      sub = _inner.listen(out.add, onError: out.addError, onDone: out.close);
-    }, onCancel: () {
-      // A broadcast controller's onCancel is `void Function()` — there is
-      // nowhere to hand the cancel future, so it is fired and forgotten.
-      sub?.cancel();
-      sub = null;
-      if (!out.isClosed) out.close();
-    });
+    out = StreamController<T>.broadcast(
+      onListen: () {
+        sub = _inner.listen(out.add, onError: out.addError, onDone: out.close);
+      },
+      onCancel: () {
+        // A broadcast controller's onCancel is `void Function()` — there is
+        // nowhere to hand the cancel future, so it is fired and forgotten.
+        sub?.cancel();
+        sub = null;
+        if (!out.isClosed) out.close();
+      },
+    );
     return FxEvents(out.stream);
   }
 
   // --- terminals & bridges --------------------------------------------------
 
   /// Listens to the chain (a plain [Stream.listen] passthrough).
-  StreamSubscription<T> listen(void Function(T event)? onData,
-          {Function? onError, void Function()? onDone, bool? cancelOnError}) =>
-      _inner.listen(onData,
-          onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+  StreamSubscription<T> listen(
+    void Function(T event)? onData, {
+    Function? onError,
+    void Function()? onDone,
+    bool? cancelOnError,
+  }) => _inner.listen(
+    onData,
+    onError: onError,
+    onDone: onDone,
+    cancelOnError: cancelOnError,
+  );
 
   /// Collects every event into a list (completes when the stream closes).
   Future<List<T>> toList() => _inner.toList();
@@ -1052,9 +1197,7 @@ class LiveValue<T> {
   LiveValue();
 
   /// A [LiveValue] that already holds [value].
-  LiveValue.seeded(T value)
-      : _value = value,
-        _hasValue = true;
+  LiveValue.seeded(T value) : _value = value, _hasValue = true;
 
   /// A [LiveValue] fed by [source], starting empty.
   ///
@@ -1073,17 +1216,21 @@ class LiveValue<T> {
   /// A [LiveValue] fed by [source] that already holds [seed] until the
   /// source's first value replaces it. See [LiveValue.from].
   LiveValue.seededFrom(T seed, Stream<T> source)
-      : _value = seed,
-        _hasValue = true {
+    : _value = seed,
+      _hasValue = true {
     _bind(source);
   }
 
   void _bind(Stream<T> source) {
-    _source = source.listen((v) {
-      _value = v;
-      _hasValue = true;
-      _controller.add(v);
-    }, onError: _controller.addError, onDone: close);
+    _source = source.listen(
+      (v) {
+        _value = v;
+        _hasValue = true;
+        _controller.add(v);
+      },
+      onError: _controller.addError,
+      onDone: close,
+    );
   }
 
   /// Whether a value has been set (by seed or [add]).
@@ -1094,7 +1241,8 @@ class LiveValue<T> {
   T get value {
     if (!_hasValue) {
       throw StateError(
-          'LiveValue has no value yet — check hasValue or use LiveValue.seeded');
+        'LiveValue has no value yet — check hasValue or use LiveValue.seeded',
+      );
     }
     return _value as T;
   }
@@ -1116,18 +1264,25 @@ class LiveValue<T> {
   FxEvents<T> get live {
     late StreamController<T> c;
     StreamSubscription<T>? sub;
-    c = StreamController<T>(onListen: () {
-      // Synchronous replay-then-subscribe: no update can slip between the
-      // replayed value and the live feed.
-      if (_hasValue) c.add(_value as T);
-      if (_closed) {
-        c.close();
-        return;
-      }
-      sub = _controller.stream
-          .listen(c.add, onError: c.addError, onDone: c.close);
-    }, onPause: () => sub?.pause(), onResume: () => sub?.resume(),
-        onCancel: () => sub?.cancel());
+    c = StreamController<T>(
+      onListen: () {
+        // Synchronous replay-then-subscribe: no update can slip between the
+        // replayed value and the live feed.
+        if (_hasValue) c.add(_value as T);
+        if (_closed) {
+          c.close();
+          return;
+        }
+        sub = _controller.stream.listen(
+          c.add,
+          onError: c.addError,
+          onDone: c.close,
+        );
+      },
+      onPause: () => sub?.pause(),
+      onResume: () => sub?.resume(),
+      onCancel: () => sub?.cancel(),
+    );
     return FxEvents(c.stream);
   }
 

@@ -10,11 +10,9 @@ Future<void> main() async {
     impl: 'fxdart',
     n: n,
     run: () {
-      final tags = fx(posts)
-          .flatMap((p) => p.tags)
-          .uniq()
-          .sort((a, b) => a.compareTo(b))
-          .toList();
+      final tags = fx(
+        posts,
+      ).flatMap((p) => p.tags).uniq().sort((a, b) => a.compareTo(b)).toList();
       return '${tags.length}|${tags.first}|${tags.last}';
     },
   );

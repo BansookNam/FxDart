@@ -11,8 +11,10 @@ void main() {
       });
 
       test('should compare by the given key', () {
-        expect(toList(uniqAdjacentBy((int a) => a % 10, [1, 11, 21, 2, 1])),
-            equals([1, 2, 1]));
+        expect(
+          toList(uniqAdjacentBy((int a) => a % 10, [1, 11, 21, 2, 1])),
+          equals([1, 2, 1]),
+        );
       });
 
       test('should differ from uniq on recurring values', () {
@@ -32,25 +34,35 @@ void main() {
 
       test('should be able to be used as a chaining method in the `fx`', () {
         expect(fx([1, 1, 2, 2, 1]).uniqAdjacent().toList(), equals([1, 2, 1]));
-        expect(fx(['a', 'A', 'b']).uniqAdjacentBy((s) => s.toLowerCase()).toList(),
-            equals(['a', 'b']));
+        expect(
+          fx(['a', 'A', 'b']).uniqAdjacentBy((s) => s.toLowerCase()).toList(),
+          equals(['a', 'b']),
+        );
       });
     });
 
     group('async', () {
       test('should drop like the sync form', () async {
-        expect(await toListAsync(uniqAdjacentAsync(toAsync([1, 1, 2, 2, 2, 1]))),
-            equals([1, 2, 1]));
-        expect(await toListAsync(uniqAdjacentAsync(asyncEmpty<int>())),
-            equals([]));
+        expect(
+          await toListAsync(uniqAdjacentAsync(toAsync([1, 1, 2, 2, 2, 1]))),
+          equals([1, 2, 1]),
+        );
+        expect(
+          await toListAsync(uniqAdjacentAsync(asyncEmpty<int>())),
+          equals([]),
+        );
       });
 
       test('should support an async key callback', () async {
         expect(
-            await toListAsync(uniqAdjacentByAsync(
-                (int a) => delay(const Duration(milliseconds: 10), a % 10),
-                toAsync([1, 11, 21, 2, 1]))),
-            equals([1, 2, 1]));
+          await toListAsync(
+            uniqAdjacentByAsync(
+              (int a) => delay(const Duration(milliseconds: 10), a % 10),
+              toAsync([1, 11, 21, 2, 1]),
+            ),
+          ),
+          equals([1, 2, 1]),
+        );
       });
 
       test('should be deduped after concurrent', () async {
@@ -80,17 +92,23 @@ void main() {
         );
       });
 
-      test('should be able to be used as a chaining method in the `fx`',
-          () async {
-        expect(await fx([1, 1, 2]).toAsync().uniqAdjacent().toList(),
-            equals([1, 2]));
-        expect(
-            await fx(['a', 'A', 'b'])
-                .toAsync()
-                .uniqAdjacentBy((s) => s.toLowerCase())
-                .toList(),
-            equals(['a', 'b']));
-      });
+      test(
+        'should be able to be used as a chaining method in the `fx`',
+        () async {
+          expect(
+            await fx([1, 1, 2]).toAsync().uniqAdjacent().toList(),
+            equals([1, 2]),
+          );
+          expect(
+            await fx([
+              'a',
+              'A',
+              'b',
+            ]).toAsync().uniqAdjacentBy((s) => s.toLowerCase()).toList(),
+            equals(['a', 'b']),
+          );
+        },
+      );
     });
   });
 }

@@ -14,15 +14,19 @@ class Post {
   const Post(this.title, this.tags);
 }
 
-final List<String> _tagPool =
-    List.generate(500, (i) => 'tag-${i.toString().padLeft(3, '0')}');
+final List<String> _tagPool = List.generate(
+  500,
+  (i) => 'tag-${i.toString().padLeft(3, '0')}',
+);
 
 List<Post> makePosts() {
   final rng = Lcg(4);
   return List.generate(n, (i) {
     final count = 2 + rng.nextInt(3); // 2..4 tags per post
     final tags = List.generate(
-        count, (_) => _tagPool[rng.nextInt(_tagPool.length)]);
+      count,
+      (_) => _tagPool[rng.nextInt(_tagPool.length)],
+    );
     return Post('Post #$i', tags);
   });
 }

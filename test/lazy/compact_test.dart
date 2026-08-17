@@ -21,21 +21,15 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = pipe(<int?>[
-          1,
-          null,
-          3,
-          4,
-          5,
-          null,
-          7,
-          8
-        ], [
-          (v) => compact(v),
-          (v) => map((int a) => a + 10, v),
-          (v) => filter((int a) => a % 2 == 0, v),
-          (v) => toList(v),
-        ]);
+        final res = pipe(
+          <int?>[1, null, 3, 4, 5, null, 7, 8],
+          [
+            (v) => compact(v),
+            (v) => map((int a) => a + 10, v),
+            (v) => filter((int a) => a % 2 == 0, v),
+            (v) => toList(v),
+          ],
+        );
 
         expect(res, equals([14, 18]));
       });
@@ -44,8 +38,9 @@ void main() {
     group('async', () {
       test("should be excluded 'null' - number", () async {
         final acc = <int>[];
-        final it =
-            compactAsync(toAsync<int?>([0, 1, null, 3, null, 5])).iterator;
+        final it = compactAsync(
+          toAsync<int?>([0, 1, null, 3, null, 5]),
+        ).iterator;
         while (true) {
           final r = await it.next();
           if (r.done) break;
@@ -56,16 +51,15 @@ void main() {
 
       test("should be excluded 'null' - string", () async {
         final res = await toListAsync(
-            compactAsync(toAsync<String?>(['', 'a', null, 'b', null])));
+          compactAsync(toAsync<String?>(['', 'a', null, 'b', null])),
+        );
         expect(res, equals(['', 'a', 'b']));
       });
 
       test('should be able to be used in the pipeline', () async {
         final res = await fxAsync(
-                compactAsync(toAsync<int?>([1, null, 3, 4, 5, null, 7, 8])))
-            .map((a) => a + 10)
-            .filter((a) => a % 2 == 0)
-            .toList();
+          compactAsync(toAsync<int?>([1, null, 3, 4, 5, null, 7, 8])),
+        ).map((a) => a + 10).filter((a) => a % 2 == 0).toList();
 
         expect(res, equals([14, 18]));
       });

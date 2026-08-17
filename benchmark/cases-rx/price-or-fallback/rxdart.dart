@@ -28,10 +28,14 @@ Future<void> main() async {
             // onErrorReturnWith after asyncMap saw the failure, the line that
             // caused it would be gone. Recovery that still knows its line
             // means wrapping each lookup in its own inner stream.
-            .flatMap((line) => Rx.fromCallable(() => promoPrice(line.sku))
-                .map((p) => '  ${line.sku}: ${p.toStringAsFixed(2)} (promo)')
-                .onErrorReturnWith((_, _) =>
-                    '  ${line.sku}: ${line.list.toStringAsFixed(2)} (list)'))
+            .flatMap(
+              (line) => Rx.fromCallable(() => promoPrice(line.sku))
+                  .map((p) => '  ${line.sku}: ${p.toStringAsFixed(2)} (promo)')
+                  .onErrorReturnWith(
+                    (_, _) =>
+                        '  ${line.sku}: ${line.list.toStringAsFixed(2)} (list)',
+                  ),
+            )
             .defaultIfEmpty('  (no lines to quote)')
             .toList();
         for (final q in quotes) {

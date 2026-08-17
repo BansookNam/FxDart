@@ -10,8 +10,10 @@ void main() {
     });
 
     test('toString should describe a done result', () {
-      expect(const IterResult<int>.done().toString(),
-          equals('IterResult.done()'));
+      expect(
+        const IterResult<int>.done().toString(),
+        equals('IterResult.done()'),
+      );
     });
   });
 
@@ -24,8 +26,10 @@ void main() {
     });
 
     test('should convert an empty stream', () async {
-      expect(await toListAsync(fromStream(const Stream<int>.empty())),
-          equals([]));
+      expect(
+        await toListAsync(fromStream(const Stream<int>.empty())),
+        equals([]),
+      );
     });
 
     test('should convert a broadcast stream', () async {
@@ -74,19 +78,27 @@ void main() {
 
   group('concurrentAsync', () {
     test('should throw when length is less than 1', () {
-      expect(() => concurrentAsync(0, toAsync([1, 2, 3])),
-          throwsA(isA<RangeError>()));
-      expect(() => concurrentAsync(-1, toAsync([1, 2, 3])),
-          throwsA(isA<RangeError>()));
+      expect(
+        () => concurrentAsync(0, toAsync([1, 2, 3])),
+        throwsA(isA<RangeError>()),
+      );
+      expect(
+        () => concurrentAsync(-1, toAsync([1, 2, 3])),
+        throwsA(isA<RangeError>()),
+      );
     });
   });
 
   group('concurrentPoolAsync', () {
     test('should throw when length is less than 1', () {
-      expect(() => concurrentPoolAsync(0, toAsync([1, 2, 3])),
-          throwsA(isA<RangeError>()));
-      expect(() => concurrentPoolAsync(-1, toAsync([1, 2, 3])),
-          throwsA(isA<RangeError>()));
+      expect(
+        () => concurrentPoolAsync(0, toAsync([1, 2, 3])),
+        throwsA(isA<RangeError>()),
+      );
+      expect(
+        () => concurrentPoolAsync(-1, toAsync([1, 2, 3])),
+        throwsA(isA<RangeError>()),
+      );
     });
   });
 }

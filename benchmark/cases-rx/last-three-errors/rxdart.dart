@@ -12,10 +12,9 @@ Future<void> main() async {
     run: () async {
       // takeLast cannot emit anything until the source is done — the last
       // three are only knowable once the done event arrives.
-      final recent = await Stream.fromIterable(logLines)
-          .where((l) => l.startsWith('ERROR'))
-          .takeLast(3)
-          .toList();
+      final recent = await Stream.fromIterable(
+        logLines,
+      ).where((l) => l.startsWith('ERROR')).takeLast(3).toList();
       return recent.join('|');
     },
   );

@@ -52,7 +52,8 @@ void main() {
 
     test('should uncurry hand-written closures', () {
       // ignore: prefer_function_declarations_over_variables
-      final greet = (String greeting) => (String name) => '$greeting, $name!';
+      final greet = (String greeting) =>
+          (String name) => '$greeting, $name!';
       expect(greet.uncurried('Hello', 'FxDart'), equals('Hello, FxDart!'));
     });
 

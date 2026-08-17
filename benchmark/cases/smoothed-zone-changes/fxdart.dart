@@ -17,8 +17,11 @@ Future<void> main() async {
           .map((w) => fx(w).average())
           .uniqAdjacentBy(zone)
           .pairwise()
-          .map((p) => '${zone(p.$1)} → ${zone(p.$2)}'
-              ' (avg ${p.$1.toStringAsFixed(1)} → ${p.$2.toStringAsFixed(1)})')
+          .map(
+            (p) =>
+                '${zone(p.$1)} → ${zone(p.$2)}'
+                ' (avg ${p.$1.toStringAsFixed(1)} → ${p.$2.toStringAsFixed(1)})',
+          )
           .ifEmpty(() => ['stable — no zone changes'])
           .toList();
       return '${lines.length}|${lines.first}|${lines.last}';

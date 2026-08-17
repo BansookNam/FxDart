@@ -32,9 +32,10 @@ Future<void> main() async {
       for (final id in manifestIds) {
         // Rx.retry re-subscribes the stream FACTORY on error — up to 2
         // retries after the first attempt, so 3 attempts in total.
-        final payload =
-            await Rx.retry(() => Rx.fromCallable(() => fetchManifest(id)), 2)
-                .first;
+        final payload = await Rx.retry(
+          () => Rx.fromCallable(() => fetchManifest(id)),
+          2,
+        ).first;
         fetched++;
         last = payload;
       }

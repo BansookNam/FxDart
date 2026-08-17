@@ -10,23 +10,26 @@ void main() {
 
       test('should be omitted properties by given predicate function', () {
         expect(
-            omitBy((e) => e.$1 == 'b' || e.$2 is bool, obj), equals({'a': 1}));
+          omitBy((e) => e.$1 == 'b' || e.$2 is bool, obj),
+          equals({'a': 1}),
+        );
       });
 
       test('should be omitted properties matching by value type', () {
-        expect(omitBy((e) => e.$2 is String || e.$2 is bool, obj),
-            equals({'a': 1}));
+        expect(
+          omitBy((e) => e.$2 is String || e.$2 is bool, obj),
+          equals({'a': 1}),
+        );
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = pipe({
-          'a': 1,
-          'b': '2',
-          'c': true
-        }, [
-          (Map<String, Object> m) =>
-              omitBy((e) => e.$1 == 'b' || e.$2 is bool, m),
-        ]);
+        final res = pipe(
+          {'a': 1, 'b': '2', 'c': true},
+          [
+            (Map<String, Object> m) =>
+                omitBy((e) => e.$1 == 'b' || e.$2 is bool, m),
+          ],
+        );
         expect(res, equals({'a': 1}));
       });
     });

@@ -2,15 +2,19 @@ import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
   // Lazy, typed pipelines with the fx chain (the Dart analogue of FxTS pipe).
-  final evens = fx([1, 2, 3, 4, 5])
-      .map((a) => a + 10)
-      .filter((a) => a % 2 == 0)
-      .toList();
+  final evens = fx([
+    1,
+    2,
+    3,
+    4,
+    5,
+  ]).map((a) => a + 10).filter((a) => a % 2 == 0).toList();
   print(evens); // [12, 14]
 
   // Everything stays lazy until a terminal operator runs.
-  final firstThreeSquares =
-      fx(range(1, 100)).map((a) => a * a).take(3).toList();
+  final firstThreeSquares = fx(
+    range(1, 100),
+  ).map((a) => a * a).take(3).toList();
   print(firstThreeSquares); // [1, 4, 9]
 
   // Top-level data-first functions compose too.
@@ -20,11 +24,12 @@ Future<void> main() async {
 
   // Async pipelines: toAsync lifts an Iterable (of values or Futures) into
   // an FxAsyncIterable; callbacks may be async.
-  final asyncResult = await fx([1, 2, 3, 4])
-      .toAsync()
-      .map((a) async => a + 10)
-      .filter((a) => a % 2 == 0)
-      .toList();
+  final asyncResult = await fx([
+    1,
+    2,
+    3,
+    4,
+  ]).toAsync().map((a) async => a + 10).filter((a) => a % 2 == 0).toList();
   print(asyncResult); // [12, 14]
 
   // concurrent(n) evaluates the upstream chain n items at a time —
@@ -38,8 +43,8 @@ Future<void> main() async {
   print('$fetched in ${stopwatch.elapsedMilliseconds}ms');
 
   // Streams bridge in and out.
-  final doubled = await fxStream(Stream.fromIterable([1, 2, 3]))
-      .map((a) => a * 2)
-      .toList();
+  final doubled = await fxStream(
+    Stream.fromIterable([1, 2, 3]),
+  ).map((a) => a * 2).toList();
   print(doubled); // [2, 4, 6]
 }

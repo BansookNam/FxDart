@@ -9,7 +9,10 @@ int searches = 0;
 Future<List<String>> fetchMatches(String q) async {
   searches++;
   await Future<void>.delayed(Duration.zero);
-  return [for (final t in titles) if (t.startsWith(q)) t];
+  return [
+    for (final t in titles)
+      if (t.startsWith(q)) t,
+  ];
 }
 
 Future<void> main() async {

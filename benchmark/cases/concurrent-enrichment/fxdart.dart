@@ -26,8 +26,11 @@ Future<void> main() async {
           .sortBy((m) => -m.total)
           .take(enrichCount)
           .toAsync()
-          .map((m) async => '${m.name} — \$${m.total.toStringAsFixed(2)} '
-              '(${await lookupCategory(m.name)})')
+          .map(
+            (m) async =>
+                '${m.name} — \$${m.total.toStringAsFixed(2)} '
+                '(${await lookupCategory(m.name)})',
+          )
           .concurrent(2)
           .toList();
       return '${enriched.length}|${enriched.first}|${enriched.last}|'

@@ -16,16 +16,14 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = pipe([
-          1,
-          2,
-          3,
-          4
-        ], [
-          (Iterable<int> a) => map((int n) => n + 10, a),
-          (Iterable<int> a) => filter((int n) => n % 2 == 0, a),
-          (Iterable<int> a) => nth(1, a),
-        ]);
+        final res = pipe(
+          [1, 2, 3, 4],
+          [
+            (Iterable<int> a) => map((int n) => n + 10, a),
+            (Iterable<int> a) => filter((int n) => n % 2 == 0, a),
+            (Iterable<int> a) => nth(1, a),
+          ],
+        );
         expect(res, equals(14));
       });
     });

@@ -75,7 +75,9 @@ class _BudgetDialogState extends State<_BudgetDialog> {
     // Adding: only money categories that have no budget yet. Editing: the
     // one being edited.
     final choices = locked
-        ? fx(state.categories).filter((c) => c.id == widget.lockedCategoryId).toList()
+        ? fx(
+            state.categories,
+          ).filter((c) => c.id == widget.lockedCategoryId).toList()
         : fx(state.categories)
               .filter(
                 (c) =>
@@ -122,16 +124,18 @@ class _BudgetDialogState extends State<_BudgetDialog> {
                     value: c.id,
                     child: Row(
                       children: [
-                        Icon(categoryIcon(c), size: 18, color: categoryColor(c)),
+                        Icon(
+                          categoryIcon(c),
+                          size: 18,
+                          color: categoryColor(c),
+                        ),
                         const SizedBox(width: 8),
                         Text(c.name),
                       ],
                     ),
                   ),
               ],
-              onChanged: locked
-                  ? null
-                  : (v) => setState(() => _categoryId = v),
+              onChanged: locked ? null : (v) => setState(() => _categoryId = v),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -186,7 +190,8 @@ class _BudgetDialogState extends State<_BudgetDialog> {
         'reused verbatim from the entry form — "budgets apply to money '
             'categories" is the same rule as "an expense needs a money '
             'category"',
-        errors == null || find((FieldError e) => e.field == 'category', errors) == null
+        errors == null ||
+                find((FieldError e) => e.field == 'category', errors) == null
             ? 'ok'
             : 'raised',
       ),
@@ -194,7 +199,8 @@ class _BudgetDialogState extends State<_BudgetDialog> {
         'vBudgetLimit',
         'vAmountValue plus one ensureNotNull: blank is "no money" on an '
             'entry, but a budget with no number is not a budget',
-        errors == null || find((FieldError e) => e.field == 'amount', errors) == null
+        errors == null ||
+                find((FieldError e) => e.field == 'amount', errors) == null
             ? 'ok'
             : 'raised',
       ),

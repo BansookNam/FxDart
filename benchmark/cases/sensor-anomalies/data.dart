@@ -11,8 +11,10 @@ const threshold = 90.0;
 
 const _kinds = ['boiler', 'pump', 'vent', 'fan', 'duct'];
 
-final List<String> sensors =
-    List.generate(n, (i) => '${_kinds[i % _kinds.length]}-$i');
+final List<String> sensors = List.generate(
+  n,
+  (i) => '${_kinds[i % _kinds.length]}-$i',
+);
 
 List<double> makeReadings() {
   final rng = Lcg(6);

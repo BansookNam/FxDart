@@ -17,7 +17,11 @@ import 'package:test/test.dart';
 void main() {
   group('toStream', () {
     test('emits every value in order and closes', () async {
-      final acc = await fx([1, 2, 3]).toAsync().map((i) => i * 2).toStream().toList();
+      final acc = await fx([
+        1,
+        2,
+        3,
+      ]).toAsync().map((i) => i * 2).toStream().toList();
       expect(acc, equals([2, 4, 6]));
     });
 
@@ -65,18 +69,26 @@ void main() {
       final sub = src.chain.toStream().listen((_) {});
       sub.pause();
       await Future<void>.delayed(const Duration(milliseconds: 5));
-      expect(src.produced(), equals(0),
-          reason: 'a paused subscription must not pull');
+      expect(
+        src.produced(),
+        equals(0),
+        reason: 'a paused subscription must not pull',
+      );
       sub.resume();
       await Future<void>.delayed(const Duration(milliseconds: 5));
-      expect(src.produced(), greaterThan(0),
-          reason: 'resuming must restart production');
+      expect(
+        src.produced(),
+        greaterThan(0),
+        reason: 'resuming must restart production',
+      );
       await sub.cancel();
     });
 
     test('pausing mid-stream stops production', () async {
       var produced = 0;
-      final chain = fx(List<int>.generate(200, (i) => i)).toAsync().map((i) async {
+      final chain = fx(List<int>.generate(200, (i) => i)).toAsync().map((
+        i,
+      ) async {
         produced++;
         await Future<void>.delayed(const Duration(milliseconds: 1));
         return i;
@@ -88,13 +100,19 @@ void main() {
       final ceiling = produced + 1;
       expect(produced, greaterThan(0), reason: 'it should have started');
       await Future<void>.delayed(const Duration(milliseconds: 20));
-      expect(produced, lessThanOrEqualTo(ceiling),
-          reason: 'a paused subscription must not keep pulling');
+      expect(
+        produced,
+        lessThanOrEqualTo(ceiling),
+        reason: 'a paused subscription must not keep pulling',
+      );
       final atRest = produced;
       sub.resume();
       await Future<void>.delayed(const Duration(milliseconds: 20));
-      expect(produced, greaterThan(atRest),
-          reason: 'resuming must restart production');
+      expect(
+        produced,
+        greaterThan(atRest),
+        reason: 'resuming must restart production',
+      );
       await sub.cancel();
     });
 
@@ -109,13 +127,16 @@ void main() {
     });
 
     test('an error reaches the listener and ends the stream', () async {
-      final stream = fx([1, 2, 3])
-          .toAsync()
-          .map((i) => i == 2 ? throw StateError('boom') : i)
-          .toStream();
+      final stream = fx([
+        1,
+        2,
+        3,
+      ]).toAsync().map((i) => i == 2 ? throw StateError('boom') : i).toStream();
       final seen = <int>[];
       await expectLater(
-          stream.listen(seen.add).asFuture<void>(), throwsA(isA<StateError>()));
+        stream.listen(seen.add).asFuture<void>(),
+        throwsA(isA<StateError>()),
+      );
       expect(seen, equals([1]));
     });
 
@@ -135,8 +156,9 @@ void main() {
     test('a synchronous chain still delivers every element', () async {
       // Exercises the FxFastIterator branch, where pulls answer without a
       // future and the loop runs until the listener pauses.
-      final acc =
-          await fx(List<int>.generate(200, (i) => i)).toAsync().toStream().toList();
+      final acc = await fx(
+        List<int>.generate(200, (i) => i),
+      ).toAsync().toStream().toList();
       expect(acc.length, equals(200));
       expect(acc.first, equals(0));
       expect(acc.last, equals(199));
@@ -145,10 +167,8 @@ void main() {
 
   group('concurrentPool terminals (push drive)', () {
     FxAsync<int> pool(int n, {int concurrency = 3}) => fx(
-            List<int>.generate(n, (i) => i))
-        .toAsync()
-        .map((i) async => i)
-        .concurrentPool(concurrency);
+      List<int>.generate(n, (i) => i),
+    ).toAsync().map((i) async => i).concurrentPool(concurrency);
 
     test('toList collects every element', () async {
       final acc = await pool(200).toList();
@@ -169,13 +189,19 @@ void main() {
         await Future<void>.delayed(Duration.zero);
         seen.add(v);
       });
-      expect(seen, equals(direct),
-          reason: 'a slow consumer must not reorder or drop elements');
+      expect(
+        seen,
+        equals(direct),
+        reason: 'a slow consumer must not reorder or drop elements',
+      );
     });
 
     test('fold accumulates over every element', () async {
       final total = await pool(100).fold<int>(0, (acc, v) => acc + v);
-      expect(total, equals(List<int>.generate(100, (i) => i).reduce((a, b) => a + b)));
+      expect(
+        total,
+        equals(List<int>.generate(100, (i) => i).reduce((a, b) => a + b)),
+      );
     });
 
     test('an asynchronous fold accumulator sees every element', () async {
@@ -183,7 +209,10 @@ void main() {
         await Future<void>.delayed(Duration.zero);
         return acc + v;
       });
-      expect(total, equals(List<int>.generate(60, (i) => i).reduce((a, b) => a + b)));
+      expect(
+        total,
+        equals(List<int>.generate(60, (i) => i).reduce((a, b) => a + b)),
+      );
     });
 
     test('an upstream error fails the terminal', () async {
@@ -196,8 +225,9 @@ void main() {
 
     test('a throwing consumer callback fails the terminal', () async {
       await expectLater(
-          pool(50).each((v) => v == 10 ? throw StateError('stop') : null),
-          throwsA(isA<StateError>()));
+        pool(50).each((v) => v == 10 ? throw StateError('stop') : null),
+        throwsA(isA<StateError>()),
+      );
     });
 
     test('an empty source completes', () async {

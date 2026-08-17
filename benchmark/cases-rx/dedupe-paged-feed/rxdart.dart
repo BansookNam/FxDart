@@ -15,7 +15,9 @@ Future<void> main() async {
           // Plain Stream.distinct is adjacent-only; global dedup needs
           // distinctUnique with an equals/hashCode pair for the key.
           .distinctUnique(
-              equals: (a, b) => a.$1 == b.$1, hashCode: (item) => item.$1)
+            equals: (a, b) => a.$1 == b.$1,
+            hashCode: (item) => item.$1,
+          )
           .map((item) => '#${item.$1} ${item.$2}')
           .toList();
       return '${items.length}|${items.first}|${items.last}';

@@ -13,9 +13,9 @@ Either<String, int> parsePositive(String s) {
 
 // Dot shorthands inside a switch expression — arms get the return context.
 Either<String, int> doubled(Either<String, int> e) => switch (e) {
-      Left(:final value) => .left(value),
-      Right(:final value) => .right(value * 2),
-    };
+  Left(:final value) => .left(value),
+  Right(:final value) => .right(value * 2),
+};
 
 // Dart 3.7 wildcards: `_` is non-binding, so it can repeat in one signature.
 int arity3(int Function(int _, int _, int _) f) => f(1, 2, 3);

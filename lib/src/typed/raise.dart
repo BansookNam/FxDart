@@ -82,9 +82,8 @@ final class _DefaultRaise<E> implements Raise<E> {
   bool _active = true;
 
   @override
-  Never raise(E error) => _active
-      ? throw _RaiseSignal(error, this)
-      : throw RaiseLeakedError();
+  Never raise(E error) =>
+      _active ? throw _RaiseSignal(error, this) : throw RaiseLeakedError();
 }
 
 /// The single primitive every builder derives from — the port of Arrow's
@@ -171,12 +170,12 @@ Either<E, A> either<E, A>(A Function(Raise<E> r) block) =>
 /// raise inside an unawaited future cannot be captured and surfaces as an
 /// unhandled zone error.
 Future<Either<E, A>> eitherAsync<E, A>(
-        FutureOr<A> Function(Raise<E> r) block) =>
-    foldRaiseAsync<E, A, Either<E, A>>(
-      block,
-      onRaise: (error) => Left(error),
-      onValue: (value) => Right(value),
-    );
+  FutureOr<A> Function(Raise<E> r) block,
+) => foldRaiseAsync<E, A, Either<E, A>>(
+  block,
+  onRaise: (error) => Left(error),
+  onValue: (value) => Right(value),
+);
 
 /// [either] with an exception boundary: a *thrown* exception is transformed
 /// by [onThrow] into the scope's typed error. The pre-combined form of the
@@ -192,26 +191,27 @@ Future<Either<E, A>> eitherAsync<E, A>(
 ///   (e, _) => RowError.one(line, FieldError('row', 'could not parse: $e')),
 /// );
 /// ```
-Either<E, A> eitherCatching<E, A>(A Function(Raise<E> r) block,
-        E Function(Object thrown, StackTrace stackTrace) onThrow) =>
-    foldRaise<E, A, Either<E, A>>(
-      block,
-      onRaise: (error) => Left(error),
-      onValue: (value) => Right(value),
-      onThrow: (thrown, stackTrace) => Left(onThrow(thrown, stackTrace)),
-    );
+Either<E, A> eitherCatching<E, A>(
+  A Function(Raise<E> r) block,
+  E Function(Object thrown, StackTrace stackTrace) onThrow,
+) => foldRaise<E, A, Either<E, A>>(
+  block,
+  onRaise: (error) => Left(error),
+  onValue: (value) => Right(value),
+  onThrow: (thrown, stackTrace) => Left(onThrow(thrown, stackTrace)),
+);
 
 /// Async twin of [eitherCatching].
 Future<Either<E, A>> eitherCatchingAsync<E, A>(
-        FutureOr<A> Function(Raise<E> r) block,
-        FutureOr<E> Function(Object thrown, StackTrace stackTrace) onThrow) =>
-    foldRaiseAsync<E, A, Either<E, A>>(
-      block,
-      onRaise: (error) => Left(error),
-      onValue: (value) => Right(value),
-      onThrow: (thrown, stackTrace) async =>
-          Left(await onThrow(thrown, stackTrace)),
-    );
+  FutureOr<A> Function(Raise<E> r) block,
+  FutureOr<E> Function(Object thrown, StackTrace stackTrace) onThrow,
+) => foldRaiseAsync<E, A, Either<E, A>>(
+  block,
+  onRaise: (error) => Left(error),
+  onValue: (value) => Right(value),
+  onThrow: (thrown, stackTrace) async =>
+      Left(await onThrow(thrown, stackTrace)),
+);
 
 /// The info-free raise scope used by [nullable] — the port of Arrow's
 /// `SingletonRaise` (errors carry no information).
@@ -251,10 +251,10 @@ final class SingletonRaise implements Raise<void> {
 /// }); // int? — null if either parse failed
 /// ```
 A? nullable<A>(A Function(SingletonRaise r) block) => foldRaise<void, A, A?>(
-      (r) => block(SingletonRaise._(r)),
-      onRaise: (_) => null,
-      onValue: (value) => value,
-    );
+  (r) => block(SingletonRaise._(r)),
+  onRaise: (_) => null,
+  onValue: (value) => value,
+);
 
 /// Async twin of [nullable].
 Future<A?> nullableAsync<A>(FutureOr<A> Function(SingletonRaise r) block) =>
@@ -270,7 +270,9 @@ Future<A?> nullableAsync<A>(FutureOr<A> Function(SingletonRaise r) block) =>
 /// `catch` + `nonFatalOrThrow` discipline; `catch` is a Dart reserved word,
 /// hence `catching`).
 A catching<A>(
-    A Function() block, A Function(Object error, StackTrace stackTrace) onError) {
+  A Function() block,
+  A Function(Object error, StackTrace stackTrace) onError,
+) {
   try {
     return block();
   } on _RaiseSignal {
@@ -281,8 +283,10 @@ A catching<A>(
 }
 
 /// Async twin of [catching].
-Future<A> catchingAsync<A>(FutureOr<A> Function() block,
-    FutureOr<A> Function(Object error, StackTrace stackTrace) onError) async {
+Future<A> catchingAsync<A>(
+  FutureOr<A> Function() block,
+  FutureOr<A> Function(Object error, StackTrace stackTrace) onError,
+) async {
   try {
     return await block();
   } on _RaiseSignal {
@@ -297,13 +301,14 @@ Future<A> catchingAsync<A>(FutureOr<A> Function() block,
 extension RaiseOps<E> on Raise<E> {
   /// Unwraps [either], raising its [Left].
   A bind<A>(Either<E, A> either) => switch (either) {
-        Left(:final value) => raise(value),
-        Right(:final value) => value,
-      };
+    Left(:final value) => raise(value),
+    Right(:final value) => value,
+  };
 
   /// Unwraps every element, raising the first [Left].
-  List<A> bindAll<A>(Iterable<Either<E, A>> eithers) =>
-      [for (final e in eithers) bind(e)];
+  List<A> bindAll<A>(Iterable<Either<E, A>> eithers) => [
+    for (final e in eithers) bind(e),
+  ];
 
   /// Raises [error] unless [condition] holds — the typed-error `require`.
   void ensure(bool condition, E Function() error) {
@@ -312,8 +317,7 @@ extension RaiseOps<E> on Raise<E> {
 
   /// Returns [value] non-null, or raises [error] — the typed-error
   /// `requireNotNull`, with promotion via the non-null return type.
-  A ensureNotNull<A>(A? value, E Function() error) =>
-      value ?? raise(error());
+  A ensureNotNull<A>(A? value, E Function() error) => value ?? raise(error());
 
   /// Runs [block] in a nested scope; a raised error is handed to [onRaise]
   /// instead of propagating.
@@ -322,19 +326,26 @@ extension RaiseOps<E> on Raise<E> {
   /// Arrow 2.x's three-clause `recover(block, recover, catch)`. The raise
   /// signal itself is never handed to [onThrow] — this scope's raise goes to
   /// [onRaise], a foreign scope's signal is rethrown untouched.
-  A recover<A>(A Function(Raise<E> r) block, A Function(E error) onRaise,
-          {A Function(Object thrown, StackTrace stackTrace)? onThrow}) =>
-      foldRaise<E, A, A>(block,
-          onRaise: onRaise, onValue: (value) => value, onThrow: onThrow);
+  A recover<A>(
+    A Function(Raise<E> r) block,
+    A Function(E error) onRaise, {
+    A Function(Object thrown, StackTrace stackTrace)? onThrow,
+  }) => foldRaise<E, A, A>(
+    block,
+    onRaise: onRaise,
+    onValue: (value) => value,
+    onThrow: onThrow,
+  );
 
   /// Runs [block] in a scope with a DIFFERENT error type `E2`, mapping any
   /// raised `E2` into this scope's `E` via [transform] — the error-type
   /// adapter (port of Arrow's `withError`).
   A withError<E2, A>(
-          E Function(E2 error) transform, A Function(Raise<E2> r) block) =>
-      foldRaise<E2, A, A>(
-        block,
-        onRaise: (error) => raise(transform(error)),
-        onValue: (value) => value,
-      );
+    E Function(E2 error) transform,
+    A Function(Raise<E2> r) block,
+  ) => foldRaise<E2, A, A>(
+    block,
+    onRaise: (error) => raise(transform(error)),
+    onValue: (value) => value,
+  );
 }

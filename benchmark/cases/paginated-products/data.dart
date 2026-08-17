@@ -19,8 +19,16 @@ class Product {
 }
 
 const _names = [
-  'Espresso Kit', 'Travel Mug', 'Pour-over Set', 'Grinder', 'Filter Pack',
-  'Milk Frother', 'Scale', 'Kettle', 'Tamper', 'Cold Brew Jar',
+  'Espresso Kit',
+  'Travel Mug',
+  'Pour-over Set',
+  'Grinder',
+  'Filter Pack',
+  'Milk Frother',
+  'Scale',
+  'Kettle',
+  'Tamper',
+  'Cold Brew Jar',
 ];
 
 List<Product> makeProducts() {

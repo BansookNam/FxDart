@@ -13,12 +13,12 @@ import 'package:test/test.dart' hide isEmpty, isNull, isNotNull, isList, isMap;
 /// A source whose iterator is deliberately NOT an [FxFastIterator], so every
 /// pull goes through the `Future`-returning branch of its consumer.
 FxAsyncIterable<T> slow<T>(List<T> values) => DelegateAsyncIterable(() {
-      var i = 0;
-      return DelegateAsyncIterator((_) async {
-        if (i >= values.length) return IterResult<T>.done();
-        return IterResult<T>.value(values[i++]);
-      });
-    });
+  var i = 0;
+  return DelegateAsyncIterator((_) async {
+    if (i >= values.length) return IterResult<T>.done();
+    return IterResult<T>.value(values[i++]);
+  });
+});
 
 void main() {
   test('slow() really is not a fast iterator', () {
@@ -28,38 +28,51 @@ void main() {
 
   group('concatAsync over a non-fast upstream', () {
     test('drains both sides in order', () async {
-      expect(await toListAsync(concatAsync(slow([1, 2]), slow([3, 4]))),
-          equals([1, 2, 3, 4]));
+      expect(
+        await toListAsync(concatAsync(slow([1, 2]), slow([3, 4]))),
+        equals([1, 2, 3, 4]),
+      );
     });
 
     test('handles an empty left side', () async {
-      expect(await toListAsync(concatAsync(slow(<int>[]), slow([3, 4]))),
-          equals([3, 4]));
+      expect(
+        await toListAsync(concatAsync(slow(<int>[]), slow([3, 4]))),
+        equals([3, 4]),
+      );
     });
 
     test('handles an empty right side', () async {
-      expect(await toListAsync(concatAsync(slow([1, 2]), slow(<int>[]))),
-          equals([1, 2]));
+      expect(
+        await toListAsync(concatAsync(slow([1, 2]), slow(<int>[]))),
+        equals([1, 2]),
+      );
     });
 
     test('handles both sides empty', () async {
-      expect(await toListAsync(concatAsync(slow(<int>[]), slow(<int>[]))),
-          equals(<int>[]));
+      expect(
+        await toListAsync(concatAsync(slow(<int>[]), slow(<int>[]))),
+        equals(<int>[]),
+      );
     });
 
     test('mixes a fast left with a non-fast right', () async {
-      expect(await toListAsync(concatAsync(toAsync([1, 2]), slow([3, 4]))),
-          equals([1, 2, 3, 4]));
+      expect(
+        await toListAsync(concatAsync(toAsync([1, 2]), slow([3, 4]))),
+        equals([1, 2, 3, 4]),
+      );
     });
 
     test('mixes a non-fast left with a fast right', () async {
-      expect(await toListAsync(concatAsync(slow([1, 2]), toAsync([3, 4]))),
-          equals([1, 2, 3, 4]));
+      expect(
+        await toListAsync(concatAsync(slow([1, 2]), toAsync([3, 4]))),
+        equals([1, 2, 3, 4]),
+      );
     });
 
     test('composes with downstream operators', () async {
       final res = await toListAsync(
-          mapAsync((int a) => a * 10, concatAsync(slow([1, 2]), slow([3]))));
+        mapAsync((int a) => a * 10, concatAsync(slow([1, 2]), slow([3]))),
+      );
       expect(res, equals([10, 20, 30]));
     });
   });
@@ -88,32 +101,39 @@ void main() {
       expect(got, equals([1, 2, 3, 4, 5]));
     });
 
-    test('a serial nextOr after the fallback is installed reads through it',
-        () async {
-      // A concurrent pull installs the legacy fallback; a downstream serial
-      // terminal then drives the same iterator with nextOr, which must route
-      // through the fallback rather than the fused path it replaced.
-      final it = concatAsync(toAsync([1, 2]), toAsync([3, 4])).iterator
-          as FxFastIterator<int>;
-      final got = <int>[(await it.next(Concurrent.of(2))).value];
-      while (true) {
-        final r = await it.nextOr();
-        if (r.done) break;
-        got.add(r.value);
-      }
-      expect(got, equals([1, 2, 3, 4]));
-    });
+    test(
+      'a serial nextOr after the fallback is installed reads through it',
+      () async {
+        // A concurrent pull installs the legacy fallback; a downstream serial
+        // terminal then drives the same iterator with nextOr, which must route
+        // through the fallback rather than the fused path it replaced.
+        final it =
+            concatAsync(toAsync([1, 2]), toAsync([3, 4])).iterator
+                as FxFastIterator<int>;
+        final got = <int>[(await it.next(Concurrent.of(2))).value];
+        while (true) {
+          final r = await it.nextOr();
+          if (r.done) break;
+          got.add(r.value);
+        }
+        expect(got, equals([1, 2, 3, 4]));
+      },
+    );
   });
 
   group('takeAsync over a non-fast upstream', () {
     test('takes fewer than available', () async {
-      expect(await toListAsync(takeAsync(2, slow([1, 2, 3, 4]))),
-          equals([1, 2]));
+      expect(
+        await toListAsync(takeAsync(2, slow([1, 2, 3, 4]))),
+        equals([1, 2]),
+      );
     });
 
     test('takes exactly what is available', () async {
-      expect(await toListAsync(takeAsync(3, slow([1, 2, 3]))),
-          equals([1, 2, 3]));
+      expect(
+        await toListAsync(takeAsync(3, slow([1, 2, 3]))),
+        equals([1, 2, 3]),
+      );
     });
 
     test('stops cleanly when the source runs out early', () async {
@@ -156,17 +176,20 @@ void main() {
       expect(got, equals([1, 2, 3]));
     });
 
-    test('a serial nextOr after the fallback is installed reads through it',
-        () async {
-      final it = takeAsync(3, toAsync([1, 2, 3, 4, 5])).iterator
-          as FxFastIterator<int>;
-      final got = <int>[(await it.next(Concurrent.of(2))).value];
-      while (true) {
-        final r = await it.nextOr();
-        if (r.done) break;
-        got.add(r.value);
-      }
-      expect(got, equals([1, 2, 3]));
-    });
+    test(
+      'a serial nextOr after the fallback is installed reads through it',
+      () async {
+        final it =
+            takeAsync(3, toAsync([1, 2, 3, 4, 5])).iterator
+                as FxFastIterator<int>;
+        final got = <int>[(await it.next(Concurrent.of(2))).value];
+        while (true) {
+          final r = await it.nextOr();
+          if (r.done) break;
+          got.add(r.value);
+        }
+        expect(got, equals([1, 2, 3]));
+      },
+    );
   });
 }

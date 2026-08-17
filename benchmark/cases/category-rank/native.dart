@@ -14,8 +14,13 @@ Future<void> main() async {
           .where((t) => t.date.startsWith('2026-07'))
           .groupListsBy((t) => t.category);
       final ranked = byCategory.entries
-          .map((e) =>
-              (e.key, e.value.fold(0.0, (s, t) => s + t.amount), e.value.length))
+          .map(
+            (e) => (
+              e.key,
+              e.value.fold(0.0, (s, t) => s + t.amount),
+              e.value.length,
+            ),
+          )
           .sorted((a, b) => b.$2.compareTo(a.$2))
           .take(3)
           .toList();

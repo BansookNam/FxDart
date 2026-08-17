@@ -25,19 +25,26 @@ void main() {
 
       test('agrees with fold over a reversed source', () {
         final source = [3, 1, 4, 1, 5];
-        expect(foldRight('', (acc, int a) => '$acc$a', source),
-            equals(fold('', (acc, int a) => '$acc$a', reverse(source))));
+        expect(
+          foldRight('', (acc, int a) => '$acc$a', source),
+          equals(fold('', (acc, int a) => '$acc$a', reverse(source))),
+        );
       });
 
       test('works on a lazy, non-List source', () {
         final source = fx([1, 2, 3]).map((a) => a * 10);
-        expect(foldRight(<int>[], (acc, int a) => acc..add(a), source),
-            equals([30, 20, 10]));
+        expect(
+          foldRight(<int>[], (acc, int a) => acc..add(a), source),
+          equals([30, 20, 10]),
+        );
       });
 
       test('can build a right-nested structure', () {
-        final res = foldRight('nil', (acc, String a) => '($a . $acc)',
-            ['a', 'b', 'c']);
+        final res = foldRight('nil', (acc, String a) => '($a . $acc)', [
+          'a',
+          'b',
+          'c',
+        ]);
         expect(res, equals('(a . (b . (c . nil)))'));
       });
 
@@ -57,30 +64,40 @@ void main() {
       });
 
       test('nests from the right', () async {
-        expect(await foldRightAsync(0, (acc, int a) => a - acc, toAsync([1, 2, 3])),
-            equals(2));
+        expect(
+          await foldRightAsync(0, (acc, int a) => a - acc, toAsync([1, 2, 3])),
+          equals(2),
+        );
       });
 
       test('accepts an async seed and accumulator', () async {
-        final res = await foldRightAsync(Future.value(0),
-            (acc, int a) async => a - acc, toAsync([1, 2, 3]));
+        final res = await foldRightAsync(
+          Future.value(0),
+          (acc, int a) async => a - acc,
+          toAsync([1, 2, 3]),
+        );
         expect(res, equals(2));
       });
 
       test('returns the seed for an empty source', () async {
-        expect(await foldRightAsync(42, (acc, int a) => acc + a, toAsync(<int>[])),
-            equals(42));
+        expect(
+          await foldRightAsync(42, (acc, int a) => acc + a, toAsync(<int>[])),
+          equals(42),
+        );
       });
 
       test('agrees with the sync form over the same values', () async {
         final source = [3, 1, 4, 1, 5];
-        expect(await foldRightAsync('', (acc, int a) => '$acc$a', toAsync(source)),
-            equals(foldRight('', (acc, int a) => '$acc$a', source)));
+        expect(
+          await foldRightAsync('', (acc, int a) => '$acc$a', toAsync(source)),
+          equals(foldRight('', (acc, int a) => '$acc$a', source)),
+        );
       });
 
       test('is available as an fxAsync chain method', () async {
-        final res =
-            await fxAsync(toAsync([1, 2, 3])).foldRight(0, (acc, a) => a - acc);
+        final res = await fxAsync(
+          toAsync([1, 2, 3]),
+        ).foldRight(0, (acc, a) => a - acc);
         expect(res, equals(2));
       });
     });
@@ -113,21 +130,27 @@ void main() {
       });
 
       test('returns the seed for an empty source', () {
-        expect(foldRightWithIndex(42, (acc, int a, i) => acc + i, <int>[]),
-            equals(42));
+        expect(
+          foldRightWithIndex(42, (acc, int a, i) => acc + i, <int>[]),
+          equals(42),
+        );
       });
 
       test('works on a lazy, non-List source', () {
         final source = fx([1, 2, 3]).map((a) => a * 10);
-        final res =
-            foldRightWithIndex(<(int, int)>[], (acc, int a, i) => acc..add((i, a)),
-                source);
+        final res = foldRightWithIndex(
+          <(int, int)>[],
+          (acc, int a, i) => acc..add((i, a)),
+          source,
+        );
         expect(res, equals([(2, 30), (1, 20), (0, 10)]));
       });
 
       test('is available as an fx chain method', () {
-        expect(fx([1, 2, 3]).foldRightWithIndex(0, (acc, a, i) => acc + a * i),
-            equals(8));
+        expect(
+          fx([1, 2, 3]).foldRightWithIndex(0, (acc, a, i) => acc + a * i),
+          equals(8),
+        );
       });
     });
 
@@ -142,20 +165,27 @@ void main() {
       });
 
       test('accepts an async seed and accumulator', () async {
-        final res = await foldRightWithIndexAsync(Future.value(0),
-            (acc, int a, i) async => acc + a * i, toAsync([1, 2, 3]));
+        final res = await foldRightWithIndexAsync(
+          Future.value(0),
+          (acc, int a, i) async => acc + a * i,
+          toAsync([1, 2, 3]),
+        );
         expect(res, equals(8));
       });
 
       test('returns the seed for an empty source', () async {
         final res = await foldRightWithIndexAsync(
-            42, (acc, int a, i) => acc + i, toAsync(<int>[]));
+          42,
+          (acc, int a, i) => acc + i,
+          toAsync(<int>[]),
+        );
         expect(res, equals(42));
       });
 
       test('is available as an fxAsync chain method', () async {
-        final res = await fxAsync(toAsync([1, 2, 3]))
-            .foldRightWithIndex(0, (acc, a, i) => acc + a * i);
+        final res = await fxAsync(
+          toAsync([1, 2, 3]),
+        ).foldRightWithIndex(0, (acc, a, i) => acc + a * i);
         expect(res, equals(8));
       });
     });

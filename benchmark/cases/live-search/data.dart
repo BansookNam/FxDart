@@ -39,7 +39,9 @@ List<String> makeTyped() {
     // ~1 in 4 of the rest lands on the corpus, so the backend keeps returning
     // real matches as the universe grows; the others range over the whole
     // universe and repeat heavily (deduped).
-    if (rng.nextDouble() < 0.25) return _query((rng.nextDouble() * 150).floor() * 17);
+    if (rng.nextDouble() < 0.25) {
+      return _query((rng.nextDouble() * 150).floor() * 17);
+    }
     return _query(rng.nextInt(n));
   });
 }

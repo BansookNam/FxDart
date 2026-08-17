@@ -17,10 +17,12 @@ Future<void> main() async {
       final beforeIds = before.map((t) => t.id).toSet();
       final afterIds = after.map((t) => t.id).toSet();
 
-      final added =
-          after.where((t) => !beforeIds.contains(t.id)).sortedBy((t) => t.id);
-      final removed =
-          before.where((t) => !afterIds.contains(t.id)).sortedBy((t) => t.id);
+      final added = after
+          .where((t) => !beforeIds.contains(t.id))
+          .sortedBy((t) => t.id);
+      final removed = before
+          .where((t) => !afterIds.contains(t.id))
+          .sortedBy((t) => t.id);
       final commonCount = after.where((t) => beforeIds.contains(t.id)).length;
 
       final diffLines = [
@@ -28,7 +30,8 @@ Future<void> main() async {
         for (final t in removed) '- ${fmt(t)}',
       ];
 
-      final net = after.fold(0.0, (s, t) => s + t.amount) -
+      final net =
+          after.fold(0.0, (s, t) => s + t.amount) -
           before.fold(0.0, (s, t) => s + t.amount);
       final sign = net < 0 ? '-' : '+';
 

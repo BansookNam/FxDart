@@ -45,7 +45,9 @@ class Lcg {
   int _state;
 
   int _next() {
-    _state = (_state * 6364136223846793005 + 1442695040888963407) & 0x7fffffffffffffff;
+    _state =
+        (_state * 6364136223846793005 + 1442695040888963407) &
+        0x7fffffffffffffff;
     return _state;
   }
 

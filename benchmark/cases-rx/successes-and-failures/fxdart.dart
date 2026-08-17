@@ -17,14 +17,16 @@ Future<void> main() async {
     run: () async {
       // One try/catch turns each outcome into a plain value; partition
       // splits.
-      final (ok, failed) =
-          await fx(orders).toAsync().map<(int, Object?)>((id) async {
-        try {
-          return (await validate(id), null);
-        } catch (e) {
-          return (id, e);
-        }
-      }).partition((r) => r.$2 == null);
+      final (ok, failed) = await fx(orders)
+          .toAsync()
+          .map<(int, Object?)>((id) async {
+            try {
+              return (await validate(id), null);
+            } catch (e) {
+              return (id, e);
+            }
+          })
+          .partition((r) => r.$2 == null);
 
       return '${ok.length + failed.length}|ok=${ok.length}'
           '|failed=${failed.length}'

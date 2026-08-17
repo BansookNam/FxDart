@@ -30,9 +30,9 @@ Future<void> main() async {
             }
           })
           .scan<({int done, int fails})>(
-              (acc, ok) =>
-                  (done: acc.done + 1, fails: acc.fails + (ok ? 0 : 1)),
-              (done: 0, fails: 0))
+            (acc, ok) => (done: acc.done + 1, fails: acc.fails + (ok ? 0 : 1)),
+            (done: 0, fails: 0),
+          )
           .takeUntilInclusive((s) => s.fails == 3)
           .toList();
 

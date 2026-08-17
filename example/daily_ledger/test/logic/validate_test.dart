@@ -295,7 +295,10 @@ void main() {
 
     test('an unset category is rejected', () {
       final result = validateDraft(draft(categoryId: null), byId);
-      expect(problems(result).single, const FieldError('category', 'pick a category'));
+      expect(
+        problems(result).single,
+        const FieldError('category', 'pick a category'),
+      );
     });
 
     test('a due date before the entry date is rejected', () {

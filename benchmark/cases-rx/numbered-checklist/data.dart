@@ -16,7 +16,8 @@ List<String> makeSteps() {
   final rng = Lcg(8);
   return List.generate(
     n,
-    (i) => '${_verbs[rng.nextInt(_verbs.length)]} '
+    (i) =>
+        '${_verbs[rng.nextInt(_verbs.length)]} '
         'the ${_nouns[rng.nextInt(_nouns.length)]}',
   );
 }

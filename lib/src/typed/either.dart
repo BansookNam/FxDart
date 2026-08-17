@@ -46,21 +46,21 @@ sealed class Either<L, R> {
 
   /// Transforms the success value; a [Left] passes through unchanged.
   Either<L, T> map<T>(T Function(R value) f) => switch (this) {
-        Left(:final value) => Left(value),
-        Right(:final value) => Right(f(value)),
-      };
+    Left(:final value) => Left(value),
+    Right(:final value) => Right(f(value)),
+  };
 
   /// Transforms the failure value; a [Right] passes through unchanged.
   Either<T, R> mapLeft<T>(T Function(L value) f) => switch (this) {
-        Left(:final value) => Left(f(value)),
-        Right(:final value) => Right(value),
-      };
+    Left(:final value) => Left(f(value)),
+    Right(:final value) => Right(value),
+  };
 
   /// Chains a dependent computation; short-circuits on [Left].
   Either<L, T> flatMap<T>(Either<L, T> Function(R value) f) => switch (this) {
-        Left(:final value) => Left(value),
-        Right(:final value) => f(value),
-      };
+    Left(:final value) => Left(value),
+    Right(:final value) => f(value),
+  };
 
   /// Combines this success with [b]'s, keeping the **first** failure — the
   /// fail-fast counterpart of `zipOrAccumulate2`.
@@ -86,70 +86,95 @@ sealed class Either<L, R> {
 
   /// 3-ary [map2].
   Either<L, T> map3<B, C, T>(
-      Either<L, B> b, Either<L, C> c, T Function(R a, B b, C c) combine) {
+    Either<L, B> b,
+    Either<L, C> c,
+    T Function(R a, B b, C c) combine,
+  ) {
     final a = this;
     if (a is Left<L, R>) return Left(a.value);
     if (b is Left<L, B>) return Left(b.value);
     if (c is Left<L, C>) return Left(c.value);
-    return Right(combine((a as Right<L, R>).value, (b as Right<L, B>).value,
-        (c as Right<L, C>).value));
+    return Right(
+      combine(
+        (a as Right<L, R>).value,
+        (b as Right<L, B>).value,
+        (c as Right<L, C>).value,
+      ),
+    );
   }
 
   /// 4-ary [map2].
-  Either<L, T> map4<B, C, D, T>(Either<L, B> b, Either<L, C> c, Either<L, D> d,
-      T Function(R a, B b, C c, D d) combine) {
+  Either<L, T> map4<B, C, D, T>(
+    Either<L, B> b,
+    Either<L, C> c,
+    Either<L, D> d,
+    T Function(R a, B b, C c, D d) combine,
+  ) {
     final a = this;
     if (a is Left<L, R>) return Left(a.value);
     if (b is Left<L, B>) return Left(b.value);
     if (c is Left<L, C>) return Left(c.value);
     if (d is Left<L, D>) return Left(d.value);
-    return Right(combine((a as Right<L, R>).value, (b as Right<L, B>).value,
-        (c as Right<L, C>).value, (d as Right<L, D>).value));
+    return Right(
+      combine(
+        (a as Right<L, R>).value,
+        (b as Right<L, B>).value,
+        (c as Right<L, C>).value,
+        (d as Right<L, D>).value,
+      ),
+    );
   }
 
   /// 5-ary [map2]. Arity capped at 5, like `zipOrAccumulate2..5` and
   /// `Curry2..Curry5` — beyond that, chain [flatMap] or use the `either`
   /// builder.
   Either<L, T> map5<B, C, D, E, T>(
-      Either<L, B> b,
-      Either<L, C> c,
-      Either<L, D> d,
-      Either<L, E> e,
-      T Function(R a, B b, C c, D d, E e) combine) {
+    Either<L, B> b,
+    Either<L, C> c,
+    Either<L, D> d,
+    Either<L, E> e,
+    T Function(R a, B b, C c, D d, E e) combine,
+  ) {
     final a = this;
     if (a is Left<L, R>) return Left(a.value);
     if (b is Left<L, B>) return Left(b.value);
     if (c is Left<L, C>) return Left(c.value);
     if (d is Left<L, D>) return Left(d.value);
     if (e is Left<L, E>) return Left(e.value);
-    return Right(combine((a as Right<L, R>).value, (b as Right<L, B>).value,
-        (c as Right<L, C>).value, (d as Right<L, D>).value,
-        (e as Right<L, E>).value));
+    return Right(
+      combine(
+        (a as Right<L, R>).value,
+        (b as Right<L, B>).value,
+        (c as Right<L, C>).value,
+        (d as Right<L, D>).value,
+        (e as Right<L, E>).value,
+      ),
+    );
   }
 
   /// Swaps the sides.
   Either<R, L> swap() => switch (this) {
-        Left(:final value) => Right(value),
-        Right(:final value) => Left(value),
-      };
+    Left(:final value) => Right(value),
+    Right(:final value) => Left(value),
+  };
 
   /// The success value, or `null` — the bridge to nullable-first code.
   R? getOrNull() => switch (this) {
-        Left() => null,
-        Right(:final value) => value,
-      };
+    Left() => null,
+    Right(:final value) => value,
+  };
 
   /// The failure value, or `null`.
   L? leftOrNull() => switch (this) {
-        Left(:final value) => value,
-        Right() => null,
-      };
+    Left(:final value) => value,
+    Right() => null,
+  };
 
   /// The success value, or the result of [orElse] applied to the failure.
   R getOrElse(R Function(L left) orElse) => switch (this) {
-        Left(:final value) => orElse(value),
-        Right(:final value) => value,
-      };
+    Left(:final value) => orElse(value),
+    Right(:final value) => value,
+  };
 
   /// Runs [action] on the failure value; returns this unchanged.
   Either<L, R> onLeft(void Function(L value) action) {
@@ -166,9 +191,9 @@ sealed class Either<L, R> {
   /// Lifts the failure into a singleton [NonEmptyList] — the bridge from
   /// fail-fast values into accumulating scopes.
   EitherNel<L, R> toEitherNel() => switch (this) {
-        Left(:final value) => Left(NonEmptyList.of(value)),
-        Right(:final value) => Right(value),
-      };
+    Left(:final value) => Left(NonEmptyList.of(value)),
+    Right(:final value) => Right(value),
+  };
 
   /// Demotes a [Right] whose value fails [predicate] to a [Left] built by
   /// [onFalse] — inline validation without a `flatMap` + `if`.
@@ -183,7 +208,9 @@ sealed class Either<L, R> {
   /// the `Either`-value form of `Raise.ensure`, which does the same job
   /// inside an `either { }` builder.
   Either<L, R> filterOrElse(
-      bool Function(R value) predicate, L Function(R value) onFalse) {
+    bool Function(R value) predicate,
+    L Function(R value) onFalse,
+  ) {
     if (this case Right(:final value) when !predicate(value)) {
       return Left(onFalse(value));
     }
@@ -201,9 +228,9 @@ sealed class Either<L, R> {
   /// fromCache(key).alt(() => fromDisk(key)).alt(() => fromNetwork(key));
   /// ```
   Either<L, R> alt(Either<L, R> Function() other) => switch (this) {
-        Left() => other(),
-        Right() => this,
-      };
+    Left() => other(),
+    Right() => this,
+  };
 
   /// Like [alt], but [other] receives the failure and may return a different
   /// failure type — the fallback that gets to look at what went wrong.
@@ -231,11 +258,11 @@ sealed class Either<L, R> {
   /// [orElse] is the plainer form for when the replacement is already an
   /// `Either`, and [alt] for when the failure doesn't matter at all.
   Either<L2, R> recover<L2>(
-          R Function(raise_.Raise<L2> r, L error) transform) =>
-      switch (this) {
-        Right(:final value) => Right(value),
-        Left(:final value) => raise_.either((r) => transform(r, value)),
-      };
+    R Function(raise_.Raise<L2> r, L error) transform,
+  ) => switch (this) {
+    Right(:final value) => Right(value),
+    Left(:final value) => raise_.either((r) => transform(r, value)),
+  };
 
   /// Runs [block], capturing any thrown object into a [Left].
   ///
@@ -243,14 +270,18 @@ sealed class Either<L, R> {
   /// of Arrow's `Either.catch` + non-fatal discipline.
   static Either<Object, R> catching<R>(R Function() block) =>
       raise_.catching<Either<Object, R>>(
-          () => Right(block()), (error, stackTrace) => Left(error));
+        () => Right(block()),
+        (error, stackTrace) => Left(error),
+      );
 
   /// Like [catching], but maps the thrown object to a typed failure first.
   static Either<L, R> catchingWith<L, R>(
-          L Function(Object error, StackTrace stackTrace) onError,
-          R Function() block) =>
-      raise_.catching<Either<L, R>>(() => Right(block()),
-          (error, stackTrace) => Left(onError(error, stackTrace)));
+    L Function(Object error, StackTrace stackTrace) onError,
+    R Function() block,
+  ) => raise_.catching<Either<L, R>>(
+    () => Right(block()),
+    (error, stackTrace) => Left(onError(error, stackTrace)),
+  );
 }
 
 /// The failure case of [Either].

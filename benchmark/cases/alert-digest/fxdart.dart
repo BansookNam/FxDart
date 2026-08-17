@@ -15,18 +15,19 @@ Future<void> main() async {
 
       final body = fx(fx(alerts).groupBy((l) => l.service).entries)
           .sortBy((e) => -e.value.length)
-          .flatMap((e) => [
-                '${e.key} (${e.value.length})',
-                ...fx(levels).flatMap((lvl) {
-                  final msgs =
-                      fx(e.value).filter((l) => l.level == lvl).toList();
-                  if (msgs.isEmpty) return const <String>[];
-                  return [
-                    '  $lvl x${msgs.length}',
-                    ...fx(msgs).map((l) => '    - ${l.message}').uniq(),
-                  ];
-                }),
-              ])
+          .flatMap(
+            (e) => [
+              '${e.key} (${e.value.length})',
+              ...fx(levels).flatMap((lvl) {
+                final msgs = fx(e.value).filter((l) => l.level == lvl).toList();
+                if (msgs.isEmpty) return const <String>[];
+                return [
+                  '  $lvl x${msgs.length}',
+                  ...fx(msgs).map((l) => '    - ${l.message}').uniq(),
+                ];
+              }),
+            ],
+          )
           .toList();
 
       return 'ERROR ${byLevel['ERROR']}, WARN ${byLevel['WARN']}|'

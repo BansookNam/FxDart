@@ -9,11 +9,12 @@ void main() {
   group('pipe1', () {
     group('sync', () {
       test(
-          'should return the value evaluated by applying the initial value to a given function',
-          () {
-        final result = pipe1(1, add10);
-        expect(result, equals(11));
-      });
+        'should return the value evaluated by applying the initial value to a given function',
+        () {
+          final result = pipe1(1, add10);
+          expect(result, equals(11));
+        },
+      );
     });
 
     group('async', () {
@@ -28,11 +29,12 @@ void main() {
       });
 
       test(
-          "should work even if the given function is asynchronous and initial value is 'Future'",
-          () async {
-        final result = await pipe1(Future.value(1), add10Async);
-        expect(result, equals(11));
-      });
+        "should work even if the given function is asynchronous and initial value is 'Future'",
+        () async {
+          final result = await pipe1(Future.value(1), add10Async);
+          expect(result, equals(11));
+        },
+      );
     });
   });
 }

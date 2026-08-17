@@ -21,13 +21,17 @@ Future<void> main() async {
           .scan((acc, i) => acc + i.reorderQty * i.unitCost, 0.0)
           .drop(1); // scan emits the seed first
 
-      final plan =
-          fx(needed).zip(running).takeWhile((p) => p.$2 <= budget).toList();
+      final plan = fx(
+        needed,
+      ).zip(running).takeWhile((p) => p.$2 <= budget).toList();
       final lines = fx(plan)
-          .map((p) => '  ${p.$1.name.padRight(15)} '
-              'x${'${p.$1.reorderQty}'.padLeft(3)}  '
-              '${money(p.$1.reorderQty * p.$1.unitCost).padRight(8)} '
-              'running ${money(p.$2)}')
+          .map(
+            (p) =>
+                '  ${p.$1.name.padRight(15)} '
+                'x${'${p.$1.reorderQty}'.padLeft(3)}  '
+                '${money(p.$1.reorderQty * p.$1.unitCost).padRight(8)} '
+                'running ${money(p.$2)}',
+          )
           .toList();
       final spent = fx(plan).sumBy((p) => p.$1.reorderQty * p.$1.unitCost);
 

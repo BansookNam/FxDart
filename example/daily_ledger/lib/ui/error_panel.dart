@@ -128,7 +128,9 @@ class _ErrorPanelState extends State<ErrorPanel> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 2),
                   child: Text(
-                    _expanded ? 'Hide the other ${rest.length}' : 'and ${rest.length} more',
+                    _expanded
+                        ? 'Hide the other ${rest.length}'
+                        : 'and ${rest.length} more',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onErrorContainer,
                       decoration: TextDecoration.underline,

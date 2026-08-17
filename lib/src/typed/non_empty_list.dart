@@ -54,8 +54,7 @@ extension type NonEmptyList<T>._(List<T> _all) implements Iterable<T> {
 
   /// A defensive copy as a plain [List].
   // ignore: annotate_redeclares
-  List<T> toList({bool growable = true}) =>
-      List.of(_all, growable: growable);
+  List<T> toList({bool growable = true}) => List.of(_all, growable: growable);
 }
 
 /// The bridge from plain iterables into the [NonEmptyList] world.

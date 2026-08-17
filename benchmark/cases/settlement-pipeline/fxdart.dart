@@ -30,15 +30,17 @@ Future<void> main() async {
     n: n,
     run: () async {
       maxInFlight = 0;
-      final byMerchant = fx(txns)
-          .reject((t) => t.status == 'failed')
-          .groupBy((t) => t.merchant);
+      final byMerchant = fx(
+        txns,
+      ).reject((t) => t.status == 'failed').groupBy((t) => t.merchant);
       final posted = await fx(byMerchant.entries)
-          .map((kv) => (
-                kv.key,
-                fx(kv.value).sumBy((t) => t.signed).toDouble(),
-                kv.value.length
-              ))
+          .map(
+            (kv) => (
+              kv.key,
+              fx(kv.value).sumBy((t) => t.signed).toDouble(),
+              kv.value.length,
+            ),
+          )
           .sortBy((m) => m.$1)
           .toAsync()
           .map((m) => post(m.$1, m.$2, m.$3))

@@ -19,8 +19,10 @@ void main() {
 
   group('reduceAsync', () {
     test('should reduce without an initial value', () async {
-      expect(await reduceAsync((acc, a) => acc + a, toAsync([1, 2, 3])),
-          equals(6));
+      expect(
+        await reduceAsync((acc, a) => acc + a, toAsync([1, 2, 3])),
+        equals(6),
+      );
     });
 
     test('should support an asynchronous reducer', () async {
@@ -30,10 +32,12 @@ void main() {
       );
     });
 
-    test('should return the only element of a single-element iterable',
-        () async {
-      expect(await reduceAsync((acc, a) => acc + a, toAsync([7])), equals(7));
-    });
+    test(
+      'should return the only element of a single-element iterable',
+      () async {
+        expect(await reduceAsync((acc, a) => acc + a, toAsync([7])), equals(7));
+      },
+    );
 
     test('should throw on an empty iterable with no initial value', () {
       expect(

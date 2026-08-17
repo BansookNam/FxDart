@@ -35,8 +35,9 @@ void main() {
     });
 
     test('map preserves non-emptiness in the type', () {
-      final NonEmptyList<String> mapped =
-          NonEmptyList.of(1, [2]).map((n) => 'n$n');
+      final NonEmptyList<String> mapped = NonEmptyList.of(1, [
+        2,
+      ]).map((n) => 'n$n');
       expect(mapped.toList(), ['n1', 'n2']);
       expect(mapped.head, 'n1');
     });

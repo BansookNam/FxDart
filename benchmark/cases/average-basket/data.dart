@@ -10,9 +10,7 @@ class Order {
   const Order(this.id, this.customer, this.total);
 }
 
-const _customers = [
-  'Ava', 'Ben', 'Cara', 'Dan', 'Elle', 'Finn', 'Gus', 'Hana',
-];
+const _customers = ['Ava', 'Ben', 'Cara', 'Dan', 'Elle', 'Finn', 'Gus', 'Hana'];
 
 List<Order> makeOrders() {
   final rng = Lcg(5);

@@ -10,10 +10,9 @@ Future<void> main() async {
     impl: 'fxdart',
     n: n,
     run: () {
-      final recent = fx(logs)
-          .filter((l) => l.level == 'ERROR')
-          .uniqBy((l) => l.message)
-          .take(3);
+      final recent = fx(
+        logs,
+      ).filter((l) => l.level == 'ERROR').uniqBy((l) => l.message).take(3);
       return recent.map((l) => '${l.time} ${l.message}').join('|');
     },
   );

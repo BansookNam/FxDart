@@ -10,7 +10,9 @@ void main() {
     test('should delay the function call', () async {
       var callCount = 0;
       final debounced = debounce<Object?>(
-          (_) => callCount++, const Duration(milliseconds: 60));
+        (_) => callCount++,
+        const Duration(milliseconds: 60),
+      );
 
       debounced(null);
       expect(callCount, equals(0));
@@ -25,7 +27,9 @@ void main() {
     test('should reset delay if called again before wait time', () async {
       var callCount = 0;
       final debounced = debounce<Object?>(
-          (_) => callCount++, const Duration(milliseconds: 60));
+        (_) => callCount++,
+        const Duration(milliseconds: 60),
+      );
 
       debounced(null);
       await wait(30);
@@ -41,8 +45,10 @@ void main() {
     test('should call immediately if leading is true', () async {
       var callCount = 0;
       final debounced = debounce<Object?>(
-          (_) => callCount++, const Duration(milliseconds: 60),
-          leading: true);
+        (_) => callCount++,
+        const Duration(milliseconds: 60),
+        leading: true,
+      );
 
       debounced(null);
       expect(callCount, equals(1));
@@ -59,8 +65,10 @@ void main() {
 
     test('should use latest arguments', () async {
       final received = <int>[];
-      final debounced =
-          debounce<int>(received.add, const Duration(milliseconds: 60));
+      final debounced = debounce<int>(
+        received.add,
+        const Duration(milliseconds: 60),
+      );
 
       debounced(1);
       debounced(2);
@@ -73,7 +81,9 @@ void main() {
     test('should cancel the delayed execution', () async {
       var callCount = 0;
       final debounced = debounce<Object?>(
-          (_) => callCount++, const Duration(milliseconds: 60));
+        (_) => callCount++,
+        const Duration(milliseconds: 60),
+      );
 
       debounced(null);
       debounced.cancel();

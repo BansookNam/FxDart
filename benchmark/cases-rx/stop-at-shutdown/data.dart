@@ -20,4 +20,6 @@ const _kinds = [
 ];
 
 List<String> makeEvents() => List.generate(
-    n, (i) => i == shutdownAt ? 'SHUTDOWN' : '${_kinds[i % _kinds.length]} #$i');
+  n,
+  (i) => i == shutdownAt ? 'SHUTDOWN' : '${_kinds[i % _kinds.length]} #$i',
+);

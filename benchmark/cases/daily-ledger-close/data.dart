@@ -20,12 +20,23 @@ class Entry {
   final double amount;
   final String categoryId;
   final DateTime date;
-  Entry(this.id, this.title, this.type, this.amount, this.categoryId,
-      this.date);
+  Entry(
+    this.id,
+    this.title,
+    this.type,
+    this.amount,
+    this.categoryId,
+    this.date,
+  );
 }
 
 const _categories = [
-  'food', 'housing', 'utilities', 'fun', 'transport', 'health',
+  'food',
+  'housing',
+  'utilities',
+  'fun',
+  'transport',
+  'health',
 ];
 
 List<Entry> makeLedger() {
@@ -37,14 +48,21 @@ List<Entry> makeLedger() {
     final type = roll == 0
         ? EntryType.income
         : roll <= 3
-            ? EntryType.bill
-            : EntryType.expense;
-    final category =
-        type == EntryType.income ? 'income' : _categories[rng.nextInt(6)];
+        ? EntryType.bill
+        : EntryType.expense;
+    final category = type == EntryType.income
+        ? 'income'
+        : _categories[rng.nextInt(6)];
     final amount = type == EntryType.income
         ? (50000 + rng.nextInt(300000)) / 100
         : (100 + rng.nextInt(19900)) / 100;
     return Entry(
-        'e$i', 'entry $i', type, amount, category, DateTime(2026, month, day));
+      'e$i',
+      'entry $i',
+      type,
+      amount,
+      category,
+      DateTime(2026, month, day),
+    );
   });
 }

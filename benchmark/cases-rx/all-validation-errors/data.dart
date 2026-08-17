@@ -15,10 +15,10 @@ class Signup {
 }
 
 List<String> ruleErrors(Signup s) => [
-      if (s.name.isEmpty) 'name is required',
-      if (!s.email.contains('@')) 'email is malformed',
-      if (s.age < 18) 'must be 18 or older',
-    ];
+  if (s.name.isEmpty) 'name is required',
+  if (!s.email.contains('@')) 'email is malformed',
+  if (s.age < 18) 'must be 18 or older',
+];
 
 /// The scaled signup batch: each rule breaks on a deterministic slice of
 /// forms (drawn from [Lcg.nextDouble] — high bits — per the harness note).

@@ -36,35 +36,38 @@ void main() {
 
       test('should match nested maps partially', () {
         final object = {
-          'user': {'name': 'John', 'age': 30}
+          'user': {'name': 'John', 'age': 30},
         };
         expect(
-            isMatch(object, {
-              'user': {'name': 'John'}
-            }),
-            isTrue);
+          isMatch(object, {
+            'user': {'name': 'John'},
+          }),
+          isTrue,
+        );
       });
 
       test('should match deeply nested maps', () {
         final object = {
           'a': {
-            'b': {'c': true}
-          }
+            'b': {'c': true},
+          },
         };
         expect(
-            isMatch(object, {
-              'a': {
-                'b': {'c': true}
-              }
-            }),
-            isTrue);
+          isMatch(object, {
+            'a': {
+              'b': {'c': true},
+            },
+          }),
+          isTrue,
+        );
         expect(
-            isMatch(object, {
-              'a': {
-                'b': {'c': false}
-              }
-            }),
-            isFalse);
+          isMatch(object, {
+            'a': {
+              'b': {'c': false},
+            },
+          }),
+          isFalse,
+        );
       });
     });
 
@@ -90,44 +93,58 @@ void main() {
 
       test('should match lists with maps partially (per-element)', () {
         expect(
-            isMatch([
-              {'a': 1}
-            ], [
-              {'a': 1}
-            ]),
-            isTrue);
+          isMatch(
+            [
+              {'a': 1},
+            ],
+            [
+              {'a': 1},
+            ],
+          ),
+          isTrue,
+        );
         expect(
-            isMatch([
-              {'a': 1, 'b': 2}
-            ], [
-              {'a': 1}
-            ]),
-            isTrue);
+          isMatch(
+            [
+              {'a': 1, 'b': 2},
+            ],
+            [
+              {'a': 1},
+            ],
+          ),
+          isTrue,
+        );
       });
 
       test('should match lists with maps partially (prefix)', () {
         expect(
-            isMatch([
+          isMatch(
+            [
               {'a': 1, 'b': 2},
-              {'c': 3}
-            ], [
-              {'a': 1}
-            ]),
-            isTrue);
+              {'c': 3},
+            ],
+            [
+              {'a': 1},
+            ],
+          ),
+          isTrue,
+        );
       });
     });
 
     group('DateTime matching', () {
       test('should match equal DateTime objects', () {
         expect(
-            isMatch(DateTime.parse('2024-01-01'), DateTime.parse('2024-01-01')),
-            isTrue);
+          isMatch(DateTime.parse('2024-01-01'), DateTime.parse('2024-01-01')),
+          isTrue,
+        );
       });
 
       test('should return false for different DateTime objects', () {
         expect(
-            isMatch(DateTime.parse('2024-01-01'), DateTime.parse('2024-02-01')),
-            isFalse);
+          isMatch(DateTime.parse('2024-01-01'), DateTime.parse('2024-02-01')),
+          isFalse,
+        );
       });
 
       test('should return false when comparing DateTime with non-DateTime', () {

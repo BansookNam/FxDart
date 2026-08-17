@@ -9,8 +9,13 @@ class Item {
   final int minStock;
   final int reorderQty;
   final double unitCost;
-  const Item(this.name, this.stock, this.minStock, this.reorderQty,
-      this.unitCost);
+  const Item(
+    this.name,
+    this.stock,
+    this.minStock,
+    this.reorderQty,
+    this.unitCost,
+  );
 }
 
 // Budget derived from n so the running-total/takeWhile stage does real work

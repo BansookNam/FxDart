@@ -5,23 +5,28 @@ void main() {
   group('cases', () {
     test('should work in pipe', () {
       final res = fx([10, 20, 30])
-          .map(cases<int, int>([
-            ((n) => gt(15, n), (n) => n + 20),
-            ((n) => gt(25, n), (n) => n + 10),
-          ]))
+          .map(
+            cases<int, int>([
+              ((n) => gt(15, n), (n) => n + 20),
+              ((n) => gt(25, n), (n) => n + 10),
+            ]),
+          )
           .toList();
       expect(res, equals([30, 30, 30]));
     });
 
     test('should work with type-narrowing predicates', () {
-      final res = fx([
-        {'a': 'A', 'b': 'B'},
-        {'a': 'A'},
-      ])
-          .map(cases<Map<String, String>, String>([
-            ((n) => n.containsKey('b'), (n) => n['b']!),
-          ], orElse: (n) => n['a']!))
-          .toList();
+      final res =
+          fx([
+                {'a': 'A', 'b': 'B'},
+                {'a': 'A'},
+              ])
+              .map(
+                cases<Map<String, String>, String>([
+                  ((n) => n.containsKey('b'), (n) => n['b']!),
+                ], orElse: (n) => n['a']!),
+              )
+              .toList();
       expect(res, equals(['B', 'A']));
 
       final upper = cases<Object, String>([
@@ -33,19 +38,17 @@ void main() {
 
     test('should match first predicate', () {
       final res = fx([5, -5])
-          .map(cases<int, Object>([
-            ((n) => lt(0, n), always('positive')),
-          ]))
+          .map(cases<int, Object>([((n) => lt(0, n), always('positive'))]))
           .toList();
       expect(res, equals(['positive', -5]));
     });
 
-    test('should throw when no case matches, no orElse, and value is not R',
-        () {
-      final f = cases<int, String>([
-        ((n) => n < 0, (n) => 'negative'),
-      ]);
-      expect(() => f(1), throwsStateError);
-    });
+    test(
+      'should throw when no case matches, no orElse, and value is not R',
+      () {
+        final f = cases<int, String>([((n) => n < 0, (n) => 'negative')]);
+        expect(() => f(1), throwsStateError);
+      },
+    );
   });
 }

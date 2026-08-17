@@ -16,7 +16,8 @@ List<Reading> makeReadings() {
   final rng = Lcg(6);
   return List.generate(n, (i) {
     final mins = (i * 5) % 1440;
-    final time = '${(mins ~/ 60).toString().padLeft(2, '0')}'
+    final time =
+        '${(mins ~/ 60).toString().padLeft(2, '0')}'
         ':${(mins % 60).toString().padLeft(2, '0')}';
     final double temp;
     if (i == n ~/ 2) {

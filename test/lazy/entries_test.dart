@@ -3,17 +3,14 @@ import 'package:test/test.dart';
 
 void main() {
   group('entries', () {
-    test('should return an iterable that iterates entries of the given map',
-        () {
-      final map = <String, Object?>{
-        'a': 1,
-        'b': '2',
-        'c': true,
-        'd': null,
-      };
-      final res = entries(map).toList();
-      expect(res, equals([('a', 1), ('b', '2'), ('c', true), ('d', null)]));
-    });
+    test(
+      'should return an iterable that iterates entries of the given map',
+      () {
+        final map = <String, Object?>{'a': 1, 'b': '2', 'c': true, 'd': null};
+        final res = entries(map).toList();
+        expect(res, equals([('a', 1), ('b', '2'), ('c', true), ('d', null)]));
+      },
+    );
 
     test('should return entries lazily', () {
       final it = entries({'a': 1, 'b': 2, 'c': 3}).iterator;

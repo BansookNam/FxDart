@@ -17,9 +17,7 @@ void main() {
       final data = {'content': ''};
       final obj = <String, Object>{'label': 'value', 'data': data};
 
-      final syncRes = pipe(obj, [
-        (Map<String, Object> m) => prop('data', m),
-      ]);
+      final syncRes = pipe(obj, [(Map<String, Object> m) => prop('data', m)]);
       expect(identical(syncRes, data), isTrue);
 
       final asyncRes = await pipe(Future.value(obj), [

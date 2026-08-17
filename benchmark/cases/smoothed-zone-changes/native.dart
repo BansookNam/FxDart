@@ -28,8 +28,10 @@ Future<void> main() async {
       for (var i = 1; i < runStarts.length; i++) {
         final from = runStarts[i - 1];
         final to = runStarts[i];
-        lines.add('${zone(from)} → ${zone(to)}'
-            ' (avg ${from.toStringAsFixed(1)} → ${to.toStringAsFixed(1)})');
+        lines.add(
+          '${zone(from)} → ${zone(to)}'
+          ' (avg ${from.toStringAsFixed(1)} → ${to.toStringAsFixed(1)})',
+        );
       }
       if (lines.isEmpty) {
         lines.add('stable — no zone changes');

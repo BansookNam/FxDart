@@ -12,9 +12,9 @@ Future<void> main() async {
     run: () async {
       // Streams have no indexed map — the numbering rides scan's index
       // argument with a throwaway seed and an ignored accumulator.
-      final numbered = await Stream.fromIterable(steps)
-          .scan<String>((_, step, i) => '${i + 1}. $step', '')
-          .toList();
+      final numbered = await Stream.fromIterable(
+        steps,
+      ).scan<String>((_, step, i) => '${i + 1}. $step', '').toList();
       return '${numbered.length}|${numbered.first}|${numbered.last}';
     },
   );

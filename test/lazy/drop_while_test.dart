@@ -5,31 +5,26 @@ void main() {
   group('dropWhile', () {
     group('sync', () {
       test(
-          'should be dropped elements until the value applied to callback returns falsey',
-          () {
-        final acc = <int>[];
-        for (final a in dropWhile((a) => a < 3, [1, 2, 3, 1, 5])) {
-          acc.add(a);
-        }
-        expect(acc, equals([3, 1, 5]));
-      });
+        'should be dropped elements until the value applied to callback returns falsey',
+        () {
+          final acc = <int>[];
+          for (final a in dropWhile((a) => a < 3, [1, 2, 3, 1, 5])) {
+            acc.add(a);
+          }
+          expect(acc, equals([3, 1, 5]));
+        },
+      );
 
       test('should be able to be used in the pipeline', () {
-        final res = pipe([
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8
-        ], [
-          (v) => map((int a) => a + 10, v),
-          (v) => filter((int a) => a % 2 == 0, v),
-          (v) => dropWhile((int a) => a < 16, v),
-          (v) => toList(v),
-        ]);
+        final res = pipe(
+          [1, 2, 3, 4, 5, 6, 7, 8],
+          [
+            (v) => map((int a) => a + 10, v),
+            (v) => filter((int a) => a % 2 == 0, v),
+            (v) => dropWhile((int a) => a < 16, v),
+            (v) => toList(v),
+          ],
+        );
 
         expect(res, equals([16, 18]));
       });
@@ -37,18 +32,21 @@ void main() {
 
     group('async', () {
       test(
-          'should be dropped elements until the value applied to callback returns falsey',
-          () async {
-        final acc = <int>[];
-        final it =
-            dropWhileAsync((a) => a < 3, toAsync([1, 2, 3, 1, 5])).iterator;
-        while (true) {
-          final r = await it.next();
-          if (r.done) break;
-          acc.add(r.value);
-        }
-        expect(acc, equals([3, 1, 5]));
-      });
+        'should be dropped elements until the value applied to callback returns falsey',
+        () async {
+          final acc = <int>[];
+          final it = dropWhileAsync(
+            (a) => a < 3,
+            toAsync([1, 2, 3, 1, 5]),
+          ).iterator;
+          while (true) {
+            final r = await it.next();
+            if (r.done) break;
+            acc.add(r.value);
+          }
+          expect(acc, equals([3, 1, 5]));
+        },
+      );
 
       test('should be able to be used in the pipeline', () async {
         final res = await fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8]))
@@ -99,41 +97,43 @@ void main() {
           yield delay(const Duration(milliseconds: 60), 10);
         }
 
-        final res = await fxAsync(toAsync(source()))
-            .dropWhile((a) => a < 7)
-            .concurrent(5)
-            .toList();
+        final res = await fxAsync(
+          toAsync(source()),
+        ).dropWhile((a) => a < 7).concurrent(5).toList();
         expect(res, equals([7, 8, 1, 10]));
       });
 
-      test('should be able to handle an error when working concurrent',
-          () async {
-        await expectLater(
-          fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
-              .dropWhile((a) {
-                if (a > 5) throw Exception('err');
-                return true;
-              })
-              .concurrent(3)
-              .toList(),
-          throwsException,
-        );
-      });
+      test(
+        'should be able to handle an error when working concurrent',
+        () async {
+          await expectLater(
+            fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+                .dropWhile((a) {
+                  if (a > 5) throw Exception('err');
+                  return true;
+                })
+                .concurrent(3)
+                .toList(),
+            throwsException,
+          );
+        },
+      );
 
       test(
-          'should be able to handle an error when working concurrent - Future.error',
-          () async {
-        await expectLater(
-          fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
-              .dropWhile((a) {
-                if (a > 5) return Future<bool>.error(Exception('err'));
-                return true;
-              })
-              .concurrent(3)
-              .toList(),
-          throwsException,
-        );
-      });
+        'should be able to handle an error when working concurrent - Future.error',
+        () async {
+          await expectLater(
+            fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+                .dropWhile((a) {
+                  if (a > 5) return Future<bool>.error(Exception('err'));
+                  return true;
+                })
+                .concurrent(3)
+                .toList(),
+            throwsException,
+          );
+        },
+      );
     });
   });
 }

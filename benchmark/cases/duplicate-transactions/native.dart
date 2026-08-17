@@ -19,7 +19,8 @@ Future<void> main() async {
         if (group.length > 1) {
           for (final t in group) {
             lines.add(
-                '${t.date}  ${t.merchant}  \$${t.amount.toStringAsFixed(2)}');
+              '${t.date}  ${t.merchant}  \$${t.amount.toStringAsFixed(2)}',
+            );
           }
         }
       }

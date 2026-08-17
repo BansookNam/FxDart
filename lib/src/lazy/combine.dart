@@ -12,8 +12,9 @@ import '../async_iterable.dart';
 /// range(1, 4);     // (1, 2, 3)
 /// range(4, 1, -1); // (4, 3, 2)
 /// ```
-Iterable<int> range(int start, [int? end, int step = 1]) =>
-    end == null ? _RangeIterable(0, start, 1) : _RangeIterable(start, end, step);
+Iterable<int> range(int start, [int? end, int step = 1]) => end == null
+    ? _RangeIterable(0, start, 1)
+    : _RangeIterable(start, end, step);
 
 class _RangeIterable extends Iterable<int> {
   _RangeIterable(this._start, this._end, this._step);
@@ -222,12 +223,17 @@ class _ConcatIterator<A> implements Iterator<A> {
 /// Async counterpart of [concat].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> concatAsync<A>(
-    FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) {
+  FxAsyncIterable<A> iterable1,
+  FxAsyncIterable<A> iterable2,
+) {
   return DelegateAsyncIterable(
-      () => _ConcatAsyncIterator<A>(iterable1, iterable2));
+    () => _ConcatAsyncIterator<A>(iterable1, iterable2),
+  );
 }
 
-class _ConcatAsyncIterator<A> with FxFastNextGate<A> implements FxFastIterator<A> {
+class _ConcatAsyncIterator<A>
+    with FxFastNextGate<A>
+    implements FxFastIterator<A> {
   _ConcatAsyncIterator(this._iterable1, this._iterable2);
   final FxAsyncIterable<A> _iterable1;
   final FxAsyncIterable<A> _iterable2;
@@ -286,7 +292,9 @@ class _ConcatAsyncIterator<A> with FxFastNextGate<A> implements FxFastIterator<A
 }
 
 FxAsyncIterable<A> _concatAsyncLegacy<A>(
-    FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) {
+  FxAsyncIterable<A> iterable1,
+  FxAsyncIterable<A> iterable2,
+) {
   return DelegateAsyncIterable(() {
     final left = iterable1.iterator;
     final right = iterable2.iterator;
@@ -311,8 +319,7 @@ FxAsyncIterable<A> _concatAsyncLegacy<A>(
 /// ifEmpty(() => [0], [1, 2]); // (1, 2)
 /// ifEmpty(() => [0], <int>[]); // (0)
 /// ```
-Iterable<A> ifEmpty<A>(
-        Iterable<A> Function() fallback, Iterable<A> iterable) =>
+Iterable<A> ifEmpty<A>(Iterable<A> Function() fallback, Iterable<A> iterable) =>
     _IfEmptyIterable(fallback, iterable);
 
 class _IfEmptyIterable<A> extends Iterable<A> {
@@ -358,7 +365,9 @@ Iterable<A> defaultIfEmpty<A>(A value, Iterable<A> iterable) =>
 /// Async counterpart of [ifEmpty].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> ifEmptyAsync<A>(
-    FxAsyncIterable<A> Function() fallback, FxAsyncIterable<A> iterable) {
+  FxAsyncIterable<A> Function() fallback,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var first = true;
@@ -383,8 +392,9 @@ FxAsyncIterable<A> ifEmptyAsync<A>(
 /// Async counterpart of [defaultIfEmpty].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> defaultIfEmptyAsync<A>(
-        FutureOr<A> value, FxAsyncIterable<A> iterable) =>
-    ifEmptyAsync(() => toAsync([value]), iterable);
+  FutureOr<A> value,
+  FxAsyncIterable<A> iterable,
+) => ifEmptyAsync(() => toAsync([value]), iterable);
 
 /// Returns the source in reverse order. A [List] source is indexed directly,
 /// back to front; any other source materializes on the first pull.
@@ -501,7 +511,9 @@ class _ForkIterator<T> implements Iterator<T> {
     }
     if (state.error != null) {
       Error.throwWithStackTrace(
-          state.error!, state.stackTrace ?? StackTrace.current);
+        state.error!,
+        state.stackTrace ?? StackTrace.current,
+      );
     }
     if (state.done) return false;
     final bool moved;
@@ -543,26 +555,32 @@ class _ForkAsyncState<T> {
   /// shared buffer in source order (protocol invariant).
   void pull(Concurrent? concurrent) {
     pullsInFlight++;
-    source.next(concurrent).then((result) {
-      pullsInFlight--;
-      if (result.done) {
-        done = true;
-      } else {
-        buffer.add(result.value);
-      }
-      _notify();
-    }, onError: (Object e, StackTrace st) {
-      pullsInFlight--;
-      error = e;
-      stackTrace = st;
-      done = true;
-      _notify();
-    });
+    source
+        .next(concurrent)
+        .then(
+          (result) {
+            pullsInFlight--;
+            if (result.done) {
+              done = true;
+            } else {
+              buffer.add(result.value);
+            }
+            _notify();
+          },
+          onError: (Object e, StackTrace st) {
+            pullsInFlight--;
+            error = e;
+            stackTrace = st;
+            done = true;
+            _notify();
+          },
+        );
   }
 }
 
-final Expando<_ForkAsyncState<Object?>> _forkAsyncStates =
-    Expando('fxdart async fork state');
+final Expando<_ForkAsyncState<Object?>> _forkAsyncStates = Expando(
+  'fxdart async fork state',
+);
 
 /// Async counterpart of [fork]. All forks of the same [FxAsyncIterable]
 /// object share one underlying iterator and buffer.
@@ -587,7 +605,9 @@ FxAsyncIterable<T> forkAsync<T>(FxAsyncIterable<T> iterable) {
           final completer = settlementQueue.removeAt(0);
           if (s.error != null) {
             completer.completeError(
-                s.error!, s.stackTrace ?? StackTrace.current);
+              s.error!,
+              s.stackTrace ?? StackTrace.current,
+            );
           } else {
             completer.complete(IterResult<T>.done());
           }

@@ -41,12 +41,11 @@ class _ZipIterable<A, B> extends Iterable<(A, B)> {
 /// reached through a fixed offset, so a step is a single field write.
 class _ZipRangeRangeIterator<A, B> implements Iterator<(A, B)> {
   _ZipRangeRangeIterator(FxListRange<A> r1, FxListRange<B> r2)
-      : _l1 = r1.list,
-        _l2 = r2.list,
-        _i = r1.start,
-        _off = r2.start - r1.start,
-        _end = r1.start +
-            (r1.length < r2.length ? r1.length : r2.length);
+    : _l1 = r1.list,
+      _l2 = r2.list,
+      _i = r1.start,
+      _off = r2.start - r1.start,
+      _end = r1.start + (r1.length < r2.length ? r1.length : r2.length);
   final List<A> _l1;
   final List<B> _l2;
   final int _off;
@@ -68,9 +67,9 @@ class _ZipRangeRangeIterator<A, B> implements Iterator<(A, B)> {
 /// the left still has a value, matching [_ZipIterator]'s short-circuit.
 class _ZipRangeIterIterator<A, B> implements Iterator<(A, B)> {
   _ZipRangeIterIterator(FxListRange<A> r, this._it2)
-      : _l1 = r.list,
-        _i1 = r.start,
-        _end1 = r.end;
+    : _l1 = r.list,
+      _i1 = r.start,
+      _end1 = r.end;
   final List<A> _l1;
   int _i1;
   final int _end1;
@@ -89,9 +88,9 @@ class _ZipRangeIterIterator<A, B> implements Iterator<(A, B)> {
 /// source with effects sees the same pull count as [_ZipIterator].
 class _ZipIterRangeIterator<A, B> implements Iterator<(A, B)> {
   _ZipIterRangeIterator(this._it1, FxListRange<B> r)
-      : _l2 = r.list,
-        _i2 = r.start,
-        _end2 = r.end;
+    : _l2 = r.list,
+      _i2 = r.start,
+      _end2 = r.end;
   final Iterator<A> _it1;
   final List<B> _l2;
   int _i2;
@@ -124,9 +123,11 @@ class _ZipIterator<A, B> implements Iterator<(A, B)> {
 
 /// Three-iterable variant of [zip]. (Dart has no variadic generics, so each
 /// arity is a separate function.)
-Iterable<(A, B, C)> zip3<A, B, C>(Iterable<A> iterable1, Iterable<B> iterable2,
-        Iterable<C> iterable3) =>
-    _Zip3Iterable(iterable1, iterable2, iterable3);
+Iterable<(A, B, C)> zip3<A, B, C>(
+  Iterable<A> iterable1,
+  Iterable<B> iterable2,
+  Iterable<C> iterable3,
+) => _Zip3Iterable(iterable1, iterable2, iterable3);
 
 class _Zip3Iterable<A, B, C> extends Iterable<(A, B, C)> {
   _Zip3Iterable(this._source1, this._source2, this._source3);
@@ -146,24 +147,28 @@ class _Zip3Iterable<A, B, C> extends Iterable<(A, B, C)> {
         if (r3 != null) return _Zip3RangeIterator(r1, r2, r3);
       }
     }
-    return _Zip3Iterator(_source1.iterator, _source2.iterator,
-        _source3.iterator);
+    return _Zip3Iterator(
+      _source1.iterator,
+      _source2.iterator,
+      _source3.iterator,
+    );
   }
 }
 
 /// All three sides indexed — one cursor plus two fixed offsets.
 class _Zip3RangeIterator<A, B, C> implements Iterator<(A, B, C)> {
   _Zip3RangeIterator(FxListRange<A> r1, FxListRange<B> r2, FxListRange<C> r3)
-      : _l1 = r1.list,
-        _l2 = r2.list,
-        _l3 = r3.list,
-        _i = r1.start,
-        _off2 = r2.start - r1.start,
-        _off3 = r3.start - r1.start,
-        _end = r1.start +
-            (r1.length < r2.length
-                ? (r1.length < r3.length ? r1.length : r3.length)
-                : (r2.length < r3.length ? r2.length : r3.length));
+    : _l1 = r1.list,
+      _l2 = r2.list,
+      _l3 = r3.list,
+      _i = r1.start,
+      _off2 = r2.start - r1.start,
+      _off3 = r3.start - r1.start,
+      _end =
+          r1.start +
+          (r1.length < r2.length
+              ? (r1.length < r3.length ? r1.length : r3.length)
+              : (r2.length < r3.length ? r2.length : r3.length));
   final List<A> _l1;
   final List<B> _l2;
   final List<C> _l3;
@@ -203,7 +208,9 @@ class _Zip3Iterator<A, B, C> implements Iterator<(A, B, C)> {
 /// Async counterpart of [zip]: pulls both sources in parallel per pair.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<(A, B)> zipAsync<A, B>(
-    FxAsyncIterable<A> iterable1, FxAsyncIterable<B> iterable2) {
+  FxAsyncIterable<A> iterable1,
+  FxAsyncIterable<B> iterable2,
+) {
   return DelegateAsyncIterable(() {
     final it1 = iterable1.iterator;
     final it2 = iterable2.iterator;
@@ -223,8 +230,11 @@ FxAsyncIterable<(A, B)> zipAsync<A, B>(
 
 /// Async counterpart of [zip3].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<(A, B, C)> zip3Async<A, B, C>(FxAsyncIterable<A> iterable1,
-    FxAsyncIterable<B> iterable2, FxAsyncIterable<C> iterable3) {
+FxAsyncIterable<(A, B, C)> zip3Async<A, B, C>(
+  FxAsyncIterable<A> iterable1,
+  FxAsyncIterable<B> iterable2,
+  FxAsyncIterable<C> iterable3,
+) {
   return DelegateAsyncIterable(() {
     final it1 = iterable1.iterator;
     final it2 = iterable2.iterator;
@@ -248,14 +258,18 @@ FxAsyncIterable<(A, B, C)> zip3Async<A, B, C>(FxAsyncIterable<A> iterable1,
 ///
 /// Port of FxTS `zipWith`.
 Iterable<C> zipWith<A, B, C>(
-        C Function(A a, B b) f, Iterable<A> iterable1, Iterable<B> iterable2) =>
-    map((r) => f(r.$1, r.$2), zip(iterable1, iterable2));
+  C Function(A a, B b) f,
+  Iterable<A> iterable1,
+  Iterable<B> iterable2,
+) => map((r) => f(r.$1, r.$2), zip(iterable1, iterable2));
 
 /// Async counterpart of [zipWith].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<C> zipWithAsync<A, B, C>(FutureOr<C> Function(A a, B b) f,
-        FxAsyncIterable<A> iterable1, FxAsyncIterable<B> iterable2) =>
-    mapAsync((r) => f(r.$1, r.$2), zipAsync(iterable1, iterable2));
+FxAsyncIterable<C> zipWithAsync<A, B, C>(
+  FutureOr<C> Function(A a, B b) f,
+  FxAsyncIterable<A> iterable1,
+  FxAsyncIterable<B> iterable2,
+) => mapAsync((r) => f(r.$1, r.$2), zipAsync(iterable1, iterable2));
 
 /// Pairs each element with its index: `(index, value)`.
 ///
@@ -319,8 +333,7 @@ class _TransposeIterator<A> implements Iterator<List<A>> {
   @override
   bool moveNext() {
     if (_done) return false;
-    final its =
-        _its ??= _rows.map((r) => r.iterator).toList(growable: false);
+    final its = _its ??= _rows.map((r) => r.iterator).toList(growable: false);
     final column = <A>[];
     for (final it in its) {
       if (it.moveNext()) column.add(it.current);
@@ -341,11 +354,12 @@ FxAsyncIterable<List<A>> transposeAsync<A>(Iterable<FxAsyncIterable<A>> rows) {
     final iterators = rows.map((r) => r.iterator).toList(growable: false);
     return DelegateAsyncIterator((concurrent) async {
       if (iterators.isEmpty) return IterResult<List<A>>.done();
-      final results =
-          await Future.wait(iterators.map((it) => it.next(concurrent)));
+      final results = await Future.wait(
+        iterators.map((it) => it.next(concurrent)),
+      );
       final current = [
         for (final r in results)
-          if (!r.done) r.value
+          if (!r.done) r.value,
       ];
       if (current.isEmpty) return IterResult<List<A>>.done();
       return IterResult.value(current);

@@ -20,20 +20,28 @@ class Tx {
 }
 
 final List<String> categories = List.generate(
-    numCategories, (i) => 'Cat-${(i + 1).toString().padLeft(3, '0')}');
+  numCategories,
+  (i) => 'Cat-${(i + 1).toString().padLeft(3, '0')}',
+);
 
 const _merchants = [
-  'Green Grocer', 'Metro', 'Cinema', 'Noodle Bar', 'Electric Co',
-  'Taxi', 'Arcade', 'Cafe Aroma', 'Water Co', 'Corner Deli',
+  'Green Grocer',
+  'Metro',
+  'Cinema',
+  'Noodle Bar',
+  'Electric Co',
+  'Taxi',
+  'Arcade',
+  'Cafe Aroma',
+  'Water Co',
+  'Corner Deli',
 ];
 
 Map<String, double> makeBudgets() {
   final rng = Lcg(7);
   final low = _expectedSpend * 94 ~/ 100;
   final range = _expectedSpend * 12 ~/ 100;
-  return {
-    for (final c in categories) c: (low + rng.nextInt(range)).toDouble(),
-  };
+  return {for (final c in categories) c: (low + rng.nextInt(range)).toDouble()};
 }
 
 List<Tx> makeTxns() {

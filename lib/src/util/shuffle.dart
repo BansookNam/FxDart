@@ -32,15 +32,19 @@ List<T> _shuffleList<T>(List<T> result, double Function() random) {
 ///
 /// Port of FxTS `shuffle`.
 List<T> shuffle<T>(Iterable<T> iterable, [int? seed]) {
-  final random =
-      seed != null ? createSeededRandom(seed) : math.Random().nextDouble;
+  final random = seed != null
+      ? createSeededRandom(seed)
+      : math.Random().nextDouble;
   return _shuffleList(List.of(iterable), random);
 }
 
 /// Async counterpart of [shuffle].
-Future<List<T>> shuffleAsync<T>(FxAsyncIterable<T> iterable,
-    [int? seed]) async {
-  final random =
-      seed != null ? createSeededRandom(seed) : math.Random().nextDouble;
+Future<List<T>> shuffleAsync<T>(
+  FxAsyncIterable<T> iterable, [
+  int? seed,
+]) async {
+  final random = seed != null
+      ? createSeededRandom(seed)
+      : math.Random().nextDouble;
   return _shuffleList(await toListAsync(iterable), random);
 }

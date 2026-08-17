@@ -43,7 +43,7 @@ Future<void> main() async {
       // The example prints a numbered listing; build it as the workload's
       // final materialization on both sides.
       final listing = [
-        for (var i = 0; i < results.length; i++) '  ${i + 1}. ${results[i]}'
+        for (var i = 0; i < results.length; i++) '  ${i + 1}. ${results[i]}',
       ].join('\n');
       final totalKb = files.fold(0, (sum, f) => sum + f.kb);
       return '${results.length}|listing=${listing.length}'

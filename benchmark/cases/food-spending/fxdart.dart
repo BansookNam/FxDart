@@ -10,9 +10,9 @@ Future<void> main() async {
     impl: 'fxdart',
     n: n,
     run: () {
-      final total = fx(txns)
-          .filter((t) => t.category == 'Food')
-          .sumBy((t) => t.amount);
+      final total = fx(
+        txns,
+      ).filter((t) => t.category == 'Food').sumBy((t) => t.amount);
       return total.toStringAsFixed(2);
     },
   );

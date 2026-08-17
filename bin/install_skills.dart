@@ -23,8 +23,12 @@ import 'dart:isolate';
 
 /// A coding agent that consumes Agent Skills (https://agentskills.io).
 class AgentTarget {
-  const AgentTarget(this.name, this.projectDir, this.globalDir,
-      {this.detectMarkers = const []});
+  const AgentTarget(
+    this.name,
+    this.projectDir,
+    this.globalDir, {
+    this.detectMarkers = const [],
+  });
 
   final String name;
 
@@ -40,19 +44,38 @@ class AgentTarget {
 }
 
 const targets = <AgentTarget>[
-  AgentTarget('claude', '.claude/skills', '.claude/skills',
-      detectMarkers: ['.claude']),
-  AgentTarget('codex', '.agents/skills', '.agents/skills',
-      detectMarkers: ['.codex']),
-  AgentTarget('devin', '.devin/skills', '.config/devin/skills',
-      detectMarkers: ['.devin']),
+  AgentTarget(
+    'claude',
+    '.claude/skills',
+    '.claude/skills',
+    detectMarkers: ['.claude'],
+  ),
+  AgentTarget(
+    'codex',
+    '.agents/skills',
+    '.agents/skills',
+    detectMarkers: ['.codex'],
+  ),
+  AgentTarget(
+    'devin',
+    '.devin/skills',
+    '.config/devin/skills',
+    detectMarkers: ['.devin'],
+  ),
   AgentTarget('antigravity', '.agents/skills', '.agents/skills'),
-  AgentTarget('opencode', '.opencode/skills', '.config/opencode/skills',
-      detectMarkers: ['.opencode']),
-  AgentTarget('pi', '.pi/skills', '.pi/agent/skills',
-      detectMarkers: ['.pi']),
-  AgentTarget('generic', '.agents/skills', '.agents/skills',
-      detectMarkers: ['.agents']),
+  AgentTarget(
+    'opencode',
+    '.opencode/skills',
+    '.config/opencode/skills',
+    detectMarkers: ['.opencode'],
+  ),
+  AgentTarget('pi', '.pi/skills', '.pi/agent/skills', detectMarkers: ['.pi']),
+  AgentTarget(
+    'generic',
+    '.agents/skills',
+    '.agents/skills',
+    detectMarkers: ['.agents'],
+  ),
 ];
 
 Never _fail(String message) {
@@ -90,32 +113,33 @@ Alternatively, the serverpod `skills` CLI installs these too:
 /// works from a dependent project, from `dart pub global activate fxdart`,
 /// and from the fxdart repo itself.
 Future<Directory> _skillsSource() async {
-  final libUri =
-      await Isolate.resolvePackageUri(Uri.parse('package:fxdart/fxdart.dart'));
+  final libUri = await Isolate.resolvePackageUri(
+    Uri.parse('package:fxdart/fxdart.dart'),
+  );
   if (libUri == null) {
-    _fail('cannot resolve package:fxdart — run from a project that '
-        'depends on fxdart (after `dart pub get`).');
+    _fail(
+      'cannot resolve package:fxdart — run from a project that '
+      'depends on fxdart (after `dart pub get`).',
+    );
   }
   final packageRoot = File.fromUri(libUri).parent.parent;
   final skills = Directory('${packageRoot.path}/skills');
   if (!skills.existsSync()) {
-    _fail('no skills/ directory found in the fxdart package '
-        'at ${packageRoot.path}');
+    _fail(
+      'no skills/ directory found in the fxdart package '
+      'at ${packageRoot.path}',
+    );
   }
   return skills;
 }
 
 /// Skill directories shipped by the package: `skills/fxdart-*/SKILL.md`.
-List<Directory> _skillDirs(Directory source) => source
-    .listSync()
-    .whereType<Directory>()
-    .where((d) {
+List<Directory> _skillDirs(Directory source) =>
+    source.listSync().whereType<Directory>().where((d) {
       final name = d.uri.pathSegments.lastWhere((s) => s.isNotEmpty);
       return name.startsWith('fxdart-') &&
           File('${d.path}/SKILL.md').existsSync();
-    })
-    .toList()
-  ..sort((a, b) => a.path.compareTo(b.path));
+    }).toList()..sort((a, b) => a.path.compareTo(b.path));
 
 void _copyTree(Directory from, Directory to) {
   to.createSync(recursive: true);
@@ -163,7 +187,8 @@ Future<void> main(List<String> args) async {
     }
   }
 
-  final home = homeOverride ??
+  final home =
+      homeOverride ??
       Platform.environment['HOME'] ??
       Platform.environment['USERPROFILE'];
   if (global && home == null) _fail('cannot determine home directory');
@@ -179,23 +204,29 @@ Future<void> main(List<String> args) async {
     selected = requested.map((name) {
       final t = known[name];
       if (t == null) {
-        _fail('unknown agent "$name" — expected one of: '
-            '${known.keys.join(', ')}, all');
+        _fail(
+          'unknown agent "$name" — expected one of: '
+          '${known.keys.join(', ')}, all',
+        );
       }
       return t;
     }).toList();
   } else {
     final base = global ? home! : root.path;
     selected = targets
-        .where((t) => t.detectMarkers
-            .any((m) => Directory('$base/$m').existsSync()))
+        .where(
+          (t) => t.detectMarkers.any((m) => Directory('$base/$m').existsSync()),
+        )
         .toList();
     if (selected.isEmpty && !list) {
-      stdout.writeln('No agent directories detected in '
-          '${global ? '~ ($base)' : base}.');
       stdout.writeln(
-          'Name agents explicitly, e.g.: dart run fxdart:install_skills '
-          'claude codex');
+        'No agent directories detected in '
+        '${global ? '~ ($base)' : base}.',
+      );
+      stdout.writeln(
+        'Name agents explicitly, e.g.: dart run fxdart:install_skills '
+        'claude codex',
+      );
       _usage();
       exit(1);
     }
@@ -205,8 +236,9 @@ Future<void> main(List<String> args) async {
   // Several agents share .agents/skills — deduplicate by destination.
   final byDest = <String, List<String>>{};
   for (final t in selected) {
-    final dest =
-        global ? '$home/${t.globalDir}' : '${root.path}/${t.projectDir}';
+    final dest = global
+        ? '$home/${t.globalDir}'
+        : '${root.path}/${t.projectDir}';
     byDest.putIfAbsent(dest, () => []).add(t.name);
   }
 
@@ -214,7 +246,7 @@ Future<void> main(List<String> args) async {
   final skills = _skillDirs(source);
   if (skills.isEmpty) _fail('no fxdart-* skills found in ${source.path}');
   final skillNames = [
-    for (final d in skills) d.uri.pathSegments.lastWhere((s) => s.isNotEmpty)
+    for (final d in skills) d.uri.pathSegments.lastWhere((s) => s.isNotEmpty),
   ];
 
   for (final MapEntry(key: dest, value: agents) in byDest.entries) {

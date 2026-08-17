@@ -28,14 +28,20 @@ void main() {
     });
 
     test('flat / flattened default to depth 1', () {
-      expect(fx([
-        [1, 2],
-        [3]
-      ]).flat().toList(), [1, 2, 3]);
-      expect(fx([
-        [1, 2],
-        [3]
-      ]).flattened().toList(), [1, 2, 3]);
+      expect(
+        fx([
+          [1, 2],
+          [3],
+        ]).flat().toList(),
+        [1, 2, 3],
+      );
+      expect(
+        fx([
+          [1, 2],
+          [3],
+        ]).flattened().toList(),
+        [1, 2, 3],
+      );
     });
 
     test('terminals', () {
@@ -70,33 +76,50 @@ void main() {
     FxAsync<int> src() => fx([1, 2, 3]).toAsync();
 
     test('lazy operators', () async {
-      expect(await fx([1, 2, 3]).toAsync().pairwise().toList(), [(1, 2), (2, 3)]);
+      expect(await fx([1, 2, 3]).toAsync().pairwise().toList(), [
+        (1, 2),
+        (2, 3),
+      ]);
       expect(await fx([1, 2, 2, 3]).toAsync().uniq().toList(), [1, 2, 3]);
       expect(await fx([1, 2, 2, 3]).toAsync().distinct().toList(), [1, 2, 3]);
-      expect(await fx([1, 1, 2, 1]).toAsync().uniqAdjacent().toList(),
-          [1, 2, 1]);
-      expect(await fx(['a', 'b']).toAsync().zipWithIndex().toList(),
-          [(0, 'a'), (1, 'b')]);
+      expect(await fx([1, 1, 2, 1]).toAsync().uniqAdjacent().toList(), [
+        1,
+        2,
+        1,
+      ]);
+      expect(await fx(['a', 'b']).toAsync().zipWithIndex().toList(), [
+        (0, 'a'),
+        (1, 'b'),
+      ]);
       expect(await fx([1, 2, 3]).toAsync().reverse().toList(), [3, 2, 1]);
-      expect(await fx([1, 2]).toAsync().cycle().take(5).toList(),
-          [1, 2, 1, 2, 1]);
-      expect(await fx(['a', 'b']).toAsync().indexed().toList(),
-          [(0, 'a'), (1, 'b')]);
+      expect(await fx([1, 2]).toAsync().cycle().take(5).toList(), [
+        1,
+        2,
+        1,
+        2,
+        1,
+      ]);
+      expect(await fx(['a', 'b']).toAsync().indexed().toList(), [
+        (0, 'a'),
+        (1, 'b'),
+      ]);
     });
 
     test('flat / flattened default to depth 1', () async {
       expect(
-          await fx([
-            [1, 2],
-            [3]
-          ]).toAsync().flat().toList(),
-          [1, 2, 3]);
+        await fx([
+          [1, 2],
+          [3],
+        ]).toAsync().flat().toList(),
+        [1, 2, 3],
+      );
       expect(
-          await fx([
-            [1, 2],
-            [3]
-          ]).toAsync().flattened().toList(),
-          [1, 2, 3]);
+        await fx([
+          [1, 2],
+          [3],
+        ]).toAsync().flattened().toList(),
+        [1, 2, 3],
+      );
     });
 
     test('terminals', () async {

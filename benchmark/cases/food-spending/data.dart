@@ -13,8 +13,16 @@ class Tx {
 
 const _categories = ['Food', 'Transport', 'Fun', 'Bills', 'Rent'];
 const _merchants = [
-  'Cafe Aroma', 'Metro', 'Green Grocer', 'Cinema', 'Noodle Bar',
-  'Electric Co', 'Taxi', 'Book Nook', 'Gym One', 'Corner Deli',
+  'Cafe Aroma',
+  'Metro',
+  'Green Grocer',
+  'Cinema',
+  'Noodle Bar',
+  'Electric Co',
+  'Taxi',
+  'Book Nook',
+  'Gym One',
+  'Corner Deli',
 ];
 
 List<Tx> makeTxns() {

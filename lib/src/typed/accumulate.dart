@@ -85,7 +85,9 @@ abstract interface class AccumulatingRaise<E> implements Raise<E> {
 
   /// Nested accumulation over [items]; all errors join this branch's raise.
   List<B> mapOrAccumulate<A, B>(
-      Iterable<A> items, B Function(AccumulatingRaise<E> r, A item) transform);
+    Iterable<A> items,
+    B Function(AccumulatingRaise<E> r, A item) transform,
+  );
 }
 
 final class _AccumulatingRaiseImpl<E> implements AccumulatingRaise<E> {
@@ -100,9 +102,10 @@ final class _AccumulatingRaiseImpl<E> implements AccumulatingRaise<E> {
   A bindNel<A>(EitherNel<E, A> either) => _nel.bindNel(either);
 
   @override
-  List<B> mapOrAccumulate<A, B>(Iterable<A> items,
-          B Function(AccumulatingRaise<E> r, A item) transform) =>
-      _nel.mapOrAccumulate(items, transform);
+  List<B> mapOrAccumulate<A, B>(
+    Iterable<A> items,
+    B Function(AccumulatingRaise<E> r, A item) transform,
+  ) => _nel.mapOrAccumulate(items, transform);
 }
 
 final class _AccumulatorImpl<E> implements Accumulator<E> {
@@ -157,15 +160,17 @@ extension AccumulatingRaiseOps<E> on Raise<NonEmptyList<E>> {
 
   /// Unwraps an [EitherNel], raising ALL of its errors at once.
   A bindNel<A>(EitherNel<E, A> either) => switch (either) {
-        Left(:final value) => raise(value),
-        Right(:final value) => value,
-      };
+    Left(:final value) => raise(value),
+    Right(:final value) => value,
+  };
 
   /// Transforms every element of [items], collecting ALL failures instead
   /// of stopping at the first (fail-slow). Returns the transformed list, or
   /// raises every accumulated error.
   List<B> mapOrAccumulate<A, B>(
-      Iterable<A> items, B Function(AccumulatingRaise<E> r, A item) transform) {
+    Iterable<A> items,
+    B Function(AccumulatingRaise<E> r, A item) transform,
+  ) {
     final errors = <E>[];
     final results = <B>[];
     for (final item in items) {
@@ -188,12 +193,11 @@ extension AccumulatingRaiseOps<E> on Raise<NonEmptyList<E>> {
     A Function(AccumulatingRaise<E> r) fa,
     B Function(AccumulatingRaise<E> r) fb,
     R Function(A a, B b) combine,
-  ) =>
-      accumulate((acc) {
-        final a = acc.accumulating(fa);
-        final b = acc.accumulating(fb);
-        return combine(a.value, b.value);
-      });
+  ) => accumulate((acc) {
+    final a = acc.accumulating(fa);
+    final b = acc.accumulating(fb);
+    return combine(a.value, b.value);
+  });
 
   /// 3-ary [zipOrAccumulate2].
   R zipOrAccumulate3<A, B, C, R>(
@@ -201,13 +205,12 @@ extension AccumulatingRaiseOps<E> on Raise<NonEmptyList<E>> {
     B Function(AccumulatingRaise<E> r) fb,
     C Function(AccumulatingRaise<E> r) fc,
     R Function(A a, B b, C c) combine,
-  ) =>
-      accumulate((acc) {
-        final a = acc.accumulating(fa);
-        final b = acc.accumulating(fb);
-        final c = acc.accumulating(fc);
-        return combine(a.value, b.value, c.value);
-      });
+  ) => accumulate((acc) {
+    final a = acc.accumulating(fa);
+    final b = acc.accumulating(fb);
+    final c = acc.accumulating(fc);
+    return combine(a.value, b.value, c.value);
+  });
 
   /// 4-ary [zipOrAccumulate2].
   R zipOrAccumulate4<A, B, C, D, R>(
@@ -216,14 +219,13 @@ extension AccumulatingRaiseOps<E> on Raise<NonEmptyList<E>> {
     C Function(AccumulatingRaise<E> r) fc,
     D Function(AccumulatingRaise<E> r) fd,
     R Function(A a, B b, C c, D d) combine,
-  ) =>
-      accumulate((acc) {
-        final a = acc.accumulating(fa);
-        final b = acc.accumulating(fb);
-        final c = acc.accumulating(fc);
-        final d = acc.accumulating(fd);
-        return combine(a.value, b.value, c.value, d.value);
-      });
+  ) => accumulate((acc) {
+    final a = acc.accumulating(fa);
+    final b = acc.accumulating(fb);
+    final c = acc.accumulating(fc);
+    final d = acc.accumulating(fd);
+    return combine(a.value, b.value, c.value, d.value);
+  });
 
   /// 5-ary [zipOrAccumulate2].
   R zipOrAccumulate5<A, B, C, D, F, R>(
@@ -233,13 +235,12 @@ extension AccumulatingRaiseOps<E> on Raise<NonEmptyList<E>> {
     D Function(AccumulatingRaise<E> r) fd,
     F Function(AccumulatingRaise<E> r) ff,
     R Function(A a, B b, C c, D d, F f) combine,
-  ) =>
-      accumulate((acc) {
-        final a = acc.accumulating(fa);
-        final b = acc.accumulating(fb);
-        final c = acc.accumulating(fc);
-        final d = acc.accumulating(fd);
-        final f = acc.accumulating(ff);
-        return combine(a.value, b.value, c.value, d.value, f.value);
-      });
+  ) => accumulate((acc) {
+    final a = acc.accumulating(fa);
+    final b = acc.accumulating(fb);
+    final c = acc.accumulating(fc);
+    final d = acc.accumulating(fd);
+    final f = acc.accumulating(ff);
+    return combine(a.value, b.value, c.value, d.value, f.value);
+  });
 }

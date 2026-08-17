@@ -14,7 +14,9 @@ void main() {
 
       test('should be able to be used in the pipeline', () {
         final res1 = includes(
-            14, fx([1, 2, 3, 4]).map((a) => a + 10).filter((a) => a % 2 == 0));
+          14,
+          fx([1, 2, 3, 4]).map((a) => a + 10).filter((a) => a % 2 == 0),
+        );
         expect(res1, isTrue);
       });
     });
@@ -30,9 +32,12 @@ void main() {
 
       test('should be able to be used in the pipeline', () async {
         final res1 = await includesAsync(
-            14,
-            filterAsync((int a) => a % 2 == 0,
-                mapAsync((int a) => a + 10, toAsync([1, 2, 3, 4]))));
+          14,
+          filterAsync(
+            (int a) => a % 2 == 0,
+            mapAsync((int a) => a + 10, toAsync([1, 2, 3, 4])),
+          ),
+        );
         expect(res1, isTrue);
       });
     });

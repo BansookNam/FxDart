@@ -10,11 +10,10 @@ Future<void> main() async {
     impl: 'fxdart',
     n: n,
     run: () {
-      final spendDays =
-          txns.map((t) => int.parse(t.date.substring(8))).toSet();
-      final strip = fx(range(1, 32))
-          .map((day) => spendDays.contains(day) ? '·' : '#')
-          .join('');
+      final spendDays = txns.map((t) => int.parse(t.date.substring(8))).toSet();
+      final strip = fx(
+        range(1, 32),
+      ).map((day) => spendDays.contains(day) ? '·' : '#').join('');
       // scan carries the running streak: reset on a spend day, else +1.
       final longest = fx(range(1, 32))
           .map((day) => spendDays.contains(day))

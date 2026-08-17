@@ -7,8 +7,9 @@ import 'dart:async';
 /// ```dart
 /// fromEntries([('a', 1), ('b', 2)]); // {a: 1, b: 2}
 /// ```
-Map<K, V> fromEntries<K, V>(Iterable<(K, V)> entries) =>
-    {for (final (k, v) in entries) k: v};
+Map<K, V> fromEntries<K, V>(Iterable<(K, V)> entries) => {
+  for (final (k, v) in entries) k: v,
+};
 
 /// Returns a copy of [map] without the given [keysToOmit].
 ///
@@ -17,7 +18,7 @@ Map<K, V> omit<K, V>(Iterable<K> keysToOmit, Map<K, V> map) {
   final set = keysToOmit.toSet();
   return {
     for (final e in map.entries)
-      if (!set.contains(e.key)) e.key: e.value
+      if (!set.contains(e.key)) e.key: e.value,
   };
 }
 
@@ -28,7 +29,7 @@ Map<K, V> pick<K, V>(Iterable<K> keysToPick, Map<K, V> map) {
   final set = keysToPick.toSet();
   return {
     for (final e in map.entries)
-      if (set.contains(e.key)) e.key: e.value
+      if (set.contains(e.key)) e.key: e.value,
   };
 }
 
@@ -43,8 +44,8 @@ Map<K, V> pick<K, V>(Iterable<K> keysToPick, Map<K, V> map) {
 /// mapValues((n) => n * 2, {'a': 1, 'b': 2}); // {a: 2, b: 4}
 /// ```
 Map<K, T> mapValues<K, V, T>(T Function(V value) f, Map<K, V> map) => {
-      for (final e in map.entries) e.key: f(e.value)
-    };
+  for (final e in map.entries) e.key: f(e.value),
+};
 
 /// Returns a copy of [map] with every key run through [f]; values are
 /// untouched.
@@ -57,8 +58,8 @@ Map<K, T> mapValues<K, V, T>(T Function(V value) f, Map<K, V> map) => {
 /// mapKeys((k) => k.toUpperCase(), {'a': 1, 'b': 2}); // {A: 1, B: 2}
 /// ```
 Map<T, V> mapKeys<K, V, T>(T Function(K key) f, Map<K, V> map) => {
-      for (final e in map.entries) f(e.key): e.value
-    };
+  for (final e in map.entries) f(e.key): e.value,
+};
 
 /// Returns a new map built by running each `(key, value)` record through [f]
 /// — the general form of [mapValues] and [mapKeys], and the transforming
@@ -71,7 +72,9 @@ Map<T, V> mapKeys<K, V, T>(T Function(K key) f, Map<K, V> map) => {
 /// // {A: 2}
 /// ```
 Map<K2, V2> mapEntries<K, V, K2, V2>(
-    (K2, V2) Function((K, V) entry) f, Map<K, V> map) {
+  (K2, V2) Function((K, V) entry) f,
+  Map<K, V> map,
+) {
   final out = <K2, V2>{};
   for (final e in map.entries) {
     final (k, v) = f((e.key, e.value));
@@ -84,9 +87,9 @@ Map<K2, V2> mapEntries<K, V, K2, V2>(
 ///
 /// Port of FxTS `omitBy` (entry tuples become records).
 Map<K, V> omitBy<K, V>(bool Function((K, V) entry) f, Map<K, V> map) => {
-      for (final e in map.entries)
-        if (!f((e.key, e.value))) e.key: e.value
-    };
+  for (final e in map.entries)
+    if (!f((e.key, e.value))) e.key: e.value,
+};
 
 /// Returns a copy of [map] with only entries matching the predicate [f].
 ///
@@ -99,9 +102,9 @@ Map<K, V> omitBy<K, V>(bool Function((K, V) entry) f, Map<K, V> map) => {
 /// pickBy((e) => e.$1.startsWith('a'), {'a': 1});  // by key    -> {a: 1}
 /// ```
 Map<K, V> pickBy<K, V>(bool Function((K, V) entry) f, Map<K, V> map) => {
-      for (final e in map.entries)
-        if (f((e.key, e.value))) e.key: e.value
-    };
+  for (final e in map.entries)
+    if (f((e.key, e.value))) e.key: e.value,
+};
 
 /// Returns the value of [key] in [map], or `null`.
 ///
@@ -111,28 +114,30 @@ V? prop<K, V>(K key, Map<K, V> map) => map[key];
 /// Returns the values of [propKeys] in [map] (missing keys yield `null`).
 ///
 /// Port of FxTS `props`.
-List<V?> props<K, V>(Iterable<K> propKeys, Map<K, V> map) =>
-    [for (final k in propKeys) map[k]];
+List<V?> props<K, V>(Iterable<K> propKeys, Map<K, V> map) => [
+  for (final k in propKeys) map[k],
+];
 
 /// Returns a copy of [map] with `null` values removed (shallow).
 ///
 /// Port of FxTS `compactObject`.
 Map<K, V> compactObject<K, V>(Map<K, V?> map) => {
-      for (final e in map.entries) e.key: ?e.value
-    };
+  for (final e in map.entries) e.key: ?e.value,
+};
 
 /// Creates a new map by running each value whose key appears in
 /// [transformations] through its transformation function.
 ///
 /// Port of FxTS `evolve`. Untransformed keys are kept as-is.
 Map<K, Object?> evolve<K>(
-    Map<K, Object? Function(Object? value)> transformations,
-    Map<K, Object?> map) {
+  Map<K, Object? Function(Object? value)> transformations,
+  Map<K, Object?> map,
+) {
   return {
     for (final e in map.entries)
       e.key: transformations.containsKey(e.key)
           ? transformations[e.key]!(e.value)
-          : e.value
+          : e.value,
   };
 }
 

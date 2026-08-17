@@ -9,28 +9,38 @@ void main() {
   group('dropWhileRight', () {
     group('sync', () {
       test('drops the trailing run', () {
-        expect(toList(dropWhileRight((int a) => a == 0, [1, 2, 0, 0])),
-            equals([1, 2]));
+        expect(
+          toList(dropWhileRight((int a) => a == 0, [1, 2, 0, 0])),
+          equals([1, 2]),
+        );
       });
 
       test('drops nothing when the last element already fails', () {
-        expect(toList(dropWhileRight((int a) => a == 0, [0, 0, 1])),
-            equals([0, 0, 1]));
+        expect(
+          toList(dropWhileRight((int a) => a == 0, [0, 0, 1])),
+          equals([0, 0, 1]),
+        );
       });
 
       test('drops everything when every element matches', () {
-        expect(toList(dropWhileRight((int a) => a > 0, [1, 2, 3])),
-            equals(<int>[]));
+        expect(
+          toList(dropWhileRight((int a) => a > 0, [1, 2, 3])),
+          equals(<int>[]),
+        );
       });
 
       test('is empty for an empty source', () {
-        expect(toList(dropWhileRight((int a) => true, <int>[])),
-            equals(<int>[]));
+        expect(
+          toList(dropWhileRight((int a) => true, <int>[])),
+          equals(<int>[]),
+        );
       });
 
       test('an interior matching run is kept, not dropped', () {
-        expect(toList(dropWhileRight((int a) => a.isEven, [2, 2, 1, 4])),
-            equals([2, 2, 1]));
+        expect(
+          toList(dropWhileRight((int a) => a.isEven, [2, 2, 1, 4])),
+          equals([2, 2, 1]),
+        );
       });
 
       test('the streaming path agrees with the List fast path', () {
@@ -42,9 +52,11 @@ void main() {
           [2, 2, 1, 4],
           [0],
         ]) {
-          expect(toList(dropWhileRight((int a) => a == 0, lazily(source))),
-              equals(toList(dropWhileRight((int a) => a == 0, source))),
-              reason: '$source');
+          expect(
+            toList(dropWhileRight((int a) => a == 0, lazily(source))),
+            equals(toList(dropWhileRight((int a) => a == 0, source))),
+            reason: '$source',
+          );
         }
       });
 
@@ -71,47 +83,55 @@ void main() {
 
       test('trims a trailing suffix, the usual use', () {
         final res = toList(
-            dropWhileRight((String c) => c == ' ', ['a', 'b', ' ', ' ', ' ']));
+          dropWhileRight((String c) => c == ' ', ['a', 'b', ' ', ' ', ' ']),
+        );
         expect(res, equals(['a', 'b']));
       });
 
       test('is available as an fx chain method', () {
-        expect(fx([1, 2, 0, 0]).dropWhileRight((a) => a == 0).toList(),
-            equals([1, 2]));
+        expect(
+          fx([1, 2, 0, 0]).dropWhileRight((a) => a == 0).toList(),
+          equals([1, 2]),
+        );
       });
     });
 
     group('async', () {
       test('drops the trailing run', () async {
         final res = await toListAsync(
-            dropWhileRightAsync((int a) => a == 0, toAsync([1, 2, 0, 0])));
+          dropWhileRightAsync((int a) => a == 0, toAsync([1, 2, 0, 0])),
+        );
         expect(res, equals([1, 2]));
       });
 
       test('drops nothing when the last value already fails', () async {
         final res = await toListAsync(
-            dropWhileRightAsync((int a) => a == 0, toAsync([0, 0, 1])));
+          dropWhileRightAsync((int a) => a == 0, toAsync([0, 0, 1])),
+        );
         expect(res, equals([0, 0, 1]));
       });
 
       test('is empty for an empty source', () async {
         final res = await toListAsync(
-            dropWhileRightAsync((int a) => true, toAsync(<int>[])));
+          dropWhileRightAsync((int a) => true, toAsync(<int>[])),
+        );
         expect(res, equals(<int>[]));
       });
 
       test('agrees with the sync form', () async {
         final source = [2, 2, 1, 4, 4];
         expect(
-            await toListAsync(
-                dropWhileRightAsync((int a) => a.isEven, toAsync(source))),
-            equals(toList(dropWhileRight((int a) => a.isEven, source))));
+          await toListAsync(
+            dropWhileRightAsync((int a) => a.isEven, toAsync(source)),
+          ),
+          equals(toList(dropWhileRight((int a) => a.isEven, source))),
+        );
       });
 
       test('is available as an fxAsync chain method', () async {
-        final res = await fxAsync(toAsync([1, 2, 0, 0]))
-            .dropWhileRight((a) => a == 0)
-            .toList();
+        final res = await fxAsync(
+          toAsync([1, 2, 0, 0]),
+        ).dropWhileRight((a) => a == 0).toList();
         expect(res, equals([1, 2]));
       });
 

@@ -50,15 +50,25 @@ void main() {
       test('should zip three async iterables', () async {
         expect(
           await toListAsync(
-              zip3Async(toAsync([1, 2]), toAsync(['a', 'b']), toAsync([true, false]))),
+            zip3Async(
+              toAsync([1, 2]),
+              toAsync(['a', 'b']),
+              toAsync([true, false]),
+            ),
+          ),
           equals([(1, 'a', true), (2, 'b', false)]),
         );
       });
 
       test('should stop at the shortest iterable', () async {
         expect(
-          await toListAsync(zip3Async(
-              toAsync([1, 2, 3]), toAsync(['a', 'b']), toAsync([true, false, true]))),
+          await toListAsync(
+            zip3Async(
+              toAsync([1, 2, 3]),
+              toAsync(['a', 'b']),
+              toAsync([true, false, true]),
+            ),
+          ),
           equals([(1, 'a', true), (2, 'b', false)]),
         );
       });
@@ -66,24 +76,31 @@ void main() {
       test('should return empty when any iterable is empty', () async {
         expect(
           await toListAsync(
-              zip3Async(toAsync(<int>[]), toAsync(['a']), toAsync([true]))),
+            zip3Async(toAsync(<int>[]), toAsync(['a']), toAsync([true])),
+          ),
           equals([]),
         );
         expect(
           await toListAsync(
-              zip3Async(toAsync([1]), toAsync(<String>[]), toAsync([true]))),
+            zip3Async(toAsync([1]), toAsync(<String>[]), toAsync([true])),
+          ),
           equals([]),
         );
         expect(
           await toListAsync(
-              zip3Async(toAsync([1]), toAsync(['a']), toAsync(<bool>[]))),
+            zip3Async(toAsync([1]), toAsync(['a']), toAsync(<bool>[])),
+          ),
           equals([]),
         );
       });
 
       test('should be able to be used in the pipeline', () async {
         final res = await pipe(
-          zip3Async(toAsync([1, 2]), toAsync(['a', 'b']), toAsync([true, false])),
+          zip3Async(
+            toAsync([1, 2]),
+            toAsync(['a', 'b']),
+            toAsync([true, false]),
+          ),
           [
             (FxAsyncIterable<(int, String, bool)> a) =>
                 mapAsync((r) => '${r.$1}${r.$2}${r.$3}', a),
@@ -95,9 +112,9 @@ void main() {
 
       test('should be reachable from the fxAsync chain', () async {
         expect(
-          await fxAsync(toAsync([1, 2, 3]))
-              .zip3(toAsync(['a', 'b']), toAsync([true, false]))
-              .toList(),
+          await fxAsync(
+            toAsync([1, 2, 3]),
+          ).zip3(toAsync(['a', 'b']), toAsync([true, false])).toList(),
           equals([(1, 'a', true), (2, 'b', false)]),
         );
       });

@@ -4,12 +4,7 @@ import 'package:test/test.dart';
 void main() {
   group('keys', () {
     test('should return an iterable that iterates keys of the given map', () {
-      final map = <String, Object?>{
-        'a': 1,
-        'b': '2',
-        'c': true,
-        'f': null,
-      };
+      final map = <String, Object?>{'a': 1, 'b': '2', 'c': true, 'f': null};
       expect(keys(map).toList(), equals(['a', 'b', 'c', 'f']));
     });
 

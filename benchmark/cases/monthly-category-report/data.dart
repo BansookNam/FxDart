@@ -15,11 +15,21 @@ class Tx {
 }
 
 final List<String> categories = List.generate(
-    numCategories, (i) => 'Cat-${(i + 1).toString().padLeft(3, '0')}');
+  numCategories,
+  (i) => 'Cat-${(i + 1).toString().padLeft(3, '0')}',
+);
 
 const _merchants = [
-  'Cafe Aroma', 'Metro', 'Green Grocer', 'Cinema', 'Noodle Bar',
-  'Electric Co', 'Taxi', 'Water Co', 'Arcade', 'Corner Deli',
+  'Cafe Aroma',
+  'Metro',
+  'Green Grocer',
+  'Cinema',
+  'Noodle Bar',
+  'Electric Co',
+  'Taxi',
+  'Water Co',
+  'Arcade',
+  'Corner Deli',
 ];
 
 List<Tx> makeTxns() {

@@ -12,14 +12,13 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = pipe({
-          'a': 1,
-          'b': '2',
-          'c': true
-        }, [
-          (Map<String, Object> m) => pick(['a', 'b'], m),
-          (Map<String, Object> m) => toList(entries(m)),
-        ]);
+        final res = pipe(
+          {'a': 1, 'b': '2', 'c': true},
+          [
+            (Map<String, Object> m) => pick(['a', 'b'], m),
+            (Map<String, Object> m) => toList(entries(m)),
+          ],
+        );
         expect(res, equals([('a', 1), ('b', '2')]));
       });
     });

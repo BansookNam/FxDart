@@ -20,42 +20,42 @@ void main() {
       test('should be chunked by the given number - string', () {
         final res = toList(chunk(3, 'abcdefghijklmnopqrstuvwxyz'.split('')));
         expect(
-            res,
-            equals([
-              ['a', 'b', 'c'],
-              ['d', 'e', 'f'],
-              ['g', 'h', 'i'],
-              ['j', 'k', 'l'],
-              ['m', 'n', 'o'],
-              ['p', 'q', 'r'],
-              ['s', 't', 'u'],
-              ['v', 'w', 'x'],
-              ['y', 'z'],
-            ]));
+          res,
+          equals([
+            ['a', 'b', 'c'],
+            ['d', 'e', 'f'],
+            ['g', 'h', 'i'],
+            ['j', 'k', 'l'],
+            ['m', 'n', 'o'],
+            ['p', 'q', 'r'],
+            ['s', 't', 'u'],
+            ['v', 'w', 'x'],
+            ['y', 'z'],
+          ]),
+        );
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = pipe(range(1, 12), [
-          (v) => chunk(3, v),
-          (v) => toList(v),
-        ]);
+        final res = pipe(range(1, 12), [(v) => chunk(3, v), (v) => toList(v)]);
         expect(res, equals(expected));
       });
 
       test('should be able to be used as a chaining method in the `fx`', () {
         expect(
-            fx([1, 2, 3, 4]).chunk(2).toList(),
-            equals([
-              [1, 2],
-              [3, 4],
-            ]));
+          fx([1, 2, 3, 4]).chunk(2).toList(),
+          equals([
+            [1, 2],
+            [3, 4],
+          ]),
+        );
         expect(
-            fx([1, 2, 3, 4, 5]).chunk(2).toList(),
-            equals([
-              [1, 2],
-              [3, 4],
-              [5],
-            ]));
+          fx([1, 2, 3, 4, 5]).chunk(2).toList(),
+          equals([
+            [1, 2],
+            [3, 4],
+            [5],
+          ]),
+        );
       });
     });
 
@@ -92,13 +92,14 @@ void main() {
             .chunk(3)
             .toList();
         expect(
-            res,
-            equals([
-              [2, 4, 6],
-              [8, 10, 12],
-              [14, 16, 18],
-              [20],
-            ]));
+          res,
+          equals([
+            [2, 4, 6],
+            [8, 10, 12],
+            [14, 16, 18],
+            [20],
+          ]),
+        );
       });
 
       test('should be chunked before concurrent', () async {
@@ -109,67 +110,75 @@ void main() {
             .concurrent(2)
             .toList();
         expect(
-            res,
-            equals([
-              [2, 4, 6],
-              [8, 10, 12],
-              [14, 16, 18],
-              [20],
-            ]));
+          res,
+          equals([
+            [2, 4, 6],
+            [8, 10, 12],
+            [14, 16, 18],
+            [20],
+          ]),
+        );
       });
 
       test(
-          'should be able to handle an error when the callback is asynchronous',
-          () async {
-        await expectLater(
-          fxAsync(toAsync(range(1, 21)))
-              .map((a) => delay(const Duration(milliseconds: 50), a))
-              .filter((a) {
-                if (a % 2 == 0) return Future<bool>.error(Exception('err'));
-                return true;
-              })
-              .chunk(3)
-              .concurrent(2)
-              .toList(),
-          throwsException,
-        );
-      });
+        'should be able to handle an error when the callback is asynchronous',
+        () async {
+          await expectLater(
+            fxAsync(toAsync(range(1, 21)))
+                .map((a) => delay(const Duration(milliseconds: 50), a))
+                .filter((a) {
+                  if (a % 2 == 0) return Future<bool>.error(Exception('err'));
+                  return true;
+                })
+                .chunk(3)
+                .concurrent(2)
+                .toList(),
+            throwsException,
+          );
+        },
+      );
 
-      test('should be able to handle an error when working concurrent',
-          () async {
-        await expectLater(
-          fxAsync(toAsync(range(1, 21)))
-              .map((a) => delay(const Duration(milliseconds: 50), a))
-              .filter((a) => a % 2 == 0)
-              .chunk(3)
-              .map<List<int>>((a) => throw Exception('err'))
-              .concurrent(2)
-              .toList(),
-          throwsException,
-        );
-      });
+      test(
+        'should be able to handle an error when working concurrent',
+        () async {
+          await expectLater(
+            fxAsync(toAsync(range(1, 21)))
+                .map((a) => delay(const Duration(milliseconds: 50), a))
+                .filter((a) => a % 2 == 0)
+                .chunk(3)
+                .map<List<int>>((a) => throw Exception('err'))
+                .concurrent(2)
+                .toList(),
+            throwsException,
+          );
+        },
+      );
 
       test('should be able to be used in the pipeline', () async {
         final res = await fxAsync(toAsync(range(1, 12))).chunk(3).toList();
         expect(res, equals(expected));
       });
 
-      test('should be able to be used as a chaining method in the `fx`',
-          () async {
-        expect(
+      test(
+        'should be able to be used as a chaining method in the `fx`',
+        () async {
+          expect(
             await fx([1, 2, 3, 4]).toAsync().chunk(2).toList(),
             equals([
               [1, 2],
               [3, 4],
-            ]));
-        expect(
+            ]),
+          );
+          expect(
             await fx([1, 2, 3, 4, 5]).toAsync().chunk(2).toList(),
             equals([
               [1, 2],
               [3, 4],
               [5],
-            ]));
-      });
+            ]),
+          );
+        },
+      );
     });
   });
 }

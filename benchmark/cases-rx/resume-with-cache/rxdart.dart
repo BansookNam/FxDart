@@ -24,7 +24,8 @@ Future<void> main() async {
       // errors, onErrorResumeNext swaps in the cached tail — one operator.
       final updates = await liveFeed()
           .onErrorResumeNext(
-              Stream.fromIterable(cachedTail).map((u) => '$u (from cache)'))
+            Stream.fromIterable(cachedTail).map((u) => '$u (from cache)'),
+          )
           .take(takeCount)
           .toList();
 

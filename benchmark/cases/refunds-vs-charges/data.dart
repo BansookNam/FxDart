@@ -14,8 +14,16 @@ class Tx {
 }
 
 const _merchants = [
-  'Cafe Aroma', 'Web Store', 'Noodle Bar', 'Airline', 'Green Grocer',
-  'Book Nook', 'Metro', 'Electric Co', 'Gym One', 'Corner Deli',
+  'Cafe Aroma',
+  'Web Store',
+  'Noodle Bar',
+  'Airline',
+  'Green Grocer',
+  'Book Nook',
+  'Metro',
+  'Electric Co',
+  'Gym One',
+  'Corner Deli',
 ];
 
 List<Tx> makeTxns() {

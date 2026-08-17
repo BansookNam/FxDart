@@ -15,8 +15,13 @@ void main() {
       });
 
       test('given string array then should return [d, e]', () {
-        final result =
-            fx(['a', 'b', 'c', 'd', 'e']).filter((x) => lte('d', x)).toList();
+        final result = fx([
+          'a',
+          'b',
+          'c',
+          'd',
+          'e',
+        ]).filter((x) => lte('d', x)).toList();
         expect(result, equals(['d', 'e']));
       });
 
@@ -35,9 +40,10 @@ void main() {
       });
 
       test('given date array then should return empty array', () {
-        final result = fx([DateTime(2021, 5, 10), DateTime(2021, 4, 9)])
-            .filter((x) => lte(DateTime.now(), x))
-            .toList();
+        final result = fx([
+          DateTime(2021, 5, 10),
+          DateTime(2021, 4, 9),
+        ]).filter((x) => lte(DateTime.now(), x)).toList();
         expect(result, equals(<DateTime>[]));
       });
     });
@@ -50,10 +56,11 @@ void main() {
         expect(lte(5, 5), isTrue);
       });
       test(
-          'should return false that the first number is not less than or not equal to second',
-          () {
-        expect(lte(5, 1), isFalse);
-      });
+        'should return false that the first number is not less than or not equal to second',
+        () {
+          expect(lte(5, 1), isFalse);
+        },
+      );
 
       test('should return true that the first char is less than second', () {
         expect(lte('a', 'b'), isTrue);
@@ -62,10 +69,11 @@ void main() {
         expect(lte('b', 'b'), isTrue);
       });
       test(
-          'should return false that the first char is not less than or not equal to second',
-          () {
-        expect(lte('c', 'b'), isFalse);
-      });
+        'should return false that the first char is not less than or not equal to second',
+        () {
+          expect(lte('c', 'b'), isFalse);
+        },
+      );
 
       test('should return true that the first Date is less than second', () {
         expect(lte(DateTime(2021, 5, 11), DateTime.now()), isTrue);
@@ -73,10 +81,12 @@ void main() {
       test('should return true that the first Date is equal to second', () {
         expect(lte(DateTime(2021, 5, 11), DateTime(2021, 5, 11)), isTrue);
       });
-      test('should return false that the first Date is not less than second',
-          () {
-        expect(lte(DateTime.now(), DateTime(2021, 5, 11)), isFalse);
-      });
+      test(
+        'should return false that the first Date is not less than second',
+        () {
+          expect(lte(DateTime.now(), DateTime(2021, 5, 11)), isFalse);
+        },
+      );
 
       test('should throw ArgumentError on mixed types', () {
         expect(() => lte(1, 'a'), throwsArgumentError);

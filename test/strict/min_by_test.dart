@@ -14,13 +14,18 @@ void main() {
       });
 
       test('should keep the first element on ties', () {
-        expect(minBy((String s) => s.length, ['aa', 'bb', 'ccc']), equals('aa'));
+        expect(
+          minBy((String s) => s.length, ['aa', 'bb', 'ccc']),
+          equals('aa'),
+        );
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = fx(['apple', 'fig', 'banana'])
-            .filter((s) => s != 'fig')
-            .minBy((s) => s.length);
+        final res = fx([
+          'apple',
+          'fig',
+          'banana',
+        ]).filter((s) => s != 'fig').minBy((s) => s.length);
         expect(res, equals('apple'));
       });
     });
@@ -35,8 +40,11 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () async {
-        final res =
-            await fx([3, 7, 5]).toAsync().map((n) => n * 10).minBy((n) => n);
+        final res = await fx([
+          3,
+          7,
+          5,
+        ]).toAsync().map((n) => n * 10).minBy((n) => n);
         expect(res, equals(30));
       });
     });

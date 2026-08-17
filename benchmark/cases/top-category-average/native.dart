@@ -14,8 +14,9 @@ Future<void> main() async {
     n: n,
     run: () {
       final byCategory = groupBy(txns, (Tx t) => t.category);
-      final averages =
-          byCategory.entries.map((kv) => (kv.key, meanSpend(kv.value)));
+      final averages = byCategory.entries.map(
+        (kv) => (kv.key, meanSpend(kv.value)),
+      );
       final top = maxBy(averages, (c) => c.$2)!;
       return '${top.$1}|${top.$2.toStringAsFixed(2)}';
     },

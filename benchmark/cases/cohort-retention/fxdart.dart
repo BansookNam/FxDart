@@ -13,8 +13,9 @@ Future<void> main() async {
       final cohorts = fx(users).groupBy((u) => u.signup);
       final rows = fx(cohorts.entries).sortBy((e) => e.key).map((e) {
         final cohort = e.value;
-        final cells =
-            fx(months).dropWhile((m) => m.compareTo(e.key) <= 0).map((m) {
+        final cells = fx(months).dropWhile((m) => m.compareTo(e.key) <= 0).map((
+          m,
+        ) {
           final active = fx(cohort).filter((u) => u.active.contains(m)).size();
           return '$m ${(100 * active / cohort.length).round()}%';
         });

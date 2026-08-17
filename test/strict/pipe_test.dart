@@ -15,56 +15,57 @@ void main() {
       });
 
       test("should work when the composed function deals with 'Iterable'", () {
-        final res = pipe([
-          1,
-          2,
-          3,
-          4,
-          5
-        ], [
-          (Iterable<int> n) => map((int a) => a + 5, n),
-          (Iterable<int> n) => filter((int a) => a % 2 == 0, n),
-          (Iterable<int> n) => fold(0, (int a, int b) => a + b, n),
-        ]);
+        final res = pipe(
+          [1, 2, 3, 4, 5],
+          [
+            (Iterable<int> n) => map((int a) => a + 5, n),
+            (Iterable<int> n) => filter((int a) => a % 2 == 0, n),
+            (Iterable<int> n) => fold(0, (int a, int b) => a + b, n),
+          ],
+        );
         expect(res, equals(24));
       });
     });
 
     group('async', () {
-      test("should work when the composed function deals with 'AsyncIterable'",
-          () async {
-        final res1 = await pipe(toAsync([1, 2, 3, 4, 5]), [
-          (FxAsyncIterable<int> n) => mapAsync((int a) => a + 5, n),
-          (FxAsyncIterable<int> n) => filterAsync((int a) => a % 2 == 0, n),
-          (FxAsyncIterable<int> n) => foldAsync(0, (int a, int b) => a + b, n),
-        ]);
+      test(
+        "should work when the composed function deals with 'AsyncIterable'",
+        () async {
+          final res1 = await pipe(toAsync([1, 2, 3, 4, 5]), [
+            (FxAsyncIterable<int> n) => mapAsync((int a) => a + 5, n),
+            (FxAsyncIterable<int> n) => filterAsync((int a) => a % 2 == 0, n),
+            (FxAsyncIterable<int> n) =>
+                foldAsync(0, (int a, int b) => a + b, n),
+          ]);
 
-        expect(res1, equals(24));
+          expect(res1, equals(24));
 
-        final res2 = await pipe(toAsync([1, 2, 3, 4, 5]), [
-          (FxAsyncIterable<int> n) => mapAsync((int a) => a + 5, n),
-          (FxAsyncIterable<int> n) => filterAsync((int a) => a % 2 == 0, n),
-          (FxAsyncIterable<int> n) => toListAsync(n),
-          (List<int> n) => fold(0, (int a, int b) => a + b, n),
-        ]);
+          final res2 = await pipe(toAsync([1, 2, 3, 4, 5]), [
+            (FxAsyncIterable<int> n) => mapAsync((int a) => a + 5, n),
+            (FxAsyncIterable<int> n) => filterAsync((int a) => a % 2 == 0, n),
+            (FxAsyncIterable<int> n) => toListAsync(n),
+            (List<int> n) => fold(0, (int a, int b) => a + b, n),
+          ]);
 
-        expect(res2, equals(24));
-      });
+          expect(res2, equals(24));
+        },
+      );
 
-      test('should make the chain async when a Future appears mid-chain',
-          () async {
-        final res = pipe([
-          1,
-          2,
-          3
-        ], [
-          (List<int> v) => Future.value(v),
-          (List<int> v) => toList(map((int a) => a + 1, v)),
-        ]);
+      test(
+        'should make the chain async when a Future appears mid-chain',
+        () async {
+          final res = pipe(
+            [1, 2, 3],
+            [
+              (List<int> v) => Future.value(v),
+              (List<int> v) => toList(map((int a) => a + 1, v)),
+            ],
+          );
 
-        expect(res, isA<Future<dynamic>>());
-        expect(await res, equals([2, 3, 4]));
-      });
+          expect(res, isA<Future<dynamic>>());
+          expect(await res, equals([2, 3, 4]));
+        },
+      );
 
       test('should await an initial Future value', () async {
         final res = await pipe(Future.value(1), [
@@ -74,44 +75,49 @@ void main() {
         expect(res, equals(22));
       });
 
-      test("should return rejected 'Future' if an error occurs in the callback",
-          () async {
-        await expectLater(
-          pipe(toAsync(range(1, 10)), [
-            (FxAsyncIterable<int> a) =>
-                mapAsync((int _) => throw Exception('err'), a),
-            (FxAsyncIterable<int> a) =>
-                reduceAsync((int acc, int b) => acc + b, a),
-          ]) as Future,
-          throwsA(isA<Exception>()),
-        );
+      test(
+        "should return rejected 'Future' if an error occurs in the callback",
+        () async {
+          await expectLater(
+            pipe(toAsync(range(1, 10)), [
+                  (FxAsyncIterable<int> a) =>
+                      mapAsync((int _) => throw Exception('err'), a),
+                  (FxAsyncIterable<int> a) =>
+                      reduceAsync((int acc, int b) => acc + b, a),
+                ])
+                as Future,
+            throwsA(isA<Exception>()),
+          );
 
-        // Future.error
-        await expectLater(
-          pipe(toAsync(range(1, 10)), [
-            (FxAsyncIterable<int> a) =>
-                mapAsync((int _) => Future<int>.error(Exception('err')), a),
-            (FxAsyncIterable<int> a) =>
-                reduceAsync((int acc, int b) => acc + b, a),
-          ]) as Future,
-          throwsA(isA<Exception>()),
-        );
-      });
+          // Future.error
+          await expectLater(
+            pipe(toAsync(range(1, 10)), [
+                  (FxAsyncIterable<int> a) => mapAsync(
+                    (int _) => Future<int>.error(Exception('err')),
+                    a,
+                  ),
+                  (FxAsyncIterable<int> a) =>
+                      reduceAsync((int acc, int b) => acc + b, a),
+                ])
+                as Future,
+            throwsA(isA<Exception>()),
+          );
+        },
+      );
 
       test('should be able to run side effects with eachAsync', () async {
         var res = 0;
 
-        await pipe([
-          'a',
-          'b',
-          'c'
-        ], [
-          (List<String> v) => toAsync(v),
-          (FxAsyncIterable<String> v) => eachAsync((_) async {
-                await delay(Duration.zero, null);
-                res++;
-              }, v),
-        ]);
+        await pipe(
+          ['a', 'b', 'c'],
+          [
+            (List<String> v) => toAsync(v),
+            (FxAsyncIterable<String> v) => eachAsync((_) async {
+              await delay(Duration.zero, null);
+              res++;
+            }, v),
+          ],
+        );
 
         expect(res, equals(3));
       });

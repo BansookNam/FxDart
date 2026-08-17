@@ -8,11 +8,7 @@ Future<void> main() async {
     impl: 'native',
     n: n,
     run: () {
-      final tags = posts
-          .expand((p) => p.tags)
-          .toSet()
-          .toList()
-        ..sort();
+      final tags = posts.expand((p) => p.tags).toSet().toList()..sort();
       return '${tags.length}|${tags.first}|${tags.last}';
     },
   );

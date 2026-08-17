@@ -18,7 +18,9 @@ class Txn {
 List<Txn> makeTxns() {
   final rng = Lcg(5);
   return List.generate(n, (i) {
-    return Txn('t-${(i + 1).toString().padLeft(5, '0')}',
-        (100 + rng.nextInt(49900)) / 100);
+    return Txn(
+      't-${(i + 1).toString().padLeft(5, '0')}',
+      (100 + rng.nextInt(49900)) / 100,
+    );
   });
 }

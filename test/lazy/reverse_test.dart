@@ -10,11 +10,15 @@ void main() {
         expect(toList(reverse([1, 2, 3, 4])), equals([4, 3, 2, 1]));
       });
 
-      test('should return the given elements in reverse order (string chars)',
-          () {
-        expect(
-            toList(reverse('abcd'.split(''))), equals(['d', 'c', 'b', 'a']));
-      });
+      test(
+        'should return the given elements in reverse order (string chars)',
+        () {
+          expect(
+            toList(reverse('abcd'.split(''))),
+            equals(['d', 'c', 'b', 'a']),
+          );
+        },
+      );
 
       test('should be able to be used in the pipeline', () {
         final res = fx([1, 2, 3, 4]).reverse().toList();
@@ -23,17 +27,25 @@ void main() {
     });
 
     group('async', () {
-      test('should return the given elements in reverse order (numbers)',
-          () async {
-        expect(await toListAsync(reverseAsync(toAsync([1, 2, 3, 4]))),
-            equals([4, 3, 2, 1]));
-      });
+      test(
+        'should return the given elements in reverse order (numbers)',
+        () async {
+          expect(
+            await toListAsync(reverseAsync(toAsync([1, 2, 3, 4]))),
+            equals([4, 3, 2, 1]),
+          );
+        },
+      );
 
-      test('should return the given elements in reverse order (string chars)',
-          () async {
-        expect(await toListAsync(reverseAsync(toAsync('abcd'.split('')))),
-            equals(['d', 'c', 'b', 'a']));
-      });
+      test(
+        'should return the given elements in reverse order (string chars)',
+        () async {
+          expect(
+            await toListAsync(reverseAsync(toAsync('abcd'.split('')))),
+            equals(['d', 'c', 'b', 'a']),
+          );
+        },
+      );
 
       test('should be able to be used in the pipeline', () async {
         final res = await fx([1, 2, 3, 4]).toAsync().reverse().toList();
@@ -54,13 +66,15 @@ void main() {
         expect(sw.elapsedMilliseconds, lessThan(800));
       });
 
-      test('should be passed concurrent object when job works concurrently',
-          () async {
-        final mock = ConcurrentMock<int>();
-        final it = reverseAsync(mock).iterator;
-        await it.next(Concurrent.of(2));
-        expect(mock.received?.length, equals(2));
-      });
+      test(
+        'should be passed concurrent object when job works concurrently',
+        () async {
+          final mock = ConcurrentMock<int>();
+          final it = reverseAsync(mock).iterator;
+          await it.next(Concurrent.of(2));
+          expect(mock.received?.length, equals(2));
+        },
+      );
     });
   });
 }

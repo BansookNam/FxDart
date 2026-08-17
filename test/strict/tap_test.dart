@@ -22,8 +22,8 @@ void main() {
       test('should support a curried style via a closure', () {
         var res1 = 10;
         curried(int a) => tap((int v) {
-              res1 += v;
-            }, a);
+          res1 += v;
+        }, a);
         final res2 = curried(50);
 
         expect(res1, equals(60));
@@ -39,8 +39,9 @@ void main() {
 
       test('should work as a side effect inside an async map', () async {
         final res = await fxAsync(toAsync(range(5)))
-            .map((a) =>
-                tap((v) => delay(const Duration(milliseconds: 10), v), a))
+            .map(
+              (a) => tap((v) => delay(const Duration(milliseconds: 10), v), a),
+            )
             .toList();
         expect(res, equals([0, 1, 2, 3, 4]));
       });

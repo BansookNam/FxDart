@@ -18,9 +18,11 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = fx(['a', 'bb', 'ccc'])
-            .filter((s) => s.length > 1)
-            .sumBy((s) => s.length);
+        final res = fx([
+          'a',
+          'bb',
+          'ccc',
+        ]).filter((s) => s.length > 1).sumBy((s) => s.length);
         expect(res, equals(5));
       });
     });
@@ -28,8 +30,9 @@ void main() {
     group('async', () {
       test('should sum the key of every element', () async {
         expect(
-            await sumByAsync((String s) => s.length, toAsync(['a', 'bb'])),
-            equals(3));
+          await sumByAsync((String s) => s.length, toAsync(['a', 'bb'])),
+          equals(3),
+        );
       });
 
       test('should return 0 for an empty iterable', () async {
@@ -37,9 +40,9 @@ void main() {
       });
 
       test('should await async keys and be usable in the pipeline', () async {
-        final res = await fx([1, 2, 3])
-            .toAsync()
-            .sumBy((n) => delay(const Duration(milliseconds: 10), n * 10));
+        final res = await fx([1, 2, 3]).toAsync().sumBy(
+          (n) => delay(const Duration(milliseconds: 10), n * 10),
+        );
         expect(res, equals(60));
       });
     });

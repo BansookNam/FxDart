@@ -21,8 +21,10 @@ Future<void> main() async {
       // means one inner stream per line, its error smuggled back as data.
       final outcomes = await Stream.fromIterable(lines)
           .asyncExpand(
-              (line) => Rx.fromCallable<(String, int)?>(() => parse(line))
-                  .onErrorReturn(null))
+            (line) => Rx.fromCallable<(String, int)?>(
+              () => parse(line),
+            ).onErrorReturn(null),
+          )
           .toList();
 
       var okCount = 0, valueSum = 0, failures = 0;

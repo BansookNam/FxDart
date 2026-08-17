@@ -17,8 +17,9 @@ Future<void> main() async {
     run: () async {
       // concurrentPool runs 3 lookups at a time and yields in COMPLETION
       // order.
-      final results =
-          await fx(ids).toAsync().map(lookup).concurrentPool(3).toList();
+      final results = await fx(
+        ids,
+      ).toAsync().map(lookup).concurrentPool(3).toList();
       // Order-independent checksum: zero delays make the interleave a
       // scheduling detail, so sum the ids instead of sampling positions.
       var idSum = 0;

@@ -11,13 +11,13 @@ Future<List<String>> fetchPage(int page) async {
   await Future<void>.delayed(Duration.zero);
   if (page > totalPages) return [];
   return [
-    for (var i = 1; i <= pageSize; i++) 'order#${(page - 1) * pageSize + i}'
+    for (var i = 1; i <= pageSize; i++) 'order#${(page - 1) * pageSize + i}',
   ];
 }
 
 /// Page numbers without end — the crawl pulls one only when it is ready.
 Iterable<int> pageNumbers() sync* {
-  for (var page = 1;; page++) {
+  for (var page = 1; ; page++) {
     yield page;
   }
 }

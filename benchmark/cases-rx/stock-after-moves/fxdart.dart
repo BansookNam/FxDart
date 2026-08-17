@@ -12,10 +12,14 @@ Future<void> main() async {
     run: () {
       final lines = fx(moves)
           // scan emits the seed first, so the opening level is line one.
-          .scan((acc, m) => (m < 0 ? '$m' : '+$m', acc.$2 + m),
-              ('start', start))
-          .map((e) =>
-              e.$2 < 0 ? '${e.$1}: ${e.$2} (backorder)' : '${e.$1}: ${e.$2}')
+          .scan((acc, m) => (m < 0 ? '$m' : '+$m', acc.$2 + m), (
+            'start',
+            start,
+          ))
+          .map(
+            (e) =>
+                e.$2 < 0 ? '${e.$1}: ${e.$2} (backorder)' : '${e.$1}: ${e.$2}',
+          )
           .toList();
       return '${lines.length}|${lines.first}|${lines[n ~/ 2]}|${lines.last}';
     },

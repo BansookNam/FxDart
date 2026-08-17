@@ -29,12 +29,14 @@ List<Tx> makeTxns() {
     }
     // nextDouble-based draws: the LCG's low bits cycle, which would lock the
     // currency to a subset; the high bits are well distributed.
-    final currency = _currencies[(rng.nextDouble() * _currencies.length).floor()];
+    final currency =
+        _currencies[(rng.nextDouble() * _currencies.length).floor()];
     // JPY amounts are nominally ~150x larger, like real prices
     final amount = currency == 'JPY'
         ? (10000 + rng.nextInt(9990000)) / 100
         : (100 + rng.nextInt(49900)) / 100;
-    final category = _categories[(rng.nextDouble() * _categories.length).floor()];
+    final category =
+        _categories[(rng.nextDouble() * _categories.length).floor()];
     return Tx(date, category, amount, currency);
   });
 }

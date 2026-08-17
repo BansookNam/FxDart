@@ -12,7 +12,11 @@ class Tx {
 }
 
 const _categories = [
-  'groceries', 'dining', 'utilities', 'transport', 'entertainment',
+  'groceries',
+  'dining',
+  'utilities',
+  'transport',
+  'entertainment',
 ];
 
 List<Tx> makeTxns() {

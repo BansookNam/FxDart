@@ -63,9 +63,7 @@ class _EntryDialogState extends State<_EntryDialog> {
   bool get _hasDue => _type == EntryType.task || _type == EntryType.bill;
 
   EntryDraft _draft() => EntryDraft(
-    id:
-        widget.existing?.id ??
-        'user-${DateTime.now().microsecondsSinceEpoch}',
+    id: widget.existing?.id ?? 'user-${DateTime.now().microsecondsSinceEpoch}',
     title: _title.text,
     type: _type,
     // The amount field is hidden for tasks, so its stale text must not leak
@@ -117,9 +115,12 @@ class _EntryDialogState extends State<_EntryDialog> {
       _categoryId = categories.isEmpty ? null : categories.first.id;
     }
 
-    final errors = _attempted ? _validate(state.categoryIndex).leftOrNull() : null;
-    String? errorFor(String field) =>
-        errors == null ? null : find((FieldError e) => e.field == field, errors)?.detail;
+    final errors = _attempted
+        ? _validate(state.categoryIndex).leftOrNull()
+        : null;
+    String? errorFor(String field) => errors == null
+        ? null
+        : find((FieldError e) => e.field == field, errors)?.detail;
 
     return AlertDialog(
       title: Row(
@@ -320,10 +321,10 @@ class _EntryDialogState extends State<_EntryDialog> {
           _failSlow ? 'zipOrAccumulate5' : 'either((r) { … })',
           _failSlow
               ? 'five independent branches all run; a raise inside one is '
-                  'recorded rather than propagated, and the errors '
-                  'concatenate in branch order'
+                    'recorded rather than propagated, and the errors '
+                    'concatenate in branch order'
               : 'one scope, five calls in order: the first raise ends the '
-                  'block and the remaining validators never run',
+                    'block and the remaining validators never run',
           _failSlow ? '5 branches' : 'stops at 1',
         ),
         PipelineStep(

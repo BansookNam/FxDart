@@ -17,13 +17,16 @@ void main() {
     });
 
     test('should return empty for no Rights', () async {
-      expect(await rightsAsync(toAsync(<Either<String, int>>[const Left('x')])),
-          isEmpty);
+      expect(
+        await rightsAsync(toAsync(<Either<String, int>>[const Left('x')])),
+        isEmpty,
+      );
     });
 
     test('should be able to be used as a chain terminal', () async {
-      final result =
-          await fx(eithers).toAsync().map((e) => e.map((n) => n * 10)).rights();
+      final result = await fx(
+        eithers,
+      ).toAsync().map((e) => e.map((n) => n * 10)).rights();
       expect(result, equals([10, 20]));
     });
   });
@@ -46,8 +49,9 @@ void main() {
     });
 
     test('should return empty pairs for an empty upstream', () async {
-      final (ls, rs) =
-          await separateEitherAsync(toAsync(<Either<String, int>>[]));
+      final (ls, rs) = await separateEitherAsync(
+        toAsync(<Either<String, int>>[]),
+      );
       expect(ls, isEmpty);
       expect(rs, isEmpty);
     });

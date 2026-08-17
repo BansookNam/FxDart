@@ -9,11 +9,9 @@ import 'package:test/test.dart';
 void main() {
   group('fused scan', () {
     test('scan then map: the seed flows through the later stages', () async {
-      final res = await fx([1, 2, 3])
-          .toAsync()
-          .scan<int>((acc, a) => acc + a, 10)
-          .map((a) => 'v$a')
-          .toList();
+      final res = await fx(
+        [1, 2, 3],
+      ).toAsync().scan<int>((acc, a) => acc + a, 10).map((a) => 'v$a').toList();
       expect(res, equals(['v10', 'v11', 'v13', 'v16']));
     });
 
@@ -44,15 +42,17 @@ void main() {
       expect(res, equals([1, 3]));
     });
 
-    test('a filter before the scan skips elements, not accumulations',
-        () async {
-      final res = await fx([1, 2, 3, 4])
-          .toAsync()
-          .filter((a) => a.isEven)
-          .scan<int>((acc, a) => acc + a, 0)
-          .toList();
-      expect(res, equals([0, 2, 6]));
-    });
+    test(
+      'a filter before the scan skips elements, not accumulations',
+      () async {
+        final res = await fx([1, 2, 3, 4])
+            .toAsync()
+            .filter((a) => a.isEven)
+            .scan<int>((acc, a) => acc + a, 0)
+            .toList();
+        expect(res, equals([0, 2, 6]));
+      },
+    );
 
     test('takeWhile after the scan ends the run', () async {
       final res = await fx([1, 2, 3, 4])
@@ -91,8 +91,9 @@ void main() {
     });
 
     test('an empty source still emits the seed', () async {
-      final res =
-          await fx(<int>[]).toAsync().scan<int>((acc, a) => acc + a, 7).toList();
+      final res = await fx(
+        <int>[],
+      ).toAsync().scan<int>((acc, a) => acc + a, 7).toList();
       expect(res, equals([7]));
     });
 
@@ -109,13 +110,10 @@ void main() {
     });
 
     test('an async accumulator error fails the terminal', () async {
-      final future = fx([1, 2, 3])
-          .toAsync()
-          .scan<int>((acc, a) async {
-            if (a == 2) throw StateError('boom');
-            return acc + a;
-          }, 0)
-          .toList();
+      final future = fx([1, 2, 3]).toAsync().scan<int>((acc, a) async {
+        if (a == 2) throw StateError('boom');
+        return acc + a;
+      }, 0).toList();
       await expectLater(future, throwsStateError);
     });
 
@@ -132,18 +130,18 @@ void main() {
     });
 
     test('a stream source keeps the pull path when a scan is fused', () async {
-      final res = await fxStream(Stream.fromIterable([1, 2, 3]))
-          .scan<int>((acc, a) => acc + a, 0)
-          .map((a) => a * 2)
-          .toList();
+      final res = await fxStream(
+        Stream.fromIterable([1, 2, 3]),
+      ).scan<int>((acc, a) => acc + a, 0).map((a) => a * 2).toList();
       expect(res, equals([0, 2, 6, 12]));
     });
 
     test('each and fold see the same elements as toList', () async {
-      FxAsync<int> chain() => fx([1, 2, 3])
-          .toAsync()
-          .scan<int>((acc, a) => acc + a, 0)
-          .filter((a) => a != 3);
+      FxAsync<int> chain() => fx([
+        1,
+        2,
+        3,
+      ]).toAsync().scan<int>((acc, a) => acc + a, 0).filter((a) => a != 3);
       final seen = <int>[];
       await chain().each(seen.add);
       expect(seen, equals([0, 1, 6]));
@@ -152,10 +150,9 @@ void main() {
 
     test('an async emit holds the pipeline in order', () async {
       final seen = <int>[];
-      await fx([1, 2, 3])
-          .toAsync()
-          .scan<int>((acc, a) => acc + a, 0)
-          .each((a) async {
+      await fx([1, 2, 3]).toAsync().scan<int>((acc, a) => acc + a, 0).each((
+        a,
+      ) async {
         await Future<void>.delayed(Duration.zero);
         seen.add(a);
       });
@@ -163,37 +160,43 @@ void main() {
     });
 
     test('a Future element in the source is awaited', () async {
-      final res = await toListAsync(scanAsync<int, int>((acc, a) => acc + a, 0,
-          toAsync(<FutureOr<int>>[1, Future.value(2), 3])));
+      final res = await toListAsync(
+        scanAsync<int, int>(
+          (acc, a) => acc + a,
+          0,
+          toAsync(<FutureOr<int>>[1, Future.value(2), 3]),
+        ),
+      );
       expect(res, equals([0, 1, 3, 6]));
     });
 
+    test(
+      'a sync stage throwing after an async one fails the terminal',
+      () async {
+        final future = fx([1, 2, 3])
+            .toAsync()
+            .scan<int>((acc, a) async => acc + a, 0)
+            .map((a) {
+              if (a == 3) throw StateError('late');
+              return a;
+            })
+            .toList();
+        await expectLater(future, throwsStateError);
+      },
+    );
 
-    test('a sync stage throwing after an async one fails the terminal',
-        () async {
-      final future = fx([1, 2, 3])
-          .toAsync()
-          .scan<int>((acc, a) async => acc + a, 0)
-          .map((a) {
-            if (a == 3) throw StateError('late');
-            return a;
-          })
-          .toList();
-      await expectLater(future, throwsStateError);
-    });
-
-    test('a sync filter throwing after an async stage fails the terminal',
-        () async {
-      final future = fx([1, 2, 3])
-          .toAsync()
-          .map((a) async => a * 2)
-          .filter((a) {
-            if (a == 4) throw StateError('late-filter');
-            return true;
-          })
-          .toList();
-      await expectLater(future, throwsStateError);
-    });
+    test(
+      'a sync filter throwing after an async stage fails the terminal',
+      () async {
+        final future = fx([1, 2, 3]).toAsync().map((a) async => a * 2).filter((
+          a,
+        ) {
+          if (a == 4) throw StateError('late-filter');
+          return true;
+        }).toList();
+        await expectLater(future, throwsStateError);
+      },
+    );
 
     test('a throwing emit fails the terminal', () async {
       final future = fx([1, 2, 3]).toAsync().map((a) async => a).each((a) {
@@ -208,10 +211,9 @@ void main() {
         throw StateError('src');
       }
 
-      final future = fx(boom())
-          .toAsync()
-          .scan<int>((acc, a) => acc + a, 0)
-          .toList();
+      final future = fx(
+        boom(),
+      ).toAsync().scan<int>((acc, a) => acc + a, 0).toList();
       await expectLater(future, throwsStateError);
     });
   });

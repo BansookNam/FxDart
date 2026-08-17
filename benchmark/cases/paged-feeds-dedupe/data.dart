@@ -36,14 +36,12 @@ class Event {
 Event _event(int i) => Event('e$i', 'log line ${i % 97}');
 
 List<List<Event>> _paged(int start, int count) => [
-      for (var p = 0; p * pageSize < count; p++)
-        [
-          for (var i = p * pageSize;
-              i < count && i < (p + 1) * pageSize;
-              i++)
-            _event(start + i)
-        ]
-    ];
+  for (var p = 0; p * pageSize < count; p++)
+    [
+      for (var i = p * pageSize; i < count && i < (p + 1) * pageSize; i++)
+        _event(start + i),
+    ],
+];
 
 List<List<Event>> makePrimary() => _paged(0, primaryCount);
 List<List<Event>> makeReplica() => _paged(replicaStart, replicaCount);

@@ -25,9 +25,12 @@ Future<void> main() async {
       // must carry its row id for the sort back to source order.
       final results = await Stream.fromIterable(rows)
           .flatMap(
-              (row) => Rx.retry(() => Rx.fromCallable(() => importRow(row)), 1)
-                  .map((line) => (row.$1, line)),
-              maxConcurrent: 3)
+            (row) => Rx.retry(
+              () => Rx.fromCallable(() => importRow(row)),
+              1,
+            ).map((line) => (row.$1, line)),
+            maxConcurrent: 3,
+          )
           .toList();
       results.sort((a, b) => a.$1.compareTo(b.$1));
       var attempts = 0;

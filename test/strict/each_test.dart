@@ -4,14 +4,16 @@ import 'package:test/test.dart';
 void main() {
   group('each', () {
     group('sync', () {
-      test("should iterate and call the function to each item of 'Iterable'",
-          () {
-        var acc = 0;
-        each((int a) {
-          acc += a;
-        }, [1, 2, 3, 4, 5]);
-        expect(acc, equals(15));
-      });
+      test(
+        "should iterate and call the function to each item of 'Iterable'",
+        () {
+          var acc = 0;
+          each((int a) {
+            acc += a;
+          }, [1, 2, 3, 4, 5]);
+          expect(acc, equals(15));
+        },
+      );
 
       test('should be able to be used in the pipeline', () {
         var acc = 0;
@@ -32,14 +34,15 @@ void main() {
 
     group('async', () {
       test(
-          "should iterate and call the function to each item of 'AsyncIterable'",
-          () async {
-        var acc = 0;
-        await eachAsync((int a) {
-          acc += a;
-        }, toAsync([1, 2, 3, 4, 5]));
-        expect(acc, equals(15));
-      });
+        "should iterate and call the function to each item of 'AsyncIterable'",
+        () async {
+          var acc = 0;
+          await eachAsync((int a) {
+            acc += a;
+          }, toAsync([1, 2, 3, 4, 5]));
+          expect(acc, equals(15));
+        },
+      );
 
       test('should work when the given function is asynchronous', () async {
         var acc = 0;
@@ -102,14 +105,16 @@ void main() {
         expect(res2, equals(50));
       });
 
-      test('should be able to be used as a chaining method in the `fx`',
-          () async {
-        var acc = 0;
-        await fx([1, 2, 3, 4]).toAsync().map((a) => a + 10).each((a) {
-          acc += a;
-        });
-        expect(acc, equals(50));
-      });
+      test(
+        'should be able to be used as a chaining method in the `fx`',
+        () async {
+          var acc = 0;
+          await fx([1, 2, 3, 4]).toAsync().map((a) => a + 10).each((a) {
+            acc += a;
+          });
+          expect(acc, equals(50));
+        },
+      );
     });
   });
 }

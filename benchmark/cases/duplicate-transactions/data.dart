@@ -21,8 +21,16 @@ class Tx {
 
 const _categories = ['Food', 'Transport', 'Fun', 'Bills', 'Rent'];
 const _merchants = [
-  'Cafe Aroma', 'Metro', 'Green Grocer', 'Cinema', 'Noodle Bar',
-  'Electric Co', 'Taxi', 'Book Nook', 'Gym One', 'Corner Deli',
+  'Cafe Aroma',
+  'Metro',
+  'Green Grocer',
+  'Cinema',
+  'Noodle Bar',
+  'Electric Co',
+  'Taxi',
+  'Book Nook',
+  'Gym One',
+  'Corner Deli',
 ];
 
 List<Tx> makeTxns() {
@@ -35,12 +43,14 @@ List<Tx> makeTxns() {
     }
     final month = 1 + rng.nextInt(12);
     final day = 1 + rng.nextInt(28);
-    txns.add(Tx(
-      '2026-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}',
-      _categories[rng.nextInt(_categories.length)],
-      _merchants[rng.nextInt(_merchants.length)],
-      (100 + rng.nextInt(9900)) / 100,
-    ));
+    txns.add(
+      Tx(
+        '2026-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}',
+        _categories[rng.nextInt(_categories.length)],
+        _merchants[rng.nextInt(_merchants.length)],
+        (100 + rng.nextInt(9900)) / 100,
+      ),
+    );
   }
   return txns;
 }

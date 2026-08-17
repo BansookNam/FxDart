@@ -14,8 +14,10 @@ class Tx {
   const Tx(this.date, this.category, this.amount);
 }
 
-final List<String> categories =
-    List.generate(200, (i) => 'Category ${i.toString().padLeft(3, '0')}');
+final List<String> categories = List.generate(
+  200,
+  (i) => 'Category ${i.toString().padLeft(3, '0')}',
+);
 
 List<Tx> makeTxns() {
   final rng = Lcg(7);

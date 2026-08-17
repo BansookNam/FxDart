@@ -51,11 +51,16 @@ void main() {
       test('every composition matches the pulled form', () {
         for (var a = 0; a <= 9; a++) {
           for (var b = 0; b <= 9; b++) {
-            expect(toList(drop(b, take(a, list))), toList(drop(b, take(a, gen(8)))),
-                reason: 'drop($b, take($a))');
-            expect(toList(takeRight(b, dropRight(a, list))),
-                toList(takeRight(b, dropRight(a, gen(8)))),
-                reason: 'takeRight($b, dropRight($a))');
+            expect(
+              toList(drop(b, take(a, list))),
+              toList(drop(b, take(a, gen(8)))),
+              reason: 'drop($b, take($a))',
+            );
+            expect(
+              toList(takeRight(b, dropRight(a, list))),
+              toList(takeRight(b, dropRight(a, gen(8)))),
+              reason: 'takeRight($b, dropRight($a))',
+            );
           }
         }
       });
@@ -90,8 +95,10 @@ void main() {
         final xs = [1, 2, 3, 4];
         expect(toList(zip(xs, drop(1, xs))), [(1, 2), (2, 3), (3, 4)]);
         expect(toList(zip(drop(1, xs), drop(2, xs))), [(2, 3), (3, 4)]);
-        expect(toList(zip(zip(xs, drop(1, xs)), drop(2, xs))),
-            [((1, 2), 3), ((2, 3), 4)]);
+        expect(toList(zip(zip(xs, drop(1, xs)), drop(2, xs))), [
+          ((1, 2), 3),
+          ((2, 3), 4),
+        ]);
       });
 
       test('range on the left, pulled on the right', () {
@@ -128,8 +135,11 @@ void main() {
     group('zip3', () {
       test('all three ranges', () {
         final xs = [1, 2, 3, 4, 5];
-        expect(toList(zip3(xs, drop(1, xs), drop(2, xs))),
-            [(1, 2, 3), (2, 3, 4), (3, 4, 5)]);
+        expect(toList(zip3(xs, drop(1, xs), drop(2, xs))), [
+          (1, 2, 3),
+          (2, 3, 4),
+          (3, 4, 5),
+        ]);
       });
 
       test('stops at the shortest side whichever it is', () {
@@ -139,14 +149,22 @@ void main() {
       });
 
       test('a single pulled side disables the indexed path', () {
-        expect(toList(zip3([1, 2, 3], [4, 5, 6], gen(2))), [(1, 4, 0), (2, 5, 1)]);
-        expect(toList(zip3(gen(2), [4, 5, 6], [7, 8, 9])), [(0, 4, 7), (1, 5, 8)]);
+        expect(toList(zip3([1, 2, 3], [4, 5, 6], gen(2))), [
+          (1, 4, 0),
+          (2, 5, 1),
+        ]);
+        expect(toList(zip3(gen(2), [4, 5, 6], [7, 8, 9])), [
+          (0, 4, 7),
+          (1, 5, 8),
+        ]);
       });
 
       test('reachable from the chain', () {
         final xs = [1, 2, 3, 4];
-        expect(fx(xs).zip3(drop(1, xs), drop(2, xs)).toList(),
-            [(1, 2, 3), (2, 3, 4)]);
+        expect(fx(xs).zip3(drop(1, xs), drop(2, xs)).toList(), [
+          (1, 2, 3),
+          (2, 3, 4),
+        ]);
       });
     });
 
@@ -158,20 +176,30 @@ void main() {
 
       test('passing the chain equals passing the operator result', () {
         expect(toList(zip(xs, fx(xs).drop(1))), toList(zip(xs, drop(1, xs))));
-        expect(toList(zip3(xs, fx(xs).drop(1), fx(xs).drop(2))),
-            toList(zip3(xs, drop(1, xs), drop(2, xs))));
-        expect(toList(windowed(2, fx(xs).drop(1))),
-            toList(windowed(2, drop(1, xs))));
+        expect(
+          toList(zip3(xs, fx(xs).drop(1), fx(xs).drop(2))),
+          toList(zip3(xs, drop(1, xs), drop(2, xs))),
+        );
+        expect(
+          toList(windowed(2, fx(xs).drop(1))),
+          toList(windowed(2, drop(1, xs))),
+        );
       });
 
       test('a chain of ranges composes like the top-level form', () {
-        expect(toList(zip(xs, fx(xs).drop(1).take(2))),
-            toList(zip(xs, take(2, drop(1, xs)))));
+        expect(
+          toList(zip(xs, fx(xs).drop(1).take(2))),
+          toList(zip(xs, take(2, drop(1, xs)))),
+        );
       });
 
       test('a non-range chain still zips correctly', () {
-        expect(toList(zip(xs, fx(xs).map((a) => a * 10))),
-            [(1, 10), (2, 20), (3, 30), (4, 40)]);
+        expect(toList(zip(xs, fx(xs).map((a) => a * 10))), [
+          (1, 10),
+          (2, 20),
+          (3, 30),
+          (4, 40),
+        ]);
       });
     });
 
@@ -183,9 +211,16 @@ void main() {
           for (final partial in [false, true]) {
             test('size=$size step=$step partial=$partial', () {
               expect(
-                  toList(windowed(size, list, step: step, partial: partial)),
-                  toList(windowed(size, gen(7).map((i) => i + 1),
-                      step: step, partial: partial)));
+                toList(windowed(size, list, step: step, partial: partial)),
+                toList(
+                  windowed(
+                    size,
+                    gen(7).map((i) => i + 1),
+                    step: step,
+                    partial: partial,
+                  ),
+                ),
+              );
             });
           }
         }
@@ -193,8 +228,11 @@ void main() {
 
       test('chunk over a List matches the pulled form', () {
         for (var size = 1; size <= 8; size++) {
-          expect(toList(chunk(size, list)), toList(chunk(size, gen(7).map((i) => i + 1))),
-              reason: 'chunk($size)');
+          expect(
+            toList(chunk(size, list)),
+            toList(chunk(size, gen(7).map((i) => i + 1))),
+            reason: 'chunk($size)',
+          );
         }
       });
 
@@ -210,7 +248,7 @@ void main() {
         expect(toList(windowed(3, [1, 2])), <int>[]);
         expect(toList(windowed(3, [1, 2], partial: true)), [
           [1, 2],
-          [2]
+          [2],
         ]);
       });
 
@@ -219,7 +257,7 @@ void main() {
           [3, 4],
           [4, 5],
           [5, 6],
-          [6, 7]
+          [6, 7],
         ]);
       });
     });

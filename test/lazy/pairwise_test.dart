@@ -5,8 +5,10 @@ void main() {
   group('pairwise', () {
     group('sync', () {
       test('should pair each element with its successor', () {
-        expect(toList(pairwise([1, 2, 3, 4])),
-            equals([(1, 2), (2, 3), (3, 4)]));
+        expect(
+          toList(pairwise([1, 2, 3, 4])),
+          equals([(1, 2), (2, 3), (3, 4)]),
+        );
       });
 
       test('should yield nothing for fewer than two elements', () {
@@ -15,8 +17,10 @@ void main() {
       });
 
       test('should stay lazy over an endless source', () {
-        expect(toList(take(3, pairwise(cycle([1, 2])))),
-            equals([(1, 2), (2, 1), (1, 2)]));
+        expect(
+          toList(take(3, pairwise(cycle([1, 2])))),
+          equals([(1, 2), (2, 1), (1, 2)]),
+        );
       });
 
       test('should support repeated iteration', () {
@@ -27,18 +31,18 @@ void main() {
       test('should be able to be used as a chaining method in the `fx`', () {
         expect(fx([1, 5, 3]).pairwise().toList(), equals([(1, 5), (5, 3)]));
         expect(
-            fx([100, 120, 90])
-                .pairwise()
-                .map((p) => p.$2 - p.$1)
-                .toList(),
-            equals([20, -30]));
+          fx([100, 120, 90]).pairwise().map((p) => p.$2 - p.$1).toList(),
+          equals([20, -30]),
+        );
       });
     });
 
     group('async', () {
       test('should pair like the sync form', () async {
-        expect(await toListAsync(pairwiseAsync(toAsync([1, 2, 3, 4]))),
-            equals([(1, 2), (2, 3), (3, 4)]));
+        expect(
+          await toListAsync(pairwiseAsync(toAsync([1, 2, 3, 4]))),
+          equals([(1, 2), (2, 3), (3, 4)]),
+        );
         expect(await toListAsync(pairwiseAsync(asyncEmpty<int>())), equals([]));
         expect(await toListAsync(pairwiseAsync(toAsync([1]))), equals([]));
       });
@@ -70,11 +74,15 @@ void main() {
         );
       });
 
-      test('should be able to be used as a chaining method in the `fx`',
-          () async {
-        expect(await fx([1, 5, 3]).toAsync().pairwise().toList(),
-            equals([(1, 5), (5, 3)]));
-      });
+      test(
+        'should be able to be used as a chaining method in the `fx`',
+        () async {
+          expect(
+            await fx([1, 5, 3]).toAsync().pairwise().toList(),
+            equals([(1, 5), (5, 3)]),
+          );
+        },
+      );
     });
   });
 }

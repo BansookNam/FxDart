@@ -52,12 +52,14 @@ void main() {
     });
 
     test('skipWhile should behave like dropWhile', () {
-      expect(
-          fx([1, 2, 3, 1]).skipWhile((a) => a < 3).toList(), equals([3, 1]));
+      expect(fx([1, 2, 3, 1]).skipWhile((a) => a < 3).toList(), equals([3, 1]));
     });
 
     test('dropUntil should drop through the first match', () {
-      expect(fx([1, 2, 3, 4]).dropUntil((a) => a == 2).toList(), equals([3, 4]));
+      expect(
+        fx([1, 2, 3, 4]).dropUntil((a) => a == 2).toList(),
+        equals([3, 4]),
+      );
     });
 
     test('zipWithIndex should pair each element with its index', () {
@@ -114,16 +116,21 @@ void main() {
       });
 
       test('calls orElse when nothing matches', () {
-        expect(fx([1, 3]).firstWhere((a) => a.isEven, orElse: () => -1),
-            equals(-1));
+        expect(
+          fx([1, 3]).firstWhere((a) => a.isEven, orElse: () => -1),
+          equals(-1),
+        );
       });
 
       test('does not call orElse when a match is found', () {
         var called = false;
-        final r = fx([2]).firstWhere((a) => a.isEven, orElse: () {
-          called = true;
-          return -1;
-        });
+        final r = fx([2]).firstWhere(
+          (a) => a.isEven,
+          orElse: () {
+            called = true;
+            return -1;
+          },
+        );
         expect(r, equals(2));
         expect(called, isFalse);
       });
@@ -140,7 +147,9 @@ void main() {
 
       test('calls orElse when nothing matches', () {
         expect(
-            fx([1, 3]).lastWhere((a) => a.isEven, orElse: () => -1), equals(-1));
+          fx([1, 3]).lastWhere((a) => a.isEven, orElse: () => -1),
+          equals(-1),
+        );
       });
 
       test('scans every element (no early exit)', () {
@@ -197,9 +206,9 @@ void main() {
 
   group('FxAsync chain', () {
     test('fxStream should wrap a Stream', () async {
-      final res = await fxStream(Stream.fromIterable([1, 2, 3]))
-          .map((a) => a * 2)
-          .toList();
+      final res = await fxStream(
+        Stream.fromIterable([1, 2, 3]),
+      ).map((a) => a * 2).toList();
       expect(res, equals([2, 4, 6]));
     });
 
@@ -227,9 +236,9 @@ void main() {
 
     test('scan should emit the seed then the running accumulator', () async {
       expect(
-        await fxAsync(toAsync([1, 2, 3]))
-            .scan<int>((acc, a) => acc + a, 0)
-            .toList(),
+        await fxAsync(
+          toAsync([1, 2, 3]),
+        ).scan<int>((acc, a) => acc + a, 0).toList(),
         equals([0, 1, 3, 6]),
       );
     });
@@ -240,8 +249,9 @@ void main() {
     });
 
     test('fold should reduce with a seed', () async {
-      final res = await fxAsync(toAsync([1, 2, 3]))
-          .fold<int>(10, (acc, a) => acc + a);
+      final res = await fxAsync(
+        toAsync([1, 2, 3]),
+      ).fold<int>(10, (acc, a) => acc + a);
       expect(res, equals(16));
     });
 
@@ -259,10 +269,12 @@ void main() {
 
     test('sortBy should sort by the selected key', () async {
       expect(
-        await fxAsync(toAsync([
-          {'n': 3},
-          {'n': 1},
-        ])).sortBy((a) => a['n']),
+        await fxAsync(
+          toAsync([
+            {'n': 3},
+            {'n': 1},
+          ]),
+        ).sortBy((a) => a['n']),
         equals([
           {'n': 1},
           {'n': 3},

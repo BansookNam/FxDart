@@ -60,8 +60,9 @@ class _FilterIterator<A> implements Iterator<A> {
 /// filterWithIndex((a, i) => i.isEven, ['a', 'b', 'c']); // ('a', 'c')
 /// ```
 Iterable<A> filterWithIndex<A>(
-        bool Function(A a, int index) f, Iterable<A> iterable) =>
-    _FilterWithIndexIterable(f, iterable);
+  bool Function(A a, int index) f,
+  Iterable<A> iterable,
+) => _FilterWithIndexIterable(f, iterable);
 
 class _FilterWithIndexIterable<A> extends Iterable<A> {
   _FilterWithIndexIterable(this._f, this._source);
@@ -94,7 +95,9 @@ class _FilterWithIndexIterator<A> implements Iterator<A> {
 /// Async counterpart of [filterWithIndex].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> filterWithIndexAsync<A>(
-    FutureOr<bool> Function(A a, int index) f, FxAsyncIterable<A> iterable) {
+  FutureOr<bool> Function(A a, int index) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     var i = 0;
     return filterAsync((A a) => f(a, i++), source).iterator;
@@ -142,7 +145,9 @@ class _CompactIterator<A> implements Iterator<A> {
 /// Maps upstream values to `(passed, value)` pairs, forwarding the
 /// concurrency marker. Port of `toFilterIterator` in FxTS `filter.ts`.
 FxAsyncIterable<(bool, A)> _toFilterIterable<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return mapAsync((A a) async => (await f(a), a), iterable);
 }
 
@@ -163,25 +168,28 @@ FxAsyncIterable<A> _asyncConcurrent<A>(FxAsyncIterable<(bool, A)> iterable) {
 
     void fillBuffer(Concurrent? concurrent) {
       final nextItem = iterator.next(concurrent);
-      prevItem = prevItem.then((_) => nextItem).then((result) {
-        if (result.done) {
-          while (settlementQueue.isNotEmpty) {
-            settlementQueue.removeAt(0).complete(IterResult<A>.done());
-          }
-          finished = true;
-          return;
-        }
-        final (cond, item) = result.value;
-        if (cond) {
-          buffer.add(item);
-        }
-        recur(concurrent);
-      }).catchError((Object reason, StackTrace st) {
-        finished = true;
-        while (settlementQueue.isNotEmpty) {
-          settlementQueue.removeAt(0).completeError(reason, st);
-        }
-      });
+      prevItem = prevItem
+          .then((_) => nextItem)
+          .then((result) {
+            if (result.done) {
+              while (settlementQueue.isNotEmpty) {
+                settlementQueue.removeAt(0).complete(IterResult<A>.done());
+              }
+              finished = true;
+              return;
+            }
+            final (cond, item) = result.value;
+            if (cond) {
+              buffer.add(item);
+            }
+            recur(concurrent);
+          })
+          .catchError((Object reason, StackTrace st) {
+            finished = true;
+            while (settlementQueue.isNotEmpty) {
+              settlementQueue.removeAt(0).completeError(reason, st);
+            }
+          });
     }
 
     void consumeBuffer() {
@@ -220,7 +228,9 @@ FxAsyncIterable<A> _asyncConcurrent<A>(FxAsyncIterable<(bool, A)> iterable) {
 /// Port of FxTS `filter` (async), including its dedicated concurrent path.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> filterAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   // Fused-stage form; a Concurrent marker falls back to
   // [_filterAsyncLegacy]'s concurrent predicate machinery.
   final stage = FxFilterStage((v) => f(v as A));
@@ -228,25 +238,32 @@ FxAsyncIterable<A> filterAsync<A>(
     final source = iterable.source;
     final stages = iterable.stages;
     final legacy = iterable.legacy;
-    return FxFusedAsyncIterable<A>(
-        source, [...stages, stage], () => _filterAsyncLegacy(f, legacy()));
+    return FxFusedAsyncIterable<A>(source, [
+      ...stages,
+      stage,
+    ], () => _filterAsyncLegacy(f, legacy()));
   }
-  return FxFusedAsyncIterable<A>(
-      iterable, [stage], () => _filterAsyncLegacy(f, iterable));
+  return FxFusedAsyncIterable<A>(iterable, [
+    stage,
+  ], () => _filterAsyncLegacy(f, iterable));
 }
 
 FxAsyncIterable<A> _filterAsyncLegacy<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   // Only reached via the fused chain's Concurrent fallback, so this is the
   // concurrent predicate machinery directly (the serial case is the fused
   // FxFilterStage). A defensive unmarked first pull degrades to width 1.
   return DelegateAsyncIterable(() {
     FxAsyncIterator<A>? inner;
     return DelegateAsyncIterator((concurrent) {
-      inner ??= _asyncConcurrent(concurrentAsync(
-              concurrent is Concurrent ? concurrent.length : 1,
-              _toFilterIterable(f, iterable)))
-          .iterator;
+      inner ??= _asyncConcurrent(
+        concurrentAsync(
+          concurrent is Concurrent ? concurrent.length : 1,
+          _toFilterIterable(f, iterable),
+        ),
+      ).iterator;
       return inner!.next(concurrent);
     });
   });
@@ -255,8 +272,9 @@ FxAsyncIterable<A> _filterAsyncLegacy<A>(
 /// Async counterpart of [reject].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> rejectAsync<A>(
-        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    filterAsync((A a) async => !await f(a), iterable);
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => filterAsync((A a) async => !await f(a), iterable);
 
 /// Async counterpart of [compact].
 @pragma('vm:prefer-inline')
@@ -417,7 +435,9 @@ List<A> uniqByStrict<A, B>(B Function(A a) f, Iterable<A> iterable) =>
 /// Async counterpart of [uniqBy]. Uses then/bare pattern for sync keys.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> uniqByAsync<A, B>(
-    FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<B> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return DelegateAsyncIterable(() {
     final seen = <B>{};
     return filterAsync((A a) {
@@ -496,7 +516,9 @@ Iterable<A> uniqAdjacent<A>(Iterable<A> iterable) =>
 /// to still evaluate the upstream in parallel.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> uniqAdjacentByAsync<A, B>(
-    FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<B> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var hasPrev = false;
@@ -525,8 +547,10 @@ FxAsyncIterable<A> uniqAdjacentAsync<A>(FxAsyncIterable<A> iterable) =>
 ///
 /// Port of FxTS `differenceBy`.
 Iterable<A> differenceBy<A, B>(
-        B Function(A a) f, Iterable<A> iterable1, Iterable<A> iterable2) =>
-    _SetOpIterable(f, iterable1, iterable2, false);
+  B Function(A a) f,
+  Iterable<A> iterable1,
+  Iterable<A> iterable2,
+) => _SetOpIterable(f, iterable1, iterable2, false);
 
 /// Returns the elements of [iterable2] that do not occur in [iterable1].
 ///
@@ -539,8 +563,10 @@ Iterable<A> difference<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
 ///
 /// Port of FxTS `intersectionBy`.
 Iterable<A> intersectionBy<A, B>(
-        B Function(A a) f, Iterable<A> iterable1, Iterable<A> iterable2) =>
-    _SetOpIterable(f, iterable1, iterable2, true);
+  B Function(A a) f,
+  Iterable<A> iterable1,
+  Iterable<A> iterable2,
+) => _SetOpIterable(f, iterable1, iterable2, true);
 
 /// Shared machinery of [differenceBy] / [intersectionBy]: one pass over
 /// [_source2], filtering on [_source1]'s key set and deduping by element —
@@ -611,10 +637,12 @@ FxAsyncIterable<A> _setOpAsync<A, B>(
           keys.add(await f(r.value));
         }
         set = keys.toSet();
-        inner = uniqAsync(filterAsync(
-                (A a) async => set!.contains(await f(a)) == keepWhenInSet,
-                source))
-            .iterator;
+        inner = uniqAsync(
+          filterAsync(
+            (A a) async => set!.contains(await f(a)) == keepWhenInSet,
+            source,
+          ),
+        ).iterator;
       }
       return inner!.next(concurrent);
     });
@@ -623,24 +651,30 @@ FxAsyncIterable<A> _setOpAsync<A, B>(
 
 /// Async counterpart of [differenceBy].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> differenceByAsync<A, B>(FutureOr<B> Function(A a) f,
-        FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
-    _setOpAsync(f, iterable1, iterable2, false);
+FxAsyncIterable<A> differenceByAsync<A, B>(
+  FutureOr<B> Function(A a) f,
+  FxAsyncIterable<A> iterable1,
+  FxAsyncIterable<A> iterable2,
+) => _setOpAsync(f, iterable1, iterable2, false);
 
 /// Async counterpart of [difference].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> differenceAsync<A>(
-        FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
-    differenceByAsync((A a) => a, iterable1, iterable2);
+  FxAsyncIterable<A> iterable1,
+  FxAsyncIterable<A> iterable2,
+) => differenceByAsync((A a) => a, iterable1, iterable2);
 
 /// Async counterpart of [intersectionBy].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> intersectionByAsync<A, B>(FutureOr<B> Function(A a) f,
-        FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
-    _setOpAsync(f, iterable1, iterable2, true);
+FxAsyncIterable<A> intersectionByAsync<A, B>(
+  FutureOr<B> Function(A a) f,
+  FxAsyncIterable<A> iterable1,
+  FxAsyncIterable<A> iterable2,
+) => _setOpAsync(f, iterable1, iterable2, true);
 
 /// Async counterpart of [intersection].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> intersectionAsync<A>(
-        FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
-    intersectionByAsync((A a) => a, iterable1, iterable2);
+  FxAsyncIterable<A> iterable1,
+  FxAsyncIterable<A> iterable2,
+) => intersectionByAsync((A a) => a, iterable1, iterable2);

@@ -15,8 +15,13 @@ void main() {
       });
 
       test('given string array then should return [a, b, c]', () {
-        final result =
-            fx(['a', 'b', 'c', 'd', 'e']).filter((x) => gte('c', x)).toList();
+        final result = fx([
+          'a',
+          'b',
+          'c',
+          'd',
+          'e',
+        ]).filter((x) => gte('c', x)).toList();
         expect(result, equals(['a', 'b', 'c']));
       });
 
@@ -35,26 +40,30 @@ void main() {
       });
 
       test('given date array then should return empty array', () {
-        final result = fx([DateTime(2021, 5, 10), DateTime(2021, 4, 9)])
-            .filter((x) => gte(DateTime(2020, 5, 10), x))
-            .toList();
+        final result = fx([
+          DateTime(2021, 5, 10),
+          DateTime(2021, 4, 9),
+        ]).filter((x) => gte(DateTime(2020, 5, 10), x)).toList();
         expect(result, equals(<DateTime>[]));
       });
     });
 
     group('eager evaluation', () {
-      test('should return true that the first number is greater than second',
-          () {
-        expect(gte(5, 1), isTrue);
-      });
+      test(
+        'should return true that the first number is greater than second',
+        () {
+          expect(gte(5, 1), isTrue);
+        },
+      );
       test('should return true that the first number is equal to second', () {
         expect(gte(5, 5), isTrue);
       });
       test(
-          'should return false that the first number is not greater than or not equal to second',
-          () {
-        expect(gte(1, 5), isFalse);
-      });
+        'should return false that the first number is not greater than or not equal to second',
+        () {
+          expect(gte(1, 5), isFalse);
+        },
+      );
 
       test('should return true that the first char is greater than second', () {
         expect(gte('b', 'a'), isTrue);
@@ -63,10 +72,11 @@ void main() {
         expect(gte('b', 'b'), isTrue);
       });
       test(
-          'should return false that the first char is not greater than or not equal to second',
-          () {
-        expect(gte('b', 'c'), isFalse);
-      });
+        'should return false that the first char is not greater than or not equal to second',
+        () {
+          expect(gte('b', 'c'), isFalse);
+        },
+      );
 
       test('should return true that the first Date is greater than second', () {
         expect(gte(DateTime.now(), DateTime(2021, 5, 11)), isTrue);
@@ -74,10 +84,12 @@ void main() {
       test('should return true that the first Date is equal to second', () {
         expect(gte(DateTime(2021, 5, 11), DateTime(2021, 5, 11)), isTrue);
       });
-      test('should return false that the first Date is not greater than second',
-          () {
-        expect(gte(DateTime(2021, 5, 11), DateTime.now()), isFalse);
-      });
+      test(
+        'should return false that the first Date is not greater than second',
+        () {
+          expect(gte(DateTime(2021, 5, 11), DateTime.now()), isFalse);
+        },
+      );
 
       test('should throw ArgumentError on mixed types', () {
         expect(() => gte(1, 'a'), throwsArgumentError);

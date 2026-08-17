@@ -22,7 +22,8 @@ List<Order> makeOrders() {
     final lineCount = rng.nextDouble() < 0.5 ? 2 : 3;
     final skus = List.generate(
       lineCount,
-      (_) => '${_skuNames[rng.nextInt(_skuNames.length)]}'
+      (_) =>
+          '${_skuNames[rng.nextInt(_skuNames.length)]}'
           '-${(1 + rng.nextInt(99)).toString().padLeft(2, '0')}',
     );
     return Order('A-${101 + i}', skus);

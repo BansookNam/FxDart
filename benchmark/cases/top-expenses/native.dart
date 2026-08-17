@@ -14,7 +14,10 @@ Future<void> main() async {
       // key to sort largest-first.
       final top = txns.sortedBy<num>((t) => -t.amount).take(3);
       return top
-          .map((t) => '${t.merchant.padRight(15)} \$${t.amount.toStringAsFixed(2)}')
+          .map(
+            (t) =>
+                '${t.merchant.padRight(15)} \$${t.amount.toStringAsFixed(2)}',
+          )
           .join('|');
     },
   );

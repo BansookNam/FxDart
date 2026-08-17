@@ -4,8 +4,18 @@ import '../../harness.dart';
 final n = caseN(1000000);
 
 const _names = [
-  'Ava', 'Ben', 'Cara', 'Dan', 'Elle', 'Finn',
-  'Gus', 'Hana', 'Ivan', 'June', 'Kai', 'Lena',
+  'Ava',
+  'Ben',
+  'Cara',
+  'Dan',
+  'Elle',
+  'Finn',
+  'Gus',
+  'Hana',
+  'Ivan',
+  'June',
+  'Kai',
+  'Lena',
 ];
 
 List<String> makeUsers() {

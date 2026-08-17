@@ -5,8 +5,10 @@ void main() {
   group('mapWithIndex', () {
     group('sync', () {
       test('passes the 0-based position alongside the value', () {
-        expect(toList(mapWithIndex((a, i) => '$i:$a', ['a', 'b', 'c'])),
-            equals(['0:a', '1:b', '2:c']));
+        expect(
+          toList(mapWithIndex((a, i) => '$i:$a', ['a', 'b', 'c'])),
+          equals(['0:a', '1:b', '2:c']),
+        );
       });
 
       test('is empty for an empty source', () {
@@ -31,48 +33,69 @@ void main() {
       });
 
       test('counts what reaches it, not the original source', () {
-        final res = fx([1, 2, 3, 4, 5])
-            .filter((a) => a.isOdd)
-            .mapWithIndex((a, i) => (i, a))
-            .toList();
+        final res = fx([
+          1,
+          2,
+          3,
+          4,
+          5,
+        ]).filter((a) => a.isOdd).mapWithIndex((a, i) => (i, a)).toList();
         expect(res, equals([(0, 1), (1, 3), (2, 5)]));
       });
 
       test('the List fast path agrees with the iterator path', () {
         final list = [10, 20, 30];
-        expect(mapWithIndex((a, i) => a + i, list).toList(),
-            equals(toList(mapWithIndex((a, i) => a + i, list.where((_) => true)))));
+        expect(
+          mapWithIndex((a, i) => a + i, list).toList(),
+          equals(
+            toList(mapWithIndex((a, i) => a + i, list.where((_) => true))),
+          ),
+        );
       });
 
       test('a non-growable toList still holds every element', () {
-        final res = mapWithIndex((a, i) => a + i, [10, 20, 30])
-            .toList(growable: false);
+        final res = mapWithIndex((a, i) => a + i, [
+          10,
+          20,
+          30,
+        ]).toList(growable: false);
         expect(res, equals([10, 21, 32]));
       });
 
       test('matches zipWithIndex + map, without the record', () {
-        final viaIndex = fx([10, 20, 30]).mapWithIndex((a, i) => a * i).toList();
-        final viaZip =
-            fx([10, 20, 30]).zipWithIndex().map((p) => p.$2 * p.$1).toList();
+        final viaIndex = fx([
+          10,
+          20,
+          30,
+        ]).mapWithIndex((a, i) => a * i).toList();
+        final viaZip = fx([
+          10,
+          20,
+          30,
+        ]).zipWithIndex().map((p) => p.$2 * p.$1).toList();
         expect(viaIndex, equals(viaZip));
       });
 
       test('is available as an fx chain method', () {
-        expect(fx(range(1, 4)).mapWithIndex((a, i) => a * i).toList(),
-            equals([0, 2, 6]));
+        expect(
+          fx(range(1, 4)).mapWithIndex((a, i) => a * i).toList(),
+          equals([0, 2, 6]),
+        );
       });
     });
 
     group('async', () {
       test('passes the 0-based position alongside the value', () async {
         final res = await toListAsync(
-            mapWithIndexAsync((a, i) => '$i:$a', toAsync(['a', 'b', 'c'])));
+          mapWithIndexAsync((a, i) => '$i:$a', toAsync(['a', 'b', 'c'])),
+        );
         expect(res, equals(['0:a', '1:b', '2:c']));
       });
 
       test('accepts an async callback', () async {
         final res = await toListAsync(
-            mapWithIndexAsync((a, i) async => a * i, toAsync([1, 2, 3])));
+          mapWithIndexAsync((a, i) async => a * i, toAsync([1, 2, 3])),
+        );
         expect(res, equals([0, 2, 6]));
       });
 
@@ -92,9 +115,9 @@ void main() {
       });
 
       test('is available as an fxAsync chain method', () async {
-        final res = await fxAsync(toAsync(range(1, 4)))
-            .mapWithIndex((a, i) => a * i)
-            .toList();
+        final res = await fxAsync(
+          toAsync(range(1, 4)),
+        ).mapWithIndex((a, i) => a * i).toList();
         expect(res, equals([0, 2, 6]));
       });
     });

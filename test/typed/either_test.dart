@@ -15,9 +15,9 @@ void main() {
 
     test('exhaustive switch without default compiles and matches', () {
       String describe(Either<String, int> e) => switch (e) {
-            Left(:final value) => 'L:$value',
-            Right(:final value) => 'R:$value',
-          };
+        Left(:final value) => 'L:$value',
+        Right(:final value) => 'R:$value',
+      };
       expect(describe(right), 'R:2');
       expect(describe(left), 'L:err');
     });
@@ -62,10 +62,14 @@ void main() {
 
     test('onLeft / onRight run for their side only and return this', () {
       final log = <String>[];
-      expect(right.onRight((v) => log.add('r$v')).onLeft((l) => log.add('l')),
-          same(right));
-      expect(left.onLeft((l) => log.add('l:$l')).onRight((v) => log.add('r')),
-          same(left));
+      expect(
+        right.onRight((v) => log.add('r$v')).onLeft((l) => log.add('l')),
+        same(right),
+      );
+      expect(
+        left.onLeft((l) => log.add('l:$l')).onRight((v) => log.add('r')),
+        same(left),
+      );
       expect(log, ['r2', 'l:err']);
     });
 
@@ -90,9 +94,12 @@ void main() {
     test('Either.catchingWith maps the thrown object to a typed failure', () {
       expect(Either.catchingWith((e, st) => 'caught: $e', () => 1), Right(1));
       expect(
-          Either.catchingWith(
-              (e, st) => 'caught', () => throw StateError('boom')),
-          Left('caught'));
+        Either.catchingWith(
+          (e, st) => 'caught',
+          () => throw StateError('boom'),
+        ),
+        Left('caught'),
+      );
     });
 
     test('structural equality, hashCode, toString', () {

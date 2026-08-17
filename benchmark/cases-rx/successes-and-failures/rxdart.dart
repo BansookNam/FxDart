@@ -18,9 +18,11 @@ Future<void> main() async {
       // A stream error ends the whole stream — each validation gets its
       // own inner stream so its failure can come back as data.
       final results = await Stream.fromIterable(orders)
-          .asyncExpand((id) => Rx.fromCallable(() => validate(id))
-              .map<(int, Object?)>((ok) => (ok, null))
-              .onErrorReturnWith((e, _) => (id, e)))
+          .asyncExpand(
+            (id) => Rx.fromCallable(() => validate(id))
+                .map<(int, Object?)>((ok) => (ok, null))
+                .onErrorReturnWith((e, _) => (id, e)),
+          )
           .toList();
 
       final ok = results.where((r) => r.$2 == null).toList();

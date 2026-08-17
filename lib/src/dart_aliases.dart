@@ -26,8 +26,9 @@ Iterable<A> where<A>(bool Function(A a) f, Iterable<A> iterable) =>
 
 /// Dart-idiomatic alias for [filterAsync].
 FxAsyncIterable<A> whereAsync<A>(
-        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    filterAsync(f, iterable);
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => filterAsync(f, iterable);
 
 /// Dart-idiomatic alias for [reject] (keeps items where `f` is false).
 Iterable<A> whereNot<A>(bool Function(A a) f, Iterable<A> iterable) =>
@@ -35,8 +36,9 @@ Iterable<A> whereNot<A>(bool Function(A a) f, Iterable<A> iterable) =>
 
 /// Dart-idiomatic alias for [rejectAsync].
 FxAsyncIterable<A> whereNotAsync<A>(
-        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    rejectAsync(f, iterable);
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => rejectAsync(f, iterable);
 
 /// Dart-idiomatic alias for [compact] (drops `null`s).
 Iterable<A> nonNulls<A>(Iterable<A?> iterable) => compact(iterable);
@@ -58,8 +60,9 @@ Iterable<A> distinctBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
 
 /// Dart-idiomatic alias for [uniqByAsync].
 FxAsyncIterable<A> distinctByAsync<A, B>(
-        FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    uniqByAsync(f, iterable);
+  FutureOr<B> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => uniqByAsync(f, iterable);
 
 // --- lazy/map.dart ---
 /// Dart-idiomatic alias for [flatMap] (matches `Iterable.expand`).
@@ -68,17 +71,19 @@ Iterable<B> expand<A, B>(Iterable<B> Function(A a) f, Iterable<A> iterable) =>
 
 /// Dart-idiomatic alias for [flatMapAsync].
 FxAsyncIterable<B> expandAsync<A, B>(
-        FutureOr<Iterable<B>> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    flatMapAsync(f, iterable);
+  FutureOr<Iterable<B>> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => flatMapAsync(f, iterable);
 
 /// Dart-idiomatic alias for [flat] (flattens [depth] levels, default 1).
 Iterable<dynamic> flattened(Iterable<dynamic> iterable, [int depth = 1]) =>
     flat(iterable, depth);
 
 /// Dart-idiomatic alias for [flatAsync].
-FxAsyncIterable<dynamic> flattenedAsync(FxAsyncIterable<dynamic> iterable,
-        [int depth = 1]) =>
-    flatAsync(iterable, depth);
+FxAsyncIterable<dynamic> flattenedAsync(
+  FxAsyncIterable<dynamic> iterable, [
+  int depth = 1,
+]) => flatAsync(iterable, depth);
 
 // --- lazy/take_drop.dart ---
 /// Dart-idiomatic alias for [takeRight] (the last [length] items).
@@ -102,8 +107,9 @@ Iterable<A> skipWhile<A>(bool Function(A a) f, Iterable<A> iterable) =>
 
 /// Dart-idiomatic alias for [dropWhileAsync].
 FxAsyncIterable<A> skipWhileAsync<A>(
-        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    dropWhileAsync(f, iterable);
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => dropWhileAsync(f, iterable);
 
 // --- lazy/zip.dart ---
 /// Dart-idiomatic alias for [zipWithIndex] (each item paired with its index).
@@ -125,7 +131,8 @@ Future<A?> firstOrNullAsync<A>(FxAsyncIterable<A> iterable) =>
 A? lastOrNull<A>(Iterable<A> iterable) => last(iterable);
 
 /// Dart-idiomatic alias for [lastAsync].
-Future<A?> lastOrNullAsync<A>(FxAsyncIterable<A> iterable) => lastAsync(iterable);
+Future<A?> lastOrNullAsync<A>(FxAsyncIterable<A> iterable) =>
+    lastAsync(iterable);
 
 /// Dart-idiomatic alias for [nth] (item at [index], or `null`).
 A? elementAtOrNull<A>(int index, Iterable<A> iterable) => nth(index, iterable);
@@ -140,8 +147,9 @@ A? firstWhereOrNull<A>(bool Function(A a) f, Iterable<A> iterable) =>
 
 /// Dart-idiomatic alias for [findAsync].
 Future<A?> firstWhereOrNullAsync<A>(
-        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    findAsync(f, iterable);
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => findAsync(f, iterable);
 
 /// Dart-idiomatic alias for [findIndex] (index of first match, or -1).
 int indexWhere<A>(bool Function(A a) f, Iterable<A> iterable) =>
@@ -149,8 +157,9 @@ int indexWhere<A>(bool Function(A a) f, Iterable<A> iterable) =>
 
 /// Dart-idiomatic alias for [findIndexAsync].
 Future<int> indexWhereAsync<A>(
-        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    findIndexAsync(f, iterable);
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => findIndexAsync(f, iterable);
 
 // Note: no top-level `contains` alias — it collides with `package:test`'s
 // matcher, and Dart's idiom is the inherited `.contains()` on the chain anyway.
@@ -161,8 +170,9 @@ bool any<A>(bool Function(A a) f, Iterable<A> iterable) => some(f, iterable);
 
 /// Dart-idiomatic alias for [someAsync].
 Future<bool> anyAsync<A>(
-        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    someAsync(f, iterable);
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => someAsync(f, iterable);
 
 // --- strict/aggregate.dart ---
 /// Dart-idiomatic alias for [each] (matches `Iterable.forEach`).
@@ -171,8 +181,9 @@ void forEach<A>(void Function(A a) f, Iterable<A> iterable) =>
 
 /// Dart-idiomatic alias for [eachAsync].
 Future<void> forEachAsync<A>(
-        FutureOr<void> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    eachAsync(f, iterable);
+  FutureOr<void> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => eachAsync(f, iterable);
 
 /// Dart-idiomatic alias for [size] (element count).
 int count<A>(Iterable<A> iterable) => size(iterable);

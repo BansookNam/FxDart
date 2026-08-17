@@ -15,10 +15,12 @@ Future<void> main() async {
           // groupBy emits a GroupedStream per new key; each one must be
           // folded, lifted back into a stream, and merged — and no total can
           // arrive before the source stream is done.
-          .flatMap((group) => group
-              .fold<int>(0, (sum, t) => sum + t.amount)
-              .asStream()
-              .map((total) => '${group.key}: $total'))
+          .flatMap(
+            (group) => group
+                .fold<int>(0, (sum, t) => sum + t.amount)
+                .asStream()
+                .map((total) => '${group.key}: $total'),
+          )
           .toList();
       // 8 fixed categories → joining is O(1)-ish.
       return totals.join('|');

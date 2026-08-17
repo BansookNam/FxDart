@@ -18,8 +18,14 @@ class Merchant {
 }
 
 const _categories = [
-  'Groceries', 'Utilities', 'Dining', 'Transport',
-  'Entertainment', 'Health', 'Travel', 'Subscriptions',
+  'Groceries',
+  'Utilities',
+  'Dining',
+  'Transport',
+  'Entertainment',
+  'Health',
+  'Travel',
+  'Subscriptions',
 ];
 
 // Totals are a bijection on [0, n*100) scaled to dollars, so every total is

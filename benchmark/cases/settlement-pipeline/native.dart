@@ -50,11 +50,13 @@ Future<void> main() async {
           .where((t) => t.status != 'failed')
           .groupListsBy((t) => t.merchant);
       final batches = byMerchant.entries
-          .map((kv) => (
-                kv.key,
-                kv.value.fold(0.0, (sum, t) => sum + t.signed),
-                kv.value.length
-              ))
+          .map(
+            (kv) => (
+              kv.key,
+              kv.value.fold(0.0, (sum, t) => sum + t.signed),
+              kv.value.length,
+            ),
+          )
           .sortedBy((m) => m.$1);
       final posted = await postAll(batches);
       final payouts = posted.where((p) => p.net >= 0).length;

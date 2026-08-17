@@ -26,15 +26,17 @@ void main() {
 
     group('async', () {
       for (final (input, result) in cases) {
-        test('should return the largest of given asyncIterable $input',
-            () async {
-          final res = await maxAsync(toAsync(input));
-          if (result.isNaN) {
-            expect(res.isNaN, isTrue);
-          } else {
-            expect(res, equals(result));
-          }
-        });
+        test(
+          'should return the largest of given asyncIterable $input',
+          () async {
+            final res = await maxAsync(toAsync(input));
+            if (result.isNaN) {
+              expect(res.isNaN, isTrue);
+            } else {
+              expect(res, equals(result));
+            }
+          },
+        );
       }
     });
   });

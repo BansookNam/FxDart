@@ -20,16 +20,21 @@ Future<void> main() async {
     n: n,
     run: () async {
       maxInFlight = 0;
-      final repriced =
-          List<({int qty, double price, bool fb})?>.filled(stock.length, null);
+      final repriced = List<({int qty, double price, bool fb})?>.filled(
+        stock.length,
+        null,
+      );
       var cursor = 0;
       Future<void> worker() async {
         while (cursor < stock.length) {
           final i = cursor++;
           final s = stock[i];
           final live = await livePrice(s.sku);
-          repriced[i] =
-              (qty: s.qty, price: live ?? s.bookPrice, fb: live == null);
+          repriced[i] = (
+            qty: s.qty,
+            price: live ?? s.bookPrice,
+            fb: live == null,
+          );
         }
       }
 

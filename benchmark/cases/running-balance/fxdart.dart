@@ -12,8 +12,10 @@ Future<void> main() async {
     run: () {
       // scan emits its seed first — that becomes the opening-balance line.
       final lines = fx(txns)
-          .scan((acc, t) => (t.label, acc.$2 + t.amount),
-              ('Opening balance', 250.0))
+          .scan((acc, t) => (t.label, acc.$2 + t.amount), (
+            'Opening balance',
+            250.0,
+          ))
           .map((e) => '${e.$1.padRight(15)} \$${e.$2.toStringAsFixed(2)}')
           .toList();
       return '${lines.length}|${lines.first}|${lines.last}';

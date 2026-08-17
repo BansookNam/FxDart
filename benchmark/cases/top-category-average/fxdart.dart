@@ -14,9 +14,9 @@ Future<void> main() async {
     n: n,
     run: () {
       final byCategory = fx(txns).groupBy((t) => t.category);
-      final top = fx(byCategory.entries)
-          .map((kv) => (kv.key, meanSpend(kv.value)))
-          .maxBy((c) => c.$2)!;
+      final top = fx(
+        byCategory.entries,
+      ).map((kv) => (kv.key, meanSpend(kv.value))).maxBy((c) => c.$2)!;
       return '${top.$1}|${top.$2.toStringAsFixed(2)}';
     },
   );

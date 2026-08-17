@@ -19,8 +19,8 @@ Future<List<A>> toListAsync<A>(FxAsyncIterable<A> iterable) async {
   // are observably identical for an all-consuming terminal.
   final drive =
       fxStreamDrive<A>(iterable, result.add) ??
-          fxPoolDrive<A>(iterable, result.add) ??
-          fxFusedDrive<A>(iterable, result.add);
+      fxPoolDrive<A>(iterable, result.add) ??
+      fxFusedDrive<A>(iterable, result.add);
   if (drive != null) {
     await drive;
     return result;
@@ -55,9 +55,12 @@ void each<A>(void Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [each]; awaits [f] per element.
 Future<void> eachAsync<A>(
-    FutureOr<void> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<void> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   // Stream-sourced chains run by subscription (see [toListAsync]).
-  final drive = fxStreamDrive<A>(iterable, f) ??
+  final drive =
+      fxStreamDrive<A>(iterable, f) ??
       fxPoolDrive<A>(iterable, f) ??
       fxFusedDrive<A>(iterable, f);
   if (drive != null) return drive;
@@ -137,8 +140,11 @@ Acc fold<A, Acc>(Acc seed, Acc Function(Acc acc, A a) f, Iterable<A> iterable) {
 /// ```dart
 /// foldWithIndex(0, (acc, a, i) => acc + a * i, [1, 2, 3]); // 8
 /// ```
-Acc foldWithIndex<A, Acc>(Acc seed,
-    Acc Function(Acc acc, A a, int index) f, Iterable<A> iterable) {
+Acc foldWithIndex<A, Acc>(
+  Acc seed,
+  Acc Function(Acc acc, A a, int index) f,
+  Iterable<A> iterable,
+) {
   var acc = seed;
   var i = 0;
   for (final a in iterable) {
@@ -159,9 +165,14 @@ Acc foldWithIndex<A, Acc>(Acc seed,
 /// direction. A non-[List] source is materialized first — walking backwards
 /// requires knowing where the end is.
 Acc foldRight<A, Acc>(
-    Acc seed, Acc Function(Acc acc, A a) f, Iterable<A> iterable) {
+  Acc seed,
+  Acc Function(Acc acc, A a) f,
+  Iterable<A> iterable,
+) {
   var acc = seed;
-  final list = iterable is List<A> ? iterable : iterable.toList(growable: false);
+  final list = iterable is List<A>
+      ? iterable
+      : iterable.toList(growable: false);
   for (var i = list.length - 1; i >= 0; i--) {
     acc = f(acc, list[i]);
   }
@@ -174,10 +185,15 @@ Acc foldRight<A, Acc>(
 /// last element arrives first carrying the highest index. That is the
 /// position [foldWithIndex] and [mapWithIndex] would give the same element;
 /// it deliberately does not renumber the reversed walk 0, 1, 2.
-Acc foldRightWithIndex<A, Acc>(Acc seed,
-    Acc Function(Acc acc, A a, int index) f, Iterable<A> iterable) {
+Acc foldRightWithIndex<A, Acc>(
+  Acc seed,
+  Acc Function(Acc acc, A a, int index) f,
+  Iterable<A> iterable,
+) {
   var acc = seed;
-  final list = iterable is List<A> ? iterable : iterable.toList(growable: false);
+  final list = iterable is List<A>
+      ? iterable
+      : iterable.toList(growable: false);
   for (var i = list.length - 1; i >= 0; i--) {
     acc = f(acc, list[i], i);
   }
@@ -189,8 +205,11 @@ Acc foldRightWithIndex<A, Acc>(Acc seed,
 /// There is no way to start from the end of a stream without reaching it,
 /// so this drains [iterable] into a list first — unlike [foldAsync], it
 /// holds every element in memory and cannot short-circuit.
-Future<Acc> foldRightAsync<A, Acc>(FutureOr<Acc> seed,
-    FutureOr<Acc> Function(Acc acc, A a) f, FxAsyncIterable<A> iterable) async {
+Future<Acc> foldRightAsync<A, Acc>(
+  FutureOr<Acc> seed,
+  FutureOr<Acc> Function(Acc acc, A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   var acc = seed is Future<Acc> ? await seed : seed;
   final list = await toListAsync(iterable);
   for (var i = list.length - 1; i >= 0; i--) {
@@ -203,9 +222,10 @@ Future<Acc> foldRightAsync<A, Acc>(FutureOr<Acc> seed,
 
 /// Async counterpart of [foldRightWithIndex].
 Future<Acc> foldRightWithIndexAsync<A, Acc>(
-    FutureOr<Acc> seed,
-    FutureOr<Acc> Function(Acc acc, A a, int index) f,
-    FxAsyncIterable<A> iterable) async {
+  FutureOr<Acc> seed,
+  FutureOr<Acc> Function(Acc acc, A a, int index) f,
+  FxAsyncIterable<A> iterable,
+) async {
   var acc = seed is Future<Acc> ? await seed : seed;
   final list = await toListAsync(iterable);
   for (var i = list.length - 1; i >= 0; i--) {
@@ -217,7 +237,9 @@ Future<Acc> foldRightWithIndexAsync<A, Acc>(
 
 /// Async counterpart of [reduce].
 Future<A> reduceAsync<A>(
-    FutureOr<A> Function(A acc, A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<A> Function(A acc, A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   final iterator = iterable.iterator;
   final first = await iterator.next();
   if (first.done) {
@@ -244,8 +266,11 @@ Future<A> reduceAsync<A>(
 }
 
 /// Async counterpart of [fold].
-Future<Acc> foldAsync<A, Acc>(FutureOr<Acc> seed,
-    FutureOr<Acc> Function(Acc acc, A a) f, FxAsyncIterable<A> iterable) async {
+Future<Acc> foldAsync<A, Acc>(
+  FutureOr<Acc> seed,
+  FutureOr<Acc> Function(Acc acc, A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   var acc = seed is Future<Acc> ? await seed : seed;
   // Stream-sourced chains fold by subscription (see [toListAsync]).
   FutureOr<void> accumulate(A a) {
@@ -258,7 +283,8 @@ Future<Acc> foldAsync<A, Acc>(FutureOr<Acc> seed,
     acc = v;
   }
 
-  final drive = fxStreamDrive<A>(iterable, accumulate) ??
+  final drive =
+      fxStreamDrive<A>(iterable, accumulate) ??
       fxPoolDrive<A>(iterable, accumulate) ??
       fxFusedDrive<A>(iterable, accumulate);
   if (drive != null) {
@@ -292,9 +318,10 @@ Future<Acc> foldAsync<A, Acc>(FutureOr<Acc> seed,
 /// paths still applies.
 @pragma('vm:prefer-inline')
 Future<Acc> foldWithIndexAsync<A, Acc>(
-    FutureOr<Acc> seed,
-    FutureOr<Acc> Function(Acc acc, A a, int index) f,
-    FxAsyncIterable<A> iterable) {
+  FutureOr<Acc> seed,
+  FutureOr<Acc> Function(Acc acc, A a, int index) f,
+  FxAsyncIterable<A> iterable,
+) {
   var i = 0;
   return foldAsync<A, Acc>(seed, (acc, a) => f(acc, a, i++), iterable);
 }
@@ -304,7 +331,9 @@ Future<Acc> foldWithIndexAsync<A, Acc>(
 ///
 /// Port of FxTS `reduceLazy`.
 Acc Function(Iterable<A>) reduceLazy<A, Acc>(
-        Acc Function(Acc acc, A a) f, Acc seed) =>
+  Acc Function(Acc acc, A a) f,
+  Acc seed,
+) =>
     (iterable) => fold(seed, f, iterable);
 
 /// Adds every number in the iterable.
@@ -400,8 +429,9 @@ num sumBy<A>(num Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [sumBy].
 Future<num> sumByAsync<A>(
-        FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    foldAsync<A, num>(0, (acc, a) async => acc + await f(a), iterable);
+  FutureOr<num> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => foldAsync<A, num>(0, (acc, a) async => acc + await f(a), iterable);
 
 /// Async counterpart of [sum].
 Future<num> sumAsync(FxAsyncIterable<num> iterable) =>
@@ -495,7 +525,9 @@ double averageBy<A>(num Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [averageBy].
 Future<double> averageByAsync<A>(
-    FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<num> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   var total = 0.0;
   var count = 0;
   await eachAsync((A a) async {
@@ -508,14 +540,14 @@ Future<double> averageByAsync<A>(
 num _minOf(num acc, num a) => a.isNaN || acc.isNaN
     ? double.nan
     : a < acc
-        ? a
-        : acc;
+    ? a
+    : acc;
 
 num _maxOf(num acc, num a) => a.isNaN || acc.isNaN
     ? double.nan
     : a > acc
-        ? a
-        : acc;
+    ? a
+    : acc;
 
 /// Returns the smallest number; `infinity` for an empty iterable, `NaN` if
 /// any element is `NaN` — mirroring FxTS `min`.
@@ -619,7 +651,9 @@ A? minBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [minBy].
 Future<A?> minByAsync<A>(
-    Object? Function(A a) f, FxAsyncIterable<A> iterable) async {
+  Object? Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   A? best;
   var seen = false;
   await eachAsync((A a) {
@@ -655,7 +689,9 @@ A? maxBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [maxBy].
 Future<A?> maxByAsync<A>(
-    Object? Function(A a) f, FxAsyncIterable<A> iterable) async {
+  Object? Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   A? best;
   var seen = false;
   await eachAsync((A a) {
@@ -700,7 +736,9 @@ int countWhere<A>(bool Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [countWhere].
 Future<int> countWhereAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   var n = 0;
   await eachAsync((A a) async {
     if (await f(a)) n++;
@@ -732,10 +770,14 @@ Map<K, List<A>> groupBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [groupBy].
 Future<Map<K, List<A>>> groupByAsync<A, K>(
-    FutureOr<K> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<K> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   final result = <K, List<A>>{};
   await eachAsync(
-      (A a) async => result.putIfAbsent(await f(a), () => []).add(a), iterable);
+    (A a) async => result.putIfAbsent(await f(a), () => []).add(a),
+    iterable,
+  );
   return result;
 }
 
@@ -750,18 +792,20 @@ Future<Map<K, List<A>>> groupByAsync<A, K>(
 /// // [(key: 2, items: [ab, cd]), (key: 1, items: [e])]
 /// ```
 List<({K key, List<A> items})> groupedBy<A, K>(
-        K Function(A a) f, Iterable<A> iterable) =>
-    [
-      for (final e in groupBy(f, iterable).entries) (key: e.key, items: e.value)
-    ];
+  K Function(A a) f,
+  Iterable<A> iterable,
+) => [
+  for (final e in groupBy(f, iterable).entries) (key: e.key, items: e.value),
+];
 
 /// Async counterpart of [groupedBy].
 Future<List<({K key, List<A> items})>> groupedByAsync<A, K>(
-        FutureOr<K> Function(A a) f, FxAsyncIterable<A> iterable) async =>
-    [
-      for (final e in (await groupByAsync(f, iterable)).entries)
-        (key: e.key, items: e.value)
-    ];
+  FutureOr<K> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async => [
+  for (final e in (await groupByAsync(f, iterable)).entries)
+    (key: e.key, items: e.value),
+];
 
 /// Indexes values by [f]; later duplicates overwrite earlier ones.
 ///
@@ -776,7 +820,9 @@ Map<K, A> indexBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [indexBy].
 Future<Map<K, A>> indexByAsync<A, K>(
-    FutureOr<K> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<K> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   final result = <K, A>{};
   await eachAsync((A a) async => result[await f(a)] = a, iterable);
   return result;
@@ -798,11 +844,14 @@ Map<K, int> countBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [countBy].
 Future<Map<K, int>> countByAsync<A, K>(
-    FutureOr<K> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<K> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   final result = <K, int>{};
   await eachAsync(
-      (A a) async => result.update(await f(a), (n) => n + 1, ifAbsent: () => 1),
-      iterable);
+    (A a) async => result.update(await f(a), (n) => n + 1, ifAbsent: () => 1),
+    iterable,
+  );
   return result;
 }
 
@@ -827,8 +876,12 @@ Future<Map<K, int>> countByAsync<A, K>(
 /// as in [fold]. A mutable seed would therefore be shared across keys: fold
 /// into new values (`sum + t.amount`), or use [groupBy] if you need to
 /// accumulate into a mutable structure per group.
-Map<K, Acc> foldBy<A, K, Acc>(K Function(A a) key, Acc seed,
-    Acc Function(Acc acc, A a) f, Iterable<A> iterable) {
+Map<K, Acc> foldBy<A, K, Acc>(
+  K Function(A a) key,
+  Acc seed,
+  Acc Function(Acc acc, A a) f,
+  Iterable<A> iterable,
+) {
   final result = <K, Acc>{};
   // Read-modify-write instead of Map.update or putIfAbsent, both of which
   // allocate a closure per element (see [countBy], [groupBy]).
@@ -840,8 +893,10 @@ Map<K, Acc> foldBy<A, K, Acc>(K Function(A a) key, Acc seed,
       final acc = result[k];
       // The containsKey probe only runs when the stored value is null, which
       // is impossible unless Acc itself is nullable.
-      result[k] =
-          f(acc == null && !result.containsKey(k) ? seed : acc as Acc, a);
+      result[k] = f(
+        acc == null && !result.containsKey(k) ? seed : acc as Acc,
+        a,
+      );
     }
     return result;
   }
@@ -856,17 +911,20 @@ Map<K, Acc> foldBy<A, K, Acc>(K Function(A a) key, Acc seed,
 /// Async counterpart of [foldBy]. [key] and [f] may each return a [Future];
 /// values are folded in source order.
 Future<Map<K, Acc>> foldByAsync<A, K, Acc>(
-    FutureOr<K> Function(A a) key,
-    FutureOr<Acc> seed,
-    FutureOr<Acc> Function(Acc acc, A a) f,
-    FxAsyncIterable<A> iterable) async {
+  FutureOr<K> Function(A a) key,
+  FutureOr<Acc> seed,
+  FutureOr<Acc> Function(Acc acc, A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   final result = <K, Acc>{};
   final start = await seed;
   await eachAsync((A a) async {
     final k = await key(a);
     final acc = result[k];
-    result[k] =
-        await f(acc == null && !result.containsKey(k) ? start : acc as Acc, a);
+    result[k] = await f(
+      acc == null && !result.containsKey(k) ? start : acc as Acc,
+      a,
+    );
   }, iterable);
   return result;
 }
@@ -880,8 +938,9 @@ List<A> sort<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
 
 /// Async counterpart of [sort].
 Future<List<A>> sortAsync<A>(
-        int Function(A a, A b) f, FxAsyncIterable<A> iterable) async =>
-    (await toListAsync(iterable))..sort(f);
+  int Function(A a, A b) f,
+  FxAsyncIterable<A> iterable,
+) async => (await toListAsync(iterable))..sort(f);
 
 /// Alias of [sort]; FxTS added `toSorted` as the non-mutating variant, which
 /// the Dart [sort] already is.
@@ -903,12 +962,15 @@ int _compareKeys(Object? fa, Object? fb) {
   }
   if (fa is Comparable && fb is Comparable) {
     return Comparable.compare(
-        fa as Comparable<Object?>, fb as Comparable<Object?>);
+      fa as Comparable<Object?>,
+      fb as Comparable<Object?>,
+    );
   }
   return 0;
 }
 
-int _compareBy<A>(Object? Function(A a) f, A a, A b) => _compareKeys(f(a), f(b));
+int _compareBy<A>(Object? Function(A a) f, A a, A b) =>
+    _compareKeys(f(a), f(b));
 
 /// Returns a new list sorted by the key extractor [f] (ascending).
 ///
@@ -925,7 +987,10 @@ List<A> sortByDesc<A>(Object? Function(A a) f, Iterable<A> iterable) =>
     _sortByImpl(f, iterable, true);
 
 List<A> _sortByImpl<A>(
-    Object? Function(A a) f, Iterable<A> iterable, bool desc) {
+  Object? Function(A a) f,
+  Iterable<A> iterable,
+  bool desc,
+) {
   // Decorate-sort-undecorate: extract each key once, sort an index list, and
   // read the permutation back. Sorting the values directly with a
   // `_compareBy` comparator would call [f] twice per comparison —
@@ -971,9 +1036,11 @@ List<A> _sortByImpl<A>(
       if (k is! int) return _sortSpilled(f, items, indices, ik, i, k, desc);
       ik[i] = k;
     }
-    indices.sort(desc
-        ? (i, j) => ik[j].compareTo(ik[i])
-        : (i, j) => ik[i].compareTo(ik[j]));
+    indices.sort(
+      desc
+          ? (i, j) => ik[j].compareTo(ik[i])
+          : (i, j) => ik[i].compareTo(ik[j]),
+    );
     return [for (final i in indices) items[i]];
   }
 
@@ -985,9 +1052,11 @@ List<A> _sortByImpl<A>(
       if (k is! String) return _sortSpilled(f, items, indices, sk, i, k, desc);
       sk[i] = k;
     }
-    indices.sort(desc
-        ? (i, j) => sk[j].compareTo(sk[i])
-        : (i, j) => sk[i].compareTo(sk[j]));
+    indices.sort(
+      desc
+          ? (i, j) => sk[j].compareTo(sk[i])
+          : (i, j) => sk[i].compareTo(sk[j]),
+    );
     return [for (final i in indices) items[i]];
   }
 
@@ -1003,8 +1072,15 @@ List<A> _sortByImpl<A>(
 /// type [typed] holds. Copies the keys read so far out of [typed], keeps
 /// [current], and reads the rest — so every element's key is extracted
 /// exactly once overall.
-List<A> _sortSpilled<A>(Object? Function(A a) f, List<A> items,
-    List<int> indices, List<Object?> typed, int at, Object? current, bool desc) {
+List<A> _sortSpilled<A>(
+  Object? Function(A a) f,
+  List<A> items,
+  List<int> indices,
+  List<Object?> typed,
+  int at,
+  Object? current,
+  bool desc,
+) {
   final keys = List<Object?>.filled(items.length, null);
   for (var i = 0; i < at; i++) {
     keys[i] = typed[i];
@@ -1017,10 +1093,16 @@ List<A> _sortSpilled<A>(Object? Function(A a) f, List<A> items,
 }
 
 List<A> _sortByKeys<A>(
-    List<A> items, List<int> indices, List<Object?> keys, bool desc) {
-  indices.sort(desc
-      ? (i, j) => _compareKeys(keys[j], keys[i])
-      : (i, j) => _compareKeys(keys[i], keys[j]));
+  List<A> items,
+  List<int> indices,
+  List<Object?> keys,
+  bool desc,
+) {
+  indices.sort(
+    desc
+        ? (i, j) => _compareKeys(keys[j], keys[i])
+        : (i, j) => _compareKeys(keys[i], keys[j]),
+  );
   return [for (final i in indices) items[i]];
 }
 
@@ -1130,13 +1212,15 @@ List<A> _mergeByDouble<A>(Float64List k, List<A> items, bool desc) {
 
 /// Async counterpart of [sortBy].
 Future<List<A>> sortByAsync<A>(
-        Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
-    sortAsync((a, b) => _compareBy(f, a, b), iterable);
+  Object? Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => sortAsync((a, b) => _compareBy(f, a, b), iterable);
 
 /// Async counterpart of [sortByDesc].
 Future<List<A>> sortByDescAsync<A>(
-        Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
-    sortAsync((a, b) => _compareBy(f, b, a), iterable);
+  Object? Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => sortAsync((a, b) => _compareBy(f, b, a), iterable);
 
 /// Splits values into `(pass, fail)` lists by predicate [f].
 ///
@@ -1152,7 +1236,9 @@ Future<List<A>> sortByDescAsync<A>(
 
 /// Async counterpart of [partition].
 Future<(List<A>, List<A>)> partitionAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   final pass = <A>[];
   final fail = <A>[];
   await eachAsync((A a) async => (await f(a) ? pass : fail).add(a), iterable);
@@ -1187,7 +1273,10 @@ typedef Fold<A, R> = ({R seed, R Function(R acc, A a) step});
 /// ```
 @pragma('vm:align-loops')
 (R1, R2) tee<A, R1, R2>(
-    Iterable<A> iterable, Fold<A, R1> first, Fold<A, R2> second) {
+  Iterable<A> iterable,
+  Fold<A, R1> first,
+  Fold<A, R2> second,
+) {
   final f1 = first.step;
   final f2 = second.step;
   var a1 = first.seed;
@@ -1201,8 +1290,12 @@ typedef Fold<A, R> = ({R seed, R Function(R acc, A a) step});
 
 /// Three-fold [tee].
 @pragma('vm:align-loops')
-(R1, R2, R3) tee3<A, R1, R2, R3>(Iterable<A> iterable, Fold<A, R1> first,
-    Fold<A, R2> second, Fold<A, R3> third) {
+(R1, R2, R3) tee3<A, R1, R2, R3>(
+  Iterable<A> iterable,
+  Fold<A, R1> first,
+  Fold<A, R2> second,
+  Fold<A, R3> third,
+) {
   final f1 = first.step;
   final f2 = second.step;
   final f3 = third.step;
@@ -1219,8 +1312,11 @@ typedef Fold<A, R> = ({R seed, R Function(R acc, A a) step});
 
 /// Async counterpart of [tee]. Steps may return a [Future]; each element is
 /// applied to both accumulators before the next is pulled.
-Future<(R1, R2)> teeAsync<A, R1, R2>(FxAsyncIterable<A> iterable,
-    AsyncFold<A, R1> first, AsyncFold<A, R2> second) async {
+Future<(R1, R2)> teeAsync<A, R1, R2>(
+  FxAsyncIterable<A> iterable,
+  AsyncFold<A, R1> first,
+  AsyncFold<A, R2> second,
+) async {
   final f1 = first.step;
   final f2 = second.step;
   var a1 = await first.seed;
@@ -1246,5 +1342,5 @@ Future<(R1, R2)> teeAsync<A, R1, R2>(FxAsyncIterable<A> iterable,
 /// The [teeAsync] counterpart of [Fold].
 typedef AsyncFold<A, R> = ({
   FutureOr<R> seed,
-  FutureOr<R> Function(R acc, A a) step
+  FutureOr<R> Function(R acc, A a) step,
 });

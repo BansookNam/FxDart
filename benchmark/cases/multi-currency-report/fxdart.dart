@@ -17,16 +17,20 @@ Future<void> main() async {
       // groupBy/sumBy/sortBy/uniq/maxBy with hand-written loops and toSet(),
       // which measured a program the page does not show; see
       // tool/check_benchmark_faithfulness.dart.
-      final usd =
-          fx(txns).map((t) => (t, t.amount * rates[t.currency]!)).toList();
+      final usd = fx(
+        txns,
+      ).map((t) => (t, t.amount * rates[t.currency]!)).toList();
 
-      final byCategory =
-          fx(usd).foldBy((p) => p.$1.category, 0.0, (s, p) => s + p.$2);
+      final byCategory = fx(
+        usd,
+      ).foldBy((p) => p.$1.category, 0.0, (s, p) => s + p.$2);
       final catLines = fx(byCategory.entries)
           .sortBy((e) => -e.value)
           .map((e) => '  ${e.key.padRight(8)} ${money(e.value)}');
 
-      final currencies = fx(txns).map((t) => t.currency).uniq().sortBy((c) => c);
+      final currencies = fx(
+        txns,
+      ).map((t) => t.currency).uniq().sortBy((c) => c);
       final biggest = fx(usd).maxBy((p) => p.$2)!;
       final total = fx(usd).sumBy((p) => p.$2);
 

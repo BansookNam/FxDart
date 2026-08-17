@@ -128,8 +128,7 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   Fx<T> takeWhile(bool Function(T value) test) => Fx(l.takeWhile(test, _inner));
 
   /// The longest trailing run of values [f] holds for, in source order.
-  Fx<T> takeWhileRight(bool Function(T a) f) =>
-      Fx(l.takeWhileRight(f, _inner));
+  Fx<T> takeWhileRight(bool Function(T a) f) => Fx(l.takeWhileRight(f, _inner));
 
   /// Yields values until [f] matches, including the matching element.
   Fx<T> takeUntilInclusive(bool Function(T a) f) =>
@@ -151,8 +150,7 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   Fx<T> dropWhile(bool Function(T a) f) => Fx(l.dropWhile(f, _inner));
 
   /// Drops the longest trailing run of values [f] holds for.
-  Fx<T> dropWhileRight(bool Function(T a) f) =>
-      Fx(l.dropWhileRight(f, _inner));
+  Fx<T> dropWhileRight(bool Function(T a) f) => Fx(l.dropWhileRight(f, _inner));
 
   Fx<T> skipWhile(bool Function(T value) test) => dropWhile(test);
 
@@ -203,8 +201,7 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   Fx<T> uniqAdjacent() => Fx(l.uniqAdjacent(_inner));
 
   /// Drops values whose [f]-key equals the previous value's key.
-  Fx<T> uniqAdjacentBy<B>(B Function(T a) f) =>
-      Fx(l.uniqAdjacentBy(f, _inner));
+  Fx<T> uniqAdjacentBy<B>(B Function(T a) f) => Fx(l.uniqAdjacentBy(f, _inner));
 
   /// Switches to [fallback]'s values when this chain turns out to be empty.
   Fx<T> ifEmpty(Iterable<T> Function() fallback) =>
@@ -220,8 +217,10 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 
   /// Three-fold [tee].
   (R1, R2, R3) tee3<R1, R2, R3>(
-          s.Fold<T, R1> first, s.Fold<T, R2> second, s.Fold<T, R3> third) =>
-      s.tee3(_inner, first, second, third);
+    s.Fold<T, R1> first,
+    s.Fold<T, R2> second,
+    s.Fold<T, R3> third,
+  ) => s.tee3(_inner, first, second, third);
 
   /// Pairs each value with the value at the same position in [other],
   /// stopping at the shorter side.
@@ -300,18 +299,20 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// values in flight at once, in source order — the pre-combined form of
   /// `toAsync().map(f).concurrent(concurrency)`.
   @pragma('vm:prefer-inline')
-  FxAsync<R> mapConcurrent<R>(
-          int concurrency, FutureOr<R> Function(T a) f) =>
+  FxAsync<R> mapConcurrent<R>(int concurrency, FutureOr<R> Function(T a) f) =>
       FxAsync(l.mapConcurrent(concurrency, f, _inner));
 
   /// Switches to the async chain and maps [f], retrying each call up to
   /// [attempts] times (with optional [delay] backoff) before the error
   /// propagates.
   @pragma('vm:prefer-inline')
-  FxAsync<R> mapRetry<R>(int attempts, FutureOr<R> Function(T a) f,
-          {Duration Function(int failed)? delay}) =>
-      FxAsync(l.mapRetryAsync(attempts, f, async_.toAsync(_inner),
-          delay: delay));
+  FxAsync<R> mapRetry<R>(
+    int attempts,
+    FutureOr<R> Function(T a) f, {
+    Duration Function(int failed)? delay,
+  }) => FxAsync(
+    l.mapRetryAsync(attempts, f, async_.toAsync(_inner), delay: delay),
+  );
 
   // --- terminal operators -------------------------------------------------
 
@@ -322,8 +323,7 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   void each(void Function(T a) f) => s.each(f, _inner);
 
   /// [Iterable.fold] with the element's 0-based position.
-  Acc foldWithIndex<Acc>(
-          Acc seed, Acc Function(Acc acc, T a, int index) f) =>
+  Acc foldWithIndex<Acc>(Acc seed, Acc Function(Acc acc, T a, int index) f) =>
       s.foldWithIndex(seed, f, _inner);
 
   /// Folds from the last value to the first — see top-level `foldRight`.
@@ -332,8 +332,9 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 
   /// [foldRight] with each value's 0-based position in the source.
   Acc foldRightWithIndex<Acc>(
-          Acc seed, Acc Function(Acc acc, T a, int index) f) =>
-      s.foldRightWithIndex(seed, f, _inner);
+    Acc seed,
+    Acc Function(Acc acc, T a, int index) f,
+  ) => s.foldRightWithIndex(seed, f, _inner);
 
   /// Consumes up to [n] values (all when omitted), forcing side effects.
   void consume([int? n]) => s.consume(_inner, n);
@@ -350,8 +351,10 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// Folds the values under each [key] in one pass, without materializing
   /// the groups — the aggregate-only counterpart of [groupBy].
   Map<K, Acc> foldBy<K, Acc>(
-          K Function(T a) key, Acc seed, Acc Function(Acc acc, T a) f) =>
-      s.foldBy(key, seed, f, _inner);
+    K Function(T a) key,
+    Acc seed,
+    Acc Function(Acc acc, T a) f,
+  ) => s.foldBy(key, seed, f, _inner);
 
   /// Counts the values [f] holds for — `filter` + `size` in one walk.
   int countWhere(bool Function(T a) f) => s.countWhere(f, _inner);
@@ -467,7 +470,7 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   String join([String separator = '']) => _inner.join(separator);
 
   /// The maximum element using [compare] function.
-  /// If [compare] is not provided, assumes T is Comparable<T>.
+  /// If [compare] is not provided, assumes T is `Comparable<T>`.
   /// Throws if empty or elements are not comparable.
   T max([int Function(T a, T b)? compare]) {
     final compareFn =
@@ -480,7 +483,7 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   }
 
   /// The minimum element using [compare] function.
-  /// If [compare] is not provided, assumes T is Comparable<T>.
+  /// If [compare] is not provided, assumes T is `Comparable<T>`.
   /// Throws if empty or elements are not comparable.
   T min([int Function(T a, T b)? compare]) {
     final compareFn =
@@ -550,8 +553,8 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// [flatMap] with the source value's 0-based position.
   @pragma('vm:prefer-inline')
   FxAsync<R> flatMapWithIndex<R>(
-          FutureOr<Iterable<R>> Function(T a, int index) f) =>
-      FxAsync(l.flatMapWithIndexAsync(f, _inner));
+    FutureOr<Iterable<R>> Function(T a, int index) f,
+  ) => FxAsync(l.flatMapWithIndexAsync(f, _inner));
 
   /// Flattens nested iterables [depth] levels.
   @pragma('vm:prefer-inline')
@@ -682,22 +685,24 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// buffering.
   @pragma('vm:prefer-inline')
   Future<(R1, R2)> tee<R1, R2>(
-          s.AsyncFold<T, R1> first, s.AsyncFold<T, R2> second) =>
-      s.teeAsync(_inner, first, second);
+    s.AsyncFold<T, R1> first,
+    s.AsyncFold<T, R2> second,
+  ) => s.teeAsync(_inner, first, second);
 
   /// Maps [f], retrying each call up to [attempts] times (with optional
   /// [delay] backoff) before the error propagates. Retries compose with
   /// [concurrent]: each in-flight value retries independently.
   @pragma('vm:prefer-inline')
-  FxAsync<R> mapRetry<R>(int attempts, FutureOr<R> Function(T a) f,
-          {Duration Function(int failed)? delay}) =>
-      FxAsync(l.mapRetryAsync(attempts, f, _inner, delay: delay));
+  FxAsync<R> mapRetry<R>(
+    int attempts,
+    FutureOr<R> Function(T a) f, {
+    Duration Function(int failed)? delay,
+  }) => FxAsync(l.mapRetryAsync(attempts, f, _inner, delay: delay));
 
   /// Fails a pull with a [TimeoutException] when the upstream takes longer
   /// than [limit] to produce it (per pull, not whole-pipeline).
   @pragma('vm:prefer-inline')
-  FxAsync<T> timeout(Duration limit) =>
-      FxAsync(l.timeoutAsync(limit, _inner));
+  FxAsync<T> timeout(Duration limit) => FxAsync(l.timeoutAsync(limit, _inner));
 
   /// Pairs each value with the value at the same position in [other],
   /// stopping at the shorter side.
@@ -708,8 +713,9 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Three-way [zip], stopping at the shortest side.
   @pragma('vm:prefer-inline')
   FxAsync<(T, U, V)> zip3<U, V>(
-          FxAsyncIterable<U> other1, FxAsyncIterable<V> other2) =>
-      FxAsync(l.zip3Async(_inner, other1, other2));
+    FxAsyncIterable<U> other1,
+    FxAsyncIterable<V> other2,
+  ) => FxAsync(l.zip3Async(_inner, other1, other2));
 
   /// Pairs each value with its index.
   @pragma('vm:prefer-inline')
@@ -751,8 +757,9 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Values of this chain whose [f]-keys do not occur in [other], deduped.
   @pragma('vm:prefer-inline')
   FxAsync<T> differenceBy<B>(
-          FutureOr<B> Function(T a) f, FxAsyncIterable<T> other) =>
-      FxAsync(l.differenceByAsync(f, other, _inner));
+    FutureOr<B> Function(T a) f,
+    FxAsyncIterable<T> other,
+  ) => FxAsync(l.differenceByAsync(f, other, _inner));
 
   /// Values of this chain that do not occur in [other].
   @pragma('vm:prefer-inline')
@@ -762,8 +769,9 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Values of this chain whose [f]-keys also occur in [other], deduped.
   @pragma('vm:prefer-inline')
   FxAsync<T> intersectionBy<B>(
-          FutureOr<B> Function(T a) f, FxAsyncIterable<T> other) =>
-      FxAsync(l.intersectionByAsync(f, other, _inner));
+    FutureOr<B> Function(T a) f,
+    FxAsyncIterable<T> other,
+  ) => FxAsync(l.intersectionByAsync(f, other, _inner));
 
   /// Values of this chain that also occur in [other].
   @pragma('vm:prefer-inline')
@@ -779,8 +787,7 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Maps [f] with up to [concurrency] values in flight at once, in source
   /// order — the pre-combined form of `map(f).concurrent(concurrency)`.
   @pragma('vm:prefer-inline')
-  FxAsync<R> mapConcurrent<R>(
-          int concurrency, FutureOr<R> Function(T a) f) =>
+  FxAsync<R> mapConcurrent<R>(int concurrency, FutureOr<R> Function(T a) f) =>
       FxAsync(l.mapConcurrentAsync(concurrency, f, _inner));
 
   /// Like [concurrent] but yields in completion order.
@@ -810,24 +817,28 @@ class FxAsync<T> implements FxAsyncIterable<T> {
 
   /// Folds every value with [f], starting from [seed].
   Future<Acc> fold<Acc>(
-          FutureOr<Acc> seed, FutureOr<Acc> Function(Acc acc, T a) f) =>
-      s.foldAsync(seed, f, _inner);
+    FutureOr<Acc> seed,
+    FutureOr<Acc> Function(Acc acc, T a) f,
+  ) => s.foldAsync(seed, f, _inner);
 
   /// [fold] with the value's 0-based position.
-  Future<Acc> foldWithIndex<Acc>(FutureOr<Acc> seed,
-          FutureOr<Acc> Function(Acc acc, T a, int index) f) =>
-      s.foldWithIndexAsync(seed, f, _inner);
+  Future<Acc> foldWithIndex<Acc>(
+    FutureOr<Acc> seed,
+    FutureOr<Acc> Function(Acc acc, T a, int index) f,
+  ) => s.foldWithIndexAsync(seed, f, _inner);
 
   /// Folds from the last value to the first, buffering the whole chain —
   /// see top-level `foldRightAsync`.
   Future<Acc> foldRight<Acc>(
-          FutureOr<Acc> seed, FutureOr<Acc> Function(Acc acc, T a) f) =>
-      s.foldRightAsync(seed, f, _inner);
+    FutureOr<Acc> seed,
+    FutureOr<Acc> Function(Acc acc, T a) f,
+  ) => s.foldRightAsync(seed, f, _inner);
 
   /// [foldRight] with each value's 0-based position in the source.
-  Future<Acc> foldRightWithIndex<Acc>(FutureOr<Acc> seed,
-          FutureOr<Acc> Function(Acc acc, T a, int index) f) =>
-      s.foldRightWithIndexAsync(seed, f, _inner);
+  Future<Acc> foldRightWithIndex<Acc>(
+    FutureOr<Acc> seed,
+    FutureOr<Acc> Function(Acc acc, T a, int index) f,
+  ) => s.foldRightWithIndexAsync(seed, f, _inner);
 
   /// Groups values into lists keyed by [f].
   Future<Map<K, List<T>>> groupBy<K>(FutureOr<K> Function(T a) f) =>
@@ -843,9 +854,11 @@ class FxAsync<T> implements FxAsyncIterable<T> {
 
   /// Folds the values under each [key] in one pass, without materializing
   /// the groups — the aggregate-only counterpart of [groupBy].
-  Future<Map<K, Acc>> foldBy<K, Acc>(FutureOr<K> Function(T a) key,
-          FutureOr<Acc> seed, FutureOr<Acc> Function(Acc acc, T a) f) =>
-      s.foldByAsync(key, seed, f, _inner);
+  Future<Map<K, Acc>> foldBy<K, Acc>(
+    FutureOr<K> Function(T a) key,
+    FutureOr<Acc> seed,
+    FutureOr<Acc> Function(Acc acc, T a) f,
+  ) => s.foldByAsync(key, seed, f, _inner);
 
   /// Whether [f] holds for at least one value.
   Future<bool> some(FutureOr<bool> Function(T a) f) => s.someAsync(f, _inner);
@@ -898,8 +911,8 @@ class FxAsync<T> implements FxAsyncIterable<T> {
 
   /// Groups values into `(key, items)` records, in first-seen key order.
   Future<List<({K key, List<T> items})>> groupedBy<K>(
-          FutureOr<K> Function(T a) f) =>
-      s.groupedByAsync(f, _inner);
+    FutureOr<K> Function(T a) f,
+  ) => s.groupedByAsync(f, _inner);
 
   /// The number of values.
   Future<int> size() => s.sizeAsync(_inner);

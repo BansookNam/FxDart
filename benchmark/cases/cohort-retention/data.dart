@@ -13,8 +13,10 @@ class User {
   const User(this.name, this.signup, this.active);
 }
 
-final List<String> months =
-    List.generate(12, (i) => '2026-${(i + 1).toString().padLeft(2, '0')}');
+final List<String> months = List.generate(
+  12,
+  (i) => '2026-${(i + 1).toString().padLeft(2, '0')}',
+);
 
 List<User> makeUsers() {
   final rng = Lcg(4);

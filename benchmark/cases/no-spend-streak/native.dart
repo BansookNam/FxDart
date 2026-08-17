@@ -8,8 +8,7 @@ Future<void> main() async {
     impl: 'native',
     n: n,
     run: () {
-      final spendDays =
-          txns.map((t) => int.parse(t.date.substring(8))).toSet();
+      final spendDays = txns.map((t) => int.parse(t.date.substring(8))).toSet();
       final strip = StringBuffer();
       var streak = 0;
       var longest = 0;

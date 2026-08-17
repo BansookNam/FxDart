@@ -5,13 +5,17 @@ void main() {
   group('foldWithIndex', () {
     group('sync', () {
       test('passes the 0-based position to the accumulator', () {
-        expect(foldWithIndex(0, (acc, int a, i) => acc + a * i, [1, 2, 3]),
-            equals(8));
+        expect(
+          foldWithIndex(0, (acc, int a, i) => acc + a * i, [1, 2, 3]),
+          equals(8),
+        );
       });
 
       test('returns the seed for an empty source', () {
-        expect(foldWithIndex(42, (acc, int a, i) => acc + a, <int>[]),
-            equals(42));
+        expect(
+          foldWithIndex(42, (acc, int a, i) => acc + a, <int>[]),
+          equals(42),
+        );
       });
 
       test('visits every element once, in order', () {
@@ -33,10 +37,16 @@ void main() {
 
       test('matches fold over zipWithIndex', () {
         final source = [3, 1, 4, 1, 5];
-        final viaIndex =
-            foldWithIndex(0, (acc, int a, i) => acc + a * i, source);
-        final viaZip =
-            fold(0, (acc, (int, int) p) => acc + p.$2 * p.$1, zipWithIndex(source));
+        final viaIndex = foldWithIndex(
+          0,
+          (acc, int a, i) => acc + a * i,
+          source,
+        );
+        final viaZip = fold(
+          0,
+          (acc, (int, int) p) => acc + p.$2 * p.$1,
+          zipWithIndex(source),
+        );
         expect(viaIndex, equals(viaZip));
       });
 
@@ -49,27 +59,38 @@ void main() {
       });
 
       test('is available as an fx chain method', () {
-        expect(fx([1, 2, 3]).foldWithIndex(0, (acc, a, i) => acc + a * i),
-            equals(8));
+        expect(
+          fx([1, 2, 3]).foldWithIndex(0, (acc, a, i) => acc + a * i),
+          equals(8),
+        );
       });
     });
 
     group('async', () {
       test('passes the 0-based position to the accumulator', () async {
         final res = await foldWithIndexAsync(
-            0, (acc, int a, i) => acc + a * i, toAsync([1, 2, 3]));
+          0,
+          (acc, int a, i) => acc + a * i,
+          toAsync([1, 2, 3]),
+        );
         expect(res, equals(8));
       });
 
       test('accepts an async seed and accumulator', () async {
-        final res = await foldWithIndexAsync(Future.value(0),
-            (acc, int a, i) async => acc + a * i, toAsync([1, 2, 3]));
+        final res = await foldWithIndexAsync(
+          Future.value(0),
+          (acc, int a, i) async => acc + a * i,
+          toAsync([1, 2, 3]),
+        );
         expect(res, equals(8));
       });
 
       test('returns the seed for an empty source', () async {
         final res = await foldWithIndexAsync(
-            42, (acc, int a, i) => acc + a, toAsync(<int>[]));
+          42,
+          (acc, int a, i) => acc + a,
+          toAsync(<int>[]),
+        );
         expect(res, equals(42));
       });
 
@@ -83,15 +104,20 @@ void main() {
 
       test('restarts the index on every call', () async {
         final source = toAsync([1, 2, 3]);
-        expect(await foldWithIndexAsync(0, (acc, int a, i) => acc + i, source),
-            equals(3));
-        expect(await foldWithIndexAsync(0, (acc, int a, i) => acc + i, source),
-            equals(3));
+        expect(
+          await foldWithIndexAsync(0, (acc, int a, i) => acc + i, source),
+          equals(3),
+        );
+        expect(
+          await foldWithIndexAsync(0, (acc, int a, i) => acc + i, source),
+          equals(3),
+        );
       });
 
       test('is available as an fxAsync chain method', () async {
-        final res = await fxAsync(toAsync([1, 2, 3]))
-            .foldWithIndex(0, (acc, a, i) => acc + a * i);
+        final res = await fxAsync(
+          toAsync([1, 2, 3]),
+        ).foldWithIndex(0, (acc, a, i) => acc + a * i);
         expect(res, equals(8));
       });
     });

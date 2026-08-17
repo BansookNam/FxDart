@@ -14,13 +14,9 @@ void main() {
 
       final result = await resolveProps(obj);
       expect(
-          result,
-          equals({
-            'a': 1,
-            'b': '2',
-            'c': true,
-            'd': 'non-future value',
-          }));
+        result,
+        equals({'a': 1, 'b': '2', 'c': true, 'd': 'non-future value'}),
+      );
     });
   });
 }

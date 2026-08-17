@@ -21,26 +21,34 @@ void main() {
     test('LAZY iterable escaping the builder detonates as RaiseLeakedError '
         'at the consumption site (sync)', () {
       final result = either<String, Iterable<int>>(
-          (r) => fx([1, 2, 3]).map((n) => r.raise('lazy')));
+        (r) => fx([1, 2, 3]).map((n) => r.raise('lazy')),
+      );
       // The builder happily returned Right(<unevaluated pipeline>) …
       expect(result.isRight, isTrue);
       // … and the deferred raise is a loud leak, not silent corruption.
-      expect(() => result.getOrNull()!.toList(),
-          throwsA(isA<RaiseLeakedError>()));
+      expect(
+        () => result.getOrNull()!.toList(),
+        throwsA(isA<RaiseLeakedError>()),
+      );
     });
 
     test('LAZY async chain escaping the builder detonates as '
         'RaiseLeakedError (async)', () async {
       final result = await eitherAsync<String, FxAsync<int>>(
-          (r) async => fxAsync(toAsync([1, 2])).map((n) => r.raise('lazy')));
+        (r) async => fxAsync(toAsync([1, 2])).map((n) => r.raise('lazy')),
+      );
       expect(result.isRight, isTrue);
       await expectLater(
-          result.getOrNull()!.toList(), throwsA(isA<RaiseLeakedError>()));
+        result.getOrNull()!.toList(),
+        throwsA(isA<RaiseLeakedError>()),
+      );
     });
 
     test('RaiseLeakedError message is actionable', () {
-      expect(RaiseLeakedError().toString(),
-          allOf(contains('lazy'), contains('toList'), contains('either')));
+      expect(
+        RaiseLeakedError().toString(),
+        allOf(contains('lazy'), contains('toList'), contains('either')),
+      );
     });
   });
 
@@ -112,14 +120,16 @@ void main() {
 
     test('catching rethrows the signal instead of handing it to onError', () {
       final result = either<String, int>(
-          (r) => catching(() => r.raise('through'), (e, st) => -1));
+        (r) => catching(() => r.raise('through'), (e, st) => -1),
+      );
       expect(result, Left('through'));
     });
 
     test('catching rethrows a signal from a nested different-E scope', () {
       final outer = either<String, int>((ro) {
         final inner = either<int, String>(
-            (ri) => catching(() => ro.raise('outer'), (e, st) => 'nope'));
+          (ri) => catching(() => ro.raise('outer'), (e, st) => 'nope'),
+        );
         fail('unreachable: $inner');
       });
       expect(outer, Left('outer'));
@@ -127,14 +137,19 @@ void main() {
 
     test('catchingAsync rethrows the signal', () async {
       final result = await eitherAsync<String, int>(
-          (r) => catchingAsync(() async => r.raise('through'), (e, st) => -1));
+        (r) => catchingAsync(() async => r.raise('through'), (e, st) => -1),
+      );
       expect(result, Left('through'));
     });
 
     test('Either.catching rethrows the signal', () {
       final result = either<String, int>(
-          (r) => r.bind(Either.catching(() => r.raise('through'))
-              .mapLeft((e) => e.toString())));
+        (r) => r.bind(
+          Either.catching(
+            () => r.raise('through'),
+          ).mapLeft((e) => e.toString()),
+        ),
+      );
       expect(result, Left('through'));
     });
 
@@ -160,8 +175,9 @@ void main() {
     test('PINNED: Future.catchError without a test swallows the signal '
         '(documented hazard)', () async {
       final result = await eitherAsync<String, int>((r) async {
-        final recovered = await Future<int>(() => r.raise('swallowed'))
-            .catchError((Object e) => -1);
+        final recovered = await Future<int>(
+          () => r.raise('swallowed'),
+        ).catchError((Object e) => -1);
         return recovered;
       });
       expect(result, Right(-1));
@@ -173,7 +189,9 @@ void main() {
         final results = await Future.wait([
           Future<int>(() => r.raise('first')),
           Future<int>.delayed(
-              const Duration(milliseconds: 5), () => r.raise('second')),
+            const Duration(milliseconds: 5),
+            () => r.raise('second'),
+          ),
         ]);
         return results.length;
       });
@@ -201,8 +219,12 @@ void main() {
       final errors = <Object>[];
       await runZonedGuarded(() async {
         final result = await eitherAsync<String, int>((r) async {
-          unawaited(Future<void>.delayed(
-              const Duration(milliseconds: 5), () => r.raise('too late')));
+          unawaited(
+            Future<void>.delayed(
+              const Duration(milliseconds: 5),
+              () => r.raise('too late'),
+            ),
+          );
           return 1;
         });
         expect(result, Right(1));

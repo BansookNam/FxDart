@@ -22,9 +22,12 @@ Future<void> main() async {
 
       // materialized (the example spreads the lazy lines into print)
       final lines = fx(drops)
-          .map((d) => '  ${d.$1.name.padRight(15)} '
-              '${money(old[d.$1.sku]!.price)} -> ${money(d.$1.price)}  '
-              '(-${money(d.$2)})')
+          .map(
+            (d) =>
+                '  ${d.$1.name.padRight(15)} '
+                '${money(old[d.$1.sku]!.price)} -> ${money(d.$1.price)}  '
+                '(-${money(d.$2)})',
+          )
           .toList();
       final biggest = fx(drops).head()!;
       final savings = fx(drops).sumBy((d) => d.$2);

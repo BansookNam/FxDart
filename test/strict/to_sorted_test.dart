@@ -16,12 +16,16 @@ void main() {
 
       test('should sort the elements (numbers)', () {
         expect(
-            toSorted(sortFn, [3, 4, 1, 2, 5, 2]), equals([1, 2, 2, 3, 4, 5]));
+          toSorted(sortFn, [3, 4, 1, 2, 5, 2]),
+          equals([1, 2, 2, 3, 4, 5]),
+        );
       });
 
       test('should sort the elements (string chars)', () {
-        expect(toSorted(sortFn, 'bcdaef'.split('')),
-            equals(['a', 'b', 'c', 'd', 'e', 'f']));
+        expect(
+          toSorted(sortFn, 'bcdaef'.split('')),
+          equals(['a', 'b', 'c', 'd', 'e', 'f']),
+        );
       });
 
       test('should handle single element', () {
@@ -39,56 +43,48 @@ void main() {
         expect(original, equals([3, 4, 1, 2, 5, 2]));
       });
 
-      test('should return the same result as sort (both non-mutating in Dart)',
-          () {
-        final arr1 = [3, 4, 1, 2, 5, 2];
-        final arr2 = [3, 4, 1, 2, 5, 2];
-        final sortedResult = sort(sortFn, arr1);
-        final toSortedResult = toSorted(sortFn, arr2);
+      test(
+        'should return the same result as sort (both non-mutating in Dart)',
+        () {
+          final arr1 = [3, 4, 1, 2, 5, 2];
+          final arr2 = [3, 4, 1, 2, 5, 2];
+          final sortedResult = sort(sortFn, arr1);
+          final toSortedResult = toSorted(sortFn, arr2);
 
-        expect(toSortedResult, equals(sortedResult));
-        // Unlike JS, the Dart port's sort never mutates either.
-        expect(arr1, equals([3, 4, 1, 2, 5, 2]));
-        expect(arr2, equals([3, 4, 1, 2, 5, 2]));
-      });
+          expect(toSortedResult, equals(sortedResult));
+          // Unlike JS, the Dart port's sort never mutates either.
+          expect(arr1, equals([3, 4, 1, 2, 5, 2]));
+          expect(arr2, equals([3, 4, 1, 2, 5, 2]));
+        },
+      );
 
       test('should be able to be used in the pipeline', () {
-        final res = pipe([
-          3,
-          4,
-          1,
-          2,
-          5,
-          2
-        ], [
-          (Iterable<int> a) => filter((int n) => n % 2 != 0, a),
-          (Iterable<int> a) => toSorted(sortFn, a),
-        ]);
+        final res = pipe(
+          [3, 4, 1, 2, 5, 2],
+          [
+            (Iterable<int> a) => filter((int n) => n % 2 != 0, a),
+            (Iterable<int> a) => toSorted(sortFn, a),
+          ],
+        );
         expect(res, equals([1, 3, 5]));
       });
 
       test('should work with other functions in pipeline', () {
-        final res = pipe([
-          3,
-          4,
-          1,
-          2,
-          5,
-          2
-        ], [
-          (Iterable<int> a) => map((int n) => n * 2, a),
-          (Iterable<int> a) => filter((int n) => n > 4, a),
-          (Iterable<int> a) => toSorted(sortFn, a),
-        ]);
+        final res = pipe(
+          [3, 4, 1, 2, 5, 2],
+          [
+            (Iterable<int> a) => map((int n) => n * 2, a),
+            (Iterable<int> a) => filter((int n) => n > 4, a),
+            (Iterable<int> a) => toSorted(sortFn, a),
+          ],
+        );
         expect(res, equals([6, 8, 10]));
       });
 
       test('should preserve immutability in pipeline', () {
         final original = [3, 4, 1, 2, 5, 2];
         final originalCopy = [...original];
-        final res = pipe(original, [
-          (Iterable<int> a) => toSorted(sortFn, a),
-        ]);
+        final res = pipe(original, [(Iterable<int> a) => toSorted(sortFn, a)]);
         expect(original, equals(originalCopy));
         expect(res, equals([1, 2, 2, 3, 4, 5]));
       });
@@ -96,24 +92,22 @@ void main() {
 
     group('async (via sortAsync — no async toSorted alias)', () {
       test('should sort the elements (numbers)', () async {
-        expect(await sortAsync(sortFn, toAsync([3, 4, 1, 2, 5, 2])),
-            equals([1, 2, 2, 3, 4, 5]));
+        expect(
+          await sortAsync(sortFn, toAsync([3, 4, 1, 2, 5, 2])),
+          equals([1, 2, 2, 3, 4, 5]),
+        );
       });
 
       test('should work with other functions in async pipeline', () async {
-        final res = await pipe([
-          3,
-          4,
-          1,
-          2,
-          5,
-          2
-        ], [
-          (List<int> a) => toAsync(a),
-          (FxAsyncIterable<int> a) => mapAsync((int n) => n * 2, a),
-          (FxAsyncIterable<int> a) => filterAsync((int n) => n > 4, a),
-          (FxAsyncIterable<int> a) => sortAsync(sortFn, a),
-        ]);
+        final res = await pipe(
+          [3, 4, 1, 2, 5, 2],
+          [
+            (List<int> a) => toAsync(a),
+            (FxAsyncIterable<int> a) => mapAsync((int n) => n * 2, a),
+            (FxAsyncIterable<int> a) => filterAsync((int n) => n > 4, a),
+            (FxAsyncIterable<int> a) => sortAsync(sortFn, a),
+          ],
+        );
         expect(res, equals([6, 8, 10]));
       });
     });

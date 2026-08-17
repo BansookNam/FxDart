@@ -8,7 +8,8 @@ T add<T extends Object>(T a, T b) => (a as dynamic) + b as T;
 /// argument (so it can be used as a unary callback).
 ///
 /// Port of FxTS `always`.
-T Function([Object? _]) always<T>(T a) => ([Object? _]) => a;
+T Function([Object? _]) always<T>(T a) =>
+    ([Object? _]) => a;
 
 /// Calls [f] with [args] as positional arguments.
 ///
@@ -33,7 +34,8 @@ bool not(bool a) => !a;
 /// Returns a predicate that negates [f].
 ///
 /// Port of FxTS `negate`.
-bool Function(T) negate<T>(bool Function(T) f) => (a) => !f(a);
+bool Function(T) negate<T>(bool Function(T) f) =>
+    (a) => !f(a);
 
 /// Calls [f] with [a] for its side effect, then returns [a].
 ///
@@ -77,10 +79,13 @@ int _compare(Object? a, Object? b) {
         !(a is num && b is num) &&
         !(a is String && b is String)) {
       throw ArgumentError(
-          'The values you want to compare must be of the same type');
+        'The values you want to compare must be of the same type',
+      );
     }
     return Comparable.compare(
-        a as Comparable<Object?>, b as Comparable<Object?>);
+      a as Comparable<Object?>,
+      b as Comparable<Object?>,
+    );
   }
   throw ArgumentError('The values must be Comparable');
 }
@@ -143,8 +148,10 @@ Future<void> sleep(Duration wait) => Future.delayed(wait);
 /// ], orElse: (n) => 'positive');
 /// classify(-4); // 'negative'
 /// ```
-R Function(T value) cases<T, R>(List<(bool Function(T), R Function(T))> pairs,
-    {R Function(T)? orElse}) {
+R Function(T value) cases<T, R>(
+  List<(bool Function(T), R Function(T))> pairs, {
+  R Function(T)? orElse,
+}) {
   return (value) {
     for (final (predicate, mapper) in pairs) {
       if (predicate(value)) return mapper(value);
@@ -158,8 +165,9 @@ R Function(T value) cases<T, R>(List<(bool Function(T), R Function(T))> pairs,
 /// Splits a string into a list of user-perceived characters, handling
 /// surrogate pairs — the same behavior as FxTS `unicodeToArray`, which
 /// splits by code point. Named `unicodeToList` for Dart idiom (returns a List).
-List<String> unicodeToList(String s) =>
-    [for (final rune in s.runes) String.fromCharCode(rune)];
+List<String> unicodeToList(String s) => [
+  for (final rune in s.runes) String.fromCharCode(rune),
+];
 
 /// FxTS-named alias of [unicodeToList].
 List<String> unicodeToArray(String s) => unicodeToList(s);
@@ -170,4 +178,6 @@ List<String> unicodeToArray(String s) => unicodeToList(s);
 /// Dart-native replacement is the `.curried` extension getter (arities 2–5)
 /// — see `WHY_CURRIED.md`.
 @Deprecated('Use the .curried extension getter instead (see WHY_CURRIED.md)')
-Function curry(Function f) => (Object? a) => (Object? b) => f(a, b);
+Function curry(Function f) =>
+    (Object? a) =>
+        (Object? b) => f(a, b);

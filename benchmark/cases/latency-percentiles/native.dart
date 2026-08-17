@@ -21,8 +21,11 @@ Future<void> main() async {
 
       final lines = rows
           .sortedBy<num>((r) => -r.$3)
-          .map((r) => '  ${r.$1.padRight(8)} p50 ${'${r.$2}'.padLeft(3)} ms  '
-              'p95 ${'${r.$3}'.padLeft(3)} ms  (${r.$4} reqs)')
+          .map(
+            (r) =>
+                '  ${r.$1.padRight(8)} p50 ${'${r.$2}'.padLeft(3)} ms  '
+                'p95 ${'${r.$3}'.padLeft(3)} ms  (${r.$4} reqs)',
+          )
           .toList();
       final worst = rows.reduce((a, b) => a.$3 >= b.$3 ? a : b);
 

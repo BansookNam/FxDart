@@ -15,8 +15,17 @@ class Tx {
 
 const _spendCategories = ['Food', 'Transport', 'Fun', 'Bills', 'Rent'];
 const _spendMerchants = [
-  'Cafe Aroma', 'Metro', 'Green Grocer', 'Cinema', 'Noodle Bar',
-  'Electric Co', 'Taxi', 'Book Nook', 'Gym One', 'Corner Deli', 'Water Works',
+  'Cafe Aroma',
+  'Metro',
+  'Green Grocer',
+  'Cinema',
+  'Noodle Bar',
+  'Electric Co',
+  'Taxi',
+  'Book Nook',
+  'Gym One',
+  'Corner Deli',
+  'Water Works',
 ];
 
 List<Tx> makeTxns() {
@@ -25,7 +34,12 @@ List<Tx> makeTxns() {
     final day = 1 + rng.nextInt(28);
     final date = '2026-07-${day.toString().padLeft(2, '0')}';
     if (i % 20 == 0) {
-      return Tx(date, 'Income', 'Payroll Inc', (200000 + rng.nextInt(60000)) / 100);
+      return Tx(
+        date,
+        'Income',
+        'Payroll Inc',
+        (200000 + rng.nextInt(60000)) / 100,
+      );
     }
     return Tx(
       date,

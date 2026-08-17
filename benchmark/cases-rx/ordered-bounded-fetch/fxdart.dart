@@ -23,8 +23,9 @@ Future<void> main() async {
       inFlight = 0;
       maxInFlight = 0;
       // mapConcurrent keeps at most 4 in flight AND yields in source order.
-      final profiles =
-          await fx(userIds).toAsync().mapConcurrent(4, fetchProfile).toList();
+      final profiles = await fx(
+        userIds,
+      ).toAsync().mapConcurrent(4, fetchProfile).toList();
 
       return '${profiles.length}|${profiles.first}|${profiles.last}'
           '|max=$maxInFlight';

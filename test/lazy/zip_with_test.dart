@@ -8,7 +8,7 @@ void main() {
     final then = [
       {'foo': 1},
       {'bar': 2},
-      {'ha': 3}
+      {'ha': 3},
     ];
 
     group('sync', () {
@@ -23,20 +23,32 @@ void main() {
 
     group('async', () {
       test(
-          'should apply `f` to each same positioned pair [AsyncIterable/Iterable]',
-          () async {
-        final res = await toListAsync(zipWithAsync(
-            (String a, int b) => {a: b}, toAsync(iter1), toAsync(iter2)));
-        expect(res, equals(then));
-      });
+        'should apply `f` to each same positioned pair [AsyncIterable/Iterable]',
+        () async {
+          final res = await toListAsync(
+            zipWithAsync(
+              (String a, int b) => {a: b},
+              toAsync(iter1),
+              toAsync(iter2),
+            ),
+          );
+          expect(res, equals(then));
+        },
+      );
 
       test(
-          'should apply `f` to each same positioned pair [AsyncIterable/AsyncIterable] with async callback',
-          () async {
-        final res = await toListAsync(zipWithAsync(
-            (String a, int b) async => {a: b}, toAsync(iter1), toAsync(iter2)));
-        expect(res, equals(then));
-      });
+        'should apply `f` to each same positioned pair [AsyncIterable/AsyncIterable] with async callback',
+        () async {
+          final res = await toListAsync(
+            zipWithAsync(
+              (String a, int b) async => {a: b},
+              toAsync(iter1),
+              toAsync(iter2),
+            ),
+          );
+          expect(res, equals(then));
+        },
+      );
     });
   });
 }

@@ -11,21 +11,25 @@ void main() {
       });
 
       test(
-          "should return 'List<Future<A>>' when 'Iterable<Future<A>>' is given",
-          () async {
-        final numberFutures =
-            toList(map((int a) => Future.value(a), range(5)));
-        final res = await Future.wait(numberFutures);
-        expect(res, equals([0, 1, 2, 3, 4]));
-      });
+        "should return 'List<Future<A>>' when 'Iterable<Future<A>>' is given",
+        () async {
+          final numberFutures = toList(
+            map((int a) => Future.value(a), range(5)),
+          );
+          final res = await Future.wait(numberFutures);
+          expect(res, equals([0, 1, 2, 3, 4]));
+        },
+      );
     });
 
     group('async', () {
-      test("should return 'Future<List<A>>' when 'FxAsyncIterable<A>' is given",
-          () async {
-        final res = await toListAsync(toAsync(range(5)));
-        expect(res, equals([0, 1, 2, 3, 4]));
-      });
+      test(
+        "should return 'Future<List<A>>' when 'FxAsyncIterable<A>' is given",
+        () async {
+          final res = await toListAsync(toAsync(range(5)));
+          expect(res, equals([0, 1, 2, 3, 4]));
+        },
+      );
     });
   });
 }

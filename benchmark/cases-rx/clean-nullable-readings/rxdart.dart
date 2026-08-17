@@ -11,10 +11,9 @@ Future<void> main() async {
     n: n,
     run: () async {
       // whereNotNull narrows Stream<double?> to Stream<double>.
-      final clean = await Stream.fromIterable(samples)
-          .whereNotNull()
-          .map((v) => '${v.toStringAsFixed(1)} V')
-          .toList();
+      final clean = await Stream.fromIterable(
+        samples,
+      ).whereNotNull().map((v) => '${v.toStringAsFixed(1)} V').toList();
       final dropped = samples.length - clean.length;
       return '${clean.length}|${clean.first}|${clean.last}|dropped=$dropped';
     },

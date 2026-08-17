@@ -5,7 +5,10 @@ void main() {
   group('maxBy', () {
     group('sync', () {
       test('should return the element with the largest key', () {
-        expect(maxBy((String s) => s.length, ['a', 'ccc', 'bb']), equals('ccc'));
+        expect(
+          maxBy((String s) => s.length, ['a', 'ccc', 'bb']),
+          equals('ccc'),
+        );
         expect(maxBy((int n) => -n, [3, 1, 2]), equals(1));
       });
 
@@ -28,9 +31,11 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = fx(['apple', 'fig', 'banana'])
-            .filter((s) => s != 'banana')
-            .maxBy((s) => s.length);
+        final res = fx([
+          'apple',
+          'fig',
+          'banana',
+        ]).filter((s) => s != 'banana').maxBy((s) => s.length);
         expect(res, equals('apple'));
       });
     });
@@ -45,8 +50,11 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () async {
-        final res =
-            await fx([3, 7, 5]).toAsync().map((n) => n * 10).maxBy((n) => n);
+        final res = await fx([
+          3,
+          7,
+          5,
+        ]).toAsync().map((n) => n * 10).maxBy((n) => n);
         expect(res, equals(70));
       });
     });

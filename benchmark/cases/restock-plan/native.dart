@@ -22,10 +22,12 @@ Future<void> main() async {
         final cost = i.reorderQty * i.unitCost;
         if (running + cost > budget) break;
         running += cost;
-        lines.add('  ${i.name.padRight(15)} '
-            'x${'${i.reorderQty}'.padLeft(3)}  '
-            '${money(cost).padRight(8)} '
-            'running ${money(running)}');
+        lines.add(
+          '  ${i.name.padRight(15)} '
+          'x${'${i.reorderQty}'.padLeft(3)}  '
+          '${money(cost).padRight(8)} '
+          'running ${money(running)}',
+        );
       }
 
       return '${lines.length}/${needed.length}|${lines.first}|'

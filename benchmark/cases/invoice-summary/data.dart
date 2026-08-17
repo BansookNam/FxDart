@@ -15,7 +15,9 @@ class Line {
 }
 
 final List<String> categories = List.generate(
-    numCategories, (i) => 'Cat-${(i + 1).toString().padLeft(3, '0')}');
+  numCategories,
+  (i) => 'Cat-${(i + 1).toString().padLeft(3, '0')}',
+);
 
 List<Line> makeItems() {
   final rng = Lcg(10);

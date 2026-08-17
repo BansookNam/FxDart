@@ -1,4 +1,3 @@
-
 import '../../harness.dart';
 import 'data.dart';
 
@@ -17,9 +16,10 @@ Future<void> main() async {
       for (final p in usd) {
         byCategory[p.$1.category] = (byCategory[p.$1.category] ?? 0) + p.$2;
       }
-      final catLines = (byCategory.entries.toList()
-            ..sort((a, b) => b.value.compareTo(a.value)))
-          .map((e) => '  ${e.key.padRight(8)} ${money(e.value)}');
+      final catLines =
+          (byCategory.entries.toList()
+                ..sort((a, b) => b.value.compareTo(a.value)))
+              .map((e) => '  ${e.key.padRight(8)} ${money(e.value)}');
 
       final currencies = txns.map((t) => t.currency).toSet().toList()..sort();
       final biggest = usd.reduce((a, b) => a.$2 >= b.$2 ? a : b);

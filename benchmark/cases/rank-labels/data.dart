@@ -10,9 +10,7 @@ class Player {
   const Player(this.name, this.score);
 }
 
-const _names = [
-  'Hana', 'Dan', 'Ava', 'Finn', 'Cara', 'Ben', 'Gus', 'Elle',
-];
+const _names = ['Hana', 'Dan', 'Ava', 'Finn', 'Cara', 'Ben', 'Gus', 'Elle'];
 
 List<Player> makeLeaderboard() {
   final rng = Lcg(9);

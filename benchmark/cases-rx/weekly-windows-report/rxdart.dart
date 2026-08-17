@@ -14,8 +14,11 @@ Future<void> main() async {
           .bufferCount(7)
           // No indexed operator — scan is drafted as the week counter.
           .scan<(int, List<int>)>((acc, week, _) => (acc.$1 + 1, week), (0, []))
-          .map((w) => 'week ${w.$1}: '
-              '\$${w.$2.fold<double>(0, (s, c) => s + c / 100).toStringAsFixed(2)}')
+          .map(
+            (w) =>
+                'week ${w.$1}: '
+                '\$${w.$2.fold<double>(0, (s, c) => s + c / 100).toStringAsFixed(2)}',
+          )
           .toList();
 
       return '${lines.length}|${lines.first}|${lines.last}';

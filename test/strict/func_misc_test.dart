@@ -17,8 +17,10 @@ void main() {
     test('should complete after the given duration', () async {
       final start = DateTime.now();
       await sleep(const Duration(milliseconds: 30));
-      expect(DateTime.now().difference(start).inMilliseconds,
-          greaterThanOrEqualTo(20));
+      expect(
+        DateTime.now().difference(start).inMilliseconds,
+        greaterThanOrEqualTo(20),
+      );
     });
   });
 

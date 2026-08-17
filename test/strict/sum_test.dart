@@ -36,14 +36,13 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () async {
-        final res1 = await pipe(<num>[
-          1,
-          2,
-          3
-        ], [
-          (List<num> a) => toAsync(a),
-          (FxAsyncIterable<num> a) => sumAsync(a),
-        ]);
+        final res1 = await pipe(
+          <num>[1, 2, 3],
+          [
+            (List<num> a) => toAsync(a),
+            (FxAsyncIterable<num> a) => sumAsync(a),
+          ],
+        );
         expect(res1, equals(6));
         final res2 = await pipe(<num>[], [
           (List<num> a) => toAsync(a),

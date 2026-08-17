@@ -24,8 +24,10 @@ void main() {
         expect(add(await Future.value(1), await Future.value(2)), equals(3));
         expect(add(await Future.value('a'), 'b'), equals('ab'));
         expect(add('a', await Future.value('b')), equals('ab'));
-        expect(add(await Future.value('a'), await Future.value('b')),
-            equals('ab'));
+        expect(
+          add(await Future.value('a'), await Future.value('b')),
+          equals('ab'),
+        );
       });
 
       test('should be able to be used in an async pipeline', () async {

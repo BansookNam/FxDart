@@ -17,11 +17,7 @@ class Item {
 List<Item> makeItems() {
   final rng = Lcg(3);
   return List.generate(n, (i) {
-    return Item(
-      'SKU-$i',
-      1 + rng.nextInt(5),
-      (100 + rng.nextInt(19900)) / 100,
-    );
+    return Item('SKU-$i', 1 + rng.nextInt(5), (100 + rng.nextInt(19900)) / 100);
   });
 }
 

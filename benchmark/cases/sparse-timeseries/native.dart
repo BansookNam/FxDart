@@ -23,8 +23,10 @@ Future<void> main() async {
         final start = i * 7 + 1;
         final cells = week.map((v) => v.toStringAsFixed(2)).join(' ');
         final total = week.fold(0.0, (s, v) => s + v);
-        weeks.add('Day ${dd(start)}-${dd(start + 6)}: $cells'
-            '  | week total ${total.toStringAsFixed(2)}');
+        weeks.add(
+          'Day ${dd(start)}-${dd(start + 6)}: $cells'
+          '  | week total ${total.toStringAsFixed(2)}',
+        );
       }
 
       return '${weeks.length}|${weeks.first}'

@@ -21,27 +21,27 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = pipe([
+        final res = pipe(
+          [1, 2, 3, 4, 5, 6, 7],
+          [
+            (Iterable<int> a) => map((int n) => n + 10, a),
+            (Iterable<int> a) => filter((int n) => n % 2 == 0, a),
+            (Iterable<int> a) => join('-', a),
+          ],
+        );
+        expect(res, equals('12-14-16'));
+      });
+
+      test('should be able to be used as a chaining method in the `fx`', () {
+        final res = fx([
           1,
           2,
           3,
           4,
           5,
           6,
-          7
-        ], [
-          (Iterable<int> a) => map((int n) => n + 10, a),
-          (Iterable<int> a) => filter((int n) => n % 2 == 0, a),
-          (Iterable<int> a) => join('-', a),
-        ]);
-        expect(res, equals('12-14-16'));
-      });
-
-      test('should be able to be used as a chaining method in the `fx`', () {
-        final res = fx([1, 2, 3, 4, 5, 6, 7])
-            .map((a) => a + 10)
-            .filter((a) => a % 2 == 0)
-            .join('-');
+          7,
+        ]).map((a) => a + 10).filter((a) => a % 2 == 0).join('-');
         expect(res, equals('12-14-16'));
       });
 
@@ -59,10 +59,12 @@ void main() {
     });
 
     group('async', () {
-      test('should return an empty string if there are no iterable items',
-          () async {
-        expect(await joinAsync(', ', asyncEmpty<int>()), equals(''));
-      });
+      test(
+        'should return an empty string if there are no iterable items',
+        () async {
+          expect(await joinAsync(', ', asyncEmpty<int>()), equals(''));
+        },
+      );
 
       test('should join elements of the async iterable', () async {
         final res = await joinAsync('-', toAsync([1, 2, 3, 4, 5]));
@@ -78,21 +80,27 @@ void main() {
         expect(res, equals('12-14-16'));
       });
 
-      test('should be able to be used as a chaining method in the `fx`',
-          () async {
-        final res = await fx([1, 2, 3, 4, 5, 6, 7])
-            .toAsync()
-            .map((a) => a + 10)
-            .filter((a) => a % 2 == 0)
-            .join('-');
-        expect(res, equals('12-14-16'));
-      });
+      test(
+        'should be able to be used as a chaining method in the `fx`',
+        () async {
+          final res = await fx([
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+          ]).toAsync().map((a) => a + 10).filter((a) => a % 2 == 0).join('-');
+          expect(res, equals('12-14-16'));
+        },
+      );
 
       test('should be able to handle an error when asynchronous', () async {
         await expectLater(
-          fxAsync(toAsync('marpple'.split('')))
-              .filter((_) => throw Exception('err'))
-              .join('!'),
+          fxAsync(
+            toAsync('marpple'.split('')),
+          ).filter((_) => throw Exception('err')).join('!'),
           throwsA(isA<Exception>()),
         );
       });

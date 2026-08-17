@@ -18,15 +18,23 @@ const levels = ['ERROR', 'WARN'];
 // 5, not 4: nextInt(4) uses only the Lcg's degenerate low bits (see the
 // caution in harness.dart) and collapses every draw to one service. See the
 // tie-free note in makeLogs.
-final _services =
-    List<String>.generate((n ~/ 1000).clamp(5, 40).toInt(), (i) => 'svc-$i');
+final _services = List<String>.generate(
+  (n ~/ 1000).clamp(5, 40).toInt(),
+  (i) => 'svc-$i',
+);
 
 // 3:4:1:2 ERROR/WARN/INFO/DEBUG mix, like the example's log spread.
 const _levelPool = [
-  'ERROR', 'ERROR', 'ERROR',
-  'WARN', 'WARN', 'WARN', 'WARN',
+  'ERROR',
+  'ERROR',
+  'ERROR',
+  'WARN',
+  'WARN',
+  'WARN',
+  'WARN',
   'INFO',
-  'DEBUG', 'DEBUG',
+  'DEBUG',
+  'DEBUG',
 ];
 
 final _messages = List<String>.generate(24, (i) => 'event $i in subsystem');

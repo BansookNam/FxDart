@@ -59,8 +59,10 @@ void main() {
 
     test('ties keep source order (stable permutation)', () {
       final xs = [('a', 1), ('b', 1), ('c', 0)];
-      expect(sortBy((r) => r.$2, xs).map((r) => r.$1).toList(),
-          equals(['c', 'a', 'b']));
+      expect(
+        sortBy((r) => r.$2, xs).map((r) => r.$1).toList(),
+        equals(['c', 'a', 'b']),
+      );
     });
   });
   doubleKeyStrategies();
@@ -71,35 +73,46 @@ void main() {
 // These pin every branch, and that the choice is invisible.
 void doubleKeyStrategies() {
   group('sortBy double-key strategies', () {
-    List<(int, double)> rows(List<double> ks) =>
-        [for (var i = 0; i < ks.length; i++) (i, ks[i])];
+    List<(int, double)> rows(List<double> ks) => [
+      for (var i = 0; i < ks.length; i++) (i, ks[i]),
+    ];
 
     test('already ascending is returned in order', () {
-      expect(sortBy((r) => r.$2, rows([1, 2, 3, 4])).map((r) => r.$1).toList(),
-          equals([0, 1, 2, 3]));
+      expect(
+        sortBy((r) => r.$2, rows([1, 2, 3, 4])).map((r) => r.$1).toList(),
+        equals([0, 1, 2, 3]),
+      );
     });
 
     test('exactly reversed is reversed', () {
-      expect(sortBy((r) => r.$2, rows([4, 3, 2, 1])).map((r) => r.$1).toList(),
-          equals([3, 2, 1, 0]));
       expect(
-          sortByDesc((r) => r.$2, rows([1, 2, 3, 4])).map((r) => r.$1).toList(),
-          equals([3, 2, 1, 0]));
+        sortBy((r) => r.$2, rows([4, 3, 2, 1])).map((r) => r.$1).toList(),
+        equals([3, 2, 1, 0]),
+      );
+      expect(
+        sortByDesc((r) => r.$2, rows([1, 2, 3, 4])).map((r) => r.$1).toList(),
+        equals([3, 2, 1, 0]),
+      );
     });
 
     test('a non-strict reversed run must NOT take the reverse shortcut', () {
       // Keys 2,1,1,0 descending with a tie: reversing would swap the two
       // 1-keyed rows, breaking stability. Rows 1 and 2 must stay in order.
-      final r = sortBy((x) => x.$2, rows([2, 1, 1, 0])).map((x) => x.$1).toList();
+      final r = sortBy(
+        (x) => x.$2,
+        rows([2, 1, 1, 0]),
+      ).map((x) => x.$1).toList();
       expect(r, equals([3, 1, 2, 0]));
     });
 
     test('ties stay in source order at every strategy', () {
       final xs = [for (var i = 0; i < 400; i++) (i, (i % 4).toDouble())];
-      for (final got in [sortBy((r) => r.$2, xs), sortByDesc((r) => r.$2, xs)]) {
+      for (final got in [
+        sortBy((r) => r.$2, xs),
+        sortByDesc((r) => r.$2, xs),
+      ]) {
         for (var key = 0; key < 4; key++) {
-          final run =
-              got.where((r) => r.$2 == key).map((r) => r.$1).toList();
+          final run = got.where((r) => r.$2 == key).map((r) => r.$1).toList();
           expect(run, equals(List.of(run)..sort()));
         }
       }
@@ -112,8 +125,11 @@ void doubleKeyStrategies() {
         final xs = [for (var i = 0; i < n; i++) (next() % 50).toDouble()];
         final want = List.of(xs)..sort();
         expect(sortBy((double a) => a, xs), equals(want), reason: 'n=$n');
-        expect(sortByDesc((double a) => a, xs),
-            equals(want.reversed.toList()), reason: 'n=$n desc');
+        expect(
+          sortByDesc((double a) => a, xs),
+          equals(want.reversed.toList()),
+          reason: 'n=$n desc',
+        );
       }
     });
 
@@ -131,7 +147,11 @@ void doubleKeyStrategies() {
     });
 
     test('the result is always growable', () {
-      for (final xs in [[1.0, 2.0], [2.0, 1.0], [2.0, 3.0, 1.0]]) {
+      for (final xs in [
+        [1.0, 2.0],
+        [2.0, 1.0],
+        [2.0, 3.0, 1.0],
+      ]) {
         expect(() => sortBy((double a) => a, xs).add(9.0), returnsNormally);
       }
     });
