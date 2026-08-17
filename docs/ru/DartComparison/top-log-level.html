@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=28957dac8754acc4">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=3e24b5eda4bffab1">
 </head>
 <body>
 <header class="site-header">
@@ -105,7 +105,7 @@ void main() {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="187b2e71916dfeec">
+      <div class="playground" data-pg="ba9668a5b3ee76e1">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -151,14 +151,43 @@ void main() {
     the largest entry. Two named ideas instead of two hand-built ones.
   </p>
 
+  <h2>Where the time actually goes</h2>
+  <p>
+    Counting is almost pure hash-map work, so this case is really a
+    measurement of how many times each element touches the map. Broken down
+    by cost per element at N=1,000,000:
+  </p>
+  <table>
+    <thead>
+      <tr><th>what the loop does</th><th>ns per element</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>walk the list</td><td>0.3</td></tr>
+      <tr><td>+ load the <code>.level</code> field</td><td>0.7</td></tr>
+      <tr><td>+ hash it</td><td>1.7</td></tr>
+      <tr><td>+ count with a <code>switch</code> into four locals</td><td>12.5</td></tr>
+      <tr><td>+ <strong>one</strong> map probe</td><td>20.9</td></tr>
+      <tr><td>+ <strong>two</strong> map probes</td><td>29.3</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Traversal and the key extractor are free — under 1 ns between them. The
+    map is everything. And the obvious hand-written line,
+    <code>counts[k] = (counts[k] ?? 0) + 1</code>, probes the map
+    <em>twice</em>: once to read, once to write back. That second probe is
+    about 30% of the runtime, and it is the reason a named operator can beat
+    the loop you would have written. Since 0.8.4 <code><a href="../tutorials/countBy.html">countBy</a></code> counts
+    into a mutable cell parked in the map, so the read hands back the cell and
+    the increment goes through that reference — the map is written once per
+    <em>distinct level</em> instead of once per entry.
+  </p>
+
   <h2>Why the benchmark crosses over</h2>
   <p>
-    The bars above are easy to misread: FxDart <em>loses</em> at N=10,000
-    and <em>wins</em> at N=1,000,000. Both are real, and neither is what it
-    looks like. Here is the same case swept across four scales, with the
-    third implementation the section above mentions but does not chart —
-    a hand-written counting loop, which is what you would write if you
-    were not reaching for <code>package:collection</code> at all.
+    Here is the same case swept across four scales, with the third
+    implementation the section above mentions but does not chart — a
+    hand-written counting loop, which is what you would write if you were not
+    reaching for <code>package:collection</code> at all.
   </p>
   <table>
     <thead>
@@ -168,29 +197,35 @@ void main() {
       </tr>
     </thead>
     <tbody>
-      <tr><td>10,000</td><td>345 µs</td><td>288 µs</td><td>415 µs</td>
-        <td>1.20× slower</td><td>1.44× slower</td></tr>
-      <tr><td>100,000</td><td>3.48 ms</td><td>2.87 ms</td><td>4.16 ms</td>
-        <td>1.20× slower</td><td>1.45× slower</td></tr>
-      <tr><td>400,000</td><td>18.7 ms</td><td>11.6 ms</td><td>16.4 ms</td>
-        <td><strong>1.14× faster</strong></td><td>1.41× slower</td></tr>
-      <tr><td>1,000,000</td><td>45.2 ms</td><td>28.5 ms</td><td>40.8 ms</td>
-        <td><strong>1.11× faster</strong></td><td>1.43× slower</td></tr>
+      <tr><td>10,000</td><td>351 µs</td><td>291 µs</td><td>199 µs</td>
+        <td><strong>1.76× faster</strong></td><td><strong>1.46× faster</strong></td></tr>
+      <tr><td>100,000</td><td>3.6 ms</td><td>2.9 ms</td><td>2.0 ms</td>
+        <td><strong>1.83× faster</strong></td><td><strong>1.47× faster</strong></td></tr>
+      <tr><td>400,000</td><td>18.2 ms</td><td>11.6 ms</td><td>7.8 ms</td>
+        <td><strong>2.32× faster</strong></td><td><strong>1.48× faster</strong></td></tr>
+      <tr><td>1,000,000</td><td>44.5 ms</td><td>28.8 ms</td><td>19.4 ms</td>
+        <td><strong>2.30× faster</strong></td><td><strong>1.48× faster</strong></td></tr>
     </tbody>
   </table>
   <p>
     Read the last column first, because it is the one that does not move:
-    against a hand-written loop FxDart is <strong>~1.4× slower at every
-    scale</strong>, from ten thousand entries to a million. That is the
-    honest cost of the chain — roughly 7 ns per element for the
-    <code>fx()</code> wrapper and the closure dispatch through
-    <code><a href="../tutorials/countBy.html">countBy</a></code>. It never improves, and no amount of N makes
-    FxDart's pipeline faster than a loop.
+    against a hand-written loop FxDart is <strong>~1.47× faster at every
+    scale</strong>, from ten thousand entries to a million. That constant is
+    the single map probe from the section above — the operator can afford a
+    trick that is too fiddly to be worth hand-writing, and it pays the same
+    dividend at every N.
   </p>
+  <div class="callout">
+    <strong>This page used to say the opposite.</strong> Before 0.8.4,
+    <code><a href="../tutorials/countBy.html">countBy</a></code> did the same two probes as the loop <em>plus</em> the
+    chain's overhead, and the honest number here was ~1.4× <em>slower</em> at
+    every scale. Only the FxDart column moved: re-measured on the same
+    machine, <code>groupListsBy</code> and the hand loop land within 2% of
+    their old figures.
+  </div>
   <p>
-    So the crossover in the middle column is not FxDart speeding up. It is
-    <code>groupListsBy</code> <em>slowing down</em> — and the memory
-    column is where that shows:
+    The <code>groupListsBy</code> column widens on top of that, and the
+    memory column is where that shows:
   </p>
   <table>
     <thead>
@@ -199,41 +234,42 @@ void main() {
       </tr>
     </thead>
     <tbody>
-      <tr><td>10,000</td><td>19.7 MB</td><td>14.7 MB</td><td>14.8 MB</td></tr>
-      <tr><td>100,000</td><td>35.3 MB</td><td>16.8 MB</td><td>16.9 MB</td></tr>
-      <tr><td>400,000</td><td>62.6 MB</td><td>25.8 MB</td><td>25.9 MB</td></tr>
-      <tr><td>1,000,000</td><td>83.3 MB</td><td>46.9 MB</td><td>47.0 MB</td></tr>
+      <tr><td>10,000</td><td>18.8 MB</td><td>14.1 MB</td><td>14.2 MB</td></tr>
+      <tr><td>100,000</td><td>33.8 MB</td><td>16.1 MB</td><td>16.2 MB</td></tr>
+      <tr><td>400,000</td><td>59.8 MB</td><td>24.7 MB</td><td>24.7 MB</td></tr>
+      <tr><td>1,000,000</td><td>88.8 MB</td><td>44.8 MB</td><td>44.8 MB</td></tr>
     </tbody>
   </table>
   <p>
     <code><a href="../tutorials/countBy.html">countBy</a></code> and the hand loop hold <strong>the same
     memory</strong> — within 0.1 MB at every scale — because both keep
-    four integer counters and nothing else.
+    four counters and nothing else.
     <code>groupListsBy</code> materialises every one of the million
     entries into per-level <code>List</code>s just to take their lengths,
-    and by N=1,000,000 that is 36 MB of garbage it has to allocate and the
+    and by N=1,000,000 that is 44 MB of garbage it has to allocate and the
     collector has to walk.
   </p>
   <p>
     That tax is also what makes it <em>erratic</em>. Across 25 samples at
-    N=1,000,000, <code>groupListsBy</code> ranged 42.1–49.5 ms while
-    FxDart ranged 40.3–42.2 ms. Its best run essentially ties FxDart's
-    best; its median loses because it sometimes stops for a collection
-    FxDart never triggers. The win above ~200,000 is the absence of
-    garbage, not a faster pipeline.
+    N=1,000,000, <code>groupListsBy</code> ranged 38.8–50.1 ms — an 11 ms
+    spread — while FxDart ranged 19.1–20.3 ms and the hand loop
+    27.9–30.4 ms. Its slow samples are collections the other two never
+    trigger. So its gap is part pipeline and part garbage; the other two
+    columns are just pipeline.
   </p>
   <p>
-    And the N=10,000 loss is just as honest: 415 µs against 345 µs is
-    70 µs — real, but under the harness's 0.6 ms floor, which is why the
-    bar above still reads <em>tie</em>. Nobody perceives 70 µs.
+    The bar chart above still reads <em>tie</em> at N=10,000 even though
+    FxDart is comfortably ahead there, because 365 µs against 191 µs is
+    174 µs — real, but under the harness's 0.6 ms floor. Nobody perceives
+    174 µs, so the badge refuses to claim a win.
   </p>
   <p>
     The fair summary, then: <strong><code><a href="../tutorials/countBy.html">countBy</a></code> gives you a hand
-    loop's memory profile with a named operator's readability, at about
-    1.4× a hand loop's time.</strong> Whether that trade is worth it is a
-    judgement about your code, not a number — but it beats the idiomatic
-    <code>package:collection</code> one-liner on both axes once the data
-    is large, and it never costs you the 36 MB.
+    loop's memory profile and beats a hand loop's time by ~1.47×, with a
+    named operator's readability.</strong> It is a rare case where the
+    library version is simply the better choice on every axis — and the
+    reason is not clever compilation, it is that the operator only has to be
+    written carefully once.
   </p>
   <div class="callout">
     <strong>Method:</strong> measured on the machine named in the Benchmark
@@ -253,12 +289,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">3.5 µs</span>
+        <span class="bench-val">3.6 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:88.4%"></span></span>
-        <span class="bench-val">3.1 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:53.9%"></span></span>
+        <span class="bench-val">2.0 µs</span>
       </div>
     </div>
     <div class="bench-metric">
@@ -266,11 +302,11 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">16.6 MB</span>
+        <span class="bench-val">16.5 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:98.8%"></span></span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:99.7%"></span></span>
         <span class="bench-val">16.4 MB</span>
       </div>
     </div>
@@ -282,12 +318,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">349 µs</span>
+        <span class="bench-val">365 µs</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:87.9%"></span></span>
-        <span class="bench-val">307 µs</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:52.5%"></span></span>
+        <span class="bench-val">191 µs</span>
       </div>
     </div>
     <div class="bench-metric">
@@ -295,12 +331,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">20.0 MB</span>
+        <span class="bench-val">18.8 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:70.6%"></span></span>
-        <span class="bench-val">14.1 MB</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:75.5%"></span></span>
+        <span class="bench-val">14.2 MB</span>
       </div>
     </div>
   </div>
@@ -311,12 +347,12 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">44.2 ms</span>
+        <span class="bench-val">44.5 ms</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:71.4%"></span></span>
-        <span class="bench-val">31.6 ms</span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:44.2%"></span></span>
+        <span class="bench-val">19.7 ms</span>
       </div>
     </div>
     <div class="bench-metric">
@@ -324,11 +360,11 @@ void main() {
       <div class="bench-row">
         <span class="bench-name">Native Dart</span>
         <span class="bench-track"><span class="bench-bar bench-native" style="width:100.0%"></span></span>
-        <span class="bench-val">80.6 MB</span>
+        <span class="bench-val">93.3 MB</span>
       </div>
       <div class="bench-row">
         <span class="bench-name">FxDart</span>
-        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:55.6%"></span></span>
+        <span class="bench-track"><span class="bench-bar bench-fxdart" style="width:48.1%"></span></span>
         <span class="bench-val">44.8 MB</span>
       </div>
     </div>
@@ -347,7 +383,7 @@ void main() {
   <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=28957dac8754acc4";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=3e24b5eda4bffab1";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

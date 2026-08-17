@@ -39,15 +39,44 @@ async: false
     construidas a mano.
   </p>
 
+  <h2>Adónde se va el tiempo en realidad</h2>
+  <p>
+    Contar es casi puro trabajo de tabla hash, así que este caso mide en
+    realidad cuántas veces toca la tabla cada elemento. Desglosado por coste
+    por elemento con N=1.000.000:
+  </p>
+  <table>
+    <thead>
+      <tr><th>lo que hace el bucle</th><th>ns por elemento</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>recorrer la lista</td><td>0,3</td></tr>
+      <tr><td>+ leer el campo <code>.level</code></td><td>0,7</td></tr>
+      <tr><td>+ calcular su hash</td><td>1,7</td></tr>
+      <tr><td>+ contar con un <code>switch</code> en cuatro locales</td><td>12,5</td></tr>
+      <tr><td>+ <strong>un</strong> sondeo de la tabla</td><td>20,9</td></tr>
+      <tr><td>+ <strong>dos</strong> sondeos de la tabla</td><td>29,3</td></tr>
+    </tbody>
+  </table>
+  <p>
+    El recorrido y el extractor de clave son gratis: menos de 1 ns entre los
+    dos. La tabla lo es todo. Y la línea obvia escrita a mano,
+    <code>counts[k] = (counts[k] ?? 0) + 1</code>, sondea la tabla
+    <em>dos veces</em>: una para leer y otra para volver a escribir. Ese
+    segundo sondeo es cerca del 30% del tiempo de ejecución, y es la razón
+    por la que un operador con nombre puede ganarle al bucle que habrías
+    escrito. Desde 0.8.4 <code>countBy</code> cuenta en una celda mutable
+    alojada en la tabla, así que la lectura devuelve la celda y el incremento
+    va por esa referencia: la tabla se escribe una vez por <em>nivel
+    distinto</em> en lugar de una vez por entrada.
+  </p>
+
   <h2>Por qué el benchmark se invierte</h2>
   <p>
-    Las barras de arriba se prestan a confusión: FxDart <em>pierde</em> con
-    N=10.000 y <em>gana</em> con N=1.000.000. Ambas cosas son ciertas, y
-    ninguna es lo que parece. Aquí está el mismo caso recorrido en cuatro
-    escalas, con la tercera implementación que el párrafo anterior menciona
-    pero no grafica: un bucle de conteo escrito a mano, que es lo que
-    escribirías si no estuvieras recurriendo a
-    <code>package:collection</code>.
+    Aquí está el mismo caso recorrido en cuatro escalas, con la tercera
+    implementación que el párrafo anterior menciona pero no grafica: un bucle
+    de conteo escrito a mano, que es lo que escribirías si no estuvieras
+    recurriendo a <code>package:collection</code>.
   </p>
   <table>
     <thead>
@@ -58,29 +87,35 @@ async: false
       </tr>
     </thead>
     <tbody>
-      <tr><td>10.000</td><td>345 µs</td><td>288 µs</td><td>415 µs</td>
-        <td>1,20× más lento</td><td>1,44× más lento</td></tr>
-      <tr><td>100.000</td><td>3,48 ms</td><td>2,87 ms</td><td>4,16 ms</td>
-        <td>1,20× más lento</td><td>1,45× más lento</td></tr>
-      <tr><td>400.000</td><td>18,7 ms</td><td>11,6 ms</td><td>16,4 ms</td>
-        <td><strong>1,14× más rápido</strong></td><td>1,41× más lento</td></tr>
-      <tr><td>1.000.000</td><td>45,2 ms</td><td>28,5 ms</td><td>40,8 ms</td>
-        <td><strong>1,11× más rápido</strong></td><td>1,43× más lento</td></tr>
+      <tr><td>10.000</td><td>351 µs</td><td>291 µs</td><td>199 µs</td>
+        <td><strong>1,76× más rápido</strong></td><td><strong>1,46× más rápido</strong></td></tr>
+      <tr><td>100.000</td><td>3,6 ms</td><td>2,9 ms</td><td>2,0 ms</td>
+        <td><strong>1,83× más rápido</strong></td><td><strong>1,47× más rápido</strong></td></tr>
+      <tr><td>400.000</td><td>18,2 ms</td><td>11,6 ms</td><td>7,8 ms</td>
+        <td><strong>2,32× más rápido</strong></td><td><strong>1,48× más rápido</strong></td></tr>
+      <tr><td>1.000.000</td><td>44,5 ms</td><td>28,8 ms</td><td>19,4 ms</td>
+        <td><strong>2,30× más rápido</strong></td><td><strong>1,48× más rápido</strong></td></tr>
     </tbody>
   </table>
   <p>
     Lee primero la última columna, porque es la que no se mueve: frente a
-    un bucle escrito a mano FxDart es <strong>~1,4× más lento en todas las
-    escalas</strong>, de diez mil entradas a un millón. Ese es el coste
-    honesto de la cadena — unos 7 ns por elemento para el envoltorio
-    <code>fx()</code> y el despacho de closures a través de
-    <code>countBy</code>. Nunca mejora, y ningún N hace que la tubería de
-    FxDart sea más rápida que un bucle.
+    un bucle escrito a mano FxDart es <strong>~1,47× más rápido en todas las
+    escalas</strong>, de diez mil entradas a un millón. Esa constante es el
+    único sondeo de la sección anterior: el operador puede permitirse un truco
+    demasiado engorroso para escribirlo a mano, y rinde lo mismo con cualquier
+    N.
   </p>
+  <div class="callout">
+    <strong>Esta página decía lo contrario.</strong> Antes de 0.8.4,
+    <code>countBy</code> hacía los mismos dos sondeos que el bucle
+    <em>más</em> el coste de la cadena, y el número honesto aquí era ~1,4×
+    <em>más lento</em> en todas las escalas. Solo se movió la columna de
+    FxDart: al volver a medir en la misma máquina, <code>groupListsBy</code>
+    y el bucle a mano quedan a menos del 2% de sus cifras anteriores.
+  </div>
   <p>
-    Así que la inversión de la columna central no es FxDart acelerando. Es
-    <code>groupListsBy</code> <em>frenándose</em>, y la columna de memoria
-    es donde eso se ve:
+    La columna de <code>groupListsBy</code> abre la brecha todavía más por
+    encima de eso, y la columna de memoria es donde eso se ve:
   </p>
   <table>
     <thead>
@@ -89,44 +124,45 @@ async: false
       </tr>
     </thead>
     <tbody>
-      <tr><td>10.000</td><td>19,7 MB</td><td>14,7 MB</td><td>14,8 MB</td></tr>
-      <tr><td>100.000</td><td>35,3 MB</td><td>16,8 MB</td><td>16,9 MB</td></tr>
-      <tr><td>400.000</td><td>62,6 MB</td><td>25,8 MB</td><td>25,9 MB</td></tr>
-      <tr><td>1.000.000</td><td>83,3 MB</td><td>46,9 MB</td><td>47,0 MB</td></tr>
+      <tr><td>10.000</td><td>18,8 MB</td><td>14,1 MB</td><td>14,2 MB</td></tr>
+      <tr><td>100.000</td><td>33,8 MB</td><td>16,1 MB</td><td>16,2 MB</td></tr>
+      <tr><td>400.000</td><td>59,8 MB</td><td>24,7 MB</td><td>24,7 MB</td></tr>
+      <tr><td>1.000.000</td><td>88,8 MB</td><td>44,8 MB</td><td>44,8 MB</td></tr>
     </tbody>
   </table>
   <p>
     <code>countBy</code> y el bucle a mano ocupan <strong>la misma
     memoria</strong> — con menos de 0,1 MB de diferencia en cada escala —
-    porque ambos guardan cuatro contadores enteros y nada más.
+    porque ambos guardan cuatro contadores y nada más.
     <code>groupListsBy</code> materializa cada una del millón de entradas
     en <code>List</code>s por nivel solo para tomar sus longitudes, y con
-    N=1.000.000 eso son 36 MB de basura que hay que reservar y que el
+    N=1.000.000 eso son 44 MB de basura que hay que reservar y que el
     recolector debe recorrer.
   </p>
   <p>
     Ese impuesto es además lo que lo vuelve <em>errático</em>. A lo largo
     de 25 muestras con N=1.000.000, <code>groupListsBy</code> osciló entre
-    42,1 y 49,5 ms, mientras que FxDart se movió entre 40,3 y 42,2 ms. Su
-    mejor tiempo prácticamente empata con el mejor de FxDart; pierde en la
-    mediana porque a veces se detiene para una recolección que FxDart nunca
-    provoca. La victoria por encima de ~200.000 es la ausencia de basura,
-    no una tubería más rápida.
+    38,8 y 50,1 ms — 11 ms de dispersión — mientras que FxDart se movió
+    entre 19,1 y 20,3 ms y el bucle a mano entre 27,9 y 30,4 ms. Sus
+    muestras lentas son recolecciones que los otros dos nunca provocan. Así
+    que su brecha es en parte tubería y en parte basura; las otras dos
+    columnas son solo tubería.
   </p>
   <p>
-    Y la derrota con N=10.000 es igual de honesta: 415 µs frente a 345 µs
-    son 70 µs — reales, pero por debajo del umbral de 0,6 ms del banco de
-    pruebas, que es por lo que la barra de arriba sigue marcando
-    <em>empate</em>. Nadie percibe 70 µs.
+    La barra de arriba sigue marcando <em>empate</em> con N=10.000 aunque
+    FxDart va holgadamente por delante, porque 365 µs frente a 191 µs son
+    174 µs: reales, pero por debajo del umbral de 0,6 ms del banco de
+    pruebas. Nadie percibe 174 µs, así que la insignia se niega a reclamar
+    la victoria.
   </p>
   <p>
     El resumen justo, entonces:
     <strong><code>countBy</code> te da el perfil de memoria de un bucle a
-    mano con la legibilidad de un operador con nombre, a alrededor de 1,4×
-    el tiempo de ese bucle.</strong> Si ese intercambio compensa es un
-    juicio sobre tu código, no un número — pero le gana a la línea
-    idiomática de <code>package:collection</code> en ambos ejes en cuanto
-    los datos crecen, y nunca te cuesta esos 36 MB.
+    mano y le gana en tiempo por ~1,47×, con la legibilidad de un operador
+    con nombre.</strong> Es uno de esos casos raros en que la versión de la
+    biblioteca es sencillamente la mejor opción en todos los ejes, y la razón
+    no es una compilación ingeniosa: es que el operador solo hay que
+    escribirlo con cuidado una vez.
   </p>
   <div class="callout">
     <strong>Método:</strong> medido en la máquina indicada en la sección
