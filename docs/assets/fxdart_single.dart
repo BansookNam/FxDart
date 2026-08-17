@@ -79,14 +79,10 @@ class IterResult<T> {
   final T? _value;
 
   /// A terminal result — the iterator has no more values.
-  const IterResult.done()
-      : done = true,
-        _value = null;
+  const IterResult.done() : done = true, _value = null;
 
   /// A result carrying the next [value].
-  const IterResult.value(T value)
-      : done = false,
-        _value = value;
+  const IterResult.value(T value) : done = false, _value = value;
 
   /// The yielded value. Only valid when [done] is false.
   T get value => _value as T;
@@ -156,8 +152,9 @@ class SerialAsyncIterator<T> implements FxAsyncIterator<T> {
   @override
   Future<IterResult<T>> next([Concurrent? concurrent]) {
     final prev = _inFlight;
-    final result =
-        prev == null ? _inner(concurrent) : prev.then((_) => _inner(concurrent));
+    final result = prev == null
+        ? _inner(concurrent)
+        : prev.then((_) => _inner(concurrent));
     late final Future<void> gate;
     void clear() {
       if (identical(_inFlight, gate)) _inFlight = null;
@@ -176,7 +173,8 @@ class SerialAsyncIterator<T> implements FxAsyncIterator<T> {
 /// An empty async iterable.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<T> asyncEmpty<T>() => DelegateAsyncIterable(
-    () => DelegateAsyncIterator((_) async => IterResult<T>.done()));
+  () => DelegateAsyncIterator((_) async => IterResult<T>.done()),
+);
 
 // --- why the operator factories are `vm:prefer-inline` --------------------
 //
@@ -389,9 +387,9 @@ final class FxScanLink extends FxLink {
 /// A fused run of stages over one [source].
 class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
   FxFusedAsyncIterable(this.source, this.stages, this.legacy)
-      : oneToOne = _oneToOne(stages),
-        scanIndex = _scanIndex(stages),
-        links = _compile(stages);
+    : oneToOne = _oneToOne(stages),
+      scanIndex = _scanIndex(stages),
+      links = _compile(stages);
 
   /// The pre-stage upstream.
   final FxAsyncIterable<Object?> source;
@@ -528,8 +526,9 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
     final src = _source!;
     if (_iterable.oneToOne) {
       if (_ended) return IterResult<T>.done();
-      final FutureOr<IterResult<Object?>> r =
-          src is FxFastIterator<Object?> ? src.nextOr() : src.next();
+      final FutureOr<IterResult<Object?>> r = src is FxFastIterator<Object?>
+          ? src.nextOr()
+          : src.next();
       if (r is Future<IterResult<Object?>>) {
         return r.then((rr) {
           if (rr.done) {
@@ -547,8 +546,9 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
     }
     while (true) {
       if (_ended) return IterResult<T>.done();
-      final FutureOr<IterResult<Object?>> r =
-          src is FxFastIterator<Object?> ? src.nextOr() : src.next();
+      final FutureOr<IterResult<Object?>> r = src is FxFastIterator<Object?>
+          ? src.nextOr()
+          : src.next();
       if (r is Future<IterResult<Object?>>) {
         return r.then((rr) {
           final out = _apply(rr);
@@ -633,7 +633,8 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
         if (k is Future<bool>) {
           final vv = v;
           return k.then<IterResult<T>?>(
-              (kk) => kk ? _applyFrom(vv, next) : null);
+            (kk) => kk ? _applyFrom(vv, next) : null,
+          );
         }
         if (!k) return null;
       } else {
@@ -687,7 +688,9 @@ class FxStreamSourceIterable<T> implements FxAsyncIterable<T> {
 /// path for a terminal that consumes everything. Returns null when the
 /// chain isn't stream-sourced; [emit] may return a Future to pause on.
 Future<void>? fxStreamDrive<T>(
-    FxAsyncIterable<T> iterable, FutureOr<void> Function(T value) emit) {
+  FxAsyncIterable<T> iterable,
+  FutureOr<void> Function(T value) emit,
+) {
   final Stream<Object?> stream;
   final FxLink? links;
   if (iterable is FxFusedAsyncIterable<T>) {
@@ -765,26 +768,30 @@ Future<void>? fxStreamDrive<T>(
     return emit(v as T);
   }
 
-  sub = stream.listen((value) {
-    final FutureOr<void> r;
-    try {
-      r = apply(value, links);
-    } catch (e, st) {
-      fail(e, st);
-      return;
-    }
-    if (r is Future) {
-      sub.pause();
-      r.then((_) {
-        if (!terminated) sub.resume();
-      }, onError: fail);
-    }
-  }, onError: fail, onDone: () {
-    if (!terminated) {
-      terminated = true;
-      completer.complete();
-    }
-  });
+  sub = stream.listen(
+    (value) {
+      final FutureOr<void> r;
+      try {
+        r = apply(value, links);
+      } catch (e, st) {
+        fail(e, st);
+        return;
+      }
+      if (r is Future) {
+        sub.pause();
+        r.then((_) {
+          if (!terminated) sub.resume();
+        }, onError: fail);
+      }
+    },
+    onError: fail,
+    onDone: () {
+      if (!terminated) {
+        terminated = true;
+        completer.complete();
+      }
+    },
+  );
   return completer.future;
 }
 
@@ -805,7 +812,9 @@ Future<void>? fxStreamDrive<T>(
 /// fused run. The [Concurrent] back-channel is never involved: the terminals
 /// that use this pull serially and never pass a marker.
 Future<void>? fxFusedDrive<T>(
-    FxAsyncIterable<T> iterable, FutureOr<void> Function(T value) emit) {
+  FxAsyncIterable<T> iterable,
+  FutureOr<void> Function(T value) emit,
+) {
   if (iterable is! FxFusedAsyncIterable<T>) return null;
   final links = iterable.links;
   final upstream = iterable.source;
@@ -1000,6 +1009,7 @@ class _StreamBridgeIterator<T> implements FxFastIterator<T> {
     if (_done) return IterResult<T>.done();
     return next();
   }
+
   final Stream<T> _stream;
   StreamSubscription<T>? _sub;
   final List<Completer<IterResult<T>>> _waiters = [];
@@ -1018,31 +1028,35 @@ class _StreamBridgeIterator<T> implements FxFastIterator<T> {
     _waiters.add(completer);
     final sub = _sub;
     if (sub == null) {
-      _sub = _stream.listen((value) {
-        if (_waiters.isEmpty) {
-          _buffered.add(value);
-          if (!_sub!.isPaused) _sub!.pause();
-          return;
-        }
-        _waiters.removeAt(0).complete(IterResult.value(value));
-        if (_waiters.isEmpty && !_sub!.isPaused) _sub!.pause();
-      }, onError: (Object e, StackTrace st) {
-        // Mirror StreamIterator: the pull that meets the error gets it, and
-        // the iteration is over.
-        _done = true;
-        _sub!.cancel();
-        if (_waiters.isNotEmpty) {
-          _waiters.removeAt(0).completeError(e, st);
-        }
-        while (_waiters.isNotEmpty) {
-          _waiters.removeAt(0).complete(IterResult<T>.done());
-        }
-      }, onDone: () {
-        _done = true;
-        while (_waiters.isNotEmpty) {
-          _waiters.removeAt(0).complete(IterResult<T>.done());
-        }
-      });
+      _sub = _stream.listen(
+        (value) {
+          if (_waiters.isEmpty) {
+            _buffered.add(value);
+            if (!_sub!.isPaused) _sub!.pause();
+            return;
+          }
+          _waiters.removeAt(0).complete(IterResult.value(value));
+          if (_waiters.isEmpty && !_sub!.isPaused) _sub!.pause();
+        },
+        onError: (Object e, StackTrace st) {
+          // Mirror StreamIterator: the pull that meets the error gets it, and
+          // the iteration is over.
+          _done = true;
+          _sub!.cancel();
+          if (_waiters.isNotEmpty) {
+            _waiters.removeAt(0).completeError(e, st);
+          }
+          while (_waiters.isNotEmpty) {
+            _waiters.removeAt(0).complete(IterResult<T>.done());
+          }
+        },
+        onDone: () {
+          _done = true;
+          while (_waiters.isNotEmpty) {
+            _waiters.removeAt(0).complete(IterResult<T>.done());
+          }
+        },
+      );
     } else if (_waiters.length == 1 && sub.isPaused) {
       sub.resume();
     }
@@ -1183,7 +1197,8 @@ FxAsyncIterable<A> concurrentAsync<A>(int length, FxAsyncIterable<A> iterable) {
     return DelegateAsyncIterable(() {
       final iterator = iterable.iterator;
       return DelegateAsyncIterator(
-          (concurrent) => iterator.next(concurrent ?? Concurrent.of(1)));
+        (concurrent) => iterator.next(concurrent ?? Concurrent.of(1)),
+      );
     });
   }
   return DelegateAsyncIterable(() {
@@ -1231,8 +1246,10 @@ FxAsyncIterable<A> concurrentAsync<A>(int length, FxAsyncIterable<A> iterable) {
         // List.generate first so a synchronous throw from a pull
         // propagates synchronously, exactly as it did through settleAll.
         final pulls = List.generate(
-            length, (_) => iterator.next(Concurrent.of(length)),
-            growable: false);
+          length,
+          (_) => iterator.next(Concurrent.of(length)),
+          growable: false,
+        );
         pending = true;
         final batch = List<Settled<IterResult<A>>?>.filled(length, null);
         var remaining = length;
@@ -1244,9 +1261,11 @@ FxAsyncIterable<A> concurrentAsync<A>(int length, FxAsyncIterable<A> iterable) {
 
         for (var i = 0; i < length; i++) {
           final slot = i;
-          pulls[i].then((v) => settle(slot, Fulfilled(v)),
-              onError: (Object e, StackTrace st) =>
-                  settle(slot, Rejected<IterResult<A>>(e, st)));
+          pulls[i].then(
+            (v) => settle(slot, Fulfilled(v)),
+            onError: (Object e, StackTrace st) =>
+                settle(slot, Rejected<IterResult<A>>(e, st)),
+          );
         }
         prev = prev.then((_) => batchDone.future).then((_) {
           for (final item in batch) {
@@ -1335,7 +1354,9 @@ _PoolFifo<E> _poolFifo<E>() => FxDart.config.optimizeMemoryForConcurrentPool
 /// Port of FxTS `concurrentPool`.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> concurrentPoolAsync<A>(
-    int length, FxAsyncIterable<A> iterable) {
+  int length,
+  FxAsyncIterable<A> iterable,
+) {
   if (length < 1) {
     throw RangeError("'length' must be positive integer");
   }
@@ -1395,22 +1416,27 @@ FxAsyncIterator<A> _poolIterator<A>(int length, FxAsyncIterable<A> iterable) {
       // even a one-pull-at-a-time terminal like toList overlaps the work.
       while (!sourceDone && !failed && inFlight < length) {
         inFlight++;
-        iterator.next(Concurrent.of(length)).then((result) {
-          inFlight--;
-          if (result.done) {
-            sourceDone = true;
-          } else {
-            ready.add(Fulfilled(result));
-          }
-          drain();
-          fill();
-        }, onError: (Object e, StackTrace st) {
-          inFlight--;
-          failed = true;
-          sourceDone = true;
-          ready.add(Rejected<IterResult<A>>(e, st));
-          drain();
-        });
+        iterator
+            .next(Concurrent.of(length))
+            .then(
+              (result) {
+                inFlight--;
+                if (result.done) {
+                  sourceDone = true;
+                } else {
+                  ready.add(Fulfilled(result));
+                }
+                drain();
+                fill();
+              },
+              onError: (Object e, StackTrace st) {
+                inFlight--;
+                failed = true;
+                sourceDone = true;
+                ready.add(Rejected<IterResult<A>>(e, st));
+                drain();
+              },
+            );
       }
     };
 
@@ -1441,7 +1467,9 @@ FxAsyncIterator<A> _poolIterator<A>(int length, FxAsyncIterable<A> iterable) {
 /// buffer, which fills the same way while a slow consumer is away). Returns
 /// null when [iterable] is not a pool.
 Future<void>? fxPoolDrive<T>(
-    FxAsyncIterable<T> iterable, FutureOr<void> Function(T value) emit) {
+  FxAsyncIterable<T> iterable,
+  FutureOr<void> Function(T value) emit,
+) {
   if (iterable is! FxConcurrentPoolIterable<T>) return null;
   final length = iterable.length;
   final iterator = iterable.source.iterator;
@@ -1519,19 +1547,24 @@ Future<void>? fxPoolDrive<T>(
     // regardless of how fast [emit] is consuming them.
     while (!terminated && !sourceDone && inFlight < length) {
       inFlight++;
-      iterator.next(Concurrent.of(length)).then((result) {
-        inFlight--;
-        if (result.done) {
-          sourceDone = true;
-          if (!terminated) finishIfDone();
-          return;
-        }
-        settle(Fulfilled(result.value));
-      }, onError: (Object e, StackTrace st) {
-        inFlight--;
-        sourceDone = true;
-        settle(Rejected<T>(e, st));
-      });
+      iterator
+          .next(Concurrent.of(length))
+          .then(
+            (result) {
+              inFlight--;
+              if (result.done) {
+                sourceDone = true;
+                if (!terminated) finishIfDone();
+                return;
+              }
+              settle(Fulfilled(result.value));
+            },
+            onError: (Object e, StackTrace st) {
+              inFlight--;
+              sourceDone = true;
+              settle(Rejected<T>(e, st));
+            },
+          );
     }
   };
 
@@ -1552,9 +1585,11 @@ FxAsyncIterable<B> dispatchAsync<A, B>(
   return DelegateAsyncIterable(() {
     FxAsyncIterator<B>? inner;
     return DelegateAsyncIterator((concurrent) {
-      inner ??= build(concurrent is Concurrent
-          ? concurrentAsync(concurrent.length, upstream)
-          : upstream);
+      inner ??= build(
+        concurrent is Concurrent
+            ? concurrentAsync(concurrent.length, upstream)
+            : upstream,
+      );
       return inner!.next(concurrent);
     });
   });
@@ -1605,7 +1640,8 @@ dynamic pipe(dynamic a, List<Function> fns) {
 /// Returns a function that pipes its argument through [fns].
 ///
 /// Port of FxTS `pipeLazy`, with the same dynamic-typing caveat as [pipe].
-dynamic Function(dynamic a) pipeLazy(List<Function> fns) => (a) => pipe(a, fns);
+dynamic Function(dynamic a) pipeLazy(List<Function> fns) =>
+    (a) => pipe(a, fns);
 
 // ---- lib/src/lazy/list_range.dart ----
 /// Internal plumbing that lets operators recognise when an upstream lazy
@@ -1730,6 +1766,7 @@ class _MapIterable<A, B> extends Iterable<B> implements FxUniqFusable<B> {
   Iterator<B> get iterator => _MapIterator(_f, _source.iterator);
   @override
   Iterable<B> fxFuseUniq() => _MapUniqIterable(_f, _source);
+
   /// Hands a `List` source to the SDK's own `map().toList()` rather than
   /// filling a pre-sized list here.
   ///
@@ -1855,8 +1892,9 @@ class _MapUniqIterator<A, B> implements Iterator<B> {
 /// mapWithIndex((a, i) => '$i:$a', ['a', 'b']); // ('0:a', '1:b')
 /// ```
 Iterable<B> mapWithIndex<A, B>(
-        B Function(A a, int index) f, Iterable<A> iterable) =>
-    _MapWithIndexIterable(f, iterable);
+  B Function(A a, int index) f,
+  Iterable<A> iterable,
+) => _MapWithIndexIterable(f, iterable);
 
 class _MapWithIndexIterable<A, B> extends Iterable<B> {
   _MapWithIndexIterable(this._f, this._source);
@@ -1904,7 +1942,9 @@ class _MapWithIndexIterator<A, B> implements Iterator<B> {
 /// order, so the numbering is the same either way.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<B> mapWithIndexAsync<A, B>(
-    FutureOr<B> Function(A a, int index) f, FxAsyncIterable<A> iterable) {
+  FutureOr<B> Function(A a, int index) f,
+  FxAsyncIterable<A> iterable,
+) {
   // dispatchAsync so the counter is per-iteration, not per-iterable — the
   // same shape as [zipWithIndexAsync].
   return dispatchAsync(iterable, (source) {
@@ -1921,7 +1961,9 @@ FxAsyncIterable<B> mapWithIndexAsync<A, B>(
 /// ```
 @pragma('vm:prefer-inline')
 FxAsyncIterable<B> mapAsync<A, B>(
-    FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<B> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   // Fused-stage form: a run of map/filter/takeWhile applies inline per
   // element (see FxFusedAsyncIterable); a Concurrent marker falls back to
   // [_mapAsyncLegacy], the parallel-safe pass-through layering.
@@ -1930,15 +1972,20 @@ FxAsyncIterable<B> mapAsync<A, B>(
     final source = iterable.source;
     final stages = iterable.stages;
     final legacy = iterable.legacy;
-    return FxFusedAsyncIterable<B>(
-        source, [...stages, stage], () => _mapAsyncLegacy(f, legacy()));
+    return FxFusedAsyncIterable<B>(source, [
+      ...stages,
+      stage,
+    ], () => _mapAsyncLegacy(f, legacy()));
   }
-  return FxFusedAsyncIterable<B>(
-      iterable, [stage], () => _mapAsyncLegacy(f, iterable));
+  return FxFusedAsyncIterable<B>(iterable, [
+    stage,
+  ], () => _mapAsyncLegacy(f, iterable));
 }
 
 FxAsyncIterable<B> _mapAsyncLegacy<A, B>(
-    FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<B> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return DelegateAsyncIterable(() {
     final iterator = iterable.iterator;
     // Parallel-safe pass-through: overlapping next() calls must start
@@ -1947,12 +1994,13 @@ FxAsyncIterable<B> _mapAsyncLegacy<A, B>(
     // pull directly, where async/await would add a microtask hop and the
     // async-function wrapper per element (measured 1.4× on sync callbacks).
     return DelegateAsyncIterator(
-        (concurrent) => iterator.next(concurrent).then((result) {
-              if (result.done) return IterResult<B>.done();
-              final value = f(result.value);
-              if (value is Future<B>) return value.then(IterResult<B>.value);
-              return IterResult<B>.value(value);
-            }));
+      (concurrent) => iterator.next(concurrent).then((result) {
+        if (result.done) return IterResult<B>.done();
+        final value = f(result.value);
+        if (value is Future<B>) return value.then(IterResult<B>.value);
+        return IterResult<B>.value(value);
+      }),
+    );
   });
 }
 
@@ -1963,8 +2011,9 @@ Iterable<B> mapEffect<A, B>(B Function(A a) f, Iterable<A> iterable) =>
 /// Identical to [mapAsync], but intended for side effects by convention.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<B> mapEffectAsync<A, B>(
-        FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    mapAsync(f, iterable);
+  FutureOr<B> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => mapAsync(f, iterable);
 
 /// Maps [f] over [iterable] with up to [concurrency] elements in flight at
 /// once, yielding results in source order — the pre-combined form of
@@ -1977,15 +2026,19 @@ FxAsyncIterable<B> mapEffectAsync<A, B>(
 /// ```
 @pragma('vm:prefer-inline')
 FxAsyncIterable<B> mapConcurrent<A, B>(
-        int concurrency, FutureOr<B> Function(A a) f, Iterable<A> iterable) =>
-    concurrentAsync(concurrency, mapAsync(f, toAsync(iterable)));
+  int concurrency,
+  FutureOr<B> Function(A a) f,
+  Iterable<A> iterable,
+) => concurrentAsync(concurrency, mapAsync(f, toAsync(iterable)));
 
 /// Async-source counterpart of [mapConcurrent] — the pre-combined form of
 /// `mapAsync` → `concurrentAsync`.
 @pragma('vm:prefer-inline')
-FxAsyncIterable<B> mapConcurrentAsync<A, B>(int concurrency,
-        FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    concurrentAsync(concurrency, mapAsync(f, iterable));
+FxAsyncIterable<B> mapConcurrentAsync<A, B>(
+  int concurrency,
+  FutureOr<B> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => concurrentAsync(concurrency, mapAsync(f, iterable));
 
 /// Lazily pairs each element with the value [f] derives from it — the input
 /// stays beside its result, so no hand-built `(x, f(x))` records.
@@ -2028,8 +2081,9 @@ class _AttachIterator<A, B> implements Iterator<(A, B)> {
 /// `concurrentAsync` like any other async operator.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<(A, B)> attachAsync<A, B>(
-        FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    mapAsync((A a) async => (a, await f(a)), iterable);
+  FutureOr<B> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => mapAsync((A a) async => (a, await f(a)), iterable);
 
 /// Iterates over each element, applying [f] without changing the values.
 ///
@@ -2066,11 +2120,12 @@ class _PeekIterator<A> implements Iterator<A> {
 /// Async counterpart of [peek].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> peekAsync<A>(
-        FutureOr<void> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    mapAsync((A a) async {
-      await f(a);
-      return a;
-    }, iterable);
+  FutureOr<void> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => mapAsync((A a) async {
+  await f(a);
+  return a;
+}, iterable);
 
 /// Extracts the value under [key] from each map in [iterable].
 ///
@@ -2081,8 +2136,9 @@ Iterable<V?> pluck<K, V>(K key, Iterable<Map<K, V>> iterable) =>
 /// Async counterpart of [pluck].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<V?> pluckAsync<K, V>(
-        K key, FxAsyncIterable<Map<K, V>> iterable) =>
-    mapAsync((Map<K, V> a) => a[key], iterable);
+  K key,
+  FxAsyncIterable<Map<K, V>> iterable,
+) => mapAsync((Map<K, V> a) => a[key], iterable);
 
 bool _isFlatAble(Object? a) => a is Iterable && a is! String;
 
@@ -2150,8 +2206,10 @@ class _FlatIterator implements Iterator<dynamic> {
 /// Async counterpart of [flat]. Only *sync* nested iterables are flattened,
 /// mirroring FxTS behavior.
 @pragma('vm:prefer-inline')
-FxAsyncIterable<dynamic> flatAsync(FxAsyncIterable<dynamic> iterable,
-    [int depth = 1]) {
+FxAsyncIterable<dynamic> flatAsync(
+  FxAsyncIterable<dynamic> iterable, [
+  int depth = 1,
+]) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     final stack = <Iterator<dynamic>>[];
@@ -2188,8 +2246,7 @@ FxAsyncIterable<dynamic> flatAsync(FxAsyncIterable<dynamic> iterable,
 /// Unlike FxTS `flatMap` (which flattens any mix of values one level), the
 /// Dart port requires the callback to return an `Iterable<B>` so the result
 /// can stay typed — same contract as `Iterable.expand`.
-Iterable<B> flatMap<A, B>(
-        Iterable<B> Function(A a) f, Iterable<A> iterable) =>
+Iterable<B> flatMap<A, B>(Iterable<B> Function(A a) f, Iterable<A> iterable) =>
     _FlatMapIterable(f, iterable);
 
 class _FlatMapIterable<A, B> extends Iterable<B> {
@@ -2231,8 +2288,9 @@ class _FlatMapIterator<A, B> implements Iterator<B> {
 /// flatMapWithIndex((a, i) => [i, a], [10, 20]); // (0, 10, 1, 20)
 /// ```
 Iterable<B> flatMapWithIndex<A, B>(
-        Iterable<B> Function(A a, int index) f, Iterable<A> iterable) =>
-    _FlatMapWithIndexIterable(f, iterable);
+  Iterable<B> Function(A a, int index) f,
+  Iterable<A> iterable,
+) => _FlatMapWithIndexIterable(f, iterable);
 
 class _FlatMapWithIndexIterable<A, B> extends Iterable<B> {
   _FlatMapWithIndexIterable(this._f, this._source);
@@ -2270,8 +2328,9 @@ class _FlatMapWithIndexIterator<A, B> implements Iterator<B> {
 /// Async counterpart of [flatMapWithIndex].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<B> flatMapWithIndexAsync<A, B>(
-    FutureOr<Iterable<B>> Function(A a, int index) f,
-    FxAsyncIterable<A> iterable) {
+  FutureOr<Iterable<B>> Function(A a, int index) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     var i = 0;
     return flatMapAsync((A a) => f(a, i++), source).iterator;
@@ -2281,7 +2340,9 @@ FxAsyncIterable<B> flatMapWithIndexAsync<A, B>(
 /// Async counterpart of [flatMap].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<B> flatMapAsync<A, B>(
-    FutureOr<Iterable<B>> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<Iterable<B>> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return DelegateAsyncIterable(() => _FlatMapAsyncIterator<A, B>(f, iterable));
 }
 
@@ -2325,8 +2386,9 @@ class _FlatMapAsyncIterator<A, B>
         _inner = null;
       }
       final src = _source ??= _sourceIterable.iterator;
-      final FutureOr<IterResult<A>> r =
-          src is FxFastIterator<A> ? src.nextOr() : src.next();
+      final FutureOr<IterResult<A>> r = src is FxFastIterator<A>
+          ? src.nextOr()
+          : src.next();
       if (r is Future<IterResult<A>>) return r.then(_afterSource);
       if (r.done) {
         _done = true;
@@ -2362,7 +2424,9 @@ class _FlatMapAsyncIterator<A, B>
 }
 
 FxAsyncIterable<B> _flatMapAsyncLegacy<A, B>(
-    FutureOr<Iterable<B>> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<Iterable<B>> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     Iterator<B>? current;
@@ -2403,8 +2467,11 @@ FxAsyncIterable<B> _flatMapAsyncLegacy<A, B>(
 /// ```dart
 /// scan((acc, a) => acc + a, 10, [1, 2, 3]); // (10, 11, 13, 16)
 /// ```
-Iterable<B> scan<A, B>(B Function(B acc, A a) f, B seed, Iterable<A> iterable) =>
-    _ScanIterable(f, seed, iterable);
+Iterable<B> scan<A, B>(
+  B Function(B acc, A a) f,
+  B seed,
+  Iterable<A> iterable,
+) => _ScanIterable(f, seed, iterable);
 
 class _ScanIterable<A, B> extends Iterable<B> {
   _ScanIterable(this._f, this._seed, this._source);
@@ -2509,8 +2576,11 @@ class _Scan1Iterator<A> implements Iterator<A> {
 
 /// Async counterpart of [scan].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<B> scanAsync<A, B>(FutureOr<B> Function(B acc, A a) f,
-    FutureOr<B> seed, FxAsyncIterable<A> iterable) {
+FxAsyncIterable<B> scanAsync<A, B>(
+  FutureOr<B> Function(B acc, A a) f,
+  FutureOr<B> seed,
+  FxAsyncIterable<A> iterable,
+) {
   // Fused-stage form: scan is one-in-one-out like map, only stateful, so it
   // joins a map/filter/takeWhile run instead of layering a pull on top of it
   // (a whole future and microtask hop per element). At most one scan per run
@@ -2522,15 +2592,21 @@ FxAsyncIterable<B> scanAsync<A, B>(FutureOr<B> Function(B acc, A a) f,
     final source = iterable.source;
     final stages = iterable.stages;
     final legacy = iterable.legacy;
-    return FxFusedAsyncIterable<B>(source, [...stages, stage],
-        () => _scanAsyncLegacy(f, seed, legacy()));
+    return FxFusedAsyncIterable<B>(source, [
+      ...stages,
+      stage,
+    ], () => _scanAsyncLegacy(f, seed, legacy()));
   }
-  return FxFusedAsyncIterable<B>(
-      iterable, [stage], () => _scanAsyncLegacy(f, seed, iterable));
+  return FxFusedAsyncIterable<B>(iterable, [
+    stage,
+  ], () => _scanAsyncLegacy(f, seed, iterable));
 }
 
-FxAsyncIterable<B> _scanAsyncLegacy<A, B>(FutureOr<B> Function(B acc, A a) f,
-    FutureOr<B> seed, FxAsyncIterable<A> iterable) {
+FxAsyncIterable<B> _scanAsyncLegacy<A, B>(
+  FutureOr<B> Function(B acc, A a) f,
+  FutureOr<B> seed,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     B? acc;
@@ -2567,7 +2643,9 @@ FxAsyncIterable<B> _scanAsyncLegacy<A, B>(FutureOr<B> Function(B acc, A a) f,
 /// Async counterpart of [scan1].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> scan1Async<A>(
-    FutureOr<A> Function(A acc, A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<A> Function(A acc, A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     A? acc;
@@ -2654,8 +2732,9 @@ class _FilterIterator<A> implements Iterator<A> {
 /// filterWithIndex((a, i) => i.isEven, ['a', 'b', 'c']); // ('a', 'c')
 /// ```
 Iterable<A> filterWithIndex<A>(
-        bool Function(A a, int index) f, Iterable<A> iterable) =>
-    _FilterWithIndexIterable(f, iterable);
+  bool Function(A a, int index) f,
+  Iterable<A> iterable,
+) => _FilterWithIndexIterable(f, iterable);
 
 class _FilterWithIndexIterable<A> extends Iterable<A> {
   _FilterWithIndexIterable(this._f, this._source);
@@ -2688,7 +2767,9 @@ class _FilterWithIndexIterator<A> implements Iterator<A> {
 /// Async counterpart of [filterWithIndex].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> filterWithIndexAsync<A>(
-    FutureOr<bool> Function(A a, int index) f, FxAsyncIterable<A> iterable) {
+  FutureOr<bool> Function(A a, int index) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     var i = 0;
     return filterAsync((A a) => f(a, i++), source).iterator;
@@ -2736,7 +2817,9 @@ class _CompactIterator<A> implements Iterator<A> {
 /// Maps upstream values to `(passed, value)` pairs, forwarding the
 /// concurrency marker. Port of `toFilterIterator` in FxTS `filter.ts`.
 FxAsyncIterable<(bool, A)> _toFilterIterable<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return mapAsync((A a) async => (await f(a), a), iterable);
 }
 
@@ -2757,25 +2840,28 @@ FxAsyncIterable<A> _asyncConcurrent<A>(FxAsyncIterable<(bool, A)> iterable) {
 
     void fillBuffer(Concurrent? concurrent) {
       final nextItem = iterator.next(concurrent);
-      prevItem = prevItem.then((_) => nextItem).then((result) {
-        if (result.done) {
-          while (settlementQueue.isNotEmpty) {
-            settlementQueue.removeAt(0).complete(IterResult<A>.done());
-          }
-          finished = true;
-          return;
-        }
-        final (cond, item) = result.value;
-        if (cond) {
-          buffer.add(item);
-        }
-        recur(concurrent);
-      }).catchError((Object reason, StackTrace st) {
-        finished = true;
-        while (settlementQueue.isNotEmpty) {
-          settlementQueue.removeAt(0).completeError(reason, st);
-        }
-      });
+      prevItem = prevItem
+          .then((_) => nextItem)
+          .then((result) {
+            if (result.done) {
+              while (settlementQueue.isNotEmpty) {
+                settlementQueue.removeAt(0).complete(IterResult<A>.done());
+              }
+              finished = true;
+              return;
+            }
+            final (cond, item) = result.value;
+            if (cond) {
+              buffer.add(item);
+            }
+            recur(concurrent);
+          })
+          .catchError((Object reason, StackTrace st) {
+            finished = true;
+            while (settlementQueue.isNotEmpty) {
+              settlementQueue.removeAt(0).completeError(reason, st);
+            }
+          });
     }
 
     void consumeBuffer() {
@@ -2814,7 +2900,9 @@ FxAsyncIterable<A> _asyncConcurrent<A>(FxAsyncIterable<(bool, A)> iterable) {
 /// Port of FxTS `filter` (async), including its dedicated concurrent path.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> filterAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   // Fused-stage form; a Concurrent marker falls back to
   // [_filterAsyncLegacy]'s concurrent predicate machinery.
   final stage = FxFilterStage((v) => f(v as A));
@@ -2822,25 +2910,32 @@ FxAsyncIterable<A> filterAsync<A>(
     final source = iterable.source;
     final stages = iterable.stages;
     final legacy = iterable.legacy;
-    return FxFusedAsyncIterable<A>(
-        source, [...stages, stage], () => _filterAsyncLegacy(f, legacy()));
+    return FxFusedAsyncIterable<A>(source, [
+      ...stages,
+      stage,
+    ], () => _filterAsyncLegacy(f, legacy()));
   }
-  return FxFusedAsyncIterable<A>(
-      iterable, [stage], () => _filterAsyncLegacy(f, iterable));
+  return FxFusedAsyncIterable<A>(iterable, [
+    stage,
+  ], () => _filterAsyncLegacy(f, iterable));
 }
 
 FxAsyncIterable<A> _filterAsyncLegacy<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   // Only reached via the fused chain's Concurrent fallback, so this is the
   // concurrent predicate machinery directly (the serial case is the fused
   // FxFilterStage). A defensive unmarked first pull degrades to width 1.
   return DelegateAsyncIterable(() {
     FxAsyncIterator<A>? inner;
     return DelegateAsyncIterator((concurrent) {
-      inner ??= _asyncConcurrent(concurrentAsync(
-              concurrent is Concurrent ? concurrent.length : 1,
-              _toFilterIterable(f, iterable)))
-          .iterator;
+      inner ??= _asyncConcurrent(
+        concurrentAsync(
+          concurrent is Concurrent ? concurrent.length : 1,
+          _toFilterIterable(f, iterable),
+        ),
+      ).iterator;
       return inner!.next(concurrent);
     });
   });
@@ -2849,8 +2944,9 @@ FxAsyncIterable<A> _filterAsyncLegacy<A>(
 /// Async counterpart of [reject].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> rejectAsync<A>(
-        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    filterAsync((A a) async => !await f(a), iterable);
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => filterAsync((A a) async => !await f(a), iterable);
 
 /// Async counterpart of [compact].
 @pragma('vm:prefer-inline')
@@ -3011,7 +3107,9 @@ List<A> uniqByStrict<A, B>(B Function(A a) f, Iterable<A> iterable) =>
 /// Async counterpart of [uniqBy]. Uses then/bare pattern for sync keys.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> uniqByAsync<A, B>(
-    FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<B> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return DelegateAsyncIterable(() {
     final seen = <B>{};
     return filterAsync((A a) {
@@ -3090,7 +3188,9 @@ Iterable<A> uniqAdjacent<A>(Iterable<A> iterable) =>
 /// to still evaluate the upstream in parallel.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> uniqAdjacentByAsync<A, B>(
-    FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<B> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var hasPrev = false;
@@ -3119,8 +3219,10 @@ FxAsyncIterable<A> uniqAdjacentAsync<A>(FxAsyncIterable<A> iterable) =>
 ///
 /// Port of FxTS `differenceBy`.
 Iterable<A> differenceBy<A, B>(
-        B Function(A a) f, Iterable<A> iterable1, Iterable<A> iterable2) =>
-    _SetOpIterable(f, iterable1, iterable2, false);
+  B Function(A a) f,
+  Iterable<A> iterable1,
+  Iterable<A> iterable2,
+) => _SetOpIterable(f, iterable1, iterable2, false);
 
 /// Returns the elements of [iterable2] that do not occur in [iterable1].
 ///
@@ -3133,8 +3235,10 @@ Iterable<A> difference<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
 ///
 /// Port of FxTS `intersectionBy`.
 Iterable<A> intersectionBy<A, B>(
-        B Function(A a) f, Iterable<A> iterable1, Iterable<A> iterable2) =>
-    _SetOpIterable(f, iterable1, iterable2, true);
+  B Function(A a) f,
+  Iterable<A> iterable1,
+  Iterable<A> iterable2,
+) => _SetOpIterable(f, iterable1, iterable2, true);
 
 /// Shared machinery of [differenceBy] / [intersectionBy]: one pass over
 /// [_source2], filtering on [_source1]'s key set and deduping by element —
@@ -3205,10 +3309,12 @@ FxAsyncIterable<A> _setOpAsync<A, B>(
           keys.add(await f(r.value));
         }
         set = keys.toSet();
-        inner = uniqAsync(filterAsync(
-                (A a) async => set!.contains(await f(a)) == keepWhenInSet,
-                source))
-            .iterator;
+        inner = uniqAsync(
+          filterAsync(
+            (A a) async => set!.contains(await f(a)) == keepWhenInSet,
+            source,
+          ),
+        ).iterator;
       }
       return inner!.next(concurrent);
     });
@@ -3217,27 +3323,33 @@ FxAsyncIterable<A> _setOpAsync<A, B>(
 
 /// Async counterpart of [differenceBy].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> differenceByAsync<A, B>(FutureOr<B> Function(A a) f,
-        FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
-    _setOpAsync(f, iterable1, iterable2, false);
+FxAsyncIterable<A> differenceByAsync<A, B>(
+  FutureOr<B> Function(A a) f,
+  FxAsyncIterable<A> iterable1,
+  FxAsyncIterable<A> iterable2,
+) => _setOpAsync(f, iterable1, iterable2, false);
 
 /// Async counterpart of [difference].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> differenceAsync<A>(
-        FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
-    differenceByAsync((A a) => a, iterable1, iterable2);
+  FxAsyncIterable<A> iterable1,
+  FxAsyncIterable<A> iterable2,
+) => differenceByAsync((A a) => a, iterable1, iterable2);
 
 /// Async counterpart of [intersectionBy].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> intersectionByAsync<A, B>(FutureOr<B> Function(A a) f,
-        FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
-    _setOpAsync(f, iterable1, iterable2, true);
+FxAsyncIterable<A> intersectionByAsync<A, B>(
+  FutureOr<B> Function(A a) f,
+  FxAsyncIterable<A> iterable1,
+  FxAsyncIterable<A> iterable2,
+) => _setOpAsync(f, iterable1, iterable2, true);
 
 /// Async counterpart of [intersection].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> intersectionAsync<A>(
-        FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
-    intersectionByAsync((A a) => a, iterable1, iterable2);
+  FxAsyncIterable<A> iterable1,
+  FxAsyncIterable<A> iterable2,
+) => intersectionByAsync((A a) => a, iterable1, iterable2);
 
 // ---- lib/src/lazy/take_drop.dart ----
 
@@ -3248,8 +3360,7 @@ FxAsyncIterable<A> intersectionAsync<A>(
 Iterable<A> take<A>(int length, Iterable<A> iterable) =>
     _TakeIterable(length, iterable);
 
-class _TakeIterable<A> extends Iterable<A>
-    implements FxListRangeSource<A> {
+class _TakeIterable<A> extends Iterable<A> implements FxListRangeSource<A> {
   _TakeIterable(this._length, this._source);
   final int _length;
   final Iterable<A> _source;
@@ -3288,13 +3399,13 @@ class _TakeIterator<A> implements Iterator<A> {
 /// parallel, as in FxTS.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> takeAsync<A>(int length, FxAsyncIterable<A> iterable) {
-  return DelegateAsyncIterable(
-      () => _TakeAsyncIterator<A>(length, iterable));
+  return DelegateAsyncIterable(() => _TakeAsyncIterator<A>(length, iterable));
 }
 
-class _TakeAsyncIterator<A> with FxFastNextGate<A> implements FxFastIterator<A> {
-  _TakeAsyncIterator(this._length, this._sourceIterable)
-      : _remaining = _length;
+class _TakeAsyncIterator<A>
+    with FxFastNextGate<A>
+    implements FxFastIterator<A> {
+  _TakeAsyncIterator(this._length, this._sourceIterable) : _remaining = _length;
   final int _length;
   final FxAsyncIterable<A> _sourceIterable;
   FxAsyncIterator<A>? _source;
@@ -3341,7 +3452,9 @@ class _TakeAsyncIterator<A> with FxFastNextGate<A> implements FxFastIterator<A> 
 }
 
 FxAsyncIterable<A> _takeAsyncLegacy<A>(
-    int length, FxAsyncIterable<A> iterable) {
+  int length,
+  FxAsyncIterable<A> iterable,
+) {
   return DelegateAsyncIterable(() {
     final iterator = iterable.iterator;
     var remaining = length;
@@ -3486,7 +3599,9 @@ class _TakeWhileIterator<A> implements Iterator<A> {
 /// Async counterpart of [takeWhile].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> takeWhileAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   // Fused-stage form; a Concurrent marker falls back to
   // [_takeWhileAsyncLegacy]'s dispatch layering.
   final stage = FxTakeWhileStage((v) => f(v as A));
@@ -3494,15 +3609,20 @@ FxAsyncIterable<A> takeWhileAsync<A>(
     final source = iterable.source;
     final stages = iterable.stages;
     final legacy = iterable.legacy;
-    return FxFusedAsyncIterable<A>(
-        source, [...stages, stage], () => _takeWhileAsyncLegacy(f, legacy()));
+    return FxFusedAsyncIterable<A>(source, [
+      ...stages,
+      stage,
+    ], () => _takeWhileAsyncLegacy(f, legacy()));
   }
-  return FxFusedAsyncIterable<A>(
-      iterable, [stage], () => _takeWhileAsyncLegacy(f, iterable));
+  return FxFusedAsyncIterable<A>(iterable, [
+    stage,
+  ], () => _takeWhileAsyncLegacy(f, iterable));
 }
 
 FxAsyncIterable<A> _takeWhileAsyncLegacy<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var end = false;
@@ -3561,7 +3681,11 @@ class _TakeWhileRightIterable<A> extends Iterable<A> {
   Iterator<A> get iterator {
     final source = _source;
     if (source is List<A>) {
-      return FxListRangeIterator(source, _suffixStart(_f, source), source.length);
+      return FxListRangeIterator(
+        source,
+        _suffixStart(_f, source),
+        source.length,
+      );
     }
     return _TakeWhileRightIterator(_f, _source);
   }
@@ -3600,7 +3724,9 @@ class _TakeWhileRightIterator<A> implements Iterator<A> {
 /// Async counterpart of [takeWhileRight].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> takeWhileRightAsync<A>(
-    bool Function(A a) f, FxAsyncIterable<A> iterable) {
+  bool Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     Iterator<A>? tail;
@@ -3624,8 +3750,7 @@ FxAsyncIterable<A> takeWhileRightAsync<A>(
 /// **including** the element that matched.
 ///
 /// Port of FxTS `takeUntilInclusive`.
-Iterable<A> takeUntilInclusive<A>(
-        bool Function(A a) f, Iterable<A> iterable) =>
+Iterable<A> takeUntilInclusive<A>(bool Function(A a) f, Iterable<A> iterable) =>
     _TakeUntilInclusiveIterable(f, iterable);
 
 class _TakeUntilInclusiveIterable<A> extends Iterable<A> {
@@ -3656,7 +3781,9 @@ class _TakeUntilInclusiveIterator<A> implements Iterator<A> {
 /// Async counterpart of [takeUntilInclusive].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> takeUntilInclusiveAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var end = false;
@@ -3683,8 +3810,9 @@ Iterable<A> takeUntil<A>(bool Function(A a) f, Iterable<A> iterable) =>
 @Deprecated('Use takeUntilInclusiveAsync instead')
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> takeUntilAsync<A>(
-        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    takeUntilInclusiveAsync(f, iterable);
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => takeUntilInclusiveAsync(f, iterable);
 
 /// Returns an iterable that skips the first [length] values.
 ///
@@ -3692,8 +3820,7 @@ FxAsyncIterable<A> takeUntilAsync<A>(
 Iterable<A> drop<A>(int length, Iterable<A> iterable) =>
     _DropIterable(length, iterable);
 
-class _DropIterable<A> extends Iterable<A>
-    implements FxListRangeSource<A> {
+class _DropIterable<A> extends Iterable<A> implements FxListRangeSource<A> {
   _DropIterable(this._length, this._source);
   final int _length;
   final Iterable<A> _source;
@@ -3884,24 +4011,26 @@ class _DropWhileIterator<A> implements Iterator<A> {
 /// Async counterpart of [dropWhile].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> dropWhileAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var dropping = true;
     return SerialAsyncIterator((concurrent) {
       Future<IterResult<A>> loop() => iterator.next(concurrent).then((result) {
-            if (result.done) return IterResult<A>.done();
-            if (!dropping) return result;
-            final drop = f(result.value);
-            FutureOr<IterResult<A>> decide(bool d) {
-              if (d) return loop();
-              dropping = false;
-              return result;
-            }
+        if (result.done) return IterResult<A>.done();
+        if (!dropping) return result;
+        final drop = f(result.value);
+        FutureOr<IterResult<A>> decide(bool d) {
+          if (d) return loop();
+          dropping = false;
+          return result;
+        }
 
-            if (drop is Future<bool>) return drop.then(decide);
-            return decide(drop);
-          });
+        if (drop is Future<bool>) return drop.then(decide);
+        return decide(drop);
+      });
       return loop();
     });
   });
@@ -3986,7 +4115,9 @@ class _DropWhileRightIterator<A> implements Iterator<A> {
 /// Async counterpart of [dropWhileRight].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> dropWhileRightAsync<A>(
-    bool Function(A a) f, FxAsyncIterable<A> iterable) {
+  bool Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     Iterator<A>? head;
@@ -4043,24 +4174,26 @@ class _DropUntilIterator<A> implements Iterator<A> {
 /// Async counterpart of [dropUntil].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> dropUntilAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var dropping = true;
     return SerialAsyncIterator((concurrent) {
       if (!dropping) return iterator.next(concurrent);
       Future<IterResult<A>> loop() => iterator.next(concurrent).then((result) {
-            if (result.done) return IterResult<A>.done();
-            final match = f(result.value);
-            FutureOr<IterResult<A>> decide(bool m) {
-              if (!m) return loop();
-              dropping = false;
-              return iterator.next(concurrent);
-            }
+        if (result.done) return IterResult<A>.done();
+        final match = f(result.value);
+        FutureOr<IterResult<A>> decide(bool m) {
+          if (!m) return loop();
+          dropping = false;
+          return iterator.next(concurrent);
+        }
 
-            if (match is Future<bool>) return match.then(decide);
-            return decide(match);
-          });
+        if (match is Future<bool>) return match.then(decide);
+        return decide(match);
+      });
       return loop();
     });
   });
@@ -4107,8 +4240,11 @@ class _SliceIterator<A> implements Iterator<A> {
 
 /// Async counterpart of [slice].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> sliceAsync<A>(int start, FxAsyncIterable<A> iterable,
-    [int? end]) {
+FxAsyncIterable<A> sliceAsync<A>(
+  int start,
+  FxAsyncIterable<A> iterable, [
+  int? end,
+]) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var i = 0;
@@ -4131,8 +4267,9 @@ FxAsyncIterable<A> sliceAsync<A>(int start, FxAsyncIterable<A> iterable,
 /// Port of FxTS `chunk`. Equivalent to
 /// `windowed(size, iterable, step: size, partial: true)`, except that a
 /// non-positive [size] yields nothing instead of throwing.
-Iterable<List<A>> chunk<A>(int size, Iterable<A> iterable) =>
-    size < 1 ? Iterable<List<A>>.empty() : _WindowIterable(size, size, true, iterable);
+Iterable<List<A>> chunk<A>(int size, Iterable<A> iterable) => size < 1
+    ? Iterable<List<A>>.empty()
+    : _WindowIterable(size, size, true, iterable);
 
 /// Returns an iterable of sliding windows over [iterable]: lists of [size]
 /// consecutive elements, each window starting [step] elements after the
@@ -4148,8 +4285,12 @@ Iterable<List<A>> chunk<A>(int size, Iterable<A> iterable) =>
 /// windowed(3, [1, 2, 3, 4, 5], step: 2);       // ([1, 2, 3], [3, 4, 5])
 /// windowed(3, [1, 2, 3, 4, 5], partial: true); // (..., [3, 4, 5], [4, 5], [5])
 /// ```
-Iterable<List<A>> windowed<A>(int size, Iterable<A> iterable,
-    {int step = 1, bool partial = false}) {
+Iterable<List<A>> windowed<A>(
+  int size,
+  Iterable<A> iterable, {
+  int step = 1,
+  bool partial = false,
+}) {
   _checkWindow(size, step);
   return _WindowIterable(size, step, partial, iterable);
 }
@@ -4184,10 +4325,10 @@ class _WindowIterable<A> extends Iterable<List<A>> {
 
 class _WindowRangeIterator<A> implements Iterator<List<A>> {
   _WindowRangeIterator(this._size, this._step, this._partial, FxListRange<A> r)
-      : _list = r.list,
-        _i = r.start,
-        _end = r.end,
-        _lastFull = r.end - _size;
+    : _list = r.list,
+      _i = r.start,
+      _end = r.end,
+      _lastFull = r.end - _size;
   final int _size;
   final int _step;
   final bool _partial;
@@ -4325,14 +4466,22 @@ FxAsyncIterable<List<A>> chunkAsync<A>(int size, FxAsyncIterable<A> iterable) {
 
 /// Async counterpart of [windowed].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<List<A>> windowedAsync<A>(int size, FxAsyncIterable<A> iterable,
-    {int step = 1, bool partial = false}) {
+FxAsyncIterable<List<A>> windowedAsync<A>(
+  int size,
+  FxAsyncIterable<A> iterable, {
+  int step = 1,
+  bool partial = false,
+}) {
   _checkWindow(size, step);
   return _windowedAsync(size, step, partial, iterable);
 }
 
 FxAsyncIterable<List<A>> _windowedAsync<A>(
-    int size, int step, bool partial, FxAsyncIterable<A> iterable) {
+  int size,
+  int step,
+  bool partial,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var carry = <A>[];
@@ -4509,7 +4658,9 @@ class _SplitIterator implements Iterator<String> {
 /// Async counterpart of [split].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<String> splitAsync(
-    String sep, FxAsyncIterable<String> iterable) {
+  String sep,
+  FxAsyncIterable<String> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var acc = '';
@@ -4550,9 +4701,12 @@ Iterable<B> compress<B>(List<bool> selectors, Iterable<B> iterable) =>
 /// Async counterpart of [compress].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<B> compressAsync<B>(
-        List<bool> selectors, FxAsyncIterable<B> iterable) =>
-    mapAsync((r) => r.$2,
-        filterAsync((r) => r.$1, zipAsync(toAsync(selectors), iterable)));
+  List<bool> selectors,
+  FxAsyncIterable<B> iterable,
+) => mapAsync(
+  (r) => r.$2,
+  filterAsync((r) => r.$1, zipAsync(toAsync(selectors), iterable)),
+);
 
 // ---- lib/src/lazy/zip.dart ----
 
@@ -4594,12 +4748,11 @@ class _ZipIterable<A, B> extends Iterable<(A, B)> {
 /// reached through a fixed offset, so a step is a single field write.
 class _ZipRangeRangeIterator<A, B> implements Iterator<(A, B)> {
   _ZipRangeRangeIterator(FxListRange<A> r1, FxListRange<B> r2)
-      : _l1 = r1.list,
-        _l2 = r2.list,
-        _i = r1.start,
-        _off = r2.start - r1.start,
-        _end = r1.start +
-            (r1.length < r2.length ? r1.length : r2.length);
+    : _l1 = r1.list,
+      _l2 = r2.list,
+      _i = r1.start,
+      _off = r2.start - r1.start,
+      _end = r1.start + (r1.length < r2.length ? r1.length : r2.length);
   final List<A> _l1;
   final List<B> _l2;
   final int _off;
@@ -4621,9 +4774,9 @@ class _ZipRangeRangeIterator<A, B> implements Iterator<(A, B)> {
 /// the left still has a value, matching [_ZipIterator]'s short-circuit.
 class _ZipRangeIterIterator<A, B> implements Iterator<(A, B)> {
   _ZipRangeIterIterator(FxListRange<A> r, this._it2)
-      : _l1 = r.list,
-        _i1 = r.start,
-        _end1 = r.end;
+    : _l1 = r.list,
+      _i1 = r.start,
+      _end1 = r.end;
   final List<A> _l1;
   int _i1;
   final int _end1;
@@ -4642,9 +4795,9 @@ class _ZipRangeIterIterator<A, B> implements Iterator<(A, B)> {
 /// source with effects sees the same pull count as [_ZipIterator].
 class _ZipIterRangeIterator<A, B> implements Iterator<(A, B)> {
   _ZipIterRangeIterator(this._it1, FxListRange<B> r)
-      : _l2 = r.list,
-        _i2 = r.start,
-        _end2 = r.end;
+    : _l2 = r.list,
+      _i2 = r.start,
+      _end2 = r.end;
   final Iterator<A> _it1;
   final List<B> _l2;
   int _i2;
@@ -4677,9 +4830,11 @@ class _ZipIterator<A, B> implements Iterator<(A, B)> {
 
 /// Three-iterable variant of [zip]. (Dart has no variadic generics, so each
 /// arity is a separate function.)
-Iterable<(A, B, C)> zip3<A, B, C>(Iterable<A> iterable1, Iterable<B> iterable2,
-        Iterable<C> iterable3) =>
-    _Zip3Iterable(iterable1, iterable2, iterable3);
+Iterable<(A, B, C)> zip3<A, B, C>(
+  Iterable<A> iterable1,
+  Iterable<B> iterable2,
+  Iterable<C> iterable3,
+) => _Zip3Iterable(iterable1, iterable2, iterable3);
 
 class _Zip3Iterable<A, B, C> extends Iterable<(A, B, C)> {
   _Zip3Iterable(this._source1, this._source2, this._source3);
@@ -4699,24 +4854,28 @@ class _Zip3Iterable<A, B, C> extends Iterable<(A, B, C)> {
         if (r3 != null) return _Zip3RangeIterator(r1, r2, r3);
       }
     }
-    return _Zip3Iterator(_source1.iterator, _source2.iterator,
-        _source3.iterator);
+    return _Zip3Iterator(
+      _source1.iterator,
+      _source2.iterator,
+      _source3.iterator,
+    );
   }
 }
 
 /// All three sides indexed — one cursor plus two fixed offsets.
 class _Zip3RangeIterator<A, B, C> implements Iterator<(A, B, C)> {
   _Zip3RangeIterator(FxListRange<A> r1, FxListRange<B> r2, FxListRange<C> r3)
-      : _l1 = r1.list,
-        _l2 = r2.list,
-        _l3 = r3.list,
-        _i = r1.start,
-        _off2 = r2.start - r1.start,
-        _off3 = r3.start - r1.start,
-        _end = r1.start +
-            (r1.length < r2.length
-                ? (r1.length < r3.length ? r1.length : r3.length)
-                : (r2.length < r3.length ? r2.length : r3.length));
+    : _l1 = r1.list,
+      _l2 = r2.list,
+      _l3 = r3.list,
+      _i = r1.start,
+      _off2 = r2.start - r1.start,
+      _off3 = r3.start - r1.start,
+      _end =
+          r1.start +
+          (r1.length < r2.length
+              ? (r1.length < r3.length ? r1.length : r3.length)
+              : (r2.length < r3.length ? r2.length : r3.length));
   final List<A> _l1;
   final List<B> _l2;
   final List<C> _l3;
@@ -4756,7 +4915,9 @@ class _Zip3Iterator<A, B, C> implements Iterator<(A, B, C)> {
 /// Async counterpart of [zip]: pulls both sources in parallel per pair.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<(A, B)> zipAsync<A, B>(
-    FxAsyncIterable<A> iterable1, FxAsyncIterable<B> iterable2) {
+  FxAsyncIterable<A> iterable1,
+  FxAsyncIterable<B> iterable2,
+) {
   return DelegateAsyncIterable(() {
     final it1 = iterable1.iterator;
     final it2 = iterable2.iterator;
@@ -4776,8 +4937,11 @@ FxAsyncIterable<(A, B)> zipAsync<A, B>(
 
 /// Async counterpart of [zip3].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<(A, B, C)> zip3Async<A, B, C>(FxAsyncIterable<A> iterable1,
-    FxAsyncIterable<B> iterable2, FxAsyncIterable<C> iterable3) {
+FxAsyncIterable<(A, B, C)> zip3Async<A, B, C>(
+  FxAsyncIterable<A> iterable1,
+  FxAsyncIterable<B> iterable2,
+  FxAsyncIterable<C> iterable3,
+) {
   return DelegateAsyncIterable(() {
     final it1 = iterable1.iterator;
     final it2 = iterable2.iterator;
@@ -4801,14 +4965,18 @@ FxAsyncIterable<(A, B, C)> zip3Async<A, B, C>(FxAsyncIterable<A> iterable1,
 ///
 /// Port of FxTS `zipWith`.
 Iterable<C> zipWith<A, B, C>(
-        C Function(A a, B b) f, Iterable<A> iterable1, Iterable<B> iterable2) =>
-    map((r) => f(r.$1, r.$2), zip(iterable1, iterable2));
+  C Function(A a, B b) f,
+  Iterable<A> iterable1,
+  Iterable<B> iterable2,
+) => map((r) => f(r.$1, r.$2), zip(iterable1, iterable2));
 
 /// Async counterpart of [zipWith].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<C> zipWithAsync<A, B, C>(FutureOr<C> Function(A a, B b) f,
-        FxAsyncIterable<A> iterable1, FxAsyncIterable<B> iterable2) =>
-    mapAsync((r) => f(r.$1, r.$2), zipAsync(iterable1, iterable2));
+FxAsyncIterable<C> zipWithAsync<A, B, C>(
+  FutureOr<C> Function(A a, B b) f,
+  FxAsyncIterable<A> iterable1,
+  FxAsyncIterable<B> iterable2,
+) => mapAsync((r) => f(r.$1, r.$2), zipAsync(iterable1, iterable2));
 
 /// Pairs each element with its index: `(index, value)`.
 ///
@@ -4872,8 +5040,7 @@ class _TransposeIterator<A> implements Iterator<List<A>> {
   @override
   bool moveNext() {
     if (_done) return false;
-    final its =
-        _its ??= _rows.map((r) => r.iterator).toList(growable: false);
+    final its = _its ??= _rows.map((r) => r.iterator).toList(growable: false);
     final column = <A>[];
     for (final it in its) {
       if (it.moveNext()) column.add(it.current);
@@ -4894,11 +5061,12 @@ FxAsyncIterable<List<A>> transposeAsync<A>(Iterable<FxAsyncIterable<A>> rows) {
     final iterators = rows.map((r) => r.iterator).toList(growable: false);
     return DelegateAsyncIterator((concurrent) async {
       if (iterators.isEmpty) return IterResult<List<A>>.done();
-      final results =
-          await Future.wait(iterators.map((it) => it.next(concurrent)));
+      final results = await Future.wait(
+        iterators.map((it) => it.next(concurrent)),
+      );
       final current = [
         for (final r in results)
-          if (!r.done) r.value
+          if (!r.done) r.value,
       ];
       if (current.isEmpty) return IterResult<List<A>>.done();
       return IterResult.value(current);
@@ -4919,8 +5087,9 @@ FxAsyncIterable<List<A>> transposeAsync<A>(Iterable<FxAsyncIterable<A>> rows) {
 /// range(1, 4);     // (1, 2, 3)
 /// range(4, 1, -1); // (4, 3, 2)
 /// ```
-Iterable<int> range(int start, [int? end, int step = 1]) =>
-    end == null ? _RangeIterable(0, start, 1) : _RangeIterable(start, end, step);
+Iterable<int> range(int start, [int? end, int step = 1]) => end == null
+    ? _RangeIterable(0, start, 1)
+    : _RangeIterable(start, end, step);
 
 class _RangeIterable extends Iterable<int> {
   _RangeIterable(this._start, this._end, this._step);
@@ -5129,12 +5298,17 @@ class _ConcatIterator<A> implements Iterator<A> {
 /// Async counterpart of [concat].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> concatAsync<A>(
-    FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) {
+  FxAsyncIterable<A> iterable1,
+  FxAsyncIterable<A> iterable2,
+) {
   return DelegateAsyncIterable(
-      () => _ConcatAsyncIterator<A>(iterable1, iterable2));
+    () => _ConcatAsyncIterator<A>(iterable1, iterable2),
+  );
 }
 
-class _ConcatAsyncIterator<A> with FxFastNextGate<A> implements FxFastIterator<A> {
+class _ConcatAsyncIterator<A>
+    with FxFastNextGate<A>
+    implements FxFastIterator<A> {
   _ConcatAsyncIterator(this._iterable1, this._iterable2);
   final FxAsyncIterable<A> _iterable1;
   final FxAsyncIterable<A> _iterable2;
@@ -5193,7 +5367,9 @@ class _ConcatAsyncIterator<A> with FxFastNextGate<A> implements FxFastIterator<A
 }
 
 FxAsyncIterable<A> _concatAsyncLegacy<A>(
-    FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) {
+  FxAsyncIterable<A> iterable1,
+  FxAsyncIterable<A> iterable2,
+) {
   return DelegateAsyncIterable(() {
     final left = iterable1.iterator;
     final right = iterable2.iterator;
@@ -5218,8 +5394,7 @@ FxAsyncIterable<A> _concatAsyncLegacy<A>(
 /// ifEmpty(() => [0], [1, 2]); // (1, 2)
 /// ifEmpty(() => [0], <int>[]); // (0)
 /// ```
-Iterable<A> ifEmpty<A>(
-        Iterable<A> Function() fallback, Iterable<A> iterable) =>
+Iterable<A> ifEmpty<A>(Iterable<A> Function() fallback, Iterable<A> iterable) =>
     _IfEmptyIterable(fallback, iterable);
 
 class _IfEmptyIterable<A> extends Iterable<A> {
@@ -5265,7 +5440,9 @@ Iterable<A> defaultIfEmpty<A>(A value, Iterable<A> iterable) =>
 /// Async counterpart of [ifEmpty].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> ifEmptyAsync<A>(
-    FxAsyncIterable<A> Function() fallback, FxAsyncIterable<A> iterable) {
+  FxAsyncIterable<A> Function() fallback,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var first = true;
@@ -5290,8 +5467,9 @@ FxAsyncIterable<A> ifEmptyAsync<A>(
 /// Async counterpart of [defaultIfEmpty].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> defaultIfEmptyAsync<A>(
-        FutureOr<A> value, FxAsyncIterable<A> iterable) =>
-    ifEmptyAsync(() => toAsync([value]), iterable);
+  FutureOr<A> value,
+  FxAsyncIterable<A> iterable,
+) => ifEmptyAsync(() => toAsync([value]), iterable);
 
 /// Returns the source in reverse order. A [List] source is indexed directly,
 /// back to front; any other source materializes on the first pull.
@@ -5408,7 +5586,9 @@ class _ForkIterator<T> implements Iterator<T> {
     }
     if (state.error != null) {
       Error.throwWithStackTrace(
-          state.error!, state.stackTrace ?? StackTrace.current);
+        state.error!,
+        state.stackTrace ?? StackTrace.current,
+      );
     }
     if (state.done) return false;
     final bool moved;
@@ -5450,26 +5630,32 @@ class _ForkAsyncState<T> {
   /// shared buffer in source order (protocol invariant).
   void pull(Concurrent? concurrent) {
     pullsInFlight++;
-    source.next(concurrent).then((result) {
-      pullsInFlight--;
-      if (result.done) {
-        done = true;
-      } else {
-        buffer.add(result.value);
-      }
-      _notify();
-    }, onError: (Object e, StackTrace st) {
-      pullsInFlight--;
-      error = e;
-      stackTrace = st;
-      done = true;
-      _notify();
-    });
+    source
+        .next(concurrent)
+        .then(
+          (result) {
+            pullsInFlight--;
+            if (result.done) {
+              done = true;
+            } else {
+              buffer.add(result.value);
+            }
+            _notify();
+          },
+          onError: (Object e, StackTrace st) {
+            pullsInFlight--;
+            error = e;
+            stackTrace = st;
+            done = true;
+            _notify();
+          },
+        );
   }
 }
 
-final Expando<_ForkAsyncState<Object?>> _forkAsyncStates =
-    Expando('fxdart async fork state');
+final Expando<_ForkAsyncState<Object?>> _forkAsyncStates = Expando(
+  'fxdart async fork state',
+);
 
 /// Async counterpart of [fork]. All forks of the same [FxAsyncIterable]
 /// object share one underlying iterator and buffer.
@@ -5494,7 +5680,9 @@ FxAsyncIterable<T> forkAsync<T>(FxAsyncIterable<T> iterable) {
           final completer = settlementQueue.removeAt(0);
           if (s.error != null) {
             completer.completeError(
-                s.error!, s.stackTrace ?? StackTrace.current);
+              s.error!,
+              s.stackTrace ?? StackTrace.current,
+            );
           } else {
             completer.complete(IterResult<T>.done());
           }
@@ -5576,10 +5764,13 @@ Iterable<V> values<K, V>(Map<K, V> map) => map.values;
 /// final user = await retry(3, () => api.fetchUser(id),
 ///     delay: (failed) => Duration(milliseconds: 100 * failed));
 /// ```
-Future<T> retry<T>(int attempts, FutureOr<T> Function() f,
-    {Duration Function(int failed)? delay}) async {
+Future<T> retry<T>(
+  int attempts,
+  FutureOr<T> Function() f, {
+  Duration Function(int failed)? delay,
+}) async {
   _checkAttempts(attempts);
-  for (var attempt = 1;; attempt++) {
+  for (var attempt = 1; ; attempt++) {
     try {
       return await f();
     } catch (_) {
@@ -5613,8 +5804,11 @@ void _checkAttempts(int attempts) {
 /// ```
 @pragma('vm:prefer-inline')
 FxAsyncIterable<R> mapRetryAsync<A, R>(
-    int attempts, FutureOr<R> Function(A a) f, FxAsyncIterable<A> iterable,
-    {Duration Function(int failed)? delay}) {
+  int attempts,
+  FutureOr<R> Function(A a) f,
+  FxAsyncIterable<A> iterable, {
+  Duration Function(int failed)? delay,
+}) {
   _checkAttempts(attempts);
   return mapAsync((A a) => retry(attempts, () => f(a), delay: delay), iterable);
 }
@@ -5635,9 +5829,12 @@ FxAsyncIterable<R> mapRetryAsync<A, R>(
 /// ```
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> timeoutAsync<A>(
-    Duration limit, FxAsyncIterable<A> iterable) {
+  Duration limit,
+  FxAsyncIterable<A> iterable,
+) {
   return DelegateAsyncIterable(
-      () => _TimeoutAsyncIterator(limit, iterable.iterator));
+    () => _TimeoutAsyncIterator(limit, iterable.iterator),
+  );
 }
 
 class _TimeoutAsyncIterator<A> implements FxFastIterator<A> {
@@ -5678,9 +5875,11 @@ class _TimeoutAsyncIterator<A> implements FxFastIterator<A> {
 ///   (file) => file.closeSync(),
 /// );
 /// ```
-Iterable<T> using<R, T>(R Function() acquire,
-        Iterable<T> Function(R resource) use, void Function(R resource) release) =>
-    _UsingIterable(acquire, use, release);
+Iterable<T> using<R, T>(
+  R Function() acquire,
+  Iterable<T> Function(R resource) use,
+  void Function(R resource) release,
+) => _UsingIterable(acquire, use, release);
 
 class _UsingIterable<R, T> extends Iterable<T> {
   _UsingIterable(this._acquire, this._use, this._release);
@@ -5741,10 +5940,13 @@ class _UsingIterator<R, T> implements Iterator<T> {
 /// The same abandonment caveat as [using] applies.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<T> usingAsync<R, T>(
-    FutureOr<R> Function() acquire,
-    FxAsyncIterable<T> Function(R resource) use,
-    FutureOr<void> Function(R resource) release) {
-  return DelegateAsyncIterable(() => _UsingAsyncIterator(acquire, use, release));
+  FutureOr<R> Function() acquire,
+  FxAsyncIterable<T> Function(R resource) use,
+  FutureOr<void> Function(R resource) release,
+) {
+  return DelegateAsyncIterable(
+    () => _UsingAsyncIterator(acquire, use, release),
+  );
 }
 
 /// The [usingAsync] iterator. Public `next` stays a pass-through (as
@@ -5772,18 +5974,21 @@ class _UsingAsyncIterator<R, T> implements FxFastIterator<T> {
         return _iterator = _use(r).iterator;
       });
 
-  Future<IterResult<T>> _settle(Future<IterResult<T>> pull) =>
-      pull.then((result) {
-        if (!result.done) return result;
-        _done = true;
-        return _releaseOnce().then((_) => result);
-      }, onError: (Object e, StackTrace st) {
-        _done = true;
-        // When acquire itself failed there is no resource to release.
-        if (!_acquired) Error.throwWithStackTrace(e, st);
-        return _releaseOnce()
-            .then<IterResult<T>>((_) => Error.throwWithStackTrace(e, st));
-      });
+  Future<IterResult<T>> _settle(Future<IterResult<T>> pull) => pull.then(
+    (result) {
+      if (!result.done) return result;
+      _done = true;
+      return _releaseOnce().then((_) => result);
+    },
+    onError: (Object e, StackTrace st) {
+      _done = true;
+      // When acquire itself failed there is no resource to release.
+      if (!_acquired) Error.throwWithStackTrace(e, st);
+      return _releaseOnce().then<IterResult<T>>(
+        (_) => Error.throwWithStackTrace(e, st),
+      );
+    },
+  );
 
   @override
   Future<IterResult<T>> next([Concurrent? concurrent]) {
@@ -5807,8 +6012,9 @@ class _UsingAsyncIterator<R, T> implements FxFastIterator<T> {
     } catch (e, st) {
       _done = true;
       if (!_acquired) rethrow;
-      return _releaseOnce()
-          .then<IterResult<T>>((_) => Error.throwWithStackTrace(e, st));
+      return _releaseOnce().then<IterResult<T>>(
+        (_) => Error.throwWithStackTrace(e, st),
+      );
     }
     if (r is Future<IterResult<T>>) return _settle(r);
     if (!r.done) return r;
@@ -5836,8 +6042,8 @@ Future<List<A>> toListAsync<A>(FxAsyncIterable<A> iterable) async {
   // are observably identical for an all-consuming terminal.
   final drive =
       fxStreamDrive<A>(iterable, result.add) ??
-          fxPoolDrive<A>(iterable, result.add) ??
-          fxFusedDrive<A>(iterable, result.add);
+      fxPoolDrive<A>(iterable, result.add) ??
+      fxFusedDrive<A>(iterable, result.add);
   if (drive != null) {
     await drive;
     return result;
@@ -5872,9 +6078,12 @@ void each<A>(void Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [each]; awaits [f] per element.
 Future<void> eachAsync<A>(
-    FutureOr<void> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<void> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   // Stream-sourced chains run by subscription (see [toListAsync]).
-  final drive = fxStreamDrive<A>(iterable, f) ??
+  final drive =
+      fxStreamDrive<A>(iterable, f) ??
       fxPoolDrive<A>(iterable, f) ??
       fxFusedDrive<A>(iterable, f);
   if (drive != null) return drive;
@@ -5954,8 +6163,11 @@ Acc fold<A, Acc>(Acc seed, Acc Function(Acc acc, A a) f, Iterable<A> iterable) {
 /// ```dart
 /// foldWithIndex(0, (acc, a, i) => acc + a * i, [1, 2, 3]); // 8
 /// ```
-Acc foldWithIndex<A, Acc>(Acc seed,
-    Acc Function(Acc acc, A a, int index) f, Iterable<A> iterable) {
+Acc foldWithIndex<A, Acc>(
+  Acc seed,
+  Acc Function(Acc acc, A a, int index) f,
+  Iterable<A> iterable,
+) {
   var acc = seed;
   var i = 0;
   for (final a in iterable) {
@@ -5976,9 +6188,14 @@ Acc foldWithIndex<A, Acc>(Acc seed,
 /// direction. A non-[List] source is materialized first — walking backwards
 /// requires knowing where the end is.
 Acc foldRight<A, Acc>(
-    Acc seed, Acc Function(Acc acc, A a) f, Iterable<A> iterable) {
+  Acc seed,
+  Acc Function(Acc acc, A a) f,
+  Iterable<A> iterable,
+) {
   var acc = seed;
-  final list = iterable is List<A> ? iterable : iterable.toList(growable: false);
+  final list = iterable is List<A>
+      ? iterable
+      : iterable.toList(growable: false);
   for (var i = list.length - 1; i >= 0; i--) {
     acc = f(acc, list[i]);
   }
@@ -5991,10 +6208,15 @@ Acc foldRight<A, Acc>(
 /// last element arrives first carrying the highest index. That is the
 /// position [foldWithIndex] and [mapWithIndex] would give the same element;
 /// it deliberately does not renumber the reversed walk 0, 1, 2.
-Acc foldRightWithIndex<A, Acc>(Acc seed,
-    Acc Function(Acc acc, A a, int index) f, Iterable<A> iterable) {
+Acc foldRightWithIndex<A, Acc>(
+  Acc seed,
+  Acc Function(Acc acc, A a, int index) f,
+  Iterable<A> iterable,
+) {
   var acc = seed;
-  final list = iterable is List<A> ? iterable : iterable.toList(growable: false);
+  final list = iterable is List<A>
+      ? iterable
+      : iterable.toList(growable: false);
   for (var i = list.length - 1; i >= 0; i--) {
     acc = f(acc, list[i], i);
   }
@@ -6006,8 +6228,11 @@ Acc foldRightWithIndex<A, Acc>(Acc seed,
 /// There is no way to start from the end of a stream without reaching it,
 /// so this drains [iterable] into a list first — unlike [foldAsync], it
 /// holds every element in memory and cannot short-circuit.
-Future<Acc> foldRightAsync<A, Acc>(FutureOr<Acc> seed,
-    FutureOr<Acc> Function(Acc acc, A a) f, FxAsyncIterable<A> iterable) async {
+Future<Acc> foldRightAsync<A, Acc>(
+  FutureOr<Acc> seed,
+  FutureOr<Acc> Function(Acc acc, A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   var acc = seed is Future<Acc> ? await seed : seed;
   final list = await toListAsync(iterable);
   for (var i = list.length - 1; i >= 0; i--) {
@@ -6020,9 +6245,10 @@ Future<Acc> foldRightAsync<A, Acc>(FutureOr<Acc> seed,
 
 /// Async counterpart of [foldRightWithIndex].
 Future<Acc> foldRightWithIndexAsync<A, Acc>(
-    FutureOr<Acc> seed,
-    FutureOr<Acc> Function(Acc acc, A a, int index) f,
-    FxAsyncIterable<A> iterable) async {
+  FutureOr<Acc> seed,
+  FutureOr<Acc> Function(Acc acc, A a, int index) f,
+  FxAsyncIterable<A> iterable,
+) async {
   var acc = seed is Future<Acc> ? await seed : seed;
   final list = await toListAsync(iterable);
   for (var i = list.length - 1; i >= 0; i--) {
@@ -6034,7 +6260,9 @@ Future<Acc> foldRightWithIndexAsync<A, Acc>(
 
 /// Async counterpart of [reduce].
 Future<A> reduceAsync<A>(
-    FutureOr<A> Function(A acc, A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<A> Function(A acc, A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   final iterator = iterable.iterator;
   final first = await iterator.next();
   if (first.done) {
@@ -6061,8 +6289,11 @@ Future<A> reduceAsync<A>(
 }
 
 /// Async counterpart of [fold].
-Future<Acc> foldAsync<A, Acc>(FutureOr<Acc> seed,
-    FutureOr<Acc> Function(Acc acc, A a) f, FxAsyncIterable<A> iterable) async {
+Future<Acc> foldAsync<A, Acc>(
+  FutureOr<Acc> seed,
+  FutureOr<Acc> Function(Acc acc, A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   var acc = seed is Future<Acc> ? await seed : seed;
   // Stream-sourced chains fold by subscription (see [toListAsync]).
   FutureOr<void> accumulate(A a) {
@@ -6075,7 +6306,8 @@ Future<Acc> foldAsync<A, Acc>(FutureOr<Acc> seed,
     acc = v;
   }
 
-  final drive = fxStreamDrive<A>(iterable, accumulate) ??
+  final drive =
+      fxStreamDrive<A>(iterable, accumulate) ??
       fxPoolDrive<A>(iterable, accumulate) ??
       fxFusedDrive<A>(iterable, accumulate);
   if (drive != null) {
@@ -6109,9 +6341,10 @@ Future<Acc> foldAsync<A, Acc>(FutureOr<Acc> seed,
 /// paths still applies.
 @pragma('vm:prefer-inline')
 Future<Acc> foldWithIndexAsync<A, Acc>(
-    FutureOr<Acc> seed,
-    FutureOr<Acc> Function(Acc acc, A a, int index) f,
-    FxAsyncIterable<A> iterable) {
+  FutureOr<Acc> seed,
+  FutureOr<Acc> Function(Acc acc, A a, int index) f,
+  FxAsyncIterable<A> iterable,
+) {
   var i = 0;
   return foldAsync<A, Acc>(seed, (acc, a) => f(acc, a, i++), iterable);
 }
@@ -6121,7 +6354,9 @@ Future<Acc> foldWithIndexAsync<A, Acc>(
 ///
 /// Port of FxTS `reduceLazy`.
 Acc Function(Iterable<A>) reduceLazy<A, Acc>(
-        Acc Function(Acc acc, A a) f, Acc seed) =>
+  Acc Function(Acc acc, A a) f,
+  Acc seed,
+) =>
     (iterable) => fold(seed, f, iterable);
 
 /// Adds every number in the iterable.
@@ -6217,8 +6452,9 @@ num sumBy<A>(num Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [sumBy].
 Future<num> sumByAsync<A>(
-        FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    foldAsync<A, num>(0, (acc, a) async => acc + await f(a), iterable);
+  FutureOr<num> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => foldAsync<A, num>(0, (acc, a) async => acc + await f(a), iterable);
 
 /// Async counterpart of [sum].
 Future<num> sumAsync(FxAsyncIterable<num> iterable) =>
@@ -6312,7 +6548,9 @@ double averageBy<A>(num Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [averageBy].
 Future<double> averageByAsync<A>(
-    FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<num> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   var total = 0.0;
   var count = 0;
   await eachAsync((A a) async {
@@ -6325,14 +6563,14 @@ Future<double> averageByAsync<A>(
 num _minOf(num acc, num a) => a.isNaN || acc.isNaN
     ? double.nan
     : a < acc
-        ? a
-        : acc;
+    ? a
+    : acc;
 
 num _maxOf(num acc, num a) => a.isNaN || acc.isNaN
     ? double.nan
     : a > acc
-        ? a
-        : acc;
+    ? a
+    : acc;
 
 /// Returns the smallest number; `infinity` for an empty iterable, `NaN` if
 /// any element is `NaN` — mirroring FxTS `min`.
@@ -6436,7 +6674,9 @@ A? minBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [minBy].
 Future<A?> minByAsync<A>(
-    Object? Function(A a) f, FxAsyncIterable<A> iterable) async {
+  Object? Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   A? best;
   var seen = false;
   await eachAsync((A a) {
@@ -6472,7 +6712,9 @@ A? maxBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [maxBy].
 Future<A?> maxByAsync<A>(
-    Object? Function(A a) f, FxAsyncIterable<A> iterable) async {
+  Object? Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   A? best;
   var seen = false;
   await eachAsync((A a) {
@@ -6517,7 +6759,9 @@ int countWhere<A>(bool Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [countWhere].
 Future<int> countWhereAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   var n = 0;
   await eachAsync((A a) async {
     if (await f(a)) n++;
@@ -6549,10 +6793,14 @@ Map<K, List<A>> groupBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [groupBy].
 Future<Map<K, List<A>>> groupByAsync<A, K>(
-    FutureOr<K> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<K> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   final result = <K, List<A>>{};
   await eachAsync(
-      (A a) async => result.putIfAbsent(await f(a), () => []).add(a), iterable);
+    (A a) async => result.putIfAbsent(await f(a), () => []).add(a),
+    iterable,
+  );
   return result;
 }
 
@@ -6567,18 +6815,20 @@ Future<Map<K, List<A>>> groupByAsync<A, K>(
 /// // [(key: 2, items: [ab, cd]), (key: 1, items: [e])]
 /// ```
 List<({K key, List<A> items})> groupedBy<A, K>(
-        K Function(A a) f, Iterable<A> iterable) =>
-    [
-      for (final e in groupBy(f, iterable).entries) (key: e.key, items: e.value)
-    ];
+  K Function(A a) f,
+  Iterable<A> iterable,
+) => [
+  for (final e in groupBy(f, iterable).entries) (key: e.key, items: e.value),
+];
 
 /// Async counterpart of [groupedBy].
 Future<List<({K key, List<A> items})>> groupedByAsync<A, K>(
-        FutureOr<K> Function(A a) f, FxAsyncIterable<A> iterable) async =>
-    [
-      for (final e in (await groupByAsync(f, iterable)).entries)
-        (key: e.key, items: e.value)
-    ];
+  FutureOr<K> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async => [
+  for (final e in (await groupByAsync(f, iterable)).entries)
+    (key: e.key, items: e.value),
+];
 
 /// Indexes values by [f]; later duplicates overwrite earlier ones.
 ///
@@ -6593,7 +6843,9 @@ Map<K, A> indexBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [indexBy].
 Future<Map<K, A>> indexByAsync<A, K>(
-    FutureOr<K> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<K> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   final result = <K, A>{};
   await eachAsync((A a) async => result[await f(a)] = a, iterable);
   return result;
@@ -6615,11 +6867,14 @@ Map<K, int> countBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [countBy].
 Future<Map<K, int>> countByAsync<A, K>(
-    FutureOr<K> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<K> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   final result = <K, int>{};
   await eachAsync(
-      (A a) async => result.update(await f(a), (n) => n + 1, ifAbsent: () => 1),
-      iterable);
+    (A a) async => result.update(await f(a), (n) => n + 1, ifAbsent: () => 1),
+    iterable,
+  );
   return result;
 }
 
@@ -6644,8 +6899,12 @@ Future<Map<K, int>> countByAsync<A, K>(
 /// as in [fold]. A mutable seed would therefore be shared across keys: fold
 /// into new values (`sum + t.amount`), or use [groupBy] if you need to
 /// accumulate into a mutable structure per group.
-Map<K, Acc> foldBy<A, K, Acc>(K Function(A a) key, Acc seed,
-    Acc Function(Acc acc, A a) f, Iterable<A> iterable) {
+Map<K, Acc> foldBy<A, K, Acc>(
+  K Function(A a) key,
+  Acc seed,
+  Acc Function(Acc acc, A a) f,
+  Iterable<A> iterable,
+) {
   final result = <K, Acc>{};
   // Read-modify-write instead of Map.update or putIfAbsent, both of which
   // allocate a closure per element (see [countBy], [groupBy]).
@@ -6657,8 +6916,10 @@ Map<K, Acc> foldBy<A, K, Acc>(K Function(A a) key, Acc seed,
       final acc = result[k];
       // The containsKey probe only runs when the stored value is null, which
       // is impossible unless Acc itself is nullable.
-      result[k] =
-          f(acc == null && !result.containsKey(k) ? seed : acc as Acc, a);
+      result[k] = f(
+        acc == null && !result.containsKey(k) ? seed : acc as Acc,
+        a,
+      );
     }
     return result;
   }
@@ -6673,17 +6934,20 @@ Map<K, Acc> foldBy<A, K, Acc>(K Function(A a) key, Acc seed,
 /// Async counterpart of [foldBy]. [key] and [f] may each return a [Future];
 /// values are folded in source order.
 Future<Map<K, Acc>> foldByAsync<A, K, Acc>(
-    FutureOr<K> Function(A a) key,
-    FutureOr<Acc> seed,
-    FutureOr<Acc> Function(Acc acc, A a) f,
-    FxAsyncIterable<A> iterable) async {
+  FutureOr<K> Function(A a) key,
+  FutureOr<Acc> seed,
+  FutureOr<Acc> Function(Acc acc, A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   final result = <K, Acc>{};
   final start = await seed;
   await eachAsync((A a) async {
     final k = await key(a);
     final acc = result[k];
-    result[k] =
-        await f(acc == null && !result.containsKey(k) ? start : acc as Acc, a);
+    result[k] = await f(
+      acc == null && !result.containsKey(k) ? start : acc as Acc,
+      a,
+    );
   }, iterable);
   return result;
 }
@@ -6697,8 +6961,9 @@ List<A> sort<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
 
 /// Async counterpart of [sort].
 Future<List<A>> sortAsync<A>(
-        int Function(A a, A b) f, FxAsyncIterable<A> iterable) async =>
-    (await toListAsync(iterable))..sort(f);
+  int Function(A a, A b) f,
+  FxAsyncIterable<A> iterable,
+) async => (await toListAsync(iterable))..sort(f);
 
 /// Alias of [sort]; FxTS added `toSorted` as the non-mutating variant, which
 /// the Dart [sort] already is.
@@ -6720,12 +6985,15 @@ int _compareKeys(Object? fa, Object? fb) {
   }
   if (fa is Comparable && fb is Comparable) {
     return Comparable.compare(
-        fa as Comparable<Object?>, fb as Comparable<Object?>);
+      fa as Comparable<Object?>,
+      fb as Comparable<Object?>,
+    );
   }
   return 0;
 }
 
-int _compareBy<A>(Object? Function(A a) f, A a, A b) => _compareKeys(f(a), f(b));
+int _compareBy<A>(Object? Function(A a) f, A a, A b) =>
+    _compareKeys(f(a), f(b));
 
 /// Returns a new list sorted by the key extractor [f] (ascending).
 ///
@@ -6742,7 +7010,10 @@ List<A> sortByDesc<A>(Object? Function(A a) f, Iterable<A> iterable) =>
     _sortByImpl(f, iterable, true);
 
 List<A> _sortByImpl<A>(
-    Object? Function(A a) f, Iterable<A> iterable, bool desc) {
+  Object? Function(A a) f,
+  Iterable<A> iterable,
+  bool desc,
+) {
   // Decorate-sort-undecorate: extract each key once, sort an index list, and
   // read the permutation back. Sorting the values directly with a
   // `_compareBy` comparator would call [f] twice per comparison —
@@ -6788,9 +7059,11 @@ List<A> _sortByImpl<A>(
       if (k is! int) return _sortSpilled(f, items, indices, ik, i, k, desc);
       ik[i] = k;
     }
-    indices.sort(desc
-        ? (i, j) => ik[j].compareTo(ik[i])
-        : (i, j) => ik[i].compareTo(ik[j]));
+    indices.sort(
+      desc
+          ? (i, j) => ik[j].compareTo(ik[i])
+          : (i, j) => ik[i].compareTo(ik[j]),
+    );
     return [for (final i in indices) items[i]];
   }
 
@@ -6802,9 +7075,11 @@ List<A> _sortByImpl<A>(
       if (k is! String) return _sortSpilled(f, items, indices, sk, i, k, desc);
       sk[i] = k;
     }
-    indices.sort(desc
-        ? (i, j) => sk[j].compareTo(sk[i])
-        : (i, j) => sk[i].compareTo(sk[j]));
+    indices.sort(
+      desc
+          ? (i, j) => sk[j].compareTo(sk[i])
+          : (i, j) => sk[i].compareTo(sk[j]),
+    );
     return [for (final i in indices) items[i]];
   }
 
@@ -6820,8 +7095,15 @@ List<A> _sortByImpl<A>(
 /// type [typed] holds. Copies the keys read so far out of [typed], keeps
 /// [current], and reads the rest — so every element's key is extracted
 /// exactly once overall.
-List<A> _sortSpilled<A>(Object? Function(A a) f, List<A> items,
-    List<int> indices, List<Object?> typed, int at, Object? current, bool desc) {
+List<A> _sortSpilled<A>(
+  Object? Function(A a) f,
+  List<A> items,
+  List<int> indices,
+  List<Object?> typed,
+  int at,
+  Object? current,
+  bool desc,
+) {
   final keys = List<Object?>.filled(items.length, null);
   for (var i = 0; i < at; i++) {
     keys[i] = typed[i];
@@ -6834,10 +7116,16 @@ List<A> _sortSpilled<A>(Object? Function(A a) f, List<A> items,
 }
 
 List<A> _sortByKeys<A>(
-    List<A> items, List<int> indices, List<Object?> keys, bool desc) {
-  indices.sort(desc
-      ? (i, j) => _compareKeys(keys[j], keys[i])
-      : (i, j) => _compareKeys(keys[i], keys[j]));
+  List<A> items,
+  List<int> indices,
+  List<Object?> keys,
+  bool desc,
+) {
+  indices.sort(
+    desc
+        ? (i, j) => _compareKeys(keys[j], keys[i])
+        : (i, j) => _compareKeys(keys[i], keys[j]),
+  );
   return [for (final i in indices) items[i]];
 }
 
@@ -6947,13 +7235,15 @@ List<A> _mergeByDouble<A>(Float64List k, List<A> items, bool desc) {
 
 /// Async counterpart of [sortBy].
 Future<List<A>> sortByAsync<A>(
-        Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
-    sortAsync((a, b) => _compareBy(f, a, b), iterable);
+  Object? Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => sortAsync((a, b) => _compareBy(f, a, b), iterable);
 
 /// Async counterpart of [sortByDesc].
 Future<List<A>> sortByDescAsync<A>(
-        Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
-    sortAsync((a, b) => _compareBy(f, b, a), iterable);
+  Object? Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => sortAsync((a, b) => _compareBy(f, b, a), iterable);
 
 /// Splits values into `(pass, fail)` lists by predicate [f].
 ///
@@ -6969,7 +7259,9 @@ Future<List<A>> sortByDescAsync<A>(
 
 /// Async counterpart of [partition].
 Future<(List<A>, List<A>)> partitionAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   final pass = <A>[];
   final fail = <A>[];
   await eachAsync((A a) async => (await f(a) ? pass : fail).add(a), iterable);
@@ -7004,7 +7296,10 @@ typedef Fold<A, R> = ({R seed, R Function(R acc, A a) step});
 /// ```
 @pragma('vm:align-loops')
 (R1, R2) tee<A, R1, R2>(
-    Iterable<A> iterable, Fold<A, R1> first, Fold<A, R2> second) {
+  Iterable<A> iterable,
+  Fold<A, R1> first,
+  Fold<A, R2> second,
+) {
   final f1 = first.step;
   final f2 = second.step;
   var a1 = first.seed;
@@ -7018,8 +7313,12 @@ typedef Fold<A, R> = ({R seed, R Function(R acc, A a) step});
 
 /// Three-fold [tee].
 @pragma('vm:align-loops')
-(R1, R2, R3) tee3<A, R1, R2, R3>(Iterable<A> iterable, Fold<A, R1> first,
-    Fold<A, R2> second, Fold<A, R3> third) {
+(R1, R2, R3) tee3<A, R1, R2, R3>(
+  Iterable<A> iterable,
+  Fold<A, R1> first,
+  Fold<A, R2> second,
+  Fold<A, R3> third,
+) {
   final f1 = first.step;
   final f2 = second.step;
   final f3 = third.step;
@@ -7036,8 +7335,11 @@ typedef Fold<A, R> = ({R seed, R Function(R acc, A a) step});
 
 /// Async counterpart of [tee]. Steps may return a [Future]; each element is
 /// applied to both accumulators before the next is pulled.
-Future<(R1, R2)> teeAsync<A, R1, R2>(FxAsyncIterable<A> iterable,
-    AsyncFold<A, R1> first, AsyncFold<A, R2> second) async {
+Future<(R1, R2)> teeAsync<A, R1, R2>(
+  FxAsyncIterable<A> iterable,
+  AsyncFold<A, R1> first,
+  AsyncFold<A, R2> second,
+) async {
   final f1 = first.step;
   final f2 = second.step;
   var a1 = await first.seed;
@@ -7063,7 +7365,7 @@ Future<(R1, R2)> teeAsync<A, R1, R2>(FxAsyncIterable<A> iterable,
 /// The [teeAsync] counterpart of [Fold].
 typedef AsyncFold<A, R> = ({
   FutureOr<R> seed,
-  FutureOr<R> Function(R acc, A a) step
+  FutureOr<R> Function(R acc, A a) step,
 });
 
 // ---- lib/src/strict/access.dart ----
@@ -7161,8 +7463,9 @@ A? find<A>(bool Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [find].
 Future<A?> findAsync<A>(
-        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    headAsync(filterAsync(f, iterable));
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => headAsync(filterAsync(f, iterable));
 
 /// Returns the index of the first element [f] returns true for, or `-1`.
 ///
@@ -7187,7 +7490,9 @@ int findIndex<A>(bool Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [findIndex].
 Future<int> findIndexAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   final result = await findAsync((r) => f(r.$2), zipWithIndexAsync(iterable));
   return result == null ? -1 : result.$1;
 }
@@ -7214,7 +7519,9 @@ bool every<A>(bool Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [every].
 Future<bool> everyAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   final iterator = iterable.iterator;
   while (true) {
     final r = await iterator.next();
@@ -7236,7 +7543,9 @@ bool some<A>(bool Function(A a) f, Iterable<A> iterable) {
 
 /// Async counterpart of [some].
 Future<bool> someAsync<A>(
-    FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) async {
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
   final iterator = iterable.iterator;
   while (true) {
     final r = await iterator.next();
@@ -7267,8 +7576,9 @@ bool isEmpty(Object? value) {
 /// ```dart
 /// fromEntries([('a', 1), ('b', 2)]); // {a: 1, b: 2}
 /// ```
-Map<K, V> fromEntries<K, V>(Iterable<(K, V)> entries) =>
-    {for (final (k, v) in entries) k: v};
+Map<K, V> fromEntries<K, V>(Iterable<(K, V)> entries) => {
+  for (final (k, v) in entries) k: v,
+};
 
 /// Returns a copy of [map] without the given [keysToOmit].
 ///
@@ -7277,7 +7587,7 @@ Map<K, V> omit<K, V>(Iterable<K> keysToOmit, Map<K, V> map) {
   final set = keysToOmit.toSet();
   return {
     for (final e in map.entries)
-      if (!set.contains(e.key)) e.key: e.value
+      if (!set.contains(e.key)) e.key: e.value,
   };
 }
 
@@ -7288,7 +7598,7 @@ Map<K, V> pick<K, V>(Iterable<K> keysToPick, Map<K, V> map) {
   final set = keysToPick.toSet();
   return {
     for (final e in map.entries)
-      if (set.contains(e.key)) e.key: e.value
+      if (set.contains(e.key)) e.key: e.value,
   };
 }
 
@@ -7303,8 +7613,8 @@ Map<K, V> pick<K, V>(Iterable<K> keysToPick, Map<K, V> map) {
 /// mapValues((n) => n * 2, {'a': 1, 'b': 2}); // {a: 2, b: 4}
 /// ```
 Map<K, T> mapValues<K, V, T>(T Function(V value) f, Map<K, V> map) => {
-      for (final e in map.entries) e.key: f(e.value)
-    };
+  for (final e in map.entries) e.key: f(e.value),
+};
 
 /// Returns a copy of [map] with every key run through [f]; values are
 /// untouched.
@@ -7317,8 +7627,8 @@ Map<K, T> mapValues<K, V, T>(T Function(V value) f, Map<K, V> map) => {
 /// mapKeys((k) => k.toUpperCase(), {'a': 1, 'b': 2}); // {A: 1, B: 2}
 /// ```
 Map<T, V> mapKeys<K, V, T>(T Function(K key) f, Map<K, V> map) => {
-      for (final e in map.entries) f(e.key): e.value
-    };
+  for (final e in map.entries) f(e.key): e.value,
+};
 
 /// Returns a new map built by running each `(key, value)` record through [f]
 /// — the general form of [mapValues] and [mapKeys], and the transforming
@@ -7331,7 +7641,9 @@ Map<T, V> mapKeys<K, V, T>(T Function(K key) f, Map<K, V> map) => {
 /// // {A: 2}
 /// ```
 Map<K2, V2> mapEntries<K, V, K2, V2>(
-    (K2, V2) Function((K, V) entry) f, Map<K, V> map) {
+  (K2, V2) Function((K, V) entry) f,
+  Map<K, V> map,
+) {
   final out = <K2, V2>{};
   for (final e in map.entries) {
     final (k, v) = f((e.key, e.value));
@@ -7344,9 +7656,9 @@ Map<K2, V2> mapEntries<K, V, K2, V2>(
 ///
 /// Port of FxTS `omitBy` (entry tuples become records).
 Map<K, V> omitBy<K, V>(bool Function((K, V) entry) f, Map<K, V> map) => {
-      for (final e in map.entries)
-        if (!f((e.key, e.value))) e.key: e.value
-    };
+  for (final e in map.entries)
+    if (!f((e.key, e.value))) e.key: e.value,
+};
 
 /// Returns a copy of [map] with only entries matching the predicate [f].
 ///
@@ -7359,9 +7671,9 @@ Map<K, V> omitBy<K, V>(bool Function((K, V) entry) f, Map<K, V> map) => {
 /// pickBy((e) => e.$1.startsWith('a'), {'a': 1});  // by key    -> {a: 1}
 /// ```
 Map<K, V> pickBy<K, V>(bool Function((K, V) entry) f, Map<K, V> map) => {
-      for (final e in map.entries)
-        if (f((e.key, e.value))) e.key: e.value
-    };
+  for (final e in map.entries)
+    if (f((e.key, e.value))) e.key: e.value,
+};
 
 /// Returns the value of [key] in [map], or `null`.
 ///
@@ -7371,28 +7683,30 @@ V? prop<K, V>(K key, Map<K, V> map) => map[key];
 /// Returns the values of [propKeys] in [map] (missing keys yield `null`).
 ///
 /// Port of FxTS `props`.
-List<V?> props<K, V>(Iterable<K> propKeys, Map<K, V> map) =>
-    [for (final k in propKeys) map[k]];
+List<V?> props<K, V>(Iterable<K> propKeys, Map<K, V> map) => [
+  for (final k in propKeys) map[k],
+];
 
 /// Returns a copy of [map] with `null` values removed (shallow).
 ///
 /// Port of FxTS `compactObject`.
 Map<K, V> compactObject<K, V>(Map<K, V?> map) => {
-      for (final e in map.entries) e.key: ?e.value
-    };
+  for (final e in map.entries) e.key: ?e.value,
+};
 
 /// Creates a new map by running each value whose key appears in
 /// [transformations] through its transformation function.
 ///
 /// Port of FxTS `evolve`. Untransformed keys are kept as-is.
 Map<K, Object?> evolve<K>(
-    Map<K, Object? Function(Object? value)> transformations,
-    Map<K, Object?> map) {
+  Map<K, Object? Function(Object? value)> transformations,
+  Map<K, Object?> map,
+) {
   return {
     for (final e in map.entries)
       e.key: transformations.containsKey(e.key)
           ? transformations[e.key]!(e.value)
-          : e.value
+          : e.value,
   };
 }
 
@@ -7456,7 +7770,8 @@ T add<T extends Object>(T a, T b) => (a as dynamic) + b as T;
 /// argument (so it can be used as a unary callback).
 ///
 /// Port of FxTS `always`.
-T Function([Object? _]) always<T>(T a) => ([Object? _]) => a;
+T Function([Object? _]) always<T>(T a) =>
+    ([Object? _]) => a;
 
 /// Calls [f] with [args] as positional arguments.
 ///
@@ -7481,7 +7796,8 @@ bool not(bool a) => !a;
 /// Returns a predicate that negates [f].
 ///
 /// Port of FxTS `negate`.
-bool Function(T) negate<T>(bool Function(T) f) => (a) => !f(a);
+bool Function(T) negate<T>(bool Function(T) f) =>
+    (a) => !f(a);
 
 /// Calls [f] with [a] for its side effect, then returns [a].
 ///
@@ -7525,10 +7841,13 @@ int _compare(Object? a, Object? b) {
         !(a is num && b is num) &&
         !(a is String && b is String)) {
       throw ArgumentError(
-          'The values you want to compare must be of the same type');
+        'The values you want to compare must be of the same type',
+      );
     }
     return Comparable.compare(
-        a as Comparable<Object?>, b as Comparable<Object?>);
+      a as Comparable<Object?>,
+      b as Comparable<Object?>,
+    );
   }
   throw ArgumentError('The values must be Comparable');
 }
@@ -7591,8 +7910,10 @@ Future<void> sleep(Duration wait) => Future.delayed(wait);
 /// ], orElse: (n) => 'positive');
 /// classify(-4); // 'negative'
 /// ```
-R Function(T value) cases<T, R>(List<(bool Function(T), R Function(T))> pairs,
-    {R Function(T)? orElse}) {
+R Function(T value) cases<T, R>(
+  List<(bool Function(T), R Function(T))> pairs, {
+  R Function(T)? orElse,
+}) {
   return (value) {
     for (final (predicate, mapper) in pairs) {
       if (predicate(value)) return mapper(value);
@@ -7606,8 +7927,9 @@ R Function(T value) cases<T, R>(List<(bool Function(T), R Function(T))> pairs,
 /// Splits a string into a list of user-perceived characters, handling
 /// surrogate pairs — the same behavior as FxTS `unicodeToArray`, which
 /// splits by code point. Named `unicodeToList` for Dart idiom (returns a List).
-List<String> unicodeToList(String s) =>
-    [for (final rune in s.runes) String.fromCharCode(rune)];
+List<String> unicodeToList(String s) => [
+  for (final rune in s.runes) String.fromCharCode(rune),
+];
 
 /// FxTS-named alias of [unicodeToList].
 List<String> unicodeToArray(String s) => unicodeToList(s);
@@ -7618,7 +7940,9 @@ List<String> unicodeToArray(String s) => unicodeToList(s);
 /// Dart-native replacement is the `.curried` extension getter (arities 2–5)
 /// — see `WHY_CURRIED.md`.
 @Deprecated('Use the .curried extension getter instead (see WHY_CURRIED.md)')
-Function curry(Function f) => (Object? a) => (Object? b) => f(a, b);
+Function curry(Function f) =>
+    (Object? a) =>
+        (Object? b) => f(a, b);
 
 // ---- lib/src/strict/curried.dart ----
 /// Dart-idiomatic currying: the `.curried` / `.uncurried` extension getters.
@@ -7640,28 +7964,39 @@ Function curry(Function f) => (Object? a) => (Object? b) => f(a, b);
 /// Dart-native replacement for FxTS `curry` (see `WHY_CURRIED.md`).
 extension Curry2<A, B, R> on R Function(A, B) {
   /// The curried form: `f.curried(a)(b) == f(a, b)`.
-  R Function(B) Function(A) get curried => (a) => (b) => this(a, b);
+  R Function(B) Function(A) get curried =>
+      (a) =>
+          (b) => this(a, b);
 }
 
 /// Curries a ternary function: `f.curried(a)(b)(c) == f(a, b, c)`.
 extension Curry3<A, B, C, R> on R Function(A, B, C) {
   /// The curried form: `f.curried(a)(b)(c) == f(a, b, c)`.
   R Function(C) Function(B) Function(A) get curried =>
-      (a) => (b) => (c) => this(a, b, c);
+      (a) =>
+          (b) =>
+              (c) => this(a, b, c);
 }
 
 /// Curries a 4-ary function.
 extension Curry4<A, B, C, D, R> on R Function(A, B, C, D) {
   /// The curried form: `f.curried(a)(b)(c)(d) == f(a, b, c, d)`.
   R Function(D) Function(C) Function(B) Function(A) get curried =>
-      (a) => (b) => (c) => (d) => this(a, b, c, d);
+      (a) =>
+          (b) =>
+              (c) =>
+                  (d) => this(a, b, c, d);
 }
 
 /// Curries a 5-ary function.
 extension Curry5<A, B, C, D, E, R> on R Function(A, B, C, D, E) {
   /// The curried form: `f.curried(a)(b)(c)(d)(e) == f(a, b, c, d, e)`.
   R Function(E) Function(D) Function(C) Function(B) Function(A) get curried =>
-      (a) => (b) => (c) => (d) => (e) => this(a, b, c, d, e);
+      (a) =>
+          (b) =>
+              (c) =>
+                  (d) =>
+                      (e) => this(a, b, c, d, e);
 }
 
 /// Uncurries a 2-level function chain: `f.uncurried(a, b) == f(a)(b)`.
@@ -7670,20 +8005,23 @@ extension Curry5<A, B, C, D, E, R> on R Function(A, B, C, D, E) {
 /// an extension explicitly (`Uncurry2(f).uncurried`) to flatten fewer levels.
 extension Uncurry2<A, B, R> on R Function(B) Function(A) {
   /// The flattened form: `f.uncurried(a, b) == f(a)(b)`.
-  R Function(A, B) get uncurried => (a, b) => this(a)(b);
+  R Function(A, B) get uncurried =>
+      (a, b) => this(a)(b);
 }
 
 /// Uncurries a 3-level function chain.
 extension Uncurry3<A, B, C, R> on R Function(C) Function(B) Function(A) {
   /// The flattened form: `f.uncurried(a, b, c) == f(a)(b)(c)`.
-  R Function(A, B, C) get uncurried => (a, b, c) => this(a)(b)(c);
+  R Function(A, B, C) get uncurried =>
+      (a, b, c) => this(a)(b)(c);
 }
 
 /// Uncurries a 4-level function chain.
 extension Uncurry4<A, B, C, D, R>
     on R Function(D) Function(C) Function(B) Function(A) {
   /// The flattened form: `f.uncurried(a, b, c, d) == f(a)(b)(c)(d)`.
-  R Function(A, B, C, D) get uncurried => (a, b, c, d) => this(a)(b)(c)(d);
+  R Function(A, B, C, D) get uncurried =>
+      (a, b, c, d) => this(a)(b)(c)(d);
 }
 
 /// Uncurries a 5-level function chain.
@@ -7776,7 +8114,8 @@ extension FxPredicateOps<T> on bool Function(T) {
   ///
   /// The extension-getter form of the top-level `negate` — `isEven.negate`
   /// and `negate(isEven)` are the same function.
-  bool Function(T) get negate => (a) => !this(a);
+  bool Function(T) get negate =>
+      (a) => !this(a);
 
   /// True when both this predicate and [other] hold. [other] is not called
   /// when this one already fails.
@@ -7785,11 +8124,13 @@ extension FxPredicateOps<T> on bool Function(T) {
 
   /// True when this predicate or [other] holds. [other] is not called when
   /// this one already succeeds.
-  bool Function(T) or(bool Function(T a) other) => (a) => this(a) || other(a);
+  bool Function(T) or(bool Function(T a) other) =>
+      (a) => this(a) || other(a);
 
   /// True when exactly one of this predicate and [other] holds. Both are
   /// always called — there is nothing to short-circuit.
-  bool Function(T) xor(bool Function(T a) other) => (a) => this(a) ^ other(a);
+  bool Function(T) xor(bool Function(T a) other) =>
+      (a) => this(a) ^ other(a);
 
   /// Moves this predicate onto a different input type by running [f] first
   /// — `map` for the *argument* rather than the result, which is why it is
@@ -7799,7 +8140,8 @@ extension FxPredicateOps<T> on bool Function(T) {
   /// final hasEvenLength = isEven.contramap<String>((s) => s.length);
   /// hasEvenLength('abcd'); // true
   /// ```
-  bool Function(A) contramap<A>(T Function(A a) f) => (a) => this(f(a));
+  bool Function(A) contramap<A>(T Function(A a) f) =>
+      (a) => this(f(a));
 }
 
 // ---- lib/src/dart_aliases.dart ----
@@ -7822,8 +8164,9 @@ Iterable<A> where<A>(bool Function(A a) f, Iterable<A> iterable) =>
 
 /// Dart-idiomatic alias for [filterAsync].
 FxAsyncIterable<A> whereAsync<A>(
-        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    filterAsync(f, iterable);
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => filterAsync(f, iterable);
 
 /// Dart-idiomatic alias for [reject] (keeps items where `f` is false).
 Iterable<A> whereNot<A>(bool Function(A a) f, Iterable<A> iterable) =>
@@ -7831,8 +8174,9 @@ Iterable<A> whereNot<A>(bool Function(A a) f, Iterable<A> iterable) =>
 
 /// Dart-idiomatic alias for [rejectAsync].
 FxAsyncIterable<A> whereNotAsync<A>(
-        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    rejectAsync(f, iterable);
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => rejectAsync(f, iterable);
 
 /// Dart-idiomatic alias for [compact] (drops `null`s).
 Iterable<A> nonNulls<A>(Iterable<A?> iterable) => compact(iterable);
@@ -7854,8 +8198,9 @@ Iterable<A> distinctBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
 
 /// Dart-idiomatic alias for [uniqByAsync].
 FxAsyncIterable<A> distinctByAsync<A, B>(
-        FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    uniqByAsync(f, iterable);
+  FutureOr<B> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => uniqByAsync(f, iterable);
 
 // --- lazy/map.dart ---
 /// Dart-idiomatic alias for [flatMap] (matches `Iterable.expand`).
@@ -7864,17 +8209,19 @@ Iterable<B> expand<A, B>(Iterable<B> Function(A a) f, Iterable<A> iterable) =>
 
 /// Dart-idiomatic alias for [flatMapAsync].
 FxAsyncIterable<B> expandAsync<A, B>(
-        FutureOr<Iterable<B>> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    flatMapAsync(f, iterable);
+  FutureOr<Iterable<B>> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => flatMapAsync(f, iterable);
 
 /// Dart-idiomatic alias for [flat] (flattens [depth] levels, default 1).
 Iterable<dynamic> flattened(Iterable<dynamic> iterable, [int depth = 1]) =>
     flat(iterable, depth);
 
 /// Dart-idiomatic alias for [flatAsync].
-FxAsyncIterable<dynamic> flattenedAsync(FxAsyncIterable<dynamic> iterable,
-        [int depth = 1]) =>
-    flatAsync(iterable, depth);
+FxAsyncIterable<dynamic> flattenedAsync(
+  FxAsyncIterable<dynamic> iterable, [
+  int depth = 1,
+]) => flatAsync(iterable, depth);
 
 // --- lazy/take_drop.dart ---
 /// Dart-idiomatic alias for [takeRight] (the last [length] items).
@@ -7898,8 +8245,9 @@ Iterable<A> skipWhile<A>(bool Function(A a) f, Iterable<A> iterable) =>
 
 /// Dart-idiomatic alias for [dropWhileAsync].
 FxAsyncIterable<A> skipWhileAsync<A>(
-        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    dropWhileAsync(f, iterable);
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => dropWhileAsync(f, iterable);
 
 // --- lazy/zip.dart ---
 /// Dart-idiomatic alias for [zipWithIndex] (each item paired with its index).
@@ -7921,7 +8269,8 @@ Future<A?> firstOrNullAsync<A>(FxAsyncIterable<A> iterable) =>
 A? lastOrNull<A>(Iterable<A> iterable) => last(iterable);
 
 /// Dart-idiomatic alias for [lastAsync].
-Future<A?> lastOrNullAsync<A>(FxAsyncIterable<A> iterable) => lastAsync(iterable);
+Future<A?> lastOrNullAsync<A>(FxAsyncIterable<A> iterable) =>
+    lastAsync(iterable);
 
 /// Dart-idiomatic alias for [nth] (item at [index], or `null`).
 A? elementAtOrNull<A>(int index, Iterable<A> iterable) => nth(index, iterable);
@@ -7936,8 +8285,9 @@ A? firstWhereOrNull<A>(bool Function(A a) f, Iterable<A> iterable) =>
 
 /// Dart-idiomatic alias for [findAsync].
 Future<A?> firstWhereOrNullAsync<A>(
-        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    findAsync(f, iterable);
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => findAsync(f, iterable);
 
 /// Dart-idiomatic alias for [findIndex] (index of first match, or -1).
 int indexWhere<A>(bool Function(A a) f, Iterable<A> iterable) =>
@@ -7945,8 +8295,9 @@ int indexWhere<A>(bool Function(A a) f, Iterable<A> iterable) =>
 
 /// Dart-idiomatic alias for [findIndexAsync].
 Future<int> indexWhereAsync<A>(
-        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    findIndexAsync(f, iterable);
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => findIndexAsync(f, iterable);
 
 // Note: no top-level `contains` alias — it collides with `package:test`'s
 // matcher, and Dart's idiom is the inherited `.contains()` on the chain anyway.
@@ -7957,8 +8308,9 @@ bool any<A>(bool Function(A a) f, Iterable<A> iterable) => some(f, iterable);
 
 /// Dart-idiomatic alias for [someAsync].
 Future<bool> anyAsync<A>(
-        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    someAsync(f, iterable);
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => someAsync(f, iterable);
 
 // --- strict/aggregate.dart ---
 /// Dart-idiomatic alias for [each] (matches `Iterable.forEach`).
@@ -7967,8 +8319,9 @@ void forEach<A>(void Function(A a) f, Iterable<A> iterable) =>
 
 /// Dart-idiomatic alias for [eachAsync].
 Future<void> forEachAsync<A>(
-        FutureOr<void> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    eachAsync(f, iterable);
+  FutureOr<void> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => eachAsync(f, iterable);
 
 /// Dart-idiomatic alias for [size] (element count).
 int count<A>(Iterable<A> iterable) => size(iterable);
@@ -7993,7 +8346,7 @@ class Debounced<T> {
   Timer? _timer;
 
   Debounced._(this._func, this._wait, {required bool leading})
-      : _leading = leading;
+    : _leading = leading;
 
   /// Registers a call with [arg], (re)starting the wait window. The wrapped
   /// function runs on the trailing edge (or immediately, once per idle
@@ -8024,9 +8377,11 @@ class Debounced<T> {
 /// edge instead.
 ///
 /// Port of FxTS `debounce` (`Util/debounce.ts`).
-Debounced<T> debounce<T>(void Function(T arg) func, Duration wait,
-        {bool leading = false}) =>
-    Debounced._(func, wait, leading: leading);
+Debounced<T> debounce<T>(
+  void Function(T arg) func,
+  Duration wait, {
+  bool leading = false,
+}) => Debounced._(func, wait, leading: leading);
 
 /// A throttled function, as returned by [throttle].
 class Throttled<T> {
@@ -8039,10 +8394,13 @@ class Throttled<T> {
   T? _lastArg;
   bool _hasPendingArg = false;
 
-  Throttled._(this._func, this._wait,
-      {required bool leading, required bool trailing})
-      : _leading = leading,
-        _trailing = trailing;
+  Throttled._(
+    this._func,
+    this._wait, {
+    required bool leading,
+    required bool trailing,
+  }) : _leading = leading,
+       _trailing = trailing;
 
   /// Registers a call with [arg]. The wrapped function runs at most once per
   /// [wait] window — on the leading edge, the trailing edge, or both, per the
@@ -8110,9 +8468,12 @@ class Throttled<T> {
 /// Creates a throttled function that invokes [func] at most once per [wait].
 ///
 /// Port of FxTS `throttle` (`Util/throttle.ts`).
-Throttled<T> throttle<T>(void Function(T arg) func, Duration wait,
-        {bool leading = true, bool trailing = true}) =>
-    Throttled._(func, wait, leading: leading, trailing: trailing);
+Throttled<T> throttle<T>(
+  void Function(T arg) func,
+  Duration wait, {
+  bool leading = true,
+  bool trailing = true,
+}) => Throttled._(func, wait, leading: leading, trailing: trailing);
 
 // ---- lib/src/util/shuffle.dart ----
 
@@ -8146,16 +8507,20 @@ List<T> _shuffleList<T>(List<T> result, double Function() random) {
 ///
 /// Port of FxTS `shuffle`.
 List<T> shuffle<T>(Iterable<T> iterable, [int? seed]) {
-  final random =
-      seed != null ? createSeededRandom(seed) : math.Random().nextDouble;
+  final random = seed != null
+      ? createSeededRandom(seed)
+      : math.Random().nextDouble;
   return _shuffleList(List.of(iterable), random);
 }
 
 /// Async counterpart of [shuffle].
-Future<List<T>> shuffleAsync<T>(FxAsyncIterable<T> iterable,
-    [int? seed]) async {
-  final random =
-      seed != null ? createSeededRandom(seed) : math.Random().nextDouble;
+Future<List<T>> shuffleAsync<T>(
+  FxAsyncIterable<T> iterable, [
+  int? seed,
+]) async {
+  final random = seed != null
+      ? createSeededRandom(seed)
+      : math.Random().nextDouble;
   return _shuffleList(await toListAsync(iterable), random);
 }
 
@@ -8216,8 +8581,7 @@ extension type NonEmptyList<T>._(List<T> _all) implements Iterable<T> {
 
   /// A defensive copy as a plain [List].
   // ignore: annotate_redeclares
-  List<T> toList({bool growable = true}) =>
-      List.of(_all, growable: growable);
+  List<T> toList({bool growable = true}) => List.of(_all, growable: growable);
 }
 
 /// The bridge from plain iterables into the [NonEmptyList] world.
@@ -8315,9 +8679,8 @@ final class _DefaultRaise<E> implements Raise<E> {
   bool _active = true;
 
   @override
-  Never raise(E error) => _active
-      ? throw _RaiseSignal(error, this)
-      : throw RaiseLeakedError();
+  Never raise(E error) =>
+      _active ? throw _RaiseSignal(error, this) : throw RaiseLeakedError();
 }
 
 /// The single primitive every builder derives from — the port of Arrow's
@@ -8404,12 +8767,12 @@ Either<E, A> either<E, A>(A Function(Raise<E> r) block) =>
 /// raise inside an unawaited future cannot be captured and surfaces as an
 /// unhandled zone error.
 Future<Either<E, A>> eitherAsync<E, A>(
-        FutureOr<A> Function(Raise<E> r) block) =>
-    foldRaiseAsync<E, A, Either<E, A>>(
-      block,
-      onRaise: (error) => Left(error),
-      onValue: (value) => Right(value),
-    );
+  FutureOr<A> Function(Raise<E> r) block,
+) => foldRaiseAsync<E, A, Either<E, A>>(
+  block,
+  onRaise: (error) => Left(error),
+  onValue: (value) => Right(value),
+);
 
 /// [either] with an exception boundary: a *thrown* exception is transformed
 /// by [onThrow] into the scope's typed error. The pre-combined form of the
@@ -8425,26 +8788,27 @@ Future<Either<E, A>> eitherAsync<E, A>(
 ///   (e, _) => RowError.one(line, FieldError('row', 'could not parse: $e')),
 /// );
 /// ```
-Either<E, A> eitherCatching<E, A>(A Function(Raise<E> r) block,
-        E Function(Object thrown, StackTrace stackTrace) onThrow) =>
-    foldRaise<E, A, Either<E, A>>(
-      block,
-      onRaise: (error) => Left(error),
-      onValue: (value) => Right(value),
-      onThrow: (thrown, stackTrace) => Left(onThrow(thrown, stackTrace)),
-    );
+Either<E, A> eitherCatching<E, A>(
+  A Function(Raise<E> r) block,
+  E Function(Object thrown, StackTrace stackTrace) onThrow,
+) => foldRaise<E, A, Either<E, A>>(
+  block,
+  onRaise: (error) => Left(error),
+  onValue: (value) => Right(value),
+  onThrow: (thrown, stackTrace) => Left(onThrow(thrown, stackTrace)),
+);
 
 /// Async twin of [eitherCatching].
 Future<Either<E, A>> eitherCatchingAsync<E, A>(
-        FutureOr<A> Function(Raise<E> r) block,
-        FutureOr<E> Function(Object thrown, StackTrace stackTrace) onThrow) =>
-    foldRaiseAsync<E, A, Either<E, A>>(
-      block,
-      onRaise: (error) => Left(error),
-      onValue: (value) => Right(value),
-      onThrow: (thrown, stackTrace) async =>
-          Left(await onThrow(thrown, stackTrace)),
-    );
+  FutureOr<A> Function(Raise<E> r) block,
+  FutureOr<E> Function(Object thrown, StackTrace stackTrace) onThrow,
+) => foldRaiseAsync<E, A, Either<E, A>>(
+  block,
+  onRaise: (error) => Left(error),
+  onValue: (value) => Right(value),
+  onThrow: (thrown, stackTrace) async =>
+      Left(await onThrow(thrown, stackTrace)),
+);
 
 /// The info-free raise scope used by [nullable] — the port of Arrow's
 /// `SingletonRaise` (errors carry no information).
@@ -8484,10 +8848,10 @@ final class SingletonRaise implements Raise<void> {
 /// }); // int? — null if either parse failed
 /// ```
 A? nullable<A>(A Function(SingletonRaise r) block) => foldRaise<void, A, A?>(
-      (r) => block(SingletonRaise._(r)),
-      onRaise: (_) => null,
-      onValue: (value) => value,
-    );
+  (r) => block(SingletonRaise._(r)),
+  onRaise: (_) => null,
+  onValue: (value) => value,
+);
 
 /// Async twin of [nullable].
 Future<A?> nullableAsync<A>(FutureOr<A> Function(SingletonRaise r) block) =>
@@ -8503,7 +8867,9 @@ Future<A?> nullableAsync<A>(FutureOr<A> Function(SingletonRaise r) block) =>
 /// `catch` + `nonFatalOrThrow` discipline; `catch` is a Dart reserved word,
 /// hence `catching`).
 A catching<A>(
-    A Function() block, A Function(Object error, StackTrace stackTrace) onError) {
+  A Function() block,
+  A Function(Object error, StackTrace stackTrace) onError,
+) {
   try {
     return block();
   } on _RaiseSignal {
@@ -8514,8 +8880,10 @@ A catching<A>(
 }
 
 /// Async twin of [catching].
-Future<A> catchingAsync<A>(FutureOr<A> Function() block,
-    FutureOr<A> Function(Object error, StackTrace stackTrace) onError) async {
+Future<A> catchingAsync<A>(
+  FutureOr<A> Function() block,
+  FutureOr<A> Function(Object error, StackTrace stackTrace) onError,
+) async {
   try {
     return await block();
   } on _RaiseSignal {
@@ -8530,13 +8898,14 @@ Future<A> catchingAsync<A>(FutureOr<A> Function() block,
 extension RaiseOps<E> on Raise<E> {
   /// Unwraps [either], raising its [Left].
   A bind<A>(Either<E, A> either) => switch (either) {
-        Left(:final value) => raise(value),
-        Right(:final value) => value,
-      };
+    Left(:final value) => raise(value),
+    Right(:final value) => value,
+  };
 
   /// Unwraps every element, raising the first [Left].
-  List<A> bindAll<A>(Iterable<Either<E, A>> eithers) =>
-      [for (final e in eithers) bind(e)];
+  List<A> bindAll<A>(Iterable<Either<E, A>> eithers) => [
+    for (final e in eithers) bind(e),
+  ];
 
   /// Raises [error] unless [condition] holds — the typed-error `require`.
   void ensure(bool condition, E Function() error) {
@@ -8545,8 +8914,7 @@ extension RaiseOps<E> on Raise<E> {
 
   /// Returns [value] non-null, or raises [error] — the typed-error
   /// `requireNotNull`, with promotion via the non-null return type.
-  A ensureNotNull<A>(A? value, E Function() error) =>
-      value ?? raise(error());
+  A ensureNotNull<A>(A? value, E Function() error) => value ?? raise(error());
 
   /// Runs [block] in a nested scope; a raised error is handed to [onRaise]
   /// instead of propagating.
@@ -8555,21 +8923,28 @@ extension RaiseOps<E> on Raise<E> {
   /// Arrow 2.x's three-clause `recover(block, recover, catch)`. The raise
   /// signal itself is never handed to [onThrow] — this scope's raise goes to
   /// [onRaise], a foreign scope's signal is rethrown untouched.
-  A recover<A>(A Function(Raise<E> r) block, A Function(E error) onRaise,
-          {A Function(Object thrown, StackTrace stackTrace)? onThrow}) =>
-      foldRaise<E, A, A>(block,
-          onRaise: onRaise, onValue: (value) => value, onThrow: onThrow);
+  A recover<A>(
+    A Function(Raise<E> r) block,
+    A Function(E error) onRaise, {
+    A Function(Object thrown, StackTrace stackTrace)? onThrow,
+  }) => foldRaise<E, A, A>(
+    block,
+    onRaise: onRaise,
+    onValue: (value) => value,
+    onThrow: onThrow,
+  );
 
   /// Runs [block] in a scope with a DIFFERENT error type `E2`, mapping any
   /// raised `E2` into this scope's `E` via [transform] — the error-type
   /// adapter (port of Arrow's `withError`).
   A withError<E2, A>(
-          E Function(E2 error) transform, A Function(Raise<E2> r) block) =>
-      foldRaise<E2, A, A>(
-        block,
-        onRaise: (error) => raise(transform(error)),
-        onValue: (value) => value,
-      );
+    E Function(E2 error) transform,
+    A Function(Raise<E2> r) block,
+  ) => foldRaise<E2, A, A>(
+    block,
+    onRaise: (error) => raise(transform(error)),
+    onValue: (value) => value,
+  );
 }
 
 // ---- lib/src/typed/accumulate.dart ----
@@ -8657,7 +9032,9 @@ abstract interface class AccumulatingRaise<E> implements Raise<E> {
 
   /// Nested accumulation over [items]; all errors join this branch's raise.
   List<B> mapOrAccumulate<A, B>(
-      Iterable<A> items, B Function(AccumulatingRaise<E> r, A item) transform);
+    Iterable<A> items,
+    B Function(AccumulatingRaise<E> r, A item) transform,
+  );
 }
 
 final class _AccumulatingRaiseImpl<E> implements AccumulatingRaise<E> {
@@ -8672,9 +9049,10 @@ final class _AccumulatingRaiseImpl<E> implements AccumulatingRaise<E> {
   A bindNel<A>(EitherNel<E, A> either) => _nel.bindNel(either);
 
   @override
-  List<B> mapOrAccumulate<A, B>(Iterable<A> items,
-          B Function(AccumulatingRaise<E> r, A item) transform) =>
-      _nel.mapOrAccumulate(items, transform);
+  List<B> mapOrAccumulate<A, B>(
+    Iterable<A> items,
+    B Function(AccumulatingRaise<E> r, A item) transform,
+  ) => _nel.mapOrAccumulate(items, transform);
 }
 
 final class _AccumulatorImpl<E> implements Accumulator<E> {
@@ -8729,15 +9107,17 @@ extension AccumulatingRaiseOps<E> on Raise<NonEmptyList<E>> {
 
   /// Unwraps an [EitherNel], raising ALL of its errors at once.
   A bindNel<A>(EitherNel<E, A> either) => switch (either) {
-        Left(:final value) => raise(value),
-        Right(:final value) => value,
-      };
+    Left(:final value) => raise(value),
+    Right(:final value) => value,
+  };
 
   /// Transforms every element of [items], collecting ALL failures instead
   /// of stopping at the first (fail-slow). Returns the transformed list, or
   /// raises every accumulated error.
   List<B> mapOrAccumulate<A, B>(
-      Iterable<A> items, B Function(AccumulatingRaise<E> r, A item) transform) {
+    Iterable<A> items,
+    B Function(AccumulatingRaise<E> r, A item) transform,
+  ) {
     final errors = <E>[];
     final results = <B>[];
     for (final item in items) {
@@ -8760,12 +9140,11 @@ extension AccumulatingRaiseOps<E> on Raise<NonEmptyList<E>> {
     A Function(AccumulatingRaise<E> r) fa,
     B Function(AccumulatingRaise<E> r) fb,
     R Function(A a, B b) combine,
-  ) =>
-      accumulate((acc) {
-        final a = acc.accumulating(fa);
-        final b = acc.accumulating(fb);
-        return combine(a.value, b.value);
-      });
+  ) => accumulate((acc) {
+    final a = acc.accumulating(fa);
+    final b = acc.accumulating(fb);
+    return combine(a.value, b.value);
+  });
 
   /// 3-ary [zipOrAccumulate2].
   R zipOrAccumulate3<A, B, C, R>(
@@ -8773,13 +9152,12 @@ extension AccumulatingRaiseOps<E> on Raise<NonEmptyList<E>> {
     B Function(AccumulatingRaise<E> r) fb,
     C Function(AccumulatingRaise<E> r) fc,
     R Function(A a, B b, C c) combine,
-  ) =>
-      accumulate((acc) {
-        final a = acc.accumulating(fa);
-        final b = acc.accumulating(fb);
-        final c = acc.accumulating(fc);
-        return combine(a.value, b.value, c.value);
-      });
+  ) => accumulate((acc) {
+    final a = acc.accumulating(fa);
+    final b = acc.accumulating(fb);
+    final c = acc.accumulating(fc);
+    return combine(a.value, b.value, c.value);
+  });
 
   /// 4-ary [zipOrAccumulate2].
   R zipOrAccumulate4<A, B, C, D, R>(
@@ -8788,14 +9166,13 @@ extension AccumulatingRaiseOps<E> on Raise<NonEmptyList<E>> {
     C Function(AccumulatingRaise<E> r) fc,
     D Function(AccumulatingRaise<E> r) fd,
     R Function(A a, B b, C c, D d) combine,
-  ) =>
-      accumulate((acc) {
-        final a = acc.accumulating(fa);
-        final b = acc.accumulating(fb);
-        final c = acc.accumulating(fc);
-        final d = acc.accumulating(fd);
-        return combine(a.value, b.value, c.value, d.value);
-      });
+  ) => accumulate((acc) {
+    final a = acc.accumulating(fa);
+    final b = acc.accumulating(fb);
+    final c = acc.accumulating(fc);
+    final d = acc.accumulating(fd);
+    return combine(a.value, b.value, c.value, d.value);
+  });
 
   /// 5-ary [zipOrAccumulate2].
   R zipOrAccumulate5<A, B, C, D, F, R>(
@@ -8805,15 +9182,14 @@ extension AccumulatingRaiseOps<E> on Raise<NonEmptyList<E>> {
     D Function(AccumulatingRaise<E> r) fd,
     F Function(AccumulatingRaise<E> r) ff,
     R Function(A a, B b, C c, D d, F f) combine,
-  ) =>
-      accumulate((acc) {
-        final a = acc.accumulating(fa);
-        final b = acc.accumulating(fb);
-        final c = acc.accumulating(fc);
-        final d = acc.accumulating(fd);
-        final f = acc.accumulating(ff);
-        return combine(a.value, b.value, c.value, d.value, f.value);
-      });
+  ) => accumulate((acc) {
+    final a = acc.accumulating(fa);
+    final b = acc.accumulating(fb);
+    final c = acc.accumulating(fc);
+    final d = acc.accumulating(fd);
+    final f = acc.accumulating(ff);
+    return combine(a.value, b.value, c.value, d.value, f.value);
+  });
 }
 
 // ---- lib/src/typed/fx_either.dart ----
@@ -8825,12 +9201,16 @@ extension AccumulatingRaiseOps<E> on Raise<NonEmptyList<E>> {
 // pipeline from a raise block; return one of these results instead).
 
 /// All [Right] values of [iterable], in order.
-List<R> rights<L, R>(Iterable<Either<L, R>> iterable) =>
-    [for (final e in iterable) if (e case Right(:final value)) value];
+List<R> rights<L, R>(Iterable<Either<L, R>> iterable) => [
+  for (final e in iterable)
+    if (e case Right(:final value)) value,
+];
 
 /// All [Left] values of [iterable], in order.
-List<L> lefts<L, R>(Iterable<Either<L, R>> iterable) =>
-    [for (final e in iterable) if (e case Left(:final value)) value];
+List<L> lefts<L, R>(Iterable<Either<L, R>> iterable) => [
+  for (final e in iterable)
+    if (e case Left(:final value)) value,
+];
 
 /// Splits [iterable] into `(lefts, rights)` — the Either analogue of
 /// `partition` (port of Arrow's `separateEither`).
@@ -8865,7 +9245,8 @@ Either<L, List<R>> sequenceEither<L, R>(Iterable<Either<L, R>> iterable) {
 /// Async twin of [sequenceEither]. Fail-fast: stops pulling from upstream at
 /// the first [Left].
 Future<Either<L, List<R>>> sequenceEitherAsync<L, R>(
-    FxAsyncIterable<Either<L, R>> iterable) async {
+  FxAsyncIterable<Either<L, R>> iterable,
+) async {
   final out = <R>[];
   final it = iterable.iterator;
   var res = await it.next();
@@ -8883,7 +9264,8 @@ Future<Either<L, List<R>>> sequenceEitherAsync<L, R>(
 
 /// Async twin of [rights].
 Future<List<R>> rightsAsync<L, R>(
-    FxAsyncIterable<Either<L, R>> iterable) async {
+  FxAsyncIterable<Either<L, R>> iterable,
+) async {
   final out = <R>[];
   final it = iterable.iterator;
   var res = await it.next();
@@ -8895,8 +9277,7 @@ Future<List<R>> rightsAsync<L, R>(
 }
 
 /// Async twin of [lefts].
-Future<List<L>> leftsAsync<L, R>(
-    FxAsyncIterable<Either<L, R>> iterable) async {
+Future<List<L>> leftsAsync<L, R>(FxAsyncIterable<Either<L, R>> iterable) async {
   final out = <L>[];
   final it = iterable.iterator;
   var res = await it.next();
@@ -8909,7 +9290,8 @@ Future<List<L>> leftsAsync<L, R>(
 
 /// Async twin of [separateEither].
 Future<(List<L>, List<R>)> separateEitherAsync<L, R>(
-    FxAsyncIterable<Either<L, R>> iterable) async {
+  FxAsyncIterable<Either<L, R>> iterable,
+) async {
   final ls = <L>[];
   final rs = <R>[];
   final it = iterable.iterator;
@@ -8930,23 +9312,24 @@ Future<(List<L>, List<R>)> separateEitherAsync<L, R>(
 /// [sequenceEither] over an existing collection of `Either`s (port of
 /// Arrow's `flattenOrAccumulate`).
 Either<NonEmptyList<E>, List<A>> flattenOrAccumulate<E, A>(
-        Iterable<Either<E, A>> iterable) =>
-    mapOrAccumulate((r, Either<E, A> e) => r.bind(e), iterable);
+  Iterable<Either<E, A>> iterable,
+) => mapOrAccumulate((r, Either<E, A> e) => r.bind(e), iterable);
 
 /// Async twin of [flattenOrAccumulate]. Fail-slow: consumes the whole
 /// upstream so every [Left] is collected.
 Future<Either<NonEmptyList<E>, List<A>>> flattenOrAccumulateAsync<E, A>(
-        FxAsyncIterable<Either<E, A>> iterable) =>
-    mapOrAccumulateAsync((r, Either<E, A> e) => r.bind(e), iterable);
+  FxAsyncIterable<Either<E, A>> iterable,
+) => mapOrAccumulateAsync((r, Either<E, A> e) => r.bind(e), iterable);
 
 /// Transforms every element of [iterable], collecting ALL failures instead
 /// of stopping at the first. The eager, pipeline-level twin of
 /// [AccumulatingRaiseOps.mapOrAccumulate].
 Either<NonEmptyList<E>, List<R>> mapOrAccumulate<E, T, R>(
-        R Function(AccumulatingRaise<E> r, T item) transform,
-        Iterable<T> iterable) =>
-    either<NonEmptyList<E>, List<R>>(
-        (r) => r.mapOrAccumulate(iterable, transform));
+  R Function(AccumulatingRaise<E> r, T item) transform,
+  Iterable<T> iterable,
+) => either<NonEmptyList<E>, List<R>>(
+  (r) => r.mapOrAccumulate(iterable, transform),
+);
 
 /// Async twin of [mapOrAccumulate] — fail-slow concurrent validation.
 ///
@@ -8956,12 +9339,15 @@ Either<NonEmptyList<E>, List<R>> mapOrAccumulate<E, T, R>(
 /// then folded eagerly in order. Pass [concurrency] to evaluate up to that
 /// many elements at once via the `concurrent(n)` back-channel.
 Future<Either<NonEmptyList<E>, List<R>>> mapOrAccumulateAsync<E, T, R>(
-    FutureOr<R> Function(AccumulatingRaise<E> r, T item) transform,
-    FxAsyncIterable<T> iterable,
-    {int? concurrency}) async {
-  var mapped = FxAsync(iterable).map((item) =>
-      eitherAsync<NonEmptyList<E>, R>(
-          (r) => transform(AccumulatingRaise.over(r), item)));
+  FutureOr<R> Function(AccumulatingRaise<E> r, T item) transform,
+  FxAsyncIterable<T> iterable, {
+  int? concurrency,
+}) async {
+  var mapped = FxAsync(iterable).map(
+    (item) => eitherAsync<NonEmptyList<E>, R>(
+      (r) => transform(AccumulatingRaise.over(r), item),
+    ),
+  );
   if (concurrency != null) mapped = mapped.concurrent(concurrency);
   final errors = <E>[];
   final results = <R>[];
@@ -8973,18 +9359,22 @@ Future<Either<NonEmptyList<E>, List<R>>> mapOrAccumulateAsync<E, T, R>(
         if (errors.isEmpty) results.add(value);
     }
   });
-  return errors.isEmpty
-      ? Right(results)
-      : Left(NonEmptyList.orNull(errors)!);
+  return errors.isEmpty ? Right(results) : Left(NonEmptyList.orNull(errors)!);
 }
 
 /// Either-aware terminals for sync chains of `Either` values.
 extension FxEitherOps<L, R> on Fx<Either<L, R>> {
   /// All [Right] values, in order.
-  List<R> rights() => [for (final e in this) if (e case Right(:final value)) value];
+  List<R> rights() => [
+    for (final e in this)
+      if (e case Right(:final value)) value,
+  ];
 
   /// All [Left] values, in order.
-  List<L> lefts() => [for (final e in this) if (e case Left(:final value)) value];
+  List<L> lefts() => [
+    for (final e in this)
+      if (e case Left(:final value)) value,
+  ];
 
   /// Splits into `(lefts, rights)` — matches the `partition` record shape.
   (List<L>, List<R>) separated() => separateEither(this);
@@ -8998,7 +9388,8 @@ extension FxEitherOps<L, R> on Fx<Either<L, R>> {
       // The top-level twin is shadowed by this member's name, so the
       // composition is spelled out (the FxEitherOps.rights precedent).
       either<NonEmptyList<L>, List<R>>(
-          (r) => r.mapOrAccumulate(this, (br, Either<L, R> e) => br.bind(e)));
+        (r) => r.mapOrAccumulate(this, (br, Either<L, R> e) => br.bind(e)),
+      );
 }
 
 /// Either-aware terminals for async chains of `Either` values.
@@ -9027,9 +9418,10 @@ extension FxAccumulateOps<T> on Fx<T> {
   /// Transforms every element, collecting ALL failures instead of stopping
   /// at the first.
   Either<NonEmptyList<E>, List<R>> mapOrAccumulate<E, R>(
-          R Function(AccumulatingRaise<E> r, T item) transform) =>
-      either<NonEmptyList<E>, List<R>>(
-          (r) => r.mapOrAccumulate(this, transform));
+    R Function(AccumulatingRaise<E> r, T item) transform,
+  ) => either<NonEmptyList<E>, List<R>>(
+    (r) => r.mapOrAccumulate(this, transform),
+  );
 }
 
 /// Fail-slow (optionally concurrent) validation over an async chain.
@@ -9037,9 +9429,9 @@ extension FxAsyncAccumulateOps<T> on FxAsync<T> {
   /// Async twin of [FxAccumulateOps.mapOrAccumulate]; pass [concurrency] to
   /// evaluate up to that many elements at once.
   Future<Either<NonEmptyList<E>, List<R>>> mapOrAccumulate<E, R>(
-          FutureOr<R> Function(AccumulatingRaise<E> r, T item) transform,
-          {int? concurrency}) =>
-      mapOrAccumulateAsync(transform, this, concurrency: concurrency);
+    FutureOr<R> Function(AccumulatingRaise<E> r, T item) transform, {
+    int? concurrency,
+  }) => mapOrAccumulateAsync(transform, this, concurrency: concurrency);
 }
 
 // ---- lib/src/stream/events.dart ----
@@ -9105,18 +9497,20 @@ class FxEvents<T> {
         return;
       }
       for (var i = 0; i < list.length; i++) {
-        subs.add(list[i].listen(
-          (v) => claim(i, () => out.add(v)),
-          onError: (Object e, StackTrace st) =>
-              claim(i, () => out.addError(e, st)),
-          onDone: () {
-            if (winner == i) {
-              out.close();
-            } else if (winner == -1 && ++done == list.length) {
-              out.close();
-            }
-          },
-        ));
+        subs.add(
+          list[i].listen(
+            (v) => claim(i, () => out.add(v)),
+            onError: (Object e, StackTrace st) =>
+                claim(i, () => out.addError(e, st)),
+            onDone: () {
+              if (winner == i) {
+                out.close();
+              } else if (winner == -1 && ++done == list.length) {
+                out.close();
+              }
+            },
+          ),
+        );
       }
       out.onCancel = () => Future.wait(subs.map((s) => s.cancel()));
     };
@@ -9135,9 +9529,15 @@ class FxEvents<T> {
         return;
       }
       for (final s in list) {
-        subs.add(s.listen(out.add, onError: out.addError, onDone: () {
-          if (++done == list.length) out.close();
-        }));
+        subs.add(
+          s.listen(
+            out.add,
+            onError: out.addError,
+            onDone: () {
+              if (++done == list.length) out.close();
+            },
+          ),
+        );
       }
       out.onCancel = () => Future.wait(subs.map((s) => s.cancel()));
     };
@@ -9165,7 +9565,9 @@ class FxEvents<T> {
   /// events — no further pair can ever be formed. An empty [sources]
   /// closes immediately.
   static FxEvents<R> zip<T, R>(
-      Iterable<Stream<T>> sources, R Function(List<T> values) combine) {
+    Iterable<Stream<T>> sources,
+    R Function(List<T> values) combine,
+  ) {
     final list = List.of(sources);
     final out = StreamController<R>();
     final subs = <StreamSubscription<T>>[];
@@ -9194,13 +9596,19 @@ class FxEvents<T> {
 
       for (var i = 0; i < list.length; i++) {
         final index = i;
-        subs.add(list[i].listen((v) {
-          buffers[index].add(v);
-          pump();
-        }, onError: out.addError, onDone: () {
-          closed[index] = true;
-          pump();
-        }));
+        subs.add(
+          list[i].listen(
+            (v) {
+              buffers[index].add(v);
+              pump();
+            },
+            onError: out.addError,
+            onDone: () {
+              closed[index] = true;
+              pump();
+            },
+          ),
+        );
       }
       out.onCancel = () => Future.wait(subs.map((s) => s.cancel()));
     };
@@ -9228,16 +9636,24 @@ class FxEvents<T> {
 
       for (var i = 0; i < list.length; i++) {
         final index = i;
-        subs.add(list[i].listen((v) {
-          if (!has[index]) {
-            has[index] = true;
-            seen++;
-          }
-          latest[index] = v;
-          if (seen == list.length) out.add([for (final v in latest) v as T]);
-        }, onError: out.addError, onDone: () {
-          if (++done == list.length) out.close();
-        }));
+        subs.add(
+          list[i].listen(
+            (v) {
+              if (!has[index]) {
+                has[index] = true;
+                seen++;
+              }
+              latest[index] = v;
+              if (seen == list.length) {
+                out.add([for (final v in latest) v as T]);
+              }
+            },
+            onError: out.addError,
+            onDone: () {
+              if (++done == list.length) out.close();
+            },
+          ),
+        );
       }
       out.onCancel = () => Future.wait(subs.map((s) => s.cancel()));
     };
@@ -9267,17 +9683,23 @@ class FxEvents<T> {
 
       for (var i = 0; i < list.length; i++) {
         final index = i;
-        subs.add(list[i].listen((v) {
-          last[index] = v;
-          has[index] = true;
-        }, onError: out.addError, onDone: () {
-          if (++done == list.length) {
-            if (!has.contains(false)) {
-              out.add([for (final v in last) v as T]);
-            }
-            out.close();
-          }
-        }));
+        subs.add(
+          list[i].listen(
+            (v) {
+              last[index] = v;
+              has[index] = true;
+            },
+            onError: out.addError,
+            onDone: () {
+              if (++done == list.length) {
+                if (!has.contains(false)) {
+                  out.add([for (final v in last) v as T]);
+                }
+                out.close();
+              }
+            },
+          ),
+        );
       }
       out.onCancel = () => Future.wait(subs.map((s) => s.cancel()));
     };
@@ -9308,18 +9730,22 @@ class FxEvents<T> {
             ..close();
           return;
         }
-        sub = source.listen(out.add, onError: (Object e, StackTrace st) {
-          sub!.cancel();
-          sub = null;
-          if (count != null && retries >= count) {
-            out
-              ..addError(e, st)
-              ..close();
-            return;
-          }
-          retries++;
-          attempt();
-        }, onDone: out.close);
+        sub = source.listen(
+          out.add,
+          onError: (Object e, StackTrace st) {
+            sub!.cancel();
+            sub = null;
+            if (count != null && retries >= count) {
+              out
+                ..addError(e, st)
+                ..close();
+              return;
+            }
+            retries++;
+            attempt();
+          },
+          onDone: out.close,
+        );
       }
 
       attempt();
@@ -9343,17 +9769,21 @@ class FxEvents<T> {
     out.onListen = () {
       late final StreamSubscription<T> sourceSub;
       late final StreamSubscription<void> triggerSub;
-      sourceSub = _inner.listen(out.add, onError: out.addError, onDone: () {
-        triggerSub.cancel();
-        out.close();
-      });
+      sourceSub = _inner.listen(
+        out.add,
+        onError: out.addError,
+        onDone: () {
+          triggerSub.cancel();
+          out.close();
+        },
+      );
       triggerSub = trigger.listen((_) {
         sourceSub.cancel();
         triggerSub.cancel();
         out.close();
       }, onError: out.addError);
-      out.onCancel =
-          () => Future.wait([sourceSub.cancel(), triggerSub.cancel()]);
+      out.onCancel = () =>
+          Future.wait([sourceSub.cancel(), triggerSub.cancel()]);
     };
     return FxEvents(out.stream);
   }
@@ -9370,18 +9800,22 @@ class FxEvents<T> {
       var open = false;
       late final StreamSubscription<T> sourceSub;
       late final StreamSubscription<void> triggerSub;
-      sourceSub = _inner.listen((v) {
-        if (open) out.add(v);
-      }, onError: out.addError, onDone: () {
-        triggerSub.cancel();
-        out.close();
-      });
+      sourceSub = _inner.listen(
+        (v) {
+          if (open) out.add(v);
+        },
+        onError: out.addError,
+        onDone: () {
+          triggerSub.cancel();
+          out.close();
+        },
+      );
       triggerSub = trigger.listen((_) {
         open = true;
         triggerSub.cancel();
       }, onError: out.addError);
-      out.onCancel =
-          () => Future.wait([sourceSub.cancel(), triggerSub.cancel()]);
+      out.onCancel = () =>
+          Future.wait([sourceSub.cancel(), triggerSub.cancel()]);
     };
     return FxEvents(out.stream);
   }
@@ -9397,19 +9831,23 @@ class FxEvents<T> {
       Timer? timer;
       late T pending;
       var hasPending = false;
-      final sub = _inner.listen((v) {
-        pending = v;
-        hasPending = true;
-        timer?.cancel();
-        timer = Timer(window, () {
-          hasPending = false;
-          out.add(pending);
-        });
-      }, onError: out.addError, onDone: () {
-        timer?.cancel();
-        if (hasPending) out.add(pending);
-        out.close();
-      });
+      final sub = _inner.listen(
+        (v) {
+          pending = v;
+          hasPending = true;
+          timer?.cancel();
+          timer = Timer(window, () {
+            hasPending = false;
+            out.add(pending);
+          });
+        },
+        onError: out.addError,
+        onDone: () {
+          timer?.cancel();
+          if (hasPending) out.add(pending);
+          out.close();
+        },
+      );
       out
         ..onPause = sub.pause
         ..onResume = sub.resume
@@ -9425,8 +9863,11 @@ class FxEvents<T> {
   /// ([leading], on by default), and with [trailing] the newest event seen
   /// during the window is emitted when it ends (or when the source closes
   /// mid-window).
-  FxEvents<T> throttle(Duration window,
-      {bool leading = true, bool trailing = false}) {
+  FxEvents<T> throttle(
+    Duration window, {
+    bool leading = true,
+    bool trailing = false,
+  }) {
     final out = StreamController<T>();
     out.onListen = () {
       Timer? timer;
@@ -9443,25 +9884,29 @@ class FxEvents<T> {
         if (closed) out.close();
       }
 
-      final sub = _inner.listen((v) {
-        if (timer == null) {
-          timer = Timer(window, endWindow);
-          if (leading) {
-            out.add(v);
-            return;
+      final sub = _inner.listen(
+        (v) {
+          if (timer == null) {
+            timer = Timer(window, endWindow);
+            if (leading) {
+              out.add(v);
+              return;
+            }
           }
-        }
-        pending = v;
-        hasPending = trailing;
-      }, onError: out.addError, onDone: () {
-        closed = true;
-        // A trailing value still waiting on its window is delivered before
-        // the close; without one, close immediately.
-        if (timer == null || !(trailing && hasPending)) {
-          timer?.cancel();
-          out.close();
-        }
-      });
+          pending = v;
+          hasPending = trailing;
+        },
+        onError: out.addError,
+        onDone: () {
+          closed = true;
+          // A trailing value still waiting on its window is delivered before
+          // the close; without one, close immediately.
+          if (timer == null || !(trailing && hasPending)) {
+            timer?.cancel();
+            out.close();
+          }
+        },
+      );
       out
         ..onPause = sub.pause
         ..onResume = sub.resume
@@ -9483,13 +9928,17 @@ class FxEvents<T> {
       var hasNew = false;
       late final StreamSubscription<T> sourceSub;
       late final StreamSubscription<void> triggerSub;
-      sourceSub = _inner.listen((v) {
-        latest = v;
-        hasNew = true;
-      }, onError: out.addError, onDone: () {
-        triggerSub.cancel();
-        out.close();
-      });
+      sourceSub = _inner.listen(
+        (v) {
+          latest = v;
+          hasNew = true;
+        },
+        onError: out.addError,
+        onDone: () {
+          triggerSub.cancel();
+          out.close();
+        },
+      );
       triggerSub = trigger.listen((_) {
         if (hasNew) {
           hasNew = false;
@@ -9525,18 +9974,22 @@ class FxEvents<T> {
         if (closed && timers.isEmpty) out.close();
       }
 
-      final sub = _inner.listen((v) {
-        late final Timer timer;
-        timer = Timer(duration, () {
-          timers.remove(timer);
-          out.add(v);
+      final sub = _inner.listen(
+        (v) {
+          late final Timer timer;
+          timer = Timer(duration, () {
+            timers.remove(timer);
+            out.add(v);
+            settle();
+          });
+          timers.add(timer);
+        },
+        onError: out.addError,
+        onDone: () {
+          closed = true;
           settle();
-        });
-        timers.add(timer);
-      }, onError: out.addError, onDone: () {
-        closed = true;
-        settle();
-      });
+        },
+      );
       out.onCancel = () {
         for (final t in timers) {
           t.cancel();
@@ -9576,13 +10029,17 @@ class FxEvents<T> {
         });
       }
 
-      final sub = _inner.listen((v) {
-        queue.add(v);
-        if (timer == null) pump();
-      }, onError: out.addError, onDone: () {
-        closed = true;
-        settle();
-      });
+      final sub = _inner.listen(
+        (v) {
+          queue.add(v);
+          if (timer == null) pump();
+        },
+        onError: out.addError,
+        onDone: () {
+          closed = true;
+          settle();
+        },
+      );
       out.onCancel = () {
         timer?.cancel();
         return sub.cancel();
@@ -9605,16 +10062,20 @@ class FxEvents<T> {
     final out = StreamController<List<T>>();
     out.onListen = () {
       var batch = <T>[];
-      final sub = _inner.listen((v) {
-        batch.add(v);
-        if (batch.length == count) {
-          out.add(batch);
-          batch = <T>[];
-        }
-      }, onError: out.addError, onDone: () {
-        if (batch.isNotEmpty) out.add(batch);
-        out.close();
-      });
+      final sub = _inner.listen(
+        (v) {
+          batch.add(v);
+          if (batch.length == count) {
+            out.add(batch);
+            batch = <T>[];
+          }
+        },
+        onError: out.addError,
+        onDone: () {
+          if (batch.isNotEmpty) out.add(batch);
+          out.close();
+        },
+      );
       out
         ..onPause = sub.pause
         ..onResume = sub.resume
@@ -9635,20 +10096,23 @@ class FxEvents<T> {
       var batch = <T>[];
       late final StreamSubscription<T> sourceSub;
       late final StreamSubscription<void> triggerSub;
-      sourceSub = _inner.listen((v) => batch.add(v), onError: out.addError,
-          onDone: () {
-        triggerSub.cancel();
-        if (batch.isNotEmpty) out.add(batch);
-        out.close();
-      });
+      sourceSub = _inner.listen(
+        (v) => batch.add(v),
+        onError: out.addError,
+        onDone: () {
+          triggerSub.cancel();
+          if (batch.isNotEmpty) out.add(batch);
+          out.close();
+        },
+      );
       triggerSub = trigger.listen((_) {
         if (batch.isNotEmpty) {
           out.add(batch);
           batch = <T>[];
         }
       }, onError: out.addError);
-      out.onCancel =
-          () => Future.wait([sourceSub.cancel(), triggerSub.cancel()]);
+      out.onCancel = () =>
+          Future.wait([sourceSub.cancel(), triggerSub.cancel()]);
     };
     return FxEvents(out.stream);
   }
@@ -9670,12 +10134,15 @@ class FxEvents<T> {
       }
 
       final timer = Timer.periodic(window, (_) => flush());
-      final sub = _inner.listen((v) => batch.add(v), onError: out.addError,
-          onDone: () {
-        timer.cancel();
-        flush();
-        out.close();
-      });
+      final sub = _inner.listen(
+        (v) => batch.add(v),
+        onError: out.addError,
+        onDone: () {
+          timer.cancel();
+          flush();
+          out.close();
+        },
+      );
       out
         ..onPause = sub.pause
         ..onResume = sub.resume
@@ -9693,7 +10160,9 @@ class FxEvents<T> {
   /// values — once both sides have produced at least one. Closes when both
   /// sides have closed.
   FxEvents<R> combineLatest<U, R>(
-      Stream<U> other, R Function(T a, U b) combine) {
+    Stream<U> other,
+    R Function(T a, U b) combine,
+  ) {
     final out = StreamController<R>();
     out.onListen = () {
       late T a;
@@ -9708,16 +10177,24 @@ class FxEvents<T> {
         if (++done == 2) out.close();
       }
 
-      final subA = _inner.listen((v) {
-        a = v;
-        hasA = true;
-        emit();
-      }, onError: out.addError, onDone: onDone);
-      final subB = other.listen((v) {
-        b = v;
-        hasB = true;
-        emit();
-      }, onError: out.addError, onDone: onDone);
+      final subA = _inner.listen(
+        (v) {
+          a = v;
+          hasA = true;
+          emit();
+        },
+        onError: out.addError,
+        onDone: onDone,
+      );
+      final subB = other.listen(
+        (v) {
+          b = v;
+          hasB = true;
+          emit();
+        },
+        onError: out.addError,
+        onDone: onDone,
+      );
       out.onCancel = () => Future.wait([subA.cancel(), subB.cancel()]);
     };
     return FxEvents(out.stream);
@@ -9727,7 +10204,9 @@ class FxEvents<T> {
   /// [other] — source events before [other] has spoken are dropped. Closes
   /// when the source closes; [other]'s close is ignored.
   FxEvents<R> withLatestFrom<U, R>(
-      Stream<U> other, R Function(T a, U b) combine) {
+    Stream<U> other,
+    R Function(T a, U b) combine,
+  ) {
     final out = StreamController<R>();
     out.onListen = () {
       late U latest;
@@ -9737,14 +10216,17 @@ class FxEvents<T> {
         hasLatest = true;
       }, onError: out.addError);
       late final StreamSubscription<T> sourceSub;
-      sourceSub = _inner.listen((v) {
-        if (hasLatest) out.add(combine(v, latest));
-      }, onError: out.addError, onDone: () {
-        otherSub.cancel();
-        out.close();
-      });
-      out.onCancel = () =>
-          Future.wait([sourceSub.cancel(), otherSub.cancel()]);
+      sourceSub = _inner.listen(
+        (v) {
+          if (hasLatest) out.add(combine(v, latest));
+        },
+        onError: out.addError,
+        onDone: () {
+          otherSub.cancel();
+          out.close();
+        },
+      );
+      out.onCancel = () => Future.wait([sourceSub.cancel(), otherSub.cancel()]);
     };
     return FxEvents(out.stream);
   }
@@ -9771,20 +10253,28 @@ class FxEvents<T> {
         }
       }
 
-      final subA = _inner.listen((v) {
-        bufferA.add(v);
-        pump();
-      }, onError: out.addError, onDone: () {
-        closedA = true;
-        pump();
-      });
-      final subB = other.listen((v) {
-        bufferB.add(v);
-        pump();
-      }, onError: out.addError, onDone: () {
-        closedB = true;
-        pump();
-      });
+      final subA = _inner.listen(
+        (v) {
+          bufferA.add(v);
+          pump();
+        },
+        onError: out.addError,
+        onDone: () {
+          closedA = true;
+          pump();
+        },
+      );
+      final subB = other.listen(
+        (v) {
+          bufferB.add(v);
+          pump();
+        },
+        onError: out.addError,
+        onDone: () {
+          closedB = true;
+          pump();
+        },
+      );
       out.onCancel = () => Future.wait([subA.cancel(), subB.cancel()]);
     };
     return FxEvents(out.stream);
@@ -9812,29 +10302,37 @@ class FxEvents<T> {
     out.onListen = () {
       StreamSubscription<R>? innerSub;
       var outerDone = false;
-      final sub = _inner.listen((v) {
-        innerSub?.cancel();
-        final Stream<R> inner;
-        try {
-          inner = f(v);
-        } catch (e, st) {
-          out.addError(e, st);
-          return;
-        }
-        late final StreamSubscription<R> s;
-        s = inner.listen(out.add, onError: out.addError, onDone: () {
-          if (identical(innerSub, s)) {
-            innerSub = null;
-            if (outerDone) out.close();
+      final sub = _inner.listen(
+        (v) {
+          innerSub?.cancel();
+          final Stream<R> inner;
+          try {
+            inner = f(v);
+          } catch (e, st) {
+            out.addError(e, st);
+            return;
           }
-        });
-        innerSub = s;
-      }, onError: out.addError, onDone: () {
-        outerDone = true;
-        if (innerSub == null) out.close();
-      });
-      out.onCancel = () => Future.wait(
-          [sub.cancel(), if (innerSub != null) innerSub!.cancel()]);
+          late final StreamSubscription<R> s;
+          s = inner.listen(
+            out.add,
+            onError: out.addError,
+            onDone: () {
+              if (identical(innerSub, s)) {
+                innerSub = null;
+                if (outerDone) out.close();
+              }
+            },
+          );
+          innerSub = s;
+        },
+        onError: out.addError,
+        onDone: () {
+          outerDone = true;
+          if (innerSub == null) out.close();
+        },
+      );
+      out.onCancel = () =>
+          Future.wait([sub.cancel(), if (innerSub != null) innerSub!.cancel()]);
     };
     return FxEvents(out.stream);
   }
@@ -9874,26 +10372,34 @@ class FxEvents<T> {
           return;
         }
         late final StreamSubscription<R> s;
-        s = inner.listen(out.add, onError: out.addError, onDone: () {
-          inners.remove(s);
-          if (waiting.isNotEmpty) start(waiting.removeAt(0));
-          settle();
-        });
+        s = inner.listen(
+          out.add,
+          onError: out.addError,
+          onDone: () {
+            inners.remove(s);
+            if (waiting.isNotEmpty) start(waiting.removeAt(0));
+            settle();
+          },
+        );
         inners.add(s);
       }
 
-      final sub = _inner.listen((v) {
-        if (concurrent != null && inners.length >= concurrent) {
-          waiting.add(v);
-        } else {
-          start(v);
-        }
-      }, onError: out.addError, onDone: () {
-        outerDone = true;
-        settle();
-      });
-      out.onCancel = () => Future.wait(
-          [sub.cancel(), for (final s in inners) s.cancel()]);
+      final sub = _inner.listen(
+        (v) {
+          if (concurrent != null && inners.length >= concurrent) {
+            waiting.add(v);
+          } else {
+            start(v);
+          }
+        },
+        onError: out.addError,
+        onDone: () {
+          outerDone = true;
+          settle();
+        },
+      );
+      out.onCancel = () =>
+          Future.wait([sub.cancel(), for (final s in inners) s.cancel()]);
     };
     return FxEvents(out.stream);
   }
@@ -9920,25 +10426,33 @@ class FxEvents<T> {
     out.onListen = () {
       StreamSubscription<R>? innerSub;
       var outerDone = false;
-      final sub = _inner.listen((v) {
-        if (innerSub != null) return;
-        final Stream<R> inner;
-        try {
-          inner = f(v);
-        } catch (e, st) {
-          out.addError(e, st);
-          return;
-        }
-        innerSub = inner.listen(out.add, onError: out.addError, onDone: () {
-          innerSub = null;
-          if (outerDone) out.close();
-        });
-      }, onError: out.addError, onDone: () {
-        outerDone = true;
-        if (innerSub == null) out.close();
-      });
-      out.onCancel = () => Future.wait(
-          [sub.cancel(), if (innerSub != null) innerSub!.cancel()]);
+      final sub = _inner.listen(
+        (v) {
+          if (innerSub != null) return;
+          final Stream<R> inner;
+          try {
+            inner = f(v);
+          } catch (e, st) {
+            out.addError(e, st);
+            return;
+          }
+          innerSub = inner.listen(
+            out.add,
+            onError: out.addError,
+            onDone: () {
+              innerSub = null;
+              if (outerDone) out.close();
+            },
+          );
+        },
+        onError: out.addError,
+        onDone: () {
+          outerDone = true;
+          if (innerSub == null) out.close();
+        },
+      );
+      out.onCancel = () =>
+          Future.wait([sub.cancel(), if (innerSub != null) innerSub!.cancel()]);
     };
     return FxEvents(out.stream);
   }
@@ -9953,9 +10467,11 @@ class FxEvents<T> {
   FxEvents<T> onErrorReturn(T value) {
     final out = StreamController<T>();
     out.onListen = () {
-      final sub = _inner.listen(out.add,
-          onError: (Object _, StackTrace __) => out.add(value),
-          onDone: out.close);
+      final sub = _inner.listen(
+        out.add,
+        onError: (Object _, StackTrace __) => out.add(value),
+        onDone: out.close,
+      );
       out
         ..onPause = sub.pause
         ..onResume = sub.resume
@@ -9972,30 +10488,38 @@ class FxEvents<T> {
   /// error thrown by [f] itself. fxdart events layer, after Rx's
   /// `onErrorResume`.
   FxEvents<T> onErrorResume(
-      Stream<T> Function(Object error, StackTrace stackTrace) f) {
+    Stream<T> Function(Object error, StackTrace stackTrace) f,
+  ) {
     final out = StreamController<T>();
     out.onListen = () {
       StreamSubscription<T>? sourceSub;
       StreamSubscription<T>? fallbackSub;
-      sourceSub = _inner.listen(out.add, onError: (Object e, StackTrace st) {
-        sourceSub!.cancel();
-        sourceSub = null;
-        final Stream<T> fallback;
-        try {
-          fallback = f(e, st);
-        } catch (e2, st2) {
-          out
-            ..addError(e2, st2)
-            ..close();
-          return;
-        }
-        fallbackSub =
-            fallback.listen(out.add, onError: out.addError, onDone: out.close);
-      }, onDone: out.close);
+      sourceSub = _inner.listen(
+        out.add,
+        onError: (Object e, StackTrace st) {
+          sourceSub!.cancel();
+          sourceSub = null;
+          final Stream<T> fallback;
+          try {
+            fallback = f(e, st);
+          } catch (e2, st2) {
+            out
+              ..addError(e2, st2)
+              ..close();
+            return;
+          }
+          fallbackSub = fallback.listen(
+            out.add,
+            onError: out.addError,
+            onDone: out.close,
+          );
+        },
+        onDone: out.close,
+      );
       out.onCancel = () => Future.wait([
-            if (sourceSub != null) sourceSub!.cancel(),
-            if (fallbackSub != null) fallbackSub!.cancel(),
-          ]);
+        if (sourceSub != null) sourceSub!.cancel(),
+        if (fallbackSub != null) fallbackSub!.cancel(),
+      ]);
     };
     return FxEvents(out.stream);
   }
@@ -10007,8 +10531,11 @@ class FxEvents<T> {
     final out = StreamController<T>();
     out.onListen = () {
       out.add(value);
-      final sub =
-          _inner.listen(out.add, onError: out.addError, onDone: out.close);
+      final sub = _inner.listen(
+        out.add,
+        onError: out.addError,
+        onDone: out.close,
+      );
       out
         ..onPause = sub.pause
         ..onResume = sub.resume
@@ -10044,25 +10571,35 @@ class FxEvents<T> {
   FxEvents<T> share() {
     late final StreamController<T> out;
     StreamSubscription<T>? sub;
-    out = StreamController<T>.broadcast(onListen: () {
-      sub = _inner.listen(out.add, onError: out.addError, onDone: out.close);
-    }, onCancel: () {
-      // A broadcast controller's onCancel is `void Function()` — there is
-      // nowhere to hand the cancel future, so it is fired and forgotten.
-      sub?.cancel();
-      sub = null;
-      if (!out.isClosed) out.close();
-    });
+    out = StreamController<T>.broadcast(
+      onListen: () {
+        sub = _inner.listen(out.add, onError: out.addError, onDone: out.close);
+      },
+      onCancel: () {
+        // A broadcast controller's onCancel is `void Function()` — there is
+        // nowhere to hand the cancel future, so it is fired and forgotten.
+        sub?.cancel();
+        sub = null;
+        if (!out.isClosed) out.close();
+      },
+    );
     return FxEvents(out.stream);
   }
 
   // --- terminals & bridges --------------------------------------------------
 
   /// Listens to the chain (a plain [Stream.listen] passthrough).
-  StreamSubscription<T> listen(void Function(T event)? onData,
-          {Function? onError, void Function()? onDone, bool? cancelOnError}) =>
-      _inner.listen(onData,
-          onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+  StreamSubscription<T> listen(
+    void Function(T event)? onData, {
+    Function? onError,
+    void Function()? onDone,
+    bool? cancelOnError,
+  }) => _inner.listen(
+    onData,
+    onError: onError,
+    onDone: onDone,
+    cancelOnError: cancelOnError,
+  );
 
   /// Collects every event into a list (completes when the stream closes).
   Future<List<T>> toList() => _inner.toList();
@@ -10094,9 +10631,7 @@ class LiveValue<T> {
   LiveValue();
 
   /// A [LiveValue] that already holds [value].
-  LiveValue.seeded(T value)
-      : _value = value,
-        _hasValue = true;
+  LiveValue.seeded(T value) : _value = value, _hasValue = true;
 
   /// A [LiveValue] fed by [source], starting empty.
   ///
@@ -10115,17 +10650,21 @@ class LiveValue<T> {
   /// A [LiveValue] fed by [source] that already holds [seed] until the
   /// source's first value replaces it. See [LiveValue.from].
   LiveValue.seededFrom(T seed, Stream<T> source)
-      : _value = seed,
-        _hasValue = true {
+    : _value = seed,
+      _hasValue = true {
     _bind(source);
   }
 
   void _bind(Stream<T> source) {
-    _source = source.listen((v) {
-      _value = v;
-      _hasValue = true;
-      _controller.add(v);
-    }, onError: _controller.addError, onDone: close);
+    _source = source.listen(
+      (v) {
+        _value = v;
+        _hasValue = true;
+        _controller.add(v);
+      },
+      onError: _controller.addError,
+      onDone: close,
+    );
   }
 
   /// Whether a value has been set (by seed or [add]).
@@ -10136,7 +10675,8 @@ class LiveValue<T> {
   T get value {
     if (!_hasValue) {
       throw StateError(
-          'LiveValue has no value yet — check hasValue or use LiveValue.seeded');
+        'LiveValue has no value yet — check hasValue or use LiveValue.seeded',
+      );
     }
     return _value as T;
   }
@@ -10158,18 +10698,25 @@ class LiveValue<T> {
   FxEvents<T> get live {
     late StreamController<T> c;
     StreamSubscription<T>? sub;
-    c = StreamController<T>(onListen: () {
-      // Synchronous replay-then-subscribe: no update can slip between the
-      // replayed value and the live feed.
-      if (_hasValue) c.add(_value as T);
-      if (_closed) {
-        c.close();
-        return;
-      }
-      sub = _controller.stream
-          .listen(c.add, onError: c.addError, onDone: c.close);
-    }, onPause: () => sub?.pause(), onResume: () => sub?.resume(),
-        onCancel: () => sub?.cancel());
+    c = StreamController<T>(
+      onListen: () {
+        // Synchronous replay-then-subscribe: no update can slip between the
+        // replayed value and the live feed.
+        if (_hasValue) c.add(_value as T);
+        if (_closed) {
+          c.close();
+          return;
+        }
+        sub = _controller.stream.listen(
+          c.add,
+          onError: c.addError,
+          onDone: c.close,
+        );
+      },
+      onPause: () => sub?.pause(),
+      onResume: () => sub?.resume(),
+      onCancel: () => sub?.cancel(),
+    );
     return FxEvents(c.stream);
   }
 
@@ -10380,8 +10927,7 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   Fx<T> takeWhile(bool Function(T value) test) => Fx(_$takeWhile(test, _inner));
 
   /// The longest trailing run of values [f] holds for, in source order.
-  Fx<T> takeWhileRight(bool Function(T a) f) =>
-      Fx(_$takeWhileRight(f, _inner));
+  Fx<T> takeWhileRight(bool Function(T a) f) => Fx(_$takeWhileRight(f, _inner));
 
   /// Yields values until [f] matches, including the matching element.
   Fx<T> takeUntilInclusive(bool Function(T a) f) =>
@@ -10403,8 +10949,7 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   Fx<T> dropWhile(bool Function(T a) f) => Fx(_$dropWhile(f, _inner));
 
   /// Drops the longest trailing run of values [f] holds for.
-  Fx<T> dropWhileRight(bool Function(T a) f) =>
-      Fx(_$dropWhileRight(f, _inner));
+  Fx<T> dropWhileRight(bool Function(T a) f) => Fx(_$dropWhileRight(f, _inner));
 
   Fx<T> skipWhile(bool Function(T value) test) => dropWhile(test);
 
@@ -10455,8 +11000,7 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   Fx<T> uniqAdjacent() => Fx(_$uniqAdjacent(_inner));
 
   /// Drops values whose [f]-key equals the previous value's key.
-  Fx<T> uniqAdjacentBy<B>(B Function(T a) f) =>
-      Fx(_$uniqAdjacentBy(f, _inner));
+  Fx<T> uniqAdjacentBy<B>(B Function(T a) f) => Fx(_$uniqAdjacentBy(f, _inner));
 
   /// Switches to [fallback]'s values when this chain turns out to be empty.
   Fx<T> ifEmpty(Iterable<T> Function() fallback) =>
@@ -10472,8 +11016,10 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 
   /// Three-fold [tee].
   (R1, R2, R3) tee3<R1, R2, R3>(
-          _$Fold<T, R1> first, _$Fold<T, R2> second, _$Fold<T, R3> third) =>
-      _$tee3(_inner, first, second, third);
+    _$Fold<T, R1> first,
+    _$Fold<T, R2> second,
+    _$Fold<T, R3> third,
+  ) => _$tee3(_inner, first, second, third);
 
   /// Pairs each value with the value at the same position in [other],
   /// stopping at the shorter side.
@@ -10552,18 +11098,20 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// values in flight at once, in source order — the pre-combined form of
   /// `toAsync().map(f).concurrent(concurrency)`.
   @pragma('vm:prefer-inline')
-  FxAsync<R> mapConcurrent<R>(
-          int concurrency, FutureOr<R> Function(T a) f) =>
+  FxAsync<R> mapConcurrent<R>(int concurrency, FutureOr<R> Function(T a) f) =>
       FxAsync(_$mapConcurrent(concurrency, f, _inner));
 
   /// Switches to the async chain and maps [f], retrying each call up to
   /// [attempts] times (with optional [delay] backoff) before the error
   /// propagates.
   @pragma('vm:prefer-inline')
-  FxAsync<R> mapRetry<R>(int attempts, FutureOr<R> Function(T a) f,
-          {Duration Function(int failed)? delay}) =>
-      FxAsync(_$mapRetryAsync(attempts, f, _$toAsync(_inner),
-          delay: delay));
+  FxAsync<R> mapRetry<R>(
+    int attempts,
+    FutureOr<R> Function(T a) f, {
+    Duration Function(int failed)? delay,
+  }) => FxAsync(
+    _$mapRetryAsync(attempts, f, _$toAsync(_inner), delay: delay),
+  );
 
   // --- terminal operators -------------------------------------------------
 
@@ -10574,8 +11122,7 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   void each(void Function(T a) f) => _$each(f, _inner);
 
   /// [Iterable.fold] with the element's 0-based position.
-  Acc foldWithIndex<Acc>(
-          Acc seed, Acc Function(Acc acc, T a, int index) f) =>
+  Acc foldWithIndex<Acc>(Acc seed, Acc Function(Acc acc, T a, int index) f) =>
       _$foldWithIndex(seed, f, _inner);
 
   /// Folds from the last value to the first — see top-level `foldRight`.
@@ -10584,8 +11131,9 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 
   /// [foldRight] with each value's 0-based position in the source.
   Acc foldRightWithIndex<Acc>(
-          Acc seed, Acc Function(Acc acc, T a, int index) f) =>
-      _$foldRightWithIndex(seed, f, _inner);
+    Acc seed,
+    Acc Function(Acc acc, T a, int index) f,
+  ) => _$foldRightWithIndex(seed, f, _inner);
 
   /// Consumes up to [n] values (all when omitted), forcing side effects.
   void consume([int? n]) => _$consume(_inner, n);
@@ -10602,8 +11150,10 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// Folds the values under each [key] in one pass, without materializing
   /// the groups — the aggregate-only counterpart of [groupBy].
   Map<K, Acc> foldBy<K, Acc>(
-          K Function(T a) key, Acc seed, Acc Function(Acc acc, T a) f) =>
-      _$foldBy(key, seed, f, _inner);
+    K Function(T a) key,
+    Acc seed,
+    Acc Function(Acc acc, T a) f,
+  ) => _$foldBy(key, seed, f, _inner);
 
   /// Counts the values [f] holds for — `filter` + `size` in one walk.
   int countWhere(bool Function(T a) f) => _$countWhere(f, _inner);
@@ -10719,7 +11269,7 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   String join([String separator = '']) => _inner.join(separator);
 
   /// The maximum element using [compare] function.
-  /// If [compare] is not provided, assumes T is Comparable<T>.
+  /// If [compare] is not provided, assumes T is `Comparable<T>`.
   /// Throws if empty or elements are not comparable.
   T max([int Function(T a, T b)? compare]) {
     final compareFn =
@@ -10732,7 +11282,7 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   }
 
   /// The minimum element using [compare] function.
-  /// If [compare] is not provided, assumes T is Comparable<T>.
+  /// If [compare] is not provided, assumes T is `Comparable<T>`.
   /// Throws if empty or elements are not comparable.
   T min([int Function(T a, T b)? compare]) {
     final compareFn =
@@ -10802,8 +11352,8 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// [flatMap] with the source value's 0-based position.
   @pragma('vm:prefer-inline')
   FxAsync<R> flatMapWithIndex<R>(
-          FutureOr<Iterable<R>> Function(T a, int index) f) =>
-      FxAsync(_$flatMapWithIndexAsync(f, _inner));
+    FutureOr<Iterable<R>> Function(T a, int index) f,
+  ) => FxAsync(_$flatMapWithIndexAsync(f, _inner));
 
   /// Flattens nested iterables [depth] levels.
   @pragma('vm:prefer-inline')
@@ -10934,22 +11484,24 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// buffering.
   @pragma('vm:prefer-inline')
   Future<(R1, R2)> tee<R1, R2>(
-          _$AsyncFold<T, R1> first, _$AsyncFold<T, R2> second) =>
-      _$teeAsync(_inner, first, second);
+    _$AsyncFold<T, R1> first,
+    _$AsyncFold<T, R2> second,
+  ) => _$teeAsync(_inner, first, second);
 
   /// Maps [f], retrying each call up to [attempts] times (with optional
   /// [delay] backoff) before the error propagates. Retries compose with
   /// [concurrent]: each in-flight value retries independently.
   @pragma('vm:prefer-inline')
-  FxAsync<R> mapRetry<R>(int attempts, FutureOr<R> Function(T a) f,
-          {Duration Function(int failed)? delay}) =>
-      FxAsync(_$mapRetryAsync(attempts, f, _inner, delay: delay));
+  FxAsync<R> mapRetry<R>(
+    int attempts,
+    FutureOr<R> Function(T a) f, {
+    Duration Function(int failed)? delay,
+  }) => FxAsync(_$mapRetryAsync(attempts, f, _inner, delay: delay));
 
   /// Fails a pull with a [TimeoutException] when the upstream takes longer
   /// than [limit] to produce it (per pull, not whole-pipeline).
   @pragma('vm:prefer-inline')
-  FxAsync<T> timeout(Duration limit) =>
-      FxAsync(_$timeoutAsync(limit, _inner));
+  FxAsync<T> timeout(Duration limit) => FxAsync(_$timeoutAsync(limit, _inner));
 
   /// Pairs each value with the value at the same position in [other],
   /// stopping at the shorter side.
@@ -10960,8 +11512,9 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Three-way [zip], stopping at the shortest side.
   @pragma('vm:prefer-inline')
   FxAsync<(T, U, V)> zip3<U, V>(
-          FxAsyncIterable<U> other1, FxAsyncIterable<V> other2) =>
-      FxAsync(_$zip3Async(_inner, other1, other2));
+    FxAsyncIterable<U> other1,
+    FxAsyncIterable<V> other2,
+  ) => FxAsync(_$zip3Async(_inner, other1, other2));
 
   /// Pairs each value with its index.
   @pragma('vm:prefer-inline')
@@ -11003,8 +11556,9 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Values of this chain whose [f]-keys do not occur in [other], deduped.
   @pragma('vm:prefer-inline')
   FxAsync<T> differenceBy<B>(
-          FutureOr<B> Function(T a) f, FxAsyncIterable<T> other) =>
-      FxAsync(_$differenceByAsync(f, other, _inner));
+    FutureOr<B> Function(T a) f,
+    FxAsyncIterable<T> other,
+  ) => FxAsync(_$differenceByAsync(f, other, _inner));
 
   /// Values of this chain that do not occur in [other].
   @pragma('vm:prefer-inline')
@@ -11014,8 +11568,9 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Values of this chain whose [f]-keys also occur in [other], deduped.
   @pragma('vm:prefer-inline')
   FxAsync<T> intersectionBy<B>(
-          FutureOr<B> Function(T a) f, FxAsyncIterable<T> other) =>
-      FxAsync(_$intersectionByAsync(f, other, _inner));
+    FutureOr<B> Function(T a) f,
+    FxAsyncIterable<T> other,
+  ) => FxAsync(_$intersectionByAsync(f, other, _inner));
 
   /// Values of this chain that also occur in [other].
   @pragma('vm:prefer-inline')
@@ -11031,8 +11586,7 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Maps [f] with up to [concurrency] values in flight at once, in source
   /// order — the pre-combined form of `map(f).concurrent(concurrency)`.
   @pragma('vm:prefer-inline')
-  FxAsync<R> mapConcurrent<R>(
-          int concurrency, FutureOr<R> Function(T a) f) =>
+  FxAsync<R> mapConcurrent<R>(int concurrency, FutureOr<R> Function(T a) f) =>
       FxAsync(_$mapConcurrentAsync(concurrency, f, _inner));
 
   /// Like [concurrent] but yields in completion order.
@@ -11062,24 +11616,28 @@ class FxAsync<T> implements FxAsyncIterable<T> {
 
   /// Folds every value with [f], starting from [seed].
   Future<Acc> fold<Acc>(
-          FutureOr<Acc> seed, FutureOr<Acc> Function(Acc acc, T a) f) =>
-      _$foldAsync(seed, f, _inner);
+    FutureOr<Acc> seed,
+    FutureOr<Acc> Function(Acc acc, T a) f,
+  ) => _$foldAsync(seed, f, _inner);
 
   /// [fold] with the value's 0-based position.
-  Future<Acc> foldWithIndex<Acc>(FutureOr<Acc> seed,
-          FutureOr<Acc> Function(Acc acc, T a, int index) f) =>
-      _$foldWithIndexAsync(seed, f, _inner);
+  Future<Acc> foldWithIndex<Acc>(
+    FutureOr<Acc> seed,
+    FutureOr<Acc> Function(Acc acc, T a, int index) f,
+  ) => _$foldWithIndexAsync(seed, f, _inner);
 
   /// Folds from the last value to the first, buffering the whole chain —
   /// see top-level `foldRightAsync`.
   Future<Acc> foldRight<Acc>(
-          FutureOr<Acc> seed, FutureOr<Acc> Function(Acc acc, T a) f) =>
-      _$foldRightAsync(seed, f, _inner);
+    FutureOr<Acc> seed,
+    FutureOr<Acc> Function(Acc acc, T a) f,
+  ) => _$foldRightAsync(seed, f, _inner);
 
   /// [foldRight] with each value's 0-based position in the source.
-  Future<Acc> foldRightWithIndex<Acc>(FutureOr<Acc> seed,
-          FutureOr<Acc> Function(Acc acc, T a, int index) f) =>
-      _$foldRightWithIndexAsync(seed, f, _inner);
+  Future<Acc> foldRightWithIndex<Acc>(
+    FutureOr<Acc> seed,
+    FutureOr<Acc> Function(Acc acc, T a, int index) f,
+  ) => _$foldRightWithIndexAsync(seed, f, _inner);
 
   /// Groups values into lists keyed by [f].
   Future<Map<K, List<T>>> groupBy<K>(FutureOr<K> Function(T a) f) =>
@@ -11095,9 +11653,11 @@ class FxAsync<T> implements FxAsyncIterable<T> {
 
   /// Folds the values under each [key] in one pass, without materializing
   /// the groups — the aggregate-only counterpart of [groupBy].
-  Future<Map<K, Acc>> foldBy<K, Acc>(FutureOr<K> Function(T a) key,
-          FutureOr<Acc> seed, FutureOr<Acc> Function(Acc acc, T a) f) =>
-      _$foldByAsync(key, seed, f, _inner);
+  Future<Map<K, Acc>> foldBy<K, Acc>(
+    FutureOr<K> Function(T a) key,
+    FutureOr<Acc> seed,
+    FutureOr<Acc> Function(Acc acc, T a) f,
+  ) => _$foldByAsync(key, seed, f, _inner);
 
   /// Whether [f] holds for at least one value.
   Future<bool> some(FutureOr<bool> Function(T a) f) => _$someAsync(f, _inner);
@@ -11150,8 +11710,8 @@ class FxAsync<T> implements FxAsyncIterable<T> {
 
   /// Groups values into `(key, items)` records, in first-seen key order.
   Future<List<({K key, List<T> items})>> groupedBy<K>(
-          FutureOr<K> Function(T a) f) =>
-      _$groupedByAsync(f, _inner);
+    FutureOr<K> Function(T a) f,
+  ) => _$groupedByAsync(f, _inner);
 
   /// The number of values.
   Future<int> size() => _$sizeAsync(_inner);
@@ -11289,21 +11849,21 @@ sealed class Either<L, R> {
 
   /// Transforms the success value; a [Left] passes through unchanged.
   Either<L, T> map<T>(T Function(R value) f) => switch (this) {
-        Left(:final value) => Left(value),
-        Right(:final value) => Right(f(value)),
-      };
+    Left(:final value) => Left(value),
+    Right(:final value) => Right(f(value)),
+  };
 
   /// Transforms the failure value; a [Right] passes through unchanged.
   Either<T, R> mapLeft<T>(T Function(L value) f) => switch (this) {
-        Left(:final value) => Left(f(value)),
-        Right(:final value) => Right(value),
-      };
+    Left(:final value) => Left(f(value)),
+    Right(:final value) => Right(value),
+  };
 
   /// Chains a dependent computation; short-circuits on [Left].
   Either<L, T> flatMap<T>(Either<L, T> Function(R value) f) => switch (this) {
-        Left(:final value) => Left(value),
-        Right(:final value) => f(value),
-      };
+    Left(:final value) => Left(value),
+    Right(:final value) => f(value),
+  };
 
   /// Combines this success with [b]'s, keeping the **first** failure — the
   /// fail-fast counterpart of `zipOrAccumulate2`.
@@ -11329,70 +11889,95 @@ sealed class Either<L, R> {
 
   /// 3-ary [map2].
   Either<L, T> map3<B, C, T>(
-      Either<L, B> b, Either<L, C> c, T Function(R a, B b, C c) combine) {
+    Either<L, B> b,
+    Either<L, C> c,
+    T Function(R a, B b, C c) combine,
+  ) {
     final a = this;
     if (a is Left<L, R>) return Left(a.value);
     if (b is Left<L, B>) return Left(b.value);
     if (c is Left<L, C>) return Left(c.value);
-    return Right(combine((a as Right<L, R>).value, (b as Right<L, B>).value,
-        (c as Right<L, C>).value));
+    return Right(
+      combine(
+        (a as Right<L, R>).value,
+        (b as Right<L, B>).value,
+        (c as Right<L, C>).value,
+      ),
+    );
   }
 
   /// 4-ary [map2].
-  Either<L, T> map4<B, C, D, T>(Either<L, B> b, Either<L, C> c, Either<L, D> d,
-      T Function(R a, B b, C c, D d) combine) {
+  Either<L, T> map4<B, C, D, T>(
+    Either<L, B> b,
+    Either<L, C> c,
+    Either<L, D> d,
+    T Function(R a, B b, C c, D d) combine,
+  ) {
     final a = this;
     if (a is Left<L, R>) return Left(a.value);
     if (b is Left<L, B>) return Left(b.value);
     if (c is Left<L, C>) return Left(c.value);
     if (d is Left<L, D>) return Left(d.value);
-    return Right(combine((a as Right<L, R>).value, (b as Right<L, B>).value,
-        (c as Right<L, C>).value, (d as Right<L, D>).value));
+    return Right(
+      combine(
+        (a as Right<L, R>).value,
+        (b as Right<L, B>).value,
+        (c as Right<L, C>).value,
+        (d as Right<L, D>).value,
+      ),
+    );
   }
 
   /// 5-ary [map2]. Arity capped at 5, like `zipOrAccumulate2..5` and
   /// `Curry2..Curry5` — beyond that, chain [flatMap] or use the `either`
   /// builder.
   Either<L, T> map5<B, C, D, E, T>(
-      Either<L, B> b,
-      Either<L, C> c,
-      Either<L, D> d,
-      Either<L, E> e,
-      T Function(R a, B b, C c, D d, E e) combine) {
+    Either<L, B> b,
+    Either<L, C> c,
+    Either<L, D> d,
+    Either<L, E> e,
+    T Function(R a, B b, C c, D d, E e) combine,
+  ) {
     final a = this;
     if (a is Left<L, R>) return Left(a.value);
     if (b is Left<L, B>) return Left(b.value);
     if (c is Left<L, C>) return Left(c.value);
     if (d is Left<L, D>) return Left(d.value);
     if (e is Left<L, E>) return Left(e.value);
-    return Right(combine((a as Right<L, R>).value, (b as Right<L, B>).value,
-        (c as Right<L, C>).value, (d as Right<L, D>).value,
-        (e as Right<L, E>).value));
+    return Right(
+      combine(
+        (a as Right<L, R>).value,
+        (b as Right<L, B>).value,
+        (c as Right<L, C>).value,
+        (d as Right<L, D>).value,
+        (e as Right<L, E>).value,
+      ),
+    );
   }
 
   /// Swaps the sides.
   Either<R, L> swap() => switch (this) {
-        Left(:final value) => Right(value),
-        Right(:final value) => Left(value),
-      };
+    Left(:final value) => Right(value),
+    Right(:final value) => Left(value),
+  };
 
   /// The success value, or `null` — the bridge to nullable-first code.
   R? getOrNull() => switch (this) {
-        Left() => null,
-        Right(:final value) => value,
-      };
+    Left() => null,
+    Right(:final value) => value,
+  };
 
   /// The failure value, or `null`.
   L? leftOrNull() => switch (this) {
-        Left(:final value) => value,
-        Right() => null,
-      };
+    Left(:final value) => value,
+    Right() => null,
+  };
 
   /// The success value, or the result of [orElse] applied to the failure.
   R getOrElse(R Function(L left) orElse) => switch (this) {
-        Left(:final value) => orElse(value),
-        Right(:final value) => value,
-      };
+    Left(:final value) => orElse(value),
+    Right(:final value) => value,
+  };
 
   /// Runs [action] on the failure value; returns this unchanged.
   Either<L, R> onLeft(void Function(L value) action) {
@@ -11409,9 +11994,9 @@ sealed class Either<L, R> {
   /// Lifts the failure into a singleton [NonEmptyList] — the bridge from
   /// fail-fast values into accumulating scopes.
   EitherNel<L, R> toEitherNel() => switch (this) {
-        Left(:final value) => Left(NonEmptyList.of(value)),
-        Right(:final value) => Right(value),
-      };
+    Left(:final value) => Left(NonEmptyList.of(value)),
+    Right(:final value) => Right(value),
+  };
 
   /// Demotes a [Right] whose value fails [predicate] to a [Left] built by
   /// [onFalse] — inline validation without a `flatMap` + `if`.
@@ -11426,7 +12011,9 @@ sealed class Either<L, R> {
   /// the `Either`-value form of `Raise.ensure`, which does the same job
   /// inside an `either { }` builder.
   Either<L, R> filterOrElse(
-      bool Function(R value) predicate, L Function(R value) onFalse) {
+    bool Function(R value) predicate,
+    L Function(R value) onFalse,
+  ) {
     if (this case Right(:final value) when !predicate(value)) {
       return Left(onFalse(value));
     }
@@ -11444,9 +12031,9 @@ sealed class Either<L, R> {
   /// fromCache(key).alt(() => fromDisk(key)).alt(() => fromNetwork(key));
   /// ```
   Either<L, R> alt(Either<L, R> Function() other) => switch (this) {
-        Left() => other(),
-        Right() => this,
-      };
+    Left() => other(),
+    Right() => this,
+  };
 
   /// Like [alt], but [other] receives the failure and may return a different
   /// failure type — the fallback that gets to look at what went wrong.
@@ -11474,11 +12061,11 @@ sealed class Either<L, R> {
   /// [orElse] is the plainer form for when the replacement is already an
   /// `Either`, and [alt] for when the failure doesn't matter at all.
   Either<L2, R> recover<L2>(
-          R Function(Raise<L2> r, L error) transform) =>
-      switch (this) {
-        Right(:final value) => Right(value),
-        Left(:final value) => _$typedEither((r) => transform(r, value)),
-      };
+    R Function(Raise<L2> r, L error) transform,
+  ) => switch (this) {
+    Right(:final value) => Right(value),
+    Left(:final value) => _$typedEither((r) => transform(r, value)),
+  };
 
   /// Runs [block], capturing any thrown object into a [Left].
   ///
@@ -11486,14 +12073,18 @@ sealed class Either<L, R> {
   /// of Arrow's `Either.catch` + non-fatal discipline.
   static Either<Object, R> catching<R>(R Function() block) =>
       _$typedCatching<Either<Object, R>>(
-          () => Right(block()), (error, stackTrace) => Left(error));
+        () => Right(block()),
+        (error, stackTrace) => Left(error),
+      );
 
   /// Like [catching], but maps the thrown object to a typed failure first.
   static Either<L, R> catchingWith<L, R>(
-          L Function(Object error, StackTrace stackTrace) onError,
-          R Function() block) =>
-      _$typedCatching<Either<L, R>>(() => Right(block()),
-          (error, stackTrace) => Left(onError(error, stackTrace)));
+    L Function(Object error, StackTrace stackTrace) onError,
+    R Function() block,
+  ) => _$typedCatching<Either<L, R>>(
+    () => Right(block()),
+    (error, stackTrace) => Left(onError(error, stackTrace)),
+  );
 }
 
 /// The failure case of [Either].
