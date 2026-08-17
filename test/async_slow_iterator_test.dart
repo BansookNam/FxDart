@@ -152,6 +152,82 @@ void main() {
     });
   });
 
+  group('flatMapAsync over a non-fast upstream', () {
+    // The fused iterator pulls its source with `nextOr()` when the source is
+    // an FxFastIterator and with `next()` otherwise. Every source the library
+    // builds is fast, so only a hand-rolled upstream reaches the second call.
+    test('flattens each element in order', () async {
+      expect(
+        await toListAsync(flatMapAsync((int a) => [a, a * 10], slow([1, 2]))),
+        equals([1, 10, 2, 20]),
+      );
+    });
+
+    test('an empty inner iterable pulls the next source element', () async {
+      expect(
+        await toListAsync(
+          flatMapAsync(
+            (int a) => a.isEven ? <int>[] : [a],
+            slow([1, 2, 3, 4, 5]),
+          ),
+        ),
+        equals([1, 3, 5]),
+      );
+    });
+
+    test('an empty source yields nothing', () async {
+      expect(
+        await toListAsync(flatMapAsync((int a) => [a], slow(<int>[]))),
+        equals(<int>[]),
+      );
+    });
+
+    test('an async callback is awaited', () async {
+      expect(
+        await toListAsync(flatMapAsync((int a) async => [a, -a], slow([1, 2]))),
+        equals([1, -1, 2, -2]),
+      );
+    });
+
+    test('an exhausted source stays done on repeated pulls', () async {
+      final it = flatMapAsync((int a) => [a], slow([1])).iterator;
+      expect((await it.next()).value, equals(1));
+      expect((await it.next()).done, isTrue);
+      expect((await it.next()).done, isTrue);
+    });
+
+    test('composes with downstream operators', () async {
+      expect(
+        await toListAsync(
+          takeAsync(3, flatMapAsync((int a) => [a, a * 10], slow([1, 2, 3]))),
+        ),
+        equals([1, 10, 2]),
+      );
+    });
+
+    test('matches the fast path element for element', () async {
+      Iterable<int> f(int a) => [a, a + 100];
+      expect(
+        await toListAsync(flatMapAsync(f, slow([1, 2, 3]))),
+        equals(await toListAsync(flatMapAsync(f, toAsync([1, 2, 3])))),
+      );
+    });
+  });
+
+  group('flatMapAsync Concurrent fallback', () {
+    test('a concurrent pull switches to the legacy path and still '
+        'yields every element in order', () async {
+      final it = flatMapAsync((int a) => [a, a * 10], toAsync([1, 2])).iterator;
+      final got = <int>[];
+      while (true) {
+        final r = await it.next(Concurrent.of(2));
+        if (r.done) break;
+        got.add(r.value);
+      }
+      expect(got, equals([1, 10, 2, 20]));
+    });
+  });
+
   group('takeAsync Concurrent fallback', () {
     test('a concurrent pull switches to the legacy path and still '
         'respects the limit', () async {
