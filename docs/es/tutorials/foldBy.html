@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=28957dac8754acc4">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=3e24b5eda4bffab1">
 </head>
 <body>
 <header class="site-header">
@@ -70,8 +70,8 @@ Future&lt;Map&lt;K, Acc&gt;&gt; FxAsync.foldBy&lt;K, Acc&gt;(FutureOr&lt;K&gt; F
     asignación proporcional a la <strong>entrada</strong> para una respuesta
     proporcional al <strong>número de claves</strong>. Si lo único que quieres es
     el total por categoría, esas listas se construyen y se tiran.
-    <code>foldBy</code> acumula directamente en el mapa de resultado, que es
-    exactamente lo que hace el bucle escrito a mano:
+    <code>foldBy</code> acumula directamente en el mapa de resultado, como el
+    bucle escrito a mano:
   </p>
   <pre><code>// lo que escribirías a mano
 for (final t in txns) {
@@ -81,11 +81,25 @@ for (final t in txns) {
 // lo mismo, con nombre
 foldBy((Tx t) =&gt; t.category, 0.0, (sum, t) =&gt; sum + t.amount, txns);</code></pre>
   <p>
-    Sobre un millón de transacciones repartidas en cinco categorías, esa
-    diferencia se midió como una bajada de <strong>3,2× a 1,3×</strong> respecto
-    del bucle escrito a mano. Varios de los ejemplos de
+    Sobre un millón de transacciones repartidas en cinco categorías, agrupar
+    primero cuesta <strong>2,7×</strong> el bucle escrito a mano.
+    <code>foldBy</code> cuesta <strong>0,91×</strong> — es algo <em>más
+    rápido</em> que el bucle que tiene al lado, y no es un artefacto de
+    redondeo. El bucle lee el mapa y luego lo reescribe, así que cada
+    transacción calcula el hash de su categoría dos veces;
+    <code>foldBy</code> acumula en una celda mutable alojada en el mapa, de modo
+    que este se escribe una vez por <em>categoría</em> y no una vez por
+    transacción. Varios de los ejemplos de
     <a href="../DartComparison/index.html">Dart vs FxDart</a> se pasaron a él
     justo por eso.
+  </p>
+  <p>
+    No leas demasiado en ese margen: aquí el callback del fold es una suma, así
+    que el mapa es casi todo el trabajo. Con un acumulador más pesado el ahorro
+    sigue ahí, pero desaparece dentro del coste del propio callback — mira la
+    nota sobre records al final. La razón para elegir <code>foldBy</code> es que
+    dice lo que quieres decir; ser una pizca más rápido que el bucle es una
+    ventaja añadida, no el argumento.
   </p>
   <p>
     Las claves salen en el <strong>orden en que aparecen por primera vez</strong>,
@@ -104,7 +118,7 @@ foldBy((Tx t) =&gt; t.category, 0.0, (sum, t) =&gt; sum + t.amount, txns);</code
   </div>
 
   <h2>Demo 1 · Lo básico</h2>
-  <div class="playground" data-pg="f1d14c65645be668">
+  <div class="playground" data-pg="0d660f5349fd7ae7">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -204,7 +218,7 @@ void main() {
   <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=28957dac8754acc4";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=3e24b5eda4bffab1";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

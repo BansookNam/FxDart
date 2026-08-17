@@ -55,6 +55,18 @@ nextLabel: range
     pre-named counter version. Reach for <code>groupBy</code> when you genuinely
     want the members.
   </p>
+  <p>
+    These two are also the rare case where the operator is faster than the loop
+    you would have written. The obvious hand-written line,
+    <code>counts[k] = (counts[k] ?? 0) + 1</code>, touches the hash map
+    <strong>twice</strong> per element — once to read, once to write back — and
+    on a counting workload the map is essentially the whole cost. Both
+    operators count into a mutable cell held in the map instead, so the map is
+    written once per <em>distinct key</em> rather than once per element:
+    ~1.5× on a million-row count, and it is why
+    <a href="../DartComparison/top-log-level.html">Most frequent log level</a>
+    beats a hand loop rather than trailing it.
+  </p>
 
   <h3>4. A lazy chain re-runs on every pass</h3>
   <p>

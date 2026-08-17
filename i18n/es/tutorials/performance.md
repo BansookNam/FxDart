@@ -57,6 +57,18 @@ nextLabel: range
     con contador, ya con nombre. Recurre a <code>groupBy</code> cuando de verdad
     quieras los miembros.
   </p>
+  <p>
+    Estos dos son además el caso raro en que el operador es más rápido que el
+    bucle que habrías escrito. La línea obvia,
+    <code>counts[k] = (counts[k] ?? 0) + 1</code>, toca la tabla hash
+    <strong>dos veces</strong> por elemento — una para leer y otra para volver
+    a escribir — y en un trabajo de conteo la tabla es prácticamente todo el
+    coste. Ambos operadores cuentan en una celda mutable alojada en la tabla,
+    así que esta se escribe una vez por <em>clave distinta</em> en lugar de una
+    vez por elemento: ~1,5× al contar un millón de filas, y es la razón por la
+    que <a href="../DartComparison/top-log-level.html">Nivel de log más
+    frecuente</a> le gana a un bucle a mano en vez de quedarse por detrás.
+  </p>
 
   <h3>4. Una cadena perezosa se reejecuta en cada pasada</h3>
   <p>

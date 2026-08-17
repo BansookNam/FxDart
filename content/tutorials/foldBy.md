@@ -28,8 +28,7 @@ nextLabel: countWhere
     proportional to the <strong>input</strong>, for an answer proportional to
     the <strong>number of keys</strong>. When all you want is the total per
     category, those lists are built and thrown away. <code>foldBy</code>
-    accumulates straight into the result map, which is exactly what the
-    hand-written loop does:
+    accumulates straight into the result map, like the hand-written loop:
   </p>
   <pre><code>// what you would write by hand
 for (final t in txns) {
@@ -39,10 +38,23 @@ for (final t in txns) {
 // the same thing, named
 foldBy((Tx t) =&gt; t.category, 0.0, (sum, t) =&gt; sum + t.amount, txns);</code></pre>
   <p>
-    On a million transactions across five categories that difference measured
-    <strong>3.2× down to 1.3×</strong> of the hand-written loop. Several of the
-    <a href="../DartComparison/index.html">Dart vs FxDart</a> examples moved
-    onto it for exactly this reason.
+    On a million transactions across five categories, grouping first costs
+    <strong>2.7×</strong> the hand-written loop. <code>foldBy</code> costs
+    <strong>0.91×</strong> of it — it is slightly <em>faster</em> than the loop
+    beside it, and that is not a rounding artefact. The loop reads the map and
+    then writes it back, so every transaction hashes its category twice;
+    <code>foldBy</code> folds into a mutable cell held in the map, so the map is
+    written once per <em>category</em> rather than once per transaction. Several
+    of the <a href="../DartComparison/index.html">Dart vs FxDart</a> examples
+    moved onto it for exactly this reason.
+  </p>
+  <p>
+    Don't over-read the margin: the fold callback here is one addition, so the
+    map is most of the work. Give it a heavier accumulator and the saving is
+    still there but disappears into the callback's own cost — see the note at
+    the bottom about records. The reason to reach for <code>foldBy</code> is
+    that it says what you mean; being a shade faster than the loop is a bonus,
+    not the argument.
   </p>
   <p>
     Keys come out in <strong>first-seen order</strong>, like

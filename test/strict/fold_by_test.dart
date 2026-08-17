@@ -109,6 +109,79 @@ void main() {
         );
       });
 
+      // 0.8.4 folds into a mutable cell held in the map. These pin the ways
+      // that could go wrong.
+
+      test('every key gets its own accumulator', () {
+        // One cell shared across keys would put the whole total under one key.
+        final r = foldBy(
+          (int a) => a % 10,
+          0,
+          (acc, a) => acc + 1,
+          List.generate(1000, (i) => i),
+        );
+        expect(r.length, equals(10));
+        expect(r.values.every((v) => v == 100), isTrue);
+      });
+
+      test('a null key folds like any other', () {
+        expect(
+          foldBy((int? a) => a == null ? null : 'n', 0, (acc, a) => acc + 1, [
+            1,
+            null,
+            2,
+            null,
+          ]),
+          equals({'n': 2, null: 2}),
+        );
+      });
+
+      test('equal but not identical keys share one accumulator', () {
+        final a = 'ab';
+        final b = String.fromCharCodes('ab'.codeUnits);
+        expect(identical(a, b), isFalse);
+        expect(
+          foldBy((String s) => s, 0, (acc, _) => acc + 1, [a, b, a]),
+          equals({'ab': 3}),
+        );
+      });
+
+      test('a mutable accumulator is not shared between keys', () {
+        // The seed is a value shared by every key, so folding must return new
+        // values rather than mutate the seed — documented behaviour, and the
+        // cell rewrite must not quietly change it.
+        final r = foldBy<int, bool, List<int>>(
+          (a) => a.isEven,
+          const [],
+          (acc, a) => [...acc, a],
+          [1, 2, 3, 4],
+        );
+        expect(
+          r,
+          equals({
+            false: [1, 3],
+            true: [2, 4],
+          }),
+        );
+      });
+
+      test('a stored null survives a non-List source too', () {
+        Iterable<int> gen() sync* {
+          yield 2;
+          yield 4;
+        }
+
+        expect(
+          foldBy<int, bool, int?>(
+            (a) => a.isEven,
+            -1,
+            (acc, a) => acc == null ? a : null,
+            gen(),
+          ),
+          equals({true: 4}),
+        );
+      });
+
       test('is reachable from the fx chain', () {
         expect(
           fx(txns).foldBy((t) => t.category, 0.0, (sum, t) => sum + t.amount),

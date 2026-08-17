@@ -34,6 +34,19 @@ nextLabel: foldBy
     nunca reserva las listas intermedias.
   </p>
   <p>
+    También es más barato que el bucle que escribirías en su lugar. La versión
+    obvia, <code>counts[k] = (counts[k] ?? 0) + 1</code>, toca la tabla hash
+    <strong>dos veces</strong> por elemento — una para leer y otra para volver a
+    escribir — y cuando lo único que haces es contar, la tabla es prácticamente
+    todo el coste. <code>countBy</code> cuenta en una celda mutable alojada en la
+    tabla, así que esta se escribe una vez por <em>clave distinta</em> en lugar
+    de una vez por elemento: alrededor de <strong>1,5× más rápido</strong> que el
+    bucle a mano sobre un millón de elementos, y el margen se mantiene desde un
+    puñado de claves hasta decenas de miles.
+    <a href="../DartComparison/top-log-level.html">Nivel de log más frecuente</a>
+    desarrolla el número de principio a fin.
+  </p>
+  <p>
     Como siempre, es un operador terminal: nada de aguas arriba se ejecuta
     hasta que <code>countBy</code> tira de ello.
   </p>

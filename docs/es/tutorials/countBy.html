@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=28957dac8754acc4">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=3e24b5eda4bffab1">
 </head>
 <body>
 <header class="site-header">
@@ -75,12 +75,25 @@ Future&lt;Map&lt;K, int&gt;&gt; FxAsync.countBy&lt;K&gt;(FutureOr&lt;K&gt; Funct
     nunca reserva las listas intermedias.
   </p>
   <p>
+    También es más barato que el bucle que escribirías en su lugar. La versión
+    obvia, <code>counts[k] = (counts[k] ?? 0) + 1</code>, toca la tabla hash
+    <strong>dos veces</strong> por elemento — una para leer y otra para volver a
+    escribir — y cuando lo único que haces es contar, la tabla es prácticamente
+    todo el coste. <code>countBy</code> cuenta en una celda mutable alojada en la
+    tabla, así que esta se escribe una vez por <em>clave distinta</em> en lugar
+    de una vez por elemento: alrededor de <strong>1,5× más rápido</strong> que el
+    bucle a mano sobre un millón de elementos, y el margen se mantiene desde un
+    puñado de claves hasta decenas de miles.
+    <a href="../DartComparison/top-log-level.html">Nivel de log más frecuente</a>
+    desarrolla el número de principio a fin.
+  </p>
+  <p>
     Como siempre, es un operador terminal: nada de aguas arriba se ejecuta
     hasta que <code>countBy</code> tira de ello.
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>
-  <div class="playground" data-pg="3ebbab803dc5b619">
+  <div class="playground" data-pg="f1ef6660691ca90e">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -148,7 +161,7 @@ void main() {
   <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=28957dac8754acc4";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=3e24b5eda4bffab1";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

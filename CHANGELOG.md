@@ -1,3 +1,127 @@
+## 0.8.4
+
+### Performance — `countBy` / `foldBy` probe the map once per element, not twice
+
+Both were written as read-modify-write:
+
+```dart
+result[k] = (result[k] ?? 0) + 1;   // countBy
+```
+
+That is *two* hash-map operations per element — the key is hashed twice and its
+bucket walked twice — and on a counting workload the map is essentially the
+entire cost. Breaking `top-log-level` (1,000,000 log entries, 4 distinct
+levels) down by AOT-measured cost per element:
+
+| | ns/elem |
+|---|---|
+| traverse the list | 0.3 |
+| + load the `.level` field | 0.7 |
+| + hash it | 1.7 |
+| + count with a `switch` into 4 locals | 12.5 |
+| + **one** map probe | 20.9 |
+| + **two** map probes (what `countBy` did) | 29.3 |
+
+So the extractor and the traversal were free; the second probe was ~30% of the
+runtime.
+
+Both functions now count into a small mutable cell parked in the map. The read
+hands back the cell and the update goes through that reference, so the map is
+**written once per distinct key** instead of once per element, and the result
+map is rebuilt from the cells at the end in the same first-seen key order.
+`foldBy` also drops the `containsKey` probe it needed to tell a stored `null`
+from an absent key — a cell is never null while it is in the map.
+
+`countBy`, AOT, 1,000,000 elements, 20 interleaved iterations:
+
+| distinct keys | 4 | 8 | 40 | 1,000 | 20,000 | 100,000 |
+|---|---|---|---|---|---|---|
+| two probes | 18.5 ms | 21.3 ms | 20.2 ms | 26.5 ms | 31.0 ms | 66.8 ms |
+| one probe | 10.1 ms | 12.0 ms | 11.5 ms | 16.6 ms | 21.8 ms | 61.4 ms |
+| | **1.83x** | **1.78x** | **1.76x** | **1.60x** | **1.42x** | **1.09x** |
+
+The win narrows as the key set outgrows cache — each `cell.n++` is a second
+dereference, and once the cells stop fitting in cache that costs a miss — but
+it never inverts, so there is no threshold to tune.
+
+#### What else was tried
+
+Two other shapes were built and measured against the same workload before
+settling on the cell.
+
+* **Inline key/count arrays for small key sets** — scan up to 8 keys linearly
+  with `identical` before falling back to `==`, promoting to a real map beyond
+  that. Fast where the key set is tiny (1.70x at 4 distinct keys) but the scan
+  is O(keys) per element, so it collapses as soon as the key set grows: 1.03x
+  at 8 keys and **0.84x — an outright regression — at 40**. Rejected; the
+  crossover is far too close to ordinary inputs to be safe.
+* **Capping the cell count and spilling to a plain int map** past a limit, to
+  protect the high-cardinality tail. It never beat the plain cell (1.02x vs
+  1.09x at 100,000 distinct keys, and *worse* at 1,000 and 20,000, where the
+  cap fires and gives up the win for nothing). Rejected: a tuning knob that
+  bought nothing.
+
+The unbounded cell won at every cardinality measured, which is why there is no
+heuristic in the final code.
+
+#### `countByAsync` also drops `Map.update`
+
+It counted with `result.update(k, (n) => n + 1, ifAbsent: () => 1)`, which
+allocates **two** closures per element. Measured on the sync path over
+1,000,000 elements, `update` was the slowest shape available:
+
+| shape | ns/elem |
+|---|---|
+| `Map.update` | 56.8 |
+| read-modify-write (two probes) | 29.3 |
+| mutable cell (one probe) | 19.7 |
+
+The awaits dominate an async count, so this is not where the time goes — but
+there was no reason to keep the slowest option. Reading the cell and updating
+it happen with no await in between, so overlapping callbacks under
+`concurrent(n)` still cannot interleave inside a single count.
+
+On the DartComparison suite at N=1,000,000:
+
+| case | 0.8.3 | 0.8.4 | | verdict |
+|---|---|---|---|---|
+| `top-log-level` | 31.6 ms | **19.7 ms** | 1.61x | fxdart |
+| `budget-alerts` | 27.4 ms | **19.1 ms** | 1.43x | native → **fxdart** |
+| `invoice-summary` | 27.3 ms | **20.0 ms** | 1.37x | native → **fxdart** |
+| `monthly-ledger-report` | 77.2 ms | **61.2 ms** | 1.26x | fxdart |
+| `multi-currency-report` | 132.0 ms | 128.2 ms | 1.03x | tie |
+| `alert-digest` | 266.0 ms | 259.2 ms | 1.03x | native |
+| `monthly-category-report` | 17.4 ms | 16.9 ms | 1.03x | native |
+
+`budget-alerts` and `invoice-summary` **cross over from losing to native to
+winning**. Both suites were re-measured end to end on an idle machine, and the
+46 cases this change does not touch moved by a median of **0.4%** (p10 −1.9%,
+p90 +3.7%) — that is the run-to-run noise floor, and it is what makes the four
+gains above readable and the three 1.03x rows honestly ties. The native side of
+every case is unchanged code and re-measured within 1%.
+
+The three ties all fold into a **record**, where allocating the record dominates
+everything else — the same 1,000,000 folds cost 260 ms with a `(double, int)`
+accumulator against 22 ms with a `double` — so the map saving is real but lost
+in the noise. None of them regress.
+
+#### Behaviour is unchanged
+
+The rewrite moves where the count lives, not what it computes:
+
+* callbacks run exactly once per element, in source order;
+* keys appear in first-seen order, matching `groupBy` — the result map is
+  rebuilt from the cells in cell-insertion order, which is that order;
+* keys are matched with `==`, not identity, so two equal-but-distinct `String`
+  instances still share one count;
+* `null` is an ordinary key;
+* for `foldBy`, the seed is still a *value* shared by every key, so a mutable
+  seed is still shared and folds must return new values — unchanged, and now
+  covered by a test.
+
+New tests pin each of these, since the old read-modify-write loop got several
+of them for free and the cell version has to preserve them deliberately.
+
 ## 0.8.3
 
 ### Fixed — `Comparable<T>` swallowed by dartdoc in `Fx.max` / `Fx.min`

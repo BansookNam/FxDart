@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=28957dac8754acc4">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=3e24b5eda4bffab1">
 </head>
 <body>
 <header class="site-header">
@@ -101,6 +101,18 @@ uniqStrict(list)                  // dedupe once when the result is reused</div>
     con contador, ya con nombre. Recurre a <code>groupBy</code> cuando de verdad
     quieras los miembros.
   </p>
+  <p>
+    Estos dos son además el caso raro en que el operador es más rápido que el
+    bucle que habrías escrito. La línea obvia,
+    <code>counts[k] = (counts[k] ?? 0) + 1</code>, toca la tabla hash
+    <strong>dos veces</strong> por elemento — una para leer y otra para volver
+    a escribir — y en un trabajo de conteo la tabla es prácticamente todo el
+    coste. Ambos operadores cuentan en una celda mutable alojada en la tabla,
+    así que esta se escribe una vez por <em>clave distinta</em> en lugar de una
+    vez por elemento: ~1,5× al contar un millón de filas, y es la razón por la
+    que <a href="../DartComparison/top-log-level.html">Nivel de log más
+    frecuente</a> le gana a un bucle a mano en vez de quedarse por detrás.
+  </p>
 
   <h3>4. Una cadena perezosa se reejecuta en cada pasada</h3>
   <p>
@@ -135,7 +147,7 @@ uniqStrict(list)                  // dedupe once when the result is reused</div>
   </div>
 
   <h2>Demo 1 · Terminales y orden del filter</h2>
-  <div class="playground" data-pg="029a61010ca0cde3">
+  <div class="playground" data-pg="c3afdc4bb4d37830">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -267,7 +279,7 @@ void main() {
   <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=28957dac8754acc4";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=3e24b5eda4bffab1";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

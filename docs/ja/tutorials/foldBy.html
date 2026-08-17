@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=28957dac8754acc4">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=3e24b5eda4bffab1">
 </head>
 <body>
 <header class="site-header">
@@ -71,8 +71,7 @@ Future&lt;Map&lt;K, Acc&gt;&gt; FxAsync.foldBy&lt;K, Acc&gt;(FutureOr&lt;K&gt; F
     proportional to the <strong>input</strong>, for an answer proportional to
     the <strong>number of keys</strong>. When all you want is the total per
     category, those lists are built and thrown away. <code>foldBy</code>
-    accumulates straight into the result map, which is exactly what the
-    hand-written loop does:
+    accumulates straight into the result map, like the hand-written loop:
   </p>
   <pre><code>// what you would write by hand
 for (final t in txns) {
@@ -82,10 +81,23 @@ for (final t in txns) {
 // the same thing, named
 foldBy((Tx t) =&gt; t.category, 0.0, (sum, t) =&gt; sum + t.amount, txns);</code></pre>
   <p>
-    On a million transactions across five categories that difference measured
-    <strong>3.2× down to 1.3×</strong> of the hand-written loop. Several of the
-    <a href="../DartComparison/index.html">Dart vs FxDart</a> examples moved
-    onto it for exactly this reason.
+    On a million transactions across five categories, grouping first costs
+    <strong>2.7×</strong> the hand-written loop. <code>foldBy</code> costs
+    <strong>0.91×</strong> of it — it is slightly <em>faster</em> than the loop
+    beside it, and that is not a rounding artefact. The loop reads the map and
+    then writes it back, so every transaction hashes its category twice;
+    <code>foldBy</code> folds into a mutable cell held in the map, so the map is
+    written once per <em>category</em> rather than once per transaction. Several
+    of the <a href="../DartComparison/index.html">Dart vs FxDart</a> examples
+    moved onto it for exactly this reason.
+  </p>
+  <p>
+    Don't over-read the margin: the fold callback here is one addition, so the
+    map is most of the work. Give it a heavier accumulator and the saving is
+    still there but disappears into the callback's own cost — see the note at
+    the bottom about records. The reason to reach for <code>foldBy</code> is
+    that it says what you mean; being a shade faster than the loop is a bonus,
+    not the argument.
   </p>
   <p>
     Keys come out in <strong>first-seen order</strong>, like
@@ -104,7 +116,7 @@ foldBy((Tx t) =&gt; t.category, 0.0, (sum, t) =&gt; sum + t.amount, txns);</code
   </div>
 
   <h2>Demo 1 · Basics</h2>
-  <div class="playground" data-pg="f1d14c65645be668">
+  <div class="playground" data-pg="0d660f5349fd7ae7">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -204,7 +216,7 @@ void main() {
   <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=28957dac8754acc4";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=3e24b5eda4bffab1";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
