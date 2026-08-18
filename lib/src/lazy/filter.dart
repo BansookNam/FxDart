@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import '../async_iterable.dart';
+import 'list_range.dart';
 import 'map.dart';
 
 /// Returns a lazy [Iterable] of all elements [f] returns true for.
@@ -13,12 +14,31 @@ import 'map.dart';
 Iterable<A> filter<A>(bool Function(A a) f, Iterable<A> iterable) =>
     _FilterIterable(f, iterable);
 
-class _FilterIterable<A> extends Iterable<A> {
+class _FilterIterable<A> extends Iterable<A>
+    implements FxUniqFusable<A>, FxUniqByFusable<A> {
   _FilterIterable(this._f, this._source);
   final bool Function(A) _f;
   final Iterable<A> _source;
   @override
-  Iterator<A> get iterator => _FilterIterator(_f, _source.iterator);
+  Iterator<A> get iterator {
+    final source = _source;
+    if (source is List<A>) return _FilterListIterator(_f, source);
+    final r = fxIntRangeOf(source);
+    if (r != null) {
+      // `range()` is the other source shape that is a plain counted loop.
+      // `filter(p, range(0, xs.length))` — walking indices to keep positional
+      // context — is common enough to be worth the counter.
+      return _FilterRangeIterator(_f, r) as Iterator<A>;
+    }
+    return _FilterIterator(_f, source.iterator);
+  }
+
+  @override
+  Iterable<A> fxFuseUniq() => _FilterUniqIterable(_f, _source);
+
+  @override
+  Iterable<A> fxFuseUniqBy<B>(B Function(A a) f) =>
+      _FilterUniqByIterable<A, B>(_f, f, _source);
 
   /// Hands a `List` source to the SDK's `where().toList()`, for the reason
   /// given on `_MapIterable.toList`: accumulating here costs a covariant
@@ -31,6 +51,256 @@ class _FilterIterable<A> extends Iterable<A> {
       return source.where(_f).toList(growable: growable);
     }
     return super.toList(growable: growable);
+  }
+}
+
+/// `filter(p, source)` followed by `uniq()`, as one stage.
+///
+/// The saving is one stage boundary — a `moveNext` plus a `current` read per
+/// source element — not the callbacks, which still run once each per element
+/// consumed. Measured on the `recent-errors` shape (1M logs, ~1/3 passing the
+/// predicate): the layered form is 1.58x a hand-written loop over the same
+/// data, one fused loop 1.36x, and the 1.36x is the two closure calls the
+/// hand-written loop inlines and a callback-taking API cannot.
+class _FilterUniqIterable<A> extends Iterable<A> {
+  _FilterUniqIterable(this._p, this._source);
+  final bool Function(A) _p;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator {
+    final source = _source;
+    if (source is List<A>) return _FilterUniqListIterator(_p, source);
+    return _FilterUniqIterator(_p, source.iterator);
+  }
+
+  @override
+  List<A> toList({bool growable = true}) {
+    final result = <A>[];
+    final seen = <Object?>{};
+    final p = _p;
+    final source = _source;
+    if (source is List<A>) {
+      final length = source.length;
+      for (var i = 0; i < length; i++) {
+        final a = source[i];
+        if (p(a) && seen.add(a)) result.add(a);
+      }
+    } else {
+      for (final a in source) {
+        if (p(a) && seen.add(a)) result.add(a);
+      }
+    }
+    return growable ? result : List<A>.from(result, growable: false);
+  }
+}
+
+/// [_FilterUniqIterable] over a `List` — see [_FilterUniqByListIterator] for
+/// why indexing beats holding the source as an `Iterator<A>` field.
+class _FilterUniqListIterator<A> implements Iterator<A> {
+  _FilterUniqListIterator(this._p, this._list) : _end = _list.length;
+  final bool Function(A) _p;
+  final List<A> _list;
+  final int _end;
+  final _seen = <Object?>{};
+  int _i = 0;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    final list = _list;
+    final end = _end;
+    var i = _i;
+    while (i < end) {
+      final v = list[i++];
+      if (_p(v) && _seen.add(v)) {
+        _i = i;
+        current = v;
+        return true;
+      }
+    }
+    _i = i;
+    return false;
+  }
+}
+
+class _FilterUniqIterator<A> implements Iterator<A> {
+  _FilterUniqIterator(this._p, this._it);
+  final bool Function(A) _p;
+  final Iterator<A> _it;
+  final _seen = <Object?>{};
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final v = _it.current;
+      if (_p(v) && _seen.add(v)) {
+        current = v;
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+/// `filter(p, source)` followed by `uniqBy(f)`, as one stage — see
+/// [_FilterUniqIterable].
+class _FilterUniqByIterable<A, B> extends Iterable<A> {
+  _FilterUniqByIterable(this._p, this._f, this._source);
+  final bool Function(A) _p;
+  final B Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator {
+    final source = _source;
+    if (source is List<A>) {
+      return _FilterUniqByListIterator(_p, _f, source);
+    }
+    return _FilterUniqByIterator(_p, _f, source.iterator);
+  }
+
+  @override
+  List<A> toList({bool growable = true}) {
+    final result = <A>[];
+    final seen = <Object?>{};
+    final p = _p;
+    final f = _f;
+    final source = _source;
+    if (source is List<A>) {
+      final length = source.length;
+      for (var i = 0; i < length; i++) {
+        final a = source[i];
+        if (p(a) && seen.add(f(a))) result.add(a);
+      }
+    } else {
+      for (final a in source) {
+        if (p(a) && seen.add(f(a))) result.add(a);
+      }
+    }
+    return growable ? result : List<A>.from(result, growable: false);
+  }
+}
+
+/// [_FilterUniqByIterable] over a `List`, walked by index.
+///
+/// Holding the source as an `Iterator<A>` field is what costs here: a
+/// `for-in` over a statically-known `List` is inlined by AOT into an indexed
+/// walk, but once the same iterator is stored in a field typed
+/// `Iterator<A>` every `moveNext`/`current` becomes a megamorphic virtual
+/// call — the site sees every iterator in the program.
+///
+/// The bounds are fixed when iteration starts, so a source mutated mid-pass
+/// is not reported as a `ConcurrentModificationError` — the trade-off
+/// `takeRight`/`dropRight`/[FxListRange] and `_MapUniqIterable.toList`
+/// already make.
+class _FilterUniqByListIterator<A, B> implements Iterator<A> {
+  _FilterUniqByListIterator(this._p, this._f, this._list) : _end = _list.length;
+  final bool Function(A) _p;
+  final B Function(A) _f;
+  final List<A> _list;
+  final int _end;
+  final _seen = <Object?>{};
+  int _i = 0;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    final list = _list;
+    final end = _end;
+    var i = _i;
+    while (i < end) {
+      final v = list[i++];
+      if (_p(v) && _seen.add(_f(v))) {
+        _i = i;
+        current = v;
+        return true;
+      }
+    }
+    _i = i;
+    return false;
+  }
+}
+
+class _FilterUniqByIterator<A, B> implements Iterator<A> {
+  _FilterUniqByIterator(this._p, this._f, this._it);
+  final bool Function(A) _p;
+  final B Function(A) _f;
+  final Iterator<A> _it;
+  final _seen = <Object?>{};
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final v = _it.current;
+      if (_p(v) && _seen.add(_f(v))) {
+        current = v;
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+/// [filter] over a `List`, walked by index — see [_FilterUniqByListIterator]
+/// for why the `Iterator<A>` field is what costs.
+class _FilterListIterator<A> implements Iterator<A> {
+  _FilterListIterator(this._f, this._list) : _end = _list.length;
+  final bool Function(A) _f;
+  final List<A> _list;
+  final int _end;
+  int _i = 0;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    final list = _list;
+    final end = _end;
+    final f = _f;
+    var i = _i;
+    while (i < end) {
+      final v = list[i++];
+      if (f(v)) {
+        _i = i;
+        current = v;
+        return true;
+      }
+    }
+    _i = i;
+    return false;
+  }
+}
+
+/// [filter] over a `range()`, walked with a counter — see
+/// [_FilterUniqByListIterator] for why the `Iterator` field is what costs.
+class _FilterRangeIterator implements Iterator<int> {
+  _FilterRangeIterator(this._f, FxIntRange r)
+    : _next = r.start,
+      _end = r.end,
+      _step = r.step;
+  final bool Function(Never) _f;
+  final int _end;
+  final int _step;
+  int _next;
+  @override
+  late int current;
+  @override
+  bool moveNext() {
+    final end = _end;
+    final step = _step;
+    final f = _f as bool Function(int);
+    var i = _next;
+    while (step < 0 ? i > end : i < end) {
+      final v = i;
+      i += step;
+      if (f(v)) {
+        _next = i;
+        current = v;
+        return true;
+      }
+    }
+    _next = i;
+    return false;
   }
 }
 
@@ -286,8 +556,28 @@ FxAsyncIterable<A> compactAsync<A>(FxAsyncIterable<A?> iterable) =>
 /// Returns an iterable with unique values as determined by [f].
 ///
 /// Port of FxTS `uniqBy`.
-Iterable<A> uniqBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
-    _UniqByIterable(f, iterable);
+Iterable<A> uniqBy<A, B>(B Function(A a) f, Iterable<A> iterable) {
+  // Cast, not promotion — see [uniq] and `fxListRangeOf` for the shape.
+  if (iterable is FxUniqByFusable<A>) {
+    return (iterable as FxUniqByFusable<A>).fxFuseUniqBy<B>(f);
+  }
+  return _UniqByIterable(f, iterable);
+}
+
+/// Implemented by a lazy stage that can absorb a following `uniqBy` into its
+/// own loop — the keyed twin of [FxUniqFusable].
+///
+/// Only stages whose output type equals their *input* type can offer this,
+/// which is why `filter` can and `map` cannot: the fused node has to name the
+/// source's element type, and for `map` that type is not reachable from the
+/// `uniqBy` call site (see [FxUniqFusable] for the same argument).
+abstract class FxUniqByFusable<A> {
+  /// This stage followed by `uniqBy(f)`, as a single stage.
+  ///
+  /// Same elements, order, and laziness as `uniqBy(f, this)` — a seen-set per
+  /// iteration, and both callbacks running once per element consumed.
+  Iterable<A> fxFuseUniqBy<B>(B Function(A a) f);
+}
 
 class _UniqByIterable<A, B> extends Iterable<A> {
   _UniqByIterable(this._f, this._source);
@@ -579,6 +869,32 @@ class _SetOpIterable<A, B> extends Iterable<A> {
   final bool _keep;
   @override
   Iterator<A> get iterator => _SetOpIterator(_f, _source1, _source2, _keep);
+
+  /// One loop: build [_source1]'s key set, then walk [_source2] by index when
+  /// it is a `List`. A `toList` consumes everything anyway, so nothing is
+  /// evaluated that the lazy path would have skipped, and [_f] still runs
+  /// once per element of each source.
+  @override
+  List<A> toList({bool growable = true}) {
+    final f = _f;
+    final keep = _keep;
+    final set = <B>{for (final a in _source1) f(a)};
+    final seen = <A>{};
+    final result = <A>[];
+    final source = _source2;
+    if (source is List<A>) {
+      final length = source.length;
+      for (var i = 0; i < length; i++) {
+        final a = source[i];
+        if (set.contains(f(a)) == keep && seen.add(a)) result.add(a);
+      }
+    } else {
+      for (final a in source) {
+        if (set.contains(f(a)) == keep && seen.add(a)) result.add(a);
+      }
+    }
+    return growable ? result : List<A>.from(result, growable: false);
+  }
 }
 
 class _SetOpIterator<A, B> implements Iterator<A> {

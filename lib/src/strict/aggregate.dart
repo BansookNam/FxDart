@@ -7,7 +7,11 @@ import '../async_iterable.dart';
 ///
 /// Port of FxTS `toArray` (sync); named `toList` to match Dart's
 /// `Iterable.toList` (Dart has no "array" type — this always returns a [List]).
-List<A> toList<A>(Iterable<A> iterable) => List.of(iterable);
+/// `iterable.toList()`, not `List.of(iterable)`: `List.of` reaches straight
+/// for the iterator, so it bypasses every operator `toList` override — the
+/// SDK hand-offs on `map`/`filter` over a `List` source, and the fused
+/// single-loop materialisations on `uniq`/`uniqBy`/`map`+`uniq`.
+List<A> toList<A>(Iterable<A> iterable) => iterable.toList();
 
 /// Materializes an [FxAsyncIterable] into a [List].
 ///
@@ -1012,7 +1016,7 @@ Future<Map<K, Acc>> foldByAsync<A, K, Acc>(
 /// Port of FxTS `sort`. Unlike the TS version (which mutates arrays in
 /// place), the Dart port never mutates its input.
 List<A> sort<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
-    List.of(iterable)..sort(f);
+    iterable.toList()..sort(f);
 
 /// Async counterpart of [sort].
 Future<List<A>> sortAsync<A>(
@@ -1075,7 +1079,10 @@ List<A> _sortByImpl<A>(
   // 2·n·log n extractions instead of n. The permutation is identical to the
   // direct sort's: sort decisions depend only on comparator outcomes, and
   // the index comparator returns exactly what the direct comparator would.
-  final items = List.of(iterable);
+  // `toList()`, not `List.of`: see the note on the top-level [toList] — a
+  // mid-chain `sortBy` must materialise through the upstream's own override,
+  // not by pulling it element by element.
+  final items = iterable.toList();
   final length = items.length;
   if (length < 2) return items;
   final indices = [for (var i = 0; i < length; i++) i];

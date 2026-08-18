@@ -13,9 +13,18 @@ A? head<A>(Iterable<A> iterable) {
 }
 
 /// Async counterpart of [head].
-Future<A?> headAsync<A>(FxAsyncIterable<A> iterable) async {
-  final r = await iterable.iterator.next();
-  return r.done ? null : r.value;
+Future<A?> headAsync<A>(FxAsyncIterable<A> iterable) {
+  // Not `async`: the function frame and its suspension cost a microtask per
+  // call, and `head` is called once per pipeline — which, in a loop that
+  // builds one short chain per work item, is once per item. Terminals own
+  // their iterator and consume serially, so the internal fast-pull path
+  // applies (see [toListAsync]).
+  final it = iterable.iterator;
+  final r = it is FxFastIterator<A> ? it.nextOr() : it.next();
+  if (r is Future<IterResult<A>>) {
+    return r.then((rr) => rr.done ? null : rr.value);
+  }
+  return Future<A?>.value(r.done ? null : r.value);
 }
 
 /// Returns the last element, or `null` when empty.

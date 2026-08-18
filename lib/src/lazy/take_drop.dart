@@ -666,6 +666,29 @@ FxAsyncIterable<A> dropWhileAsync<A>(
   FutureOr<bool> Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) {
+  // Fused-stage form, like filterAsync/takeWhileAsync. Only one dropWhile
+  // fuses into a run — its latch lives on the iterator — so a second one
+  // starts a new run over this iterable, exactly as a second scan does.
+  // A Concurrent marker falls back to [_dropWhileAsyncLegacy].
+  final stage = FxDropWhileStage((v) => f(v as A));
+  if (iterable is FxFusedAsyncIterable<A> && iterable.dropWhileIndex < 0) {
+    final source = iterable.source;
+    final stages = iterable.stages;
+    final legacy = iterable.legacy;
+    return FxFusedAsyncIterable<A>(source, [
+      ...stages,
+      stage,
+    ], () => _dropWhileAsyncLegacy(f, legacy()));
+  }
+  return FxFusedAsyncIterable<A>(iterable, [
+    stage,
+  ], () => _dropWhileAsyncLegacy(f, iterable));
+}
+
+FxAsyncIterable<A> _dropWhileAsyncLegacy<A>(
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var dropping = true;
@@ -1129,6 +1152,162 @@ FxAsyncIterable<List<A>> windowedAsync<A>(
 }
 
 FxAsyncIterable<List<A>> _windowedAsync<A>(
+  int size,
+  int step,
+  bool partial,
+  FxAsyncIterable<A> iterable,
+) => DelegateAsyncIterable(
+  () => _WindowedAsyncIterator<A>(size, step, partial, iterable),
+);
+
+/// Pull-based `windowed`/`chunk`, on the internal fast-pull path.
+///
+/// The previous form wrapped an `async` closure in a [SerialAsyncIterator],
+/// so every *element* crossed a real `Future` and every *window* an async
+/// function frame — even when the source could answer synchronously. Over a
+/// `toAsync` source at 100,000 elements, `chunk(4)` cost 27 ms more than the
+/// same chain without it (2.1 ms to 29.1 ms), which is 270 ns an element for
+/// bookkeeping that does no work.
+///
+/// Filling a window is a loop of [FxFastIterator.nextOr] pulls that only
+/// chains a continuation when a pull actually answers asynchronously
+/// (then/bare, per the 0.7.4 shape lesson). Semantics are unchanged: window
+/// contents and count, the `partial` tail, overlap carry for `step < size`,
+/// the skip for `step > size`, and — via [_windowedAsyncLegacy] — the
+/// concurrent path.
+class _WindowedAsyncIterator<A>
+    with FxFastNextGate<List<A>>
+    implements FxFastIterator<List<A>> {
+  _WindowedAsyncIterator(
+    this._size,
+    this._step,
+    this._partial,
+    this._sourceIterable,
+  );
+
+  final int _size;
+  final int _step;
+  final bool _partial;
+  final FxAsyncIterable<A> _sourceIterable;
+  FxAsyncIterator<A>? _source;
+  FxAsyncIterator<List<A>>? _fallback;
+  List<A> _carry = <A>[];
+  int _pendingSkip = 0;
+  bool _sourceDone = false;
+  bool _finished = false;
+
+  @override
+  Future<IterResult<List<A>>> next([Concurrent? concurrent]) {
+    if (_fallback == null &&
+        concurrent is Concurrent &&
+        _source == null &&
+        !_finished) {
+      // Nothing pulled yet and the consumer wants concurrency: hand the whole
+      // iteration to the serial form, which threads the marker upstream.
+      _fallback = _windowedAsyncLegacy(
+        _size,
+        _step,
+        _partial,
+        _sourceIterable,
+      ).iterator;
+    }
+    final fb = _fallback;
+    if (fb != null) return fb.next(concurrent);
+    return super.next(concurrent);
+  }
+
+  @override
+  FutureOr<IterResult<List<A>>> nextOr() {
+    final fb = _fallback;
+    if (fb != null) return fb.next();
+    if (_finished) return IterResult<List<A>>.done();
+    _source ??= _sourceIterable.iterator;
+    return _skip();
+  }
+
+  FutureOr<IterResult<A>> _pull() {
+    final src = _source!;
+    return src is FxFastIterator<A> ? src.nextOr() : src.next();
+  }
+
+  /// Consumes the gap left by a `step` wider than `size`.
+  FutureOr<IterResult<List<A>>> _skip() {
+    while (_pendingSkip > 0 && !_sourceDone) {
+      final r = _pull();
+      if (r is Future<IterResult<A>>) {
+        return r.then((rr) {
+          if (rr.done) {
+            _sourceDone = true;
+          } else {
+            _pendingSkip--;
+          }
+          return _skip();
+        });
+      }
+      if (r.done) {
+        _sourceDone = true;
+      } else {
+        _pendingSkip--;
+      }
+    }
+    if (_pendingSkip > 0) {
+      _finished = true;
+      return IterResult<List<A>>.done();
+    }
+    final window = _carry;
+    _carry = <A>[];
+    return _fill(window);
+  }
+
+  FutureOr<IterResult<List<A>>> _fill(List<A> window) {
+    while (window.length < _size && !_sourceDone) {
+      final r = _pull();
+      if (r is Future<IterResult<A>>) {
+        return r.then((rr) {
+          if (rr.done) {
+            _sourceDone = true;
+          } else {
+            window.add(rr.value);
+          }
+          return _fill(window);
+        });
+      }
+      if (r.done) {
+        _sourceDone = true;
+      } else {
+        window.add(r.value);
+      }
+    }
+    return _emit(window);
+  }
+
+  IterResult<List<A>> _emit(List<A> window) {
+    if (window.isEmpty) {
+      _finished = true;
+      return IterResult<List<A>>.done();
+    }
+    if (window.length < _size) {
+      if (!_partial) {
+        _finished = true;
+        return IterResult<List<A>>.done();
+      }
+      if (_step >= window.length) {
+        _finished = true;
+      } else {
+        _carry = window.sublist(_step);
+      }
+      return IterResult.value(window);
+    }
+    if (_step < _size) {
+      _carry = window.sublist(_step);
+    } else {
+      _pendingSkip = _step - _size;
+    }
+    return IterResult.value(window);
+  }
+}
+
+FxAsyncIterable<List<A>> _windowedAsyncLegacy<A>(
   int size,
   int step,
   bool partial,

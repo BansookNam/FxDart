@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import '../async_iterable.dart';
+import 'list_range.dart';
 
 /// Returns an iterable of numbers from [start] (inclusive) to [end]
 /// (exclusive), stepping by [step]. With one argument, counts `0..start`.
@@ -16,13 +17,15 @@ Iterable<int> range(int start, [int? end, int step = 1]) => end == null
     ? _RangeIterable(0, start, 1)
     : _RangeIterable(start, end, step);
 
-class _RangeIterable extends Iterable<int> {
+class _RangeIterable extends Iterable<int> implements FxIntRangeSource {
   _RangeIterable(this._start, this._end, this._step);
   final int _start;
   final int _end;
   final int _step;
   @override
   Iterator<int> get iterator => _RangeIterator(_start, _end, _step);
+  @override
+  FxIntRange get intRange => FxIntRange(_start, _end, _step);
 }
 
 class _RangeIterator implements Iterator<int> {

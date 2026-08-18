@@ -3010,8 +3010,7 @@ class _FilterUniqByIterable<A, B> extends Iterable<A> {
 /// `takeRight`/`dropRight`/[FxListRange] and `_MapUniqIterable.toList`
 /// already make.
 class _FilterUniqByListIterator<A, B> implements Iterator<A> {
-  _FilterUniqByListIterator(this._p, this._f, this._list)
-    : _end = _list.length;
+  _FilterUniqByListIterator(this._p, this._f, this._list) : _end = _list.length;
   final bool Function(A) _p;
   final B Function(A) _f;
   final List<A> _list;

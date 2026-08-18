@@ -49,6 +49,35 @@ FxListRange<A>? fxListRangeOf<A>(Iterable<A> iterable) {
   return null;
 }
 
+/// An arithmetic `start..end` range with a fixed [step] — what `range()`
+/// produces.
+///
+/// Exposed for the same reason as [FxListRange]: an operator that knows its
+/// source is a counted loop can run the counter itself instead of pulling
+/// each value through an [Iterator], which costs a `moveNext` plus a
+/// `current` read per element at a megamorphic call site.
+class FxIntRange {
+  const FxIntRange(this.start, this.end, this.step);
+
+  final int start;
+  final int end;
+  final int step;
+}
+
+/// Implemented by `range()`'s iterable.
+abstract class FxIntRangeSource {
+  /// This iterable as a counted range.
+  FxIntRange get intRange;
+}
+
+/// [iterable] viewed as an arithmetic range, or null if it is not one.
+FxIntRange? fxIntRangeOf(Iterable<Object?> iterable) =>
+    // Cast, not promotion: FxIntRangeSource is not a subtype of Iterable, so
+    // the type test alone does not promote (same shape as [fxListRangeOf]).
+    iterable is FxIntRangeSource
+    ? (iterable as FxIntRangeSource).intRange
+    : null;
+
 /// Walks `list[start..end)` by index.
 class FxListRangeIterator<A> implements Iterator<A> {
   FxListRangeIterator(this._list, this._i, this._end);

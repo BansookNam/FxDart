@@ -52,7 +52,12 @@ class _MapIterable<A, B> extends Iterable<B> implements FxUniqFusable<B> {
   final B Function(A) _f;
   final Iterable<A> _source;
   @override
-  Iterator<B> get iterator => _MapIterator(_f, _source.iterator);
+  Iterator<B> get iterator {
+    final source = _source;
+    if (source is List<A>) return _MapListIterator(_f, source);
+    return _MapIterator(_f, source.iterator);
+  }
+
   @override
   Iterable<B> fxFuseUniq() => _MapUniqIterable(_f, _source);
 
@@ -81,6 +86,32 @@ class _MapIterable<A, B> extends Iterable<B> implements FxUniqFusable<B> {
       return source.map(_f).toList(growable: growable);
     }
     return super.toList(growable: growable);
+  }
+}
+
+/// [map] over a `List`, walked by index.
+///
+/// Rejected in 0.8.0 on the strength of a before/after `results.json` diff
+/// that showed a −3.8% median; that comparison was later shown to be unable
+/// to resolve anything under ~5% (the `native` side, whose binary does not
+/// even change, moved −27% to +4% across runs). Re-measured with the paired
+/// interleaved A/B in `tool/ab_bench.dart` — see the CHANGELOG for the
+/// per-case numbers.
+class _MapListIterator<A, B> implements Iterator<B> {
+  _MapListIterator(this._f, this._list) : _end = _list.length;
+  final B Function(A) _f;
+  final List<A> _list;
+  final int _end;
+  int _i = 0;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    final i = _i;
+    if (i >= _end) return false;
+    _i = i + 1;
+    current = _f(_list[i]);
+    return true;
   }
 }
 
@@ -411,8 +442,14 @@ class _PeekIterator<A> implements Iterator<A> {
 FxAsyncIterable<A> peekAsync<A>(
   FutureOr<void> Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => mapAsync((A a) async {
-  await f(a);
+) => mapAsync((A a) {
+  // then/bare, not `async`+`await`: an `async` wrapper allocates a Future and
+  // suspends once per element even when [f] is synchronous — which `peek`
+  // usually is, since its whole job is a side effect. Same shape as
+  // `uniqByAsync`; 0.7.4 measured the async-function form at 1.4x the
+  // then/bare form for synchronous callbacks.
+  final r = f(a);
+  if (r is Future) return r.then((_) => a);
   return a;
 }, iterable);
 

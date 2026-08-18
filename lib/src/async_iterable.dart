@@ -281,6 +281,15 @@ class FxTakeWhileStage extends FxStage {
   final FutureOr<bool> Function(Object? value) p;
 }
 
+/// A `dropWhileAsync` stage. Stateful like [FxScanStage]: the latch ("have we
+/// stopped dropping yet") lives on the iterator, so at most one may be fused
+/// into a run — a second one starts a new fused iterable, exactly as a second
+/// `scan` does.
+class FxDropWhileStage extends FxStage {
+  const FxDropWhileStage(this.p);
+  final FutureOr<bool> Function(Object? value) p;
+}
+
 /// A `scanAsync` stage. Unlike the others it carries state: the running
 /// accumulator lives on the iterator (one scan per fused run, so one slot),
 /// and [seed] is emitted through the stages *after* this one before the
@@ -327,6 +336,12 @@ final class FxTakeWhileLink extends FxLink {
   final FutureOr<bool> Function(Object? value) p;
 }
 
+/// Compiled [FxDropWhileStage].
+final class FxDropWhileLink extends FxLink {
+  const FxDropWhileLink(this.p, super.next);
+  final FutureOr<bool> Function(Object? value) p;
+}
+
 /// Compiled [FxScanStage].
 final class FxScanLink extends FxLink {
   const FxScanLink(this.f, this.seed, super.next);
@@ -339,6 +354,7 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
   FxFusedAsyncIterable(this.source, this.stages, this.legacy)
     : oneToOne = _oneToOne(stages),
       scanIndex = _scanIndex(stages),
+      dropWhileIndex = _dropWhileIndex(stages),
       links = _compile(stages);
 
   /// The pre-stage upstream.
@@ -359,6 +375,10 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
   /// Index of the run's [FxScanStage], or -1 when there is none. At most one
   /// scan fuses into a run; a second one starts a new run over this iterable.
   final int scanIndex;
+
+  /// Index of the run's [FxDropWhileStage], or -1 when there is none. At most
+  /// one fuses into a run, for the reason [scanIndex] gives.
+  final int dropWhileIndex;
 
   /// [stages] compiled into the chain the per-element loops walk.
   final FxLink? links;
@@ -385,6 +405,7 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
         FxFilterStage(:final p) => FxFilterLink(p, head),
         FxTakeWhileStage(:final p) => FxTakeWhileLink(p, head),
         FxScanStage(:final f, :final seed) => FxScanLink(f, seed, head),
+        FxDropWhileStage(:final p) => FxDropWhileLink(p, head),
       };
     }
     return head;
@@ -404,6 +425,13 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
     return -1;
   }
 
+  static int _dropWhileIndex(List<FxStage> stages) {
+    for (var i = 0; i < stages.length; i++) {
+      if (stages[i] is FxDropWhileStage) return i;
+    }
+    return -1;
+  }
+
   @override
   FxAsyncIterator<T> get iterator => _FusedIterator<T>(this);
 }
@@ -418,6 +446,10 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
   /// The running accumulator of the run's [FxScanStage] (at most one).
   Object? _acc;
   bool _seedEmitted = false;
+
+  /// The latch of the run's [FxDropWhileStage] (at most one). Per-iterator,
+  /// like [_acc]: the links are shared by every iterator over the iterable.
+  bool _dropping = true;
 
   @override
   Future<IterResult<T>> next([Concurrent? concurrent]) {
@@ -587,6 +619,20 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
           );
         }
         if (!k) return null;
+      } else if (l is FxDropWhileLink) {
+        if (_dropping) {
+          final k = l.p(v);
+          if (k is Future<bool>) {
+            final vv = v;
+            return k.then<IterResult<T>?>((kk) {
+              if (kk) return null;
+              _dropping = false;
+              return _applyFrom(vv, next);
+            });
+          }
+          if (k) return null;
+          _dropping = false;
+        }
       } else {
         l as FxTakeWhileLink;
         final k = l.p(v);
@@ -661,6 +707,8 @@ Future<void>? fxStreamDrive<T>(
   final completer = Completer<void>();
   late final StreamSubscription<Object?> sub;
   var terminated = false;
+  // Latch of the run's single FxDropWhileStage, if it has one.
+  var dropping = true;
 
   void finish() {
     if (terminated) return;
@@ -698,6 +746,20 @@ Future<void>? fxStreamDrive<T>(
           });
         }
         if (!k) return null;
+      } else if (l is FxDropWhileLink) {
+        if (dropping) {
+          final k = l.p(v);
+          if (k is Future<bool>) {
+            final vv = v;
+            return k.then((kk) {
+              if (kk) return null;
+              dropping = false;
+              return apply(vv, next);
+            });
+          }
+          if (k) return null;
+          dropping = false;
+        }
       } else {
         l as FxTakeWhileLink;
         final k = l.p(v);
@@ -778,6 +840,8 @@ Future<void>? fxFusedDrive<T>(
   final completer = Completer<void>();
   var terminated = false;
   Object? acc;
+  // Latch of the run's single FxDropWhileStage, if it has one.
+  var dropping = true;
 
   void fail(Object e, StackTrace st) {
     if (terminated) return;
@@ -835,6 +899,21 @@ Future<void>? fxFusedDrive<T>(
           }, onError: fail);
         }
         if (!k) return null;
+      } else if (l is FxDropWhileLink) {
+        if (dropping) {
+          final k = l.p(v);
+          if (k is Future<bool>) {
+            final vv = v;
+            return k.then((kk) {
+              if (terminated) return;
+              if (kk) return pump();
+              dropping = false;
+              resume(vv, next);
+            }, onError: fail);
+          }
+          if (k) return null;
+          dropping = false;
+        }
       } else {
         l as FxTakeWhileLink;
         final k = l.p(v);

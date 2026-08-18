@@ -1,3 +1,198 @@
+## 0.8.5
+
+A measurement-led performance pass over the ten slowest DartComparison cases.
+The headline is a new instrument as much as the changes: **`tool/ab_bench.dart`**
+builds the baseline `lib/` from a git worktree, copies the working tree's
+benchmark sources over it so *only* `lib/` differs, and runs the two binaries
+interleaved in one session, alternating order each round. Calibrated against
+no change at all it reads control −1.10% / fxdart +0.24% — resolution ~1.5%,
+against the ~5% floor of a before/after `results.json` diff.
+
+Every number below is that instrument, not a diff of two runs.
+
+### What a pipeline stage actually costs
+
+The pass started from a wrong hypothesis — that layered iterators were the
+overhead — and a probe killed it. Measured over 1,000,000 elements, AOT:
+
+| operation | ns/element |
+|---|---|
+| indexed `List` walk, no call | 0.64 |
+| `for-in` over a `List`, no call | 0.66 |
+| polymorphic **virtual** call (`moveNext` / `current`) | 0.88 |
+| **closure call loaded from a field** (a user callback) | **2.75** |
+
+A callback costs *three times* a virtual call. So a push/sink protocol — which
+replaces two cheap virtual calls per stage with one extra closure call — is
+strictly worse; prototyped, measured at **+36% to +54%**, and abandoned.
+
+The same measurement sets an honest ceiling. `recent-errors`
+(`filter → uniqBy → take(3) → map → join` over 1M logs), attributed:
+
+| variant | ms | vs native |
+|---|---|---|
+| native, predicate and key inline in the loop | 10.07 | 1.00x |
+| one *perfectly* fused loop, callbacks through fields | 13.68 | **1.36x** |
+| layered iterators (0.8.4) | 15.95 | 1.58x |
+
+The 1.36x is not iterator overhead — it is the cost of *calling* two closures
+where the hand-written loop inlines them, and no library change removes it.
+Where the native side runs at ~10 ns an element, one callback is +27% on its
+own. That is the floor these cases sit on, and it is why several of them land
+near 1.3x rather than at parity.
+
+### Lazy stages walk a `List` (or a `range`) instead of holding an iterator
+
+Storing the source as an `Iterator<A>` **field** is what costs: a `for-in`
+over a statically known `List` is inlined by AOT into an indexed walk, but
+through a field the site is megamorphic and every `moveNext`/`current` is a
+real virtual call. `filter`, `map`, and the new fused stages now index a
+`List` source directly, and `filter` walks a `range()` source with a counter.
+
+| case | delta |
+|---|---|
+| `average-basket` | **−12.73%** |
+| `recent-errors` | **−11.92%** |
+| `monthly-category-report` | **−10.89%** |
+| `anomaly-context` | −6.56% |
+| `top-merchants` | −3.28% |
+
+`filter` followed by `uniq`/`uniqBy` is also built as **one stage** now, via
+`FxUniqByFusable` — the keyed twin of the `FxUniqFusable` handshake that
+`map`+`uniq` has used since 0.8.0.
+
+That interface is the release's only **public API change**: additive, one new
+abstract class, nothing existing moved. Like `FxUniqFusable` it is a stage-to-
+stage handshake rather than something to call — it is visible only because
+`lib/fxdart.dart` re-exports `src/lazy/filter.dart` without a `show` clause.
+The rest of the new machinery (`FxIntRange`/`FxIntRangeSource` for the `range`
+walk, `FxDropWhileStage`/`FxDropWhileLink` for the fused async stage) is not
+exported and is not reachable from `package:fxdart`.
+
+**Correction to 0.8.0.** The indexed `map` iterator was rejected then on a
+measured "−3.8% median, worst −14.9%" — but that came from a before/after
+`results.json` diff, the exact comparison later shown to be unable to resolve
+anything under ~5% (the `native` side, whose binary does not even change,
+moved −27% to +4% between runs). Re-measured paired and interleaved it is a
+small consistent win with no regression anywhere, so it lands.
+
+### `sortBy` / `sort` / `toList` stop bypassing their upstream
+
+All three materialized with `List.of(iterable)`, which reaches straight for
+the iterator and so skipped every operator `toList` override — the SDK
+hand-offs on `map`/`filter` over a `List` source and the fused single-loop
+forms on `uniq`/`uniqBy`. They use `iterable.toList()` now.
+`latency-percentiles` −4.51%.
+
+`differenceBy`/`intersectionBy` gained a fused `toList` that builds the key
+set and walks the second source by index in one loop — `ledger-diff` −8.40%.
+
+### Async — `chunk` and `windowed` were the largest single defect
+
+`chunk(4)` cost **27 ms per 100,000 elements** on top of the same chain
+without it (2.1 → 29.1 ms) — 270 ns an element for bookkeeping that does no
+work. `_windowedAsync` wrapped an `async` closure in a `SerialAsyncIterator`
+and pulled with `next()`, so every element crossed a real `Future` and every
+window an async function frame, even over a fully synchronous source.
+Rewritten on the internal fast-pull path (`FxFastNextGate` + `nextOr`,
+then/bare):
+
+| chain, N=100,000 | before | after |
+|---|---|---|
+| `toAsync → chunk(4) → toList` | 29.09 ms | **3.62 ms** |
+| `toAsync → windowed(4, step: 4) → toList` | 28.66 ms | **2.66 ms** |
+
+`stream-windowed-alerts` **−21.55%**. Window contents and count, the
+`partial` tail, overlap carry for `step < size`, the skip for `step > size`,
+and the concurrent path are all unchanged.
+
+Three smaller async fixes, together worth **−9.58%** on `flaky-api-retry`:
+
+- **`peekAsync`** wrapped its callback in an `async` closure, so a
+  synchronous `peek` — which is what `peek` usually is — allocated a Future
+  and suspended once per element. Now then/bare.
+- **`headAsync`** was an `async` function; it now takes the fast-pull path
+  and returns without a frame. This matters when a loop builds one short
+  chain per work item, which is `head`'s common shape.
+- **`dropWhileAsync`** is a fused stage (`FxDropWhileStage`) instead of its
+  own `SerialAsyncIterator` layer, so `map → peek → dropWhile` is a single
+  fused run reachable by `nextOr`. Its latch is per-iterator, and at most one
+  fuses into a run — a second starts a new one, as a second `scan` does.
+
+### Example change — `alert-digest`
+
+The fxdart panel formatted *every* alert message and then deduped the
+resulting strings; the native panel deduped first and formatted only what
+survived. On 1M logs that is ~667,000 throwaway string interpolations. The
+panel now reads `uniqBy((l) => l.message).map(...)` — which is also the
+clearer statement of the intent — for byte-identical output:
+**262 ms → 176 ms**, from 1.46x behind native to a tie.
+
+This is the only example that changed. Two candidate rewrites were probed and
+rejected: `windowed(3)` for `consecutive-over-limit` is *worse* (31.0 ms vs
+23.2 ms), and an index walk over `range` gains only 9% while losing the
+sliding-window idea the example exists to show.
+
+### Where the ten cases landed
+
+Full 53-case sweep, headline scale, fxdart/native:
+
+| case | 0.8.4 | 0.8.5 |
+|---|---|---|
+| `alert-digest` | 1.46x | **1.00x** |
+| `stream-windowed-alerts` | 1.47x | **1.14x** |
+| `flaky-api-retry` | 1.42x | 1.25x |
+| `ledger-diff` | 1.35x | 1.27x |
+| `monthly-category-report` | 1.48x | 1.31x |
+| `latency-percentiles` | 1.34x | 1.33x |
+| `consecutive-over-limit` | 1.36x | 1.35x |
+| `recent-errors` | 1.56x | 1.37x |
+| `live-search` | 1.34x | 1.34x |
+| `anomaly-context` | 1.49x | 1.48x |
+
+No case regressed: the four that looked worse in the sweep table
+(`sensor-anomalies`, `stock-revaluation`, `leaderboard-ties`,
+`rate-limited-import`) all read flat under the paired A/B — −0.84%, +0.14%,
++0.37%, −0.33% — so the movement was baseline drift, not the change.
+`food-spending` improved off-target, 1.05x → 0.88x.
+
+### RxDartComparison — no case is RxDart-faster any more
+
+The `chunk`/`windowed` rewrite reaches this family too. Re-swept at 41 cases:
+**33 fxdart, 8 ties, 0 RxDart.** The two cases RxDart still won in 0.8.4 are
+now ties — `pipeline-into-stream` 1.07x → 1.00x and `cursor-lifetime`
+1.07x → 1.04x — and `price-or-fallback` (1.01x → 0.91x) crossed from tie to
+an fxdart win. Nothing regressed.
+
+`pipeline-into-stream` is worth noting because the 0.7.4 investigation had
+attributed all of its 3.0 microtasks/element to `concurrentAsync` and measured
+`chunk` as costing nothing. `chunk` was not free; the cost was its
+`SerialAsyncIterator` wrapper, and removing that closed the gap without
+touching `concurrentAsync` at all.
+
+### Tests
+
+The fast paths are behaviour-pinned rather than measured-only —
+`test/lazy/fused_filter_uniq_test.dart` and
+`test/lazy/fused_drop_while_test.dart` add 29 cases covering what a fast path
+could plausibly break: callback invocation counts and order, laziness under a
+downstream `take`, per-iteration state (so a chain stays re-iterable), the
+descending-`range` direction, error propagation, and — for the async side —
+that a `Concurrent` marker still abandons fusion and reaches the source. Two
+white-box assertions pin which stage/iterator gets built, because a fast path
+silently switching itself off is otherwise invisible. Suite: 1980 passing.
+
+### Still open
+
+- `_StreamBridgeIterator` allocates a `Completer` per element and pauses the
+  subscription after every delivery. The *subscription* drive is already 5.6x
+  faster than `await for` (4.03 ms vs 22.78 ms per 100,000); the cost only
+  appears when an operator that is not a fused stage — today `uniq`, `take`,
+  `chunk` — breaks the drive and forces the pull protocol. Making `uniqBy`
+  and `take` fused stages would put `live-search` back on it.
+- The `zip` family still allocates a record per element, which is what is
+  left in `consecutive-over-limit`.
+
 ## 0.8.4
 
 ### Performance — `countBy` / `foldBy` probe the map once per element, not twice
