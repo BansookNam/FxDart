@@ -331,6 +331,15 @@ class FxTakeWhileStage extends FxStage {
   final FutureOr<bool> Function(Object? value) p;
 }
 
+/// A `dropWhileAsync` stage. Stateful like [FxScanStage]: the latch ("have we
+/// stopped dropping yet") lives on the iterator, so at most one may be fused
+/// into a run — a second one starts a new fused iterable, exactly as a second
+/// `scan` does.
+class FxDropWhileStage extends FxStage {
+  const FxDropWhileStage(this.p);
+  final FutureOr<bool> Function(Object? value) p;
+}
+
 /// A `scanAsync` stage. Unlike the others it carries state: the running
 /// accumulator lives on the iterator (one scan per fused run, so one slot),
 /// and [seed] is emitted through the stages *after* this one before the
@@ -377,6 +386,12 @@ final class FxTakeWhileLink extends FxLink {
   final FutureOr<bool> Function(Object? value) p;
 }
 
+/// Compiled [FxDropWhileStage].
+final class FxDropWhileLink extends FxLink {
+  const FxDropWhileLink(this.p, super.next);
+  final FutureOr<bool> Function(Object? value) p;
+}
+
 /// Compiled [FxScanStage].
 final class FxScanLink extends FxLink {
   const FxScanLink(this.f, this.seed, super.next);
@@ -389,6 +404,7 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
   FxFusedAsyncIterable(this.source, this.stages, this.legacy)
     : oneToOne = _oneToOne(stages),
       scanIndex = _scanIndex(stages),
+      dropWhileIndex = _dropWhileIndex(stages),
       links = _compile(stages);
 
   /// The pre-stage upstream.
@@ -409,6 +425,10 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
   /// Index of the run's [FxScanStage], or -1 when there is none. At most one
   /// scan fuses into a run; a second one starts a new run over this iterable.
   final int scanIndex;
+
+  /// Index of the run's [FxDropWhileStage], or -1 when there is none. At most
+  /// one fuses into a run, for the reason [scanIndex] gives.
+  final int dropWhileIndex;
 
   /// [stages] compiled into the chain the per-element loops walk.
   final FxLink? links;
@@ -435,6 +455,7 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
         FxFilterStage(:final p) => FxFilterLink(p, head),
         FxTakeWhileStage(:final p) => FxTakeWhileLink(p, head),
         FxScanStage(:final f, :final seed) => FxScanLink(f, seed, head),
+        FxDropWhileStage(:final p) => FxDropWhileLink(p, head),
       };
     }
     return head;
@@ -454,6 +475,13 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
     return -1;
   }
 
+  static int _dropWhileIndex(List<FxStage> stages) {
+    for (var i = 0; i < stages.length; i++) {
+      if (stages[i] is FxDropWhileStage) return i;
+    }
+    return -1;
+  }
+
   @override
   FxAsyncIterator<T> get iterator => _FusedIterator<T>(this);
 }
@@ -468,6 +496,10 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
   /// The running accumulator of the run's [FxScanStage] (at most one).
   Object? _acc;
   bool _seedEmitted = false;
+
+  /// The latch of the run's [FxDropWhileStage] (at most one). Per-iterator,
+  /// like [_acc]: the links are shared by every iterator over the iterable.
+  bool _dropping = true;
 
   @override
   Future<IterResult<T>> next([Concurrent? concurrent]) {
@@ -637,6 +669,20 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
           );
         }
         if (!k) return null;
+      } else if (l is FxDropWhileLink) {
+        if (_dropping) {
+          final k = l.p(v);
+          if (k is Future<bool>) {
+            final vv = v;
+            return k.then<IterResult<T>?>((kk) {
+              if (kk) return null;
+              _dropping = false;
+              return _applyFrom(vv, next);
+            });
+          }
+          if (k) return null;
+          _dropping = false;
+        }
       } else {
         l as FxTakeWhileLink;
         final k = l.p(v);
@@ -711,6 +757,8 @@ Future<void>? fxStreamDrive<T>(
   final completer = Completer<void>();
   late final StreamSubscription<Object?> sub;
   var terminated = false;
+  // Latch of the run's single FxDropWhileStage, if it has one.
+  var dropping = true;
 
   void finish() {
     if (terminated) return;
@@ -748,6 +796,20 @@ Future<void>? fxStreamDrive<T>(
           });
         }
         if (!k) return null;
+      } else if (l is FxDropWhileLink) {
+        if (dropping) {
+          final k = l.p(v);
+          if (k is Future<bool>) {
+            final vv = v;
+            return k.then((kk) {
+              if (kk) return null;
+              dropping = false;
+              return apply(vv, next);
+            });
+          }
+          if (k) return null;
+          dropping = false;
+        }
       } else {
         l as FxTakeWhileLink;
         final k = l.p(v);
@@ -828,6 +890,8 @@ Future<void>? fxFusedDrive<T>(
   final completer = Completer<void>();
   var terminated = false;
   Object? acc;
+  // Latch of the run's single FxDropWhileStage, if it has one.
+  var dropping = true;
 
   void fail(Object e, StackTrace st) {
     if (terminated) return;
@@ -885,6 +949,21 @@ Future<void>? fxFusedDrive<T>(
           }, onError: fail);
         }
         if (!k) return null;
+      } else if (l is FxDropWhileLink) {
+        if (dropping) {
+          final k = l.p(v);
+          if (k is Future<bool>) {
+            final vv = v;
+            return k.then((kk) {
+              if (terminated) return;
+              if (kk) return pump();
+              dropping = false;
+              resume(vv, next);
+            }, onError: fail);
+          }
+          if (k) return null;
+          dropping = false;
+        }
       } else {
         l as FxTakeWhileLink;
         final k = l.p(v);
@@ -1694,6 +1773,35 @@ FxListRange<A>? fxListRangeOf<A>(Iterable<A> iterable) {
   return null;
 }
 
+/// An arithmetic `start..end` range with a fixed [step] — what `range()`
+/// produces.
+///
+/// Exposed for the same reason as [FxListRange]: an operator that knows its
+/// source is a counted loop can run the counter itself instead of pulling
+/// each value through an [Iterator], which costs a `moveNext` plus a
+/// `current` read per element at a megamorphic call site.
+class FxIntRange {
+  const FxIntRange(this.start, this.end, this.step);
+
+  final int start;
+  final int end;
+  final int step;
+}
+
+/// Implemented by `range()`'s iterable.
+abstract class FxIntRangeSource {
+  /// This iterable as a counted range.
+  FxIntRange get intRange;
+}
+
+/// [iterable] viewed as an arithmetic range, or null if it is not one.
+FxIntRange? fxIntRangeOf(Iterable<Object?> iterable) =>
+    // Cast, not promotion: FxIntRangeSource is not a subtype of Iterable, so
+    // the type test alone does not promote (same shape as [fxListRangeOf]).
+    iterable is FxIntRangeSource
+    ? (iterable as FxIntRangeSource).intRange
+    : null;
+
 /// Walks `list[start..end)` by index.
 class FxListRangeIterator<A> implements Iterator<A> {
   FxListRangeIterator(this._list, this._i, this._end);
@@ -1763,7 +1871,12 @@ class _MapIterable<A, B> extends Iterable<B> implements FxUniqFusable<B> {
   final B Function(A) _f;
   final Iterable<A> _source;
   @override
-  Iterator<B> get iterator => _MapIterator(_f, _source.iterator);
+  Iterator<B> get iterator {
+    final source = _source;
+    if (source is List<A>) return _MapListIterator(_f, source);
+    return _MapIterator(_f, source.iterator);
+  }
+
   @override
   Iterable<B> fxFuseUniq() => _MapUniqIterable(_f, _source);
 
@@ -1792,6 +1905,32 @@ class _MapIterable<A, B> extends Iterable<B> implements FxUniqFusable<B> {
       return source.map(_f).toList(growable: growable);
     }
     return super.toList(growable: growable);
+  }
+}
+
+/// [map] over a `List`, walked by index.
+///
+/// Rejected in 0.8.0 on the strength of a before/after `results.json` diff
+/// that showed a −3.8% median; that comparison was later shown to be unable
+/// to resolve anything under ~5% (the `native` side, whose binary does not
+/// even change, moved −27% to +4% across runs). Re-measured with the paired
+/// interleaved A/B in `tool/ab_bench.dart` — see the CHANGELOG for the
+/// per-case numbers.
+class _MapListIterator<A, B> implements Iterator<B> {
+  _MapListIterator(this._f, this._list) : _end = _list.length;
+  final B Function(A) _f;
+  final List<A> _list;
+  final int _end;
+  int _i = 0;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    final i = _i;
+    if (i >= _end) return false;
+    _i = i + 1;
+    current = _f(_list[i]);
+    return true;
   }
 }
 
@@ -2122,8 +2261,14 @@ class _PeekIterator<A> implements Iterator<A> {
 FxAsyncIterable<A> peekAsync<A>(
   FutureOr<void> Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => mapAsync((A a) async {
-  await f(a);
+) => mapAsync((A a) {
+  // then/bare, not `async`+`await`: an `async` wrapper allocates a Future and
+  // suspends once per element even when [f] is synchronous — which `peek`
+  // usually is, since its whole job is a side effect. Same shape as
+  // `uniqByAsync`; 0.7.4 measured the async-function form at 1.4x the
+  // then/bare form for synchronous callbacks.
+  final r = f(a);
+  if (r is Future) return r.then((_) => a);
   return a;
 }, iterable);
 
@@ -2685,12 +2830,31 @@ FxAsyncIterable<A> scan1Async<A>(
 Iterable<A> filter<A>(bool Function(A a) f, Iterable<A> iterable) =>
     _FilterIterable(f, iterable);
 
-class _FilterIterable<A> extends Iterable<A> {
+class _FilterIterable<A> extends Iterable<A>
+    implements FxUniqFusable<A>, FxUniqByFusable<A> {
   _FilterIterable(this._f, this._source);
   final bool Function(A) _f;
   final Iterable<A> _source;
   @override
-  Iterator<A> get iterator => _FilterIterator(_f, _source.iterator);
+  Iterator<A> get iterator {
+    final source = _source;
+    if (source is List<A>) return _FilterListIterator(_f, source);
+    final r = fxIntRangeOf(source);
+    if (r != null) {
+      // `range()` is the other source shape that is a plain counted loop.
+      // `filter(p, range(0, xs.length))` — walking indices to keep positional
+      // context — is common enough to be worth the counter.
+      return _FilterRangeIterator(_f, r) as Iterator<A>;
+    }
+    return _FilterIterator(_f, source.iterator);
+  }
+
+  @override
+  Iterable<A> fxFuseUniq() => _FilterUniqIterable(_f, _source);
+
+  @override
+  Iterable<A> fxFuseUniqBy<B>(B Function(A a) f) =>
+      _FilterUniqByIterable<A, B>(_f, f, _source);
 
   /// Hands a `List` source to the SDK's `where().toList()`, for the reason
   /// given on `_MapIterable.toList`: accumulating here costs a covariant
@@ -2703,6 +2867,257 @@ class _FilterIterable<A> extends Iterable<A> {
       return source.where(_f).toList(growable: growable);
     }
     return super.toList(growable: growable);
+  }
+}
+
+/// `filter(p, source)` followed by `uniq()`, as one stage.
+///
+/// The saving is one stage boundary — a `moveNext` plus a `current` read per
+/// source element — not the callbacks, which still run once each per element
+/// consumed. Measured on the `recent-errors` shape (1M logs, ~1/3 passing the
+/// predicate): the layered form is 1.58x a hand-written loop over the same
+/// data, one fused loop 1.36x, and the 1.36x is the two closure calls the
+/// hand-written loop inlines and a callback-taking API cannot.
+class _FilterUniqIterable<A> extends Iterable<A> {
+  _FilterUniqIterable(this._p, this._source);
+  final bool Function(A) _p;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator {
+    final source = _source;
+    if (source is List<A>) return _FilterUniqListIterator(_p, source);
+    return _FilterUniqIterator(_p, source.iterator);
+  }
+
+  @override
+  List<A> toList({bool growable = true}) {
+    final result = <A>[];
+    final seen = <Object?>{};
+    final p = _p;
+    final source = _source;
+    if (source is List<A>) {
+      final length = source.length;
+      for (var i = 0; i < length; i++) {
+        final a = source[i];
+        if (p(a) && seen.add(a)) result.add(a);
+      }
+    } else {
+      for (final a in source) {
+        if (p(a) && seen.add(a)) result.add(a);
+      }
+    }
+    return growable ? result : List<A>.from(result, growable: false);
+  }
+}
+
+/// [_FilterUniqIterable] over a `List` — see [_FilterUniqByListIterator] for
+/// why indexing beats holding the source as an `Iterator<A>` field.
+class _FilterUniqListIterator<A> implements Iterator<A> {
+  _FilterUniqListIterator(this._p, this._list) : _end = _list.length;
+  final bool Function(A) _p;
+  final List<A> _list;
+  final int _end;
+  final _seen = <Object?>{};
+  int _i = 0;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    final list = _list;
+    final end = _end;
+    var i = _i;
+    while (i < end) {
+      final v = list[i++];
+      if (_p(v) && _seen.add(v)) {
+        _i = i;
+        current = v;
+        return true;
+      }
+    }
+    _i = i;
+    return false;
+  }
+}
+
+class _FilterUniqIterator<A> implements Iterator<A> {
+  _FilterUniqIterator(this._p, this._it);
+  final bool Function(A) _p;
+  final Iterator<A> _it;
+  final _seen = <Object?>{};
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final v = _it.current;
+      if (_p(v) && _seen.add(v)) {
+        current = v;
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+/// `filter(p, source)` followed by `uniqBy(f)`, as one stage — see
+/// [_FilterUniqIterable].
+class _FilterUniqByIterable<A, B> extends Iterable<A> {
+  _FilterUniqByIterable(this._p, this._f, this._source);
+  final bool Function(A) _p;
+  final B Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<A> get iterator {
+    final source = _source;
+    if (source is List<A>) {
+      return _FilterUniqByListIterator(_p, _f, source);
+    }
+    return _FilterUniqByIterator(_p, _f, source.iterator);
+  }
+
+  @override
+  List<A> toList({bool growable = true}) {
+    final result = <A>[];
+    final seen = <Object?>{};
+    final p = _p;
+    final f = _f;
+    final source = _source;
+    if (source is List<A>) {
+      final length = source.length;
+      for (var i = 0; i < length; i++) {
+        final a = source[i];
+        if (p(a) && seen.add(f(a))) result.add(a);
+      }
+    } else {
+      for (final a in source) {
+        if (p(a) && seen.add(f(a))) result.add(a);
+      }
+    }
+    return growable ? result : List<A>.from(result, growable: false);
+  }
+}
+
+/// [_FilterUniqByIterable] over a `List`, walked by index.
+///
+/// Holding the source as an `Iterator<A>` field is what costs here: a
+/// `for-in` over a statically-known `List` is inlined by AOT into an indexed
+/// walk, but once the same iterator is stored in a field typed
+/// `Iterator<A>` every `moveNext`/`current` becomes a megamorphic virtual
+/// call — the site sees every iterator in the program.
+///
+/// The bounds are fixed when iteration starts, so a source mutated mid-pass
+/// is not reported as a `ConcurrentModificationError` — the trade-off
+/// `takeRight`/`dropRight`/[FxListRange] and `_MapUniqIterable.toList`
+/// already make.
+class _FilterUniqByListIterator<A, B> implements Iterator<A> {
+  _FilterUniqByListIterator(this._p, this._f, this._list)
+    : _end = _list.length;
+  final bool Function(A) _p;
+  final B Function(A) _f;
+  final List<A> _list;
+  final int _end;
+  final _seen = <Object?>{};
+  int _i = 0;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    final list = _list;
+    final end = _end;
+    var i = _i;
+    while (i < end) {
+      final v = list[i++];
+      if (_p(v) && _seen.add(_f(v))) {
+        _i = i;
+        current = v;
+        return true;
+      }
+    }
+    _i = i;
+    return false;
+  }
+}
+
+class _FilterUniqByIterator<A, B> implements Iterator<A> {
+  _FilterUniqByIterator(this._p, this._f, this._it);
+  final bool Function(A) _p;
+  final B Function(A) _f;
+  final Iterator<A> _it;
+  final _seen = <Object?>{};
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final v = _it.current;
+      if (_p(v) && _seen.add(_f(v))) {
+        current = v;
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+/// [filter] over a `List`, walked by index — see [_FilterUniqByListIterator]
+/// for why the `Iterator<A>` field is what costs.
+class _FilterListIterator<A> implements Iterator<A> {
+  _FilterListIterator(this._f, this._list) : _end = _list.length;
+  final bool Function(A) _f;
+  final List<A> _list;
+  final int _end;
+  int _i = 0;
+  @override
+  late A current;
+  @override
+  bool moveNext() {
+    final list = _list;
+    final end = _end;
+    final f = _f;
+    var i = _i;
+    while (i < end) {
+      final v = list[i++];
+      if (f(v)) {
+        _i = i;
+        current = v;
+        return true;
+      }
+    }
+    _i = i;
+    return false;
+  }
+}
+
+/// [filter] over a `range()`, walked with a counter — see
+/// [_FilterUniqByListIterator] for why the `Iterator` field is what costs.
+class _FilterRangeIterator implements Iterator<int> {
+  _FilterRangeIterator(this._f, FxIntRange r)
+    : _next = r.start,
+      _end = r.end,
+      _step = r.step;
+  final bool Function(Never) _f;
+  final int _end;
+  final int _step;
+  int _next;
+  @override
+  late int current;
+  @override
+  bool moveNext() {
+    final end = _end;
+    final step = _step;
+    final f = _f as bool Function(int);
+    var i = _next;
+    while (step < 0 ? i > end : i < end) {
+      final v = i;
+      i += step;
+      if (f(v)) {
+        _next = i;
+        current = v;
+        return true;
+      }
+    }
+    _next = i;
+    return false;
   }
 }
 
@@ -2958,8 +3373,28 @@ FxAsyncIterable<A> compactAsync<A>(FxAsyncIterable<A?> iterable) =>
 /// Returns an iterable with unique values as determined by [f].
 ///
 /// Port of FxTS `uniqBy`.
-Iterable<A> uniqBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
-    _UniqByIterable(f, iterable);
+Iterable<A> uniqBy<A, B>(B Function(A a) f, Iterable<A> iterable) {
+  // Cast, not promotion — see [uniq] and `fxListRangeOf` for the shape.
+  if (iterable is FxUniqByFusable<A>) {
+    return (iterable as FxUniqByFusable<A>).fxFuseUniqBy<B>(f);
+  }
+  return _UniqByIterable(f, iterable);
+}
+
+/// Implemented by a lazy stage that can absorb a following `uniqBy` into its
+/// own loop — the keyed twin of [FxUniqFusable].
+///
+/// Only stages whose output type equals their *input* type can offer this,
+/// which is why `filter` can and `map` cannot: the fused node has to name the
+/// source's element type, and for `map` that type is not reachable from the
+/// `uniqBy` call site (see [FxUniqFusable] for the same argument).
+abstract class FxUniqByFusable<A> {
+  /// This stage followed by `uniqBy(f)`, as a single stage.
+  ///
+  /// Same elements, order, and laziness as `uniqBy(f, this)` — a seen-set per
+  /// iteration, and both callbacks running once per element consumed.
+  Iterable<A> fxFuseUniqBy<B>(B Function(A a) f);
+}
 
 class _UniqByIterable<A, B> extends Iterable<A> {
   _UniqByIterable(this._f, this._source);
@@ -3251,6 +3686,32 @@ class _SetOpIterable<A, B> extends Iterable<A> {
   final bool _keep;
   @override
   Iterator<A> get iterator => _SetOpIterator(_f, _source1, _source2, _keep);
+
+  /// One loop: build [_source1]'s key set, then walk [_source2] by index when
+  /// it is a `List`. A `toList` consumes everything anyway, so nothing is
+  /// evaluated that the lazy path would have skipped, and [_f] still runs
+  /// once per element of each source.
+  @override
+  List<A> toList({bool growable = true}) {
+    final f = _f;
+    final keep = _keep;
+    final set = <B>{for (final a in _source1) f(a)};
+    final seen = <A>{};
+    final result = <A>[];
+    final source = _source2;
+    if (source is List<A>) {
+      final length = source.length;
+      for (var i = 0; i < length; i++) {
+        final a = source[i];
+        if (set.contains(f(a)) == keep && seen.add(a)) result.add(a);
+      }
+    } else {
+      for (final a in source) {
+        if (set.contains(f(a)) == keep && seen.add(a)) result.add(a);
+      }
+    }
+    return growable ? result : List<A>.from(result, growable: false);
+  }
 }
 
 class _SetOpIterator<A, B> implements Iterator<A> {
@@ -4014,6 +4475,29 @@ FxAsyncIterable<A> dropWhileAsync<A>(
   FutureOr<bool> Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) {
+  // Fused-stage form, like filterAsync/takeWhileAsync. Only one dropWhile
+  // fuses into a run — its latch lives on the iterator — so a second one
+  // starts a new run over this iterable, exactly as a second scan does.
+  // A Concurrent marker falls back to [_dropWhileAsyncLegacy].
+  final stage = FxDropWhileStage((v) => f(v as A));
+  if (iterable is FxFusedAsyncIterable<A> && iterable.dropWhileIndex < 0) {
+    final source = iterable.source;
+    final stages = iterable.stages;
+    final legacy = iterable.legacy;
+    return FxFusedAsyncIterable<A>(source, [
+      ...stages,
+      stage,
+    ], () => _dropWhileAsyncLegacy(f, legacy()));
+  }
+  return FxFusedAsyncIterable<A>(iterable, [
+    stage,
+  ], () => _dropWhileAsyncLegacy(f, iterable));
+}
+
+FxAsyncIterable<A> _dropWhileAsyncLegacy<A>(
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var dropping = true;
@@ -4477,6 +4961,162 @@ FxAsyncIterable<List<A>> windowedAsync<A>(
 }
 
 FxAsyncIterable<List<A>> _windowedAsync<A>(
+  int size,
+  int step,
+  bool partial,
+  FxAsyncIterable<A> iterable,
+) => DelegateAsyncIterable(
+  () => _WindowedAsyncIterator<A>(size, step, partial, iterable),
+);
+
+/// Pull-based `windowed`/`chunk`, on the internal fast-pull path.
+///
+/// The previous form wrapped an `async` closure in a [SerialAsyncIterator],
+/// so every *element* crossed a real `Future` and every *window* an async
+/// function frame — even when the source could answer synchronously. Over a
+/// `toAsync` source at 100,000 elements, `chunk(4)` cost 27 ms more than the
+/// same chain without it (2.1 ms to 29.1 ms), which is 270 ns an element for
+/// bookkeeping that does no work.
+///
+/// Filling a window is a loop of [FxFastIterator.nextOr] pulls that only
+/// chains a continuation when a pull actually answers asynchronously
+/// (then/bare, per the 0.7.4 shape lesson). Semantics are unchanged: window
+/// contents and count, the `partial` tail, overlap carry for `step < size`,
+/// the skip for `step > size`, and — via [_windowedAsyncLegacy] — the
+/// concurrent path.
+class _WindowedAsyncIterator<A>
+    with FxFastNextGate<List<A>>
+    implements FxFastIterator<List<A>> {
+  _WindowedAsyncIterator(
+    this._size,
+    this._step,
+    this._partial,
+    this._sourceIterable,
+  );
+
+  final int _size;
+  final int _step;
+  final bool _partial;
+  final FxAsyncIterable<A> _sourceIterable;
+  FxAsyncIterator<A>? _source;
+  FxAsyncIterator<List<A>>? _fallback;
+  List<A> _carry = <A>[];
+  int _pendingSkip = 0;
+  bool _sourceDone = false;
+  bool _finished = false;
+
+  @override
+  Future<IterResult<List<A>>> next([Concurrent? concurrent]) {
+    if (_fallback == null &&
+        concurrent is Concurrent &&
+        _source == null &&
+        !_finished) {
+      // Nothing pulled yet and the consumer wants concurrency: hand the whole
+      // iteration to the serial form, which threads the marker upstream.
+      _fallback = _windowedAsyncLegacy(
+        _size,
+        _step,
+        _partial,
+        _sourceIterable,
+      ).iterator;
+    }
+    final fb = _fallback;
+    if (fb != null) return fb.next(concurrent);
+    return super.next(concurrent);
+  }
+
+  @override
+  FutureOr<IterResult<List<A>>> nextOr() {
+    final fb = _fallback;
+    if (fb != null) return fb.next();
+    if (_finished) return IterResult<List<A>>.done();
+    _source ??= _sourceIterable.iterator;
+    return _skip();
+  }
+
+  FutureOr<IterResult<A>> _pull() {
+    final src = _source!;
+    return src is FxFastIterator<A> ? src.nextOr() : src.next();
+  }
+
+  /// Consumes the gap left by a `step` wider than `size`.
+  FutureOr<IterResult<List<A>>> _skip() {
+    while (_pendingSkip > 0 && !_sourceDone) {
+      final r = _pull();
+      if (r is Future<IterResult<A>>) {
+        return r.then((rr) {
+          if (rr.done) {
+            _sourceDone = true;
+          } else {
+            _pendingSkip--;
+          }
+          return _skip();
+        });
+      }
+      if (r.done) {
+        _sourceDone = true;
+      } else {
+        _pendingSkip--;
+      }
+    }
+    if (_pendingSkip > 0) {
+      _finished = true;
+      return IterResult<List<A>>.done();
+    }
+    final window = _carry;
+    _carry = <A>[];
+    return _fill(window);
+  }
+
+  FutureOr<IterResult<List<A>>> _fill(List<A> window) {
+    while (window.length < _size && !_sourceDone) {
+      final r = _pull();
+      if (r is Future<IterResult<A>>) {
+        return r.then((rr) {
+          if (rr.done) {
+            _sourceDone = true;
+          } else {
+            window.add(rr.value);
+          }
+          return _fill(window);
+        });
+      }
+      if (r.done) {
+        _sourceDone = true;
+      } else {
+        window.add(r.value);
+      }
+    }
+    return _emit(window);
+  }
+
+  IterResult<List<A>> _emit(List<A> window) {
+    if (window.isEmpty) {
+      _finished = true;
+      return IterResult<List<A>>.done();
+    }
+    if (window.length < _size) {
+      if (!_partial) {
+        _finished = true;
+        return IterResult<List<A>>.done();
+      }
+      if (_step >= window.length) {
+        _finished = true;
+      } else {
+        _carry = window.sublist(_step);
+      }
+      return IterResult.value(window);
+    }
+    if (_step < _size) {
+      _carry = window.sublist(_step);
+    } else {
+      _pendingSkip = _step - _size;
+    }
+    return IterResult.value(window);
+  }
+}
+
+FxAsyncIterable<List<A>> _windowedAsyncLegacy<A>(
   int size,
   int step,
   bool partial,
@@ -5091,13 +5731,15 @@ Iterable<int> range(int start, [int? end, int step = 1]) => end == null
     ? _RangeIterable(0, start, 1)
     : _RangeIterable(start, end, step);
 
-class _RangeIterable extends Iterable<int> {
+class _RangeIterable extends Iterable<int> implements FxIntRangeSource {
   _RangeIterable(this._start, this._end, this._step);
   final int _start;
   final int _end;
   final int _step;
   @override
   Iterator<int> get iterator => _RangeIterator(_start, _end, _step);
+  @override
+  FxIntRange get intRange => FxIntRange(_start, _end, _step);
 }
 
 class _RangeIterator implements Iterator<int> {
@@ -6030,7 +6672,11 @@ class _UsingAsyncIterator<R, T> implements FxFastIterator<T> {
 ///
 /// Port of FxTS `toArray` (sync); named `toList` to match Dart's
 /// `Iterable.toList` (Dart has no "array" type — this always returns a [List]).
-List<A> toList<A>(Iterable<A> iterable) => List.of(iterable);
+/// `iterable.toList()`, not `List.of(iterable)`: `List.of` reaches straight
+/// for the iterator, so it bypasses every operator `toList` override — the
+/// SDK hand-offs on `map`/`filter` over a `List` source, and the fused
+/// single-loop materialisations on `uniq`/`uniqBy`/`map`+`uniq`.
+List<A> toList<A>(Iterable<A> iterable) => iterable.toList();
 
 /// Materializes an [FxAsyncIterable] into a [List].
 ///
@@ -7035,7 +7681,7 @@ Future<Map<K, Acc>> foldByAsync<A, K, Acc>(
 /// Port of FxTS `sort`. Unlike the TS version (which mutates arrays in
 /// place), the Dart port never mutates its input.
 List<A> sort<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
-    List.of(iterable)..sort(f);
+    iterable.toList()..sort(f);
 
 /// Async counterpart of [sort].
 Future<List<A>> sortAsync<A>(
@@ -7098,7 +7744,10 @@ List<A> _sortByImpl<A>(
   // 2·n·log n extractions instead of n. The permutation is identical to the
   // direct sort's: sort decisions depend only on comparator outcomes, and
   // the index comparator returns exactly what the direct comparator would.
-  final items = List.of(iterable);
+  // `toList()`, not `List.of`: see the note on the top-level [toList] — a
+  // mid-chain `sortBy` must materialise through the upstream's own override,
+  // not by pulling it element by element.
+  final items = iterable.toList();
   final length = items.length;
   if (length < 2) return items;
   final indices = [for (var i = 0; i < length; i++) i];
@@ -7458,9 +8107,18 @@ A? head<A>(Iterable<A> iterable) {
 }
 
 /// Async counterpart of [head].
-Future<A?> headAsync<A>(FxAsyncIterable<A> iterable) async {
-  final r = await iterable.iterator.next();
-  return r.done ? null : r.value;
+Future<A?> headAsync<A>(FxAsyncIterable<A> iterable) {
+  // Not `async`: the function frame and its suspension cost a microtask per
+  // call, and `head` is called once per pipeline — which, in a loop that
+  // builds one short chain per work item, is once per item. Terminals own
+  // their iterator and consume serially, so the internal fast-pull path
+  // applies (see [toListAsync]).
+  final it = iterable.iterator;
+  final r = it is FxFastIterator<A> ? it.nextOr() : it.next();
+  if (r is Future<IterResult<A>>) {
+    return r.then((rr) => rr.done ? null : rr.value);
+  }
+  return Future<A?>.value(r.done ? null : r.value);
 }
 
 /// Returns the last element, or `null` when empty.

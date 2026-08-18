@@ -37,7 +37,9 @@ void main() {
               if (msgs.isEmpty) return const <String>[];
               return [
                 '  $lvl x${msgs.length}',
-                ...fx(msgs).map((l) => '    - ${l.message}').uniq(),
+                ...fx(msgs)
+                    .uniqBy((l) => l.message)
+                    .map((l) => '    - ${l.message}'),
               ];
             }),
           ]);
