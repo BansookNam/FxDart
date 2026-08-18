@@ -76,6 +76,41 @@ anything under ~5% (the `native` side, whose binary does not even change,
 moved −27% to +4% between runs). Re-measured paired and interleaved it is a
 small consistent win with no regression anywhere, so it lands.
 
+### A terminal that is inlined inlines the caller's callback with it
+
+The 2.75 ns callback cost above is not universal — it is what you pay when the
+loop and the callback live in *different* functions. Mark a strict terminal
+`vm:prefer-inline` and AOT inlines it into the call site, where `f` is the
+literal closure written there rather than a parameter holding an unknown
+function. Measured over 1,000,000 rows extracting a `double` field:
+
+| `maxBy` variant | ns/element |
+|---|---|
+| hand-written loop | 0.65 |
+| `list.reduce(closure)` — what the native panel writes | 1.90 |
+| plain generic terminal | **6.26** |
+| + `vm:prefer-inline` | 0.97 |
+| + inline **and** an indexed `List` walk | **0.65** |
+
+So `minBy`/`maxBy` now carry the pragma and index a `List` source directly.
+`anomaly-context`, which extracts a peak over 1,000,000 readings, went
+**−36%** and now *beats* the hand-written loop: 1.48x behind to **0.90x**.
+`foldBy` gained the pragma for the same reason (`monthly-category-report`).
+
+The indexed walk is worth its branch only *because* of the inlining. 0.8.0
+measured indexed loops around an un-inlined callback at 1.03-1.05x and
+rejected them; with the callback inlined there is nothing left for the
+iterator to hide behind.
+
+**This does not generalise, and trying to was a measured mistake.** The same
+pragma applied to the lazy operator factories and to the larger strict
+terminals (`groupBy`, `countBy`, `each`, `fold`, …) cost
+`weekly-sensor-averages` **+8.7%** through code-size pressure while buying
+about 1.7% elsewhere — so both groups were reverted, and the pragma is kept
+only where it is measured to pay. A lazy stage cannot benefit from it at all:
+its callback lives in an *iterator field*, so no amount of inlining at the
+call site makes the closure's identity known.
+
 ### `sortBy` / `sort` / `toList` stop bypassing their upstream
 
 All three materialized with `List.of(iterable)`, which reaches straight for
@@ -119,7 +154,7 @@ Three smaller async fixes, together worth **−9.58%** on `flaky-api-retry`:
   fused run reachable by `nextOr`. Its latch is per-iterator, and at most one
   fuses into a run — a second starts a new one, as a second `scan` does.
 
-### Example change — `alert-digest`
+### Example changes
 
 The fxdart panel formatted *every* alert message and then deduped the
 resulting strings; the native panel deduped first and formatted only what
@@ -128,10 +163,24 @@ panel now reads `uniqBy((l) => l.message).map(...)` — which is also the
 clearer statement of the intent — for byte-identical output:
 **262 ms → 176 ms**, from 1.46x behind native to a tie.
 
-This is the only example that changed. Two candidate rewrites were probed and
-rejected: `windowed(3)` for `consecutive-over-limit` is *worse* (31.0 ms vs
-23.2 ms), and an index walk over `range` gains only 9% while losing the
-sliding-window idea the example exists to show.
+**`latency-percentiles`** sorted each endpoint's latencies with
+`sortBy((ms) => ms)` — an *identity* key, which is a misuse of the operator:
+`sortBy` exists to sort by a key you derive, and paying its
+decorate-sort-undecorate to sort integers by themselves is pure overhead. It
+now reads `sort((a, b) => a.compareTo(b))`, which is both the natural way to
+say it and faster than the native panel's `..sort()`, because an explicit
+comparator on a statically-typed `List<int>` devirtualises `int.compareTo`
+where the default sort goes through `Comparable.compare`. In isolation over
+~950k values: `sortBy` 211.4 ms, native `..sort()` 175.0 ms, this **135.7 ms**.
+The case went 1.33x to **1.03x**, a tie. Output is byte-identical on both
+sides and `check_comparison` passes.
+
+Those are the only two examples that changed. Three further rewrites were
+probed and rejected: `windowed(3)` for `consecutive-over-limit` is *worse*
+(31.0 ms vs 23.2 ms); an index walk over `range` for the same case gains only
+9% while losing the sliding-window idea the example exists to show; and a
+then/bare callback for `flaky-api-retry` recovers 10 ms of a 151 ms gap while
+making the pipeline harder to read.
 
 ### Where the ten cases landed
 
@@ -139,22 +188,65 @@ Full 53-case sweep, headline scale, fxdart/native:
 
 | case | 0.8.4 | 0.8.5 |
 |---|---|---|
-| `alert-digest` | 1.46x | **1.00x** |
-| `stream-windowed-alerts` | 1.47x | **1.14x** |
-| `flaky-api-retry` | 1.42x | 1.25x |
-| `ledger-diff` | 1.35x | 1.27x |
-| `monthly-category-report` | 1.48x | 1.31x |
-| `latency-percentiles` | 1.34x | 1.33x |
-| `consecutive-over-limit` | 1.36x | 1.35x |
-| `recent-errors` | 1.56x | 1.37x |
-| `live-search` | 1.34x | 1.34x |
-| `anomaly-context` | 1.49x | 1.48x |
+| `anomaly-context` | 1.49x | **0.90x** |
+| `alert-digest` | 1.46x | **1.01x** |
+| `latency-percentiles` | 1.34x | **1.03x** |
+| `stream-windowed-alerts` | 1.47x | **1.12x** |
+| `flaky-api-retry` | 1.42x | 1.19x |
+| `ledger-diff` | 1.35x | 1.20x |
+| `monthly-category-report` | 1.48x | 1.26x |
+| `recent-errors` | 1.56x | 1.34x |
+| `live-search` | 1.34x | 1.36x |
+| `consecutive-over-limit` | 1.36x | 1.38x |
 
-No case regressed: the four that looked worse in the sweep table
-(`sensor-anomalies`, `stock-revaluation`, `leaderboard-ties`,
-`rate-limited-import`) all read flat under the paired A/B — −0.84%, +0.14%,
-+0.37%, −0.33% — so the movement was baseline drift, not the change.
-`food-spending` improved off-target, 1.05x → 0.88x.
+Four of the ten reach parity or better; six do not, and the reason is
+measured rather than guessed — see the two floors above. `recent-errors`,
+`monthly-category-report` and `consecutive-over-limit` sit on the *lazy*
+callback floor, which the inlining trick cannot reach because those closures
+live in iterator fields; `flaky-api-retry` and `live-search` sit on the async
+pull protocol at roughly 1 microsecond per awaited element.
+
+All 53 cases were then A/B'd against the 0.8.4 library with the case sources
+held identical and an unchanged-native control per case: **20 net faster, 26
+flat, and two genuinely slower** — `paginated-products` +2.6% and
+`no-spend-streak` +2.5%, both with a clean control. They are the cost of the
+`List`-indexed walks, and they are paid back many times over by the 20 (which
+run from −4% to −38%). Everything else that *looked* like a regression in the
+sweep table read flat or faster once measured properly; `top-merchants`, for
+instance, is +1.2% against a −0.6% control, i.e. inside the noise band.
+
+A single sweep's ratio is not evidence of a change. `results.json` also merges
+partial runs from different sessions, so two versions of it are not even a
+like-for-like comparison — over these two sweeps the *native* side, whose
+binary never changed, moved a median of −4.5%.
+
+Large off-target gains came with the inlining: `invoice-summary` 0.82x →
+0.51x, `budget-alerts` 0.88x → 0.60x, `multi-currency-report` 0.97x → 0.86x,
+`monthly-ledger-report` 0.41x → 0.32x, `food-spending` 1.05x → 0.88x.
+
+### Correction — `price-drop-detection` was never 0.22x
+
+Its published figure moves from **0.22x to 0.53x**, and that is a correction,
+not a regression. The case is byte-identical to 0.8.4 and its native panel
+does not import fxdart, so no library change can reach it. What moved is the
+measurement:
+
+| | native median | native **min** | fxdart median | fxdart **min** |
+|---|---|---|---|---|
+| 0.8.4 | 3480.0 ms | **1124.5 ms** | 780.0 ms | **581.0 ms** |
+| 0.8.5 | 1148.3 ms | **1128.7 ms** | 613.1 ms | **592.7 ms** |
+
+The two runs' *minimums* agree to 0.4% (native) and 2% (fxdart); the medians
+differ by 3x and 27%. This case holds 434 MB / 465 MB of RSS at N=1,000,000,
+so under transient memory pressure most of its samples inflate while the best
+sample still reflects the real cost. Taking the ratio from the minimums gives
+0.52x for 0.8.4 and 0.53x now — unchanged. The 0.22x that 0.8.4 published was
+an artifact of a spoiled native median, and it overstated fxdart's win.
+
+Worth knowing for the next pass: **the median is the fragile statistic for
+memory-heavy cases**, and the harness renders it. `price-drop-detection`'s
+median/min ratio was 3.1 in that run against ~1.03 for a healthy case, which
+is a usable signal for re-running a block rather than recording it.
 
 ### RxDartComparison — no case is RxDart-faster any more
 
@@ -191,7 +283,15 @@ silently switching itself off is otherwise invisible. Suite: 1980 passing.
   `chunk` — breaks the drive and forces the pull protocol. Making `uniqBy`
   and `take` fused stages would put `live-search` back on it.
 - The `zip` family still allocates a record per element, which is what is
-  left in `consecutive-over-limit`.
+  left in `consecutive-over-limit`. Fusing `zip3` into a following `filter`
+  would not help: the predicate is a closure, so the record escapes into it
+  and cannot be scalar-replaced.
+- **The lazy callback floor is the open design question.** A strict terminal
+  can inline its caller's callback; a lazy stage cannot, because the closure
+  lives in an iterator field. Two attempts to close that gap were measured and
+  rejected — a push/sink protocol (+36% to +54%) and blanket factory inlining
+  (+8.7% on an unrelated case). Anything that fixes it has to change how a
+  lazy stage stores its callback, not how it is called.
 
 ## 0.8.4
 

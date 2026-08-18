@@ -351,11 +351,16 @@ final class FxScanLink extends FxLink {
 
 /// A fused run of stages over one [source].
 class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
-  FxFusedAsyncIterable(this.source, this.stages, this.legacy)
-    : oneToOne = _oneToOne(stages),
-      scanIndex = _scanIndex(stages),
-      dropWhileIndex = _dropWhileIndex(stages),
-      links = _compile(stages);
+  // Everything derived from [stages] is computed on FIRST USE, not here.
+  //
+  // Each operator in a chain builds a *new* FxFusedAsyncIterable carrying
+  // `[...stages, stage]`, so a k-operator chain allocates k of them and
+  // discards the first k-1 without ever iterating them. Deriving eagerly made
+  // every one of those pay four list traversals plus a link allocation per
+  // stage. That is invisible when a chain is built once and drained, and
+  // dominant when a chain is built *per work item* — `flaky-api-retry` builds
+  // one four-operator chain per job, 100,000 times.
+  FxFusedAsyncIterable(this.source, this.stages, this.legacy);
 
   /// The pre-stage upstream.
   final FxAsyncIterable<Object?> source;
@@ -370,18 +375,18 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
   /// always yields exactly one output. This lets the pull answer with the
   /// stage's own future instead of chaining a second one to re-check for a
   /// filtered-out element — one future and one microtask hop per element.
-  final bool oneToOne;
+  late final bool oneToOne = _oneToOne(stages);
 
   /// Index of the run's [FxScanStage], or -1 when there is none. At most one
   /// scan fuses into a run; a second one starts a new run over this iterable.
-  final int scanIndex;
+  late final int scanIndex = _scanIndex(stages);
 
   /// Index of the run's [FxDropWhileStage], or -1 when there is none. At most
   /// one fuses into a run, for the reason [scanIndex] gives.
-  final int dropWhileIndex;
+  late final int dropWhileIndex = _dropWhileIndex(stages);
 
   /// [stages] compiled into the chain the per-element loops walk.
-  final FxLink? links;
+  late final FxLink? links = _compile(stages);
 
   /// The run's scan link, or null when the run has no scan — the entry point
   /// for emitting the seed through the stages that follow it. Resolved once
@@ -437,8 +442,16 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
 }
 
 class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
-  _FusedIterator(this._iterable);
+  // The iterable's derived state is lazy (see its constructor), so resolve it
+  // once here rather than paying a late-initialisation check on every element.
+  // Creating an iterator is the point at which the run is definitely going to
+  // be walked, so nothing is computed that would otherwise have been skipped.
+  _FusedIterator(this._iterable)
+    : _links = _iterable.links,
+      _oneToOne = _iterable.oneToOne;
   final FxFusedAsyncIterable<T> _iterable;
+  final FxLink? _links;
+  final bool _oneToOne;
   FxAsyncIterator<Object?>? _source;
   FxAsyncIterator<T>? _fallback;
   bool _ended = false;
@@ -506,7 +519,7 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
 
   FutureOr<IterResult<T>> _pull() {
     final src = _source!;
-    if (_iterable.oneToOne) {
+    if (_oneToOne) {
       if (_ended) return IterResult<T>.done();
       final FutureOr<IterResult<Object?>> r = src is FxFastIterator<Object?>
           ? src.nextOr()
@@ -517,14 +530,14 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
             _ended = true;
             return IterResult<T>.done();
           }
-          return _mapFrom(rr.value, _iterable.links);
+          return _mapFrom(rr.value, _links);
         });
       }
       if (r.done) {
         _ended = true;
         return IterResult<T>.done();
       }
-      return _mapFrom(r.value, _iterable.links);
+      return _mapFrom(r.value, _links);
     }
     while (true) {
       if (_ended) return IterResult<T>.done();
@@ -586,7 +599,7 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
       _ended = true;
       return IterResult<T>.done();
     }
-    return _applyFrom(r.value, _iterable.links);
+    return _applyFrom(r.value, _links);
   }
 
   FutureOr<IterResult<T>?> _applyFrom(Object? value, FxLink? from) {

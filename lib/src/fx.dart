@@ -340,16 +340,19 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   void consume([int? n]) => s.consume(_inner, n);
 
   /// Groups values into lists keyed by [f].
+  @pragma('vm:prefer-inline')
   Map<K, List<T>> groupBy<K>(K Function(T a) f) => s.groupBy(f, _inner);
 
   /// Maps the key [f] returns to its value (later values win on collisions).
   Map<K, T> indexBy<K>(K Function(T a) f) => s.indexBy(f, _inner);
 
   /// Counts how many values fall under each key [f] returns.
+  @pragma('vm:prefer-inline')
   Map<K, int> countBy<K>(K Function(T a) f) => s.countBy(f, _inner);
 
   /// Folds the values under each [key] in one pass, without materializing
   /// the groups — the aggregate-only counterpart of [groupBy].
+  @pragma('vm:prefer-inline')
   Map<K, Acc> foldBy<K, Acc>(
     K Function(T a) key,
     Acc seed,
@@ -357,6 +360,7 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   ) => s.foldBy(key, seed, f, _inner);
 
   /// Counts the values [f] holds for — `filter` + `size` in one walk.
+  @pragma('vm:prefer-inline')
   int countWhere(bool Function(T a) f) => s.countWhere(f, _inner);
 
   /// Whether [f] holds for at least one value.
@@ -378,9 +382,14 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   T? head() => s.head(_inner);
 
   /// The value with the smallest key [f], or `null` if empty.
+  ///
+  /// Inlined so the chain method does not sit between the caller's closure
+  /// and the loop that runs it — see the note on the top-level `minBy`.
+  @pragma('vm:prefer-inline')
   T? minBy(Object? Function(T a) f) => s.minBy(f, _inner);
 
   /// The value with the largest key [f], or `null` if empty.
+  @pragma('vm:prefer-inline')
   T? maxBy(Object? Function(T a) f) => s.maxBy(f, _inner);
 
   /// The sum of [f] over every value.

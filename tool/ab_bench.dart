@@ -252,6 +252,11 @@ Future<void> _prepareBaseline(String ref, bool keepTree) async {
     }
     stdout.writeln('baseline moved → re-checking out ${head.substring(0, 8)}');
     await _git(['worktree', 'remove', '--force', _treeDir]);
+    // The `_base` binaries were compiled against the OLD baseline's lib/, and
+    // [_compileAll]'s staleness check only watches the case sources and the
+    // *head* tree's lib/ — so without this they would silently survive a
+    // baseline change and the run would measure the wrong pair of libraries.
+    _dropBaseBinaries();
   } else if (existing) {
     stdout.writeln('reusing baseline worktree as-is (--keep-tree)');
     return;
@@ -284,6 +289,15 @@ void _syncCaseSources(String casesDir, List<String> slugs) {
     ).listSync().whereType<File>()) {
       f.copySync('${dst.path}/${f.uri.pathSegments.last}');
     }
+  }
+}
+
+/// Deletes every `_base` binary, so a baseline change forces a rebuild.
+void _dropBaseBinaries() {
+  final dir = Directory(_abDir);
+  if (!dir.existsSync()) return;
+  for (final f in dir.listSync()) {
+    if (f is File && f.path.endsWith('_base')) f.deleteSync();
   }
 }
 

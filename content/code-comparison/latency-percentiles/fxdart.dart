@@ -30,7 +30,7 @@ void main() {
   final ok = fx(reqs).filter((r) => r.status == 200).toList();
 
   final rows = fx(fx(ok).groupBy((r) => r.endpoint).entries).map((e) {
-    final sorted = fx(e.value).map((r) => r.ms).sortBy((ms) => ms).toList();
+    final sorted = fx(e.value).map((r) => r.ms).sort((a, b) => a.compareTo(b)).toList();
     int pct(int q) => nth(((sorted.length - 1) * q / 100).round(), sorted)!;
     return (e.key, pct(50), pct(95), sorted.length);
   }).toList();

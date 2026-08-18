@@ -879,7 +879,12 @@ class _SetOpIterable<A, B> extends Iterable<A> {
     final f = _f;
     final keep = _keep;
     final set = <B>{for (final a in _source1) f(a)};
-    final seen = <A>{};
+    // `Set<Object?>`, not `Set<A>`: A is a runtime type argument here, so
+    // every `add` on a `Set<A>` pays a covariant parameter check — once per
+    // element that clears the membership test, which on an *intersection*
+    // is nearly every element. Membership is `hashCode`/`==` either way, so
+    // the dedup is unchanged. Same trade `_MapUniqIterable.toList` makes.
+    final seen = <Object?>{};
     final result = <A>[];
     final source = _source2;
     if (source is List<A>) {
@@ -905,7 +910,7 @@ class _SetOpIterator<A, B> implements Iterator<A> {
   final bool _keep;
   Set<B>? _set; // iterable1's keys, materialized on the first pull
   Iterator<A>? _it;
-  final Set<A> _seen = {};
+  final Set<Object?> _seen = {}; // see _SetOpIterable.toList
   @override
   late A current;
   @override
