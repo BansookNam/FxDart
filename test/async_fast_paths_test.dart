@@ -485,6 +485,29 @@ void main() {
         2,
         -2,
       ]);
+
+      // `windowed`/`chunk` keeps the same guard (0.8.5 moved it onto the
+      // fast-pull path), but yields lists, so it needs its own drive.
+      final wit =
+          chunkAsync(2, toAsync([1, 2, 3, 4, 5])).iterator
+              as FxFastIterator<List<int>>;
+      final windows = <List<int>>[
+        (await wit.next(Concurrent.of(2))).value,
+      ];
+      while (true) {
+        final ro = wit.nextOr();
+        final r = ro is Future<IterResult<List<int>>> ? await ro : ro;
+        if (r.done) break;
+        windows.add(r.value);
+      }
+      expect(
+        windows,
+        equals([
+          [1, 2],
+          [3, 4],
+          [5],
+        ]),
+      );
     });
 
     test('bridge nextOr with a pending stream and after done', () async {
