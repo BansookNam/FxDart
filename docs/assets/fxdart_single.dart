@@ -401,11 +401,16 @@ final class FxScanLink extends FxLink {
 
 /// A fused run of stages over one [source].
 class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
-  FxFusedAsyncIterable(this.source, this.stages, this.legacy)
-    : oneToOne = _oneToOne(stages),
-      scanIndex = _scanIndex(stages),
-      dropWhileIndex = _dropWhileIndex(stages),
-      links = _compile(stages);
+  // Everything derived from [stages] is computed on FIRST USE, not here.
+  //
+  // Each operator in a chain builds a *new* FxFusedAsyncIterable carrying
+  // `[...stages, stage]`, so a k-operator chain allocates k of them and
+  // discards the first k-1 without ever iterating them. Deriving eagerly made
+  // every one of those pay four list traversals plus a link allocation per
+  // stage. That is invisible when a chain is built once and drained, and
+  // dominant when a chain is built *per work item* — `flaky-api-retry` builds
+  // one four-operator chain per job, 100,000 times.
+  FxFusedAsyncIterable(this.source, this.stages, this.legacy);
 
   /// The pre-stage upstream.
   final FxAsyncIterable<Object?> source;
@@ -420,18 +425,18 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
   /// always yields exactly one output. This lets the pull answer with the
   /// stage's own future instead of chaining a second one to re-check for a
   /// filtered-out element — one future and one microtask hop per element.
-  final bool oneToOne;
+  late final bool oneToOne = _oneToOne(stages);
 
   /// Index of the run's [FxScanStage], or -1 when there is none. At most one
   /// scan fuses into a run; a second one starts a new run over this iterable.
-  final int scanIndex;
+  late final int scanIndex = _scanIndex(stages);
 
   /// Index of the run's [FxDropWhileStage], or -1 when there is none. At most
   /// one fuses into a run, for the reason [scanIndex] gives.
-  final int dropWhileIndex;
+  late final int dropWhileIndex = _dropWhileIndex(stages);
 
   /// [stages] compiled into the chain the per-element loops walk.
-  final FxLink? links;
+  late final FxLink? links = _compile(stages);
 
   /// The run's scan link, or null when the run has no scan — the entry point
   /// for emitting the seed through the stages that follow it. Resolved once
@@ -487,8 +492,16 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
 }
 
 class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
-  _FusedIterator(this._iterable);
+  // The iterable's derived state is lazy (see its constructor), so resolve it
+  // once here rather than paying a late-initialisation check on every element.
+  // Creating an iterator is the point at which the run is definitely going to
+  // be walked, so nothing is computed that would otherwise have been skipped.
+  _FusedIterator(this._iterable)
+    : _links = _iterable.links,
+      _oneToOne = _iterable.oneToOne;
   final FxFusedAsyncIterable<T> _iterable;
+  final FxLink? _links;
+  final bool _oneToOne;
   FxAsyncIterator<Object?>? _source;
   FxAsyncIterator<T>? _fallback;
   bool _ended = false;
@@ -556,7 +569,7 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
 
   FutureOr<IterResult<T>> _pull() {
     final src = _source!;
-    if (_iterable.oneToOne) {
+    if (_oneToOne) {
       if (_ended) return IterResult<T>.done();
       final FutureOr<IterResult<Object?>> r = src is FxFastIterator<Object?>
           ? src.nextOr()
@@ -567,14 +580,14 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
             _ended = true;
             return IterResult<T>.done();
           }
-          return _mapFrom(rr.value, _iterable.links);
+          return _mapFrom(rr.value, _links);
         });
       }
       if (r.done) {
         _ended = true;
         return IterResult<T>.done();
       }
-      return _mapFrom(r.value, _iterable.links);
+      return _mapFrom(r.value, _links);
     }
     while (true) {
       if (_ended) return IterResult<T>.done();
@@ -636,7 +649,7 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
       _ended = true;
       return IterResult<T>.done();
     }
-    return _applyFrom(r.value, _iterable.links);
+    return _applyFrom(r.value, _links);
   }
 
   FutureOr<IterResult<T>?> _applyFrom(Object? value, FxLink? from) {
@@ -3695,7 +3708,12 @@ class _SetOpIterable<A, B> extends Iterable<A> {
     final f = _f;
     final keep = _keep;
     final set = <B>{for (final a in _source1) f(a)};
-    final seen = <A>{};
+    // `Set<Object?>`, not `Set<A>`: A is a runtime type argument here, so
+    // every `add` on a `Set<A>` pays a covariant parameter check — once per
+    // element that clears the membership test, which on an *intersection*
+    // is nearly every element. Membership is `hashCode`/`==` either way, so
+    // the dedup is unchanged. Same trade `_MapUniqIterable.toList` makes.
+    final seen = <Object?>{};
     final result = <A>[];
     final source = _source2;
     if (source is List<A>) {
@@ -3721,7 +3739,7 @@ class _SetOpIterator<A, B> implements Iterator<A> {
   final bool _keep;
   Set<B>? _set; // iterable1's keys, materialized on the first pull
   Iterator<A>? _it;
-  final Set<A> _seen = {};
+  final Set<Object?> _seen = {}; // see _SetOpIterable.toList
   @override
   late A current;
   @override
@@ -7300,13 +7318,45 @@ Future<num> maxAsync(FxAsyncIterable<num> iterable) =>
 ///
 /// Dart-native addition (FxTS has only numeric `min`); named after Kotlin's
 /// `minByOrNull` shape, nullable like [head]/[last].
+// `vm:prefer-inline` here is not about the call overhead of `minBy` itself —
+// it is what lets AOT inline **the caller's key extractor**. Inlined into the
+// call site, `f` is the literal closure written there rather than a parameter
+// holding an unknown function, so the per-element indirect call disappears.
+// Measured over 1,000,000 rows extracting a `double` field:
+//
+//   hand-written loop            0.65 ns/element
+//   `list.reduce(closure)`       1.90
+//   this, without the pragma     6.26
+//   this, with the pragma        0.97
+//   this, pragma + indexed walk  0.65
+//
+// The indexed walk is worth its extra branch only *because* of the inlining:
+// 0.8.0 measured indexed loops around an un-inlined callback at 1.03-1.05x and
+// rejected them. With the callback inlined there is no longer a callback to
+// hide behind, and the iterator shows up.
+@pragma('vm:prefer-inline')
 A? minBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
+  // The key of the running best is extracted once and cached; [f] runs
+  // exactly once per element.
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    if (length == 0) return null;
+    var best = iterable[0];
+    var bestKey = f(best);
+    for (var i = 1; i < length; i++) {
+      final a = iterable[i];
+      final key = f(a);
+      if (_compareKeys(key, bestKey) < 0) {
+        best = a;
+        bestKey = key;
+      }
+    }
+    return best;
+  }
   A? best;
   Object? bestKey;
   var seen = false;
   for (final a in iterable) {
-    // The key of the running best is extracted once and cached; [f] runs
-    // exactly once per element.
     final key = f(a);
     if (!seen || _compareKeys(key, bestKey) < 0) {
       best = a;
@@ -7340,7 +7390,24 @@ Future<A?> minByAsync<A>(
 ///
 /// Dart-native addition (FxTS has only numeric `max`); named after Kotlin's
 /// `maxByOrNull` shape, nullable like [head]/[last].
+/// Inlined for the reason given on [minBy].
+@pragma('vm:prefer-inline')
 A? maxBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    if (length == 0) return null;
+    var best = iterable[0];
+    var bestKey = f(best);
+    for (var i = 1; i < length; i++) {
+      final a = iterable[i];
+      final key = f(a);
+      if (_compareKeys(key, bestKey) > 0) {
+        best = a;
+        bestKey = key;
+      }
+    }
+    return best;
+  }
   A? best;
   Object? bestKey;
   var seen = false;
@@ -7603,6 +7670,8 @@ Future<Map<K, int>> countByAsync<A, K>(
 /// as in [fold]. A mutable seed would therefore be shared across keys: fold
 /// into new values (`sum + t.amount`), or use [groupBy] if you need to
 /// accumulate into a mutable structure per group.
+/// Inlined so the caller's callback is inlined with it — see [minBy].
+@pragma('vm:prefer-inline')
 Map<K, Acc> foldBy<A, K, Acc>(
   K Function(A a) key,
   Acc seed,
@@ -11874,16 +11943,19 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   void consume([int? n]) => _$consume(_inner, n);
 
   /// Groups values into lists keyed by [f].
+  @pragma('vm:prefer-inline')
   Map<K, List<T>> groupBy<K>(K Function(T a) f) => _$groupBy(f, _inner);
 
   /// Maps the key [f] returns to its value (later values win on collisions).
   Map<K, T> indexBy<K>(K Function(T a) f) => _$indexBy(f, _inner);
 
   /// Counts how many values fall under each key [f] returns.
+  @pragma('vm:prefer-inline')
   Map<K, int> countBy<K>(K Function(T a) f) => _$countBy(f, _inner);
 
   /// Folds the values under each [key] in one pass, without materializing
   /// the groups — the aggregate-only counterpart of [groupBy].
+  @pragma('vm:prefer-inline')
   Map<K, Acc> foldBy<K, Acc>(
     K Function(T a) key,
     Acc seed,
@@ -11891,6 +11963,7 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   ) => _$foldBy(key, seed, f, _inner);
 
   /// Counts the values [f] holds for — `filter` + `size` in one walk.
+  @pragma('vm:prefer-inline')
   int countWhere(bool Function(T a) f) => _$countWhere(f, _inner);
 
   /// Whether [f] holds for at least one value.
@@ -11912,9 +11985,14 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   T? head() => _$head(_inner);
 
   /// The value with the smallest key [f], or `null` if empty.
+  ///
+  /// Inlined so the chain method does not sit between the caller's closure
+  /// and the loop that runs it — see the note on the top-level `minBy`.
+  @pragma('vm:prefer-inline')
   T? minBy(Object? Function(T a) f) => _$minBy(f, _inner);
 
   /// The value with the largest key [f], or `null` if empty.
+  @pragma('vm:prefer-inline')
   T? maxBy(Object? Function(T a) f) => _$maxBy(f, _inner);
 
   /// The sum of [f] over every value.

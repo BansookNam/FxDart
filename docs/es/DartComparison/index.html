@@ -155,11 +155,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="false" data-speed="tie" data-fns="zipWithIndex map">
+    <li data-verdict="tie" data-async="false" data-speed="native" data-fns="zipWithIndex map">
       <a class="cmp-row" href="rank-labels.html">
         <span class="cmp-num">6</span>
         <span class="cmp-row-body">
-          <strong>Etiquetas de puesto para una tabla de clasificación</strong> <span class="badge verdict-tie">Empate</span> <span class="badge badge-speed speed-tie">⚡ Misma velocidad</span>
+          <strong>Etiquetas de puesto para una tabla de clasificación</strong> <span class="badge verdict-tie">Empate</span> <span class="badge badge-speed speed-native">⚡ Nativo más rápido</span>
           <span class="dim">Numera de 1 a n una tabla de clasificación ya ordenada — los records de indexed de Dart 3 frente a zipWithIndex + map en FxDart.</span>
         </span>
       </a>
@@ -359,11 +359,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/entries.html">entries</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="chunk map averageBy zipWithIndex join">
+    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="chunk map averageBy zipWithIndex join">
       <a class="cmp-row" href="weekly-sensor-averages.html">
         <span class="cmp-num">25</span>
         <span class="cmp-row-body">
-          <strong>Medias semanales a partir de lecturas diarias</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart más rápido</span>
+          <strong>Medias semanales a partir de lecturas diarias</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-tie">⚡ Misma velocidad</span>
           <span class="dim">Plegar 21 lecturas diarias en 3 medias semanales — aritmética de índices y sublist en Dart nativo frente a chunk + averageBy + zipWithIndex en FxDart.</span>
         </span>
       </a>
@@ -426,11 +426,11 @@
   <h2>Parte 4 · De seis a diez funciones</h2>
   <p class="dim">Flujos de trabajo completos, casi todos con concurrencia acotada: la parte que Dart nativo no sabe expresar con elegancia.</p>
   <ol class="cmp-list">
-    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="map foldBy sumBy sortBy uniq maxBy join">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="map foldBy sumBy sortBy uniq maxBy join">
       <a class="cmp-row" href="multi-currency-report.html">
         <span class="cmp-num">31</span>
         <span class="cmp-row-body">
-          <strong>Informe de gastos multidivisa</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-tie">⚡ Misma velocidad</span>
+          <strong>Informe de gastos multidivisa</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart más rápido</span>
           <span class="dim">Normaliza a USD el libro de cuentas de un viaje con tipos fijos y luego agrupa, ordena y resume — un pipeline por línea de informe frente al boilerplate de fold/reduce.</span>
         </span>
       </a>
@@ -516,11 +516,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/countBy.html">countBy</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="filter groupBy map sortBy nth maxBy join">
+    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="filter groupBy map sortBy nth maxBy join">
       <a class="cmp-row" href="latency-percentiles.html">
         <span class="cmp-num">40</span>
         <span class="cmp-row-body">
-          <strong>Latencia p50/p95 por endpoint</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-native">⚡ Nativo más rápido</span>
+          <strong>Latencia p50/p95 por endpoint</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-tie">⚡ Misma velocidad</span>
           <span class="dim">Tabla de percentiles a partir de logs de peticiones en crudo — groupBy + sortBy + nth por endpoint frente a un bucle que acumula filas con ordenaciones in situ.</span>
         </span>
       </a>
@@ -536,11 +536,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/concat.html">concat</a></li><li><a href="../tutorials/uniqBy.html">uniqBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="zipWithIndex filter flatMap uniq map maxBy join">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="zipWithIndex filter flatMap uniq map maxBy join">
       <a class="cmp-row" href="anomaly-context.html">
         <span class="cmp-num">42</span>
         <span class="cmp-row-body">
-          <strong>Anomalías con su contexto alrededor</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-native">⚡ Nativo más rápido</span>
+          <strong>Anomalías con su contexto alrededor</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart más rápido</span>
           <span class="dim">Muestra las lecturas de sensor por encima del límite más una línea antes y otra después — zipWithIndex + flatMap + uniq como un solo pipeline frente a un conjunto de índices construido en bucles anidados.</span>
         </span>
       </a>

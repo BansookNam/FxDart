@@ -155,11 +155,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/chunk.html">chunk</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
     </li>
-    <li data-verdict="tie" data-async="false" data-speed="tie" data-fns="zipWithIndex map">
+    <li data-verdict="tie" data-async="false" data-speed="native" data-fns="zipWithIndex map">
       <a class="cmp-row" href="rank-labels.html">
         <span class="cmp-num">6</span>
         <span class="cmp-row-body">
-          <strong>Rank labels for a leaderboard</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-speed speed-tie">⚡ Mesma velocidade</span>
+          <strong>Rank labels for a leaderboard</strong> <span class="badge verdict-tie">Toss-up</span> <span class="badge badge-speed speed-native">⚡ Nativo mais rápido</span>
           <span class="dim">Number a sorted leaderboard 1..n — Dart 3 indexed records vs zipWithIndex + map in FxDart.</span>
         </span>
       </a>
@@ -359,11 +359,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/entries.html">entries</a></li><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="chunk map averageBy zipWithIndex join">
+    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="chunk map averageBy zipWithIndex join">
       <a class="cmp-row" href="weekly-sensor-averages.html">
         <span class="cmp-num">25</span>
         <span class="cmp-row-body">
-          <strong>Weekly averages from daily readings</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart mais rápido</span>
+          <strong>Weekly averages from daily readings</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-tie">⚡ Mesma velocidade</span>
           <span class="dim">Fold 21 daily readings into 3 weekly averages — index arithmetic and sublist in plain Dart vs chunk + averageBy + zipWithIndex in FxDart.</span>
         </span>
       </a>
@@ -426,11 +426,11 @@
   <h2>Part 4 · Six to ten functions</h2>
   <p class="dim">Full workflows, most with bounded concurrency — the part native Dart cannot express cleanly.</p>
   <ol class="cmp-list">
-    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="map foldBy sumBy sortBy uniq maxBy join">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="map foldBy sumBy sortBy uniq maxBy join">
       <a class="cmp-row" href="multi-currency-report.html">
         <span class="cmp-num">31</span>
         <span class="cmp-row-body">
-          <strong>Multi-currency expense report</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-tie">⚡ Mesma velocidade</span>
+          <strong>Multi-currency expense report</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart mais rápido</span>
           <span class="dim">Normalize a trip ledger to USD with fixed rates, then group, rank, and summarize — one pipeline per report line vs fold/reduce boilerplate.</span>
         </span>
       </a>
@@ -516,11 +516,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/countBy.html">countBy</a></li><li><a href="../tutorials/groupBy.html">groupBy</a></li><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="filter groupBy map sortBy nth maxBy join">
+    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="filter groupBy map sortBy nth maxBy join">
       <a class="cmp-row" href="latency-percentiles.html">
         <span class="cmp-num">40</span>
         <span class="cmp-row-body">
-          <strong>p50/p95 latency per endpoint</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-native">⚡ Nativo mais rápido</span>
+          <strong>p50/p95 latency per endpoint</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-tie">⚡ Mesma velocidade</span>
           <span class="dim">Percentile table from raw request logs — groupBy + sortBy + nth per endpoint vs a row-accumulating loop with in-place sorts.</span>
         </span>
       </a>
@@ -536,11 +536,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/concat.html">concat</a></li><li><a href="../tutorials/uniqBy.html">uniqBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="zipWithIndex filter flatMap uniq map maxBy join">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="zipWithIndex filter flatMap uniq map maxBy join">
       <a class="cmp-row" href="anomaly-context.html">
         <span class="cmp-num">42</span>
         <span class="cmp-row-body">
-          <strong>Anomalies with surrounding context</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-native">⚡ Nativo mais rápido</span>
+          <strong>Anomalies with surrounding context</strong> <span class="badge verdict-fxdart">FxDart wins</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart mais rápido</span>
           <span class="dim">Show over-limit sensor readings plus one line before and after — zipWithIndex + flatMap + uniq as one pipeline vs an index set built in nested loops.</span>
         </span>
       </a>
