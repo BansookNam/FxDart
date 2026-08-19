@@ -23,6 +23,15 @@ class _FilterIterable<A> extends Iterable<A>
   Iterator<A> get iterator {
     final source = _source;
     if (source is List<A>) return _FilterListIterator(_f, source);
+    if (source is FxFilterFusable<A>) {
+      // A `zip`/`zip3` over `List` ranges absorbs this filter into its own
+      // iterator, which removes a whole stage boundary per element — see
+      // [FxFilterFusable]. Null means the sides are not all indexable, and
+      // the ordinary layering below stands. Resolved once per iteration,
+      // never per element.
+      final fused = (source as FxFilterFusable<A>).fxFusedFilterIterator(_f);
+      if (fused != null) return fused;
+    }
     final r = fxIntRangeOf(source);
     if (r != null) {
       // `range()` is the other source shape that is a plain counted loop.

@@ -15,10 +15,24 @@ import 'map.dart';
 Iterable<(A, B)> zip<A, B>(Iterable<A> iterable1, Iterable<B> iterable2) =>
     _ZipIterable(iterable1, iterable2);
 
-class _ZipIterable<A, B> extends Iterable<(A, B)> {
+class _ZipIterable<A, B> extends Iterable<(A, B)>
+    implements FxFilterFusable<(A, B)> {
   _ZipIterable(this._source1, this._source2);
   final Iterable<A> _source1;
   final Iterable<B> _source2;
+
+  @override
+  Iterator<(A, B)>? fxFusedFilterIterator(bool Function((A, B) a) p) {
+    // Only the all-indexed shape fuses, for the reason [iterator] gives about
+    // the mixed shapes: a pulled side still costs its own iterator, so the
+    // stage boundary this removes is the smaller half of the work.
+    final r1 = fxListRangeOf(_source1);
+    if (r1 == null) return null;
+    final r2 = fxListRangeOf(_source2);
+    if (r2 == null) return null;
+    return _ZipRangeRangeFilterIterator(p, r1, r2);
+  }
+
   @override
   Iterator<(A, B)> get iterator {
     // A side that is a range over a backing [List] — the list itself, or a
@@ -60,6 +74,46 @@ class _ZipRangeRangeIterator<A, B> implements Iterator<(A, B)> {
     _i = i + 1;
     current = (_l1[i], _l2[i + _off]);
     return true;
+  }
+}
+
+/// [_ZipRangeRangeIterator] with a following `filter` folded in — see
+/// [FxFilterFusable]. Same elements and same order as
+/// `filter(p, zip(a, b))`; the predicate still runs exactly once per pair,
+/// in order.
+class _ZipRangeRangeFilterIterator<A, B> implements Iterator<(A, B)> {
+  _ZipRangeRangeFilterIterator(this._p, FxListRange<A> r1, FxListRange<B> r2)
+    : _l1 = r1.list,
+      _l2 = r2.list,
+      _i = r1.start,
+      _off = r2.start - r1.start,
+      _end = r1.start + (r1.length < r2.length ? r1.length : r2.length);
+  final bool Function((A, B)) _p;
+  final List<A> _l1;
+  final List<B> _l2;
+  final int _off;
+  final int _end;
+  int _i;
+  @override
+  late (A, B) current;
+  @override
+  bool moveNext() {
+    final l1 = _l1;
+    final l2 = _l2;
+    final off = _off;
+    final end = _end;
+    var i = _i;
+    while (i < end) {
+      final t = (l1[i], l2[i + off]);
+      i++;
+      if (_p(t)) {
+        _i = i;
+        current = t;
+        return true;
+      }
+    }
+    _i = i;
+    return false;
   }
 }
 
@@ -129,11 +183,24 @@ Iterable<(A, B, C)> zip3<A, B, C>(
   Iterable<C> iterable3,
 ) => _Zip3Iterable(iterable1, iterable2, iterable3);
 
-class _Zip3Iterable<A, B, C> extends Iterable<(A, B, C)> {
+class _Zip3Iterable<A, B, C> extends Iterable<(A, B, C)>
+    implements FxFilterFusable<(A, B, C)> {
   _Zip3Iterable(this._source1, this._source2, this._source3);
   final Iterable<A> _source1;
   final Iterable<B> _source2;
   final Iterable<C> _source3;
+
+  @override
+  Iterator<(A, B, C)>? fxFusedFilterIterator(bool Function((A, B, C) a) p) {
+    final r1 = fxListRangeOf(_source1);
+    if (r1 == null) return null;
+    final r2 = fxListRangeOf(_source2);
+    if (r2 == null) return null;
+    final r3 = fxListRangeOf(_source3);
+    if (r3 == null) return null;
+    return _Zip3RangeFilterIterator(p, r1, r2, r3);
+  }
+
   @override
   Iterator<(A, B, C)> get iterator {
     // Same idea as [_ZipIterable], but only the all-indexed case is
@@ -185,6 +252,60 @@ class _Zip3RangeIterator<A, B, C> implements Iterator<(A, B, C)> {
     _i = i + 1;
     current = (_l1[i], _l2[i + _off2], _l3[i + _off3]);
     return true;
+  }
+}
+
+/// [_Zip3RangeIterator] with a following `filter` folded in — see
+/// [FxFilterFusable]. This is the shape a sliding window of three takes
+/// (`zip3(xs, drop(1, xs), drop(2, xs))` then a predicate), and the one the
+/// fusion was measured on.
+class _Zip3RangeFilterIterator<A, B, C> implements Iterator<(A, B, C)> {
+  _Zip3RangeFilterIterator(
+    this._p,
+    FxListRange<A> r1,
+    FxListRange<B> r2,
+    FxListRange<C> r3,
+  ) : _l1 = r1.list,
+      _l2 = r2.list,
+      _l3 = r3.list,
+      _i = r1.start,
+      _off2 = r2.start - r1.start,
+      _off3 = r3.start - r1.start,
+      _end =
+          r1.start +
+          (r1.length < r2.length
+              ? (r1.length < r3.length ? r1.length : r3.length)
+              : (r2.length < r3.length ? r2.length : r3.length));
+  final bool Function((A, B, C)) _p;
+  final List<A> _l1;
+  final List<B> _l2;
+  final List<C> _l3;
+  final int _off2;
+  final int _off3;
+  final int _end;
+  int _i;
+  @override
+  late (A, B, C) current;
+  @override
+  bool moveNext() {
+    final l1 = _l1;
+    final l2 = _l2;
+    final l3 = _l3;
+    final off2 = _off2;
+    final off3 = _off3;
+    final end = _end;
+    var i = _i;
+    while (i < end) {
+      final t = (l1[i], l2[i + off2], l3[i + off3]);
+      i++;
+      if (_p(t)) {
+        _i = i;
+        current = t;
+        return true;
+      }
+    }
+    _i = i;
+    return false;
   }
 }
 

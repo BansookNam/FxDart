@@ -16,15 +16,14 @@ Date: 2026-08-19 · Scale: `full` (headline N per case)
 | Categories over their monthly budget | `benchmark/cases/budget-alerts` | 1,000,000 | 21,518 | 12,954 | FxDart 1.66x faster |
 | End-of-day settlement pipeline | `benchmark/cases/settlement-pipeline` | 100,000 | 48,934 | 30,701 | FxDart 1.59x faster |
 | All tags across posts, sorted | `benchmark/cases/unique-tags` | 1,000,000 | 106,922 | 77,818 | FxDart 1.37x faster |
-| Three consecutive readings over the limit | `benchmark/cases/consecutive-over-limit` | 1,000,000 | 17,130 | 23,269 | Native 1.36x faster |
 | Recent error messages, deduped | `benchmark/cases/recent-errors` | 1,000,000 | 10,390 | 13,967 | Native 1.34x faster |
 | Spending inside a date window | `benchmark/cases/date-window-spend` | 1,000,000 | 14,852 | 11,441 | FxDart 1.30x faster |
 | Monthly category report, sorted by spend | `benchmark/cases/monthly-category-report` | 1,000,000 | 11,319 | 14,315 | Native 1.26x faster |
-| Pair sensors with readings, keep anomalies | `benchmark/cases/sensor-anomalies` | 1,000,000 | 61,440 | 76,326 | Native 1.24x faster |
 | Live search over a keystroke stream | `benchmark/cases/live-search` | 100,000 | 45,186 | 56,022 | Native 1.24x faster |
 | Diff two ledger snapshots | `benchmark/cases/ledger-diff` | 500,000 | 228,503 | 282,872 | Native 1.24x faster |
 | Rate-limited batch import | `benchmark/cases/rate-limited-import` | 100,000 | 130,963 | 157,739 | Native 1.20x faster |
 | Enrich top merchants concurrently | `benchmark/cases/concurrent-enrichment` | 100,000 | 194,966 | 232,989 | Native 1.20x faster |
+| Three consecutive readings over the limit | `benchmark/cases/consecutive-over-limit` | 1,000,000 | 17,065 | 20,315 | Native 1.19x faster |
 | Paginated product listing | `benchmark/cases/paginated-products` | 1,000,000 | 102,103 | 120,667 | Native 1.18x faster |
 | Multi-currency expense report | `benchmark/cases/multi-currency-report` | 1,000,000 | 123,300 | 104,392 | FxDart 1.18x faster |
 | Running account balance | `benchmark/cases/running-balance` | 1,000,000 | 237,775 | 275,067 | Native 1.16x faster |
@@ -41,6 +40,7 @@ Date: 2026-08-19 · Scale: `full` (headline N per case)
 | Compound interest table | `benchmark/cases/compound-interest` | 1,000,000 | 221,723 | 244,461 | Native 1.10x faster |
 | Food spending this month | `benchmark/cases/food-spending` | 1,000,000 | 12,554 | 11,435 | FxDart 1.10x faster |
 | Two paged feeds, concatenated and deduped | `benchmark/cases/paged-feeds-dedupe` | 100,000 | 78,495 | 85,678 | Native 1.09x faster |
+| Pair sensors with readings, keep anomalies | `benchmark/cases/sensor-anomalies` | 1,000,000 | 62,546 | 68,163 | Native 1.09x faster |
 | First 5 valid emails, normalized | `benchmark/cases/valid-emails` | 1,000,000 | 72,451 | 67,110 | FxDart 1.08x faster |
 | Refunds vs charges, both formatted | `benchmark/cases/refunds-vs-charges` | 1,000,000 | 253,321 | 235,918 | FxDart 1.07x faster |
 | Category with highest average expense | `benchmark/cases/top-category-average` | 1,000,000 | 60,453 | 64,596 | Native 1.07x faster |

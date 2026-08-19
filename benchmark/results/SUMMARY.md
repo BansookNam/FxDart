@@ -28,7 +28,7 @@
 | 16 | compound-interest | 100 | 18 µs | 22 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
 | 17 | top-category-average | 100 | 8.4 µs | 7.9 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
 | 18 | date-window-spend | 100 | 2.2 µs | 1.6 µs | **tie** | 16.5 MB | 15.3 MB | fxdart | 3 |
-| 19 | sensor-anomalies | 100 | 6.9 µs | 7.0 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
+| 19 | sensor-anomalies | 100 | 6.0 µs | 6.9 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
 | 20 | recent-errors | 100 | 1.4 µs | 1.5 µs | **tie** | 16.3 MB | 16.6 MB | tie | 3 |
 | 21 | duplicate-transactions | 100 | 50 µs | 42 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 22 | no-spend-streak | 100 | 4.5 µs | 5.6 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
@@ -39,7 +39,7 @@
 | 27 | invoice-summary | 100 | 4.5 µs | 8.2 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 28 | budget-alerts | 100 | 3.8 µs | 3.6 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
 | 29 | monthly-category-report | 100 | 2.5 µs | 6.1 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
-| 30 | consecutive-over-limit | 100 | 1.7 µs | 2.8 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
+| 30 | consecutive-over-limit | 100 | 2.1 µs | 2.4 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
 | 31 | multi-currency-report | 100 | 14 µs | 11 µs | **tie** | 17.0 MB | 16.5 MB | tie | 3 |
 | 32 | restock-plan | 100 | 11 µs | 6.7 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
 | 33 | price-lookup-fallback (async) | 100 | 374 µs | 395 µs | **tie** | 16.5 MB | 17.1 MB | tie | 3 |
@@ -86,7 +86,7 @@
 | 16 | compound-interest | 10000 | 1.94 ms | 2.04 ms | **tie** | 22.5 MB | 22.9 MB | tie | 3 |
 | 17 | top-category-average | 10000 | 365 µs | 355 µs | **tie** | 22.9 MB | 22.9 MB | tie | 3 |
 | 18 | date-window-spend | 10000 | 176 µs | 110 µs | **tie** | 20.8 MB | 15.6 MB | fxdart | 3 |
-| 19 | sensor-anomalies | 10000 | 538 µs | 625 µs | **tie** | 23.6 MB | 23.7 MB | tie | 3 |
+| 19 | sensor-anomalies | 10000 | 520 µs | 572 µs | **tie** | 23.7 MB | 23.7 MB | tie | 3 |
 | 20 | recent-errors | 10000 | 92 µs | 125 µs | **tie** | 15.8 MB | 15.9 MB | tie | 3 |
 | 21 | duplicate-transactions | 10000 | 4.17 ms | 3.86 ms | **tie** | 40.2 MB | 36.0 MB | fxdart | 3 |
 | 22 | no-spend-streak | 10000 | 261 µs | 262 µs | **tie** | 19.6 MB | 19.6 MB | tie | 3 |
@@ -97,7 +97,7 @@
 | 27 | invoice-summary | 10000 | 243 µs | 111 µs | **tie** | 22.4 MB | 15.8 MB | fxdart | 3 |
 | 28 | budget-alerts | 10000 | 185 µs | 90 µs | **tie** | 21.8 MB | 15.6 MB | fxdart | 3 |
 | 29 | monthly-category-report | 10000 | 110 µs | 147 µs | **tie** | 16.9 MB | 15.8 MB | fxdart | 3 |
-| 30 | consecutive-over-limit | 10000 | 120 µs | 217 µs | **tie** | 20.5 MB | 23.5 MB | native | 3 |
+| 30 | consecutive-over-limit | 10000 | 114 µs | 173 µs | **tie** | 20.5 MB | 23.5 MB | native | 3 |
 | 31 | multi-currency-report | 10000 | 784 µs | 719 µs | **tie** | 23.5 MB | 22.9 MB | tie | 3 |
 | 32 | restock-plan | 10000 | 1.30 ms | 312 µs | **fxdart** | 17.5 MB | 23.4 MB | native | 3 |
 | 33 | price-lookup-fallback (async) | 10000 | 34.9 ms | 34.2 ms | **tie** | 49.1 MB | 30.9 MB | fxdart | 5 |
@@ -144,7 +144,7 @@
 | 16 | compound-interest | 1000000 | 221.7 ms | 244.5 ms | **native** | 126.6 MB | 128.6 MB | tie | 3 |
 | 17 | top-category-average | 1000000 | 60.5 ms | 64.6 ms | **native** | 136.9 MB | 136.1 MB | tie | 3 |
 | 18 | date-window-spend | 1000000 | 14.9 ms | 11.4 ms | **fxdart** | 124.3 MB | 120.1 MB | tie | 3 |
-| 19 | sensor-anomalies | 1000000 | 61.4 ms | 76.3 ms | **native** | 162.6 MB | 159.9 MB | tie | 3 |
+| 19 | sensor-anomalies | 1000000 | 62.5 ms | 68.2 ms | **native** | 169.8 MB | 159.4 MB | fxdart | 3 |
 | 20 | recent-errors | 1000000 | 10.4 ms | 14.0 ms | **native** | 113.4 MB | 114.5 MB | tie | 3 |
 | 21 | duplicate-transactions | 1000000 | 977.4 ms | 966.1 ms | **tie** | 324.6 MB | 332.5 MB | tie | 5 |
 | 22 | no-spend-streak | 1000000 | 23.8 ms | 24.0 ms | **tie** | 106.6 MB | 106.4 MB | tie | 3 |
@@ -155,7 +155,7 @@
 | 27 | invoice-summary | 1000000 | 25.3 ms | 13.6 ms | **fxdart** | 92.3 MB | 88.4 MB | tie | 3 |
 | 28 | budget-alerts | 1000000 | 21.5 ms | 13.0 ms | **fxdart** | 90.1 MB | 82.7 MB | fxdart | 3 |
 | 29 | monthly-category-report | 1000000 | 11.3 ms | 14.3 ms | **native** | 119.3 MB | 119.6 MB | tie | 3 |
-| 30 | consecutive-over-limit | 1000000 | 17.1 ms | 23.3 ms | **native** | 150.1 MB | 148.4 MB | tie | 3 |
+| 30 | consecutive-over-limit | 1000000 | 17.1 ms | 20.3 ms | **native** | 149.8 MB | 148.0 MB | tie | 3 |
 | 31 | multi-currency-report | 1000000 | 123.3 ms | 104.4 ms | **fxdart** | 201.8 MB | 220.0 MB | native | 3 |
 | 32 | restock-plan | 1000000 | 216.2 ms | 51.9 ms | **fxdart** | 174.0 MB | 193.1 MB | native | 3 |
 | 33 | price-lookup-fallback (async) | 100000 | 351.3 ms | 353.2 ms | **tie** | 81.1 MB | 80.8 MB | tie | 5 |

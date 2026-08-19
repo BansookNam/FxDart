@@ -533,9 +533,11 @@ count, a second `take`/`uniq` starting its own run, per-iterator state,
 asynchronous keys, the `Concurrent` hand-off through both operators, and the
 subscription-drive shape end to end. Suite: 2069 passing, 1 skipped.
 
-### The remaining native-faster cases were measured and left alone
+### The remaining native-faster cases were measured
 
-The other five gaps in the ratio report were attributed and not acted on — each is at the lazy callback floor, not carrying library overhead:
+The other gaps in the ratio report were attributed rather than guessed at.
+Two of them turned out to be real library overhead — see the next section;
+these are the ones that are genuinely at the lazy callback floor:
 
 - **`recent-errors`** is the sharpest measurement of the floor yet. The fused
   `filter`+`uniqBy` stage runs it in **13,824 µs**; a *hand-written loop*
@@ -543,13 +545,109 @@ The other five gaps in the ratio report were attributed and not acted on — eac
   which inlines both, takes **10,331 µs**. The library is already faster than
   the hand loop. The whole 1.34x is the two closure calls, and `Set<Object?>`
   costs nothing (13,850 µs against `Set<String>`'s 13,948 µs).
-- **`consecutive-over-limit`** and **`sensor-anomalies`**: a hand loop written
-  directly over `zip3` costs 25,907 µs against the full chain's 25,708 µs —
-  the chain adds nothing. `zip3` drain alone is 7.7 ms per 1,000,000 and the
-  `filter` predicate another 4.5 ms; that is the record and the callback,
-  which the API shape requires.
 - **`monthly-category-report`** was already attributed to its `filter`
   predicate in the second pass, and nothing here reaches it.
+
+**`consecutive-over-limit` and `sensor-anomalies` were first put in this list
+too, on a comparison that did not hold up.** The "hand loop" they were
+measured against still iterated the library's own `zip3`, so it paid the
+stage boundary as well and the two sides matched at ~25.8 ms — which reads as
+"the chain adds nothing" and is not what it means. Rebuilding the baseline as
+a loop that indexes the lists directly separated them immediately. The next
+section is that measurement.
+
+### `filter` over a `zip` fuses into one iterator
+
+`consecutive-over-limit` and `sensor-anomalies` are the same shape —
+`zip`/`zip3` over `List`s, then a predicate, then a projection — and both sat
+around 1.3x behind native. The previous entry attributed that to the record
+`zip` allocates and to the lazy callback floor, and left them alone. **That
+attribution was wrong**, and the measurement that shows it is a hand-written
+loop that pays *both* of those costs on purpose.
+
+Over 1,000,000 elements, AOT, each variant in its own binary (a single binary
+running every variant makes the shared `filter` call site megamorphic and
+inflates the library side by ~20% — that artifact is what hid this):
+
+| variant | µs |
+|---|---|
+| everything inline — no record, no closure | 4,670 |
+| an opaque closure taking three arguments | 7,150 |
+| an opaque closure taking a **record** | 8,184 |
+| **the library, `filter(p, zip3(…))`** | **11,889** |
+| **one fused iterator (prototype)** | **7,929** |
+
+So the record costs ~750 µs and the closure ~2,700 µs — both real, both
+irreducible. But the library was spending ~3,900 µs *beyond* them, and a
+single fused iterator gives all of it back and lands at the hand-loop floor.
+
+That cost is the **stage boundary**. Unfused, every element crosses a
+megamorphic `moveNext` plus a `current` read between the zip iterator and the
+filter iterator; the filter holds its upstream in an `Iterator<A>` field, so
+that site sees every iterator in the program. Fused, there is one loop that
+indexes the backing lists, builds the record, and calls the predicate inline.
+
+The old note's reasoning — *"fusing `zip3` into a following `filter` would not
+help: the predicate is a closure, so the record escapes into it and cannot be
+scalar-replaced"* — is correct about the record and wrong about the
+conclusion. The win was never going to come from eliminating the record.
+
+`FxFilterFusable` (in `list_range.dart`) is the mirror of `filter`'s own
+`FxUniqFusable`: a source that can absorb a *following* filter. `_ZipIterable`
+and `_Zip3Iterable` implement it, and only for the all-indexed shape — a side
+that has to be pulled still costs its own iterator, so the boundary being
+removed would be the smaller half of the work. Anything else returns null and
+the ordinary layering stands. It is resolved once per iteration, never per
+element, so a chain that cannot fuse pays one `is` test for the whole run.
+
+| case | paired delta | control |
+|---|---|---|
+| `consecutive-over-limit` | **−14.98%** | +0.91% |
+| `sensor-anomalies` | **−7.39%** | +1.22% |
+
+In the published sweep `consecutive-over-limit` goes from 1.36x behind native
+to **1.19x** and `sensor-anomalies` from 1.24x to **1.09x**.
+
+Every other case that uses `zip` (`leaderboard-ties`, `monthly-ledger-report`,
+`parallel-downloads`, `rank-labels`, `restock-plan`, `sparse-timeseries`,
+`weekly-sensor-averages`) was A/B'd, and so were the `filter` users, since
+`filter` gained a branch on the way to its iterator. Nothing regressed.
+
+**What the benchmark cases did *not* need is a rewrite.** Three alternative
+formulations were measured against the example as it stands. `windowed(3)` —
+the operator that reads most naturally for a sliding window — is *worse*, at
+roughly 31 ms against the `zip3` form's 22 ms, because it copies a `List` per
+window where `zip3` allocates one record. Walking `range(0, n - 2)` and
+indexing by hand was the only faster one, and only by ~3% once measured
+properly with the harness rather than a shared-process probe — not worth
+turning the fxdart panel into the native panel's index arithmetic for. The
+example keeps its `zip3`, and the library got faster underneath it.
+
+Fifteen regression tests pin the fused path: identical elements and order
+against the layered form, the short-circuit at whichever of the three sides
+is shortest, the predicate's call count and order, laziness, an empty side,
+re-iteration, and the fallback when any side is not indexable.
+
+### `_TakeAsyncIterator` is gone, and the suite covers every line again
+
+Making `take` a fused stage left its old iterator with no way in. Its body
+answered pulls for an unfused `take`; now `takeAsync` either fuses (count of
+one or more) or hands straight to `_takeAsyncLegacy` (count below one, which
+that function already answers `done` for before its first pull), and a
+`Concurrent` marker goes to `_takeAsyncLegacy` too. Forty-seven lines of
+unreachable code removed, and the pass-through contract is unchanged —
+`_takeAsyncLegacy` is what kept overlapping pulls parallel all along.
+
+Coverage found it. The two fusion changes in this release dropped the suite
+from 100% to 98.87%, and the gaps were not where the new code was: making
+`uniq` and `take` fused stages moved whole chains off the *pull* path and
+onto the drive, so `_FusedIterator`'s own walker — the asynchronous branch of
+every stage, a scan that is not first in its run, a source that is not an
+`FxFastIterator` — stopped being exercised by any terminal. Thirty-five tests
+drain those chains one pull at a time, which is the only thing that reaches
+them. Back to **100.00%**, 4,835 of 4,835 lines, every file.
+
+Suite: 2,116 passing, 1 skipped.
 
 ### Still open
 
@@ -558,10 +656,15 @@ The other five gaps in the ratio report were attributed and not acted on — eac
   that path — they are fused stages as of this release — but **`chunk` still
   does**, and so does any chain a `Concurrent` marker pushes back onto the
   layering. The bridge itself is unchanged.
-- The `zip` family still allocates a record per element, which is what is
-  left in `consecutive-over-limit`. Fusing `zip3` into a following `filter`
-  would not help: the predicate is a closure, so the record escapes into it
-  and cannot be scalar-replaced.
+- The `zip` family still allocates a record per element — ~750 µs per
+  1,000,000, measured above. That part really is irreducible while a closure
+  receives the record. What is left in `consecutive-over-limit` after the
+  fusion is that record plus the callback floor below, and the two together
+  put it within ~16% of a native loop that allocates nothing.
+- **Only `filter` absorbs a `zip` today.** `zip().map()` with no predicate in
+  between still crosses the stage boundary this release removed, and so does
+  any chain whose zip has a pulled side. The same `FxFilterFusable` shape
+  would extend to `map`, and was not measured.
 - **The lazy callback floor is the open design question.** A strict terminal
   can inline its caller's callback; a lazy stage cannot, because the closure
   lives in an iterator field. Two attempts to close that gap were measured and
