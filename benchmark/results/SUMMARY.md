@@ -50,11 +50,11 @@
 | 38 | flaky-api-retry (async) | 100 | 556 µs | 645 µs | **tie** | 16.4 MB | 17.1 MB | tie | 3 |
 | 39 | alert-digest | 100 | 21 µs | 25 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 40 | latency-percentiles | 100 | 22 µs | 20 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
-| 41 | paged-feeds-dedupe (async) | 100 | 94 µs | 100 µs | **tie** | 16.3 MB | 16.6 MB | tie | 3 |
+| 41 | paged-feeds-dedupe (async) | 100 | 92 µs | 101 µs | **tie** | 16.4 MB | 16.6 MB | tie | 3 |
 | 42 | anomaly-context | 100 | 1.6 µs | 1.5 µs | **tie** | 16.5 MB | 16.4 MB | tie | 3 |
 | 43 | smoothed-zone-changes | 100 | 2.3 µs | 4.3 µs | **tie** | 16.4 MB | 16.3 MB | tie | 3 |
 | 44 | stream-windowed-alerts (async) | 100 | 37 µs | 42 µs | **tie** | 16.5 MB | 17.2 MB | tie | 3 |
-| 45 | live-search (async) | 100 | 53 µs | 68 µs | **tie** | 16.4 MB | 16.6 MB | tie | 3 |
+| 45 | live-search (async) | 100 | 52 µs | 71 µs | **tie** | 16.4 MB | 16.6 MB | tie | 3 |
 | 46 | rate-limited-import (async) | 100 | 156 µs | 177 µs | **tie** | 16.5 MB | 16.8 MB | tie | 3 |
 | 47 | category-rank | 100 | 4.5 µs | 13 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
 | 48 | stock-revaluation (async) | 100 | 385 µs | 381 µs | **tie** | 16.4 MB | 16.6 MB | tie | 3 |
@@ -108,11 +108,11 @@
 | 38 | flaky-api-retry (async) | 10000 | 48.2 ms | 55.5 ms | **native** | 29.5 MB | 24.5 MB | fxdart | 3 |
 | 39 | alert-digest | 10000 | 1.46 ms | 1.39 ms | **tie** | 17.9 MB | 18.1 MB | tie | 3 |
 | 40 | latency-percentiles | 10000 | 1.93 ms | 1.80 ms | **tie** | 18.1 MB | 17.3 MB | fxdart | 3 |
-| 41 | paged-feeds-dedupe (async) | 10000 | 7.82 ms | 8.77 ms | **native** | 43.1 MB | 24.5 MB | fxdart | 3 |
+| 41 | paged-feeds-dedupe (async) | 10000 | 7.60 ms | 8.37 ms | **native** | 43.0 MB | 47.6 MB | native | 3 |
 | 42 | anomaly-context | 10000 | 113 µs | 93 µs | **tie** | 18.3 MB | 18.7 MB | tie | 3 |
 | 43 | smoothed-zone-changes | 10000 | 194 µs | 410 µs | **tie** | 22.5 MB | 22.7 MB | tie | 3 |
 | 44 | stream-windowed-alerts (async) | 10000 | 3.30 ms | 3.47 ms | **tie** | 24.0 MB | 25.2 MB | native | 3 |
-| 45 | live-search (async) | 10000 | 4.86 ms | 6.12 ms | **native** | 23.5 MB | 23.6 MB | tie | 3 |
+| 45 | live-search (async) | 10000 | 4.44 ms | 5.44 ms | **native** | 23.1 MB | 23.2 MB | tie | 3 |
 | 46 | rate-limited-import (async) | 10000 | 12.7 ms | 17.3 ms | **native** | 24.0 MB | 27.5 MB | native | 3 |
 | 47 | category-rank | 10000 | 348 µs | 299 µs | **tie** | 17.5 MB | 17.5 MB | tie | 3 |
 | 48 | stock-revaluation (async) | 10000 | 30.5 ms | 34.1 ms | **native** | 49.0 MB | 31.1 MB | fxdart | 3 |
@@ -166,11 +166,11 @@
 | 38 | flaky-api-retry (async) | 100000 | 495.5 ms | 571.7 ms | **native** | 56.2 MB | 50.4 MB | fxdart | 3 |
 | 39 | alert-digest | 1000000 | 174.1 ms | 174.4 ms | **tie** | 213.2 MB | 239.8 MB | native | 5 |
 | 40 | latency-percentiles | 1000000 | 204.7 ms | 209.7 ms | **tie** | 139.4 MB | 192.2 MB | native | 5 |
-| 41 | paged-feeds-dedupe (async) | 100000 | 86.1 ms | 91.4 ms | **native** | 73.6 MB | 74.0 MB | tie | 3 |
+| 41 | paged-feeds-dedupe (async) | 100000 | 78.5 ms | 85.7 ms | **native** | 73.5 MB | 74.0 MB | tie | 3 |
 | 42 | anomaly-context | 1000000 | 11.9 ms | 10.4 ms | **fxdart** | 132.2 MB | 131.7 MB | tie | 3 |
 | 43 | smoothed-zone-changes | 1000000 | 39.4 ms | 37.4 ms | **fxdart** | 237.3 MB | 81.8 MB | fxdart | 3 |
 | 44 | stream-windowed-alerts (async) | 100000 | 32.8 ms | 36.6 ms | **native** | 75.0 MB | 74.8 MB | tie | 3 |
-| 45 | live-search (async) | 100000 | 45.3 ms | 60.5 ms | **native** | 52.7 MB | 57.4 MB | native | 3 |
+| 45 | live-search (async) | 100000 | 45.2 ms | 56.0 ms | **native** | 52.8 MB | 54.8 MB | tie | 3 |
 | 46 | rate-limited-import (async) | 100000 | 131.0 ms | 157.7 ms | **native** | 75.9 MB | 79.7 MB | tie | 3 |
 | 47 | category-rank | 1000000 | 33.2 ms | 32.1 ms | **tie** | 146.9 MB | 148.0 MB | tie | 5 |
 | 48 | stock-revaluation (async) | 100000 | 310.9 ms | 352.9 ms | **native** | 80.8 MB | 80.5 MB | tie | 3 |

@@ -2832,15 +2832,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 93.6842105263158,
-            "minUs": 76.4,
-            "medianRssBytes": 17104896.0,
+            "medianUs": 91.625,
+            "minUs": 74.9375,
+            "medianRssBytes": 17186816.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 99.76470588235294,
-            "minUs": 86.0,
-            "medianRssBytes": 17448960.0,
+            "medianUs": 100.5909090909091,
+            "minUs": 82.0,
+            "medianRssBytes": 17367040.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -2850,33 +2850,33 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 7820.0,
-            "minUs": 7495.0,
-            "medianRssBytes": 45203456.0,
+            "medianUs": 7597.0,
+            "minUs": 7292.0,
+            "medianRssBytes": 45056000.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 8768.0,
-            "minUs": 8250.0,
-            "medianRssBytes": 25640960.0,
+            "medianUs": 8365.0,
+            "minUs": 7874.0,
+            "medianRssBytes": 49954816.0,
             "samples": 15
           },
           "timeWinner": "native",
-          "memWinner": "fxdart"
+          "memWinner": "native"
         },
         "full": {
           "n": 100000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 86137.0,
-            "minUs": 79015.0,
-            "medianRssBytes": 77185024.0,
+            "medianUs": 78495.0,
+            "minUs": 77040.0,
+            "medianRssBytes": 77103104.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 91362.0,
-            "minUs": 87430.0,
-            "medianRssBytes": 77594624.0,
+            "medianUs": 85678.0,
+            "minUs": 83025.0,
+            "medianRssBytes": 77627392.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2954,15 +2954,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 53.46875,
-            "minUs": 43.0,
-            "medianRssBytes": 17219584.0,
+            "medianUs": 52.1578947368421,
+            "minUs": 41.75609756097561,
+            "medianRssBytes": 17203200.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 68.48275862068965,
-            "minUs": 60.34615384615385,
-            "medianRssBytes": 17383424.0,
+            "medianUs": 70.52,
+            "minUs": 55.206896551724135,
+            "medianRssBytes": 17399808.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -2972,15 +2972,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 4859.0,
-            "minUs": 4302.0,
-            "medianRssBytes": 24625152.0,
+            "medianUs": 4440.0,
+            "minUs": 4225.0,
+            "medianRssBytes": 24231936.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 6123.0,
-            "minUs": 5620.0,
-            "medianRssBytes": 24756224.0,
+            "medianUs": 5439.0,
+            "minUs": 5209.0,
+            "medianRssBytes": 24313856.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2990,19 +2990,19 @@
           "n": 100000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 45277.0,
-            "minUs": 43139.0,
-            "medianRssBytes": 55296000.0,
+            "medianUs": 45186.0,
+            "minUs": 42437.0,
+            "medianRssBytes": 55410688.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 60460.0,
-            "minUs": 57538.0,
-            "medianRssBytes": 60194816.0,
+            "medianUs": 56022.0,
+            "minUs": 53391.0,
+            "medianRssBytes": 57409536.0,
             "samples": 15
           },
           "timeWinner": "native",
-          "memWinner": "native"
+          "memWinner": "tie"
         }
       }
     },

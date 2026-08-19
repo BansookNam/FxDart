@@ -476,14 +476,88 @@ branches, source cancellation on both `take` and `head`, the empty-stream
 `null`, and `pause`/`resume`/`cancel` forwarding on every new chain operator.
 Suite: 2038 passing, 1 skipped. Verified on Dart 3.12.2 and 3.13.1.
 
+### `take` and `uniq` become fused async stages
+
+The previous entry's "Still open" list opened with this exact change, and the
+measurement that motivated it holds up: over 200,000 elements the subscription
+drive runs a stream-sourced chain in **10.9 ms** where `await for` and the
+SDK's own `StreamIterator` both take **~45 ms**. The drive is four times
+faster, and `live-search` was not on it.
+
+It was not on it because `uniqAsync` returned a `DelegateAsyncIterable`. That
+breaks the fused run, so `fxStreamDrive` declined the chain and every element
+went through the pull protocol instead — a `Completer`, a `Future`, a
+microtask and a `pause`/`resume` pair each. `takeAsync` did the same. Both are
+fused stages now (`FxUniqByStage`, `FxTakeStage`), so
+`fxStream().filter().uniq().take().map()` compiles to **one run of four
+stages over the raw stream** and executes by subscription.
+
+**`take` ends its run on the count-th element, not on the pull that would
+follow it.** That is the whole subtlety: `take` must never pull the element
+after its last, so the stage marks the run ended as the count is met, while
+that element still flows through the stages after it. A later stage may drop
+it — the loop then answers done without pulling again. Pull counts are pinned
+by test, because an off-by-one here is invisible except to a source with
+side effects, which is exactly what `live-search` counts.
+
+`uniq` carries no key function at all (the element is its own key), one fewer
+call per element than `uniqBy(identity)`. Both stages are stateful — the
+seen-set and the counter live on the iterator — so at most one of each fuses
+into a run and a second starts a new one, as `scan` and `dropWhile` already
+do. A `Concurrent` marker still abandons fusion for the old layering, and a
+non-positive `take` count stays off the fused path entirely so it neither
+yields nor pulls.
+
+| case | paired delta | control |
+|---|---|---|
+| `live-search` | **−7.55%** | +1.29% |
+| `paged-feeds-dedupe` | **−4.39%** | −0.03% |
+
+`live-search` goes from 1.34x behind native to **1.24x**.
+
+**All 14 async cases and 7 sync cases were A/B'd; nothing regressed.** The
+widest reading anywhere was +1.23% (`recent-errors`) against a −0.15%
+control — inside the instrument's ±1.5% band. That sweep matters more than
+usual here: the change adds two link kinds, so every fused async element now
+walks two more type tests before reaching `FxTakeWhileLink`.
+
+One caveat on the published numbers. `paged-feeds-dedupe`'s *sweep* ratio
+moved the wrong way, 1.06x to 1.09x — but its `native` side moved with it
+(86.1 ms to 78.5 ms), and `native` links no fxdart code, so that is session
+drift, not a regression. The paired figure above is the real one. Same lesson
+as the second pass: a sweep ratio is not evidence of a change.
+
+Eighteen regression tests pin the pull count on `take` (alone, after a
+filter, and with a later stage dropping the last element), the non-positive
+count, a second `take`/`uniq` starting its own run, per-iterator state,
+asynchronous keys, the `Concurrent` hand-off through both operators, and the
+subscription-drive shape end to end. Suite: 2069 passing, 1 skipped.
+
+### The remaining native-faster cases were measured and left alone
+
+The other five gaps in the ratio report were attributed and not acted on — each is at the lazy callback floor, not carrying library overhead:
+
+- **`recent-errors`** is the sharpest measurement of the floor yet. The fused
+  `filter`+`uniqBy` stage runs it in **13,824 µs**; a *hand-written loop*
+  using the same non-inlinable closures takes **13,948 µs**; the native panel,
+  which inlines both, takes **10,331 µs**. The library is already faster than
+  the hand loop. The whole 1.34x is the two closure calls, and `Set<Object?>`
+  costs nothing (13,850 µs against `Set<String>`'s 13,948 µs).
+- **`consecutive-over-limit`** and **`sensor-anomalies`**: a hand loop written
+  directly over `zip3` costs 25,907 µs against the full chain's 25,708 µs —
+  the chain adds nothing. `zip3` drain alone is 7.7 ms per 1,000,000 and the
+  `filter` predicate another 4.5 ms; that is the record and the callback,
+  which the API shape requires.
+- **`monthly-category-report`** was already attributed to its `filter`
+  predicate in the second pass, and nothing here reaches it.
+
 ### Still open
 
-- `_StreamBridgeIterator` allocates a `Completer` per element and pauses the
-  subscription after every delivery. The *subscription* drive is already 5.6x
-  faster than `await for` (4.03 ms vs 22.78 ms per 100,000); the cost only
-  appears when an operator that is not a fused stage — today `uniq`, `take`,
-  `chunk` — breaks the drive and forces the pull protocol. Making `uniqBy`
-  and `take` fused stages would put `live-search` back on it.
+- `_StreamBridgeIterator` still allocates a `Completer` per element and pauses
+  the subscription after every delivery. `uniq` and `take` no longer force
+  that path — they are fused stages as of this release — but **`chunk` still
+  does**, and so does any chain a `Concurrent` marker pushes back onto the
+  layering. The bridge itself is unchanged.
 - The `zip` family still allocates a record per element, which is what is
   left in `consecutive-over-limit`. Fusing `zip3` into a following `filter`
   would not help: the predicate is a closure, so the record escapes into it

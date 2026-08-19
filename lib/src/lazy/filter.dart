@@ -723,11 +723,37 @@ List<A> uniqByStrict<A, B>(B Function(A a) f, Iterable<A> iterable) =>
     _UniqByIterable(f, iterable).toList();
 
 /// Async counterpart of [uniqBy]. Uses then/bare pattern for sync keys.
+///
+/// A fused stage, so a chain that dedupes stays on the subscription drive
+/// instead of dropping to the pull protocol — the seen-set lives on the
+/// iterator, so only one `uniqBy` fuses into a run and a second starts a new
+/// one. A [Concurrent] marker falls back to [_uniqByAsyncLegacy].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> uniqByAsync<A, B>(
   FutureOr<B> Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) {
+  final stage = FxUniqByStage((v) => f(v as A));
+  if (iterable is FxFusedAsyncIterable<A> && iterable.uniqIndex < 0) {
+    final source = iterable.source;
+    final stages = iterable.stages;
+    final legacy = iterable.legacy;
+    return FxFusedAsyncIterable<A>(source, [
+      ...stages,
+      stage,
+    ], () => _uniqByAsyncLegacy(f, legacy()));
+  }
+  return FxFusedAsyncIterable<A>(iterable, [
+    stage,
+  ], () => _uniqByAsyncLegacy(f, iterable));
+}
+
+FxAsyncIterable<A> _uniqByAsyncLegacy<A, B>(
+  FutureOr<B> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) {
+  // The pre-fusion layering, kept for the concurrent path: `filterAsync` over
+  // a seen-set closure carries `uniqBy` through the concurrency machinery.
   return DelegateAsyncIterable(() {
     final seen = <B>{};
     return filterAsync((A a) {
@@ -741,9 +767,25 @@ FxAsyncIterable<A> uniqByAsync<A, B>(
 }
 
 /// Async counterpart of [uniq].
+///
+/// The element is its own key, so the fused stage carries no key function at
+/// all — one fewer call per element than `uniqByAsync(identity)`.
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> uniqAsync<A>(FxAsyncIterable<A> iterable) =>
-    uniqByAsync((A a) => a, iterable);
+FxAsyncIterable<A> uniqAsync<A>(FxAsyncIterable<A> iterable) {
+  const stage = FxUniqByStage(null);
+  if (iterable is FxFusedAsyncIterable<A> && iterable.uniqIndex < 0) {
+    final source = iterable.source;
+    final stages = iterable.stages;
+    final legacy = iterable.legacy;
+    return FxFusedAsyncIterable<A>(source, [
+      ...stages,
+      stage,
+    ], () => _uniqByAsyncLegacy((A a) => a, legacy()));
+  }
+  return FxFusedAsyncIterable<A>(iterable, [
+    stage,
+  ], () => _uniqByAsyncLegacy((A a) => a, iterable));
+}
 
 /// Drops elements whose [f]-key equals the previous element's key, keeping
 /// the first of each run. Unlike [uniqBy], only *adjacent* duplicates are

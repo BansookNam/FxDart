@@ -18,10 +18,10 @@ Date: 2026-08-19 · Scale: `full` (headline N per case)
 | All tags across posts, sorted | `benchmark/cases/unique-tags` | 1,000,000 | 106,922 | 77,818 | FxDart 1.37x faster |
 | Three consecutive readings over the limit | `benchmark/cases/consecutive-over-limit` | 1,000,000 | 17,130 | 23,269 | Native 1.36x faster |
 | Recent error messages, deduped | `benchmark/cases/recent-errors` | 1,000,000 | 10,390 | 13,967 | Native 1.34x faster |
-| Live search over a keystroke stream | `benchmark/cases/live-search` | 100,000 | 45,277 | 60,460 | Native 1.34x faster |
 | Spending inside a date window | `benchmark/cases/date-window-spend` | 1,000,000 | 14,852 | 11,441 | FxDart 1.30x faster |
 | Monthly category report, sorted by spend | `benchmark/cases/monthly-category-report` | 1,000,000 | 11,319 | 14,315 | Native 1.26x faster |
 | Pair sensors with readings, keep anomalies | `benchmark/cases/sensor-anomalies` | 1,000,000 | 61,440 | 76,326 | Native 1.24x faster |
+| Live search over a keystroke stream | `benchmark/cases/live-search` | 100,000 | 45,186 | 56,022 | Native 1.24x faster |
 | Diff two ledger snapshots | `benchmark/cases/ledger-diff` | 500,000 | 228,503 | 282,872 | Native 1.24x faster |
 | Rate-limited batch import | `benchmark/cases/rate-limited-import` | 100,000 | 130,963 | 157,739 | Native 1.20x faster |
 | Enrich top merchants concurrently | `benchmark/cases/concurrent-enrichment` | 100,000 | 194,966 | 232,989 | Native 1.20x faster |
@@ -40,10 +40,10 @@ Date: 2026-08-19 · Scale: `full` (headline N per case)
 | Merchants in first-visit order | `benchmark/cases/first-visit-merchants` | 1,000,000 | 23,752 | 26,194 | Native 1.10x faster |
 | Compound interest table | `benchmark/cases/compound-interest` | 1,000,000 | 221,723 | 244,461 | Native 1.10x faster |
 | Food spending this month | `benchmark/cases/food-spending` | 1,000,000 | 12,554 | 11,435 | FxDart 1.10x faster |
+| Two paged feeds, concatenated and deduped | `benchmark/cases/paged-feeds-dedupe` | 100,000 | 78,495 | 85,678 | Native 1.09x faster |
 | First 5 valid emails, normalized | `benchmark/cases/valid-emails` | 1,000,000 | 72,451 | 67,110 | FxDart 1.08x faster |
 | Refunds vs charges, both formatted | `benchmark/cases/refunds-vs-charges` | 1,000,000 | 253,321 | 235,918 | FxDart 1.07x faster |
 | Category with highest average expense | `benchmark/cases/top-category-average` | 1,000,000 | 60,453 | 64,596 | Native 1.07x faster |
-| Two paged feeds, concatenated and deduped | `benchmark/cases/paged-feeds-dedupe` | 100,000 | 86,137 | 91,362 | Native 1.06x faster |
 | First sensor reading over the limit | `benchmark/cases/first-over-limit` | 1,000,000 | 4,952 | 5,224 | ~tie |
 | Smoothed zone changes | `benchmark/cases/smoothed-zone-changes` | 1,000,000 | 39,409 | 37,410 | FxDart 1.05x faster |
 | Rank labels for a leaderboard | `benchmark/cases/rank-labels` | 1,000,000 | 200,130 | 210,735 | Native 1.05x faster |
