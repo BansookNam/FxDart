@@ -1,11 +1,19 @@
 ## 0.8.5
 
-Two things this time: an API addition on the events layer — `FxEvents` gains
-the stateful and limiting operators the pull layer already had — and a
-measurement-led performance pass. The performance work is the bulk of what
-follows; the API section sits just before "Still open".
+Two API additions and a performance pass that runs most of this section.
 
-A measurement-led performance pass over the ten slowest DartComparison cases.
+The additions: `FxEvents` gains the stateful and limiting operators the pull
+layer already had (`scan`, `uniqAdjacent`, `pairwise`, `take`, `drop`, and a
+`head` terminal), and `takeUniqBy` lands on the strict side — `filter` +
+`uniqBy` + `take` as one call whose callback the compiler can actually
+inline. Both sections are near the end, before "Still open".
+
+The performance work started as a pass over the ten slowest DartComparison
+cases and grew two more rounds as the measurements got sharper: `take` and
+`uniq` became fused async stages, `filter` over a `zip` became one iterator,
+and the "lazy callback floor" that closes the section is now measured rather
+than asserted.
+
 The headline is a new instrument as much as the changes: **`tool/ab_bench.dart`**
 builds the baseline `lib/` from a git worktree, copies the working tree's
 benchmark sources over it so *only* `lib/` differs, and runs the two binaries
