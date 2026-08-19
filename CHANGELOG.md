@@ -229,6 +229,141 @@ Large off-target gains came with the inlining: `invoice-summary` 0.82x →
 0.51x, `budget-alerts` 0.88x → 0.60x, `multi-currency-report` 0.97x → 0.86x,
 `monthly-ledger-report` 0.41x → 0.32x, `food-spending` 1.05x → 0.88x.
 
+### Second pass — the sort strategies and a record-typed `head`
+
+A second sweep of the same instrument over the cases still sitting at 1.19x
+or worse. Three defects, all of them things the library was doing that no
+program asked for. The four `###` sections that follow are that pass.
+
+### Int keys were still sorting through an index permutation
+
+0.8.0 moved the `double` key path off the index sort for a stated reason —
+"every comparison does two random reads into the key array and the result is
+gathered through the permutation — millions of cache misses on a large sort".
+The `int` path never followed it. It does now, and where it can it skips
+comparison sorting altogether.
+
+Int keys in real pipelines are **narrow**: scores, ranks, counts, ages,
+priorities, deficits, month numbers, status codes. When `max - min` is no
+wider than the input, `sortBy` runs a stable **counting sort** — two linear
+passes over the keys plus one prefix sum, and no comparisons at all. Wider
+keys (ids, timestamps, hashes) take an unboxed lockstep merge, comparing with
+`<=` on raw ints: ints have no NaN and no signed zero, so `compareTo` buys
+nothing there. The O(n) presorted / exactly-reversed scan that the double
+path runs first is kept, including its insistence on a *strict* run before
+reversing.
+
+| case | delta | key |
+|---|---|---|
+| `restock-plan` | **−76.31%** | `i.stock - i.minStock` over 1M rows |
+| `leaderboard-ties` | **−27.86%** | `-p.score`, 500 distinct scores |
+| `concurrent-profile-fetch` | −3.41% | `u.id` |
+
+`restock-plan` goes from a tie to **0.24x**, the fastest case in the suite;
+`leaderboard-ties` from 1.22x behind native to **0.88x** ahead.
+
+**Both new strategies are stable, and the index sort was not.** `List.sort`
+is free to shuffle equal keys, so this is a behaviour change — a strictly
+better one, and it also ends an inconsistency where a `double` key sorted
+stably and an `int` key did not.
+
+It shows in exactly one place. `leaderboard-ties`'s native panel sorts
+2000-deep tie groups with `List.sort`; the two panels used to agree only
+because sorting an index list and sorting the values make identical
+comparator decisions on the same input, and so produced the *same* arbitrary
+permutation. They no longer do. The case's checksum now reports rank and
+score without the name — which is what the two programs actually agree on —
+and neither panel's pipeline changed. The tutorial example's six-player
+output is unaffected: at that size `List.sort` is an insertion sort, which is
+stable, so `expected.txt` already recorded the stable order.
+
+### The `indices` list was allocated for key types that never used it
+
+`_sortByImpl` built an n-element index list *before* it knew the key type,
+but the double path has merged rather than gathered since 0.8.0 and never
+reads it. Every `sortBy` over a double key was allocating and filling a
+million-entry `List<int>` and discarding it untouched.
+
+| case | delta |
+|---|---|
+| `paginated-products` | **−6.71%** |
+| `top-expenses` | **−5.54%** |
+
+`paginated-products` was the one case the first pass made genuinely slower
+(+2.6%, the price of the `List`-indexed walks). This more than pays it back:
+1.28x → **1.18x**.
+
+### A record-typed `head` was paying a runtime subtype test
+
+`headAsync` already took the fast-pull path, but it is generic, and without
+`vm:prefer-inline` its `A` is a **runtime** type argument — so
+`r is Future<IterResult<A>>` is a real subtype test rather than a
+compile-time-shaped one. Ordinary classes shrug that off; records do not,
+which is the same finding 0.7.6 recorded when it put the pragma on the
+operator factories. Measured over 100,000 one-element pipelines,
+`toAsync → map → head`:
+
+| element type | before | after |
+|---|---|---|
+| a class | 38 ms | 38 ms |
+| a `String` | 38 ms | 38 ms |
+| a record `(int, String)` | **193 ms** | **112 ms** |
+
+`flaky-api-retry` **−10.61%**, 1.27x → **1.15x**. This is `head`'s common
+shape — a loop building one short chain per work item — and
+`map((a) async => (a, await f(a)))` makes the element a record almost by
+default, so the two compound.
+
+The residual 112-vs-38 ms is the same runtime record cast one level further
+out, in the `Future<A?>` the terminal constructs. It did not respond to the
+pragma on `FxAsync.head()` either, so it is left measured rather than
+guessed at.
+
+### What was probed and rejected
+
+- **Tuning the double merge.** `_mergeByDouble` really is slower than the
+  native panel's in-place `List.sort` on 800k doubles (110 ms vs 78 ms) — the
+  price of stability and of moving two arrays in lockstep. Insertion-sorted
+  base runs of 32 plus an already-ordered-merge skip measured −12% once and
+  then inside the noise on repeat; `<=` instead of `compareTo` was a wash. No
+  change worth its risk to NaN and `-0.0` ordering, and the `indices` fix
+  above closed the case that motivated it anyway.
+- **`ledger-diff`'s remaining 1.24x is algorithmic, not overhead.** The
+  fxdart panel calls `differenceBy` twice and `intersectionBy` once, so it
+  builds three key sets plus three element-dedup sets; the native panel
+  builds two id sets and reuses them for all three questions, and dedups
+  nothing. That is ~1.9M extra hash operations against ~2.5M, which is the
+  measured gap almost exactly. Faithful, and not the library's to remove.
+- **`recent-errors`, `consecutive-over-limit`, `monthly-category-report`**
+  sit on the lazy-callback floor this release already documented. Attributed:
+  `monthly-category-report`'s whole 2.4 ms gap over 1M rows is the `filter`
+  predicate that the native loop inlines; `consecutive-over-limit`'s is one
+  three-field record allocated per element by `zip3`, which the API shape
+  requires. Both already take the `List`-range fast path.
+
+### Side effects: all 53 cases re-measured
+
+Every case A/B'd against the pre-pass library with case sources held
+identical and a `native` control per case. **Five wins at or past 5%, no
+regression anywhere** — every other case reads inside the instrument's ±2%
+resolution band against a clean control:
+
+| | |
+|---|---|
+| `restock-plan` | −76.31% (control +0.16%) |
+| `leaderboard-ties` | −27.86% (control −0.08%) |
+| `flaky-api-retry` | −10.61% (control +0.27%) |
+| `paginated-products` | −6.71% (control −0.05%) |
+| `top-expenses` | −5.54% (control +0.06%) |
+
+The raw `results.json` diff disagreed, and was wrong four times over:
+`cohort-retention` read +11.3% there and +0.05% paired (its control had moved
++17.7%), `latency-percentiles` +4.4% → +0.27%, `top-category-average` +3.5% →
+−0.67%, `alert-digest` +3.4% → −1.24%. `category-rank` read +4.07% in the
+first paired batch against a −1.94% control and +0.55% on re-run; it sorts
+six groups by a double key, so nothing in this pass can reach it. Which is
+the standing lesson, again: a sweep ratio is not evidence of a change.
+
 ### Correction — `price-drop-detection` was never 0.22x
 
 Its published figure moves from **0.22x to 0.53x**, and that is a correction,

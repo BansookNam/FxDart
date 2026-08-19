@@ -886,6 +886,7 @@ class FxAsync<T> implements FxAsyncIterable<T> {
       s.findIndexAsync(f, _inner);
 
   /// The first value, or `null` if empty.
+  @pragma('vm:prefer-inline')
   Future<T?> head() => s.headAsync(_inner);
 
   /// The last value, or `null` if empty.

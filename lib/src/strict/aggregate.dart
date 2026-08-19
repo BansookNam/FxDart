@@ -1136,7 +1136,6 @@ List<A> _sortByImpl<A>(
   final items = iterable.toList();
   final length = items.length;
   if (length < 2) return items;
-  final indices = [for (var i = 0; i < length; i++) i];
 
   // Homogeneous key types get an unboxed key array and a devirtualized
   // compareTo — the generic path pays an `is Comparable` test and a dynamic
@@ -1158,7 +1157,7 @@ List<A> _sortByImpl<A>(
     dk[0] = first;
     for (var i = 1; i < length; i++) {
       final k = f(items[i]);
-      if (k is! double) return _sortSpilled(f, items, indices, dk, i, k, desc);
+      if (k is! double) return _sortSpilled(f, items, dk, i, k, desc);
       dk[i] = k;
     }
     return _sortDoubleKeys(dk, items, desc);
@@ -1169,15 +1168,10 @@ List<A> _sortByImpl<A>(
     ik[0] = first;
     for (var i = 1; i < length; i++) {
       final k = f(items[i]);
-      if (k is! int) return _sortSpilled(f, items, indices, ik, i, k, desc);
+      if (k is! int) return _sortSpilled(f, items, ik, i, k, desc);
       ik[i] = k;
     }
-    indices.sort(
-      desc
-          ? (i, j) => ik[j].compareTo(ik[i])
-          : (i, j) => ik[i].compareTo(ik[j]),
-    );
-    return [for (final i in indices) items[i]];
+    return _sortIntKeys(ik, items, desc);
   }
 
   if (first is String) {
@@ -1185,9 +1179,10 @@ List<A> _sortByImpl<A>(
     sk[0] = first;
     for (var i = 1; i < length; i++) {
       final k = f(items[i]);
-      if (k is! String) return _sortSpilled(f, items, indices, sk, i, k, desc);
+      if (k is! String) return _sortSpilled(f, items, sk, i, k, desc);
       sk[i] = k;
     }
+    final indices = [for (var i = 0; i < length; i++) i];
     indices.sort(
       desc
           ? (i, j) => sk[j].compareTo(sk[i])
@@ -1201,7 +1196,7 @@ List<A> _sortByImpl<A>(
   for (var i = 1; i < length; i++) {
     keys[i] = f(items[i]);
   }
-  return _sortByKeys(items, indices, keys, desc);
+  return _sortByKeys(items, keys, desc);
 }
 
 /// The typed run broke at [at], where [f] returned [current] instead of the
@@ -1211,7 +1206,6 @@ List<A> _sortByImpl<A>(
 List<A> _sortSpilled<A>(
   Object? Function(A a) f,
   List<A> items,
-  List<int> indices,
   List<Object?> typed,
   int at,
   Object? current,
@@ -1225,21 +1219,186 @@ List<A> _sortSpilled<A>(
   for (var i = at + 1; i < items.length; i++) {
     keys[i] = f(items[i]);
   }
-  return _sortByKeys(items, indices, keys, desc);
+  return _sortByKeys(items, keys, desc);
 }
 
-List<A> _sortByKeys<A>(
-  List<A> items,
-  List<int> indices,
-  List<Object?> keys,
-  bool desc,
-) {
+List<A> _sortByKeys<A>(List<A> items, List<Object?> keys, bool desc) {
+  final indices = [for (var i = 0; i < items.length; i++) i];
   indices.sort(
     desc
         ? (i, j) => _compareKeys(keys[j], keys[i])
         : (i, j) => _compareKeys(keys[i], keys[j]),
   );
   return [for (final i in indices) items[i]];
+}
+
+/// Widest `max - min` that still buys a counting sort a counter array.
+/// Bounded independently of the input so a handful of extreme keys cannot
+/// turn a small sort into a large allocation; the `range < n` test in
+/// [_sortIntKeys] is the one that actually fires most of the time.
+const int _countingSortMaxRange = 1 << 22;
+
+/// Sorts [items] by the unboxed int keys [k], choosing a strategy from the
+/// shape of the keys.
+///
+/// The same O(n) presorted / exactly-reversed scan as [_sortDoubleKeys] runs
+/// first, for the same reason. What follows differs, because int keys in real
+/// pipelines are usually *narrow*: scores, ranks, counts, ages, priorities,
+/// month numbers, status codes. When `max - min` is no wider than the input,
+/// a stable counting sort finishes in two linear passes over the keys and one
+/// prefix sum over the counters — no comparisons at all. On a million players
+/// keyed by a score in `[0, 500)` that is ~25 ms against ~225 ms for a
+/// comparison sort.
+///
+/// Wide keys (ids, timestamps, hashes) fall back to the same lockstep merge
+/// the double path uses, where the comparison is `<=` on unboxed ints — ints
+/// have no NaN and no signed zero, so `compareTo` buys nothing here.
+///
+/// Both strategies are **stable**, which the index sort this replaced was
+/// not: `List.sort` is free to shuffle equal keys.
+List<A> _sortIntKeys<A>(List<int> k, List<A> items, bool desc) {
+  final n = items.length;
+  var nonDec = true, nonInc = true, strictInc = true, strictDec = true;
+  for (var i = 1; i < n; i++) {
+    final a = k[i - 1];
+    final b = k[i];
+    if (a > b) {
+      nonDec = false;
+      strictInc = false;
+    } else if (a < b) {
+      nonInc = false;
+      strictDec = false;
+    } else {
+      strictInc = false;
+      strictDec = false;
+    }
+    if (!nonDec && !nonInc) break;
+  }
+  // Ties are why the reverse shortcuts demand a STRICT run: reversing a run
+  // with equal keys would reverse their source order, and this sort is
+  // stable.
+  if (desc) {
+    if (nonInc) return items;
+    if (strictInc) return [for (var i = n - 1; i >= 0; i--) items[i]];
+  } else {
+    if (nonDec) return items;
+    if (strictDec) return [for (var i = n - 1; i >= 0; i--) items[i]];
+  }
+
+  var min = k[0];
+  var max = k[0];
+  for (var i = 1; i < n; i++) {
+    final v = k[i];
+    if (v < min) {
+      min = v;
+    } else if (v > max) {
+      max = v;
+    }
+  }
+  final range = max - min;
+  // A negative `range` is the 64-bit wrap of a min/max pair further apart
+  // than the int range — not a width a counter array could ever cover.
+  if (range >= 0 && range < n && range <= _countingSortMaxRange) {
+    return _countingSortByInt(k, items, desc, min, max, range);
+  }
+  return _mergeByInt(k, items, desc);
+}
+
+/// Stable counting sort of [items] by the unboxed int keys [k].
+///
+/// `counts` is offset by one so the prefix sum turns it directly into each
+/// bucket's start offset; the placement pass then bumps the offset as it
+/// writes, so equal keys land in source order. Descending only changes which
+/// end the bucket index counts from — the placement pass is identical, so
+/// descending is stable too.
+List<A> _countingSortByInt<A>(
+  List<int> k,
+  List<A> items,
+  bool desc,
+  int min,
+  int max,
+  int range,
+) {
+  final n = items.length;
+  final counts = List<int>.filled(range + 2, 0);
+  if (desc) {
+    for (var i = 0; i < n; i++) {
+      counts[max - k[i] + 1]++;
+    }
+  } else {
+    for (var i = 0; i < n; i++) {
+      counts[k[i] - min + 1]++;
+    }
+  }
+  for (var i = 1; i <= range; i++) {
+    counts[i] += counts[i - 1];
+  }
+  // `items[0]` only fills the list; every slot is overwritten below, since
+  // the offsets cover [0, n) exactly.
+  final out = List<A>.filled(n, items[0]);
+  if (desc) {
+    for (var i = 0; i < n; i++) {
+      out[counts[max - k[i]]++] = items[i];
+    }
+  } else {
+    for (var i = 0; i < n; i++) {
+      out[counts[k[i] - min]++] = items[i];
+    }
+  }
+  return out;
+}
+
+/// Stable bottom-up merge of [items] by the unboxed int keys [k] — the int
+/// twin of [_mergeByDouble], comparing with `<=` / `>=` instead of
+/// `compareTo`.
+List<A> _mergeByInt<A>(List<int> k, List<A> items, bool desc) {
+  final n = items.length;
+  var srcK = k;
+  var dstK = List<int>.filled(n, 0);
+  var srcV = items;
+  var dstV = List<A>.of(items);
+  for (var width = 1; width < n; width <<= 1) {
+    for (var lo = 0; lo < n; lo += width << 1) {
+      var mid = lo + width;
+      if (mid > n) mid = n;
+      var hi = mid + width;
+      if (hi > n) hi = n;
+      var i = lo, j = mid, t = lo;
+      while (i < mid && j < hi) {
+        final a = srcK[i];
+        final b = srcK[j];
+        if (desc ? a >= b : a <= b) {
+          dstK[t] = a;
+          dstV[t] = srcV[i];
+          i++;
+        } else {
+          dstK[t] = b;
+          dstV[t] = srcV[j];
+          j++;
+        }
+        t++;
+      }
+      while (i < mid) {
+        dstK[t] = srcK[i];
+        dstV[t] = srcV[i];
+        i++;
+        t++;
+      }
+      while (j < hi) {
+        dstK[t] = srcK[j];
+        dstV[t] = srcV[j];
+        j++;
+        t++;
+      }
+    }
+    final tk = srcK;
+    srcK = dstK;
+    dstK = tk;
+    final tv = srcV;
+    srcV = dstV;
+    dstV = tv;
+  }
+  return srcV;
 }
 
 /// Sorts [items] by the unboxed keys [k], choosing a strategy from the shape

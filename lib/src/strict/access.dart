@@ -13,6 +13,7 @@ A? head<A>(Iterable<A> iterable) {
 }
 
 /// Async counterpart of [head].
+@pragma('vm:prefer-inline')
 Future<A?> headAsync<A>(FxAsyncIterable<A> iterable) {
   // Not `async`: the function frame and its suspension cost a microtask per
   // call, and `head` is called once per pipeline — which, in a loop that
