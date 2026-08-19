@@ -5,7 +5,7 @@ description: The three most recent distinct errors from a newest-first log — a
 heading: Recent error messages, deduped
 order: 20
 tier: 2
-functions: filter, uniqBy, take
+functions: filter, uniqBy, take, takeUniqBy
 domain: logs
 verdict: fxdart
 async: false

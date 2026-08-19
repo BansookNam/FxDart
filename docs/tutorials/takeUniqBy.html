@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>takeUniqBy — FxDart 101</title>
+  <meta name="description" content="FxDart takeUniqBy tutorial: filter, dedupe and truncate in one strict call whose callback the compiler can inline — with a live playground.">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/takeUniqBy.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/takeUniqBy.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/takeUniqBy.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/takeUniqBy.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/takeUniqBy.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/takeUniqBy.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/takeUniqBy.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/takeUniqBy.html">
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../assets/fxdart_single.dart?v=c9d5f9ac47fe3d61">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../101/index.html">FxDart 101</a>
+      <a href="../theory/index.html">Theory</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API Tutorials</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="Language">
+      <span class="lang-label">Language</span>
+      <ul>
+        <li><a href="../tutorials/takeUniqBy.html" hreflang="en" lang="en" aria-current="page">English</a></li>
+        <li><a href="../ko/tutorials/takeUniqBy.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../zh/tutorials/takeUniqBy.html" hreflang="zh-Hans" lang="zh-Hans">简体中文</a></li>
+        <li><a href="../ja/tutorials/takeUniqBy.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../es/tutorials/takeUniqBy.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../pt-br/tutorials/takeUniqBy.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../ru/tutorials/takeUniqBy.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="breadcrumb"><a href="../101/index.html">FxDart 101</a> › Section 4 · Filtering &amp; deduplication › <strong>takeUniqBy</strong></p>
+  <h1><code>takeUniqBy</code></h1>
+  <p class="hero-sub">The first <em>count</em> elements whose key is new, as a list — a <code>null</code> key skips the element, so one callback both selects and keys.</p>
+
+  <div class="signature">List&lt;A&gt; takeUniqBy&lt;A, B extends Object&gt;(int count, B? Function(A a) f, Iterable&lt;A&gt; iterable)
+List&lt;T&gt; Fx&lt;T&gt;.takeUniqBy&lt;B extends Object&gt;(int count, B? Function(T a) f)  // chain
+
+// Strict: returns a List, runs when called. A null key skips the element,
+// so f both selects and keys — filter + uniqBy + take in one call.</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>takeUniqBy(3, key, xs)</code> is
+    <code><a href="filter.html">filter</a></code> +
+    <code><a href="uniqBy.html">uniqBy</a></code> +
+    <code><a href="take.html">take</a></code> written as a single strict call.
+    It returns a <code>List</code>, it runs when you call it, and it stops the
+    moment the count is met — the elements after that are never inspected.
+    The one twist is the callback: it returns a key, and returning
+    <code>null</code> means "skip this element". That is the
+    <code>filter_map</code> shape, and it is what lets one function do the work
+    of two.
+  </p>
+  <p>
+    Write the chain by default. Three named steps read better than one
+    callback doing two jobs, and the lazy chain short-circuits just as well.
+    This operator exists for one reason, and it is worth knowing what it is.
+  </p>
+
+  <h2>Why it exists: the callback the compiler cannot see</h2>
+  <p>
+    A lazy stage keeps its callback in an <em>iterator field</em>. The AOT
+    compiler cannot see through a field, so the closure never inlines — every
+    element pays a real indirect call, and its body is never fused into the
+    loop around it. Two stages, two calls per element. That is most of what
+    separates an idiomatic FxDart chain from a hand-written loop.
+  </p>
+  <p>
+    <code>takeUniqBy</code> takes its callback as a <em>parameter</em> of a
+    body small enough to inline into the caller, so the compiler inlines the
+    closure with it. Measured over 1,000,000 log lines, AOT:
+  </p>
+  <table>
+    <thead><tr><th>Spelling</th><th>Time</th></tr></thead>
+    <tbody>
+      <tr><td><code>filter().uniqBy().take(3)</code></td><td>13.7 ms</td></tr>
+      <tr><td><code>takeUniqBy(3, …)</code></td><td><strong>11.3 ms</strong></td></tr>
+      <tr><td>a hand-written loop</td><td>10.2 ms</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Both spellings, and both bars, are on
+    <a href="../DartComparison/recent-errors.html">Recent error messages,
+    deduped</a> — the one comparison page that publishes three bars instead of
+    two, because the gap between two ways of writing the same pipeline is the
+    point it makes.
+  </p>
+  <p>
+    So: reach for this when the pipeline is hot and a profile says these
+    callbacks are the cost. Not before. fxdart extension — no FxTS
+    counterpart, and no async twin: the win is inlining, which the async
+    machinery dwarfs.
+  </p>
+
+  <h2>Demo 1 · The three most recent distinct errors</h2>
+  <div class="playground" data-pg="9596b8518a00cb4e">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  // A log store returns entries newest first.
+  final logs = [
+    ('09:41', 'ERROR', 'payment gateway timeout'),
+    ('09:40', 'INFO', 'checkout started'),
+    ('09:38', 'ERROR', 'payment gateway timeout'),
+    ('09:31', 'ERROR', 'inventory service 503'),
+    ('09:28', 'INFO', 'cache warmed'),
+    ('09:17', 'ERROR', 'invalid session token'),
+  ];
+
+  // The three most recent DISTINCT error messages.
+  // One callback does both jobs: a null key means "skip this element".
+  final recent = takeUniqBy(
+    3,
+    (l) => l.$2 == 'ERROR' ? l.$3 : null,
+    logs,
+  );
+
+  for (final l in recent) {
+    print('${l.$1} ${l.$3}');
+  }
+  // 09:41 payment gateway timeout
+  // 09:31 inventory service 503
+  // 09:17 invalid session token
+
+  // The same answer, written as three composable steps. This is the one to
+  // reach for by default — takeUniqBy is the shape you drop to when a
+  // profile says these callbacks are the cost.
+  print(
+    fx(logs)
+        .filter((l) => l.$2 == 'ERROR')
+        .uniqBy((l) => l.$3)
+        .take(3)
+        .map((l) => l.$1)
+        .toList(),
+  );
+  // [09:41, 09:31, 09:17]
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · null skips, count is a ceiling</h2>
+  <div class="playground" data-pg="7f960069597ef7bc">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final orders = [
+    (id: 1, city: 'Seoul', status: 'paid'),
+    (id: 2, city: 'Busan', status: 'cancelled'),
+    (id: 3, city: 'Seoul', status: 'paid'),
+    (id: 4, city: 'Daegu', status: 'paid'),
+    (id: 5, city: 'Incheon', status: 'paid'),
+  ];
+
+  // "The first two cities we actually shipped to." The null key drops the
+  // cancelled order; the Seoul repeat is dropped as a duplicate key.
+  print(takeUniqBy(2, (o) => o.status == 'paid' ? o.city : null, orders));
+  // [(city: Seoul, id: 1, status: paid), (city: Daegu, id: 4, status: paid)]
+
+  // count is a ceiling, not a promise — it returns what it found.
+  print(takeUniqBy(99, (o) => o.status == 'paid' ? o.city : null, orders).length);
+  // 3
+
+  // Every key null means nothing survives.
+  print(takeUniqBy(3, (o) => null, orders));
+  // []
+
+  // It stops the moment the count is met: the fifth order is never inspected.
+  var looked = 0;
+  takeUniqBy(2, (o) {
+    looked++;
+    return o.status == 'paid' ? o.city : null;
+  }, orders);
+  print('inspected $looked of ${orders.length}');
+  // inspected 4 of 5
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: the first three distinct users who landed on a page.</p>
+  <div class="playground" data-pg="32d930778dcd6025">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final visits = [
+    (user: 'ana', page: '/pricing'),
+    (user: 'bo', page: '/'),
+    (user: 'ana', page: '/docs'),
+    (user: 'cy', page: '/pricing'),
+    (user: 'bo', page: '/pricing'),
+    (user: 'dee', page: '/docs'),
+  ];
+
+  // TODO: the first three DISTINCT users who landed on '/pricing'.
+  // Hint: one callback — return the user when the page matches, null
+  // otherwise. Remember the argument order: count, key, iterable.
+  final firstPricingUsers = takeUniqBy(
+    3,
+    (v) => v.user, // ← almost: this ignores the page. Skip the others.
+    visits,
+  );
+
+  print(firstPricingUsers.map((v) => v.user).toList());
+  // Expected once solved:
+  // [ana, cy, bo]
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="uniqBy.html"><code>uniqBy</code></a> — the lazy dedup this folds in ·
+    <a href="take.html"><code>take</code></a> — the lazy truncation this folds in ·
+    <a href="uniqStrict.html"><code>uniqStrict</code></a> — the other strict member of the family ·
+    <a href="performance.html">Performance</a> — where the callback floor comes from
+  </div>
+
+  <nav class="tut-nav">
+    <a href="uniqAdjacent.html">← Previous: uniqAdjacent</a>
+    <a href="difference.html">Next: difference →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart is a port of <a href="https://github.com/marpple/FxTS">FxTS</a>. Great thanks to <strong>Indong Yoo</strong> (CTO, Marpple) and the FxTS team for the ideas, semantics, and test suite this library is built on.</p>
+  <p>Playground compiles via the DartPad compile service. © Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ Run","pgReset":"Reset","pgCompiling":"Compiling…","pgCompileError":"Compile error","pgError":"Error","pgLoading":"Loading runtime…","pgRunning":"Running…","pgNoOutput":"(no output)","pgLoadFailed":"Could not load the FxDart library"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=c9d5f9ac47fe3d61";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../js/playground.js" defer></script>
+</body>
+</html>

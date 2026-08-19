@@ -1371,6 +1371,16 @@
     <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/takeRight.html"/>
   </url>
   <url>
+    <loc>https://bansooknam.github.io/FxDart/tutorials/takeUniqBy.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/takeUniqBy.html"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/takeUniqBy.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/takeUniqBy.html"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/takeUniqBy.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/takeUniqBy.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/takeUniqBy.html"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/takeUniqBy.html"/>
+  </url>
+  <url>
     <loc>https://bansooknam.github.io/FxDart/tutorials/takeUntilInclusive.html</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/takeUntilInclusive.html"/>
     <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/takeUntilInclusive.html"/>
@@ -4109,6 +4119,16 @@
     <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/takeRight.html"/>
     <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/takeRight.html"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/takeRight.html"/>
+  </url>
+  <url>
+    <loc>https://bansooknam.github.io/FxDart/ko/tutorials/takeUniqBy.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/takeUniqBy.html"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/takeUniqBy.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/takeUniqBy.html"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/takeUniqBy.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/takeUniqBy.html"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/takeUniqBy.html"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/takeUniqBy.html"/>
   </url>
   <url>
     <loc>https://bansooknam.github.io/FxDart/ko/tutorials/takeUntilInclusive.html</loc>

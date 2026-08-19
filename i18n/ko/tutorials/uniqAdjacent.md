@@ -7,8 +7,8 @@ section: 4
 crumb: uniqAdjacent
 prev: uniqStrict.html
 prevLabel: uniqStrict
-next: difference.html
-nextLabel: difference
+next: takeUniqBy.html
+nextLabel: takeUniqBy
 ---
   <p class="hero-sub">바로 앞 원소와 같은 원소를 버립니다 — <em>인접한</em> 중복만 사라지고, seen 집합은 쌓이지 않습니다.</p>
 

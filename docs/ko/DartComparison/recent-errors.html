@@ -50,7 +50,7 @@
   <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #20 · <strong>최근 오류 메시지, 중복 제거</strong></p>
   <h1>최근 오류 메시지, 중복 제거</h1>
   <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart 승</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/uniqBy.html">uniqBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/uniqBy.html">uniqBy</a></li><li><a href="../tutorials/take.html">take</a></li><li><a href="../tutorials/takeUniqBy.html">takeUniqBy</a></li></ul>
   <h2>요구사항</h2>
   <p>
     로그 저장소는 항목을 최신순으로 반환합니다. <strong>가장 최근의 서로
@@ -198,7 +198,7 @@ void main() {
     루프를 갈라놓는 것의 대부분이 그 두 호출입니다.
   </p>
   <p>
-    FxDart 패널의 <code>main</code> 위에 있는 <code>takeUniqBy</code>는 같은
+    FxDart 패널의 <code>main</code> 위에 있는 <code><a href="../tutorials/takeUniqBy.html">takeUniqBy</a></code>는 같은
     파이프라인을 하나의 즉시(strict) 호출로 쓴 것입니다. 콜백이 호출자에
     인라인될 만큼 작은 본문의 <em>매개변수</em>라서, 컴파일러가 클로저 본문을
     함께 인라인합니다. 콜백 하나가 두 일을 겸하며, 키가 <code>null</code>이면
@@ -207,7 +207,7 @@ void main() {
   </p>
   <p>
     기본은 체인으로 쓰십시오. 파이프라인이 뜨거운 경로에 있고 프로파일이 이
-    콜백들을 지목할 때 <code>takeUniqBy</code>를 꺼내면 됩니다.
+    콜백들을 지목할 때 <code><a href="../tutorials/takeUniqBy.html">takeUniqBy</a></code>를 꺼내면 됩니다.
   </p>
   <section class="cmp-bench">
   <h2>벤치마크</h2>

@@ -119,6 +119,10 @@
       "label": "uniqAdjacent"
     },
     {
+      "href": "takeUniqBy.html",
+      "label": "takeUniqBy"
+    },
+    {
       "href": "difference.html",
       "label": "difference"
     },

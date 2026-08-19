@@ -52,7 +52,7 @@
   <p class="breadcrumb"><a href="../../DartComparison/index.html">Dart vs FxDart</a> › #20 · <strong>Recent error messages, deduped</strong></p>
   <h1>Recent error messages, deduped</h1>
   <p class="cmp-meta"><span class="badge verdict-fxdart">FxDart wins</span></p>
-  <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/uniqBy.html">uniqBy</a></li><li><a href="../tutorials/take.html">take</a></li></ul>
+  <ul class="fn-list cmp-fns"><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/uniqBy.html">uniqBy</a></li><li><a href="../tutorials/take.html">take</a></li><li><a href="../tutorials/takeUniqBy.html">takeUniqBy</a></li></ul>
   <h2>Requirement</h2>
   <p>
     A log store returns entries newest first. Show the <strong>three most
@@ -200,7 +200,7 @@ void main() {
     pipeline from the native loop.
   </p>
   <p>
-    <code>takeUniqBy</code>, shown above <code>main</code> in the FxDart panel,
+    <code><a href="../tutorials/takeUniqBy.html">takeUniqBy</a></code>, shown above <code>main</code> in the FxDart panel,
     is the same pipeline written as one strict call. Its callback is a
     <em>parameter</em> of a body small enough to inline into the caller, so the
     compiler inlines the closure with it; one callback does both jobs, with a
@@ -209,7 +209,7 @@ void main() {
     loop is what the first bar shows.
   </p>
   <p>
-    Write the chain by default. Reach for <code>takeUniqBy</code> when the
+    Write the chain by default. Reach for <code><a href="../tutorials/takeUniqBy.html">takeUniqBy</a></code> when the
     pipeline is hot and a profile says these callbacks are the cost.
   </p>
   <section class="cmp-bench">

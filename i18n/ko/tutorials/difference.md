@@ -5,8 +5,8 @@ description: FxDart difference 튜토리얼 — 한 이터러블에는 없고 �
 heading: <code>difference</code>
 section: 4
 crumb: difference
-prev: uniqAdjacent.html
-prevLabel: uniqAdjacent
+prev: takeUniqBy.html
+prevLabel: takeUniqBy
 next: differenceBy.html
 nextLabel: differenceBy
 ---

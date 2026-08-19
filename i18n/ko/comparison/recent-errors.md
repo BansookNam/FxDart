@@ -5,7 +5,7 @@ description: 최신순 로그에서 가장 최근의 서로 다른 오류 3개�
 heading: 최근 오류 메시지, 중복 제거
 order: 20
 tier: 2
-functions: filter, uniqBy, take
+functions: filter, uniqBy, take, takeUniqBy
 domain: logs
 verdict: fxdart
 async: false
