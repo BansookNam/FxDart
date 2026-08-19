@@ -1132,7 +1132,13 @@ class FxEvents<T> {
   /// A throwing [f] parts company with the pull spelling the same way
   /// [uniqAdjacentBy] does: there the throw ends the iteration, here it
   /// becomes one error event and the accumulator keeps its last good value,
-  /// so the next event folds against a total the caller never saw.
+  /// so the next event folds against a total the caller never saw. Nothing
+  /// stops after the first failure, so an [f] that always throws turns a
+  /// live source into an endless run of error events rather than one
+  /// failure.
+  ///
+  /// The result is single-subscription even when the source is a broadcast
+  /// stream, as with every controller-based operator here.
   FxEvents<R> scan<R>(R Function(R acc, T a) f, R seed) {
     final out = StreamController<R>();
     out.onListen = () {
@@ -1173,7 +1179,12 @@ class FxEvents<T> {
   /// A throwing [f] parts company with the pull spelling: there the throw
   /// leaves `moveNext()` and ends the iteration, here it becomes one error
   /// event and the chain carries on against the last key it managed to
-  /// compute. A push chain has no caller to throw back to.
+  /// compute. A push chain has no caller to throw back to. Nothing stops
+  /// after the first failure, so an [f] that always throws turns a live
+  /// source into an endless run of error events.
+  ///
+  /// The result is single-subscription even when the source is a broadcast
+  /// stream, as with every controller-based operator here.
   FxEvents<T> uniqAdjacentBy<B>(B Function(T a) f) {
     final out = StreamController<T>();
     out.onListen = () {
@@ -1211,6 +1222,12 @@ class FxEvents<T> {
   ///
   /// Nothing is emitted until the second event arrives, so a source that
   /// closes after one event produces nothing.
+  ///
+  /// A source error passes through without disturbing the held predecessor,
+  /// so the next event pairs with the one from before the error.
+  ///
+  /// The result is single-subscription even when the source is a broadcast
+  /// stream, as with every controller-based operator here.
   FxEvents<(T, T)> pairwise() {
     final out = StreamController<(T, T)>();
     out.onListen = () {
@@ -1253,9 +1270,12 @@ class FxEvents<T> {
   /// [Stream.skip] throws on a negative count; the pull layer's `drop` reads
   /// one as "skip nothing" and this matches it.
   FxEvents<T> drop(int count) =>
-      count < 1 ? this : FxEvents(_inner.skip(count));
+      count < 1 ? FxEvents(_inner) : FxEvents(_inner.skip(count));
 
   /// Dart-idiomatic alias of [drop], as on `Fx` and `FxAsync`.
+  ///
+  /// The name comes from Dart but the contract is [drop]'s: a negative count
+  /// skips nothing, where [Stream.skip] throws.
   FxEvents<T> skip(int count) => drop(count);
 
   // --- multicast ------------------------------------------------------------
@@ -1320,31 +1340,35 @@ class FxEvents<T> {
   /// Like [Stream.first], the future waits for the source's teardown before
   /// it answers, so a caller that awaits this can rely on the subscription
   /// already being gone.
+  ///
+  /// On an `FxEvents<T?>` a `null` first event and an empty stream both
+  /// answer `null`; the two are indistinguishable, as on `FxAsync`.
   Future<T?> head() {
     final completer = Completer<T?>();
-    // Handlers are attached after `listen` returns, the shape `Stream.first`
-    // uses: the subscription is in hand before any of them can run, so the
-    // cancel below always has something to cancel.
-    final sub = _inner.listen(null);
-    var settled = false;
-
-    void finish(void Function() complete) {
-      if (settled) return;
-      settled = true;
-      sub.cancel().then((_) => complete(), onError: completer.completeError);
-    }
-
-    sub
-      ..onData((v) => finish(() => completer.complete(v)))
-      ..onError(
-        (Object e, StackTrace st) =>
-            finish(() => completer.completeError(e, st)),
-      )
-      ..onDone(() {
-        if (settled) return;
-        settled = true;
+    // [Stream.first]'s exact shape: `onError` and `onDone` go in at `listen`
+    // so a source that delivers during that call is still heard, and only
+    // `onData` waits for the subscription it has to cancel. `cancelOnError`
+    // tears the source down on the error path for the same reason.
+    final sub = _inner.listen(
+      null,
+      onError: (Object e, StackTrace st) {
+        if (completer.isCompleted) return;
+        completer.completeError(e, st);
+      },
+      onDone: () {
+        if (completer.isCompleted) return;
         completer.complete(null);
-      });
+      },
+      cancelOnError: true,
+    );
+    sub.onData((v) {
+      if (completer.isCompleted) return;
+      // `whenComplete`, not `then(onError:)`: a source that also fails to
+      // tear down would otherwise replace the value with the cancel error.
+      // `Stream.first` drops the teardown failure the same way — what the
+      // stream delivered outranks what its disposer did.
+      sub.cancel().whenComplete(() => completer.complete(v));
+    });
     return completer.future;
   }
 

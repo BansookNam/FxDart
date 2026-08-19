@@ -1,5 +1,10 @@
 ## 0.8.5
 
+Two things this time: an API addition on the events layer — `FxEvents` gains
+the stateful and limiting operators the pull layer already had — and a
+measurement-led performance pass. The performance work is the bulk of what
+follows; the API section sits just before "Still open".
+
 A measurement-led performance pass over the ten slowest DartComparison cases.
 The headline is a new instrument as much as the changes: **`tool/ab_bench.dart`**
 builds the baseline `lib/` from a git worktree, copies the working tree's
@@ -320,13 +325,21 @@ non-positive count — `Stream.empty()` is broadcast by default while
 would hand back streams accepting different numbers of listeners depending on
 the argument.
 
-Twenty-six regression tests cover the seed, the empty source, a throwing fold,
+`head` answers with what the stream delivered even when the source's disposer
+throws; the teardown failure surfaces as a zone error instead of replacing the
+answer, which is what `Stream.first` does. The three controller-based
+operators hand back a single-subscription stream whether or not the source is
+a broadcast one — `take` and `drop` preserve it because they delegate to the
+SDK. That split is documented on each operator and pinned by a test rather
+than left to be discovered.
+
+Thirty regression tests cover the seed, the empty source, a throwing fold,
 a throwing key function, a source error keeping its place in the sequence,
 adjacent runs, key-based comparison, single-event `pairwise`, non-positive
 `take` and `drop` counts, subscription multiplicity across `take`'s two
 branches, source cancellation on both `take` and `head`, the empty-stream
 `null`, and `pause`/`resume`/`cancel` forwarding on every new chain operator.
-Suite: 2034 passing, 1 skipped.
+Suite: 2038 passing, 1 skipped. Verified on Dart 3.12.2 and 3.13.1.
 
 ### Still open
 

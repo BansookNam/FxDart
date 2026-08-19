@@ -1356,6 +1356,24 @@ void main() {
         expect(at, lessThan(seen.length - 1));
       }
     });
+
+    test('the controller operators answer single-subscription, broadcast '
+        'source or not', () async {
+      final broadcast = StreamController<int>.broadcast().stream;
+      expect(broadcast.isBroadcast, isTrue);
+      final built = <FxEvents<Object>>[
+        fxEvents(broadcast).scan<int>((acc, a) => acc + a, 0),
+        fxEvents(broadcast).uniqAdjacentBy((a) => a),
+        fxEvents(broadcast).pairwise(),
+      ];
+      for (final e in built) {
+        // Documented on each operator: a controller stage does not carry the
+        // source's broadcast-ness through. `take`/`drop` do, because they
+        // delegate to the SDK — the asymmetry is deliberate and pinned here
+        // so a later change to either side is a visible decision.
+        expect(e.stream.isBroadcast, isFalse);
+      }
+    });
   });
 
   group('limiting', () {
@@ -1456,6 +1474,47 @@ void main() {
       expect(await value, equals(1));
       // No settling delay: the future waits for the teardown itself.
       expect(cancelled, isTrue);
+    });
+
+    // `Stream.first` answers with what the stream delivered and lets a
+    // throwing disposer surface as a zone error instead. These two pin the
+    // same split, because the tempting `then(onError:)` spelling would let
+    // the teardown failure replace the answer.
+    test('a failing teardown does not replace the delivered value', () async {
+      final zoneErrors = <Object>[];
+      await runZonedGuarded(() async {
+        final c = StreamController<int>(
+          onCancel: () => throw StateError('cancel-boom'),
+        );
+        final value = fxEvents(c.stream).head();
+        c.add(1);
+        expect(await value, equals(1));
+      }, (e, _) => zoneErrors.add(e));
+      await Future<void>.delayed(Duration.zero);
+      expect(zoneErrors.single, isStateError);
+    });
+
+    test('a source error survives a failing teardown', () async {
+      final zoneErrors = <Object>[];
+      await runZonedGuarded(() async {
+        final c = StreamController<int>(
+          onCancel: () => throw StateError('cancel-boom'),
+        );
+        final value = fxEvents(c.stream).head();
+        c.addError(ArgumentError('source-boom'));
+        await expectLater(value, throwsArgumentError);
+      }, (e, _) => zoneErrors.add(e));
+      await Future<void>.delayed(Duration.zero);
+      expect(zoneErrors.single, isStateError);
+    });
+
+    test('answers from a broadcast source', () async {
+      final c = StreamController<int>.broadcast();
+      final value = fxEvents(c.stream).head();
+      await Future<void>.delayed(Duration.zero);
+      c.add(5);
+      expect(await value, equals(5));
+      await c.close();
     });
 
     test('forwards an error instead of answering', () async {
