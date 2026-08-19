@@ -67,6 +67,27 @@ the intersection leg runs in 58,083 µs, faster than the native panel's
   measured the same. The 1.5 million-element key-set build is not on the
   iterator path this release fixed.
 
+### The ratio report is ordered by one axis again
+
+`perf_ratio_report.py` sorted by the same `max/min` multiple it prints, which
+is not directional — a row where FxDart leads by 1.37x and one where it
+trails by 1.32x sort next to each other. Across 53 cases the direction
+flipped **20 times**, so the numbers read as a clean descent while the
+meaning alternated, and the file's own title — *slowest to fastest* — was not
+what the order delivered: the fastest case in the suite sat at the top.
+
+It now sorts by `fxdart / native`, which is directional. `recent-errors`
+(1.32) leads the table, `restock-plan` (0.24) closes it, the ordering never
+changes direction, and the printed multiple stays what it was — the harness's
+own verdict for that row.
+
+The old key had a second problem this removes: the harness calls a tie on
+`tieAbsMs` as well as `tieMarginPct`, so a small-N case can be a tie at a raw
+1.8 and outrank a genuine 1.5x gap. Nothing in the current data hits it; the
+door is simply closed.
+
+Report-only. No measurement changed.
+
 ### On 12 rounds
 
 Three findings in this pass were artifacts of `ab_bench`'s default round
