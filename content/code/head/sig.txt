@@ -3,3 +3,4 @@ Future&lt;A?&gt; firstOrNullAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
 T? Fx.firstOrNull                // sync chain: inherited Iterable getter, no parens
 Future&lt;T?&gt; FxAsync.firstOrNull()  // async chain method
 A? head&lt;A&gt;(Iterable&lt;A&gt; iterable)  // FxTS alias
+Future&lt;T?&gt; FxEvents&lt;T&gt;.head() / .firstOrNull() // terminal (events)

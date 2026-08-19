@@ -23,7 +23,7 @@ Stream<String> mirror(String name, int ms) {
 Future<void> main() async {
   // Race both mirrors: first event wins, the loser is CANCELLED mid-flight.
   final winner = await FxEvents.race(
-      [mirror('eu-mirror', 60), mirror('us-mirror', 180)]).stream.first;
+      [mirror('eu-mirror', 60), mirror('us-mirror', 180)]).head();
 
   // Wait long past the loser's 180 ms — its timer was cancelled at ~60 ms.
   await Future.delayed(const Duration(milliseconds: 540));

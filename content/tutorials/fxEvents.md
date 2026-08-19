@@ -28,11 +28,14 @@ nextLabel: sampleOn
     Design decisions worth knowing. <code>FxEvents</code> is a thin
     <strong>wrapper</strong>, deliberately not a set of <code>Stream</code>
     extensions — so it can never collide with rxdart or any other stream
-    library in the same file. The chain stays <strong>cold</strong>: wrapping
     listens to nothing; only a terminal (<code>toList</code>,
-    <code>listen</code>) starts events flowing. And it is an fxdart
-    extension inspired by Rx, not part of FxTS — the operator names follow
-    the Rx tradition because that is where these ideas come from.
+    <code>head</code>, <code>listen</code>) starts events flowing. And it is
+    an fxdart extension inspired by Rx, not part of FxTS — the ideas come
+    from Rx, but where a name would clash with the pull layer's the pull
+    spelling wins: <code>uniqAdjacent</code> rather than
+    <code>distinctUntilChanged</code>, <code>stopOn</code> rather than
+    <code>takeUntil</code>, <code>head</code> rather than
+    <code>first</code>. One word means one thing on both sides.
   </p>
   <p>
     Two escape hatches keep you unlocked. <code>.stream</code> unwraps back

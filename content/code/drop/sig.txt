@@ -3,3 +3,4 @@ FxAsyncIterable&lt;A&gt; skipAsync&lt;A&gt;(int length, FxAsyncIterable&lt;A&gt;
 Fx&lt;T&gt; Fx.skip(int count)        // chain
 FxAsync&lt;T&gt; FxAsync.skip(int count)
 Iterable&lt;A&gt; drop&lt;A&gt;(...)        // FxTS alias
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.drop(int count) / .skip(int count) // chain (events)

@@ -4,3 +4,4 @@ FxAsyncIterable&lt;B&gt; scanAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(B acc,
 FxAsyncIterable&lt;A&gt; scan1Async&lt;A&gt;(FutureOr&lt;A&gt; Function(A acc, A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;B&gt; Fx.scan&lt;B&gt;(B Function(B acc, T a) f, B seed)        // chain
 FxAsync&lt;B&gt; FxAsync.scan&lt;B&gt;(FutureOr&lt;B&gt; Function(B acc, T a) f, FutureOr&lt;B&gt; seed)
+FxEvents&lt;R&gt; FxEvents&lt;T&gt;.scan&lt;R&gt;(R Function(R acc, T a) f, R seed) // chain (events)
