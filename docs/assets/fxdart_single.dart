@@ -11358,6 +11358,166 @@ class FxEvents<T> {
   FxEvents<R> asyncMap<R>(FutureOr<R> Function(T a) f) =>
       FxEvents(_inner.asyncMap(f));
 
+  // --- stateful & limiting --------------------------------------------------
+
+  /// Emits [seed], then each running accumulation as [f] folds in an event.
+  ///
+  /// The push-side counterpart of the pull layer's `scan`, and seeded the
+  /// same way: the seed is emitted before any event arrives. Rx's `scan`
+  /// emits only the accumulations, so a port from there gains one leading
+  /// value.
+  ///
+  /// A throwing [f] parts company with the pull spelling the same way
+  /// [uniqAdjacentBy] does: there the throw ends the iteration, here it
+  /// becomes one error event and the accumulator keeps its last good value,
+  /// so the next event folds against a total the caller never saw. Nothing
+  /// stops after the first failure, so an [f] that always throws turns a
+  /// live source into an endless run of error events rather than one
+  /// failure.
+  ///
+  /// The result is single-subscription even when the source is a broadcast
+  /// stream, as with every controller-based operator here.
+  FxEvents<R> scan<R>(R Function(R acc, T a) f, R seed) {
+    final out = StreamController<R>();
+    out.onListen = () {
+      var acc = seed;
+      out.add(seed);
+      final sub = _inner.listen(
+        (v) {
+          final R next;
+          try {
+            next = f(acc, v);
+          } catch (e, st) {
+            // A throwing [f] becomes an error event rather than an uncaught
+            // zone error, matching how [Stream.map] treats its transform.
+            out.addError(e, st);
+            return;
+          }
+          acc = next;
+          out.add(next);
+        },
+        onError: out.addError,
+        onDone: out.close,
+      );
+      out
+        ..onPause = sub.pause
+        ..onResume = sub.resume
+        ..onCancel = sub.cancel;
+    };
+    return FxEvents(out.stream);
+  }
+
+  /// Drops events whose [f]-key equals the previous event's key, keeping
+  /// the first of each run.
+  ///
+  /// The push-side counterpart of the pull layer's `uniqAdjacentBy`, after
+  /// Rx's `distinctUntilChanged`. Only adjacent duplicates go, so no
+  /// seen-set builds up behind a long-lived source.
+  ///
+  /// A throwing [f] parts company with the pull spelling: there the throw
+  /// leaves `moveNext()` and ends the iteration, here it becomes one error
+  /// event and the chain carries on against the last key it managed to
+  /// compute. A push chain has no caller to throw back to. Nothing stops
+  /// after the first failure, so an [f] that always throws turns a live
+  /// source into an endless run of error events.
+  ///
+  /// The result is single-subscription even when the source is a broadcast
+  /// stream, as with every controller-based operator here.
+  FxEvents<T> uniqAdjacentBy<B>(B Function(T a) f) {
+    final out = StreamController<T>();
+    out.onListen = () {
+      var hasPrev = false;
+      late B prevKey;
+      final sub = _inner.listen(
+        (v) {
+          final B key;
+          try {
+            key = f(v);
+          } catch (e, st) {
+            out.addError(e, st);
+            return;
+          }
+          final keep = !hasPrev || key != prevKey;
+          prevKey = key;
+          hasPrev = true;
+          if (keep) out.add(v);
+        },
+        onError: out.addError,
+        onDone: out.close,
+      );
+      out
+        ..onPause = sub.pause
+        ..onResume = sub.resume
+        ..onCancel = sub.cancel;
+    };
+    return FxEvents(out.stream);
+  }
+
+  /// Drops events equal to their predecessor, keeping the first of each run.
+  FxEvents<T> uniqAdjacent() => uniqAdjacentBy((T a) => a);
+
+  /// Pairs each event with its successor.
+  ///
+  /// Nothing is emitted until the second event arrives, so a source that
+  /// closes after one event produces nothing.
+  ///
+  /// A source error passes through without disturbing the held predecessor,
+  /// so the next event pairs with the one from before the error.
+  ///
+  /// The result is single-subscription even when the source is a broadcast
+  /// stream, as with every controller-based operator here.
+  FxEvents<(T, T)> pairwise() {
+    final out = StreamController<(T, T)>();
+    out.onListen = () {
+      var hasPrev = false;
+      late T prev;
+      final sub = _inner.listen(
+        (v) {
+          if (hasPrev) out.add((prev, v));
+          prev = v;
+          hasPrev = true;
+        },
+        onError: out.addError,
+        onDone: out.close,
+      );
+      out
+        ..onPause = sub.pause
+        ..onResume = sub.resume
+        ..onCancel = sub.cancel;
+    };
+    return FxEvents(out.stream);
+  }
+
+  /// The first [count] events, then the source is cancelled and the chain
+  /// closes.
+  ///
+  /// [Stream.take] handles everything from 1 up, cancellation included. A
+  /// count below 1 is the one case it does not: it still subscribes, where
+  /// the pull layer's `take` clamps a non-positive count to empty.
+  ///
+  /// The empty stand-in copies the source's [Stream.isBroadcast] because
+  /// `Stream.empty()` is broadcast by default while `Stream.take` forwards
+  /// whatever the source is — without this, `take(0)` and `take(1)` would
+  /// hand back streams that accept different numbers of listeners.
+  FxEvents<T> take(int count) => count < 1
+      ? FxEvents(Stream<T>.empty(broadcast: _inner.isBroadcast))
+      : FxEvents(_inner.take(count));
+
+  /// Skips the first [count] events and mirrors the rest.
+  ///
+  /// [Stream.skip] throws on a negative count; the pull layer's `drop` reads
+  /// one as "skip nothing" and this matches it.
+  FxEvents<T> drop(int count) =>
+      count < 1 ? FxEvents(_inner) : FxEvents(_inner.skip(count));
+
+  /// Dart-idiomatic alias of [drop], as on `Fx` and `FxAsync`.
+  ///
+  /// The name comes from Dart but the contract is [drop]'s: a negative count
+  /// skips nothing, where [Stream.skip] throws.
+  FxEvents<T> skip(int count) => drop(count);
+
+  // --- multicast ------------------------------------------------------------
+
   /// Lets many listeners share ONE run of the chain instead of each
   /// getting a private one.
   ///
@@ -11407,6 +11567,51 @@ class FxEvents<T> {
 
   /// Collects every event into a list (completes when the stream closes).
   Future<List<T>> toList() => _inner.toList();
+
+  /// The first event, or `null` when the stream closes without one — then
+  /// cancels the source.
+  ///
+  /// Named for the pull layer's terminal, not for [Stream.first]: that one
+  /// answers `Future<T>` and throws on an empty stream, and it is one hop
+  /// away through [stream].
+  ///
+  /// Like [Stream.first], the future waits for the source's teardown before
+  /// it answers, so a caller that awaits this can rely on the subscription
+  /// already being gone.
+  ///
+  /// On an `FxEvents<T?>` a `null` first event and an empty stream both
+  /// answer `null`; the two are indistinguishable, as on `FxAsync`.
+  Future<T?> head() {
+    final completer = Completer<T?>();
+    // [Stream.first]'s exact shape: `onError` and `onDone` go in at `listen`
+    // so a source that delivers during that call is still heard, and only
+    // `onData` waits for the subscription it has to cancel. `cancelOnError`
+    // tears the source down on the error path for the same reason.
+    final sub = _inner.listen(
+      null,
+      onError: (Object e, StackTrace st) {
+        if (completer.isCompleted) return;
+        completer.completeError(e, st);
+      },
+      onDone: () {
+        if (completer.isCompleted) return;
+        completer.complete(null);
+      },
+      cancelOnError: true,
+    );
+    sub.onData((v) {
+      if (completer.isCompleted) return;
+      // `whenComplete`, not `then(onError:)`: a source that also fails to
+      // tear down would otherwise replace the value with the cancel error.
+      // `Stream.first` drops the teardown failure the same way — what the
+      // stream delivered outranks what its disposer did.
+      sub.cancel().whenComplete(() => completer.complete(v));
+    });
+    return completer.future;
+  }
+
+  /// Alias of [head], matching `FxAsync.firstOrNull`.
+  Future<T?> firstOrNull() => head();
 
   /// Crosses into the pull model: the events become an [FxAsync] chain,
   /// pulled on demand from here on.

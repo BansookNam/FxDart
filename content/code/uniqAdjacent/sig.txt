@@ -4,3 +4,4 @@ FxAsyncIterable&lt;A&gt; uniqAdjacentAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; ite
 FxAsyncIterable&lt;A&gt; uniqAdjacentByAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 Fx&lt;T&gt; Fx&lt;T&gt;.uniqAdjacent() / .uniqAdjacentBy&lt;B&gt;(B Function(T a) f)                    // chain (sync)
 FxAsync&lt;T&gt; FxAsync&lt;T&gt;.uniqAdjacent() / .uniqAdjacentBy&lt;B&gt;(FutureOr&lt;B&gt; Function(T a) f) // chain (async)
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.uniqAdjacent() / .uniqAdjacentBy&lt;B&gt;(B Function(T a) f) // chain (events)

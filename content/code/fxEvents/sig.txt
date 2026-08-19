@@ -6,7 +6,12 @@ class FxEvents&lt;T&gt; {
   FxEvents&lt;T&gt; where(bool Function(T a) f);
   FxEvents&lt;R&gt; asyncMap&lt;R&gt;(FutureOr&lt;R&gt; Function(T a) f);
   FxEvents&lt;T&gt; startWith(T value);
+  FxEvents&lt;R&gt; scan&lt;R&gt;(R Function(R acc, T a) f, R seed); // seed first
+  FxEvents&lt;T&gt; uniqAdjacent() / uniqAdjacentBy&lt;B&gt;(B Function(T a) f);
+  FxEvents&lt;(T, T)&gt; pairwise();
+  FxEvents&lt;T&gt; take(int count) / drop(int count) / skip(int count);
   static FxEvents&lt;T&gt; merge&lt;T&gt;(Iterable&lt;Stream&lt;T&gt;&gt; sources);
   Future&lt;List&lt;T&gt;&gt; toList();                          // terminal
+  Future&lt;T?&gt; head() / firstOrNull();                 // terminal
   FxAsync&lt;T&gt; pull();                                 // cross into the pull model
 }

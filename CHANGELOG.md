@@ -1,5 +1,10 @@
 ## 0.8.5
 
+Two things this time: an API addition on the events layer — `FxEvents` gains
+the stateful and limiting operators the pull layer already had — and a
+measurement-led performance pass. The performance work is the bulk of what
+follows; the API section sits just before "Still open".
+
 A measurement-led performance pass over the ten slowest DartComparison cases.
 The headline is a new instrument as much as the changes: **`tool/ab_bench.dart`**
 builds the baseline `lib/` from a git worktree, copies the working tree's
@@ -273,6 +278,68 @@ descending-`range` direction, error propagation, and — for the async side —
 that a `Concurrent` marker still abandons fusion and reaches the source. Two
 white-box assertions pin which stage/iterator gets built, because a fast path
 silently switching itself off is otherwise invisible. Suite: 1980 passing.
+
+### `FxEvents` gains the operators the pull layer already had
+
+`scan`, `uniqAdjacent`, `uniqAdjacentBy`, `pairwise`, `take`, `drop`, and the
+`head` terminal. `skip` and `firstOrNull` alias `drop` and `head`, as on `Fx`
+and `FxAsync`. Until now the events layer could transform (`map`, `where`,
+`asyncMap`) and it could keep time (`debounce`, `throttle`, `sample`, …), but
+it could not carry state across events or stop itself. Anything that needed a
+running total or adjacent de-duplication had to cross into the pull layer with
+`pull()` — and `pull()` only answers once the source closes, so a live stream
+could not use it at all. `first-mirror-wins` in the RxDart comparison shows the
+other half of the same hole: with no terminal short of `toList()` it reaches
+past the chain for `.stream.first`.
+
+Semantics follow the pull layer rather than Rx where the two disagree.
+`scan` emits its seed before any event, so a chain ported from Rx's `scan`
+gains one leading value. `uniqAdjacent` is the name `distinctUntilChanged`
+goes by here, matching `uniqAdjacentBy` and the pull spelling. The terminal is
+`head`, not `first`, because `FxAsync` already spells it that way and
+`Stream.first` — one hop away through `stream` — throws on an empty stream
+where this answers `null`.
+
+A throwing key function in `uniqAdjacentBy` parts company with the pull
+spelling: there the throw leaves `moveNext()` and ends the iteration, here it
+becomes one error event and the chain continues against the last key it
+managed to compute. A push chain has no caller to throw back to.
+
+`take` cancels its source the moment the count is met, which the pull layer
+cannot do — `FxAsyncIterator` has no cancel signal — and which is the sharpest
+argument for the asymmetry being real rather than cosmetic. It gets that from
+`Stream.take`, which this delegates to; the hand-written part is only the
+non-positive count, where `Stream.take` still subscribes and the pull layer
+clamps to empty. `drop` delegates to `Stream.skip` on the same terms — the SDK
+throws on a negative count, the pull layer reads one as "skip nothing".
+
+Every new operator forwards `pause`/`resume` to its source, as `chunk` does.
+Six of the twenty-five existing operators do; a stateful operator that cannot
+stop its source grows its controller queue without bound.
+
+`head` waits for the source teardown before it answers, as `Stream.first` does,
+so an awaiting caller can rely on the subscription already being gone. `take`
+copies the source's `isBroadcast` onto the empty stand-in it returns for a
+non-positive count — `Stream.empty()` is broadcast by default while
+`Stream.take` forwards whatever the source is, and without the copy one method
+would hand back streams accepting different numbers of listeners depending on
+the argument.
+
+`head` answers with what the stream delivered even when the source's disposer
+throws; the teardown failure surfaces as a zone error instead of replacing the
+answer, which is what `Stream.first` does. The three controller-based
+operators hand back a single-subscription stream whether or not the source is
+a broadcast one — `take` and `drop` preserve it because they delegate to the
+SDK. That split is documented on each operator and pinned by a test rather
+than left to be discovered.
+
+Thirty regression tests cover the seed, the empty source, a throwing fold,
+a throwing key function, a source error keeping its place in the sequence,
+adjacent runs, key-based comparison, single-event `pairwise`, non-positive
+`take` and `drop` counts, subscription multiplicity across `take`'s two
+branches, source cancellation on both `take` and `head`, the empty-stream
+`null`, and `pause`/`resume`/`cancel` forwarding on every new chain operator.
+Suite: 2038 passing, 1 skipped. Verified on Dart 3.12.2 and 3.13.1.
 
 ### Still open
 

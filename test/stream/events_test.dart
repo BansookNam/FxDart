@@ -1175,4 +1175,373 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 20));
     });
   });
+
+  group('stateful', () {
+    test('scan emits the seed before any event', () async {
+      expect(
+        await fxEvents(
+          Stream.fromIterable([1, 2, 3]),
+        ).scan<int>((acc, a) => acc + a, 10).toList(),
+        equals([10, 11, 13, 16]),
+      );
+    });
+
+    test('scan on an empty source emits the seed alone', () async {
+      expect(
+        await fxEvents(
+          const Stream<int>.empty(),
+        ).scan<int>((acc, a) => acc + a, 7).toList(),
+        equals([7]),
+      );
+    });
+
+    test('scan turns a throwing fold into an error event and carries on',
+        () async {
+      final seen = <Object>[];
+      final done = Completer<void>();
+      fxEvents(Stream.fromIterable([1, 2, 3]))
+          .scan<int>(
+            (acc, a) => a == 2 ? throw StateError('boom') : acc + a,
+            0,
+          )
+          .listen(seen.add, onError: seen.add, onDone: done.complete);
+      await done.future;
+      expect(seen.first, equals(0));
+      expect(seen.any((e) => e is StateError), isTrue);
+      expect(seen.last, equals(4));
+    });
+
+    test('uniqAdjacent drops runs but keeps a later repeat', () async {
+      expect(
+        await fxEvents(
+          Stream.fromIterable([1, 1, 2, 2, 2, 1]),
+        ).uniqAdjacent().toList(),
+        equals([1, 2, 1]),
+      );
+    });
+
+    test('uniqAdjacentBy compares the key, not the value', () async {
+      expect(
+        await fxEvents(
+          Stream.fromIterable([1, 11, 21, 2, 1]),
+        ).uniqAdjacentBy((a) => a % 10).toList(),
+        equals([1, 2, 1]),
+      );
+    });
+
+    test('pairwise pairs each event with its successor', () async {
+      expect(
+        await fxEvents(Stream.fromIterable([1, 2, 3, 4])).pairwise().toList(),
+        equals([(1, 2), (2, 3), (3, 4)]),
+      );
+    });
+
+    test('pairwise stays silent when only one event arrives', () async {
+      expect(
+        await fxEvents(Stream.fromIterable([1])).pairwise().toList(),
+        hasLength(0),
+      );
+    });
+
+    test('uniqAdjacentBy reports a throwing key and keeps the last one it '
+        'computed', () async {
+      final seen = <Object>[];
+      final done = Completer<void>();
+      fxEvents(Stream.fromIterable([1, 2, 11, 3]))
+          .uniqAdjacentBy((a) => a == 2 ? throw StateError('boom') : a % 10)
+          .listen(seen.add, onError: seen.add, onDone: done.complete);
+      await done.future;
+      // 2 fails, so the key stays 1 and the following 11 is dropped as a
+      // repeat of it.
+      expect(seen.whereType<int>().toList(), equals([1, 3]));
+      expect(seen.any((e) => e is StateError), isTrue);
+    });
+
+    test('scan forwards pause, resume and cancel to the source', () async {
+      final c = StreamController<int>();
+      final seen = <int>[];
+      final sub = fxEvents(c.stream).scan<int>((acc, a) => acc + a, 0).listen(
+        seen.add,
+      );
+      await Future<void>.delayed(Duration.zero);
+      expect(seen, equals([0]));
+      sub.pause();
+      c
+        ..add(1)
+        ..add(2);
+      await Future<void>.delayed(Duration.zero);
+      expect(c.isPaused, isTrue);
+      expect(seen, equals([0]));
+      sub.resume();
+      await Future<void>.delayed(Duration.zero);
+      expect(seen, equals([0, 1, 3]));
+      await sub.cancel();
+      expect(c.hasListener, isFalse);
+      await c.close();
+    });
+
+    test('drop forwards pause, resume and cancel to the source', () async {
+      final c = StreamController<int>();
+      final seen = <int>[];
+      final sub = fxEvents(c.stream).drop(1).listen(seen.add);
+      await Future<void>.delayed(Duration.zero);
+      sub.pause();
+      c
+        ..add(1)
+        ..add(2);
+      await Future<void>.delayed(Duration.zero);
+      expect(c.isPaused, isTrue);
+      expect(seen, hasLength(0));
+      sub.resume();
+      await Future<void>.delayed(Duration.zero);
+      expect(seen, equals([2]));
+      await sub.cancel();
+      expect(c.hasListener, isFalse);
+      await c.close();
+    });
+
+    test('uniqAdjacentBy, pairwise and take forward pause and cancel',
+        () async {
+      for (final build in <FxEvents<int> Function(Stream<int>)>[
+        (s) => fxEvents(s).uniqAdjacentBy((a) => a),
+        (s) => fxEvents(s).pairwise().map((p) => p.$1),
+        (s) => fxEvents(s).take(9),
+      ]) {
+        final c = StreamController<int>();
+        final seen = <int>[];
+        final sub = build(c.stream).listen(seen.add);
+        await Future<void>.delayed(Duration.zero);
+        sub.pause();
+        c
+          ..add(1)
+          ..add(2);
+        await Future<void>.delayed(Duration.zero);
+        expect(c.isPaused, isTrue);
+        expect(seen, hasLength(0));
+        sub.resume();
+        await Future<void>.delayed(Duration.zero);
+        expect(seen, isNotEmpty);
+        await sub.cancel();
+        expect(c.hasListener, isFalse);
+        await c.close();
+      }
+    });
+
+    test('scan, uniqAdjacentBy and pairwise forward a source error in place',
+        () async {
+      for (final build in <FxEvents<Object> Function(Stream<int>)>[
+        (s) => fxEvents(s).scan<int>((acc, a) => acc + a, 0).map((a) => a),
+        (s) => fxEvents(s).uniqAdjacentBy((a) => a).map((a) => a),
+        (s) => fxEvents(s).pairwise().map((p) => p.$2),
+      ]) {
+        final c = StreamController<int>();
+        final seen = <Object>[];
+        final done = Completer<void>();
+        build(c.stream).listen(
+          seen.add,
+          onError: seen.add,
+          onDone: done.complete,
+        );
+        c
+          ..add(1)
+          ..add(2)
+          ..addError(StateError('boom'))
+          ..add(3);
+        await c.close();
+        await done.future;
+        // The error keeps its place in the sequence: whatever the operator
+        // emitted for `2` comes before it, whatever it emits for `3` after.
+        final at = seen.indexWhere((e) => e is StateError);
+        expect(at, greaterThan(0));
+        expect(at, lessThan(seen.length - 1));
+      }
+    });
+
+    test('the controller operators answer single-subscription, broadcast '
+        'source or not', () async {
+      final broadcast = StreamController<int>.broadcast().stream;
+      expect(broadcast.isBroadcast, isTrue);
+      final built = <FxEvents<Object>>[
+        fxEvents(broadcast).scan<int>((acc, a) => acc + a, 0),
+        fxEvents(broadcast).uniqAdjacentBy((a) => a),
+        fxEvents(broadcast).pairwise(),
+      ];
+      for (final e in built) {
+        // Documented on each operator: a controller stage does not carry the
+        // source's broadcast-ness through. `take`/`drop` do, because they
+        // delegate to the SDK — the asymmetry is deliberate and pinned here
+        // so a later change to either side is a visible decision.
+        expect(e.stream.isBroadcast, isFalse);
+      }
+    });
+  });
+
+  group('limiting', () {
+    test('take stops at the count', () async {
+      expect(
+        await fxEvents(Stream.fromIterable([1, 2, 3, 4, 5])).take(2).toList(),
+        equals([1, 2]),
+      );
+    });
+
+    test('take cancels the source once the count is met', () async {
+      var cancelled = false;
+      final c = StreamController<int>(onCancel: () => cancelled = true);
+      final collected = fxEvents(c.stream).take(2).toList();
+      c
+        ..add(1)
+        ..add(2)
+        ..add(3);
+      expect(await collected, equals([1, 2]));
+      await Future<void>.delayed(Duration.zero);
+      expect(cancelled, isTrue);
+    });
+
+    test('take below 1 closes without subscribing', () async {
+      for (final count in [0, -1]) {
+        var listened = false;
+        final c = StreamController<int>(onListen: () => listened = true);
+        expect(await fxEvents(c.stream).take(count).toList(), hasLength(0));
+        expect(listened, isFalse);
+        // Nobody subscribed, so `close()` would never complete — the done
+        // event has no listener to reach.
+        unawaited(c.close());
+      }
+    });
+
+    test('take keeps the source subscription multiplicity at every count',
+        () async {
+      final single = StreamController<int>().stream;
+      final broadcast = StreamController<int>.broadcast().stream;
+      for (final count in [0, 1]) {
+        expect(fxEvents(single).take(count).stream.isBroadcast, isFalse);
+        expect(fxEvents(broadcast).take(count).stream.isBroadcast, isTrue);
+      }
+    });
+
+    test('drop skips the leading events', () async {
+      expect(
+        await fxEvents(Stream.fromIterable([1, 2, 3, 4, 5])).drop(2).toList(),
+        equals([3, 4, 5]),
+      );
+    });
+
+    test('drop past the end yields nothing', () async {
+      expect(
+        await fxEvents(Stream.fromIterable([1, 2])).drop(5).toList(),
+        hasLength(0),
+      );
+    });
+
+    test('skip is the same operator as drop', () async {
+      expect(
+        await fxEvents(Stream.fromIterable([1, 2, 3])).skip(1).toList(),
+        equals([2, 3]),
+      );
+    });
+
+    test('drop below 1 skips nothing, where Stream.skip would throw', () async {
+      expect(
+        await fxEvents(Stream.fromIterable([1, 2])).drop(-1).toList(),
+        equals([1, 2]),
+      );
+      expect(
+        await fxEvents(Stream.fromIterable([1, 2])).drop(0).toList(),
+        equals([1, 2]),
+      );
+    });
+  });
+
+  group('head', () {
+    test('answers the first event', () async {
+      expect(
+        await fxEvents(Stream.fromIterable([7, 8, 9])).head(),
+        equals(7),
+      );
+    });
+
+    test('answers null on a stream that closes empty', () async {
+      expect(await fxEvents(const Stream<int>.empty()).head(), equals(null));
+    });
+
+    test('the source is already cancelled when it answers', () async {
+      var cancelled = false;
+      final c = StreamController<int>(onCancel: () => cancelled = true);
+      final value = fxEvents(c.stream).head();
+      c
+        ..add(1)
+        ..add(2);
+      expect(await value, equals(1));
+      // No settling delay: the future waits for the teardown itself.
+      expect(cancelled, isTrue);
+    });
+
+    // `Stream.first` answers with what the stream delivered and lets a
+    // throwing disposer surface as a zone error instead. These two pin the
+    // same split, because the tempting `then(onError:)` spelling would let
+    // the teardown failure replace the answer.
+    test('a failing teardown does not replace the delivered value', () async {
+      final zoneErrors = <Object>[];
+      await runZonedGuarded(() async {
+        final c = StreamController<int>(
+          onCancel: () => throw StateError('cancel-boom'),
+        );
+        final value = fxEvents(c.stream).head();
+        c.add(1);
+        expect(await value, equals(1));
+      }, (e, _) => zoneErrors.add(e));
+      await Future<void>.delayed(Duration.zero);
+      expect(zoneErrors.single, isStateError);
+    });
+
+    test('a source error survives a failing teardown', () async {
+      final zoneErrors = <Object>[];
+      await runZonedGuarded(() async {
+        final c = StreamController<int>(
+          onCancel: () => throw StateError('cancel-boom'),
+        );
+        final value = fxEvents(c.stream).head();
+        c.addError(ArgumentError('source-boom'));
+        await expectLater(value, throwsArgumentError);
+      }, (e, _) => zoneErrors.add(e));
+      await Future<void>.delayed(Duration.zero);
+      expect(zoneErrors.single, isStateError);
+    });
+
+    test('answers from a broadcast source', () async {
+      final c = StreamController<int>.broadcast();
+      final value = fxEvents(c.stream).head();
+      await Future<void>.delayed(Duration.zero);
+      c.add(5);
+      expect(await value, equals(5));
+      await c.close();
+    });
+
+    test('forwards an error instead of answering', () async {
+      await expectLater(
+        fxEvents(Stream<int>.error(StateError('boom'))).head(),
+        throwsStateError,
+      );
+    });
+
+    test('answers the value when the source errors after it', () async {
+      final c = StreamController<int>();
+      final value = fxEvents(c.stream).head();
+      c.add(1);
+      expect(await value, equals(1));
+      c.addError(StateError('late'));
+      await c.close();
+    });
+
+    test('firstOrNull is the same terminal', () async {
+      expect(
+        await fxEvents(Stream.fromIterable([7, 8])).firstOrNull(),
+        equals(7),
+      );
+      expect(
+        await fxEvents(const Stream<int>.empty()).firstOrNull(),
+        equals(null),
+      );
+    });
+  });
 }
