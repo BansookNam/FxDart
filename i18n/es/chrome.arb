@@ -19,6 +19,7 @@
   "cmpRxTier4Blurb": "Donde los modelos se separan: concurrencia dirigida por la demanda en un lado, tiempo de reloj y multicast en el otro — incluidos los ejemplos donde RxDart es sencillamente la herramienta adecuada.",
   "cmpNative": "Dart nativo",
   "cmpFxdart": "FxDart",
+  "cmpFxdartStrict": "FxDart (estricto)",
   "cmpExpected": "Salida esperada",
   "cmpVerdictFxdart": "Gana FxDart",
   "cmpVerdictTie": "Empate",

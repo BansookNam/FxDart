@@ -290,6 +290,32 @@ class FxDropWhileStage extends FxStage {
   final FutureOr<bool> Function(Object? value) p;
 }
 
+/// A `uniqByAsync` stage — `uniqAsync` when [f] is null (the element is its
+/// own key). Stateful like [FxScanStage]: the seen-set lives on the iterator,
+/// so at most one may be fused into a run; a second one starts a new run.
+class FxUniqByStage extends FxStage {
+  const FxUniqByStage(this.f);
+
+  /// The key function, or null when the element is its own key.
+  final FutureOr<Object?> Function(Object? value)? f;
+}
+
+/// A `takeAsync` stage. Stateful: the count lives on the iterator, so at most
+/// one may be fused into a run.
+///
+/// The run ends the moment the [count]th element passes *through* this stage,
+/// not when the next pull finds the counter spent — `take` must not pull the
+/// element after its last, and the fused form keeps that exact pull count. An
+/// element the stage passes can still be dropped by a later stage; ending is
+/// decided here either way, so the source is never over-pulled.
+class FxTakeStage extends FxStage {
+  const FxTakeStage(this.count);
+
+  /// How many elements pass before the run ends. Always >= 1: `takeAsync`
+  /// keeps a non-positive count off the fused path entirely.
+  final int count;
+}
+
 /// A `scanAsync` stage. Unlike the others it carries state: the running
 /// accumulator lives on the iterator (one scan per fused run, so one slot),
 /// and [seed] is emitted through the stages *after* this one before the
@@ -342,6 +368,18 @@ final class FxDropWhileLink extends FxLink {
   final FutureOr<bool> Function(Object? value) p;
 }
 
+/// Compiled [FxUniqByStage].
+final class FxUniqByLink extends FxLink {
+  const FxUniqByLink(this.f, super.next);
+  final FutureOr<Object?> Function(Object? value)? f;
+}
+
+/// Compiled [FxTakeStage].
+final class FxTakeLink extends FxLink {
+  const FxTakeLink(this.count, super.next);
+  final int count;
+}
+
 /// Compiled [FxScanStage].
 final class FxScanLink extends FxLink {
   const FxScanLink(this.f, this.seed, super.next);
@@ -385,6 +423,14 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
   /// one fuses into a run, for the reason [scanIndex] gives.
   late final int dropWhileIndex = _dropWhileIndex(stages);
 
+  /// Index of the run's [FxUniqByStage], or -1 when there is none. At most one
+  /// fuses into a run — its seen-set lives on the iterator.
+  late final int uniqIndex = _stageIndex(stages, (s) => s is FxUniqByStage);
+
+  /// Index of the run's [FxTakeStage], or -1 when there is none. At most one
+  /// fuses into a run — its counter lives on the iterator.
+  late final int takeIndex = _stageIndex(stages, (s) => s is FxTakeStage);
+
   /// [stages] compiled into the chain the per-element loops walk.
   late final FxLink? links = _compile(stages);
 
@@ -411,6 +457,8 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
         FxTakeWhileStage(:final p) => FxTakeWhileLink(p, head),
         FxScanStage(:final f, :final seed) => FxScanLink(f, seed, head),
         FxDropWhileStage(:final p) => FxDropWhileLink(p, head),
+        FxUniqByStage(:final f) => FxUniqByLink(f, head),
+        FxTakeStage(:final count) => FxTakeLink(count, head),
       };
     }
     return head;
@@ -426,6 +474,13 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
   static int _scanIndex(List<FxStage> stages) {
     for (var i = 0; i < stages.length; i++) {
       if (stages[i] is FxScanStage) return i;
+    }
+    return -1;
+  }
+
+  static int _stageIndex(List<FxStage> stages, bool Function(FxStage) is_) {
+    for (var i = 0; i < stages.length; i++) {
+      if (is_(stages[i])) return i;
     }
     return -1;
   }
@@ -463,6 +518,13 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
   /// The latch of the run's [FxDropWhileStage] (at most one). Per-iterator,
   /// like [_acc]: the links are shared by every iterator over the iterable.
   bool _dropping = true;
+
+  /// The seen-set of the run's [FxUniqByStage] (at most one). Allocated on
+  /// the first element, so a run that never reaches the stage pays nothing.
+  Set<Object?>? _seen;
+
+  /// How many elements the run's [FxTakeStage] (at most one) has passed.
+  int _taken = 0;
 
   @override
   Future<IterResult<T>> next([Concurrent? concurrent]) {
@@ -646,6 +708,27 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
           if (k) return null;
           _dropping = false;
         }
+      } else if (l is FxUniqByLink) {
+        final kf = l.f;
+        if (kf == null) {
+          if (!(_seen ??= <Object?>{}).add(v)) return null;
+        } else {
+          final k = kf(v);
+          if (k is Future) {
+            final vv = v;
+            return k.then<IterResult<T>?>(
+              (kk) =>
+                  (_seen ??= <Object?>{}).add(kk) ? _applyFrom(vv, next) : null,
+            );
+          }
+          if (!(_seen ??= <Object?>{}).add(k)) return null;
+        }
+      } else if (l is FxTakeLink) {
+        // Ends here, on the count-th element, rather than on the pull that
+        // would follow it: `take` never pulls past its last element. A later
+        // stage may still drop this one — `_pull`'s loop sees `_ended` and
+        // answers done without pulling again.
+        if (++_taken >= l.count) _ended = true;
       } else {
         l as FxTakeWhileLink;
         final k = l.p(v);
@@ -722,6 +805,12 @@ Future<void>? fxStreamDrive<T>(
   var terminated = false;
   // Latch of the run's single FxDropWhileStage, if it has one.
   var dropping = true;
+  // Seen-set and counter of the run's single FxUniqByStage / FxTakeStage.
+  Set<Object?>? seen;
+  var taken = 0;
+  // Set when the run's take stage passes its last element; the caller ends
+  // the drive once that element has finished flowing, dropped or emitted.
+  var takeDone = false;
 
   void finish() {
     if (terminated) return;
@@ -773,6 +862,22 @@ Future<void>? fxStreamDrive<T>(
           if (k) return null;
           dropping = false;
         }
+      } else if (l is FxUniqByLink) {
+        final kf = l.f;
+        if (kf == null) {
+          if (!(seen ??= <Object?>{}).add(v)) return null;
+        } else {
+          final k = kf(v);
+          if (k is Future) {
+            final vv = v;
+            return k.then((kk) {
+              if ((seen ??= <Object?>{}).add(kk)) return apply(vv, next);
+            });
+          }
+          if (!(seen ??= <Object?>{}).add(k)) return null;
+        }
+      } else if (l is FxTakeLink) {
+        if (++taken >= l.count) takeDone = true;
       } else {
         l as FxTakeWhileLink;
         final k = l.p(v);
@@ -805,9 +910,14 @@ Future<void>? fxStreamDrive<T>(
       if (r is Future) {
         sub.pause();
         r.then((_) {
+          // The take stage's last element has finished flowing: end here
+          // rather than resuming, so no further element is ever delivered.
+          if (takeDone) return finish();
           if (!terminated) sub.resume();
         }, onError: fail);
+        return;
       }
+      if (takeDone) finish();
     },
     onError: fail,
     onDone: () {
@@ -853,6 +963,11 @@ Future<void>? fxFusedDrive<T>(
   final completer = Completer<void>();
   var terminated = false;
   Object? acc;
+  Set<Object?>? seen;
+  var taken = 0;
+  // Set when the run's take stage passes its last element; the loop ends once
+  // that element has finished flowing, dropped or emitted.
+  var takeDone = false;
   // Latch of the run's single FxDropWhileStage, if it has one.
   var dropping = true;
 
@@ -927,6 +1042,27 @@ Future<void>? fxFusedDrive<T>(
           if (k) return null;
           dropping = false;
         }
+      } else if (l is FxUniqByLink) {
+        final kf = l.f;
+        if (kf == null) {
+          if (!(seen ??= <Object?>{}).add(v)) return null;
+        } else {
+          final k = kf(v);
+          if (k is Future) {
+            final vv = v;
+            return k.then((kk) {
+              if (terminated) return;
+              if ((seen ??= <Object?>{}).add(kk)) return resume(vv, next);
+              if (takeDone) return finish();
+              pump();
+            }, onError: fail);
+          }
+          if (!(seen ??= <Object?>{}).add(k)) return null;
+        }
+      } else if (l is FxTakeLink) {
+        // See [FxTakeStage]: the run ends on the count-th element, not on the
+        // pull that would follow it.
+        if (++taken >= l.count) takeDone = true;
       } else {
         l as FxTakeWhileLink;
         final k = l.p(v);
@@ -948,7 +1084,9 @@ Future<void>? fxFusedDrive<T>(
     final r = emit(v as T);
     if (r is Future) {
       return r.then((_) {
-        if (!terminated) pump();
+        if (terminated) return;
+        if (takeDone) return finish();
+        pump();
       }, onError: fail);
     }
     return null;
@@ -962,7 +1100,10 @@ Future<void>? fxFusedDrive<T>(
     } catch (e, st) {
       return fail(e, st);
     }
-    if (held == null && !terminated) pump();
+    if (held == null && !terminated) {
+      if (takeDone) return finish();
+      pump();
+    }
   };
 
   pump = () {
@@ -986,6 +1127,7 @@ Future<void>? fxFusedDrive<T>(
           return fail(e, st);
         }
         if (held != null) return;
+        if (takeDone) return finish();
         continue;
       }
       final FutureOr<IterResult<Object?>> r;
@@ -1010,6 +1152,7 @@ Future<void>? fxFusedDrive<T>(
         return fail(e, st);
       }
       if (held != null) return;
+      if (takeDone) return finish();
     }
   };
 

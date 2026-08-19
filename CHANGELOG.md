@@ -1,11 +1,19 @@
 ## 0.8.5
 
-Two things this time: an API addition on the events layer — `FxEvents` gains
-the stateful and limiting operators the pull layer already had — and a
-measurement-led performance pass. The performance work is the bulk of what
-follows; the API section sits just before "Still open".
+Two API additions and a performance pass that runs most of this section.
 
-A measurement-led performance pass over the ten slowest DartComparison cases.
+The additions: `FxEvents` gains the stateful and limiting operators the pull
+layer already had (`scan`, `uniqAdjacent`, `pairwise`, `take`, `drop`, and a
+`head` terminal), and `takeUniqBy` lands on the strict side — `filter` +
+`uniqBy` + `take` as one call whose callback the compiler can actually
+inline. Both sections are near the end, before "Still open".
+
+The performance work started as a pass over the ten slowest DartComparison
+cases and grew two more rounds as the measurements got sharper: `take` and
+`uniq` became fused async stages, `filter` over a `zip` became one iterator,
+and the "lazy callback floor" that closes the section is now measured rather
+than asserted.
+
 The headline is a new instrument as much as the changes: **`tool/ab_bench.dart`**
 builds the baseline `lib/` from a git worktree, copies the working tree's
 benchmark sources over it so *only* `lib/` differs, and runs the two binaries
@@ -229,6 +237,141 @@ Large off-target gains came with the inlining: `invoice-summary` 0.82x →
 0.51x, `budget-alerts` 0.88x → 0.60x, `multi-currency-report` 0.97x → 0.86x,
 `monthly-ledger-report` 0.41x → 0.32x, `food-spending` 1.05x → 0.88x.
 
+### Second pass — the sort strategies and a record-typed `head`
+
+A second sweep of the same instrument over the cases still sitting at 1.19x
+or worse. Three defects, all of them things the library was doing that no
+program asked for. The four `###` sections that follow are that pass.
+
+### Int keys were still sorting through an index permutation
+
+0.8.0 moved the `double` key path off the index sort for a stated reason —
+"every comparison does two random reads into the key array and the result is
+gathered through the permutation — millions of cache misses on a large sort".
+The `int` path never followed it. It does now, and where it can it skips
+comparison sorting altogether.
+
+Int keys in real pipelines are **narrow**: scores, ranks, counts, ages,
+priorities, deficits, month numbers, status codes. When `max - min` is no
+wider than the input, `sortBy` runs a stable **counting sort** — two linear
+passes over the keys plus one prefix sum, and no comparisons at all. Wider
+keys (ids, timestamps, hashes) take an unboxed lockstep merge, comparing with
+`<=` on raw ints: ints have no NaN and no signed zero, so `compareTo` buys
+nothing there. The O(n) presorted / exactly-reversed scan that the double
+path runs first is kept, including its insistence on a *strict* run before
+reversing.
+
+| case | delta | key |
+|---|---|---|
+| `restock-plan` | **−76.31%** | `i.stock - i.minStock` over 1M rows |
+| `leaderboard-ties` | **−27.86%** | `-p.score`, 500 distinct scores |
+| `concurrent-profile-fetch` | −3.41% | `u.id` |
+
+`restock-plan` goes from a tie to **0.24x**, the fastest case in the suite;
+`leaderboard-ties` from 1.22x behind native to **0.88x** ahead.
+
+**Both new strategies are stable, and the index sort was not.** `List.sort`
+is free to shuffle equal keys, so this is a behaviour change — a strictly
+better one, and it also ends an inconsistency where a `double` key sorted
+stably and an `int` key did not.
+
+It shows in exactly one place. `leaderboard-ties`'s native panel sorts
+2000-deep tie groups with `List.sort`; the two panels used to agree only
+because sorting an index list and sorting the values make identical
+comparator decisions on the same input, and so produced the *same* arbitrary
+permutation. They no longer do. The case's checksum now reports rank and
+score without the name — which is what the two programs actually agree on —
+and neither panel's pipeline changed. The tutorial example's six-player
+output is unaffected: at that size `List.sort` is an insertion sort, which is
+stable, so `expected.txt` already recorded the stable order.
+
+### The `indices` list was allocated for key types that never used it
+
+`_sortByImpl` built an n-element index list *before* it knew the key type,
+but the double path has merged rather than gathered since 0.8.0 and never
+reads it. Every `sortBy` over a double key was allocating and filling a
+million-entry `List<int>` and discarding it untouched.
+
+| case | delta |
+|---|---|
+| `paginated-products` | **−6.71%** |
+| `top-expenses` | **−5.54%** |
+
+`paginated-products` was the one case the first pass made genuinely slower
+(+2.6%, the price of the `List`-indexed walks). This more than pays it back:
+1.28x → **1.18x**.
+
+### A record-typed `head` was paying a runtime subtype test
+
+`headAsync` already took the fast-pull path, but it is generic, and without
+`vm:prefer-inline` its `A` is a **runtime** type argument — so
+`r is Future<IterResult<A>>` is a real subtype test rather than a
+compile-time-shaped one. Ordinary classes shrug that off; records do not,
+which is the same finding 0.7.6 recorded when it put the pragma on the
+operator factories. Measured over 100,000 one-element pipelines,
+`toAsync → map → head`:
+
+| element type | before | after |
+|---|---|---|
+| a class | 38 ms | 38 ms |
+| a `String` | 38 ms | 38 ms |
+| a record `(int, String)` | **193 ms** | **112 ms** |
+
+`flaky-api-retry` **−10.61%**, 1.27x → **1.15x**. This is `head`'s common
+shape — a loop building one short chain per work item — and
+`map((a) async => (a, await f(a)))` makes the element a record almost by
+default, so the two compound.
+
+The residual 112-vs-38 ms is the same runtime record cast one level further
+out, in the `Future<A?>` the terminal constructs. It did not respond to the
+pragma on `FxAsync.head()` either, so it is left measured rather than
+guessed at.
+
+### What was probed and rejected
+
+- **Tuning the double merge.** `_mergeByDouble` really is slower than the
+  native panel's in-place `List.sort` on 800k doubles (110 ms vs 78 ms) — the
+  price of stability and of moving two arrays in lockstep. Insertion-sorted
+  base runs of 32 plus an already-ordered-merge skip measured −12% once and
+  then inside the noise on repeat; `<=` instead of `compareTo` was a wash. No
+  change worth its risk to NaN and `-0.0` ordering, and the `indices` fix
+  above closed the case that motivated it anyway.
+- **`ledger-diff`'s remaining 1.24x is algorithmic, not overhead.** The
+  fxdart panel calls `differenceBy` twice and `intersectionBy` once, so it
+  builds three key sets plus three element-dedup sets; the native panel
+  builds two id sets and reuses them for all three questions, and dedups
+  nothing. That is ~1.9M extra hash operations against ~2.5M, which is the
+  measured gap almost exactly. Faithful, and not the library's to remove.
+- **`recent-errors`, `consecutive-over-limit`, `monthly-category-report`**
+  sit on the lazy-callback floor this release already documented. Attributed:
+  `monthly-category-report`'s whole 2.4 ms gap over 1M rows is the `filter`
+  predicate that the native loop inlines; `consecutive-over-limit`'s is one
+  three-field record allocated per element by `zip3`, which the API shape
+  requires. Both already take the `List`-range fast path.
+
+### Side effects: all 53 cases re-measured
+
+Every case A/B'd against the pre-pass library with case sources held
+identical and a `native` control per case. **Five wins at or past 5%, no
+regression anywhere** — every other case reads inside the instrument's ±2%
+resolution band against a clean control:
+
+| | |
+|---|---|
+| `restock-plan` | −76.31% (control +0.16%) |
+| `leaderboard-ties` | −27.86% (control −0.08%) |
+| `flaky-api-retry` | −10.61% (control +0.27%) |
+| `paginated-products` | −6.71% (control −0.05%) |
+| `top-expenses` | −5.54% (control +0.06%) |
+
+The raw `results.json` diff disagreed, and was wrong four times over:
+`cohort-retention` read +11.3% there and +0.05% paired (its control had moved
++17.7%), `latency-percentiles` +4.4% → +0.27%, `top-category-average` +3.5% →
+−0.67%, `alert-digest` +3.4% → −1.24%. `category-rank` read +4.07% in the
+first paired batch against a −1.94% control and +0.55% on re-run; it sorts
+six groups by a double key, so nothing in this pass can reach it. Which is
+the standing lesson, again: a sweep ratio is not evidence of a change.
+
 ### Correction — `price-drop-detection` was never 0.22x
 
 Its published figure moves from **0.22x to 0.53x**, and that is a correction,
@@ -341,24 +484,271 @@ branches, source cancellation on both `take` and `head`, the empty-stream
 `null`, and `pause`/`resume`/`cancel` forwarding on every new chain operator.
 Suite: 2038 passing, 1 skipped. Verified on Dart 3.12.2 and 3.13.1.
 
+### `take` and `uniq` become fused async stages
+
+The previous entry's "Still open" list opened with this exact change, and the
+measurement that motivated it holds up: over 200,000 elements the subscription
+drive runs a stream-sourced chain in **10.9 ms** where `await for` and the
+SDK's own `StreamIterator` both take **~45 ms**. The drive is four times
+faster, and `live-search` was not on it.
+
+It was not on it because `uniqAsync` returned a `DelegateAsyncIterable`. That
+breaks the fused run, so `fxStreamDrive` declined the chain and every element
+went through the pull protocol instead — a `Completer`, a `Future`, a
+microtask and a `pause`/`resume` pair each. `takeAsync` did the same. Both are
+fused stages now (`FxUniqByStage`, `FxTakeStage`), so
+`fxStream().filter().uniq().take().map()` compiles to **one run of four
+stages over the raw stream** and executes by subscription.
+
+**`take` ends its run on the count-th element, not on the pull that would
+follow it.** That is the whole subtlety: `take` must never pull the element
+after its last, so the stage marks the run ended as the count is met, while
+that element still flows through the stages after it. A later stage may drop
+it — the loop then answers done without pulling again. Pull counts are pinned
+by test, because an off-by-one here is invisible except to a source with
+side effects, which is exactly what `live-search` counts.
+
+`uniq` carries no key function at all (the element is its own key), one fewer
+call per element than `uniqBy(identity)`. Both stages are stateful — the
+seen-set and the counter live on the iterator — so at most one of each fuses
+into a run and a second starts a new one, as `scan` and `dropWhile` already
+do. A `Concurrent` marker still abandons fusion for the old layering, and a
+non-positive `take` count stays off the fused path entirely so it neither
+yields nor pulls.
+
+| case | paired delta | control |
+|---|---|---|
+| `live-search` | **−7.55%** | +1.29% |
+| `paged-feeds-dedupe` | **−4.39%** | −0.03% |
+
+`live-search` goes from 1.34x behind native to **1.24x**.
+
+**All 14 async cases and 7 sync cases were A/B'd; nothing regressed.** The
+widest reading anywhere was +1.23% (`recent-errors`) against a −0.15%
+control — inside the instrument's ±1.5% band. That sweep matters more than
+usual here: the change adds two link kinds, so every fused async element now
+walks two more type tests before reaching `FxTakeWhileLink`.
+
+One caveat on the published numbers. `paged-feeds-dedupe`'s *sweep* ratio
+moved the wrong way, 1.06x to 1.09x — but its `native` side moved with it
+(86.1 ms to 78.5 ms), and `native` links no fxdart code, so that is session
+drift, not a regression. The paired figure above is the real one. Same lesson
+as the second pass: a sweep ratio is not evidence of a change.
+
+Eighteen regression tests pin the pull count on `take` (alone, after a
+filter, and with a later stage dropping the last element), the non-positive
+count, a second `take`/`uniq` starting its own run, per-iterator state,
+asynchronous keys, the `Concurrent` hand-off through both operators, and the
+subscription-drive shape end to end. Suite: 2069 passing, 1 skipped.
+
+### The remaining native-faster cases were measured
+
+The other gaps in the ratio report were attributed rather than guessed at.
+Two of them turned out to be real library overhead — see the next section;
+these are the ones that are genuinely at the lazy callback floor:
+
+- **`recent-errors`** is the sharpest measurement of the floor yet. The fused
+  `filter`+`uniqBy` stage runs it in **13,824 µs**; a *hand-written loop*
+  using the same non-inlinable closures takes **13,948 µs**; the native panel,
+  which inlines both, takes **10,331 µs**. The library is already faster than
+  the hand loop. The whole 1.34x is the two closure calls, and `Set<Object?>`
+  costs nothing (13,850 µs against `Set<String>`'s 13,948 µs).
+- **`monthly-category-report`** was already attributed to its `filter`
+  predicate in the second pass, and nothing here reaches it.
+
+**`consecutive-over-limit` and `sensor-anomalies` were first put in this list
+too, on a comparison that did not hold up.** The "hand loop" they were
+measured against still iterated the library's own `zip3`, so it paid the
+stage boundary as well and the two sides matched at ~25.8 ms — which reads as
+"the chain adds nothing" and is not what it means. Rebuilding the baseline as
+a loop that indexes the lists directly separated them immediately. The next
+section is that measurement.
+
+### `filter` over a `zip` fuses into one iterator
+
+`consecutive-over-limit` and `sensor-anomalies` are the same shape —
+`zip`/`zip3` over `List`s, then a predicate, then a projection — and both sat
+around 1.3x behind native. The previous entry attributed that to the record
+`zip` allocates and to the lazy callback floor, and left them alone. **That
+attribution was wrong**, and the measurement that shows it is a hand-written
+loop that pays *both* of those costs on purpose.
+
+Over 1,000,000 elements, AOT, each variant in its own binary (a single binary
+running every variant makes the shared `filter` call site megamorphic and
+inflates the library side by ~20% — that artifact is what hid this):
+
+| variant | µs |
+|---|---|
+| everything inline — no record, no closure | 4,670 |
+| an opaque closure taking three arguments | 7,150 |
+| an opaque closure taking a **record** | 8,184 |
+| **the library, `filter(p, zip3(…))`** | **11,889** |
+| **one fused iterator (prototype)** | **7,929** |
+
+So the record costs ~750 µs and the closure ~2,700 µs — both real, both
+irreducible. But the library was spending ~3,900 µs *beyond* them, and a
+single fused iterator gives all of it back and lands at the hand-loop floor.
+
+That cost is the **stage boundary**. Unfused, every element crosses a
+megamorphic `moveNext` plus a `current` read between the zip iterator and the
+filter iterator; the filter holds its upstream in an `Iterator<A>` field, so
+that site sees every iterator in the program. Fused, there is one loop that
+indexes the backing lists, builds the record, and calls the predicate inline.
+
+The old note's reasoning — *"fusing `zip3` into a following `filter` would not
+help: the predicate is a closure, so the record escapes into it and cannot be
+scalar-replaced"* — is correct about the record and wrong about the
+conclusion. The win was never going to come from eliminating the record.
+
+`FxFilterFusable` (in `list_range.dart`) is the mirror of `filter`'s own
+`FxUniqFusable`: a source that can absorb a *following* filter. `_ZipIterable`
+and `_Zip3Iterable` implement it, and only for the all-indexed shape — a side
+that has to be pulled still costs its own iterator, so the boundary being
+removed would be the smaller half of the work. Anything else returns null and
+the ordinary layering stands. It is resolved once per iteration, never per
+element, so a chain that cannot fuse pays one `is` test for the whole run.
+
+| case | paired delta | control |
+|---|---|---|
+| `consecutive-over-limit` | **−14.98%** | +0.91% |
+| `sensor-anomalies` | **−7.39%** | +1.22% |
+
+In the published sweep `consecutive-over-limit` goes from 1.36x behind native
+to **1.19x** and `sensor-anomalies` from 1.24x to **1.09x**.
+
+Every other case that uses `zip` (`leaderboard-ties`, `monthly-ledger-report`,
+`parallel-downloads`, `rank-labels`, `restock-plan`, `sparse-timeseries`,
+`weekly-sensor-averages`) was A/B'd, and so were the `filter` users, since
+`filter` gained a branch on the way to its iterator. Nothing regressed.
+
+**What the benchmark cases did *not* need is a rewrite.** Three alternative
+formulations were measured against the example as it stands. `windowed(3)` —
+the operator that reads most naturally for a sliding window — is *worse*, at
+roughly 31 ms against the `zip3` form's 22 ms, because it copies a `List` per
+window where `zip3` allocates one record. Walking `range(0, n - 2)` and
+indexing by hand was the only faster one, and only by ~3% once measured
+properly with the harness rather than a shared-process probe — not worth
+turning the fxdart panel into the native panel's index arithmetic for. The
+example keeps its `zip3`, and the library got faster underneath it.
+
+Fifteen regression tests pin the fused path: identical elements and order
+against the layered form, the short-circuit at whichever of the three sides
+is shortest, the predicate's call count and order, laziness, an empty side,
+re-iteration, and the fallback when any side is not indexable.
+
+### `_TakeAsyncIterator` is gone, and the suite covers every line again
+
+Making `take` a fused stage left its old iterator with no way in. Its body
+answered pulls for an unfused `take`; now `takeAsync` either fuses (count of
+one or more) or hands straight to `_takeAsyncLegacy` (count below one, which
+that function already answers `done` for before its first pull), and a
+`Concurrent` marker goes to `_takeAsyncLegacy` too. Forty-seven lines of
+unreachable code removed, and the pass-through contract is unchanged —
+`_takeAsyncLegacy` is what kept overlapping pulls parallel all along.
+
+Coverage found it. The two fusion changes in this release dropped the suite
+from 100% to 98.87%, and the gaps were not where the new code was: making
+`uniq` and `take` fused stages moved whole chains off the *pull* path and
+onto the drive, so `_FusedIterator`'s own walker — the asynchronous branch of
+every stage, a scan that is not first in its run, a source that is not an
+`FxFastIterator` — stopped being exercised by any terminal. Thirty-five tests
+drain those chains one pull at a time, which is the only thing that reaches
+them. Back to **100.00%**, 4,835 of 4,835 lines, every file.
+
+Suite: 2,116 passing, 1 skipped.
+
+### Added — `takeUniqBy`, and what the callback floor actually is
+
+`recent-errors` was the last case still reading 1.34x, and the release notes
+above called it "the sharpest measurement of the floor yet": the fused
+`filter`+`uniqBy` stage runs it in 13.8 ms, a hand loop with the same
+non-inlinable closures in 13.9 ms, the native panel — which inlines both — in
+10.3 ms. No library overhead, all of it callbacks.
+
+Two experiments sharpened that into something actionable. Both use one binary
+per variant; a single binary running every variant makes the shared call site
+megamorphic and hides the effect.
+
+**The floor is not a property of Dart closures.** The *same* strict function,
+called once with closure literals and once with closures from a
+`vm:never-inline` factory:
+
+| | µs per 1,000,000 |
+|---|---|
+| native panel | 10,370 |
+| strict function, callbacks are **literals** | **10,270** |
+| strict function, callbacks are **opaque** | 14,220 |
+| the lazy chain | 13,950 |
+
+**The barrier is the field.** A stand-in stage that stores its callbacks in
+fields, built from literals at the call site, with the constructor, the
+terminal, and the loop all marked `vm:prefer-inline`, still measured 14,300 µs
+— no better than the lazy chain. Storing a closure in a field is opaque to the
+AOT compiler no matter what is inlined around it. To inline, a callback has to
+be a *parameter* of the function that runs the loop.
+
+**Partial fusion is worth nothing.** The predicate accounts for ~2,880 µs of
+the gap and the key function ~880 µs, so a strict terminal that absorbs only
+the key — the natural, composable API — measured 14,180 µs: no gain at all,
+the extra iterator hops eating what the inlined key returned. Either every
+callback in the pipeline becomes a parameter, or none of them do. That rules
+out fixing this stage by stage, and it is why the entry below still stands.
+
+So `takeUniqBy(count, f, iterable)`: the first *count* elements whose `f`-key
+is new, as a list, where a `null` key skips the element. One callback does
+both jobs — the `filter_map` shape — and it is a parameter of a body small
+enough to inline, so the compiler inlines the closure with it.
+
+| spelling | µs per 1,000,000 |
+|---|---|
+| `filter(...).uniqBy(...).take(3)` | 13,690 |
+| **`takeUniqBy(3, ...)`** | **11,130** |
+| `fx(...).takeUniqBy(3, ...)` | 11,180 |
+| hand-written loop | 10,150 |
+
+**−19%**, and 1.35x behind native becomes **1.10x**. The chain method costs
+nothing over the top-level call, as an extension type should.
+
+**The published bars still measure the composable chain.** They are what the
+page teaches as the default, and swapping them for a specialised operator
+would advertise a number the default code does not deliver — the same reason
+`consecutive-over-limit` kept its `zip3` rather than moving to index
+arithmetic for 3%. `content/code-comparison/recent-errors` now shows both
+spellings, with the measurement and the "reach for it when a profile says
+these callbacks are the cost" caveat next to the strict one; the benchmark
+case runs both once, outside the timed closure, so they cannot drift.
+
+Fourteen tests, including the null-key contract (a `null` key skips rather
+than keys on null), the count short-circuit, a non-`List` source taking the
+out-of-line walk, and agreement with the lazy spelling. `tools/build_single_file.sh`
+gains the matching `_$takeUniqBy` wrapper — the playground bundle is where a
+missing one shows up, and `check_comparison` caught it.
+
 ### Still open
 
-- `_StreamBridgeIterator` allocates a `Completer` per element and pauses the
-  subscription after every delivery. The *subscription* drive is already 5.6x
-  faster than `await for` (4.03 ms vs 22.78 ms per 100,000); the cost only
-  appears when an operator that is not a fused stage — today `uniq`, `take`,
-  `chunk` — breaks the drive and forces the pull protocol. Making `uniqBy`
-  and `take` fused stages would put `live-search` back on it.
-- The `zip` family still allocates a record per element, which is what is
-  left in `consecutive-over-limit`. Fusing `zip3` into a following `filter`
-  would not help: the predicate is a closure, so the record escapes into it
-  and cannot be scalar-replaced.
-- **The lazy callback floor is the open design question.** A strict terminal
-  can inline its caller's callback; a lazy stage cannot, because the closure
-  lives in an iterator field. Two attempts to close that gap were measured and
-  rejected — a push/sink protocol (+36% to +54%) and blanket factory inlining
-  (+8.7% on an unrelated case). Anything that fixes it has to change how a
-  lazy stage stores its callback, not how it is called.
+- `_StreamBridgeIterator` still allocates a `Completer` per element and pauses
+  the subscription after every delivery. `uniq` and `take` no longer force
+  that path — they are fused stages as of this release — but **`chunk` still
+  does**, and so does any chain a `Concurrent` marker pushes back onto the
+  layering. The bridge itself is unchanged.
+- The `zip` family still allocates a record per element — ~750 µs per
+  1,000,000, measured above. That part really is irreducible while a closure
+  receives the record. What is left in `consecutive-over-limit` after the
+  fusion is that record plus the callback floor below, and the two together
+  put it within ~16% of a native loop that allocates nothing.
+- **Only `filter` absorbs a `zip` today.** `zip().map()` with no predicate in
+  between still crosses the stage boundary this release removed, and so does
+  any chain whose zip has a pulled side. The same `FxFilterFusable` shape
+  would extend to `map`, and was not measured.
+- **The lazy callback floor is the open design question**, and this release
+  measured it exactly: a closure in an iterator *field* is opaque to AOT even
+  when the object is built from literals and everything around it is inlined,
+  and absorbing one stage's callback into a strict terminal buys nothing while
+  another stage's stays in a field. Three attempts to close it are now
+  measured and rejected — a push/sink protocol (+36% to +54%), blanket factory
+  inlining (+8.7% on an unrelated case), and partial strict fusion (0%).
+  `takeUniqBy` sidesteps it for one shape rather than solving it; solving it
+  means a lazy stage that does not store its callback at all.
 
 ## 0.8.4
 

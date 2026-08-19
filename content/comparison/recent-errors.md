@@ -5,7 +5,7 @@ description: The three most recent distinct errors from a newest-first log — a
 heading: Recent error messages, deduped
 order: 20
 tier: 2
-functions: filter, uniqBy, take
+functions: filter, uniqBy, take, takeUniqBy
 domain: logs
 verdict: fxdart
 async: false
@@ -36,4 +36,30 @@ async: false
     because the chain is lazy, it also stops scanning the log the moment the
     third distinct error is found, exactly like the hand-written
     <code>break</code>.
+  </p>
+
+  <h2>Two FxDart spellings</h2>
+  <p>
+    The benchmark on this page carries a <strong>third bar</strong>, which no
+    other comparison does. The chain above is the one to write: three
+    independent rules, read top to bottom, and lazy — it stops scanning at the
+    third distinct error, exactly like the hand-written <code>break</code>.
+    What it cannot do is inline its own callbacks. A lazy stage keeps its
+    closure in an iterator field, and the AOT compiler cannot see through a
+    field, so <code>filter</code> and <code>uniqBy</code> each cost a real
+    indirect call on every element — together, most of what separates this
+    pipeline from the native loop.
+  </p>
+  <p>
+    <code>takeUniqBy</code>, shown above <code>main</code> in the FxDart panel,
+    is the same pipeline written as one strict call. Its callback is a
+    <em>parameter</em> of a body small enough to inline into the caller, so the
+    compiler inlines the closure with it; one callback does both jobs, with a
+    <code>null</code> key meaning "skip this element". Over 1,000,000 log lines
+    that is the difference between the second and third bars — and the native
+    loop is what the first bar shows.
+  </p>
+  <p>
+    Write the chain by default. Reach for <code>takeUniqBy</code> when the
+    pipeline is hot and a profile says these callbacks are the cost.
   </p>

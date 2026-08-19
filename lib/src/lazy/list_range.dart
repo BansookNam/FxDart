@@ -49,6 +49,24 @@ FxListRange<A>? fxListRangeOf<A>(Iterable<A> iterable) {
   return null;
 }
 
+/// Implemented by a lazy iterable that can absorb a *following* `filter` into
+/// its own iterator, the mirror of `filter`'s own [FxUniqFusable].
+///
+/// `zip`/`zip3` are the ones that can. Their record is unavoidable — the
+/// predicate is a closure, so it escapes into the call and cannot be
+/// scalar-replaced — but the *stage boundary* is not: unfused, every element
+/// crosses a megamorphic `moveNext` plus a `current` read between the zip
+/// iterator and the filter iterator. Measured over 1,000,000 elements, AOT:
+/// a hand loop that pays the same record and the same opaque closure costs
+/// 8.2 ms, the layered chain 11.9 ms, and one fused iterator 7.9 ms. The
+/// stage boundary was the whole difference.
+abstract class FxFilterFusable<A> {
+  /// This iterable followed by `filter(p)`, as a single iterator — or null
+  /// when this instance cannot fuse (a side that is not a `List` range), in
+  /// which case the caller keeps the ordinary layering.
+  Iterator<A>? fxFusedFilterIterator(bool Function(A a) p);
+}
+
 /// An arithmetic `start..end` range with a fixed [step] — what `range()`
 /// produces.
 ///

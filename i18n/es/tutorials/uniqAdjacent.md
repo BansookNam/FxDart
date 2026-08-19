@@ -7,8 +7,8 @@ section: 4
 crumb: uniqAdjacent
 prev: uniqStrict.html
 prevLabel: uniqStrict
-next: difference.html
-nextLabel: difference
+next: takeUniqBy.html
+nextLabel: takeUniqBy
 ---
   <p class="hero-sub">Descarta los elementos iguales a su predecesor — solo se van los duplicados <em>adyacentes</em>, y no se acumula ningún conjunto de vistos.</p>
 

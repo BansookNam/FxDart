@@ -49,58 +49,32 @@ class _TakeIterator<A> implements Iterator<A> {
 
 /// Async counterpart of [take]. Pass-through: overlapping pulls stay
 /// parallel, as in FxTS.
+///
+/// A fused stage, so a chain that truncates stays on the subscription drive
+/// instead of dropping to the pull protocol. The counter lives on the
+/// iterator, so only one `take` fuses into a run and a second starts a new
+/// one; a [Concurrent] marker falls back to [_takeAsyncLegacy], which is what
+/// keeps overlapping pulls parallel.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> takeAsync<A>(int length, FxAsyncIterable<A> iterable) {
-  return DelegateAsyncIterable(() => _TakeAsyncIterator<A>(length, iterable));
-}
-
-class _TakeAsyncIterator<A>
-    with FxFastNextGate<A>
-    implements FxFastIterator<A> {
-  _TakeAsyncIterator(this._length, this._sourceIterable) : _remaining = _length;
-  final int _length;
-  final FxAsyncIterable<A> _sourceIterable;
-  FxAsyncIterator<A>? _source;
-  FxAsyncIterator<A>? _fallback;
-  int _remaining;
-  bool _done = false;
-
-  @override
-  Future<IterResult<A>> next([Concurrent? concurrent]) {
-    if (_fallback == null &&
-        concurrent is Concurrent &&
-        _source == null &&
-        !_done) {
-      _fallback = _takeAsyncLegacy(_length, _sourceIterable).iterator;
-    }
-    final fb = _fallback;
-    if (fb != null) return fb.next(concurrent);
-    return super.next(concurrent);
+  // A non-positive count yields nothing and must not pull at all — off the
+  // fused path entirely, since [FxTakeStage] only ever sees counts >= 1.
+  // [_takeAsyncLegacy] answers done before its first pull, so it is the whole
+  // implementation of that case as well as the concurrent fallback.
+  if (length < 1) return _takeAsyncLegacy(length, iterable);
+  final stage = FxTakeStage(length);
+  if (iterable is FxFusedAsyncIterable<A> && iterable.takeIndex < 0) {
+    final source = iterable.source;
+    final stages = iterable.stages;
+    final legacy = iterable.legacy;
+    return FxFusedAsyncIterable<A>(source, [
+      ...stages,
+      stage,
+    ], () => _takeAsyncLegacy(length, legacy()));
   }
-
-  @override
-  FutureOr<IterResult<A>> nextOr() {
-    final fb = _fallback;
-    if (fb != null) return fb.next();
-    if (_done || _remaining < 1) return IterResult<A>.done();
-    _remaining--;
-    final src = _source ??= _sourceIterable.iterator;
-    if (src is FxFastIterator<A>) {
-      final r = src.nextOr();
-      if (r is Future<IterResult<A>>) return r;
-      if (r.done) {
-        _done = true;
-        return IterResult<A>.done();
-      }
-      return r;
-    }
-    return src.next().then((r) {
-      if (r.done) {
-        _done = true;
-      }
-      return r;
-    });
-  }
+  return FxFusedAsyncIterable<A>(iterable, [
+    stage,
+  ], () => _takeAsyncLegacy(length, iterable));
 }
 
 FxAsyncIterable<A> _takeAsyncLegacy<A>(

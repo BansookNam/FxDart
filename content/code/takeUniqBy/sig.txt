@@ -1,0 +1,5 @@
+List&lt;A&gt; takeUniqBy&lt;A, B extends Object&gt;(int count, B? Function(A a) f, Iterable&lt;A&gt; iterable)
+List&lt;T&gt; Fx&lt;T&gt;.takeUniqBy&lt;B extends Object&gt;(int count, B? Function(T a) f)  // chain
+
+// Strict: returns a List, runs when called. A null key skips the element,
+// so f both selects and keys — filter + uniqBy + take in one call.

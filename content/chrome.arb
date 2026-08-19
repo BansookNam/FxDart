@@ -59,6 +59,9 @@
   "cmpFxdart": "FxDart",
   "@cmpFxdart": { "description": "Header of the right comparison panel. Product name — never translated." },
 
+  "cmpFxdartStrict": "FxDart (strict)",
+  "@cmpFxdartStrict": { "description": "Benchmark bar label for a case that publishes a second FxDart spelling alongside the first — the strict, non-lazy form. 'FxDart' is the product name; translate only the parenthesised word." },
+
   "cmpExpected": "Expected output",
   "@cmpExpected": { "description": "Toggle label above the verified output both implementations print." },
 

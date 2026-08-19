@@ -5,7 +5,7 @@ description: Los tres errores distintos más recientes de un log ordenado de má
 heading: Mensajes de error recientes, sin duplicados
 order: 20
 tier: 2
-functions: filter, uniqBy, take
+functions: filter, uniqBy, take, takeUniqBy
 domain: logs
 verdict: fxdart
 async: false

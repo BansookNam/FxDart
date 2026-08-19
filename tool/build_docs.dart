@@ -1245,9 +1245,14 @@ String _cmpBenchSection(String slug, Map<String, String> chrome,
   if (scales == null) return '';
   final machine = data['machine'] as Map<String, dynamic>;
 
+  // A case may publish a second FxDart spelling (benchmark/cases/<slug>/
+  // fxdart_strict.dart) when the gap between two ways of writing the same
+  // pipeline is the point the page makes. It is a third bar only — the
+  // verdict badge stays a two-way call.
   String metric(String titleKey, String winner, num natVal, num fxVal,
-      String Function(num) fmt) {
-    final max = natVal > fxVal ? natVal : fxVal;
+      num? strictVal, String Function(num) fmt) {
+    var max = natVal > fxVal ? natVal : fxVal;
+    if (strictVal != null && strictVal > max) max = strictVal;
     String row(String nameKey, String side, num v) {
       final pct = (v / max * 100).toStringAsFixed(1);
       return '''
@@ -1258,11 +1263,14 @@ String _cmpBenchSection(String slug, Map<String, String> chrome,
       </div>''';
     }
 
+    final strictRow = strictVal == null
+        ? ''
+        : '\n${row('cmpFxdartStrict', 'fxdart-strict', strictVal)}';
     return '''
     <div class="bench-metric">
       <h4>${chrome[titleKey]} <span class="badge verdict-$winner">${chrome[winKeys[winner]]}</span></h4>
 ${row(family.leftKey, family.leftSide, natVal)}
-${row('cmpFxdart', 'fxdart', fxVal)}
+${row('cmpFxdart', 'fxdart', fxVal)}$strictRow
     </div>''';
   }
 
@@ -1272,16 +1280,18 @@ ${row('cmpFxdart', 'fxdart', fxVal)}
     if (s == null || s.containsKey('error')) continue;
     final nat = s[family.leftSide] as Map<String, dynamic>;
     final fx = s['fxdart'] as Map<String, dynamic>;
+    final strict = s['fxdart_strict'] as Map<String, dynamic>?;
     final heading = chrome['cmpBenchScale']!
         .replaceAll('{n}', _benchFmtInt(s['n'] as num));
     blocks
       ..writeln('  <div class="bench-scale">')
       ..writeln('    <h3>$heading</h3>')
       ..writeln(metric('cmpBenchTime', s['timeWinner'] as String,
-          nat['medianUs'] as num, fx['medianUs'] as num, _benchFmtUs))
+          nat['medianUs'] as num, fx['medianUs'] as num,
+          strict?['medianUs'] as num?, _benchFmtUs))
       ..writeln(metric('cmpBenchMemory', s['memWinner'] as String,
           nat['medianRssBytes'] as num, fx['medianRssBytes'] as num,
-          _benchFmtMb))
+          strict?['medianRssBytes'] as num?, _benchFmtMb))
       ..writeln('  </div>');
   }
   if (blocks.isEmpty) return '';

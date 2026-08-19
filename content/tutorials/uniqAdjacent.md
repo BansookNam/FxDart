@@ -7,8 +7,8 @@ section: 4
 crumb: uniqAdjacent
 prev: uniqStrict.html
 prevLabel: uniqStrict
-next: difference.html
-nextLabel: difference
+next: takeUniqBy.html
+nextLabel: takeUniqBy
 ---
   <p class="hero-sub">Drops elements equal to their predecessor — only <em>adjacent</em> duplicates go, and no seen-set builds up.</p>
 
