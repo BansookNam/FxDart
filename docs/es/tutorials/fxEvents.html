@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ce3c3e548e062054">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=c9d5f9ac47fe3d61">
 </head>
 <body>
 <header class="site-header">
@@ -59,8 +59,13 @@ class FxEvents&lt;T&gt; {
   FxEvents&lt;T&gt; where(bool Function(T a) f);
   FxEvents&lt;R&gt; asyncMap&lt;R&gt;(FutureOr&lt;R&gt; Function(T a) f);
   FxEvents&lt;T&gt; startWith(T value);
+  FxEvents&lt;R&gt; scan&lt;R&gt;(R Function(R acc, T a) f, R seed); // seed first
+  FxEvents&lt;T&gt; uniqAdjacent() / uniqAdjacentBy&lt;B&gt;(B Function(T a) f);
+  FxEvents&lt;(T, T)&gt; pairwise();
+  FxEvents&lt;T&gt; take(int count) / drop(int count) / skip(int count);
   static FxEvents&lt;T&gt; merge&lt;T&gt;(Iterable&lt;Stream&lt;T&gt;&gt; sources);
   Future&lt;List&lt;T&gt;&gt; toList();                          // terminal
+  Future&lt;T?&gt; head() / firstOrNull();                 // terminal
   FxAsync&lt;T&gt; pull();                                 // cross into the pull model
 }</div>
 
@@ -199,7 +204,7 @@ Future<void> main() async {
   <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=ce3c3e548e062054";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=c9d5f9ac47fe3d61";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

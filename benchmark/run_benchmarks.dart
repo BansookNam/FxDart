@@ -309,11 +309,15 @@ class _SideStats {
 }
 
 class _ScaleResult {
-  _ScaleResult(this.n, this.left, this.fxdart, this.roundsRun);
+  _ScaleResult(this.n, this.left, this.fxdart, this.roundsRun, this.extra);
   final int n; // actual dataset size the case reported for this scale
   final _SideStats left; // the family's non-fxdart side
   final _SideStats fxdart;
   final int roundsRun;
+
+  /// The optional second FxDart spelling — see [_extra]. Rendered as a third
+  /// bar; it takes no part in [timeWinner] / [memWinner].
+  final _SideStats? extra;
 
   String get timeWinner =>
       _verdict(left.medianUs, fxdart.medianUs, absFloor: tieAbsMs * 1000.0);
@@ -324,6 +328,7 @@ class _ScaleResult {
     'roundsRun': roundsRun,
     _fam.left: left.toJson(),
     'fxdart': fxdart.toJson(),
+    if (extra != null) _extra: extra!.toJson(),
     'timeWinner': timeWinner,
     'memWinner': memWinner,
   };
@@ -342,12 +347,17 @@ Future<_ScaleResult> _runCase(
   int baseRounds,
   bool smoke,
 ) async {
-  final sides = {_fam.left: _SideStats([], []), 'fxdart': _SideStats([], [])};
+  final extra = _hasExtra(slug);
+  final sides = {
+    _fam.left: _SideStats([], []),
+    'fxdart': _SideStats([], []),
+    if (extra) _extra: _SideStats([], []),
+  };
   int? n;
   final checksums = <String, String>{};
 
   Future<void> round() async {
-    for (final impl in [_fam.left, 'fxdart']) {
+    for (final impl in [_fam.left, 'fxdart', if (extra) _extra]) {
       final res = await Process.run(
         _binPath(slug, impl),
         const [],
@@ -389,7 +399,20 @@ Future<_ScaleResult> _runCase(
       );
       sides[impl]!.rssBytes.add(r['maxRssBytes'] as int);
     }
-    if (checksums.length == 2 && checksums[_fam.left] != checksums['fxdart']) {
+    // Every side must agree, the third one included — that agreement is the
+    // whole claim a second spelling makes.
+    for (final impl in [if (extra) _extra]) {
+      if (checksums.containsKey(impl) &&
+          checksums[impl] != checksums['fxdart']) {
+        throw StateError(
+          'checksum mismatch at N-scale $scale: '
+          'fxdart=${checksums['fxdart']} $impl=${checksums[impl]}',
+        );
+      }
+    }
+    if (checksums.containsKey(_fam.left) &&
+        checksums.containsKey('fxdart') &&
+        checksums[_fam.left] != checksums['fxdart']) {
       throw StateError(
         'checksum mismatch at N-scale $scale: '
         '${_fam.left}=${checksums[_fam.left]} fxdart=${checksums['fxdart']}',
@@ -414,13 +437,28 @@ Future<_ScaleResult> _runCase(
       roundsRun++;
     }
   }
-  return _ScaleResult(n!, sides[_fam.left]!, sides['fxdart']!, roundsRun);
+  return _ScaleResult(
+    n!,
+    sides[_fam.left]!,
+    sides['fxdart']!,
+    roundsRun,
+    extra ? sides[_extra] : null,
+  );
 }
 
 // --- AOT compilation --------------------------------------------------------
 
 String _binPath(String slug, String impl) =>
     '$root/benchmark/.build/${slug}_$impl';
+
+/// The optional third side. A case that wants a second FxDart spelling
+/// measured alongside the first drops a `fxdart_strict.dart` next to its
+/// `fxdart.dart`; nothing else opts in, and the verdict stays a two-way call
+/// between [_BenchFamily.left] and `fxdart`.
+const _extra = 'fxdart_strict';
+
+bool _hasExtra(String slug) =>
+    File('$root/benchmark/${_fam.casesDir}/$slug/$_extra.dart').existsSync();
 
 /// AOT-compiles every side of every selected case, 8 at a time. A binary is
 /// reused when it is newer than the case's sources and the harness.
@@ -437,13 +475,14 @@ Future<void> _compileAll(List<String> slugs) async {
   }
   final jobs = [
     for (final slug in slugs)
-      for (final impl in [_fam.left, 'fxdart']) (slug, impl),
+      for (final impl in [_fam.left, 'fxdart', if (_hasExtra(slug)) _extra])
+        (slug, impl),
   ];
   final pending = jobs.where((j) {
     final out = File(_binPath(j.$1, j.$2));
     if (!out.existsSync()) return true;
     final built = out.lastModifiedSync();
-    if (j.$2 == 'fxdart' && libTouched.isAfter(built)) return true;
+    if (j.$2 != _fam.left && libTouched.isAfter(built)) return true;
     final deps = Directory(
       '$root/benchmark/${_fam.casesDir}/${j.$1}',
     ).listSync().whereType<File>().followedBy([harness]);

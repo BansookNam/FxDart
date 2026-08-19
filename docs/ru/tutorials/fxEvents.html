@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ce3c3e548e062054">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=c9d5f9ac47fe3d61">
 </head>
 <body>
 <header class="site-header">
@@ -61,8 +61,13 @@ class FxEvents&lt;T&gt; {
   FxEvents&lt;T&gt; where(bool Function(T a) f);
   FxEvents&lt;R&gt; asyncMap&lt;R&gt;(FutureOr&lt;R&gt; Function(T a) f);
   FxEvents&lt;T&gt; startWith(T value);
+  FxEvents&lt;R&gt; scan&lt;R&gt;(R Function(R acc, T a) f, R seed); // seed first
+  FxEvents&lt;T&gt; uniqAdjacent() / uniqAdjacentBy&lt;B&gt;(B Function(T a) f);
+  FxEvents&lt;(T, T)&gt; pairwise();
+  FxEvents&lt;T&gt; take(int count) / drop(int count) / skip(int count);
   static FxEvents&lt;T&gt; merge&lt;T&gt;(Iterable&lt;Stream&lt;T&gt;&gt; sources);
   Future&lt;List&lt;T&gt;&gt; toList();                          // terminal
+  Future&lt;T?&gt; head() / firstOrNull();                 // terminal
   FxAsync&lt;T&gt; pull();                                 // cross into the pull model
 }</div>
 
@@ -82,11 +87,14 @@ class FxEvents&lt;T&gt; {
     Design decisions worth knowing. <code>FxEvents</code> is a thin
     <strong>wrapper</strong>, deliberately not a set of <code>Stream</code>
     extensions — so it can never collide with rxdart or any other stream
-    library in the same file. The chain stays <strong>cold</strong>: wrapping
     listens to nothing; only a terminal (<code>toList</code>,
-    <code>listen</code>) starts events flowing. And it is an fxdart
-    extension inspired by Rx, not part of FxTS — the operator names follow
-    the Rx tradition because that is where these ideas come from.
+    <code>head</code>, <code>listen</code>) starts events flowing. And it is
+    an fxdart extension inspired by Rx, not part of FxTS — the ideas come
+    from Rx, but where a name would clash with the pull layer's the pull
+    spelling wins: <code>uniqAdjacent</code> rather than
+    <code>distinctUntilChanged</code>, <code>stopOn</code> rather than
+    <code>takeUntil</code>, <code>head</code> rather than
+    <code>first</code>. One word means one thing on both sides.
   </p>
   <p>
     Two escape hatches keep you unlocked. <code>.stream</code> unwraps back
@@ -198,7 +206,7 @@ Future<void> main() async {
   <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=ce3c3e548e062054";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=c9d5f9ac47fe3d61";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

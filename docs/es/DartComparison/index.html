@@ -272,11 +272,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="groupBy map maxBy">
+    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="groupBy map maxBy">
       <a class="cmp-row" href="top-category-average.html">
         <span class="cmp-num">17</span>
         <span class="cmp-row-body">
-          <strong>Categoría con el gasto medio más alto</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-tie">⚡ Misma velocidad</span>
+          <strong>Categoría con el gasto medio más alto</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-native">⚡ Nativo más rápido</span>
           <span class="dim">Agrupar gastos y encontrar la categoría más cara por transacción — llamadas anidadas a groupBy + maxBy de collection en Dart nativo frente a una sola cadena de FxDart.</span>
         </span>
       </a>
@@ -349,11 +349,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="sortBy groupBy entries zipWithIndex flatMap">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="sortBy groupBy entries zipWithIndex flatMap">
       <a class="cmp-row" href="leaderboard-ties.html">
         <span class="cmp-num">24</span>
         <span class="cmp-row-body">
-          <strong>Tabla de clasificación con puestos empatados</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-native">⚡ Nativo más rápido</span>
+          <strong>Tabla de clasificación con puestos empatados</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart más rápido</span>
           <span class="dim">Clasifica jugadores de modo que las puntuaciones iguales compartan puesto — estado mutable rank/prevScore en Dart nativo frente a sortBy + groupBy + zipWithIndex en FxDart.</span>
         </span>
       </a>
@@ -546,11 +546,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="windowed average uniqAdjacent pairwise ifEmpty map">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="windowed average uniqAdjacent pairwise ifEmpty map">
       <a class="cmp-row" href="smoothed-zone-changes.html">
         <span class="cmp-num">43</span>
         <span class="cmp-row-body">
-          <strong>Cambios de zona suavizados</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-tie">⚡ Misma velocidad</span>
+          <strong>Cambios de zona suavizados</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart más rápido</span>
           <span class="dim">Media móvil, rachas de zona y alertas de transición — tres bucles con estado mutable en Dart puro vs windowed → uniqAdjacentBy → pairwise en FxDart.</span>
         </span>
       </a>
@@ -606,11 +606,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/attach.html">attach</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/countWhere.html">countWhere</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="true" data-speed="native" data-fns="filter sortBy toAsync map concurrent join">
+    <li data-verdict="fxdart" data-async="true" data-speed="tie" data-fns="filter sortBy toAsync map concurrent join">
       <a class="cmp-row" href="concurrent-profile-fetch.html">
         <span class="cmp-num">49</span>
         <span class="cmp-row-body">
-          <strong>Obtener 10 perfiles, de tres en tres</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-native">⚡ Nativo más rápido</span>
+          <strong>Obtener 10 perfiles, de tres en tres</strong> <span class="badge verdict-fxdart">Gana FxDart</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ Misma velocidad</span>
           <span class="dim">Preparación síncrona que desemboca directamente en concurrencia acotada — filter y sort, luego toAsync + map + concurrent(3), frente a un pool de workers hecho a mano.</span>
         </span>
       </a>

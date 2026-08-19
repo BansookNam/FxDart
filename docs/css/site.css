@@ -360,6 +360,10 @@ main.cmp-wide { max-width: 1280px; }
 .bench-native { background: var(--ok); }
 .bench-fxdart { background: var(--accent); }
 .bench-rxdart { background: var(--rx); }
+/* A case that publishes a second FxDart spelling gets a third bar: same hue
+   as the FxDart bar, lightened, so it reads as a variant of it rather than a
+   third contender. */
+.bench-fxdart-strict { background: color-mix(in srgb, var(--accent) 55%, transparent); }
 .bench-val {
   font-family: ui-monospace, Menlo, monospace; font-size: 0.82rem;
   color: var(--text); white-space: nowrap; text-align: right;

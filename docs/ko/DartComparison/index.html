@@ -271,11 +271,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/range.html">range</a></li><li><a href="../tutorials/scan.html">scan</a></li><li><a href="../tutorials/map.html">map</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="groupBy map maxBy">
+    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="groupBy map maxBy">
       <a class="cmp-row" href="top-category-average.html">
         <span class="cmp-num">17</span>
         <span class="cmp-row-body">
-          <strong>거래당 평균 지출이 가장 높은 카테고리</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-speed speed-tie">⚡ 속도 동일</span>
+          <strong>거래당 평균 지출이 가장 높은 카테고리</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-speed speed-native">⚡ 네이티브가 더 빠름</span>
           <span class="dim">지출을 그룹화해 거래당 가장 비싼 카테고리를 찾습니다 — 순수 Dart에서 collection의 groupBy + maxBy 중첩 호출과 하나의 FxDart 체인을 비교합니다.</span>
         </span>
       </a>
@@ -348,11 +348,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/sortBy.html">sortBy</a></li><li><a href="../tutorials/take.html">take</a></li><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="native" data-fns="sortBy groupBy entries zipWithIndex flatMap">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="sortBy groupBy entries zipWithIndex flatMap">
       <a class="cmp-row" href="leaderboard-ties.html">
         <span class="cmp-num">24</span>
         <span class="cmp-row-body">
-          <strong>동점 순위가 있는 리더보드</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-speed speed-native">⚡ 네이티브가 더 빠름</span>
+          <strong>동점 순위가 있는 리더보드</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart가 더 빠름</span>
           <span class="dim">동점 점수가 같은 순위를 공유하도록 선수 순위를 매깁니다 — 순수 Dart의 가변 rank/prevScore 상태와 FxDart의 sortBy + groupBy + zipWithIndex를 비교합니다.</span>
         </span>
       </a>
@@ -545,11 +545,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/zipWithIndex.html">zipWithIndex</a></li><li><a href="../tutorials/filter.html">filter</a></li><li><a href="../tutorials/flatMap.html">flatMap</a></li><li><a href="../tutorials/uniq.html">uniq</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/maxBy.html">maxBy</a></li><li><a href="../tutorials/join.html">join</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="false" data-speed="tie" data-fns="windowed average uniqAdjacent pairwise ifEmpty map">
+    <li data-verdict="fxdart" data-async="false" data-speed="fxdart" data-fns="windowed average uniqAdjacent pairwise ifEmpty map">
       <a class="cmp-row" href="smoothed-zone-changes.html">
         <span class="cmp-num">43</span>
         <span class="cmp-row-body">
-          <strong>평활화된 구간 전환</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-speed speed-tie">⚡ 속도 동일</span>
+          <strong>평활화된 구간 전환</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-speed speed-fxdart">⚡ FxDart가 더 빠름</span>
           <span class="dim">이동 평균, 구간 런, 전환 알림 — 순수 Dart의 가변 상태를 든 인덱스 루프 세 개 vs FxDart의 windowed → uniqAdjacentBy → pairwise 체인.</span>
         </span>
       </a>
@@ -605,11 +605,11 @@
       </a>
       <ul class="fn-list cmp-fns"><li><a href="../tutorials/toAsync.html">toAsync</a></li><li><a href="../tutorials/attach.html">attach</a></li><li><a href="../tutorials/concurrent.html">concurrent</a></li><li><a href="../tutorials/map.html">map</a></li><li><a href="../tutorials/sumBy.html">sumBy</a></li><li><a href="../tutorials/countWhere.html">countWhere</a></li></ul>
     </li>
-    <li data-verdict="fxdart" data-async="true" data-speed="native" data-fns="filter sortBy toAsync map concurrent join">
+    <li data-verdict="fxdart" data-async="true" data-speed="tie" data-fns="filter sortBy toAsync map concurrent join">
       <a class="cmp-row" href="concurrent-profile-fetch.html">
         <span class="cmp-num">49</span>
         <span class="cmp-row-body">
-          <strong>프로필 10개를 세 개씩 가져오기</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-native">⚡ 네이티브가 더 빠름</span>
+          <strong>프로필 10개를 세 개씩 가져오기</strong> <span class="badge verdict-fxdart">FxDart 승</span> <span class="badge badge-async">async</span> <span class="badge badge-speed speed-tie">⚡ 속도 동일</span>
           <span class="dim">동기 준비 과정이 그대로 제한된 동시성으로 이어집니다 — filter와 sort 다음에 toAsync + map + concurrent(3)를 잇는 방식과 직접 만든 워커 풀을 비교합니다.</span>
         </span>
       </a>

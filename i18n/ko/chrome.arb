@@ -19,6 +19,7 @@
   "cmpRxTier4Blurb": "두 모델이 갈라지는 지점입니다: 한쪽은 수요 기반 동시성, 다른 쪽은 실제 시간과 멀티캐스트 — RxDart가 그야말로 제격인 예제들도 여기 있습니다.",
   "cmpNative": "네이티브 Dart",
   "cmpFxdart": "FxDart",
+  "cmpFxdartStrict": "FxDart (strict 방식)",
   "cmpExpected": "예상 출력",
   "cmpVerdictFxdart": "FxDart 승",
   "cmpVerdictTie": "우열 없음",
