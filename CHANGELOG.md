@@ -1,3 +1,85 @@
+## 0.8.6
+
+One change, and a correction to what 0.8.5 said about the case it fixes.
+
+### `differenceBy` / `intersectionBy` walk a `List` by index when pulled
+
+`_SetOpIterable` has had a `toList` fast path since 0.8.2 — build the first
+source's key set, then walk the second source *by index* when it is a `List`.
+`_SetOpIterator`, the path every other consumer takes, never got it: it held
+the second source in an `Iterator<A>` field, so each element cost a
+megamorphic `moveNext` plus a `current` read. `size()` counts by pulling, so
+a caller who only wants the size of a set operation paid that on every
+element.
+
+`ledger-diff` is that caller. Attributed leg by leg over 500,000 rows, AOT,
+one binary per variant:
+
+| leg | native | fxdart | gap |
+|---|---|---|---|
+| whole panel | 219,873 µs | 270,897 µs | +51,000 |
+| the three set operations | 162,390 µs | 225,782 µs | +63,400 |
+| **`intersectionBy` + `size()` alone** | **64,273 µs** | **107,808 µs** | **+43,500** |
+| the two sums | 1,113 µs | 1,568 µs | +455 |
+
+One leg is 85% of the gap, and inside it `size()` (107,808 µs) was *slower
+than* `toList().length` (99,306 µs) — the tell that the iterator, not the
+work, was the cost. The iterator now walks a `List` second source by index,
+as `toList` does; the pulled branch is unchanged for every other source shape.
+
+| | paired delta | control |
+|---|---|---|
+| `ledger-diff` | **−4.05% / −4.40%** | −0.98% / +0.13% |
+
+In the published sweep it goes from **1.24x behind native to 1.17x**. Nothing
+else moved: `top-merchants` +0.81%, `cohort-retention` +0.91% / +0.06%,
+`price-lookup-fallback`, `stream-windowed-alerts` and `unique-tags` all within
+±1.2%.
+
+### Correction — `ledger-diff`'s gap was not all algorithmic
+
+0.8.5 said: *"`ledger-diff`'s remaining 1.24x is algorithmic, not overhead …
+Faithful, and not the library's to remove."* Half of that holds. The fxdart
+panel does build three key sets where the native panel builds two and reuses
+them, and that really is the example's shape rather than the library's —
+about 20 ms of the 51 ms gap. But the larger half was library overhead the
+attribution missed, because it compared the two panels end to end instead of
+leg by leg. Splitting the legs put 85% of the gap in one place and made the
+`size()`-vs-`toList` inversion visible.
+
+What remains is the element-dedup set. Measured against a variant with no
+dedup at all — not shippable, `intersectionBy` promises duplicates removed —
+the intersection leg runs in 58,083 µs, faster than the native panel's
+62,692 µs. So the dedup is 27 ms, and it is the contract, not overhead.
+
+### What was probed and rejected
+
+- **A `length` override on `_SetOpIterable`**, counting without building the
+  element list: 85,226 µs against the iterator's 107,808 µs in isolation. It
+  is unreachable from the benchmark — `size()` counts by pulling rather than
+  asking for `length` — and making `size()` defer to `Iterable.length` to
+  reach it moved unrelated cases by ±2.5% in both directions across runs.
+  Dropped: an override on a member as widely implemented as `Iterable.length`
+  is not worth adding for codegen churn.
+- **Building the key set by index too.** The set literal
+  `{for (final a in _source1) f(a)}` is already good code: as a shared helper
+  the case got *worse* (−3.6% against −4.2%), inlined at both call sites it
+  measured the same. The 1.5 million-element key-set build is not on the
+  iterator path this release fixed.
+
+### On 12 rounds
+
+Three findings in this pass were artifacts of `ab_bench`'s default round
+count, and all three reversed at `--rounds 20`: `top-merchants` read +4.37%,
++3.31% and +2.54% across three runs with clean controls and is flat; the same
+happened in the other direction to `cohort-retention`, which read −4.66% and
+is also flat. A null run — the working tree against itself — was clean
+throughout, so the instrument is sound; twelve rounds is simply not enough to
+resolve a few percent on a case this size. Raise it before believing a
+sub-5% reading.
+
+Suite: 2,145 passing, 1 skipped. Coverage 100.00%.
+
 ## 0.8.5
 
 Two API additions and a performance pass that runs most of this section.

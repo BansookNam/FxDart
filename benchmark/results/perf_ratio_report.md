@@ -1,7 +1,7 @@
 # DartComparison: slowest to fastest ratio
 
 Machine: Apple M1 Max, 32GB RAM, Dart 3.12.2, macos Version 26.3 (Build 25D125) (AOT (dart compile exe), enforced per result line)
-Date: 2026-08-19 · Scale: `full` (headline N per case)
+Date: 2026-08-20 · Scale: `full` (headline N per case)
 
 | Case | Path | N | Native (µs) | FxDart (µs) | Ratio |
 |---|---|---:|---:|---:|---|
@@ -16,16 +16,16 @@ Date: 2026-08-19 · Scale: `full` (headline N per case)
 | Categories over their monthly budget | `benchmark/cases/budget-alerts` | 1,000,000 | 21,518 | 12,954 | FxDart 1.66x faster |
 | End-of-day settlement pipeline | `benchmark/cases/settlement-pipeline` | 100,000 | 48,934 | 30,701 | FxDart 1.59x faster |
 | All tags across posts, sorted | `benchmark/cases/unique-tags` | 1,000,000 | 106,922 | 77,818 | FxDart 1.37x faster |
-| Recent error messages, deduped | `benchmark/cases/recent-errors` | 1,000,000 | 10,350 | 13,705 | Native 1.32x faster |
+| Recent error messages, deduped | `benchmark/cases/recent-errors` | 1,000,000 | 10,182 | 13,737 | Native 1.35x faster |
 | Spending inside a date window | `benchmark/cases/date-window-spend` | 1,000,000 | 14,852 | 11,441 | FxDart 1.30x faster |
 | Monthly category report, sorted by spend | `benchmark/cases/monthly-category-report` | 1,000,000 | 11,319 | 14,315 | Native 1.26x faster |
 | Live search over a keystroke stream | `benchmark/cases/live-search` | 100,000 | 45,186 | 56,022 | Native 1.24x faster |
-| Diff two ledger snapshots | `benchmark/cases/ledger-diff` | 500,000 | 228,503 | 282,872 | Native 1.24x faster |
 | Rate-limited batch import | `benchmark/cases/rate-limited-import` | 100,000 | 130,963 | 157,739 | Native 1.20x faster |
 | Enrich top merchants concurrently | `benchmark/cases/concurrent-enrichment` | 100,000 | 194,966 | 232,989 | Native 1.20x faster |
 | Three consecutive readings over the limit | `benchmark/cases/consecutive-over-limit` | 1,000,000 | 17,065 | 20,315 | Native 1.19x faster |
 | Paginated product listing | `benchmark/cases/paginated-products` | 1,000,000 | 102,103 | 120,667 | Native 1.18x faster |
 | Multi-currency expense report | `benchmark/cases/multi-currency-report` | 1,000,000 | 123,300 | 104,392 | FxDart 1.18x faster |
+| Diff two ledger snapshots | `benchmark/cases/ledger-diff` | 500,000 | 223,406 | 260,993 | Native 1.17x faster |
 | Running account balance | `benchmark/cases/running-balance` | 1,000,000 | 237,775 | 275,067 | Native 1.16x faster |
 | Poll a flaky API until first success | `benchmark/cases/flaky-api-retry` | 100,000 | 495,525 | 571,710 | Native 1.15x faster |
 | Anomalies with surrounding context | `benchmark/cases/anomaly-context` | 1,000,000 | 11,932 | 10,443 | FxDart 1.14x faster |

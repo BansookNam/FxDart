@@ -6,7 +6,7 @@
     "os": "macos Version 26.3 (Build 25D125)",
     "compilation": "AOT (dart compile exe), enforced per result line"
   },
-  "date": "2026-08-19",
+  "date": "2026-08-20",
   "warmup": 2,
   "itersPerRound": 5,
   "tieMarginPct": 5.0,
@@ -2423,15 +2423,15 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 27.17910447761194,
-            "minUs": 20.035714285714285,
-            "medianRssBytes": 17448960.0,
+            "medianUs": 20.919540229885058,
+            "minUs": 19.876543209876544,
+            "medianRssBytes": 17317888.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 26.507462686567163,
-            "minUs": 23.565217391304348,
-            "medianRssBytes": 17924096.0,
+            "medianUs": 22.653333333333332,
+            "minUs": 21.63768115942029,
+            "medianRssBytes": 17252352.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -2441,15 +2441,15 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 2403.0,
-            "minUs": 2295.0,
-            "medianRssBytes": 27410432.0,
+            "medianUs": 2367.0,
+            "minUs": 2306.0,
+            "medianRssBytes": 27312128.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 3238.0,
-            "minUs": 2947.0,
-            "medianRssBytes": 32751616.0,
+            "medianUs": 3157.0,
+            "minUs": 3000.0,
+            "medianRssBytes": 32702464.0,
             "samples": 15
           },
           "timeWinner": "native",
@@ -2459,15 +2459,15 @@
           "n": 500000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 228503.0,
-            "minUs": 217434.0,
-            "medianRssBytes": 278790144.0,
+            "medianUs": 223406.0,
+            "minUs": 212976.0,
+            "medianRssBytes": 190988288.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 282872.0,
-            "minUs": 270956.0,
-            "medianRssBytes": 180699136.0,
+            "medianUs": 260993.0,
+            "minUs": 250634.0,
+            "medianRssBytes": 180191232.0,
             "samples": 15
           },
           "timeWinner": "native",

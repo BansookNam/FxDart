@@ -2,7 +2,7 @@
 
 - **Machine:** Apple M1 Max, 32 GB RAM
 - **Dart:** 3.12.2 (macos Version 26.3 (Build 25D125)), AOT-compiled
-- **Date:** 2026-08-19
+- **Date:** 2026-08-20
 - **Method:** per side and N-scale, fresh process × rounds, 2 warmup + 5 measured iterations per process (small N auto-batched to ≥2 ms samples); median reported. Ties — within 5.0% of each other, or within 0.6 ms absolute (beneath human perception) — with close relative races re-run up to 5 rounds.
 - Memory is peak process RSS — the runtime and the dataset are identical on both sides, so the *difference* is what the pipeline itself holds onto. At small N it is all runtime baseline; expect ties.
 
@@ -46,7 +46,7 @@
 | 34 | monthly-ledger-report | 100 | 24 µs | 30 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
 | 35 | sparse-timeseries | 100 | 31 µs | 29 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 36 | parallel-downloads (async) | 100 | 373 µs | 444 µs | **tie** | 16.5 MB | 17.1 MB | tie | 3 |
-| 37 | ledger-diff | 100 | 27 µs | 27 µs | **tie** | 16.6 MB | 17.1 MB | tie | 3 |
+| 37 | ledger-diff | 100 | 21 µs | 23 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 38 | flaky-api-retry (async) | 100 | 556 µs | 645 µs | **tie** | 16.4 MB | 17.1 MB | tie | 3 |
 | 39 | alert-digest | 100 | 21 µs | 25 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 40 | latency-percentiles | 100 | 22 µs | 20 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
@@ -104,7 +104,7 @@
 | 34 | monthly-ledger-report | 10000 | 934 µs | 442 µs | **tie** | 23.4 MB | 17.2 MB | fxdart | 3 |
 | 35 | sparse-timeseries | 10000 | 565 µs | 471 µs | **tie** | 23.0 MB | 20.2 MB | fxdart | 3 |
 | 36 | parallel-downloads (async) | 10000 | 31.8 ms | 37.3 ms | **native** | 50.8 MB | 33.0 MB | fxdart | 3 |
-| 37 | ledger-diff | 10000 | 2.40 ms | 3.24 ms | **native** | 26.1 MB | 31.2 MB | native | 3 |
+| 37 | ledger-diff | 10000 | 2.37 ms | 3.16 ms | **native** | 26.0 MB | 31.2 MB | native | 3 |
 | 38 | flaky-api-retry (async) | 10000 | 48.2 ms | 55.5 ms | **native** | 29.5 MB | 24.5 MB | fxdart | 3 |
 | 39 | alert-digest | 10000 | 1.46 ms | 1.39 ms | **tie** | 17.9 MB | 18.1 MB | tie | 3 |
 | 40 | latency-percentiles | 10000 | 1.93 ms | 1.80 ms | **tie** | 18.1 MB | 17.3 MB | fxdart | 3 |
@@ -162,7 +162,7 @@
 | 34 | monthly-ledger-report | 1000000 | 135.1 ms | 47.3 ms | **fxdart** | 157.8 MB | 127.0 MB | fxdart | 3 |
 | 35 | sparse-timeseries | 1000000 | 57.3 ms | 51.2 ms | **fxdart** | 125.0 MB | 144.6 MB | native | 3 |
 | 36 | parallel-downloads (async) | 100000 | 338.8 ms | 380.5 ms | **native** | 80.9 MB | 92.8 MB | native | 3 |
-| 37 | ledger-diff | 500000 | 228.5 ms | 282.9 ms | **native** | 265.9 MB | 172.3 MB | fxdart | 3 |
+| 37 | ledger-diff | 500000 | 223.4 ms | 261.0 ms | **native** | 182.1 MB | 171.8 MB | fxdart | 3 |
 | 38 | flaky-api-retry (async) | 100000 | 495.5 ms | 571.7 ms | **native** | 56.2 MB | 50.4 MB | fxdart | 3 |
 | 39 | alert-digest | 1000000 | 174.1 ms | 174.4 ms | **tie** | 213.2 MB | 239.8 MB | native | 5 |
 | 40 | latency-percentiles | 1000000 | 204.7 ms | 209.7 ms | **tie** | 139.4 MB | 192.2 MB | native | 5 |
