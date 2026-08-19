@@ -29,7 +29,7 @@
 | 17 | top-category-average | 100 | 8.4 µs | 7.9 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
 | 18 | date-window-spend | 100 | 2.2 µs | 1.6 µs | **tie** | 16.5 MB | 15.3 MB | fxdart | 3 |
 | 19 | sensor-anomalies | 100 | 6.0 µs | 6.9 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
-| 20 | recent-errors | 100 | 1.4 µs | 1.5 µs | **tie** | 16.3 MB | 16.6 MB | tie | 3 |
+| 20 | recent-errors | 100 | 1.0 µs | 1.3 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 21 | duplicate-transactions | 100 | 50 µs | 42 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 22 | no-spend-streak | 100 | 4.5 µs | 5.6 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
 | 23 | concurrent-enrichment (async) | 100 | 214 µs | 237 µs | **tie** | 16.6 MB | 16.6 MB | tie | 3 |
@@ -87,7 +87,7 @@
 | 17 | top-category-average | 10000 | 365 µs | 355 µs | **tie** | 22.9 MB | 22.9 MB | tie | 3 |
 | 18 | date-window-spend | 10000 | 176 µs | 110 µs | **tie** | 20.8 MB | 15.6 MB | fxdart | 3 |
 | 19 | sensor-anomalies | 10000 | 520 µs | 572 µs | **tie** | 23.7 MB | 23.7 MB | tie | 3 |
-| 20 | recent-errors | 10000 | 92 µs | 125 µs | **tie** | 15.8 MB | 15.9 MB | tie | 3 |
+| 20 | recent-errors | 10000 | 90 µs | 127 µs | **tie** | 15.8 MB | 15.8 MB | tie | 3 |
 | 21 | duplicate-transactions | 10000 | 4.17 ms | 3.86 ms | **tie** | 40.2 MB | 36.0 MB | fxdart | 3 |
 | 22 | no-spend-streak | 10000 | 261 µs | 262 µs | **tie** | 19.6 MB | 19.6 MB | tie | 3 |
 | 23 | concurrent-enrichment (async) | 10000 | 17.7 ms | 21.5 ms | **native** | 49.3 MB | 50.4 MB | tie | 3 |
@@ -145,7 +145,7 @@
 | 17 | top-category-average | 1000000 | 60.5 ms | 64.6 ms | **native** | 136.9 MB | 136.1 MB | tie | 3 |
 | 18 | date-window-spend | 1000000 | 14.9 ms | 11.4 ms | **fxdart** | 124.3 MB | 120.1 MB | tie | 3 |
 | 19 | sensor-anomalies | 1000000 | 62.5 ms | 68.2 ms | **native** | 169.8 MB | 159.4 MB | fxdart | 3 |
-| 20 | recent-errors | 1000000 | 10.4 ms | 14.0 ms | **native** | 113.4 MB | 114.5 MB | tie | 3 |
+| 20 | recent-errors | 1000000 | 10.3 ms | 13.7 ms | **native** | 114.3 MB | 113.5 MB | tie | 3 |
 | 21 | duplicate-transactions | 1000000 | 977.4 ms | 966.1 ms | **tie** | 324.6 MB | 332.5 MB | tie | 5 |
 | 22 | no-spend-streak | 1000000 | 23.8 ms | 24.0 ms | **tie** | 106.6 MB | 106.4 MB | tie | 3 |
 | 23 | concurrent-enrichment (async) | 100000 | 195.0 ms | 233.0 ms | **native** | 81.4 MB | 84.0 MB | tie | 3 |

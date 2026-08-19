@@ -649,6 +649,73 @@ them. Back to **100.00%**, 4,835 of 4,835 lines, every file.
 
 Suite: 2,116 passing, 1 skipped.
 
+### Added — `takeUniqBy`, and what the callback floor actually is
+
+`recent-errors` was the last case still reading 1.34x, and the release notes
+above called it "the sharpest measurement of the floor yet": the fused
+`filter`+`uniqBy` stage runs it in 13.8 ms, a hand loop with the same
+non-inlinable closures in 13.9 ms, the native panel — which inlines both — in
+10.3 ms. No library overhead, all of it callbacks.
+
+Two experiments sharpened that into something actionable. Both use one binary
+per variant; a single binary running every variant makes the shared call site
+megamorphic and hides the effect.
+
+**The floor is not a property of Dart closures.** The *same* strict function,
+called once with closure literals and once with closures from a
+`vm:never-inline` factory:
+
+| | µs per 1,000,000 |
+|---|---|
+| native panel | 10,370 |
+| strict function, callbacks are **literals** | **10,270** |
+| strict function, callbacks are **opaque** | 14,220 |
+| the lazy chain | 13,950 |
+
+**The barrier is the field.** A stand-in stage that stores its callbacks in
+fields, built from literals at the call site, with the constructor, the
+terminal, and the loop all marked `vm:prefer-inline`, still measured 14,300 µs
+— no better than the lazy chain. Storing a closure in a field is opaque to the
+AOT compiler no matter what is inlined around it. To inline, a callback has to
+be a *parameter* of the function that runs the loop.
+
+**Partial fusion is worth nothing.** The predicate accounts for ~2,880 µs of
+the gap and the key function ~880 µs, so a strict terminal that absorbs only
+the key — the natural, composable API — measured 14,180 µs: no gain at all,
+the extra iterator hops eating what the inlined key returned. Either every
+callback in the pipeline becomes a parameter, or none of them do. That rules
+out fixing this stage by stage, and it is why the entry below still stands.
+
+So `takeUniqBy(count, f, iterable)`: the first *count* elements whose `f`-key
+is new, as a list, where a `null` key skips the element. One callback does
+both jobs — the `filter_map` shape — and it is a parameter of a body small
+enough to inline, so the compiler inlines the closure with it.
+
+| spelling | µs per 1,000,000 |
+|---|---|
+| `filter(...).uniqBy(...).take(3)` | 13,690 |
+| **`takeUniqBy(3, ...)`** | **11,130** |
+| `fx(...).takeUniqBy(3, ...)` | 11,180 |
+| hand-written loop | 10,150 |
+
+**−19%**, and 1.35x behind native becomes **1.10x**. The chain method costs
+nothing over the top-level call, as an extension type should.
+
+**The published bars still measure the composable chain.** They are what the
+page teaches as the default, and swapping them for a specialised operator
+would advertise a number the default code does not deliver — the same reason
+`consecutive-over-limit` kept its `zip3` rather than moving to index
+arithmetic for 3%. `content/code-comparison/recent-errors` now shows both
+spellings, with the measurement and the "reach for it when a profile says
+these callbacks are the cost" caveat next to the strict one; the benchmark
+case runs both once, outside the timed closure, so they cannot drift.
+
+Fourteen tests, including the null-key contract (a `null` key skips rather
+than keys on null), the count short-circuit, a non-`List` source taking the
+out-of-line walk, and agreement with the lazy spelling. `tools/build_single_file.sh`
+gains the matching `_$takeUniqBy` wrapper — the playground bundle is where a
+missing one shows up, and `check_comparison` caught it.
+
 ### Still open
 
 - `_StreamBridgeIterator` still allocates a `Completer` per element and pauses
@@ -665,12 +732,15 @@ Suite: 2,116 passing, 1 skipped.
   between still crosses the stage boundary this release removed, and so does
   any chain whose zip has a pulled side. The same `FxFilterFusable` shape
   would extend to `map`, and was not measured.
-- **The lazy callback floor is the open design question.** A strict terminal
-  can inline its caller's callback; a lazy stage cannot, because the closure
-  lives in an iterator field. Two attempts to close that gap were measured and
-  rejected — a push/sink protocol (+36% to +54%) and blanket factory inlining
-  (+8.7% on an unrelated case). Anything that fixes it has to change how a
-  lazy stage stores its callback, not how it is called.
+- **The lazy callback floor is the open design question**, and this release
+  measured it exactly: a closure in an iterator *field* is opaque to AOT even
+  when the object is built from literals and everything around it is inlined,
+  and absorbing one stage's callback into a strict terminal buys nothing while
+  another stage's stays in a field. Three attempts to close it are now
+  measured and rejected — a push/sink protocol (+36% to +54%), blanket factory
+  inlining (+8.7% on an unrelated case), and partial strict fusion (0%).
+  `takeUniqBy` sidesteps it for one shape rather than solving it; solving it
+  means a lazy stage that does not store its callback at all.
 
 ## 0.8.4
 

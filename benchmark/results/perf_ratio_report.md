@@ -16,7 +16,7 @@ Date: 2026-08-19 · Scale: `full` (headline N per case)
 | Categories over their monthly budget | `benchmark/cases/budget-alerts` | 1,000,000 | 21,518 | 12,954 | FxDart 1.66x faster |
 | End-of-day settlement pipeline | `benchmark/cases/settlement-pipeline` | 100,000 | 48,934 | 30,701 | FxDart 1.59x faster |
 | All tags across posts, sorted | `benchmark/cases/unique-tags` | 1,000,000 | 106,922 | 77,818 | FxDart 1.37x faster |
-| Recent error messages, deduped | `benchmark/cases/recent-errors` | 1,000,000 | 10,390 | 13,967 | Native 1.34x faster |
+| Recent error messages, deduped | `benchmark/cases/recent-errors` | 1,000,000 | 10,350 | 13,705 | Native 1.32x faster |
 | Spending inside a date window | `benchmark/cases/date-window-spend` | 1,000,000 | 14,852 | 11,441 | FxDart 1.30x faster |
 | Monthly category report, sorted by spend | `benchmark/cases/monthly-category-report` | 1,000,000 | 11,319 | 14,315 | Native 1.26x faster |
 | Live search over a keystroke stream | `benchmark/cases/live-search` | 100,000 | 45,186 | 56,022 | Native 1.24x faster |

@@ -197,6 +197,13 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// Strict [uniqBy] — see [uniqStrict] for the trade-off.
   Fx<T> uniqByStrict<B>(B Function(T a) f) => Fx(l.uniqByStrict(f, _inner));
 
+  /// The first [count] elements whose [f]-key is new, as a list; a `null` key
+  /// skips the element. `filter().uniqBy().take()` as one strict, inlinable
+  /// call — see the top-level `takeUniqBy` for when that is worth it.
+  @pragma('vm:prefer-inline')
+  List<T> takeUniqBy<B extends Object>(int count, B? Function(T a) f) =>
+      l.takeUniqBy(count, f, _inner);
+
   /// Drops values equal to their predecessor, keeping the first of each run.
   Fx<T> uniqAdjacent() => Fx(l.uniqAdjacent(_inner));
 
