@@ -20,18 +20,18 @@ int _score(Row r) => r.$2;
 
 List<String> _ids(Iterable<Row> rows) => [for (final r in rows) r.$1];
 
-typedef NumericRow = (String id, num key);
+typedef NumericRow = (String id, double key);
 
 const _numericRows = <NumericRow>[
-  ('negative int', -3),
+  ('negative', -3.0),
   ('negative zero', -0.0),
   ('zero', 0.0),
-  ('ordinary double', 1.5),
-  ('ordinary int', 2),
+  ('ordinary', 1.5),
+  ('positive', 2.0),
   ('NaN', double.nan),
 ];
 
-num _numericKey(NumericRow row) => row.$2;
+double _numericKey(NumericRow row) => row.$2;
 
 List<String> _numericIds(Iterable<NumericRow> rows) => [
   for (final row in rows) row.$1,
