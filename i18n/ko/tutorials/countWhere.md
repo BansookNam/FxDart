@@ -24,9 +24,9 @@ nextLabel: sort
     구체화되지 않습니다.
   </p>
   <p>
-    <em>키별</em> 개수(개수의 맵)가 필요하면
-    <code><a href="countBy.html">countBy</a></code>를, 조건 하나의 개수가
-    답의 전부라면 <code>countWhere</code>를 잡으세요. 비동기 쌍둥이는
+    <code><a href="countBy.html">countBy</a></code>는 <em>키별</em>
+    개수(개수의 맵)가 필요할 때, <code>countWhere</code>는 조건 하나의
+    개수가 답의 전부일 때 잡으세요. 비동기 쌍둥이는
     다른 모든 <code>*Async</code> 연산자처럼 원소마다 조건을 await합니다.
   </p>
   <p>

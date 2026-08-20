@@ -35,15 +35,15 @@ nextLabel: join
     이터러블 안에 무엇이 들었는지는 신경 쓰지 않고 몇 개인지만 봅니다.
   </p>
   <p>
-    동기 체인에서 <code>count</code>는 Dart에서 물려받은
-    <code>Iterable.length</code> 게터 <em>그 자체</em>입니다(괄호 없음).
+    동기 체인에서 <code>count</code>는 <em>바로</em> Dart에서 물려받은
+    <code>Iterable.length</code> 게터입니다(괄호 없음).
     <code>Fx</code>가 <code>Iterable</code>이므로
     <code>fx(pipeline).length</code>가 체인을 훑으며 총 개수를 돌려줍니다.
     이름 붙은 연산자로 쓰는 편이 좋다면 최상위 <code>count(iterable)</code>를,
-    <em>비동기</em> 체인에서는 <code>.count()</code>를 쓰세요. 이미 구체적인
+    <code>.count()</code>는 <em>비동기</em> 체인에서 쓰세요. 이미 구체적인
     <code>List</code>를 들고 있다면 <code>.length</code>가 공짜입니다 —
-    <code>count</code>는 지연 체인의 결과를 먼저
-    <code><a href="../101/index.html">toList</a></code>로 <code>List</code>에
+    <code>count</code>는 지연 체인의 결과를 <code>List</code>로 —
+    <code><a href="../101/index.html">toList</a></code>를 거쳐 — 먼저
     구체화하지 않고 개수만 세고 싶을 때 꺼내 쓰는 도구입니다.
   </p>
 

@@ -41,7 +41,7 @@ nextLabel: nullable
       분석도 알고 있습니다.</li>
   </ul>
   <p>
-    내부 구현은 <code>flatMap</code> 연쇄가 <em>아닙니다</em>. 실패한
+    내부 구현은 <em>결코</em> <code>flatMap</code> 연쇄가 아닙니다. 실패한
     <code>bind</code>는 스코프 토큰이 달린 비공개 신호를 던지고, 빌더가
     자신의 경계에서 그것을 잡아냅니다. 그래서 이른 반환, 반복문,
     <code>if</code>가 블록 안에서 전부 그대로 동작하고, 중첩된 빌더가 서로의

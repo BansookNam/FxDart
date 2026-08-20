@@ -23,7 +23,7 @@ description: FxDart es una librería de programación funcional para Dart, porta
   <p>
     <a class="demo-cta cta-compare" href="DartComparison/">
       <span class="demo-cta-emoji">⚖️</span>
-      Dart vs FxDart — 50 tareas reales, lado a lado&nbsp;→
+      Dart vs FxDart — 53 tareas reales, lado a lado&nbsp;→
     </a>
   </p>
 

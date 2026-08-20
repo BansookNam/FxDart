@@ -42,9 +42,9 @@ prevLabel: LiveValue
   </p>
   <p>
     <code><a href="stopOn.html">stopOn</a></code>과 자연스럽게 짝을
-    이룹니다: 무언가가 <em>일어나서</em> 체인이 끝나야 할 때는
-    <code>stopOn</code>을, 그것들을 소유하던 것이 <em>사라져서</em> 여러
-    체인이 끝나야 할 때는 <code>FxSubscriptions</code>를 쓰세요.
+    이룹니다: <code>stopOn</code>은 무언가가 <em>일어나서</em> 체인이
+    끝나야 할 때, <code>FxSubscriptions</code>는 그것들을 소유하던 것이
+    <em>사라져서</em> 여러 체인이 끝나야 할 때 쓰세요.
   </p>
 
   <h2>데모 1 · dispose 한 줄</h2>

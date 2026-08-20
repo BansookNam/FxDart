@@ -33,7 +33,7 @@ nextLabel: accumulation
   </p>
   <p>
     Arrow의 <code>value class NonEmptyList</code>에 대응하는 Dart 쪽
-    짝입니다. <code>List</code> 위에 얹은 <em>확장 타입</em>이라 할당이 전혀
+    짝입니다. <em>확장 타입</em>으로 <code>List</code> 위에 얹혀 있어 할당이 전혀
     없고 런타임에 지워지며, <code>implements Iterable</code>이므로 모든
     fxdart 파이프라인과 <code>for</code> 반복문이 이 값을 그대로 받습니다.
     불변식은 컴파일 타임의 규율로 지켜집니다: 생성은 오직

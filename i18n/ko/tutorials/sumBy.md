@@ -24,8 +24,8 @@ nextLabel: average
   </p>
   <p>
     동작 규약은 <code><a href="sum.html">sum</a></code>과 같습니다. 빈
-    파이프라인의 합은 <code>0</code>이고, <code>int</code> 키는 정수
-    연산을 유지하지만 <code>double</code> 키가 하나라도 있으면 합이
+    파이프라인의 합은 <code>0</code>이고, int 키는 정수
+    연산을 유지하지만 double 키가 하나라도 있으면 합이
     <code>double</code>로 승격됩니다.
   </p>
   <p>

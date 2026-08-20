@@ -24,8 +24,8 @@ nextLabel: sortByDesc
     <code>Comparable.compare</code>로 비교합니다.
   </p>
   <p>
-    내부가 <code>sort((a, b) =&gt; compare(f(a), f(b)))</code>인 것은
-    <em>아니며</em>, 그 차이는 여러분의 콜백에서 그대로 드러납니다. 그
+    내부는 <em>결코</em> <code>sort((a, b) =&gt; compare(f(a), f(b)))</code>가
+    아니며, 그 차이는 여러분의 콜백에서 그대로 드러납니다. 그
     형태라면 비교할 때마다 <code>f</code>를 두 번씩, 대략
     <code>2·n·log n</code>번 호출하게 됩니다. <code>sortBy</code>는 각 키를
     <strong>정확히 한 번</strong>만 추출한 뒤 그 키로 정렬하므로, 비싼 키

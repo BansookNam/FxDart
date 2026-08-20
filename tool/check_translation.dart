@@ -12,25 +12,54 @@ import 'dart:io';
 final root = Directory.current.path;
 
 /// Front-matter keys whose value must be byte-identical to English.
+///
+/// `heading` is deliberately absent: build_docs.dart:323-328 classifies it as
+/// prose alongside `title` and `description`. Tutorial headings happen to be
+/// `<code>fnName</code>` snippets that match English anyway, but comparison
+/// and theory headings are sentences that genuinely need translating.
 const _verbatimKeys = {
   'slug',
   'section',
   'prev',
   'next',
-  'heading',
   'prevLabel',
   'nextLabel',
   'crumb',
 };
 
-/// Tutorial titles are `<fn> — FxDart 101` — all identifier and brand, no
-/// prose — so they stay verbatim too. The two hand-written landing pages
-/// (pages/index.md, pages/101.md) do have real prose in their titles.
-bool _titleIsVerbatim(String rel) => rel.startsWith('tutorials/');
+/// The brand suffix every tutorial title carries.
+const _brandSuffix = ' — FxDart 101';
 
+/// Most tutorial titles are `<fn> — FxDart 101` — one identifier plus brand,
+/// no prose — so they stay verbatim. Seventeen of them lead with a real
+/// sentence instead (`Error accumulation`, `predicate combinators`,
+/// `mapValues, mapKeys &amp; mapEntries`), and those must be translated. A
+/// lead that is a single bare identifier is the only verbatim case; anything
+/// with a space, comma or connective is prose. The two hand-written landing
+/// pages (pages/index.md, pages/101.md) also have real prose in their titles.
+bool _titleIsVerbatim(String rel, String englishTitle) {
+  if (!rel.startsWith('tutorials/')) return false;
+  if (!englishTitle.endsWith(_brandSuffix)) return false;
+  final lead = englishTitle
+      .substring(0, englishTitle.length - _brandSuffix.length)
+      .trim();
+  return _bareIdentifier.hasMatch(lead);
+}
+
+final _bareIdentifier = RegExp(r'^[A-Za-z_$][A-Za-z0-9_$]*$');
 final _placeholder = RegExp(r'\{\{(?:root|signature|playground:\d+)\}\}');
 final _tag = RegExp(r'<[^>]+>');
 final _href = RegExp(r'href="([^"]*)"');
+
+/// Fenced blocks and inline spans hold Dart, Scala and Kotlin source, where a
+/// bare `<` is a generic bracket or an arrow — not markup. Extracting tags
+/// from them yields garbage like `<- parseId(raw) }` (theory chapter 7), so
+/// code is removed from both sides before the tag streams are compared.
+final _fenced = RegExp(r'^```.*?^```', multiLine: true, dotAll: true);
+final _inlineCode = RegExp(r'(`+)(?:(?!\1).)*\1', dotAll: true);
+
+String _stripCode(String body) =>
+    body.replaceAll(_fenced, '').replaceAll(_inlineCode, '');
 
 void main(List<String> args) {
   if (args.isEmpty) {
@@ -40,18 +69,11 @@ void main(List<String> args) {
   final locale = args.first;
   var rels = args.skip(1).toList();
   if (rels.isEmpty) {
-    final dir = Directory('$root/i18n/$locale/tutorials');
-    if (!dir.existsSync()) {
-      stderr.writeln('no translations at i18n/$locale/tutorials');
+    if (!Directory('$root/i18n/$locale').existsSync()) {
+      stderr.writeln('no translations at i18n/$locale');
       exit(2);
     }
-    rels = dir
-        .listSync()
-        .whereType<File>()
-        .map((f) => 'tutorials/${f.uri.pathSegments.last}')
-        .where((p) => p.endsWith('.md'))
-        .toList()
-      ..sort();
+    rels = _translatable();
   }
 
   final problems = <String>[];
@@ -70,6 +92,32 @@ void main(List<String> args) {
   exit(1);
 }
 
+/// Every English page a locale is expected to carry, mirroring
+/// `_translatable()` in build_docs.dart:133-143 — the 300 rendered pages under
+/// `pages/`, `theory/`, `tutorials/` and the `comparison*` families. The
+/// `code*` directories hold source samples and their AUTHORING notes, which
+/// are never rendered per-locale, and `theory/PLAN.md` is the writing plan
+/// rather than a chapter.
+///
+/// Driving the default run off the *English* set — not off whatever the locale
+/// happens to have — is what lets an absent translation be reported as
+/// `missing` instead of silently passing.
+List<String> _translatable() {
+  const pageDirs = {'pages', 'theory', 'tutorials'};
+  final base = Directory('$root/content');
+  return base
+      .listSync(recursive: true)
+      .whereType<File>()
+      .map((f) => f.path.substring(base.path.length + 1))
+      .where((p) => p.endsWith('.md') && p != 'theory/PLAN.md')
+      .where((p) {
+        final dir = p.split('/').first;
+        return pageDirs.contains(dir) || dir.startsWith('comparison');
+      })
+      .toList()
+    ..sort();
+}
+
 List<String> _check(String locale, String rel) {
   final out = <String>[];
   void bad(String msg) => out.add('i18n/$locale/$rel: $msg');
@@ -86,15 +134,21 @@ List<String> _check(String locale, String rel) {
 
   // --- front matter
   if (!_sameList(a.metaKeys, b.metaKeys)) {
-    bad('front-matter keys differ\n  english: ${a.metaKeys}\n  found:   ${b.metaKeys}');
+    bad(
+      'front-matter keys differ\n  english: ${a.metaKeys}\n  found:   ${b.metaKeys}',
+    );
   }
   for (final k in a.meta.keys) {
-    final verbatim = _verbatimKeys.contains(k) || (k == 'title' && _titleIsVerbatim(rel));
+    final verbatim =
+        _verbatimKeys.contains(k) ||
+        (k == 'title' && _titleIsVerbatim(rel, a.meta[k] ?? ''));
     if (!verbatim) continue;
     if (!b.meta.containsKey(k)) continue;
     if (a.meta[k] != b.meta[k]) {
-      bad('front matter "$k" must stay identical\n'
-          '  english: ${a.meta[k]}\n  found:   ${b.meta[k]}');
+      bad(
+        'front matter "$k" must stay identical\n'
+        '  english: ${a.meta[k]}\n  found:   ${b.meta[k]}',
+      );
     }
   }
   final desc = b.meta['description'];
@@ -110,11 +164,14 @@ List<String> _check(String locale, String rel) {
   }
 
   // --- markup: identical tag stream, identical link targets
-  final ta = _tag.allMatches(a.body).map((m) => m[0]!).toList();
-  final tb = _tag.allMatches(b.body).map((m) => m[0]!).toList();
+  final proseA = _stripCode(a.body), proseB = _stripCode(b.body);
+  final ta = _tag.allMatches(proseA).map((m) => m[0]!).toList();
+  final tb = _tag.allMatches(proseB).map((m) => m[0]!).toList();
   if (!_sameList(ta, tb)) {
-    out.add('i18n/$locale/$rel: HTML tag stream differs from English\n'
-        '${_firstDiff(ta, tb)}');
+    out.add(
+      'i18n/$locale/$rel: HTML tag stream differs from English\n'
+      '${_firstDiff(ta, tb)}',
+    );
   }
   final ha = _href.allMatches(a.body).map((m) => m[1]!).toList();
   final hb = _href.allMatches(b.body).map((m) => m[1]!).toList();
@@ -143,7 +200,9 @@ String _firstDiff(List<String> a, List<String> b) {
 }
 
 int _indent(String body) {
-  final line = body.split('\n').firstWhere((l) => l.trim().isNotEmpty, orElse: () => '');
+  final line = body
+      .split('\n')
+      .firstWhere((l) => l.trim().isNotEmpty, orElse: () => '');
   return line.length - line.trimLeft().length;
 }
 
