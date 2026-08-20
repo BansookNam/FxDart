@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>foldByOrSkip — FxDart 101</title>
+  <meta name="description" content="FxDart foldByOrSkip tutorial: filter and fold-by-key in one strict call whose callback the compiler can inline — with a live playground.">
+  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/foldByOrSkip.html">
+  <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/foldByOrSkip.html">
+  <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/foldByOrSkip.html">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/foldByOrSkip.html">
+  <link rel="alternate" hreflang="ja" href="https://bansooknam.github.io/FxDart/ja/tutorials/foldByOrSkip.html">
+  <link rel="alternate" hreflang="es" href="https://bansooknam.github.io/FxDart/es/tutorials/foldByOrSkip.html">
+  <link rel="alternate" hreflang="pt-BR" href="https://bansooknam.github.io/FxDart/pt-br/tutorials/foldByOrSkip.html">
+  <link rel="alternate" hreflang="ru" href="https://bansooknam.github.io/FxDart/ru/tutorials/foldByOrSkip.html">
+  <link rel="alternate" hreflang="x-default" href="https://bansooknam.github.io/FxDart/tutorials/foldByOrSkip.html">
+  <link rel="stylesheet" href="../../css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=e72c578f0f50c7d1">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="logo" href="../index.html">Fx<span>Dart</span></a>
+    <nav>
+      <a href="../index.html">首页</a>
+      <a href="../101/index.html">FxDart 入门</a>
+      <a href="../theory/index.html">理论</a>
+      <a href="../DartComparison/index.html">Dart vs FxDart</a>
+      <a href="../RxDartComparison/index.html">RxDart vs FxDart</a>
+      <a href="../101/index.html#api">API 教程</a>
+      <a href="https://github.com/bansooknam/fxDart">GitHub</a>
+      <a href="https://github.com/marpple/FxTS">FxTS</a>
+    </nav>
+    <nav class="lang-switcher" aria-label="语言">
+      <span class="lang-label">语言</span>
+      <ul>
+        <li><a href="../../tutorials/foldByOrSkip.html" hreflang="en" lang="en">English</a></li>
+        <li><a href="../../ko/tutorials/foldByOrSkip.html" hreflang="ko" lang="ko">한국어</a></li>
+        <li><a href="../../zh/tutorials/foldByOrSkip.html" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">简体中文</a></li>
+        <li><a href="../../ja/tutorials/foldByOrSkip.html" hreflang="ja" lang="ja">日本語</a></li>
+        <li><a href="../../es/tutorials/foldByOrSkip.html" hreflang="es" lang="es">Español</a></li>
+        <li><a href="../../pt-br/tutorials/foldByOrSkip.html" hreflang="pt-BR" lang="pt-BR">Português</a></li>
+        <li><a href="../../ru/tutorials/foldByOrSkip.html" hreflang="ru" lang="ru">Русский</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+  <p class="i18n-banner">本页尚未翻译，因此以英文显示。 <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">参与翻译</a></p>
+  <p class="breadcrumb"><a href="../../101/index.html">FxDart 入门</a> › 章节 7 · 聚合 › <strong>foldByOrSkip</strong></p>
+  <h1><code>foldByOrSkip</code></h1>
+  <p class="hero-sub">Folds by key like <code>foldBy</code>, except a <code>null</code> key skips the element — so one callback both selects and buckets.</p>
+
+  <div class="signature">Map&lt;K, Acc&gt; foldByOrSkip&lt;A, K extends Object, Acc&gt;(K? Function(A a) key, Acc seed, Acc Function(Acc acc, A a) f, Iterable&lt;A&gt; iterable)
+Map&lt;K, Acc&gt; Fx&lt;T&gt;.foldByOrSkip&lt;K extends Object, Acc&gt;(K? Function(T a) key, Acc seed, Acc Function(Acc acc, T a) f)  // chain
+
+// Strict: returns a Map, runs when called. A null key skips the element, so
+// `key` both selects and buckets — filter + foldBy in one call.</div>
+
+  <h2>Lecture</h2>
+  <p>
+    <code>foldByOrSkip(key, seed, f, xs)</code> is
+    <code><a href="filter.html">filter</a></code> +
+    <code><a href="foldBy.html">foldBy</a></code> written as a single strict
+    call. Everything <code>foldBy</code> guarantees still holds: [seed] starts
+    every key rather than running across them, keys come out in first-seen
+    order, and the map is probed once per element. The one twist is the key
+    function — returning <code>null</code> means "skip this element", the same
+    <code>filter_map</code> shape
+    <code><a href="takeUniqBy.html">takeUniqBy</a></code> uses.
+  </p>
+  <p>
+    Write <code>filter(...).foldBy(...)</code> by default. Two named steps read
+    better than one callback answering two questions, and here the two
+    questions are usually unrelated — a date range and a category are not the
+    same thought. This operator exists for one reason, and it is worth knowing
+    what it is.
+  </p>
+
+  <h2>Why it exists: the predicate the compiler cannot see</h2>
+  <p>
+    <code>filter</code> is a <em>lazy</em> stage, so it keeps its predicate in
+    an iterator field. The AOT compiler cannot see through a field, so that
+    predicate never inlines — every element pays a real indirect call, and its
+    body is never fused into the loop around it. <code>foldBy</code> does not
+    have that problem: it is strict, so its callbacks are parameters and get
+    inlined into the call site. The filter in front of it is what costs.
+  </p>
+  <p>
+    <code>foldByOrSkip</code> moves the test into the key, which is a
+    parameter. Measured over 1,000,000 transactions, AOT, keeping one month in
+    twelve:
+  </p>
+  <table>
+    <thead><tr><th>Spelling</th><th>Time</th></tr></thead>
+    <tbody>
+      <tr><td><code>filter().foldBy()</code></td><td>14.5 ms</td></tr>
+      <tr><td><code>foldByOrSkip(…)</code></td><td><strong>12.6 ms</strong></td></tr>
+      <tr><td>a hand-written loop</td><td>11.3 ms</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Both spellings, and both bars, are on
+    <a href="../DartComparison/monthly-category-report.html">Monthly category
+    report, sorted by spend</a> — one of the two comparison pages that publish
+    three bars instead of two, because the gap between two ways of writing the
+    same pipeline is the point they make.
+  </p>
+
+  <h2>Demo 1 · July's spend per category</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final txns = [
+    (date: '2026-06-28', category: 'Food', amount: 31.10),
+    (date: '2026-07-02', category: 'Food', amount: 12.50),
+    (date: '2026-07-03', category: 'Transport', amount: 2.75),
+    (date: '2026-07-05', category: 'Food', amount: 43.20),
+    (date: '2026-08-01', category: 'Transport', amount: 50.00),
+  ];
+
+  // July's spend per category. One callback answers both questions:
+  // "is this row in scope?" and "which bucket?" — null means skip.
+  final july = foldByOrSkip(
+    (t) => t.date.startsWith('2026-07') ? t.category : null,
+    0.0,
+    (double sum, t) => sum + t.amount,
+    txns,
+  );
+  print(july);
+  // {Food: 55.7, Transport: 2.75}
+
+  // The same answer as two named steps. This is the one to write by default —
+  // foldByOrSkip is what you drop to when a profile says the filter's
+  // predicate is the cost.
+  print(
+    fx(txns)
+        .filter((t) => t.date.startsWith('2026-07'))
+        .foldBy((t) => t.category, 0.0, (sum, t) => sum + t.amount),
+  );
+  // {Food: 55.7, Transport: 2.75}
+}
+</textarea>
+  </div>
+
+  <h2>Demo 2 · The seed, the skip, and what the fold sees</h2>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final events = [
+    (kind: 'click', page: '/pricing'),
+    (kind: 'scroll', page: '/pricing'),
+    (kind: 'click', page: '/docs'),
+    (kind: 'click', page: '/pricing'),
+  ];
+
+  // The seed starts EVERY key — it does not run across them.
+  print(foldByOrSkip(
+    (e) => e.kind == 'click' ? e.page : null,
+    100,
+    (int n, e) => n + 1,
+    events,
+  ));
+  // {/pricing: 102, /docs: 101}
+
+  // A null key skips; it never becomes a bucket of its own.
+  final none = foldByOrSkip((e) => null, 0, (int n, e) => n + 1, events);
+  print(none.isEmpty);
+  // true
+
+  // The fold never sees a skipped element.
+  var folded = 0;
+  foldByOrSkip((e) => e.kind == 'click' ? e.page : null, 0, (int n, e) {
+    folded++;
+    return n + 1;
+  }, events);
+  print('folded $folded of ${events.length}');
+  // folded 3 of 4
+}
+</textarea>
+  </div>
+
+  <h2>Try it yourself</h2>
+  <p>Exercise: the highest reading per sensor, ignoring faulty rows.</p>
+  <div class="playground">
+<textarea>
+import 'package:fxdart/fxdart.dart';
+
+void main() {
+  final readings = [
+    (sensor: 'boiler', ok: true, degrees: 71.0),
+    (sensor: 'vent', ok: false, degrees: 18.0),
+    (sensor: 'boiler', ok: true, degrees: 75.0),
+    (sensor: 'pump', ok: true, degrees: 40.0),
+    (sensor: 'vent', ok: true, degrees: 21.0),
+  ];
+
+  // TODO: the highest reading per sensor, counting only ok:true rows.
+  // Hint: one callback — return the sensor when ok, null otherwise.
+  // Remember the argument order: key, seed, fold, iterable.
+  final hottest = foldByOrSkip(
+    (r) => r.sensor, // ← almost: this folds the faulty reading in too.
+    0.0,
+    (double best, r) => r.degrees > best ? r.degrees : best,
+    readings,
+  );
+
+  print(hottest);
+  // Expected once solved:
+  // {boiler: 75.0, pump: 40.0, vent: 21.0}
+}
+</textarea>
+  </div>
+
+  <div class="callout">
+    <strong>Related:</strong>
+    <a href="foldBy.html"><code>foldBy</code></a> — the fold this builds on ·
+    <a href="filter.html"><code>filter</code></a> — the stage it absorbs ·
+    <a href="takeUniqBy.html"><code>takeUniqBy</code></a> — the same idea for <code>filter</code> + <code>uniqBy</code> + <code>take</code> ·
+    <a href="performance.html">Performance</a> — where the callback floor comes from
+  </div>
+
+  <nav class="tut-nav">
+    <a href="foldBy.html">← 上一节： foldBy</a>
+    <a href="countWhere.html">下一节： countWhere →</a>
+  </nav>
+</main>
+<footer class="site-footer">
+  <p>FxDart 是 <a href="https://github.com/marpple/FxTS">FxTS</a> 的移植版本。特别感谢 <strong>Indong Yoo</strong>（Marpple CTO）与 FxTS 团队，本库的设计思路、语义和测试套件均源于他们的工作。</p>
+  <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
+</footer>
+<script>window.FXDART_I18N = {"pgRun":"▶ 运行","pgReset":"重置","pgCompiling":"编译中…","pgCompileError":"编译错误","pgError":"错误","pgLoading":"正在加载运行时…","pgRunning":"运行中…","pgNoOutput":"（无输出）","pgLoadFailed":"无法加载 FxDart 库"};
+window.FXDART_LIB = "assets/fxdart_single.dart?v=e72c578f0f50c7d1";</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="../../js/playground.js" defer></script>
+</body>
+</html>

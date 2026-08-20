@@ -405,6 +405,16 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
     Acc Function(Acc acc, T a) f,
   ) => s.foldBy(key, seed, f, _inner);
 
+  /// [foldBy] where a `null` key skips the element — `filter().foldBy()` as
+  /// one strict, inlinable call. See the top-level `foldByOrSkip` for when
+  /// that is worth reaching for.
+  @pragma('vm:prefer-inline')
+  Map<K, Acc> foldByOrSkip<K extends Object, Acc>(
+    K? Function(T a) key,
+    Acc seed,
+    Acc Function(Acc acc, T a) f,
+  ) => s.foldByOrSkip(key, seed, f, _inner);
+
   /// Counts the values [f] holds for — `filter` + `size` in one walk.
   @pragma('vm:prefer-inline')
   int countWhere(bool Function(T a) f) => s.countWhere(f, _inner);

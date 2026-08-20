@@ -5,8 +5,8 @@ description: FxDart countWhere 튜토리얼 — 조건에 맞는 값을 한 번�
 heading: <code>countWhere</code>
 section: 7
 crumb: countWhere
-prev: foldBy.html
-prevLabel: foldBy
+prev: foldByOrSkip.html
+prevLabel: foldByOrSkip
 next: sort.html
 nextLabel: sort
 ---

@@ -1,0 +1,5 @@
+Map&lt;K, Acc&gt; foldByOrSkip&lt;A, K extends Object, Acc&gt;(K? Function(A a) key, Acc seed, Acc Function(Acc acc, A a) f, Iterable&lt;A&gt; iterable)
+Map&lt;K, Acc&gt; Fx&lt;T&gt;.foldByOrSkip&lt;K extends Object, Acc&gt;(K? Function(T a) key, Acc seed, Acc Function(Acc acc, T a) f)  // chain
+
+// Strict: returns a Map, runs when called. A null key skips the element, so
+// `key` both selects and buckets — filter + foldBy in one call.

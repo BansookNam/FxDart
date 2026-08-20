@@ -129,7 +129,11 @@ Future<void> main(List<String> argv) async {
   // Both sides of every case, from both trees: 4 binaries per case.
   final jobs = <(String slug, String impl, bool base)>[
     for (final slug in slugs)
-      for (final impl in [left, 'fxdart'])
+      for (final impl in [
+        left,
+        'fxdart',
+        if (_hasExtra(casesDir, slug)) _extra,
+      ])
         for (final base in [true, false]) (slug, impl, base),
   ];
   await _compileAll(jobs, casesDir);
@@ -140,15 +144,28 @@ Future<void> main(List<String> argv) async {
   );
   stdout.writeln('=' * 72);
 
-  final report = <(String slug, double control, double fxdart)>[];
+  final report =
+      <(String slug, double control, double fxdart, double? extra)>[];
   var worstControl = 0.0;
   for (final slug in slugs) {
     stdout.writeln('\n$slug');
     var control = 0.0;
     var fxdart = 0.0;
-    for (final impl in [left, 'fxdart']) {
+    double? extra;
+    final measureExtra =
+        _hasExtra(casesDir, slug) && !_extraUnavailable.contains(slug);
+    if (_extraUnavailable.contains(slug)) {
+      stdout.writeln(
+        '  (the $_extra spelling does not build against $ref — skipped)',
+      );
+    }
+    for (final impl in [left, 'fxdart', if (measureExtra) _extra]) {
       final r = await _abOne(slug, impl, scale, rounds, iters, warmup);
-      final tag = impl == 'fxdart' ? 'fxdart' : '$impl (control)';
+      final tag = impl == 'fxdart'
+          ? 'fxdart'
+          : impl == _extra
+          ? 'fxdart (strict)'
+          : '$impl (control)';
       final line =
           '  ${tag.padRight(18)} '
           'base ${_ms(r.baseMedian).padLeft(9)}   '
@@ -157,6 +174,10 @@ Future<void> main(List<String> argv) async {
       stdout.writeln(line);
       if (impl == 'fxdart') {
         fxdart = r.delta;
+        continue;
+      }
+      if (impl == _extra) {
+        extra = r.delta;
         continue;
       }
       control = r.delta;
@@ -168,7 +189,7 @@ Future<void> main(List<String> argv) async {
         );
       }
     }
-    report.add((slug, control, fxdart));
+    report.add((slug, control, fxdart, extra));
   }
   stdout.writeln('\n${'=' * 72}');
   stdout.writeln('negative = faster after the change');
@@ -207,7 +228,8 @@ const _controlLimit = 2.0;
 
 /// The per-case delta table, in the shape the CHANGELOG entries use.
 String _reportTable({
-  required List<(String, double, double)> rows,
+  required List<(String slug, double control, double fxdart, double? extra)>
+  rows,
   required String ref,
   required String scale,
   required int rounds,
@@ -215,6 +237,7 @@ String _reportTable({
   required int warmup,
   required String control,
 }) {
+  final anyExtra = rows.any((r) => r.$4 != null);
   final b = StringBuffer()
     ..writeln('# ab_bench — paired A/B against `$ref`')
     ..writeln()
@@ -223,13 +246,20 @@ String _reportTable({
       'negative = faster after the change',
     )
     ..writeln()
-    ..writeln('| Case | fxdart | $control (control) | usable |')
-    ..writeln('|---|---:|---:|---|');
-  for (final (slug, ctrl, fx) in rows) {
+    // The strict column only appears when some case published a second
+    // spelling; an empty column on 52 rows is noise.
+    ..writeln(
+      anyExtra
+          ? '| Case | fxdart | fxdart (strict) | $control (control) | usable |'
+          : '| Case | fxdart | $control (control) | usable |',
+    )
+    ..writeln(anyExtra ? '|---|---:|---:|---:|---|' : '|---|---:|---:|---|');
+  for (final (slug, ctrl, fx, extra) in rows) {
     // A single noisy case fails the whole run, so the table has to say which
     // rows it was: the others are still readable.
     final usable = ctrl.abs() > _controlLimit ? 'no — control drift' : 'yes';
-    b.writeln('| `$slug` | ${_pct(fx)} | ${_pct(ctrl)} | $usable |');
+    final strict = anyExtra ? ' ${extra == null ? '—' : _pct(extra)} |' : '';
+    b.writeln('| `$slug` | ${_pct(fx)} |$strict ${_pct(ctrl)} | $usable |');
   }
   return b.toString().trimRight();
 }
@@ -398,6 +428,21 @@ Future<String> _git(List<String> args) async {
 
 // --- compilation ------------------------------------------------------------
 
+/// The optional third side, matching `run_benchmarks.dart`: a case that wants
+/// a second FxDart spelling measured alongside the first drops a
+/// `fxdart_strict.dart` next to its `fxdart.dart`.
+///
+/// It takes no part in the control check — the gate is still the non-fxdart
+/// side — and a baseline too old to compile it is skipped rather than fatal,
+/// which is the normal case when the spelling uses API the baseline predates.
+const _extra = 'fxdart_strict';
+
+bool _hasExtra(String casesDir, String slug) =>
+    File('$root/benchmark/$casesDir/$slug/$_extra.dart').existsSync();
+
+/// Cases whose extra side could not be built from the baseline tree.
+final _extraUnavailable = <String>{};
+
 String _binPath(String slug, String impl, bool base) =>
     '$_abDir/${slug}_${impl}_${base ? 'base' : 'head'}';
 
@@ -420,7 +465,11 @@ Future<void> _compileAll(
     )) {
       return true;
     }
-    if (!j.$3 && j.$2 == 'fxdart' && headLib.isAfter(built)) return true;
+    // Every fxdart-side binary tracks lib/ — the second spelling as much
+    // as the first. The control side links no fxdart code at all.
+    if (!j.$3 && j.$2.startsWith('fxdart') && headLib.isAfter(built)) {
+      return true;
+    }
     return false;
   }).toList();
   if (pending.isEmpty) return;
@@ -439,7 +488,15 @@ Future<void> _compileAll(
         '-o',
         _binPath(slug, impl, base),
       ], workingDirectory: tree);
-      if (res.exitCode != 0) failed.add('$slug/$impl/$tree: ${res.stderr}');
+      if (res.exitCode != 0) {
+        if (impl == _extra && base) {
+          // The baseline predates whatever this spelling calls. Expected when
+          // the second spelling is newer than the ref; measure the other two.
+          _extraUnavailable.add(slug);
+        } else {
+          failed.add('$slug/$impl/$tree: ${res.stderr}');
+        }
+      }
       stdout.write('.');
     }
   }
@@ -447,6 +504,18 @@ Future<void> _compileAll(
   await Future.wait([for (var i = 0; i < 6; i++) worker()]);
   stdout.writeln(' done');
   if (failed.isNotEmpty) {
+    // A case source that calls API the baseline predates cannot be A/B'd
+    // against that ref at all — the two trees are not comparable. Say that,
+    // rather than handing back a kernel error.
+    final baselineOnly = failed.every((f) => f.contains(_treeDir));
+    if (baselineOnly) {
+      stderr.writeln(
+        '\nThe baseline cannot build these cases. That happens when a case '
+        'source calls library API newer than the ref — the two trees are not '
+        'comparable, so there is nothing to measure. Pick a newer --ref, or '
+        'leave the case out.\n',
+      );
+    }
     throw StateError('AOT compile failed:\n${failed.join('\n')}');
   }
 }

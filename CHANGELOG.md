@@ -8,8 +8,9 @@ and stopped there. Twelve strict terminals — including the two most-used ones,
 `fold` and `each` — were left on the slow side of the same line.
 
 They are most of this release, plus additional sync *stage fusion*, two
-asymptotic bugs that no benchmark case could have found, and the instrument
-that decided all of it.
+asymptotic bugs that no benchmark case could have found, one lazy stage that
+had a fast path for `toList` and not for anything that pulls it, and the
+instrument that decided all of it.
 
 ### Strict terminals inline the caller's callback
 
@@ -450,6 +451,145 @@ chain step.
   values, `mapAccum`, Rust's `Iterator::scan` and Haskell's `mapAccumL`
   produce n. Argument order matches `scan` deliberately, so swapping one for
   the other is a one-word edit.
+### `differenceBy` / `intersectionBy` walk a `List` by index when pulled
+
+`_SetOpIterable` has had a `toList` fast path since 0.8.2 — build the first
+source's key set, then walk the second source *by index* when it is a `List`.
+`_SetOpIterator`, the path every other consumer takes, never got it: it held
+the second source in an `Iterator<A>` field, so each element cost a
+megamorphic `moveNext` plus a `current` read. `size()` counts by pulling, so
+a caller who only wants the size of a set operation paid that on every
+element.
+
+`ledger-diff` is that caller. Attributed leg by leg over 500,000 rows, AOT,
+one binary per variant:
+
+| leg | native | fxdart | gap |
+|---|---|---|---|
+| whole panel | 219,873 µs | 270,897 µs | +51,000 |
+| the three set operations | 162,390 µs | 225,782 µs | +63,400 |
+| **`intersectionBy` + `size()` alone** | **64,273 µs** | **107,808 µs** | **+43,500** |
+| the two sums | 1,113 µs | 1,568 µs | +455 |
+
+One leg is 85% of the gap, and inside it `size()` (107,808 µs) was *slower
+than* `toList().length` (99,306 µs) — the tell that the iterator, not the
+work, was the cost. The iterator now walks a `List` second source by index,
+as `toList` does; the pulled branch is unchanged for every other source shape.
+
+| | paired delta | control |
+|---|---|---|
+| `ledger-diff` | **−4.05% / −4.40%** | −0.98% / +0.13% |
+
+In the published sweep it goes from **1.24x behind native to 1.17x**. Nothing
+else moved: `top-merchants` +0.81%, `cohort-retention` +0.91% / +0.06%,
+`price-lookup-fallback`, `stream-windowed-alerts` and `unique-tags` all within
+±1.2%.
+
+### Correction — `ledger-diff`'s gap was not all algorithmic
+
+0.8.5 said: *"`ledger-diff`'s remaining 1.24x is algorithmic, not overhead …
+Faithful, and not the library's to remove."* Half of that holds. The fxdart
+panel does build three key sets where the native panel builds two and reuses
+them, and that really is the example's shape rather than the library's —
+about 20 ms of the 51 ms gap. But the larger half was library overhead the
+attribution missed, because it compared the two panels end to end instead of
+leg by leg. Splitting the legs put 85% of the gap in one place and made the
+`size()`-vs-`toList` inversion visible.
+
+What remains is the element-dedup set. Measured against a variant with no
+dedup at all — not shippable, `intersectionBy` promises duplicates removed —
+the intersection leg runs in 58,083 µs, faster than the native panel's
+62,692 µs. So the dedup is 27 ms, and it is the contract, not overhead.
+
+### What was probed and rejected on `ledger-diff`
+
+- **A `length` override on `_SetOpIterable`**, counting without building the
+  element list: 85,226 µs against the iterator's 107,808 µs in isolation. It
+  is unreachable from the benchmark — `size()` counts by pulling rather than
+  asking for `length` — and making `size()` defer to `Iterable.length` to
+  reach it moved unrelated cases by ±2.5% in both directions across runs.
+  Dropped: an override on a member as widely implemented as `Iterable.length`
+  is not worth adding for codegen churn.
+- **Building the key set by index too.** The set literal
+  `{for (final a in _source1) f(a)}` is already good code: as a shared helper
+  the case got *worse* (−3.6% against −4.2%), inlined at both call sites it
+  measured the same. The 1.5 million-element key-set build is not on the
+  iterator path this release fixed.
+
+### The ratio report is ordered by one axis again
+
+`perf_ratio_report.py` sorted by the same `max/min` multiple it prints, which
+is not directional — a row where FxDart leads by 1.37x and one where it
+trails by 1.32x sort next to each other. Across 53 cases the direction
+flipped **20 times**, so the numbers read as a clean descent while the
+meaning alternated, and the file's own title — *slowest to fastest* — was not
+what the order delivered: the fastest case in the suite sat at the top.
+
+It now sorts by `fxdart / native`, which is directional. `recent-errors`
+(1.32) leads the table, `restock-plan` (0.24) closes it, the ordering never
+changes direction, and the printed multiple stays what it was — the harness's
+own verdict for that row.
+
+The old key had a second problem this removes: the harness calls a tie on
+`tieAbsMs` as well as `tieMarginPct`, so a small-N case can be a tie at a raw
+1.8 and outrank a genuine 1.5x gap. Nothing in the current data hits it; the
+door is simply closed.
+
+Report-only. No measurement changed.
+
+### Rounds, on top of the control check
+
+The gate above rejects a run whose control drifted. A run whose control is
+clean can still be unreadable, and the fix is rounds rather than another
+check. Measuring the change above at `ab_bench`'s default 12,
+`top-merchants` read +4.37%, +3.31% and +2.54% across three runs with
+controls of −0.44%, −0.12% and −0.49%, and `cohort-retention` read −4.66%
+against +1.63% — four clean-looking readings, all four gone at
+`--rounds 20`. A null run, the working tree against itself, was flat
+throughout, so nothing was wrong with the instrument.
+
+This is a different failure from the two bimodal cases above: those do not
+converge with more rounds, these do. Both end in the same place — a sub-5%
+reading needs more than the default before it means anything — which is why
+`./benchmark.sh --ab` runs 20.
+
+### Added — `foldByOrSkip`, the same trade on `monthly-category-report`
+
+`monthly-category-report` sat at 1.28x, and 0.8.5 had already named the cause:
+"the `filter` predicate that the native loop inlines". That reading holds, and
+it is now measured leg by leg. The predicate alone, over 1,000,000 rows:
+**9.8 ms** inlined against **12.6 ms** through an opaque closure — a 2.8 ms
+difference that is the whole of this case's gap.
+
+`foldBy` is strict and already inlines its own callbacks. The `filter` in
+front of it is lazy, so its predicate lives in an iterator field and never
+does. `foldByOrSkip(key, seed, f, xs)` moves the test into the key — a `null`
+key skips the element, the `filter_map` shape `takeUniqBy` introduced — and
+the key is a parameter of a body small enough to inline.
+
+| spelling | µs per 1,000,000 |
+|---|---|
+| `filter().foldBy()` | 13,965 |
+| `foldByOrSkip(…)` | 12,070 |
+| **`fx(…).foldByOrSkip(…)`** | **11,716** |
+| hand-written loop | 11,322 |
+
+**−16%**, and 1.28x behind native becomes **1.11x** in the published sweep.
+It keeps `foldBy`'s one-probe cell, which is most of why it lands where it
+does: a first prototype using the plain `map[k] = f(map[k] ?? seed, a)` read
+only −6%.
+
+As on `recent-errors`, the **headline bar still measures the composable
+chain** — it is what the page teaches — and the page publishes a third bar
+beside it. That makes two pages with three bars; the harness, `ab_bench` and
+`build_docs` already carried the shape.
+
+Thirteen tests, including the two things easy to get wrong when a filter is
+folded into a key: a `null` key skips rather than bucketing under `null`, and
+the seed stays a per-key starting value. A nullable accumulator is pinned too,
+since a stored `null` must not read as "no cell yet".
+
+`tools/build_single_file.sh` gains the matching `_$foldByOrSkip` wrapper.
 
 ### Behaviour notes
 

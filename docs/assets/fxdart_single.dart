@@ -4365,17 +4365,51 @@ class _SetOpIterator<A, B> implements Iterator<A> {
   final bool _keep;
   Set<B>? _set; // iterable1's keys, materialized on the first pull
   Iterator<A>? _it;
+  // A `List` [_source2] is walked by index instead, for the reason
+  // [_FilterUniqByListIterator] gives: an `Iterator<A>` field turns every
+  // `moveNext` into a megamorphic call. `size()` counts by pulling, so this
+  // is the path a caller who only wants the size of a set operation takes.
+  //
+  // The names carry a `_setOp` prefix rather than the obvious `_list` / `_i` /
+  // `_end` because the playground bundle concatenates every source file into
+  // one library (see `list_range.dart`): a plain `_end` here makes another
+  // file's nullable `_end` non-promotable, and that failure only shows up in
+  // the merged build.
+  List<A>? _setOpList;
+  int _setOpI = 0;
+  int _setOpEnd = 0;
   final Set<Object?> _seen = {}; // see _SetOpIterable.toList
   @override
   late A current;
   @override
   bool moveNext() {
-    var it = _it;
-    if (it == null) {
+    if (_set == null) {
       _set = {for (final a in _source1) _f(a)};
-      it = _it = _source2.iterator;
+      final source = _source2;
+      if (source is List<A>) {
+        _setOpList = source;
+        _setOpEnd = source.length;
+      } else {
+        _it = source.iterator;
+      }
     }
     final set = _set!;
+    final list = _setOpList;
+    if (list != null) {
+      var i = _setOpI;
+      final end = _setOpEnd;
+      while (i < end) {
+        final a = list[i++];
+        if (set.contains(_f(a)) == _keep && _seen.add(a)) {
+          _setOpI = i;
+          current = a;
+          return true;
+        }
+      }
+      _setOpI = i;
+      return false;
+    }
+    final it = _it!;
     while (it.moveNext()) {
       final a = it.current;
       if (set.contains(_f(a)) == _keep && _seen.add(a)) {
@@ -8862,6 +8896,73 @@ Map<K, Acc> foldBy<A, K, Acc>(
   } else {
     for (final a in iterable) {
       final k = key(a);
+      final cell = cells[k];
+      if (cell == null) {
+        cells[k] = _Cell(f(seed, a));
+      } else {
+        cell.v = f(cell.v as Acc, a);
+      }
+    }
+  }
+  final result = <K, Acc>{};
+  cells.forEach((k, cell) => result[k] = cell.v as Acc);
+  return result;
+}
+
+/// [foldBy] where a `null` key skips the element, so [key] both selects and
+/// buckets — `filter(...).foldBy(...)` as one strict call.
+///
+/// The reason it exists is the same one [takeUniqBy] documents: `filter` is a
+/// lazy stage and keeps its predicate in an iterator field, which the AOT
+/// compiler cannot see through, so that predicate is never inlined and costs
+/// a real indirect call on every element. Here it rides along inside [key],
+/// which is a parameter of a body small enough to inline into the caller.
+/// Measured over 1,000,000 transactions, AOT, filtering one month out of
+/// twelve and folding by category: **13.6 ms** for the lazy chain, **12.8 ms**
+/// here, **11.3 ms** for the hand-written loop.
+///
+/// Prefer `filter(...).foldBy(...)`. Two named steps read better than one
+/// callback answering two questions, and unlike [takeUniqBy] — where "is this
+/// an error" and "what is its message" belong together — a filter and a key
+/// are usually unrelated. Reach for this when the pipeline is hot and a
+/// profile says that predicate is the cost.
+///
+/// ```dart
+/// // July's spend per category, in one pass.
+/// foldByOrSkip(
+///   (Tx t) => t.date.startsWith('2026-07') ? t.category : null,
+///   0.0,
+///   (sum, t) => sum + t.amount,
+///   txns,
+/// );
+/// ```
+@pragma('vm:prefer-inline')
+Map<K, Acc> foldByOrSkip<A, K extends Object, Acc>(
+  K? Function(A a) key,
+  Acc seed,
+  Acc Function(Acc acc, A a) f,
+  Iterable<A> iterable,
+) {
+  // Same one-probe cell as [foldBy] — see the note there for why the map is
+  // written once per distinct key rather than once per element.
+  final cells = <K, _Cell>{};
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      final a = iterable[i];
+      final k = key(a);
+      if (k == null) continue;
+      final cell = cells[k];
+      if (cell == null) {
+        cells[k] = _Cell(f(seed, a));
+      } else {
+        cell.v = f(cell.v as Acc, a);
+      }
+    }
+  } else {
+    for (final a in iterable) {
+      final k = key(a);
+      if (k == null) continue;
       final cell = cells[k];
       if (cell == null) {
         cells[k] = _Cell(f(seed, a));
@@ -13809,6 +13910,16 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
     Acc Function(Acc acc, T a) f,
   ) => _$foldBy(key, seed, f, _inner);
 
+  /// [foldBy] where a `null` key skips the element — `filter().foldBy()` as
+  /// one strict, inlinable call. See the top-level `foldByOrSkip` for when
+  /// that is worth reaching for.
+  @pragma('vm:prefer-inline')
+  Map<K, Acc> foldByOrSkip<K extends Object, Acc>(
+    K? Function(T a) key,
+    Acc seed,
+    Acc Function(Acc acc, T a) f,
+  ) => _$foldByOrSkip(key, seed, f, _inner);
+
   /// Counts the values [f] holds for — `filter` + `size` in one walk.
   @pragma('vm:prefer-inline')
   int countWhere(bool Function(T a) f) => _$countWhere(f, _inner);
@@ -14992,6 +15103,12 @@ FxAsyncIterable<A> _$uniqByAsync<A, B>(
 List<A> _$uniqStrict<A>(Iterable<A> iterable) => uniqStrict(iterable);
 List<A> _$uniqByStrict<A, B>(B Function(A a) f, Iterable<A> iterable) =>
     uniqByStrict(f, iterable);
+Map<K, Acc> _$foldByOrSkip<A, K extends Object, Acc>(
+        K? Function(A a) key,
+        Acc seed,
+        Acc Function(Acc acc, A a) f,
+        Iterable<A> iterable) =>
+    foldByOrSkip(key, seed, f, iterable);
 List<A> _$takeUniqBy<A, B extends Object>(
         int count, B? Function(A a) f, Iterable<A> iterable) =>
     takeUniqBy(count, f, iterable);

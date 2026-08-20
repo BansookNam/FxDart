@@ -1117,17 +1117,51 @@ class _SetOpIterator<A, B> implements Iterator<A> {
   final bool _keep;
   Set<B>? _set; // iterable1's keys, materialized on the first pull
   Iterator<A>? _it;
+  // A `List` [_source2] is walked by index instead, for the reason
+  // [_FilterUniqByListIterator] gives: an `Iterator<A>` field turns every
+  // `moveNext` into a megamorphic call. `size()` counts by pulling, so this
+  // is the path a caller who only wants the size of a set operation takes.
+  //
+  // The names carry a `_setOp` prefix rather than the obvious `_list` / `_i` /
+  // `_end` because the playground bundle concatenates every source file into
+  // one library (see `list_range.dart`): a plain `_end` here makes another
+  // file's nullable `_end` non-promotable, and that failure only shows up in
+  // the merged build.
+  List<A>? _setOpList;
+  int _setOpI = 0;
+  int _setOpEnd = 0;
   final Set<Object?> _seen = {}; // see _SetOpIterable.toList
   @override
   late A current;
   @override
   bool moveNext() {
-    var it = _it;
-    if (it == null) {
+    if (_set == null) {
       _set = {for (final a in _source1) _f(a)};
-      it = _it = _source2.iterator;
+      final source = _source2;
+      if (source is List<A>) {
+        _setOpList = source;
+        _setOpEnd = source.length;
+      } else {
+        _it = source.iterator;
+      }
     }
     final set = _set!;
+    final list = _setOpList;
+    if (list != null) {
+      var i = _setOpI;
+      final end = _setOpEnd;
+      while (i < end) {
+        final a = list[i++];
+        if (set.contains(_f(a)) == _keep && _seen.add(a)) {
+          _setOpI = i;
+          current = a;
+          return true;
+        }
+      }
+      _setOpI = i;
+      return false;
+    }
+    final it = _it!;
     while (it.moveNext()) {
       final a = it.current;
       if (set.contains(_f(a)) == _keep && _seen.add(a)) {
