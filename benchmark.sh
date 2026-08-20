@@ -156,11 +156,18 @@ case "$MODE" in
       "${all[@]+${all[@]}}" --rounds "$rounds" ${SLUGS[@]+"${SLUGS[@]}"} 2>&1 | tee "$out"
     ab_status=${PIPESTATUS[0]}
     set -e
-    if [[ $ab_status -ne 0 ]] || grep -q '!!' "$out" || grep -q 'control drift' "$out"; then
+    if grep -q '!!' "$out" || grep -q 'control drift' "$out"; then
       warn ""
       warn "A control moved past its limit — those rows mean nothing."
       warn "Re-run on an idle machine, or raise --rounds."
       exit 1
+    fi
+    if [[ $ab_status -ne 0 ]]; then
+      # Something other than control drift — a compile failure against the
+      # baseline is the usual one. ab_bench has already said what.
+      warn ""
+      warn "ab_bench exited $ab_status; see its message above."
+      exit "$ab_status"
     fi
     ;;
 
