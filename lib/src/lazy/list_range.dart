@@ -67,6 +67,28 @@ abstract class FxFilterFusable<A> {
   Iterator<A>? fxFusedFilterIterator(bool Function(A a) p);
 }
 
+/// Implemented by a lazy iterable that can absorb a *following* `map` into
+/// its own iterator — the map twin of [FxFilterFusable].
+///
+/// Unlike [FxFilterFusable] this hands back a whole [Iterable] rather than an
+/// [Iterator], because the fused node has to decide *per iteration* whether
+/// its source is still a [FxListRange] (see `fxListRangeOf`: resolving that at
+/// chain-construction time would freeze the bounds too early and break
+/// repeated iteration over a source that grew in between).
+///
+/// The stage has to build the fused node itself, for the reason spelled out on
+/// `FxUniqFusable`: the element type of its own source is not nameable from
+/// the `map` call site. What this does *not* buy is devirtualization of the
+/// caller's callback — `f` lands in a field of the fused node exactly as it
+/// would in a `map` stage, so it stays one indirect call per element. The win
+/// is the stage boundary and nothing else.
+abstract class FxMapFusable<A> {
+  /// This iterable followed by `map(f)`, as a single stage.
+  ///
+  /// Same elements, order, laziness, and callback count as `map(f, this)`.
+  Iterable<B> fxFuseMap<B>(B Function(A a) f);
+}
+
 /// An arithmetic `start..end` range with a fixed [step] — what `range()`
 /// produces.
 ///
