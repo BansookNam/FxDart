@@ -7,8 +7,9 @@ fix to `sumBy`, `averageBy`, `foldBy`, `minBy`, `maxBy`, `find`, `findIndex`
 and stopped there. Twelve strict terminals — including the two most-used ones,
 `fold` and `each` — were left on the slow side of the same line.
 
-They are the whole of this release, plus two asymptotic bugs that no benchmark
-case could have found and the instrument that decided all of it.
+They are most of this release, plus the first sync *stage fusion* since 0.8.0,
+two asymptotic bugs that no benchmark case could have found, and the
+instrument that decided all of it.
 
 ### Strict terminals inline the caller's callback
 
@@ -87,6 +88,142 @@ earns its code size only on the hop that can see the caller's closure literal,
 and every hop between that literal and the loop has to inline or none of them
 do.
 
+### `windowed`/`chunk` → `map` is one stage, and the window copy is the SDK's
+
+`windowed(step: 1)` emits one window per *source* element, so the boundary
+between it and a following `map` is one of the few in the library still paid at
+the full element rate — the shape §B of the 0.8.6 analysis identifies as the
+only remaining headroom. `FxMapFusable` joins `FxUniqFusable`,
+`FxUniqByFusable` and `FxFilterFusable`; `map()` probes it **once when the
+chain is built, never per element**, which is what keeps the 50 cases that call
+no `windowed`/`chunk` at zero cost. `_WindowIterable` answers it, and the
+window is built and the callback applied inside one `moveNext`.
+
+**What it is not.** `f` still lands in a field of the fused node, exactly as it
+would in a `map` stage, so the caller's closure literal is *not* visible at the
+changed hop and `f` is *not* devirtualized. Nothing here got a
+`vm:prefer-inline`, for the reason stated two sections up.
+
+**The fusion is the smaller half, and the measurement says so.** Adjudicated
+separately, `smoothed-zone-changes` at `--scale 10000`:
+
+| change | clean-control readings | median | spread |
+|---|---|---|---|
+| stage fusion alone | −1.69% · −2.90% · −1.29% · −6.09% · −2.89% · −2.79% · −3.26% · −3.49% | −2.90% | 4.8 pts |
+| fusion **and** the SDK window copy | −9.98% · −9.31% · −9.79% · −8.98% · −10.23% · −10.49% · −9.35% | −9.79% | 1.5 pts |
+
+Fusion alone would have failed the 5% bar. Two thirds of the win is removing a
+**covariant store check per element** from the window copy:
+`List<A>.operator[]=` takes a covariant parameter and `A` is a runtime type
+argument, so filling a pre-sized window from package code cannot elide the
+check. `List.sublist` reaches the VM's own `_slice`, which copies into an array
+carrying no type argument. Measured AOT, 1,000,000 windows of `double` built
+and summed:
+
+| window build | size 3 | size 7 | size 10 |
+|---|---|---|---|
+| pre-sized fill, element by element | 16.4 ms | 35.4 ms | 51.8 ms |
+| **`List.sublist`** | **14.1 ms** | **26.7 ms** | **36.0 ms** |
+| `List.filled` + `setRange` | 21.1 ms | 44.0 ms | 62.4 ms |
+| `getRange().toList(growable: false)` | 29.1 ms | 55.0 ms | 76.9 ms |
+
+The last two rows are why this cost a contract (below): **no bulk copy that
+preserves a fixed-length window is faster than the loop it would replace** —
+both go through `Lists.copy`, an element loop behind an interface `[]=` call.
+Note also that it removes most of the case's run-to-run spread, which is the
+more useful property: the fill was producing a long right tail.
+
+### Result — paired A/B against `main` (0.8.6 + the strict terminals)
+
+Same instrument, `--ref main`, `--rounds 30`, `--scale 10000`, every reading
+with its paired `native` control. **Ten runs, ten clean controls, none
+excluded:**
+
+| case | fxdart, every clean-control reading | control |
+|---|---|---|
+| `smoothed-zone-changes` | **−8.74%** · −7.95% · −8.00% · −7.07% · −9.97% · −7.63% · −8.83% · −10.39% · −7.70% · −7.47% | −0.76% · +0.25% · −0.33% · +0.25% · −0.74% · +0.27% · +0.74% · +0.65% · +1.35% · +0.13% |
+| `paginate-users` | **−11.67%** · −11.15% · −11.04% | −0.80% · +0.60% · −0.33% |
+
+Median −7.98% and −11.15%. `paginate-users` is `chunk(10)` → `map` → `toList`
+and reads −9.75% (control +0.15%) at `--scale full` too.
+
+Earlier exploratory rounds at `--rounds 12` are excluded from that table
+entirely rather than pooled with it; three of them had drifted controls
+(+4.71%, +2.23%, −2.20%), and the one fusion-only run whose control moved
+−2.15% is likewise excluded from the table above it.
+
+**The win is scale-dependent, and does not carry to `--scale full`**, where the
+same case reads +0.26% / −0.32% / −0.08%. At 1,000,000 elements `sublist`'s
+second allocation per window — a `_GrowableList` header over the copied array,
+where `List.filled` allocated one object — costs about what the store checks
+save. *[Inference from the two measurements; not separately instrumented.]*
+Nothing regresses there, and the claim above is scoped to `--scale 10000`.
+
+**No regression.** Both scales swept with `--all`, and because a single noisy
+case fails the whole invocation, every row whose *own* control drifted past 2%
+was re-measured individually — 23 of them, plus every row that moved past 2%
+with a clean control. All resolve inside the band:
+
+- The five cases fxdart already wins big are flat: `restock-plan` +1.52%,
+  `monthly-ledger-report` −1.69%, `top-expenses` +0.02%, `top-log-level`
+  +0.62%, `top-merchants` — see below.
+- The sweep's two worst-looking rows were artifacts and neither reproduces:
+  `food-spending` read +13.14% off a clean control at `--scale 10000` and then
+  +0.79% / −3.97% / −4.67% / +2.24% / +0.00% on re-measurement; it is a 34 µs
+  case, the smallest in the suite. `date-window-spend` read +9.22% and then
+  ±1%. Neither calls `map`, `windowed` or `chunk` at all.
+- Also re-measured to flat: `category-rank`, `multi-currency-report`,
+  `top-category-average`, `budget-alerts`, `no-spend-streak`,
+  `monthly-category-report`, `consecutive-over-limit`, `sensor-anomalies`,
+  `running-balance`, `invoice-summary`, `anomaly-context`,
+  `concurrent-enrichment`.
+
+`top-merchants` is the one row worth naming: twelve clean-control readings at
+`--scale full` spanning −0.04% to +4.20%, median **+1.8%**. It is under the 3%
+bar but it is not zero, so it was isolated rather than waved through. It calls
+`map()` **once per million elements**, so no per-element mechanism exists; and
+A/B'ing the two commits separately puts the window-copy commit at
++0.34% / −0.23% / +0.70% and, with only the two-line `map()` probe removed and
+every new class left in place, −0.02% / −0.15% / +0.67%. So at most ~1 point is
+attributable to compiling a generic type test into `map()` at all, and the rest
+is this case's spread at `--scale full`.
+
+`weekly-sensor-averages` is **not claimed**, though it is on the changed path
+and read −9.32% against a clean control at `--scale 10000`. At `--scale full`
+it swings +8.08% [+1.56%] · −7.18% [+0.66%] · +9.10% [+0.41%] — the same
+bimodal-per-process behaviour recorded for it below, unchanged by this release.
+Its safety is argued **structurally instead of measured**: it is
+`chunk` → `map`, so it takes the fused iterator, and no work was added to any
+`moveNext` on its path — the type test resolves at chain construction, and the
+fused loop does strictly less per window than the pair it replaces.
+
+`smoothed-zone-changes` cannot be adjudicated at `--scale full` either, and for
+a different reason: its **`native` side** is the unstable one there. The
+control drifted −11.65% / −10.86% / −11.99% across three consecutive runs of
+the same byte-identical binary pair. Measured directly, interleaving all four
+binaries in one session, native's median/min spread at 1,000,000 elements is
+**100%–174%** against fxdart's 1.3%–3.6%. That is the same defect
+`benchmark/results/results.json` recorded as +78.8%, reproduced on different
+hardware and a different SDK.
+
+It matters beyond this release, because `HEADLINE_SCALE = "full"` is what
+`content/comparison/smoothed-zone-changes.md` publishes a verdict from. On the
+cleanest statistic either side offers, fxdart **loses** this case at every
+scale — measured here, before and after:
+
+| scale | statistic | before (`main`) | after |
+|---|---|---|---|
+| 10000 | median | 2.02x native | **1.81x** |
+| 10000 | min | 1.89x native | 1.83x |
+| full | median | 0.55x native *(native's tail, not a win)* | 0.58x |
+| full | min | 1.16x–1.41x native | 1.18x–1.52x |
+
+The median at `--scale 10000` is the honest headline and it improved. The
+`min` barely moved: what this change mostly does is pull the typical case down
+to the best case rather than lower the best case. The published `verdict:
+fxdart` is an artifact of native's right tail and is left for a separate
+change, since `content/` is owned elsewhere.
+
 ### Two asymptotic bugs, neither reachable from a benchmark case
 
 - **`slice` walked the whole source.** `_SliceIterator.moveNext` kept pulling
@@ -138,6 +275,30 @@ outlying processes, which the runner throws away today.
 
 ### Behaviour notes
 
+- **Every `windowed`/`chunk` window is now a growable list.** Before this
+  release the two *sync* paths handed back a fixed-length list while
+  `windowedAsync`/`chunkAsync` already returned a growable one, so the same
+  operator disagreed with its own async twin; all four now agree. The only
+  caller that can observe the difference is one that relied on `window.add(x)`
+  throwing `UnsupportedError`, and nothing in the library did. It is a
+  widening, not a narrowing: a window is still a fresh **copy** the caller
+  owns, never a view onto the source, and mutating one window still cannot
+  disturb another or the source — that is the part the old test was really
+  protecting, and it is unchanged. The reason is the measurement two sections
+  up: a fixed-length window has to be filled from package code at one
+  covariant store check per element, and no fixed-length bulk copy is faster
+  than that loop. Stated in the public dartdoc of all four operators, not just
+  in the implementation, and the test that pinned the old representation was
+  rewritten rather than deleted — `test/lazy/windowed_test.dart` now pins
+  growability across all four paths at once, including both branches of the
+  ring buffer.
+- The window copy is also why the pulled path changed shape: a window that
+  does not wrap the ring is now one `sublist` (measured 14.8 ms against
+  18.8 ms per 1,000,000 windows at `size: 3`, and `chunk` never wraps), and
+  only an *overlapping* window over a non-`List` source still assembles the
+  wrapped tail by hand, at 21.6 ms against 19.6 ms. That is the one path this
+  release makes slower, it is the rarest in the family, and no benchmark case
+  reaches it.
 - The `List` fast paths read `length` once and then index, so mutating the
   source during a pass is no longer reported as such on these twelve
   terminals. Both directions changed, and they changed differently: a source
