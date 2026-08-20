@@ -18,7 +18,7 @@ bash tools/build_single_file.sh        # regenerate docs/assets/fxdart_single.da
 dart run tool/precompile_playgrounds.dart  # build docs/pg/ artifacts (--scope, --status, --prune, --limit, --only)
 dart run tool/rebuild_page.dart DartComparison/top-merchants.html  # after editing one page's snippets: compile + restamp + commit
 ./benchmark.sh                             # sweep + regenerate the ratio report (--docs also rebuilds docs/)
-./benchmark.sh --ab <slug…>                # paired A/B — the only way to read a change under ~5%
+./benchmark.sh --ab <slug…> | --ab --all   # paired A/B — the only way to read a change under ~5%
 ./benchmark.sh --verify                    # is the ratio report in step with results.json?
 ./benchmark.sh --check | --report-only | --smoke | --rx
 dart run benchmark/run_benchmarks.dart     # the raw runner benchmark.sh wraps (--smoke, --rounds N, [slugs…])
@@ -49,9 +49,10 @@ Async operator callbacks in `mapAsync`-style code must stay parallel-safe: overl
   report is a separate script (leave it and the two disagree until someone
   regenerates months later, at which point it reads as a regression); `--smoke`
   writes un-warmed numbers into `results.json` like any other run; and a sweep
-  cannot resolve a change under ~5%, so `--ab` is the instrument for "did my
-  change do anything" — it defaults to 20 rounds because ab_bench's 12 produced
-  three reversed findings in the 0.8.6 pass. `--verify` catches the
+  cannot resolve a change under ~5%, so `--ab` (`--all` for every case) is the
+  instrument for "did my change do anything" — it runs 20 rounds because at
+  ab_bench's default 12, four readings in the 0.8.6 pass looked solid against
+  *clean* controls and vanished at 20. `--verify` catches the
   report-vs-results drift directly.
 - **Two benchmark families** exist and must be maintained separately:
   - **DartComparison** (`docs/DartComparison/`, `benchmark/results/results.json`): native Dart vs FxDart perf comparison. Run with `dart run benchmark/run_benchmarks.dart`. Compares `benchmark/cases/<slug>/native.dart` against `benchmark/cases/<slug>/fxdart.dart`. Measures 3 scales (N=100, 10k, headline 1M or case-specific).

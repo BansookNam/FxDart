@@ -7,6 +7,7 @@
 #   ./benchmark.sh --docs                 # sweep, regenerate, and rebuild docs/
 #
 #   ./benchmark.sh --ab ledger-diff       # paired A/B: did MY change move this?
+#   ./benchmark.sh --ab --all             # …across every case
 #   ./benchmark.sh --ab --ref v0.8.5 ledger-diff
 #
 #   ./benchmark.sh --verify               # are results.json and the report in step?
@@ -32,9 +33,11 @@
 #     measures at a median -2.1% with a -27%..+4% range across runs. Use --ab
 #     for "did my change do anything", which runs both variants interleaved in
 #     one session so drift lands on both.
-#   * ab_bench's default 12 rounds does not resolve a few percent. Three
-#     findings in the 0.8.6 pass were artifacts of it and reversed at 20.
-#     --ab defaults to 20 here, and flags a control that moved too far.
+#   * ab_bench rejects a run whose control drifted, but a clean control is not
+#     enough on its own: at its default 12 rounds, four readings in the 0.8.6
+#     pass looked like solid ±3-4% results against clean controls and were all
+#     gone at 20. --ab runs 20 here, and fails the run when ab_bench's own
+#     gate fires (a pipeline hides its exit code, so PIPESTATUS is read).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -46,6 +49,7 @@ BUILD_DOCS=0
 ROUNDS=""
 REF=()
 SLUGS=()
+AB_ALL=0
 
 bold() { printf '\033[1m%s\033[0m\n' "$*"; }
 warn() { printf '\033[33m%s\033[0m\n' "$*" >&2; }
@@ -54,6 +58,7 @@ die()  { printf '\033[31m%s\033[0m\n' "$*" >&2; exit 1; }
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --ab)          MODE=ab; shift ;;
+    --all)         AB_ALL=1; shift ;;
     --verify)      MODE=verify; shift ;;
     --check)       MODE=check; shift ;;
     --report-only) MODE=report; shift ;;
@@ -132,18 +137,29 @@ case "$MODE" in
     ;;
 
   ab)
-    if [[ ${#SLUGS[@]} -eq 0 ]]; then die "--ab needs at least one case slug"; fi
+    if [[ ${#SLUGS[@]} -eq 0 && $AB_ALL -eq 0 ]]; then
+      die "--ab needs case slugs, or --all for every case"
+    fi
     # 20, not ab_bench's default 12: see the note at the top of this file.
     rounds="${ROUNDS:-20}"
-    bold "→ paired A/B over ${#SLUGS[@]} case(s), $rounds rounds"
+    scope="${#SLUGS[@]} case(s)"
+    all=()
+    if [[ $AB_ALL -eq 1 ]]; then all=(--all); scope="every case"; fi
+    bold "→ paired A/B over $scope, $rounds rounds"
     out="$(mktemp)"
     trap 'rm -f "$out"' EXIT
+    # ab_bench exits 1 when a control drifted past its limit, but a pipeline's
+    # status is the last command's — so read PIPESTATUS rather than $?, and
+    # keep the text check as a second net.
+    set +e
     dart run tool/ab_bench.dart ${FAMILY[@]+"${FAMILY[@]}"} ${REF[@]+"${REF[@]}"} \
-      --rounds "$rounds" ${SLUGS[@]+"${SLUGS[@]}"} 2>&1 | tee "$out"
-    if grep -q '!!' "$out"; then
+      "${all[@]+${all[@]}}" --rounds "$rounds" ${SLUGS[@]+"${SLUGS[@]}"} 2>&1 | tee "$out"
+    ab_status=${PIPESTATUS[0]}
+    set -e
+    if [[ $ab_status -ne 0 ]] || grep -q '!!' "$out" || grep -q 'control drift' "$out"; then
       warn ""
-      warn "One or more controls moved too far — those rows mean nothing."
-      warn "Re-run when the machine is idle, or raise --rounds."
+      warn "A control moved past its limit — those rows mean nothing."
+      warn "Re-run on an idle machine, or raise --rounds."
       exit 1
     fi
     ;;

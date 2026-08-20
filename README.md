@@ -392,10 +392,13 @@ interleaved in one session, so drift hits both sides:
 ```
 
 The `native` side is the control. **If it moved more than ~2%, the machine was
-too busy and the row means nothing** — the script fails the run when that
-happens. It also defaults to 20 rounds rather than 12, because 12 does not
-resolve a few percent: three findings in the 0.8.6 pass looked like clean
-regressions at 12 rounds and vanished at 20.
+too busy and the row means nothing** — `ab_bench` fails the run when that
+happens, and the script surfaces it.
+
+A clean control is not sufficient on its own, though. At `ab_bench`'s default
+12 rounds, four readings in the 0.8.6 pass looked like solid ±3-4% results
+*against clean controls* and were all gone at 20, so `--ab` runs 20. Add
+`--all` to sweep every case.
 
 Two more things that have burned us, both handled by the script: `--smoke`
 writes un-warmed numbers into `results.json` like any real run, and a sweep
