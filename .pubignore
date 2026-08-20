@@ -29,9 +29,12 @@ benchmark/
 example/daily_ledger/
 example/dart_comparison_plan.md
 
-# Agent-harness instructions for this repo, not API documentation
-AGENTS.md
-CLAUDE.md
+# Agent-harness instructions for this repo, not API documentation. Anchored so
+# that a future consumer-facing skills/**/CLAUDE.md still ships. The harness
+# directories (.claude/, .Codex/, .omp/, .agent-flow/) need no entry here: pub
+# never archives dot-prefixed paths, tracked or not.
+/AGENTS.md
+/CLAUDE.md
 
 # Working plans — local only. .pubignore fully overrides .gitignore, so the
 # .gitignore entry for plans/ does NOT keep it out of the published archive.
