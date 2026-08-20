@@ -357,53 +357,74 @@ Two suites back the comparison sites linked at the top:
 and [RxDart vs FxDart](https://bansooknam.github.io/FxDart/RxDartComparison/)
 (41 cases). Every case is AOT-compiled (`dart compile exe`) and each side runs
 as a fresh process, interleaved, so thermal drift lands on both equally.
+`./benchmark.sh` is the entry point.
 
-`./benchmark.sh` is the entry point:
+### Which command, when
+
+**1 · While developing — "did my change move this case?"**
 
 ```sh
-./benchmark.sh                     # sweep every case, then regenerate the ratio report
-./benchmark.sh ledger-diff         # just these cases; the rest keep their recorded numbers
-./benchmark.sh --docs              # also rebuild docs/ — the bar charts read results.json
-./benchmark.sh --rx                # the RxDart family instead
-
-./benchmark.sh --ab ledger-diff    # did MY change move this case?
-./benchmark.sh --verify            # is the ratio report in step with results.json?
-./benchmark.sh --check             # cases still match their published examples
-./benchmark.sh --smoke ledger-diff # liveness only; results.json is restored afterwards
+./benchmark.sh --ab ledger-diff               # against HEAD
+./benchmark.sh --ab --ref v0.8.5 ledger-diff  # against a tag or commit
 ```
 
-A sweep writes `benchmark/results/results.json` (the site's bar charts),
-`SUMMARY.md`, and `perf_ratio_report.md` — a table of every case ordered
-slowest to fastest.
+The one you will reach for most. It builds both variants of `lib/` and runs
+them **interleaved in one session**, so drift hits both sides. The `native`
+side is the control: it links no fxdart code, so a library-only change must
+leave it identical — if it moved, the row is void.
+
+It runs 20 rounds rather than `ab_bench`'s default 12, because 12 is not
+enough. Four readings in the 0.8.6 pass looked like solid ±3-4% results
+*against clean controls* and every one of them was gone at 20.
+
+**2 · Before merging or releasing — "did anything regress?"**
+
+```sh
+./benchmark.sh --ab --all
+```
+
+The same instrument across every case, as a gate: if a control drifts past its
+limit the run fails rather than printing a number. `--all` exists because
+without it every slug had to be typed by hand, which made "nothing regressed
+by 3%" a claim rather than a check. Give it an idle machine — it takes a
+while.
+
+**3 · Publishing — updating the numbers the site shows**
+
+```sh
+./benchmark.sh --docs        # sweep, regenerate the report, rebuild docs/
+./benchmark.sh --docs --rx   # the RxDart family
+```
+
+The only output fit to publish: native and fxdart are measured in the same
+session, so each row's ratio is sound. It writes
+`benchmark/results/results.json` (the bar charts), `SUMMARY.md`, and
+`perf_ratio_report.md` — every case ordered slowest to fastest. The RxDart
+family writes `results-rx.json` and `SUMMARY-RX.md`; its pages carry bars but
+no ranking table, so there is no report to regenerate there.
+
+Skip `--docs` and the site keeps showing the old numbers. Skip the report
+regeneration — which is why this mode always does it for you — and
+`results.json` and the report drift apart silently, which has happened, and
+surfaced months later looking like a regression that had just landed.
 
 ### ⚠️ Reading the numbers
 
-**Do not compare two sweeps to judge a change.** Cross-run noise is about 5%.
-The proof is built in: the `native` side links no fxdart code, so a
-library-only change must leave it byte-identical — and its measured cross-run
-delta is a median −2.1%, ranging −27% to +4%.
+**Do not compare two sweeps to judge a change.** Cross-run noise is about 5%,
+and the proof is built in: the `native` side must be byte-identical across a
+library-only change, yet its measured cross-run delta is a median −2.1%,
+ranging −27% to +4%. Judge changes with 1, publish with 3.
 
-Use `--ab` instead. It builds both variants of `lib/` and runs them
-interleaved in one session, so drift hits both sides:
+`--smoke` is for "does this still run" — one un-warmed iteration, and the
+script restores `results.json` afterwards precisely so those numbers cannot
+leak into anything.
+
+Two checks cost seconds and are worth running freely:
 
 ```sh
-./benchmark.sh --ab ledger-diff              # against HEAD
-./benchmark.sh --ab --ref v0.8.5 ledger-diff # against a tag or commit
+./benchmark.sh --verify   # is the ratio report in step with results.json?
+./benchmark.sh --check    # do the cases still match their published examples?
 ```
-
-The `native` side is the control. **If it moved more than ~2%, the machine was
-too busy and the row means nothing** — `ab_bench` fails the run when that
-happens, and the script surfaces it.
-
-A clean control is not sufficient on its own, though. At `ab_bench`'s default
-12 rounds, four readings in the 0.8.6 pass looked like solid ±3-4% results
-*against clean controls* and were all gone at 20, so `--ab` runs 20. Add
-`--all` to sweep every case.
-
-Two more things that have burned us, both handled by the script: `--smoke`
-writes un-warmed numbers into `results.json` like any real run, and a sweep
-that skips the report regeneration leaves the two files disagreeing until
-someone notices months later.
 
 Adding or changing a case? `benchmark/AUTHORING.md` has the rules — the first
 being that a case must measure the same pipeline its published example shows,
