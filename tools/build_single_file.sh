@@ -202,6 +202,12 @@ List<A> _$uniqByStrict<A, B>(B Function(A a) f, Iterable<A> iterable) =>
 List<A> _$takeUniqBy<A, B extends Object>(
         int count, B? Function(A a) f, Iterable<A> iterable) =>
     takeUniqBy(count, f, iterable);
+Iterable<B> _$mapNotNull<A, B extends Object>(
+        B? Function(A a) f, Iterable<A> iterable) =>
+    mapNotNull(f, iterable);
+FxAsyncIterable<B> _$mapNotNullAsync<A, B extends Object>(
+        FutureOr<B?> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    mapNotNullAsync(f, iterable);
 Iterable<A> _$differenceBy<A, B>(
         B Function(A a) f, Iterable<A> iterable1, Iterable<A> iterable2) =>
     differenceBy(f, iterable1, iterable2);
@@ -303,6 +309,11 @@ Iterable<(int, A)> _$zipWithIndex<A>(Iterable<A> iterable) =>
 FxAsyncIterable<(int, A)> _$zipWithIndexAsync<A>(
         FxAsyncIterable<A> iterable) =>
     zipWithIndexAsync(iterable);
+(List<A>, List<B>) _$unzip<A, B>(Iterable<(A, B)> iterable) =>
+    unzip(iterable);
+Future<(List<A>, List<B>)> _$unzipAsync<A, B>(
+        FxAsyncIterable<(A, B)> iterable) =>
+    unzipAsync(iterable);
 
 // lazy/combine.dart
 Iterable<A> _$append<A>(A a, Iterable<A> iterable) => append(a, iterable);
@@ -411,6 +422,9 @@ Future<Acc> _$foldRightWithIndexAsync<A, Acc>(
     foldRightWithIndexAsync(seed, f, iterable);
 num _$sum(Iterable<num> iterable) => sum(iterable);
 Future<num> _$sumAsync(FxAsyncIterable<num> iterable) => sumAsync(iterable);
+num _$product(Iterable<num> iterable) => product(iterable);
+Future<num> _$productAsync(FxAsyncIterable<num> iterable) =>
+    productAsync(iterable);
 double _$average(Iterable<num> iterable) => average(iterable);
 Future<double> _$averageAsync(FxAsyncIterable<num> iterable) =>
     averageAsync(iterable);
@@ -433,6 +447,11 @@ num _$sumBy<A>(num Function(A a) f, Iterable<A> iterable) =>
 Future<num> _$sumByAsync<A>(
         FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) =>
     sumByAsync(f, iterable);
+num _$productBy<A>(num Function(A a) f, Iterable<A> iterable) =>
+    productBy(f, iterable);
+Future<num> _$productByAsync<A>(
+        FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    productByAsync(f, iterable);
 double _$averageBy<A>(num Function(A a) f, Iterable<A> iterable) =>
     averageBy(f, iterable);
 Future<double> _$averageByAsync<A>(
@@ -534,6 +553,17 @@ bool _$every<A>(bool Function(A a) f, Iterable<A> iterable) =>
 Future<bool> _$everyAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
     everyAsync(f, iterable);
+bool _$none<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    none(f, iterable);
+Future<bool> _$noneAsync<A>(
+        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    noneAsync(f, iterable);
+B? _$firstNotNullOf<A, B extends Object>(
+        B? Function(A a) f, Iterable<A> iterable) =>
+    firstNotNullOf(f, iterable);
+Future<B?> _$firstNotNullOfAsync<A, B extends Object>(
+        FutureOr<B?> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    firstNotNullOfAsync(f, iterable);
 WRAPPERS
 
 } > "$OUT"

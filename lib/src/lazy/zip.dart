@@ -326,6 +326,56 @@ class _Zip3Iterator<A, B, C> implements Iterator<(A, B, C)> {
   }
 }
 
+/// Splits an iterable of pairs back into a pair of lists — the inverse of
+/// [zip], with `unzip(zip(a, b))` returning `a` and `b` truncated to the
+/// shorter of the two.
+///
+/// Strict, and it has to be: a lazy `unzip` would have to hand back two
+/// iterables over one source, so draining either would buffer everything the
+/// other has not reached (the cost `fork` pays). Both lists are filled in a
+/// single pass instead.
+///
+/// Dart-native addition (FxTS has no `unzip`); Kotlin and Rust spell it the
+/// same, and the TS tuple becomes a Dart record — as in `partition`.
+///
+/// ```dart
+/// unzip([('a', 1), ('b', 2)]); // (['a', 'b'], [1, 2])
+/// ```
+(List<A>, List<B>) unzip<A, B>(Iterable<(A, B)> iterable) {
+  final lefts = <A>[];
+  final rights = <B>[];
+  if (iterable is List<(A, B)>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      final (a, b) = iterable[i];
+      lefts.add(a);
+      rights.add(b);
+    }
+    return (lefts, rights);
+  }
+  for (final (a, b) in iterable) {
+    lefts.add(a);
+    rights.add(b);
+  }
+  return (lefts, rights);
+}
+
+/// Async counterpart of [unzip].
+Future<(List<A>, List<B>)> unzipAsync<A, B>(
+  FxAsyncIterable<(A, B)> iterable,
+) async {
+  final lefts = <A>[];
+  final rights = <B>[];
+  final iterator = iterable.iterator;
+  while (true) {
+    final r = await iterator.next();
+    if (r.done) return (lefts, rights);
+    final (a, b) = r.value;
+    lefts.add(a);
+    rights.add(b);
+  }
+}
+
 /// Async counterpart of [zip]: pulls both sources in parallel per pair.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<(A, B)> zipAsync<A, B>(

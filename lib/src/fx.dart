@@ -76,6 +76,12 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// Identical to [map]; intended for side effects by convention.
   Fx<R> mapEffect<R>(R Function(T a) f) => map(f);
 
+  /// Maps each value through [f] and keeps only the non-null results —
+  /// `map(f).compact()` as a single lazy stage. See the top-level
+  /// `mapNotNull`.
+  Fx<R> mapNotNull<R extends Object>(R? Function(T a) f) =>
+      Fx(l.mapNotNull(f, _inner));
+
   /// See top-level `flatMap`; same contract as [Iterable.expand].
   Fx<R> flatMap<R>(Iterable<R> Function(T a) f) {
     final flatMapped = l.flatMap(f, _inner);
@@ -378,11 +384,22 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   @pragma('vm:prefer-inline')
   bool some(bool Function(T a) f) => s.some(f, _inner);
 
+  /// Whether [f] holds for no value — a universal, rather than the negated
+  /// existential `!some(f)`.
+  @pragma('vm:prefer-inline')
+  bool none(bool Function(T a) f) => s.none(f, _inner);
+
   /// The first value [f] matches, or `null`.
   T? find(bool Function(T a) f) => s.find(f, _inner);
 
   /// Dart-idiomatic alias of [find] (cf. `package:collection`).
   T? firstWhereOrNull(bool Function(T a) f) => find(f);
+
+  /// The first non-null result of [f], or `null` when [f] returns `null` for
+  /// every value — the projection [find] cannot hand back.
+  @pragma('vm:prefer-inline')
+  R? firstNotNullOf<R extends Object>(R? Function(T a) f) =>
+      s.firstNotNullOf(f, _inner);
 
   /// The index of the first value [f] matches, or -1.
   int findIndex(bool Function(T a) f) => s.findIndex(f, _inner);
@@ -407,6 +424,9 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// The sum of [f] over every value.
   num sumBy(num Function(T a) f) => s.sumBy(f, _inner);
 
+  /// The product of [f] over every value; `1` when empty.
+  num productBy(num Function(T a) f) => s.productBy(f, _inner);
+
   /// The mean of [f] over every value.
   double averageBy(num Function(T a) f) => s.averageBy(f, _inner);
 
@@ -426,13 +446,22 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   T? get last => s.last(_inner);
 
   /// The number of elements.
+  ///
+  /// O(1) for a `List` or `Set` source, O(n) for anything else: a general
+  /// [Iterable] exposes no cheaper count, so this walks the chain. Unlike
+  /// [isEmpty] it therefore does not terminate on an unbounded chain — that
+  /// is inherent to counting, not a defect to fix.
   int get length => s.size(_inner);
 
   /// True if there are no elements.
-  bool get isEmpty => size() == 0;
+  ///
+  /// O(1): asks the source for its first element and stops. Through 0.8.5
+  /// this was `size() == 0`, which walked the whole chain and so never
+  /// returned for an unbounded one — `fx(cycle([1, 2])).isEmpty` hung.
+  bool get isEmpty => _inner.isEmpty;
 
-  /// True if there is at least one element.
-  bool get isNotEmpty => !isEmpty;
+  /// True if there is at least one element. O(1), like [isEmpty].
+  bool get isNotEmpty => _inner.isNotEmpty;
 
   // --- Phase 1: Aggregation Operators ---
 
@@ -519,6 +548,12 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 
 /// Numeric terminals for [Fx] chains (generic covariance makes these apply
 /// to `Fx<int>` and `Fx<double>` as well).
+///
+/// [min] and [max] are reachable only through explicit extension
+/// application — `FxNum(fx(xs)).min()`. On a plain `fx(xs).min()` receiver
+/// the [Fx.min] *member* wins: a member redeclared on an extension type
+/// shadows every extension on that type. Both spellings are supported, and
+/// they now agree on empty input.
 extension FxNum on Fx<num> {
   /// The sum of every value.
   @pragma('vm:prefer-inline')
@@ -528,13 +563,38 @@ extension FxNum on Fx<num> {
   @pragma('vm:prefer-inline')
   double average() => s.average(_inner);
 
-  /// The smallest value.
-  @pragma('vm:prefer-inline') // coverage:ignore-line
-  num min() => s.min(_inner); // coverage:ignore-line
+  /// The product of every value; `1` when empty.
+  @pragma('vm:prefer-inline')
+  num product() => s.product(_inner);
 
-  /// The largest value.
-  @pragma('vm:prefer-inline') // coverage:ignore-line
-  num max() => s.max(_inner); // coverage:ignore-line
+  /// The smallest value; `NaN` when any value is `NaN`.
+  ///
+  /// Throws a [StateError] on an empty chain, matching the [Fx.min] member
+  /// this extension sits behind. Through 0.8.5 it returned `double.infinity`
+  /// there instead, so the two spellings disagreed.
+  @pragma('vm:prefer-inline')
+  num min() {
+    if (_inner.isEmpty) throw StateError('No element');
+    return s.min(_inner);
+  }
+
+  /// The largest value; `NaN` when any value is `NaN`.
+  ///
+  /// Throws a [StateError] on an empty chain, matching the [Fx.max] member —
+  /// see [min].
+  @pragma('vm:prefer-inline')
+  num max() {
+    if (_inner.isEmpty) throw StateError('No element');
+    return s.max(_inner);
+  }
+}
+
+/// Pair terminals for [Fx] chains over two-element records — the shape
+/// `zip`, `attach` and `pairwise` produce.
+extension FxPair<A, B> on Fx<(A, B)> {
+  /// Splits the pairs into `(lefts, rights)` in one pass — the inverse of
+  /// `zip`. See the top-level `unzip`.
+  (List<A>, List<B>) unzip() => l.unzip(_inner);
 }
 
 /// Async chainable iterable — the async half of FxTS's `fx` chain.
@@ -565,6 +625,12 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Identical to [map]; intended for side effects by convention.
   @pragma('vm:prefer-inline')
   FxAsync<R> mapEffect<R>(FutureOr<R> Function(T a) f) => map(f);
+
+  /// Maps each value through [f] and keeps only the non-null results. See
+  /// the top-level `mapNotNullAsync`.
+  @pragma('vm:prefer-inline')
+  FxAsync<R> mapNotNull<R extends Object>(FutureOr<R?> Function(T a) f) =>
+      FxAsync(l.mapNotNullAsync(f, _inner));
 
   /// Maps each value to an iterable via [f] and flattens the results.
   @pragma('vm:prefer-inline')
@@ -887,11 +953,19 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Whether [f] holds for every value.
   Future<bool> every(FutureOr<bool> Function(T a) f) => s.everyAsync(f, _inner);
 
+  /// Whether [f] holds for no value.
+  Future<bool> none(FutureOr<bool> Function(T a) f) => s.noneAsync(f, _inner);
+
   /// Joins the values into a string separated by [sep].
   Future<String> join([String sep = ',']) => s.joinAsync(sep, _inner);
 
   /// The first value [f] matches, or `null`.
   Future<T?> find(FutureOr<bool> Function(T a) f) => s.findAsync(f, _inner);
+
+  /// The first non-null result of [f], or `null` when [f] returns `null` for
+  /// every value.
+  Future<R?> firstNotNullOf<R extends Object>(FutureOr<R?> Function(T a) f) =>
+      s.firstNotNullOfAsync(f, _inner);
 
   /// The index of the first value [f] matches, or -1.
   Future<int> findIndex(FutureOr<bool> Function(T a) f) =>
@@ -912,6 +986,10 @@ class FxAsync<T> implements FxAsyncIterable<T> {
 
   /// The sum of [f] over every value.
   Future<num> sumBy(FutureOr<num> Function(T a) f) => s.sumByAsync(f, _inner);
+
+  /// The product of [f] over every value; `1` when empty.
+  Future<num> productBy(FutureOr<num> Function(T a) f) =>
+      s.productByAsync(f, _inner);
 
   /// The mean of [f] over every value.
   Future<double> averageBy(FutureOr<num> Function(T a) f) =>
@@ -1018,9 +1096,19 @@ extension FxAsyncNum on FxAsync<num> {
   /// The arithmetic mean of every value.
   Future<double> average() => s.averageAsync(this);
 
+  /// The product of every value; `1` when empty.
+  Future<num> product() => s.productAsync(this);
+
   /// The smallest value.
   Future<num> min() => s.minAsync(this);
 
   /// The largest value.
   Future<num> max() => s.maxAsync(this);
+}
+
+/// Pair terminals for [FxAsync] chains over two-element records.
+extension FxAsyncPair<A, B> on FxAsync<(A, B)> {
+  /// Splits the pairs into `(lefts, rights)` in one pass — the inverse of
+  /// `zip`. See the top-level `unzipAsync`.
+  Future<(List<A>, List<B>)> unzip() => l.unzipAsync(this);
 }

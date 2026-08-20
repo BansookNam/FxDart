@@ -480,6 +480,97 @@ Future<num> sumByAsync<A>(
 Future<num> sumAsync(FxAsyncIterable<num> iterable) =>
     foldAsync<num, num>(0, (a, b) => a + b, iterable);
 
+/// Multiplies every number in the iterable.
+///
+/// Empty input returns `1`, the multiplicative identity — the value that
+/// makes `product(concat(xs, ys)) == product(xs) * product(ys)` hold for
+/// every pair of inputs, including empty ones, exactly as [sum]'s empty `0`
+/// does for addition.
+///
+/// Dart-native addition (FxTS has `sum` but no `product`); Kotlin spells the
+/// keyed form `fold(1) { … }`, Rust `product`.
+///
+/// ```dart
+/// product([2, 3, 4]); // 24
+/// product(<num>[]); // 1
+/// ```
+@pragma('vm:prefer-inline')
+num product(Iterable<num> iterable) {
+  // Same unboxed int-then-double accumulation as [sum]: ints multiply in an
+  // int until the first double arrives, then accumulation switches to double
+  // seeded with the int total — the value a boxed `num acc *= v` would hold
+  // at every step.
+  var iacc = 1;
+  var dacc = 1.0;
+  var isInt = true;
+  for (final v in iterable) {
+    if (isInt) {
+      if (v is int) {
+        iacc *= v;
+        continue;
+      }
+      dacc = iacc.toDouble();
+      isInt = false;
+    }
+    dacc *= v;
+  }
+  return isInt ? iacc : dacc;
+}
+
+/// Multiplies the key [f] of every element — `map` + [product] in one step,
+/// the counterpart of [sumBy].
+///
+/// Empty input returns `1` (the [product] contract).
+///
+/// Dart-native addition; named after [sumBy]/[maxBy]/[minBy].
+@pragma('vm:prefer-inline')
+num productBy<A>(num Function(A a) f, Iterable<A> iterable) {
+  // Same unboxed accumulation as [product]; lists iterate by index so no
+  // iterator is allocated.
+  var iacc = 1;
+  var dacc = 1.0;
+  var isInt = true;
+  if (iterable is List<A>) {
+    final len = iterable.length;
+    for (var i = 0; i < len; i++) {
+      final v = f(iterable[i]);
+      if (isInt) {
+        if (v is int) {
+          iacc *= v;
+          continue;
+        }
+        dacc = iacc.toDouble();
+        isInt = false;
+      }
+      dacc *= v;
+    }
+    return isInt ? iacc : dacc;
+  }
+  for (final a in iterable) {
+    final v = f(a);
+    if (isInt) {
+      if (v is int) {
+        iacc *= v;
+        continue;
+      }
+      dacc = iacc.toDouble();
+      isInt = false;
+    }
+    dacc *= v;
+  }
+  return isInt ? iacc : dacc;
+}
+
+/// Async counterpart of [product].
+Future<num> productAsync(FxAsyncIterable<num> iterable) =>
+    foldAsync<num, num>(1, (a, b) => a * b, iterable);
+
+/// Async counterpart of [productBy].
+Future<num> productByAsync<A>(
+  FutureOr<num> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => foldAsync<A, num>(1, (acc, a) async => acc * await f(a), iterable);
+
 /// Concatenates every string in the iterable.
 ///
 /// `Iterable.join()`, not `fold('', (a, b) => a + b)`: the fold copies the
