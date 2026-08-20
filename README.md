@@ -27,7 +27,7 @@ await fx(userIds).toAsync().map(fetchUser).concurrent(3).toList();
 </a>
 
 <a href="https://bansooknam.github.io/FxDart/DartComparison/">
-  <img src="https://img.shields.io/badge/%E2%9A%96%EF%B8%8F%20Dart%20vs%20FxDart-50%20Side--by--Side%20Examples%20%E2%86%92-0984E3?style=for-the-badge&labelColor=074B80" alt="Dart vs FxDart — 50 Side-by-Side Examples" height="56">
+  <img src="https://img.shields.io/badge/%E2%9A%96%EF%B8%8F%20Dart%20vs%20FxDart-53%20Side--by--Side%20Examples%20%E2%86%92-0984E3?style=for-the-badge&labelColor=074B80" alt="Dart vs FxDart — 53 Side-by-Side Examples" height="56">
 </a>
 
 <a href="https://bansooknam.github.io/FxDart/RxDartComparison/">
@@ -40,7 +40,7 @@ await fx(userIds).toAsync().map(fetchUser).concurrent(3).toList();
 |---|---|---|
 | 📚 | **FxDart 101** | A guided course with an in-browser playground for *every* function |
 | 📒 | **Daily Ledger** | A full app built with fxdart, running live |
-| ⚖️ | **Dart vs FxDart** | 50 problems solved both ways, with an honest verdict on each |
+| ⚖️ | **Dart vs FxDart** | 53 problems solved both ways, with an honest verdict on each |
 | ⚡ | **RxDart vs FxDart** | The same 50-example format vs RxDart — push streams vs pull pipelines, *including* the cases where RxDart is simply the right tool |
 
 ---

@@ -22,7 +22,7 @@ nextLabel: filter
     자신을 발견하게 됩니다:
     <code>.map((x)&nbsp;async&nbsp;=&gt;&nbsp;(x,&nbsp;await&nbsp;f(x)))</code>.
     <code>attach(f)</code>는 그 관용구를 연산자로 만든 것입니다.
-    <code>(값, f(값))</code> 쌍을 지연 방식으로 내놓습니다.
+    <code>(value, f(value))</code> 쌍을 지연 방식으로 내놓습니다.
   </p>
   <p>
     진가는 비동기 체인에서 드러납니다. 품목마다 가격을 조회하면 쌍이

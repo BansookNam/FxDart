@@ -23,7 +23,7 @@ description: FxDart — библиотека функционального пр
   <p>
     <a class="demo-cta cta-compare" href="DartComparison/">
       <span class="demo-cta-emoji">⚖️</span>
-      Dart vs FxDart — 50 реальных задач, бок о бок&nbsp;→
+      Dart vs FxDart — 53 реальные задачи, бок о бок&nbsp;→
     </a>
   </p>
 

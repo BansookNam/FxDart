@@ -10,7 +10,7 @@ prevLabel: props
 next: evolve.html
 nextLabel: evolve
 ---
-  <p class="hero-sub">맵의 값 전체, 키 전체, 또는 <code>(키, 값)</code> 엔트리 전체를 변환합니다.</p>
+  <p class="hero-sub">맵의 값 전체, 키 전체, 또는 <code>(key, value)</code> 엔트리 전체를 변환합니다.</p>
 
   {{signature}}
 
@@ -22,7 +22,7 @@ nextLabel: evolve
     <a href="omitBy.html"><code>omitBy</code></a>) 일부를 읽습니다.
     이 셋은 맵을 <em>변환</em>합니다. <code>mapValues</code>는 값마다 콜백을
     돌리고 키는 건드리지 않으며, <code>mapKeys</code>는 그 반대,
-    <code>mapEntries</code>는 <code>(키, 값)</code> 레코드를 통째로 받아 새
+    <code>mapEntries</code>는 <code>(key, value)</code> 레코드를 통째로 받아 새
     레코드를 돌려줍니다.
   </p>
   <p>

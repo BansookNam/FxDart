@@ -28,8 +28,8 @@ nextLabel: indexBy
     <code>g.items</code>로 읽힙니다.
   </p>
   <p>
-    그룹은 <code>groupBy</code>의 맵이 순회되는 것과 똑같이
-    <strong>키를 처음 만난 순서</strong>로 나옵니다.
+    그룹은 <strong>키를 처음 만난 순서</strong>로 나옵니다.
+    <code>groupBy</code>의 맵이 순회되는 것과 똑같습니다.
     <code><a href="sortBy.html">sortBy</a></code>처럼 첫 그룹을 내놓기
     전에 모든 값을 봐야 하므로 그룹핑 자체는 즉시 평가되고, 그 주변의
     체인은 계속 합성 가능합니다.

@@ -17,9 +17,9 @@ nextLabel: countWhere
   <h2>강의</h2>
   <p>
     <code>foldBy</code>는 <code><a href="fold.html">fold</a></code>를 소스
-    전체에 한 번이 아니라 <em>키마다 한 번씩</em> 실행하는 것입니다. 각
+    전체에 한 번이 아니라 키마다 한 번씩 실행하는 것입니다. 각
     원소가 자기 키를 고르고, 그 값이 해당 키의 누적값에 접혀 들어갑니다.
-    그래서 결과는 원소의 <code>Map</code>이 아니라 답의
+    그래서 결과는 원소가 아니라 답의
     <code>Map&lt;K, Acc&gt;</code>입니다.
   </p>
   <p>
@@ -49,15 +49,15 @@ foldBy((Tx t) =&gt; t.category, 0.0, (sum, t) =&gt; sum + t.amount, txns);</code
     바로 이 이유로 이 함수로 옮겨 갔습니다.
   </p>
   <p>
-    다만 그 차이를 과대 해석하지는 마세요. 여기서 접기 콜백은 덧셈 하나라
+    다만 그 차이를 과대 해석하지는 마세요. 여기서 폴드 콜백은 덧셈 하나라
     맵이 작업의 대부분입니다. 누산기가 무거워지면 절약은 그대로지만 콜백
     자신의 비용에 묻힙니다 — 맨 아래 레코드에 관한 메모를 보세요.
     <code>foldBy</code>에 손을 뻗는 이유는 뜻하는 바를 그대로 말해 주기
     때문이고, 반복문보다 조금 빠른 것은 논거가 아니라 덤입니다.
   </p>
   <p>
-    키는 <code>groupBy</code>와 마찬가지로 <strong>처음 등장한 순서</strong>로
-    나옵니다. FxTS 포팅이 아니라, Kotlin의
+    키는 <strong>처음 등장한 순서</strong>로 나옵니다.
+    <code>groupBy</code>와 마찬가지입니다. FxTS 포팅이 아니라, Kotlin의
     <code>groupingBy().fold()</code>에서 온 형태입니다.
   </p>
 
@@ -95,6 +95,6 @@ foldBy((Tx t) =&gt; t.category, 0.0, (sum, t) =&gt; sum + t.amount, txns);</code
     <strong>관련 함수:</strong>
     <a href="groupBy.html"><code>groupBy</code></a> — 접지 않고 원소를 그대로 모읍니다 ·
     <a href="countBy.html"><code>countBy</code></a> — 카운터를 쓰는 <code>foldBy</code>에 이름을 붙인 것 ·
-    <a href="fold.html"><code>fold</code></a> — 누적값 하나에 대한 같은 접기 ·
+    <a href="fold.html"><code>fold</code></a> — 누적값 하나에 대한 같은 폴드 ·
     <a href="groupedBy.html"><code>groupedBy</code></a> — 체인 안에 머무는 그룹핑
   </div>
