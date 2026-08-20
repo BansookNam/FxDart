@@ -319,28 +319,40 @@ void main() {
       expect(windows.last, [2, 3]);
     });
 
-    test('the fused window is fixed-length, exactly like the unfused one', () {
-      // `windowed` hands out a fixed-length window (pinned in
-      // test/lazy/list_range_test.dart, "windows are fixed-length and
-      // independent"), and the fused path shares `_windowSlice` with the
-      // unfused one precisely so that cannot drift. A `sublist` copy would be
-      // ~2.3 ns an element cheaper and growable; see `_windowSlice` for why
-      // the contract wins.
+    test('every path hands back a growable window, fused or not', () {
+      // The bulk-copy canary. `_windowSlice` and `_WindowIterator._emit` both
+      // hand the copy to `List.sublist` to avoid a covariant store check per
+      // element, and a growable result is how that is observable from outside
+      // — on `smoothed-zone-changes` it measured as two thirds of this PR's
+      // win. Reverting either to a pre-sized fill would fail here.
+      //
+      // All four paths must agree, which is the point: before 0.8.6 the two
+      // sync paths were fixed-length while `windowedAsync` was already
+      // growable.
       final unfusedWindow = windowed(2, [1, 2, 3]).first;
       expect(unfusedWindow, [1, 2]);
-      expect(() => unfusedWindow.add(9), throwsUnsupportedError);
+      expect(() => unfusedWindow.add(9), returnsNormally);
 
       final fusedWindow = map((List<int> w) => w, windowed(2, [1, 2, 3])).first;
       expect(fusedWindow, [1, 2]);
-      expect(() => fusedWindow.add(9), throwsUnsupportedError);
+      expect(() => fusedWindow.add(9), returnsNormally);
 
-      // The pulled path builds its window out of the ring buffer, and agrees.
-      final pulledWindow = map(
+      // The pulled path builds its window out of the ring buffer. Both of its
+      // branches have to agree: `chunk` never wraps past the ring's end,
+      // an overlapping `windowed` does.
+      final contiguous = map(
         (List<int> w) => w,
-        windowed(2, pulled([1, 2, 3])),
+        chunk(2, pulled([1, 2, 3, 4])),
       ).first;
-      expect(pulledWindow, [1, 2]);
-      expect(() => pulledWindow.add(9), throwsUnsupportedError);
+      expect(contiguous, [1, 2]);
+      expect(() => contiguous.add(9), returnsNormally);
+
+      final wrapped = map(
+        (List<int> w) => w,
+        windowed(3, pulled([1, 2, 3, 4, 5])),
+      ).toList()[2];
+      expect(wrapped, [3, 4, 5], reason: 'this window wraps the ring');
+      expect(() => wrapped.add(9), returnsNormally);
     });
 
     test('rejects a non-positive size or step before fusing', () {

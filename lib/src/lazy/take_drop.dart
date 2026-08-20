@@ -919,6 +919,8 @@ FxAsyncIterable<A> sliceAsync<A>(
 /// Port of FxTS `chunk`. Equivalent to
 /// `windowed(size, iterable, step: size, partial: true)`, except that a
 /// non-positive [size] yields nothing instead of throwing.
+///
+/// Each chunk is a fresh growable list — see [windowed].
 Iterable<List<A>> chunk<A>(int size, Iterable<A> iterable) => size < 1
     ? Iterable<List<A>>.empty()
     : _WindowIterable(size, size, true, iterable);
@@ -937,6 +939,18 @@ Iterable<List<A>> chunk<A>(int size, Iterable<A> iterable) => size < 1
 /// windowed(3, [1, 2, 3, 4, 5], step: 2);       // ([1, 2, 3], [3, 4, 5])
 /// windowed(3, [1, 2, 3, 4, 5], partial: true); // (..., [3, 4, 5], [4, 5], [5])
 /// ```
+///
+/// Each window is a fresh growable list, owned by the caller: it is a copy,
+/// never a view onto the source, and mutating one window cannot disturb
+/// another or the source.
+///
+/// Windows became growable in 0.8.6. Before that the two sync paths handed
+/// back a fixed-length list while the async path (`windowedAsync`) already
+/// returned a growable one; all four paths now agree. The reason is
+/// performance: a fixed-length window has to be filled from package code, one
+/// covariant store check per element, and no bulk copy that preserves the
+/// fixed length is faster than that loop — the full measurement is on
+/// `_windowSlice`. Nothing that only reads a window is affected.
 Iterable<List<A>> windowed<A>(
   int size,
   Iterable<A> iterable, {
@@ -956,38 +970,38 @@ void _checkWindow(int size, int step) {
   }
 }
 
-/// One window of [list] — `list[i .. i + length)`.
+/// One window of [list] — `list[i .. i + length)` — copied by the SDK rather
+/// than element by element.
 ///
 /// Shared by [_WindowRangeIterator] and [_WindowRangeMapIterator] so the two
 /// cannot disagree about how a window is built.
 ///
-/// This fills a pre-sized fixed-length list element by element, which costs a
-/// **covariant store check per element**: `List<A>.operator[]=` takes a
-/// covariant parameter and `A` is a runtime type argument here, so the check
-/// cannot be elided — the cost `_MapIterable.toList` documents at length.
+/// Filling a pre-sized `List<A>` from package code costs a **covariant store
+/// check per element**: `List<A>.operator[]=` takes a covariant parameter and
+/// `A` is a runtime type argument here, so the check cannot be elided — the
+/// cost `_MapIterable.toList` documents at length. `List.sublist` reaches the
+/// VM's own `_slice`, which copies into an array carrying no type argument and
+/// so pays no check at all.
 ///
-/// Handing the copy to `List.sublist` instead removes that check: it reaches
-/// the VM's own `_slice`, which copies into an array carrying no type argument.
-/// Measured AOT over 1,000,000 windows of `double`, built and summed: this
-/// 16.4 ms vs `sublist` 14.1 ms at `size: 3`, 35.4 vs 26.7 at 7, 51.8 vs 36.0
-/// at 10 — about 2.3 ns a source element at the size `windowed` is usually
-/// called with. **It is not used, and the reason is a contract, not a doubt
-/// about the number:** `sublist` returns a *growable* list, and a fixed-length
-/// window is pinned behaviour (`test/lazy/list_range_test.dart`, "windows are
-/// fixed-length and independent"). Every bulk form that preserves the
-/// fixed length measured *slower* than this loop — `List.filled` + `setRange`
-/// 21.1 / 44.0 / 62.4, `getRange().toList(growable: false)` 29.1 / 55.0 / 76.9
-/// — because both copy through `Lists.copy`, an element loop behind an
-/// interface `[]=` call. So the check stays until the window's growability is
-/// deliberately re-specified, which is not this change's business.
+/// Measured AOT over 1,000,000 windows of `double`, built and summed: the
+/// pre-sized fill 16.4 ms against `sublist` 14.1 ms at `size: 3`, 35.4 vs 26.7
+/// at 7, 51.8 vs 36.0 at 10 — about 2.3 ns a source element at the default
+/// `step: 1`, which on `smoothed-zone-changes` measured as two thirds of the
+/// whole win (see the CHANGELOG). It also removes most of that case's
+/// run-to-run spread: the same A/B swung 4.8 percentage points across clean
+/// runs with the fill in place and 1.5 with it gone.
+///
+/// **No fixed-length bulk copy exists for package code.** `List.filled` +
+/// `setRange` (21.1 / 44.0 / 62.4 ms) and
+/// `getRange().toList(growable: false)` (29.1 / 55.0 / 76.9) are both *slower*
+/// than the fill they would replace, because both copy through `Lists.copy` —
+/// an element loop behind an interface `[]=` call. Buying the check back
+/// therefore means giving up the fixed-length window, which 0.8.6 does
+/// deliberately and uniformly: see [windowed] for the contract, and
+/// [_WindowIterator._emit] for the same change on the pulled path.
 @pragma('vm:prefer-inline')
-List<A> _windowSlice<A>(List<A> list, int i, int length) {
-  final window = List<A>.filled(length, list[i]);
-  for (var k = 1; k < length; k++) {
-    window[k] = list[i + k];
-  }
-  return window;
-}
+List<A> _windowSlice<A>(List<A> list, int i, int length) =>
+    list.sublist(i, i + length);
 
 class _WindowIterable<A> extends Iterable<List<A>>
     implements FxMapFusable<List<A>> {
@@ -1160,8 +1174,8 @@ class _WindowIterator<A> implements Iterator<List<A>> {
   final int _step;
   final bool _partial;
   final Iterator<A> _it;
-  // Overlapping elements are kept in a reused ring buffer so each emitted
-  // window costs exactly one exact-size allocation (no sublist + growth).
+  // Overlapping elements are kept in a reused ring buffer, so a window never
+  // re-pulls what the previous one already read.
   List<A>? _ring;
   int _ringStart = 0;
   int _ringCount = 0;
@@ -1178,14 +1192,29 @@ class _WindowIterator<A> implements Iterator<List<A>> {
     return false;
   }
 
+  /// One window out of the ring, growable to match [_windowSlice].
+  ///
+  /// The ring is itself a `List<A>`, so whenever the window does not wrap past
+  /// its end — always, for `chunk` and for any `step >= size`, where
+  /// [_ringStart] stays at 0 — the whole copy is one `sublist` and pays no
+  /// covariant store check. Only an overlapping window over a non-`List`
+  /// source wraps, and that tail is added by hand.
+  ///
+  /// Measured AOT over 1,000,000 windows of `double`, built and summed, at
+  /// `size` 3/7/10: contiguous 14.8/27.8/37.6 ms against 18.8/38.7/55.8 for
+  /// the pre-sized fill this replaces, wrapped 21.6/42.3/60.9 against
+  /// 19.6/41.4/59.0. So the common shape gets ~21% cheaper and only the
+  /// overlapping-over-a-generator shape pays, 2–10%, for a window whose
+  /// growability now matches every other path in the family.
   List<A> _emit(int length) {
     final ring = _ring!;
-    final window = List<A>.filled(length, ring[_ringStart]);
-    var idx = _ringStart;
-    for (var i = 0; i < length; i++) {
-      window[i] = ring[idx];
-      idx++;
-      if (idx == _size) idx = 0;
+    final start = _ringStart;
+    final head = _size - start;
+    if (length <= head) return ring.sublist(start, start + length);
+    final window = ring.sublist(start, _size);
+    final wrapped = length - head;
+    for (var k = 0; k < wrapped; k++) {
+      window.add(ring[k]);
     }
     return window;
   }
