@@ -874,11 +874,13 @@ class _SliceIterator<A> implements Iterator<A> {
   late A current;
   @override
   bool moveNext() {
-    // Matches the generator form: the source is consumed to its end even
-    // past [_end] — iteration stops only when the source does.
-    while (_it.moveNext()) {
-      final index = _i++;
-      if (index >= _start && (_end == null || index < _end)) {
+    // Stops pulling once index [_end] is reached, so `slice(0, xs, k)` costs
+    // O(k) like [take] instead of walking the whole source. The elements
+    // before [_start] still have to be pulled — the cut is by index.
+    final end = _end;
+    while (end == null || _i < end) {
+      if (!_it.moveNext()) return false;
+      if (_i++ >= _start) {
         current = _it.current;
         return true;
       }
