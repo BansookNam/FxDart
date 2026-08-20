@@ -192,6 +192,22 @@ class _Converter {
       .map((l) => '<span class="cl">${_esc(l).isEmpty ? ' ' : _esc(l)}</span>')
       .join();
 
+  /// The learning-objectives box, told apart by its *shape*: a fully bold
+  /// first line followed by nothing but bullets.
+  ///
+  /// It used to be matched on the literal `**In this chapter**`, which is
+  /// English — so every translated chapter lost the styling and rendered the
+  /// box as a plain pull quote. The Korean edition had 22 of them and showed
+  /// none. Across the book this shape matches those 22 and none of the other
+  /// 27 blockquotes, in any language, because a depth box opens with 🎓 and a
+  /// pull quote is prose rather than a bullet list.
+  static bool _isGoals(List<String> body) {
+    final lines = body.where((l) => l.trim().isNotEmpty).toList();
+    if (lines.length < 2) return false;
+    if (!RegExp(r'^\*\*.+\*\*$').hasMatch(lines.first.trim())) return false;
+    return lines.skip(1).every((l) => l.trimLeft().startsWith('- '));
+  }
+
   /// Blockquotes carry three roles, told apart by their content: the learning
   /// objectives that open a chapter, 🎓 depth boxes (skippable theory), and
   /// plain pull quotes.
@@ -211,9 +227,7 @@ class _Converter {
       i++;
     }
     final text = body.join('\n');
-    final cls = text.contains('🎓')
-        ? 'deep'
-        : (text.contains('**In this chapter**') ? 'goals' : 'quote');
+    final cls = text.contains('🎓') ? 'deep' : (_isGoals(body) ? 'goals' : 'quote');
     final inner = _Converter(
       number: number,
       diagramsDir: diagramsDir,
