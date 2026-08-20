@@ -19,6 +19,23 @@ run.sh
 DEPLOY.md
 CODECOV.md
 
+# Benchmark suite (295 files / 428 KB of case sources and result JSON) —
+# useful in the repo, dead weight for a consumer.
+benchmark/
+
+# The nested Flutter demo app and its plan doc. example/fxdart_example.dart
+# stays: pub.dev renders and scores it, so a bare example/ entry here would
+# cost that scored category.
+example/daily_ledger/
+example/dart_comparison_plan.md
+
+# Agent-harness instructions for this repo, not API documentation. Anchored so a
+# future consumer-facing skills/**/CLAUDE.md still ships. AGENTS.md is untracked
+# and listed in .git/info/exclude, yet it shipped before this entry existed:
+# .pubignore replaces gitignore semantics, so git-ignored is not archive-excluded.
+/AGENTS.md
+/CLAUDE.md
+
 # Working plans — local only. .pubignore fully overrides .gitignore, so the
 # .gitignore entry for plans/ does NOT keep it out of the published archive.
 plans/
