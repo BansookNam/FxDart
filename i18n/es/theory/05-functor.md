@@ -2,7 +2,7 @@
 slug: functor
 chapter: 5
 part: 2
-title: Functor
+title: El functor
 description: El primer piso de la torre — map, sus dos leyes, y por qué «estructura preservada, contenido cambiado» es lo que convierte la fusión de etapas en un refactor y no en una reescritura.
 ---
 # Functor

@@ -111,6 +111,8 @@
   "theory/03-illegal-states.md": "140ceeaf57ae02d8",
   "theory/04-functions-as-values.md": "0a97bfb8c3d7e4c5",
   "theory/05-functor.md": "4d674a795f23ed4a",
+  "theory/06-applicative.md": "-3242a68bf3ae242d",
+  "theory/07-monad-in-anger.md": "75ab7521e6d92a30",
   "theory/book.md": "-1398aa4db693320d",
   "tutorials/accumulate.md": "-631b7ecc6ff95fe2",
   "tutorials/add.md": "-386e9b18e0fc3945",
