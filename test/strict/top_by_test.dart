@@ -206,9 +206,7 @@ void main() {
         _numericIds(sortByDesc(_numericKey, _numericRows).take(4)),
       );
       expect(
-        _numericIds(
-          await bottomByAsync(4, _numericKey, toAsync(_numericRows)),
-        ),
+        _numericIds(await bottomByAsync(4, _numericKey, toAsync(_numericRows))),
         _numericIds(sortBy(_numericKey, _numericRows).take(4)),
       );
     });

@@ -36,10 +36,7 @@ void main() {
       final iterator = toPairs(map).iterator;
       expect(iterator.moveNext(), isTrue);
       map['b'] = 2;
-      expect(
-        iterator.moveNext,
-        throwsA(isA<ConcurrentModificationError>()),
-      );
+      expect(iterator.moveNext, throwsA(isA<ConcurrentModificationError>()));
     });
 
     test('enters a chain without a MapEntry conversion stage', () {

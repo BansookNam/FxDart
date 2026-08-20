@@ -97,14 +97,8 @@ void main() {
     });
 
     test('a single-pass iterable does not lose its first element', () {
-      expect(
-        FxNum(fx(_SinglePassIterable<num>([3, 1, 2]))).min(),
-        1,
-      );
-      expect(
-        FxNum(fx(_SinglePassIterable<num>([3, 1, 2]))).max(),
-        3,
-      );
+      expect(FxNum(fx(_SinglePassIterable<num>([3, 1, 2]))).min(), 1);
+      expect(FxNum(fx(_SinglePassIterable<num>([3, 1, 2]))).max(), 3);
     });
 
     test('FxNum.sum / average / product still resolve', () {
