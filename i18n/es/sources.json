@@ -113,6 +113,8 @@
   "theory/05-functor.md": "4d674a795f23ed4a",
   "theory/06-applicative.md": "-3242a68bf3ae242d",
   "theory/07-monad-in-anger.md": "75ab7521e6d92a30",
+  "theory/08-monoid.md": "52c3843c4a352eae",
+  "theory/09-traverse.md": "-88def6462dbc6aa",
   "theory/book.md": "-1398aa4db693320d",
   "tutorials/accumulate.md": "-631b7ecc6ff95fe2",
   "tutorials/add.md": "-386e9b18e0fc3945",
