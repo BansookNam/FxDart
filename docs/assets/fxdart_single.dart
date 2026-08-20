@@ -8915,17 +8915,16 @@ List<A> toSorted<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
     sort(f, iterable);
 
 int _compareKeys(Object? fa, Object? fb) {
-  // `num` first: it is the overwhelmingly common key kind, and a direct
-  // comparison skips two `is Comparable` tests, two casts and
-  // `Comparable.compare`'s virtual dispatch. Measured on `maxBy` over 1M
-  // readings keyed by a double: 8.9 ms → 6.3 ms, against 2.1 ms for a
-  // hand-written `reduce`. The rest of that gap is the key extractor's
-  // closure call plus boxing each key into the `Object?` the signature
-  // takes — neither removable without changing the public shape.
+  // `num` first: it is the overwhelmingly common key kind, and its direct
+  // `compareTo` preserves the order used by the sort family's numeric paths
+  // while skipping two `is Comparable` tests, two casts and
+  // `Comparable.compare`'s indirection. Measured on `maxBy` over 1M readings
+  // keyed by a double: 8.9 ms → 6.3 ms, against 2.1 ms for a hand-written
+  // `reduce`. The rest of that gap is the key extractor's closure call plus
+  // boxing each key into the `Object?` the signature takes — neither removable
+  // without changing the public shape.
   if (fa is num && fb is num) {
-    if (fa < fb) return -1;
-    if (fa > fb) return 1;
-    return 0;
+    return fa.compareTo(fb);
   }
   if (fa is Comparable && fb is Comparable) {
     return Comparable.compare(
@@ -9370,8 +9369,9 @@ Future<List<A>> sortByDescAsync<A>(
 /// - **[k]** — `k <= 0` returns an empty list; a [k] beyond the input length
 ///   returns every element, ordered.
 ///
-/// Keys are compared exactly as [sortBy] compares them, so `null` and
-/// mutually incomparable keys compare equal here too.
+/// Keys are compared exactly as [sortBy] compares them. Pairs that do not both
+/// implement [Comparable] compare equal; incompatible [Comparable] key types
+/// may throw instead, exactly as they do in [sortBy].
 ///
 /// The boundary is maintained by insertion, so the worst case is `O(n·k)`
 /// comparisons: this is for a small [k] over a large input. Use [sortByDesc]
@@ -9961,8 +9961,9 @@ Map<K, V> fromEntries<K, V>(Iterable<(K, V)> entries) => {
 /// `fx(m.entries)` and then converting `MapEntry` back into the record shape
 /// the rest of fxdart speaks; `fx(toPairs(m))` is both steps at once.
 ///
-/// Lazy: this is a view over `Map.entries`, so nothing is copied. Iterating
-/// it after mutating [map] throws, exactly as iterating `Map.entries` does.
+/// Lazy: this is a view over `Map.entries`, so nothing is copied. Mutations
+/// made before iteration begins are reflected; structural mutation during
+/// active iteration may throw [ConcurrentModificationError].
 ///
 /// No `*Async` twin, and that is this file's convention rather than an
 /// omission: no function in `object.dart` has one, because a `Map` argument
@@ -13999,26 +14000,24 @@ extension FxNum on Fx<num> {
   @pragma('vm:prefer-inline')
   num product() => _$product(_inner);
 
-  /// The smallest value; `NaN` when any value is `NaN`.
+  /// The smallest value under `num.compareTo` ordering.
   ///
   /// Throws a [StateError] on an empty chain, matching the [Fx.min] member
   /// this extension sits behind. Through 0.8.5 it returned `double.infinity`
   /// there instead, so the two spellings disagreed.
   @pragma('vm:prefer-inline')
-  num min() {
-    if (_inner.isEmpty) throw StateError('No element');
-    return _$min(_inner);
-  }
+  num min() => _inner.reduce(
+    (result, item) => item.compareTo(result) < 0 ? item : result,
+  );
 
-  /// The largest value; `NaN` when any value is `NaN`.
+  /// The largest value under `num.compareTo` ordering.
   ///
   /// Throws a [StateError] on an empty chain, matching the [Fx.max] member —
   /// see [min].
   @pragma('vm:prefer-inline')
-  num max() {
-    if (_inner.isEmpty) throw StateError('No element');
-    return _$max(_inner);
-  }
+  num max() => _inner.reduce(
+    (result, item) => item.compareTo(result) > 0 ? item : result,
+  );
 }
 
 /// Pair terminals for [Fx] chains over two-element records — the shape
