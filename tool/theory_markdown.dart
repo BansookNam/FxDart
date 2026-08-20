@@ -205,7 +205,19 @@ class _Converter {
     final lines = body.where((l) => l.trim().isNotEmpty).toList();
     if (lines.length < 2) return false;
     if (!RegExp(r'^\*\*.+\*\*$').hasMatch(lines.first.trim())) return false;
-    return lines.skip(1).every((l) => l.trimLeft().startsWith('- '));
+    // A bullet may wrap. English objectives happen to fit on one line each;
+    // a translation of the same sentence usually does not, and the first
+    // version of this check called those chapters plain quotes — the same
+    // English-shaped assumption it was written to remove.
+    var bullets = 0;
+    for (final l in lines.skip(1)) {
+      if (l.startsWith('- ')) {
+        bullets++;
+      } else if (!l.startsWith(' ')) {
+        return false; // prose, not a wrapped bullet
+      }
+    }
+    return bullets > 0;
   }
 
   /// Blockquotes carry three roles, told apart by their content: the learning
