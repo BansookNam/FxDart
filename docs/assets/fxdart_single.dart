@@ -2991,6 +2991,118 @@ FxAsyncIterable<A> scan1Async<A>(
   });
 }
 
+/// Folds [seed] into each value with [f] and emits every intermediate
+/// accumulation — n values in, n values out.
+///
+/// This is [scan] without the seed in the output. [scan] and Kotlin's
+/// `runningFold` emit `seed` first and so produce n+1 values; [mapAccum],
+/// Rust's `Iterator::scan`, Haskell's `mapAccumL` and RxDart's `scan`
+/// produce n. Use [scan] when the starting state is part of the answer
+/// (a ledger's opening balance), [mapAccum] when it is only the state the
+/// first element folds into — the case that otherwise ends in a trailing
+/// `.drop(1)`.
+///
+/// [f] runs exactly once per element, in order, and the accumulator is
+/// per-iteration: iterating twice starts from [seed] both times.
+///
+/// Argument order matches [scan] deliberately — `scan` to `mapAccum` is a
+/// one-word edit.
+///
+/// ```dart
+/// mapAccum((acc, a) => acc + a, 0, [1, 2, 3]); // (1, 3, 6)
+/// scan((acc, a) => acc + a, 0, [1, 2, 3]); //     (0, 1, 3, 6)
+/// ```
+Iterable<B> mapAccum<A, B>(
+  B Function(B acc, A a) f,
+  B seed,
+  Iterable<A> iterable,
+) => _MapAccumIterable(f, seed, iterable);
+
+class _MapAccumIterable<A, B> extends Iterable<B> {
+  _MapAccumIterable(this._f, this._seed, this._source);
+  final B Function(B, A) _f;
+  final B _seed;
+  final Iterable<A> _source;
+  @override
+  Iterator<B> get iterator => _MapAccumIterator(_f, _seed, _source.iterator);
+  @override
+  List<B> toList({bool growable = true}) {
+    final source = _source;
+    // A List source accumulates into a pre-sized list (output length is
+    // exactly n) — as in [_ScanIterable.toList], the inherited toList would
+    // grow and recopy ~log n times. [_f] still runs exactly once per
+    // element, in order.
+    if (source is List<A>) {
+      final length = source.length;
+      final out = List<B>.filled(length, _seed, growable: growable);
+      var acc = _seed;
+      for (var i = 0; i < length; i++) {
+        acc = _f(acc, source[i]);
+        out[i] = acc;
+      }
+      return out;
+    }
+    return super.toList(growable: growable);
+  }
+}
+
+class _MapAccumIterator<A, B> implements Iterator<B> {
+  _MapAccumIterator(this._f, this._acc, this._it);
+  final B Function(B, A) _f;
+  final Iterator<A> _it;
+  // The accumulator *is* the current value once a step has run — one field
+  // for both, where [_ScanIterator] needs the seed slot to emit as well.
+  B _acc;
+  @override
+  B get current => _acc;
+  @override
+  bool moveNext() {
+    if (!_it.moveNext()) return false;
+    _acc = _f(_acc, _it.current);
+    return true;
+  }
+}
+
+/// Async counterpart of [mapAccum]. [seed] and [f] may each return a
+/// [Future]; values are folded in source order.
+@pragma('vm:prefer-inline')
+FxAsyncIterable<B> mapAccumAsync<A, B>(
+  FutureOr<B> Function(B acc, A a) f,
+  FutureOr<B> seed,
+  FxAsyncIterable<A> iterable,
+) {
+  // [_scanAsyncLegacy]'s shape without the seed emission, and serialized
+  // for the reason that one is: the accumulator is a single slot, so a
+  // concurrent consumer must not be able to interleave two folds. The state
+  // lives in dispatchAsync's builder, so each iteration starts from [seed]
+  // again. Not a fused stage — FxScanStage emits the seed, which is the one
+  // thing this operator does not do.
+  return dispatchAsync(iterable, (source) {
+    final iterator = source.iterator;
+    FutureOr<B> acc = seed;
+    return SerialAsyncIterator((concurrent) {
+      return iterator.next(concurrent).then((result) {
+        if (result.done) return IterResult<B>.done();
+        final previous = acc;
+        // A pending accumulator is chained onto rather than awaited, so a
+        // Future seed and a Future-returning [f] both fold in order without
+        // an extra await hop per element.
+        if (previous is Future<B>) {
+          final chained = previous.then(
+            (resolved) => f(resolved, result.value),
+          );
+          acc = chained;
+          return chained.then(IterResult<B>.value);
+        }
+        final next = f(previous, result.value);
+        acc = next;
+        if (next is Future<B>) return next.then(IterResult<B>.value);
+        return IterResult<B>.value(next);
+      });
+    });
+  });
+}
+
 // ---- lib/src/lazy/filter.dart ----
 
 
@@ -6988,6 +7100,39 @@ FxAsyncIterable<R> mapRetryAsync<A, R>(
   return mapAsync((A a) => retry(attempts, () => f(a), delay: delay), iterable);
 }
 
+/// Lazily maps each value with [f], handing any error [f] throws to
+/// [onError] and yielding what that returns in its place. One element's
+/// failure never ends the iteration.
+///
+/// The library's own raise signal is **rethrown, not recovered**: this
+/// delegates to [catching], so a `r.raise(...)` crossing [f] — from a
+/// `bind`, an `ensure`, or a nested builder — still short-circuits the
+/// enclosing `either {}` / `nullable {}` block. Recovering it here would
+/// turn a typed error into a lost one, and leak a raise out of its scope.
+///
+/// fxdart extension (not part of FxTS) — the per-element form of [catching],
+/// the pair [retry]/[mapRetryAsync] already establishes. RxDart writes this
+/// as `onErrorReturnWith` in the same position.
+///
+/// ```dart
+/// fx(ids).mapCatching(parse, (e, _) => Reading.invalid(e)).toList();
+/// ```
+Iterable<R> mapCatching<A, R>(
+  R Function(A a) f,
+  R Function(Object error, StackTrace stackTrace) onError,
+  Iterable<A> iterable,
+) => map((A a) => catching(() => f(a), onError), iterable);
+
+/// Async counterpart of [mapCatching]; [f] and [onError] may each return a
+/// [Future], and the raise signal is rethrown by [catchingAsync] for the
+/// same reason.
+@pragma('vm:prefer-inline')
+FxAsyncIterable<R> mapCatchingAsync<A, R>(
+  FutureOr<R> Function(A a) f,
+  FutureOr<R> Function(Object error, StackTrace stackTrace) onError,
+  FxAsyncIterable<A> iterable,
+) => mapAsync((A a) => catchingAsync(() => f(a), onError), iterable);
+
 /// Fails a pull with a [TimeoutException] when the upstream takes longer
 /// than [limit] to produce it. The limit applies to each pull (the time to
 /// produce one item), not to inter-item gaps or the whole pipeline.
@@ -8892,6 +9037,149 @@ Future<List<A>> sortByDescAsync<A>(
   FxAsyncIterable<A> iterable,
 ) => sortAsync((a, b) => _compareBy(f, b, a), iterable);
 
+/// The [k] elements with the largest keys [f], largest first.
+///
+/// One pass that keeps a [k]-sized boundary: allocation is proportional to
+/// [k] rather than to the input length, and nothing outside the boundary is
+/// retained. This replaces `sortByDesc(f, xs).take(k)`, which allocates a
+/// key array, an index list and a result list sized to the whole input,
+/// sorts all of it, and then discards all but [k].
+///
+/// The contract, which is what makes the result usable without a second
+/// pass:
+///
+/// - **Order** — descending by key, so the first element has the largest
+///   key. Ties keep their relative input order.
+/// - **Ties** — the element seen **first** wins. A later element whose key
+///   only equals the weakest kept key does not displace it, and an equal key
+///   inside the boundary is inserted *after* the ones already there.
+/// - **[k]** — `k <= 0` returns an empty list; a [k] beyond the input length
+///   returns every element, ordered.
+///
+/// Keys are compared exactly as [sortBy] compares them, so `null` and
+/// mutually incomparable keys compare equal here too.
+///
+/// The boundary is maintained by insertion, so the worst case is `O(n·k)`
+/// comparisons: this is for a small [k] over a large input. Use [sortByDesc]
+/// when [k] approaches the input length.
+///
+/// fxdart extension, not a port — FxTS, Kotlin and Lodash have no
+/// equivalent. The shape is Python's `heapq.nlargest`, Rust itertools'
+/// `k_largest_by_key` and Guava's `Ordering.greatestOf`.
+///
+/// ```dart
+/// topBy(2, (e) => e.amount, expenses); // the two largest, largest first
+/// ```
+// Inlined for the reason given on [minBy]: it is the caller's key extractor
+// that inlining exposes, not this call. `Fx.topBy` carries the same pragma —
+// a single non-inlined hop between the caller's closure literal and the loop
+// breaks the chain for every hop.
+@pragma('vm:prefer-inline')
+List<A> topBy<A>(int k, Object? Function(A a) f, Iterable<A> iterable) =>
+    _topByImpl(k, f, iterable, 1);
+
+/// The [k] elements with the smallest keys [f], smallest first.
+///
+/// Mirror image of [topBy]: same boundary pass, same tie rule (the element
+/// seen first wins), same handling of [k]. Replaces
+/// `sortBy(f, xs).take(k)`.
+@pragma('vm:prefer-inline')
+List<A> bottomBy<A>(int k, Object? Function(A a) f, Iterable<A> iterable) =>
+    _topByImpl(k, f, iterable, -1);
+
+/// [sign] is `1` for [topBy] and `-1` for [bottomBy] — it flips every key
+/// comparison, so one boundary pass serves both. Inlined along with its two
+/// callers: that is what keeps [f] visible inside the loop.
+@pragma('vm:prefer-inline')
+List<A> _topByImpl<A>(
+  int k,
+  Object? Function(A a) f,
+  Iterable<A> iterable,
+  int sign,
+) {
+  final values = <A>[];
+  if (k <= 0) return values;
+  final keys = <Object?>[];
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      final a = iterable[i];
+      _offerBoundary(values, keys, k, sign, a, f(a));
+    }
+  } else {
+    for (final a in iterable) {
+      _offerBoundary(values, keys, k, sign, a, f(a));
+    }
+  }
+  return values;
+}
+
+/// Offers ([a], [key]) to the [k]-sized boundary held by [values] and
+/// [keys], which stay ordered best-first — "best" meaning largest through a
+/// [sign] of `1` and smallest through `-1`.
+///
+/// The two tie decisions live here: a key that merely equals the weakest
+/// kept key is rejected, and the insertion scan stops at the first key that
+/// is not strictly worse than [key]. Together they keep the first-seen
+/// element ahead of every later equal-keyed one.
+void _offerBoundary<A>(
+  List<A> values,
+  List<Object?> keys,
+  int k,
+  int sign,
+  A a,
+  Object? key,
+) {
+  if (values.length < k) {
+    values.add(a);
+    keys.add(key);
+  } else if (_compareKeys(key, keys[k - 1]) * sign <= 0) {
+    return;
+  }
+  // The last slot is a hole: either the one just appended, or the element
+  // this one evicts. Strictly worse keys shift into it and [key] drops in.
+  var i = values.length - 1;
+  while (i > 0 && _compareKeys(keys[i - 1], key) * sign < 0) {
+    keys[i] = keys[i - 1];
+    values[i] = values[i - 1];
+    i--;
+  }
+  keys[i] = key;
+  values[i] = a;
+}
+
+/// Async counterpart of [topBy]: the same boundary pass over an
+/// [FxAsyncIterable], with the same order, tie and [k] contract. [f] stays
+/// synchronous, as it does on [sortByAsync] and [minByAsync].
+Future<List<A>> topByAsync<A>(
+  int k,
+  Object? Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => _topByAsyncImpl(k, f, iterable, 1);
+
+/// Async counterpart of [bottomBy].
+Future<List<A>> bottomByAsync<A>(
+  int k,
+  Object? Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => _topByAsyncImpl(k, f, iterable, -1);
+
+Future<List<A>> _topByAsyncImpl<A>(
+  int k,
+  Object? Function(A a) f,
+  FxAsyncIterable<A> iterable,
+  int sign,
+) async {
+  final values = <A>[];
+  if (k <= 0) return values;
+  final keys = <Object?>[];
+  await eachAsync(
+    (A a) => _offerBoundary(values, keys, k, sign, a, f(a)),
+    iterable,
+  );
+  return values;
+}
+
 /// Splits values into `(pass, fail)` lists by predicate [f].
 ///
 /// Port of FxTS `partition` (TS tuple becomes a Dart record).
@@ -9349,6 +9637,32 @@ bool isEmpty(Object? value) {
 Map<K, V> fromEntries<K, V>(Iterable<(K, V)> entries) => {
   for (final (k, v) in entries) k: v,
 };
+
+/// The `(key, value)` records of [map], in the map's own iteration order —
+/// the inverse of [fromEntries], and the chain *entrance* for anything a
+/// `Map`-returning operator produced.
+///
+/// `groupBy`, `countBy`, `foldBy` and `indexBy` all end a chain with a
+/// `Map`. Continuing (ranking, formatting) means re-entering with
+/// `fx(m.entries)` and then converting `MapEntry` back into the record shape
+/// the rest of fxdart speaks; `fx(toPairs(m))` is both steps at once.
+///
+/// Lazy: this is a view over `Map.entries`, so nothing is copied. Iterating
+/// it after mutating [map] throws, exactly as iterating `Map.entries` does.
+///
+/// No `*Async` twin, and that is this file's convention rather than an
+/// omission: no function in `object.dart` has one, because a `Map` argument
+/// is already fully materialized — there is nothing to await.
+///
+/// Port of Lodash `toPairs` (FxTS `entries`, Kotlin `Map.toList()`). Named
+/// `toPairs`, not `entries`, because fxdart's barrel exports every top-level
+/// name unprefixed and `entries` is a common local variable name.
+///
+/// ```dart
+/// fx(toPairs(groupBy(f, xs))).sortByDesc((p) => p.$2.length);
+/// ```
+Iterable<(K, V)> toPairs<K, V>(Map<K, V> map) =>
+    map.entries.map((e) => (e.key, e.value));
 
 /// Returns a copy of [map] without the given [keysToOmit].
 ///
@@ -12857,6 +13171,15 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   Fx<R> mapNotNull<R extends Object>(R? Function(T a) f) =>
       Fx(_$mapNotNull(f, _inner));
 
+  /// Maps each value through [f], replacing any error [f] throws with what
+  /// [onError] returns for it. Stays on the sync chain — there is no delay
+  /// to await, unlike [mapRetry]. A raise signal is rethrown, never
+  /// recovered; see the top-level `mapCatching`.
+  Fx<R> mapCatching<R>(
+    R Function(T a) f,
+    R Function(Object error, StackTrace stackTrace) onError,
+  ) => Fx(_$mapCatching(f, onError, _inner));
+
   /// See top-level `flatMap`; same contract as [Iterable.expand].
   Fx<R> flatMap<R>(Iterable<R> Function(T a) f) {
     final flatMapped = _$flatMap(f, _inner);
@@ -13037,6 +13360,11 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   Fx<B> scan<B>(B Function(B acc, T a) f, B seed) =>
       Fx(_$scan(f, seed, _inner));
 
+  /// Emits each running accumulation, n values for n values — [scan]
+  /// without [seed] in the output. See the top-level `mapAccum`.
+  Fx<B> mapAccum<B>(B Function(B acc, T a) f, B seed) =>
+      Fx(_$mapAccum(f, seed, _inner));
+
   /// The values in reverse order (materializes the source).
   Fx<T> reverse() => Fx(_$reverse(_inner));
 
@@ -13052,6 +13380,21 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// A new chain sorted by the key [f], descending — any comparable key,
   /// not just the numeric ones `sortBy((a) => -key)` can negate.
   Fx<T> sortByDesc(Object? Function(T a) f) => Fx(_$sortByDesc(f, _inner));
+
+  /// The [k] values with the largest keys [f], largest first — one boundary
+  /// pass, not a whole sort. Ties keep input order; see the top-level
+  /// `topBy`.
+  ///
+  /// Inlined for the reason given on [minBy]: the pragma has to be on this
+  /// hop *and* on the top-level function, or the caller's key extractor
+  /// stops being visible inside the loop.
+  @pragma('vm:prefer-inline')
+  Fx<T> topBy(int k, Object? Function(T a) f) => Fx(_$topBy(k, f, _inner));
+
+  /// The [k] values with the smallest keys [f], smallest first.
+  @pragma('vm:prefer-inline')
+  Fx<T> bottomBy(int k, Object? Function(T a) f) =>
+      Fx(_$bottomBy(k, f, _inner));
 
   /// Lazily pairs each value with the result of [f] — the value stays
   /// beside what was derived from it.
@@ -13407,6 +13750,15 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   FxAsync<R> mapNotNull<R extends Object>(FutureOr<R?> Function(T a) f) =>
       FxAsync(_$mapNotNullAsync(f, _inner));
 
+  /// Maps each value through [f], replacing any error [f] throws with what
+  /// [onError] returns for it. A raise signal is rethrown, never recovered;
+  /// see the top-level `mapCatchingAsync`.
+  @pragma('vm:prefer-inline')
+  FxAsync<R> mapCatching<R>(
+    FutureOr<R> Function(T a) f,
+    FutureOr<R> Function(Object error, StackTrace stackTrace) onError,
+  ) => FxAsync(_$mapCatchingAsync(f, onError, _inner));
+
   /// Maps each value to an iterable via [f] and flattens the results.
   @pragma('vm:prefer-inline')
   FxAsync<R> flatMap<R>(FutureOr<Iterable<R>> Function(T a) f) =>
@@ -13601,6 +13953,14 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   FxAsync<B> scan<B>(FutureOr<B> Function(B acc, T a) f, FutureOr<B> seed) =>
       FxAsync(_$scanAsync(f, seed, _inner));
 
+  /// Emits each running accumulation, n values for n values — [scan]
+  /// without [seed] in the output. See the top-level `mapAccumAsync`.
+  @pragma('vm:prefer-inline')
+  FxAsync<B> mapAccum<B>(
+    FutureOr<B> Function(B acc, T a) f,
+    FutureOr<B> seed,
+  ) => FxAsync(_$mapAccumAsync(f, seed, _inner));
+
   /// The values in reverse order (materializes the source).
   @pragma('vm:prefer-inline')
   FxAsync<T> reverse() => FxAsync(_$reverseAsync(_inner));
@@ -13783,6 +14143,15 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// A new list sorted by the key [f], descending.
   Future<List<T>> sortByDesc(Object? Function(T a) f) =>
       _$sortByDescAsync(f, _inner);
+
+  /// The [k] values with the largest keys [f], largest first — one boundary
+  /// pass, not a whole sort. Ties keep source order.
+  Future<List<T>> topBy(int k, Object? Function(T a) f) =>
+      _$topByAsync(k, f, _inner);
+
+  /// The [k] values with the smallest keys [f], smallest first.
+  Future<List<T>> bottomBy(int k, Object? Function(T a) f) =>
+      _$bottomByAsync(k, f, _inner);
 
   /// Groups values into `(key, items)` records, in first-seen key order.
   Future<List<({K key, List<T> items})>> groupedBy<K>(
@@ -14263,6 +14632,12 @@ Iterable<B> _$scan<A, B>(
 FxAsyncIterable<B> _$scanAsync<A, B>(FutureOr<B> Function(B acc, A a) f,
         FutureOr<B> seed, FxAsyncIterable<A> iterable) =>
     scanAsync(f, seed, iterable);
+Iterable<B> _$mapAccum<A, B>(
+        B Function(B acc, A a) f, B seed, Iterable<A> iterable) =>
+    mapAccum(f, seed, iterable);
+FxAsyncIterable<B> _$mapAccumAsync<A, B>(FutureOr<B> Function(B acc, A a) f,
+        FutureOr<B> seed, FxAsyncIterable<A> iterable) =>
+    mapAccumAsync(f, seed, iterable);
 FxAsyncIterable<B> _$mapConcurrent<A, B>(
         int concurrency, FutureOr<B> Function(A a) f, Iterable<A> iterable) =>
     mapConcurrent(concurrency, f, iterable);
@@ -14477,6 +14852,14 @@ FxAsyncIterable<R> _$mapRetryAsync<A, R>(
         int attempts, FutureOr<R> Function(A a) f, FxAsyncIterable<A> iterable,
         {Duration Function(int failed)? delay}) =>
     mapRetryAsync(attempts, f, iterable, delay: delay);
+Iterable<R> _$mapCatching<A, R>(R Function(A a) f,
+        R Function(Object error, StackTrace stackTrace) onError,
+        Iterable<A> iterable) =>
+    mapCatching(f, onError, iterable);
+FxAsyncIterable<R> _$mapCatchingAsync<A, R>(FutureOr<R> Function(A a) f,
+        FutureOr<R> Function(Object error, StackTrace stackTrace) onError,
+        FxAsyncIterable<A> iterable) =>
+    mapCatchingAsync(f, onError, iterable);
 FxAsyncIterable<A> _$timeoutAsync<A>(
         Duration limit, FxAsyncIterable<A> iterable) =>
     timeoutAsync(limit, iterable);
@@ -14605,6 +14988,18 @@ List<A> _$sortByDesc<A>(Object? Function(A a) f, Iterable<A> iterable) =>
 Future<List<A>> _$sortByDescAsync<A>(
         Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
     sortByDescAsync(f, iterable);
+List<A> _$topBy<A>(
+        int k, Object? Function(A a) f, Iterable<A> iterable) =>
+    topBy(k, f, iterable);
+List<A> _$bottomBy<A>(
+        int k, Object? Function(A a) f, Iterable<A> iterable) =>
+    bottomBy(k, f, iterable);
+Future<List<A>> _$topByAsync<A>(
+        int k, Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
+    topByAsync(k, f, iterable);
+Future<List<A>> _$bottomByAsync<A>(
+        int k, Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
+    bottomByAsync(k, f, iterable);
 List<({K key, List<A> items})> _$groupedBy<A, K>(
         K Function(A a) f, Iterable<A> iterable) =>
     groupedBy(f, iterable);

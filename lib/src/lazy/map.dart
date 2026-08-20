@@ -997,3 +997,115 @@ FxAsyncIterable<A> scan1Async<A>(
     });
   });
 }
+
+/// Folds [seed] into each value with [f] and emits every intermediate
+/// accumulation — n values in, n values out.
+///
+/// This is [scan] without the seed in the output. [scan] and Kotlin's
+/// `runningFold` emit `seed` first and so produce n+1 values; [mapAccum],
+/// Rust's `Iterator::scan`, Haskell's `mapAccumL` and RxDart's `scan`
+/// produce n. Use [scan] when the starting state is part of the answer
+/// (a ledger's opening balance), [mapAccum] when it is only the state the
+/// first element folds into — the case that otherwise ends in a trailing
+/// `.drop(1)`.
+///
+/// [f] runs exactly once per element, in order, and the accumulator is
+/// per-iteration: iterating twice starts from [seed] both times.
+///
+/// Argument order matches [scan] deliberately — `scan` to `mapAccum` is a
+/// one-word edit.
+///
+/// ```dart
+/// mapAccum((acc, a) => acc + a, 0, [1, 2, 3]); // (1, 3, 6)
+/// scan((acc, a) => acc + a, 0, [1, 2, 3]); //     (0, 1, 3, 6)
+/// ```
+Iterable<B> mapAccum<A, B>(
+  B Function(B acc, A a) f,
+  B seed,
+  Iterable<A> iterable,
+) => _MapAccumIterable(f, seed, iterable);
+
+class _MapAccumIterable<A, B> extends Iterable<B> {
+  _MapAccumIterable(this._f, this._seed, this._source);
+  final B Function(B, A) _f;
+  final B _seed;
+  final Iterable<A> _source;
+  @override
+  Iterator<B> get iterator => _MapAccumIterator(_f, _seed, _source.iterator);
+  @override
+  List<B> toList({bool growable = true}) {
+    final source = _source;
+    // A List source accumulates into a pre-sized list (output length is
+    // exactly n) — as in [_ScanIterable.toList], the inherited toList would
+    // grow and recopy ~log n times. [_f] still runs exactly once per
+    // element, in order.
+    if (source is List<A>) {
+      final length = source.length;
+      final out = List<B>.filled(length, _seed, growable: growable);
+      var acc = _seed;
+      for (var i = 0; i < length; i++) {
+        acc = _f(acc, source[i]);
+        out[i] = acc;
+      }
+      return out;
+    }
+    return super.toList(growable: growable);
+  }
+}
+
+class _MapAccumIterator<A, B> implements Iterator<B> {
+  _MapAccumIterator(this._f, this._acc, this._it);
+  final B Function(B, A) _f;
+  final Iterator<A> _it;
+  // The accumulator *is* the current value once a step has run — one field
+  // for both, where [_ScanIterator] needs the seed slot to emit as well.
+  B _acc;
+  @override
+  B get current => _acc;
+  @override
+  bool moveNext() {
+    if (!_it.moveNext()) return false;
+    _acc = _f(_acc, _it.current);
+    return true;
+  }
+}
+
+/// Async counterpart of [mapAccum]. [seed] and [f] may each return a
+/// [Future]; values are folded in source order.
+@pragma('vm:prefer-inline')
+FxAsyncIterable<B> mapAccumAsync<A, B>(
+  FutureOr<B> Function(B acc, A a) f,
+  FutureOr<B> seed,
+  FxAsyncIterable<A> iterable,
+) {
+  // [_scanAsyncLegacy]'s shape without the seed emission, and serialized
+  // for the reason that one is: the accumulator is a single slot, so a
+  // concurrent consumer must not be able to interleave two folds. The state
+  // lives in dispatchAsync's builder, so each iteration starts from [seed]
+  // again. Not a fused stage — FxScanStage emits the seed, which is the one
+  // thing this operator does not do.
+  return dispatchAsync(iterable, (source) {
+    final iterator = source.iterator;
+    FutureOr<B> acc = seed;
+    return SerialAsyncIterator((concurrent) {
+      return iterator.next(concurrent).then((result) {
+        if (result.done) return IterResult<B>.done();
+        final previous = acc;
+        // A pending accumulator is chained onto rather than awaited, so a
+        // Future seed and a Future-returning [f] both fold in order without
+        // an extra await hop per element.
+        if (previous is Future<B>) {
+          final chained = previous.then(
+            (resolved) => f(resolved, result.value),
+          );
+          acc = chained;
+          return chained.then(IterResult<B>.value);
+        }
+        final next = f(previous, result.value);
+        acc = next;
+        if (next is Future<B>) return next.then(IterResult<B>.value);
+        return IterResult<B>.value(next);
+      });
+    });
+  });
+}

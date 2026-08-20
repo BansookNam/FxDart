@@ -82,6 +82,15 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   Fx<R> mapNotNull<R extends Object>(R? Function(T a) f) =>
       Fx(l.mapNotNull(f, _inner));
 
+  /// Maps each value through [f], replacing any error [f] throws with what
+  /// [onError] returns for it. Stays on the sync chain — there is no delay
+  /// to await, unlike [mapRetry]. A raise signal is rethrown, never
+  /// recovered; see the top-level `mapCatching`.
+  Fx<R> mapCatching<R>(
+    R Function(T a) f,
+    R Function(Object error, StackTrace stackTrace) onError,
+  ) => Fx(l.mapCatching(f, onError, _inner));
+
   /// See top-level `flatMap`; same contract as [Iterable.expand].
   Fx<R> flatMap<R>(Iterable<R> Function(T a) f) {
     final flatMapped = l.flatMap(f, _inner);
@@ -262,6 +271,11 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   Fx<B> scan<B>(B Function(B acc, T a) f, B seed) =>
       Fx(l.scan(f, seed, _inner));
 
+  /// Emits each running accumulation, n values for n values — [scan]
+  /// without [seed] in the output. See the top-level `mapAccum`.
+  Fx<B> mapAccum<B>(B Function(B acc, T a) f, B seed) =>
+      Fx(l.mapAccum(f, seed, _inner));
+
   /// The values in reverse order (materializes the source).
   Fx<T> reverse() => Fx(l.reverse(_inner));
 
@@ -277,6 +291,21 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// A new chain sorted by the key [f], descending — any comparable key,
   /// not just the numeric ones `sortBy((a) => -key)` can negate.
   Fx<T> sortByDesc(Object? Function(T a) f) => Fx(s.sortByDesc(f, _inner));
+
+  /// The [k] values with the largest keys [f], largest first — one boundary
+  /// pass, not a whole sort. Ties keep input order; see the top-level
+  /// `topBy`.
+  ///
+  /// Inlined for the reason given on [minBy]: the pragma has to be on this
+  /// hop *and* on the top-level function, or the caller's key extractor
+  /// stops being visible inside the loop.
+  @pragma('vm:prefer-inline')
+  Fx<T> topBy(int k, Object? Function(T a) f) => Fx(s.topBy(k, f, _inner));
+
+  /// The [k] values with the smallest keys [f], smallest first.
+  @pragma('vm:prefer-inline')
+  Fx<T> bottomBy(int k, Object? Function(T a) f) =>
+      Fx(s.bottomBy(k, f, _inner));
 
   /// Lazily pairs each value with the result of [f] — the value stays
   /// beside what was derived from it.
@@ -632,6 +661,15 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   FxAsync<R> mapNotNull<R extends Object>(FutureOr<R?> Function(T a) f) =>
       FxAsync(l.mapNotNullAsync(f, _inner));
 
+  /// Maps each value through [f], replacing any error [f] throws with what
+  /// [onError] returns for it. A raise signal is rethrown, never recovered;
+  /// see the top-level `mapCatchingAsync`.
+  @pragma('vm:prefer-inline')
+  FxAsync<R> mapCatching<R>(
+    FutureOr<R> Function(T a) f,
+    FutureOr<R> Function(Object error, StackTrace stackTrace) onError,
+  ) => FxAsync(l.mapCatchingAsync(f, onError, _inner));
+
   /// Maps each value to an iterable via [f] and flattens the results.
   @pragma('vm:prefer-inline')
   FxAsync<R> flatMap<R>(FutureOr<Iterable<R>> Function(T a) f) =>
@@ -826,6 +864,14 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   FxAsync<B> scan<B>(FutureOr<B> Function(B acc, T a) f, FutureOr<B> seed) =>
       FxAsync(l.scanAsync(f, seed, _inner));
 
+  /// Emits each running accumulation, n values for n values — [scan]
+  /// without [seed] in the output. See the top-level `mapAccumAsync`.
+  @pragma('vm:prefer-inline')
+  FxAsync<B> mapAccum<B>(
+    FutureOr<B> Function(B acc, T a) f,
+    FutureOr<B> seed,
+  ) => FxAsync(l.mapAccumAsync(f, seed, _inner));
+
   /// The values in reverse order (materializes the source).
   @pragma('vm:prefer-inline')
   FxAsync<T> reverse() => FxAsync(l.reverseAsync(_inner));
@@ -1008,6 +1054,15 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// A new list sorted by the key [f], descending.
   Future<List<T>> sortByDesc(Object? Function(T a) f) =>
       s.sortByDescAsync(f, _inner);
+
+  /// The [k] values with the largest keys [f], largest first — one boundary
+  /// pass, not a whole sort. Ties keep source order.
+  Future<List<T>> topBy(int k, Object? Function(T a) f) =>
+      s.topByAsync(k, f, _inner);
+
+  /// The [k] values with the smallest keys [f], smallest first.
+  Future<List<T>> bottomBy(int k, Object? Function(T a) f) =>
+      s.bottomByAsync(k, f, _inner);
 
   /// Groups values into `(key, items)` records, in first-seen key order.
   Future<List<({K key, List<T> items})>> groupedBy<K>(

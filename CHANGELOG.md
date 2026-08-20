@@ -192,6 +192,40 @@ that pair together; `unzip` and `product` take no callback and get neither.
   particular what those deprecated aliases are for. They now say it as
   documentation.
 
+### Four more operators, from the published examples
+
+Additive API. Each has an `*Async` twin and `Fx` / `FxAsync` chain members,
+except `toPairs`, whose source is a `Map` — it is a chain *entrance*, not a
+chain step.
+
+- **`topBy` / `bottomBy`** (strict) — the k largest (smallest) by key in one
+  boundary pass, instead of sorting everything and then taking `k`. The result
+  is in descending (ascending) key order and a tie is won by the element seen
+  **first**, so no second sort and no tie-breaking key is needed. `k <= 0` is
+  empty, a `k` past the end is everything, ordered. The boundary is kept by
+  insertion, so this is for a small `k` over a large input. fxdart extension,
+  not a port — the shape is Python's `heapq.nlargest`, Rust itertools'
+  `k_largest_by_key`, Guava's `Ordering.greatestOf`. No benchmark claim is
+  attached to it.
+- **`toPairs`** (strict, `Map`) — the inverse `fromEntries` never had, so a
+  `Map` from `groupBy` / `countBy` / `foldBy` / `indexBy` can be continued as
+  a chain without re-entering through `fx(m.entries)` and converting
+  `MapEntry` back to a record by hand. Named after Lodash rather than
+  `entries`, which is a common local variable name and the barrel exports
+  every top-level name unprefixed.
+- **`mapCatching`** (lazy) — per-element error recovery, the element-wise
+  partner `catching` never had while `retry` already had `mapRetryAsync`. The
+  raise signal is **rethrown, not recovered**: it delegates to `catching`, so
+  a `raise` crossing the callback still short-circuits the enclosing
+  `either {}` / `nullable {}` instead of being swallowed into a recovered
+  value. RxDart spells this `onErrorReturnWith`.
+- **`mapAccum`** (lazy) — n values in, n values out: `scan` without the seed in
+  the output, so the trailing `.drop(1)` goes away. Not a re-proposal of
+  `scan`: `scan` and Kotlin's `runningFold` emit the seed and produce n+1
+  values, `mapAccum`, Rust's `Iterator::scan` and Haskell's `mapAccumL`
+  produce n. Argument order matches `scan` deliberately, so swapping one for
+  the other is a one-word edit.
+
 ### Behaviour notes
 
 - The `List` fast paths read `length` once and then index, so mutating the

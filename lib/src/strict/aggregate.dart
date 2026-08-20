@@ -1694,6 +1694,149 @@ Future<List<A>> sortByDescAsync<A>(
   FxAsyncIterable<A> iterable,
 ) => sortAsync((a, b) => _compareBy(f, b, a), iterable);
 
+/// The [k] elements with the largest keys [f], largest first.
+///
+/// One pass that keeps a [k]-sized boundary: allocation is proportional to
+/// [k] rather than to the input length, and nothing outside the boundary is
+/// retained. This replaces `sortByDesc(f, xs).take(k)`, which allocates a
+/// key array, an index list and a result list sized to the whole input,
+/// sorts all of it, and then discards all but [k].
+///
+/// The contract, which is what makes the result usable without a second
+/// pass:
+///
+/// - **Order** — descending by key, so the first element has the largest
+///   key. Ties keep their relative input order.
+/// - **Ties** — the element seen **first** wins. A later element whose key
+///   only equals the weakest kept key does not displace it, and an equal key
+///   inside the boundary is inserted *after* the ones already there.
+/// - **[k]** — `k <= 0` returns an empty list; a [k] beyond the input length
+///   returns every element, ordered.
+///
+/// Keys are compared exactly as [sortBy] compares them, so `null` and
+/// mutually incomparable keys compare equal here too.
+///
+/// The boundary is maintained by insertion, so the worst case is `O(n·k)`
+/// comparisons: this is for a small [k] over a large input. Use [sortByDesc]
+/// when [k] approaches the input length.
+///
+/// fxdart extension, not a port — FxTS, Kotlin and Lodash have no
+/// equivalent. The shape is Python's `heapq.nlargest`, Rust itertools'
+/// `k_largest_by_key` and Guava's `Ordering.greatestOf`.
+///
+/// ```dart
+/// topBy(2, (e) => e.amount, expenses); // the two largest, largest first
+/// ```
+// Inlined for the reason given on [minBy]: it is the caller's key extractor
+// that inlining exposes, not this call. `Fx.topBy` carries the same pragma —
+// a single non-inlined hop between the caller's closure literal and the loop
+// breaks the chain for every hop.
+@pragma('vm:prefer-inline')
+List<A> topBy<A>(int k, Object? Function(A a) f, Iterable<A> iterable) =>
+    _topByImpl(k, f, iterable, 1);
+
+/// The [k] elements with the smallest keys [f], smallest first.
+///
+/// Mirror image of [topBy]: same boundary pass, same tie rule (the element
+/// seen first wins), same handling of [k]. Replaces
+/// `sortBy(f, xs).take(k)`.
+@pragma('vm:prefer-inline')
+List<A> bottomBy<A>(int k, Object? Function(A a) f, Iterable<A> iterable) =>
+    _topByImpl(k, f, iterable, -1);
+
+/// [sign] is `1` for [topBy] and `-1` for [bottomBy] — it flips every key
+/// comparison, so one boundary pass serves both. Inlined along with its two
+/// callers: that is what keeps [f] visible inside the loop.
+@pragma('vm:prefer-inline')
+List<A> _topByImpl<A>(
+  int k,
+  Object? Function(A a) f,
+  Iterable<A> iterable,
+  int sign,
+) {
+  final values = <A>[];
+  if (k <= 0) return values;
+  final keys = <Object?>[];
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      final a = iterable[i];
+      _offerBoundary(values, keys, k, sign, a, f(a));
+    }
+  } else {
+    for (final a in iterable) {
+      _offerBoundary(values, keys, k, sign, a, f(a));
+    }
+  }
+  return values;
+}
+
+/// Offers ([a], [key]) to the [k]-sized boundary held by [values] and
+/// [keys], which stay ordered best-first — "best" meaning largest through a
+/// [sign] of `1` and smallest through `-1`.
+///
+/// The two tie decisions live here: a key that merely equals the weakest
+/// kept key is rejected, and the insertion scan stops at the first key that
+/// is not strictly worse than [key]. Together they keep the first-seen
+/// element ahead of every later equal-keyed one.
+void _offerBoundary<A>(
+  List<A> values,
+  List<Object?> keys,
+  int k,
+  int sign,
+  A a,
+  Object? key,
+) {
+  if (values.length < k) {
+    values.add(a);
+    keys.add(key);
+  } else if (_compareKeys(key, keys[k - 1]) * sign <= 0) {
+    return;
+  }
+  // The last slot is a hole: either the one just appended, or the element
+  // this one evicts. Strictly worse keys shift into it and [key] drops in.
+  var i = values.length - 1;
+  while (i > 0 && _compareKeys(keys[i - 1], key) * sign < 0) {
+    keys[i] = keys[i - 1];
+    values[i] = values[i - 1];
+    i--;
+  }
+  keys[i] = key;
+  values[i] = a;
+}
+
+/// Async counterpart of [topBy]: the same boundary pass over an
+/// [FxAsyncIterable], with the same order, tie and [k] contract. [f] stays
+/// synchronous, as it does on [sortByAsync] and [minByAsync].
+Future<List<A>> topByAsync<A>(
+  int k,
+  Object? Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => _topByAsyncImpl(k, f, iterable, 1);
+
+/// Async counterpart of [bottomBy].
+Future<List<A>> bottomByAsync<A>(
+  int k,
+  Object? Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => _topByAsyncImpl(k, f, iterable, -1);
+
+Future<List<A>> _topByAsyncImpl<A>(
+  int k,
+  Object? Function(A a) f,
+  FxAsyncIterable<A> iterable,
+  int sign,
+) async {
+  final values = <A>[];
+  if (k <= 0) return values;
+  final keys = <Object?>[];
+  await eachAsync(
+    (A a) => _offerBoundary(values, keys, k, sign, a, f(a)),
+    iterable,
+  );
+  return values;
+}
+
 /// Splits values into `(pass, fail)` lists by predicate [f].
 ///
 /// Port of FxTS `partition` (TS tuple becomes a Dart record).

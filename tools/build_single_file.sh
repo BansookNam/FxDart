@@ -158,6 +158,12 @@ Iterable<B> _$scan<A, B>(
 FxAsyncIterable<B> _$scanAsync<A, B>(FutureOr<B> Function(B acc, A a) f,
         FutureOr<B> seed, FxAsyncIterable<A> iterable) =>
     scanAsync(f, seed, iterable);
+Iterable<B> _$mapAccum<A, B>(
+        B Function(B acc, A a) f, B seed, Iterable<A> iterable) =>
+    mapAccum(f, seed, iterable);
+FxAsyncIterable<B> _$mapAccumAsync<A, B>(FutureOr<B> Function(B acc, A a) f,
+        FutureOr<B> seed, FxAsyncIterable<A> iterable) =>
+    mapAccumAsync(f, seed, iterable);
 FxAsyncIterable<B> _$mapConcurrent<A, B>(
         int concurrency, FutureOr<B> Function(A a) f, Iterable<A> iterable) =>
     mapConcurrent(concurrency, f, iterable);
@@ -372,6 +378,14 @@ FxAsyncIterable<R> _$mapRetryAsync<A, R>(
         int attempts, FutureOr<R> Function(A a) f, FxAsyncIterable<A> iterable,
         {Duration Function(int failed)? delay}) =>
     mapRetryAsync(attempts, f, iterable, delay: delay);
+Iterable<R> _$mapCatching<A, R>(R Function(A a) f,
+        R Function(Object error, StackTrace stackTrace) onError,
+        Iterable<A> iterable) =>
+    mapCatching(f, onError, iterable);
+FxAsyncIterable<R> _$mapCatchingAsync<A, R>(FutureOr<R> Function(A a) f,
+        FutureOr<R> Function(Object error, StackTrace stackTrace) onError,
+        FxAsyncIterable<A> iterable) =>
+    mapCatchingAsync(f, onError, iterable);
 FxAsyncIterable<A> _$timeoutAsync<A>(
         Duration limit, FxAsyncIterable<A> iterable) =>
     timeoutAsync(limit, iterable);
@@ -500,6 +514,18 @@ List<A> _$sortByDesc<A>(Object? Function(A a) f, Iterable<A> iterable) =>
 Future<List<A>> _$sortByDescAsync<A>(
         Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
     sortByDescAsync(f, iterable);
+List<A> _$topBy<A>(
+        int k, Object? Function(A a) f, Iterable<A> iterable) =>
+    topBy(k, f, iterable);
+List<A> _$bottomBy<A>(
+        int k, Object? Function(A a) f, Iterable<A> iterable) =>
+    bottomBy(k, f, iterable);
+Future<List<A>> _$topByAsync<A>(
+        int k, Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
+    topByAsync(k, f, iterable);
+Future<List<A>> _$bottomByAsync<A>(
+        int k, Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
+    bottomByAsync(k, f, iterable);
 List<({K key, List<A> items})> _$groupedBy<A, K>(
         K Function(A a) f, Iterable<A> iterable) =>
     groupedBy(f, iterable);
