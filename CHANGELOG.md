@@ -95,9 +95,11 @@ do.
   accumulator per element; it is now `Iterable.join()`. 20,000 x 10 characters:
   **74,620 µs → 343 µs**.
 
-`slice` no longer drains its source, which is observable on a side-effecting
-or single-shot iterable. That is the intended contract — it is what every
-other limiting operator does — and it is pinned by a test that counts pulls.
+Neither `slice` nor `sliceAsync` drains its source any more, which is
+observable on a side-effecting or single-shot iterable. That is the intended
+contract — it is what every other limiting operator does — it is stated in the
+public dartdoc rather than only in the implementation, and the sync side is
+pinned by a test that counts pulls.
 
 ### `tool/ab_bench.dart` is a gate now, not a report
 
@@ -133,11 +135,19 @@ outlying processes, which the runner throws away today.
 
 ### Behaviour notes
 
-- The `List` fast paths fix the traversal range when iteration starts, so
-  mutating the source during a pass no longer raises
-  `ConcurrentModificationError` on these twelve terminals. Same trade-off the
-  lazy stages took in 0.8.0, now covering the strict side too.
-- `slice` stops consuming its source at `end`, as above.
+- The `List` fast paths read `length` once and then index, so mutating the
+  source during a pass is no longer reported as such on these twelve
+  terminals. Both directions changed, and they changed differently: a source
+  that **grows** mid-pass is silently truncated to the length the pass started
+  with, and a source that **shrinks** now throws `RangeError` from the index
+  read where it used to throw `ConcurrentModificationError`. A non-`List`
+  source still takes the pulled loop and still raises
+  `ConcurrentModificationError`. Same trade-off the lazy stages took in 0.8.0,
+  now covering the strict side too, and pinned in all three directions by
+  `test/strict/numeric_fast_paths_test.dart`.
+- `slice` and `sliceAsync` stop consuming their source at `end`, as above.
+- `Fx.all` now delegates to `every` instead of carrying its own loop, so the
+  chain's universal quantifier reaches the same fast path as `Fx.any`.
 
 
 ## 0.8.5

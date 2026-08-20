@@ -93,6 +93,29 @@ void main() {
         );
       });
 
+      test('should stop pulling the source at the end index', () async {
+        var pulled = 0;
+        Stream<int> counted() async* {
+          for (var i = 0; i < 100; i++) {
+            pulled++;
+            yield i;
+          }
+        }
+
+        expect(
+          await toListAsync(sliceAsync(0, fromStream(counted()), 3)),
+          equals([0, 1, 2]),
+        );
+        expect(pulled, equals(3));
+
+        pulled = 0;
+        expect(
+          await toListAsync(sliceAsync(2, fromStream(counted()), 5)),
+          equals([2, 3, 4]),
+        );
+        expect(pulled, equals(5));
+      });
+
       test('should return elements from startIndex to end', () async {
         expect(
           await toListAsync(sliceAsync(1, toAsync([1, 2, 3, 4, 5]))),

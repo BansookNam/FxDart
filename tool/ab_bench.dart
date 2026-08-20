@@ -223,10 +223,13 @@ String _reportTable({
       'negative = faster after the change',
     )
     ..writeln()
-    ..writeln('| Case | fxdart | $control (control) |')
-    ..writeln('|---|---:|---:|');
+    ..writeln('| Case | fxdart | $control (control) | usable |')
+    ..writeln('|---|---:|---:|---|');
   for (final (slug, ctrl, fx) in rows) {
-    b.writeln('| `$slug` | ${_pct(fx)} | ${_pct(ctrl)} |');
+    // A single noisy case fails the whole run, so the table has to say which
+    // rows it was: the others are still readable.
+    final usable = ctrl.abs() > _controlLimit ? 'no — control drift' : 'yes';
+    b.writeln('| `$slug` | ${_pct(fx)} | ${_pct(ctrl)} | $usable |');
   }
   return b.toString().trimRight();
 }

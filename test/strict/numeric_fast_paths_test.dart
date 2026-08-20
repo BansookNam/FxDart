@@ -251,5 +251,32 @@ void main() {
       expect(lazyEvens, equals(evens));
       expect(lazyOdds, equals(odds));
     });
+
+    // The indexed branch reads `length` once, so a source mutated mid-pass no
+    // longer reports a concurrent modification. 0.8.6 documents this; pin both
+    // directions so a future rewrite back to `for-in` cannot pass silently.
+    test('mutating a List source mid-pass no longer reports it', () {
+      final growing = [1, 2, 3];
+      expect(
+        fold(0, (int acc, int a) {
+          if (growing.length < 6) growing.add(a);
+          return acc + a;
+        }, growing),
+        equals(6),
+      );
+      expect(growing, equals([1, 2, 3, 1, 2, 3]));
+
+      final shrinking = [1, 2, 3, 4];
+      expect(
+        () => each((int _) => shrinking.removeLast(), shrinking),
+        throwsRangeError,
+      );
+
+      final pulled = [1, 2, 3];
+      expect(
+        () => each((int _) => pulled.add(0), pulled.where((_) => true)),
+        throwsConcurrentModificationError,
+      );
+    });
   });
 }

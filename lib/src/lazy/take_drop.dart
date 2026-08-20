@@ -852,6 +852,11 @@ FxAsyncIterable<A> dropUntilAsync<A>(
 /// (exclusive) by index.
 ///
 /// Port of FxTS `slice`. Omit [end] to take everything from [start].
+///
+/// The source is consumed only up to [end], so `slice(0, xs, k)` costs O(k)
+/// like [take] and terminates on an infinite source. Before 0.8.6 it kept
+/// pulling to the end of the source; a side-effecting or single-shot source
+/// that relied on being drained will now see only the first [end] elements.
 Iterable<A> slice<A>(int start, Iterable<A> iterable, [int? end]) =>
     _SliceIterable(start, end, iterable);
 
@@ -874,9 +879,7 @@ class _SliceIterator<A> implements Iterator<A> {
   late A current;
   @override
   bool moveNext() {
-    // Stops pulling once index [_end] is reached, so `slice(0, xs, k)` costs
-    // O(k) like [take] instead of walking the whole source. The elements
-    // before [_start] still have to be pulled — the cut is by index.
+    // O(k), not O(n) — see [slice].
     final end = _end;
     while (end == null || _i < end) {
       if (!_it.moveNext()) return false;
@@ -889,7 +892,7 @@ class _SliceIterator<A> implements Iterator<A> {
   }
 }
 
-/// Async counterpart of [slice].
+/// Async counterpart of [slice], including its stop-at-[end] consumption.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> sliceAsync<A>(
   int start,
@@ -900,14 +903,12 @@ FxAsyncIterable<A> sliceAsync<A>(
     final iterator = source.iterator;
     var i = 0;
     return SerialAsyncIterator((concurrent) async {
-      while (true) {
+      while (end == null || i < end) {
         final result = await iterator.next(concurrent);
         if (result.done) return IterResult<A>.done();
-        final index = i++;
-        if (index >= start && (end == null || index < end)) {
-          return result;
-        }
+        if (i++ >= start) return result;
       }
+      return IterResult<A>.done();
     });
   });
 }

@@ -479,12 +479,8 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 
   /// True if [test] holds for every element.
   /// Stops at first false (early exit).
-  bool all(bool Function(T) test) {
-    for (final item in _inner) {
-      if (!test(item)) return false;
-    }
-    return true;
-  }
+  @pragma('vm:prefer-inline')
+  bool all(bool Function(T) test) => s.every(test, _inner);
 
   /// Joins all elements into a string separated by [separator].
   ///
