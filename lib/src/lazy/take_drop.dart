@@ -1272,6 +1272,8 @@ class _WindowIterator<A> implements Iterator<List<A>> {
 }
 
 /// Async counterpart of [chunk].
+///
+/// Each chunk is a fresh growable list the caller owns — see [windowed].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<List<A>> chunkAsync<A>(int size, FxAsyncIterable<A> iterable) {
   if (size < 1) return asyncEmpty();
@@ -1279,6 +1281,10 @@ FxAsyncIterable<List<A>> chunkAsync<A>(int size, FxAsyncIterable<A> iterable) {
 }
 
 /// Async counterpart of [windowed].
+///
+/// Each window is a fresh growable list the caller owns, exactly as in the
+/// sync form — see [windowed] for the contract all four of these operators
+/// share.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<List<A>> windowedAsync<A>(
   int size,
