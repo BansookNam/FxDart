@@ -1246,15 +1246,21 @@
           "n": 100,
           "roundsRun": 3,
           "native": {
-            "medianUs": 2.4662668665667167,
-            "minUs": 1.901098901098901,
-            "medianRssBytes": 17235968.0,
+            "medianUs": 2.2577422577422577,
+            "minUs": 2.047952047952048,
+            "medianRssBytes": 17317888.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 6.053892215568863,
-            "minUs": 5.595808383233533,
-            "medianRssBytes": 17252352.0,
+            "medianUs": 6.194915254237288,
+            "minUs": 5.502994011976048,
+            "medianRssBytes": 17055744.0,
+            "samples": 15
+          },
+          "fxdart_strict": {
+            "medianUs": 5.970059880239521,
+            "minUs": 5.304239401496259,
+            "medianRssBytes": 17334272.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1264,15 +1270,21 @@
           "n": 10000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 110.15789473684211,
-            "minUs": 104.3157894736842,
-            "medianRssBytes": 17727488.0,
+            "medianUs": 105.78947368421052,
+            "minUs": 103.1,
+            "medianRssBytes": 17858560.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 146.57142857142858,
-            "minUs": 136.26666666666668,
-            "medianRssBytes": 16613376.0,
+            "medianUs": 139.33333333333334,
+            "minUs": 134.13333333333333,
+            "medianRssBytes": 16728064.0,
+            "samples": 15
+          },
+          "fxdart_strict": {
+            "medianUs": 119.22222222222223,
+            "minUs": 116.27777777777777,
+            "medianRssBytes": 16728064.0,
             "samples": 15
           },
           "timeWinner": "tie",
@@ -1282,15 +1294,21 @@
           "n": 1000000,
           "roundsRun": 3,
           "native": {
-            "medianUs": 11319.0,
-            "minUs": 11104.0,
-            "medianRssBytes": 125124608.0,
+            "medianUs": 11298.0,
+            "minUs": 11118.0,
+            "medianRssBytes": 126222336.0,
             "samples": 15
           },
           "fxdart": {
-            "medianUs": 14315.0,
-            "minUs": 14010.0,
-            "medianRssBytes": 125403136.0,
+            "medianUs": 14495.0,
+            "minUs": 14178.0,
+            "medianRssBytes": 125845504.0,
+            "samples": 15
+          },
+          "fxdart_strict": {
+            "medianUs": 12581.0,
+            "minUs": 12438.0,
+            "medianRssBytes": 125632512.0,
             "samples": 15
           },
           "timeWinner": "native",

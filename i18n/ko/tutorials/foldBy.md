@@ -7,8 +7,8 @@ section: 7
 crumb: foldBy
 prev: countBy.html
 prevLabel: countBy
-next: countWhere.html
-nextLabel: countWhere
+next: foldByOrSkip.html
+nextLabel: foldByOrSkip
 ---
   <p class="hero-sub">한 번의 순회로 키별 값을 접습니다 — 그룹 없이 집계만.</p>
 

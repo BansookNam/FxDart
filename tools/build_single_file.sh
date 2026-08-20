@@ -199,6 +199,12 @@ FxAsyncIterable<A> _$uniqByAsync<A, B>(
 List<A> _$uniqStrict<A>(Iterable<A> iterable) => uniqStrict(iterable);
 List<A> _$uniqByStrict<A, B>(B Function(A a) f, Iterable<A> iterable) =>
     uniqByStrict(f, iterable);
+Map<K, Acc> _$foldByOrSkip<A, K extends Object, Acc>(
+        K? Function(A a) key,
+        Acc seed,
+        Acc Function(Acc acc, A a) f,
+        Iterable<A> iterable) =>
+    foldByOrSkip(key, seed, f, iterable);
 List<A> _$takeUniqBy<A, B extends Object>(
         int count, B? Function(A a) f, Iterable<A> iterable) =>
     takeUniqBy(count, f, iterable);

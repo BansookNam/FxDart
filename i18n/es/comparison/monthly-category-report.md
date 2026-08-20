@@ -5,7 +5,7 @@ description: Filtra un libro de cuentas a un solo mes, suma cada categoría y or
 heading: Informe mensual por categorías, ordenado por gasto
 order: 29
 tier: 3
-functions: filter, groupBy, map, sortBy, join
+functions: filter, groupBy, map, sortBy, join, foldByOrSkip
 domain: transactions
 verdict: fxdart
 async: false

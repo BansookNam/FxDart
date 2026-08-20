@@ -8,7 +8,7 @@ Ordered by FxDart/native, slowest first — so the rows worth acting on are at t
 | Case | Path | N | Native (µs) | FxDart (µs) | Ratio |
 |---|---|---:|---:|---:|---|
 | Recent error messages, deduped | `benchmark/cases/recent-errors` | 1,000,000 | 10,350 | 13,705 | Native 1.32x faster |
-| Monthly category report, sorted by spend | `benchmark/cases/monthly-category-report` | 1,000,000 | 11,319 | 14,315 | Native 1.26x faster |
+| Monthly category report, sorted by spend | `benchmark/cases/monthly-category-report` | 1,000,000 | 11,298 | 14,495 | Native 1.28x faster |
 | Live search over a keystroke stream | `benchmark/cases/live-search` | 100,000 | 45,186 | 56,022 | Native 1.24x faster |
 | Rate-limited batch import | `benchmark/cases/rate-limited-import` | 100,000 | 130,963 | 157,739 | Native 1.20x faster |
 | Enrich top merchants concurrently | `benchmark/cases/concurrent-enrichment` | 100,000 | 194,966 | 232,989 | Native 1.20x faster |

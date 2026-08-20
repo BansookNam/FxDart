@@ -239,6 +239,44 @@ converge with more rounds, these do. Both end in the same place — a sub-5%
 reading needs more than the default before it means anything — which is why
 `./benchmark.sh --ab` runs 20.
 
+### Added — `foldByOrSkip`, the same trade on `monthly-category-report`
+
+`monthly-category-report` sat at 1.28x, and 0.8.5 had already named the cause:
+"the `filter` predicate that the native loop inlines". That reading holds, and
+it is now measured leg by leg. The predicate alone, over 1,000,000 rows:
+**9.8 ms** inlined against **12.6 ms** through an opaque closure — a 2.8 ms
+difference that is the whole of this case's gap.
+
+`foldBy` is strict and already inlines its own callbacks. The `filter` in
+front of it is lazy, so its predicate lives in an iterator field and never
+does. `foldByOrSkip(key, seed, f, xs)` moves the test into the key — a `null`
+key skips the element, the `filter_map` shape `takeUniqBy` introduced — and
+the key is a parameter of a body small enough to inline.
+
+| spelling | µs per 1,000,000 |
+|---|---|
+| `filter().foldBy()` | 13,965 |
+| `foldByOrSkip(…)` | 12,070 |
+| **`fx(…).foldByOrSkip(…)`** | **11,716** |
+| hand-written loop | 11,322 |
+
+**−16%**, and 1.28x behind native becomes **1.11x** in the published sweep.
+It keeps `foldBy`'s one-probe cell, which is most of why it lands where it
+does: a first prototype using the plain `map[k] = f(map[k] ?? seed, a)` read
+only −6%.
+
+As on `recent-errors`, the **headline bar still measures the composable
+chain** — it is what the page teaches — and the page publishes a third bar
+beside it. That makes two pages with three bars; the harness, `ab_bench` and
+`build_docs` already carried the shape.
+
+Thirteen tests, including the two things easy to get wrong when a filter is
+folded into a key: a `null` key skips rather than bucketing under `null`, and
+the seed stays a per-key starting value. A nullable accumulator is pinned too,
+since a stored `null` must not read as "no cell yet".
+
+`tools/build_single_file.sh` gains the matching `_$foldByOrSkip` wrapper.
+
 ### Behaviour notes
 
 - The `List` fast paths read `length` once and then index, so mutating the

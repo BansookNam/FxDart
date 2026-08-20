@@ -7,8 +7,8 @@ section: 7
 crumb: foldBy
 prev: countBy.html
 prevLabel: countBy
-next: countWhere.html
-nextLabel: countWhere
+next: foldByOrSkip.html
+nextLabel: foldByOrSkip
 ---
   <p class="hero-sub">Folds the values under each key in one pass — the aggregate without the groups.</p>
 

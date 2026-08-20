@@ -38,7 +38,7 @@
 | 26 | paginated-products | 100 | 6.2 µs | 6.6 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 27 | invoice-summary | 100 | 4.5 µs | 8.2 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 28 | budget-alerts | 100 | 3.8 µs | 3.6 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
-| 29 | monthly-category-report | 100 | 2.5 µs | 6.1 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
+| 29 | monthly-category-report | 100 | 2.3 µs | 6.2 µs | **tie** | 16.5 MB | 16.3 MB | tie | 3 |
 | 30 | consecutive-over-limit | 100 | 2.1 µs | 2.4 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
 | 31 | multi-currency-report | 100 | 14 µs | 11 µs | **tie** | 17.0 MB | 16.5 MB | tie | 3 |
 | 32 | restock-plan | 100 | 11 µs | 6.7 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
@@ -96,7 +96,7 @@
 | 26 | paginated-products | 10000 | 886 µs | 848 µs | **tie** | 17.7 MB | 21.3 MB | native | 3 |
 | 27 | invoice-summary | 10000 | 243 µs | 111 µs | **tie** | 22.4 MB | 15.8 MB | fxdart | 3 |
 | 28 | budget-alerts | 10000 | 185 µs | 90 µs | **tie** | 21.8 MB | 15.6 MB | fxdart | 3 |
-| 29 | monthly-category-report | 10000 | 110 µs | 147 µs | **tie** | 16.9 MB | 15.8 MB | fxdart | 3 |
+| 29 | monthly-category-report | 10000 | 106 µs | 139 µs | **tie** | 17.0 MB | 16.0 MB | fxdart | 3 |
 | 30 | consecutive-over-limit | 10000 | 114 µs | 173 µs | **tie** | 20.5 MB | 23.5 MB | native | 3 |
 | 31 | multi-currency-report | 10000 | 784 µs | 719 µs | **tie** | 23.5 MB | 22.9 MB | tie | 3 |
 | 32 | restock-plan | 10000 | 1.30 ms | 312 µs | **fxdart** | 17.5 MB | 23.4 MB | native | 3 |
@@ -154,7 +154,7 @@
 | 26 | paginated-products | 1000000 | 102.1 ms | 120.7 ms | **native** | 177.8 MB | 195.6 MB | native | 3 |
 | 27 | invoice-summary | 1000000 | 25.3 ms | 13.6 ms | **fxdart** | 92.3 MB | 88.4 MB | tie | 3 |
 | 28 | budget-alerts | 1000000 | 21.5 ms | 13.0 ms | **fxdart** | 90.1 MB | 82.7 MB | fxdart | 3 |
-| 29 | monthly-category-report | 1000000 | 11.3 ms | 14.3 ms | **native** | 119.3 MB | 119.6 MB | tie | 3 |
+| 29 | monthly-category-report | 1000000 | 11.3 ms | 14.5 ms | **native** | 120.4 MB | 120.0 MB | tie | 3 |
 | 30 | consecutive-over-limit | 1000000 | 17.1 ms | 20.3 ms | **native** | 149.8 MB | 148.0 MB | tie | 3 |
 | 31 | multi-currency-report | 1000000 | 123.3 ms | 104.4 ms | **fxdart** | 201.8 MB | 220.0 MB | native | 3 |
 | 32 | restock-plan | 1000000 | 216.2 ms | 51.9 ms | **fxdart** | 174.0 MB | 193.1 MB | native | 3 |

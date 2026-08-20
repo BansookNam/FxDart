@@ -7,8 +7,8 @@ section: 7
 crumb: foldBy
 prev: countBy.html
 prevLabel: countBy
-next: countWhere.html
-nextLabel: countWhere
+next: foldByOrSkip.html
+nextLabel: foldByOrSkip
 ---
   <p class="hero-sub">Reduce los valores de cada clave en una sola pasada: el agregado, sin los grupos.</p>
 
