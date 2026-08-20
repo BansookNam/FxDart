@@ -956,7 +956,41 @@ void _checkWindow(int size, int step) {
   }
 }
 
-class _WindowIterable<A> extends Iterable<List<A>> {
+/// One window of [list] — `list[i .. i + length)`.
+///
+/// Shared by [_WindowRangeIterator] and [_WindowRangeMapIterator] so the two
+/// cannot disagree about how a window is built.
+///
+/// This fills a pre-sized fixed-length list element by element, which costs a
+/// **covariant store check per element**: `List<A>.operator[]=` takes a
+/// covariant parameter and `A` is a runtime type argument here, so the check
+/// cannot be elided — the cost `_MapIterable.toList` documents at length.
+///
+/// Handing the copy to `List.sublist` instead removes that check: it reaches
+/// the VM's own `_slice`, which copies into an array carrying no type argument.
+/// Measured AOT over 1,000,000 windows of `double`, built and summed: this
+/// 16.4 ms vs `sublist` 14.1 ms at `size: 3`, 35.4 vs 26.7 at 7, 51.8 vs 36.0
+/// at 10 — about 2.3 ns a source element at the size `windowed` is usually
+/// called with. **It is not used, and the reason is a contract, not a doubt
+/// about the number:** `sublist` returns a *growable* list, and a fixed-length
+/// window is pinned behaviour (`test/lazy/list_range_test.dart`, "windows are
+/// fixed-length and independent"). Every bulk form that preserves the
+/// fixed length measured *slower* than this loop — `List.filled` + `setRange`
+/// 21.1 / 44.0 / 62.4, `getRange().toList(growable: false)` 29.1 / 55.0 / 76.9
+/// — because both copy through `Lists.copy`, an element loop behind an
+/// interface `[]=` call. So the check stays until the window's growability is
+/// deliberately re-specified, which is not this change's business.
+@pragma('vm:prefer-inline')
+List<A> _windowSlice<A>(List<A> list, int i, int length) {
+  final window = List<A>.filled(length, list[i]);
+  for (var k = 1; k < length; k++) {
+    window[k] = list[i + k];
+  }
+  return window;
+}
+
+class _WindowIterable<A> extends Iterable<List<A>>
+    implements FxMapFusable<List<A>> {
   _WindowIterable(this._size, this._step, this._partial, this._source);
   final int _size;
   final int _step;
@@ -973,6 +1007,17 @@ class _WindowIterable<A> extends Iterable<List<A>> {
     }
     return _WindowIterator(_size, _step, _partial, _source.iterator);
   }
+
+  /// `windowed(...).map(f)` as one stage — see [FxMapFusable].
+  ///
+  /// Unfused, every window crosses a megamorphic `moveNext` plus a `current`
+  /// read between this iterator and the `map` iterator, and `windowed` emits
+  /// one window per *source* element at the default `step: 1`, so that
+  /// boundary is paid at the full element rate. [f] is still one indirect
+  /// call per window either way.
+  @override
+  Iterable<B> fxFuseMap<B>(B Function(List<A> a) f) =>
+      _WindowMapIterable(_size, _step, _partial, _source, f);
 }
 
 class _WindowRangeIterator<A> implements Iterator<List<A>> {
@@ -1011,13 +1056,101 @@ class _WindowRangeIterator<A> implements Iterator<List<A>> {
     return true;
   }
 
-  List<A> _slice(int i, int length) {
-    final list = _list;
-    final window = List<A>.filled(length, list[i]);
-    for (var k = 1; k < length; k++) {
-      window[k] = list[i + k];
+  List<A> _slice(int i, int length) => _windowSlice(_list, i, length);
+}
+
+/// `windowed`/`chunk` followed by `map`, as one stage — see [FxMapFusable].
+///
+/// The window is built and [_f] applied inside a single `moveNext`, instead of
+/// the window crossing a stage boundary to reach a `map` iterator. Which
+/// iterator that is has to be decided per iteration, not here: `fxListRangeOf`
+/// snapshots the source's bounds, and doing that when the chain is built would
+/// break repeated iteration over a source that changed in between.
+class _WindowMapIterable<A, B> extends Iterable<B> {
+  _WindowMapIterable(
+    this._size,
+    this._step,
+    this._partial,
+    this._source,
+    this._f,
+  );
+  final int _size;
+  final int _step;
+  final bool _partial;
+  final Iterable<A> _source;
+  final B Function(List<A>) _f;
+  @override
+  Iterator<B> get iterator {
+    final r = fxListRangeOf(_source);
+    if (r != null) {
+      return _WindowRangeMapIterator(_size, _step, _partial, r, _f);
     }
-    return window;
+    // Not a [List] range, so the ring buffer is still needed and the window
+    // still has to come out of it. The boundary stays, but over a concrete
+    // [_WindowIterator] rather than the `Iterator<A>` field a `map` stage
+    // would hold, so the call is monomorphic instead of megamorphic.
+    return _WindowMapIterator(
+      _WindowIterator(_size, _step, _partial, _source.iterator),
+      _f,
+    );
+  }
+}
+
+/// [_WindowRangeIterator] with the `map` callback folded in.
+///
+/// Deliberately a second copy of that iterator's bound arithmetic rather than
+/// a wrapper around it — a wrapper is the boundary this exists to remove. The
+/// two are pinned against each other in `test/lazy/fused_window_map_test.dart`.
+class _WindowRangeMapIterator<A, B> implements Iterator<B> {
+  _WindowRangeMapIterator(
+    this._size,
+    this._step,
+    this._partial,
+    FxListRange<A> r,
+    this._f,
+  ) : _list = r.list,
+      _i = r.start,
+      _end = r.end,
+      _lastFull = r.end - _size;
+  final int _size;
+  final int _step;
+  final bool _partial;
+  final B Function(List<A>) _f;
+  final List<A> _list;
+  final int _end;
+  final int _lastFull;
+  int _i;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    final i = _i;
+    if (i <= _lastFull) {
+      current = _f(_windowSlice(_list, i, _size));
+      _i = i + _step;
+      return true;
+    }
+    if (!_partial) return false;
+    final remaining = _end - i;
+    if (remaining <= 0) return false;
+    current = _f(_windowSlice(_list, i, remaining));
+    _i = i + _step;
+    return true;
+  }
+}
+
+/// The pulled half of [_WindowMapIterable]: [_WindowIterator] plus [_f].
+class _WindowMapIterator<A, B> implements Iterator<B> {
+  _WindowMapIterator(this._it, this._f);
+  final _WindowIterator<A> _it;
+  final B Function(List<A>) _f;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    if (!_it.moveNext()) return false;
+    current = _f(_it.current);
+    return true;
   }
 }
 

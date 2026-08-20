@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import '../async_iterable.dart';
+import 'list_range.dart';
 
 // The sync operators here (and in filter.dart, take_drop.dart, zip.dart,
 // combine.dart, effect.dart) are hand-written Iterator classes rather than
@@ -17,8 +18,15 @@ import '../async_iterable.dart';
 /// ```dart
 /// map((a) => a + 10, [1, 2, 3, 4]); // (11, 12, 13, 14)
 /// ```
-Iterable<B> map<A, B>(B Function(A a) f, Iterable<A> iterable) =>
-    _MapIterable(f, iterable);
+Iterable<B> map<A, B>(B Function(A a) f, Iterable<A> iterable) {
+  // Resolved once, when the chain is built — never per element. Cast, not
+  // promotion: FxMapFusable is not a subtype of Iterable, so the type test
+  // alone does not promote (the shape `uniqBy` uses for FxUniqByFusable).
+  if (iterable is FxMapFusable<A>) {
+    return (iterable as FxMapFusable<A>).fxFuseMap<B>(f);
+  }
+  return _MapIterable(f, iterable);
+}
 
 /// Implemented by a lazy stage that can absorb a following `uniq` into its
 /// own loop instead of being pulled through an [Iterator] by it.
