@@ -29,10 +29,10 @@ benchmark/
 example/daily_ledger/
 example/dart_comparison_plan.md
 
-# Agent-harness instructions for this repo, not API documentation. Anchored so
-# that a future consumer-facing skills/**/CLAUDE.md still ships. The harness
-# directories (.claude/, .Codex/, .omp/, .agent-flow/) need no entry here: pub
-# never archives dot-prefixed paths, tracked or not.
+# Agent-harness instructions for this repo, not API documentation. Anchored so a
+# future consumer-facing skills/**/CLAUDE.md still ships. AGENTS.md is untracked
+# and listed in .git/info/exclude, yet it shipped before this entry existed:
+# .pubignore replaces gitignore semantics, so git-ignored is not archive-excluded.
 /AGENTS.md
 /CLAUDE.md
 
