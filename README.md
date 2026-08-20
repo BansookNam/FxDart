@@ -350,6 +350,64 @@ dart run coverage:test_with_coverage   # writes coverage/lcov.info
 
 ---
 
+## 📊 Benchmarks
+
+Two suites back the comparison sites linked at the top:
+[Dart vs FxDart](https://bansooknam.github.io/FxDart/DartComparison/) (53 cases)
+and [RxDart vs FxDart](https://bansooknam.github.io/FxDart/RxDartComparison/)
+(41 cases). Every case is AOT-compiled (`dart compile exe`) and each side runs
+as a fresh process, interleaved, so thermal drift lands on both equally.
+
+`./benchmark.sh` is the entry point:
+
+```sh
+./benchmark.sh                     # sweep every case, then regenerate the ratio report
+./benchmark.sh ledger-diff         # just these cases; the rest keep their recorded numbers
+./benchmark.sh --docs              # also rebuild docs/ — the bar charts read results.json
+./benchmark.sh --rx                # the RxDart family instead
+
+./benchmark.sh --ab ledger-diff    # did MY change move this case?
+./benchmark.sh --verify            # is the ratio report in step with results.json?
+./benchmark.sh --check             # cases still match their published examples
+./benchmark.sh --smoke ledger-diff # liveness only; results.json is restored afterwards
+```
+
+A sweep writes `benchmark/results/results.json` (the site's bar charts),
+`SUMMARY.md`, and `perf_ratio_report.md` — a table of every case ordered
+slowest to fastest.
+
+### ⚠️ Reading the numbers
+
+**Do not compare two sweeps to judge a change.** Cross-run noise is about 5%.
+The proof is built in: the `native` side links no fxdart code, so a
+library-only change must leave it byte-identical — and its measured cross-run
+delta is a median −2.1%, ranging −27% to +4%.
+
+Use `--ab` instead. It builds both variants of `lib/` and runs them
+interleaved in one session, so drift hits both sides:
+
+```sh
+./benchmark.sh --ab ledger-diff              # against HEAD
+./benchmark.sh --ab --ref v0.8.5 ledger-diff # against a tag or commit
+```
+
+The `native` side is the control. **If it moved more than ~2%, the machine was
+too busy and the row means nothing** — the script fails the run when that
+happens. It also defaults to 20 rounds rather than 12, because 12 does not
+resolve a few percent: three findings in the 0.8.6 pass looked like clean
+regressions at 12 rounds and vanished at 20.
+
+Two more things that have burned us, both handled by the script: `--smoke`
+writes un-warmed numbers into `results.json` like any real run, and a sweep
+that skips the report regeneration leaves the two files disagreeing until
+someone notices months later.
+
+Adding or changing a case? `benchmark/AUTHORING.md` has the rules — the first
+being that a case must measure the same pipeline its published example shows,
+which CI enforces.
+
+---
+
 ## 🙏 Acknowledgments
 
 Great thanks to **Indong Yoo**, CTO of [Marpple](https://www.marpple.com), the
