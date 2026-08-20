@@ -278,6 +278,7 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 
   /// Groups values into `(key, items)` records, in first-seen key order —
   /// the chainable view of [groupBy] (no `Map.entries` re-entry).
+  @pragma('vm:prefer-inline')
   Fx<({K key, List<T> items})> groupedBy<K>(K Function(T a) f) =>
       Fx(s.groupedBy(f, _inner));
 
@@ -327,9 +328,11 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   List<T> toList({bool growable = true}) => _inner.toList(growable: growable);
 
   /// Runs [f] for every value, forcing the pipeline.
+  @pragma('vm:prefer-inline')
   void each(void Function(T a) f) => s.each(f, _inner);
 
   /// [Iterable.fold] with the element's 0-based position.
+  @pragma('vm:prefer-inline')
   Acc foldWithIndex<Acc>(Acc seed, Acc Function(Acc acc, T a, int index) f) =>
       s.foldWithIndex(seed, f, _inner);
 
@@ -351,6 +354,7 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   Map<K, List<T>> groupBy<K>(K Function(T a) f) => s.groupBy(f, _inner);
 
   /// Maps the key [f] returns to its value (later values win on collisions).
+  @pragma('vm:prefer-inline')
   Map<K, T> indexBy<K>(K Function(T a) f) => s.indexBy(f, _inner);
 
   /// Counts how many values fall under each key [f] returns.
@@ -371,6 +375,7 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   int countWhere(bool Function(T a) f) => s.countWhere(f, _inner);
 
   /// Whether [f] holds for at least one value.
+  @pragma('vm:prefer-inline')
   bool some(bool Function(T a) f) => s.some(f, _inner);
 
   /// The first value [f] matches, or `null`.
@@ -406,6 +411,7 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   double averageBy(num Function(T a) f) => s.averageBy(f, _inner);
 
   /// Splits into `(matches, non-matches)` by [f].
+  @pragma('vm:prefer-inline')
   (List<T>, List<T>) partition(bool Function(T a) f) => s.partition(f, _inner);
 
   /// The number of values.
@@ -440,11 +446,13 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   }
 
   /// Folds every value with [combine], starting from [initial].
+  @pragma('vm:prefer-inline')
   R fold<R>(R initial, R Function(R acc, T a) combine) =>
       s.fold(initial, combine, _inner);
 
   /// Folds every value with [combine], starting from the first element.
   /// Throws if empty.
+  @pragma('vm:prefer-inline')
   T reduce(T Function(T acc, T a) combine) => s.reduce(combine, _inner);
 
   /// The first element matching [test], or call [orElse] if none match.
@@ -466,16 +474,13 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 
   /// True if [test] holds for at least one element.
   /// Stops at first true (early exit).
+  @pragma('vm:prefer-inline')
   bool any(bool Function(T) test) => s.some(test, _inner);
 
   /// True if [test] holds for every element.
   /// Stops at first false (early exit).
-  bool all(bool Function(T) test) {
-    for (final item in _inner) {
-      if (!test(item)) return false;
-    }
-    return true;
-  }
+  @pragma('vm:prefer-inline')
+  bool all(bool Function(T) test) => s.every(test, _inner);
 
   /// Joins all elements into a string separated by [separator].
   ///

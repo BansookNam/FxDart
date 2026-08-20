@@ -4,6 +4,7 @@
 //   dart run tool/ab_bench.dart --rounds 8 --scale 10000 ledger-diff
 //   dart run tool/ab_bench.dart --rx even-totals
 //   dart run tool/ab_bench.dart --ref 0.8.4 recent-errors
+//   dart run tool/ab_bench.dart --ref main --all --rounds 20
 //
 // WHY THIS EXISTS, and why a results.json diff will not do
 // -------------------------------------------------------
@@ -59,6 +60,7 @@ Future<void> main(List<String> argv) async {
   var ref = 'HEAD';
   var rx = false;
   var keepTree = false;
+  var all = false;
   final slugs = <String>[];
 
   for (var i = 0; i < argv.length; i++) {
@@ -78,6 +80,8 @@ Future<void> main(List<String> argv) async {
         rx = true;
       case '--keep-tree':
         keepTree = true;
+      case '--all':
+        all = true;
       default:
         if (a.startsWith('-')) {
           stderr.writeln('unknown flag: $a');
@@ -86,17 +90,31 @@ Future<void> main(List<String> argv) async {
         slugs.add(a);
     }
   }
+  final casesDir = rx ? 'cases-rx' : 'cases';
+  final left = rx ? 'rxdart' : 'native';
+
+  if (all) {
+    if (slugs.isNotEmpty) {
+      stderr.writeln('--all measures every case; it takes no slugs');
+      exit(2);
+    }
+    slugs.addAll(
+      Directory('$root/benchmark/$casesDir')
+          .listSync()
+          .whereType<Directory>()
+          .map((d) => d.path.split(Platform.pathSeparator).last)
+          .toList()
+        ..sort(),
+    );
+  }
   if (slugs.isEmpty) {
     stderr.writeln(
       'usage: dart run tool/ab_bench.dart [--ref R] [--rounds N] [--iters N]\n'
       '                                   [--warmup N] [--scale 100|10000|full]\n'
-      '                                   [--rx] [--keep-tree] <slug>...',
+      '                                   [--rx] [--keep-tree] (--all | <slug>...)',
     );
     exit(2);
   }
-
-  final casesDir = rx ? 'cases-rx' : 'cases';
-  final left = rx ? 'rxdart' : 'native';
 
   for (final slug in slugs) {
     if (!Directory('$root/benchmark/$casesDir/$slug').existsSync()) {
@@ -122,9 +140,12 @@ Future<void> main(List<String> argv) async {
   );
   stdout.writeln('=' * 72);
 
-  final report = <String>[];
+  final report = <(String slug, double control, double fxdart)>[];
+  var worstControl = 0.0;
   for (final slug in slugs) {
     stdout.writeln('\n$slug');
+    var control = 0.0;
+    var fxdart = 0.0;
     for (final impl in [left, 'fxdart']) {
       final r = await _abOne(slug, impl, scale, rounds, iters, warmup);
       final tag = impl == 'fxdart' ? 'fxdart' : '$impl (control)';
@@ -134,17 +155,83 @@ Future<void> main(List<String> argv) async {
           'head ${_ms(r.headMedian).padLeft(9)}   '
           '${_pct(r.delta).padLeft(8)}';
       stdout.writeln(line);
-      report.add('$slug/$impl ${_pct(r.delta)}');
-      if (impl != 'fxdart' && r.delta.abs() > 2.0) {
+      if (impl == 'fxdart') {
+        fxdart = r.delta;
+        continue;
+      }
+      control = r.delta;
+      if (control.abs() > worstControl.abs()) worstControl = control;
+      if (control.abs() > _controlLimit) {
         stdout.writeln(
-          '  !! control moved ${_pct(r.delta)} — the machine is too busy for '
+          '  !! control moved ${_pct(control)} — the machine is too busy for '
           'this measurement to mean anything.',
         );
       }
     }
+    report.add((slug, control, fxdart));
   }
   stdout.writeln('\n${'=' * 72}');
   stdout.writeln('negative = faster after the change');
+
+  final table = _reportTable(
+    rows: report,
+    ref: ref,
+    scale: scale,
+    rounds: rounds,
+    iters: iters,
+    warmup: warmup,
+    control: left,
+  );
+  final out = File('$_abDir/report.md');
+  out.parent.createSync(recursive: true);
+  out.writeAsStringSync('$table\n');
+  stdout.writeln('\n$table\n\nwritten: ${out.path}');
+
+  if (worstControl.abs() > _controlLimit) {
+    stderr.writeln(
+      'control moved ${_pct(worstControl)}, past the '
+      '${_controlLimit.toStringAsFixed(1)}% limit — these numbers cannot carry '
+      'a percentage claim. Rerun on an idle machine.',
+    );
+    exit(1);
+  }
+}
+
+/// How far the control may drift before the run is declared unusable.
+///
+/// The control side links none of the changed library, so its two binaries are
+/// identical and everything it reports is measurement noise. Past this much
+/// noise a sub-5% reading is not resolvable, so the run exits non-zero rather
+/// than hand back a number that looks publishable.
+const _controlLimit = 2.0;
+
+/// The per-case delta table, in the shape the CHANGELOG entries use.
+String _reportTable({
+  required List<(String, double, double)> rows,
+  required String ref,
+  required String scale,
+  required int rounds,
+  required int iters,
+  required int warmup,
+  required String control,
+}) {
+  final b = StringBuffer()
+    ..writeln('# ab_bench — paired A/B against `$ref`')
+    ..writeln()
+    ..writeln(
+      'scale `$scale` · rounds $rounds · iters $iters · warmup $warmup · '
+      'negative = faster after the change',
+    )
+    ..writeln()
+    ..writeln('| Case | fxdart | $control (control) | usable |')
+    ..writeln('|---|---:|---:|---|');
+  for (final (slug, ctrl, fx) in rows) {
+    // A single noisy case fails the whole run, so the table has to say which
+    // rows it was: the others are still readable.
+    final usable = ctrl.abs() > _controlLimit ? 'no — control drift' : 'yes';
+    b.writeln('| `$slug` | ${_pct(fx)} | ${_pct(ctrl)} | $usable |');
+  }
+  return b.toString().trimRight();
 }
 
 // --- one interleaved A/B ----------------------------------------------------

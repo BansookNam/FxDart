@@ -153,7 +153,15 @@ Future<bool> includesAsync<A>(A a, FxAsyncIterable<A> iterable) =>
 /// iterable). Short-circuits.
 ///
 /// Port of FxTS `every`.
+@pragma('vm:prefer-inline')
 bool every<A>(bool Function(A a) f, Iterable<A> iterable) {
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      if (!f(iterable[i])) return false;
+    }
+    return true;
+  }
   for (final a in iterable) {
     if (!f(a)) return false;
   }
@@ -177,7 +185,15 @@ Future<bool> everyAsync<A>(
 /// iterable). Short-circuits.
 ///
 /// Port of FxTS `some`.
+@pragma('vm:prefer-inline')
 bool some<A>(bool Function(A a) f, Iterable<A> iterable) {
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      if (f(iterable[i])) return true;
+    }
+    return false;
+  }
   for (final a in iterable) {
     if (f(a)) return true;
   }

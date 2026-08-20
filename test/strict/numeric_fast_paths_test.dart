@@ -156,4 +156,127 @@ void main() {
       expect(chain.isNotEmpty, isTrue);
     });
   });
+
+  // Every terminal below grew an indexed branch beside its pulled one. The two
+  // loops are written separately, so a divergence between them is exactly the
+  // bug these cases catch.
+  group('strict terminal list fast paths', () {
+    final list = [1, 2, 3, 4];
+    Iterable<int> lazy() => list.where((_) => true);
+
+    test('each visits every element in order on both paths', () {
+      final indexed = <int>[];
+      each(indexed.add, list);
+      final pulled = <int>[];
+      each(pulled.add, lazy());
+      expect(indexed, equals([1, 2, 3, 4]));
+      expect(pulled, equals(indexed));
+    });
+
+    test('fold and foldWithIndex agree on both paths', () {
+      expect(fold(0, (int acc, int a) => acc + a, list), equals(10));
+      expect(fold(0, (int acc, int a) => acc + a, lazy()), equals(10));
+      expect(
+        foldWithIndex(0, (int acc, int a, int i) => acc + a * i, list),
+        equals(20),
+      );
+      expect(
+        foldWithIndex(0, (int acc, int a, int i) => acc + a * i, lazy()),
+        equals(20),
+      );
+    });
+
+    test('reduce agrees on both paths and still throws when empty', () {
+      expect(reduce((int acc, int a) => acc + a, list), equals(10));
+      expect(reduce((int acc, int a) => acc + a, lazy()), equals(10));
+      expect(() => reduce((int a, int b) => a + b, <int>[]), throwsStateError);
+      expect(
+        () => reduce((int a, int b) => a + b, <int>[].where((_) => true)),
+        throwsStateError,
+      );
+    });
+
+    test('every and some short-circuit identically on both paths', () {
+      final seen = <int>[];
+      bool under3(int a) {
+        seen.add(a);
+        return a < 3;
+      }
+
+      expect(every(under3, list), isFalse);
+      expect(seen, equals([1, 2, 3]));
+      seen.clear();
+      expect(every(under3, lazy()), isFalse);
+      expect(seen, equals([1, 2, 3]));
+      expect(every((int a) => a > 0, list), isTrue);
+      expect(every((int a) => a > 0, lazy()), isTrue);
+      expect(some((int a) => a > 3, list), isTrue);
+      expect(some((int a) => a > 3, lazy()), isTrue);
+      expect(some((int a) => a > 9, list), isFalse);
+      expect(some((int a) => a > 9, lazy()), isFalse);
+    });
+
+    test('countWhere agrees on both paths', () {
+      expect(countWhere((int a) => a.isEven, list), equals(2));
+      expect(countWhere((int a) => a.isEven, lazy()), equals(2));
+    });
+
+    test(
+      'groupBy, indexBy and countBy keep first-seen order on both paths',
+      () {
+        String key(int a) => a.isEven ? 'even' : 'odd';
+        expect(
+          groupBy(key, list),
+          equals({
+            'odd': [1, 3],
+            'even': [2, 4],
+          }),
+        );
+        expect(groupBy(key, lazy()), equals(groupBy(key, list)));
+        expect(groupBy(key, list).keys.toList(), equals(['odd', 'even']));
+        expect(indexBy(key, list), equals({'odd': 3, 'even': 4}));
+        expect(indexBy(key, lazy()), equals(indexBy(key, list)));
+        expect(indexBy(key, list).keys.toList(), equals(['odd', 'even']));
+        expect(countBy(key, list), equals({'odd': 2, 'even': 2}));
+        expect(countBy(key, lazy()), equals(countBy(key, list)));
+        expect(countBy(key, list).keys.toList(), equals(['odd', 'even']));
+      },
+    );
+
+    test('partition splits in source order on both paths', () {
+      final (evens, odds) = partition((int a) => a.isEven, list);
+      expect(evens, equals([2, 4]));
+      expect(odds, equals([1, 3]));
+      final (lazyEvens, lazyOdds) = partition((int a) => a.isEven, lazy());
+      expect(lazyEvens, equals(evens));
+      expect(lazyOdds, equals(odds));
+    });
+
+    // The indexed branch reads `length` once, so a source mutated mid-pass no
+    // longer reports a concurrent modification. 0.8.6 documents this; pin both
+    // directions so a future rewrite back to `for-in` cannot pass silently.
+    test('mutating a List source mid-pass no longer reports it', () {
+      final growing = [1, 2, 3];
+      expect(
+        fold(0, (int acc, int a) {
+          if (growing.length < 6) growing.add(a);
+          return acc + a;
+        }, growing),
+        equals(6),
+      );
+      expect(growing, equals([1, 2, 3, 1, 2, 3]));
+
+      final shrinking = [1, 2, 3, 4];
+      expect(
+        () => each((int _) => shrinking.removeLast(), shrinking),
+        throwsRangeError,
+      );
+
+      final pulled = [1, 2, 3];
+      expect(
+        () => each((int _) => pulled.add(0), pulled.where((_) => true)),
+        throwsConcurrentModificationError,
+      );
+    });
+  });
 }

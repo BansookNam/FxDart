@@ -1,3 +1,158 @@
+## 0.8.6
+
+0.8.5 taught the *lazy* stages to stop hiding the user's callback behind an
+iterator field, and measured the floor that leaves: a closure loaded from a
+field costs 2.75 ns an element against 0.88 for a virtual call. It applied the
+fix to `sumBy`, `averageBy`, `foldBy`, `minBy`, `maxBy`, `find`, `findIndex`
+and stopped there. Twelve strict terminals — including the two most-used ones,
+`fold` and `each` — were left on the slow side of the same line.
+
+They are the whole of this release, plus two asymptotic bugs that no benchmark
+case could have found and the instrument that decided all of it.
+
+### Strict terminals inline the caller's callback
+
+`minBy` already carried the measurement, in its own comment since 0.8.2:
+
+| over 1,000,000 rows, extracting a `double` field | ns/element |
+|---|---|
+| hand-written loop | 0.65 |
+| `list.reduce(closure)` | 1.90 |
+| the terminal, no `vm:prefer-inline` | **6.26** |
+| the terminal, with the pragma | 0.97 |
+| the pragma **and** an indexed `List` walk | 0.65 |
+
+The pragma is not about the call overhead of the terminal. Inlined into the
+call site, the callback is the literal closure written there instead of a
+parameter holding an unknown function, and the per-element indirect call
+disappears. The indexed walk is worth its extra branch only *because* of the
+inlining — 0.8.0 measured indexed loops around an un-inlined callback at
+1.03-1.05x and rejected them, correctly.
+
+`fold`, `foldWithIndex`, `each`, `reduce`, `every`, `some`, `countWhere`,
+`groupBy`, `groupedBy`, `indexBy`, `countBy`, `partition` now get both, in the
+shape their already-optimized siblings use: the indexed branch first, the
+pulled loop unchanged behind it.
+
+A hop that does not inline breaks the chain, so the `Fx` members that stand
+between a chain call and these terminals were pragma'd too — `each`,
+`foldWithIndex`, `groupedBy`, `indexBy`, `some`, `any`, `partition`, `fold`,
+`reduce`. `groupBy`, `countBy`, `countWhere` and `foldBy` already had it, which
+is why they were the ones that moved first.
+
+`tee` / `tee3` were deliberately left alone: they carry `vm:align-loops`, and
+an indexed walk without the inlining is the shape 0.8.0 already measured as a
+regression.
+
+### Result — paired A/B against 0.8.5, all 53 cases
+
+Apple M5 Pro, Dart 3.13.1, AOT, `tool/ab_bench.dart` with a `native` control
+per case. Two cases at or past 5%, reproduced with a clean control:
+
+| case | terminal | fxdart, every clean-control reading | control |
+|---|---|---|---|
+| `top-log-level` | `countBy` over 1,000,000 log lines | **−9.37%** · −8.70% · −8.24% | +0.99% · −1.04% · −0.41% |
+| `sparse-timeseries` | `groupBy` over 1,000,000 readings | **−8.89%** · −7.27% · −6.80% · −6.59% · −6.37% | +1.12% · −0.80% · +1.09% · +1.30% · −1.16% |
+
+Readings against a control that had drifted past 2% are excluded from that
+table rather than averaged in; there were five such runs.
+
+No regression. Every other case reads inside the instrument's ±2% band
+against a clean control — `refunds-vs-charges` −1.35%, `alert-digest` −2.09%,
+`latency-percentiles` −1.47%, `cohort-retention` −0.22%,
+`duplicate-transactions` +0.40%, `daily-ledger-close` +0.34%, `ledger-diff`
+−0.90%, `restock-plan` −0.54%, `monthly-ledger-report` −0.37%, `top-expenses`
++0.48%, `recent-errors` +0.03%.
+
+`top-category-average` is **not** claimed: four readings against clean
+controls came in at −2.56%, −7.11%, −7.85%, −2.65%. It is bimodal here, so
+its win is real in direction and unmeasurable in size.
+
+### The gate caught a regression, and the regression named its own cause
+
+`top-merchants` read **+2.91%** and then **+3.35%** against clean controls —
+a real slowdown on a case fxdart already won 1.84x.
+
+It calls `groupedBy`, which was a list comprehension over `groupBy(f, iterable)`
+where `f` is `groupedBy`'s own **parameter**, not a literal. Forcing `groupBy`
+to inline there bought nothing — there was no closure literal at that call site
+to expose — while making `groupedBy` too big to be inlined itself, so the
+caller's literal never reached the loop and the indexed branch was paid for
+twice with no callback inlined either time. Pragma'ing `groupedBy` and
+`Fx.groupedBy` closes the chain: **+3.35% → −1.04%** (control −0.06%),
+confirmed at −1.35%.
+
+The general rule, now stated once instead of rediscovered: `vm:prefer-inline`
+earns its code size only on the hop that can see the caller's closure literal,
+and every hop between that literal and the loop has to inline or none of them
+do.
+
+### Two asymptotic bugs, neither reachable from a benchmark case
+
+- **`slice` walked the whole source.** `_SliceIterator.moveNext` kept pulling
+  past `end` — the comment called it deliberate ("matches the generator form")
+  — so `slice(0, xs, 3)` was O(n) where `take(3)` is O(3). It now stops at
+  `end`. Measured AOT, `slice(0, gen(1000000), 3).toList()` x20:
+  **331,552 µs → 27 µs**.
+- **`sumStrings` was quadratic.** `fold('', (a, b) => a + b)` copies the whole
+  accumulator per element; it is now `Iterable.join()`. 20,000 x 10 characters:
+  **74,620 µs → 343 µs**.
+
+Neither `slice` nor `sliceAsync` drains its source any more, which is
+observable on a side-effecting or single-shot iterable. That is the intended
+contract — it is what every other limiting operator does — it is stated in the
+public dartdoc rather than only in the implementation, and the sync side is
+pinned by a test that counts pulls.
+
+### `tool/ab_bench.dart` is a gate now, not a report
+
+Three defects, all of which mattered while measuring this release:
+
+- The ±2% control check **warned and exited 0**. It now exits 1, and it fired
+  on five of the runs below — including two that would otherwise have shipped
+  `top-log-level` at −10.09% and −10.70% off a control that had moved +5.05%
+  and +3.83%.
+- No all-cases mode: every slug had to be typed, so "no case regresses 3%" was
+  a manual claim. `--all` enumerates `benchmark/cases` (or `cases-rx`).
+- The per-case delta list was built and never emitted — dead code since it was
+  written. It now prints, and writes `benchmark/.build/ab/report.md` in the
+  shape these CHANGELOG tables use.
+
+### Two cases this instrument cannot adjudicate
+
+`weekly-sensor-averages` and `stream-windowed-alerts` swing past ±3% in both
+directions with clean controls, **in the same session**, back to back:
+
+| case | readings, control in brackets |
+|---|---|
+| `weekly-sensor-averages` | +6.94% [+1.00%] · −5.07% [−0.39%] · +9.66% [+2.75%] · −11.38% [−1.01%] · +18.34% [−1.86%] |
+| `stream-windowed-alerts` | −3.14% [+0.63%] · +2.84% [+0.96%] · +4.20% [−1.10%] · −0.62% [+0.93%] |
+
+Neither calls a single function this release changed — both are
+`chunk` → `averageBy` / `maxBy` pipelines, and `chunk` allocates one list per
+window, which makes their cost bimodal per *process* rather than per round.
+More rounds do not help; pooling per-iteration samples across processes cannot
+separate the modes. Recording them as unresolved rather than as a ±4% result,
+and noting what would fix it: keeping the raw `iterUs` samples and rejecting
+outlying processes, which the runner throws away today.
+
+### Behaviour notes
+
+- The `List` fast paths read `length` once and then index, so mutating the
+  source during a pass is no longer reported as such on these twelve
+  terminals. Both directions changed, and they changed differently: a source
+  that **grows** mid-pass is silently truncated to the length the pass started
+  with, and a source that **shrinks** now throws `RangeError` from the index
+  read where it used to throw `ConcurrentModificationError`. A non-`List`
+  source still takes the pulled loop and still raises
+  `ConcurrentModificationError`. Same trade-off the lazy stages took in 0.8.0,
+  now covering the strict side too, and pinned in all three directions by
+  `test/strict/numeric_fast_paths_test.dart`.
+- `slice` and `sliceAsync` stop consuming their source at `end`, as above.
+- `Fx.all` now delegates to `every` instead of carrying its own loop, so the
+  chain's universal quantifier reaches the same fast path as `Fx.any`.
+
+
 ## 0.8.5
 
 Two API additions and a performance pass that runs most of this section.

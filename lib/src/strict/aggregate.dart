@@ -51,7 +51,18 @@ Future<List<A>> toListAsync<A>(FxAsyncIterable<A> iterable) async {
 /// Iterates over [iterable], applying [f] to each value.
 ///
 /// Port of FxTS `each` (sync).
+// `vm:prefer-inline` + indexed walk, for the reason [minBy] measures: the
+// pragma is what lets AOT inline the caller's callback, and only then is the
+// iterator worth removing.
+@pragma('vm:prefer-inline')
 void each<A>(void Function(A a) f, Iterable<A> iterable) {
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      f(iterable[i]);
+    }
+    return;
+  }
   for (final a in iterable) {
     f(a);
   }
@@ -114,7 +125,19 @@ Future<void> consumeAsync<A>(FxAsyncIterable<A> iterable, [int? n]) async {
 /// Throws a [StateError] on an empty iterable.
 ///
 /// Port of FxTS `reduce(f, iterable)`. For the seeded form use [fold].
+@pragma('vm:prefer-inline')
 A reduce<A>(A Function(A acc, A a) f, Iterable<A> iterable) {
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    if (length == 0) {
+      throw StateError("'reduce' of empty iterable with no initial value");
+    }
+    var acc = iterable[0];
+    for (var i = 1; i < length; i++) {
+      acc = f(acc, iterable[i]);
+    }
+    return acc;
+  }
   final iterator = iterable.iterator;
   if (!iterator.moveNext()) {
     throw StateError("'reduce' of empty iterable with no initial value");
@@ -130,8 +153,16 @@ A reduce<A>(A Function(A acc, A a) f, Iterable<A> iterable) {
 ///
 /// Port of FxTS `reduce(f, seed, iterable)` (named after Dart's
 /// `Iterable.fold` since Dart cannot overload by arity).
+@pragma('vm:prefer-inline')
 Acc fold<A, Acc>(Acc seed, Acc Function(Acc acc, A a) f, Iterable<A> iterable) {
   var acc = seed;
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      acc = f(acc, iterable[i]);
+    }
+    return acc;
+  }
   for (final a in iterable) {
     acc = f(acc, a);
   }
@@ -144,12 +175,20 @@ Acc fold<A, Acc>(Acc seed, Acc Function(Acc acc, A a) f, Iterable<A> iterable) {
 /// ```dart
 /// foldWithIndex(0, (acc, a, i) => acc + a * i, [1, 2, 3]); // 8
 /// ```
+@pragma('vm:prefer-inline')
 Acc foldWithIndex<A, Acc>(
   Acc seed,
   Acc Function(Acc acc, A a, int index) f,
   Iterable<A> iterable,
 ) {
   var acc = seed;
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      acc = f(acc, iterable[i], i);
+    }
+    return acc;
+  }
   var i = 0;
   for (final a in iterable) {
     acc = f(acc, a, i++);
@@ -442,8 +481,11 @@ Future<num> sumAsync(FxAsyncIterable<num> iterable) =>
     foldAsync<num, num>(0, (a, b) => a + b, iterable);
 
 /// Concatenates every string in the iterable.
-String sumStrings(Iterable<String> iterable) =>
-    fold('', (a, b) => a + b, iterable);
+///
+/// `Iterable.join()`, not `fold('', (a, b) => a + b)`: the fold copies the
+/// whole accumulator on every element, so its cost is quadratic in the total
+/// output length.
+String sumStrings(Iterable<String> iterable) => iterable.join();
 
 /// Returns the average of the numbers. `NaN` for an empty iterable.
 ///
@@ -779,8 +821,16 @@ Future<int> sizeAsync<A>(FxAsyncIterable<A> iterable) async {
 /// Counts the values [f] holds for — `filter` + `size` in one walk.
 ///
 /// Dart-native addition (Kotlin's `count { }`).
+@pragma('vm:prefer-inline')
 int countWhere<A>(bool Function(A a) f, Iterable<A> iterable) {
   var n = 0;
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      if (f(iterable[i])) n++;
+    }
+    return n;
+  }
   for (final a in iterable) {
     if (f(a)) n++;
   }
@@ -811,10 +861,19 @@ Future<String> joinAsync<A>(String sep, FxAsyncIterable<A> iterable) async =>
 /// Splits values into groups keyed by [f].
 ///
 /// Port of FxTS `groupBy` (TS objects become Dart Maps).
+@pragma('vm:prefer-inline')
 Map<K, List<A>> groupBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
   final result = <K, List<A>>{};
   // `??=` instead of putIfAbsent: putIfAbsent allocates an ifAbsent closure
   // per element.
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      final a = iterable[i];
+      (result[f(a)] ??= []).add(a);
+    }
+    return result;
+  }
   for (final a in iterable) {
     (result[f(a)] ??= []).add(a);
   }
@@ -844,6 +903,10 @@ Future<Map<K, List<A>>> groupByAsync<A, K>(
 /// groupedBy((w) => w.length, ['ab', 'cd', 'e']);
 /// // [(key: 2, items: [ab, cd]), (key: 1, items: [e])]
 /// ```
+// Inlined for the same reason as [groupBy] itself: this is the hop between the
+// caller's key-extractor literal and the loop, and a hop that does not inline
+// leaves the callback opaque while still paying for the indexed branch.
+@pragma('vm:prefer-inline')
 List<({K key, List<A> items})> groupedBy<A, K>(
   K Function(A a) f,
   Iterable<A> iterable,
@@ -863,8 +926,17 @@ Future<List<({K key, List<A> items})>> groupedByAsync<A, K>(
 /// Indexes values by [f]; later duplicates overwrite earlier ones.
 ///
 /// Port of FxTS `indexBy`.
+@pragma('vm:prefer-inline')
 Map<K, A> indexBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
   final result = <K, A>{};
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      final a = iterable[i];
+      result[f(a)] = a;
+    }
+    return result;
+  }
   for (final a in iterable) {
     result[f(a)] = a;
   }
@@ -902,6 +974,7 @@ class _Cell {
 /// Counts occurrences of each key produced by [f].
 ///
 /// Port of FxTS `countBy`.
+@pragma('vm:prefer-inline')
 Map<K, int> countBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
   // `result[k] = (result[k] ?? 0) + 1` reads the map and then writes it back,
   // so every element hashes its key twice and walks the bucket twice — and on
@@ -923,13 +996,26 @@ Map<K, int> countBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
   // second dereference — but it never inverts, so there is no threshold to
   // tune. Bounding the cell count was measured too and bought nothing.
   final cells = <K, _IntCell>{};
-  for (final a in iterable) {
-    final k = f(a);
-    final cell = cells[k];
-    if (cell == null) {
-      cells[k] = _IntCell(1);
-    } else {
-      cell.n++;
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      final k = f(iterable[i]);
+      final cell = cells[k];
+      if (cell == null) {
+        cells[k] = _IntCell(1);
+      } else {
+        cell.n++;
+      }
+    }
+  } else {
+    for (final a in iterable) {
+      final k = f(a);
+      final cell = cells[k];
+      if (cell == null) {
+        cells[k] = _IntCell(1);
+      } else {
+        cell.n++;
+      }
     }
   }
   // Rebuilt in first-seen order, exactly as the two-probe loop produced it.
@@ -1520,9 +1606,18 @@ Future<List<A>> sortByDescAsync<A>(
 /// Splits values into `(pass, fail)` lists by predicate [f].
 ///
 /// Port of FxTS `partition` (TS tuple becomes a Dart record).
+@pragma('vm:prefer-inline')
 (List<A>, List<A>) partition<A>(bool Function(A a) f, Iterable<A> iterable) {
   final pass = <A>[];
   final fail = <A>[];
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      final a = iterable[i];
+      (f(a) ? pass : fail).add(a);
+    }
+    return (pass, fail);
+  }
   for (final a in iterable) {
     (f(a) ? pass : fail).add(a);
   }

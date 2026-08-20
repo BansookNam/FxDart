@@ -529,6 +529,8 @@ bool _$some<A>(bool Function(A a) f, Iterable<A> iterable) => some(f, iterable);
 Future<bool> _$someAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
     someAsync(f, iterable);
+bool _$every<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    every(f, iterable);
 Future<bool> _$everyAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
     everyAsync(f, iterable);
