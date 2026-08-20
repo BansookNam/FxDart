@@ -49,10 +49,13 @@ regression.
 Apple M5 Pro, Dart 3.13.1, AOT, `tool/ab_bench.dart` with a `native` control
 per case. Two cases at or past 5%, reproduced with a clean control:
 
-| case | terminal | fxdart | control |
+| case | terminal | fxdart, every clean-control reading | control |
 |---|---|---|---|
-| `top-log-level` | `countBy` over 1,000,000 log lines | **−9.37%** / −8.70% | +0.99% / −1.04% |
-| `sparse-timeseries` | `groupBy` over 1,000,000 readings | **−8.89%** / −7.27% / −6.80% / −6.37% | +1.12% / −0.80% / +1.09% / −1.16% |
+| `top-log-level` | `countBy` over 1,000,000 log lines | **−9.37%** · −8.70% · −8.24% | +0.99% · −1.04% · −0.41% |
+| `sparse-timeseries` | `groupBy` over 1,000,000 readings | **−8.89%** · −7.27% · −6.80% · −6.59% · −6.37% | +1.12% · −0.80% · +1.09% · +1.30% · −1.16% |
+
+Readings against a control that had drifted past 2% are excluded from that
+table rather than averaged in; there were five such runs.
 
 No regression. Every other case reads inside the instrument's ±2% band
 against a clean control — `refunds-vs-charges` −1.35%, `alert-digest` −2.09%,
