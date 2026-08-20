@@ -807,13 +807,18 @@ Iterable<B> scan<A, B>(
   Iterable<A> iterable,
 ) => _ScanIterable(f, seed, iterable);
 
-class _ScanIterable<A, B> extends Iterable<B> {
+class _ScanIterable<A, B> extends Iterable<B> implements FxMapFusable<B> {
   _ScanIterable(this._f, this._seed, this._source);
   final B Function(B, A) _f;
   final B _seed;
   final Iterable<A> _source;
   @override
   Iterator<B> get iterator => _ScanIterator(_f, _seed, _source.iterator);
+
+  @override
+  Iterable<C> fxFuseMap<C>(C Function(B a) g) =>
+      _ScanMapIterable(_f, _seed, _source, g);
+
   @override
   List<B> toList({bool growable = true}) {
     final source = _source;
@@ -852,6 +857,118 @@ class _ScanIterator<A, B> implements Iterator<B> {
     }
     if (_it.moveNext()) {
       current = _f(current, _it.current);
+      return true;
+    }
+    return false;
+  }
+}
+
+/// `scan(f, seed, source)` followed by `map(g)`, as one stage — see
+/// [FxMapFusable].
+///
+/// The accumulator step and [_g] run inside a single `moveNext` (or a single
+/// `toList` loop), instead of every accumulated value crossing a stage
+/// boundary — a megamorphic `moveNext` plus a `current` read — to reach a
+/// `map` iterator. Both callbacks land in fields of this node exactly as they
+/// would in the two stages it replaces, so **neither one is devirtualized**:
+/// they stay two indirect calls per element. The removed stage boundaries are
+/// the whole win.
+///
+/// Lazily equivalent to the pair: `_g(seed)` is emitted first and then one
+/// value per source element (so exactly `source.length + 1` in all), [_f] and
+/// [_g] each run once per element consumed, the accumulator is fresh per
+/// iteration, and a downstream `take` still cuts the source short.
+class _ScanMapIterable<A, B, C> extends Iterable<C> {
+  _ScanMapIterable(this._f, this._seed, this._source, this._g);
+  final B Function(B, A) _f;
+  final B _seed;
+  final Iterable<A> _source;
+  final C Function(B) _g;
+
+  @override
+  Iterator<C> get iterator => _ScanMapIterator(_f, _seed, _source.iterator, _g);
+
+  /// The point of the fusion: accumulate, map, and collect in one loop.
+  ///
+  /// A `toList` consumes everything anyway, so the source shape is resolved
+  /// once here rather than pulled: a [FxListRange] is walked by index and a
+  /// [FxIntRange] (what `range()` produces) by counter, leaving [_f] and [_g]
+  /// as the only calls per element. [_f], [_g], the accumulator and the bounds
+  /// are copied into locals first, so none of them is reloaded through the
+  /// receiver on every iteration (see [_MapUniqIterable.toList]).
+  ///
+  /// Accumulated with `add`, *not* the pre-sized fill [_ScanIterable.toList]
+  /// uses: `List<C>.operator[]=` takes a covariant parameter and `C` is a
+  /// runtime type argument here, so the store check per element cannot be
+  /// elided — and for a record element type it is not a class-id compare. The
+  /// measurement is on [_MapIterable.toList].
+  @override
+  List<C> toList({bool growable = true}) {
+    final f = _f;
+    final g = _g;
+    final source = _source;
+    var acc = _seed;
+    final result = <C>[g(acc)];
+    final r = fxListRangeOf(source);
+    if (r != null) {
+      final list = r.list;
+      final end = r.end;
+      for (var i = r.start; i < end; i++) {
+        acc = f(acc, list[i]);
+        result.add(g(acc));
+      }
+      return growable ? result : List<C>.from(result, growable: false);
+    }
+    final ir = fxIntRangeOf(source);
+    if (ir != null) {
+      // The elements are `int` while `A` is only *some* supertype of it, so
+      // the callback is cast once, here — never the values, per element (the
+      // shape `_FilterRangeIterator` uses).
+      final fi = f as B Function(B, int);
+      final end = ir.end;
+      final step = ir.step;
+      for (var i = ir.start; step < 0 ? i > end : i < end; i += step) {
+        acc = fi(acc, i);
+        result.add(g(acc));
+      }
+      return growable ? result : List<C>.from(result, growable: false);
+    }
+    for (final a in source) {
+      acc = f(acc, a);
+      result.add(g(acc));
+    }
+    return growable ? result : List<C>.from(result, growable: false);
+  }
+}
+
+/// The pulled half of [_ScanMapIterable]: [_ScanIterator]'s accumulation with
+/// [_g] folded into the same `moveNext`.
+///
+/// The accumulator needs a field of its own rather than riding in [current] as
+/// [_ScanIterator] lets it — [current] is a `C` here, and what the next step
+/// folds is the `B` before [_g]. The upstream is held as a bare `Iterator<A>`,
+/// exactly as [_ScanIterator] holds it, so the fused chain pays one stage
+/// boundary where the unfused pair pays two.
+class _ScanMapIterator<A, B, C> implements Iterator<C> {
+  _ScanMapIterator(this._f, this._acc, this._it, this._g);
+  final B Function(B, A) _f;
+  final Iterator<A> _it;
+  final C Function(B) _g;
+  B _acc;
+  var _emittedSeed = false;
+  @override
+  late C current;
+  @override
+  bool moveNext() {
+    if (!_emittedSeed) {
+      _emittedSeed = true;
+      current = _g(_acc);
+      return true;
+    }
+    if (_it.moveNext()) {
+      final acc = _f(_acc, _it.current);
+      _acc = acc;
+      current = _g(acc);
       return true;
     }
     return false;
