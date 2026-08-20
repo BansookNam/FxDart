@@ -16,6 +16,7 @@ tool/
 tools/
 deploy.sh
 run.sh
+benchmark.sh
 DEPLOY.md
 CODECOV.md
 
