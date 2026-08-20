@@ -360,6 +360,96 @@ separate the modes. Recording them as unresolved rather than as a ±4% result,
 and noting what would fix it: keeping the raw `iterUs` samples and rejecting
 outlying processes, which the runner throws away today.
 
+### Five convenience operators
+
+All additive, each with an `*Async` twin and an `Fx` / `FxAsync` chain member.
+
+- **`mapNotNull`** (lazy) — `map` and `compact` as a single stage.
+  `compact(map(f, xs))` stacks two lazy stages, so every surviving element
+  crosses two `moveNext`/`current` boundaries instead of one. Here `f` both
+  transforms and selects: the `filter_map` shape `takeUniqBy` already uses for
+  its key extractor. `B extends Object`, so a `null` from `f` means *skip this
+  element*, never *yield null*.
+- **`unzip`** (strict) — `zip` had no inverse. Strict by necessity: two lazy
+  views over one source would have to buffer everything the lagging one has
+  not reached, the cost `fork` pays. Both lists fill in one pass.
+- **`product` / `productBy`** (strict) — the numeric aggregate family had only
+  `sum`/`average`. Empty input is `1`, the multiplicative identity: it is the
+  only value that keeps `product(concat(xs, ys)) == product(xs) * product(ys)`
+  true when one side is empty, exactly as `sum`'s empty `0` does for addition.
+  Same unboxed int-then-double accumulation as `sum`, so an all-int input
+  stays an `int`.
+- **`none`** (strict) — the third quantifier beside `every`/`some`, so a
+  universal no longer has to be written as the negated existential `!some(f)`.
+  It does not collide with `SingletonRaise.none()`: that one is an instance
+  member and this one a top-level function, and inside the class body the
+  member wins regardless of what the barrel exports.
+- **`firstNotNullOf`** (strict) — Kotlin's `firstNotNullOfOrNull`. `find`
+  returns the *element*, so reaching the projection of the first match cost
+  either a second call to the projection or a hand-written loop.
+
+No benchmark claim is attached to any of them. `mapNotNull`, `productBy`,
+`none` and `firstNotNullOf` carry `vm:prefer-inline` and the indexed-`List`
+branch because they take a caller callback and their measured siblings ship
+that pair together; `unzip` and `product` take no callback and get neither.
+
+### Three defects in already-published API
+
+- **`Fx.isEmpty` never returned on an unbounded chain.** It was `size() == 0`,
+  an O(n) walk, where Dart's own `Iterable.isEmpty` is O(1) — so
+  `fx(cycle([1, 2])).isEmpty` hung. `isEmpty` and `isNotEmpty` now delegate to
+  the `Iterable` members, which ask the source for one element and stop.
+  `Fx.length` is deliberately left as a full walk: O(n) is inherent to
+  counting a general `Iterable` (it already takes `List`/`Set.length` when it
+  can), so unlike `isEmpty` it still does not terminate on an unbounded
+  chain — by construction, not by defect.
+- **`FxNum.min()` / `max()` disagreed with the members that shadow them.** A
+  member redeclared on an extension type wins over every extension on that
+  type, so `fx(xs).min()` runs `Fx.min` and never reaches the extension. The
+  extension is still reachable through explicit extension application —
+  `FxNum(fx(xs)).min()` — which is what the `// coverage:ignore-line` was
+  papering over, and there an empty chain returned `double.infinity` while the
+  member threw `StateError`. Both spellings now throw `StateError`, and the
+  extension is pinned by a test instead of excused by an ignore comment.
+- **Three `TODO(port):` markers rendered on pub.dev.** They sat in the public
+  dartdoc of `isUndefined`, `isArray` and `isObject`, explaining to nobody in
+  particular what those deprecated aliases are for. They now say it as
+  documentation.
+
+### Four more operators, from the published examples
+
+Additive API. Each has an `*Async` twin and `Fx` / `FxAsync` chain members,
+except `toPairs`, whose source is a `Map` — it is a chain *entrance*, not a
+chain step.
+
+- **`topBy` / `bottomBy`** (strict) — the k largest (smallest) by key in one
+  boundary pass, instead of sorting everything and then taking `k`. The result
+  is in descending (ascending) key order and a tie is won by the element seen
+  **first**, so no second sort and no tie-breaking key is needed. `k <= 0` is
+  empty, a `k` past the end is everything, ordered. The boundary is kept by
+  insertion, so this is for a small `k` over a large input. fxdart extension,
+  not a port — the shape is Python's `heapq.nlargest`, Rust itertools'
+  `k_largest_by_key`, Guava's `Ordering.greatestOf`. No benchmark claim is
+  attached to it.
+- **`toPairs`** (strict, `Map`) — the inverse `fromEntries` never had, so a
+  `Map` from `groupBy` / `countBy` / `foldBy` / `indexBy` can be continued as
+  a chain without re-entering through `fx(m.entries)` and converting
+  `MapEntry` back to a record by hand. Named after Lodash rather than
+  `entries`, which is a common local variable name and the barrel exports
+  every top-level name unprefixed.
+- **`mapCatching`** (lazy) — per-element error recovery, the element-wise
+  partner `catching` never had while `retry` already had `mapRetryAsync`. The
+  raise signal is **rethrown, not recovered**: it delegates to `catching`, so
+  a `raise` crossing the callback still short-circuits the enclosing
+  `either {}` / `nullable {}` instead of being swallowed into a recovered
+  value. RxDart spells this `onErrorReturnWith`.
+- **`mapAccum`** (lazy) — n values in, n values out: `scan` without the seed in
+  the output, so the trailing `.drop(1)` goes away. Not a re-proposal of
+  `scan`: `scan` and Kotlin's `runningFold` emit the seed and produce n+1
+  values, `mapAccum`, Rust's `Iterator::scan` and Haskell's `mapAccumL`
+  produce n. Argument order matches `scan` deliberately, so swapping one for
+  the other is a one-word edit.
+
 ### Behaviour notes
 
 - **Every `windowed`/`chunk` window is now a growable list.** Before this
@@ -399,6 +489,12 @@ outlying processes, which the runner throws away today.
 - `slice` and `sliceAsync` stop consuming their source at `end`, as above.
 - `Fx.all` now delegates to `every` instead of carrying its own loop, so the
   chain's universal quantifier reaches the same fast path as `Fx.any`.
+- `Fx.isEmpty` / `Fx.isNotEmpty` are O(1) and terminate on an unbounded chain,
+  where they used to count every element.
+- `FxNum(fx(xs)).min()` / `.max()` throw `StateError` on an empty chain where
+  they returned `double.infinity` / `-double.infinity`. Reachable only through
+  explicit extension application; the `fx(xs).min()` spelling is the `Fx`
+  member and is unchanged.
 
 
 ## 0.8.5
