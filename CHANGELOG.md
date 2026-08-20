@@ -144,8 +144,10 @@ excluded:**
 | `smoothed-zone-changes` | **−8.74%** · −7.95% · −8.00% · −7.07% · −9.97% · −7.63% · −8.83% · −10.39% · −7.70% · −7.47% | −0.76% · +0.25% · −0.33% · +0.25% · −0.74% · +0.27% · +0.74% · +0.65% · +1.35% · +0.13% |
 | `paginate-users` | **−11.67%** · −11.15% · −11.04% | −0.80% · +0.60% · −0.33% |
 
-Median −7.98% and −11.15%. `paginate-users` is `chunk(10)` → `map` → `toList`
-and reads −9.75% (control +0.15%) at `--scale full` too.
+Median −7.98% and −11.15%. The `--all` sweep confirms both independently at
+−9.82% (control +0.80%) and −10.81% (control −0.44%). `paginate-users` is
+`chunk(10)` → `map` → `toList` and also clears the bar at `--scale full`, at
+−10.50% (control +0.37%).
 
 Earlier exploratory rounds at `--rounds 12` are excluded from that table
 entirely rather than pooled with it; three of them had drifted controls
@@ -159,43 +161,80 @@ where `List.filled` allocated one object — costs about what the store checks
 save. *[Inference from the two measurements; not separately instrumented.]*
 Nothing regresses there, and the claim above is scoped to `--scale 10000`.
 
-**No regression.** Both scales swept with `--all`, and because a single noisy
-case fails the whole invocation, every row whose *own* control drifted past 2%
-was re-measured individually — 23 of them, plus every row that moved past 2%
-with a clean control. All resolve inside the band:
+**No regression** — swept with `--all` at both scales, and re-swept from
+scratch after the `scan` fusion below landed, so the figures cover both
+changes together. Because a single noisy case fails the whole invocation, the
+verdict is read per row from `benchmark/.build/ab/report.md` against that row's
+*own* control, and every row whose control drifted was then re-measured
+individually — 31 of them across the two scales, plus every row that moved past
+2% with a clean control.
 
-- The five cases fxdart already wins big are flat: `restock-plan` +1.52%,
-  `monthly-ledger-report` −1.69%, `top-expenses` +0.02%, `top-log-level`
-  +0.62%, `top-merchants` — see below.
-- The sweep's two worst-looking rows were artifacts and neither reproduces:
-  `food-spending` read +13.14% off a clean control at `--scale 10000` and then
-  +0.79% / −3.97% / −4.67% / +2.24% / +0.00% on re-measurement; it is a 34 µs
-  case, the smallest in the suite. `date-window-spend` read +9.22% and then
-  ±1%. Neither calls `map`, `windowed` or `chunk` at all.
-- Also re-measured to flat: `category-rank`, `multi-currency-report`,
-  `top-category-average`, `budget-alerts`, `no-spend-streak`,
-  `monthly-category-report`, `consecutive-over-limit`, `sensor-anomalies`,
-  `running-balance`, `invoice-summary`, `anomaly-context`,
-  `concurrent-enrichment`.
+At `--scale 10000`, 51 of 53 rows came back usable in one pass. The largest
+positive against a clean control anywhere in that sweep is `top-log-level` at
++2.14%; the other movement is all the other way (`average-basket` −4.39%,
+`duplicate-transactions` −3.27%, `sensor-anomalies` −3.25%, `food-spending`
+−2.45%). The two unusable rows re-measured flat: `bounded-concurrency`
+−0.05% / −0.10% / −0.08%, `no-spend-streak` −1.36% / +0.82% / −2.02%.
 
-`top-merchants` is the one row worth naming: twelve clean-control readings at
-`--scale full` spanning −0.04% to +4.20%, median **+1.8%**. It is under the 3%
-bar but it is not zero, so it was isolated rather than waved through. It calls
-`map()` **once per million elements**, so no per-element mechanism exists; and
-A/B'ing the two commits separately puts the window-copy commit at
-+0.34% / −0.23% / +0.70% and, with only the two-line `map()` probe removed and
-every new class left in place, −0.02% / −0.15% / +0.67%. So at most ~1 point is
-attributable to compiling a generic type test into `map()` at all, and the rest
-is this case's spread at `--scale full`.
+At `--scale full`, 47 of 53 came back usable, and the six that did not
+re-measured flat as well — `monthly-ledger-report` +0.07% / −0.14%,
+`multi-currency-report` −1.54% / −2.78%, `valid-emails` +0.01% / −0.71%, and
+`smoothed-zone-changes` not adjudicable there for the reason below.
 
-`weekly-sensor-averages` is **not claimed**, though it is on the changed path
-and read −9.32% against a clean control at `--scale 10000`. At `--scale full`
-it swings +8.08% [+1.56%] · −7.18% [+0.66%] · +9.10% [+0.41%] — the same
-bimodal-per-process behaviour recorded for it below, unchanged by this release.
-Its safety is argued **structurally instead of measured**: it is
-`chunk` → `map`, so it takes the fused iterator, and no work was added to any
-`moveNext` on its path — the type test resolves at chain construction, and the
-fused loop does strictly less per window than the pair it replaces.
+The five cases fxdart already wins by 1.8x–4.2x are flat: `restock-plan`
++1.54%, `monthly-ledger-report` −0.14%, `top-expenses` −0.12%, `top-log-level`
++1.16%, `top-merchants` −7.45% in the final sweep — see below, that number is
+spread, not a win.
+
+Three rows produced a single clean reading past 3% and none of them holds up:
+
+| case | clean-control readings at `--scale full` | median |
+|---|---|---|
+| `top-merchants` | 13 readings from −7.45% to +4.20% | +1.81% |
+| `sensor-anomalies` | −0.50% · +0.92% · +2.09% · +4.89% | +1.5% |
+| `sparse-timeseries` | −1.81% · −0.72% · +0.15% · +1.74% · +2.38% · +3.45% | +0.95% |
+
+`top-merchants` was isolated rather than waved through, because it is a canary.
+It calls `map()` **once per million elements**, so no per-element mechanism
+exists; A/B'ing the two commits separately puts the window-copy commit at
++0.34% / −0.23% / +0.70%, and with only the two-line `map()` probe removed and
+every new class left in place it reads −0.02% / −0.15% / +0.67%. At most ~1
+point is attributable to compiling a generic type test into `map()` at all.
+The rest — and the −7.45% — is this case's spread at 1,000,000 elements.
+
+The general shape, worth stating because it is the instrument's real
+resolution: at `--scale full` a single reading on a mid-size case can land ±4
+points from its own median *with a clean control*, so no individual reading at
+that scale should be read as a result. Medians over 4–6 clean readings are all
+inside ±2%. Both claims in this release are made at the scale where their case
+measures tightly, from ten and twelve readings respectively.
+
+The two sweep rows that looked worst were artifacts and neither reproduces:
+`food-spending` read +13.14% off a clean control and then
++0.79% / −3.97% / −4.67% / +2.24% / +0.00%; it is a 34 µs case, the smallest in
+the suite. `date-window-spend` read +9.22% and then ±1%. Neither calls `map`,
+`windowed` or `chunk` at all.
+
+`recent-errors` could not be adjudicated at `--scale 10000` at all: seven
+attempts, seven drifted controls, on a 60 µs case against a 40 µs control. At
+`--scale full` it is clean and flat, +0.08% (control +0.83%).
+
+`weekly-sensor-averages` is **not claimed**, and this release adds the cleanest
+proof yet of why. It is on the changed path, and against clean controls it read
+**−9.32%**, then **−12.88%**, then **+11.34%**, then +8.08% [+1.56%] · −7.18%
+[+0.66%] · +9.10% [+0.41%]. A change cannot make a case 13% faster and 11%
+slower; the sign flip is the bimodal-per-process behaviour already recorded for
+it below, and more rounds do not touch it because the modes are per *process*,
+not per round.
+
+Its safety is therefore argued **structurally instead of measured**. It is
+`chunk` → `map`, so it takes the fused iterator. No work was added to any
+`moveNext` on its path: the type test resolves once when the chain is built, the
+fused `moveNext` does strictly less per window than the two it replaces (one
+window built, one callback applied, no `current` write and no cross-iterator
+call), and its window copy is the same `_windowSlice` the unfused path uses. The
+one path this release makes slower — the wrapped ring branch — is not reachable
+from `chunk`, which never wraps.
 
 `smoothed-zone-changes` cannot be adjudicated at `--scale full` either, and for
 a different reason: its **`native` side** is the unstable one there. The
@@ -223,6 +262,54 @@ The median at `--scale 10000` is the honest headline and it improved. The
 to the best case rather than lower the best case. The published `verdict:
 fxdart` is an artifact of native's right tail and is left for a separate
 change, since `content/` is owned elsewhere.
+
+### `scan` → `map` is one stage too, and it was the bigger win
+
+`FxMapFusable` cost one interface, so the second implementor was nearly free.
+`scan(f, seed, xs).map(g).toList()` crossed **three** boundaries at the full
+element rate — source into `_ScanIterator`, `_ScanIterator` into `_MapIterator`,
+`_MapIterator` into the inherited `toList`, which pulled every element back
+through the chain because a `_ScanIterable` is not a `List`. `_ScanIterable`
+now answers `fxFuseMap`, and the fused node's `toList` is a single loop with the
+accumulator in a **local**, resolving its source shape once: an indexed walk for
+a `List` range, a counted walk for `range()`, the pulled loop otherwise.
+
+Same caveat as above, for the same reason: `f` and `g` both land in fields of
+the fused node, so **neither callback is devirtualized**. Boundaries only.
+
+It accumulates with `<C>[]` and `add`, deliberately, rather than the pre-sized
+`List<C>.filled` + `out[i + 1] = …` that `_ScanIterable.toList` still uses for
+the unfused case. That is the covariant-store cost again, and it is worst
+exactly here: for a **record** element type the check is structural rather than
+a class-id compare, which `map.dart` measured at 394 ms against 220 ms at
+N=1,000,000. Both cases below have record element types — `(String, double)`
+and `(int, double)`.
+
+`--ref main`, `--rounds 24`, `--scale full`. **Twelve readings, twelve clean
+controls, none excluded:**
+
+| case | fxdart, every clean-control reading | control |
+|---|---|---|
+| `running-balance` | **−10.17%** · −9.42% · −10.76% · −9.99% · −9.63% · −10.10% | +0.71% · +1.50% · +0.77% · −0.07% · +0.08% · +0.24% |
+| `compound-interest` | **−5.89%** · −6.79% · −5.50% · −7.06% · −7.18% · −6.24% | −1.09% · −1.16% · −0.22% · −0.78% · −0.42% · −0.02% |
+
+Medians −10.05% and −6.52%; the `--all` sweep independently read −11.06%
+(control −1.11%) and −7.73% (control −0.81%), and `compound-interest` also
+clears the bar at `--scale 10000` at −6.07% (control +1.06%).
+
+The design estimate for this was 2.7%–6.5%, derived from three boundaries at
+1.8–4.0 ns each against these cases' 237–276 ns per element — both of which are
+dominated by `toStringAsFixed` and `padRight`, which is why so little was
+expected. Measured, it is 5.5%–11.1%. The estimate was conservative; the extra
+is not attributed here, because nothing was instrumented that would say which
+of the three removed boundaries, the removed `late` accumulator field traffic,
+or the removed growth reallocations in the inherited `toList` accounts for it.
+
+Worth recording: `_ScanIterable.toList`'s pre-sized `List` path is reached by
+**no** benchmark case — `scan` is followed by `map` in these two, by `drop` in
+`restock-plan` and `rate-limited-import`, and by `max()` in `no-spend-streak` —
+so it has never been measured by this instrument at all, and this change does
+not touch it.
 
 ### Two asymptotic bugs, neither reachable from a benchmark case
 
