@@ -5,8 +5,8 @@ description: Tutorial de countWhere en FxDart — cuenta los valores que cumplen
 heading: <code>countWhere</code>
 section: 7
 crumb: countWhere
-prev: foldBy.html
-prevLabel: foldBy
+prev: foldByOrSkip.html
+prevLabel: foldByOrSkip
 next: sort.html
 nextLabel: sort
 ---

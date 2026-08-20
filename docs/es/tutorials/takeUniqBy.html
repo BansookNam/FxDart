@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>takeUniqBy — FxDart 101</title>
-  <meta name="description" content="FxDart takeUniqBy tutorial: filter, dedupe and truncate in one strict call whose callback the compiler can inline — with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/takeUniqBy.html">
+  <meta name="description" content="Tutorial de takeUniqBy en FxDart: filtra, deduplica y trunca en una sola llamada estricta cuyo callback el compilador sí puede insertar, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/takeUniqBy.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/takeUniqBy.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/takeUniqBy.html">
@@ -17,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=c9d5f9ac47fe3d61">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=5337b860bc3ce009">
 </head>
 <body>
 <header class="site-header">
@@ -48,10 +47,9 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 4 · Filtrado &amp; deduplicación › <strong>takeUniqBy</strong></p>
   <h1><code>takeUniqBy</code></h1>
-  <p class="hero-sub">The first <em>count</em> elements whose key is new, as a list — a <code>null</code> key skips the element, so one callback both selects and keys.</p>
+  <p class="hero-sub">Los primeros <em>count</em> elementos cuya clave es nueva, como lista — una clave <code>null</code> se salta el elemento, así que un solo callback selecciona y da la clave.</p>
 
   <div class="signature">List&lt;A&gt; takeUniqBy&lt;A, B extends Object&gt;(int count, B? Function(A a) f, Iterable&lt;A&gt; iterable)
 List&lt;T&gt; Fx&lt;T&gt;.takeUniqBy&lt;B extends Object&gt;(int count, B? Function(T a) f)  // chain
@@ -59,62 +57,64 @@ List&lt;T&gt; Fx&lt;T&gt;.takeUniqBy&lt;B extends Object&gt;(int count, B? Funct
 // Strict: returns a List, runs when called. A null key skips the element,
 // so f both selects and keys — filter + uniqBy + take in one call.</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>takeUniqBy(3, key, xs)</code> is
+    <code>takeUniqBy(3, key, xs)</code> es
     <code><a href="filter.html">filter</a></code> +
     <code><a href="uniqBy.html">uniqBy</a></code> +
-    <code><a href="take.html">take</a></code> written as a single strict call.
-    It returns a <code>List</code>, it runs when you call it, and it stops the
-    moment the count is met — the elements after that are never inspected.
-    The one twist is the callback: it returns a key, and returning
-    <code>null</code> means "skip this element". That is the
-    <code>filter_map</code> shape, and it is what lets one function do the work
-    of two.
+    <code><a href="take.html">take</a></code> escrito como una única llamada
+    estricta. Devuelve una <code>List</code>, se ejecuta cuando la llamas y se
+    detiene en cuanto alcanza la cuenta: los elementos posteriores nunca se
+    inspeccionan. La única vuelta de tuerca es el callback: devuelve una clave,
+    y devolver <code>null</code> significa «salta este elemento». Esa es la
+    forma <code>filter_map</code>, y es lo que permite que una sola función
+    haga el trabajo de dos.
   </p>
   <p>
-    Write the chain by default. Three named steps read better than one
-    callback doing two jobs, and the lazy chain short-circuits just as well.
-    This operator exists for one reason, and it is worth knowing what it is.
+    Escribe la cadena por defecto. Tres pasos con nombre se leen mejor que un
+    callback respondiendo a dos preguntas, y la cadena perezosa corta igual de
+    bien. Este operador existe por un solo motivo, y conviene saber cuál es.
   </p>
 
-  <h2>Why it exists: the callback the compiler cannot see</h2>
+  <h2>Por qué existe: el callback que el compilador no puede ver</h2>
   <p>
-    A lazy stage keeps its callback in an <em>iterator field</em>. The AOT
-    compiler cannot see through a field, so the closure never inlines — every
-    element pays a real indirect call, and its body is never fused into the
-    loop around it. Two stages, two calls per element. That is most of what
-    separates an idiomatic FxDart chain from a hand-written loop.
+    Una etapa perezosa guarda su callback en un <em>campo del iterador</em>. El
+    compilador AOT no puede ver a través de un campo, así que el closure nunca
+    se inserta: cada elemento paga una llamada indirecta real y su cuerpo jamás
+    se funde con el bucle que lo rodea. Dos etapas, dos llamadas por elemento.
+    Eso es la mayor parte de lo que separa una cadena idiomática de FxDart de
+    un bucle escrito a mano.
   </p>
   <p>
-    <code>takeUniqBy</code> takes its callback as a <em>parameter</em> of a
-    body small enough to inline into the caller, so the compiler inlines the
-    closure with it. Measured over 1,000,000 log lines, AOT:
+    <code>takeUniqBy</code> recibe su callback como <em>parámetro</em> de un
+    cuerpo lo bastante pequeño para insertarse en el punto de llamada, así que
+    el compilador inserta con él el cuerpo del closure. Medido sobre 1.000.000
+    de líneas de log, AOT:
   </p>
   <table>
-    <thead><tr><th>Spelling</th><th>Time</th></tr></thead>
+    <thead><tr><th>Forma</th><th>Tiempo</th></tr></thead>
     <tbody>
-      <tr><td><code>filter().uniqBy().take(3)</code></td><td>13.7 ms</td></tr>
-      <tr><td><code>takeUniqBy(3, …)</code></td><td><strong>11.3 ms</strong></td></tr>
-      <tr><td>a hand-written loop</td><td>10.2 ms</td></tr>
+      <tr><td><code>filter().uniqBy().take(3)</code></td><td>13,7 ms</td></tr>
+      <tr><td><code>takeUniqBy(3, …)</code></td><td><strong>11,3 ms</strong></td></tr>
+      <tr><td>un bucle escrito a mano</td><td>10,2 ms</td></tr>
     </tbody>
   </table>
   <p>
-    Both spellings, and both bars, are on
-    <a href="../DartComparison/recent-errors.html">Recent error messages,
-    deduped</a> — the one comparison page that publishes three bars instead of
-    two, because the gap between two ways of writing the same pipeline is the
-    point it makes.
+    Ambas formas, y ambas barras, están en
+    <a href="../DartComparison/recent-errors.html">Mensajes de error recientes,
+    deduplicados</a>: la página de comparación que publica tres barras en lugar
+    de dos, porque la diferencia entre dos maneras de escribir la misma
+    tubería es precisamente lo que quiere mostrar.
   </p>
   <p>
-    So: reach for this when the pipeline is hot and a profile says these
-    callbacks are the cost. Not before. fxdart extension — no FxTS
-    counterpart, and no async twin: the win is inlining, which the async
-    machinery dwarfs.
+    Así que: recurre a esto cuando la tubería esté en el camino caliente y un
+    perfilador diga que estos callbacks son el coste. Antes no. Extensión de
+    fxdart — sin equivalente en FxTS, y sin gemelo asíncrono: la ganancia es la
+    inserción, que la maquinaria asíncrona eclipsa.
   </p>
 
-  <h2>Demo 1 · The three most recent distinct errors</h2>
-  <div class="playground" data-pg="9596b8518a00cb4e">
+  <h2>Demo 1 · Los tres errores distintos más recientes</h2>
+  <div class="playground" data-pg="e008e679bd823cdb">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -160,8 +160,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · null skips, count is a ceiling</h2>
-  <div class="playground" data-pg="7f960069597ef7bc">
+  <h2>Demo 2 · null salta, count es un techo</h2>
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -199,9 +199,9 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: the first three distinct users who landed on a page.</p>
-  <div class="playground" data-pg="32d930778dcd6025">
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: los primeros tres usuarios distintos que llegaron a una página.</p>
+  <div class="playground">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -232,11 +232,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="uniqBy.html"><code>uniqBy</code></a> — the lazy dedup this folds in ·
-    <a href="take.html"><code>take</code></a> — the lazy truncation this folds in ·
-    <a href="uniqStrict.html"><code>uniqStrict</code></a> — the other strict member of the family ·
-    <a href="performance.html">Performance</a> — where the callback floor comes from
+    <strong>Relacionado:</strong>
+    <a href="uniqBy.html"><code>uniqBy</code></a> — la deduplicación perezosa que absorbe ·
+    <a href="take.html"><code>take</code></a> — el truncado perezoso que absorbe ·
+    <a href="uniqStrict.html"><code>uniqStrict</code></a> — el otro miembro estricto de la familia ·
+    <a href="performance.html">Rendimiento</a> — de dónde sale el suelo de los callbacks
   </div>
 
   <nav class="tut-nav">
@@ -249,7 +249,7 @@ void main() {
   <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=c9d5f9ac47fe3d61";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=5337b860bc3ce009";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

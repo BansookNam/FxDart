@@ -5,7 +5,7 @@ description: Filter a ledger to one month, total each category, and rank them �
 heading: Monthly category report, sorted by spend
 order: 29
 tier: 3
-functions: filter, groupBy, map, sortBy, join
+functions: filter, groupBy, map, sortBy, join, foldByOrSkip
 domain: transactions
 verdict: fxdart
 async: false
@@ -35,4 +35,30 @@ async: false
     — and <code>join</code> formats the report. Adding a requirement
     (say, a minimum total) is one more chain step; in the loop it is
     another branch inside an already-busy body.
+  </p>
+
+  <h2>Two FxDart spellings</h2>
+  <p>
+    The benchmark below carries a <strong>third bar</strong>, which only one
+    other page does. The chain above is the one to write: <code>filter</code>
+    and <code>foldBy</code> as two named steps, each answering one question.
+    What it cannot do is inline its own predicate. <code>filter</code> is a
+    lazy stage, so it keeps that predicate in an iterator field, and the AOT
+    compiler cannot see through a field — every transaction pays a real
+    indirect call whose body never fuses into the loop. <code>foldBy</code>
+    does not have that problem; it is strict, so its callbacks are parameters
+    and get inlined.
+  </p>
+  <p>
+    <a href="../tutorials/foldByOrSkip.html"><code>foldByOrSkip</code></a>,
+    shown above <code>main</code> in the FxDart panel, moves the test into the
+    key: a <code>null</code> key skips the row, so one callback both selects
+    and buckets, and it is a parameter of a body small enough to inline. Over
+    1,000,000 transactions that is the difference between the second and third
+    bars; the first is the hand-written loop.
+  </p>
+  <p>
+    Write the chain by default — two unrelated questions read better as two
+    steps. Reach for <code>foldByOrSkip</code> when the pipeline is hot and a
+    profile says that predicate is the cost.
   </p>

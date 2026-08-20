@@ -2,7 +2,7 @@
 
 - **Machine:** Apple M1 Max, 32 GB RAM
 - **Dart:** 3.12.2 (macos Version 26.3 (Build 25D125)), AOT-compiled
-- **Date:** 2026-08-19
+- **Date:** 2026-08-20
 - **Method:** per side and N-scale, fresh process × rounds, 2 warmup + 5 measured iterations per process (small N auto-batched to ≥2 ms samples); median reported. Ties — within 5.0% of each other, or within 0.6 ms absolute (beneath human perception) — with close relative races re-run up to 5 rounds.
 - Memory is peak process RSS — the runtime and the dataset are identical on both sides, so the *difference* is what the pipeline itself holds onto. At small N it is all runtime baseline; expect ties.
 
@@ -29,7 +29,7 @@
 | 17 | top-category-average | 100 | 8.4 µs | 7.9 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
 | 18 | date-window-spend | 100 | 2.2 µs | 1.6 µs | **tie** | 16.5 MB | 15.3 MB | fxdart | 3 |
 | 19 | sensor-anomalies | 100 | 6.0 µs | 6.9 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
-| 20 | recent-errors | 100 | 1.1 µs | 1.4 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
+| 20 | recent-errors | 100 | 1.0 µs | 1.3 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 21 | duplicate-transactions | 100 | 50 µs | 42 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 22 | no-spend-streak | 100 | 4.5 µs | 5.6 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
 | 23 | concurrent-enrichment (async) | 100 | 214 µs | 237 µs | **tie** | 16.6 MB | 16.6 MB | tie | 3 |
@@ -38,7 +38,7 @@
 | 26 | paginated-products | 100 | 6.2 µs | 6.6 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 27 | invoice-summary | 100 | 4.5 µs | 8.2 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 28 | budget-alerts | 100 | 3.8 µs | 3.6 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
-| 29 | monthly-category-report | 100 | 2.5 µs | 6.1 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
+| 29 | monthly-category-report | 100 | 2.3 µs | 6.2 µs | **tie** | 16.5 MB | 16.3 MB | tie | 3 |
 | 30 | consecutive-over-limit | 100 | 2.1 µs | 2.4 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
 | 31 | multi-currency-report | 100 | 14 µs | 11 µs | **tie** | 17.0 MB | 16.5 MB | tie | 3 |
 | 32 | restock-plan | 100 | 11 µs | 6.7 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
@@ -46,7 +46,7 @@
 | 34 | monthly-ledger-report | 100 | 24 µs | 30 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
 | 35 | sparse-timeseries | 100 | 31 µs | 29 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 36 | parallel-downloads (async) | 100 | 373 µs | 444 µs | **tie** | 16.5 MB | 17.1 MB | tie | 3 |
-| 37 | ledger-diff | 100 | 27 µs | 27 µs | **tie** | 16.6 MB | 17.1 MB | tie | 3 |
+| 37 | ledger-diff | 100 | 21 µs | 23 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 38 | flaky-api-retry (async) | 100 | 556 µs | 645 µs | **tie** | 16.4 MB | 17.1 MB | tie | 3 |
 | 39 | alert-digest | 100 | 21 µs | 25 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 40 | latency-percentiles | 100 | 22 µs | 20 µs | **tie** | 16.6 MB | 16.5 MB | tie | 3 |
@@ -87,7 +87,7 @@
 | 17 | top-category-average | 10000 | 365 µs | 355 µs | **tie** | 22.9 MB | 22.9 MB | tie | 3 |
 | 18 | date-window-spend | 10000 | 176 µs | 110 µs | **tie** | 20.8 MB | 15.6 MB | fxdart | 3 |
 | 19 | sensor-anomalies | 10000 | 520 µs | 572 µs | **tie** | 23.7 MB | 23.7 MB | tie | 3 |
-| 20 | recent-errors | 10000 | 90 µs | 122 µs | **tie** | 15.9 MB | 15.8 MB | tie | 3 |
+| 20 | recent-errors | 10000 | 90 µs | 127 µs | **tie** | 15.8 MB | 15.8 MB | tie | 3 |
 | 21 | duplicate-transactions | 10000 | 4.17 ms | 3.86 ms | **tie** | 40.2 MB | 36.0 MB | fxdart | 3 |
 | 22 | no-spend-streak | 10000 | 261 µs | 262 µs | **tie** | 19.6 MB | 19.6 MB | tie | 3 |
 | 23 | concurrent-enrichment (async) | 10000 | 17.7 ms | 21.5 ms | **native** | 49.3 MB | 50.4 MB | tie | 3 |
@@ -96,7 +96,7 @@
 | 26 | paginated-products | 10000 | 886 µs | 848 µs | **tie** | 17.7 MB | 21.3 MB | native | 3 |
 | 27 | invoice-summary | 10000 | 243 µs | 111 µs | **tie** | 22.4 MB | 15.8 MB | fxdart | 3 |
 | 28 | budget-alerts | 10000 | 185 µs | 90 µs | **tie** | 21.8 MB | 15.6 MB | fxdart | 3 |
-| 29 | monthly-category-report | 10000 | 110 µs | 147 µs | **tie** | 16.9 MB | 15.8 MB | fxdart | 3 |
+| 29 | monthly-category-report | 10000 | 106 µs | 139 µs | **tie** | 17.0 MB | 16.0 MB | fxdart | 3 |
 | 30 | consecutive-over-limit | 10000 | 114 µs | 173 µs | **tie** | 20.5 MB | 23.5 MB | native | 3 |
 | 31 | multi-currency-report | 10000 | 784 µs | 719 µs | **tie** | 23.5 MB | 22.9 MB | tie | 3 |
 | 32 | restock-plan | 10000 | 1.30 ms | 312 µs | **fxdart** | 17.5 MB | 23.4 MB | native | 3 |
@@ -104,7 +104,7 @@
 | 34 | monthly-ledger-report | 10000 | 934 µs | 442 µs | **tie** | 23.4 MB | 17.2 MB | fxdart | 3 |
 | 35 | sparse-timeseries | 10000 | 565 µs | 471 µs | **tie** | 23.0 MB | 20.2 MB | fxdart | 3 |
 | 36 | parallel-downloads (async) | 10000 | 31.8 ms | 37.3 ms | **native** | 50.8 MB | 33.0 MB | fxdart | 3 |
-| 37 | ledger-diff | 10000 | 2.40 ms | 3.24 ms | **native** | 26.1 MB | 31.2 MB | native | 3 |
+| 37 | ledger-diff | 10000 | 2.37 ms | 3.16 ms | **native** | 26.0 MB | 31.2 MB | native | 3 |
 | 38 | flaky-api-retry (async) | 10000 | 48.2 ms | 55.5 ms | **native** | 29.5 MB | 24.5 MB | fxdart | 3 |
 | 39 | alert-digest | 10000 | 1.46 ms | 1.39 ms | **tie** | 17.9 MB | 18.1 MB | tie | 3 |
 | 40 | latency-percentiles | 10000 | 1.93 ms | 1.80 ms | **tie** | 18.1 MB | 17.3 MB | fxdart | 3 |
@@ -145,7 +145,7 @@
 | 17 | top-category-average | 1000000 | 60.5 ms | 64.6 ms | **native** | 136.9 MB | 136.1 MB | tie | 3 |
 | 18 | date-window-spend | 1000000 | 14.9 ms | 11.4 ms | **fxdart** | 124.3 MB | 120.1 MB | tie | 3 |
 | 19 | sensor-anomalies | 1000000 | 62.5 ms | 68.2 ms | **native** | 169.8 MB | 159.4 MB | fxdart | 3 |
-| 20 | recent-errors | 1000000 | 10.2 ms | 13.7 ms | **native** | 113.8 MB | 113.8 MB | tie | 3 |
+| 20 | recent-errors | 1000000 | 10.3 ms | 13.7 ms | **native** | 114.3 MB | 113.5 MB | tie | 3 |
 | 21 | duplicate-transactions | 1000000 | 977.4 ms | 966.1 ms | **tie** | 324.6 MB | 332.5 MB | tie | 5 |
 | 22 | no-spend-streak | 1000000 | 23.8 ms | 24.0 ms | **tie** | 106.6 MB | 106.4 MB | tie | 3 |
 | 23 | concurrent-enrichment (async) | 100000 | 195.0 ms | 233.0 ms | **native** | 81.4 MB | 84.0 MB | tie | 3 |
@@ -154,7 +154,7 @@
 | 26 | paginated-products | 1000000 | 102.1 ms | 120.7 ms | **native** | 177.8 MB | 195.6 MB | native | 3 |
 | 27 | invoice-summary | 1000000 | 25.3 ms | 13.6 ms | **fxdart** | 92.3 MB | 88.4 MB | tie | 3 |
 | 28 | budget-alerts | 1000000 | 21.5 ms | 13.0 ms | **fxdart** | 90.1 MB | 82.7 MB | fxdart | 3 |
-| 29 | monthly-category-report | 1000000 | 11.3 ms | 14.3 ms | **native** | 119.3 MB | 119.6 MB | tie | 3 |
+| 29 | monthly-category-report | 1000000 | 11.3 ms | 14.5 ms | **native** | 120.4 MB | 120.0 MB | tie | 3 |
 | 30 | consecutive-over-limit | 1000000 | 17.1 ms | 20.3 ms | **native** | 149.8 MB | 148.0 MB | tie | 3 |
 | 31 | multi-currency-report | 1000000 | 123.3 ms | 104.4 ms | **fxdart** | 201.8 MB | 220.0 MB | native | 3 |
 | 32 | restock-plan | 1000000 | 216.2 ms | 51.9 ms | **fxdart** | 174.0 MB | 193.1 MB | native | 3 |
@@ -162,7 +162,7 @@
 | 34 | monthly-ledger-report | 1000000 | 135.1 ms | 47.3 ms | **fxdart** | 157.8 MB | 127.0 MB | fxdart | 3 |
 | 35 | sparse-timeseries | 1000000 | 57.3 ms | 51.2 ms | **fxdart** | 125.0 MB | 144.6 MB | native | 3 |
 | 36 | parallel-downloads (async) | 100000 | 338.8 ms | 380.5 ms | **native** | 80.9 MB | 92.8 MB | native | 3 |
-| 37 | ledger-diff | 500000 | 228.5 ms | 282.9 ms | **native** | 265.9 MB | 172.3 MB | fxdart | 3 |
+| 37 | ledger-diff | 500000 | 223.4 ms | 261.0 ms | **native** | 182.1 MB | 171.8 MB | fxdart | 3 |
 | 38 | flaky-api-retry (async) | 100000 | 495.5 ms | 571.7 ms | **native** | 56.2 MB | 50.4 MB | fxdart | 3 |
 | 39 | alert-digest | 1000000 | 174.1 ms | 174.4 ms | **tie** | 213.2 MB | 239.8 MB | native | 5 |
 | 40 | latency-percentiles | 1000000 | 204.7 ms | 209.7 ms | **tie** | 139.4 MB | 192.2 MB | native | 5 |

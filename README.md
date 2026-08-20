@@ -350,6 +350,88 @@ dart run coverage:test_with_coverage   # writes coverage/lcov.info
 
 ---
 
+## 📊 Benchmarks
+
+Two suites back the comparison sites linked at the top:
+[Dart vs FxDart](https://bansooknam.github.io/FxDart/DartComparison/) (53 cases)
+and [RxDart vs FxDart](https://bansooknam.github.io/FxDart/RxDartComparison/)
+(41 cases). Every case is AOT-compiled (`dart compile exe`) and each side runs
+as a fresh process, interleaved, so thermal drift lands on both equally.
+`./benchmark.sh` is the entry point.
+
+### Which command, when
+
+**1 · While developing — "did my change move this case?"**
+
+```sh
+./benchmark.sh --ab ledger-diff               # against HEAD
+./benchmark.sh --ab --ref v0.8.5 ledger-diff  # against a tag or commit
+```
+
+The one you will reach for most. It builds both variants of `lib/` and runs
+them **interleaved in one session**, so drift hits both sides. The `native`
+side is the control: it links no fxdart code, so a library-only change must
+leave it identical — if it moved, the row is void.
+
+It runs 20 rounds rather than `ab_bench`'s default 12, because 12 is not
+enough. Four readings in the 0.8.6 pass looked like solid ±3-4% results
+*against clean controls* and every one of them was gone at 20.
+
+**2 · Before merging or releasing — "did anything regress?"**
+
+```sh
+./benchmark.sh --ab --all
+```
+
+The same instrument across every case, as a gate: if a control drifts past its
+limit the run fails rather than printing a number. `--all` exists because
+without it every slug had to be typed by hand, which made "nothing regressed
+by 3%" a claim rather than a check. Give it an idle machine — it takes a
+while.
+
+**3 · Publishing — updating the numbers the site shows**
+
+```sh
+./benchmark.sh --docs        # sweep, regenerate the report, rebuild docs/
+./benchmark.sh --docs --rx   # the RxDart family
+```
+
+The only output fit to publish: native and fxdart are measured in the same
+session, so each row's ratio is sound. It writes
+`benchmark/results/results.json` (the bar charts), `SUMMARY.md`, and
+`perf_ratio_report.md` — every case ordered slowest to fastest. The RxDart
+family writes `results-rx.json` and `SUMMARY-RX.md`; its pages carry bars but
+no ranking table, so there is no report to regenerate there.
+
+Skip `--docs` and the site keeps showing the old numbers. Skip the report
+regeneration — which is why this mode always does it for you — and
+`results.json` and the report drift apart silently, which has happened, and
+surfaced months later looking like a regression that had just landed.
+
+### ⚠️ Reading the numbers
+
+**Do not compare two sweeps to judge a change.** Cross-run noise is about 5%,
+and the proof is built in: the `native` side must be byte-identical across a
+library-only change, yet its measured cross-run delta is a median −2.1%,
+ranging −27% to +4%. Judge changes with 1, publish with 3.
+
+`--smoke` is for "does this still run" — one un-warmed iteration, and the
+script restores `results.json` afterwards precisely so those numbers cannot
+leak into anything.
+
+Two checks cost seconds and are worth running freely:
+
+```sh
+./benchmark.sh --verify   # is the ratio report in step with results.json?
+./benchmark.sh --check    # do the cases still match their published examples?
+```
+
+Adding or changing a case? `benchmark/AUTHORING.md` has the rules — the first
+being that a case must measure the same pipeline its published example shows,
+which CI enforces.
+
+---
+
 ## 🙏 Acknowledgments
 
 Great thanks to **Indong Yoo**, CTO of [Marpple](https://www.marpple.com), the

@@ -1,11 +1,23 @@
 #!/usr/bin/env python3
 """Rank DartComparison benchmark cases by native/FxDart performance gap.
 
-Reads results.json (headline "full" scale, the largest N per case), computes
-a slower/faster ratio per case using the harness's own tie call
-(timeWinner: "tie"/"native"/"fxdart", already thresholded by tieMarginPct /
-tieAbsMs), and writes a markdown table ordered from the biggest gap down to
-near-parity ties.
+Reads results.json (headline "full" scale, the largest N per case) and writes
+a markdown table ordered **slowest to fastest**: the cases where FxDart
+trails native by the most first, near-parity in the middle, the cases where
+it leads by the most last.
+
+Two different ratios are in play, and mixing them up is the trap:
+
+* The *ordering* is `fxdart / native` — directional, so reading down the
+  table is reading one axis. Sorting by the label's multiple instead (a
+  `max/min`, always >= 1) looks monotonic but flips direction every few rows:
+  "FxDart 1.37x faster" sitting directly above "Native 1.32x faster" above
+  "FxDart 1.30x faster". It also lets a `~tie` with a wide raw ratio — the
+  harness calls a tie on `tieAbsMs` as well as `tieMarginPct`, so a small-N
+  case can be a tie at 1.8 — outrank a real gap.
+* The *label* is the harness's own call (timeWinner: "tie"/"native"/"fxdart",
+  already thresholded by tieMarginPct / tieAbsMs) stated as a slower/faster
+  multiple, which is what a reader wants to see per row.
 
 Usage: python3 perf_ratio_report.py [results.json] [-o out.md]
 """
@@ -33,6 +45,8 @@ def build_rows(data):
         fxdart_us = scale["fxdart"]["medianUs"]
         winner = scale["timeWinner"]
         ratio = max(native_us, fxdart_us) / min(native_us, fxdart_us)
+        # The sort key: directional, so the table reads down one axis.
+        gap = fxdart_us / native_us
         if winner == "tie":
             ratio_label = "~tie"
         elif winner == "fxdart":
@@ -48,10 +62,11 @@ def build_rows(data):
                 "native_us": native_us,
                 "fxdart_us": fxdart_us,
                 "ratio": ratio,
+                "gap": gap,
                 "ratio_label": ratio_label,
             }
         )
-    rows.sort(key=lambda r: r["ratio"], reverse=True)
+    rows.sort(key=lambda r: r["gap"], reverse=True)
     return rows
 
 
@@ -63,6 +78,10 @@ def render_markdown(data, rows):
         f"Machine: {machine['cpu']}, {machine['ramGb']}GB RAM, Dart {machine['dart']}, "
         f"{machine['os']} ({machine['compilation']})",
         f"Date: {data['date']} · Scale: `{HEADLINE_SCALE}` (headline N per case)",
+        "",
+        "Ordered by FxDart/native, slowest first — so the rows worth acting on "
+        "are at the top and the ordering does not change direction partway "
+        "down. The Ratio column states each row's own verdict.",
         "",
         "| Case | Path | N | Native (µs) | FxDart (µs) | Ratio |",
         "|---|---|---:|---:|---:|---|",
