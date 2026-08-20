@@ -109,6 +109,8 @@
   "theory/01-monad.md": "-56bafccecadad81c",
   "theory/02-purity-and-effects.md": "195763f7b5c26b22",
   "theory/03-illegal-states.md": "140ceeaf57ae02d8",
+  "theory/04-functions-as-values.md": "0a97bfb8c3d7e4c5",
+  "theory/05-functor.md": "4d674a795f23ed4a",
   "theory/book.md": "-1398aa4db693320d",
   "tutorials/accumulate.md": "-631b7ecc6ff95fe2",
   "tutorials/add.md": "-386e9b18e0fc3945",
