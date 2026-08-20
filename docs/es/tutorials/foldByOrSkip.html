@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>foldByOrSkip — FxDart 101</title>
-  <meta name="description" content="FxDart foldByOrSkip tutorial: filter and fold-by-key in one strict call whose callback the compiler can inline — with a live playground.">
-  <link rel="canonical" href="https://bansooknam.github.io/FxDart/tutorials/foldByOrSkip.html">
+  <meta name="description" content="Tutorial de foldByOrSkip en FxDart: filtra y reduce por clave en una sola llamada estricta cuyo callback el compilador sí puede insertar, con un playground en vivo.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/foldByOrSkip.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/foldByOrSkip.html">
   <link rel="alternate" hreflang="zh-Hans" href="https://bansooknam.github.io/FxDart/zh/tutorials/foldByOrSkip.html">
@@ -48,10 +47,9 @@
   </div>
 </header>
 <main>
-  <p class="i18n-banner">Esta página aún no está traducida, así que se muestra en inglés. <a href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">Ayuda a traducirla</a></p>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › Sección 7 · Agregar › <strong>foldByOrSkip</strong></p>
   <h1><code>foldByOrSkip</code></h1>
-  <p class="hero-sub">Folds by key like <code>foldBy</code>, except a <code>null</code> key skips the element — so one callback both selects and buckets.</p>
+  <p class="hero-sub">Reduce por clave como <code>foldBy</code>, salvo que una clave <code>null</code> salta el elemento — así un solo callback selecciona y clasifica.</p>
 
   <div class="signature">Map&lt;K, Acc&gt; foldByOrSkip&lt;A, K extends Object, Acc&gt;(K? Function(A a) key, Acc seed, Acc Function(Acc acc, A a) f, Iterable&lt;A&gt; iterable)
 Map&lt;K, Acc&gt; Fx&lt;T&gt;.foldByOrSkip&lt;K extends Object, Acc&gt;(K? Function(T a) key, Acc seed, Acc Function(Acc acc, T a) f)  // chain
@@ -59,57 +57,59 @@ Map&lt;K, Acc&gt; Fx&lt;T&gt;.foldByOrSkip&lt;K extends Object, Acc&gt;(K? Funct
 // Strict: returns a Map, runs when called. A null key skips the element, so
 // `key` both selects and buckets — filter + foldBy in one call.</div>
 
-  <h2>Lecture</h2>
+  <h2>Lección</h2>
   <p>
-    <code>foldByOrSkip(key, seed, f, xs)</code> is
+    <code>foldByOrSkip(key, seed, f, xs)</code> es
     <code><a href="filter.html">filter</a></code> +
-    <code><a href="foldBy.html">foldBy</a></code> written as a single strict
-    call. Everything <code>foldBy</code> guarantees still holds: [seed] starts
-    every key rather than running across them, keys come out in first-seen
-    order, and the map is probed once per element. The one twist is the key
-    function — returning <code>null</code> means "skip this element", the same
-    <code>filter_map</code> shape
-    <code><a href="takeUniqBy.html">takeUniqBy</a></code> uses.
+    <code><a href="foldBy.html">foldBy</a></code> escrito como una única
+    llamada estricta. Todo lo que <code>foldBy</code> garantiza sigue en pie:
+    <code>seed</code> inicia cada clave en lugar de arrastrarse entre ellas,
+    las claves salen en orden de primera aparición y el mapa se consulta una
+    vez por elemento. La única vuelta de tuerca es la función de clave:
+    devolver <code>null</code> significa «salta este elemento», la misma forma
+    <code>filter_map</code> que usa
+    <code><a href="takeUniqBy.html">takeUniqBy</a></code>.
   </p>
   <p>
-    Write <code>filter(...).foldBy(...)</code> by default. Two named steps read
-    better than one callback answering two questions, and here the two
-    questions are usually unrelated — a date range and a category are not the
-    same thought. This operator exists for one reason, and it is worth knowing
-    what it is.
+    Escribe <code>filter(...).foldBy(...)</code> por defecto. Dos pasos con
+    nombre se leen mejor que un callback respondiendo a dos preguntas, y aquí
+    esas dos preguntas suelen no tener relación: un rango de fechas y una
+    categoría no son la misma idea. Este operador existe por un solo motivo, y
+    conviene saber cuál es.
   </p>
 
-  <h2>Why it exists: the predicate the compiler cannot see</h2>
+  <h2>Por qué existe: el predicado que el compilador no puede ver</h2>
   <p>
-    <code>filter</code> is a <em>lazy</em> stage, so it keeps its predicate in
-    an iterator field. The AOT compiler cannot see through a field, so that
-    predicate never inlines — every element pays a real indirect call, and its
-    body is never fused into the loop around it. <code>foldBy</code> does not
-    have that problem: it is strict, so its callbacks are parameters and get
-    inlined into the call site. The filter in front of it is what costs.
+    <code>filter</code> es una etapa <em>perezosa</em>, así que guarda su
+    predicado en un campo del iterador. El compilador AOT no puede ver a través
+    de un campo, de modo que ese predicado nunca se inserta: cada elemento paga
+    una llamada indirecta real y su cuerpo jamás se funde con el bucle que lo
+    rodea. <code>foldBy</code> no tiene ese problema: es estricto, así que sus
+    callbacks son parámetros y sí se insertan. Lo que cuesta es el filtro que
+    va delante.
   </p>
   <p>
-    <code>foldByOrSkip</code> moves the test into the key, which is a
-    parameter. Measured over 1,000,000 transactions, AOT, keeping one month in
-    twelve:
+    <code>foldByOrSkip</code> mueve la prueba dentro de la clave, que es un
+    parámetro. Medido sobre 1.000.000 de transacciones, AOT, conservando un mes
+    de doce:
   </p>
   <table>
-    <thead><tr><th>Spelling</th><th>Time</th></tr></thead>
+    <thead><tr><th>Forma</th><th>Tiempo</th></tr></thead>
     <tbody>
-      <tr><td><code>filter().foldBy()</code></td><td>14.5 ms</td></tr>
-      <tr><td><code>foldByOrSkip(…)</code></td><td><strong>12.6 ms</strong></td></tr>
-      <tr><td>a hand-written loop</td><td>11.3 ms</td></tr>
+      <tr><td><code>filter().foldBy()</code></td><td>14,5 ms</td></tr>
+      <tr><td><code>foldByOrSkip(…)</code></td><td><strong>12,6 ms</strong></td></tr>
+      <tr><td>un bucle escrito a mano</td><td>11,3 ms</td></tr>
     </tbody>
   </table>
   <p>
-    Both spellings, and both bars, are on
-    <a href="../DartComparison/monthly-category-report.html">Monthly category
-    report, sorted by spend</a> — one of the two comparison pages that publish
-    three bars instead of two, because the gap between two ways of writing the
-    same pipeline is the point they make.
+    Ambas formas, y ambas barras, están en
+    <a href="../DartComparison/monthly-category-report.html">Informe mensual
+    por categoría</a>: una de las dos páginas de comparación que publican tres
+    barras en lugar de dos, porque la diferencia entre dos maneras de escribir
+    la misma tubería es precisamente lo que quieren mostrar.
   </p>
 
-  <h2>Demo 1 · July's spend per category</h2>
+  <h2>Demo 1 · El gasto de julio por categoría</h2>
   <div class="playground" data-pg="071b77330b0dc53d">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -147,7 +147,7 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Demo 2 · The seed, the skip, and what the fold sees</h2>
+  <h2>Demo 2 · La semilla, el salto y lo que ve el fold</h2>
   <div class="playground" data-pg="ebb530a61128883b">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -186,8 +186,8 @@ void main() {
 </textarea>
   </div>
 
-  <h2>Try it yourself</h2>
-  <p>Exercise: the highest reading per sensor, ignoring faulty rows.</p>
+  <h2>Pruébalo tú</h2>
+  <p>Ejercicio: la lectura más alta por sensor, ignorando las filas defectuosas.</p>
   <div class="playground" data-pg="8d10caff144748bb">
 <textarea>
 import 'package:fxdart/fxdart.dart';
@@ -219,11 +219,11 @@ void main() {
   </div>
 
   <div class="callout">
-    <strong>Related:</strong>
-    <a href="foldBy.html"><code>foldBy</code></a> — the fold this builds on ·
-    <a href="filter.html"><code>filter</code></a> — the stage it absorbs ·
-    <a href="takeUniqBy.html"><code>takeUniqBy</code></a> — the same idea for <code>filter</code> + <code>uniqBy</code> + <code>take</code> ·
-    <a href="performance.html">Performance</a> — where the callback floor comes from
+    <strong>Relacionado:</strong>
+    <a href="foldBy.html"><code>foldBy</code></a> — la reducción sobre la que se apoya ·
+    <a href="filter.html"><code>filter</code></a> — la etapa que absorbe ·
+    <a href="takeUniqBy.html"><code>takeUniqBy</code></a> — la misma idea para <code>filter</code> + <code>uniqBy</code> + <code>take</code> ·
+    <a href="performance.html">Rendimiento</a> — de dónde sale el suelo de los callbacks
   </div>
 
   <nav class="tut-nav">
