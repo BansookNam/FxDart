@@ -14,9 +14,9 @@ final root = Directory.current.path;
 /// Front-matter keys whose value must be byte-identical to English.
 ///
 /// `heading` is deliberately absent: build_docs.dart:323-328 classifies it as
-/// prose alongside `title` and `description`. Tutorial headings happen to be
-/// `<code>fnName</code>` snippets that match English anyway, but comparison
-/// and theory headings are sentences that genuinely need translating.
+/// prose alongside `title` and `description`. Code-only tutorial headings are
+/// classified separately below; every heading with surrounding prose must be
+/// translated.
 const _verbatimKeys = {
   'slug',
   'section',
@@ -47,6 +47,14 @@ bool _titleIsVerbatim(String rel, String englishTitle) {
 }
 
 final _bareIdentifier = RegExp(r'^[A-Za-z_$][A-Za-z0-9_$]*$');
+
+/// A heading made entirely from one or more rendered identifiers.
+///
+/// Punctuation between `<code>` spans is part of the code label and therefore
+/// stays byte-identical. Any text outside those spans makes the heading prose.
+final _codeOnlyHeading = RegExp(
+  r'^<code>[^<]+</code>(?:\s*(?:,|·|&amp;)\s*<code>[^<]+</code>)*$',
+);
 final _placeholder = RegExp(r'\{\{(?:root|signature|playground:\d+)\}\}');
 final _tag = RegExp(r'<[^>]+>');
 final _href = RegExp(r'href="([^"]*)"');
@@ -139,21 +147,27 @@ List<String> _check(String locale, String rel) {
     );
   }
   for (final k in a.meta.keys) {
+    if (!b.meta.containsKey(k)) continue;
+    final english = a.meta[k] ?? '';
+    final translated = b.meta[k]!;
     final verbatim =
         _verbatimKeys.contains(k) ||
-        (k == 'title' && _titleIsVerbatim(rel, a.meta[k] ?? ''));
-    if (!verbatim) continue;
-    if (!b.meta.containsKey(k)) continue;
-    if (a.meta[k] != b.meta[k]) {
-      bad(
-        'front matter "$k" must stay identical\n'
-        '  english: ${a.meta[k]}\n  found:   ${b.meta[k]}',
-      );
+        (k == 'title' && _titleIsVerbatim(rel, english)) ||
+        (k == 'heading' && _codeOnlyHeading.hasMatch(english));
+    if (verbatim) {
+      if (english != translated) {
+        bad(
+          'front matter "$k" must stay identical\n'
+          '  english: $english\n  found:   $translated',
+        );
+      }
+      continue;
     }
-  }
-  final desc = b.meta['description'];
-  if (desc != null && desc == a.meta['description'] && desc.isNotEmpty) {
-    bad('front matter "description" is still English');
+    if ((k == 'title' || k == 'heading' || k == 'description') &&
+        english.isNotEmpty &&
+        translated == english) {
+      bad('front matter "$k" is still English');
+    }
   }
 
   // --- placeholders: same set, same order

@@ -1,6 +1,6 @@
 ---
 slug: curried
-title: curried &amp; uncurried — FxDart 101
+title: curried와 uncurried — FxDart 101
 description: FxDart curried 튜토리얼: 확장 게터로 구현한 완전한 타입의 커링 — FxTS curry를 대신하는 Dart다운 방식을 라이브 플레이그라운드와 함께 배웁니다.
 heading: <code>.curried</code> &amp; <code>.uncurried</code>
 section: 10

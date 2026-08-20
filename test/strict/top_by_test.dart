@@ -20,6 +20,32 @@ int _score(Row r) => r.$2;
 
 List<String> _ids(Iterable<Row> rows) => [for (final r in rows) r.$1];
 
+typedef NumericRow = (String id, num key);
+
+const _numericRows = <NumericRow>[
+  ('negative int', -3),
+  ('negative zero', -0.0),
+  ('zero', 0.0),
+  ('ordinary double', 1.5),
+  ('ordinary int', 2),
+  ('NaN', double.nan),
+];
+
+num _numericKey(NumericRow row) => row.$2;
+
+List<String> _numericIds(Iterable<NumericRow> rows) => [
+  for (final row in rows) row.$1,
+];
+
+Type _thrownType(void Function() action) {
+  try {
+    action();
+  } on Object catch (error) {
+    return error.runtimeType;
+  }
+  throw StateError('Expected action to throw');
+}
+
 void main() {
   group('topBy', () {
     test('returns the k largest, largest first', () {
@@ -87,6 +113,13 @@ void main() {
         _ids(sortByDesc(_score, distinct).take(2)),
       );
     });
+
+    test('numeric ordering agrees with sortByDesc().take()', () {
+      expect(
+        _numericIds(topBy(4, _numericKey, _numericRows)),
+        _numericIds(sortByDesc(_numericKey, _numericRows).take(4)),
+      );
+    });
   });
 
   group('bottomBy', () {
@@ -127,6 +160,29 @@ void main() {
         _ids(sortBy(_score, distinct).take(2)),
       );
     });
+
+    test('numeric ordering agrees with sortBy().take()', () {
+      expect(
+        _numericIds(bottomBy(4, _numericKey, _numericRows)),
+        _numericIds(sortBy(_numericKey, _numericRows).take(4)),
+      );
+    });
+  });
+
+  group('comparison failures', () {
+    test('incompatible Comparable keys fail as the sort family does', () {
+      final values = <Object>['string', 1];
+      Object key(Object value) => value;
+
+      expect(
+        _thrownType(() => topBy(1, key, values)),
+        _thrownType(() => sortByDesc(key, values)),
+      );
+      expect(
+        _thrownType(() => bottomBy(1, key, values)),
+        _thrownType(() => sortBy(key, values)),
+      );
+    });
   });
 
   group('the async twins', () {
@@ -141,6 +197,19 @@ void main() {
       expect(
         _ids(await bottomByAsync(3, _score, toAsync(_rows))),
         _ids(bottomBy(3, _score, _rows)),
+      );
+    });
+
+    test('numeric ordering agrees with the sort spellings', () async {
+      expect(
+        _numericIds(await topByAsync(4, _numericKey, toAsync(_numericRows))),
+        _numericIds(sortByDesc(_numericKey, _numericRows).take(4)),
+      );
+      expect(
+        _numericIds(
+          await bottomByAsync(4, _numericKey, toAsync(_numericRows)),
+        ),
+        _numericIds(sortBy(_numericKey, _numericRows).take(4)),
       );
     });
 

@@ -1,6 +1,6 @@
 ---
 slug: nonEmptyList
-title: NonEmptyList (Nel) — FxDart 101
+title: NonEmptyList와 Nel — FxDart 101
 description: FxDart NonEmptyList 튜토리얼: 비어 있을 수 없는 리스트를 위한 제로 비용 확장 타입 — head와 first가 전체 함수(total)라 실패하지 않으며, 누적된 에러를 실어 나릅니다.
 heading: <code>NonEmptyList</code> · <code>Nel</code>
 section: 13

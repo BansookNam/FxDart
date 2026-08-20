@@ -596,26 +596,24 @@ extension FxNum on Fx<num> {
   @pragma('vm:prefer-inline')
   num product() => s.product(_inner);
 
-  /// The smallest value; `NaN` when any value is `NaN`.
+  /// The smallest value under `num.compareTo` ordering.
   ///
   /// Throws a [StateError] on an empty chain, matching the [Fx.min] member
   /// this extension sits behind. Through 0.8.5 it returned `double.infinity`
   /// there instead, so the two spellings disagreed.
   @pragma('vm:prefer-inline')
-  num min() {
-    if (_inner.isEmpty) throw StateError('No element');
-    return s.min(_inner);
-  }
+  num min() => _inner.reduce(
+    (result, item) => item.compareTo(result) < 0 ? item : result,
+  );
 
-  /// The largest value; `NaN` when any value is `NaN`.
+  /// The largest value under `num.compareTo` ordering.
   ///
   /// Throws a [StateError] on an empty chain, matching the [Fx.max] member —
   /// see [min].
   @pragma('vm:prefer-inline')
-  num max() {
-    if (_inner.isEmpty) throw StateError('No element');
-    return s.max(_inner);
-  }
+  num max() => _inner.reduce(
+    (result, item) => item.compareTo(result) > 0 ? item : result,
+  );
 }
 
 /// Pair terminals for [Fx] chains over two-element records — the shape

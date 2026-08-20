@@ -7,9 +7,9 @@ fix to `sumBy`, `averageBy`, `foldBy`, `minBy`, `maxBy`, `find`, `findIndex`
 and stopped there. Twelve strict terminals — including the two most-used ones,
 `fold` and `each` — were left on the slow side of the same line.
 
-They are most of this release, plus the first sync *stage fusion* since 0.8.0,
-two asymptotic bugs that no benchmark case could have found, and the
-instrument that decided all of it.
+They are most of this release, plus additional sync *stage fusion*, two
+asymptotic bugs that no benchmark case could have found, and the instrument
+that decided all of it.
 
 ### Strict terminals inline the caller's callback
 
@@ -352,9 +352,10 @@ directions with clean controls, **in the same session**, back to back:
 | `weekly-sensor-averages` | +6.94% [+1.00%] · −5.07% [−0.39%] · +9.66% [+2.75%] · −11.38% [−1.01%] · +18.34% [−1.86%] |
 | `stream-windowed-alerts` | −3.14% [+0.63%] · +2.84% [+0.96%] · +4.20% [−1.10%] · −0.62% [+0.93%] |
 
-Neither calls a single function this release changed — both are
-`chunk` → `averageBy` / `maxBy` pipelines, and `chunk` allocates one list per
-window, which makes their cost bimodal per *process* rather than per round.
+`weekly-sensor-averages` is now on the new sync `chunk` → `map` path described
+above, but remains unadjudicable because its cost is bimodal per *process*.
+`stream-windowed-alerts` uses the async `chunk` → `maxBy` path and remains
+untouched by the sync changes. Both still allocate one list per window.
 More rounds do not help; pooling per-iteration samples across processes cannot
 separate the modes. Recording them as unresolved rather than as a ±4% result,
 and noting what would fix it: keeping the raw `iterUs` samples and rejecting

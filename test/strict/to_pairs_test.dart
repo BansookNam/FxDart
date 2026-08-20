@@ -31,6 +31,17 @@ void main() {
       expect(pairs.toList(), [('a', 1), ('b', 2)]);
     });
 
+    test('structural mutation during iteration throws', () {
+      final map = {'a': 1};
+      final iterator = toPairs(map).iterator;
+      expect(iterator.moveNext(), isTrue);
+      map['b'] = 2;
+      expect(
+        iterator.moveNext,
+        throwsA(isA<ConcurrentModificationError>()),
+      );
+    });
+
     test('enters a chain without a MapEntry conversion stage', () {
       final counts = countBy((String s) => s.length, [
         'aa',

@@ -2,7 +2,7 @@
 slug: waitAll
 title: waitAll — FxDart 101
 description: FxDart waitAll 튜토리얼: 모든 스트림이 닫히면 결과 하나, 그리고 zip·concat·combineLatestAll·mergeWith·raceWith — 를 라이브 플레이그라운드와 함께 다룹니다.
-heading: <code>waitAll</code>, <code>zip</code> &amp; friends
+heading: <code>waitAll</code>, <code>zip</code> 및 관련 함수
 section: 14
 crumb: waitAll
 prev: race.html

@@ -20,8 +20,9 @@ Map<K, V> fromEntries<K, V>(Iterable<(K, V)> entries) => {
 /// `fx(m.entries)` and then converting `MapEntry` back into the record shape
 /// the rest of fxdart speaks; `fx(toPairs(m))` is both steps at once.
 ///
-/// Lazy: this is a view over `Map.entries`, so nothing is copied. Iterating
-/// it after mutating [map] throws, exactly as iterating `Map.entries` does.
+/// Lazy: this is a view over `Map.entries`, so nothing is copied. Mutations
+/// made before iteration begins are reflected; structural mutation during
+/// active iteration may throw [ConcurrentModificationError].
 ///
 /// No `*Async` twin, and that is this file's convention rather than an
 /// omission: no function in `object.dart` has one, because a `Map` argument
