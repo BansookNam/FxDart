@@ -878,6 +878,12 @@ class _ScanIterator<A, B> implements Iterator<B> {
 /// value per source element (so exactly `source.length + 1` in all), [_f] and
 /// [_g] each run once per element consumed, the accumulator is fresh per
 /// iteration, and a downstream `take` still cuts the source short.
+///
+/// Like [_WindowMapIterable], fusing here ends the chain's fusion: this node
+/// is neither [FxUniqFusable] nor [FxMapFusable], so `scan -> map -> uniq`
+/// loses the map+uniq fusion and `scan -> map -> map` fuses only the first
+/// `map`. Stage boundaries only — same elements, same order. See
+/// [_WindowMapIterable] for why the gap is left open.
 class _ScanMapIterable<A, B, C> extends Iterable<C> {
   _ScanMapIterable(this._f, this._seed, this._source, this._g);
   final B Function(B, A) _f;
@@ -1164,6 +1170,18 @@ class _MapAccumIterable<A, B> extends Iterable<B> {
     // exactly n) — as in [_ScanIterable.toList], the inherited toList would
     // grow and recopy ~log n times. [_f] still runs exactly once per
     // element, in order.
+    //
+    // This is the opposite choice from [_ScanMapIterable.toList], which
+    // accumulates with `add` to dodge the covariant store check that
+    // `List<B>.operator[]=` costs per element. The two are not in conflict,
+    // they are the two sides of one trade: the fill pays a store check per
+    // element and saves ~log n regrow-and-recopy passes, `add` pays the
+    // reverse. Which wins depends on the element type — the check is a
+    // class-id compare for a plain class and much more for a record, the
+    // measurement on [_MapIterable.toList] — and neither of these two shapes
+    // has been measured against its alternative. Both are left as written
+    // rather than unified on an unmeasured guess; the note is here so the
+    // next person reads the difference as open, not as settled.
     if (source is List<A>) {
       final length = source.length;
       final out = List<B>.filled(length, _seed, growable: growable);

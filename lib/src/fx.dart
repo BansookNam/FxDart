@@ -561,27 +561,45 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// The maximum element using [compare] function.
   /// If [compare] is not provided, assumes T is `Comparable<T>`.
   /// Throws if empty or elements are not comparable.
+  ///
+  /// The chain spellings throw a [StateError] on empty input; the top-level
+  /// `max(xs)` returns `double.negativeInfinity` there (`min(xs)` returns
+  /// `double.infinity`). That difference is deliberate and it is not going
+  /// away: the top-level pair is a `num` fold whose identity element *is* the
+  /// infinity, and it is what FxTS's `max` returns, while a chain terminal
+  /// over an arbitrary `T` has no identity to return and can only throw. So
+  /// there are three spellings and two contracts:
+  ///
+  /// ```dart
+  /// max(<num>[]);              // -Infinity
+  /// fx(<num>[]).max();         // StateError  (this member)
+  /// FxNum(fx(<num>[])).max();  // StateError  (see [FxNum.max])
+  /// ```
   T max([int Function(T a, T b)? compare]) {
     final compareFn =
         compare ?? (a, b) => (a as dynamic).compareTo(b as dynamic) as int;
-    var result = _inner.first;
-    for (final item in _inner.skip(1)) {
-      if (compareFn(item, result) > 0) result = item;
-    }
-    return result;
+    // `reduce`, not `first` + `skip(1)`: the latter iterates the chain twice,
+    // which on a `sync*` source with a side effect runs it twice and on an
+    // expensive one pays for it twice — n + 1 pulls where n do. `reduce`
+    // throws the same [StateError] on empty that `first` did.
+    return _inner.reduce(
+      (result, item) => compareFn(item, result) > 0 ? item : result,
+    );
   }
 
   /// The minimum element using [compare] function.
   /// If [compare] is not provided, assumes T is `Comparable<T>`.
   /// Throws if empty or elements are not comparable.
+  ///
+  /// On empty input this throws while the top-level `min(xs)` returns
+  /// `double.infinity` — see [max] for why the two contracts differ.
   T min([int Function(T a, T b)? compare]) {
     final compareFn =
         compare ?? (a, b) => (a as dynamic).compareTo(b as dynamic) as int;
-    var result = _inner.first;
-    for (final item in _inner.skip(1)) {
-      if (compareFn(item, result) < 0) result = item;
-    }
-    return result;
+    // Single pass — see [max].
+    return _inner.reduce(
+      (result, item) => compareFn(item, result) < 0 ? item : result,
+    );
   }
 }
 
@@ -591,8 +609,10 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 /// [min] and [max] are reachable only through explicit extension
 /// application — `FxNum(fx(xs)).min()`. On a plain `fx(xs).min()` receiver
 /// the [Fx.min] *member* wins: a member redeclared on an extension type
-/// shadows every extension on that type. Both spellings are supported, and
-/// they now agree on empty input.
+/// shadows every extension on that type. Both chain spellings are supported,
+/// and they now agree on empty input — with each other, but deliberately not
+/// with the top-level `min`/`max`, which return an infinity there. [Fx.max]
+/// spells the three-way comparison out.
 extension FxNum on Fx<num> {
   /// The sum of every value.
   @pragma('vm:prefer-inline')

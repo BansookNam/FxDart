@@ -241,7 +241,7 @@ void main() {
         expect(ws.first, [1, 2]);
         expect(ws[1], [2, 3]);
         // Each window is a copy the caller owns, not a view onto `list`, and
-        // since 0.8.6 it is growable on every path — the fixed-length fill it
+        // since 0.8.7 it is growable on every path — the fixed-length fill it
         // replaced cost a covariant store check per element (see
         // `_windowSlice`). Independence is the part that matters and is
         // unchanged: writing through one window touches nothing else.

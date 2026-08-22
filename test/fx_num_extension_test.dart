@@ -101,6 +101,36 @@ void main() {
       expect(FxNum(fx(_SinglePassIterable<num>([3, 1, 2]))).max(), 3);
     });
 
+    test('the Fx member is single-pass too', () {
+      // Through 0.8.6 the member was `_inner.first` + `_inner.skip(1)`, which
+      // iterates the chain twice: n + 1 pulls, the source's side effects run
+      // twice, and a source that can only be walked once loses everything
+      // after the first element. The extension was already `reduce`; this is
+      // the spelling a plain `fx(xs).min()` actually reaches.
+      var observed = 0;
+      final source = <num>[3, 1, 2].map((value) {
+        observed++;
+        return value;
+      });
+      expect(fx(source).min(), 1);
+      expect(observed, 3);
+
+      observed = 0;
+      final maxSource = <num>[3, 1, 2].map((value) {
+        observed++;
+        return value;
+      });
+      expect(fx(maxSource).max(), 3);
+      expect(observed, 3);
+    });
+
+    test('a single-pass iterable survives the member spelling', () {
+      // `first` + `skip(1)` shared one exhausted iterator here and answered 3
+      // for the minimum.
+      expect(fx(_SinglePassIterable<num>([3, 1, 2])).min(), 1);
+      expect(fx(_SinglePassIterable<num>([3, 1, 2])).max(), 3);
+    });
+
     test('FxNum.sum / average / product still resolve', () {
       expect(FxNum(fx(<num>[1, 2, 3])).sum(), 6);
       expect(FxNum(fx(<num>[1, 2, 3])).average(), 2.0);

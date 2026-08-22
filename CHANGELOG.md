@@ -1,93 +1,13 @@
-## 0.8.6
+## 0.8.7
 
-0.8.5 taught the *lazy* stages to stop hiding the user's callback behind an
-iterator field, and measured the floor that leaves: a closure loaded from a
-field costs 2.75 ns an element against 0.88 for a virtual call. It applied the
-fix to `sumBy`, `averageBy`, `foldBy`, `minBy`, `maxBy`, `find`, `findIndex`
-and stopped there. Twelve strict terminals — including the two most-used ones,
-`fold` and `each` — were left on the slow side of the same line.
-
-They are most of this release, plus additional sync *stage fusion*, two
-asymptotic bugs that no benchmark case could have found, one lazy stage that
-had a fast path for `toList` and not for anything that pulls it, and the
-instrument that decided all of it.
-
-### Strict terminals inline the caller's callback
-
-`minBy` already carried the measurement, in its own comment since 0.8.2:
-
-| over 1,000,000 rows, extracting a `double` field | ns/element |
-|---|---|
-| hand-written loop | 0.65 |
-| `list.reduce(closure)` | 1.90 |
-| the terminal, no `vm:prefer-inline` | **6.26** |
-| the terminal, with the pragma | 0.97 |
-| the pragma **and** an indexed `List` walk | 0.65 |
-
-The pragma is not about the call overhead of the terminal. Inlined into the
-call site, the callback is the literal closure written there instead of a
-parameter holding an unknown function, and the per-element indirect call
-disappears. The indexed walk is worth its extra branch only *because* of the
-inlining — 0.8.0 measured indexed loops around an un-inlined callback at
-1.03-1.05x and rejected them, correctly.
-
-`fold`, `foldWithIndex`, `each`, `reduce`, `every`, `some`, `countWhere`,
-`groupBy`, `groupedBy`, `indexBy`, `countBy`, `partition` now get both, in the
-shape their already-optimized siblings use: the indexed branch first, the
-pulled loop unchanged behind it.
-
-A hop that does not inline breaks the chain, so the `Fx` members that stand
-between a chain call and these terminals were pragma'd too — `each`,
-`foldWithIndex`, `groupedBy`, `indexBy`, `some`, `any`, `partition`, `fold`,
-`reduce`. `groupBy`, `countBy`, `countWhere` and `foldBy` already had it, which
-is why they were the ones that moved first.
-
-`tee` / `tee3` were deliberately left alone: they carry `vm:align-loops`, and
-an indexed walk without the inlining is the shape 0.8.0 already measured as a
-regression.
-
-### Result — paired A/B against 0.8.5, all 53 cases
-
-Apple M5 Pro, Dart 3.13.1, AOT, `tool/ab_bench.dart` with a `native` control
-per case. Two cases at or past 5%, reproduced with a clean control:
-
-| case | terminal | fxdart, every clean-control reading | control |
-|---|---|---|---|
-| `top-log-level` | `countBy` over 1,000,000 log lines | **−9.37%** · −8.70% · −8.24% | +0.99% · −1.04% · −0.41% |
-| `sparse-timeseries` | `groupBy` over 1,000,000 readings | **−8.89%** · −7.27% · −6.80% · −6.59% · −6.37% | +1.12% · −0.80% · +1.09% · +1.30% · −1.16% |
-
-Readings against a control that had drifted past 2% are excluded from that
-table rather than averaged in; there were five such runs.
-
-No regression. Every other case reads inside the instrument's ±2% band
-against a clean control — `refunds-vs-charges` −1.35%, `alert-digest` −2.09%,
-`latency-percentiles` −1.47%, `cohort-retention` −0.22%,
-`duplicate-transactions` +0.40%, `daily-ledger-close` +0.34%, `ledger-diff`
-−0.90%, `restock-plan` −0.54%, `monthly-ledger-report` −0.37%, `top-expenses`
-+0.48%, `recent-errors` +0.03%.
-
-`top-category-average` is **not** claimed: four readings against clean
-controls came in at −2.56%, −7.11%, −7.85%, −2.65%. It is bimodal here, so
-its win is real in direction and unmeasurable in size.
-
-### The gate caught a regression, and the regression named its own cause
-
-`top-merchants` read **+2.91%** and then **+3.35%** against clean controls —
-a real slowdown on a case fxdart already won 1.84x.
-
-It calls `groupedBy`, which was a list comprehension over `groupBy(f, iterable)`
-where `f` is `groupedBy`'s own **parameter**, not a literal. Forcing `groupBy`
-to inline there bought nothing — there was no closure literal at that call site
-to expose — while making `groupedBy` too big to be inlined itself, so the
-caller's literal never reached the loop and the indexed branch was paid for
-twice with no callback inlined either time. Pragma'ing `groupedBy` and
-`Fx.groupedBy` closes the chain: **+3.35% → −1.04%** (control −0.06%),
-confirmed at −1.35%.
-
-The general rule, now stated once instead of rediscovered: `vm:prefer-inline`
-earns its code size only on the hop that can see the caller's closure literal,
-and every hop between that literal and the loop has to inline or none of them
-do.
+0.8.6 measured what a *strict* terminal costs when it hides the caller's
+callback behind an iterator field, and removed that cost from twelve of them.
+This release does the same for two *lazy* stage boundaries — `windowed`/`chunk`
+followed by `map`, and `scan` followed by `map` — with the same instrument and
+the same rule about what may be claimed. It also adds nine operators, four of
+them asked for by the published example corpus and five by the API's own
+symmetry, fixes three defects in API that shipped in 0.8.6 or earlier, and
+makes the Korean documentation checker a gate instead of a script nothing ran.
 
 ### `windowed`/`chunk` → `map` is one stage, and the window copy is the SDK's
 
@@ -312,55 +232,12 @@ Worth recording: `_ScanIterable.toList`'s pre-sized `List` path is reached by
 so it has never been measured by this instrument at all, and this change does
 not touch it.
 
-### Two asymptotic bugs, neither reachable from a benchmark case
-
-- **`slice` walked the whole source.** `_SliceIterator.moveNext` kept pulling
-  past `end` — the comment called it deliberate ("matches the generator form")
-  — so `slice(0, xs, 3)` was O(n) where `take(3)` is O(3). It now stops at
-  `end`. Measured AOT, `slice(0, gen(1000000), 3).toList()` x20:
-  **331,552 µs → 27 µs**.
-- **`sumStrings` was quadratic.** `fold('', (a, b) => a + b)` copies the whole
-  accumulator per element; it is now `Iterable.join()`. 20,000 x 10 characters:
-  **74,620 µs → 343 µs**.
-
-Neither `slice` nor `sliceAsync` drains its source any more, which is
-observable on a side-effecting or single-shot iterable. That is the intended
-contract — it is what every other limiting operator does — it is stated in the
-public dartdoc rather than only in the implementation, and the sync side is
-pinned by a test that counts pulls.
-
-### `tool/ab_bench.dart` is a gate now, not a report
-
-Three defects, all of which mattered while measuring this release:
-
-- The ±2% control check **warned and exited 0**. It now exits 1, and it fired
-  on five of the runs below — including two that would otherwise have shipped
-  `top-log-level` at −10.09% and −10.70% off a control that had moved +5.05%
-  and +3.83%.
-- No all-cases mode: every slug had to be typed, so "no case regresses 3%" was
-  a manual claim. `--all` enumerates `benchmark/cases` (or `cases-rx`).
-- The per-case delta list was built and never emitted — dead code since it was
-  written. It now prints, and writes `benchmark/.build/ab/report.md` in the
-  shape these CHANGELOG tables use.
-
-### Two cases this instrument cannot adjudicate
-
-`weekly-sensor-averages` and `stream-windowed-alerts` swing past ±3% in both
-directions with clean controls, **in the same session**, back to back:
-
-| case | readings, control in brackets |
-|---|---|
-| `weekly-sensor-averages` | +6.94% [+1.00%] · −5.07% [−0.39%] · +9.66% [+2.75%] · −11.38% [−1.01%] · +18.34% [−1.86%] |
-| `stream-windowed-alerts` | −3.14% [+0.63%] · +2.84% [+0.96%] · +4.20% [−1.10%] · −0.62% [+0.93%] |
+### The two unadjudicable cases, under these changes
 
 `weekly-sensor-averages` is now on the new sync `chunk` → `map` path described
 above, but remains unadjudicable because its cost is bimodal per *process*.
 `stream-windowed-alerts` uses the async `chunk` → `maxBy` path and remains
 untouched by the sync changes. Both still allocate one list per window.
-More rounds do not help; pooling per-iteration samples across processes cannot
-separate the modes. Recording them as unresolved rather than as a ±4% result,
-and noting what would fix it: keeping the raw `iterUs` samples and rejecting
-outlying processes, which the runner throws away today.
 
 ### Five convenience operators
 
@@ -451,6 +328,272 @@ chain step.
   values, `mapAccum`, Rust's `Iterator::scan` and Haskell's `mapAccumL`
   produce n. Argument order matches `scan` deliberately, so swapping one for
   the other is a one-word edit.
+
+### Korean documentation, and the translation checker that now guards it
+
+`tool/check_translation.dart` reported 306 problems of which 224 were false,
+which is the same as reporting nothing. Three causes, all in the checker:
+
+- `heading` was listed as a verbatim key, while `build_docs.dart` classifies it
+  as prose alongside `title`/`description`. That one line produced 115 of the
+  Korean reports and 110 of the Spanish.
+- A tutorial title of the form `<fn> — FxDart 101` was assumed to be an
+  identifier throughout. It is only verbatim when the part before the brand
+  suffix is a single identifier: 150 of the 167 tutorials stay verbatim and the
+  17 prose titles become translatable.
+- The tag regex matched `<` inside code, so a chapter line like
+  `<- parseId(raw) }` was read as a tag. Fenced blocks and inline code spans
+  are stripped before tags are counted.
+
+Run with no path arguments it now checks all ~300 English pages rather than
+only `tutorials/`, so a locale that is missing a page entirely is reported as
+`missing` instead of passing in silence.
+
+With the checker trustworthy, 25 real defects in the Korean translation are
+fixed: tag order and count in `maxBy`, `minBy` and six other pages (Korean word
+order puts `<em>`/`<code>` in different places than English, and the `fxEvents`
+name-collision paragraph — twelve code tags — was missing outright), six
+identifiers that had been translated inside `<code>`, chapter 13's
+`ceil(count / n) × delay` restored to a runnable expression, chapter 5's
+"🎓 Functors, formally" quote block restored, and the noun `fold` spelled one
+way throughout. Two chrome strings (`cmpBenchMeta`) were missing from both `ko`
+and `es`, which left the benchmark-machine line in English on those pages; the
+published example count in the prose was 50 against an actual 53.
+
+**The checker is now wired into CI**, which is what the previous release
+claimed and did not do — nothing in the repository called it. Only `ko` is
+gated, deliberately: it is the one locale translated end to end (301 of 301
+pages). `es` is a partial translation carrying 25 defects of its own, and
+`ja`/`pt-BR`/`ru`/`zh-Hans` have no overlay for most pages, which the checker
+reports as `missing` by design — gating any of those would be red on every
+commit and would therefore report nothing at all.
+
+A second CI step diffs `build_docs.dart --list-translatable` against
+`check_translation.dart --list-translatable`. The set of translatable pages is
+derived twice by different routes — build_docs enumerates it from its own
+family tables, the checker walks `content/` — and a page family added to one
+and not the other would silently escape the gate above. The two agree today;
+the step is what keeps them agreeing.
+
+### Three findings from the integrated review
+
+- **A `TypedData` source produced a window that was not the window the
+  dartdoc promises.** `List.sublist` returns a list of the *receiver's*
+  runtime type, and a `Uint8List` is a `List<int>`, so it reached the indexed
+  window path unchanged and came back out as a `Uint8List`: fixed length, and
+  truncating on store — `window[0] = 300` silently left `44` behind. That made
+  the growable contract stated below false on that path, and it was a
+  regression against 0.8.6, where the pre-sized fill this release replaced
+  returned a plain `List<int>`. The receiver's type is fixed for a whole
+  iteration, so it is tested once when the iterator is built and a typed-data
+  source buys the covariant store check back; every ordinary `List` keeps the
+  measured `sublist` win. `windowed`, `chunk` and the fused
+  `windowed` → `map` path all build the window through the same helper and so
+  are all fixed, with `Uint8List` and `Float64List` pinned by test.
+- **`Fx.min()` / `Fx.max()` walked the chain twice.** The members were
+  `_inner.first` followed by `_inner.skip(1)`, so a five-element source was
+  pulled six times, a `sync*` source with a side effect ran it twice, and a
+  source that can only be walked once lost everything after its first element.
+  They now `reduce`, which is single-pass and throws the same `StateError` on
+  empty that `first` did. This is the spelling a plain `fx(xs).min()` actually
+  reaches — the `FxNum` extension below is only reachable through explicit
+  extension application, and it was already single-pass.
+- **The empty contract has three spellings and two answers**, which is
+  deliberate and now documented rather than merely true. `min(<num>[])` returns
+  `double.infinity` because the top-level pair is a `num` fold whose identity
+  element *is* the infinity, and that is what FxTS returns; both chain
+  spellings throw `StateError`, because a terminal over an arbitrary `T` has no
+  identity to return.
+
+### Behaviour notes
+
+- **Every `windowed`/`chunk` window is now a growable list.** Before this
+  release the two *sync* paths handed back a fixed-length list while
+  `windowedAsync`/`chunkAsync` already returned a growable one, so the same
+  operator disagreed with its own async twin; all four now agree. The only
+  caller that can observe the difference is one that relied on `window.add(x)`
+  throwing `UnsupportedError`, and nothing in the library did. It is a
+  widening, not a narrowing: a window is still a fresh **copy** the caller
+  owns, never a view onto the source, and mutating one window still cannot
+  disturb another or the source — that is the part the old test was really
+  protecting, and it is unchanged. The reason is the measurement two sections
+  up: a fixed-length window has to be filled from package code at one
+  covariant store check per element, and no fixed-length bulk copy is faster
+  than that loop. Stated in the public dartdoc of all four operators, not just
+  in the implementation, and the test that pinned the old representation was
+  rewritten rather than deleted — `test/lazy/windowed_test.dart` now pins
+  growability across all four paths at once, including both branches of the
+  ring buffer.
+- The window copy is also why the pulled path changed shape: a window that
+  does not wrap the ring is now one `sublist` (measured 14.8 ms against
+  18.8 ms per 1,000,000 windows at `size: 3`, and `chunk` never wraps), and
+  only an *overlapping* window over a non-`List` source still assembles the
+  wrapped tail by hand, at 21.6 ms against 19.6 ms. That is the one path this
+  release makes slower, it is the rarest in the family, and no benchmark case
+  reaches it.
+
+- **`maxBy` orders `NaN` and `-0.0` differently.** `_compareKeys` — shared by
+  `minBy`, `maxBy` and `sortBy`'s non-`List` path — compared with `<` and `>`,
+  which are both *false* for a `NaN` on either side, so every `NaN` read as a
+  tie and the first-seen element won. It now uses `compareTo`. The visible
+  changes are `maxBy((d) => d, [1.0, nan, 3.0])`, which was `3.0` and is now
+  `NaN`, and `-0.0`, which no longer ties with `0.0` on either quantifier:
+  `maxBy` over `[-0.0, 0.0]` was `-0.0` and is `0.0`, `minBy` over `[0.0, -0.0]`
+  was `0.0` and is `-0.0`. `minBy` with a `NaN` is unchanged, because `NaN`
+  compares above everything.
+
+  This makes an older promise true rather than breaking a current one: the
+  0.7.x notes already said `compareTo` semantics for `NaN` and `-0.0` were
+  identical on every path, and `sortBy`'s typed-`double` path already used
+  `compareTo` — `_compareKeys` was the one that disagreed. Pinned by test on
+  both `minBy` and `maxBy`.
+
+- `Fx.isEmpty` / `Fx.isNotEmpty` are O(1) and terminate on an unbounded chain,
+  where they used to count every element.
+- `FxNum(fx(xs)).min()` / `.max()` throw `StateError` on an empty chain where
+  they returned `double.infinity` / `-double.infinity`. Reachable only through
+  explicit extension application; the `fx(xs).min()` spelling is the `Fx`
+  member and is unchanged.
+
+## 0.8.6
+
+0.8.5 taught the *lazy* stages to stop hiding the user's callback behind an
+iterator field, and measured the floor that leaves: a closure loaded from a
+field costs 2.75 ns an element against 0.88 for a virtual call. It applied the
+fix to `sumBy`, `averageBy`, `foldBy`, `minBy`, `maxBy`, `find`, `findIndex`
+and stopped there. Twelve strict terminals — including the two most-used ones,
+`fold` and `each` — were left on the slow side of the same line.
+
+They are most of this release, plus two asymptotic bugs that no benchmark case
+could have found, one lazy stage that had a fast path for `toList` and not for
+anything that pulls it, and the instrument that decided all of it.
+
+### Strict terminals inline the caller's callback
+
+`minBy` already carried the measurement, in its own comment since 0.8.2:
+
+| over 1,000,000 rows, extracting a `double` field | ns/element |
+|---|---|
+| hand-written loop | 0.65 |
+| `list.reduce(closure)` | 1.90 |
+| the terminal, no `vm:prefer-inline` | **6.26** |
+| the terminal, with the pragma | 0.97 |
+| the pragma **and** an indexed `List` walk | 0.65 |
+
+The pragma is not about the call overhead of the terminal. Inlined into the
+call site, the callback is the literal closure written there instead of a
+parameter holding an unknown function, and the per-element indirect call
+disappears. The indexed walk is worth its extra branch only *because* of the
+inlining — 0.8.0 measured indexed loops around an un-inlined callback at
+1.03-1.05x and rejected them, correctly.
+
+`fold`, `foldWithIndex`, `each`, `reduce`, `every`, `some`, `countWhere`,
+`groupBy`, `groupedBy`, `indexBy`, `countBy`, `partition` now get both, in the
+shape their already-optimized siblings use: the indexed branch first, the
+pulled loop unchanged behind it.
+
+A hop that does not inline breaks the chain, so the `Fx` members that stand
+between a chain call and these terminals were pragma'd too — `each`,
+`foldWithIndex`, `groupedBy`, `indexBy`, `some`, `any`, `partition`, `fold`,
+`reduce`. `groupBy`, `countBy`, `countWhere` and `foldBy` already had it, which
+is why they were the ones that moved first.
+
+`tee` / `tee3` were deliberately left alone: they carry `vm:align-loops`, and
+an indexed walk without the inlining is the shape 0.8.0 already measured as a
+regression.
+
+### Result — paired A/B against 0.8.5, all 53 cases
+
+Apple M5 Pro, Dart 3.13.1, AOT, `tool/ab_bench.dart` with a `native` control
+per case. Two cases at or past 5%, reproduced with a clean control:
+
+| case | terminal | fxdart, every clean-control reading | control |
+|---|---|---|---|
+| `top-log-level` | `countBy` over 1,000,000 log lines | **−9.37%** · −8.70% · −8.24% | +0.99% · −1.04% · −0.41% |
+| `sparse-timeseries` | `groupBy` over 1,000,000 readings | **−8.89%** · −7.27% · −6.80% · −6.59% · −6.37% | +1.12% · −0.80% · +1.09% · +1.30% · −1.16% |
+
+Readings against a control that had drifted past 2% are excluded from that
+table rather than averaged in; there were five such runs.
+
+No regression. Every other case reads inside the instrument's ±2% band
+against a clean control — `refunds-vs-charges` −1.35%, `alert-digest` −2.09%,
+`latency-percentiles` −1.47%, `cohort-retention` −0.22%,
+`duplicate-transactions` +0.40%, `daily-ledger-close` +0.34%, `ledger-diff`
+−0.90%, `restock-plan` −0.54%, `monthly-ledger-report` −0.37%, `top-expenses`
++0.48%, `recent-errors` +0.03%.
+
+`top-category-average` is **not** claimed: four readings against clean
+controls came in at −2.56%, −7.11%, −7.85%, −2.65%. It is bimodal here, so
+its win is real in direction and unmeasurable in size.
+
+### The gate caught a regression, and the regression named its own cause
+
+`top-merchants` read **+2.91%** and then **+3.35%** against clean controls —
+a real slowdown on a case fxdart already won 1.84x.
+
+It calls `groupedBy`, which was a list comprehension over `groupBy(f, iterable)`
+where `f` is `groupedBy`'s own **parameter**, not a literal. Forcing `groupBy`
+to inline there bought nothing — there was no closure literal at that call site
+to expose — while making `groupedBy` too big to be inlined itself, so the
+caller's literal never reached the loop and the indexed branch was paid for
+twice with no callback inlined either time. Pragma'ing `groupedBy` and
+`Fx.groupedBy` closes the chain: **+3.35% → −1.04%** (control −0.06%),
+confirmed at −1.35%.
+
+The general rule, now stated once instead of rediscovered: `vm:prefer-inline`
+earns its code size only on the hop that can see the caller's closure literal,
+and every hop between that literal and the loop has to inline or none of them
+do.
+
+### Two asymptotic bugs, neither reachable from a benchmark case
+
+- **`slice` walked the whole source.** `_SliceIterator.moveNext` kept pulling
+  past `end` — the comment called it deliberate ("matches the generator form")
+  — so `slice(0, xs, 3)` was O(n) where `take(3)` is O(3). It now stops at
+  `end`. Measured AOT, `slice(0, gen(1000000), 3).toList()` x20:
+  **331,552 µs → 27 µs**.
+- **`sumStrings` was quadratic.** `fold('', (a, b) => a + b)` copies the whole
+  accumulator per element; it is now `Iterable.join()`. 20,000 x 10 characters:
+  **74,620 µs → 343 µs**.
+
+Neither `slice` nor `sliceAsync` drains its source any more, which is
+observable on a side-effecting or single-shot iterable. That is the intended
+contract — it is what every other limiting operator does — it is stated in the
+public dartdoc rather than only in the implementation, and the sync side is
+pinned by a test that counts pulls.
+
+### `tool/ab_bench.dart` is a gate now, not a report
+
+Three defects, all of which mattered while measuring this release:
+
+- The ±2% control check **warned and exited 0**. It now exits 1, and it fired
+  on five of the runs below — including two that would otherwise have shipped
+  `top-log-level` at −10.09% and −10.70% off a control that had moved +5.05%
+  and +3.83%.
+- No all-cases mode: every slug had to be typed, so "no case regresses 3%" was
+  a manual claim. `--all` enumerates `benchmark/cases` (or `cases-rx`).
+- The per-case delta list was built and never emitted — dead code since it was
+  written. It now prints, and writes `benchmark/.build/ab/report.md` in the
+  shape these CHANGELOG tables use.
+
+### Two cases this instrument cannot adjudicate
+
+`weekly-sensor-averages` and `stream-windowed-alerts` swing past ±3% in both
+directions with clean controls, **in the same session**, back to back:
+
+| case | readings, control in brackets |
+|---|---|
+| `weekly-sensor-averages` | +6.94% [+1.00%] · −5.07% [−0.39%] · +9.66% [+2.75%] · −11.38% [−1.01%] · +18.34% [−1.86%] |
+| `stream-windowed-alerts` | −3.14% [+0.63%] · +2.84% [+0.96%] · +4.20% [−1.10%] · −0.62% [+0.93%] |
+
+Neither calls a single function this release changed — both are
+`chunk` → `averageBy` / `maxBy` pipelines, and `chunk` allocates one list per
+window, which makes their cost bimodal per *process* rather than per round.
+More rounds do not help; pooling per-iteration samples across processes cannot
+separate the modes. Recording them as unresolved rather than as a ±4% result,
+and noting what would fix it: keeping the raw `iterUs` samples and rejecting
+outlying processes, which the runner throws away today.
+
 ### `differenceBy` / `intersectionBy` walk a `List` by index when pulled
 
 `_SetOpIterable` has had a `toList` fast path since 0.8.2 — build the first
@@ -593,30 +736,6 @@ since a stored `null` must not read as "no cell yet".
 
 ### Behaviour notes
 
-- **Every `windowed`/`chunk` window is now a growable list.** Before this
-  release the two *sync* paths handed back a fixed-length list while
-  `windowedAsync`/`chunkAsync` already returned a growable one, so the same
-  operator disagreed with its own async twin; all four now agree. The only
-  caller that can observe the difference is one that relied on `window.add(x)`
-  throwing `UnsupportedError`, and nothing in the library did. It is a
-  widening, not a narrowing: a window is still a fresh **copy** the caller
-  owns, never a view onto the source, and mutating one window still cannot
-  disturb another or the source — that is the part the old test was really
-  protecting, and it is unchanged. The reason is the measurement two sections
-  up: a fixed-length window has to be filled from package code at one
-  covariant store check per element, and no fixed-length bulk copy is faster
-  than that loop. Stated in the public dartdoc of all four operators, not just
-  in the implementation, and the test that pinned the old representation was
-  rewritten rather than deleted — `test/lazy/windowed_test.dart` now pins
-  growability across all four paths at once, including both branches of the
-  ring buffer.
-- The window copy is also why the pulled path changed shape: a window that
-  does not wrap the ring is now one `sublist` (measured 14.8 ms against
-  18.8 ms per 1,000,000 windows at `size: 3`, and `chunk` never wraps), and
-  only an *overlapping* window over a non-`List` source still assembles the
-  wrapped tail by hand, at 21.6 ms against 19.6 ms. That is the one path this
-  release makes slower, it is the rarest in the family, and no benchmark case
-  reaches it.
 - The `List` fast paths read `length` once and then index, so mutating the
   source during a pass is no longer reported as such on these twelve
   terminals. Both directions changed, and they changed differently: a source
@@ -630,12 +749,6 @@ since a stored `null` must not read as "no cell yet".
 - `slice` and `sliceAsync` stop consuming their source at `end`, as above.
 - `Fx.all` now delegates to `every` instead of carrying its own loop, so the
   chain's universal quantifier reaches the same fast path as `Fx.any`.
-- `Fx.isEmpty` / `Fx.isNotEmpty` are O(1) and terminate on an unbounded chain,
-  where they used to count every element.
-- `FxNum(fx(xs)).min()` / `.max()` throw `StateError` on an empty chain where
-  they returned `double.infinity` / `-double.infinity`. Reachable only through
-  explicit extension application; the `fx(xs).min()` spelling is the `Fx`
-  member and is unchanged.
 
 
 ## 0.8.5

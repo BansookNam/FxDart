@@ -326,7 +326,7 @@ void main() {
       // — on `smoothed-zone-changes` it measured as two thirds of this PR's
       // win. Reverting either to a pre-sized fill would fail here.
       //
-      // All four paths must agree, which is the point: before 0.8.6 the two
+      // All four paths must agree, which is the point: before 0.8.7 the two
       // sync paths were fixed-length while `windowedAsync` was already
       // growable.
       final unfusedWindow = windowed(2, [1, 2, 3]).first;

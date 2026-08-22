@@ -70,8 +70,20 @@ String _stripCode(String body) =>
     body.replaceAll(_fenced, '').replaceAll(_inlineCode, '');
 
 void main(List<String> args) {
+  // Prints the page set this tool derives, so CI can diff it against
+  // `build_docs.dart --list-translatable`. The two derive the same set by
+  // different routes — build_docs enumerates it from its own family tables,
+  // this walks `content/` — and a page family added to one and not the other
+  // would otherwise go unchecked in silence.
+  if (args.contains('--list-translatable')) {
+    _translatable().forEach(stdout.writeln);
+    return;
+  }
   if (args.isEmpty) {
-    stderr.writeln('usage: check_translation.dart <locale> [relPath...]');
+    stderr.writeln(
+      'usage: check_translation.dart <locale> [relPath...]\n'
+      '       check_translation.dart --list-translatable',
+    );
     exit(2);
   }
   final locale = args.first;
