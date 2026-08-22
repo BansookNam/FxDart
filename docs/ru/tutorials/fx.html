@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=5337b860bc3ce009">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=367a788d58e3bc1c">
 </head>
 <body>
 <header class="site-header">
@@ -56,11 +56,13 @@
   <div class="signature">Fx&lt;T&gt; fx&lt;T&gt;(Iterable&lt;T&gt; iterable)
 FxAsync&lt;T&gt; fxAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable)
 FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)
+FxEvents&lt;T&gt; fxEvents&lt;T&gt;(Stream&lt;T&gt; stream)
 
-Fx&lt;T&gt;      Iterable&lt;T&gt;.fx
-FxAsync&lt;T&gt; FxAsyncIterable&lt;T&gt;.fx
-FxAsync&lt;T&gt; Stream&lt;T&gt;.fx
-FxAsync&lt;T&gt; Iterable&lt;FutureOr&lt;T&gt;&gt;.fxAsync</div>
+Fx&lt;T&gt;       Iterable&lt;T&gt;.fx
+FxAsync&lt;T&gt;  FxAsyncIterable&lt;T&gt;.fx
+FxAsync&lt;T&gt;  Stream&lt;T&gt;.fx
+FxAsync&lt;T&gt;  Iterable&lt;FutureOr&lt;T&gt;&gt;.fxAsync
+FxEvents&lt;T&gt; Stream&lt;T&gt;.fxEvents</div>
 
   <h2>Lecture</h2>
   <p>
@@ -117,7 +119,7 @@ FxAsync&lt;T&gt; Iterable&lt;FutureOr&lt;T&gt;&gt;.fxAsync</div>
   <h2>Demo 1 · Nothing runs until the terminal op</h2>
   <p>Watch <code>calls</code> stay at 0 right after building the chain, then
     jump once <code>toList()</code> actually pulls the 5 values:</p>
-  <div class="playground" data-pg="f57356e5b14d7ddb">
+  <div class="playground" data-pg="9cc6560f7deb4f7a">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -171,9 +173,10 @@ Future<void> main() async {
   <p>
     Every entry point also exists as a getter: <code>.fx</code> on an
     <code>Iterable</code>, an <code>FxAsyncIterable</code> or a
-    <code>Stream</code>, and <code>.fxAsync</code> on an iterable of futures.
-    They build exactly the same chain — the difference is only which end of
-    the expression you read from:
+    <code>Stream</code>, <code>.fxAsync</code> on an iterable of futures, and
+    <code>.fxEvents</code> on a <code>Stream</code>. They build exactly the
+    same chain — the difference is only which end of the expression you read
+    from:
   </p>
   <pre><code>// the function: you go back to the front to open the paren
 fx(orders.where(isPaid)).groupBy((o) =&gt; o.customerId);
@@ -203,6 +206,20 @@ orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
     resolved type and <code>concurrent(n)</code> has something to work with.
   </p>
   <pre><code>await responses.fxAsync.map(parse).concurrent(4).toList();</code></pre>
+  <p>
+    A <code>Stream</code> carries both getters, because it is the one source
+    that belongs to both worlds. <code>.fx</code> gives the <em>pull</em>
+    chain, the same as <code>fxStream</code>; <code>.fxEvents</code> gives the
+    <em>push</em> chain, the same as <a href="fxEvents.html"><code>fxEvents</code></a> —
+    debouncing, throttling, switching. Cross from push back to pull with
+    <code>.pull()</code>. The two are compared side by side in
+    <a href="streams.html">Stream bridges</a>.
+  </p>
+  <pre><code>keystrokes.fxEvents
+    .debounce(const Duration(milliseconds: 160))
+    .switchMap((q) =&gt; search(q).asStream())
+    .pull()
+    .toList();</code></pre>
 
   <h2>Try it yourself</h2>
   <p>Exercise: build a chain that keeps scores of 60 or above, doubles them
@@ -245,7 +262,7 @@ void main() {
   <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=5337b860bc3ce009";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=367a788d58e3bc1c";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

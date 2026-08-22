@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=5337b860bc3ce009">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=367a788d58e3bc1c">
 </head>
 <body>
 <header class="site-header">
@@ -54,11 +54,13 @@
   <div class="signature">Fx&lt;T&gt; fx&lt;T&gt;(Iterable&lt;T&gt; iterable)
 FxAsync&lt;T&gt; fxAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable)
 FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)
+FxEvents&lt;T&gt; fxEvents&lt;T&gt;(Stream&lt;T&gt; stream)
 
-Fx&lt;T&gt;      Iterable&lt;T&gt;.fx
-FxAsync&lt;T&gt; FxAsyncIterable&lt;T&gt;.fx
-FxAsync&lt;T&gt; Stream&lt;T&gt;.fx
-FxAsync&lt;T&gt; Iterable&lt;FutureOr&lt;T&gt;&gt;.fxAsync</div>
+Fx&lt;T&gt;       Iterable&lt;T&gt;.fx
+FxAsync&lt;T&gt;  FxAsyncIterable&lt;T&gt;.fx
+FxAsync&lt;T&gt;  Stream&lt;T&gt;.fx
+FxAsync&lt;T&gt;  Iterable&lt;FutureOr&lt;T&gt;&gt;.fxAsync
+FxEvents&lt;T&gt; Stream&lt;T&gt;.fxEvents</div>
 
   <h2>Lección</h2>
   <p>
@@ -116,7 +118,7 @@ FxAsync&lt;T&gt; Iterable&lt;FutureOr&lt;T&gt;&gt;.fxAsync</div>
   <h2>Demo 1 · Nada se ejecuta hasta el operador terminal</h2>
   <p>Fíjate en que <code>calls</code> se queda en 0 justo después de construir la cadena, y
     salta en cuanto <code>toList()</code> tira de verdad de los 5 valores:</p>
-  <div class="playground" data-pg="f57356e5b14d7ddb">
+  <div class="playground" data-pg="9cc6560f7deb4f7a">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -170,9 +172,10 @@ Future<void> main() async {
   <p>
     Cada punto de entrada existe también como getter: <code>.fx</code> sobre un
     <code>Iterable</code>, un <code>FxAsyncIterable</code> o un
-    <code>Stream</code>, y <code>.fxAsync</code> sobre un iterable de futuros.
-    Construyen exactamente la misma cadena; lo único que cambia es por qué
-    extremo de la expresión se empieza a leer:
+    <code>Stream</code>, <code>.fxAsync</code> sobre un iterable de futuros y
+    <code>.fxEvents</code> sobre un <code>Stream</code>. Construyen exactamente
+    la misma cadena; lo único que cambia es por qué extremo de la expresión se
+    empieza a leer:
   </p>
   <pre><code>// la función: hay que volver al principio para abrir el paréntesis
 fx(orders.where(isPaid)).groupBy((o) =&gt; o.customerId);
@@ -204,6 +207,20 @@ orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
     tipo resuelto y <code>concurrent(n)</code> tiene algo que hacer.
   </p>
   <pre><code>await responses.fxAsync.map(parse).concurrent(4).toList();</code></pre>
+  <p>
+    Un <code>Stream</code> lleva ambos getters, porque es la única fuente que
+    pertenece a los dos mundos. <code>.fx</code> da la cadena <em>pull</em>, lo
+    mismo que <code>fxStream</code>; <code>.fxEvents</code> da la cadena
+    <em>push</em>, lo mismo que <a href="fxEvents.html"><code>fxEvents</code></a> —
+    debounce, throttle, switch. Para volver de push a pull,
+    <code>.pull()</code>. Se comparan lado a lado en
+    <a href="streams.html">Puentes de Stream</a>.
+  </p>
+  <pre><code>keystrokes.fxEvents
+    .debounce(const Duration(milliseconds: 160))
+    .switchMap((q) =&gt; search(q).asStream())
+    .pull()
+    .toList();</code></pre>
 
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: construye una cadena que se quede con las puntuaciones de 60 o más, las duplique
@@ -246,7 +263,7 @@ void main() {
   <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=5337b860bc3ce009";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=367a788d58e3bc1c";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

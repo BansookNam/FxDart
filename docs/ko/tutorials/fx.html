@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=5337b860bc3ce009">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=367a788d58e3bc1c">
 </head>
 <body>
 <header class="site-header">
@@ -54,11 +54,13 @@
   <div class="signature">Fx&lt;T&gt; fx&lt;T&gt;(Iterable&lt;T&gt; iterable)
 FxAsync&lt;T&gt; fxAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable)
 FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)
+FxEvents&lt;T&gt; fxEvents&lt;T&gt;(Stream&lt;T&gt; stream)
 
-Fx&lt;T&gt;      Iterable&lt;T&gt;.fx
-FxAsync&lt;T&gt; FxAsyncIterable&lt;T&gt;.fx
-FxAsync&lt;T&gt; Stream&lt;T&gt;.fx
-FxAsync&lt;T&gt; Iterable&lt;FutureOr&lt;T&gt;&gt;.fxAsync</div>
+Fx&lt;T&gt;       Iterable&lt;T&gt;.fx
+FxAsync&lt;T&gt;  FxAsyncIterable&lt;T&gt;.fx
+FxAsync&lt;T&gt;  Stream&lt;T&gt;.fx
+FxAsync&lt;T&gt;  Iterable&lt;FutureOr&lt;T&gt;&gt;.fxAsync
+FxEvents&lt;T&gt; Stream&lt;T&gt;.fxEvents</div>
 
   <h2>강의</h2>
   <p>
@@ -113,7 +115,7 @@ FxAsync&lt;T&gt; Iterable&lt;FutureOr&lt;T&gt;&gt;.fxAsync</div>
   <h2>데모 1 · 종결 연산자 전까지는 아무것도 실행되지 않습니다</h2>
   <p>체인을 만든 직후에는 <code>calls</code>가 0에 머물러 있다가,
     <code>toList()</code>가 실제로 값 5개를 끌어당기는 순간 올라가는 것을 보세요.</p>
-  <div class="playground" data-pg="f57356e5b14d7ddb">
+  <div class="playground" data-pg="9cc6560f7deb4f7a">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -168,8 +170,9 @@ Future<void> main() async {
   <p>
     모든 진입점에는 getter 형태도 있습니다. <code>Iterable</code>,
     <code>FxAsyncIterable</code>, <code>Stream</code>에는 <code>.fx</code>가,
-    Future의 이터러블에는 <code>.fxAsync</code>가 붙습니다. 만들어지는 체인은
-    완전히 같고, 차이는 표현식을 어느 쪽부터 읽느냐뿐입니다.
+    Future의 이터러블에는 <code>.fxAsync</code>가, <code>Stream</code>에는
+    <code>.fxEvents</code>가 붙습니다. 만들어지는 체인은 완전히 같고, 차이는
+    표현식을 어느 쪽부터 읽느냐뿐입니다.
   </p>
   <pre><code>// 함수 표기: 괄호를 열려면 표현식 앞으로 되돌아가야 합니다
 fx(orders.where(isPaid)).groupBy((o) =&gt; o.customerId);
@@ -200,6 +203,20 @@ orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
     갖게 됩니다.
   </p>
   <pre><code>await responses.fxAsync.map(parse).concurrent(4).toList();</code></pre>
+  <p>
+    <code>Stream</code>에는 두 getter가 모두 붙습니다. 양쪽 세계에 걸쳐 있는
+    유일한 소스이기 때문입니다. <code>.fx</code>는 <em>pull</em> 체인으로,
+    <code>fxStream</code>과 같습니다. <code>.fxEvents</code>는 <em>push</em>
+    체인으로, <a href="fxEvents.html"><code>fxEvents</code></a>와 같습니다 —
+    debounce, throttle, switch가 여기에 있습니다. push에서 pull로 건너올 때는
+    <code>.pull()</code>을 씁니다. 둘을 나란히 놓고 비교한 표는
+    <a href="streams.html">Stream 다리</a>에 있습니다.
+  </p>
+  <pre><code>keystrokes.fxEvents
+    .debounce(const Duration(milliseconds: 160))
+    .switchMap((q) =&gt; search(q).asStream())
+    .pull()
+    .toList();</code></pre>
 
   <h2>직접 해 보기</h2>
   <p>연습: 60점 이상인 점수만 남기고, 보너스 점수로 두 배를 한 뒤,
@@ -242,7 +259,7 @@ void main() {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=5337b860bc3ce009";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=367a788d58e3bc1c";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
