@@ -88,6 +88,27 @@ A paged book viewer — the FP theory companion to 101, modelled on the
   under an "8–9" indicator) and no z-index scheme fixed it. Turning a page is
   now a synchronous re-render (~0.4ms), so the DOM holds two pages and what is
   on screen always matches the indicator. Do not reintroduce the flip.
+- Under ~880px wide (or ~520px tall) the viewer switches to **single-page
+  mode**: no spread, no fixed paper — `measureGeometry()` writes `--page-w` /
+  `--page-h` from what the stage leaves over and the flow fills that box, so
+  the page is as large as the screen allows. The nav arrows and the page
+  indicator move into a bar under the paper (back · page picker · forward) and
+  the language row into a sheet of its own behind a globe button (`#lang-btn`,
+  tagged with the edition being read); `#book-crumb` names the chapter the
+  spread used to show for free. The switcher links are *moved* into that sheet,
+  never copied — they carry the handler that hands the reading position to the
+  other edition.
+- The book's switcher lists **only locales that have `i18n/<code>/theory/`**
+  (plus the one being read, so a reader who landed on an untranslated edition
+  can still see where they are) — a 300-page manuscript is not translated by a
+  locale directory that has no theory book, and offering it lands the reader on
+  the same English pages. Its last row is `.book-contribute` → `contributeUrl`
+  (the i18n guide on GitHub); it carries no `hreflang`, which is what keeps the
+  reading-position handler off it. Because the box is measured, a resize or a
+  rotation **re-runs the flow** — the reader is restored by anchor, never by
+  page number, and the box is read off the *stage* (not `#scaler`, whose width
+  follows `#book`, which is sized from the box). The stage is `100svh` there:
+  a collapsing mobile toolbar must not re-flow 300 pages.
 - Blocks taller than a page are **split** before the flow: listings by line
   (continuation marked `⋯`, the whole program kept on the wrapper's `data-src`
   so ▶ Run still compiles the full file), tables by row with the header

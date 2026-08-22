@@ -1,6 +1,6 @@
 ---
 slug: comparisons
-title: gt · gte · lt · lte — FxDart 101
+title: gt · gte · lt · lte 비교 — FxDart 101
 description: FxDart 비교 함수 튜토리얼: data-first 방식의 gt, gte, lt, lte와 이들을 단항 술어로 커링하는 방법을 라이브 플레이그라운드와 함께 살펴봅니다.
 heading: <code>gt</code> · <code>gte</code> · <code>lt</code> · <code>lte</code>
 section: 10

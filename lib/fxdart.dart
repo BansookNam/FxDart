@@ -36,7 +36,9 @@ export 'src/fx.dart'
         FxEntry,
         FxAsyncEntry,
         FxStreamEntry,
-        FxFutureEntry;
+        FxFutureEntry,
+        FxPair,
+        FxAsyncPair;
 export 'src/dart_aliases.dart';
 export 'src/lazy/combine.dart';
 export 'src/lazy/effect.dart';

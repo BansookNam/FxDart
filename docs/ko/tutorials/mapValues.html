@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ff74f6fa047725a6">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2319e42fb7768e50">
 </head>
 <body>
 <header class="site-header">
@@ -49,7 +49,7 @@
 <main>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 9 · 객체(Map) 함수 › <strong>mapValues</strong></p>
   <h1><code>mapValues</code>와 친구들</h1>
-  <p class="hero-sub">맵의 값 전체, 키 전체, 또는 <code>(키, 값)</code> 엔트리 전체를 변환합니다.</p>
+  <p class="hero-sub">맵의 값 전체, 키 전체, 또는 <code>(key, value)</code> 엔트리 전체를 변환합니다.</p>
 
   <div class="signature">Map&lt;K, T&gt; mapValues&lt;K, V, T&gt;(T Function(V value) f, Map&lt;K, V&gt; map)
 Map&lt;T, V&gt; mapKeys&lt;K, V, T&gt;(T Function(K key) f, Map&lt;K, V&gt; map)
@@ -63,7 +63,7 @@ Map&lt;K2, V2&gt; mapEntries&lt;K, V, K2, V2&gt;((K2, V2) Function((K, V) entry)
     <a href="omitBy.html"><code>omitBy</code></a>) 일부를 읽습니다.
     이 셋은 맵을 <em>변환</em>합니다. <code>mapValues</code>는 값마다 콜백을
     돌리고 키는 건드리지 않으며, <code>mapKeys</code>는 그 반대,
-    <code>mapEntries</code>는 <code>(키, 값)</code> 레코드를 통째로 받아 새
+    <code>mapEntries</code>는 <code>(key, value)</code> 레코드를 통째로 받아 새
     레코드를 돌려줍니다.
   </p>
   <p>
@@ -95,7 +95,7 @@ Map&lt;K2, V2&gt; mapEntries&lt;K, V, K2, V2&gt;((K2, V2) Function((K, V) entry)
   </p>
 
   <h2>데모 1 · 기본</h2>
-  <div class="playground" data-pg="adc4999c97d11460">
+  <div class="playground" data-pg="e91d9c60361c0366">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -166,7 +166,7 @@ void main() {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=ff74f6fa047725a6";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=2319e42fb7768e50";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

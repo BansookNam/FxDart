@@ -1,6 +1,6 @@
 ---
 slug: delay
-title: delay &amp; sleep — FxDart 101
+title: delay와 sleep — FxDart 101
 description: FxDart delay와 sleep 튜토리얼 — 이 사이트의 모든 비동기 데모를 떠받치는 두 가지 기본 재료를 라이브 플레이그라운드와 함께 살펴봅니다.
 heading: <code>delay</code> &amp; <code>sleep</code>
 section: 10

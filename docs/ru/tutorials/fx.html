@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ff74f6fa047725a6">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2319e42fb7768e50">
 </head>
 <body>
 <header class="site-header">
@@ -55,14 +55,7 @@
 
   <div class="signature">Fx&lt;T&gt; fx&lt;T&gt;(Iterable&lt;T&gt; iterable)
 FxAsync&lt;T&gt; fxAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable)
-FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)
-FxEvents&lt;T&gt; fxEvents&lt;T&gt;(Stream&lt;T&gt; stream)
-
-Fx&lt;T&gt;       Iterable&lt;T&gt;.fx
-FxAsync&lt;T&gt;  FxAsyncIterable&lt;T&gt;.fx
-FxAsync&lt;T&gt;  Stream&lt;T&gt;.fx
-FxAsync&lt;T&gt;  Iterable&lt;FutureOr&lt;T&gt;&gt;.fxAsync
-FxEvents&lt;T&gt; Stream&lt;T&gt;.fxEvents</div>
+FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)</div>
 
   <h2>Lecture</h2>
   <p>
@@ -119,7 +112,7 @@ FxEvents&lt;T&gt; Stream&lt;T&gt;.fxEvents</div>
   <h2>Demo 1 · Nothing runs until the terminal op</h2>
   <p>Watch <code>calls</code> stay at 0 right after building the chain, then
     jump once <code>toList()</code> actually pulls the 5 values:</p>
-  <div class="playground" data-pg="172a1a55841595d4">
+  <div class="playground" data-pg="d41f460a8ce0ff42">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -169,90 +162,6 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>The getter spelling</h2>
-  <p>
-    Every entry point also exists as a getter: <code>.fx</code> on an
-    <code>Iterable</code>, an <code>FxAsyncIterable</code> or a
-    <code>Stream</code>, <code>.fxAsync</code> on an iterable of futures, and
-    <code>.fxEvents</code> on a <code>Stream</code>. They build exactly the
-    same chain — the difference is only which end of the expression you read
-    from:
-  </p>
-  <pre><code>// the function: you go back to the front to open the paren
-fx(orders.where(isPaid)).groupBy((o) =&gt; o.customerId);
-
-// the getter: left to right, the way .toList() reads
-orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
-  <p>
-    This is the Dart-idiomatic spelling, and it is free: <code>Fx</code> is an
-    extension type, so the wrapper erases to the iterable itself, and a getter
-    whose body is <code>this</code> is a static call the compiler deletes. Over
-    a million-element <code>map</code> + <code>filter</code> + <code>sum</code>,
-    the two forms measure 12.640 ms and 12.665 ms — the same number twice.
-  </p>
-  <p>
-    <strong>These pages use <code>fx()</code> throughout.</strong> It is the
-    name FxTS uses, and it is the one that takes an explicit type argument,
-    which a getter cannot do postfix — <code>fx&lt;num&gt;(xs)</code> works
-    where <code>xs.fx&lt;num&gt;</code> does not parse. Pick whichever reads
-    better in your own code; they compile to the same thing.
-  </p>
-  <p>
-    One asymmetry is worth knowing. Over an
-    <code>Iterable&lt;Future&lt;T&gt;&gt;</code>, <code>.fx</code> gives you an
-    <code>Fx&lt;Future&lt;T&gt;&gt;</code> — a chain over the futures rather
-    than their values, which compiles and quietly does the wrong thing. That is
-    what <code>.fxAsync</code> is for: it awaits them, so <code>T</code> is the
-    resolved type and <code>concurrent(n)</code> has something to work with.
-  </p>
-  <pre><code>await responses.fxAsync.map(parse).concurrent(4).toList();</code></pre>
-  <p>
-    A <code>Stream</code> carries both getters, because it is the one source
-    that belongs to both worlds. <code>.fx</code> gives the <em>pull</em>
-    chain, the same as <code>fxStream</code>; <code>.fxEvents</code> gives the
-    <em>push</em> chain, the same as <a href="fxEvents.html"><code>fxEvents</code></a> —
-    debouncing, throttling, switching. Cross from push back to pull with
-    <code>.pull()</code>. The two are compared side by side in
-    <a href="streams.html">Stream bridges</a>.
-  </p>
-  <pre><code>keystrokes.fxEvents
-    .debounce(const Duration(milliseconds: 160))
-    .switchMap((q) =&gt; search(q).asStream())
-    .pull()
-    .toList();</code></pre>
-
-  <h2>Every getter spelling</h2>
-  <p>
-    The convention is one rule: an entry point carries <code>fx</code> in its
-    name. It says which library you are stepping into, and it keeps the bare
-    name — <code>toAsync</code>, <code>shuffle</code>, <code>debounce</code> —
-    free for whatever else a project puts on that type.
-  </p>
-  <table>
-    <thead><tr><th>Receiver</th><th>Getter</th><th>Same as</th></tr></thead>
-    <tbody>
-      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fx(xs)</code></td></tr>
-      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxAsync(it)</code></td></tr>
-      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxStream(s)</code></td></tr>
-      <tr><td><code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code></td><td><code>.fxAsync</code></td><td><a href="toAsync.html"><code>toAsync(xs)</code></a></td></tr>
-      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxEvents</code></td><td><a href="fxEvents.html"><code>fxEvents(s)</code></a></td></tr>
-      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLive</code></td><td><a href="liveValue.html"><code>LiveValue.from(s)</code></a></td></tr>
-      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLiveSeeded</code></td><td><a href="liveValue.html"><code>LiveValue.seededFrom(v, s)</code></a></td></tr>
-      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffle(xs)</code></a></td></tr>
-      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffleAsync(it)</code></a></td></tr>
-      <tr><td><code>void Function(T)</code></td><td><code>.fxDebounce</code></td><td><a href="debounce.html"><code>debounce(f, w)</code></a></td></tr>
-      <tr><td><code>void Function(T)</code></td><td><code>.fxThrottle</code></td><td><a href="throttle.html"><code>throttle(f, w)</code></a></td></tr>
-    </tbody>
-  </table>
-  <p>
-    The operators themselves are not on this list, and will not be. Fifteen of
-    them — <code>map</code>, <code>where</code>, <code>take</code>,
-    <code>fold</code> and friends — share a name with a member
-    <code>Iterable</code> already has, and an instance member always beats an
-    extension, so those calls could never reach fxdart. The chain is where the
-    operators live: <code>xs.fx.map(f)</code>, not <code>xs.map(f)</code>.
-  </p>
-
   <h2>Try it yourself</h2>
   <p>Exercise: build a chain that keeps scores of 60 or above, doubles them
     as bonus points, and takes only the first 2 results.</p>
@@ -294,7 +203,7 @@ void main() {
   <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=ff74f6fa047725a6";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=2319e42fb7768e50";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

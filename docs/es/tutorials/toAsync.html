@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ff74f6fa047725a6">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2319e42fb7768e50">
 </head>
 <body>
 <header class="site-header">
@@ -52,8 +52,7 @@
   <p class="hero-sub">Eleva un Iterable normal —de valores o de Futures— a un FxAsyncIterable, la puerta de entrada al pipeline asíncrono de FxDart.</p>
 
   <div class="signature">FxAsyncIterable&lt;T&gt; toAsync&lt;T&gt;(Iterable&lt;FutureOr&lt;T&gt;&gt; iterable)
-FxAsync&lt;T&gt; Fx.toAsync&lt;T&gt;()        // chain, on a sync Fx
-FxAsync&lt;T&gt;         Iterable&lt;FutureOr&lt;T&gt;&gt;.fxAsync   // method (resolves the futures)</div>
+FxAsync&lt;T&gt; Fx.toAsync&lt;T&gt;()        // chain, on a sync Fx</div>
 
   <h2>Lección</h2>
   <p>
@@ -95,7 +94,7 @@ FxAsync&lt;T&gt;         Iterable&lt;FutureOr&lt;T&gt;&gt;.fxAsync   // method (
   <p><code>toAsync</code> acepta valores simples, Futures o una mezcla de
     ambos — y la forma encadenada hace lo mismo a partir de un <code>Fx</code>
     existente:</p>
-  <div class="playground" data-pg="0d9fa211bc739989">
+  <div class="playground" data-pg="816c784541ea61e3">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -162,23 +161,6 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>La forma con método</h2>
-  <p>
-    <code>xs.fxAsync</code> es esta función como getter. Devuelve un
-    <code>FxAsync</code> y no un <code>FxAsyncIterable</code> pelado, así que
-    la cadena puede continuar — y resuelve los futuros, cosa que
-    <code>xs.fx</code> no hace.
-  </p>
-  <pre><code>await responses.fxAsync.map(parse).concurrent(4).toList();
-
-// responses.fx would be an Fx&lt;Future&lt;T&gt;&gt; — a chain over the
-// futures rather than their values.</code></pre>
-  <p>
-    El nombre lleva <code>fx</code> a propósito: <code>toAsync</code> es una
-    expresión lo bastante general como para no decir, sobre un
-    <code>Iterable</code> pelado, en qué librería se entra. Las formas con
-    getter están recogidas en <a href="fx.html"><code>fx</code></a>.
-  </p>
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: filtra la lista de abajo para que solo las notas aprobadas
     (&gt;= 60) lleguen al resultado.</p>
@@ -216,7 +198,7 @@ Future<void> main() async {
   <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=ff74f6fa047725a6";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=2319e42fb7768e50";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

@@ -34,6 +34,13 @@ void main(List<String> args) {
 
   if (args.contains('--record')) return _record(locales);
   if (args.contains('--status')) return _status(locales);
+  // The set of translatable pages is derived here and re-derived, by a
+  // different route, in check_translation.dart. Both can print it so CI can
+  // diff the two and catch them drifting apart.
+  if (args.contains('--list-translatable')) {
+    (_translatable().toList()..sort()).forEach(stdout.writeln);
+    return;
+  }
 
   final course = _loadJson('$root/content/course.json');
 
@@ -725,6 +732,15 @@ String _renderTutorial(
 /// Chapter manuscripts, in reading order. Only `NN-slug.md` counts — `book.md`
 /// is the preface and `PLAN.md` is the writing plan, neither of which is a
 /// chapter.
+/// Whether `locale` has its own edition of the theory book.
+///
+/// Keyed on the preface (`theory/book.md`) — the same file the page's own
+/// "not translated" banner is keyed on, so the switcher and the banner can
+/// never disagree.
+bool _hasTheoryBook(Locale locale) =>
+    locale.isBase ||
+    File('$root/i18n/${locale.code}/theory/book.md').existsSync();
+
 List<String> _theoryChapterFiles() {
   final dir = Directory('$root/content/theory');
   if (!dir.existsSync()) return const [];
@@ -809,6 +825,9 @@ String _renderTheoryBook(
     'editTitle': chrome['theoryEditTitle'] ?? 'Edit and run',
     'reset': chrome['theoryReset'] ?? 'Reset',
     'edited': chrome['theoryEdited'] ?? 'edited',
+    'goto': chrome['theoryGoto'] ?? 'Go to page',
+    'go': chrome['theoryGo'] ?? 'Go',
+    'lang': chrome['langLabel'] ?? 'Language',
   };
   final pgStrings = {
     for (final k in const ['pgCompileError', 'pgError', 'pgLoadFailed'])
@@ -853,6 +872,9 @@ String _renderTheoryBook(
     ..writeln('        <div class="spine"></div>')
     ..writeln('      </div>')
     ..writeln('    </div>')
+    // Single-page mode has no facing page to say which chapter this is, so
+    // the crumb does; the spread hides it.
+    ..writeln('    <span id="book-crumb"></span>')
     // Locale-root-relative, like the site nav: closing the Korean book must
     // land on the Korean course, not drop the reader into English.
     ..writeln('    <a id="book-close" '
@@ -866,7 +888,22 @@ String _renderTheoryBook(
     ..writeln('    <div id="book-hud">')
     ..writeln('      <span id="page-indicator"></span>')
     ..writeln('      <button id="toc-btn" type="button">'
-        '${chrome['theoryToc']}</button>');
+        '${chrome['theoryToc']}</button>')
+    // The page picker: single-page mode's middle control, which also carries
+    // the page indicator there. Hidden while a spread is showing.
+    ..writeln('      <button id="goto-btn" type="button" '
+        'aria-label="${chrome['theoryGoto']}"></button>')
+    // Its neighbour: the language switch. A spread lists every edition along
+    // the foot of the page, but the bar has room for a glyph and the tag of
+    // the edition being read, so on a phone the list moves into a sheet.
+    ..writeln('      <button id="lang-btn" type="button" '
+        'aria-label="${chrome['langLabel']}">'
+        '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true" '
+        'fill="none" stroke="currentColor" stroke-width="1.4">'
+        '<circle cx="10" cy="10" r="8"></circle><path d="M2 10h16"></path>'
+        '<path d="M10 2c2.2 2.3 3.4 5 3.4 8s-1.2 5.7-3.4 8'
+        'c-2.2-2.3-3.4-5-3.4-8S7.8 4.3 10 2z"></path></svg>'
+        '<span>${locale.code.split('-').first.toUpperCase()}</span></button>');
   // The standalone page has no room for the site's translation banner, but a
   // reader handed an English book inside a localized shell still deserves to
   // be told why.
@@ -875,16 +912,27 @@ String _renderTheoryBook(
     b.writeln('      <a class="book-note" href="${chrome['contributeUrl']}">'
         '$message</a>');
   }
+  // Only the editions that exist. The book is a 300-page manuscript, so a
+  // locale with no `i18n/<code>/theory/` is not a translation of it — offering
+  // 日本語 that lands on the same English pages is a promise the switcher
+  // cannot keep. The locale being read stays listed either way, so a reader
+  // who arrived on one of those pages can still see where they are.
   b.writeln('      <nav class="book-langs" '
       'aria-label="${chrome['langLabel']}">');
   for (final l in locales) {
+    if (!_hasTheoryBook(l) && l.code != locale.code) continue;
     final href =
         '${_rel(depth)}${l.isBase ? '' : '${l.path}/'}theory/index.html';
     b.writeln('        <a href="$href" hreflang="${l.code}" lang="${l.code}"'
         '${l.code == locale.code ? ' aria-current="page"' : ''}>'
         '${l.name}</a>');
   }
+  // …and how to add one. No hreflang: this leaves the book, and the anchor
+  // that carries the reading position between editions must not follow it.
   b
+    ..writeln('        <a class="book-contribute" '
+        'href="${chrome['contributeUrl']}" target="_blank" rel="noopener">'
+        '${chrome['theoryContribute']}</a>')
     ..writeln('      </nav>')
     ..writeln('    </div>')
     ..writeln('  </div>')

@@ -1,5 +1,467 @@
 ## 0.8.7
 
+0.8.6 measured what a *strict* terminal costs when it hides the caller's
+callback behind an iterator field, and removed that cost from twelve of them.
+This release does the same for two *lazy* stage boundaries — `windowed`/`chunk`
+followed by `map`, and `scan` followed by `map` — with the same instrument and
+the same rule about what may be claimed. It also adds nine operators, four of
+them asked for by the published example corpus and five by the API's own
+symmetry, fixes three defects in API that shipped in 0.8.6 or earlier, and
+makes the Korean documentation checker a gate instead of a script nothing ran.
+
+This release has a second, independent half: `fx(xs)` gains a **getter
+spelling**. `.fx`, `.fxAsync`, `.fxEvents` and the `fx`-prefixed wrapper twins
+put the chain one dot away from the collection that feeds it, with `fx()` still
+the documented spelling and a naming rule that keeps the events layer from
+colliding with anything else in the file. The two halves touch no common code;
+they ship together because neither had reached pub.dev on its own.
+
+### `windowed`/`chunk` → `map` is one stage, and the window copy is the SDK's
+
+`windowed(step: 1)` emits one window per *source* element, so the boundary
+between it and a following `map` is one of the few in the library still paid at
+the full element rate — the shape §B of the 0.8.6 analysis identifies as the
+only remaining headroom. `FxMapFusable` joins `FxUniqFusable`,
+`FxUniqByFusable` and `FxFilterFusable`; `map()` probes it **once when the
+chain is built, never per element**, which is what keeps the 50 cases that call
+no `windowed`/`chunk` at zero cost. `_WindowIterable` answers it, and the
+window is built and the callback applied inside one `moveNext`.
+
+**What it is not.** `f` still lands in a field of the fused node, exactly as it
+would in a `map` stage, so the caller's closure literal is *not* visible at the
+changed hop and `f` is *not* devirtualized. Nothing here got a
+`vm:prefer-inline`, for the reason stated two sections up.
+
+**The fusion is the smaller half, and the measurement says so.** Adjudicated
+separately, `smoothed-zone-changes` at `--scale 10000`:
+
+| change | clean-control readings | median | spread |
+|---|---|---|---|
+| stage fusion alone | −1.69% · −2.90% · −1.29% · −6.09% · −2.89% · −2.79% · −3.26% · −3.49% | −2.90% | 4.8 pts |
+| fusion **and** the SDK window copy | −9.98% · −9.31% · −9.79% · −8.98% · −10.23% · −10.49% · −9.35% | −9.79% | 1.5 pts |
+
+Fusion alone would have failed the 5% bar. Two thirds of the win is removing a
+**covariant store check per element** from the window copy:
+`List<A>.operator[]=` takes a covariant parameter and `A` is a runtime type
+argument, so filling a pre-sized window from package code cannot elide the
+check. `List.sublist` reaches the VM's own `_slice`, which copies into an array
+carrying no type argument. Measured AOT, 1,000,000 windows of `double` built
+and summed:
+
+| window build | size 3 | size 7 | size 10 |
+|---|---|---|---|
+| pre-sized fill, element by element | 16.4 ms | 35.4 ms | 51.8 ms |
+| **`List.sublist`** | **14.1 ms** | **26.7 ms** | **36.0 ms** |
+| `List.filled` + `setRange` | 21.1 ms | 44.0 ms | 62.4 ms |
+| `getRange().toList(growable: false)` | 29.1 ms | 55.0 ms | 76.9 ms |
+
+The last two rows are why this cost a contract (below): **no bulk copy that
+preserves a fixed-length window is faster than the loop it would replace** —
+both go through `Lists.copy`, an element loop behind an interface `[]=` call.
+Note also that it removes most of the case's run-to-run spread, which is the
+more useful property: the fill was producing a long right tail.
+
+### Result — paired A/B against `main` (0.8.6 + the strict terminals)
+
+Same instrument, `--ref main`, `--rounds 30`, `--scale 10000`, every reading
+with its paired `native` control. **Ten runs, ten clean controls, none
+excluded:**
+
+| case | fxdart, every clean-control reading | control |
+|---|---|---|
+| `smoothed-zone-changes` | **−8.74%** · −7.95% · −8.00% · −7.07% · −9.97% · −7.63% · −8.83% · −10.39% · −7.70% · −7.47% | −0.76% · +0.25% · −0.33% · +0.25% · −0.74% · +0.27% · +0.74% · +0.65% · +1.35% · +0.13% |
+| `paginate-users` | **−11.67%** · −11.15% · −11.04% | −0.80% · +0.60% · −0.33% |
+
+Median −7.98% and −11.15%. The `--all` sweep confirms both independently at
+−9.82% (control +0.80%) and −10.81% (control −0.44%). `paginate-users` is
+`chunk(10)` → `map` → `toList` and also clears the bar at `--scale full`, at
+−10.50% (control +0.37%).
+
+Earlier exploratory rounds at `--rounds 12` are excluded from that table
+entirely rather than pooled with it; three of them had drifted controls
+(+4.71%, +2.23%, −2.20%), and the one fusion-only run whose control moved
+−2.15% is likewise excluded from the table above it.
+
+**The win is scale-dependent, and does not carry to `--scale full`**, where the
+same case reads +0.26% / −0.32% / −0.08%. At 1,000,000 elements `sublist`'s
+second allocation per window — a `_GrowableList` header over the copied array,
+where `List.filled` allocated one object — costs about what the store checks
+save. *[Inference from the two measurements; not separately instrumented.]*
+Nothing regresses there, and the claim above is scoped to `--scale 10000`.
+
+**No regression** — swept with `--all` at both scales, and re-swept from
+scratch after the `scan` fusion below landed, so the figures cover both
+changes together. Because a single noisy case fails the whole invocation, the
+verdict is read per row from `benchmark/.build/ab/report.md` against that row's
+*own* control, and every row whose control drifted was then re-measured
+individually — 31 of them across the two scales, plus every row that moved past
+2% with a clean control.
+
+At `--scale 10000`, 51 of 53 rows came back usable in one pass. The largest
+positive against a clean control anywhere in that sweep is `top-log-level` at
++2.14%; the other movement is all the other way (`average-basket` −4.39%,
+`duplicate-transactions` −3.27%, `sensor-anomalies` −3.25%, `food-spending`
+−2.45%). The two unusable rows re-measured flat: `bounded-concurrency`
+−0.05% / −0.10% / −0.08%, `no-spend-streak` −1.36% / +0.82% / −2.02%.
+
+At `--scale full`, 47 of 53 came back usable, and the six that did not
+re-measured flat as well — `monthly-ledger-report` +0.07% / −0.14%,
+`multi-currency-report` −1.54% / −2.78%, `valid-emails` +0.01% / −0.71%, and
+`smoothed-zone-changes` not adjudicable there for the reason below.
+
+The five cases fxdart already wins by 1.8x–4.2x are flat: `restock-plan`
++1.54%, `monthly-ledger-report` −0.14%, `top-expenses` −0.12%, `top-log-level`
++1.16%, `top-merchants` −7.45% in the final sweep — see below, that number is
+spread, not a win.
+
+Three rows produced a single clean reading past 3% and none of them holds up:
+
+| case | clean-control readings at `--scale full` | median |
+|---|---|---|
+| `top-merchants` | 13 readings from −7.45% to +4.20% | +1.81% |
+| `sensor-anomalies` | −0.50% · +0.92% · +2.09% · +4.89% | +1.5% |
+| `sparse-timeseries` | −1.81% · −0.72% · +0.15% · +1.74% · +2.38% · +3.45% | +0.95% |
+
+`top-merchants` was isolated rather than waved through, because it is a canary.
+It calls `map()` **once per million elements**, so no per-element mechanism
+exists; A/B'ing the two commits separately puts the window-copy commit at
++0.34% / −0.23% / +0.70%, and with only the two-line `map()` probe removed and
+every new class left in place it reads −0.02% / −0.15% / +0.67%. At most ~1
+point is attributable to compiling a generic type test into `map()` at all.
+The rest — and the −7.45% — is this case's spread at 1,000,000 elements.
+
+The general shape, worth stating because it is the instrument's real
+resolution: at `--scale full` a single reading on a mid-size case can land ±4
+points from its own median *with a clean control*, so no individual reading at
+that scale should be read as a result. Medians over 4–6 clean readings are all
+inside ±2%. Both claims in this release are made at the scale where their case
+measures tightly, from ten and twelve readings respectively.
+
+The two sweep rows that looked worst were artifacts and neither reproduces:
+`food-spending` read +13.14% off a clean control and then
++0.79% / −3.97% / −4.67% / +2.24% / +0.00%; it is a 34 µs case, the smallest in
+the suite. `date-window-spend` read +9.22% and then ±1%. Neither calls `map`,
+`windowed` or `chunk` at all.
+
+`recent-errors` could not be adjudicated at `--scale 10000` at all: seven
+attempts, seven drifted controls, on a 60 µs case against a 40 µs control. At
+`--scale full` it is clean and flat, +0.08% (control +0.83%).
+
+`weekly-sensor-averages` is **not claimed**, and this release adds the cleanest
+proof yet of why. It is on the changed path, and against clean controls it read
+**−9.32%**, then **−12.88%**, then **+11.34%**, then +8.08% [+1.56%] · −7.18%
+[+0.66%] · +9.10% [+0.41%]. A change cannot make a case 13% faster and 11%
+slower; the sign flip is the bimodal-per-process behaviour already recorded for
+it below, and more rounds do not touch it because the modes are per *process*,
+not per round.
+
+Its safety is therefore argued **structurally instead of measured**. It is
+`chunk` → `map`, so it takes the fused iterator. No work was added to any
+`moveNext` on its path: the type test resolves once when the chain is built, the
+fused `moveNext` does strictly less per window than the two it replaces (one
+window built, one callback applied, no `current` write and no cross-iterator
+call), and its window copy is the same `_windowSlice` the unfused path uses. The
+one path this release makes slower — the wrapped ring branch — is not reachable
+from `chunk`, which never wraps.
+
+`smoothed-zone-changes` cannot be adjudicated at `--scale full` either, and for
+a different reason: its **`native` side** is the unstable one there. The
+control drifted −11.65% / −10.86% / −11.99% across three consecutive runs of
+the same byte-identical binary pair. Measured directly, interleaving all four
+binaries in one session, native's median/min spread at 1,000,000 elements is
+**100%–174%** against fxdart's 1.3%–3.6%. That is the same defect
+`benchmark/results/results.json` recorded as +78.8%, reproduced on different
+hardware and a different SDK.
+
+It matters beyond this release, because `HEADLINE_SCALE = "full"` is what
+`content/comparison/smoothed-zone-changes.md` publishes a verdict from. On the
+cleanest statistic either side offers, fxdart **loses** this case at every
+scale — measured here, before and after:
+
+| scale | statistic | before (`main`) | after |
+|---|---|---|---|
+| 10000 | median | 2.02x native | **1.81x** |
+| 10000 | min | 1.89x native | 1.83x |
+| full | median | 0.55x native *(native's tail, not a win)* | 0.58x |
+| full | min | 1.16x–1.41x native | 1.18x–1.52x |
+
+The median at `--scale 10000` is the honest headline and it improved. The
+`min` barely moved: what this change mostly does is pull the typical case down
+to the best case rather than lower the best case. The published `verdict:
+fxdart` is an artifact of native's right tail and is left for a separate
+change, since `content/` is owned elsewhere.
+
+### `scan` → `map` is one stage too, and it was the bigger win
+
+`FxMapFusable` cost one interface, so the second implementor was nearly free.
+`scan(f, seed, xs).map(g).toList()` crossed **three** boundaries at the full
+element rate — source into `_ScanIterator`, `_ScanIterator` into `_MapIterator`,
+`_MapIterator` into the inherited `toList`, which pulled every element back
+through the chain because a `_ScanIterable` is not a `List`. `_ScanIterable`
+now answers `fxFuseMap`, and the fused node's `toList` is a single loop with the
+accumulator in a **local**, resolving its source shape once: an indexed walk for
+a `List` range, a counted walk for `range()`, the pulled loop otherwise.
+
+Same caveat as above, for the same reason: `f` and `g` both land in fields of
+the fused node, so **neither callback is devirtualized**. Boundaries only.
+
+It accumulates with `<C>[]` and `add`, deliberately, rather than the pre-sized
+`List<C>.filled` + `out[i + 1] = …` that `_ScanIterable.toList` still uses for
+the unfused case. That is the covariant-store cost again, and it is worst
+exactly here: for a **record** element type the check is structural rather than
+a class-id compare, which `map.dart` measured at 394 ms against 220 ms at
+N=1,000,000. Both cases below have record element types — `(String, double)`
+and `(int, double)`.
+
+`--ref main`, `--rounds 24`, `--scale full`. **Twelve readings, twelve clean
+controls, none excluded:**
+
+| case | fxdart, every clean-control reading | control |
+|---|---|---|
+| `running-balance` | **−10.17%** · −9.42% · −10.76% · −9.99% · −9.63% · −10.10% | +0.71% · +1.50% · +0.77% · −0.07% · +0.08% · +0.24% |
+| `compound-interest` | **−5.89%** · −6.79% · −5.50% · −7.06% · −7.18% · −6.24% | −1.09% · −1.16% · −0.22% · −0.78% · −0.42% · −0.02% |
+
+Medians −10.05% and −6.52%; the `--all` sweep independently read −11.06%
+(control −1.11%) and −7.73% (control −0.81%), and `compound-interest` also
+clears the bar at `--scale 10000` at −6.07% (control +1.06%).
+
+The design estimate for this was 2.7%–6.5%, derived from three boundaries at
+1.8–4.0 ns each against these cases' 237–276 ns per element — both of which are
+dominated by `toStringAsFixed` and `padRight`, which is why so little was
+expected. Measured, it is 5.5%–11.1%. The estimate was conservative; the extra
+is not attributed here, because nothing was instrumented that would say which
+of the three removed boundaries, the removed `late` accumulator field traffic,
+or the removed growth reallocations in the inherited `toList` accounts for it.
+
+Worth recording: `_ScanIterable.toList`'s pre-sized `List` path is reached by
+**no** benchmark case — `scan` is followed by `map` in these two, by `drop` in
+`restock-plan` and `rate-limited-import`, and by `max()` in `no-spend-streak` —
+so it has never been measured by this instrument at all, and this change does
+not touch it.
+
+### The two unadjudicable cases, under these changes
+
+`weekly-sensor-averages` is now on the new sync `chunk` → `map` path described
+above, but remains unadjudicable because its cost is bimodal per *process*.
+`stream-windowed-alerts` uses the async `chunk` → `maxBy` path and remains
+untouched by the sync changes. Both still allocate one list per window.
+
+### Five convenience operators
+
+All additive, each with an `*Async` twin and an `Fx` / `FxAsync` chain member.
+
+- **`mapNotNull`** (lazy) — `map` and `compact` as a single stage.
+  `compact(map(f, xs))` stacks two lazy stages, so every surviving element
+  crosses two `moveNext`/`current` boundaries instead of one. Here `f` both
+  transforms and selects: the `filter_map` shape `takeUniqBy` already uses for
+  its key extractor. `B extends Object`, so a `null` from `f` means *skip this
+  element*, never *yield null*.
+- **`unzip`** (strict) — `zip` had no inverse. Strict by necessity: two lazy
+  views over one source would have to buffer everything the lagging one has
+  not reached, the cost `fork` pays. Both lists fill in one pass.
+- **`product` / `productBy`** (strict) — the numeric aggregate family had only
+  `sum`/`average`. Empty input is `1`, the multiplicative identity: it is the
+  only value that keeps `product(concat(xs, ys)) == product(xs) * product(ys)`
+  true when one side is empty, exactly as `sum`'s empty `0` does for addition.
+  Same unboxed int-then-double accumulation as `sum`, so an all-int input
+  stays an `int`.
+- **`none`** (strict) — the third quantifier beside `every`/`some`, so a
+  universal no longer has to be written as the negated existential `!some(f)`.
+  It does not collide with `SingletonRaise.none()`: that one is an instance
+  member and this one a top-level function, and inside the class body the
+  member wins regardless of what the barrel exports.
+- **`firstNotNullOf`** (strict) — Kotlin's `firstNotNullOfOrNull`. `find`
+  returns the *element*, so reaching the projection of the first match cost
+  either a second call to the projection or a hand-written loop.
+
+No benchmark claim is attached to any of them. `mapNotNull`, `productBy`,
+`none` and `firstNotNullOf` carry `vm:prefer-inline` and the indexed-`List`
+branch because they take a caller callback and their measured siblings ship
+that pair together; `unzip` and `product` take no callback and get neither.
+
+### Three defects in already-published API
+
+- **`Fx.isEmpty` never returned on an unbounded chain.** It was `size() == 0`,
+  an O(n) walk, where Dart's own `Iterable.isEmpty` is O(1) — so
+  `fx(cycle([1, 2])).isEmpty` hung. `isEmpty` and `isNotEmpty` now delegate to
+  the `Iterable` members, which ask the source for one element and stop.
+  `Fx.length` is deliberately left as a full walk: O(n) is inherent to
+  counting a general `Iterable` (it already takes `List`/`Set.length` when it
+  can), so unlike `isEmpty` it still does not terminate on an unbounded
+  chain — by construction, not by defect.
+- **`FxNum.min()` / `max()` disagreed with the members that shadow them.** A
+  member redeclared on an extension type wins over every extension on that
+  type, so `fx(xs).min()` runs `Fx.min` and never reaches the extension. The
+  extension is still reachable through explicit extension application —
+  `FxNum(fx(xs)).min()` — which is what the `// coverage:ignore-line` was
+  papering over, and there an empty chain returned `double.infinity` while the
+  member threw `StateError`. Both spellings now throw `StateError`, and the
+  extension is pinned by a test instead of excused by an ignore comment.
+- **Three `TODO(port):` markers rendered on pub.dev.** They sat in the public
+  dartdoc of `isUndefined`, `isArray` and `isObject`, explaining to nobody in
+  particular what those deprecated aliases are for. They now say it as
+  documentation.
+
+### Four more operators, from the published examples
+
+Additive API. Each has an `*Async` twin and `Fx` / `FxAsync` chain members,
+except `toPairs`, whose source is a `Map` — it is a chain *entrance*, not a
+chain step.
+
+- **`topBy` / `bottomBy`** (strict) — the k largest (smallest) by key in one
+  boundary pass, instead of sorting everything and then taking `k`. The result
+  is in descending (ascending) key order and a tie is won by the element seen
+  **first**, so no second sort and no tie-breaking key is needed. `k <= 0` is
+  empty, a `k` past the end is everything, ordered. The boundary is kept by
+  insertion, so this is for a small `k` over a large input. fxdart extension,
+  not a port — the shape is Python's `heapq.nlargest`, Rust itertools'
+  `k_largest_by_key`, Guava's `Ordering.greatestOf`. No benchmark claim is
+  attached to it.
+- **`toPairs`** (strict, `Map`) — the inverse `fromEntries` never had, so a
+  `Map` from `groupBy` / `countBy` / `foldBy` / `indexBy` can be continued as
+  a chain without re-entering through `fx(m.entries)` and converting
+  `MapEntry` back to a record by hand. Named after Lodash rather than
+  `entries`, which is a common local variable name and the barrel exports
+  every top-level name unprefixed.
+- **`mapCatching`** (lazy) — per-element error recovery, the element-wise
+  partner `catching` never had while `retry` already had `mapRetryAsync`. The
+  raise signal is **rethrown, not recovered**: it delegates to `catching`, so
+  a `raise` crossing the callback still short-circuits the enclosing
+  `either {}` / `nullable {}` instead of being swallowed into a recovered
+  value. RxDart spells this `onErrorReturnWith`.
+- **`mapAccum`** (lazy) — n values in, n values out: `scan` without the seed in
+  the output, so the trailing `.drop(1)` goes away. Not a re-proposal of
+  `scan`: `scan` and Kotlin's `runningFold` emit the seed and produce n+1
+  values, `mapAccum`, Rust's `Iterator::scan` and Haskell's `mapAccumL`
+  produce n. Argument order matches `scan` deliberately, so swapping one for
+  the other is a one-word edit.
+
+### Korean documentation, and the translation checker that now guards it
+
+`tool/check_translation.dart` reported 306 problems of which 224 were false,
+which is the same as reporting nothing. Three causes, all in the checker:
+
+- `heading` was listed as a verbatim key, while `build_docs.dart` classifies it
+  as prose alongside `title`/`description`. That one line produced 115 of the
+  Korean reports and 110 of the Spanish.
+- A tutorial title of the form `<fn> — FxDart 101` was assumed to be an
+  identifier throughout. It is only verbatim when the part before the brand
+  suffix is a single identifier: 150 of the 167 tutorials stay verbatim and the
+  17 prose titles become translatable.
+- The tag regex matched `<` inside code, so a chapter line like
+  `<- parseId(raw) }` was read as a tag. Fenced blocks and inline code spans
+  are stripped before tags are counted.
+
+Run with no path arguments it now checks all ~300 English pages rather than
+only `tutorials/`, so a locale that is missing a page entirely is reported as
+`missing` instead of passing in silence.
+
+With the checker trustworthy, 25 real defects in the Korean translation are
+fixed: tag order and count in `maxBy`, `minBy` and six other pages (Korean word
+order puts `<em>`/`<code>` in different places than English, and the `fxEvents`
+name-collision paragraph — twelve code tags — was missing outright), six
+identifiers that had been translated inside `<code>`, chapter 13's
+`ceil(count / n) × delay` restored to a runnable expression, chapter 5's
+"🎓 Functors, formally" quote block restored, and the noun `fold` spelled one
+way throughout. Two chrome strings (`cmpBenchMeta`) were missing from both `ko`
+and `es`, which left the benchmark-machine line in English on those pages; the
+published example count in the prose was 50 against an actual 53.
+
+**The checker is now wired into CI**, which is what the previous release
+claimed and did not do — nothing in the repository called it. Only `ko` is
+gated, deliberately: it is the one locale translated end to end (301 of 301
+pages). `es` is a partial translation carrying 25 defects of its own, and
+`ja`/`pt-BR`/`ru`/`zh-Hans` have no overlay for most pages, which the checker
+reports as `missing` by design — gating any of those would be red on every
+commit and would therefore report nothing at all.
+
+A second CI step diffs `build_docs.dart --list-translatable` against
+`check_translation.dart --list-translatable`. The set of translatable pages is
+derived twice by different routes — build_docs enumerates it from its own
+family tables, the checker walks `content/` — and a page family added to one
+and not the other would silently escape the gate above. The two agree today;
+the step is what keeps them agreeing.
+
+### Three findings from the integrated review
+
+- **A `TypedData` source produced a window that was not the window the
+  dartdoc promises.** `List.sublist` returns a list of the *receiver's*
+  runtime type, and a `Uint8List` is a `List<int>`, so it reached the indexed
+  window path unchanged and came back out as a `Uint8List`: fixed length, and
+  truncating on store — `window[0] = 300` silently left `44` behind. That made
+  the growable contract stated below false on that path, and it was a
+  regression against 0.8.6, where the pre-sized fill this release replaced
+  returned a plain `List<int>`. The receiver's type is fixed for a whole
+  iteration, so it is tested once when the iterator is built and a typed-data
+  source buys the covariant store check back; every ordinary `List` keeps the
+  measured `sublist` win. `windowed`, `chunk` and the fused
+  `windowed` → `map` path all build the window through the same helper and so
+  are all fixed, with `Uint8List` and `Float64List` pinned by test.
+- **`Fx.min()` / `Fx.max()` walked the chain twice.** The members were
+  `_inner.first` followed by `_inner.skip(1)`, so a five-element source was
+  pulled six times, a `sync*` source with a side effect ran it twice, and a
+  source that can only be walked once lost everything after its first element.
+  They now `reduce`, which is single-pass and throws the same `StateError` on
+  empty that `first` did. This is the spelling a plain `fx(xs).min()` actually
+  reaches — the `FxNum` extension below is only reachable through explicit
+  extension application, and it was already single-pass.
+- **The empty contract has three spellings and two answers**, which is
+  deliberate and now documented rather than merely true. `min(<num>[])` returns
+  `double.infinity` because the top-level pair is a `num` fold whose identity
+  element *is* the infinity, and that is what FxTS returns; both chain
+  spellings throw `StateError`, because a terminal over an arbitrary `T` has no
+  identity to return.
+
+### Behaviour notes
+
+- **Every `windowed`/`chunk` window is now a growable list.** Before this
+  release the two *sync* paths handed back a fixed-length list while
+  `windowedAsync`/`chunkAsync` already returned a growable one, so the same
+  operator disagreed with its own async twin; all four now agree. The only
+  caller that can observe the difference is one that relied on `window.add(x)`
+  throwing `UnsupportedError`, and nothing in the library did. It is a
+  widening, not a narrowing: a window is still a fresh **copy** the caller
+  owns, never a view onto the source, and mutating one window still cannot
+  disturb another or the source — that is the part the old test was really
+  protecting, and it is unchanged. The reason is the measurement two sections
+  up: a fixed-length window has to be filled from package code at one
+  covariant store check per element, and no fixed-length bulk copy is faster
+  than that loop. Stated in the public dartdoc of all four operators, not just
+  in the implementation, and the test that pinned the old representation was
+  rewritten rather than deleted — `test/lazy/windowed_test.dart` now pins
+  growability across all four paths at once, including both branches of the
+  ring buffer.
+- The window copy is also why the pulled path changed shape: a window that
+  does not wrap the ring is now one `sublist` (measured 14.8 ms against
+  18.8 ms per 1,000,000 windows at `size: 3`, and `chunk` never wraps), and
+  only an *overlapping* window over a non-`List` source still assembles the
+  wrapped tail by hand, at 21.6 ms against 19.6 ms. That is the one path this
+  release makes slower, it is the rarest in the family, and no benchmark case
+  reaches it.
+
+- **`maxBy` orders `NaN` and `-0.0` differently.** `_compareKeys` — shared by
+  `minBy`, `maxBy` and `sortBy`'s non-`List` path — compared with `<` and `>`,
+  which are both *false* for a `NaN` on either side, so every `NaN` read as a
+  tie and the first-seen element won. It now uses `compareTo`. The visible
+  changes are `maxBy((d) => d, [1.0, nan, 3.0])`, which was `3.0` and is now
+  `NaN`, and `-0.0`, which no longer ties with `0.0` on either quantifier:
+  `maxBy` over `[-0.0, 0.0]` was `-0.0` and is `0.0`, `minBy` over `[0.0, -0.0]`
+  was `0.0` and is `-0.0`. `minBy` with a `NaN` is unchanged, because `NaN`
+  compares above everything.
+
+  This makes an older promise true rather than breaking a current one: the
+  0.7.x notes already said `compareTo` semantics for `NaN` and `-0.0` were
+  identical on every path, and `sortBy`'s typed-`double` path already used
+  `compareTo` — `_compareKeys` was the one that disagreed. Pinned by test on
+  both `minBy` and `maxBy`.
+
+- `Fx.isEmpty` / `Fx.isNotEmpty` are O(1) and terminate on an unbounded chain,
+  where they used to count every element.
+- `FxNum(fx(xs)).min()` / `.max()` throw `StateError` on an empty chain where
+  they returned `double.infinity` / `-double.infinity`. Reachable only through
+  explicit extension application; the `fx(xs).min()` spelling is the `Fx`
+  member and is unchanged.
+
 ### `.fx` — the chain as a getter
 
 `fx(xs)` gains a getter spelling. `.fx` works on an `Iterable`, an

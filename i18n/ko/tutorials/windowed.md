@@ -32,9 +32,9 @@ nextLabel: pairwise
     타일처럼 깔리게, <code>step&nbsp;&gt;&nbsp;size</code>는 사이를 띄워
     샘플링하게 만듭니다. <code>partial:&nbsp;true</code>는 꼬리의 짧은
     윈도우를 버리는 대신 남겨 둡니다 — 실제로
-    <code>chunk(n)</code>은
-    <code>windowed(n, step:&nbsp;n, partial:&nbsp;true)</code>
-    <em>그 자체</em>이며, 둘은 하나의 구현을 공유합니다.
+    <code>chunk(n)</code>은 <em>바로</em>
+    <code>windowed(n, step:&nbsp;n, partial:&nbsp;true)</code>이며,
+    둘은 하나의 구현을 공유합니다.
   </p>
   <p>
     Dart 고유의 추가 기능입니다(FxTS에는 대응물이 없습니다) — 이름은

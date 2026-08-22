@@ -1947,6 +1947,28 @@ abstract class FxFilterFusable<A> {
   Iterator<A>? fxFusedFilterIterator(bool Function(A a) p);
 }
 
+/// Implemented by a lazy iterable that can absorb a *following* `map` into
+/// its own iterator — the map twin of [FxFilterFusable].
+///
+/// Unlike [FxFilterFusable] this hands back a whole [Iterable] rather than an
+/// [Iterator], because the fused node has to decide *per iteration* whether
+/// its source is still a [FxListRange] (see `fxListRangeOf`: resolving that at
+/// chain-construction time would freeze the bounds too early and break
+/// repeated iteration over a source that grew in between).
+///
+/// The stage has to build the fused node itself, for the reason spelled out on
+/// `FxUniqFusable`: the element type of its own source is not nameable from
+/// the `map` call site. What this does *not* buy is devirtualization of the
+/// caller's callback — `f` lands in a field of the fused node exactly as it
+/// would in a `map` stage, so it stays one indirect call per element. The win
+/// is the stage boundary and nothing else.
+abstract class FxMapFusable<A> {
+  /// This iterable followed by `map(f)`, as a single stage.
+  ///
+  /// Same elements, order, laziness, and callback count as `map(f, this)`.
+  Iterable<B> fxFuseMap<B>(B Function(A a) f);
+}
+
 /// An arithmetic `start..end` range with a fixed [step] — what `range()`
 /// produces.
 ///
@@ -2010,8 +2032,15 @@ class FxListRangeIterator<A> implements Iterator<A> {
 /// ```dart
 /// map((a) => a + 10, [1, 2, 3, 4]); // (11, 12, 13, 14)
 /// ```
-Iterable<B> map<A, B>(B Function(A a) f, Iterable<A> iterable) =>
-    _MapIterable(f, iterable);
+Iterable<B> map<A, B>(B Function(A a) f, Iterable<A> iterable) {
+  // Resolved once, when the chain is built — never per element. Cast, not
+  // promotion: FxMapFusable is not a subtype of Iterable, so the type test
+  // alone does not promote (the shape `uniqBy` uses for FxUniqByFusable).
+  if (iterable is FxMapFusable<A>) {
+    return (iterable as FxMapFusable<A>).fxFuseMap<B>(f);
+  }
+  return _MapIterable(f, iterable);
+}
 
 /// Implemented by a lazy stage that can absorb a following `uniq` into its
 /// own loop instead of being pulled through an [Iterator] by it.
@@ -2792,13 +2821,18 @@ Iterable<B> scan<A, B>(
   Iterable<A> iterable,
 ) => _ScanIterable(f, seed, iterable);
 
-class _ScanIterable<A, B> extends Iterable<B> {
+class _ScanIterable<A, B> extends Iterable<B> implements FxMapFusable<B> {
   _ScanIterable(this._f, this._seed, this._source);
   final B Function(B, A) _f;
   final B _seed;
   final Iterable<A> _source;
   @override
   Iterator<B> get iterator => _ScanIterator(_f, _seed, _source.iterator);
+
+  @override
+  Iterable<C> fxFuseMap<C>(C Function(B a) g) =>
+      _ScanMapIterable(_f, _seed, _source, g);
+
   @override
   List<B> toList({bool growable = true}) {
     final source = _source;
@@ -2837,6 +2871,124 @@ class _ScanIterator<A, B> implements Iterator<B> {
     }
     if (_it.moveNext()) {
       current = _f(current, _it.current);
+      return true;
+    }
+    return false;
+  }
+}
+
+/// `scan(f, seed, source)` followed by `map(g)`, as one stage — see
+/// [FxMapFusable].
+///
+/// The accumulator step and [_g] run inside a single `moveNext` (or a single
+/// `toList` loop), instead of every accumulated value crossing a stage
+/// boundary — a megamorphic `moveNext` plus a `current` read — to reach a
+/// `map` iterator. Both callbacks land in fields of this node exactly as they
+/// would in the two stages it replaces, so **neither one is devirtualized**:
+/// they stay two indirect calls per element. The removed stage boundaries are
+/// the whole win.
+///
+/// Lazily equivalent to the pair: `_g(seed)` is emitted first and then one
+/// value per source element (so exactly `source.length + 1` in all), [_f] and
+/// [_g] each run once per element consumed, the accumulator is fresh per
+/// iteration, and a downstream `take` still cuts the source short.
+///
+/// Like [_WindowMapIterable], fusing here ends the chain's fusion: this node
+/// is neither [FxUniqFusable] nor [FxMapFusable], so `scan -> map -> uniq`
+/// loses the map+uniq fusion and `scan -> map -> map` fuses only the first
+/// `map`. Stage boundaries only — same elements, same order. See
+/// [_WindowMapIterable] for why the gap is left open.
+class _ScanMapIterable<A, B, C> extends Iterable<C> {
+  _ScanMapIterable(this._f, this._seed, this._source, this._g);
+  final B Function(B, A) _f;
+  final B _seed;
+  final Iterable<A> _source;
+  final C Function(B) _g;
+
+  @override
+  Iterator<C> get iterator => _ScanMapIterator(_f, _seed, _source.iterator, _g);
+
+  /// The point of the fusion: accumulate, map, and collect in one loop.
+  ///
+  /// A `toList` consumes everything anyway, so the source shape is resolved
+  /// once here rather than pulled: a [FxListRange] is walked by index and a
+  /// [FxIntRange] (what `range()` produces) by counter, leaving [_f] and [_g]
+  /// as the only calls per element. [_f], [_g], the accumulator and the bounds
+  /// are copied into locals first, so none of them is reloaded through the
+  /// receiver on every iteration (see [_MapUniqIterable.toList]).
+  ///
+  /// Accumulated with `add`, *not* the pre-sized fill [_ScanIterable.toList]
+  /// uses: `List<C>.operator[]=` takes a covariant parameter and `C` is a
+  /// runtime type argument here, so the store check per element cannot be
+  /// elided — and for a record element type it is not a class-id compare. The
+  /// measurement is on [_MapIterable.toList].
+  @override
+  List<C> toList({bool growable = true}) {
+    final f = _f;
+    final g = _g;
+    final source = _source;
+    var acc = _seed;
+    final result = <C>[g(acc)];
+    final r = fxListRangeOf(source);
+    if (r != null) {
+      final list = r.list;
+      final end = r.end;
+      for (var i = r.start; i < end; i++) {
+        acc = f(acc, list[i]);
+        result.add(g(acc));
+      }
+      return growable ? result : List<C>.from(result, growable: false);
+    }
+    final ir = fxIntRangeOf(source);
+    if (ir != null) {
+      // The elements are `int` while `A` is only *some* supertype of it, so
+      // the callback is cast once, here — never the values, per element (the
+      // shape `_FilterRangeIterator` uses).
+      final fi = f as B Function(B, int);
+      final end = ir.end;
+      final step = ir.step;
+      for (var i = ir.start; step < 0 ? i > end : i < end; i += step) {
+        acc = fi(acc, i);
+        result.add(g(acc));
+      }
+      return growable ? result : List<C>.from(result, growable: false);
+    }
+    for (final a in source) {
+      acc = f(acc, a);
+      result.add(g(acc));
+    }
+    return growable ? result : List<C>.from(result, growable: false);
+  }
+}
+
+/// The pulled half of [_ScanMapIterable]: [_ScanIterator]'s accumulation with
+/// [_g] folded into the same `moveNext`.
+///
+/// The accumulator needs a field of its own rather than riding in [current] as
+/// [_ScanIterator] lets it — [current] is a `C` here, and what the next step
+/// folds is the `B` before [_g]. The upstream is held as a bare `Iterator<A>`,
+/// exactly as [_ScanIterator] holds it, so the fused chain pays one stage
+/// boundary where the unfused pair pays two.
+class _ScanMapIterator<A, B, C> implements Iterator<C> {
+  _ScanMapIterator(this._f, this._acc, this._it, this._g);
+  final B Function(B, A) _f;
+  final Iterator<A> _it;
+  final C Function(B) _g;
+  B _acc;
+  var _emittedSeed = false;
+  @override
+  late C current;
+  @override
+  bool moveNext() {
+    if (!_emittedSeed) {
+      _emittedSeed = true;
+      current = _g(_acc);
+      return true;
+    }
+    if (_it.moveNext()) {
+      final acc = _f(_acc, _it.current);
+      _acc = acc;
+      current = _g(acc);
       return true;
     }
     return false;
@@ -2986,6 +3138,130 @@ FxAsyncIterable<A> scan1Async<A>(
         }
         acc = v;
         return IterResult.value(v);
+      });
+    });
+  });
+}
+
+/// Folds [seed] into each value with [f] and emits every intermediate
+/// accumulation — n values in, n values out.
+///
+/// This is [scan] without the seed in the output. [scan] and Kotlin's
+/// `runningFold` emit `seed` first and so produce n+1 values; [mapAccum],
+/// Rust's `Iterator::scan`, Haskell's `mapAccumL` and RxDart's `scan`
+/// produce n. Use [scan] when the starting state is part of the answer
+/// (a ledger's opening balance), [mapAccum] when it is only the state the
+/// first element folds into — the case that otherwise ends in a trailing
+/// `.drop(1)`.
+///
+/// [f] runs exactly once per element, in order, and the accumulator is
+/// per-iteration: iterating twice starts from [seed] both times.
+///
+/// Argument order matches [scan] deliberately — `scan` to `mapAccum` is a
+/// one-word edit.
+///
+/// ```dart
+/// mapAccum((acc, a) => acc + a, 0, [1, 2, 3]); // (1, 3, 6)
+/// scan((acc, a) => acc + a, 0, [1, 2, 3]); //     (0, 1, 3, 6)
+/// ```
+Iterable<B> mapAccum<A, B>(
+  B Function(B acc, A a) f,
+  B seed,
+  Iterable<A> iterable,
+) => _MapAccumIterable(f, seed, iterable);
+
+class _MapAccumIterable<A, B> extends Iterable<B> {
+  _MapAccumIterable(this._f, this._seed, this._source);
+  final B Function(B, A) _f;
+  final B _seed;
+  final Iterable<A> _source;
+  @override
+  Iterator<B> get iterator => _MapAccumIterator(_f, _seed, _source.iterator);
+  @override
+  List<B> toList({bool growable = true}) {
+    final source = _source;
+    // A List source accumulates into a pre-sized list (output length is
+    // exactly n) — as in [_ScanIterable.toList], the inherited toList would
+    // grow and recopy ~log n times. [_f] still runs exactly once per
+    // element, in order.
+    //
+    // This is the opposite choice from [_ScanMapIterable.toList], which
+    // accumulates with `add` to dodge the covariant store check that
+    // `List<B>.operator[]=` costs per element. The two are not in conflict,
+    // they are the two sides of one trade: the fill pays a store check per
+    // element and saves ~log n regrow-and-recopy passes, `add` pays the
+    // reverse. Which wins depends on the element type — the check is a
+    // class-id compare for a plain class and much more for a record, the
+    // measurement on [_MapIterable.toList] — and neither of these two shapes
+    // has been measured against its alternative. Both are left as written
+    // rather than unified on an unmeasured guess; the note is here so the
+    // next person reads the difference as open, not as settled.
+    if (source is List<A>) {
+      final length = source.length;
+      final out = List<B>.filled(length, _seed, growable: growable);
+      var acc = _seed;
+      for (var i = 0; i < length; i++) {
+        acc = _f(acc, source[i]);
+        out[i] = acc;
+      }
+      return out;
+    }
+    return super.toList(growable: growable);
+  }
+}
+
+class _MapAccumIterator<A, B> implements Iterator<B> {
+  _MapAccumIterator(this._f, this._acc, this._it);
+  final B Function(B, A) _f;
+  final Iterator<A> _it;
+  // The accumulator *is* the current value once a step has run — one field
+  // for both, where [_ScanIterator] needs the seed slot to emit as well.
+  B _acc;
+  @override
+  B get current => _acc;
+  @override
+  bool moveNext() {
+    if (!_it.moveNext()) return false;
+    _acc = _f(_acc, _it.current);
+    return true;
+  }
+}
+
+/// Async counterpart of [mapAccum]. [seed] and [f] may each return a
+/// [Future]; values are folded in source order.
+@pragma('vm:prefer-inline')
+FxAsyncIterable<B> mapAccumAsync<A, B>(
+  FutureOr<B> Function(B acc, A a) f,
+  FutureOr<B> seed,
+  FxAsyncIterable<A> iterable,
+) {
+  // [_scanAsyncLegacy]'s shape without the seed emission, and serialized
+  // for the reason that one is: the accumulator is a single slot, so a
+  // concurrent consumer must not be able to interleave two folds. The state
+  // lives in dispatchAsync's builder, so each iteration starts from [seed]
+  // again. Not a fused stage — FxScanStage emits the seed, which is the one
+  // thing this operator does not do.
+  return dispatchAsync(iterable, (source) {
+    final iterator = source.iterator;
+    FutureOr<B> acc = seed;
+    return SerialAsyncIterator((concurrent) {
+      return iterator.next(concurrent).then((result) {
+        if (result.done) return IterResult<B>.done();
+        final previous = acc;
+        // A pending accumulator is chained onto rather than awaited, so a
+        // Future seed and a Future-returning [f] both fold in order without
+        // an extra await hop per element.
+        if (previous is Future<B>) {
+          final chained = previous.then(
+            (resolved) => f(resolved, result.value),
+          );
+          acc = chained;
+          return chained.then(IterResult<B>.value);
+        }
+        final next = f(previous, result.value);
+        acc = next;
+        if (next is Future<B>) return next.then(IterResult<B>.value);
+        return IterResult<B>.value(next);
       });
     });
   });
@@ -3409,6 +3685,85 @@ class _CompactIterator<A> implements Iterator<A> {
   }
 }
 
+/// Maps each element through [f] and yields only the non-null results —
+/// lazily, in a single stage.
+///
+/// `compact(map(f, xs))` computes the same values, but stacks two lazy
+/// stages: every surviving element crosses the mapping iterator's
+/// `moveNext`/`current` boundary and then the compacting one's. Here [f]
+/// both transforms and selects — the `filter_map` shape, the same bargain
+/// [takeUniqBy] strikes with its key extractor.
+///
+/// Dart-native addition (FxTS composes `map` + `compact`). Kotlin spells it
+/// `mapNotNull`, Rust `filter_map`. [B] is bound to [Object], so a `null`
+/// from [f] unambiguously means *skip this element* rather than *yield
+/// null*.
+///
+/// ```dart
+/// mapNotNull((String s) => int.tryParse(s), ['1', 'x', '3']); // (1, 3)
+/// ```
+Iterable<B> mapNotNull<A, B extends Object>(
+  B? Function(A a) f,
+  Iterable<A> iterable,
+) => _MapNotNullIterable(f, iterable);
+
+class _MapNotNullIterable<A, B extends Object> extends Iterable<B> {
+  _MapNotNullIterable(this._f, this._source);
+  final B? Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<B> get iterator {
+    final source = _source;
+    if (source is List<A>) return _MapNotNullListIterator(_f, source);
+    return _MapNotNullIterator(_f, source.iterator);
+  }
+}
+
+/// [mapNotNull] over a `List`, walked by index — no upstream iterator and no
+/// per-element virtual call, the shape `map` already uses for a list source.
+class _MapNotNullListIterator<A, B extends Object> implements Iterator<B> {
+  _MapNotNullListIterator(this._f, this._list) : _end = _list.length;
+  final B? Function(A) _f;
+  final List<A> _list;
+  final int _end;
+  int _i = 0;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    var i = _i;
+    while (i < _end) {
+      final v = _f(_list[i++]);
+      if (v != null) {
+        _i = i;
+        current = v;
+        return true;
+      }
+    }
+    _i = i;
+    return false;
+  }
+}
+
+class _MapNotNullIterator<A, B extends Object> implements Iterator<B> {
+  _MapNotNullIterator(this._f, this._it);
+  final B? Function(A) _f;
+  final Iterator<A> _it;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final v = _f(_it.current);
+      if (v != null) {
+        current = v;
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
 // --- async ---------------------------------------------------------------
 
 /// Maps upstream values to `(passed, value)` pairs, forwarding the
@@ -3549,6 +3904,18 @@ FxAsyncIterable<A> rejectAsync<A>(
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> compactAsync<A>(FxAsyncIterable<A?> iterable) =>
     mapAsync((A? a) => a as A, filterAsync((A? a) => a != null, iterable));
+
+/// Async counterpart of [mapNotNull]. [f] may return a [Future].
+///
+/// Spelled as `compactAsync(mapAsync(...))` rather than as a hand-written
+/// iterator: on the async side a run of map/filter stages fuses into one
+/// pass (see [FxFusedAsyncIterable]), so the composed spelling already costs
+/// the single boundary [mapNotNull] needs its own iterator to reach.
+@pragma('vm:prefer-inline')
+FxAsyncIterable<B> mapNotNullAsync<A, B extends Object>(
+  FutureOr<B?> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => compactAsync<B>(mapAsync<A, B?>(f, iterable));
 
 // --- uniq / set operations ----------------------------------------------
 
@@ -5056,6 +5423,8 @@ FxAsyncIterable<A> sliceAsync<A>(
 /// Port of FxTS `chunk`. Equivalent to
 /// `windowed(size, iterable, step: size, partial: true)`, except that a
 /// non-positive [size] yields nothing instead of throwing.
+///
+/// Each chunk is a fresh growable list — see [windowed].
 Iterable<List<A>> chunk<A>(int size, Iterable<A> iterable) => size < 1
     ? Iterable<List<A>>.empty()
     : _WindowIterable(size, size, true, iterable);
@@ -5074,6 +5443,18 @@ Iterable<List<A>> chunk<A>(int size, Iterable<A> iterable) => size < 1
 /// windowed(3, [1, 2, 3, 4, 5], step: 2);       // ([1, 2, 3], [3, 4, 5])
 /// windowed(3, [1, 2, 3, 4, 5], partial: true); // (..., [3, 4, 5], [4, 5], [5])
 /// ```
+///
+/// Each window is a fresh growable list, owned by the caller: it is a copy,
+/// never a view onto the source, and mutating one window cannot disturb
+/// another or the source.
+///
+/// Windows became growable in 0.8.7. Before that the two sync paths handed
+/// back a fixed-length list while the async path (`windowedAsync`) already
+/// returned a growable one; all four paths now agree. The reason is
+/// performance: a fixed-length window has to be filled from package code, one
+/// covariant store check per element, and no bulk copy that preserves the
+/// fixed length is faster than that loop — the full measurement is on
+/// `_windowSlice`. Nothing that only reads a window is affected.
 Iterable<List<A>> windowed<A>(
   int size,
   Iterable<A> iterable, {
@@ -5093,7 +5474,68 @@ void _checkWindow(int size, int step) {
   }
 }
 
-class _WindowIterable<A> extends Iterable<List<A>> {
+/// One window of [list] — `list[i .. i + length)` — copied by the SDK rather
+/// than element by element.
+///
+/// Shared by [_WindowRangeIterator] and [_WindowRangeMapIterator] so the two
+/// cannot disagree about how a window is built.
+///
+/// Filling a pre-sized `List<A>` from package code costs a **covariant store
+/// check per element**: `List<A>.operator[]=` takes a covariant parameter and
+/// `A` is a runtime type argument here, so the check cannot be elided — the
+/// cost `_MapIterable.toList` documents at length. `List.sublist` reaches the
+/// VM's own `_slice`, which copies into an array carrying no type argument and
+/// so pays no check at all.
+///
+/// Measured AOT over 1,000,000 windows of `double`, built and summed: the
+/// pre-sized fill 16.4 ms against `sublist` 14.1 ms at `size: 3`, 35.4 vs 26.7
+/// at 7, 51.8 vs 36.0 at 10 — about 2.3 ns a source element at the default
+/// `step: 1`, which on `smoothed-zone-changes` measured as two thirds of the
+/// whole win (see the CHANGELOG). It also removes most of that case's
+/// run-to-run spread: the same A/B swung 4.8 percentage points across clean
+/// runs with the fill in place and 1.5 with it gone.
+///
+/// **No fixed-length bulk copy exists for package code.** `List.filled` +
+/// `setRange` (21.1 / 44.0 / 62.4 ms) and
+/// `getRange().toList(growable: false)` (29.1 / 55.0 / 76.9) are both *slower*
+/// than the fill they would replace, because both copy through `Lists.copy` —
+/// an element loop behind an interface `[]=` call. Buying the check back
+/// therefore means giving up the fixed-length window, which 0.8.7 does
+/// deliberately and uniformly: see [windowed] for the contract, and
+/// [_WindowIterator._emit] for the same change on the pulled path.
+@pragma('vm:prefer-inline')
+List<A> _windowSlice<A>(List<A> list, int i, int length) =>
+    list.sublist(i, i + length);
+
+/// The pre-sized fill [_windowSlice] replaces, kept for the one backing list
+/// it cannot serve: `TypedData`.
+///
+/// `List.sublist` returns a list of the *receiver's* runtime type. A
+/// `Uint8List` is a `List<int>` and a `Float64List` a `List<double>`, so both
+/// reach [_WindowRangeIterator] through `fxListRangeOf` unchanged — and
+/// slicing one yields another typed-data list, which is fixed length and
+/// truncates on store. That is not the window [windowed] promises: it would
+/// make the growable contract false, and `window[0] = 300` would silently
+/// leave 44 behind in a `Uint8List` window instead of throwing or storing.
+///
+/// Only a fresh `List<A>` keeps both halves of the contract, so the typed-data
+/// source buys the covariant store check back. It is the rare source here —
+/// the measured `sublist` win stands for every ordinary `List`, which is what
+/// [_WindowRangeIterator._typed] is for: the receiver's type is fixed for the
+/// whole iteration, so it is tested once when the iterator is built, never per
+/// window.
+@pragma('vm:prefer-inline')
+List<A> _windowFill<A>(List<A> list, int i, int length) {
+  // length >= 1 at every call site, so element i is a safe fill value.
+  final out = List<A>.filled(length, list[i], growable: true);
+  for (var k = 1; k < length; k++) {
+    out[k] = list[i + k];
+  }
+  return out;
+}
+
+class _WindowIterable<A> extends Iterable<List<A>>
+    implements FxMapFusable<List<A>> {
   _WindowIterable(this._size, this._step, this._partial, this._source);
   final int _size;
   final int _step;
@@ -5110,11 +5552,23 @@ class _WindowIterable<A> extends Iterable<List<A>> {
     }
     return _WindowIterator(_size, _step, _partial, _source.iterator);
   }
+
+  /// `windowed(...).map(f)` as one stage — see [FxMapFusable].
+  ///
+  /// Unfused, every window crosses a megamorphic `moveNext` plus a `current`
+  /// read between this iterator and the `map` iterator, and `windowed` emits
+  /// one window per *source* element at the default `step: 1`, so that
+  /// boundary is paid at the full element rate. [f] is still one indirect
+  /// call per window either way.
+  @override
+  Iterable<B> fxFuseMap<B>(B Function(List<A> a) f) =>
+      _WindowMapIterable(_size, _step, _partial, _source, f);
 }
 
 class _WindowRangeIterator<A> implements Iterator<List<A>> {
   _WindowRangeIterator(this._size, this._step, this._partial, FxListRange<A> r)
     : _list = r.list,
+      _typed = r.list is TypedData,
       _i = r.start,
       _end = r.end,
       _lastFull = r.end - _size;
@@ -5122,6 +5576,11 @@ class _WindowRangeIterator<A> implements Iterator<List<A>> {
   final int _step;
   final bool _partial;
   final List<A> _list;
+
+  /// Whether [_list] is typed data, and so whether a window has to be filled
+  /// rather than sliced — see [_windowFill]. Fixed for the whole iteration, so
+  /// it is decided here and not per window.
+  final bool _typed;
   final int _end;
 
   /// Largest start index that still has a full window behind it — the one
@@ -5148,13 +5607,125 @@ class _WindowRangeIterator<A> implements Iterator<List<A>> {
     return true;
   }
 
-  List<A> _slice(int i, int length) {
-    final list = _list;
-    final window = List<A>.filled(length, list[i]);
-    for (var k = 1; k < length; k++) {
-      window[k] = list[i + k];
+  List<A> _slice(int i, int length) =>
+      _typed ? _windowFill(_list, i, length) : _windowSlice(_list, i, length);
+}
+
+/// `windowed`/`chunk` followed by `map`, as one stage — see [FxMapFusable].
+///
+/// The window is built and [_f] applied inside a single `moveNext`, instead of
+/// the window crossing a stage boundary to reach a `map` iterator. Which
+/// iterator that is has to be decided per iteration, not here: `fxListRangeOf`
+/// snapshots the source's bounds, and doing that when the chain is built would
+/// break repeated iteration over a source that changed in between.
+///
+/// **Fusing here ends the chain's fusion**, deliberately. This node is
+/// neither [FxUniqFusable] nor [FxMapFusable], where the `_MapIterable` it
+/// displaces was the former — so `{windowed,chunk} -> map -> uniq` loses the
+/// map+uniq fusion it would have had without the window stage, and
+/// `... -> map -> map` fuses only the first `map`. Both are a question of how
+/// many stage boundaries survive; the elements and their order are identical
+/// either way, which is why no regression sweep reports either one.
+///
+/// Closing those gaps means another fused node per source shape, and every
+/// added `Iterator` implementation makes the `moveNext` call site at each
+/// consumer more polymorphic — the cost that already decided several fusion
+/// choices in this file. Neither combination appears in the published example
+/// corpus. Left unfused on purpose, not overlooked. [_ScanMapIterable] says
+/// the same of the `scan` side.
+class _WindowMapIterable<A, B> extends Iterable<B> {
+  _WindowMapIterable(
+    this._size,
+    this._step,
+    this._partial,
+    this._source,
+    this._f,
+  );
+  final int _size;
+  final int _step;
+  final bool _partial;
+  final Iterable<A> _source;
+  final B Function(List<A>) _f;
+  @override
+  Iterator<B> get iterator {
+    final r = fxListRangeOf(_source);
+    if (r != null) {
+      return _WindowRangeMapIterator(_size, _step, _partial, r, _f);
     }
-    return window;
+    // Not a [List] range, so the ring buffer is still needed and the window
+    // still has to come out of it. The boundary stays, but over a concrete
+    // [_WindowIterator] rather than the `Iterator<A>` field a `map` stage
+    // would hold, so the call is monomorphic instead of megamorphic.
+    return _WindowMapIterator(
+      _WindowIterator(_size, _step, _partial, _source.iterator),
+      _f,
+    );
+  }
+}
+
+/// [_WindowRangeIterator] with the `map` callback folded in.
+///
+/// Deliberately a second copy of that iterator's bound arithmetic rather than
+/// a wrapper around it — a wrapper is the boundary this exists to remove. The
+/// two are pinned against each other in `test/lazy/fused_window_map_test.dart`.
+class _WindowRangeMapIterator<A, B> implements Iterator<B> {
+  _WindowRangeMapIterator(
+    this._size,
+    this._step,
+    this._partial,
+    FxListRange<A> r,
+    this._f,
+  ) : _list = r.list,
+      _typed = r.list is TypedData,
+      _i = r.start,
+      _end = r.end,
+      _lastFull = r.end - _size;
+  final int _size;
+  final int _step;
+  final bool _partial;
+  final B Function(List<A>) _f;
+  final List<A> _list;
+
+  /// See [_WindowRangeIterator._typed] — the fused path builds the same
+  /// window, so it makes the same decision once.
+  final bool _typed;
+  final int _end;
+  final int _lastFull;
+  int _i;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    final i = _i;
+    if (i <= _lastFull) {
+      current = _f(_slice(i, _size));
+      _i = i + _step;
+      return true;
+    }
+    if (!_partial) return false;
+    final remaining = _end - i;
+    if (remaining <= 0) return false;
+    current = _f(_slice(i, remaining));
+    _i = i + _step;
+    return true;
+  }
+
+  List<A> _slice(int i, int length) =>
+      _typed ? _windowFill(_list, i, length) : _windowSlice(_list, i, length);
+}
+
+/// The pulled half of [_WindowMapIterable]: [_WindowIterator] plus [_f].
+class _WindowMapIterator<A, B> implements Iterator<B> {
+  _WindowMapIterator(this._it, this._f);
+  final _WindowIterator<A> _it;
+  final B Function(List<A>) _f;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    if (!_it.moveNext()) return false;
+    current = _f(_it.current);
+    return true;
   }
 }
 
@@ -5164,8 +5735,8 @@ class _WindowIterator<A> implements Iterator<List<A>> {
   final int _step;
   final bool _partial;
   final Iterator<A> _it;
-  // Overlapping elements are kept in a reused ring buffer so each emitted
-  // window costs exactly one exact-size allocation (no sublist + growth).
+  // Overlapping elements are kept in a reused ring buffer, so a window never
+  // re-pulls what the previous one already read.
   List<A>? _ring;
   int _ringStart = 0;
   int _ringCount = 0;
@@ -5182,14 +5753,29 @@ class _WindowIterator<A> implements Iterator<List<A>> {
     return false;
   }
 
+  /// One window out of the ring, growable to match [_windowSlice].
+  ///
+  /// The ring is itself a `List<A>`, so whenever the window does not wrap past
+  /// its end — always, for `chunk` and for any `step >= size`, where
+  /// [_ringStart] stays at 0 — the whole copy is one `sublist` and pays no
+  /// covariant store check. Only an overlapping window over a non-`List`
+  /// source wraps, and that tail is added by hand.
+  ///
+  /// Measured AOT over 1,000,000 windows of `double`, built and summed, at
+  /// `size` 3/7/10: contiguous 14.8/27.8/37.6 ms against 18.8/38.7/55.8 for
+  /// the pre-sized fill this replaces, wrapped 21.6/42.3/60.9 against
+  /// 19.6/41.4/59.0. So the common shape gets ~21% cheaper and only the
+  /// overlapping-over-a-generator shape pays, 2–10%, for a window whose
+  /// growability now matches every other path in the family.
   List<A> _emit(int length) {
     final ring = _ring!;
-    final window = List<A>.filled(length, ring[_ringStart]);
-    var idx = _ringStart;
-    for (var i = 0; i < length; i++) {
-      window[i] = ring[idx];
-      idx++;
-      if (idx == _size) idx = 0;
+    final start = _ringStart;
+    final head = _size - start;
+    if (length <= head) return ring.sublist(start, start + length);
+    final window = ring.sublist(start, _size);
+    final wrapped = length - head;
+    for (var k = 0; k < wrapped; k++) {
+      window.add(ring[k]);
     }
     return window;
   }
@@ -5247,6 +5833,8 @@ class _WindowIterator<A> implements Iterator<List<A>> {
 }
 
 /// Async counterpart of [chunk].
+///
+/// Each chunk is a fresh growable list the caller owns — see [windowed].
 @pragma('vm:prefer-inline')
 FxAsyncIterable<List<A>> chunkAsync<A>(int size, FxAsyncIterable<A> iterable) {
   if (size < 1) return asyncEmpty();
@@ -5254,6 +5842,10 @@ FxAsyncIterable<List<A>> chunkAsync<A>(int size, FxAsyncIterable<A> iterable) {
 }
 
 /// Async counterpart of [windowed].
+///
+/// Each window is a fresh growable list the caller owns, exactly as in the
+/// sync form — see [windowed] for the contract all four of these operators
+/// share.
 @pragma('vm:prefer-inline')
 FxAsyncIterable<List<A>> windowedAsync<A>(
   int size,
@@ -5975,6 +6567,56 @@ class _Zip3Iterator<A, B, C> implements Iterator<(A, B, C)> {
       return true;
     }
     return false;
+  }
+}
+
+/// Splits an iterable of pairs back into a pair of lists — the inverse of
+/// [zip], with `unzip(zip(a, b))` returning `a` and `b` truncated to the
+/// shorter of the two.
+///
+/// Strict, and it has to be: a lazy `unzip` would have to hand back two
+/// iterables over one source, so draining either would buffer everything the
+/// other has not reached (the cost `fork` pays). Both lists are filled in a
+/// single pass instead.
+///
+/// Dart-native addition (FxTS has no `unzip`); Kotlin and Rust spell it the
+/// same, and the TS tuple becomes a Dart record — as in `partition`.
+///
+/// ```dart
+/// unzip([('a', 1), ('b', 2)]); // (['a', 'b'], [1, 2])
+/// ```
+(List<A>, List<B>) unzip<A, B>(Iterable<(A, B)> iterable) {
+  final lefts = <A>[];
+  final rights = <B>[];
+  if (iterable is List<(A, B)>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      final (a, b) = iterable[i];
+      lefts.add(a);
+      rights.add(b);
+    }
+    return (lefts, rights);
+  }
+  for (final (a, b) in iterable) {
+    lefts.add(a);
+    rights.add(b);
+  }
+  return (lefts, rights);
+}
+
+/// Async counterpart of [unzip].
+Future<(List<A>, List<B>)> unzipAsync<A, B>(
+  FxAsyncIterable<(A, B)> iterable,
+) async {
+  final lefts = <A>[];
+  final rights = <B>[];
+  final iterator = iterable.iterator;
+  while (true) {
+    final r = await iterator.next();
+    if (r.done) return (lefts, rights);
+    final (a, b) = r.value;
+    lefts.add(a);
+    rights.add(b);
   }
 }
 
@@ -6881,6 +7523,39 @@ FxAsyncIterable<R> mapRetryAsync<A, R>(
   return mapAsync((A a) => retry(attempts, () => f(a), delay: delay), iterable);
 }
 
+/// Lazily maps each value with [f], handing any error [f] throws to
+/// [onError] and yielding what that returns in its place. One element's
+/// failure never ends the iteration.
+///
+/// The library's own raise signal is **rethrown, not recovered**: this
+/// delegates to [catching], so a `r.raise(...)` crossing [f] — from a
+/// `bind`, an `ensure`, or a nested builder — still short-circuits the
+/// enclosing `either {}` / `nullable {}` block. Recovering it here would
+/// turn a typed error into a lost one, and leak a raise out of its scope.
+///
+/// fxdart extension (not part of FxTS) — the per-element form of [catching],
+/// the pair [retry]/[mapRetryAsync] already establishes. RxDart writes this
+/// as `onErrorReturnWith` in the same position.
+///
+/// ```dart
+/// fx(ids).mapCatching(parse, (e, _) => Reading.invalid(e)).toList();
+/// ```
+Iterable<R> mapCatching<A, R>(
+  R Function(A a) f,
+  R Function(Object error, StackTrace stackTrace) onError,
+  Iterable<A> iterable,
+) => map((A a) => catching(() => f(a), onError), iterable);
+
+/// Async counterpart of [mapCatching]; [f] and [onError] may each return a
+/// [Future], and the raise signal is rethrown by [catchingAsync] for the
+/// same reason.
+@pragma('vm:prefer-inline')
+FxAsyncIterable<R> mapCatchingAsync<A, R>(
+  FutureOr<R> Function(A a) f,
+  FutureOr<R> Function(Object error, StackTrace stackTrace) onError,
+  FxAsyncIterable<A> iterable,
+) => mapAsync((A a) => catchingAsync(() => f(a), onError), iterable);
+
 /// Fails a pull with a [TimeoutException] when the upstream takes longer
 /// than [limit] to produce it. The limit applies to each pull (the time to
 /// produce one item), not to inter-item gaps or the whole pipeline.
@@ -7570,6 +8245,97 @@ Future<num> sumByAsync<A>(
 /// Async counterpart of [sum].
 Future<num> sumAsync(FxAsyncIterable<num> iterable) =>
     foldAsync<num, num>(0, (a, b) => a + b, iterable);
+
+/// Multiplies every number in the iterable.
+///
+/// Empty input returns `1`, the multiplicative identity — the value that
+/// makes `product(concat(xs, ys)) == product(xs) * product(ys)` hold for
+/// every pair of inputs, including empty ones, exactly as [sum]'s empty `0`
+/// does for addition.
+///
+/// Dart-native addition (FxTS has `sum` but no `product`); Kotlin spells the
+/// keyed form `fold(1) { … }`, Rust `product`.
+///
+/// ```dart
+/// product([2, 3, 4]); // 24
+/// product(<num>[]); // 1
+/// ```
+@pragma('vm:prefer-inline')
+num product(Iterable<num> iterable) {
+  // Same unboxed int-then-double accumulation as [sum]: ints multiply in an
+  // int until the first double arrives, then accumulation switches to double
+  // seeded with the int total — the value a boxed `num acc *= v` would hold
+  // at every step.
+  var iacc = 1;
+  var dacc = 1.0;
+  var isInt = true;
+  for (final v in iterable) {
+    if (isInt) {
+      if (v is int) {
+        iacc *= v;
+        continue;
+      }
+      dacc = iacc.toDouble();
+      isInt = false;
+    }
+    dacc *= v;
+  }
+  return isInt ? iacc : dacc;
+}
+
+/// Multiplies the key [f] of every element — `map` + [product] in one step,
+/// the counterpart of [sumBy].
+///
+/// Empty input returns `1` (the [product] contract).
+///
+/// Dart-native addition; named after [sumBy]/[maxBy]/[minBy].
+@pragma('vm:prefer-inline')
+num productBy<A>(num Function(A a) f, Iterable<A> iterable) {
+  // Same unboxed accumulation as [product]; lists iterate by index so no
+  // iterator is allocated.
+  var iacc = 1;
+  var dacc = 1.0;
+  var isInt = true;
+  if (iterable is List<A>) {
+    final len = iterable.length;
+    for (var i = 0; i < len; i++) {
+      final v = f(iterable[i]);
+      if (isInt) {
+        if (v is int) {
+          iacc *= v;
+          continue;
+        }
+        dacc = iacc.toDouble();
+        isInt = false;
+      }
+      dacc *= v;
+    }
+    return isInt ? iacc : dacc;
+  }
+  for (final a in iterable) {
+    final v = f(a);
+    if (isInt) {
+      if (v is int) {
+        iacc *= v;
+        continue;
+      }
+      dacc = iacc.toDouble();
+      isInt = false;
+    }
+    dacc *= v;
+  }
+  return isInt ? iacc : dacc;
+}
+
+/// Async counterpart of [product].
+Future<num> productAsync(FxAsyncIterable<num> iterable) =>
+    foldAsync<num, num>(1, (a, b) => a * b, iterable);
+
+/// Async counterpart of [productBy].
+Future<num> productByAsync<A>(
+  FutureOr<num> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => foldAsync<A, num>(1, (acc, a) async => acc * await f(a), iterable);
 
 /// Concatenates every string in the iterable.
 ///
@@ -8325,17 +9091,16 @@ List<A> toSorted<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
     sort(f, iterable);
 
 int _compareKeys(Object? fa, Object? fb) {
-  // `num` first: it is the overwhelmingly common key kind, and a direct
-  // comparison skips two `is Comparable` tests, two casts and
-  // `Comparable.compare`'s virtual dispatch. Measured on `maxBy` over 1M
-  // readings keyed by a double: 8.9 ms → 6.3 ms, against 2.1 ms for a
-  // hand-written `reduce`. The rest of that gap is the key extractor's
-  // closure call plus boxing each key into the `Object?` the signature
-  // takes — neither removable without changing the public shape.
+  // `num` first: it is the overwhelmingly common key kind, and its direct
+  // `compareTo` preserves the order used by the sort family's numeric paths
+  // while skipping two `is Comparable` tests, two casts and
+  // `Comparable.compare`'s indirection. Measured on `maxBy` over 1M readings
+  // keyed by a double: 8.9 ms → 6.3 ms, against 2.1 ms for a hand-written
+  // `reduce`. The rest of that gap is the key extractor's closure call plus
+  // boxing each key into the `Object?` the signature takes — neither removable
+  // without changing the public shape.
   if (fa is num && fb is num) {
-    if (fa < fb) return -1;
-    if (fa > fb) return 1;
-    return 0;
+    return fa.compareTo(fb);
   }
   if (fa is Comparable && fb is Comparable) {
     return Comparable.compare(
@@ -8761,6 +9526,150 @@ Future<List<A>> sortByDescAsync<A>(
   FxAsyncIterable<A> iterable,
 ) => sortAsync((a, b) => _compareBy(f, b, a), iterable);
 
+/// The [k] elements with the largest keys [f], largest first.
+///
+/// One pass that keeps a [k]-sized boundary: allocation is proportional to
+/// [k] rather than to the input length, and nothing outside the boundary is
+/// retained. This replaces `sortByDesc(f, xs).take(k)`, which allocates a
+/// key array, an index list and a result list sized to the whole input,
+/// sorts all of it, and then discards all but [k].
+///
+/// The contract, which is what makes the result usable without a second
+/// pass:
+///
+/// - **Order** — descending by key, so the first element has the largest
+///   key. Ties keep their relative input order.
+/// - **Ties** — the element seen **first** wins. A later element whose key
+///   only equals the weakest kept key does not displace it, and an equal key
+///   inside the boundary is inserted *after* the ones already there.
+/// - **[k]** — `k <= 0` returns an empty list; a [k] beyond the input length
+///   returns every element, ordered.
+///
+/// Keys are compared exactly as [sortBy] compares them. Pairs that do not both
+/// implement [Comparable] compare equal; incompatible [Comparable] key types
+/// may throw instead, exactly as they do in [sortBy].
+///
+/// The boundary is maintained by insertion, so the worst case is `O(n·k)`
+/// comparisons: this is for a small [k] over a large input. Use [sortByDesc]
+/// when [k] approaches the input length.
+///
+/// fxdart extension, not a port — FxTS, Kotlin and Lodash have no
+/// equivalent. The shape is Python's `heapq.nlargest`, Rust itertools'
+/// `k_largest_by_key` and Guava's `Ordering.greatestOf`.
+///
+/// ```dart
+/// topBy(2, (e) => e.amount, expenses); // the two largest, largest first
+/// ```
+// Inlined for the reason given on [minBy]: it is the caller's key extractor
+// that inlining exposes, not this call. `Fx.topBy` carries the same pragma —
+// a single non-inlined hop between the caller's closure literal and the loop
+// breaks the chain for every hop.
+@pragma('vm:prefer-inline')
+List<A> topBy<A>(int k, Object? Function(A a) f, Iterable<A> iterable) =>
+    _topByImpl(k, f, iterable, 1);
+
+/// The [k] elements with the smallest keys [f], smallest first.
+///
+/// Mirror image of [topBy]: same boundary pass, same tie rule (the element
+/// seen first wins), same handling of [k]. Replaces
+/// `sortBy(f, xs).take(k)`.
+@pragma('vm:prefer-inline')
+List<A> bottomBy<A>(int k, Object? Function(A a) f, Iterable<A> iterable) =>
+    _topByImpl(k, f, iterable, -1);
+
+/// [sign] is `1` for [topBy] and `-1` for [bottomBy] — it flips every key
+/// comparison, so one boundary pass serves both. Inlined along with its two
+/// callers: that is what keeps [f] visible inside the loop.
+@pragma('vm:prefer-inline')
+List<A> _topByImpl<A>(
+  int k,
+  Object? Function(A a) f,
+  Iterable<A> iterable,
+  int sign,
+) {
+  final values = <A>[];
+  if (k <= 0) return values;
+  final keys = <Object?>[];
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      final a = iterable[i];
+      _offerBoundary(values, keys, k, sign, a, f(a));
+    }
+  } else {
+    for (final a in iterable) {
+      _offerBoundary(values, keys, k, sign, a, f(a));
+    }
+  }
+  return values;
+}
+
+/// Offers ([a], [key]) to the [k]-sized boundary held by [values] and
+/// [keys], which stay ordered best-first — "best" meaning largest through a
+/// [sign] of `1` and smallest through `-1`.
+///
+/// The two tie decisions live here: a key that merely equals the weakest
+/// kept key is rejected, and the insertion scan stops at the first key that
+/// is not strictly worse than [key]. Together they keep the first-seen
+/// element ahead of every later equal-keyed one.
+void _offerBoundary<A>(
+  List<A> values,
+  List<Object?> keys,
+  int k,
+  int sign,
+  A a,
+  Object? key,
+) {
+  if (values.length < k) {
+    values.add(a);
+    keys.add(key);
+  } else if (_compareKeys(key, keys[k - 1]) * sign <= 0) {
+    return;
+  }
+  // The last slot is a hole: either the one just appended, or the element
+  // this one evicts. Strictly worse keys shift into it and [key] drops in.
+  var i = values.length - 1;
+  while (i > 0 && _compareKeys(keys[i - 1], key) * sign < 0) {
+    keys[i] = keys[i - 1];
+    values[i] = values[i - 1];
+    i--;
+  }
+  keys[i] = key;
+  values[i] = a;
+}
+
+/// Async counterpart of [topBy]: the same boundary pass over an
+/// [FxAsyncIterable], with the same order, tie and [k] contract. [f] stays
+/// synchronous, as it does on [sortByAsync] and [minByAsync].
+Future<List<A>> topByAsync<A>(
+  int k,
+  Object? Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => _topByAsyncImpl(k, f, iterable, 1);
+
+/// Async counterpart of [bottomBy].
+Future<List<A>> bottomByAsync<A>(
+  int k,
+  Object? Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => _topByAsyncImpl(k, f, iterable, -1);
+
+Future<List<A>> _topByAsyncImpl<A>(
+  int k,
+  Object? Function(A a) f,
+  FxAsyncIterable<A> iterable,
+  int sign,
+) async {
+  final values = <A>[];
+  if (k <= 0) return values;
+  final keys = <Object?>[];
+  await eachAsync(
+    (A a) => _offerBoundary(values, keys, k, sign, a, f(a)),
+    iterable,
+  );
+  return values;
+}
+
 /// Splits values into `(pass, fail)` lists by predicate [f].
 ///
 /// Port of FxTS `partition` (TS tuple becomes a Dart record).
@@ -9105,6 +10014,94 @@ Future<bool> someAsync<A>(
   }
 }
 
+/// Returns true when no element satisfies [f] (true for an empty iterable).
+/// Short-circuits on the first match.
+///
+/// The third quantifier beside [every] and [some]. `!some(f, xs)` says the
+/// same thing, but reads as a negated existential rather than a universal,
+/// and negation is where quantifier bugs live.
+///
+/// Dart-native addition (FxTS has only `every`/`some`); Kotlin spells it
+/// `none`. Unrelated to `SingletonRaise.none`, which short-circuits a raise
+/// scope — that one is a member, so neither name shadows the other.
+@pragma('vm:prefer-inline')
+bool none<A>(bool Function(A a) f, Iterable<A> iterable) {
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      if (f(iterable[i])) return false;
+    }
+    return true;
+  }
+  for (final a in iterable) {
+    if (f(a)) return false;
+  }
+  return true;
+}
+
+/// Async counterpart of [none].
+Future<bool> noneAsync<A>(
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
+  final iterator = iterable.iterator;
+  while (true) {
+    final r = await iterator.next();
+    if (r.done) return true;
+    if (await f(r.value)) return false;
+  }
+}
+
+/// Returns the first non-null result of [f], or `null` when [f] returns
+/// `null` for every element. Short-circuits.
+///
+/// [find] returns the *element*, so getting at a projection of the first
+/// match costs either a second call to the projection or a manual loop.
+/// Here [f] both tests and projects — the `filter_map` shape `mapNotNull`
+/// applies lazily, terminated at the first hit.
+///
+/// Dart-native addition (FxTS has no equivalent); Kotlin spells it
+/// `firstNotNullOfOrNull`, nullable like [find]/[nth]. [B] is bound to
+/// [Object] so a `null` from [f] unambiguously means *no result for this
+/// element*.
+///
+/// ```dart
+/// firstNotNullOf((String s) => int.tryParse(s), ['x', '2', '3']); // 2
+/// ```
+@pragma('vm:prefer-inline')
+B? firstNotNullOf<A, B extends Object>(
+  B? Function(A a) f,
+  Iterable<A> iterable,
+) {
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      final b = f(iterable[i]);
+      if (b != null) return b;
+    }
+    return null;
+  }
+  for (final a in iterable) {
+    final b = f(a);
+    if (b != null) return b;
+  }
+  return null;
+}
+
+/// Async counterpart of [firstNotNullOf]. [f] may return a [Future].
+Future<B?> firstNotNullOfAsync<A, B extends Object>(
+  FutureOr<B?> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
+  final iterator = iterable.iterator;
+  while (true) {
+    final r = await iterator.next();
+    if (r.done) return null;
+    final b = await f(r.value);
+    if (b != null) return b;
+  }
+}
+
 /// Value-based emptiness check: true for `null`, `''`, and empty
 /// [Iterable]/[Map]/[Set]; false for everything else (numbers, booleans,
 /// functions, arbitrary objects).
@@ -9130,6 +10127,33 @@ bool isEmpty(Object? value) {
 Map<K, V> fromEntries<K, V>(Iterable<(K, V)> entries) => {
   for (final (k, v) in entries) k: v,
 };
+
+/// The `(key, value)` records of [map], in the map's own iteration order —
+/// the inverse of [fromEntries], and the chain *entrance* for anything a
+/// `Map`-returning operator produced.
+///
+/// `groupBy`, `countBy`, `foldBy` and `indexBy` all end a chain with a
+/// `Map`. Continuing (ranking, formatting) means re-entering with
+/// `fx(m.entries)` and then converting `MapEntry` back into the record shape
+/// the rest of fxdart speaks; `fx(toPairs(m))` is both steps at once.
+///
+/// Lazy: this is a view over `Map.entries`, so nothing is copied. Mutations
+/// made before iteration begins are reflected; structural mutation during
+/// active iteration may throw [ConcurrentModificationError].
+///
+/// No `*Async` twin, and that is this file's convention rather than an
+/// omission: no function in `object.dart` has one, because a `Map` argument
+/// is already fully materialized — there is nothing to await.
+///
+/// Port of Lodash `toPairs` (FxTS `entries`, Kotlin `Map.toList()`). Named
+/// `toPairs`, not `entries`, because fxdart's barrel exports every top-level
+/// name unprefixed and `entries` is a common local variable name.
+///
+/// ```dart
+/// fx(toPairs(groupBy(f, xs))).sortByDesc((p) => p.$2.length);
+/// ```
+Iterable<(K, V)> toPairs<K, V>(Map<K, V> map) =>
+    map.entries.map((e) => (e.key, e.value));
 
 /// Returns a copy of [map] without the given [keysToOmit].
 ///
@@ -9600,8 +10624,8 @@ bool isNotNull(Object? a) => a != null;
 /// so this is exactly [isNull].
 bool isNil(Object? a) => a == null;
 
-/// TODO(port): TypeScript distinguishes `undefined` from `null`; Dart has
-/// only `null`, so this cannot be ported meaningfully.
+/// Exactly [isNull]: TypeScript distinguishes `undefined` from `null`, Dart
+/// has only `null`. Kept so ported FxTS code still compiles.
 @Deprecated('Dart has no undefined; use isNull instead')
 bool isUndefined(Object? a) => a == null;
 
@@ -9629,7 +10653,8 @@ bool isDate(Object? a) => isDateTime(a);
 /// True when [a] is a [List]. Port of FxTS `isArray`.
 bool isList(Object? a) => a is List;
 
-/// TODO(port): JS `Array` maps to Dart [List]; kept as a deprecated alias.
+/// True when [a] is a [List] — JavaScript's `Array` is Dart's [List], so
+/// this is an alias of [isList] under the FxTS name.
 @Deprecated('Use isList instead')
 bool isArray(Object? a) => a is List;
 
@@ -9638,8 +10663,8 @@ bool isArray(Object? a) => a is List;
 /// in Dart.
 bool isMap(Object? a) => a is Map;
 
-/// TODO(port): JS plain objects map to Dart [Map]s; kept as a deprecated
-/// alias of [isMap].
+/// True when [a] is a [Map] — JavaScript's plain objects are Dart's [Map]s,
+/// so this is an alias of [isMap] under the FxTS name.
 @Deprecated('Use isMap instead')
 bool isObject(Object? a) => a is Map;
 
@@ -10026,25 +11051,6 @@ Throttled<T> throttle<T>(
   bool trailing = true,
 }) => Throttled._(func, wait, leading: leading, trailing: trailing);
 
-/// Method spellings of [debounce] and [throttle], on the callback itself.
-///
-/// Both carry the `fx` prefix on purpose. `saveDraft.debounce(…)` would read
-/// as if Dart had always had it; `saveDraft.fxDebounce(…)` says which library
-/// is wrapping the callback, and leaves the bare names free for whatever else
-/// a project puts on its function types.
-extension FxCallbackTiming<T> on void Function(T arg) {
-  /// This callback, debounced by [wait]. See [debounce].
-  Debounced<T> fxDebounce(Duration wait, {bool leading = false}) =>
-      debounce(this, wait, leading: leading);
-
-  /// This callback, throttled to once per [wait]. See [throttle].
-  Throttled<T> fxThrottle(
-    Duration wait, {
-    bool leading = true,
-    bool trailing = true,
-  }) => throttle(this, wait, leading: leading, trailing: trailing);
-}
-
 // ---- lib/src/util/shuffle.dart ----
 
 
@@ -10092,23 +11098,6 @@ Future<List<T>> shuffleAsync<T>(
       ? createSeededRandom(seed)
       : math.Random().nextDouble;
   return _shuffleList(await toListAsync(iterable), random);
-}
-
-/// Method spellings of [shuffle] and [shuffleAsync].
-///
-/// Named `fxShuffle`, not `shuffle`: `List.shuffle` already exists in
-/// `dart:core` and shuffles **in place, returning void**. An extension can
-/// never win against it, so a `List` receiver would silently call the wrong
-/// one — the prefix makes the two impossible to confuse.
-extension FxShuffleEntry<T> on Iterable<T> {
-  /// A new list with these elements shuffled. See [shuffle].
-  List<T> fxShuffle([int? seed]) => shuffle(this, seed);
-}
-
-/// Async counterpart of [FxShuffleEntry].
-extension FxShuffleAsyncEntry<T> on FxAsyncIterable<T> {
-  /// A new list with these elements shuffled. See [shuffleAsync].
-  Future<List<T>> fxShuffle([int? seed]) => shuffleAsync(this, seed);
 }
 
 // ---- lib/src/typed/non_empty_list.dart ----
@@ -11040,38 +12029,10 @@ extension FxAsyncAccumulateOps<T> on FxAsync<T> {
 /// ```
 FxEvents<T> fxEvents<T>(Stream<T> stream) => FxEvents(stream);
 
-/// `fxEvents(stream)` as a getter: `keystrokes.fxEvents.debounce(window)`.
-///
-/// The push-side counterpart to `Stream.fx`, which gives the *pull* chain
-/// ([FxAsync]). Both spellings of both entry points exist; these pages use
-/// the functions.
-///
-/// This is an extension where [FxEvents] itself deliberately is not — see the
-/// note on the class. One entry-point name is not the same risk as forty
-/// operator names: `debounce` and `switchMap` collide with rxdart's Stream
-/// extensions, `fxEvents` does not.
-extension FxEventsEntry<T> on Stream<T> {
-  /// This stream as a chainable [FxEvents].
-  @pragma('vm:prefer-inline')
-  FxEvents<T> get fxEvents => FxEvents(this);
-
-  /// This stream as a [LiveValue] — see [LiveValue.from].
-  ///
-  /// Hot: the subscription opens immediately, so values arriving before
-  /// anyone listens still update [LiveValue.value].
-  LiveValue<T> get fxLive => LiveValue<T>.from(this);
-
-  /// This stream as a [LiveValue] already holding [seed] — see
-  /// [LiveValue.seededFrom].
-  LiveValue<T> fxLiveSeeded(T seed) => LiveValue<T>.seededFrom(seed, this);
-}
-
 /// Chainable event-stream operators over a plain Dart [Stream].
 ///
 /// A thin wrapper (never an extension), so it can coexist with any other
-/// stream library — including rxdart — without member conflicts. The one
-/// extension in this file is [FxEventsEntry], which adds the single entry
-/// name `fxEvents` and nothing rxdart claims. Every
+/// stream library — including rxdart — without member conflicts. Every
 /// operator returns a new [FxEvents] over a derived single-subscription
 /// stream; unwrap with [stream], collect with [toList], or continue in the
 /// pull model with [pull].
@@ -12657,54 +13618,6 @@ FxAsync<T> fxAsync<T>(FxAsyncIterable<T> iterable) => FxAsync(iterable);
 @pragma('vm:prefer-inline')
 FxAsync<T> fxStream<T>(Stream<T> stream) => FxAsync(fromStream(stream));
 
-// --- getter entry points --------------------------------------------------
-//
-// `xs.fx` and `fx(xs)` are the same chain: `Fx` is an extension type, so the
-// wrapper erases to `xs` itself and the getter is a static call returning its
-// receiver. Measured on a 1M map+filter+sum, AOT, 20 interleaved rounds, the
-// getter form is 1.002x the function form — noise, against a ~5% floor.
-//
-// Both spellings stay: the function is the FxTS-parity name and reads better
-// when the type argument is written out, the getter reads better when the
-// source is itself a call. Type arguments are available on the getter through
-// an extension override — `FxEntry<num>(xs).fx` — since a getter cannot take
-// them postfix.
-
-/// `fx(iterable)` as a getter: `xs.fx.map(f).toList()`.
-///
-/// Chains off a call site without wrapping it in parentheses. Identical to
-/// [fx] in every other way.
-extension FxEntry<T> on Iterable<T> {
-  /// This iterable as a chainable [Fx].
-  @pragma('vm:prefer-inline')
-  Fx<T> get fx => Fx(this);
-}
-
-/// `fxAsync(iterable)` as a getter: `it.fx.map(f).concurrent(4)`.
-extension FxAsyncEntry<T> on FxAsyncIterable<T> {
-  /// This async iterable as a chainable [FxAsync].
-  @pragma('vm:prefer-inline')
-  FxAsync<T> get fx => FxAsync(this);
-}
-
-/// `fxStream(stream)` as a getter: `stream.fx.filter(f).toList()`.
-extension FxStreamEntry<T> on Stream<T> {
-  /// This stream as a chainable [FxAsync].
-  @pragma('vm:prefer-inline')
-  FxAsync<T> get fx => FxAsync(fromStream(this));
-}
-
-/// Awaited entry for an iterable of futures: `futures.fxAsync.sum()`.
-///
-/// `futures.fx` would give an `Fx<Future<T>>` — a chain over the futures
-/// themselves, not their values. This getter resolves them, so `T` is the
-/// awaited type, and the chain can then run them with `concurrent(n)`.
-extension FxFutureEntry<T> on Iterable<FutureOr<T>> {
-  /// This iterable of futures as a chainable [FxAsync] of their values.
-  @pragma('vm:prefer-inline')
-  FxAsync<T> get fxAsync => FxAsync(_$toAsync(this));
-}
-
 /// Lazy chainable iterable — the sync half of FxTS's `fx` chain.
 ///
 /// [Fx] extends [Iterable], so the whole Dart iterable API is available
@@ -12742,6 +13655,21 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 
   /// Identical to [map]; intended for side effects by convention.
   Fx<R> mapEffect<R>(R Function(T a) f) => map(f);
+
+  /// Maps each value through [f] and keeps only the non-null results —
+  /// `map(f).compact()` as a single lazy stage. See the top-level
+  /// `mapNotNull`.
+  Fx<R> mapNotNull<R extends Object>(R? Function(T a) f) =>
+      Fx(_$mapNotNull(f, _inner));
+
+  /// Maps each value through [f], replacing any error [f] throws with what
+  /// [onError] returns for it. Stays on the sync chain — there is no delay
+  /// to await, unlike [mapRetry]. A raise signal is rethrown, never
+  /// recovered; see the top-level `mapCatching`.
+  Fx<R> mapCatching<R>(
+    R Function(T a) f,
+    R Function(Object error, StackTrace stackTrace) onError,
+  ) => Fx(_$mapCatching(f, onError, _inner));
 
   /// See top-level `flatMap`; same contract as [Iterable.expand].
   Fx<R> flatMap<R>(Iterable<R> Function(T a) f) {
@@ -12923,6 +13851,11 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   Fx<B> scan<B>(B Function(B acc, T a) f, B seed) =>
       Fx(_$scan(f, seed, _inner));
 
+  /// Emits each running accumulation, n values for n values — [scan]
+  /// without [seed] in the output. See the top-level `mapAccum`.
+  Fx<B> mapAccum<B>(B Function(B acc, T a) f, B seed) =>
+      Fx(_$mapAccum(f, seed, _inner));
+
   /// The values in reverse order (materializes the source).
   Fx<T> reverse() => Fx(_$reverse(_inner));
 
@@ -12938,6 +13871,21 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// A new chain sorted by the key [f], descending — any comparable key,
   /// not just the numeric ones `sortBy((a) => -key)` can negate.
   Fx<T> sortByDesc(Object? Function(T a) f) => Fx(_$sortByDesc(f, _inner));
+
+  /// The [k] values with the largest keys [f], largest first — one boundary
+  /// pass, not a whole sort. Ties keep input order; see the top-level
+  /// `topBy`.
+  ///
+  /// Inlined for the reason given on [minBy]: the pragma has to be on this
+  /// hop *and* on the top-level function, or the caller's key extractor
+  /// stops being visible inside the loop.
+  @pragma('vm:prefer-inline')
+  Fx<T> topBy(int k, Object? Function(T a) f) => Fx(_$topBy(k, f, _inner));
+
+  /// The [k] values with the smallest keys [f], smallest first.
+  @pragma('vm:prefer-inline')
+  Fx<T> bottomBy(int k, Object? Function(T a) f) =>
+      Fx(_$bottomBy(k, f, _inner));
 
   /// Lazily pairs each value with the result of [f] — the value stays
   /// beside what was derived from it.
@@ -13055,11 +14003,22 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   @pragma('vm:prefer-inline')
   bool some(bool Function(T a) f) => _$some(f, _inner);
 
+  /// Whether [f] holds for no value — a universal, rather than the negated
+  /// existential `!some(f)`.
+  @pragma('vm:prefer-inline')
+  bool none(bool Function(T a) f) => _$none(f, _inner);
+
   /// The first value [f] matches, or `null`.
   T? find(bool Function(T a) f) => _$find(f, _inner);
 
   /// Dart-idiomatic alias of [find] (cf. `package:collection`).
   T? firstWhereOrNull(bool Function(T a) f) => find(f);
+
+  /// The first non-null result of [f], or `null` when [f] returns `null` for
+  /// every value — the projection [find] cannot hand back.
+  @pragma('vm:prefer-inline')
+  R? firstNotNullOf<R extends Object>(R? Function(T a) f) =>
+      _$firstNotNullOf(f, _inner);
 
   /// The index of the first value [f] matches, or -1.
   int findIndex(bool Function(T a) f) => _$findIndex(f, _inner);
@@ -13084,6 +14043,9 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// The sum of [f] over every value.
   num sumBy(num Function(T a) f) => _$sumBy(f, _inner);
 
+  /// The product of [f] over every value; `1` when empty.
+  num productBy(num Function(T a) f) => _$productBy(f, _inner);
+
   /// The mean of [f] over every value.
   double averageBy(num Function(T a) f) => _$averageBy(f, _inner);
 
@@ -13103,13 +14065,22 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   T? get last => _$last(_inner);
 
   /// The number of elements.
+  ///
+  /// O(1) for a `List` or `Set` source, O(n) for anything else: a general
+  /// [Iterable] exposes no cheaper count, so this walks the chain. Unlike
+  /// [isEmpty] it therefore does not terminate on an unbounded chain — that
+  /// is inherent to counting, not a defect to fix.
   int get length => _$size(_inner);
 
   /// True if there are no elements.
-  bool get isEmpty => size() == 0;
+  ///
+  /// O(1): asks the source for its first element and stops. Through 0.8.5
+  /// this was `size() == 0`, which walked the whole chain and so never
+  /// returned for an unbounded one — `fx(cycle([1, 2])).isEmpty` hung.
+  bool get isEmpty => _inner.isEmpty;
 
-  /// True if there is at least one element.
-  bool get isNotEmpty => !isEmpty;
+  /// True if there is at least one element. O(1), like [isEmpty].
+  bool get isNotEmpty => _inner.isNotEmpty;
 
   // --- Phase 1: Aggregation Operators ---
 
@@ -13170,32 +14141,58 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// The maximum element using [compare] function.
   /// If [compare] is not provided, assumes T is `Comparable<T>`.
   /// Throws if empty or elements are not comparable.
+  ///
+  /// The chain spellings throw a [StateError] on empty input; the top-level
+  /// `max(xs)` returns `double.negativeInfinity` there (`min(xs)` returns
+  /// `double.infinity`). That difference is deliberate and it is not going
+  /// away: the top-level pair is a `num` fold whose identity element *is* the
+  /// infinity, and it is what FxTS's `max` returns, while a chain terminal
+  /// over an arbitrary `T` has no identity to return and can only throw. So
+  /// there are three spellings and two contracts:
+  ///
+  /// ```dart
+  /// max(<num>[]);              // -Infinity
+  /// fx(<num>[]).max();         // StateError  (this member)
+  /// FxNum(fx(<num>[])).max();  // StateError  (see [FxNum.max])
+  /// ```
   T max([int Function(T a, T b)? compare]) {
     final compareFn =
         compare ?? (a, b) => (a as dynamic).compareTo(b as dynamic) as int;
-    var result = _inner.first;
-    for (final item in _inner.skip(1)) {
-      if (compareFn(item, result) > 0) result = item;
-    }
-    return result;
+    // `reduce`, not `first` + `skip(1)`: the latter iterates the chain twice,
+    // which on a `sync*` source with a side effect runs it twice and on an
+    // expensive one pays for it twice — n + 1 pulls where n do. `reduce`
+    // throws the same [StateError] on empty that `first` did.
+    return _inner.reduce(
+      (result, item) => compareFn(item, result) > 0 ? item : result,
+    );
   }
 
   /// The minimum element using [compare] function.
   /// If [compare] is not provided, assumes T is `Comparable<T>`.
   /// Throws if empty or elements are not comparable.
+  ///
+  /// On empty input this throws while the top-level `min(xs)` returns
+  /// `double.infinity` — see [max] for why the two contracts differ.
   T min([int Function(T a, T b)? compare]) {
     final compareFn =
         compare ?? (a, b) => (a as dynamic).compareTo(b as dynamic) as int;
-    var result = _inner.first;
-    for (final item in _inner.skip(1)) {
-      if (compareFn(item, result) < 0) result = item;
-    }
-    return result;
+    // Single pass — see [max].
+    return _inner.reduce(
+      (result, item) => compareFn(item, result) < 0 ? item : result,
+    );
   }
 }
 
 /// Numeric terminals for [Fx] chains (generic covariance makes these apply
 /// to `Fx<int>` and `Fx<double>` as well).
+///
+/// [min] and [max] are reachable only through explicit extension
+/// application — `FxNum(fx(xs)).min()`. On a plain `fx(xs).min()` receiver
+/// the [Fx.min] *member* wins: a member redeclared on an extension type
+/// shadows every extension on that type. Both chain spellings are supported,
+/// and they now agree on empty input — with each other, but deliberately not
+/// with the top-level `min`/`max`, which return an infinity there. [Fx.max]
+/// spells the three-way comparison out.
 extension FxNum on Fx<num> {
   /// The sum of every value.
   @pragma('vm:prefer-inline')
@@ -13205,13 +14202,36 @@ extension FxNum on Fx<num> {
   @pragma('vm:prefer-inline')
   double average() => _$average(_inner);
 
-  /// The smallest value.
-  @pragma('vm:prefer-inline') // coverage:ignore-line
-  num min() => _$min(_inner); // coverage:ignore-line
+  /// The product of every value; `1` when empty.
+  @pragma('vm:prefer-inline')
+  num product() => _$product(_inner);
 
-  /// The largest value.
-  @pragma('vm:prefer-inline') // coverage:ignore-line
-  num max() => _$max(_inner); // coverage:ignore-line
+  /// The smallest value under `num.compareTo` ordering.
+  ///
+  /// Throws a [StateError] on an empty chain, matching the [Fx.min] member
+  /// this extension sits behind. Through 0.8.5 it returned `double.infinity`
+  /// there instead, so the two spellings disagreed.
+  @pragma('vm:prefer-inline')
+  num min() => _inner.reduce(
+    (result, item) => item.compareTo(result) < 0 ? item : result,
+  );
+
+  /// The largest value under `num.compareTo` ordering.
+  ///
+  /// Throws a [StateError] on an empty chain, matching the [Fx.max] member —
+  /// see [min].
+  @pragma('vm:prefer-inline')
+  num max() => _inner.reduce(
+    (result, item) => item.compareTo(result) > 0 ? item : result,
+  );
+}
+
+/// Pair terminals for [Fx] chains over two-element records — the shape
+/// `zip`, `attach` and `pairwise` produce.
+extension FxPair<A, B> on Fx<(A, B)> {
+  /// Splits the pairs into `(lefts, rights)` in one pass — the inverse of
+  /// `zip`. See the top-level `unzip`.
+  (List<A>, List<B>) unzip() => _$unzip(_inner);
 }
 
 /// Async chainable iterable — the async half of FxTS's `fx` chain.
@@ -13242,6 +14262,21 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Identical to [map]; intended for side effects by convention.
   @pragma('vm:prefer-inline')
   FxAsync<R> mapEffect<R>(FutureOr<R> Function(T a) f) => map(f);
+
+  /// Maps each value through [f] and keeps only the non-null results. See
+  /// the top-level `mapNotNullAsync`.
+  @pragma('vm:prefer-inline')
+  FxAsync<R> mapNotNull<R extends Object>(FutureOr<R?> Function(T a) f) =>
+      FxAsync(_$mapNotNullAsync(f, _inner));
+
+  /// Maps each value through [f], replacing any error [f] throws with what
+  /// [onError] returns for it. A raise signal is rethrown, never recovered;
+  /// see the top-level `mapCatchingAsync`.
+  @pragma('vm:prefer-inline')
+  FxAsync<R> mapCatching<R>(
+    FutureOr<R> Function(T a) f,
+    FutureOr<R> Function(Object error, StackTrace stackTrace) onError,
+  ) => FxAsync(_$mapCatchingAsync(f, onError, _inner));
 
   /// Maps each value to an iterable via [f] and flattens the results.
   @pragma('vm:prefer-inline')
@@ -13437,6 +14472,14 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   FxAsync<B> scan<B>(FutureOr<B> Function(B acc, T a) f, FutureOr<B> seed) =>
       FxAsync(_$scanAsync(f, seed, _inner));
 
+  /// Emits each running accumulation, n values for n values — [scan]
+  /// without [seed] in the output. See the top-level `mapAccumAsync`.
+  @pragma('vm:prefer-inline')
+  FxAsync<B> mapAccum<B>(
+    FutureOr<B> Function(B acc, T a) f,
+    FutureOr<B> seed,
+  ) => FxAsync(_$mapAccumAsync(f, seed, _inner));
+
   /// The values in reverse order (materializes the source).
   @pragma('vm:prefer-inline')
   FxAsync<T> reverse() => FxAsync(_$reverseAsync(_inner));
@@ -13564,11 +14607,19 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Whether [f] holds for every value.
   Future<bool> every(FutureOr<bool> Function(T a) f) => _$everyAsync(f, _inner);
 
+  /// Whether [f] holds for no value.
+  Future<bool> none(FutureOr<bool> Function(T a) f) => _$noneAsync(f, _inner);
+
   /// Joins the values into a string separated by [sep].
   Future<String> join([String sep = ',']) => _$joinAsync(sep, _inner);
 
   /// The first value [f] matches, or `null`.
   Future<T?> find(FutureOr<bool> Function(T a) f) => _$findAsync(f, _inner);
+
+  /// The first non-null result of [f], or `null` when [f] returns `null` for
+  /// every value.
+  Future<R?> firstNotNullOf<R extends Object>(FutureOr<R?> Function(T a) f) =>
+      _$firstNotNullOfAsync(f, _inner);
 
   /// The index of the first value [f] matches, or -1.
   Future<int> findIndex(FutureOr<bool> Function(T a) f) =>
@@ -13590,6 +14641,10 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// The sum of [f] over every value.
   Future<num> sumBy(FutureOr<num> Function(T a) f) => _$sumByAsync(f, _inner);
 
+  /// The product of [f] over every value; `1` when empty.
+  Future<num> productBy(FutureOr<num> Function(T a) f) =>
+      _$productByAsync(f, _inner);
+
   /// The mean of [f] over every value.
   Future<double> averageBy(FutureOr<num> Function(T a) f) =>
       _$averageByAsync(f, _inner);
@@ -13607,6 +14662,15 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// A new list sorted by the key [f], descending.
   Future<List<T>> sortByDesc(Object? Function(T a) f) =>
       _$sortByDescAsync(f, _inner);
+
+  /// The [k] values with the largest keys [f], largest first — one boundary
+  /// pass, not a whole sort. Ties keep source order.
+  Future<List<T>> topBy(int k, Object? Function(T a) f) =>
+      _$topByAsync(k, f, _inner);
+
+  /// The [k] values with the smallest keys [f], smallest first.
+  Future<List<T>> bottomBy(int k, Object? Function(T a) f) =>
+      _$bottomByAsync(k, f, _inner);
 
   /// Groups values into `(key, items)` records, in first-seen key order.
   Future<List<({K key, List<T> items})>> groupedBy<K>(
@@ -13695,11 +14759,21 @@ extension FxAsyncNum on FxAsync<num> {
   /// The arithmetic mean of every value.
   Future<double> average() => _$averageAsync(this);
 
+  /// The product of every value; `1` when empty.
+  Future<num> product() => _$productAsync(this);
+
   /// The smallest value.
   Future<num> min() => _$minAsync(this);
 
   /// The largest value.
   Future<num> max() => _$maxAsync(this);
+}
+
+/// Pair terminals for [FxAsync] chains over two-element records.
+extension FxAsyncPair<A, B> on FxAsync<(A, B)> {
+  /// Splits the pairs into `(lefts, rights)` in one pass — the inverse of
+  /// `zip`. See the top-level `unzipAsync`.
+  Future<(List<A>, List<B>)> unzip() => _$unzipAsync(this);
 }
 
 // ---- lib/src/typed/either.dart (transformed: raise_. -> _$typed* / plain) ----
@@ -14077,6 +15151,12 @@ Iterable<B> _$scan<A, B>(
 FxAsyncIterable<B> _$scanAsync<A, B>(FutureOr<B> Function(B acc, A a) f,
         FutureOr<B> seed, FxAsyncIterable<A> iterable) =>
     scanAsync(f, seed, iterable);
+Iterable<B> _$mapAccum<A, B>(
+        B Function(B acc, A a) f, B seed, Iterable<A> iterable) =>
+    mapAccum(f, seed, iterable);
+FxAsyncIterable<B> _$mapAccumAsync<A, B>(FutureOr<B> Function(B acc, A a) f,
+        FutureOr<B> seed, FxAsyncIterable<A> iterable) =>
+    mapAccumAsync(f, seed, iterable);
 FxAsyncIterable<B> _$mapConcurrent<A, B>(
         int concurrency, FutureOr<B> Function(A a) f, Iterable<A> iterable) =>
     mapConcurrent(concurrency, f, iterable);
@@ -14127,6 +15207,12 @@ Map<K, Acc> _$foldByOrSkip<A, K extends Object, Acc>(
 List<A> _$takeUniqBy<A, B extends Object>(
         int count, B? Function(A a) f, Iterable<A> iterable) =>
     takeUniqBy(count, f, iterable);
+Iterable<B> _$mapNotNull<A, B extends Object>(
+        B? Function(A a) f, Iterable<A> iterable) =>
+    mapNotNull(f, iterable);
+FxAsyncIterable<B> _$mapNotNullAsync<A, B extends Object>(
+        FutureOr<B?> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    mapNotNullAsync(f, iterable);
 Iterable<A> _$differenceBy<A, B>(
         B Function(A a) f, Iterable<A> iterable1, Iterable<A> iterable2) =>
     differenceBy(f, iterable1, iterable2);
@@ -14228,6 +15314,11 @@ Iterable<(int, A)> _$zipWithIndex<A>(Iterable<A> iterable) =>
 FxAsyncIterable<(int, A)> _$zipWithIndexAsync<A>(
         FxAsyncIterable<A> iterable) =>
     zipWithIndexAsync(iterable);
+(List<A>, List<B>) _$unzip<A, B>(Iterable<(A, B)> iterable) =>
+    unzip(iterable);
+Future<(List<A>, List<B>)> _$unzipAsync<A, B>(
+        FxAsyncIterable<(A, B)> iterable) =>
+    unzipAsync(iterable);
 
 // lazy/combine.dart
 Iterable<A> _$append<A>(A a, Iterable<A> iterable) => append(a, iterable);
@@ -14286,6 +15377,14 @@ FxAsyncIterable<R> _$mapRetryAsync<A, R>(
         int attempts, FutureOr<R> Function(A a) f, FxAsyncIterable<A> iterable,
         {Duration Function(int failed)? delay}) =>
     mapRetryAsync(attempts, f, iterable, delay: delay);
+Iterable<R> _$mapCatching<A, R>(R Function(A a) f,
+        R Function(Object error, StackTrace stackTrace) onError,
+        Iterable<A> iterable) =>
+    mapCatching(f, onError, iterable);
+FxAsyncIterable<R> _$mapCatchingAsync<A, R>(FutureOr<R> Function(A a) f,
+        FutureOr<R> Function(Object error, StackTrace stackTrace) onError,
+        FxAsyncIterable<A> iterable) =>
+    mapCatchingAsync(f, onError, iterable);
 FxAsyncIterable<A> _$timeoutAsync<A>(
         Duration limit, FxAsyncIterable<A> iterable) =>
     timeoutAsync(limit, iterable);
@@ -14336,6 +15435,9 @@ Future<Acc> _$foldRightWithIndexAsync<A, Acc>(
     foldRightWithIndexAsync(seed, f, iterable);
 num _$sum(Iterable<num> iterable) => sum(iterable);
 Future<num> _$sumAsync(FxAsyncIterable<num> iterable) => sumAsync(iterable);
+num _$product(Iterable<num> iterable) => product(iterable);
+Future<num> _$productAsync(FxAsyncIterable<num> iterable) =>
+    productAsync(iterable);
 double _$average(Iterable<num> iterable) => average(iterable);
 Future<double> _$averageAsync(FxAsyncIterable<num> iterable) =>
     averageAsync(iterable);
@@ -14358,6 +15460,11 @@ num _$sumBy<A>(num Function(A a) f, Iterable<A> iterable) =>
 Future<num> _$sumByAsync<A>(
         FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) =>
     sumByAsync(f, iterable);
+num _$productBy<A>(num Function(A a) f, Iterable<A> iterable) =>
+    productBy(f, iterable);
+Future<num> _$productByAsync<A>(
+        FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    productByAsync(f, iterable);
 double _$averageBy<A>(num Function(A a) f, Iterable<A> iterable) =>
     averageBy(f, iterable);
 Future<double> _$averageByAsync<A>(
@@ -14406,6 +15513,18 @@ List<A> _$sortByDesc<A>(Object? Function(A a) f, Iterable<A> iterable) =>
 Future<List<A>> _$sortByDescAsync<A>(
         Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
     sortByDescAsync(f, iterable);
+List<A> _$topBy<A>(
+        int k, Object? Function(A a) f, Iterable<A> iterable) =>
+    topBy(k, f, iterable);
+List<A> _$bottomBy<A>(
+        int k, Object? Function(A a) f, Iterable<A> iterable) =>
+    bottomBy(k, f, iterable);
+Future<List<A>> _$topByAsync<A>(
+        int k, Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
+    topByAsync(k, f, iterable);
+Future<List<A>> _$bottomByAsync<A>(
+        int k, Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
+    bottomByAsync(k, f, iterable);
 List<({K key, List<A> items})> _$groupedBy<A, K>(
         K Function(A a) f, Iterable<A> iterable) =>
     groupedBy(f, iterable);
@@ -14459,3 +15578,14 @@ bool _$every<A>(bool Function(A a) f, Iterable<A> iterable) =>
 Future<bool> _$everyAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
     everyAsync(f, iterable);
+bool _$none<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    none(f, iterable);
+Future<bool> _$noneAsync<A>(
+        FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    noneAsync(f, iterable);
+B? _$firstNotNullOf<A, B extends Object>(
+        B? Function(A a) f, Iterable<A> iterable) =>
+    firstNotNullOf(f, iterable);
+Future<B?> _$firstNotNullOfAsync<A, B extends Object>(
+        FutureOr<B?> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    firstNotNullOfAsync(f, iterable);

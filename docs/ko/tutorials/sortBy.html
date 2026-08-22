@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ff74f6fa047725a6">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2319e42fb7768e50">
 </head>
 <body>
 <header class="site-header">
@@ -66,8 +66,8 @@ Future&lt;List&lt;T&gt;&gt; FxAsync.sortBy(Object? Function(T a) f)     // chain
     <code>Comparable.compare</code>로 비교합니다.
   </p>
   <p>
-    내부가 <code>sort((a, b) =&gt; compare(f(a), f(b)))</code>인 것은
-    <em>아니며</em>, 그 차이는 여러분의 콜백에서 그대로 드러납니다. 그
+    내부는 <em>결코</em> <code>sort((a, b) =&gt; compare(f(a), f(b)))</code>가
+    아니며, 그 차이는 여러분의 콜백에서 그대로 드러납니다. 그
     형태라면 비교할 때마다 <code>f</code>를 두 번씩, 대략
     <code>2·n·log n</code>번 호출하게 됩니다. <code>sortBy</code>는 각 키를
     <strong>정확히 한 번</strong>만 추출한 뒤 그 키로 정렬하므로, 비싼 키
@@ -92,7 +92,7 @@ Future&lt;List&lt;T&gt;&gt; FxAsync.sortBy(Object? Function(T a) f)     // chain
   </p>
 
   <h2>데모 1 · 기본</h2>
-  <div class="playground" data-pg="54fffcb1214b0213">
+  <div class="playground" data-pg="8f0a41a007d6079d">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -170,7 +170,7 @@ void main() {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=ff74f6fa047725a6";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=2319e42fb7768e50";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

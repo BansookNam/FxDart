@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ff74f6fa047725a6">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2319e42fb7768e50">
 </head>
 <body>
 <header class="site-header">
@@ -101,7 +101,7 @@ Future<void> main() async {
     </section>
     <section class="cmp-panel cmp-fxdart">
       <h3>FxDart</h3>
-      <div class="playground" data-pg="63500f6f9adbaa14">
+      <div class="playground" data-pg="e3c438a41b93283e">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -145,10 +145,10 @@ void main() {
   </p>
   <p>
     둘 다 버퍼를 피하며, 그 이유도 같습니다 — 모든 리더가 각 원소를
-    그것이 <em>현재</em> 원소인 동안 보기 때문입니다. 리더들을 먼저
+    그것이 현재 원소인 동안 보기 때문입니다. 리더들을 먼저
     붙게 만듦으로써 <code>connect()</code>가 사는 것이 그것이고,
-    리더들을 폴드로 — 파이프라인이 아니라 <code>seed</code>와
-    <code>step</code>으로 — 받음으로써 <code><a href="../tutorials/tee.html">tee</a></code>가 사는 것도
+    리더들을 폴드로 — 독립적으로 전진할 수 있는 두 파이프라인이 아니라
+    시드와 스텝으로 — 받음으로써 <code><a href="../tutorials/tee.html">tee</a></code>가 사는 것도
     그것입니다. 그 제약이 대가입니다. <code>publish()</code>는 원하는
     어떤 스트림 연산자든 먹일 수 있지만, <code><a href="../tutorials/tee.html">tee</a></code>는 폴드만
     먹입니다. 두 리더가 정말로 독립적인 파이프라인이라면 FxDart의
@@ -161,7 +161,7 @@ void main() {
   </p>
   <section class="cmp-bench">
   <h2>벤치마크</h2>
-  <p class="dim bench-meta">Apple M1 Max, 32 GB RAM · Dart 3.12.2 (AOT-compiled) · 2026-08-18</p>
+  <p class="dim bench-meta">Apple M1 Max, RAM 32 GB · Dart 3.12.2 (AOT 컴파일) · 2026-08-18</p>
   <div class="bench-scales">
   <div class="bench-scale">
     <h3>N = 100</h3>
@@ -234,7 +234,7 @@ void main() {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=ff74f6fa047725a6";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=2319e42fb7768e50";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>async variants — FxDart 101</title>
+  <title>비동기 변형 — FxDart 101</title>
   <meta name="description" content="FxDart의 *Async 명명 규칙 — 모든 지연 연산자와 집계 연산자에는 FxAsyncIterable용 짝이 있습니다. 라이브 플레이그라운드 포함.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/asyncVariants.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/asyncVariants.html">
@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ff74f6fa047725a6">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2319e42fb7768e50">
 </head>
 <body>
 <header class="site-header">
@@ -48,7 +48,7 @@
 </header>
 <main>
   <p class="breadcrumb"><a href="../../101/index.html">FxDart 101</a> › 섹션 11 · 비동기 &amp; 동시성 › <strong>async variants</strong></p>
-  <h1>The <code>*Async</code> naming convention</h1>
+  <h1><code>*Async</code> 명명 규칙</h1>
   <p class="hero-sub">모든 지연 연산자와 집계 연산자에는 FxAsyncIterable에서 동작하는 짝이 있습니다 — 동작은 같고, 콜백만 비동기 친화적입니다.</p>
 
   <div class="signature">Iterable&lt;B&gt; map&lt;A, B&gt;(B Function(A a) f, Iterable&lt;A&gt; iterable)
@@ -90,7 +90,7 @@ FxAsync&lt;R&gt; FxAsync.map&lt;R&gt;(FutureOr&lt;R&gt; Function(T a) f)  // asy
   <h2>데모 1 · 짝지어 놓고 비교하기</h2>
   <p><code>FxAsyncIterable</code>을 다루는 순간, data-first 호출에는 항상
     <code>Async</code> 접미사가 필요합니다.</p>
-  <div class="playground" data-pg="28fe3e17c383888d">
+  <div class="playground" data-pg="fce14df0dbcaffcf">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -179,7 +179,7 @@ Future<void> main() async {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=ff74f6fa047725a6";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=2319e42fb7768e50";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

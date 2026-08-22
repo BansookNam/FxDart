@@ -213,6 +213,94 @@ Future<bool> someAsync<A>(
   }
 }
 
+/// Returns true when no element satisfies [f] (true for an empty iterable).
+/// Short-circuits on the first match.
+///
+/// The third quantifier beside [every] and [some]. `!some(f, xs)` says the
+/// same thing, but reads as a negated existential rather than a universal,
+/// and negation is where quantifier bugs live.
+///
+/// Dart-native addition (FxTS has only `every`/`some`); Kotlin spells it
+/// `none`. Unrelated to `SingletonRaise.none`, which short-circuits a raise
+/// scope — that one is a member, so neither name shadows the other.
+@pragma('vm:prefer-inline')
+bool none<A>(bool Function(A a) f, Iterable<A> iterable) {
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      if (f(iterable[i])) return false;
+    }
+    return true;
+  }
+  for (final a in iterable) {
+    if (f(a)) return false;
+  }
+  return true;
+}
+
+/// Async counterpart of [none].
+Future<bool> noneAsync<A>(
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
+  final iterator = iterable.iterator;
+  while (true) {
+    final r = await iterator.next();
+    if (r.done) return true;
+    if (await f(r.value)) return false;
+  }
+}
+
+/// Returns the first non-null result of [f], or `null` when [f] returns
+/// `null` for every element. Short-circuits.
+///
+/// [find] returns the *element*, so getting at a projection of the first
+/// match costs either a second call to the projection or a manual loop.
+/// Here [f] both tests and projects — the `filter_map` shape `mapNotNull`
+/// applies lazily, terminated at the first hit.
+///
+/// Dart-native addition (FxTS has no equivalent); Kotlin spells it
+/// `firstNotNullOfOrNull`, nullable like [find]/[nth]. [B] is bound to
+/// [Object] so a `null` from [f] unambiguously means *no result for this
+/// element*.
+///
+/// ```dart
+/// firstNotNullOf((String s) => int.tryParse(s), ['x', '2', '3']); // 2
+/// ```
+@pragma('vm:prefer-inline')
+B? firstNotNullOf<A, B extends Object>(
+  B? Function(A a) f,
+  Iterable<A> iterable,
+) {
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      final b = f(iterable[i]);
+      if (b != null) return b;
+    }
+    return null;
+  }
+  for (final a in iterable) {
+    final b = f(a);
+    if (b != null) return b;
+  }
+  return null;
+}
+
+/// Async counterpart of [firstNotNullOf]. [f] may return a [Future].
+Future<B?> firstNotNullOfAsync<A, B extends Object>(
+  FutureOr<B?> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
+  final iterator = iterable.iterator;
+  while (true) {
+    final r = await iterator.next();
+    if (r.done) return null;
+    final b = await f(r.value);
+    if (b != null) return b;
+  }
+}
+
 /// Value-based emptiness check: true for `null`, `''`, and empty
 /// [Iterable]/[Map]/[Set]; false for everything else (numbers, booleans,
 /// functions, arbitrary objects).

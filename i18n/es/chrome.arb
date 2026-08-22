@@ -63,6 +63,7 @@
   "cmpBenchWinFxdart": "Gana FxDart",
   "cmpBenchWinTie": "Empate",
   "cmpBenchWinRxdart": "Gana RxDart",
+  "cmpBenchMeta": "{cpu}, {ram} GB de RAM · Dart {dart} (compilado AOT) · {date}",
   "cmpBenchScale": "N = {n}",
   "cmpBenchNoneTiming": "Sin benchmark para este ejemplo. Este operador se define por el tiempo transcurrido, no por el trabajo realizado: ambos lados esperan las mismas ventanas, así que una barra estaría midiendo los temporizadores de Dart y no las librerías. Acortar las ventanas tampoco sirve — cuántos valores produce una ráfaga pasaría a depender de lo rápida que sea la máquina, y ya no se podría comprobar que ambos lados dan un resultado idéntico. Por eso los ejemplos construidos sobre operadores de temporización se dejan sin medir; los que solo usan retardos para simular E/S sí se miden, con esos retardos puestos a cero.",
   "cmpBenchAsyncNote": "Caso async: la escala principal es N = {n}, no 1,000,000. Cada elemento cuesta una vuelta del event loop en ambos lados, así que un millón de awaits reales mediría el event loop de Dart durante minutos — no el pipeline. Los retardos son de longitud cero y se conserva el límite de concurrencia del ejemplo; lo que comparan las barras es la maquinaria del pipeline.",
@@ -80,5 +81,8 @@
   "theoryEdit": "✎ Editar",
   "theoryEditTitle": "Editar y ejecutar",
   "theoryReset": "Restablecer",
+  "theoryContribute": "Contribuir una traducción",
+  "theoryGoto": "Ir a la página",
+  "theoryGo": "Ir",
   "theoryEdited": "editado"
 }

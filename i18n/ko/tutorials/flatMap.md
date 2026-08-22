@@ -27,7 +27,7 @@ nextLabel: flat
   </p>
   <p>
     <strong>FxTS와 다른 점:</strong> FxTS에서는 콜백이 일반 값과 이터러블을
-    섞어서 반환해도 <code>expand</code>가 <code>DeepFlat</code> 타입 마법으로
+    섞어서 반환해도 연산자가 <code>DeepFlat</code> 타입 마법으로
     무엇을 평탄화할지 알아냅니다. Dart에는 그런 조건부 타입이 없기 때문에,
     Dart 포팅판은 <code>f</code>가 <em>항상</em>
     <code>Iterable&lt;B&gt;</code>를 반환하도록 요구합니다 —

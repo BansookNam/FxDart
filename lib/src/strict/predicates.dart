@@ -15,8 +15,8 @@ bool isNotNull(Object? a) => a != null;
 /// so this is exactly [isNull].
 bool isNil(Object? a) => a == null;
 
-/// TODO(port): TypeScript distinguishes `undefined` from `null`; Dart has
-/// only `null`, so this cannot be ported meaningfully.
+/// Exactly [isNull]: TypeScript distinguishes `undefined` from `null`, Dart
+/// has only `null`. Kept so ported FxTS code still compiles.
 @Deprecated('Dart has no undefined; use isNull instead')
 bool isUndefined(Object? a) => a == null;
 
@@ -44,7 +44,8 @@ bool isDate(Object? a) => isDateTime(a);
 /// True when [a] is a [List]. Port of FxTS `isArray`.
 bool isList(Object? a) => a is List;
 
-/// TODO(port): JS `Array` maps to Dart [List]; kept as a deprecated alias.
+/// True when [a] is a [List] — JavaScript's `Array` is Dart's [List], so
+/// this is an alias of [isList] under the FxTS name.
 @Deprecated('Use isList instead')
 bool isArray(Object? a) => a is List;
 
@@ -53,8 +54,8 @@ bool isArray(Object? a) => a is List;
 /// in Dart.
 bool isMap(Object? a) => a is Map;
 
-/// TODO(port): JS plain objects map to Dart [Map]s; kept as a deprecated
-/// alias of [isMap].
+/// True when [a] is a [Map] — JavaScript's plain objects are Dart's [Map]s,
+/// so this is an alias of [isMap] under the FxTS name.
 @Deprecated('Use isMap instead')
 bool isObject(Object? a) => a is Map;
 

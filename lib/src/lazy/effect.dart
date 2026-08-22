@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import '../async_iterable.dart';
+import '../typed/raise.dart';
 import 'map.dart';
 
 /// Runs [f], retrying on error until it succeeds or [attempts] runs are
@@ -64,6 +65,39 @@ FxAsyncIterable<R> mapRetryAsync<A, R>(
   _checkAttempts(attempts);
   return mapAsync((A a) => retry(attempts, () => f(a), delay: delay), iterable);
 }
+
+/// Lazily maps each value with [f], handing any error [f] throws to
+/// [onError] and yielding what that returns in its place. One element's
+/// failure never ends the iteration.
+///
+/// The library's own raise signal is **rethrown, not recovered**: this
+/// delegates to [catching], so a `r.raise(...)` crossing [f] — from a
+/// `bind`, an `ensure`, or a nested builder — still short-circuits the
+/// enclosing `either {}` / `nullable {}` block. Recovering it here would
+/// turn a typed error into a lost one, and leak a raise out of its scope.
+///
+/// fxdart extension (not part of FxTS) — the per-element form of [catching],
+/// the pair [retry]/[mapRetryAsync] already establishes. RxDart writes this
+/// as `onErrorReturnWith` in the same position.
+///
+/// ```dart
+/// fx(ids).mapCatching(parse, (e, _) => Reading.invalid(e)).toList();
+/// ```
+Iterable<R> mapCatching<A, R>(
+  R Function(A a) f,
+  R Function(Object error, StackTrace stackTrace) onError,
+  Iterable<A> iterable,
+) => map((A a) => catching(() => f(a), onError), iterable);
+
+/// Async counterpart of [mapCatching]; [f] and [onError] may each return a
+/// [Future], and the raise signal is rethrown by [catchingAsync] for the
+/// same reason.
+@pragma('vm:prefer-inline')
+FxAsyncIterable<R> mapCatchingAsync<A, R>(
+  FutureOr<R> Function(A a) f,
+  FutureOr<R> Function(Object error, StackTrace stackTrace) onError,
+  FxAsyncIterable<A> iterable,
+) => mapAsync((A a) => catchingAsync(() => f(a), onError), iterable);
 
 /// Fails a pull with a [TimeoutException] when the upstream takes longer
 /// than [limit] to produce it. The limit applies to each pull (the time to

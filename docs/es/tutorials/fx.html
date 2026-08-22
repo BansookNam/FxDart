@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ff74f6fa047725a6">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2319e42fb7768e50">
 </head>
 <body>
 <header class="site-header">
@@ -53,14 +53,7 @@
 
   <div class="signature">Fx&lt;T&gt; fx&lt;T&gt;(Iterable&lt;T&gt; iterable)
 FxAsync&lt;T&gt; fxAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable)
-FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)
-FxEvents&lt;T&gt; fxEvents&lt;T&gt;(Stream&lt;T&gt; stream)
-
-Fx&lt;T&gt;       Iterable&lt;T&gt;.fx
-FxAsync&lt;T&gt;  FxAsyncIterable&lt;T&gt;.fx
-FxAsync&lt;T&gt;  Stream&lt;T&gt;.fx
-FxAsync&lt;T&gt;  Iterable&lt;FutureOr&lt;T&gt;&gt;.fxAsync
-FxEvents&lt;T&gt; Stream&lt;T&gt;.fxEvents</div>
+FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)</div>
 
   <h2>Lección</h2>
   <p>
@@ -118,7 +111,7 @@ FxEvents&lt;T&gt; Stream&lt;T&gt;.fxEvents</div>
   <h2>Demo 1 · Nada se ejecuta hasta el operador terminal</h2>
   <p>Fíjate en que <code>calls</code> se queda en 0 justo después de construir la cadena, y
     salta en cuanto <code>toList()</code> tira de verdad de los 5 valores:</p>
-  <div class="playground" data-pg="172a1a55841595d4">
+  <div class="playground" data-pg="d41f460a8ce0ff42">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -168,93 +161,6 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>La forma con getter</h2>
-  <p>
-    Cada punto de entrada existe también como getter: <code>.fx</code> sobre un
-    <code>Iterable</code>, un <code>FxAsyncIterable</code> o un
-    <code>Stream</code>, <code>.fxAsync</code> sobre un iterable de futuros y
-    <code>.fxEvents</code> sobre un <code>Stream</code>. Construyen exactamente
-    la misma cadena; lo único que cambia es por qué extremo de la expresión se
-    empieza a leer:
-  </p>
-  <pre><code>// la función: hay que volver al principio para abrir el paréntesis
-fx(orders.where(isPaid)).groupBy((o) =&gt; o.customerId);
-
-// el getter: de izquierda a derecha, como se lee .toList()
-orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
-  <p>
-    Esta es la forma idiomática en Dart, y es gratis: <code>Fx</code> es un
-    extension type, así que el envoltorio se borra y queda el iterable mismo, y
-    un getter cuyo cuerpo es <code>this</code> es una llamada estática que el
-    compilador elimina. Sobre un <code>map</code> + <code>filter</code> +
-    <code>sum</code> de un millón de elementos, ambas formas miden 12.640 ms y
-    12.665 ms — el mismo número dos veces.
-  </p>
-  <p>
-    <strong>Estas páginas usan <code>fx()</code> en todo momento.</strong> Es el
-    nombre que usa FxTS y es el que admite un argumento de tipo explícito, algo
-    que un getter no puede recibir en posición posfija:
-    <code>fx&lt;num&gt;(xs)</code> funciona donde
-    <code>xs.fx&lt;num&gt;</code> ni siquiera parsea. En tu propio código elige
-    la que mejor se lea; compilan a lo mismo.
-  </p>
-  <p>
-    Conviene conocer una asimetría. Sobre un
-    <code>Iterable&lt;Future&lt;T&gt;&gt;</code>, <code>.fx</code> devuelve un
-    <code>Fx&lt;Future&lt;T&gt;&gt;</code> — una cadena sobre los futuros y no
-    sobre sus valores, que compila y hace lo incorrecto en silencio. Para eso
-    está <code>.fxAsync</code>: los espera, de modo que <code>T</code> es el
-    tipo resuelto y <code>concurrent(n)</code> tiene algo que hacer.
-  </p>
-  <pre><code>await responses.fxAsync.map(parse).concurrent(4).toList();</code></pre>
-  <p>
-    Un <code>Stream</code> lleva ambos getters, porque es la única fuente que
-    pertenece a los dos mundos. <code>.fx</code> da la cadena <em>pull</em>, lo
-    mismo que <code>fxStream</code>; <code>.fxEvents</code> da la cadena
-    <em>push</em>, lo mismo que <a href="fxEvents.html"><code>fxEvents</code></a> —
-    debounce, throttle, switch. Para volver de push a pull,
-    <code>.pull()</code>. Se comparan lado a lado en
-    <a href="streams.html">Puentes de Stream</a>.
-  </p>
-  <pre><code>keystrokes.fxEvents
-    .debounce(const Duration(milliseconds: 160))
-    .switchMap((q) =&gt; search(q).asStream())
-    .pull()
-    .toList();</code></pre>
-
-  <h2>Todas las formas con getter</h2>
-  <p>
-    La convención es una sola regla: un punto de entrada lleva <code>fx</code>
-    en el nombre. Dice en qué librería estás entrando y deja el nombre desnudo
-    — <code>toAsync</code>, <code>shuffle</code>, <code>debounce</code> —
-    libre para lo que el proyecto quiera poner en ese tipo.
-  </p>
-  <table>
-    <thead><tr><th>Receptor</th><th>Getter</th><th>Equivale a</th></tr></thead>
-    <tbody>
-      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fx(xs)</code></td></tr>
-      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxAsync(it)</code></td></tr>
-      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxStream(s)</code></td></tr>
-      <tr><td><code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code></td><td><code>.fxAsync</code></td><td><a href="toAsync.html"><code>toAsync(xs)</code></a></td></tr>
-      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxEvents</code></td><td><a href="fxEvents.html"><code>fxEvents(s)</code></a></td></tr>
-      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLive</code></td><td><a href="liveValue.html"><code>LiveValue.from(s)</code></a></td></tr>
-      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLiveSeeded</code></td><td><a href="liveValue.html"><code>LiveValue.seededFrom(v, s)</code></a></td></tr>
-      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffle(xs)</code></a></td></tr>
-      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffleAsync(it)</code></a></td></tr>
-      <tr><td><code>void Function(T)</code></td><td><code>.fxDebounce</code></td><td><a href="debounce.html"><code>debounce(f, w)</code></a></td></tr>
-      <tr><td><code>void Function(T)</code></td><td><code>.fxThrottle</code></td><td><a href="throttle.html"><code>throttle(f, w)</code></a></td></tr>
-    </tbody>
-  </table>
-  <p>
-    Los operadores no están en esta lista, y no lo estarán. Quince de ellos —
-    <code>map</code>, <code>where</code>, <code>take</code>,
-    <code>fold</code> y compañía — comparten nombre con un miembro que
-    <code>Iterable</code> ya tiene, y un miembro de instancia siempre gana a
-    una extensión, así que esas llamadas nunca podrían llegar a fxdart. Los
-    operadores viven en la cadena: <code>xs.fx.map(f)</code>, no
-    <code>xs.map(f)</code>.
-  </p>
-
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: construye una cadena que se quede con las puntuaciones de 60 o más, las duplique
     como puntos extra y tome solo los 2 primeros resultados.</p>
@@ -296,7 +202,7 @@ void main() {
   <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=ff74f6fa047725a6";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=2319e42fb7768e50";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

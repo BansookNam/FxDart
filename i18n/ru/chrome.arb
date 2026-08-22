@@ -35,5 +35,8 @@
   "theoryEdit": "✎ Правка",
   "theoryEditTitle": "Изменить и запустить",
   "theoryReset": "Сбросить",
+  "theoryContribute": "Помочь с переводом",
+  "theoryGoto": "Перейти к странице",
+  "theoryGo": "Перейти",
   "theoryEdited": "изменено"
 }

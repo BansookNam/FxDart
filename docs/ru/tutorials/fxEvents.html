@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ff74f6fa047725a6">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2319e42fb7768e50">
 </head>
 <body>
 <header class="site-header">
@@ -86,14 +86,9 @@ class FxEvents&lt;T&gt; {
   <p>
     Design decisions worth knowing. <code>FxEvents</code> is a thin
     <strong>wrapper</strong>, deliberately not a set of <code>Stream</code>
-    extensions — so its operators can never collide with rxdart or any other
-    stream library in the same file. The one exception is the
-    <code>.fxEvents</code> entry getter, a single name nothing else claims; it
-    sits beside <code>.fx</code> in
-    <a href="streams.html">Stream bridges</a>. The chain stays
-    <strong>cold</strong>: wrapping listens to nothing; only a terminal
-    (<code>toList</code>, <code>head</code>, <code>listen</code>) starts
-    events flowing. And it is
+    extensions — so it can never collide with rxdart or any other stream
+    listens to nothing; only a terminal (<code>toList</code>,
+    <code>head</code>, <code>listen</code>) starts events flowing. And it is
     an fxdart extension inspired by Rx, not part of FxTS — the ideas come
     from Rx, but where a name would clash with the pull layer's the pull
     spelling wins: <code>uniqAdjacent</code> rather than
@@ -111,7 +106,7 @@ class FxEvents&lt;T&gt; {
   </p>
 
   <h2>Demo 1 · A cold chain over a Stream</h2>
-  <div class="playground" data-pg="9ae6b9deacd5b928">
+  <div class="playground" data-pg="a333d58eb7d14f5e">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -196,7 +191,7 @@ Future<void> main() async {
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="streams.html">Stream bridges</a> — the pull side of the border, and <code>stream.fx</code> vs <code>stream.fxEvents</code> side by side ·
+    <a href="streams.html">Stream bridges</a> — <code>fromStream</code> / <code>toStream()</code>, the pull side of the border ·
     <a href="debounce.html"><code>debounce</code></a> &amp; <a href="throttle.html"><code>throttle</code></a> — both have <code>FxEvents</code> forms ·
     <a href="liveValue.html"><code>LiveValue</code></a> — the current-value companion to this chain
   </div>
@@ -211,7 +206,7 @@ Future<void> main() async {
   <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=ff74f6fa047725a6";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=2319e42fb7768e50";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

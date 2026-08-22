@@ -35,5 +35,8 @@
   "theoryEdit": "✎ 编辑",
   "theoryEditTitle": "编辑并运行",
   "theoryReset": "重置",
+  "theoryContribute": "参与翻译",
+  "theoryGoto": "跳转页面",
+  "theoryGo": "跳转",
   "theoryEdited": "已修改"
 }

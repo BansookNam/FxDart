@@ -23,7 +23,7 @@ description: FxDart 是从 FxTS 移植而来的 Dart 函数式编程库：惰性
   <p>
     <a class="demo-cta cta-compare" href="DartComparison/">
       <span class="demo-cta-emoji">⚖️</span>
-      Dart vs FxDart —— 50 个真实任务，并排对比&nbsp;→
+      Dart vs FxDart —— 53 个真实任务，并排对比&nbsp;→
     </a>
   </p>
 

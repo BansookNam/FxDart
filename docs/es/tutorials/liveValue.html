@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ff74f6fa047725a6">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2319e42fb7768e50">
 </head>
 <body>
 <header class="site-header">
@@ -54,8 +54,6 @@
   <div class="signature">class LiveValue&lt;T&gt; {
   LiveValue();                  // empty — subscribers wait for the first add
   LiveValue.seeded(T value);    // starts with a current value
-  LiveValue.from(Stream&lt;T&gt; source);            // hot, fed by source
-  LiveValue.seededFrom(T seed, Stream&lt;T&gt; src);  // hot, seeded
 
   T get value;                  // latest value; StateError when none set
   bool get hasValue;
@@ -64,10 +62,7 @@
   FxEvents&lt;T&gt; get live;         // replay the latest, then live updates
   Stream&lt;T&gt; get stream;         // plain-Stream view of live
   Future&lt;void&gt; close();
-}
-
-LiveValue&lt;T&gt; Stream&lt;T&gt;.fxLive                 // = LiveValue.from(stream)
-LiveValue&lt;T&gt; Stream&lt;T&gt;.fxLiveSeeded(T seed)  // = LiveValue.seededFrom(seed, stream)</div>
+}</div>
 
   <h2>Lección</h2>
   <p>
@@ -103,7 +98,7 @@ LiveValue&lt;T&gt; Stream&lt;T&gt;.fxLiveSeeded(T seed)  // = LiveValue.seededFr
   </p>
 
   <h2>Demo 1 · Los suscriptores tardíos arrancan desde el último valor</h2>
-  <div class="playground" data-pg="df1cc7a1cdeea664">
+  <div class="playground" data-pg="44d486ca68bf0bc2">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -170,16 +165,6 @@ Future<void> main() async {
 </textarea>
   </div>
 
-  <h2>La forma con método</h2>
-  <p>
-    Un <code>Stream</code> alcanza ambos constructores como miembros:
-    <code>source.fxLive</code> es <code>LiveValue.from(source)</code>, y
-    <code>source.fxLiveSeeded(v)</code> es
-    <code>LiveValue.seededFrom(v, source)</code>. Los dos siguen siendo
-    calientes: la suscripción se abre en el acto.
-  </p>
-  <pre><code>final price = ticker.fxLive;
-final count = taps.fxLiveSeeded(0);   // has a value before the first tap</code></pre>
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: deriva un feed de etiquetas desde estado en vivo.</p>
   <div class="playground">
@@ -222,7 +207,7 @@ Future<void> main() async {
   <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=ff74f6fa047725a6";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=2319e42fb7768e50";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

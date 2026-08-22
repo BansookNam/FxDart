@@ -33,10 +33,10 @@ async: false
     들어가서, 각 그룹을 타입 정보 없는 <code>kv.key</code> /
     <code>kv.value</code> 쌍으로 읽어야 하죠. 정렬에는 우회로가 두 개 더
     붙습니다: 명시적인 <code>&lt;num&gt;</code> 타입 인자(<code>double</code>은
-    <code>Comparable&lt;double&gt;</code>이 아니라
-    <code>Comparable&lt;num&gt;</code>이라 추론이 실패합니다), 그리고
-    <code>sortedBy</code>가 오름차순만 지원하니 <em>부호를 반전한</em> 키가
-    필요합니다.
+    <code>Comparable&lt;num&gt;</code>이지
+    <code>Comparable&lt;double&gt;</code>이 아니라서 추론이 실패합니다),
+    그리고 <em>부호를 반전한</em> 키 — <code>sortedBy</code>가 오름차순만
+    지원하기 때문입니다.
   </p>
   <p>
     FxDart에서는 네 단계가 하나의 체인의 네 고리가 되어, 요구사항이 말하는

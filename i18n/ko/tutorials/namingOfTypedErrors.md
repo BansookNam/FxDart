@@ -18,8 +18,8 @@ crumb: naming
   <p>
     기능을 잘못 설명하는 이름이기 때문입니다. <code>Raise</code> 설계의
     핵심은 모나딕 스타일이 <em>아니라는</em> 것입니다 — 이 기능은
-    <code>flatMap</code> 연쇄를 일직선 코드로 <strong>대체하기</strong> 위해
-    존재합니다. <a href="typedErrors.html">타입 있는 에러 페이지</a>에서 본
+    <strong>대체</strong>를 위해 존재합니다. <code>flatMap</code> 연쇄를
+    일직선 코드로 바꾸는 것이죠. <a href="typedErrors.html">타입 있는 에러 페이지</a>에서 본
     그대로입니다: <code>either((r) { ... })</code> 블록은 중첩
     <code>flatMap</code> 피라미드의 대안이지, 그것을 감싼 포장이 아닙니다.
   </p>

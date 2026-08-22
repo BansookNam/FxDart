@@ -1,8 +1,8 @@
 ---
 slug: asyncVariants
-title: async variants — FxDart 101
+title: 비동기 변형 — FxDart 101
 description: FxDart의 *Async 명명 규칙 — 모든 지연 연산자와 집계 연산자에는 FxAsyncIterable용 짝이 있습니다. 라이브 플레이그라운드 포함.
-heading: The <code>*Async</code> naming convention
+heading: <code>*Async</code> 명명 규칙
 section: 11
 crumb: async variants
 next: streams.html

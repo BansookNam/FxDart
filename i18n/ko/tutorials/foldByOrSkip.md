@@ -20,12 +20,12 @@ nextLabel: countWhere
     <code><a href="filter.html">filter</a></code> +
     <code><a href="foldBy.html">foldBy</a></code>를 하나의 즉시(strict)
     호출로 쓴 것입니다. <code>foldBy</code>가 보장하는 것은 그대로입니다 —
-    <code>seed</code>는 키마다 시작점이지 키를 가로질러 누적되지 않고, 키는
+    seed는 키마다 시작점이지 키를 가로질러 누적되지 않고, 키는
     처음 등장한 순서로 나오며, 맵은 원소당 한 번만 조회됩니다. 한 가지
     비틀림은 키 함수입니다: <code>null</code>을 반환하면 "이 원소는
-    건너뛴다"는 뜻으로,
-    <code><a href="takeUniqBy.html">takeUniqBy</a></code>가 쓰는 것과 같은
-    <code>filter_map</code> 형태입니다.
+    건너뛴다"는 뜻으로, <code>filter_map</code> 형태이며
+    <code><a href="takeUniqBy.html">takeUniqBy</a></code>가 같은 형태를
+    씁니다.
   </p>
   <p>
     기본은 <code>filter(...).foldBy(...)</code>로 쓰십시오. 이름 붙은 두

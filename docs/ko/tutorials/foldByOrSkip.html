@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ff74f6fa047725a6">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2319e42fb7768e50">
 </head>
 <body>
 <header class="site-header">
@@ -63,12 +63,12 @@ Map&lt;K, Acc&gt; Fx&lt;T&gt;.foldByOrSkip&lt;K extends Object, Acc&gt;(K? Funct
     <code><a href="filter.html">filter</a></code> +
     <code><a href="foldBy.html">foldBy</a></code>를 하나의 즉시(strict)
     호출로 쓴 것입니다. <code>foldBy</code>가 보장하는 것은 그대로입니다 —
-    <code>seed</code>는 키마다 시작점이지 키를 가로질러 누적되지 않고, 키는
+    seed는 키마다 시작점이지 키를 가로질러 누적되지 않고, 키는
     처음 등장한 순서로 나오며, 맵은 원소당 한 번만 조회됩니다. 한 가지
     비틀림은 키 함수입니다: <code>null</code>을 반환하면 "이 원소는
-    건너뛴다"는 뜻으로,
-    <code><a href="takeUniqBy.html">takeUniqBy</a></code>가 쓰는 것과 같은
-    <code>filter_map</code> 형태입니다.
+    건너뛴다"는 뜻으로, <code>filter_map</code> 형태이며
+    <code><a href="takeUniqBy.html">takeUniqBy</a></code>가 같은 형태를
+    씁니다.
   </p>
   <p>
     기본은 <code>filter(...).foldBy(...)</code>로 쓰십시오. 이름 붙은 두
@@ -107,7 +107,7 @@ Map&lt;K, Acc&gt; Fx&lt;T&gt;.foldByOrSkip&lt;K extends Object, Acc&gt;(K? Funct
   </p>
 
   <h2>데모 1 · 7월의 카테고리별 지출</h2>
-  <div class="playground" data-pg="76169f7e378ae052">
+  <div class="playground" data-pg="07f5783c3b2072fc">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -233,7 +233,7 @@ void main() {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=ff74f6fa047725a6";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=2319e42fb7768e50";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

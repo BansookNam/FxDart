@@ -51,9 +51,9 @@ async: false
     연산자라 콜백이 매개변수이고 인라인됩니다.
   </p>
   <p>
-    FxDart 패널의 <code>main</code> 위에 있는
     <a href="../tutorials/foldByOrSkip.html"><code>foldByOrSkip</code></a>은
-    그 판정을 키 안으로 옮깁니다. 키가 <code>null</code>이면 그 행을
+    FxDart 패널의 <code>main</code> 위에 있으며, 그 판정을 키 안으로
+    옮깁니다. 키가 <code>null</code>이면 그 행을
     건너뛰므로 콜백 하나가 선택과 분류를 겸하고, 그 콜백은 인라인될 만큼
     작은 본문의 매개변수입니다. 거래 100만 건에서 두 번째 막대와 세 번째
     막대의 차이가 그것이고, 첫 번째가 손으로 쓴 루프입니다.

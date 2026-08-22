@@ -23,7 +23,7 @@ description: FxDart는 FxTS를 포팅한 Dart 함수형 프로그래밍 라이�
   <p>
     <a class="demo-cta cta-compare" href="DartComparison/">
       <span class="demo-cta-emoji">⚖️</span>
-      Dart vs FxDart — 실전 과제 50개, 나란히 비교&nbsp;→
+      Dart vs FxDart — 실전 과제 53개, 나란히 비교&nbsp;→
     </a>
   </p>
 

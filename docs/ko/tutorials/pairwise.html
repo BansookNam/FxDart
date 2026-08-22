@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ff74f6fa047725a6">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2319e42fb7768e50">
 </head>
 <body>
 <header class="site-header">
@@ -65,7 +65,7 @@ FxEvents&lt;(T, T)&gt; FxEvents&lt;T&gt;.pairwise() // chain (events)</div>
     우회로는 인덱스 루프(<code>list[i&nbsp;-&nbsp;1]</code>,
     off-by-one 위험 포함)이거나, 리스트를 한 칸 밀어 자기 자신과 zip하는
     것입니다. <code>pairwise()</code>는 그 아이디어를 연산자로 만든
-    것입니다. <code>(이전, 현재)</code> 레코드를 지연 방식으로 내놓으며,
+    것입니다. <code>(previous, current)</code> 레코드를 지연 방식으로 내놓으며,
     원소 <em>n</em>개에서 쌍 <em>n&nbsp;−&nbsp;1</em>개가 나옵니다. 원소가
     두 개 미만이면 아무것도 내놓지 않습니다 — 만들 쌍이 없기 때문입니다.
   </p>
@@ -85,7 +85,7 @@ FxEvents&lt;(T, T)&gt; FxEvents&lt;T&gt;.pairwise() // chain (events)</div>
   </p>
 
   <h2>데모 1 · 측정값 사이의 증감량</h2>
-  <div class="playground" data-pg="97b2e664bbcdf144">
+  <div class="playground" data-pg="9048e2842294986e">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -178,7 +178,7 @@ void main() {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=ff74f6fa047725a6";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=2319e42fb7768e50";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

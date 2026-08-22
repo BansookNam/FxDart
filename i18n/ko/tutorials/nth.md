@@ -29,9 +29,9 @@ nextLabel: find
   </p>
   <p>
     동기 체인에서 <code>fx(iterable).elementAtOrNull(index)</code>는
-    <code>Iterable</code>에서 물려받은 메서드입니다 — <code>Fx</code>는
-    <em>그 자체가</em> <code>Iterable</code>이므로 어떤 <code>Fx</code>
-    체인에서든 그대로 호출하면 됩니다. <code>FxAsyncIterable</code>에는
+    <code>Iterable</code>에서 물려받은 메서드입니다 — 어떤 <code>Fx</code>
+    체인에서든 그대로 호출하면 됩니다. <code>Fx</code>가 <em>곧</em>
+    <code>Iterable</code>이기 때문입니다. <code>FxAsyncIterable</code>에는
     최상위 <code>elementAtOrNullAsync(index, iterable)</code>을 쓰세요.
   </p>
 
