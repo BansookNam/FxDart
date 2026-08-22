@@ -59,6 +59,8 @@ else
 fi
 
 # ---------------------------------------------------------------- sanity
+# css/, js/ and frame.html are copied out of web/ by build_docs, so this
+# also checks that the copy ran — without it every page renders unstyled.
 step "Checking docs/ layout"
 for required in docs/index.html docs/101/index.html docs/css/site.css \
                 docs/js/playground.js docs/frame.html \
@@ -78,7 +80,7 @@ dart run tool/build_docs.dart --status
 step "Staging changes"
 # benchmark/ is included because benchmark/results/results.json is a
 # build_docs input (the per-page Benchmark sections render from it).
-git add docs content i18n tool tools benchmark deploy.sh DEPLOY.md
+git add docs web content i18n tool tools benchmark deploy.sh DEPLOY.md
 
 if git diff --cached --quiet; then
   echo "nothing to deploy — docs/ is already up to date."

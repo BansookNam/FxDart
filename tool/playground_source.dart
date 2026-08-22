@@ -5,7 +5,7 @@
 // round trip to the DartPad compile service. This file owns everything the
 // first path needs on the Dart side:
 //
-//   * `mergedSource` — the exact library+snippet merge docs/js/playground.js
+//   * `mergedSource` — the exact library+snippet merge web/js/playground.js
 //     performs, so what we precompile is what the reader would have compiled.
 //   * `playgroundId` — the content address a snippet is stored under. It is
 //     purely a build-time identifier: build_docs stamps it on the
