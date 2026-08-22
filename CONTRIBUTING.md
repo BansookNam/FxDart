@@ -14,8 +14,9 @@ tell when a rule stops applying.
 
 ## Branching
 
-`main` is always deployable: GitHub Pages serves `docs/` straight off it, so a
-broken `main` is a broken public site, not just a red build. Never commit to it
+`main` is always deployable: a push to it runs `pages.yml`, which builds the
+site and publishes it to GitHub Pages, so a broken `main` is a broken public
+site, not just a red build. Never commit to it
 directly.
 
 | prefix | for | example |
@@ -40,8 +41,9 @@ Three rules keep it from becoming a merge event.
 implementation, its tests, its tutorial, its comparison example and its
 benchmark case are five, and the first two are useful on `main` before the
 other three exist. Open a PR when the library change is green, and follow it
-with docs PRs. `deploy.sh` stages only docs paths for exactly this reason — the
-two streams are designed not to block each other.
+with docs PRs. The two streams are designed not to block each other, and now
+genuinely do not: a library PR carries no generated page, so it cannot collide
+with a docs PR over one.
 
 **2. Rebase onto `main` at least weekly, and always before review.** The files
 most likely to collide are the ones every change touches:
@@ -78,17 +80,18 @@ the lazy callback floor actually is`, not `add takeUniqBy operator`.
 3. *What did you deliberately not do?* Deferred work, rejected alternatives,
    and the reason. This is the part that survives into the CHANGELOG.
 
-**Size** — under ~400 lines of non-generated diff. Generated output
-(`docs/`, `docs/assets/fxdart_single.dart`, `docs/pg/`, `benchmark/results/`)
-does not count against that, but it should be in its own commit inside the PR
-so the reviewer can skip it in one click.
+**Size** — under ~400 lines of diff. `docs/` is untracked, so a PR carries no
+rendered pages, no bundle and no playground artifacts at all. The one
+generated thing that still lands in a PR is `benchmark/results/` — keep it in
+its own commit so the reviewer can skip it in one click.
 
 **Squash** the merge unless the individual commits each stand alone and are
 each green. The default is squash.
 
 **Before requesting review**, the full gate passes locally and the PR
-description says so. CI is a backstop, not your test run — two of the gates
-below (`build_docs --check`, `check_theory`) are not in CI at all.
+description says so. CI is a backstop, not your test run — but it is a real
+one: every gate below is also a CI step, including the site render and the
+theory-book listings, so nothing silently depends on you having run it.
 
 ## The gates
 
@@ -123,7 +126,6 @@ Everything above, plus:
 
 ```bash
 bash tools/build_single_file.sh                      # regenerate the playground bundle
-git diff --exit-code -- docs/assets/fxdart_single.dart   # must leave no diff
 dart run tool/check_benchmark_faithfulness.dart      # cases match their published examples
 dart run coverage:test_with_coverage                 # what coverage CI runs
 ```
@@ -131,23 +133,36 @@ dart run coverage:test_with_coverage                 # what coverage CI runs
 The bundle step is not optional busywork. `tools/build_single_file.sh` keeps a
 hand-maintained `_$NAME` wrapper list, and it silently fell out of step with
 `uniqStrict`/`uniqByStrict` from 0.8.1 — the bundle failed to analyze for two
-releases, and only a manual `./deploy.sh` ever noticed. **If you added a
-public top-level function, check whether the wrapper list needs it.**
+releases, and only a manual publish ever noticed. **If you added a public
+top-level function, check whether the wrapper list needs it.** The script
+analyzes what it generates, so a missing wrapper fails right there. CI runs
+the same step, so this is a way to find out sooner, not a thing only you can
+find out.
 
-It has a consequence that catches everyone once. Every playground artifact
-under `docs/pg/` is keyed by the snippet *plus* the bundle it compiles
-against, so **any change to `lib/` re-keys every fxdart snippet on the site**
-— rebuilding the bundle for a four-line addition orphaned 333 of 448
-artifacts. Nothing fails; those pages just fall back to the network compile
-service and get ~2s slower on Run. So a `lib/` PR runs the deploy sequence in
-order and commits the result:
+### You do not build the site
 
-```bash
-bash tools/build_single_file.sh                     # 1. bundle
-dart run tool/precompile_playgrounds.dart --prune   # 2. re-compile, drop the superseded
-dart run tool/build_docs.dart                       # 3. restamp data-pg
-dart run tool/precompile_playgrounds.dart --status  # 0 "in scope not built yet"
-```
+There is no step here that regenerates `docs/`, and that is deliberate.
+`docs/` is untracked generated output, built and published by
+`.github/workflows/pages.yml` on a push to `main`. **A `lib/` PR does not
+rebuild the bundle-keyed artifacts, does not restamp anything, and commits no
+generated file.**
+
+This used to be real work, and the reason it is gone is worth knowing, because
+it is why you must not add it back. Every playground artifact under `docs/pg/`
+is keyed by the snippet *plus* the bundle it compiles against, so any change
+to `lib/` re-keyed every fxdart snippet on the site — a four-line addition
+orphaned 333 of 448 artifacts and rewrote `data-pg` on ~1,900 committed HTML
+files. Two branches that both touched `lib/` then conflicted on all ~1,900,
+and not one of those conflicts carried information. The most recent one
+measured 1,985 conflicting files of which **four** needed a human.
+
+Two changes retired it. The bundle is comment-stripped
+(`tool/strip_dart_comments.dart`), so a dartdoc-only edit to `lib/` leaves it
+byte-identical and re-keys nothing. And the whole build moved into CI, so the
+output is never committed and can never conflict.
+
+If you want to look at the site before it ships, `./deploy.sh` builds exactly
+what CI builds and `./run.sh -s` serves it — locally, committing nothing.
 
 Step 2 compiles over the network and takes minutes. Never reorder these:
 `build_docs` stamps `data-pg` only on snippets that already have an artifact

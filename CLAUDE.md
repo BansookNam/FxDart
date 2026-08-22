@@ -12,11 +12,11 @@ dart analyze lib                       # lint (lints/recommended)
 dart run coverage:test_with_coverage   # coverage (what CI runs)
 
 ./run.sh                               # build docs site + serve locally (-o opens browser, -s skips build)
-./deploy.sh                            # build + commit + push docs (GitHub Pages serves docs/ off main)
+./deploy.sh                            # build docs/ locally to inspect it (commits nothing; CI publishes)
 dart run tool/build_docs.dart          # regenerate docs/ from content/ + i18n/  (--status, --check, --record)
 bash tools/build_single_file.sh        # regenerate docs/assets/fxdart_single.dart (playground bundle)
 dart run tool/precompile_playgrounds.dart  # build docs/pg/ artifacts (--scope, --status, --prune, --limit, --only)
-dart run tool/rebuild_page.dart DartComparison/top-merchants.html  # after editing one page's snippets: compile + restamp + commit
+dart run tool/rebuild_page.dart DartComparison/top-merchants.html  # optional: rebuild one page's artifacts for a local preview
 ./benchmark.sh                             # sweep + regenerate the ratio report (--docs also rebuilds docs/)
 ./benchmark.sh --ab <slug…> | --ab --all   # paired A/B — the only way to read a change under ~5%
 ./benchmark.sh --verify                    # is the ratio report in step with results.json?
@@ -171,7 +171,9 @@ A paged book viewer — the FP theory companion to 101, modelled on the
   run then prints in ~200ms instead of ~2.5s. They count as first-on-page, so
   the default `PG_SCOPE=first` covers them; after editing any listing run
   `dart run tool/precompile_playgrounds.dart --only=content/theory` (74
-  compiles, ~1 min, ~8MB).
+  compiles, ~1 min, ~8MB) — only if you want the fast path locally; CI builds
+  them on publish either way. `dart run tool/check_theory.dart` is the gate
+  that matters, and it is a CI step.
 - **✎ Edit** opens the whole program in an overlay editor (a page is a fixed
   box, so typing cannot happen in place). Edits live in a JS map keyed by
   chapter+listing — never in the DOM, which is re-rendered on every page turn —
@@ -195,12 +197,16 @@ POST body from a browser and comparing.
 
 Build order matters: `build_single_file.sh` → `precompile_playgrounds.dart` →
 `build_docs.dart`. Editing **any** snippet changes its id, so it orphans the
-artifact its page was stamped with and the panel silently falls back to the
-compile service — `tool/rebuild_page.dart <page>` does that whole sequence for
-one page (both comparison panels, or all of a tutorial's demos; locale prefixes
-are accepted and ignored, since artifacts are shared across locales).
-Rebuilding the bundle changes every fxdart snippet's id, so
-precompiling takes `--prune` to drop the superseded artifacts. `deploy.sh` honours
+artifact its page was stamped with and the panel falls back to the compile
+service; rebuilding the bundle re-keys every fxdart snippet at once, which is
+why precompiling takes `--prune`.
+
+**This is CI's job, not yours.** `pages.yml` runs the three in order on every
+push to `main`. Nothing generated is committed, so there is no artifact to keep
+in step by hand and no reason for a `lib/` change to touch `docs/` at all.
+`tool/rebuild_page.dart <page>` still exists for a local preview of one page
+(both comparison panels, or all of a tutorial's demos; locale prefixes are
+accepted and ignored, since artifacts are shared across locales). `deploy.sh` honours
 `PG_SCOPE` (`first` default, `all`, `none`).
 
 The 17MB DDC runtime is fetched by the **parent page**, not the sandboxed frame, and
