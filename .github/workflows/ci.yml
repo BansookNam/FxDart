@@ -41,13 +41,15 @@ jobs:
 
       # Regenerates the single-file playground build and analyzes it. This is
       # the only check that sees wrapper drift in tools/build_single_file.sh.
+      #
+      # A "bundle is up to date" step used to follow, comparing the rebuild
+      # against the committed copy. docs/ is no longer tracked, so that
+      # `git diff` would match nothing and pass unconditionally — a check that
+      # had quietly stopped checking. It is deleted rather than left in place;
+      # staleness is now impossible, because every publish rebuilds from lib/.
+      # The wrapper-drift coverage is in this step's own `dart analyze`.
       - name: Build and analyze the playground bundle
         run: bash tools/build_single_file.sh
-
-      # The bundle is generated output committed to the repo; if this step
-      # leaves a diff, docs/assets/fxdart_single.dart is stale on main.
-      - name: Bundle is up to date
-        run: git diff --exit-code -- docs/assets/fxdart_single.dart
 
       # `tool/check_translation.dart` existed since 0.8.6 but nothing ever
       # called it, so "the translations are structurally in step" was a claim

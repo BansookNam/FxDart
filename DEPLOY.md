@@ -21,9 +21,11 @@ hand-written half of the site lives in `web/` — `web/css/*.css`, `web/js/*.js`
 `build_docs.dart` copies that tree verbatim into `docs/`, so `web/css/site.css`
 is served as `docs/css/site.css`.
 
-The site is normally built and published by `.github/workflows/pages.yml` on a
-push to `main`, with nothing committed back. The manual path below still works
-and is what to use when you want to inspect the output before it ships.
+`docs/` is **not tracked** — it is in `.gitignore`. The site is built and
+published by `.github/workflows/pages.yml` on a push to `main`, and nothing
+generated is committed back. `./deploy.sh` builds the identical output locally
+so it can be inspected, and `./run.sh -s` serves that build; neither commits.
+To publish without a source change, run `gh workflow run pages.yml`.
 
 The site builds in 7 languages (English at the root, plus `ko`, `zh-Hans`,
 `ja`, `es`, `pt-BR`, `ru` under their own prefixes). See
