@@ -19,10 +19,28 @@ import '../fx.dart';
 /// ```
 FxEvents<T> fxEvents<T>(Stream<T> stream) => FxEvents(stream);
 
+/// `fxEvents(stream)` as a getter: `keystrokes.fxEvents.debounce(window)`.
+///
+/// The push-side counterpart to `Stream.fx`, which gives the *pull* chain
+/// ([FxAsync]). Both spellings of both entry points exist; these pages use
+/// the functions.
+///
+/// This is an extension where [FxEvents] itself deliberately is not — see the
+/// note on the class. One entry-point name is not the same risk as forty
+/// operator names: `debounce` and `switchMap` collide with rxdart's Stream
+/// extensions, `fxEvents` does not.
+extension FxEventsEntry<T> on Stream<T> {
+  /// This stream as a chainable [FxEvents].
+  @pragma('vm:prefer-inline')
+  FxEvents<T> get fxEvents => FxEvents(this);
+}
+
 /// Chainable event-stream operators over a plain Dart [Stream].
 ///
 /// A thin wrapper (never an extension), so it can coexist with any other
-/// stream library — including rxdart — without member conflicts. Every
+/// stream library — including rxdart — without member conflicts. The one
+/// extension in this file is [FxEventsEntry], which adds the single entry
+/// name `fxEvents` and nothing rxdart claims. Every
 /// operator returns a new [FxEvents] over a derived single-subscription
 /// stream; unwrap with [stream], collect with [toList], or continue in the
 /// pull model with [pull].

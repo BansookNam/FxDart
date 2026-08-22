@@ -101,4 +101,47 @@ void main() {
       expect(await [1, 2, 3].fxAsync.toList(), [1, 2, 3]);
     });
   });
+
+  group('FxEventsEntry — .fxEvents on Stream', () {
+    test('is the same chain as fxEvents()', () async {
+      Stream<int> src() => Stream.fromIterable([1, 2, 3]);
+      expect(
+        await src().fxEvents.map((a) => a * 2).toList(),
+        await fxEvents(src()).map((a) => a * 2).toList(),
+      );
+    });
+
+    test('stays cold until something listens', () async {
+      var listened = 0;
+      final src = Stream<int>.multi((c) {
+        listened++;
+        c
+          ..add(1)
+          ..close();
+      });
+      final chain = src.fxEvents.map((a) => a + 1);
+      expect(listened, 0);
+      expect(await chain.toList(), [2]);
+      expect(listened, 1);
+    });
+
+    test('the push and pull getters on Stream stay distinct', () async {
+      final events = Stream.fromIterable([1, 2, 3]).fxEvents;
+      final pull = Stream.fromIterable([1, 2, 3]).fx;
+      expect(events, isA<FxEvents<int>>());
+      expect(pull, isA<FxAsync<int>>());
+      expect(await events.toList(), await pull.toList());
+    });
+
+    test('crosses into the pull chain with .pull', () async {
+      expect(
+        await Stream.fromIterable([1, 2, 3, 4])
+            .fxEvents
+            .debounce(const Duration(milliseconds: 1))
+            .pull()
+            .toList(),
+        [4],
+      );
+    });
+  });
 }
