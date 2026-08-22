@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=5337b860bc3ce009">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2319e42fb7768e50">
 </head>
 <body>
 <header class="site-header">
@@ -83,7 +83,7 @@ on Raise&lt;E&gt;: bind · bindAll · ensure · ensureNotNull · recover(block, 
       분석도 알고 있습니다.</li>
   </ul>
   <p>
-    내부 구현은 <code>flatMap</code> 연쇄가 <em>아닙니다</em>. 실패한
+    내부 구현은 <em>결코</em> <code>flatMap</code> 연쇄가 아닙니다. 실패한
     <code>bind</code>는 스코프 토큰이 달린 비공개 신호를 던지고, 빌더가
     자신의 경계에서 그것을 잡아냅니다. 그래서 이른 반환, 반복문,
     <code>if</code>가 블록 안에서 전부 그대로 동작하고, 중첩된 빌더가 서로의
@@ -93,7 +93,7 @@ on Raise&lt;E&gt;: bind · bindAll · ensure · ensureNotNull · recover(block, 
   </p>
 
   <h2>데모 1 · ensure &amp; ensureNotNull</h2>
-  <div class="playground" data-pg="2abd32d121d84800">
+  <div class="playground" data-pg="556b1602749dc61d">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -270,7 +270,7 @@ void main() {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=5337b860bc3ce009";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=2319e42fb7768e50";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

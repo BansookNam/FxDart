@@ -31,7 +31,7 @@ nextLabel: reduceLazy
   </p>
   <p>
     리듀서는 Haskell <code>foldr</code>처럼 인자를 뒤집지 않고
-    <code>fold</code>의 <code>(acc, 원소)</code> 순서를 그대로 지킵니다.
+    <code>fold</code>의 <code>(acc, element)</code> 순서를 그대로 지킵니다.
     같은 콜백이 양쪽 방향 모두에서 동작하므로, 고쳐 쓰지 않고 서로 바꿔 끼울
     수 있습니다.
   </p>

@@ -40,6 +40,19 @@ void main() {
       });
     });
 
+    test('orders NaN and -0.0 by compareTo, not by < / >', () {
+      // `_compareKeys` is shared by minBy, maxBy and sortBy's non-List
+      // path. It used to compare with `<`/`>`, which report *false* both
+      // ways for NaN and so made every NaN a tie — the first-seen element
+      // won and a NaN in the input was skipped over. `compareTo` orders NaN
+      // above every other double, and orders `0.0` above `-0.0`, which is
+      // what the sort family's typed double path already did.
+      expect(maxBy((double d) => d, [1.0, double.nan, 3.0]), isNaN);
+      // Was `-0.0` under `<`/`>`, where the two compare equal.
+      expect(maxBy((double d) => d, [-0.0, 0.0]), 0.0);
+      expect(maxBy((double d) => d, [-0.0, 0.0])!.isNegative, isFalse);
+    });
+
     group('async', () {
       test('should return the element with the largest key', () async {
         expect(await maxByAsync((int n) => n, toAsync([3, 7, 5])), equals(7));

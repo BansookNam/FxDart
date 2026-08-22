@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:fxdart/fxdart.dart';
 import 'package:test/test.dart';
 
@@ -142,6 +144,101 @@ void main() {
             reason: 'size $n',
           );
         }
+      });
+    });
+
+    // Replaces the old "windows are fixed-length" pin. 0.8.7 made every window
+    // growable; before it, the two sync paths handed back a fixed-length list
+    // while windowedAsync/chunkAsync already returned a growable one, so the
+    // same operator disagreed with its own async twin. The value of the old
+    // test was catching an unintended change to window mutability, and that
+    // value is what this keeps — now across all four paths at once.
+    //
+    // The reason for the flip is on `_windowSlice`: a fixed-length window has
+    // to be filled from package code at one covariant store check per element,
+    // and no bulk copy that preserves the fixed length is faster than that
+    // loop.
+    group('window representation', () {
+      test('every window is growable, on all four paths', () async {
+        // sync, List source — the indexed path (_windowSlice)
+        final syncList = windowed(2, [1, 2, 3]).first;
+        // sync, non-List source — the ring path, contiguous and wrapped
+        final syncPulledContiguous = chunk(2, range(1, 5)).first;
+        final syncPulledWrapped = windowed(3, range(1, 6)).toList()[2];
+        // async
+        final asyncWindow = (await toListAsync(
+          windowedAsync(2, toAsync(range(1, 4))),
+        )).first;
+        final asyncChunk = (await toListAsync(
+          chunkAsync(2, toAsync(range(1, 5))),
+        )).first;
+
+        expect(syncList, [1, 2]);
+        expect(syncPulledContiguous, [1, 2]);
+        expect(syncPulledWrapped, [3, 4, 5]);
+        expect(asyncWindow, [1, 2]);
+        expect(asyncChunk, [1, 2]);
+
+        for (final w in [
+          syncList,
+          syncPulledContiguous,
+          syncPulledWrapped,
+          asyncWindow,
+          asyncChunk,
+        ]) {
+          expect(() => w.add(99), returnsNormally);
+          expect(w.last, 99);
+        }
+      });
+
+      test('a typed-data source still yields a plain growable window', () {
+        // `List.sublist` returns the receiver's runtime type, and a
+        // `Uint8List` is a `List<int>`, so the indexed path used to hand back
+        // a typed-data window: fixed length, and truncating on store — a
+        // `w[0] = 300` that silently left 44 behind. Both the plain and the
+        // fused `windowed -> map` path build the window the same way, so both
+        // are pinned here, for `chunk` as well as `windowed`.
+        final u8 = Uint8List.fromList([1, 2, 3, 4]);
+        final f64 = Float64List.fromList([1.0, 2.0, 3.0, 4.0]);
+
+        final windows = <List<num>>[
+          windowed(2, u8).first,
+          chunk(2, u8).first,
+          fx(u8).windowed(2).map((w) => w).first!,
+          windowed(2, f64).first,
+          chunk(2, f64).first,
+          fx(f64).windowed(2).map((w) => w).first!,
+        ];
+
+        for (final w in windows) {
+          expect(w, isNot(isA<TypedData>()));
+          // A same-typed element, so this tests growability and not the
+          // int/double split between the two sources.
+          expect(() => w.add(w.first), returnsNormally);
+          expect(w.length, 3);
+        }
+
+        // The store that used to be truncated by the element width.
+        final w = windowed(2, u8).first;
+        w[0] = 300;
+        expect(w[0], 300);
+        // …and the source is untouched, as for any other window.
+        expect(u8, [1, 2, 3, 4]);
+      });
+
+      test('a window is a copy the caller owns, not a view', () {
+        final src = [1, 2, 3];
+        final ws = toList(windowed(2, src));
+        expect(ws, [
+          [1, 2],
+          [2, 3],
+        ]);
+        // Writing through one window touches neither its neighbour nor the
+        // source — the property the fixed-length pin was really protecting.
+        ws.first[0] = 99;
+        ws.first.add(-1);
+        expect(ws.last, [2, 3]);
+        expect(src, [1, 2, 3]);
       });
     });
 

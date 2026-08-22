@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NonEmptyList (Nel) — FxDart 101</title>
+  <title>NonEmptyList와 Nel — FxDart 101</title>
   <meta name="description" content="FxDart NonEmptyList 튜토리얼: 비어 있을 수 없는 리스트를 위한 제로 비용 확장 타입 — head와 first가 전체 함수(total)라 실패하지 않으며, 누적된 에러를 실어 나릅니다.">
   <link rel="alternate" hreflang="en" href="https://bansooknam.github.io/FxDart/tutorials/nonEmptyList.html">
   <link rel="alternate" hreflang="ko" href="https://bansooknam.github.io/FxDart/ko/tutorials/nonEmptyList.html">
@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=5337b860bc3ce009">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2319e42fb7768e50">
 </head>
 <body>
 <header class="site-header">
@@ -75,7 +75,7 @@ on Iterable&lt;T&gt;: NonEmptyList&lt;T&gt;? toNelOrNull()</div>
   </p>
   <p>
     Arrow의 <code>value class NonEmptyList</code>에 대응하는 Dart 쪽
-    짝입니다. <code>List</code> 위에 얹은 <em>확장 타입</em>이라 할당이 전혀
+    짝입니다. <em>확장 타입</em>으로 <code>List</code> 위에 얹혀 있어 할당이 전혀
     없고 런타임에 지워지며, <code>implements Iterable</code>이므로 모든
     fxdart 파이프라인과 <code>for</code> 반복문이 이 값을 그대로 받습니다.
     불변식은 컴파일 타임의 규율로 지켜집니다: 생성은 오직
@@ -87,7 +87,7 @@ on Iterable&lt;T&gt;: NonEmptyList&lt;T&gt;? toNelOrNull()</div>
   </p>
 
   <h2>데모 1 · of, orNull, head &amp; tail</h2>
-  <div class="playground" data-pg="ec9aff61b2e562e9">
+  <div class="playground" data-pg="4245b2f9a19d2be0">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -215,7 +215,7 @@ void main() {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=5337b860bc3ce009";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=2319e42fb7768e50";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

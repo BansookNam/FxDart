@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=5337b860bc3ce009">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=2319e42fb7768e50">
 </head>
 <body>
 <header class="site-header">
@@ -78,20 +78,20 @@ int size&lt;A&gt;(Iterable&lt;A&gt; iterable)  // FxTS alias</div>
     이터러블 안에 무엇이 들었는지는 신경 쓰지 않고 몇 개인지만 봅니다.
   </p>
   <p>
-    동기 체인에서 <code>count</code>는 Dart에서 물려받은
-    <code>Iterable.length</code> 게터 <em>그 자체</em>입니다(괄호 없음).
+    동기 체인에서 <code>count</code>는 <em>바로</em> Dart에서 물려받은
+    <code>Iterable.length</code> 게터입니다(괄호 없음).
     <code>Fx</code>가 <code>Iterable</code>이므로
     <code>fx(pipeline).length</code>가 체인을 훑으며 총 개수를 돌려줍니다.
     이름 붙은 연산자로 쓰는 편이 좋다면 최상위 <code>count(iterable)</code>를,
-    <em>비동기</em> 체인에서는 <code>.count()</code>를 쓰세요. 이미 구체적인
+    <code>.count()</code>는 <em>비동기</em> 체인에서 쓰세요. 이미 구체적인
     <code>List</code>를 들고 있다면 <code>.length</code>가 공짜입니다 —
-    <code>count</code>는 지연 체인의 결과를 먼저
-    <code><a href="../101/index.html">toList</a></code>로 <code>List</code>에
+    <code>count</code>는 지연 체인의 결과를 <code>List</code>로 —
+    <code><a href="../101/index.html">toList</a></code>를 거쳐 — 먼저
     구체화하지 않고 개수만 세고 싶을 때 꺼내 쓰는 도구입니다.
   </p>
 
   <h2>데모 1 · 기본</h2>
-  <div class="playground" data-pg="7142cf87d852a3ed">
+  <div class="playground" data-pg="d3d388ba72594dfe">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -162,7 +162,7 @@ void main() {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=5337b860bc3ce009";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=2319e42fb7768e50";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

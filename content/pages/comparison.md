@@ -1,7 +1,7 @@
 ---
 slug: comparison
 title: Dart vs FxDart — real tasks, side by side
-description: 50 real-world tasks solved twice — once in plain Dart, once with FxDart — each pair runnable in the browser, with an honest verdict on which reads better.
+description: 53 real-world tasks solved twice — once in plain Dart, once with FxDart — each pair runnable in the browser, with an honest verdict on which reads better.
 ---
   <h1>Dart vs FxDart</h1>
   <p class="hero-sub">

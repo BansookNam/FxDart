@@ -22,7 +22,7 @@ nextLabel: split
     우회로는 인덱스 루프(<code>list[i&nbsp;-&nbsp;1]</code>,
     off-by-one 위험 포함)이거나, 리스트를 한 칸 밀어 자기 자신과 zip하는
     것입니다. <code>pairwise()</code>는 그 아이디어를 연산자로 만든
-    것입니다. <code>(이전, 현재)</code> 레코드를 지연 방식으로 내놓으며,
+    것입니다. <code>(previous, current)</code> 레코드를 지연 방식으로 내놓으며,
     원소 <em>n</em>개에서 쌍 <em>n&nbsp;−&nbsp;1</em>개가 나옵니다. 원소가
     두 개 미만이면 아무것도 내놓지 않습니다 — 만들 쌍이 없기 때문입니다.
   </p>

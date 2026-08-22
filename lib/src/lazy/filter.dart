@@ -419,6 +419,85 @@ class _CompactIterator<A> implements Iterator<A> {
   }
 }
 
+/// Maps each element through [f] and yields only the non-null results —
+/// lazily, in a single stage.
+///
+/// `compact(map(f, xs))` computes the same values, but stacks two lazy
+/// stages: every surviving element crosses the mapping iterator's
+/// `moveNext`/`current` boundary and then the compacting one's. Here [f]
+/// both transforms and selects — the `filter_map` shape, the same bargain
+/// [takeUniqBy] strikes with its key extractor.
+///
+/// Dart-native addition (FxTS composes `map` + `compact`). Kotlin spells it
+/// `mapNotNull`, Rust `filter_map`. [B] is bound to [Object], so a `null`
+/// from [f] unambiguously means *skip this element* rather than *yield
+/// null*.
+///
+/// ```dart
+/// mapNotNull((String s) => int.tryParse(s), ['1', 'x', '3']); // (1, 3)
+/// ```
+Iterable<B> mapNotNull<A, B extends Object>(
+  B? Function(A a) f,
+  Iterable<A> iterable,
+) => _MapNotNullIterable(f, iterable);
+
+class _MapNotNullIterable<A, B extends Object> extends Iterable<B> {
+  _MapNotNullIterable(this._f, this._source);
+  final B? Function(A) _f;
+  final Iterable<A> _source;
+  @override
+  Iterator<B> get iterator {
+    final source = _source;
+    if (source is List<A>) return _MapNotNullListIterator(_f, source);
+    return _MapNotNullIterator(_f, source.iterator);
+  }
+}
+
+/// [mapNotNull] over a `List`, walked by index — no upstream iterator and no
+/// per-element virtual call, the shape `map` already uses for a list source.
+class _MapNotNullListIterator<A, B extends Object> implements Iterator<B> {
+  _MapNotNullListIterator(this._f, this._list) : _end = _list.length;
+  final B? Function(A) _f;
+  final List<A> _list;
+  final int _end;
+  int _i = 0;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    var i = _i;
+    while (i < _end) {
+      final v = _f(_list[i++]);
+      if (v != null) {
+        _i = i;
+        current = v;
+        return true;
+      }
+    }
+    _i = i;
+    return false;
+  }
+}
+
+class _MapNotNullIterator<A, B extends Object> implements Iterator<B> {
+  _MapNotNullIterator(this._f, this._it);
+  final B? Function(A) _f;
+  final Iterator<A> _it;
+  @override
+  late B current;
+  @override
+  bool moveNext() {
+    while (_it.moveNext()) {
+      final v = _f(_it.current);
+      if (v != null) {
+        current = v;
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
 // --- async ---------------------------------------------------------------
 
 /// Maps upstream values to `(passed, value)` pairs, forwarding the
@@ -559,6 +638,18 @@ FxAsyncIterable<A> rejectAsync<A>(
 @pragma('vm:prefer-inline')
 FxAsyncIterable<A> compactAsync<A>(FxAsyncIterable<A?> iterable) =>
     mapAsync((A? a) => a as A, filterAsync((A? a) => a != null, iterable));
+
+/// Async counterpart of [mapNotNull]. [f] may return a [Future].
+///
+/// Spelled as `compactAsync(mapAsync(...))` rather than as a hand-written
+/// iterator: on the async side a run of map/filter stages fuses into one
+/// pass (see [FxFusedAsyncIterable]), so the composed spelling already costs
+/// the single boundary [mapNotNull] needs its own iterator to reach.
+@pragma('vm:prefer-inline')
+FxAsyncIterable<B> mapNotNullAsync<A, B extends Object>(
+  FutureOr<B?> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => compactAsync<B>(mapAsync<A, B?>(f, iterable));
 
 // --- uniq / set operations ----------------------------------------------
 

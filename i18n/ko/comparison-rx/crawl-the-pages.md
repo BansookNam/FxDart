@@ -40,8 +40,8 @@ async: true
   <p>
     스트림 쪽도 같은 곳에 도달하지만, 풀 메커니즘을 빌려서만
     가능합니다: 끝없는 <code>async*</code> 커서 — Rx 연산자가 아니라
-    순수 Dart — 를 <code>asyncMap</code>의 배압으로 요구 주도 동작에
-    <em>일시 정지</em>시키고, <code>takeWhile</code>의 취소가 빈
+    순수 Dart — 를 <em>일시 정지</em>시켜 <code>asyncMap</code>의 배압으로
+    요구 주도 동작으로 만들고, <code>takeWhile</code>의 취소가 빈
     페이지에서 크롤을 멈춥니다. 동작하고, 같은
     <code>pages fetched: 4</code>를 출력합니다 — pause, resume,
     cancel이 바로 "준비되면 다시 요청한다"를 흉내 내는 스트림 모델의

@@ -49,6 +49,25 @@ jobs:
       - name: Bundle is up to date
         run: git diff --exit-code -- docs/assets/fxdart_single.dart
 
+      # `tool/check_translation.dart` existed since 0.8.6 but nothing ever
+      # called it, so "the translations are structurally in step" was a claim
+      # a human had to re-verify by hand. Only `ko` is gated, and that is
+      # deliberate: it is the one locale translated end to end (301 of 301
+      # pages). `es` is a partial translation carrying 25 real defects of its
+      # own, and ja/pt-BR/ru/zh-Hans have no overlay for most pages at all,
+      # which the checker reports as `missing` by design — gating any of those
+      # would be red on every commit and would therefore report nothing.
+      - name: Korean translation is structurally in step with English
+        run: dart run tool/check_translation.dart ko
+
+      # The page set is derived twice — build_docs enumerates it from its own
+      # family tables, check_translation walks content/. They must agree, or
+      # a newly added page family is silently exempt from the gate above.
+      - name: The two translatable-page sets agree
+        run: |
+          diff <(dart run tool/build_docs.dart --list-translatable) \
+               <(dart run tool/check_translation.dart --list-translatable)
+
       # AUTHORING.md's first rule: a benchmark case must measure the same
       # pipeline its published example shows.
       - name: Benchmark cases match their examples

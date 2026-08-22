@@ -34,6 +34,13 @@ void main(List<String> args) {
 
   if (args.contains('--record')) return _record(locales);
   if (args.contains('--status')) return _status(locales);
+  // The set of translatable pages is derived here and re-derived, by a
+  // different route, in check_translation.dart. Both can print it so CI can
+  // diff the two and catch them drifting apart.
+  if (args.contains('--list-translatable')) {
+    (_translatable().toList()..sort()).forEach(stdout.writeln);
+    return;
+  }
 
   final course = _loadJson('$root/content/course.json');
 

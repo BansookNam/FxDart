@@ -11,6 +11,33 @@ Map<K, V> fromEntries<K, V>(Iterable<(K, V)> entries) => {
   for (final (k, v) in entries) k: v,
 };
 
+/// The `(key, value)` records of [map], in the map's own iteration order —
+/// the inverse of [fromEntries], and the chain *entrance* for anything a
+/// `Map`-returning operator produced.
+///
+/// `groupBy`, `countBy`, `foldBy` and `indexBy` all end a chain with a
+/// `Map`. Continuing (ranking, formatting) means re-entering with
+/// `fx(m.entries)` and then converting `MapEntry` back into the record shape
+/// the rest of fxdart speaks; `fx(toPairs(m))` is both steps at once.
+///
+/// Lazy: this is a view over `Map.entries`, so nothing is copied. Mutations
+/// made before iteration begins are reflected; structural mutation during
+/// active iteration may throw [ConcurrentModificationError].
+///
+/// No `*Async` twin, and that is this file's convention rather than an
+/// omission: no function in `object.dart` has one, because a `Map` argument
+/// is already fully materialized — there is nothing to await.
+///
+/// Port of Lodash `toPairs` (FxTS `entries`, Kotlin `Map.toList()`). Named
+/// `toPairs`, not `entries`, because fxdart's barrel exports every top-level
+/// name unprefixed and `entries` is a common local variable name.
+///
+/// ```dart
+/// fx(toPairs(groupBy(f, xs))).sortByDesc((p) => p.$2.length);
+/// ```
+Iterable<(K, V)> toPairs<K, V>(Map<K, V> map) =>
+    map.entries.map((e) => (e.key, e.value));
+
 /// Returns a copy of [map] without the given [keysToOmit].
 ///
 /// Port of FxTS `omit`.

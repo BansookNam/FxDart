@@ -1,6 +1,6 @@
 ---
 slug: nonEmptyList
-title: NonEmptyList (Nel) — FxDart 101
+title: NonEmptyList와 Nel — FxDart 101
 description: FxDart NonEmptyList 튜토리얼: 비어 있을 수 없는 리스트를 위한 제로 비용 확장 타입 — head와 first가 전체 함수(total)라 실패하지 않으며, 누적된 에러를 실어 나릅니다.
 heading: <code>NonEmptyList</code> · <code>Nel</code>
 section: 13
@@ -33,7 +33,7 @@ nextLabel: accumulation
   </p>
   <p>
     Arrow의 <code>value class NonEmptyList</code>에 대응하는 Dart 쪽
-    짝입니다. <code>List</code> 위에 얹은 <em>확장 타입</em>이라 할당이 전혀
+    짝입니다. <em>확장 타입</em>으로 <code>List</code> 위에 얹혀 있어 할당이 전혀
     없고 런타임에 지워지며, <code>implements Iterable</code>이므로 모든
     fxdart 파이프라인과 <code>for</code> 반복문이 이 값을 그대로 받습니다.
     불변식은 컴파일 타임의 규율로 지켜집니다: 생성은 오직

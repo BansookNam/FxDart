@@ -29,12 +29,16 @@ nextLabel: sampleOn
     알아 둘 만한 설계 결정들입니다. <code>FxEvents</code>는 얇은
     <strong>래퍼</strong>이며, 의도적으로 <code>Stream</code> 확장의
     집합이 아닙니다 — 그래서 같은 파일 안에서 rxdart나 다른 어떤 스트림
-    라이브러리와도 절대 충돌하지 않습니다. 체인은 <strong>콜드</strong>로
+    라이브러리와도 절대 충돌하지 않습니다. 체인은 콜드로
     유지됩니다: 감싸는 것만으로는 아무것도 듣지 않고, 종결 연산자
-    (<code>toList</code>, <code>listen</code>)만이 이벤트를 흐르게
-    합니다. 그리고 이것은 Rx에서 영감을 받은 fxdart의 확장이지 FxTS의
-    일부가 아닙니다 — 연산자 이름이 Rx 전통을 따르는 것은 이 아이디어들이
-    바로 거기서 왔기 때문입니다.
+    (<code>toList</code>, <code>head</code>, <code>listen</code>)만이
+    이벤트를 흐르게 합니다. 그리고 이것은 Rx에서 영감을 받은 fxdart의
+    확장이지 FxTS의 일부가 아닙니다 — 아이디어는 Rx에서 왔지만, 이름이
+    풀 레이어의 것과 부딪힐 때는 풀 쪽 표기가 이깁니다:
+    <code>uniqAdjacent</code>를 쓰고 <code>distinctUntilChanged</code>는
+    쓰지 않으며, <code>stopOn</code>을 쓰고 <code>takeUntil</code>은
+    쓰지 않고, <code>head</code>를 쓰고 <code>first</code>는 쓰지
+    않습니다. 한 낱말은 양쪽에서 한 가지를 뜻합니다.
   </p>
   <p>
     두 개의 탈출구가 여러분을 가두지 않게 지켜 줍니다.

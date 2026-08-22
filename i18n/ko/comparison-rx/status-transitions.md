@@ -13,8 +13,8 @@ async: false
   <h2>요구사항</h2>
   <p>
     헬스체크 피드가 <code>ok, ok, warn, warn, ok, ok, ok</code>를
-    보고합니다 — 대부분 반복입니다. <strong>런</strong>마다
-    <em>status now</em> 한 줄씩(세 줄)을 출력한 뒤, 처음 본 순서로 모든
+    보고합니다 — 대부분 반복입니다. <em>status now</em> 한 줄을
+    <strong>런</strong>마다(세 줄) 출력한 뒤, 처음 본 순서로 모든
     고유 상태를 나열하는 <code>statuses seen:</code> 한 줄을 출력하세요.
     데이터는 아래 코드에 있으며, 두 버전 모두 <em>예상 출력</em> 아래에
     표시된 줄들을 출력해야 합니다.

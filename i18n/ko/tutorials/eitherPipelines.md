@@ -24,7 +24,7 @@ nextLabel: the naming rationale
     <code>lefts()</code>는 한쪽만 남기고, <code>separated()</code>는 양쪽을
     한 번에 나누며(<code>partition</code>과 같은 레코드 모양),
     <code>sequence()</code>는 전부 아니면 전무입니다 — 모든 성공을 리스트
-    하나로 모으되 첫 <code>Left</code>에서 <em>즉시</em> 실패합니다.
+    하나로 모으되 <em>즉시</em>, 첫 <code>Left</code>에서 실패합니다.
     파이프라인이 지연 평가되므로 fail-fast는 말 그대로입니다.
     <code>sequence()</code>는 첫 실패에서 <em>당기기</em>를 멈추고, 그래서
     뒤쪽 원소는 아예 계산되지 않습니다.
@@ -56,7 +56,7 @@ nextLabel: the naming rationale
 
   <h2>데모 4 · flattenOrAccumulate와 비동기 추출 패밀리</h2>
   <p>
-    이미 <code>Either</code>들을 <em>가지고</em> 있을 때, fail-slow 터미널은
+    이미 <em>가지고</em> 있는 <code>Either</code>들을 다룰 때, fail-slow 터미널은
     <code>mapOrAccumulate((r,&nbsp;v)&nbsp;=&gt;&nbsp;r.bind(v))</code> —
     항등 bind — 로 써야 했습니다. <code>flattenOrAccumulate()</code>(Arrow의
     이름 그대로)가 그 터미널입니다. 모든 성공을, 아니면 <em>모든</em> 실패를

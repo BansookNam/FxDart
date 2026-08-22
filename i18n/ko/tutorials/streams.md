@@ -1,8 +1,8 @@
 ---
 slug: streams
-title: Stream bridges — FxDart 101
+title: Stream 브리지 — FxDart 101
 description: FxDart의 Stream 브리지 — fromStream, fxStream, toStream()으로 Dart의 Stream과 FxAsyncIterable 사이를 자유롭게 오갑니다. 라이브 플레이그라운드 포함.
-heading: Stream bridges
+heading: Stream 브리지
 section: 11
 crumb: Stream bridges
 next: concurrent.html
