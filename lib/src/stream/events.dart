@@ -33,6 +33,16 @@ extension FxEventsEntry<T> on Stream<T> {
   /// This stream as a chainable [FxEvents].
   @pragma('vm:prefer-inline')
   FxEvents<T> get fxEvents => FxEvents(this);
+
+  /// This stream as a [LiveValue] — see [LiveValue.from].
+  ///
+  /// Hot: the subscription opens immediately, so values arriving before
+  /// anyone listens still update [LiveValue.value].
+  LiveValue<T> get fxLive => LiveValue<T>.from(this);
+
+  /// This stream as a [LiveValue] already holding [seed] — see
+  /// [LiveValue.seededFrom].
+  LiveValue<T> fxLiveSeeded(T seed) => LiveValue<T>.seededFrom(seed, this);
 }
 
 /// Chainable event-stream operators over a plain Dart [Stream].
