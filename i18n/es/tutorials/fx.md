@@ -82,9 +82,10 @@ nextLabel: pipe
   <p>
     Cada punto de entrada existe también como getter: <code>.fx</code> sobre un
     <code>Iterable</code>, un <code>FxAsyncIterable</code> o un
-    <code>Stream</code>, y <code>.fxAsync</code> sobre un iterable de futuros.
-    Construyen exactamente la misma cadena; lo único que cambia es por qué
-    extremo de la expresión se empieza a leer:
+    <code>Stream</code>, <code>.fxAsync</code> sobre un iterable de futuros y
+    <code>.fxEvents</code> sobre un <code>Stream</code>. Construyen exactamente
+    la misma cadena; lo único que cambia es por qué extremo de la expresión se
+    empieza a leer:
   </p>
   <pre><code>// la función: hay que volver al principio para abrir el paréntesis
 fx(orders.where(isPaid)).groupBy((o) =&gt; o.customerId);
@@ -116,6 +117,20 @@ orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
     tipo resuelto y <code>concurrent(n)</code> tiene algo que hacer.
   </p>
   <pre><code>await responses.fxAsync.map(parse).concurrent(4).toList();</code></pre>
+  <p>
+    Un <code>Stream</code> lleva ambos getters, porque es la única fuente que
+    pertenece a los dos mundos. <code>.fx</code> da la cadena <em>pull</em>, lo
+    mismo que <code>fxStream</code>; <code>.fxEvents</code> da la cadena
+    <em>push</em>, lo mismo que <a href="fxEvents.html"><code>fxEvents</code></a> —
+    debounce, throttle, switch. Para volver de push a pull,
+    <code>.pull()</code>. Se comparan lado a lado en
+    <a href="streams.html">Puentes de Stream</a>.
+  </p>
+  <pre><code>keystrokes.fxEvents
+    .debounce(const Duration(milliseconds: 160))
+    .switchMap((q) =&gt; search(q).asStream())
+    .pull()
+    .toList();</code></pre>
 
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: construye una cadena que se quede con las puntuaciones de 60 o más, las duplique

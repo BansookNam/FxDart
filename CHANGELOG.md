@@ -3,11 +3,13 @@
 ### `.fx` — the chain as a getter
 
 `fx(xs)` gains a getter spelling. `.fx` works on an `Iterable`, an
-`FxAsyncIterable` and a `Stream`; `.fxAsync` works on an iterable of futures:
+`FxAsyncIterable` and a `Stream`; `.fxAsync` works on an iterable of futures;
+`.fxEvents` works on a `Stream`:
 
 ```dart
 orders.where(isPaid).fx.groupBy((o) => o.customerId);
 await responses.fxAsync.map(parse).concurrent(4).toList();
+keystrokes.fxEvents.debounce(window).switchMap(search).pull();
 ```
 
 The point is which end of the expression you read from. Wrapping a call in
@@ -47,10 +49,27 @@ cost more in consistency than either gains in brevity; the getter is introduced
 once, in the [`fx()` tutorial](https://bansooknam.github.io/FxDart/tutorials/fx.html),
 as the Dart-idiomatic alternative.
 
-The four extensions are `FxEntry`, `FxAsyncEntry`, `FxStreamEntry` and
-`FxFutureEntry`. Naming them matters: a clash with another package's `.fx` on
-`Iterable` is a compile error, and the fix is to say which extension you mean
-at the call site.
+### The events layer gets one too, carefully
+
+`FxEvents` is documented as "a thin wrapper (never an extension), so it can
+coexist with any other stream library — including rxdart — without member
+conflicts", and that rule still holds for its operators: `debounce`,
+`switchMap`, `throttle` and thirty-odd others all collide with rxdart's
+`Stream` extensions, which is exactly why they live on a wrapper class.
+
+`FxEventsEntry` adds one name, `fxEvents`, and rxdart's forty-plus `Stream`
+extensions claim nothing like it (checked against rxdart 0.28.0). One entry
+name is a different risk from forty operator names, so the class comment now
+points at the exception rather than reading as absolute.
+
+That leaves `Stream` carrying both getters, which is right: it is the one
+source that belongs to both worlds. `.fx` is the pull chain (`fxStream`),
+`.fxEvents` is the push chain (`fxEvents`), and `.pull()` still crosses back.
+
+The five extensions are `FxEntry`, `FxAsyncEntry`, `FxStreamEntry`,
+`FxFutureEntry` and `FxEventsEntry`. Naming them matters: a clash with another
+package's `.fx` on `Iterable` is a compile error, and the fix is to say which
+extension you mean at the call site.
 
 ## 0.8.6
 

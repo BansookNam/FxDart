@@ -174,8 +174,8 @@ fx(range(1, 1000000)).map((a) => a * a).take(3).toList(); // [1, 4, 9]
 ```
 
 Every entry point has a getter twin — `.fx` on an `Iterable`, `FxAsyncIterable` or
-`Stream`, `.fxAsync` on an iterable of futures — which builds the same chain and
-reads left to right when the source is itself a call:
+`Stream`, `.fxAsync` on an iterable of futures, `.fxEvents` on a `Stream` — which
+builds the same chain and reads left to right when the source is itself a call:
 `orders.where(isPaid).fx.groupBy(...)`. The docs use `fx()` throughout; see the
 [`fx()` tutorial](https://bansooknam.github.io/FxDart/tutorials/fx.html) for when
 each spelling reads better.

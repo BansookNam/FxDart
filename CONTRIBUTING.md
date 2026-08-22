@@ -134,6 +134,26 @@ hand-maintained `_$NAME` wrapper list, and it silently fell out of step with
 releases, and only a manual `./deploy.sh` ever noticed. **If you added a
 public top-level function, check whether the wrapper list needs it.**
 
+It has a consequence that catches everyone once. Every playground artifact
+under `docs/pg/` is keyed by the snippet *plus* the bundle it compiles
+against, so **any change to `lib/` re-keys every fxdart snippet on the site**
+— rebuilding the bundle for a four-line addition orphaned 333 of 448
+artifacts. Nothing fails; those pages just fall back to the network compile
+service and get ~2s slower on Run. So a `lib/` PR runs the deploy sequence in
+order and commits the result:
+
+```bash
+bash tools/build_single_file.sh                     # 1. bundle
+dart run tool/precompile_playgrounds.dart --prune   # 2. re-compile, drop the superseded
+dart run tool/build_docs.dart                       # 3. restamp data-pg
+dart run tool/precompile_playgrounds.dart --status  # 0 "in scope not built yet"
+```
+
+Step 2 compiles over the network and takes minutes. Never reorder these:
+`build_docs` stamps `data-pg` only on snippets that already have an artifact
+on disk, so building docs before precompiling silently produces unstamped
+pages.
+
 ### Docs gate — if you touched `content/`, `i18n/`, or the theory book
 
 ```bash

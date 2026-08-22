@@ -53,6 +53,38 @@ nextLabel: concurrent
   </p>
   {{playground:1}}
 
+  <h2>하나의 Stream, 두 개의 체인</h2>
+  <p>
+    <code>Stream</code>은 FxDart의 두 세계 모두에 속하는 유일한 소스라서
+    getter가 둘 붙습니다. 서로의 변종이 아니라 <strong>모델이 다릅니다</strong>.
+  </p>
+  <table>
+    <thead><tr><th></th><th><code>stream.fx</code></th><th><code>stream.fxEvents</code></th></tr></thead>
+    <tbody>
+      <tr><td>결과</td><td><code>FxAsync&lt;T&gt;</code></td><td><code>FxEvents&lt;T&gt;</code></td></tr>
+      <tr><td>함수 표기</td><td><code>fxStream(stream)</code></td><td><code>fxEvents(stream)</code></td></tr>
+      <tr><td>모델</td><td><strong>pull</strong> — 수요에 따라 흐르는 데이터</td><td><strong>push</strong> — 시간 위에 놓인 이벤트</td></tr>
+      <tr><td>속도를 정하는 쪽</td><td>소비자 — <code>next()</code> 한 번에 하나</td><td>스트림 — 연산자는 타이밍을 다듬을 뿐</td></tr>
+      <tr><td>주로 쓰는 연산자</td><td><code>map</code>, <code>filter</code>, <code>concurrent</code>, <code>toList</code></td><td><code>debounce</code>, <code>throttle</code>, <code>switchMap</code>, <code>combineLatest</code></td></tr>
+      <tr><td>배압(backpressure)</td><td>있음 — 요청하기 전에는 당기지 않음</td><td>없음 — 스트림은 나올 때 나옴</td></tr>
+    </tbody>
+  </table>
+  <p>
+    고르는 기준은 이렇습니다. 질문이 <em>“한 번에 몇 개씩?”</em>이면 pull
+    체인입니다. <code>concurrent(n)</code>은 소비자가 수요를 쥐고 있을 때만
+    의미가 있기 때문입니다. 질문이 <em>“얼마나 자주, 그리고 어느 것이
+    이기나?”</em>라면 이벤트 체인입니다. 어느 쪽에서 시작하든 건너올 수
+    있습니다 — <code>.pull()</code>은 <code>FxEvents</code>를 pull 체인으로,
+    <code>.toStream()</code>은 <code>FxAsync</code>를 다시
+    <code>Stream</code>으로 바꿉니다.
+  </p>
+  <p>
+    자세한 수업: push 체인은
+    <a href="fxEvents.html"><code>fxEvents</code></a>, 체인 모델과 getter
+    표기는 <a href="fx.html"><code>fx</code></a>, pull 쪽에서만 가능한 일은
+    <a href="concurrent.html"><code>concurrent</code></a>에 있습니다.
+  </p>
+
   <h2>직접 해 보기</h2>
   <p>연습: 이 스트림에서 10 이상인 값만 남겨 보세요.</p>
   {{playground:2}}

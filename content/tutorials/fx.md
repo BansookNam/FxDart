@@ -81,9 +81,10 @@ nextLabel: pipe
   <p>
     Every entry point also exists as a getter: <code>.fx</code> on an
     <code>Iterable</code>, an <code>FxAsyncIterable</code> or a
-    <code>Stream</code>, and <code>.fxAsync</code> on an iterable of futures.
-    They build exactly the same chain — the difference is only which end of
-    the expression you read from:
+    <code>Stream</code>, <code>.fxAsync</code> on an iterable of futures, and
+    <code>.fxEvents</code> on a <code>Stream</code>. They build exactly the
+    same chain — the difference is only which end of the expression you read
+    from:
   </p>
   <pre><code>// the function: you go back to the front to open the paren
 fx(orders.where(isPaid)).groupBy((o) =&gt; o.customerId);
@@ -113,6 +114,20 @@ orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
     resolved type and <code>concurrent(n)</code> has something to work with.
   </p>
   <pre><code>await responses.fxAsync.map(parse).concurrent(4).toList();</code></pre>
+  <p>
+    A <code>Stream</code> carries both getters, because it is the one source
+    that belongs to both worlds. <code>.fx</code> gives the <em>pull</em>
+    chain, the same as <code>fxStream</code>; <code>.fxEvents</code> gives the
+    <em>push</em> chain, the same as <a href="fxEvents.html"><code>fxEvents</code></a> —
+    debouncing, throttling, switching. Cross from push back to pull with
+    <code>.pull()</code>. The two are compared side by side in
+    <a href="streams.html">Stream bridges</a>.
+  </p>
+  <pre><code>keystrokes.fxEvents
+    .debounce(const Duration(milliseconds: 160))
+    .switchMap((q) =&gt; search(q).asStream())
+    .pull()
+    .toList();</code></pre>
 
   <h2>Try it yourself</h2>
   <p>Exercise: build a chain that keeps scores of 60 or above, doubles them

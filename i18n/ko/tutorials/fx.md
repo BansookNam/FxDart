@@ -80,8 +80,9 @@ nextLabel: pipe
   <p>
     모든 진입점에는 getter 형태도 있습니다. <code>Iterable</code>,
     <code>FxAsyncIterable</code>, <code>Stream</code>에는 <code>.fx</code>가,
-    Future의 이터러블에는 <code>.fxAsync</code>가 붙습니다. 만들어지는 체인은
-    완전히 같고, 차이는 표현식을 어느 쪽부터 읽느냐뿐입니다.
+    Future의 이터러블에는 <code>.fxAsync</code>가, <code>Stream</code>에는
+    <code>.fxEvents</code>가 붙습니다. 만들어지는 체인은 완전히 같고, 차이는
+    표현식을 어느 쪽부터 읽느냐뿐입니다.
   </p>
   <pre><code>// 함수 표기: 괄호를 열려면 표현식 앞으로 되돌아가야 합니다
 fx(orders.where(isPaid)).groupBy((o) =&gt; o.customerId);
@@ -112,6 +113,20 @@ orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
     갖게 됩니다.
   </p>
   <pre><code>await responses.fxAsync.map(parse).concurrent(4).toList();</code></pre>
+  <p>
+    <code>Stream</code>에는 두 getter가 모두 붙습니다. 양쪽 세계에 걸쳐 있는
+    유일한 소스이기 때문입니다. <code>.fx</code>는 <em>pull</em> 체인으로,
+    <code>fxStream</code>과 같습니다. <code>.fxEvents</code>는 <em>push</em>
+    체인으로, <a href="fxEvents.html"><code>fxEvents</code></a>와 같습니다 —
+    debounce, throttle, switch가 여기에 있습니다. push에서 pull로 건너올 때는
+    <code>.pull()</code>을 씁니다. 둘을 나란히 놓고 비교한 표는
+    <a href="streams.html">Stream 다리</a>에 있습니다.
+  </p>
+  <pre><code>keystrokes.fxEvents
+    .debounce(const Duration(milliseconds: 160))
+    .switchMap((q) =&gt; search(q).asStream())
+    .pull()
+    .toList();</code></pre>
 
   <h2>직접 해 보기</h2>
   <p>연습: 60점 이상인 점수만 남기고, 보너스 점수로 두 배를 한 뒤,
