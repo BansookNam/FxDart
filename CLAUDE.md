@@ -84,7 +84,11 @@ Async operator callbacks in `mapAsync`-style code must stay parallel-safe: overl
   belongs in the same commit as the edit. Before recording in bulk, confirm the English
   diff really is prose-free (`git show <sha> -- content/comparison | grep -v '^[-+]order:'`),
   since recording is what silences a *genuine* staleness too.
-- `deploy.sh` stages only docs-related paths (`docs web content i18n tool tools benchmark deploy.sh DEPLOY.md`) — commit `lib/`/`test/` changes separately first.
+- **`docs/` is untracked** (`.gitignore`). It is built and published by
+  `.github/workflows/pages.yml` on a push to `main`; nothing generated is ever
+  committed. `./deploy.sh` builds the same output locally for inspection and
+  `./run.sh -s` serves it — neither commits. To publish without a source
+  change: `gh workflow run pages.yml` (`-f pg_scope=all` for every playground).
 
 ### Theory textbook (content/theory/ → docs/theory/)
 
