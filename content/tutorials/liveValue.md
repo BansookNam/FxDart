@@ -51,6 +51,16 @@ nextLabel: FxSubscriptions
   <h2>Demo 2 · value, hasValue, and close</h2>
   {{playground:1}}
 
+  <h2>Method spelling</h2>
+  <p>
+    A <code>Stream</code> reaches both constructors as members:
+    <code>source.fxLive</code> is <code>LiveValue.from(source)</code>, and
+    <code>source.fxLiveSeeded(v)</code> is
+    <code>LiveValue.seededFrom(v, source)</code>. Both are still hot — the
+    subscription opens on the spot.
+  </p>
+  <pre><code>final price = ticker.fxLive;
+final count = taps.fxLiveSeeded(0);   // has a value before the first tap</code></pre>
   <h2>Try it yourself</h2>
   <p>Exercise: derive a label feed from live state.</p>
   {{playground:2}}

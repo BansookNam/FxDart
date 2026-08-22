@@ -27,9 +27,14 @@ nextLabel: sampleOn
   <p>
     Design decisions worth knowing. <code>FxEvents</code> is a thin
     <strong>wrapper</strong>, deliberately not a set of <code>Stream</code>
-    extensions — so it can never collide with rxdart or any other stream
-    listens to nothing; only a terminal (<code>toList</code>,
-    <code>head</code>, <code>listen</code>) starts events flowing. And it is
+    extensions — so its operators can never collide with rxdart or any other
+    stream library in the same file. The one exception is the
+    <code>.fxEvents</code> entry getter, a single name nothing else claims; it
+    sits beside <code>.fx</code> in
+    <a href="streams.html">Stream bridges</a>. The chain stays
+    <strong>cold</strong>: wrapping listens to nothing; only a terminal
+    (<code>toList</code>, <code>head</code>, <code>listen</code>) starts
+    events flowing. And it is
     an fxdart extension inspired by Rx, not part of FxTS — the ideas come
     from Rx, but where a name would clash with the pull layer's the pull
     spelling wins: <code>uniqAdjacent</code> rather than
@@ -58,7 +63,7 @@ nextLabel: sampleOn
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="streams.html">Stream bridges</a> — <code>fromStream</code> / <code>toStream()</code>, the pull side of the border ·
+    <a href="streams.html">Stream bridges</a> — the pull side of the border, and <code>stream.fx</code> vs <code>stream.fxEvents</code> side by side ·
     <a href="debounce.html"><code>debounce</code></a> &amp; <a href="throttle.html"><code>throttle</code></a> — both have <code>FxEvents</code> forms ·
     <a href="liveValue.html"><code>LiveValue</code></a> — the current-value companion to this chain
   </div>

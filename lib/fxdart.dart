@@ -33,6 +33,10 @@ export 'src/fx.dart'
         FxAsync,
         FxNum,
         FxAsyncNum,
+        FxEntry,
+        FxAsyncEntry,
+        FxStreamEntry,
+        FxFutureEntry,
         FxPair,
         FxAsyncPair;
 export 'src/dart_aliases.dart';
@@ -49,7 +53,8 @@ export 'src/strict/curried.dart';
 export 'src/strict/func.dart';
 export 'src/strict/object.dart';
 export 'src/strict/predicates.dart';
-export 'src/stream/events.dart' show FxEvents, LiveValue, fxEvents;
+export 'src/stream/events.dart'
+    show FxEvents, FxEventsEntry, LiveValue, fxEvents;
 export 'src/stream/subscriptions.dart' show FxSubscriptions;
 export 'src/typed/accumulate.dart'
     show Accumulated, Accumulator, AccumulatingRaise, AccumulatingRaiseOps;

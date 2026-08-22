@@ -1,2 +1,3 @@
 FxAsyncIterable&lt;T&gt; toAsync&lt;T&gt;(Iterable&lt;FutureOr&lt;T&gt;&gt; iterable)
 FxAsync&lt;T&gt; Fx.toAsync&lt;T&gt;()        // chain, on a sync Fx
+FxAsync&lt;T&gt;         Iterable&lt;FutureOr&lt;T&gt;&gt;.fxAsync   // method (resolves the futures)

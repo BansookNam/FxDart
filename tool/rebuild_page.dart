@@ -1,5 +1,9 @@
-// Rebuilds the playground artifacts for one built page, then restamps and
-// commits.
+// Rebuilds the playground artifacts for one built page, then restamps it.
+//
+// A local convenience, not a step anyone owes the repository: `docs/` is
+// untracked and `.github/workflows/pages.yml` builds every artifact on a push
+// to main. Use this when you have edited one page's snippets and want that
+// page fast in a local preview without waiting for a full precompile.
 //
 // Editing a snippet changes its id, which orphans the artifact the page was
 // stamped with — the panel silently falls back to the DartPad compile service
@@ -17,8 +21,6 @@
 //
 // Flags:
 //   --dry-run      resolve and report; touch nothing
-//   --no-commit    rebuild, leave the result unstaged
-//   --message=…    commit subject (default: "docs: rebuild playgrounds for …")
 //
 // This is a build tool, not a correctness gate: it will happily ship a snippet
 // whose output drifted. Run `dart run tool/check_comparison.dart <slug>` for
@@ -32,14 +34,14 @@ final root = Directory.current.path;
 
 void main(List<String> args) async {
   final dryRun = args.contains('--dry-run');
-  final commit = !args.contains('--no-commit');
-  final message = _flag(args, 'message');
   final pages = args.where((a) => !a.startsWith('--')).toList();
 
   if (pages.isEmpty) {
-    stderr.writeln('usage: dart run tool/rebuild_page.dart <page…> '
-        '[--dry-run] [--no-commit] [--message=…]\n'
-        'e.g.  DartComparison/top-merchants.html');
+    stderr.writeln(
+      'usage: dart run tool/rebuild_page.dart <page…> '
+      '[--dry-run]\n'
+      'e.g.  DartComparison/top-merchants.html',
+    );
     exit(2);
   }
 
@@ -50,9 +52,11 @@ void main(List<String> args) async {
     final route = _route(page);
     final dir = _sourceDir(route);
     if (dir == null) {
-      stderr.writeln('no playgrounds known for "$route" (from "$page")\n'
-          'expected one of: index, tutorials/<slug>, '
-          'DartComparison/<slug>, RxDartComparison/<slug>');
+      stderr.writeln(
+        'no playgrounds known for "$route" (from "$page")\n'
+        'expected one of: index, tutorials/<slug>, '
+        'DartComparison/<slug>, RxDartComparison/<slug>',
+      );
       exit(1);
     }
     if (!Directory('$root/$dir').existsSync()) {
@@ -67,7 +71,9 @@ void main(List<String> args) async {
   final all = snippets(root);
   var missing = 0;
   for (final entry in routes.entries) {
-    final found = all.where((s) => s.path.startsWith('${entry.value}/')).toList();
+    final found = all
+        .where((s) => s.path.startsWith('${entry.value}/'))
+        .toList();
     if (found.isEmpty) {
       stderr.writeln('${entry.key}: no snippets under ${entry.value}/');
       exit(1);
@@ -76,13 +82,17 @@ void main(List<String> args) async {
     for (final s in found) {
       final present = File(artifactPath(root, s.id)).existsSync();
       if (!present) missing++;
-      stdout.writeln('  ${present ? '✓' : '·'} ${s.path}  ${s.id}'
-          '${present ? '' : '  (needs compile)'}');
+      stdout.writeln(
+        '  ${present ? '✓' : '·'} ${s.path}  ${s.id}'
+        '${present ? '' : '  (needs compile)'}',
+      );
     }
   }
-  stdout.writeln(missing == 0
-      ? 'all artifacts current — rebuilding docs to confirm stamps'
-      : '$missing snippet(s) to compile');
+  stdout.writeln(
+    missing == 0
+        ? 'all artifacts current — rebuilding docs to confirm stamps'
+        : '$missing snippet(s) to compile',
+  );
 
   if (dryRun) return;
 
@@ -97,18 +107,10 @@ void main(List<String> args) async {
   ]);
   await _run('dart', ['run', 'tool/build_docs.dart']);
 
-  if (!commit) {
-    stdout.writeln('\n--no-commit: leaving changes unstaged');
-    return;
-  }
-  _commit(routes, message);
-}
-
-String? _flag(List<String> args, String name) {
-  for (final a in args) {
-    if (a.startsWith('--$name=')) return a.substring(name.length + 3);
-  }
-  return null;
+  stdout.writeln(
+    '\ndone — docs/ is untracked, so there is nothing to stage. '
+    'Serve it with `./run.sh -s`.',
+  );
 }
 
 /// Reduces any spelling of a page to `<family>/<slug>` (or `index`).
@@ -167,51 +169,22 @@ void _warnIfBundleStale() {
       .where((f) => f.lastModifiedSync().isAfter(built))
       .toList();
   if (newer.isNotEmpty) {
-    stdout.writeln('warning: lib/ has ${newer.length} file(s) newer than '
-        '$libraryPath\n         run tools/build_single_file.sh first, or every '
-        'fxdart id here is stale\n');
+    stdout.writeln(
+      'warning: lib/ has ${newer.length} file(s) newer than '
+      '$libraryPath\n         run tools/build_single_file.sh first, or every '
+      'fxdart id here is stale\n',
+    );
   }
 }
 
 Future<void> _run(String exe, List<String> args) async {
   stdout.writeln('\n\$ $exe ${args.join(' ')}');
-  final p = await Process.start(exe, args,
-      workingDirectory: root, mode: ProcessStartMode.inheritStdio);
+  final p = await Process.start(
+    exe,
+    args,
+    workingDirectory: root,
+    mode: ProcessStartMode.inheritStdio,
+  );
   final code = await p.exitCode;
   if (code != 0) exit(code);
-}
-
-void _commit(Map<String, String> routes, String? message) {
-  // Anything already staged would ride along in a commit this tool worded.
-  final staged = _git(['diff', '--cached', '--name-only']);
-  if (staged.isNotEmpty) {
-    stderr.writeln('\nindex already has staged changes:\n  '
-        '${staged.split('\n').join('\n  ')}\n'
-        'commit or reset them first, or re-run with --no-commit');
-    exit(1);
-  }
-
-  // Stage the sources this page is built from alongside docs/, so the snippet
-  // change and the artifact it produced land together.
-  _git(['add', 'docs', ...routes.values]);
-  if (_git(['diff', '--cached', '--name-only']).isEmpty) {
-    stdout.writeln('\nnothing changed — no commit');
-    return;
-  }
-  stdout.writeln('\n${_git(['diff', '--cached', '--stat'])}');
-
-  final subject =
-      message ?? 'docs: rebuild playgrounds for ${routes.keys.join(', ')}';
-  _git(['commit', '-m', subject]);
-  stdout.writeln('\n${_git(['log', '--oneline', '-1'])}');
-  stdout.writeln('not pushed — review, then `git push origin main`');
-}
-
-String _git(List<String> args) {
-  final r = Process.runSync('git', args, workingDirectory: root);
-  if (r.exitCode != 0) {
-    stderr.writeln('git ${args.join(' ')} failed:\n${r.stderr}');
-    exit(r.exitCode);
-  }
-  return (r.stdout as String).trim();
 }

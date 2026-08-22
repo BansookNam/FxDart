@@ -51,6 +51,16 @@ nextLabel: FxSubscriptions
   <h2>데모 2 · value, hasValue, 그리고 close</h2>
   {{playground:1}}
 
+  <h2>메서드 표기</h2>
+  <p>
+    <code>Stream</code>에서 두 생성자를 멤버로 부를 수 있습니다.
+    <code>source.fxLive</code>는 <code>LiveValue.from(source)</code>이고,
+    <code>source.fxLiveSeeded(v)</code>는
+    <code>LiveValue.seededFrom(v, source)</code>입니다. 둘 다 여전히 hot이라
+    구독이 즉시 열립니다.
+  </p>
+  <pre><code>final price = ticker.fxLive;
+final count = taps.fxLiveSeeded(0);   // has a value before the first tap</code></pre>
   <h2>직접 해 보기</h2>
   <p>연습: 라이브 상태로부터 레이블 피드 파생하기.</p>
   {{playground:2}}

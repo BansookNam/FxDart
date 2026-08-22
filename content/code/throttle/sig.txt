@@ -6,3 +6,5 @@ class Throttled&lt;T&gt; {
 }
 
 FxEvents&lt;T&gt; FxEvents&lt;T&gt;.throttle(Duration window, {bool leading = true, bool trailing = false}) // chain (events)
+
+Throttled&lt;T&gt; (void Function(T arg)).fxThrottle(Duration wait, {bool leading = true, bool trailing = true}) // method

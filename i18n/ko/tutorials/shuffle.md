@@ -49,6 +49,21 @@ nextLabel: createSeededRandom
   </p>
   {{playground:1}}
 
+  <h2>메서드 표기</h2>
+  <p>
+    <code>xs.fxShuffle(seed)</code>는 <code>shuffle(xs, seed)</code>이고,
+    <code>FxAsyncIterable</code>에서 같은 이름은
+    <code>shuffleAsync</code>입니다.
+  </p>
+  <p>
+    이름이 <code>shuffle</code>이 아닌 것은 취향 문제가 아닙니다.
+    <code>List.shuffle</code>은 이미 <code>dart:core</code>에 있고,
+    <strong>제자리에서 섞고 void를 돌려줍니다</strong>. 인스턴스 멤버는 항상
+    확장을 이기므로 <code>List</code>를 수신자로 두면 조용히 엉뚱한 쪽이
+    불립니다 — 접두사가 둘을 헷갈릴 수 없게 만듭니다.
+  </p>
+  <pre><code>final a = [1, 2, 3].fxShuffle(42);   // a new List, seeded
+final b = [1, 2, 3]..shuffle();      // dart:core, in place, void</code></pre>
   <h2>직접 해 보기</h2>
   <p>연습: 이 턴 순서에 시드를 주어, 매번 무작위로 바뀌는 대신 앱을 재시작해도
     재현되도록 만들어 보세요.</p>

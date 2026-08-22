@@ -49,6 +49,21 @@ nextLabel: createSeededRandom
   </p>
   {{playground:1}}
 
+  <h2>Method spelling</h2>
+  <p>
+    <code>xs.fxShuffle(seed)</code> is <code>shuffle(xs, seed)</code>, and on an
+    <code>FxAsyncIterable</code> the same name is
+    <code>shuffleAsync</code>.
+  </p>
+  <p>
+    It is not called <code>shuffle</code>, and that is not a style choice.
+    <code>List.shuffle</code> already exists in <code>dart:core</code> and
+    shuffles <strong>in place, returning void</strong>. An instance member
+    always beats an extension, so a <code>List</code> receiver would silently
+    call the wrong one — the prefix makes the two impossible to confuse.
+  </p>
+  <pre><code>final a = [1, 2, 3].fxShuffle(42);   // a new List, seeded
+final b = [1, 2, 3]..shuffle();      // dart:core, in place, void</code></pre>
   <h2>Try it yourself</h2>
   <p>Exercise: give this turn order a seed so it's reproducible across app
     restarts instead of random every time.</p>

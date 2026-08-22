@@ -77,6 +77,90 @@ nextLabel: pipe
   </p>
   {{playground:1}}
 
+  <h2>The getter spelling</h2>
+  <p>
+    Every entry point also exists as a getter: <code>.fx</code> on an
+    <code>Iterable</code>, an <code>FxAsyncIterable</code> or a
+    <code>Stream</code>, <code>.fxAsync</code> on an iterable of futures, and
+    <code>.fxEvents</code> on a <code>Stream</code>. They build exactly the
+    same chain — the difference is only which end of the expression you read
+    from:
+  </p>
+  <pre><code>// the function: you go back to the front to open the paren
+fx(orders.where(isPaid)).groupBy((o) =&gt; o.customerId);
+
+// the getter: left to right, the way .toList() reads
+orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
+  <p>
+    This is the Dart-idiomatic spelling, and it is free: <code>Fx</code> is an
+    extension type, so the wrapper erases to the iterable itself, and a getter
+    whose body is <code>this</code> is a static call the compiler deletes. Over
+    a million-element <code>map</code> + <code>filter</code> + <code>sum</code>,
+    the two forms measure 12.640 ms and 12.665 ms — the same number twice.
+  </p>
+  <p>
+    <strong>These pages use <code>fx()</code> throughout.</strong> It is the
+    name FxTS uses, and it is the one that takes an explicit type argument,
+    which a getter cannot do postfix — <code>fx&lt;num&gt;(xs)</code> works
+    where <code>xs.fx&lt;num&gt;</code> does not parse. Pick whichever reads
+    better in your own code; they compile to the same thing.
+  </p>
+  <p>
+    One asymmetry is worth knowing. Over an
+    <code>Iterable&lt;Future&lt;T&gt;&gt;</code>, <code>.fx</code> gives you an
+    <code>Fx&lt;Future&lt;T&gt;&gt;</code> — a chain over the futures rather
+    than their values, which compiles and quietly does the wrong thing. That is
+    what <code>.fxAsync</code> is for: it awaits them, so <code>T</code> is the
+    resolved type and <code>concurrent(n)</code> has something to work with.
+  </p>
+  <pre><code>await responses.fxAsync.map(parse).concurrent(4).toList();</code></pre>
+  <p>
+    A <code>Stream</code> carries both getters, because it is the one source
+    that belongs to both worlds. <code>.fx</code> gives the <em>pull</em>
+    chain, the same as <code>fxStream</code>; <code>.fxEvents</code> gives the
+    <em>push</em> chain, the same as <a href="fxEvents.html"><code>fxEvents</code></a> —
+    debouncing, throttling, switching. Cross from push back to pull with
+    <code>.pull()</code>. The two are compared side by side in
+    <a href="streams.html">Stream bridges</a>.
+  </p>
+  <pre><code>keystrokes.fxEvents
+    .debounce(const Duration(milliseconds: 160))
+    .switchMap((q) =&gt; search(q).asStream())
+    .pull()
+    .toList();</code></pre>
+
+  <h2>Every getter spelling</h2>
+  <p>
+    The convention is one rule: an entry point carries <code>fx</code> in its
+    name. It says which library you are stepping into, and it keeps the bare
+    name — <code>toAsync</code>, <code>shuffle</code>, <code>debounce</code> —
+    free for whatever else a project puts on that type.
+  </p>
+  <table>
+    <thead><tr><th>Receiver</th><th>Getter</th><th>Same as</th></tr></thead>
+    <tbody>
+      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fx(xs)</code></td></tr>
+      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxAsync(it)</code></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxStream(s)</code></td></tr>
+      <tr><td><code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code></td><td><code>.fxAsync</code></td><td><a href="toAsync.html"><code>toAsync(xs)</code></a></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxEvents</code></td><td><a href="fxEvents.html"><code>fxEvents(s)</code></a></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLive</code></td><td><a href="liveValue.html"><code>LiveValue.from(s)</code></a></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLiveSeeded</code></td><td><a href="liveValue.html"><code>LiveValue.seededFrom(v, s)</code></a></td></tr>
+      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffle(xs)</code></a></td></tr>
+      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffleAsync(it)</code></a></td></tr>
+      <tr><td><code>void Function(T)</code></td><td><code>.fxDebounce</code></td><td><a href="debounce.html"><code>debounce(f, w)</code></a></td></tr>
+      <tr><td><code>void Function(T)</code></td><td><code>.fxThrottle</code></td><td><a href="throttle.html"><code>throttle(f, w)</code></a></td></tr>
+    </tbody>
+  </table>
+  <p>
+    The operators themselves are not on this list, and will not be. Fifteen of
+    them — <code>map</code>, <code>where</code>, <code>take</code>,
+    <code>fold</code> and friends — share a name with a member
+    <code>Iterable</code> already has, and an instance member always beats an
+    extension, so those calls could never reach fxdart. The chain is where the
+    operators live: <code>xs.fx.map(f)</code>, not <code>xs.map(f)</code>.
+  </p>
+
   <h2>Try it yourself</h2>
   <p>Exercise: build a chain that keeps scores of 60 or above, doubles them
     as bonus points, and takes only the first 2 results.</p>

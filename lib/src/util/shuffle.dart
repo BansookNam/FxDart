@@ -48,3 +48,20 @@ Future<List<T>> shuffleAsync<T>(
       : math.Random().nextDouble;
   return _shuffleList(await toListAsync(iterable), random);
 }
+
+/// Method spellings of [shuffle] and [shuffleAsync].
+///
+/// Named `fxShuffle`, not `shuffle`: `List.shuffle` already exists in
+/// `dart:core` and shuffles **in place, returning void**. An extension can
+/// never win against it, so a `List` receiver would silently call the wrong
+/// one — the prefix makes the two impossible to confuse.
+extension FxShuffleEntry<T> on Iterable<T> {
+  /// A new list with these elements shuffled. See [shuffle].
+  List<T> fxShuffle([int? seed]) => shuffle(this, seed);
+}
+
+/// Async counterpart of [FxShuffleEntry].
+extension FxShuffleAsyncEntry<T> on FxAsyncIterable<T> {
+  /// A new list with these elements shuffled. See [shuffleAsync].
+  Future<List<T>> fxShuffle([int? seed]) => shuffleAsync(this, seed);
+}

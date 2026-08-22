@@ -47,6 +47,24 @@ nextLabel: shuffle
   </p>
   {{playground:1}}
 
+  <h2>Method spelling</h2>
+  <p>
+    Same as <a href="debounce.html"><code>debounce</code></a>:
+    <code>onScroll.fxThrottle(wait)</code> is
+    <code>throttle(onScroll, wait)</code>, and it forwards
+    <code>leading</code> and <code>trailing</code> unchanged.
+  </p>
+  <pre><code>void onScroll(double offset) =&gt; _measure(offset);
+
+final handler = onScroll.fxThrottle(
+  const Duration(milliseconds: 100),
+  trailing: false,
+);</code></pre>
+  <p>
+    The <code>fx</code> prefix names the library doing the wrapping, the same
+    convention as the getter spellings in
+    <a href="fx.html"><code>fx</code></a>.
+  </p>
   <h2>Try it yourself</h2>
   <p>Exercise: wrap <code>onClick</code> in <code>throttle</code> (100ms
     wait) so rapid clicks register at most twice — leading and trailing —

@@ -54,6 +54,40 @@ nextLabel: concurrent
   </p>
   {{playground:1}}
 
+  <h2>Dos cadenas, un Stream</h2>
+  <p>
+    Un <code>Stream</code> es la única fuente que pertenece a las dos mitades
+    de FxDart, así que lleva dos getters. No son variantes uno del otro: son
+    <strong>modelos distintos</strong>.
+  </p>
+  <table>
+    <thead><tr><th></th><th><code>stream.fx</code></th><th><code>stream.fxEvents</code></th></tr></thead>
+    <tbody>
+      <tr><td>devuelve</td><td><code>FxAsync&lt;T&gt;</code></td><td><code>FxEvents&lt;T&gt;</code></td></tr>
+      <tr><td>equivale a</td><td><code>fxStream(stream)</code></td><td><code>fxEvents(stream)</code></td></tr>
+      <tr><td>modelo</td><td><strong>pull</strong> — datos bajo demanda</td><td><strong>push</strong> — eventos en el tiempo</td></tr>
+      <tr><td>quién marca el ritmo</td><td>el consumidor, un <code>next()</code> cada vez</td><td>el stream; los operadores reajustan el tiempo</td></tr>
+      <tr><td>operadores típicos</td><td><code>map</code>, <code>filter</code>, <code>concurrent</code>, <code>toList</code></td><td><code>debounce</code>, <code>throttle</code>, <code>switchMap</code>, <code>combineLatest</code></td></tr>
+      <tr><td>contrapresión</td><td>sí — nada se tira hasta pedirlo</td><td>no — el stream emite cuando emite</td></tr>
+    </tbody>
+  </table>
+  <p>
+    La regla práctica: si la pregunta es <em>«¿cuántos a la vez?»</em> quieres
+    la cadena pull, porque <code>concurrent(n)</code> solo significa algo
+    cuando el consumidor controla la demanda. Si la pregunta es <em>«¿con qué
+    frecuencia, y cuál gana?»</em> quieres la cadena de eventos. Empieza por
+    cualquiera y cruza — <code>.pull()</code> convierte un
+    <code>FxEvents</code> en la cadena pull y <code>.toStream()</code> devuelve
+    un <code>FxAsync</code> a <code>Stream</code>.
+  </p>
+  <p>
+    Lecciones completas: <a href="fxEvents.html"><code>fxEvents</code></a> para
+    la cadena push, <a href="fx.html"><code>fx</code></a> para el modelo de
+    cadena y las formas con getter, y
+    <a href="concurrent.html"><code>concurrent</code></a> para lo que solo el
+    lado pull puede hacer.
+  </p>
+
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: quédate solo con los valores &gt;= 10 de este stream.</p>
   {{playground:2}}

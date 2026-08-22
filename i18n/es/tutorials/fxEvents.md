@@ -28,13 +28,20 @@ nextLabel: sampleOn
   <p>
     Decisiones de diseño que conviene conocer. <code>FxEvents</code> es un
     <strong>wrapper</strong> fino, deliberadamente no un conjunto de
-    extensiones sobre <code>Stream</code> — así nunca puede chocar con
-    rxdart ni con ninguna otra librería de streams en el mismo archivo. La
+    extensiones sobre <code>Stream</code> — así sus operadores nunca pueden
+    chocar con rxdart ni con ninguna otra librería de streams en el mismo
+    archivo. La única excepción es el getter de entrada
+    <code>.fxEvents</code>, un solo nombre que nadie más reclama; se compara
+    con <code>.fx</code> en <a href="streams.html">Puentes de Stream</a>. La
     cadena se mantiene <strong>fría</strong>: envolver no escucha nada; solo
-    un terminal (<code>toList</code>, <code>listen</code>) pone los eventos
-    a fluir. Y es una extensión de fxdart inspirada en Rx, no parte de
-    FxTS — los nombres de los operadores siguen la tradición Rx porque de
-    ahí vienen estas ideas.
+    un terminal (<code>toList</code>, <code>head</code>,
+    <code>listen</code>) pone los eventos a fluir. Y es una extensión de
+    fxdart inspirada en Rx, no parte de FxTS — las ideas vienen de Rx, pero
+    cuando un nombre chocaría con el de la capa pull gana la grafía pull:
+    <code>uniqAdjacent</code> en vez de <code>distinctUntilChanged</code>,
+    <code>stopOn</code> en vez de <code>takeUntil</code>, <code>head</code>
+    en vez de <code>first</code>. Una palabra significa una cosa en ambos
+    lados.
   </p>
   <p>
     Dos vías de escape te mantienen sin ataduras. <code>.stream</code>
@@ -58,7 +65,7 @@ nextLabel: sampleOn
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="streams.html">Puentes de Stream</a> — <code>fromStream</code> / <code>toStream()</code>, el lado pull de la frontera ·
+    <a href="streams.html">Puentes de Stream</a> — el lado pull de la frontera y <code>stream.fx</code> frente a <code>stream.fxEvents</code> ·
     <a href="debounce.html"><code>debounce</code></a> &amp; <a href="throttle.html"><code>throttle</code></a> — ambos tienen forma <code>FxEvents</code> ·
     <a href="liveValue.html"><code>LiveValue</code></a> — el compañero de valor actual de esta cadena
   </div>

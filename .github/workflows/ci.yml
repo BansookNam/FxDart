@@ -70,6 +70,24 @@ jobs:
           diff <(dart run tool/build_docs.dart --list-translatable) \
                <(dart run tool/check_translation.dart --list-translatable)
 
+      # The site is built and published by pages.yml on a push to main, which
+      # means a content/ change that does not render is a broken public site
+      # discovered *after* the merge. These two steps move that discovery to
+      # PR time, which is what lets a contributor ignore the docs build
+      # entirely: they do not run it, CI does, and CI tells them if they broke
+      # it. build_docs is ~2.5s; check_theory actually executes all 74 book
+      # listings and takes ~65s.
+      #
+      # Precompiling playgrounds is deliberately NOT here: it is ~10 minutes
+      # and depends on the DartPad compile service, so it belongs in the
+      # publish workflow rather than on every push. A missing artifact costs a
+      # reader latency, never correctness.
+      - name: The site renders
+        run: dart run tool/build_docs.dart
+
+      - name: Theory book listings run, and fit the page
+        run: dart run tool/check_theory.dart
+
       # AUTHORING.md's first rule: a benchmark case must measure the same
       # pipeline its published example shows.
       - name: Benchmark cases match their examples

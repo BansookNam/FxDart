@@ -1,6 +1,8 @@
 class LiveValue&lt;T&gt; {
   LiveValue();                  // empty — subscribers wait for the first add
   LiveValue.seeded(T value);    // starts with a current value
+  LiveValue.from(Stream&lt;T&gt; source);            // hot, fed by source
+  LiveValue.seededFrom(T seed, Stream&lt;T&gt; src);  // hot, seeded
 
   T get value;                  // latest value; StateError when none set
   bool get hasValue;
@@ -10,3 +12,6 @@ class LiveValue&lt;T&gt; {
   Stream&lt;T&gt; get stream;         // plain-Stream view of live
   Future&lt;void&gt; close();
 }
+
+LiveValue&lt;T&gt; Stream&lt;T&gt;.fxLive                 // = LiveValue.from(stream)
+LiveValue&lt;T&gt; Stream&lt;T&gt;.fxLiveSeeded(T seed)  // = LiveValue.seededFrom(seed, stream)

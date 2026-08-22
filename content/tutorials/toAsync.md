@@ -61,6 +61,23 @@ nextLabel: async variants
   </p>
   {{playground:1}}
 
+  <h2>Method spelling</h2>
+  <p>
+    <code>xs.fxAsync</code> is this function as a getter. It returns an
+    <code>FxAsync</code> rather than a bare <code>FxAsyncIterable</code>, so
+    the chain is ready to continue — and it resolves the futures, which
+    <code>xs.fx</code> does not.
+  </p>
+  <pre><code>await responses.fxAsync.map(parse).concurrent(4).toList();
+
+// responses.fx would be an Fx&lt;Future&lt;T&gt;&gt; — a chain over the
+// futures rather than their values.</code></pre>
+  <p>
+    The name carries <code>fx</code> on purpose. <code>toAsync</code> is a
+    general enough phrase that on a bare <code>Iterable</code> it would say
+    nothing about which library it enters; the getter spellings are collected
+    in <a href="fx.html"><code>fx</code></a>.
+  </p>
   <h2>Try it yourself</h2>
   <p>Exercise: filter the list below so only passing scores (&gt;= 60) make
     it into the result.</p>

@@ -76,6 +76,90 @@ nextLabel: pipe
   </p>
   {{playground:1}}
 
+  <h2>getter 표기</h2>
+  <p>
+    모든 진입점에는 getter 형태도 있습니다. <code>Iterable</code>,
+    <code>FxAsyncIterable</code>, <code>Stream</code>에는 <code>.fx</code>가,
+    Future의 이터러블에는 <code>.fxAsync</code>가, <code>Stream</code>에는
+    <code>.fxEvents</code>가 붙습니다. 만들어지는 체인은 완전히 같고, 차이는
+    표현식을 어느 쪽부터 읽느냐뿐입니다.
+  </p>
+  <pre><code>// 함수 표기: 괄호를 열려면 표현식 앞으로 되돌아가야 합니다
+fx(orders.where(isPaid)).groupBy((o) =&gt; o.customerId);
+
+// getter 표기: .toList()를 읽듯 왼쪽에서 오른쪽으로
+orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
+  <p>
+    이쪽이 Dart의 관용 표기이고, 비용은 없습니다. <code>Fx</code>는 extension
+    type이라 래퍼가 이터러블 자체로 소거되고, 본문이 <code>this</code>뿐인
+    getter는 컴파일러가 지워 버리는 정적 호출입니다. 100만 원소의
+    <code>map</code> + <code>filter</code> + <code>sum</code>에서 두 표기는
+    12.640 ms와 12.665 ms — 같은 숫자가 두 번 나옵니다.
+  </p>
+  <p>
+    <strong>이 문서는 전부 <code>fx()</code>로 씁니다.</strong> FxTS가 쓰는
+    이름이고, 타입 인자를 명시할 수 있는 쪽이기 때문입니다. getter는 후위로
+    타입 인자를 받을 수 없어서 <code>fx&lt;num&gt;(xs)</code>는 되지만
+    <code>xs.fx&lt;num&gt;</code>은 파싱되지 않습니다. 실제 코드에서는 더 잘
+    읽히는 쪽을 쓰세요 — 컴파일 결과는 동일합니다.
+  </p>
+  <p>
+    한 가지 비대칭은 알아 둘 만합니다.
+    <code>Iterable&lt;Future&lt;T&gt;&gt;</code>에 <code>.fx</code>를 붙이면
+    <code>Fx&lt;Future&lt;T&gt;&gt;</code>가 됩니다 — 값이 아니라 Future 자체를
+    훑는 체인이고, 컴파일은 되면서 조용히 엉뚱하게 동작합니다.
+    <code>.fxAsync</code>가 그래서 있습니다. Future를 await해 주므로
+    <code>T</code>는 결과 타입이 되고, <code>concurrent(n)</code>이 일할 거리를
+    갖게 됩니다.
+  </p>
+  <pre><code>await responses.fxAsync.map(parse).concurrent(4).toList();</code></pre>
+  <p>
+    <code>Stream</code>에는 두 getter가 모두 붙습니다. 양쪽 세계에 걸쳐 있는
+    유일한 소스이기 때문입니다. <code>.fx</code>는 <em>pull</em> 체인으로,
+    <code>fxStream</code>과 같습니다. <code>.fxEvents</code>는 <em>push</em>
+    체인으로, <a href="fxEvents.html"><code>fxEvents</code></a>와 같습니다 —
+    debounce, throttle, switch가 여기에 있습니다. push에서 pull로 건너올 때는
+    <code>.pull()</code>을 씁니다. 둘을 나란히 놓고 비교한 표는
+    <a href="streams.html">Stream 다리</a>에 있습니다.
+  </p>
+  <pre><code>keystrokes.fxEvents
+    .debounce(const Duration(milliseconds: 160))
+    .switchMap((q) =&gt; search(q).asStream())
+    .pull()
+    .toList();</code></pre>
+
+  <h2>getter 표기 전체</h2>
+  <p>
+    규칙은 하나입니다. 진입점 이름에는 <code>fx</code>가 들어갑니다. 어느
+    라이브러리로 들어가는지를 밝혀 주고, 맨 이름 — <code>toAsync</code>,
+    <code>shuffle</code>, <code>debounce</code> — 은 프로젝트가 그 타입에
+    붙일 몫으로 남겨 둡니다.
+  </p>
+  <table>
+    <thead><tr><th>수신 타입</th><th>getter</th><th>같은 것</th></tr></thead>
+    <tbody>
+      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fx(xs)</code></td></tr>
+      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxAsync(it)</code></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxStream(s)</code></td></tr>
+      <tr><td><code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code></td><td><code>.fxAsync</code></td><td><a href="toAsync.html"><code>toAsync(xs)</code></a></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxEvents</code></td><td><a href="fxEvents.html"><code>fxEvents(s)</code></a></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLive</code></td><td><a href="liveValue.html"><code>LiveValue.from(s)</code></a></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLiveSeeded</code></td><td><a href="liveValue.html"><code>LiveValue.seededFrom(v, s)</code></a></td></tr>
+      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffle(xs)</code></a></td></tr>
+      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffleAsync(it)</code></a></td></tr>
+      <tr><td><code>void Function(T)</code></td><td><code>.fxDebounce</code></td><td><a href="debounce.html"><code>debounce(f, w)</code></a></td></tr>
+      <tr><td><code>void Function(T)</code></td><td><code>.fxThrottle</code></td><td><a href="throttle.html"><code>throttle(f, w)</code></a></td></tr>
+    </tbody>
+  </table>
+  <p>
+    연산자 자체는 이 목록에 없고, 앞으로도 넣지 않습니다. 그중 열다섯 개 —
+    <code>map</code>, <code>where</code>, <code>take</code>,
+    <code>fold</code> 등 — 은 <code>Iterable</code>이 이미 가진 멤버와 이름이
+    같고, 인스턴스 멤버는 항상 확장을 이기므로 그 호출은 fxdart에 닿을 수조차
+    없습니다. 연산자가 사는 곳은 체인입니다 — <code>xs.map(f)</code>가 아니라
+    <code>xs.fx.map(f)</code>입니다.
+  </p>
+
   <h2>직접 해 보기</h2>
   <p>연습: 60점 이상인 점수만 남기고, 보너스 점수로 두 배를 한 뒤,
     앞의 2개 결과만 가져오는 체인을 만들어 보세요.</p>

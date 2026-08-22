@@ -49,6 +49,24 @@ nextLabel: throttle
   </p>
   {{playground:1}}
 
+  <h2>Method spelling</h2>
+  <p>
+    The callback carries the same thing as a method:
+    <code>saveDraft.fxDebounce(wait)</code> is
+    <code>debounce(saveDraft, wait)</code>, named arguments and all.
+  </p>
+  <pre><code>void saveDraft(String text) =&gt; _post(text);
+
+final save = saveDraft.fxDebounce(const Duration(milliseconds: 300));
+save('h');
+save('he');
+save('hello');   // only this one reaches _post</code></pre>
+  <p>
+    The <code>fx</code> prefix is deliberate. It says which library is wrapping
+    the callback and leaves the bare name free for whatever else a project puts
+    on its function types — the same convention as the getter spellings in
+    <a href="fx.html"><code>fx</code></a>.
+  </p>
   <h2>Try it yourself</h2>
   <p>Exercise: wrap <code>save</code> in <code>debounce</code> (100ms wait)
     so only the final value survives the burst of calls below.</p>

@@ -50,6 +50,24 @@ nextLabel: shuffle
   </p>
   {{playground:1}}
 
+  <h2>La forma con método</h2>
+  <p>
+    Igual que <a href="debounce.html"><code>debounce</code></a>:
+    <code>onScroll.fxThrottle(wait)</code> es
+    <code>throttle(onScroll, wait)</code>, y reenvía
+    <code>leading</code> y <code>trailing</code> sin cambios.
+  </p>
+  <pre><code>void onScroll(double offset) =&gt; _measure(offset);
+
+final handler = onScroll.fxThrottle(
+  const Duration(milliseconds: 100),
+  trailing: false,
+);</code></pre>
+  <p>
+    El prefijo <code>fx</code> nombra a la librería que envuelve, la misma
+    convención que las formas con getter de
+    <a href="fx.html"><code>fx</code></a>.
+  </p>
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: envuelve <code>onClick</code> en <code>throttle</code> (100 ms
     de espera) para que los clics rápidos se registren como mucho dos veces

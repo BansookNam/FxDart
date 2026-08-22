@@ -19,6 +19,7 @@ run.sh
 benchmark.sh
 DEPLOY.md
 CODECOV.md
+CONTRIBUTING.md
 
 # Benchmark suite (295 files / 428 KB of case sources and result JSON) —
 # useful in the repo, dead weight for a consumer.

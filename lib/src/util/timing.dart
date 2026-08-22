@@ -139,3 +139,22 @@ Throttled<T> throttle<T>(
   bool leading = true,
   bool trailing = true,
 }) => Throttled._(func, wait, leading: leading, trailing: trailing);
+
+/// Method spellings of [debounce] and [throttle], on the callback itself.
+///
+/// Both carry the `fx` prefix on purpose. `saveDraft.debounce(…)` would read
+/// as if Dart had always had it; `saveDraft.fxDebounce(…)` says which library
+/// is wrapping the callback, and leaves the bare names free for whatever else
+/// a project puts on its function types.
+extension FxCallbackTiming<T> on void Function(T arg) {
+  /// This callback, debounced by [wait]. See [debounce].
+  Debounced<T> fxDebounce(Duration wait, {bool leading = false}) =>
+      debounce(this, wait, leading: leading);
+
+  /// This callback, throttled to once per [wait]. See [throttle].
+  Throttled<T> fxThrottle(
+    Duration wait, {
+    bool leading = true,
+    bool trailing = true,
+  }) => throttle(this, wait, leading: leading, trailing: trailing);
+}

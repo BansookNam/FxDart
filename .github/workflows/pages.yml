@@ -54,6 +54,10 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Hoisted to the job so the cache key can name it. A run publishes exactly
+    # the scope it was given, so the key has to distinguish them — see below.
+    env:
+      PG_SCOPE: ${{ github.event.inputs.pg_scope || 'first' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -81,12 +85,15 @@ jobs:
         uses: actions/cache@v4
         with:
           path: docs/pg
-          key: pg-${{ hashFiles('docs/assets/fxdart_single.dart', 'content/**/*.dart', 'content/theory/*.md') }}
-          restore-keys: pg-
+          key: pg-${{ env.PG_SCOPE }}-${{ hashFiles('docs/assets/fxdart_single.dart', 'content/**/*.dart', 'content/theory/*.md') }}
+          # Falls back to the same scope's older build, then to any build at
+          # all: artifacts are content-addressed, so a partial restore is a
+          # head start and never wrong.
+          restore-keys: |
+            pg-${{ env.PG_SCOPE }}-
+            pg-
 
       - name: Precompile playgrounds
-        env:
-          PG_SCOPE: ${{ github.event.inputs.pg_scope || 'first' }}
         run: dart run tool/precompile_playgrounds.dart --scope="$PG_SCOPE" --prune
 
       - name: Render the site
