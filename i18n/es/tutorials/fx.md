@@ -78,6 +78,45 @@ nextLabel: pipe
   </p>
   {{playground:1}}
 
+  <h2>La forma con getter</h2>
+  <p>
+    Cada punto de entrada existe también como getter: <code>.fx</code> sobre un
+    <code>Iterable</code>, un <code>FxAsyncIterable</code> o un
+    <code>Stream</code>, y <code>.fxAsync</code> sobre un iterable de futuros.
+    Construyen exactamente la misma cadena; lo único que cambia es por qué
+    extremo de la expresión se empieza a leer:
+  </p>
+  <pre><code>// la función: hay que volver al principio para abrir el paréntesis
+fx(orders.where(isPaid)).groupBy((o) =&gt; o.customerId);
+
+// el getter: de izquierda a derecha, como se lee .toList()
+orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
+  <p>
+    Esta es la forma idiomática en Dart, y es gratis: <code>Fx</code> es un
+    extension type, así que el envoltorio se borra y queda el iterable mismo, y
+    un getter cuyo cuerpo es <code>this</code> es una llamada estática que el
+    compilador elimina. Sobre un <code>map</code> + <code>filter</code> +
+    <code>sum</code> de un millón de elementos, ambas formas miden 12.640 ms y
+    12.665 ms — el mismo número dos veces.
+  </p>
+  <p>
+    <strong>Estas páginas usan <code>fx()</code> en todo momento.</strong> Es el
+    nombre que usa FxTS y es el que admite un argumento de tipo explícito, algo
+    que un getter no puede recibir en posición posfija:
+    <code>fx&lt;num&gt;(xs)</code> funciona donde
+    <code>xs.fx&lt;num&gt;</code> ni siquiera parsea. En tu propio código elige
+    la que mejor se lea; compilan a lo mismo.
+  </p>
+  <p>
+    Conviene conocer una asimetría. Sobre un
+    <code>Iterable&lt;Future&lt;T&gt;&gt;</code>, <code>.fx</code> devuelve un
+    <code>Fx&lt;Future&lt;T&gt;&gt;</code> — una cadena sobre los futuros y no
+    sobre sus valores, que compila y hace lo incorrecto en silencio. Para eso
+    está <code>.fxAsync</code>: los espera, de modo que <code>T</code> es el
+    tipo resuelto y <code>concurrent(n)</code> tiene algo que hacer.
+  </p>
+  <pre><code>await responses.fxAsync.map(parse).concurrent(4).toList();</code></pre>
+
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: construye una cadena que se quede con las puntuaciones de 60 o más, las duplique
     como puntos extra y tome solo los 2 primeros resultados.</p>

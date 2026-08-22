@@ -77,6 +77,43 @@ nextLabel: pipe
   </p>
   {{playground:1}}
 
+  <h2>The getter spelling</h2>
+  <p>
+    Every entry point also exists as a getter: <code>.fx</code> on an
+    <code>Iterable</code>, an <code>FxAsyncIterable</code> or a
+    <code>Stream</code>, and <code>.fxAsync</code> on an iterable of futures.
+    They build exactly the same chain — the difference is only which end of
+    the expression you read from:
+  </p>
+  <pre><code>// the function: you go back to the front to open the paren
+fx(orders.where(isPaid)).groupBy((o) =&gt; o.customerId);
+
+// the getter: left to right, the way .toList() reads
+orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
+  <p>
+    This is the Dart-idiomatic spelling, and it is free: <code>Fx</code> is an
+    extension type, so the wrapper erases to the iterable itself, and a getter
+    whose body is <code>this</code> is a static call the compiler deletes. Over
+    a million-element <code>map</code> + <code>filter</code> + <code>sum</code>,
+    the two forms measure 12.640 ms and 12.665 ms — the same number twice.
+  </p>
+  <p>
+    <strong>These pages use <code>fx()</code> throughout.</strong> It is the
+    name FxTS uses, and it is the one that takes an explicit type argument,
+    which a getter cannot do postfix — <code>fx&lt;num&gt;(xs)</code> works
+    where <code>xs.fx&lt;num&gt;</code> does not parse. Pick whichever reads
+    better in your own code; they compile to the same thing.
+  </p>
+  <p>
+    One asymmetry is worth knowing. Over an
+    <code>Iterable&lt;Future&lt;T&gt;&gt;</code>, <code>.fx</code> gives you an
+    <code>Fx&lt;Future&lt;T&gt;&gt;</code> — a chain over the futures rather
+    than their values, which compiles and quietly does the wrong thing. That is
+    what <code>.fxAsync</code> is for: it awaits them, so <code>T</code> is the
+    resolved type and <code>concurrent(n)</code> has something to work with.
+  </p>
+  <pre><code>await responses.fxAsync.map(parse).concurrent(4).toList();</code></pre>
+
   <h2>Try it yourself</h2>
   <p>Exercise: build a chain that keeps scores of 60 or above, doubles them
     as bonus points, and takes only the first 2 results.</p>

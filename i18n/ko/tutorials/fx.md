@@ -76,6 +76,43 @@ nextLabel: pipe
   </p>
   {{playground:1}}
 
+  <h2>getter 표기</h2>
+  <p>
+    모든 진입점에는 getter 형태도 있습니다. <code>Iterable</code>,
+    <code>FxAsyncIterable</code>, <code>Stream</code>에는 <code>.fx</code>가,
+    Future의 이터러블에는 <code>.fxAsync</code>가 붙습니다. 만들어지는 체인은
+    완전히 같고, 차이는 표현식을 어느 쪽부터 읽느냐뿐입니다.
+  </p>
+  <pre><code>// 함수 표기: 괄호를 열려면 표현식 앞으로 되돌아가야 합니다
+fx(orders.where(isPaid)).groupBy((o) =&gt; o.customerId);
+
+// getter 표기: .toList()를 읽듯 왼쪽에서 오른쪽으로
+orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
+  <p>
+    이쪽이 Dart의 관용 표기이고, 비용은 없습니다. <code>Fx</code>는 extension
+    type이라 래퍼가 이터러블 자체로 소거되고, 본문이 <code>this</code>뿐인
+    getter는 컴파일러가 지워 버리는 정적 호출입니다. 100만 원소의
+    <code>map</code> + <code>filter</code> + <code>sum</code>에서 두 표기는
+    12.640 ms와 12.665 ms — 같은 숫자가 두 번 나옵니다.
+  </p>
+  <p>
+    <strong>이 문서는 전부 <code>fx()</code>로 씁니다.</strong> FxTS가 쓰는
+    이름이고, 타입 인자를 명시할 수 있는 쪽이기 때문입니다. getter는 후위로
+    타입 인자를 받을 수 없어서 <code>fx&lt;num&gt;(xs)</code>는 되지만
+    <code>xs.fx&lt;num&gt;</code>은 파싱되지 않습니다. 실제 코드에서는 더 잘
+    읽히는 쪽을 쓰세요 — 컴파일 결과는 동일합니다.
+  </p>
+  <p>
+    한 가지 비대칭은 알아 둘 만합니다.
+    <code>Iterable&lt;Future&lt;T&gt;&gt;</code>에 <code>.fx</code>를 붙이면
+    <code>Fx&lt;Future&lt;T&gt;&gt;</code>가 됩니다 — 값이 아니라 Future 자체를
+    훑는 체인이고, 컴파일은 되면서 조용히 엉뚱하게 동작합니다.
+    <code>.fxAsync</code>가 그래서 있습니다. Future를 await해 주므로
+    <code>T</code>는 결과 타입이 되고, <code>concurrent(n)</code>이 일할 거리를
+    갖게 됩니다.
+  </p>
+  <pre><code>await responses.fxAsync.map(parse).concurrent(4).toList();</code></pre>
+
   <h2>직접 해 보기</h2>
   <p>연습: 60점 이상인 점수만 남기고, 보너스 점수로 두 배를 한 뒤,
     앞의 2개 결과만 가져오는 체인을 만들어 보세요.</p>

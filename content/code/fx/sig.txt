@@ -1,3 +1,8 @@
 Fx&lt;T&gt; fx&lt;T&gt;(Iterable&lt;T&gt; iterable)
 FxAsync&lt;T&gt; fxAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable)
 FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)
+
+Fx&lt;T&gt;      Iterable&lt;T&gt;.fx
+FxAsync&lt;T&gt; FxAsyncIterable&lt;T&gt;.fx
+FxAsync&lt;T&gt; Stream&lt;T&gt;.fx
+FxAsync&lt;T&gt; Iterable&lt;FutureOr&lt;T&gt;&gt;.fxAsync

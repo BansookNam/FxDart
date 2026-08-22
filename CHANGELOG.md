@@ -1,3 +1,57 @@
+## 0.8.7
+
+### `.fx` — the chain as a getter
+
+`fx(xs)` gains a getter spelling. `.fx` works on an `Iterable`, an
+`FxAsyncIterable` and a `Stream`; `.fxAsync` works on an iterable of futures:
+
+```dart
+orders.where(isPaid).fx.groupBy((o) => o.customerId);
+await responses.fxAsync.map(parse).concurrent(4).toList();
+```
+
+The point is which end of the expression you read from. Wrapping a call in
+`fx(...)` means going back to its front to open the paren, which is the same
+reason `.toList()` exists on `Iterable` and `toList(iterable)` mostly does not.
+
+It costs nothing. `Fx` is an extension type, so the wrapper erases to the
+iterable itself, and an extension getter whose body is `this` is a static call
+AOT deletes. Over a 1M `map` + `filter` + `sum`, 20 interleaved rounds:
+
+| | median |
+|---|---|
+| `fx(xs).map(…).filter(…).sum()` | 12.640 ms |
+| `xs.fx.map(…).filter(…).sum()` | 12.665 ms (1.002x) |
+
+That is noise against the ~5% floor `benchmark.sh --ab` exists to see past.
+`vm:prefer-inline` on the getter moves it by 0.2 points, which is to say
+nothing; the pragma is there for consistency with the rest of the file, not
+because it earns its place.
+
+`.fxAsync` on `Iterable<FutureOr<T>>` is not sugar for `.fx`. Over an
+`Iterable<Future<T>>`, `.fx` gives an `Fx<Future<T>>` — a chain over the
+futures rather than their values, which compiles and quietly does the wrong
+thing. `.fxAsync` resolves them, so `T` is the awaited type and `concurrent(n)`
+has something to work with.
+
+### `fx()` stays the documented spelling
+
+Both forms are supported and neither is deprecated, but the docs, the README
+and the 101 course keep using `fx()`. Two reasons: it is the FxTS name this
+port is faithful to, and it is the form that takes an explicit type argument —
+a getter cannot take one postfix, so `fx<num>(xs)` parses where `xs.fx<num>`
+does not. (An extension override still can: `FxEntry<num>(xs).fx`. Inference
+covers the common case anyway, since `Fx<T>` is covariant and `FxNum` applies
+to an `Fx<int>`.) Mixing the two spellings across fifty comparison pages would
+cost more in consistency than either gains in brevity; the getter is introduced
+once, in the [`fx()` tutorial](https://bansooknam.github.io/FxDart/tutorials/fx.html),
+as the Dart-idiomatic alternative.
+
+The four extensions are `FxEntry`, `FxAsyncEntry`, `FxStreamEntry` and
+`FxFutureEntry`. Naming them matters: a clash with another package's `.fx` on
+`Iterable` is a compile error, and the fix is to say which extension you mean
+at the call site.
+
 ## 0.8.6
 
 0.8.5 taught the *lazy* stages to stop hiding the user's callback behind an
