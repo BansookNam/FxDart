@@ -265,6 +265,15 @@
   "theoryReset": "Reset",
   "@theoryReset": { "description": "Button that restores a listing the reader edited back to the published text." },
 
+  "theoryContribute": "Contribute a translation",
+  "@theoryContribute": { "description": "Last row of the theory book's language switcher: a link to the translation guide on GitHub, for readers who want to add an edition in another language." },
+
+  "theoryGoto": "Go to page",
+  "@theoryGoto": { "description": "Button under the page on narrow screens that opens the page picker — a chapter list plus a box to type a page number. Very short." },
+
+  "theoryGo": "Go",
+  "@theoryGo": { "description": "Button that jumps to the page number typed into the picker. Very short." },
+
   "theoryEdited": "edited",
   "@theoryEdited": { "description": "Badge on a textbook listing the reader has changed. Lowercase, very short." }
 }

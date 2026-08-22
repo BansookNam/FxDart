@@ -540,6 +540,15 @@ body.book-standalone {
 }
 .book-langs a:hover { color: rgba(255, 255, 255, .9); }
 .book-langs a[aria-current="page"] { color: #fff; font-weight: 700; }
+
+/* The switcher's last row is not an edition — it is how one gets made. A
+   border keeps it from reading as another language in the list. */
+.book-contribute {
+  border: 1px solid rgba(255, 255, 255, .28);
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+.book-contribute:hover { border-color: rgba(255, 255, 255, .6); }
 #book-hud button {
   font: inherit;
   background: rgba(255, 255, 255, .12);
@@ -550,6 +559,276 @@ body.book-standalone {
   cursor: pointer;
 }
 #book-hud button:hover { background: rgba(255, 255, 255, .24); }
+
+/* The page picker, the language button and the chapter crumb belong to
+   single-page mode; a spread shows its own page numbers, carries the Contents
+   button and lists every edition along the foot of the page. */
+#goto-btn, #lang-btn, #book-crumb { display: none; }
+
+/* --- single-page mode ------------------------------------------------------
+ *
+ * A spread of two 560px pages fitted to a phone lands at about a quarter
+ * scale: a picture of a book, not a page anyone can read. Under ~880px (or a
+ * very short window) the viewer drops the fold and gives one page the whole
+ * screen — which is why nothing here has a fixed size. js/theorybook.js
+ * measures what this layout leaves over, writes it back as --page-w/--page-h,
+ * and flows the manuscript into that box.
+ *
+ * The controls move with the paper: full-bleed pages leave no margin for the
+ * side arrows to sit in, so back, the page picker and forward line up in a bar
+ * beneath the page, and the language links move into the picker sheet.
+ */
+
+body.book-single #book-stage {
+  display: flex;
+  flex-direction: column;
+  /* Room for the close button — with the paper reaching both edges there is no
+     margin left for it to float in. */
+  padding-top: 38px;
+  /* svh, not dvh: a collapsing browser toolbar must not change the page box,
+     or a scroll would re-flow three hundred pages. */
+  height: 100svh;
+}
+
+/* #scaler stops scaling and just centres the page in the space the bar and
+   the close strip leave over. It is pinned to the stage's width and clipped:
+   left to size itself it would follow #book, which is sized *from* this box. */
+body.book-single #scaler {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: none !important;
+}
+
+body.book-single #book { width: var(--page-w); }
+body.book-single #book .board { left: -5px; right: -5px; }
+body.book-single .spine,
+body.book-single .page-slot.left { display: none; }
+body.book-single .page-slot.right { border-radius: 8px; box-shadow: none; }
+body.book-single .book-cover { left: 0; width: 100%; }
+
+/* The page is now the width of a phone: less margin, larger type. */
+body.book-single .page { padding: 22px 18px 30px; }
+body.book-single .page-content { font-size: 15.5px; }
+body.book-single .page-content pre.code { font-size: 10.5px; }
+body.book-single .pageno { bottom: 9px; }
+body.book-single .pageno.r { right: 14px; }
+body.book-single .pageno.l { left: 14px; }
+body.book-single .hc-frame { padding: 24px; }
+body.book-single .hc-frame h1 { font-size: 32px; }
+
+body.book-single #book-close { top: 5px; right: 8px; width: 32px; height: 32px; }
+
+/* Which chapter this is — a spread showed that for free, one page does not. */
+body.book-single #book-crumb {
+  display: block;
+  position: absolute;
+  top: 13px;
+  left: 14px;
+  right: 52px;
+  color: rgba(255, 255, 255, .55);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 500;
+}
+
+/* The bar: three touch targets, nothing else. The page indicator moves into
+   the picker button, and the notice and language links into its sheet. */
+body.book-single #book-hud {
+  position: static;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  gap: 8px;
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+}
+body.book-single #book-hud #page-indicator,
+body.book-single #book-hud #toc-btn,
+body.book-single #book-hud .book-note,
+body.book-single #book-hud .book-langs { display: none; }
+
+body.book-single .book-nav {
+  position: static;
+  transform: none;
+  flex: 0 0 auto;
+  width: 62px;
+  height: 44px;
+  border-radius: 12px;
+}
+body.book-single #goto-btn {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+/* Globe plus the tag of the edition being read — the bar has room for that
+   much, and it doubles as the label for what the button opens. */
+body.book-single #lang-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  height: 44px;
+  padding: 0 11px;
+  border-radius: 12px;
+  font-size: 12px;
+  letter-spacing: .04em;
+}
+body.book-single #lang-btn svg { flex: 0 0 auto; opacity: .85; }
+
+/* --- the page picker ------------------------------------------------------ */
+
+.goto-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 800;
+  background: rgba(12, 13, 22, .6);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.goto-sheet[hidden] { display: none; }
+
+.goto-panel {
+  width: min(520px, 100%);
+  max-height: 84%;
+  display: flex;
+  flex-direction: column;
+  background: #232637;
+  color: #E7E9F5;
+  border-radius: 14px 14px 0 0;
+  overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -18px 50px rgba(0, 0, 0, .5);
+}
+
+.goto-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 8px;
+  font-size: 13px;
+}
+.goto-close {
+  background: none;
+  border: 0;
+  color: inherit;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.goto-form { display: flex; gap: 8px; padding: 0 14px 10px; }
+.goto-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  font: inherit;
+  /* 16px exactly: anything smaller and iOS zooms the page on focus. */
+  font-size: 16px;
+  padding: 8px 11px;
+  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, .2);
+  background: rgba(255, 255, 255, .06);
+  color: inherit;
+}
+.goto-submit {
+  font: inherit;
+  font-size: 14px;
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--fp-op, #6C5CE7);
+  color: #fff;
+  cursor: pointer;
+}
+
+.goto-list {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px 8px 12px;
+  border-top: 1px solid rgba(255, 255, 255, .08);
+}
+.goto-row {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+  align-items: baseline;
+  font: inherit;
+  font-size: 13.5px;
+  text-align: left;
+  background: none;
+  border: 0;
+  color: inherit;
+  padding: 10px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.goto-row:hover { background: rgba(255, 255, 255, .08); }
+/* The chapter being read — the list opens scrolled to it. */
+.goto-row[aria-current] { background: rgba(169, 155, 255, .16); }
+.goto-row[aria-current] .t { font-weight: 700; }
+.goto-row .n { width: 1.8em; color: #A99BFF; font-weight: 700; }
+.goto-row .t { flex: 1 1 auto; }
+.goto-row .pg { opacity: .5; font-size: .9em; }
+.goto-part {
+  margin: 14px 8px 4px;
+  font-size: 10.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, .45);
+}
+
+/* The language sheet: the same panel, holding the switcher as a list of rows
+   big enough to hit. The links are the page's own — moved here, not copied —
+   so they keep the handler that carries the reading position across editions. */
+.lang-body {
+  overflow-y: auto;
+  padding: 2px 8px 14px;
+  border-top: 1px solid rgba(255, 255, 255, .08);
+}
+.lang-sheet .book-langs { display: block; }
+.lang-sheet .book-langs a {
+  display: block;
+  padding: 12px 10px;
+  border-radius: 8px;
+  font-size: 15px;
+  color: rgba(255, 255, 255, .75);
+}
+.lang-sheet .book-langs a[aria-current="page"] {
+  background: rgba(169, 155, 255, .16);
+  color: #fff;
+}
+.lang-sheet .book-contribute {
+  margin-top: 10px;
+  text-align: center;
+  border-color: rgba(255, 255, 255, .35);
+  border-radius: 10px;
+  padding: 12px 10px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, .9);
+}
+.lang-sheet .book-note {
+  display: block;
+  margin-top: 8px;
+  padding: 10px;
+  max-width: none;
+  white-space: normal;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* The overlay editor has no margin to spare on a phone. */
+body.book-single .editor-overlay { padding: 8px; }
 
 /* --- the editor overlay --------------------------------------------------- */
 
