@@ -166,6 +166,12 @@ fx([1, 2, 3, 4, 5])
     .filter((a) => a % 2 == 0)
     .toList(); // [12, 14]
 
+// The same chain as a getter, reached from the collection itself:
+[1, 2, 3, 4, 5].fx
+    .map((a) => a + 10)
+    .filter((a) => a % 2 == 0)
+    .toList(); // [12, 14]
+
 // Equivalent with top-level functions:
 toList(filter((a) => a % 2 == 0, map((a) => a + 10, [1, 2, 3, 4, 5])));
 
