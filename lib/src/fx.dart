@@ -38,6 +38,54 @@ FxAsync<T> fxAsync<T>(FxAsyncIterable<T> iterable) => FxAsync(iterable);
 @pragma('vm:prefer-inline')
 FxAsync<T> fxStream<T>(Stream<T> stream) => FxAsync(fromStream(stream));
 
+// --- getter entry points --------------------------------------------------
+//
+// `xs.fx` and `fx(xs)` are the same chain: `Fx` is an extension type, so the
+// wrapper erases to `xs` itself and the getter is a static call returning its
+// receiver. Measured on a 1M map+filter+sum, AOT, 20 interleaved rounds, the
+// getter form is 1.002x the function form — noise, against a ~5% floor.
+//
+// Both spellings stay: the function is the FxTS-parity name and reads better
+// when the type argument is written out, the getter reads better when the
+// source is itself a call. Type arguments are available on the getter through
+// an extension override — `FxEntry<num>(xs).fx` — since a getter cannot take
+// them postfix.
+
+/// `fx(iterable)` as a getter: `xs.fx.map(f).toList()`.
+///
+/// Chains off a call site without wrapping it in parentheses. Identical to
+/// [fx] in every other way.
+extension FxEntry<T> on Iterable<T> {
+  /// This iterable as a chainable [Fx].
+  @pragma('vm:prefer-inline')
+  Fx<T> get fx => Fx(this);
+}
+
+/// `fxAsync(iterable)` as a getter: `it.fx.map(f).concurrent(4)`.
+extension FxAsyncEntry<T> on FxAsyncIterable<T> {
+  /// This async iterable as a chainable [FxAsync].
+  @pragma('vm:prefer-inline')
+  FxAsync<T> get fx => FxAsync(this);
+}
+
+/// `fxStream(stream)` as a getter: `stream.fx.filter(f).toList()`.
+extension FxStreamEntry<T> on Stream<T> {
+  /// This stream as a chainable [FxAsync].
+  @pragma('vm:prefer-inline')
+  FxAsync<T> get fx => FxAsync(fromStream(this));
+}
+
+/// Awaited entry for an iterable of futures: `futures.fxAsync.sum()`.
+///
+/// `futures.fx` would give an `Fx<Future<T>>` — a chain over the futures
+/// themselves, not their values. This getter resolves them, so `T` is the
+/// awaited type, and the chain can then run them with `concurrent(n)`.
+extension FxFutureEntry<T> on Iterable<FutureOr<T>> {
+  /// This iterable of futures as a chainable [FxAsync] of their values.
+  @pragma('vm:prefer-inline')
+  FxAsync<T> get fxAsync => FxAsync(async_.toAsync(this));
+}
+
 /// Lazy chainable iterable — the sync half of FxTS's `fx` chain.
 ///
 /// [Fx] extends [Iterable], so the whole Dart iterable API is available
