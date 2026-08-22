@@ -462,6 +462,14 @@ and the original test suite come from the
 Contributions, issues and feature requests are welcome!
 Feel free to check the [issues page](https://github.com/bansooknam/fxdart/issues).
 
+**[CONTRIBUTING.md](https://github.com/BansookNam/fxdart/blob/main/CONTRIBUTING.md)** has the working rules: branch naming and
+how to keep a long-running feature from becoming a merge event, what a PR
+description has to answer, and the gates a branch passes before review —
+`dart analyze`, a 100%-passing `dart test`, the playground-bundle check that
+catches wrapper drift, and the docs/translation checks that CI does not run.
+Performance claims need a paired A/B, not a sweep; the ~5% noise floor and the
+instrument for seeing past it are documented there too.
+
 ## 📝 License
 
 Copyright © 2023 [Bansook Nam](https://github.com/bansooknam).
