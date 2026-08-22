@@ -173,12 +173,17 @@ toList(filter((a) => a % 2 == 0, map((a) => a + 10, [1, 2, 3, 4, 5])));
 fx(range(1, 1000000)).map((a) => a * a).take(3).toList(); // [1, 4, 9]
 ```
 
-Every entry point has a getter twin — `.fx` on an `Iterable`, `FxAsyncIterable` or
-`Stream`, `.fxAsync` on an iterable of futures, `.fxEvents` on a `Stream` — which
-builds the same chain and reads left to right when the source is itself a call:
-`orders.where(isPaid).fx.groupBy(...)`. The docs use `fx()` throughout; see the
-[`fx()` tutorial](https://bansooknam.github.io/FxDart/tutorials/fx.html) for when
-each spelling reads better.
+Every entry point has a getter twin, and the name always carries `fx` so it is
+clear which library you are stepping into: `.fx` on an `Iterable`,
+`FxAsyncIterable` or `Stream`, `.fxAsync` on an iterable of futures, `.fxEvents`
+and `.fxLive` on a `Stream`, `.fxShuffle` on an `Iterable`, `.fxDebounce` /
+`.fxThrottle` on a callback. It builds the same thing and reads left to right
+when the source is itself a call: `orders.where(isPaid).fx.groupBy(...)`. The
+operators stay on the chain rather than on `Iterable` — fifteen of them share a
+name with a member `Iterable` already has, and an instance member always wins.
+The docs use the function spellings throughout; the
+[`fx()` tutorial](https://bansooknam.github.io/FxDart/tutorials/fx.html) has the
+full roster.
 
 ### ⏳ Async pipelines
 

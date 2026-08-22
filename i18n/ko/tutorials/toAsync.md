@@ -63,6 +63,23 @@ nextLabel: async variants
   </p>
   {{playground:1}}
 
+  <h2>메서드 표기</h2>
+  <p>
+    <code>xs.fxAsync</code>가 이 함수의 getter 형태입니다. 맨
+    <code>FxAsyncIterable</code>이 아니라 <code>FxAsync</code>를 돌려주므로
+    체인을 바로 이어 갈 수 있고, <code>xs.fx</code>와 달리 Future를 풀어
+    줍니다.
+  </p>
+  <pre><code>await responses.fxAsync.map(parse).concurrent(4).toList();
+
+// responses.fx would be an Fx&lt;Future&lt;T&gt;&gt; — a chain over the
+// futures rather than their values.</code></pre>
+  <p>
+    이름에 <code>fx</code>가 들어간 것은 의도한 것입니다.
+    <code>toAsync</code>는 너무 일반적인 말이라 맨 <code>Iterable</code> 위에
+    올라가면 어느 라이브러리로 들어가는지를 전혀 말해 주지 못합니다. getter
+    표기는 <a href="fx.html"><code>fx</code></a>에 모아 두었습니다.
+  </p>
   <h2>직접 해 보기</h2>
   <p>연습: 아래 리스트를 필터링해서 합격 점수(&gt;= 60)만 결과에 남도록
     해 보세요.</p>

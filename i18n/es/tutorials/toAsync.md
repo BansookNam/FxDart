@@ -66,6 +66,23 @@ nextLabel: async variants
   </p>
   {{playground:1}}
 
+  <h2>La forma con método</h2>
+  <p>
+    <code>xs.fxAsync</code> es esta función como getter. Devuelve un
+    <code>FxAsync</code> y no un <code>FxAsyncIterable</code> pelado, así que
+    la cadena puede continuar — y resuelve los futuros, cosa que
+    <code>xs.fx</code> no hace.
+  </p>
+  <pre><code>await responses.fxAsync.map(parse).concurrent(4).toList();
+
+// responses.fx would be an Fx&lt;Future&lt;T&gt;&gt; — a chain over the
+// futures rather than their values.</code></pre>
+  <p>
+    El nombre lleva <code>fx</code> a propósito: <code>toAsync</code> es una
+    expresión lo bastante general como para no decir, sobre un
+    <code>Iterable</code> pelado, en qué librería se entra. Las formas con
+    getter están recogidas en <a href="fx.html"><code>fx</code></a>.
+  </p>
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: filtra la lista de abajo para que solo las notas aprobadas
     (&gt;= 60) lleguen al resultado.</p>

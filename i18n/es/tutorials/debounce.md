@@ -51,6 +51,24 @@ nextLabel: throttle
   </p>
   {{playground:1}}
 
+  <h2>La forma con método</h2>
+  <p>
+    El propio callback lleva lo mismo como método:
+    <code>saveDraft.fxDebounce(wait)</code> es
+    <code>debounce(saveDraft, wait)</code>, argumentos con nombre incluidos.
+  </p>
+  <pre><code>void saveDraft(String text) =&gt; _post(text);
+
+final save = saveDraft.fxDebounce(const Duration(milliseconds: 300));
+save('h');
+save('he');
+save('hello');   // only this one reaches _post</code></pre>
+  <p>
+    El prefijo <code>fx</code> es deliberado: dice qué librería está envolviendo
+    el callback y deja el nombre desnudo libre para lo que el proyecto quiera
+    poner en sus tipos función — la misma convención que las formas con getter
+    de <a href="fx.html"><code>fx</code></a>.
+  </p>
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: envuelve <code>save</code> en <code>debounce</code> (100 ms de espera)
     para que solo sobreviva el valor final de la ráfaga de llamadas de abajo.</p>

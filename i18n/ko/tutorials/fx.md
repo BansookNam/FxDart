@@ -128,6 +128,38 @@ orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
     .pull()
     .toList();</code></pre>
 
+  <h2>getter 표기 전체</h2>
+  <p>
+    규칙은 하나입니다. 진입점 이름에는 <code>fx</code>가 들어갑니다. 어느
+    라이브러리로 들어가는지를 밝혀 주고, 맨 이름 — <code>toAsync</code>,
+    <code>shuffle</code>, <code>debounce</code> — 은 프로젝트가 그 타입에
+    붙일 몫으로 남겨 둡니다.
+  </p>
+  <table>
+    <thead><tr><th>수신 타입</th><th>getter</th><th>같은 것</th></tr></thead>
+    <tbody>
+      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fx(xs)</code></td></tr>
+      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxAsync(it)</code></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxStream(s)</code></td></tr>
+      <tr><td><code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code></td><td><code>.fxAsync</code></td><td><a href="toAsync.html"><code>toAsync(xs)</code></a></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxEvents</code></td><td><a href="fxEvents.html"><code>fxEvents(s)</code></a></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLive</code></td><td><a href="liveValue.html"><code>LiveValue.from(s)</code></a></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLiveSeeded</code></td><td><a href="liveValue.html"><code>LiveValue.seededFrom(v, s)</code></a></td></tr>
+      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffle(xs)</code></a></td></tr>
+      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffleAsync(it)</code></a></td></tr>
+      <tr><td><code>void Function(T)</code></td><td><code>.fxDebounce</code></td><td><a href="debounce.html"><code>debounce(f, w)</code></a></td></tr>
+      <tr><td><code>void Function(T)</code></td><td><code>.fxThrottle</code></td><td><a href="throttle.html"><code>throttle(f, w)</code></a></td></tr>
+    </tbody>
+  </table>
+  <p>
+    연산자 자체는 이 목록에 없고, 앞으로도 넣지 않습니다. 그중 열다섯 개 —
+    <code>map</code>, <code>where</code>, <code>take</code>,
+    <code>fold</code> 등 — 은 <code>Iterable</code>이 이미 가진 멤버와 이름이
+    같고, 인스턴스 멤버는 항상 확장을 이기므로 그 호출은 fxdart에 닿을 수조차
+    없습니다. 연산자가 사는 곳은 체인입니다 — <code>xs.map(f)</code>가 아니라
+    <code>xs.fx.map(f)</code>입니다.
+  </p>
+
   <h2>직접 해 보기</h2>
   <p>연습: 60점 이상인 점수만 남기고, 보너스 점수로 두 배를 한 뒤,
     앞의 2개 결과만 가져오는 체인을 만들어 보세요.</p>

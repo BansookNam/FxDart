@@ -1,2 +1,5 @@
 List&lt;T&gt; shuffle&lt;T&gt;(Iterable&lt;T&gt; iterable, [int? seed])
 Future&lt;List&lt;T&gt;&gt; shuffleAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable, [int? seed])
+
+List&lt;T&gt;          Iterable&lt;T&gt;.fxShuffle([int? seed])          // method
+Future&lt;List&lt;T&gt;&gt; FxAsyncIterable&lt;T&gt;.fxShuffle([int? seed])   // method

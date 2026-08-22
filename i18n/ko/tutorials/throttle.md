@@ -47,6 +47,23 @@ nextLabel: shuffle
   </p>
   {{playground:1}}
 
+  <h2>메서드 표기</h2>
+  <p>
+    <a href="debounce.html"><code>debounce</code></a>와 같습니다.
+    <code>onScroll.fxThrottle(wait)</code>는
+    <code>throttle(onScroll, wait)</code>이고,
+    <code>leading</code>과 <code>trailing</code>도 그대로 전달합니다.
+  </p>
+  <pre><code>void onScroll(double offset) =&gt; _measure(offset);
+
+final handler = onScroll.fxThrottle(
+  const Duration(milliseconds: 100),
+  trailing: false,
+);</code></pre>
+  <p>
+    <code>fx</code> 접두사는 감싸는 주체가 어느 라이브러리인지 밝혀 줍니다 —
+    <a href="fx.html"><code>fx</code></a>의 getter 표기와 같은 규칙입니다.
+  </p>
   <h2>직접 해 보기</h2>
   <p>연습: <code>onClick</code>을 <code>throttle</code>로 감싸(wait는 100ms)
     빠르게 이어진 클릭이 세 번이 아니라 최대 두 번 — 리딩과 트레일링 —

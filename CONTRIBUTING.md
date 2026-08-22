@@ -206,6 +206,23 @@ member *replaces* the interface member rather than overriding it. Anything
 `Iterable` provides a default for (`join`, `fold`, `followedBy`) loses that
 default the moment you redeclare it. This is the 0.8.0 `join()` bug.
 
+**A new entry point** (a function that wraps a value into an fxdart type) gets
+a getter twin, and **its name carries `fx`**: `.fx`, `.fxAsync`, `.fxEvents`,
+`.fxLive`, `.fxShuffle`, `.fxDebounce`. The prefix says which library the call
+steps into, and it leaves the bare word free for whatever else a project puts
+on that type. `fxShuffle` shows why the rule earns its keep: `List.shuffle`
+exists in `dart:core` and shuffles in place returning void, an instance member
+always beats an extension, so a getter named `shuffle` would silently call the
+wrong one.
+
+**Operators do not get extensions on `Iterable`.** Fifteen of them (`map`,
+`where`, `take`, `fold`, `reduce`, `join`, `any`, `every`, `expand`,
+`forEach`, `last`, `toList`, `takeWhile`, `skipWhile`, `skip`) share a name
+with a member `Iterable` already has, so the call could never reach fxdart;
+seven more (`average`, `chunk`, `count`, `elementAtOrNull`, `firstWhereOrNull`,
+`sorted`, `whereNot`) collide with `package:collection` and would be a compile
+error in code importing both. Operators live on the chain — `xs.fx.map(f)`.
+
 **Anything in `lib/`** — zero runtime dependencies, and it stays that way.
 
 **A translation** — code blocks are locale-invariant. `content/code/` and

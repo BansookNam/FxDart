@@ -53,6 +53,16 @@ nextLabel: FxSubscriptions
   <h2>Demo 2 · value, hasValue y close</h2>
   {{playground:1}}
 
+  <h2>La forma con método</h2>
+  <p>
+    Un <code>Stream</code> alcanza ambos constructores como miembros:
+    <code>source.fxLive</code> es <code>LiveValue.from(source)</code>, y
+    <code>source.fxLiveSeeded(v)</code> es
+    <code>LiveValue.seededFrom(v, source)</code>. Los dos siguen siendo
+    calientes: la suscripción se abre en el acto.
+  </p>
+  <pre><code>final price = ticker.fxLive;
+final count = taps.fxLiveSeeded(0);   // has a value before the first tap</code></pre>
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: deriva un feed de etiquetas desde estado en vivo.</p>
   {{playground:2}}

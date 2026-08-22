@@ -6,3 +6,5 @@ class Debounced&lt;T&gt; {
 }
 
 FxEvents&lt;T&gt; FxEvents&lt;T&gt;.debounce(Duration window) // chain (events)
+
+Debounced&lt;T&gt; (void Function(T arg)).fxDebounce(Duration wait, {bool leading = false}) // method

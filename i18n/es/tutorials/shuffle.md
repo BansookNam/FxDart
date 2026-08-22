@@ -52,6 +52,22 @@ nextLabel: createSeededRandom
   </p>
   {{playground:1}}
 
+  <h2>La forma con método</h2>
+  <p>
+    <code>xs.fxShuffle(seed)</code> es <code>shuffle(xs, seed)</code>, y sobre
+    un <code>FxAsyncIterable</code> ese mismo nombre es
+    <code>shuffleAsync</code>.
+  </p>
+  <p>
+    No se llama <code>shuffle</code>, y no es una cuestión de estilo.
+    <code>List.shuffle</code> ya existe en <code>dart:core</code> y baraja
+    <strong>en el sitio, devolviendo void</strong>. Un miembro de instancia
+    siempre gana a una extensión, así que con un <code>List</code> como
+    receptor se llamaría en silencio al equivocado; el prefijo hace imposible
+    confundirlos.
+  </p>
+  <pre><code>final a = [1, 2, 3].fxShuffle(42);   // a new List, seeded
+final b = [1, 2, 3]..shuffle();      // dart:core, in place, void</code></pre>
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: dale una semilla a este orden de turnos para que sea
     reproducible entre reinicios de la app en lugar de aleatorio cada vez.</p>

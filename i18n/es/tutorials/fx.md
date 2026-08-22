@@ -132,6 +132,39 @@ orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
     .pull()
     .toList();</code></pre>
 
+  <h2>Todas las formas con getter</h2>
+  <p>
+    La convención es una sola regla: un punto de entrada lleva <code>fx</code>
+    en el nombre. Dice en qué librería estás entrando y deja el nombre desnudo
+    — <code>toAsync</code>, <code>shuffle</code>, <code>debounce</code> —
+    libre para lo que el proyecto quiera poner en ese tipo.
+  </p>
+  <table>
+    <thead><tr><th>Receptor</th><th>Getter</th><th>Equivale a</th></tr></thead>
+    <tbody>
+      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fx(xs)</code></td></tr>
+      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxAsync(it)</code></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxStream(s)</code></td></tr>
+      <tr><td><code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code></td><td><code>.fxAsync</code></td><td><a href="toAsync.html"><code>toAsync(xs)</code></a></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxEvents</code></td><td><a href="fxEvents.html"><code>fxEvents(s)</code></a></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLive</code></td><td><a href="liveValue.html"><code>LiveValue.from(s)</code></a></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLiveSeeded</code></td><td><a href="liveValue.html"><code>LiveValue.seededFrom(v, s)</code></a></td></tr>
+      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffle(xs)</code></a></td></tr>
+      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffleAsync(it)</code></a></td></tr>
+      <tr><td><code>void Function(T)</code></td><td><code>.fxDebounce</code></td><td><a href="debounce.html"><code>debounce(f, w)</code></a></td></tr>
+      <tr><td><code>void Function(T)</code></td><td><code>.fxThrottle</code></td><td><a href="throttle.html"><code>throttle(f, w)</code></a></td></tr>
+    </tbody>
+  </table>
+  <p>
+    Los operadores no están en esta lista, y no lo estarán. Quince de ellos —
+    <code>map</code>, <code>where</code>, <code>take</code>,
+    <code>fold</code> y compañía — comparten nombre con un miembro que
+    <code>Iterable</code> ya tiene, y un miembro de instancia siempre gana a
+    una extensión, así que esas llamadas nunca podrían llegar a fxdart. Los
+    operadores viven en la cadena: <code>xs.fx.map(f)</code>, no
+    <code>xs.map(f)</code>.
+  </p>
+
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: construye una cadena que se quede con las puntuaciones de 60 o más, las duplique
     como puntos extra y tome solo los 2 primeros resultados.</p>

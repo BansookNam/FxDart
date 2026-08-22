@@ -48,6 +48,24 @@ nextLabel: throttle
   </p>
   {{playground:1}}
 
+  <h2>메서드 표기</h2>
+  <p>
+    콜백 쪽에서 같은 것을 메서드로 부를 수 있습니다.
+    <code>saveDraft.fxDebounce(wait)</code>는
+    <code>debounce(saveDraft, wait)</code>와 같고, 이름 붙은 인자도 그대로
+    받습니다.
+  </p>
+  <pre><code>void saveDraft(String text) =&gt; _post(text);
+
+final save = saveDraft.fxDebounce(const Duration(milliseconds: 300));
+save('h');
+save('he');
+save('hello');   // only this one reaches _post</code></pre>
+  <p>
+    <code>fx</code> 접두사는 의도한 것입니다. 어느 라이브러리가 콜백을 감싸는지
+    드러내고, 맨 이름은 프로젝트가 자기 함수 타입에 붙일 몫으로 남겨 둡니다 —
+    <a href="fx.html"><code>fx</code></a>의 getter 표기와 같은 규칙입니다.
+  </p>
   <h2>직접 해 보기</h2>
   <p>연습: <code>save</code>를 <code>debounce</code>로 감싸(wait는 100ms)
     아래 연속 호출 중 마지막 값만 살아남게 만들어 보세요.</p>

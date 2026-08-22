@@ -66,10 +66,47 @@ That leaves `Stream` carrying both getters, which is right: it is the one
 source that belongs to both worlds. `.fx` is the pull chain (`fxStream`),
 `.fxEvents` is the push chain (`fxEvents`), and `.pull()` still crosses back.
 
-The five extensions are `FxEntry`, `FxAsyncEntry`, `FxStreamEntry`,
-`FxFutureEntry` and `FxEventsEntry`. Naming them matters: a clash with another
-package's `.fx` on `Iterable` is a compile error, and the fix is to say which
-extension you mean at the call site.
+### The wrapper utilities too, under one naming rule
+
+The same treatment for the constructor-shaped utilities — the functions that
+take a value and hand back a different kind of thing:
+
+| receiver | getter | same as |
+|---|---|---|
+| `Iterable<T>` | `.fxShuffle([seed])` | `shuffle(xs, seed)` |
+| `FxAsyncIterable<T>` | `.fxShuffle([seed])` | `shuffleAsync(it, seed)` |
+| `Stream<T>` | `.fxLive` | `LiveValue.from(s)` |
+| `Stream<T>` | `.fxLiveSeeded(v)` | `LiveValue.seededFrom(v, s)` |
+| `void Function(T)` | `.fxDebounce(w, …)` | `debounce(f, w, …)` |
+| `void Function(T)` | `.fxThrottle(w, …)` | `throttle(f, w, …)` |
+
+**Every entry point carries `fx` in its name.** Not decoration: `toAsync`,
+`shuffle` and `debounce` are general enough words that on a bare `Iterable` or
+a bare callback they say nothing about which library they enter, and the prefix
+leaves those names free for whatever else a project puts on those types.
+
+`fxShuffle` has a sharper reason. `List.shuffle` already exists in `dart:core`
+and shuffles **in place, returning void**; an instance member always beats an
+extension, so a `List` receiver named `shuffle` would silently call the wrong
+one. A wrong answer that compiles is worse than a longer name.
+
+### What is deliberately not here
+
+The operators. `map`, `where`, `take`, `fold`, `reduce`, `join`, `any`,
+`every`, `expand`, `forEach`, `last`, `toList`, `takeWhile`, `skipWhile` and
+`skip` — fifteen of the 120 `Iterable`-receiving functions — share a name with
+a member `Iterable` already has, so `xs.map(f)` could never reach fxdart no
+matter what is declared. Seven more (`average`, `chunk`, `count`,
+`elementAtOrNull`, `firstWhereOrNull`, `sorted`, `whereNot`) collide with
+`package:collection`, where the failure is a compile error in code that imports
+both. The chain is where operators live: `xs.fx.map(f)`, not `xs.map(f)`.
+
+### Extension names
+
+`FxEntry`, `FxAsyncEntry`, `FxStreamEntry`, `FxFutureEntry`, `FxEventsEntry`,
+`FxShuffleEntry`, `FxShuffleAsyncEntry` and `FxCallbackTiming`. Naming them
+matters: a clash with another package's `.fx` on `Iterable` is a compile error,
+and the fix is to say which extension you mean at the call site.
 
 ## 0.8.6
 
