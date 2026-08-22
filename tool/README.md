@@ -117,7 +117,7 @@ first if you see it.
 | --- | --- |
 | `build_docs.dart` | renders `content/` + `i18n/<locale>/` into `docs/`, once per locale. `--check` fails if `docs/` is stale, `--status` reports translation coverage, `--record` marks translations current. |
 | `precompile_playgrounds.dart` | compiles snippets into `docs/pg/<id>.js.gz`. `--scope=first\|all\|none`, `--only=<substring,…>`, `--prune` (drop orphans), `--status`, `--limit=N`. |
-| `playground_source.dart` | library, not a script: the library+snippet merge and the id function. Must stay byte-identical to `buildSource` in `docs/js/playground.js`. |
+| `playground_source.dart` | library, not a script: the library+snippet merge and the id function. Must stay byte-identical to `buildSource` in `web/js/playground.js`. |
 | `check_comparison.dart` | runs both panels of every comparison example and requires byte-identical stdout; writes `expected.txt`. `--check` for CI, `--rx` for the RxDart family. |
 | `check_translation.dart` | structural diff of a translation against its English source — front matter, placeholders, tags and hrefs must survive. |
 | `extract_docs.dart` | one-time migration that produced `content/` from the original hand-written HTML. Kept for history; not part of any build. |

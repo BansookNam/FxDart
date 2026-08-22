@@ -1,7 +1,7 @@
 // Markdown → block HTML for the theory textbook (content/theory/ → docs/theory/).
 //
 // The unit of output is a *block* — one paragraph, heading, figure, table or
-// code listing. The viewer (docs/js/theorybook.js) measures blocks and flows
+// code listing. The viewer (web/js/theorybook.js) measures blocks and flows
 // them into fixed-size pages at runtime, exactly like the print manuscript
 // pipeline it is modelled on: the build never decides where a page break goes,
 // because the page size depends on the reader's viewport.

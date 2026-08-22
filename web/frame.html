@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<!-- FxDart playground execution frame.
+     Runs DDC library-bundle output from the DartPad compile service
+     (compileNewDDC). Print output and errors are relayed to the parent page
+     via postMessage.
+
+     The frame fetches nothing itself. The parent hands it the two runtime
+     artifacts (ddc_module_loader.js, dart_sdk_new.js) as source text over
+     postMessage — neither is an AMD module, both are plain scripts that
+     assign globals, so injecting them as <script> nodes reproduces exactly
+     what loading them by URL would do. Keeping the network in the parent is
+     what lets the 17MB SDK be cached once, permanently, instead of being
+     re-fetched by every sandboxed (opaque-origin) frame.
+
+     Lifecycle: load -> 'ready' -> parent posts 'boot' -> 'warm' -> parent
+     posts 'execute' -> 'started' -> stdout/stderr -> 'done'. The parent
+     boots frames ahead of time so 'warm' has already fired by the time a
+     reader clicks Run. -->
+<html>
+<head>
+  <meta charset="utf-8">
+  <script>
+    function post(type, message) {
+      parent.postMessage({ sender: 'fx-frame', type: type, message: message }, '*');
+    }
+
+    // Dart's print() routes here when defined.
+    window.dartPrint = function (msg) { post('stdout', String(msg)); };
+
+    window.addEventListener('error', function (e) {
+      post('stderr', String(e.message || e.error || e));
+    });
+    window.addEventListener('unhandledrejection', function (e) {
+      post('stderr', 'Uncaught async error: ' + String(e.reason));
+    });
+    var consoleError = console.error.bind(console);
+    console.error = function () {
+      post('stderr', Array.prototype.map.call(arguments, String).join(' '));
+      consoleError.apply(null, arguments);
+    };
+
+    // Runs `src` as a classic script at global scope. Not eval(): the module
+    // loader declares things with let/const/class at top level, which eval
+    // would confine to its own lexical scope where the SDK bundle could not
+    // see them. A <script> node shares the global lexical environment, same
+    // as the original <script src> did.
+    function runScript(src) {
+      var node = document.createElement('script');
+      node.textContent = src;
+      document.head.appendChild(node);
+    }
+
+    var booted = false;
+
+    window.addEventListener('message', function (e) {
+      var data = e.data || {};
+
+      if (data.command === 'boot') {
+        if (booted) return;
+        booted = true;
+        try {
+          runScript(data.loader); // defines window.dartDevEmbedder
+          runScript(data.sdk);    // registers the dart:* libraries on it
+          if (!window.dartDevEmbedder) throw new Error('dartDevEmbedder missing');
+          post('warm', '');
+        } catch (err) {
+          post('bootfail', String(err));
+        }
+        return;
+      }
+
+      if (data.command === 'execute') {
+        try {
+          (0, eval)(data.js); // defines package:dartpad_sample/* libraries
+          post('started', '');
+          dartDevEmbedder.runMain('package:dartpad_sample/bootstrap.dart', {});
+          post('done', '');
+        } catch (err) {
+          post('stderr', String(err));
+        }
+      }
+    });
+
+    window.addEventListener('load', function () { post('ready', ''); });
+  </script>
+</head>
+<body></body>
+</html>

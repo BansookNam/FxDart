@@ -1,0 +1,113 @@
+# Builds the docs site and publishes it to GitHub Pages from CI.
+#
+# Why this exists
+# ---------------
+# The site under docs/ is generated: ~5,700 HTML pages, the playground bundle,
+# and ~450 precompiled playground artifacts. It used to be built on a
+# developer's machine by ./deploy.sh and committed, which made every release a
+# 2,500-file commit and made any two branches that both touched lib/ conflict
+# on ~1,900 of them — a snippet's artifact id hashes the bundle, so any change
+# to lib/ rewrites the `data-pg` attribute on every page that embeds a
+# snippet. None of those conflicts carry information: the files are derived
+# from content/, i18n/, lib/ and web/, which merge cleanly on their own.
+#
+# So the build moves here. Nothing is committed back — the site is uploaded as
+# a Pages artifact and deployed, which is also why this needs no token beyond
+# the default GITHUB_TOKEN and never touches the protected main branch.
+#
+# REQUIRES the repository's Pages source to be set to "GitHub Actions"
+# (Settings → Pages → Build and deployment → Source). While it is still set to
+# "Deploy from a branch", this workflow's deploy step fails and the committed
+# docs/ is what gets served.
+name: pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'content/**'
+      - 'i18n/**'
+      - 'lib/**'
+      - 'web/**'
+      - 'tool/**'
+      - 'tools/**'
+      - 'benchmark/results/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+    inputs:
+      pg_scope:
+        description: 'Playground precompile scope (first | all | none)'
+        required: false
+        default: 'first'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time, and never cancel one in flight: a half-uploaded
+# artifact would publish a partial site.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
+      # Order matters and is not interchangeable:
+      #   1. the bundle, because a snippet's artifact id hashes it;
+      #   2. the artifacts, because build_docs stamps `data-pg` only on
+      #      snippets that already have one on disk;
+      #   3. the pages.
+      - name: Build the playground bundle
+        run: bash tools/build_single_file.sh
+
+      # Artifacts are content-addressed, so a run that changes neither lib/
+      # nor a snippet restores all of them and compiles nothing. A change to
+      # lib/ rotates every id and the restore misses by design — that is the
+      # cost of the bundle being an input to the id, and it is paid here
+      # rather than by a developer.
+      - name: Restore precompiled playgrounds
+        uses: actions/cache@v4
+        with:
+          path: docs/pg
+          key: pg-${{ hashFiles('docs/assets/fxdart_single.dart', 'content/**/*.dart', 'content/theory/*.md') }}
+          restore-keys: pg-
+
+      - name: Precompile playgrounds
+        env:
+          PG_SCOPE: ${{ github.event.inputs.pg_scope || 'first' }}
+        run: dart run tool/precompile_playgrounds.dart --scope="$PG_SCOPE" --prune
+
+      - name: Render the site
+        run: dart run tool/build_docs.dart
+
+      # Catches the failure mode this whole workflow is built around: a page
+      # that silently lost its artifact and would fall back to the compile
+      # service, costing a reader ~2.5s per Run instead of ~200ms.
+      - name: Report artifact coverage
+        run: dart run tool/precompile_playgrounds.dart --status
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

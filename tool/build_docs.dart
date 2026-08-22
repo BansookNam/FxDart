@@ -123,6 +123,8 @@ void main(List<String> args) {
     return;
   }
 
+  _copyStaticSources();
+
   written.forEach((path, content) {
     final f = File('$root/$path');
     f.parent.createSync(recursive: true);
@@ -132,6 +134,34 @@ void main(List<String> args) {
   final translated = pages.where((p) => p.translated).length;
   stdout.writeln('built ${written.length} files across ${locales.length} locales');
   stdout.writeln('$translated/${pages.length} pages translated');
+}
+
+
+/// Copies `web/` — the hand-written half of the site — into the generated
+/// `docs/` output.
+///
+/// `docs/` used to hold both: the ~5,700 rendered pages plus `css/`, `js/`,
+/// `frame.html`, the logos and the built Daily Ledger demo. Since everything
+/// generated is now built in CI and untracked, the two had to be separated,
+/// and `web/` is the tracked half. Layout is preserved verbatim, so
+/// `web/css/site.css` lands at `docs/css/site.css` and every relative link a
+/// rendered page emits keeps working unchanged.
+///
+/// A plain copy, not a sync: `build_single_file.sh` and
+/// `precompile_playgrounds.dart` also write under `docs/`, and deleting what
+/// this function did not put there would throw their output away.
+void _copyStaticSources() {
+  final src = Directory('$root/web');
+  if (!src.existsSync()) {
+    stderr.writeln('web/ is missing — the site cannot be assembled without it');
+    exit(1);
+  }
+  for (final entity in src.listSync(recursive: true).whereType<File>()) {
+    final rel = entity.path.substring(src.path.length + 1);
+    final dest = File('$root/docs/$rel');
+    dest.parent.createSync(recursive: true);
+    entity.copySync(dest.path);
+  }
 }
 
 // --- translation bookkeeping ------------------------------------------------
@@ -726,7 +756,7 @@ String _renderTutorial(
 // chapter files. Unlike the rest of the site it renders to a *single* page —
 // docs/theory/index.html — because the reader turns pages inside it rather
 // than navigating between URLs. tool/theory_markdown.dart converts the
-// manuscript to blocks; docs/js/theorybook.js flows them into pages at
+// manuscript to blocks; web/js/theorybook.js flows them into pages at
 // runtime, where the viewport size is finally known.
 
 /// Chapter manuscripts, in reading order. Only `NN-slug.md` counts — `book.md`
