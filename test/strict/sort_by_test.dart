@@ -38,6 +38,21 @@ void main() {
         );
       });
 
+      test('should not mutate the original list', () {
+        final original = [3, 4, 1, 2, 5, 2];
+        final result = sortBy(identity, original);
+        expect(identical(original, result), isFalse);
+        expect(original, equals([3, 4, 1, 2, 5, 2]));
+      });
+
+      test('should not mutate the original list (double keys, merge path)', () {
+        final original = [2.5, 0.5, 1.5, 4.0, 3.0];
+        final result = sortBy((double d) => d, original);
+        expect(identical(original, result), isFalse);
+        expect(original, equals([2.5, 0.5, 1.5, 4.0, 3.0]));
+        expect(result, equals([0.5, 1.5, 2.5, 3.0, 4.0]));
+      });
+
       test("should sort the elements by 'f' (key extractor)", () {
         final res = sortBy((Map<String, Object> a) => a['id'], [
           {'id': 4, 'name': 'foo'},
