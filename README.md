@@ -462,6 +462,71 @@ and the original test suite come from the
 * 🌐 Website: https://github.com/bansooknam
 * 🐙 Github: [@bansooknam](https://github.com/bansooknam)
 
+## 🚢 Publishing the docs site
+
+**Normally there is nothing to do.** [`docs/`](https://bansooknam.github.io/FxDart/)
+is generated and untracked; `.github/workflows/pages.yml` builds and publishes
+it on every push to `main`. A `lib/` change does not require rebuilding the
+bundle, re-stamping pages or committing anything.
+
+The one part worth steering by hand is how many playground snippets get
+**precompiled**. Precompiling is what makes ▶ Run take ~200 ms instead of
+~2.5 s, because the page ships the compiled JS instead of calling the DartPad
+compile service in the browser. It is also the slow part of the build — about
+a second per snippet, four at a time — so the default only covers the first
+playground on each page.
+
+### Trigger a publish by hand
+
+```bash
+gh workflow run pages.yml                  # republish at the default scope
+gh workflow run pages.yml -f pg_scope=all  # …precompiling every snippet
+gh workflow run pages.yml -f pg_scope=none # …skipping precompilation entirely
+gh run watch                               # follow it
+```
+
+or **Actions → pages → Run workflow** in the browser.
+
+| `pg_scope` | Snippets precompiled | Cold build |
+|---|---|---|
+| `first` *(default)* | 446 of 784 — the first playground on each page | ~8 min |
+| `all` | all 784 | ~13 min |
+| `none` | none; every Run compiles over the network | seconds |
+
+Artifacts are content-addressed and cached per scope, so a repeat run only
+compiles what actually changed. A change to `lib/` re-keys every snippet at
+once — that is inherent, since an artifact is keyed by the snippet *plus* the
+library it was compiled against, and it is what stops a stale artifact
+outliving the library.
+
+### A manual `all` run is temporary
+
+**A run publishes exactly the scope it was given.** So `pg_scope=all` holds
+only until the next push to `main`, which republishes at `first` and drops the
+extra artifacts from the deployed site. Nothing breaks — those pages just fall
+back to the compile service and get slower on Run.
+
+If you want `all` permanently, change the default in
+[`.github/workflows/pages.yml`](.github/workflows/pages.yml) rather than
+re-running by hand:
+
+```yaml
+env:
+  PG_SCOPE: ${{ github.event.inputs.pg_scope || 'first' }}   # ← 'all'
+```
+
+### Build it locally to look at it
+
+None of these commit anything — `docs/` is ignored.
+
+```bash
+./run.sh                  # build the site and serve it (-o opens a browser)
+./run.sh -s               # serve what is already built, no rebuild
+./deploy.sh               # build exactly what CI builds, then stop
+dart run tool/precompile_playgrounds.dart --status   # coverage report, no network
+dart run tool/rebuild_page.dart tutorials/map.html   # one page's artifacts, for a fast local preview
+```
+
 ## 🤝 Contributing
 
 Contributions, issues and feature requests are welcome!
@@ -471,7 +536,8 @@ Feel free to check the [issues page](https://github.com/bansooknam/fxdart/issues
 how to keep a long-running feature from becoming a merge event, what a PR
 description has to answer, and the gates a branch passes before review —
 `dart analyze`, a 100%-passing `dart test`, the playground-bundle check that
-catches wrapper drift, and the docs/translation checks that CI does not run.
+catches wrapper drift, and the docs and translation checks — all of which CI
+also runs, so nothing silently depends on you having run them.
 Performance claims need a paired A/B, not a sweep; the ~5% noise floor and the
 instrument for seeing past it are documented there too.
 
