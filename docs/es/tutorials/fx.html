@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=367a788d58e3bc1c">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ff74f6fa047725a6">
 </head>
 <body>
 <header class="site-header">
@@ -118,7 +118,7 @@ FxEvents&lt;T&gt; Stream&lt;T&gt;.fxEvents</div>
   <h2>Demo 1 · Nada se ejecuta hasta el operador terminal</h2>
   <p>Fíjate en que <code>calls</code> se queda en 0 justo después de construir la cadena, y
     salta en cuanto <code>toList()</code> tira de verdad de los 5 valores:</p>
-  <div class="playground" data-pg="9cc6560f7deb4f7a">
+  <div class="playground" data-pg="172a1a55841595d4">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -222,6 +222,39 @@ orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
     .pull()
     .toList();</code></pre>
 
+  <h2>Todas las formas con getter</h2>
+  <p>
+    La convención es una sola regla: un punto de entrada lleva <code>fx</code>
+    en el nombre. Dice en qué librería estás entrando y deja el nombre desnudo
+    — <code>toAsync</code>, <code>shuffle</code>, <code>debounce</code> —
+    libre para lo que el proyecto quiera poner en ese tipo.
+  </p>
+  <table>
+    <thead><tr><th>Receptor</th><th>Getter</th><th>Equivale a</th></tr></thead>
+    <tbody>
+      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fx(xs)</code></td></tr>
+      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxAsync(it)</code></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxStream(s)</code></td></tr>
+      <tr><td><code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code></td><td><code>.fxAsync</code></td><td><a href="toAsync.html"><code>toAsync(xs)</code></a></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxEvents</code></td><td><a href="fxEvents.html"><code>fxEvents(s)</code></a></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLive</code></td><td><a href="liveValue.html"><code>LiveValue.from(s)</code></a></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLiveSeeded</code></td><td><a href="liveValue.html"><code>LiveValue.seededFrom(v, s)</code></a></td></tr>
+      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffle(xs)</code></a></td></tr>
+      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffleAsync(it)</code></a></td></tr>
+      <tr><td><code>void Function(T)</code></td><td><code>.fxDebounce</code></td><td><a href="debounce.html"><code>debounce(f, w)</code></a></td></tr>
+      <tr><td><code>void Function(T)</code></td><td><code>.fxThrottle</code></td><td><a href="throttle.html"><code>throttle(f, w)</code></a></td></tr>
+    </tbody>
+  </table>
+  <p>
+    Los operadores no están en esta lista, y no lo estarán. Quince de ellos —
+    <code>map</code>, <code>where</code>, <code>take</code>,
+    <code>fold</code> y compañía — comparten nombre con un miembro que
+    <code>Iterable</code> ya tiene, y un miembro de instancia siempre gana a
+    una extensión, así que esas llamadas nunca podrían llegar a fxdart. Los
+    operadores viven en la cadena: <code>xs.fx.map(f)</code>, no
+    <code>xs.map(f)</code>.
+  </p>
+
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: construye una cadena que se quede con las puntuaciones de 60 o más, las duplique
     como puntos extra y tome solo los 2 primeros resultados.</p>
@@ -263,7 +296,7 @@ void main() {
   <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=367a788d58e3bc1c";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=ff74f6fa047725a6";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

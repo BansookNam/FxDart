@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=367a788d58e3bc1c">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ff74f6fa047725a6">
 </head>
 <body>
 <header class="site-header">
@@ -54,7 +54,10 @@
   <p class="hero-sub">Returns a new list with elements in shuffled order — pass a seed for a reproducible result.</p>
 
   <div class="signature">List&lt;T&gt; shuffle&lt;T&gt;(Iterable&lt;T&gt; iterable, [int? seed])
-Future&lt;List&lt;T&gt;&gt; shuffleAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable, [int? seed])</div>
+Future&lt;List&lt;T&gt;&gt; shuffleAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; iterable, [int? seed])
+
+List&lt;T&gt;          Iterable&lt;T&gt;.fxShuffle([int? seed])          // method
+Future&lt;List&lt;T&gt;&gt; FxAsyncIterable&lt;T&gt;.fxShuffle([int? seed])   // method</div>
 
   <h2>Lecture</h2>
   <p>
@@ -84,7 +87,7 @@ Future&lt;List&lt;T&gt;&gt; shuffleAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; itera
   <h2>Demo 1 · Seeded determinism</h2>
   <p>Same seed, same order — every time. A different seed gives a different
     (but still reproducible) order:</p>
-  <div class="playground" data-pg="ce2ddfb55246e268">
+  <div class="playground" data-pg="260f007c869ae8de">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -133,6 +136,21 @@ Future<void> main() async {
 </textarea>
   </div>
 
+  <h2>Method spelling</h2>
+  <p>
+    <code>xs.fxShuffle(seed)</code> is <code>shuffle(xs, seed)</code>, and on an
+    <code>FxAsyncIterable</code> the same name is
+    <code>shuffleAsync</code>.
+  </p>
+  <p>
+    It is not called <code>shuffle</code>, and that is not a style choice.
+    <code>List.shuffle</code> already exists in <code>dart:core</code> and
+    shuffles <strong>in place, returning void</strong>. An instance member
+    always beats an extension, so a <code>List</code> receiver would silently
+    call the wrong one — the prefix makes the two impossible to confuse.
+  </p>
+  <pre><code>final a = [1, 2, 3].fxShuffle(42);   // a new List, seeded
+final b = [1, 2, 3]..shuffle();      // dart:core, in place, void</code></pre>
   <h2>Try it yourself</h2>
   <p>Exercise: give this turn order a seed so it's reproducible across app
     restarts instead of random every time.</p>
@@ -171,7 +189,7 @@ void main() {
   <p>O playground compila pelo serviço de compilação do DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Executar","pgReset":"Redefinir","pgCompiling":"Compilando…","pgCompileError":"Erro de compilação","pgError":"Erro","pgLoading":"Carregando runtime…","pgRunning":"Executando…","pgNoOutput":"(sem saída)","pgLoadFailed":"Não foi possível carregar a biblioteca FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=367a788d58e3bc1c";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=ff74f6fa047725a6";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

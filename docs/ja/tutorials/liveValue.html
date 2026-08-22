@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=367a788d58e3bc1c">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ff74f6fa047725a6">
 </head>
 <body>
 <header class="site-header">
@@ -56,6 +56,8 @@
   <div class="signature">class LiveValue&lt;T&gt; {
   LiveValue();                  // empty — subscribers wait for the first add
   LiveValue.seeded(T value);    // starts with a current value
+  LiveValue.from(Stream&lt;T&gt; source);            // hot, fed by source
+  LiveValue.seededFrom(T seed, Stream&lt;T&gt; src);  // hot, seeded
 
   T get value;                  // latest value; StateError when none set
   bool get hasValue;
@@ -64,7 +66,10 @@
   FxEvents&lt;T&gt; get live;         // replay the latest, then live updates
   Stream&lt;T&gt; get stream;         // plain-Stream view of live
   Future&lt;void&gt; close();
-}</div>
+}
+
+LiveValue&lt;T&gt; Stream&lt;T&gt;.fxLive                 // = LiveValue.from(stream)
+LiveValue&lt;T&gt; Stream&lt;T&gt;.fxLiveSeeded(T seed)  // = LiveValue.seededFrom(seed, stream)</div>
 
   <h2>Lecture</h2>
   <p>
@@ -98,7 +103,7 @@
   </p>
 
   <h2>Demo 1 · Late subscribers start from the latest value</h2>
-  <div class="playground" data-pg="4ba140f2b7b5aeca">
+  <div class="playground" data-pg="df1cc7a1cdeea664">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -165,6 +170,16 @@ Future<void> main() async {
 </textarea>
   </div>
 
+  <h2>Method spelling</h2>
+  <p>
+    A <code>Stream</code> reaches both constructors as members:
+    <code>source.fxLive</code> is <code>LiveValue.from(source)</code>, and
+    <code>source.fxLiveSeeded(v)</code> is
+    <code>LiveValue.seededFrom(v, source)</code>. Both are still hot — the
+    subscription opens on the spot.
+  </p>
+  <pre><code>final price = ticker.fxLive;
+final count = taps.fxLiveSeeded(0);   // has a value before the first tap</code></pre>
   <h2>Try it yourself</h2>
   <p>Exercise: derive a label feed from live state.</p>
   <div class="playground">
@@ -207,7 +222,7 @@ Future<void> main() async {
   <p>プレイグラウンドは DartPad のコンパイルサービスでコンパイルされます。© Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 実行","pgReset":"リセット","pgCompiling":"コンパイル中…","pgCompileError":"コンパイルエラー","pgError":"エラー","pgLoading":"ランタイムを読み込み中…","pgRunning":"実行中…","pgNoOutput":"（出力なし）","pgLoadFailed":"FxDart ライブラリを読み込めませんでした"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=367a788d58e3bc1c";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=ff74f6fa047725a6";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

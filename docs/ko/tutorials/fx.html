@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=367a788d58e3bc1c">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ff74f6fa047725a6">
 </head>
 <body>
 <header class="site-header">
@@ -115,7 +115,7 @@ FxEvents&lt;T&gt; Stream&lt;T&gt;.fxEvents</div>
   <h2>데모 1 · 종결 연산자 전까지는 아무것도 실행되지 않습니다</h2>
   <p>체인을 만든 직후에는 <code>calls</code>가 0에 머물러 있다가,
     <code>toList()</code>가 실제로 값 5개를 끌어당기는 순간 올라가는 것을 보세요.</p>
-  <div class="playground" data-pg="9cc6560f7deb4f7a">
+  <div class="playground" data-pg="172a1a55841595d4">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -218,6 +218,38 @@ orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
     .pull()
     .toList();</code></pre>
 
+  <h2>getter 표기 전체</h2>
+  <p>
+    규칙은 하나입니다. 진입점 이름에는 <code>fx</code>가 들어갑니다. 어느
+    라이브러리로 들어가는지를 밝혀 주고, 맨 이름 — <code>toAsync</code>,
+    <code>shuffle</code>, <code>debounce</code> — 은 프로젝트가 그 타입에
+    붙일 몫으로 남겨 둡니다.
+  </p>
+  <table>
+    <thead><tr><th>수신 타입</th><th>getter</th><th>같은 것</th></tr></thead>
+    <tbody>
+      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fx(xs)</code></td></tr>
+      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxAsync(it)</code></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxStream(s)</code></td></tr>
+      <tr><td><code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code></td><td><code>.fxAsync</code></td><td><a href="toAsync.html"><code>toAsync(xs)</code></a></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxEvents</code></td><td><a href="fxEvents.html"><code>fxEvents(s)</code></a></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLive</code></td><td><a href="liveValue.html"><code>LiveValue.from(s)</code></a></td></tr>
+      <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLiveSeeded</code></td><td><a href="liveValue.html"><code>LiveValue.seededFrom(v, s)</code></a></td></tr>
+      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffle(xs)</code></a></td></tr>
+      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffleAsync(it)</code></a></td></tr>
+      <tr><td><code>void Function(T)</code></td><td><code>.fxDebounce</code></td><td><a href="debounce.html"><code>debounce(f, w)</code></a></td></tr>
+      <tr><td><code>void Function(T)</code></td><td><code>.fxThrottle</code></td><td><a href="throttle.html"><code>throttle(f, w)</code></a></td></tr>
+    </tbody>
+  </table>
+  <p>
+    연산자 자체는 이 목록에 없고, 앞으로도 넣지 않습니다. 그중 열다섯 개 —
+    <code>map</code>, <code>where</code>, <code>take</code>,
+    <code>fold</code> 등 — 은 <code>Iterable</code>이 이미 가진 멤버와 이름이
+    같고, 인스턴스 멤버는 항상 확장을 이기므로 그 호출은 fxdart에 닿을 수조차
+    없습니다. 연산자가 사는 곳은 체인입니다 — <code>xs.map(f)</code>가 아니라
+    <code>xs.fx.map(f)</code>입니다.
+  </p>
+
   <h2>직접 해 보기</h2>
   <p>연습: 60점 이상인 점수만 남기고, 보너스 점수로 두 배를 한 뒤,
     앞의 2개 결과만 가져오는 체인을 만들어 보세요.</p>
@@ -259,7 +291,7 @@ void main() {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=367a788d58e3bc1c";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=ff74f6fa047725a6";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

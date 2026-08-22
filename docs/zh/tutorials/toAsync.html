@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=367a788d58e3bc1c">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ff74f6fa047725a6">
 </head>
 <body>
 <header class="site-header">
@@ -54,7 +54,8 @@
   <p class="hero-sub">Lifts a plain Iterable — of values or Futures — into an FxAsyncIterable, the entry point to FxDart's async pipeline.</p>
 
   <div class="signature">FxAsyncIterable&lt;T&gt; toAsync&lt;T&gt;(Iterable&lt;FutureOr&lt;T&gt;&gt; iterable)
-FxAsync&lt;T&gt; Fx.toAsync&lt;T&gt;()        // chain, on a sync Fx</div>
+FxAsync&lt;T&gt; Fx.toAsync&lt;T&gt;()        // chain, on a sync Fx
+FxAsync&lt;T&gt;         Iterable&lt;FutureOr&lt;T&gt;&gt;.fxAsync   // method (resolves the futures)</div>
 
   <h2>Lecture</h2>
   <p>
@@ -92,7 +93,7 @@ FxAsync&lt;T&gt; Fx.toAsync&lt;T&gt;()        // chain, on a sync Fx</div>
   <h2>Demo 1 · Values, Futures, and the chain form</h2>
   <p><code>toAsync</code> accepts plain values, Futures, or a mix of both —
     and the chain form does the same thing from an existing <code>Fx</code>:</p>
-  <div class="playground" data-pg="364e6e26c921febb">
+  <div class="playground" data-pg="0d9fa211bc739989">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -158,6 +159,23 @@ Future<void> main() async {
 </textarea>
   </div>
 
+  <h2>Method spelling</h2>
+  <p>
+    <code>xs.fxAsync</code> is this function as a getter. It returns an
+    <code>FxAsync</code> rather than a bare <code>FxAsyncIterable</code>, so
+    the chain is ready to continue — and it resolves the futures, which
+    <code>xs.fx</code> does not.
+  </p>
+  <pre><code>await responses.fxAsync.map(parse).concurrent(4).toList();
+
+// responses.fx would be an Fx&lt;Future&lt;T&gt;&gt; — a chain over the
+// futures rather than their values.</code></pre>
+  <p>
+    The name carries <code>fx</code> on purpose. <code>toAsync</code> is a
+    general enough phrase that on a bare <code>Iterable</code> it would say
+    nothing about which library it enters; the getter spellings are collected
+    in <a href="fx.html"><code>fx</code></a>.
+  </p>
   <h2>Try it yourself</h2>
   <p>Exercise: filter the list below so only passing scores (&gt;= 60) make
     it into the result.</p>
@@ -195,7 +213,7 @@ Future<void> main() async {
   <p>Playground 通过 DartPad 编译服务完成编译。© Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 运行","pgReset":"重置","pgCompiling":"编译中…","pgCompileError":"编译错误","pgError":"错误","pgLoading":"正在加载运行时…","pgRunning":"运行中…","pgNoOutput":"（无输出）","pgLoadFailed":"无法加载 FxDart 库"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=367a788d58e3bc1c";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=ff74f6fa047725a6";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

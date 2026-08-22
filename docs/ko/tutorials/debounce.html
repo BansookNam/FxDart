@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=367a788d58e3bc1c">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ff74f6fa047725a6">
 </head>
 <body>
 <header class="site-header">
@@ -58,7 +58,9 @@ class Debounced&lt;T&gt; {
   void cancel();
 }
 
-FxEvents&lt;T&gt; FxEvents&lt;T&gt;.debounce(Duration window) // chain (events)</div>
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.debounce(Duration window) // chain (events)
+
+Debounced&lt;T&gt; (void Function(T arg)).fxDebounce(Duration wait, {bool leading = false}) // method</div>
 
   <h2>강의</h2>
   <p>
@@ -87,7 +89,7 @@ FxEvents&lt;T&gt; FxEvents&lt;T&gt;.debounce(Duration window) // chain (events)<
 
   <h2>데모 1 · 트레일링 에지(기본 동작)</h2>
   <p>빠르게 이어진 세 번의 호출이 하나로 합쳐지고, 마지막 인자만 남습니다.</p>
-  <div class="playground" data-pg="2a9443331a857ea4">
+  <div class="playground" data-pg="29155c6bd2f301de">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -142,6 +144,24 @@ Future<void> main() async {
 </textarea>
   </div>
 
+  <h2>메서드 표기</h2>
+  <p>
+    콜백 쪽에서 같은 것을 메서드로 부를 수 있습니다.
+    <code>saveDraft.fxDebounce(wait)</code>는
+    <code>debounce(saveDraft, wait)</code>와 같고, 이름 붙은 인자도 그대로
+    받습니다.
+  </p>
+  <pre><code>void saveDraft(String text) =&gt; _post(text);
+
+final save = saveDraft.fxDebounce(const Duration(milliseconds: 300));
+save('h');
+save('he');
+save('hello');   // only this one reaches _post</code></pre>
+  <p>
+    <code>fx</code> 접두사는 의도한 것입니다. 어느 라이브러리가 콜백을 감싸는지
+    드러내고, 맨 이름은 프로젝트가 자기 함수 타입에 붙일 몫으로 남겨 둡니다 —
+    <a href="fx.html"><code>fx</code></a>의 getter 표기와 같은 규칙입니다.
+  </p>
   <h2>직접 해 보기</h2>
   <p>연습: <code>save</code>를 <code>debounce</code>로 감싸(wait는 100ms)
     아래 연속 호출 중 마지막 값만 살아남게 만들어 보세요.</p>
@@ -228,7 +248,7 @@ Future<void> main() async {
   <p>플레이그라운드는 DartPad 컴파일 서비스를 통해 컴파일됩니다. © 남반석 · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ 실행","pgReset":"초기화","pgCompiling":"컴파일 중…","pgCompileError":"컴파일 오류","pgError":"오류","pgLoading":"런타임 로딩 중…","pgRunning":"실행 중…","pgNoOutput":"(출력 없음)","pgLoadFailed":"FxDart 라이브러리를 불러오지 못했습니다"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=367a788d58e3bc1c";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=ff74f6fa047725a6";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

@@ -10026,6 +10026,25 @@ Throttled<T> throttle<T>(
   bool trailing = true,
 }) => Throttled._(func, wait, leading: leading, trailing: trailing);
 
+/// Method spellings of [debounce] and [throttle], on the callback itself.
+///
+/// Both carry the `fx` prefix on purpose. `saveDraft.debounce(…)` would read
+/// as if Dart had always had it; `saveDraft.fxDebounce(…)` says which library
+/// is wrapping the callback, and leaves the bare names free for whatever else
+/// a project puts on its function types.
+extension FxCallbackTiming<T> on void Function(T arg) {
+  /// This callback, debounced by [wait]. See [debounce].
+  Debounced<T> fxDebounce(Duration wait, {bool leading = false}) =>
+      debounce(this, wait, leading: leading);
+
+  /// This callback, throttled to once per [wait]. See [throttle].
+  Throttled<T> fxThrottle(
+    Duration wait, {
+    bool leading = true,
+    bool trailing = true,
+  }) => throttle(this, wait, leading: leading, trailing: trailing);
+}
+
 // ---- lib/src/util/shuffle.dart ----
 
 
@@ -10073,6 +10092,23 @@ Future<List<T>> shuffleAsync<T>(
       ? createSeededRandom(seed)
       : math.Random().nextDouble;
   return _shuffleList(await toListAsync(iterable), random);
+}
+
+/// Method spellings of [shuffle] and [shuffleAsync].
+///
+/// Named `fxShuffle`, not `shuffle`: `List.shuffle` already exists in
+/// `dart:core` and shuffles **in place, returning void**. An extension can
+/// never win against it, so a `List` receiver would silently call the wrong
+/// one — the prefix makes the two impossible to confuse.
+extension FxShuffleEntry<T> on Iterable<T> {
+  /// A new list with these elements shuffled. See [shuffle].
+  List<T> fxShuffle([int? seed]) => shuffle(this, seed);
+}
+
+/// Async counterpart of [FxShuffleEntry].
+extension FxShuffleAsyncEntry<T> on FxAsyncIterable<T> {
+  /// A new list with these elements shuffled. See [shuffleAsync].
+  Future<List<T>> fxShuffle([int? seed]) => shuffleAsync(this, seed);
 }
 
 // ---- lib/src/typed/non_empty_list.dart ----
@@ -11018,6 +11054,16 @@ extension FxEventsEntry<T> on Stream<T> {
   /// This stream as a chainable [FxEvents].
   @pragma('vm:prefer-inline')
   FxEvents<T> get fxEvents => FxEvents(this);
+
+  /// This stream as a [LiveValue] — see [LiveValue.from].
+  ///
+  /// Hot: the subscription opens immediately, so values arriving before
+  /// anyone listens still update [LiveValue.value].
+  LiveValue<T> get fxLive => LiveValue<T>.from(this);
+
+  /// This stream as a [LiveValue] already holding [seed] — see
+  /// [LiveValue.seededFrom].
+  LiveValue<T> fxLiveSeeded(T seed) => LiveValue<T>.seededFrom(seed, this);
 }
 
 /// Chainable event-stream operators over a plain Dart [Stream].

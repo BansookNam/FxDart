@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=367a788d58e3bc1c">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ff74f6fa047725a6">
 </head>
 <body>
 <header class="site-header">
@@ -60,7 +60,9 @@ class Throttled&lt;T&gt; {
   void cancel();
 }
 
-FxEvents&lt;T&gt; FxEvents&lt;T&gt;.throttle(Duration window, {bool leading = true, bool trailing = false}) // chain (events)</div>
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.throttle(Duration window, {bool leading = true, bool trailing = false}) // chain (events)
+
+Throttled&lt;T&gt; (void Function(T arg)).fxThrottle(Duration wait, {bool leading = true, bool trailing = true}) // method</div>
 
   <h2>Lecture</h2>
   <p>
@@ -87,7 +89,7 @@ FxEvents&lt;T&gt; FxEvents&lt;T&gt;.throttle(Duration window, {bool leading = tr
   <h2>Demo 1 · Leading + trailing (the default)</h2>
   <p>The first call fires immediately; the last call in the window fires
     again once the window closes:</p>
-  <div class="playground" data-pg="aaa9573700735e51">
+  <div class="playground" data-pg="f1a153520e08a463">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -156,6 +158,24 @@ Future<void> main() async {
 </textarea>
   </div>
 
+  <h2>Method spelling</h2>
+  <p>
+    Same as <a href="debounce.html"><code>debounce</code></a>:
+    <code>onScroll.fxThrottle(wait)</code> is
+    <code>throttle(onScroll, wait)</code>, and it forwards
+    <code>leading</code> and <code>trailing</code> unchanged.
+  </p>
+  <pre><code>void onScroll(double offset) =&gt; _measure(offset);
+
+final handler = onScroll.fxThrottle(
+  const Duration(milliseconds: 100),
+  trailing: false,
+);</code></pre>
+  <p>
+    The <code>fx</code> prefix names the library doing the wrapping, the same
+    convention as the getter spellings in
+    <a href="fx.html"><code>fx</code></a>.
+  </p>
   <h2>Try it yourself</h2>
   <p>Exercise: wrap <code>onClick</code> in <code>throttle</code> (100ms
     wait) so rapid clicks register at most twice — leading and trailing —
@@ -249,7 +269,7 @@ Future<void> main() async {
   <p>Playground компилируется через сервис компиляции DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Запустить","pgReset":"Сбросить","pgCompiling":"Компиляция…","pgCompileError":"Ошибка компиляции","pgError":"Ошибка","pgLoading":"Загрузка среды выполнения…","pgRunning":"Выполнение…","pgNoOutput":"(нет вывода)","pgLoadFailed":"Не удалось загрузить библиотеку FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=367a788d58e3bc1c";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=ff74f6fa047725a6";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>

@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../../css/site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="preconnect" href="https://stable.api.dartpad.dev" crossorigin>
-  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=367a788d58e3bc1c">
+  <link rel="prefetch" href="../../assets/fxdart_single.dart?v=ff74f6fa047725a6">
 </head>
 <body>
 <header class="site-header">
@@ -58,7 +58,9 @@ class Debounced&lt;T&gt; {
   void cancel();
 }
 
-FxEvents&lt;T&gt; FxEvents&lt;T&gt;.debounce(Duration window) // chain (events)</div>
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.debounce(Duration window) // chain (events)
+
+Debounced&lt;T&gt; (void Function(T arg)).fxDebounce(Duration wait, {bool leading = false}) // method</div>
 
   <h2>Lección</h2>
   <p>
@@ -89,7 +91,7 @@ FxEvents&lt;T&gt; FxEvents&lt;T&gt;.debounce(Duration window) // chain (events)<
 
   <h2>Demo 1 · Flanco de bajada (el valor por defecto)</h2>
   <p>Tres llamadas rápidas se colapsan en una — solo sobrevive el último argumento:</p>
-  <div class="playground" data-pg="2a9443331a857ea4">
+  <div class="playground" data-pg="29155c6bd2f301de">
 <textarea>
 import 'package:fxdart/fxdart.dart';
 
@@ -145,6 +147,24 @@ Future<void> main() async {
 </textarea>
   </div>
 
+  <h2>La forma con método</h2>
+  <p>
+    El propio callback lleva lo mismo como método:
+    <code>saveDraft.fxDebounce(wait)</code> es
+    <code>debounce(saveDraft, wait)</code>, argumentos con nombre incluidos.
+  </p>
+  <pre><code>void saveDraft(String text) =&gt; _post(text);
+
+final save = saveDraft.fxDebounce(const Duration(milliseconds: 300));
+save('h');
+save('he');
+save('hello');   // only this one reaches _post</code></pre>
+  <p>
+    El prefijo <code>fx</code> es deliberado: dice qué librería está envolviendo
+    el callback y deja el nombre desnudo libre para lo que el proyecto quiera
+    poner en sus tipos función — la misma convención que las formas con getter
+    de <a href="fx.html"><code>fx</code></a>.
+  </p>
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: envuelve <code>save</code> en <code>debounce</code> (100 ms de espera)
     para que solo sobreviva el valor final de la ráfaga de llamadas de abajo.</p>
@@ -231,7 +251,7 @@ Future<void> main() async {
   <p>El playground compila mediante el servicio de compilación de DartPad. © Bansook Nam · MIT License</p>
 </footer>
 <script>window.FXDART_I18N = {"pgRun":"▶ Ejecutar","pgReset":"Restablecer","pgCompiling":"Compilando…","pgCompileError":"Error de compilación","pgError":"Error","pgLoading":"Cargando el runtime…","pgRunning":"Ejecutando…","pgNoOutput":"(sin salida)","pgLoadFailed":"No se pudo cargar la librería FxDart"};
-window.FXDART_LIB = "assets/fxdart_single.dart?v=367a788d58e3bc1c";</script>
+window.FXDART_LIB = "assets/fxdart_single.dart?v=ff74f6fa047725a6";</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
