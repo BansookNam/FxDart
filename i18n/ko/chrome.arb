@@ -87,5 +87,8 @@
   "theoryEdit": "✎ 편집",
   "theoryEditTitle": "고쳐서 실행하기",
   "theoryReset": "되돌리기",
+  "theoryContribute": "다른 언어 번역 기여하기",
+  "theoryGoto": "쪽 이동",
+  "theoryGo": "이동",
   "theoryEdited": "수정됨"
 }

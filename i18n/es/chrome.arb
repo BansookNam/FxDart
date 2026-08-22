@@ -80,5 +80,8 @@
   "theoryEdit": "✎ Editar",
   "theoryEditTitle": "Editar y ejecutar",
   "theoryReset": "Restablecer",
+  "theoryContribute": "Contribuir una traducción",
+  "theoryGoto": "Ir a la página",
+  "theoryGo": "Ir",
   "theoryEdited": "editado"
 }

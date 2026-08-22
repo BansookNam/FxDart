@@ -35,5 +35,8 @@
   "theoryEdit": "✎ 編集",
   "theoryEditTitle": "編集して実行",
   "theoryReset": "リセット",
+  "theoryContribute": "翻訳に貢献する",
+  "theoryGoto": "ページ移動",
+  "theoryGo": "移動",
   "theoryEdited": "編集済み"
 }

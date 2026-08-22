@@ -27,21 +27,22 @@
         <div class="spine"></div>
       </div>
     </div>
+    <span id="book-crumb"></span>
     <a id="book-close" href="../101/index.html" aria-label="Close" title="Close">✕</a>
     <button id="nav-prev" class="book-nav" type="button" aria-label="Previous page">‹</button>
     <button id="nav-next" class="book-nav" type="button" aria-label="Next page">›</button>
     <div id="book-hud">
       <span id="page-indicator"></span>
       <button id="toc-btn" type="button">目录</button>
+      <button id="goto-btn" type="button" aria-label="跳转页面"></button>
+      <button id="lang-btn" type="button" aria-label="语言"><svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="10" cy="10" r="8"></circle><path d="M2 10h16"></path><path d="M10 2c2.2 2.3 3.4 5 3.4 8s-1.2 5.7-3.4 8c-2.2-2.3-3.4-5-3.4-8S7.8 4.3 10 2z"></path></svg><span>ZH</span></button>
       <a class="book-note" href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md">本页尚未翻译，因此以英文显示。</a>
       <nav class="book-langs" aria-label="语言">
         <a href="../../theory/index.html" hreflang="en" lang="en">English</a>
         <a href="../../ko/theory/index.html" hreflang="ko" lang="ko">한국어</a>
         <a href="../../zh/theory/index.html" hreflang="zh-Hans" lang="zh-Hans" aria-current="page">简体中文</a>
-        <a href="../../ja/theory/index.html" hreflang="ja" lang="ja">日本語</a>
         <a href="../../es/theory/index.html" hreflang="es" lang="es">Español</a>
-        <a href="../../pt-br/theory/index.html" hreflang="pt-BR" lang="pt-BR">Português</a>
-        <a href="../../ru/theory/index.html" hreflang="ru" lang="ru">Русский</a>
+        <a class="book-contribute" href="https://github.com/bansooknam/fxDart/blob/main/i18n/README.md" target="_blank" rel="noopener">参与翻译</a>
       </nav>
     </div>
   </div>
@@ -2262,7 +2263,7 @@
   </div>
 <script>window.FXDART_I18N = {"pgCompileError":"编译错误","pgError":"错误","pgLoadFailed":"无法加载 FxDart 库"};
 window.FXDART_LIB = "assets/fxdart_single.dart?v=5337b860bc3ce009";
-window.FXDART_THEORY = {"toc":"目录","run":"▶ 运行","output":"输出","close":"Close","compiling":"编译中…","running":"运行中…","noOutput":"（无输出）","runUnavailable":"The run engine could not be loaded — reload the page to try again.","edit":"✎ 编辑","editTitle":"编辑并运行","reset":"重置","edited":"已修改"};</script>
+window.FXDART_THEORY = {"toc":"目录","run":"▶ 运行","output":"输出","close":"Close","compiling":"编译中…","running":"运行中…","noOutput":"（无输出）","runUnavailable":"The run engine could not be loaded — reload the page to try again.","edit":"✎ 编辑","editTitle":"编辑并运行","reset":"重置","edited":"已修改","goto":"跳转页面","go":"跳转","lang":"语言"};</script>
 <script src="../../js/playground.js" defer></script>
 <script src="../../js/theorybook.js" defer></script>
 </body>
