@@ -2892,6 +2892,12 @@ class _ScanIterator<A, B> implements Iterator<B> {
 /// value per source element (so exactly `source.length + 1` in all), [_f] and
 /// [_g] each run once per element consumed, the accumulator is fresh per
 /// iteration, and a downstream `take` still cuts the source short.
+///
+/// Like [_WindowMapIterable], fusing here ends the chain's fusion: this node
+/// is neither [FxUniqFusable] nor [FxMapFusable], so `scan -> map -> uniq`
+/// loses the map+uniq fusion and `scan -> map -> map` fuses only the first
+/// `map`. Stage boundaries only — same elements, same order. See
+/// [_WindowMapIterable] for why the gap is left open.
 class _ScanMapIterable<A, B, C> extends Iterable<C> {
   _ScanMapIterable(this._f, this._seed, this._source, this._g);
   final B Function(B, A) _f;
@@ -3178,6 +3184,18 @@ class _MapAccumIterable<A, B> extends Iterable<B> {
     // exactly n) — as in [_ScanIterable.toList], the inherited toList would
     // grow and recopy ~log n times. [_f] still runs exactly once per
     // element, in order.
+    //
+    // This is the opposite choice from [_ScanMapIterable.toList], which
+    // accumulates with `add` to dodge the covariant store check that
+    // `List<B>.operator[]=` costs per element. The two are not in conflict,
+    // they are the two sides of one trade: the fill pays a store check per
+    // element and saves ~log n regrow-and-recopy passes, `add` pays the
+    // reverse. Which wins depends on the element type — the check is a
+    // class-id compare for a plain class and much more for a record, the
+    // measurement on [_MapIterable.toList] — and neither of these two shapes
+    // has been measured against its alternative. Both are left as written
+    // rather than unified on an unmeasured guess; the note is here so the
+    // next person reads the difference as open, not as settled.
     if (source is List<A>) {
       final length = source.length;
       final out = List<B>.filled(length, _seed, growable: growable);
@@ -5430,7 +5448,7 @@ Iterable<List<A>> chunk<A>(int size, Iterable<A> iterable) => size < 1
 /// never a view onto the source, and mutating one window cannot disturb
 /// another or the source.
 ///
-/// Windows became growable in 0.8.6. Before that the two sync paths handed
+/// Windows became growable in 0.8.7. Before that the two sync paths handed
 /// back a fixed-length list while the async path (`windowedAsync`) already
 /// returned a growable one; all four paths now agree. The reason is
 /// performance: a fixed-length window has to be filled from package code, one
@@ -5482,12 +5500,39 @@ void _checkWindow(int size, int step) {
 /// `getRange().toList(growable: false)` (29.1 / 55.0 / 76.9) are both *slower*
 /// than the fill they would replace, because both copy through `Lists.copy` —
 /// an element loop behind an interface `[]=` call. Buying the check back
-/// therefore means giving up the fixed-length window, which 0.8.6 does
+/// therefore means giving up the fixed-length window, which 0.8.7 does
 /// deliberately and uniformly: see [windowed] for the contract, and
 /// [_WindowIterator._emit] for the same change on the pulled path.
 @pragma('vm:prefer-inline')
 List<A> _windowSlice<A>(List<A> list, int i, int length) =>
     list.sublist(i, i + length);
+
+/// The pre-sized fill [_windowSlice] replaces, kept for the one backing list
+/// it cannot serve: `TypedData`.
+///
+/// `List.sublist` returns a list of the *receiver's* runtime type. A
+/// `Uint8List` is a `List<int>` and a `Float64List` a `List<double>`, so both
+/// reach [_WindowRangeIterator] through `fxListRangeOf` unchanged — and
+/// slicing one yields another typed-data list, which is fixed length and
+/// truncates on store. That is not the window [windowed] promises: it would
+/// make the growable contract false, and `window[0] = 300` would silently
+/// leave 44 behind in a `Uint8List` window instead of throwing or storing.
+///
+/// Only a fresh `List<A>` keeps both halves of the contract, so the typed-data
+/// source buys the covariant store check back. It is the rare source here —
+/// the measured `sublist` win stands for every ordinary `List`, which is what
+/// [_WindowRangeIterator._typed] is for: the receiver's type is fixed for the
+/// whole iteration, so it is tested once when the iterator is built, never per
+/// window.
+@pragma('vm:prefer-inline')
+List<A> _windowFill<A>(List<A> list, int i, int length) {
+  // length >= 1 at every call site, so element i is a safe fill value.
+  final out = List<A>.filled(length, list[i], growable: true);
+  for (var k = 1; k < length; k++) {
+    out[k] = list[i + k];
+  }
+  return out;
+}
 
 class _WindowIterable<A> extends Iterable<List<A>>
     implements FxMapFusable<List<A>> {
@@ -5523,6 +5568,7 @@ class _WindowIterable<A> extends Iterable<List<A>>
 class _WindowRangeIterator<A> implements Iterator<List<A>> {
   _WindowRangeIterator(this._size, this._step, this._partial, FxListRange<A> r)
     : _list = r.list,
+      _typed = r.list is TypedData,
       _i = r.start,
       _end = r.end,
       _lastFull = r.end - _size;
@@ -5530,6 +5576,11 @@ class _WindowRangeIterator<A> implements Iterator<List<A>> {
   final int _step;
   final bool _partial;
   final List<A> _list;
+
+  /// Whether [_list] is typed data, and so whether a window has to be filled
+  /// rather than sliced — see [_windowFill]. Fixed for the whole iteration, so
+  /// it is decided here and not per window.
+  final bool _typed;
   final int _end;
 
   /// Largest start index that still has a full window behind it — the one
@@ -5556,7 +5607,8 @@ class _WindowRangeIterator<A> implements Iterator<List<A>> {
     return true;
   }
 
-  List<A> _slice(int i, int length) => _windowSlice(_list, i, length);
+  List<A> _slice(int i, int length) =>
+      _typed ? _windowFill(_list, i, length) : _windowSlice(_list, i, length);
 }
 
 /// `windowed`/`chunk` followed by `map`, as one stage — see [FxMapFusable].
@@ -5566,6 +5618,21 @@ class _WindowRangeIterator<A> implements Iterator<List<A>> {
 /// iterator that is has to be decided per iteration, not here: `fxListRangeOf`
 /// snapshots the source's bounds, and doing that when the chain is built would
 /// break repeated iteration over a source that changed in between.
+///
+/// **Fusing here ends the chain's fusion**, deliberately. This node is
+/// neither [FxUniqFusable] nor [FxMapFusable], where the `_MapIterable` it
+/// displaces was the former — so `{windowed,chunk} -> map -> uniq` loses the
+/// map+uniq fusion it would have had without the window stage, and
+/// `... -> map -> map` fuses only the first `map`. Both are a question of how
+/// many stage boundaries survive; the elements and their order are identical
+/// either way, which is why no regression sweep reports either one.
+///
+/// Closing those gaps means another fused node per source shape, and every
+/// added `Iterator` implementation makes the `moveNext` call site at each
+/// consumer more polymorphic — the cost that already decided several fusion
+/// choices in this file. Neither combination appears in the published example
+/// corpus. Left unfused on purpose, not overlooked. [_ScanMapIterable] says
+/// the same of the `scan` side.
 class _WindowMapIterable<A, B> extends Iterable<B> {
   _WindowMapIterable(
     this._size,
@@ -5609,6 +5676,7 @@ class _WindowRangeMapIterator<A, B> implements Iterator<B> {
     FxListRange<A> r,
     this._f,
   ) : _list = r.list,
+      _typed = r.list is TypedData,
       _i = r.start,
       _end = r.end,
       _lastFull = r.end - _size;
@@ -5617,6 +5685,10 @@ class _WindowRangeMapIterator<A, B> implements Iterator<B> {
   final bool _partial;
   final B Function(List<A>) _f;
   final List<A> _list;
+
+  /// See [_WindowRangeIterator._typed] — the fused path builds the same
+  /// window, so it makes the same decision once.
+  final bool _typed;
   final int _end;
   final int _lastFull;
   int _i;
@@ -5626,17 +5698,20 @@ class _WindowRangeMapIterator<A, B> implements Iterator<B> {
   bool moveNext() {
     final i = _i;
     if (i <= _lastFull) {
-      current = _f(_windowSlice(_list, i, _size));
+      current = _f(_slice(i, _size));
       _i = i + _step;
       return true;
     }
     if (!_partial) return false;
     final remaining = _end - i;
     if (remaining <= 0) return false;
-    current = _f(_windowSlice(_list, i, remaining));
+    current = _f(_slice(i, remaining));
     _i = i + _step;
     return true;
   }
+
+  List<A> _slice(int i, int length) =>
+      _typed ? _windowFill(_list, i, length) : _windowSlice(_list, i, length);
 }
 
 /// The pulled half of [_WindowMapIterable]: [_WindowIterator] plus [_f].
@@ -14066,27 +14141,45 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// The maximum element using [compare] function.
   /// If [compare] is not provided, assumes T is `Comparable<T>`.
   /// Throws if empty or elements are not comparable.
+  ///
+  /// The chain spellings throw a [StateError] on empty input; the top-level
+  /// `max(xs)` returns `double.negativeInfinity` there (`min(xs)` returns
+  /// `double.infinity`). That difference is deliberate and it is not going
+  /// away: the top-level pair is a `num` fold whose identity element *is* the
+  /// infinity, and it is what FxTS's `max` returns, while a chain terminal
+  /// over an arbitrary `T` has no identity to return and can only throw. So
+  /// there are three spellings and two contracts:
+  ///
+  /// ```dart
+  /// max(<num>[]);              // -Infinity
+  /// fx(<num>[]).max();         // StateError  (this member)
+  /// FxNum(fx(<num>[])).max();  // StateError  (see [FxNum.max])
+  /// ```
   T max([int Function(T a, T b)? compare]) {
     final compareFn =
         compare ?? (a, b) => (a as dynamic).compareTo(b as dynamic) as int;
-    var result = _inner.first;
-    for (final item in _inner.skip(1)) {
-      if (compareFn(item, result) > 0) result = item;
-    }
-    return result;
+    // `reduce`, not `first` + `skip(1)`: the latter iterates the chain twice,
+    // which on a `sync*` source with a side effect runs it twice and on an
+    // expensive one pays for it twice — n + 1 pulls where n do. `reduce`
+    // throws the same [StateError] on empty that `first` did.
+    return _inner.reduce(
+      (result, item) => compareFn(item, result) > 0 ? item : result,
+    );
   }
 
   /// The minimum element using [compare] function.
   /// If [compare] is not provided, assumes T is `Comparable<T>`.
   /// Throws if empty or elements are not comparable.
+  ///
+  /// On empty input this throws while the top-level `min(xs)` returns
+  /// `double.infinity` — see [max] for why the two contracts differ.
   T min([int Function(T a, T b)? compare]) {
     final compareFn =
         compare ?? (a, b) => (a as dynamic).compareTo(b as dynamic) as int;
-    var result = _inner.first;
-    for (final item in _inner.skip(1)) {
-      if (compareFn(item, result) < 0) result = item;
-    }
-    return result;
+    // Single pass — see [max].
+    return _inner.reduce(
+      (result, item) => compareFn(item, result) < 0 ? item : result,
+    );
   }
 }
 
@@ -14096,8 +14189,10 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 /// [min] and [max] are reachable only through explicit extension
 /// application — `FxNum(fx(xs)).min()`. On a plain `fx(xs).min()` receiver
 /// the [Fx.min] *member* wins: a member redeclared on an extension type
-/// shadows every extension on that type. Both spellings are supported, and
-/// they now agree on empty input.
+/// shadows every extension on that type. Both chain spellings are supported,
+/// and they now agree on empty input — with each other, but deliberately not
+/// with the top-level `min`/`max`, which return an infinity there. [Fx.max]
+/// spells the three-way comparison out.
 extension FxNum on Fx<num> {
   /// The sum of every value.
   @pragma('vm:prefer-inline')
