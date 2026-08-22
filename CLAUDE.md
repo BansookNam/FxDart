@@ -41,8 +41,27 @@ Async operator callbacks in `mapAsync`-style code must stay parallel-safe: overl
 
 ## Docs site (content/ → docs/)
 
-- Most of `docs/` is **generated output — never edit by hand**: every `*.html` + `sitemap.xml` (from `content/` English truth + `i18n/<locale>/` overlays, which fall back to English, via `tool/build_docs.dart`), `docs/assets/fxdart_single.dart` (from `lib/` via `tools/build_single_file.sh`), and `docs/pg/*.js.gz` (via `tool/precompile_playgrounds.dart`).
-- These files under `docs/` are **hand-maintained sources** and are meant to be edited directly: `docs/css/site.css`, `docs/js/*.js`, `docs/frame.html`, `docs/assets/logo*.png`.
+- **`docs/` is entirely generated — never edit anything in it.** Every `*.html`
+  + `sitemap.xml` comes from `content/` (English truth) + `i18n/<locale>/`
+  overlays via `tool/build_docs.dart`; `docs/assets/fxdart_single.dart` from
+  `lib/` via `tools/build_single_file.sh`; `docs/pg/*.js.gz` via
+  `tool/precompile_playgrounds.dart`; and everything else is copied in from
+  `web/`.
+- **`web/` is the hand-written half of the site** and is what you edit:
+  `web/css/*.css`, `web/js/*.js`, `web/frame.html`, `web/assets/logo*.png`,
+  `web/DailyLedger/` (the built Flutter demo). `build_docs.dart` copies the
+  tree verbatim into `docs/`, so `web/css/site.css` is served as
+  `docs/css/site.css` and every relative link in a rendered page is unchanged.
+- The site is **built and published by `.github/workflows/pages.yml`**, not by
+  a developer. Nothing generated is committed back; the run uploads `docs/` as
+  a Pages artifact. `./deploy.sh` still exists for a manual publish, and
+  `./run.sh` still builds locally for preview.
+- The bundle is **comment-stripped** (`tool/strip_dart_comments.dart`). A
+  snippet's playground artifact id hashes the bundle, so while `lib/`'s dartdoc
+  was in there a comment-only edit rotated every id and rewrote `data-pg` on
+  ~1,900 pages — which is what made two branches touching `lib/` conflict on
+  ~1,900 files that carry no information. Analyzer `// ignore` directives are
+  kept, because CI analyzes the bundle.
 - `content/code/` (playground code) and `sig.txt` are shared across locales — **never translated**.
 - `./benchmark.sh` is the entry point for both families, and exists because the
   steps fail quietly on their own: a sweep writes `results.json` but the ratio
@@ -65,7 +84,11 @@ Async operator callbacks in `mapAsync`-style code must stay parallel-safe: overl
   belongs in the same commit as the edit. Before recording in bulk, confirm the English
   diff really is prose-free (`git show <sha> -- content/comparison | grep -v '^[-+]order:'`),
   since recording is what silences a *genuine* staleness too.
-- `deploy.sh` stages only docs-related paths (`docs content i18n tool tools deploy.sh DEPLOY.md`) — commit `lib/`/`test/` changes separately first.
+- **`docs/` is untracked** (`.gitignore`). It is built and published by
+  `.github/workflows/pages.yml` on a push to `main`; nothing generated is ever
+  committed. `./deploy.sh` builds the same output locally for inspection and
+  `./run.sh -s` serves it — neither commits. To publish without a source
+  change: `gh workflow run pages.yml` (`-f pg_scope=all` for every playground).
 
 ### Theory textbook (content/theory/ → docs/theory/)
 
@@ -79,9 +102,9 @@ A paged book viewer — the FP theory companion to 101, modelled on the
   locales, never translated**, inlined at build time with ids namespaced.
 - `tool/theory_markdown.dart` converts a chapter to *blocks*; the whole book
   renders into one page per locale (`docs/theory/index.html`, `docs/ko/theory/…`).
-  Pagination is **runtime** work: `docs/js/theorybook.js` measures blocks against
+  Pagination is **runtime** work: `web/js/theorybook.js` measures blocks against
   the real page box and flows them, because page capacity depends on the viewport.
-  `docs/js/theorybook.js` + `docs/css/theorybook.css` are hand-maintained.
+  `web/js/theorybook.js` + `web/css/theorybook.css` are the hand-written sources.
 - The viewer renders **only the current spread** — two `.page-slot` divs, no 3D,
   no stacked sheets. An earlier version flipped every page in 3D; at 300 pages
   the compositor bled stale layers through the current spread (page 6 visible
@@ -137,7 +160,7 @@ A paged book viewer — the FP theory companion to 101, modelled on the
   output (paste it back into the prose), and enforces the ≤ 66-column rule that
   keeps listings from wrapping in the page box. The book asserts what programs
   print, so a failing listing is a factual error, not a style nit.
-- Running uses the 101 playground engine: `docs/js/playground.js` exposes
+- Running uses the 101 playground engine: `web/js/playground.js` exposes
   `window.FxDartPlayground.run(source, handlers, {prebuiltId})`, so compile
   caching, the DDC runtime download and frame lifetime are shared with the
   tutorials' playgrounds.
@@ -167,7 +190,7 @@ A Run resolves the snippet's JS from the cheapest available source: a build-time
 artifact in `docs/pg/` (stamped on the `.playground` div as `data-pg`), then the
 reader's Cache Storage, then the DartPad compile service. `tool/playground_source.dart`
 holds the library+snippet merge and **must stay byte-identical to `buildSource` in
-`docs/js/playground.js`** — if you touch either, verify by capturing the real compile
+`web/js/playground.js`** — if you touch either, verify by capturing the real compile
 POST body from a browser and comparing.
 
 Build order matters: `build_single_file.sh` → `precompile_playgrounds.dart` →

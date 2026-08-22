@@ -15,9 +15,17 @@ Most of `docs/` is **generated output — never edit it by hand.** The sources a
 | `tools/build_single_file.sh` | Concatenates `lib/src/` into `docs/assets/fxdart_single.dart` |
 | `tool/precompile_playgrounds.dart` | Compiles playground snippets into `docs/pg/*.js.gz` |
 
-The exceptions — hand-maintained files that live under `docs/` because that is
-what gets served — are `docs/css/site.css`, `docs/js/*.js`, `docs/frame.html`,
-and `docs/assets/logo*.png`. Edit those directly.
+`docs/` is now **entirely generated**; nothing in it is edited by hand. The
+hand-written half of the site lives in `web/` — `web/css/*.css`, `web/js/*.js`,
+`web/frame.html`, `web/assets/logo*.png` and `web/DailyLedger/` — and
+`build_docs.dart` copies that tree verbatim into `docs/`, so `web/css/site.css`
+is served as `docs/css/site.css`.
+
+`docs/` is **not tracked** — it is in `.gitignore`. The site is built and
+published by `.github/workflows/pages.yml` on a push to `main`, and nothing
+generated is committed back. `./deploy.sh` builds the identical output locally
+so it can be inspected, and `./run.sh -s` serves that build; neither commits.
+To publish without a source change, run `gh workflow run pages.yml`.
 
 The site builds in 7 languages (English at the root, plus `ko`, `zh-Hans`,
 `ja`, `es`, `pt-BR`, `ru` under their own prefixes). See
@@ -117,10 +125,10 @@ If the build produces no changes, the script stops with
 
 - **Never hand-edit the generated parts of `docs/`** — the HTML and
   `sitemap.xml` from `content/` + `i18n/`, `fxdart_single.dart` from `lib/src/`,
-  and `pg/*.js.gz` from the precompiler. The hand-maintained files listed at the
-  top of this page are the ones to edit directly.
+  and `pg/*.js.gz` from the precompiler. Everything else under `docs/` is
+  copied in from `web/`, which is where those files are edited.
 - `tool/playground_source.dart` reimplements the library+snippet merge that
-  `docs/js/playground.js` performs, so that precompiled output is built from
+  `web/js/playground.js` performs, so that precompiled output is built from
   exactly the text the browser would have sent. The two must stay
   byte-identical; if they drift, every page silently falls back to compiling
   over the network. Verify by capturing a real compile POST body from the

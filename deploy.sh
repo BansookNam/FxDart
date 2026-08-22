@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
-# Builds the GitHub Pages resources under docs/ and commits + pushes them.
+# Builds the GitHub Pages site under docs/ exactly as CI does, so it can be
+# inspected before it ships.
 #
-#   ./deploy.sh                     # build, commit with a default message, push
-#   ./deploy.sh "tweak 101 intro"   # build, commit with your message, push
-#   ./deploy.sh -n                  # dry run: build + show what would be committed
-#   ./deploy.sh -s "msg"            # skip the build step, just commit + push
+#   ./deploy.sh        # build the site, then say how to publish it
+#   ./deploy.sh -n     # dry run: build only
+#   ./deploy.sh -s     # skip the build, just verify what is already in docs/
 #
-# GitHub Pages for this repo serves the docs/ folder on the default branch, so
-# "deploying" is just pushing docs/ — no separate build artifact branch.
+# It does NOT commit. docs/ is untracked generated output, published by
+# .github/workflows/pages.yml on a push to main. Serve the local build with
+# `./run.sh -s`.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -59,6 +60,8 @@ else
 fi
 
 # ---------------------------------------------------------------- sanity
+# css/, js/ and frame.html are copied out of web/ by build_docs, so this
+# also checks that the copy ran — without it every page renders unstyled.
 step "Checking docs/ layout"
 for required in docs/index.html docs/101/index.html docs/css/site.css \
                 docs/js/playground.js docs/frame.html \
@@ -70,40 +73,41 @@ echo "ok — $(find docs -type f | wc -l | tr -d ' ') files under docs/"
 step "Translation coverage"
 dart run tool/build_docs.dart --status
 
-# ---------------------------------------------------------------- stage
-# Staged by path, deliberately. A docs deploy must not sweep up unrelated
-# work-in-progress in lib/ or test/ — if you want source changes in the same
-# push, commit them yourself first. This also leaves the untracked
-# example/_snip_*.dart scratch files alone.
-step "Staging changes"
-# benchmark/ is included because benchmark/results/results.json is a
-# build_docs input (the per-page Benchmark sections render from it).
-git add docs content i18n tool tools benchmark deploy.sh DEPLOY.md
-
-if git diff --cached --quiet; then
-  echo "nothing to deploy — docs/ is already up to date."
-  exit 0
+# ---------------------------------------------------------------- ship
+# docs/ is not tracked any more, so there is nothing here to commit. The site
+# is published by .github/workflows/pages.yml, which runs on a push to main
+# and uploads docs/ straight to GitHub Pages. What this script is now for is
+# building the exact same output locally and looking at it before it ships —
+# `./run.sh -s` serves what the build above just produced.
+#
+# Sources still have to be committed the ordinary way. They are listed here
+# only so a build that changed them does not look clean by accident.
+step "Source changes that would trigger a publish"
+if git diff --quiet -- web content i18n lib tool tools benchmark; then
+  echo "none — the working tree matches HEAD."
+else
+  git diff --stat -- web content i18n lib tool tools benchmark
+  echo
+  echo "Commit and push these to main; pages.yml publishes on arrival."
 fi
-
-git diff --cached --stat
 
 if [[ $DRY_RUN -eq 1 ]]; then
-  step "Dry run — stopping before commit"
-  echo "run without -n to commit and push to origin/$BRANCH"
+  step "Dry run — stopping"
   exit 0
 fi
 
-# ---------------------------------------------------------------- ship
-if [[ -z "$MESSAGE" ]]; then
-  MESSAGE="docs: update GitHub Pages site"
+step "Publishing"
+if [[ -n "$MESSAGE" ]]; then
+  echo "note: -m/--message no longer applies — this script does not commit." >&2
+fi
+if command -v gh >/dev/null 2>&1; then
+  echo "To publish what is on main right now:"
+  echo "  gh workflow run pages.yml"
+  echo "To publish every playground artifact rather than the default scope:"
+  echo "  gh workflow run pages.yml -f pg_scope=all"
+else
+  echo "Push to main, or run the \"pages\" workflow from the Actions tab."
 fi
 
-step "Committing"
-git commit -m "$MESSAGE"
-
-step "Pushing to origin/$BRANCH"
-git push origin "$BRANCH"
-
-step "Deployed"
+step "Site"
 echo "https://bansooknam.github.io/FxDart/"
-echo "(Pages usually takes ~1 minute to rebuild.)"

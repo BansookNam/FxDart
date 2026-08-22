@@ -243,7 +243,7 @@ void _checkImports(String slug, File file,
 }
 
 /// Merges each fxdart panel with the single-file library exactly the way
-/// docs/js/playground.js does (dart: imports hoisted, fxdart import commented
+/// web/js/playground.js does (dart: imports hoisted, fxdart import commented
 /// out, library prepended) and analyzes the results in one pass. Only
 /// error-severity diagnostics fail — the inlined library itself trips lint
 /// noise that is not the example's fault.
