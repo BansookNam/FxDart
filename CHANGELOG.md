@@ -1,3 +1,9 @@
+## 0.8.9
+
+Documentation fix: the FxDart logo in the README was not displaying on GitHub
+due to a blocked raw.githubusercontent.com URL. Switched to the GitHub Pages URL
+which is properly CORS-enabled.
+
 ## 0.8.8
 
 0.8.7 gave the chain a getter spelling and fused two lazy stage boundaries.
