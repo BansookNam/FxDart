@@ -1,0 +1,4 @@
+FxEvents&lt;List&lt;T&gt;&gt; combine&lt;T&gt;(Iterable&lt;CombineSpec&lt;T&gt;&gt; specs)
+class CombineSpec&lt;T&gt;(Stream&lt;T&gt; source, {bool causesEmit = true, bool requireFirst = true})
+FxEvents&lt;R&gt; FxEvents&lt;Stream&lt;T&gt;&gt;.zipAll&lt;R&gt;([R Function(List&lt;T&gt; values)? project])
+FxEvents&lt;R&gt; FxEvents&lt;T&gt;.withLatestFromAll&lt;R&gt;(Iterable&lt;Stream&lt;Object?&gt;&gt; others, R Function(T value, List&lt;Object?&gt; latest) combine)

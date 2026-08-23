@@ -71,12 +71,16 @@ description: 50 real tasks solved twice — RxDart streams vs FxDart pull pipeli
     Rx-style push operators — debounce, throttle, sample, combineLatest,
     switchMap, race, a <code>LiveValue</code> — on plain Dart streams, so
     Part&nbsp;4's time-shaped pairs meet as equals, operator for operator.
-    RxDart's catalog remains far larger, and past those everyday verbs it
-    is still the tool to reach for. What the pairs expose is the other
-    half of the story — how often a problem that gets solved with a stream
-    is really a <em>data pipeline</em> wearing a stream costume: a bounded
-    fetch, a batch transform, a paginated crawl. For those, the pull
-    version is shorter, ordered, typed, and needs no subscription
+    RxDart still has a Subject class hierarchy and arity-suffixed
+    <code>combineLatest2…9</code> overloads; fxdart covers the <em>jobs</em>
+    on plain Dart streams without colliding with rxdart in the same file —
+    windows, live <code>groupsBy</code>, <code>shareReplay</code>,
+    selector-driven debounce, <code>combine</code>, the four
+    <code>fromStream*</code> pull policies. What the pairs expose is the
+    other half of the story — how often a problem that gets solved with a
+    stream is really a <em>data pipeline</em> wearing a stream costume: a
+    bounded fetch, a batch transform, a paginated crawl. For those, the
+    pull version is shorter, ordered, typed, and needs no subscription
     lifecycle at all.
   </p>
 

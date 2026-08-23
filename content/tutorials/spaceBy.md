@@ -5,10 +5,10 @@ description: FxDart spaceBy tutorial: pace a burst without dropping any of it, s
 heading: <code>delay</code>, <code>spaceBy</code> &amp; <code>sample</code>
 section: 14
 crumb: spaceBy
-prev: chunkOn.html
-prevLabel: chunkOn
-next: onErrorResume.html
-nextLabel: onErrorResume
+prev: groupsBy.html
+prevLabel: groupsBy
+next: debounceOn.html
+nextLabel: debounceOn
 ---
   <p class="hero-sub">Three ways to move events around in time: shift them all, spread them out, or read only the newest on a fixed clock.</p>
 

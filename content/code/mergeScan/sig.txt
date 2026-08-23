@@ -1,0 +1,3 @@
+FxEvents&lt;R&gt; FxEvents&lt;T&gt;.mergeScan&lt;R&gt;(R seed, Stream&lt;R&gt; Function(R acc, T value) accumulator, {int? concurrent})
+FxEvents&lt;R&gt; FxEvents&lt;T&gt;.switchScan&lt;R&gt;(R seed, Stream&lt;R&gt; Function(R acc, T value) accumulator)
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.expandEach(Stream&lt;T&gt; Function(T value) project, {int? concurrent})

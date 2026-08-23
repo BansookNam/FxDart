@@ -5,8 +5,8 @@ description: FxDart sampleOn 튜토리얼: 트리거 스트림이 발화할 때�
 heading: <code>sampleOn</code>
 section: 14
 crumb: sampleOn
-prev: fxEvents.html
-prevLabel: fxEvents
+prev: whenComplete.html
+prevLabel: whenComplete
 next: combineLatest.html
 nextLabel: combineLatest
 ---

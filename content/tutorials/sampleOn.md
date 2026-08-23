@@ -5,8 +5,8 @@ description: FxDart sampleOn tutorial: emit the newest source value each time a 
 heading: <code>sampleOn</code>
 section: 14
 crumb: sampleOn
-prev: fxEvents.html
-prevLabel: fxEvents
+prev: whenComplete.html
+prevLabel: whenComplete
 next: combineLatest.html
 nextLabel: combineLatest
 ---

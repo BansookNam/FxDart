@@ -5,8 +5,8 @@ description: FxDart fxEvents tutorial: the events layer — a chainable wrapper 
 heading: <code>fxEvents</code>
 section: 14
 crumb: fxEvents
-next: sampleOn.html
-nextLabel: sampleOn
+next: fxEventsCreate.html
+nextLabel: fxEventsCreate
 ---
   <p class="hero-sub">Wraps a plain Dart <code>Stream</code> in a chainable <code>FxEvents</code> — the entry point to FxDart's push side.</p>
 

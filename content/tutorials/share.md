@@ -7,8 +7,8 @@ section: 14
 crumb: share
 prev: onErrorResume.html
 prevLabel: onErrorResume
-next: liveValue.html
-nextLabel: LiveValue
+next: shareReplay.html
+nextLabel: shareReplay
 ---
   <p class="hero-sub">One run of a chain, many listeners — and the version that remembers its latest value for whoever arrives late.</p>
 
@@ -33,19 +33,27 @@ nextLabel: LiveValue
     not one per subscriber.
   </p>
   <p>
-    There is a limit worth stating plainly, because Rx's <code>share</code>
-    does not have it. Rx re-subscribes when the listener count returns to
-    zero and then rises again; here it <strong>cannot</strong>, because
-    the upstream chain is single-subscription and there is no second run
-    to give. So when the last listener leaves, the source is cancelled and
-    the shared stream closes for good — a listener arriving afterwards is
-    handed an already-closed stream rather than a fresh run. Attach every
-    listener before the first event, or keep one alive.
+    <code>share({reset: true})</code> — the default — now matches Rx's
+    ref-count reset. When the last listener leaves
+    <strong>before the source has completed</strong>, the upstream
+    subscription is cancelled and the next listener starts a fresh
+    subscribe. After the source <strong>completes</strong>, a later
+    listener is still handed a closed stream.
+    <code>share(reset: false)</code> is the 0.8.7 behaviour: the last
+    cancel closes forever. A resubscribe needs a source that allows a
+    second listen — <code>Stream.fromIterable</code>,
+    <code>Stream.multi</code>, <code>FxEvents.defer</code>, a
+    broadcast — a spent single-subscription
+    <code>StreamController</code> still cannot be re-listened. Attach
+    every listener before the first event if the source is one-shot,
+    or keep one alive.
   </p>
   <p>
     <code>share()</code> also does not <em>remember</em>: a listener that
-    arrives after an event has passed has simply missed it. When latecomers
-    need the current state — which is most UI —
+    arrives after an event has passed has simply missed it. For a window
+    of history, <code><a href="shareReplay.html">shareReplay</a></code>
+    is the next page. When latecomers need the current state — which is
+    most UI —
     <code><a href="liveValue.html">LiveValue</a></code> is the answer, and
     <code>LiveValue.from(source)</code> / <code>LiveValue.seededFrom(seed,
     source)</code> build one directly from a stream. Those are
@@ -69,6 +77,7 @@ nextLabel: LiveValue
 
   <div class="callout">
     <strong>Related:</strong>
+    <a href="shareReplay.html"><code>shareReplay</code></a> — multicast that remembers a buffer of history ·
     <a href="liveValue.html"><code>LiveValue</code></a> — the sharing that remembers: late subscribers get the current value first ·
     <a href="tee.html"><code>tee</code></a> — the pull-side answer to two readers over one pass, with no buffer ·
     <a href="fork.html"><code>fork</code></a> — two independent pull cursors over one source, at the cost of a buffer

@@ -630,65 +630,31 @@
     }
   ],
   "14": [
-    {
-      "href": "fxEvents.html",
-      "label": "fxEvents"
-    },
-    {
-      "href": "sampleOn.html",
-      "label": "sampleOn"
-    },
-    {
-      "href": "combineLatest.html",
-      "label": "combineLatest"
-    },
-    {
-      "href": "withLatestFrom.html",
-      "label": "withLatestFrom"
-    },
-    {
-      "href": "switchMap.html",
-      "label": "switchMap"
-    },
-    {
-      "href": "mergeMap.html",
-      "label": "mergeMap"
-    },
-    {
-      "href": "race.html",
-      "label": "race"
-    },
-    {
-      "href": "waitAll.html",
-      "label": "waitAll"
-    },
-    {
-      "href": "stopOn.html",
-      "label": "stopOn"
-    },
-    {
-      "href": "chunkOn.html",
-      "label": "chunkOn"
-    },
-    {
-      "href": "spaceBy.html",
-      "label": "spaceBy"
-    },
-    {
-      "href": "onErrorResume.html",
-      "label": "onErrorResume"
-    },
-    {
-      "href": "share.html",
-      "label": "share"
-    },
-    {
-      "href": "liveValue.html",
-      "label": "LiveValue"
-    },
-    {
-      "href": "fxSubscriptions.html",
-      "label": "FxSubscriptions"
-    }
+    {"href": "fxEvents.html", "label": "fxEvents"},
+    {"href": "fxEventsCreate.html", "label": "constructors"},
+    {"href": "whenComplete.html", "label": "peek · whenComplete"},
+    {"href": "sampleOn.html", "label": "sampleOn"},
+    {"href": "combineLatest.html", "label": "combineLatest"},
+    {"href": "withLatestFrom.html", "label": "withLatestFrom"},
+    {"href": "switchMap.html", "label": "switchMap"},
+    {"href": "mergeMap.html", "label": "mergeMap"},
+    {"href": "switchLatest.html", "label": "switchLatest"},
+    {"href": "mergeScan.html", "label": "mergeScan"},
+    {"href": "race.html", "label": "race"},
+    {"href": "waitAll.html", "label": "waitAll"},
+    {"href": "combine.html", "label": "combine"},
+    {"href": "stopOn.html", "label": "stopOn"},
+    {"href": "chunkOn.html", "label": "chunkOn"},
+    {"href": "windowOn.html", "label": "windowOn"},
+    {"href": "groupsBy.html", "label": "groupsBy"},
+    {"href": "spaceBy.html", "label": "spaceBy"},
+    {"href": "debounceOn.html", "label": "debounceOn"},
+    {"href": "retryOn.html", "label": "retryOn"},
+    {"href": "onErrorResume.html", "label": "onErrorResume"},
+    {"href": "share.html", "label": "share"},
+    {"href": "shareReplay.html", "label": "shareReplay"},
+    {"href": "liveValue.html", "label": "LiveValue"},
+    {"href": "fxSubscriptions.html", "label": "FxSubscriptions"},
+    {"href": "materialize.html", "label": "materialize"}
   ]
 }

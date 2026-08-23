@@ -7,8 +7,8 @@ section: 14
 crumb: chunkOn
 prev: stopOn.html
 prevLabel: stopOn
-next: spaceBy.html
-nextLabel: spaceBy
+next: windowOn.html
+nextLabel: windowOn
 ---
   <p class="hero-sub">이벤트를 리스트로 모읍니다 — 개수로, 트리거로, 또는 시계로 — 수다스러운 스트림이 몇 번의 묶인 호출이 되도록.</p>
 

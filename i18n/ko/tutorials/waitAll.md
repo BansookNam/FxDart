@@ -7,8 +7,8 @@ section: 14
 crumb: waitAll
 prev: race.html
 prevLabel: race
-next: stopOn.html
-nextLabel: stopOn
+next: combine.html
+nextLabel: combine
 ---
   <p class="hero-sub">여러 스트림을 하나로 합치기: 전부 기다리거나, 인덱스로 짝짓거나, 차례로 재생하거나, 경주시키거나.</p>
 

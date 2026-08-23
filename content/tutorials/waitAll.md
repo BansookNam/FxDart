@@ -7,8 +7,8 @@ section: 14
 crumb: waitAll
 prev: race.html
 prevLabel: race
-next: stopOn.html
-nextLabel: stopOn
+next: combine.html
+nextLabel: combine
 ---
   <p class="hero-sub">Combining many streams into one: wait for all of them, pair them up by index, play them in sequence, or let them race.</p>
 

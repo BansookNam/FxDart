@@ -1,0 +1,5 @@
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.peek(void Function(T)? onData, {void Function(Object, StackTrace)? onError, void Function()? onDone})
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.whenComplete(void Function() callback)   // Rx finalize
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.handleError(Function onError, {bool Function(Object)? test})
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.endWith(T value)
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.ifEmpty(T Function() fallback)

@@ -1,0 +1,11 @@
+FxEvents.value(T value)                                      // of / just
+FxEvents.empty()                                             // closes, no events
+FxEvents.fromFuture(Future&lt;T&gt; future)
+FxEvents.defer(Stream&lt;T&gt; Function() factory)                 // factory per listen
+FxEvents.generate(T initial, bool Function(T), T Function(T))
+static FxEvents&lt;int&gt; FxEvents.timer(Duration delay, [Duration? every])
+FxEvents.create(void Function(EventEmitter&lt;T&gt; emit) init)
+FxEvents.fromPattern(void Function(void Function(T)) add,
+                     void Function(void Function(T)) remove)
+static FxEvents&lt;T&gt; FxEvents.using&lt;R, T&gt;(R Function() acquire,
+    Stream&lt;T&gt; Function(R) asStream, FutureOr&lt;void&gt; Function(R) release)

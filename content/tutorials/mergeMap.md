@@ -7,8 +7,8 @@ section: 14
 crumb: mergeMap
 prev: switchMap.html
 prevLabel: switchMap
-next: race.html
-nextLabel: race
+next: switchLatest.html
+nextLabel: switchLatest
 ---
   <p class="hero-sub">Three more answers to "an event arrived while the last one is still running": run them all, run them in order, or ignore the new one.</p>
 

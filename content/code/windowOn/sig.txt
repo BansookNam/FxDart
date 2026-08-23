@@ -1,0 +1,4 @@
+FxEvents&lt;FxEvents&lt;T&gt;&gt; FxEvents&lt;T&gt;.windowOn(Stream&lt;void&gt; boundaries) // chain (events)
+FxEvents&lt;FxEvents&lt;T&gt;&gt; FxEvents&lt;T&gt;.windowCount(int size, {int? startEvery})
+FxEvents&lt;FxEvents&lt;T&gt;&gt; FxEvents&lt;T&gt;.windowEvery(Duration span, {Duration? every, int? maxSize})
+FxEvents&lt;List&lt;T&gt;&gt; FxEvents&lt;T&gt;.chunkToggle&lt;O&gt;(Stream&lt;O&gt; openings, Stream&lt;void&gt; Function(O opening) closeOf)

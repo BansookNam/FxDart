@@ -1,7 +1,7 @@
 ---
 slug: streams
 title: Stream 브리지 — FxDart 101
-description: FxDart의 Stream 브리지 — fromStream, fxStream, toStream()으로 Dart의 Stream과 FxAsyncIterable 사이를 자유롭게 오갑니다. 라이브 플레이그라운드 포함.
+description: FxDart의 Stream 브리지 — fromStream, fromStreamLatest, fromStreamChunked, fromStreamNext, fxStream, toStream()으로 Dart Stream을 FxAsyncIterable로 당기는 네 가지 방법. 라이브 플레이그라운드 포함.
 heading: Stream 브리지
 section: 11
 crumb: Stream bridges
@@ -37,6 +37,29 @@ nextLabel: concurrent
     <em>먼저</em> 적용한 다음 <code>.toStream()</code>을 호출하세요.
     스트림 변환 자체는 병렬성을 더해 주지 않습니다.
   </p>
+  <p>
+    푸시에서 풀로 건너오는 것은 연산 하나가 아닙니다 — 넷입니다. 소비자가
+    바쁜 동안에도 스트림은 계속 내보낼 수 있기 때문입니다. RxJS 9는 넷을
+    <code>iterateEach</code>, <code>iterateLatest</code>,
+    <code>iterateBuffered</code>, <code>iterateNext</code>로 부릅니다.
+    FxDart는 이를 <code>fromStream*</code>(날것 iterable)과
+    <code>FxEvents.pull*</code>(체인)에 대응시킵니다:
+  </p>
+  <table>
+    <thead><tr><th>RxJS 9</th><th>FxDart</th><th>바쁜 동안</th></tr></thead>
+    <tbody>
+      <tr><td><code>iterateEach</code></td><td><code>fromStream</code> / <code>.pull()</code></td><td>무손실 FIFO — 소스를 일시정지하고 모든 값을 큐에 담음</td></tr>
+      <tr><td><code>iterateLatest</code></td><td><code>fromStreamLatest</code> / <code>.pullLatest()</code></td><td>낡은 값 버리기 — 읽히지 않은 최신 값만 유지</td></tr>
+      <tr><td><code>iterateBuffered</code></td><td><code>fromStreamChunked</code> / <code>.pullChunked()</code></td><td>배치 — 도착분을 리스트 하나로 내보냄</td></tr>
+      <tr><td><code>iterateNext</code></td><td><code>fromStreamNext</code> / <code>.pullNext()</code></td><td>수요 게이트로 버리기 — 기다리는 pull이 없을 때 온 것은 무시</td></tr>
+    </tbody>
+  </table>
+  <p>
+    <code>fromStream</code>이 기본값이자 데모 1이 쓰는 것이고, 파일이나
+    소켓은 바이트를 잃으면 안 되기 때문입니다. 최신만 쓰는 UI에는
+    latest, 묶음으로 일하고 싶으면 chunked, 낡은 이벤트가 공백보다 나쁠
+    때는 next를 고르세요.
+  </p>
 
   <h2>데모 1 · fromStream과 fxStream</h2>
   <p>둘 다 <code>Stream.fromIterable</code>을 감싸므로, 기존 스트림을
@@ -52,6 +75,19 @@ nextLabel: concurrent
     내보내는 것입니다.
   </p>
   {{playground:1}}
+
+  <h2>데모 3 · 스트림을 당기는 네 가지 방법</h2>
+  <p>
+    이미 pull이 기다리는 동안 1, 2, 3의 동기 버스트가 도착합니다.
+    <code>fromStream</code>은 모든 값을 지키고,
+    <code>fromStreamLatest</code>는 최신만 지키고,
+    <code>fromStreamChunked</code>는 리스트 하나로 내보내고,
+    <code>fromStreamNext</code>는 기다리던 pull을 만난 값만 지킵니다.
+    이벤트 체인 표기는 <code>.pull()</code>,
+    <code>.pullLatest()</code>, <code>.pullChunked()</code>,
+    <code>.pullNext()</code>입니다.
+  </p>
+  {{playground:3}}
 
   <h2>하나의 Stream, 두 개의 체인</h2>
   <p>
@@ -74,9 +110,11 @@ nextLabel: concurrent
     체인입니다. <code>concurrent(n)</code>은 소비자가 수요를 쥐고 있을 때만
     의미가 있기 때문입니다. 질문이 <em>“얼마나 자주, 그리고 어느 것이
     이기나?”</em>라면 이벤트 체인입니다. 어느 쪽에서 시작하든 건너올 수
-    있습니다 — <code>.pull()</code>은 <code>FxEvents</code>를 pull 체인으로,
-    <code>.toStream()</code>은 <code>FxAsync</code>를 다시
-    <code>Stream</code>으로 바꿉니다.
+    있습니다 —
+    <code>.pull()</code> / <code>.pullLatest()</code> /
+    <code>.pullChunked()</code> / <code>.pullNext()</code>가
+    <code>FxEvents</code>를 pull 체인으로, <code>.toStream()</code>은
+    <code>FxAsync</code>를 다시 <code>Stream</code>으로 바꿉니다.
   </p>
   <p>
     자세한 수업: push 체인은
@@ -94,5 +132,6 @@ nextLabel: concurrent
     <a href="toAsync.html"><code>toAsync</code></a> — 스트림 대신 평범한 Iterable을 끌어올리기 ·
     <a href="asyncVariants.html">비동기 변형</a> — *Async 명명 규칙 ·
     <a href="concurrent.html"><code>concurrent</code></a> — 실제 병렬 처리를 원하면 toStream() 이전에 적용 ·
-    <a href="concurrentPool.html"><code>concurrentPool</code></a> — 완료 순서 방식의 변형
+    <a href="concurrentPool.html"><code>concurrentPool</code></a> — 완료 순서 방식의 변형 ·
+    <a href="fxEvents.html"><code>fxEvents</code></a> — 푸시 체인; <code>.pull()</code> / <code>.pullLatest()</code> / <code>.pullChunked()</code> / <code>.pullNext()</code>로 되돌아옴
   </div>

@@ -1,0 +1,3 @@
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.debounceOn(Stream&lt;void&gt; Function(T value) selector) // chain (events)
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.delayOn(Stream&lt;void&gt; Function(T value) selector)
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.throttleOn(Stream&lt;void&gt; Function(T value) selector, {bool leading = true, bool trailing = false})
