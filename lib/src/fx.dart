@@ -10,6 +10,7 @@ import 'lazy/take_drop.dart' as l;
 import 'lazy/zip.dart' as l;
 import 'strict/access.dart' as s;
 import 'strict/aggregate.dart' as s;
+import 'strict/sequence_equal.dart' as s;
 
 /// Wraps an [Iterable] (or anything convertible) in a lazy, chainable [Fx].
 ///
@@ -550,6 +551,11 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// True if there is at least one element. O(1), like [isEmpty].
   bool get isNotEmpty => _inner.isNotEmpty;
 
+  /// True when this chain and [other] hold the same values in the same
+  /// order. Optional [eq] replaces `==`. After Rx's `sequenceEqual`.
+  bool sequenceEqual(Iterable<T> other, [bool Function(T, T)? eq]) =>
+      s.sequenceEqual(_inner, other, eq);
+
   // --- Phase 1: Aggregation Operators ---
 
   /// The element at [index], or null if out of bounds.
@@ -1077,6 +1083,13 @@ class FxAsync<T> implements FxAsyncIterable<T> {
 
   /// Whether [f] holds for no value.
   Future<bool> none(FutureOr<bool> Function(T a) f) => s.noneAsync(f, _inner);
+
+  /// True when this chain and [other] yield the same values in the same
+  /// order. Optional [eq] replaces `==`. After Rx's `sequenceEqual`.
+  Future<bool> sequenceEqual(
+    FxAsyncIterable<T> other, [
+    bool Function(T, T)? eq,
+  ]) => s.sequenceEqualAsync(_inner, other, eq);
 
   /// Joins the values into a string separated by [sep].
   Future<String> join([String sep = ',']) => s.joinAsync(sep, _inner);

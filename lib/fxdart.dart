@@ -21,6 +21,9 @@ export 'src/async_iterable.dart'
         asyncEmpty,
         toAsync,
         fromStream,
+        fromStreamLatest,
+        fromStreamChunked,
+        fromStreamNext,
         concurrentAsync,
         concurrentPoolAsync;
 export 'src/config.dart' show FxDart, FxConfig;
@@ -53,8 +56,18 @@ export 'src/strict/curried.dart';
 export 'src/strict/func.dart';
 export 'src/strict/object.dart';
 export 'src/strict/predicates.dart';
+export 'src/strict/sequence_equal.dart';
 export 'src/stream/events.dart'
-    show FxEvents, FxEventsEntry, LiveValue, fxEvents;
+    show FxEvents, FxEventsEntry, LiveValue, EventEmitter, fxEvents;
+export 'src/stream/events_chain.dart';
+export 'src/stream/events_combine.dart';
+export 'src/stream/events_notify.dart';
+export 'src/stream/events_pull.dart';
+export 'src/stream/events_scan.dart';
+export 'src/stream/events_select.dart';
+export 'src/stream/events_window.dart';
+export 'src/stream/connectable.dart';
+export 'src/stream/values.dart';
 export 'src/stream/subscriptions.dart' show FxSubscriptions;
 export 'src/typed/accumulate.dart'
     show Accumulated, Accumulator, AccumulatingRaise, AccumulatingRaiseOps;

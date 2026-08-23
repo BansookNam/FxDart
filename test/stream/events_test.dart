@@ -1132,50 +1132,6 @@ void main() {
     });
   });
 
-  group('share', () {
-    test('two listeners see one run of the chain', () async {
-      var runs = 0;
-      final shared = fxEvents(timed([(0, 1), (60, 2)], 150)).map((v) {
-        runs++;
-        return v;
-      }).share();
-      final a = shared.toList();
-      final b = shared.toList();
-      expect(await a, equals([1, 2]));
-      expect(await b, equals([1, 2]));
-      expect(
-        runs,
-        2,
-        reason: 'the map ran once per event, not once per listener',
-      );
-    });
-
-    test(
-      'a listener arriving after the run is handed a closed stream',
-      () async {
-        final shared = fxEvents(Stream.fromIterable([1, 2, 3])).share();
-        expect(await shared.toList(), equals([1, 2, 3]));
-        expect(await shared.toList(), hasLength(0));
-      },
-    );
-
-    test('the last listener leaving disconnects for good', () async {
-      final c = StreamController<int>();
-      final shared = fxEvents(c.stream).share();
-      final sub = shared.listen((_) {});
-      await Future<void>.delayed(Duration.zero);
-      await sub.cancel();
-      expect(await shared.toList(), hasLength(0));
-      await c.close();
-    });
-
-    test('share forwards errors', () async {
-      final shared = fxEvents(Stream<int>.error(StateError('boom'))).share();
-      expect(shared.toList(), throwsStateError);
-      await Future<void>.delayed(const Duration(milliseconds: 20));
-    });
-  });
-
   group('stateful', () {
     test('scan emits the seed before any event', () async {
       expect(

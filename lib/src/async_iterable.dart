@@ -1249,6 +1249,303 @@ class _StreamBridgeIterator<T> implements FxFastIterator<T> {
   }
 }
 
+/// Tears down the [StreamSubscription] owned by a `fromStream*` policy
+/// iterator. [fromStream] itself has no cancel — it pauses instead.
+abstract interface class StreamPullCancel {
+  /// Cancels the source subscription and ends any in-flight pull as done.
+  Future<void> cancel();
+}
+
+/// Latest-wins pull over a [Stream]. While the consumer is between pulls,
+/// each arrival replaces the single unread slot; a same-turn burst therefore
+/// yields only its last value. On completion the accepted latest is yielded
+/// then done; on error it is yielded then the error is thrown.
+@pragma('vm:prefer-inline')
+FxAsyncIterable<T> fromStreamLatest<T>(Stream<T> stream) =>
+    DelegateAsyncIterable(() => _StreamLatestIterator(stream));
+
+class _StreamLatestIterator<T>
+    with FxFastNextGate<T>
+    implements FxFastIterator<T>, StreamPullCancel {
+  _StreamLatestIterator(this._stream);
+
+  final Stream<T> _stream;
+  StreamSubscription<T>? _sub;
+  Completer<IterResult<T>>? _waiter;
+  T? _latest;
+  var _hasLatest = false;
+  var _scheduled = false;
+  var _done = false;
+  Object? _error;
+  StackTrace? _errorStack;
+
+  void _onData(T value) {
+    _hasLatest = true;
+    _latest = value;
+    if (_waiter != null && !_scheduled) {
+      _scheduled = true;
+      scheduleMicrotask(_deliver);
+    }
+  }
+
+  void _deliver() {
+    _scheduled = false;
+    final waiter = _waiter;
+    if (waiter == null) return;
+    _hasLatest = false;
+    final v = _latest as T;
+    _latest = null;
+    _waiter = null;
+    waiter.complete(IterResult.value(v));
+  }
+
+  void _onError(Object e, StackTrace st) {
+    _done = true;
+    // `listen` may deliver a sync error before it has returned, so [_sub]
+    // is still null.
+    _sub?.cancel();
+    if (_scheduled) {
+      _error = e;
+      _errorStack = st;
+      return;
+    }
+    final waiter = _waiter;
+    if (waiter != null) {
+      _waiter = null;
+      waiter.completeError(e, st);
+      return;
+    }
+    _error = e;
+    _errorStack = st;
+  }
+
+  void _onDone() {
+    _done = true;
+    if (_scheduled) return;
+    final waiter = _waiter;
+    if (waiter == null) return;
+    _waiter = null;
+    waiter.complete(IterResult<T>.done());
+  }
+
+  @override
+  FutureOr<IterResult<T>> nextOr() {
+    if (_hasLatest) {
+      _hasLatest = false;
+      final v = _latest as T;
+      _latest = null;
+      return IterResult.value(v);
+    }
+    if (_error != null) {
+      final e = _error!;
+      final st = _errorStack!;
+      _error = null;
+      return Future<IterResult<T>>.error(e, st);
+    }
+    if (_done) return IterResult<T>.done();
+    if (_sub == null) {
+      _sub = _stream.listen(_onData, onError: _onError, onDone: _onDone);
+      return nextOr();
+    }
+    final waiter = Completer<IterResult<T>>();
+    _waiter = waiter;
+    return waiter.future;
+  }
+
+  @override
+  Future<void> cancel() {
+    _done = true;
+    _hasLatest = false;
+    _latest = null;
+    final waiter = _waiter;
+    _waiter = null;
+    waiter?.complete(IterResult<T>.done());
+    final sub = _sub;
+    _sub = null;
+    return sub?.cancel() ?? Future<void>.value();
+  }
+}
+
+/// Batched pull over a [Stream]. Values that arrive while the consumer is
+/// between pulls are yielded together as a list. Empty lists are never
+/// yielded. On completion a remaining non-empty buffer is flushed then done.
+@pragma('vm:prefer-inline')
+FxAsyncIterable<List<T>> fromStreamChunked<T>(Stream<T> stream) =>
+    DelegateAsyncIterable(() => _StreamChunkedIterator(stream));
+
+class _StreamChunkedIterator<T>
+    with FxFastNextGate<List<T>>
+    implements FxFastIterator<List<T>>, StreamPullCancel {
+  _StreamChunkedIterator(this._stream);
+
+  final Stream<T> _stream;
+  StreamSubscription<T>? _sub;
+  Completer<IterResult<List<T>>>? _waiter;
+  var _buffer = <T>[];
+  var _scheduled = false;
+  var _done = false;
+  Object? _error;
+  StackTrace? _errorStack;
+
+  void _onData(T value) {
+    _buffer.add(value);
+    if (_waiter != null && !_scheduled) {
+      _scheduled = true;
+      scheduleMicrotask(_deliver);
+    }
+  }
+
+  void _deliver() {
+    _scheduled = false;
+    final waiter = _waiter;
+    if (waiter == null) return;
+    final snapshot = _buffer;
+    _buffer = <T>[];
+    _waiter = null;
+    waiter.complete(IterResult.value(snapshot));
+  }
+
+  void _onError(Object e, StackTrace st) {
+    _done = true;
+    _sub?.cancel();
+    if (_scheduled) {
+      _error = e;
+      _errorStack = st;
+      return;
+    }
+    final waiter = _waiter;
+    if (waiter != null) {
+      _waiter = null;
+      waiter.completeError(e, st);
+      return;
+    }
+    _error = e;
+    _errorStack = st;
+  }
+
+  void _onDone() {
+    _done = true;
+    if (_scheduled) return;
+    final waiter = _waiter;
+    if (waiter == null) return;
+    _waiter = null;
+    waiter.complete(IterResult<List<T>>.done());
+  }
+
+  @override
+  FutureOr<IterResult<List<T>>> nextOr() {
+    if (_buffer.isNotEmpty) {
+      final snapshot = _buffer;
+      _buffer = <T>[];
+      return IterResult.value(snapshot);
+    }
+    if (_error != null) {
+      final e = _error!;
+      final st = _errorStack!;
+      _error = null;
+      return Future<IterResult<List<T>>>.error(e, st);
+    }
+    if (_done) return IterResult<List<T>>.done();
+    if (_sub == null) {
+      _sub = _stream.listen(_onData, onError: _onError, onDone: _onDone);
+      return nextOr();
+    }
+    final waiter = Completer<IterResult<List<T>>>();
+    _waiter = waiter;
+    return waiter.future;
+  }
+
+  @override
+  Future<void> cancel() {
+    _done = true;
+    _buffer = <T>[];
+    final waiter = _waiter;
+    _waiter = null;
+    waiter?.complete(IterResult<List<T>>.done());
+    final sub = _sub;
+    _sub = null;
+    return sub?.cancel() ?? Future<void>.value();
+  }
+}
+
+/// Demand-gated pull over a [Stream]. Only values that arrive while a pull
+/// is waiting are yielded; arrivals while the consumer is busy are dropped.
+/// A synchronously completing source can finish before the first demand slot
+/// is installed and yield nothing.
+@pragma('vm:prefer-inline')
+FxAsyncIterable<T> fromStreamNext<T>(Stream<T> stream) =>
+    DelegateAsyncIterable(() => _StreamNextIterator(stream));
+
+class _StreamNextIterator<T>
+    with FxFastNextGate<T>
+    implements FxFastIterator<T>, StreamPullCancel {
+  _StreamNextIterator(this._stream);
+
+  final Stream<T> _stream;
+  StreamSubscription<T>? _sub;
+  Completer<IterResult<T>>? _waiter;
+  var _done = false;
+  Object? _error;
+  StackTrace? _errorStack;
+
+  void _onData(T value) {
+    final waiter = _waiter;
+    if (waiter == null) return;
+    _waiter = null;
+    waiter.complete(IterResult.value(value));
+  }
+
+  void _onError(Object e, StackTrace st) {
+    _done = true;
+    _sub?.cancel();
+    final waiter = _waiter;
+    if (waiter != null) {
+      _waiter = null;
+      waiter.completeError(e, st);
+      return;
+    }
+    _error = e;
+    _errorStack = st;
+  }
+
+  void _onDone() {
+    _done = true;
+    final waiter = _waiter;
+    if (waiter == null) return;
+    _waiter = null;
+    waiter.complete(IterResult<T>.done());
+  }
+
+  @override
+  FutureOr<IterResult<T>> nextOr() {
+    if (_error != null) {
+      final e = _error!;
+      final st = _errorStack!;
+      _error = null;
+      return Future<IterResult<T>>.error(e, st);
+    }
+    if (_done) return IterResult<T>.done();
+    if (_sub == null) {
+      _sub = _stream.listen(_onData, onError: _onError, onDone: _onDone);
+      return nextOr();
+    }
+    final waiter = Completer<IterResult<T>>();
+    _waiter = waiter;
+    return waiter.future;
+  }
+
+  @override
+  Future<void> cancel() {
+    _done = true;
+    final waiter = _waiter;
+    _waiter = null;
+    waiter?.complete(IterResult<T>.done());
+    final sub = _sub;
+    _sub = null;
+    return sub?.cancel() ?? Future<void>.value();
+  }
+}
+
 /// Bridges the pull-based async protocol back to a push-based [Stream].
 extension FxAsyncIterableToStream<T> on FxAsyncIterable<T> {
   /// Drives this async iterable sequentially and emits its values as a
