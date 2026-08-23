@@ -61,6 +61,7 @@ export 'src/stream/events.dart'
     show FxEvents, FxEventsEntry, LiveValue, EventEmitter, fxEvents;
 export 'src/stream/events_chain.dart';
 export 'src/stream/events_combine.dart';
+export 'src/stream/events_either.dart';
 export 'src/stream/events_notify.dart';
 export 'src/stream/events_pull.dart';
 export 'src/stream/events_scan.dart';

@@ -42,6 +42,7 @@ FILES=(
   "lib/src/stream/events.dart"
   "lib/src/stream/events_chain.dart"
   "lib/src/stream/events_combine.dart"
+  "lib/src/stream/events_either.dart"
   "lib/src/stream/events_notify.dart"
   "lib/src/stream/events_pull.dart"
   "lib/src/stream/events_scan.dart"
