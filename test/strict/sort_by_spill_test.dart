@@ -105,6 +105,20 @@ void doubleKeyStrategies() {
       expect(r, equals([3, 1, 2, 0]));
     });
 
+    test('double keys keep source order on ties (fast merge path)', () {
+      // Finite, neither sorted nor exactly reversed, so the scan falls
+      // through to the `<=` / `>=` merge rather than compareTo.
+      final rows = [('a', 2.0), ('b', 1.0), ('c', 2.0), ('d', 1.0), ('e', 2.0)];
+      expect(
+        sortBy(((String, double) r) => r.$2, rows).map((r) => r.$1),
+        equals(['b', 'd', 'a', 'c', 'e']),
+      );
+      expect(
+        sortByDesc(((String, double) r) => r.$2, rows).map((r) => r.$1),
+        equals(['a', 'c', 'e', 'b', 'd']),
+      );
+    });
+
     test('ties stay in source order at every strategy', () {
       final xs = [for (var i = 0; i < 400; i++) (i, (i % 4).toDouble())];
       for (final got in [

@@ -39,6 +39,9 @@ void main() {
       });
 
       test('should not mutate the original list', () {
+        // `_sortByImpl` copies via `iterable.toList()` before any merge
+        // buffer is allocated, so the caller's list cannot be aliased.
+        // The new `List.filled` workspaces only ever see that copy.
         final original = [3, 4, 1, 2, 5, 2];
         final result = sortBy(identity, original);
         expect(identical(original, result), isFalse);

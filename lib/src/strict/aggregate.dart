@@ -1404,14 +1404,21 @@ List<A> _sortByImpl<A>(
     // running total, a score. Detected while extracting, not in a second
     // pass: `isNaN` / `-0.0` are both cheap tests on a double already in a
     // register. paginated-products is this shape (positive unique prices).
-    var totalOrder = first.isNaN || (first.isNegative && first == 0.0);
+    //
+    // One NaN or -0.0 anywhere drops the *entire* array onto compareTo.
+    // `sortBy((x) => -x.key)` is this repo's own descending spelling
+    // (top-expenses, and `_sortDoubleKeys`'s docstring); negating a `0.0`
+    // key produces `-0.0`, so a single zero-valued row is enough. The
+    // fallback is right — `-0.0 < 0.0` is contracted — but the fast path
+    // evaporates silently.
+    var needsCompareTo = first.isNaN || (first.isNegative && first == 0.0);
     for (var i = 1; i < length; i++) {
       final k = f(items[i]);
       if (k is! double) return _sortSpilled(f, items, dk, i, k, desc);
       dk[i] = k;
-      if (k.isNaN || (k.isNegative && k == 0.0)) totalOrder = true;
+      if (k.isNaN || (k.isNegative && k == 0.0)) needsCompareTo = true;
     }
-    return _sortDoubleKeys(dk, items, desc, totalOrder);
+    return _sortDoubleKeys(dk, items, desc, needsCompareTo);
   }
 
   if (first is int) {
@@ -1681,7 +1688,7 @@ List<A> _sortDoubleKeys<A>(
   Float64List k,
   List<A> items,
   bool desc,
-  bool totalOrder,
+  bool needsCompareTo,
 ) {
   final n = items.length;
   var nonDec = true, nonInc = true, strictInc = true, strictDec = true;
@@ -1709,38 +1716,31 @@ List<A> _sortDoubleKeys<A>(
     if (nonDec) return items;
     if (strictDec) return [for (var i = n - 1; i >= 0; i--) items[i]];
   }
-  return _mergeByDouble(k, items, desc, totalOrder);
+  return _mergeByDouble(k, items, desc, needsCompareTo);
 }
 
 /// Stable bottom-up merge sort of [items] by the unboxed keys [k], moving
 /// both arrays in lockstep. Stable by construction: a tie takes the left run,
 /// so equal keys keep their source order.
 ///
-/// [totalOrder] is true when a key was NaN or -0.0: those disagree with `<=`
-/// (`0.0 <= -0.0` is true while `0.0.compareTo(-0.0)` is positive; NaN
+/// [needsCompareTo] is true when a key was NaN or -0.0: those disagree with
+/// `<=` (`0.0 <= -0.0` is true while `0.0.compareTo(-0.0)` is positive; NaN
 /// compares greater than every finite). Ordinary finite keys — prices,
 /// totals, scores — take the `<=` path, which is a VM compare rather than
-/// a `compareTo` call per decision. The two bodies are separate so that
-/// branch does not sit in the inner loop of the common case.
+/// a `compareTo` call per decision.
+///
+/// The `<=` / `>=` choice is hoisted out of `while (i < mid && j < hi)` so
+/// the inner loop is a single VM compare. The branch then runs once per
+/// merge block (~n times) instead of once per comparison (~n log n).
 List<A> _mergeByDouble<A>(
   Float64List k,
   List<A> items,
   bool desc,
-  bool totalOrder,
+  bool needsCompareTo,
 ) {
-  if (totalOrder) return _mergeByDoubleCompareTo(k, items, desc);
-  // Separate asc/desc bodies so the inner loop is a single VM compare, not
-  // a `desc ? >= : <=` branch on every decision.
-  return desc
-      ? _mergeByDoubleGe(k, items)
-      : _mergeByDoubleLe(k, items);
+  if (needsCompareTo) return _mergeByDoubleCompareTo(k, items, desc);
+  return _mergeByDoubleRel(k, items, !desc);
 }
-
-List<A> _mergeByDoubleLe<A>(Float64List k, List<A> items) =>
-    _mergeByDoubleRel(k, items, true);
-
-List<A> _mergeByDoubleGe<A>(Float64List k, List<A> items) =>
-    _mergeByDoubleRel(k, items, false);
 
 List<A> _mergeByDoubleRel<A>(Float64List k, List<A> items, bool le) {
   final n = items.length;
