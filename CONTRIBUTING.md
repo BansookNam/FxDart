@@ -11,6 +11,7 @@ tell when a rule stops applying.
 - [What each kind of change touches](#what-each-kind-of-change-touches)
 - [Performance claims](#performance-claims)
 - [Releasing](#releasing)
+  - [A release, end to end](#a-release-end-to-end)
 
 ## Branching
 
@@ -85,8 +86,11 @@ rendered pages, no bundle and no playground artifacts at all. The one
 generated thing that still lands in a PR is `benchmark/results/` — keep it in
 its own commit so the reviewer can skip it in one click.
 
-**Squash** the merge unless the individual commits each stand alone and are
-each green. The default is squash.
+**Squash** is the only merge button the repository offers — merge commits and
+rebase merges are disabled, and the head branch is deleted automatically. The
+squash commit takes the **PR title and body verbatim**, so both are the
+permanent record: write the body for whoever reads `git log v0.8.7..main` while
+drafting the next CHANGELOG, not only for the reviewer you have today.
 
 **Before requesting review**, the full gate passes locally and the PR
 description says so. CI is a backstop, not your test run — but it is a real
@@ -197,10 +201,10 @@ Three traps, in the order people hit them:
   `dart run tool/rebuild_page.dart <page.html>` does the whole sequence for one
   page.
 
-`docs/` is generated output that is **committed**. Never hand-edit a `*.html`
-under it. The hand-maintained exceptions are `docs/css/site.css`,
-`docs/js/*.js`, `docs/frame.html`, `docs/assets/logo*.png` and
-`docs/css/theorybook.css` + `docs/js/theorybook.js`.
+`docs/` is **untracked** generated output — never edit anything in it. The
+hand-written half of the site is `web/`: `web/css/*.css`, `web/js/*.js`,
+`web/frame.html`, `web/assets/logo*.png`. `build_docs.dart` copies that tree in
+verbatim, so `web/css/site.css` is what gets served as `docs/css/site.css`.
 
 ## What each kind of change touches
 
@@ -273,8 +277,8 @@ itself. That is what `--verify` is for.
 Version bumps and CHANGELOG sections are their own PR on a `release/` branch,
 separate from the feature commits.
 
-**pub.dev is the source of truth for what shipped** — not git tags (three of
-them for twenty-three published versions), and not the CHANGELOG (`0.7.7` and
+**pub.dev is the source of truth for what shipped** — not git tags (four of
+them for thirty published versions), and not the CHANGELOG (`0.7.7` and
 `0.7.8` have sections and never reached pub.dev; both shipped inside `0.7.9`).
 
 ```bash
@@ -292,6 +296,88 @@ A CHANGELOG section is prose, not a bullet list. It says what changed, what it
 cost, what was measured, and what was deliberately left out — the same three
 questions the PR body answered.
 
-Docs deploy separately, via `./deploy.sh`, which stages only
-`docs content i18n tool tools deploy.sh DEPLOY.md`. Commit `lib/` and `test/`
-changes yourself first; the deploy will not sweep them up.
+Docs do not ship with the release. `docs/` is untracked and `pages.yml`
+rebuilds it on every push to `main`, so the site is already current by the time
+you tag. `./deploy.sh` builds the same output locally for inspection and
+commits nothing.
+
+### A release, end to end
+
+The next release is `0.8.8`, and `main` already carries its first piece. Below
+is the whole path.
+
+**1 — Topic PRs land on `main`, one idea each, in any order.**
+
+```
+   perf/…     feat/…     docs/…     fix/…        release/0.8.8
+      │          │          │         │        (bump + CHANGELOG)
+      │          │          │         │                 │
+main ─●──────────●──────────●─────────●─────────────────●─────▶
+                                                        │
+                                                   tag v0.8.8
+                                                        │
+                                                        └─▶ publish.yml → pub.dev
+```
+
+`perf/sortby-merge-workspace` was the first piece of `0.8.8`: it carried its
+paired A/B output in the body and touched `lib/` and `test/` only — no version,
+no changelog. The operator after it is two PRs — the library change, then its
+tutorial — because
+[the two streams are designed not to block each other](#long-running-features).
+Order does not matter. Nothing waits for anything.
+
+**A topic PR never touches `pubspec.yaml` or `CHANGELOG.md`.** Two reasons,
+both of which have already cost this repo:
+
+- Those two are on the
+  [short list every branch collides on](#long-running-features). A version bump
+  inside a feature branch converts a semantically empty conflict into one on
+  every other open branch.
+- "What is in 0.8.8" has to be answerable from the tag range, not from
+  whichever PR claimed the number first. While PRs carried versions, #10 and
+  #13 were both titled `0.8.7` and #6 and #8 were both `0.8.6`. The numbers
+  stopped meaning anything.
+
+Squash is the only merge button the repository offers, so `main` gains exactly
+one commit per PR and the head branch is deleted on merge.
+
+**2 — One `release/0.8.8` branch off `main`, touching exactly two files.**
+
+The previous release's tag is what makes the section writable:
+
+```bash
+git switch -c release/0.8.8 main
+git log --oneline v0.8.7..main     # everything the section has to account for
+./benchmark.sh --verify            # the site's bars still agree with results.json
+```
+
+Bump `version:` in `pubspec.yaml`, write the `## 0.8.8` section, and stop
+there. It goes up as a PR like any other, so the release is reviewed as a
+change rather than performed as a ritual.
+
+**3 — Squash-merge it, then tag that commit.**
+
+```bash
+git switch main && git pull
+git tag -a v0.8.8 -m "0.8.8"
+git push origin v0.8.8
+```
+
+The tag is what publishes. `.github/workflows/publish.yml` guards it first: the
+tag must equal the pubspec version, `CHANGELOG.md` must carry a `## 0.8.8`
+section, and `dart analyze lib` + `dart test` must pass on that exact commit —
+a tag need not sit on a commit that ever went through `main`. Only then does
+pub.dev mint the OIDC token and publish. No credential is stored in the
+repository.
+
+**Never run `dart pub publish` by hand.** That is what produced thirty
+published versions and four tags — only four of the thirty can be named at
+all. Step 2 works today because `v0.8.7` exists; the same step was impossible
+one release earlier, and `0.8.6` still cannot be checked out, diffed or
+bisected.
+
+**Why there is no long-lived `develop` or `release` line.** Those earn their
+keep when several versions are supported at once — a fix backported to `1.x`
+while `2.x` is built. fxdart supports one line, so a second permanent branch
+would only add a merge direction to get wrong. Cut a `1.x` branch on the day
+`2.0` ships and `1.x` still needs fixes, not before.
