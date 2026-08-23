@@ -59,7 +59,7 @@ jobs:
     env:
       PG_SCOPE: ${{ github.event.inputs.pg_scope || 'first' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: dart-lang/setup-dart@v1
         with:
@@ -94,7 +94,7 @@ jobs:
       # cost of the bundle being an input to the id, and it is paid here
       # rather than by a developer.
       - name: Restore precompiled playgrounds
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: docs/pg
           key: pg-${{ env.PG_SCOPE }}-${{ env.DARTPAD_VERSION }}-${{ hashFiles('docs/assets/fxdart_single.dart', 'content/**/*.dart', 'content/theory/*.md') }}
@@ -119,7 +119,7 @@ jobs:
       - name: Report artifact coverage
         run: dart run tool/precompile_playgrounds.dart --status
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: docs
 
@@ -131,4 +131,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

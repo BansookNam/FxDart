@@ -10,6 +10,10 @@ back to a live compile; the precompiler rebuilds anything compiled by
 another DDC, and the Pages cache key includes DartPad's `dartVersion` so a
 future upgrade misses instead of restoring the stale JS.
 
+GitHub Actions: `checkout`, `cache`, `upload-pages-artifact`, and
+`deploy-pages` now use their Node 24 majors so the Pages workflow is not
+forced off Node 20.
+
 ## 0.8.9
 
 Documentation fix: the FxDart logo in the README was not displaying on GitHub
