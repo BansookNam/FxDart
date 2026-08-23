@@ -2,7 +2,7 @@
 
 - **Machine:** Apple M1 Max, 32 GB RAM
 - **Dart:** 3.12.2 (macos Version 26.3 (Build 25D125)), AOT-compiled
-- **Date:** 2026-08-20
+- **Date:** 2026-08-23
 - **Method:** per side and N-scale, fresh process × rounds, 2 warmup + 5 measured iterations per process (small N auto-batched to ≥2 ms samples); median reported. Ties — within 5.0% of each other, or within 0.6 ms absolute (beneath human perception) — with close relative races re-run up to 5 rounds.
 - Memory is peak process RSS — the runtime and the dataset are identical on both sides, so the *difference* is what the pipeline itself holds onto. At small N it is all runtime baseline; expect ties.
 
@@ -10,7 +10,7 @@
 
 | # | Case | N | native time | FxDart time | Time winner | native mem | FxDart mem | Mem winner | Rounds |
 |--:|------|--:|--:|--:|:-:|--:|--:|:-:|--:|
-| 1 | top-expenses | 100 | 20 µs | 5.4 µs | **tie** | 16.5 MB | 16.4 MB | tie | 3 |
+| 1 | top-expenses | 100 | 20 µs | 5.7 µs | **tie** | 16.5 MB | 17.0 MB | tie | 3 |
 | 2 | top-log-level | 100 | 3.9 µs | 2.1 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 3 | sequential-configs (async) | 100 | 427 µs | 321 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
 | 4 | average-basket | 100 | 2.0 µs | 787 ns | **tie** | 16.5 MB | 16.4 MB | tie | 3 |
@@ -35,7 +35,7 @@
 | 23 | concurrent-enrichment (async) | 100 | 214 µs | 237 µs | **tie** | 16.6 MB | 16.6 MB | tie | 3 |
 | 24 | leaderboard-ties | 100 | 22 µs | 26 µs | **tie** | 16.4 MB | 16.6 MB | tie | 3 |
 | 25 | weekly-sensor-averages | 98 | 4.2 µs | 4.5 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
-| 26 | paginated-products | 100 | 6.2 µs | 6.6 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
+| 26 | paginated-products | 100 | 5.9 µs | 6.5 µs | **tie** | 16.5 MB | 17.1 MB | tie | 3 |
 | 27 | invoice-summary | 100 | 4.5 µs | 8.2 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 28 | budget-alerts | 100 | 3.8 µs | 3.6 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
 | 29 | monthly-category-report | 100 | 2.3 µs | 6.2 µs | **tie** | 16.5 MB | 16.3 MB | tie | 3 |
@@ -68,7 +68,7 @@
 
 | # | Case | N | native time | FxDart time | Time winner | native mem | FxDart mem | Mem winner | Rounds |
 |--:|------|--:|--:|--:|:-:|--:|--:|:-:|--:|
-| 1 | top-expenses | 10000 | 3.35 ms | 871 µs | **fxdart** | 23.1 MB | 21.3 MB | fxdart | 3 |
+| 1 | top-expenses | 10000 | 3.28 ms | 828 µs | **fxdart** | 23.1 MB | 21.4 MB | fxdart | 3 |
 | 2 | top-log-level | 10000 | 353 µs | 193 µs | **tie** | 20.0 MB | 14.2 MB | fxdart | 3 |
 | 3 | sequential-configs (async) | 10000 | 31.4 ms | 31.2 ms | **tie** | 50.7 MB | 51.1 MB | tie | 3 |
 | 4 | average-basket | 10000 | 185 µs | 83 µs | **tie** | 19.1 MB | 15.4 MB | fxdart | 3 |
@@ -93,7 +93,7 @@
 | 23 | concurrent-enrichment (async) | 10000 | 17.7 ms | 21.5 ms | **native** | 49.3 MB | 50.4 MB | tie | 3 |
 | 24 | leaderboard-ties | 10000 | 2.41 ms | 2.37 ms | **tie** | 23.5 MB | 24.1 MB | tie | 3 |
 | 25 | weekly-sensor-averages | 9996 | 396 µs | 464 µs | **tie** | 22.7 MB | 22.7 MB | tie | 3 |
-| 26 | paginated-products | 10000 | 886 µs | 848 µs | **tie** | 17.7 MB | 21.3 MB | native | 3 |
+| 26 | paginated-products | 10000 | 815 µs | 818 µs | **tie** | 17.7 MB | 21.5 MB | native | 3 |
 | 27 | invoice-summary | 10000 | 243 µs | 111 µs | **tie** | 22.4 MB | 15.8 MB | fxdart | 3 |
 | 28 | budget-alerts | 10000 | 185 µs | 90 µs | **tie** | 21.8 MB | 15.6 MB | fxdart | 3 |
 | 29 | monthly-category-report | 10000 | 106 µs | 139 µs | **tie** | 17.0 MB | 16.0 MB | fxdart | 3 |
@@ -126,7 +126,7 @@
 
 | # | Case | N | native time | FxDart time | Time winner | native mem | FxDart mem | Mem winner | Rounds |
 |--:|------|--:|--:|--:|:-:|--:|--:|:-:|--:|
-| 1 | top-expenses | 1000000 | 508.9 ms | 196.6 ms | **fxdart** | 125.0 MB | 130.9 MB | tie | 3 |
+| 1 | top-expenses | 1000000 | 503.9 ms | 189.7 ms | **fxdart** | 124.8 MB | 130.4 MB | tie | 3 |
 | 2 | top-log-level | 1000000 | 44.8 ms | 19.7 ms | **fxdart** | 85.7 MB | 44.9 MB | fxdart | 3 |
 | 3 | sequential-configs (async) | 100000 | 323.5 ms | 329.8 ms | **tie** | 82.6 MB | 82.1 MB | tie | 5 |
 | 4 | average-basket | 1000000 | 17.3 ms | 8.79 ms | **fxdart** | 75.2 MB | 72.9 MB | tie | 3 |
@@ -151,7 +151,7 @@
 | 23 | concurrent-enrichment (async) | 100000 | 195.0 ms | 233.0 ms | **native** | 81.4 MB | 84.0 MB | tie | 3 |
 | 24 | leaderboard-ties | 1000000 | 533.8 ms | 470.7 ms | **fxdart** | 231.5 MB | 228.0 MB | tie | 3 |
 | 25 | weekly-sensor-averages | 999999 | 49.1 ms | 48.5 ms | **tie** | 97.2 MB | 146.0 MB | native | 5 |
-| 26 | paginated-products | 1000000 | 102.1 ms | 120.7 ms | **native** | 177.8 MB | 195.6 MB | native | 3 |
+| 26 | paginated-products | 1000000 | 101.3 ms | 111.9 ms | **native** | 177.8 MB | 196.4 MB | native | 3 |
 | 27 | invoice-summary | 1000000 | 25.3 ms | 13.6 ms | **fxdart** | 92.3 MB | 88.4 MB | tie | 3 |
 | 28 | budget-alerts | 1000000 | 21.5 ms | 13.0 ms | **fxdart** | 90.1 MB | 82.7 MB | fxdart | 3 |
 | 29 | monthly-category-report | 1000000 | 11.3 ms | 14.5 ms | **native** | 120.4 MB | 120.0 MB | tie | 3 |

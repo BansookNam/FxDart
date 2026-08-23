@@ -1,7 +1,7 @@
 # DartComparison: slowest to fastest ratio
 
 Machine: Apple M1 Max, 32GB RAM, Dart 3.12.2, macos Version 26.3 (Build 25D125) (AOT (dart compile exe), enforced per result line)
-Date: 2026-08-20 · Scale: `full` (headline N per case)
+Date: 2026-08-23 · Scale: `full` (headline N per case)
 
 Ordered by FxDart/native, slowest first — so the rows worth acting on are at the top and the ordering does not change direction partway down. The Ratio column states each row's own verdict.
 
@@ -13,7 +13,6 @@ Ordered by FxDart/native, slowest first — so the rows worth acting on are at t
 | Rate-limited batch import | `benchmark/cases/rate-limited-import` | 100,000 | 130,963 | 157,739 | Native 1.20x faster |
 | Enrich top merchants concurrently | `benchmark/cases/concurrent-enrichment` | 100,000 | 194,966 | 232,989 | Native 1.20x faster |
 | Three consecutive readings over the limit | `benchmark/cases/consecutive-over-limit` | 1,000,000 | 17,065 | 20,315 | Native 1.19x faster |
-| Paginated product listing | `benchmark/cases/paginated-products` | 1,000,000 | 102,103 | 120,667 | Native 1.18x faster |
 | Diff two ledger snapshots | `benchmark/cases/ledger-diff` | 500,000 | 223,406 | 260,993 | Native 1.17x faster |
 | Running account balance | `benchmark/cases/running-balance` | 1,000,000 | 237,775 | 275,067 | Native 1.16x faster |
 | Poll a flaky API until first success | `benchmark/cases/flaky-api-retry` | 100,000 | 495,525 | 571,710 | Native 1.15x faster |
@@ -21,6 +20,7 @@ Ordered by FxDart/native, slowest first — so the rows worth acting on are at t
 | Parallel downloads, results in order | `benchmark/cases/parallel-downloads` | 100,000 | 338,767 | 380,499 | Native 1.12x faster |
 | Windowed alerts from a sensor stream | `benchmark/cases/stream-windowed-alerts` | 100,000 | 32,801 | 36,580 | Native 1.12x faster |
 | Fetch profiles, two at a time | `benchmark/cases/bounded-concurrency` | 100,000 | 305,945 | 339,218 | Native 1.11x faster |
+| Paginated product listing | `benchmark/cases/paginated-products` | 1,000,000 | 101,254 | 111,942 | Native 1.11x faster |
 | Merchants in first-visit order | `benchmark/cases/first-visit-merchants` | 1,000,000 | 23,752 | 26,194 | Native 1.10x faster |
 | Compound interest table | `benchmark/cases/compound-interest` | 1,000,000 | 221,723 | 244,461 | Native 1.10x faster |
 | Two paged feeds, concatenated and deduped | `benchmark/cases/paged-feeds-dedupe` | 100,000 | 78,495 | 85,678 | Native 1.09x faster |
@@ -57,6 +57,6 @@ Ordered by FxDart/native, slowest first — so the rows worth acting on are at t
 | Line items to invoice summary | `benchmark/cases/invoice-summary` | 1,000,000 | 25,325 | 13,623 | FxDart 1.86x faster |
 | Average order value over $100 | `benchmark/cases/average-basket` | 1,000,000 | 17,331 | 8,790 | FxDart 1.97x faster |
 | Most frequent log level | `benchmark/cases/top-log-level` | 1,000,000 | 44,788 | 19,704 | FxDart 2.27x faster |
-| Top 3 largest expenses | `benchmark/cases/top-expenses` | 1,000,000 | 508,924 | 196,561 | FxDart 2.59x faster |
+| Top 3 largest expenses | `benchmark/cases/top-expenses` | 1,000,000 | 503,939 | 189,687 | FxDart 2.66x faster |
 | Full monthly ledger report | `benchmark/cases/monthly-ledger-report` | 1,000,000 | 135,112 | 47,285 | FxDart 2.86x faster |
 | Inventory restock plan | `benchmark/cases/restock-plan` | 1,000,000 | 216,181 | 51,924 | FxDart 4.16x faster |
