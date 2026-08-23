@@ -31,6 +31,7 @@ FILES=(
   "lib/src/strict/func.dart"
   "lib/src/strict/curried.dart"
   "lib/src/strict/predicates.dart"
+  "lib/src/strict/sequence_equal.dart"
   "lib/src/dart_aliases.dart"
   "lib/src/util/timing.dart"
   "lib/src/util/shuffle.dart"
@@ -39,6 +40,15 @@ FILES=(
   "lib/src/typed/accumulate.dart"
   "lib/src/typed/fx_either.dart"
   "lib/src/stream/events.dart"
+  "lib/src/stream/events_chain.dart"
+  "lib/src/stream/events_combine.dart"
+  "lib/src/stream/events_notify.dart"
+  "lib/src/stream/events_pull.dart"
+  "lib/src/stream/events_scan.dart"
+  "lib/src/stream/events_select.dart"
+  "lib/src/stream/events_window.dart"
+  "lib/src/stream/connectable.dart"
+  "lib/src/stream/values.dart"
   "lib/src/stream/subscriptions.dart"
 )
 
@@ -589,6 +599,12 @@ bool _$none<A>(bool Function(A a) f, Iterable<A> iterable) =>
 Future<bool> _$noneAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
     noneAsync(f, iterable);
+bool _$sequenceEqual<A>(
+        Iterable<A> a, Iterable<A> b, [bool Function(A, A)? eq]) =>
+    sequenceEqual(a, b, eq);
+Future<bool> _$sequenceEqualAsync<A>(
+        FxAsyncIterable<A> a, FxAsyncIterable<A> b, [bool Function(A, A)? eq]) =>
+    sequenceEqualAsync(a, b, eq);
 B? _$firstNotNullOf<A, B extends Object>(
         B? Function(A a) f, Iterable<A> iterable) =>
     firstNotNullOf(f, iterable);

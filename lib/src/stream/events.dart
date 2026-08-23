@@ -63,6 +63,103 @@ class FxEvents<T> {
   /// The wrapped stream, for handing to any `Stream`-based API.
   Stream<T> get stream => _inner;
 
+  // --- constructors ---------------------------------------------------------
+
+  /// A stream that emits [value] and then closes.
+  ///
+  /// Cold: the value is not produced until a listener arrives. fxdart
+  /// events layer, after Rx's `of`/`just`.
+  FxEvents.value(T value) : _inner = Stream<T>.value(value);
+
+  /// A stream that closes without emitting.
+  ///
+  /// Wraps [Stream.empty] (broadcast, as the Dart default). fxdart
+  /// events layer, after Rx's `EMPTY`.
+  FxEvents.empty() : _inner = Stream<T>.empty();
+
+  /// A stream that never emits and never closes.
+  ///
+  /// Listening hangs until cancelled. fxdart events layer, after Rx's
+  /// `NEVER`.
+  FxEvents.never() : _inner = StreamController<T>().stream;
+
+  /// A stream that emits [error] and then closes.
+  ///
+  /// fxdart events layer, after Rx's `throwError`.
+  FxEvents.error(Object error, [StackTrace? stackTrace])
+    : _inner = Stream<T>.error(error, stackTrace);
+
+  /// A stream that emits the result of [future] (or its error) and closes.
+  ///
+  /// Cold: the future is not observed until a listener arrives, matching
+  /// [Stream.fromFuture]. fxdart events layer, after Rx's `from` on a
+  /// Promise.
+  FxEvents.fromFuture(Future<T> future) : _inner = Stream<T>.fromFuture(future);
+
+  /// Emits a value every [period] and never completes.
+  ///
+  /// When [computation] is omitted the event is the 0-based tick count,
+  /// so `FxEvents<int>.periodic(period)` is Rx's `interval`. fxdart
+  /// events layer, after Rx's `interval`.
+  FxEvents.periodic(Duration period, [T Function(int count)? computation])
+    : _inner = Stream<T>.periodic(period, computation ?? (i) => i as T);
+
+  /// Emits `0` after [delay] and closes; with [every], continues `1, 2, …`
+  /// on that period.
+  ///
+  /// fxdart events layer, after Rx's `timer`.
+  static FxEvents<int> timer(Duration delay, [Duration? every]) =>
+      FxEvents(_timerStream(delay, every));
+
+  /// Builds the inner stream on listen, so each subscriber gets a fresh
+  /// source.
+  ///
+  /// A throw from [factory] is forwarded and the stream closes. fxdart
+  /// events layer, after Rx's `defer`.
+  FxEvents.defer(Stream<T> Function() factory) : _inner = _deferStream(factory);
+
+  /// Walks `initial, iterate(initial), …` while [condition] holds.
+  ///
+  /// Production starts on listen. Each step is a timer tick so an
+  /// infinite generator can still be cancelled. fxdart events layer,
+  /// after Rx's `generate`.
+  FxEvents.generate(
+    T initial,
+    bool Function(T) condition,
+    T Function(T) iterate,
+  ) : _inner = _generateStream(initial, condition, iterate);
+
+  /// Subscribes by calling [add] with a handler and unsubscribes by
+  /// calling [remove] with the same handler.
+  ///
+  /// The typical bridge to `on`/`off` event APIs. fxdart events layer,
+  /// after Rx's `fromEventPattern`.
+  FxEvents.fromPattern(
+    void Function(void Function(T) handler) add,
+    void Function(void Function(T) handler) remove,
+  ) : _inner = _fromPatternStream(add, remove);
+
+  /// Acquires a resource on listen, mirrors [asStream] of it, and
+  /// releases the resource exactly once — on cancel, complete, error, or
+  /// if [asStream] throws.
+  ///
+  /// A throw from [acquire] is forwarded and there is nothing to
+  /// release. fxdart events layer, after Rx's `using`.
+  static FxEvents<T> using<R, T>(
+    R Function() acquire,
+    Stream<T> Function(R resource) asStream,
+    FutureOr<void> Function(R resource) release,
+  ) => FxEvents(_usingStream(acquire, asStream, release));
+
+  /// Calls [init] on listen with an [EventEmitter] the producer uses to
+  /// push events, errors, and completion.
+  ///
+  /// Set [EventEmitter.onCancel] for teardown; a throw from [init] is
+  /// forwarded and the stream closes. fxdart events layer, after Rx's
+  /// `Observable` constructor / `create`.
+  FxEvents.create(void Function(EventEmitter<T> emit) init)
+    : _inner = _createStream(init);
+
   /// Mirrors whichever candidate emits first — the whole winning stream —
   /// cancelling every other candidate the moment the winner is decided.
   ///
@@ -1316,25 +1413,63 @@ class FxEvents<T> {
   /// only be consumed once. `share()` connects on the first listener and
   /// broadcasts to all of them from there.
   ///
-  /// Because the upstream chain is single-subscription it cannot be
-  /// re-run: when the LAST listener leaves, the source is cancelled and
-  /// the shared stream is closed for good, so a later listener is handed
-  /// an already-closed stream rather than a second run. Attach every
-  /// listener before the first event, or keep one alive.
+  /// [reset] (default `true`) is RxJS 7 `share` simplified to one flag.
+  /// When the last listener leaves *before the source has completed*,
+  /// the upstream subscription is cancelled but the broadcast stays
+  /// open; the next listener starts a fresh subscribe of the source
+  /// (the source must itself allow a second listen — `Stream.fromIterable`
+  /// and `Stream.multi` do, a single-subscription [StreamController]
+  /// does not). When the source **completes**, the broadcast closes for
+  /// good: a later listener is handed a closed stream. When the source
+  /// **errors**, the error is forwarded; with [reset] the broadcast stays
+  /// open so a later listener may resubscribe, and with `reset: false`
+  /// it closes. `reset: false` is the 0.8.7 behaviour: the last cancel
+  /// closes forever.
+  ///
   /// fxdart events layer, after Rx's `share`.
-  FxEvents<T> share() {
+  FxEvents<T> share({bool reset = true}) {
     late final StreamController<T> out;
     StreamSubscription<T>? sub;
+    var completed = false;
     out = StreamController<T>.broadcast(
       onListen: () {
-        sub = _inner.listen(out.add, onError: out.addError, onDone: out.close);
+        sub = _inner.listen(
+          out.add,
+          onError: (Object e, StackTrace st) {
+            out.addError(e, st);
+            if (reset) {
+              // Drop this subscribe so a trailing onDone (Stream.error)
+              // is not treated as a successful complete, and so the
+              // next 0→1 listen can start a fresh one. Cancel it too: a
+              // Dart stream survives an error, so leaving it attached
+              // keeps the chain running with nobody listening and lets
+              // the next listen stack a second run on top of it.
+              final current = sub;
+              sub = null;
+              current?.cancel();
+            } else {
+              completed = true;
+              if (!out.isClosed) out.close();
+            }
+          },
+          onDone: () {
+            if (sub == null) return;
+            completed = true;
+            sub = null;
+            if (!out.isClosed) out.close();
+          },
+        );
       },
       onCancel: () {
-        // A broadcast controller's onCancel is `void Function()` — there is
-        // nowhere to hand the cancel future, so it is fired and forgotten.
-        sub?.cancel();
+        // A broadcast controller's constructor types onCancel as
+        // `void Function()` — there is nowhere to hand the cancel future,
+        // so it is fired and forgotten.
+        final current = sub;
         sub = null;
-        if (!out.isClosed) out.close();
+        current?.cancel();
+        if (!reset || completed) {
+          if (!out.isClosed) out.close();
+        }
       },
     );
     return FxEvents(out.stream);
@@ -1406,6 +1541,237 @@ class FxEvents<T> {
   /// Crosses into the pull model: the events become an [FxAsync] chain,
   /// pulled on demand from here on.
   FxAsync<T> pull() => fxAsync(fromStream(_inner));
+}
+
+/// Sink handed to [FxEvents.create] so the producer can emit, fail, or
+/// complete — and register teardown.
+///
+/// fxdart events layer, after Rx's `Subscriber` / the `Observable`
+/// constructor's observer.
+class EventEmitter<T> {
+  EventEmitter._(this._out);
+  final StreamController<T> _out;
+  var _done = false;
+
+  /// Invoked once when the listener cancels or this emitter [close]s.
+  FutureOr<void> Function()? onCancel;
+
+  /// Pushes [value] to the current listener. No-ops after [close] or
+  /// cancel.
+  void add(T value) {
+    if (_done || _out.isClosed) return;
+    _out.add(value);
+  }
+
+  /// Pushes [error] to the current listener. No-ops after [close] or
+  /// cancel.
+  void addError(Object error, [StackTrace? stackTrace]) {
+    if (_done || _out.isClosed) return;
+    _out.addError(error, stackTrace);
+  }
+
+  /// Completes the stream. Further [add]/[addError]/[close] no-op.
+  void close() {
+    if (_done || _out.isClosed) return;
+    _done = true;
+    _out.close();
+  }
+
+  Future<void> _teardown() async {
+    _done = true;
+    final cb = onCancel;
+    onCancel = null;
+    if (cb != null) await cb();
+  }
+}
+
+Stream<int> _timerStream(Duration delay, Duration? every) {
+  final out = StreamController<int>();
+  out.onListen = () {
+    var n = 0;
+    Timer? timer;
+    timer = Timer(delay, () {
+      out.add(n++);
+      if (every == null) {
+        out.close();
+        return;
+      }
+      timer = Timer.periodic(every, (_) => out.add(n++));
+    });
+    out.onCancel = () => timer?.cancel();
+  };
+  return out.stream;
+}
+
+Stream<T> _deferStream<T>(Stream<T> Function() factory) {
+  final out = StreamController<T>();
+  out.onListen = () {
+    final Stream<T> source;
+    try {
+      source = factory();
+    } catch (e, st) {
+      out
+        ..addError(e, st)
+        ..close();
+      return;
+    }
+    final sub = source.listen(
+      out.add,
+      onError: out.addError,
+      onDone: out.close,
+    );
+    out
+      ..onPause = sub.pause
+      ..onResume = sub.resume
+      ..onCancel = sub.cancel;
+  };
+  return out.stream;
+}
+
+Stream<T> _generateStream<T>(
+  T initial,
+  bool Function(T) condition,
+  T Function(T) iterate,
+) {
+  final out = StreamController<T>();
+  out.onListen = () {
+    var current = initial;
+    var cancelled = false;
+    Timer? pending;
+    void step() {
+      pending = null;
+      if (cancelled || out.isClosed) return;
+      final bool ok;
+      try {
+        ok = condition(current);
+      } catch (e, st) {
+        out
+          ..addError(e, st)
+          ..close();
+        return;
+      }
+      if (!ok) {
+        out.close();
+        return;
+      }
+      out.add(current);
+      try {
+        current = iterate(current);
+      } catch (e, st) {
+        out
+          ..addError(e, st)
+          ..close();
+        return;
+      }
+      pending = Timer(Duration.zero, step);
+    }
+
+    pending = Timer(Duration.zero, step);
+    out.onCancel = () {
+      cancelled = true;
+      pending?.cancel();
+    };
+  };
+  return out.stream;
+}
+
+Stream<T> _fromPatternStream<T>(
+  void Function(void Function(T) handler) add,
+  void Function(void Function(T) handler) remove,
+) {
+  final out = StreamController<T>();
+  out.onListen = () {
+    void handler(T value) => out.add(value);
+
+    try {
+      add(handler);
+    } catch (e, st) {
+      out
+        ..addError(e, st)
+        ..close();
+      return;
+    }
+    out.onCancel = () => remove(handler);
+  };
+  return out.stream;
+}
+
+Stream<T> _usingStream<R, T>(
+  R Function() acquire,
+  Stream<T> Function(R resource) asStream,
+  FutureOr<void> Function(R resource) release,
+) {
+  final out = StreamController<T>();
+  out.onListen = () {
+    late final R resource;
+    try {
+      resource = acquire();
+    } catch (e, st) {
+      out
+        ..addError(e, st)
+        ..close();
+      return;
+    }
+
+    var released = false;
+    Future<void> dispose() async {
+      if (released) return;
+      released = true;
+      await release(resource);
+    }
+
+    final Stream<T> source;
+    try {
+      source = asStream(resource);
+    } catch (e, st) {
+      out
+        ..addError(e, st)
+        ..close();
+      dispose();
+      return;
+    }
+
+    late final StreamSubscription<T> sub;
+    sub = source.listen(
+      out.add,
+      onError: (Object e, StackTrace st) {
+        out.addError(e, st);
+        sub.cancel();
+        out.close();
+        dispose();
+      },
+      onDone: () {
+        out.close();
+        dispose();
+      },
+    );
+    out
+      ..onPause = sub.pause
+      ..onResume = sub.resume
+      ..onCancel = () async {
+        await sub.cancel();
+        await dispose();
+      };
+  };
+  return out.stream;
+}
+
+Stream<T> _createStream<T>(void Function(EventEmitter<T> emit) init) {
+  final out = StreamController<T>();
+  out.onListen = () {
+    final emit = EventEmitter._(out);
+    out.onCancel = emit._teardown;
+    try {
+      init(emit);
+    } catch (e, st) {
+      if (!out.isClosed) {
+        out
+          ..addError(e, st)
+          ..close();
+      }
+    }
+  };
+  return out.stream;
 }
 
 /// A live "current value" with subscribers — fxdart's counterpart of Rx's
