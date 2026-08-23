@@ -18,6 +18,11 @@ Comparison playgrounds are a true 50/50 split: long unwrapped lines no
 longer inflate the left grid track (CodeMirror now wraps, and the grid
 uses `minmax(0, 1fr)`).
 
+`top-expenses` "Why they differ" now matches the current `sortBy`:
+stable unboxed merge of a `Float64List`, not the old index
+permutation / `List.sort`. The 2.6× gap vs `sortedBy` is the cost of
+extracting and boxing a `num` key inside every comparison.
+
 ## 0.8.9
 
 Documentation fix: the FxDart logo in the README was not displaying on GitHub

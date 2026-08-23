@@ -2,7 +2,7 @@
 
 - **Machine:** Apple M1 Max, 32 GB RAM
 - **Dart:** 3.12.2 (macos Version 26.3 (Build 25D125)), AOT-compiled
-- **Date:** 2026-08-23
+- **Date:** 2026-08-24
 - **Method:** per side and N-scale, fresh process × rounds, 2 warmup + 5 measured iterations per process (small N auto-batched to ≥2 ms samples); median reported. Ties — within 5.0% of each other, or within 0.6 ms absolute (beneath human perception) — with close relative races re-run up to 5 rounds.
 - Memory is peak process RSS — the runtime and the dataset are identical on both sides, so the *difference* is what the pipeline itself holds onto. At small N it is all runtime baseline; expect ties.
 
@@ -10,12 +10,12 @@
 
 | # | Case | N | native time | FxDart time | Time winner | native mem | FxDart mem | Mem winner | Rounds |
 |--:|------|--:|--:|--:|:-:|--:|--:|:-:|--:|
-| 1 | top-expenses | 100 | 20 µs | 5.7 µs | **tie** | 16.5 MB | 17.0 MB | tie | 3 |
+| 1 | top-expenses | 100 | 20 µs | 5.6 µs | **tie** | 16.6 MB | 16.5 MB | tie | 5 |
 | 2 | top-log-level | 100 | 3.9 µs | 2.1 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 3 | sequential-configs (async) | 100 | 427 µs | 321 µs | **tie** | 16.5 MB | 16.6 MB | tie | 3 |
 | 4 | average-basket | 100 | 2.0 µs | 787 ns | **tie** | 16.5 MB | 16.4 MB | tie | 3 |
 | 5 | paginate-users | 100 | 9.4 µs | 7.3 µs | **tie** | 16.4 MB | 16.5 MB | tie | 3 |
-| 6 | rank-labels | 100 | 16 µs | 15 µs | **tie** | 16.3 MB | 16.5 MB | tie | 3 |
+| 6 | rank-labels | 100 | 15 µs | 15 µs | **tie** | 16.4 MB | 16.5 MB | tie | 5 |
 | 7 | running-balance | 100 | 24 µs | 22 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 8 | food-spending | 100 | 1.2 µs | 833 ns | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
 | 9 | first-visit-merchants | 100 | 1.4 µs | 1.7 µs | **tie** | 16.5 MB | 16.5 MB | tie | 3 |
@@ -68,12 +68,12 @@
 
 | # | Case | N | native time | FxDart time | Time winner | native mem | FxDart mem | Mem winner | Rounds |
 |--:|------|--:|--:|--:|:-:|--:|--:|:-:|--:|
-| 1 | top-expenses | 10000 | 3.28 ms | 828 µs | **fxdart** | 23.1 MB | 21.4 MB | fxdart | 3 |
+| 1 | top-expenses | 10000 | 3.31 ms | 846 µs | **fxdart** | 23.2 MB | 21.4 MB | fxdart | 5 |
 | 2 | top-log-level | 10000 | 353 µs | 193 µs | **tie** | 20.0 MB | 14.2 MB | fxdart | 3 |
 | 3 | sequential-configs (async) | 10000 | 31.4 ms | 31.2 ms | **tie** | 50.7 MB | 51.1 MB | tie | 3 |
 | 4 | average-basket | 10000 | 185 µs | 83 µs | **tie** | 19.1 MB | 15.4 MB | fxdart | 3 |
 | 5 | paginate-users | 10000 | 754 µs | 628 µs | **tie** | 22.9 MB | 23.5 MB | tie | 3 |
-| 6 | rank-labels | 10000 | 1.60 ms | 1.56 ms | **tie** | 34.7 MB | 37.5 MB | native | 3 |
+| 6 | rank-labels | 10000 | 1.69 ms | 1.72 ms | **tie** | 34.8 MB | 37.8 MB | native | 5 |
 | 7 | running-balance | 10000 | 2.07 ms | 2.11 ms | **tie** | 24.0 MB | 23.6 MB | tie | 3 |
 | 8 | food-spending | 10000 | 147 µs | 100 µs | **tie** | 17.0 MB | 15.6 MB | fxdart | 3 |
 | 9 | first-visit-merchants | 10000 | 151 µs | 168 µs | **tie** | 17.0 MB | 17.0 MB | tie | 3 |
@@ -126,12 +126,12 @@
 
 | # | Case | N | native time | FxDart time | Time winner | native mem | FxDart mem | Mem winner | Rounds |
 |--:|------|--:|--:|--:|:-:|--:|--:|:-:|--:|
-| 1 | top-expenses | 1000000 | 503.9 ms | 189.7 ms | **fxdart** | 124.8 MB | 130.4 MB | tie | 3 |
+| 1 | top-expenses | 1000000 | 521.1 ms | 199.6 ms | **fxdart** | 123.2 MB | 129.7 MB | native | 5 |
 | 2 | top-log-level | 1000000 | 44.8 ms | 19.7 ms | **fxdart** | 85.7 MB | 44.9 MB | fxdart | 3 |
 | 3 | sequential-configs (async) | 100000 | 323.5 ms | 329.8 ms | **tie** | 82.6 MB | 82.1 MB | tie | 5 |
 | 4 | average-basket | 1000000 | 17.3 ms | 8.79 ms | **fxdart** | 75.2 MB | 72.9 MB | tie | 3 |
 | 5 | paginate-users | 1000000 | 82.1 ms | 73.7 ms | **fxdart** | 125.4 MB | 124.7 MB | tie | 3 |
-| 6 | rank-labels | 1000000 | 200.1 ms | 210.7 ms | **native** | 241.4 MB | 222.2 MB | fxdart | 3 |
+| 6 | rank-labels | 1000000 | 226.0 ms | 232.7 ms | **tie** | 239.5 MB | 223.1 MB | fxdart | 5 |
 | 7 | running-balance | 1000000 | 237.8 ms | 275.1 ms | **native** | 182.9 MB | 185.2 MB | tie | 3 |
 | 8 | food-spending | 1000000 | 12.6 ms | 11.4 ms | **fxdart** | 91.0 MB | 85.1 MB | fxdart | 3 |
 | 9 | first-visit-merchants | 1000000 | 23.8 ms | 26.2 ms | **native** | 116.6 MB | 116.0 MB | tie | 3 |

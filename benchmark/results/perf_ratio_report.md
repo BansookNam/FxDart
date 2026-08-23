@@ -1,7 +1,7 @@
 # DartComparison: slowest to fastest ratio
 
 Machine: Apple M1 Max, 32GB RAM, Dart 3.12.2, macos Version 26.3 (Build 25D125) (AOT (dart compile exe), enforced per result line)
-Date: 2026-08-23 · Scale: `full` (headline N per case)
+Date: 2026-08-24 · Scale: `full` (headline N per case)
 
 Ordered by FxDart/native, slowest first — so the rows worth acting on are at the top and the ordering does not change direction partway down. The Ratio column states each row's own verdict.
 
@@ -27,7 +27,7 @@ Ordered by FxDart/native, slowest first — so the rows worth acting on are at t
 | Pair sensors with readings, keep anomalies | `benchmark/cases/sensor-anomalies` | 1,000,000 | 62,546 | 68,163 | Native 1.09x faster |
 | Category with highest average expense | `benchmark/cases/top-category-average` | 1,000,000 | 60,453 | 64,596 | Native 1.07x faster |
 | First sensor reading over the limit | `benchmark/cases/first-over-limit` | 1,000,000 | 4,952 | 5,224 | ~tie |
-| Rank labels for a leaderboard | `benchmark/cases/rank-labels` | 1,000,000 | 200,130 | 210,735 | Native 1.05x faster |
+| Rank labels for a leaderboard | `benchmark/cases/rank-labels` | 1,000,000 | 226,015 | 232,668 | ~tie |
 | p50/p95 latency per endpoint | `benchmark/cases/latency-percentiles` | 1,000,000 | 204,682 | 209,743 | ~tie |
 | Fetch 10 profiles, 3 at a time | `benchmark/cases/concurrent-profile-fetch` | 100,000 | 301,340 | 307,916 | ~tie |
 | Load three remote configs in order | `benchmark/cases/sequential-configs` | 100,000 | 323,546 | 329,816 | ~tie |
@@ -57,6 +57,6 @@ Ordered by FxDart/native, slowest first — so the rows worth acting on are at t
 | Line items to invoice summary | `benchmark/cases/invoice-summary` | 1,000,000 | 25,325 | 13,623 | FxDart 1.86x faster |
 | Average order value over $100 | `benchmark/cases/average-basket` | 1,000,000 | 17,331 | 8,790 | FxDart 1.97x faster |
 | Most frequent log level | `benchmark/cases/top-log-level` | 1,000,000 | 44,788 | 19,704 | FxDart 2.27x faster |
-| Top 3 largest expenses | `benchmark/cases/top-expenses` | 1,000,000 | 503,939 | 189,687 | FxDart 2.66x faster |
+| Top 3 largest expenses | `benchmark/cases/top-expenses` | 1,000,000 | 521,120 | 199,555 | FxDart 2.61x faster |
 | Full monthly ledger report | `benchmark/cases/monthly-ledger-report` | 1,000,000 | 135,112 | 47,285 | FxDart 2.86x faster |
 | Inventory restock plan | `benchmark/cases/restock-plan` | 1,000,000 | 216,181 | 51,924 | FxDart 4.16x faster |
