@@ -14,6 +14,10 @@ GitHub Actions: `checkout`, `cache`, `upload-pages-artifact`, and
 `deploy-pages` now use their Node 24 majors so the Pages workflow is not
 forced off Node 20.
 
+Comparison playgrounds are a true 50/50 split: long unwrapped lines no
+longer inflate the left grid track (CodeMirror now wraps, and the grid
+uses `minmax(0, 1fr)`).
+
 ## 0.8.9
 
 Documentation fix: the FxDart logo in the README was not displaying on GitHub

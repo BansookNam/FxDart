@@ -223,6 +223,7 @@ th { background: var(--bg-soft); }
    regardless of link order. Don't "simplify" these back to `.CodeMirror`. */
 .CodeMirror.cm-s-fxdart {
   height: auto;
+  width: 100%;
   background: var(--code-bg);
   color: var(--text);
   font-family: "SF Mono", ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
@@ -292,10 +293,16 @@ th { background: var(--bg-soft); }
 main.cmp-wide { max-width: 1280px; }
 
 .comparison {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem;
+  display: grid;
+  /* minmax(0, 1fr) — not 1fr. Grid items default to min-width: auto, so a
+     CodeMirror whose longest line is ~90ch inflates the track past 50% and
+     the other panel is clipped by .playground { overflow: hidden }. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1.1rem;
   align-items: start; margin: 1.4rem 0 2rem;
 }
 @media (max-width: 900px) { .comparison { grid-template-columns: 1fr; } }
+.cmp-panel { min-width: 0; }
 .cmp-panel h3 { margin: 0 0 0.5rem; }
 .cmp-panel .playground { margin: 0; }
 

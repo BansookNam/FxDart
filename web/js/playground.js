@@ -554,9 +554,16 @@
         lineNumbers: true,
         indentUnit: 2,
         tabSize: 2,
+        lineWrapping: true,
         viewportMargin: Infinity,
         theme: 'fxdart'
       });
+      // Wrap width is measured once at init. A comparison panel that
+      // goes 2-col → 1-col at 900px, or a flex/grid sibling that settles
+      // after layout, would otherwise keep wrapping at the old width.
+      if (window.ResizeObserver) {
+        new ResizeObserver(function () { editor.refresh(); }).observe(container);
+      }
     }
     function getCode() { return editor ? editor.getValue() : textarea.value; }
 
