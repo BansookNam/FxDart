@@ -138,15 +138,22 @@ extension FxEventsChain<T> on FxEvents<T> {
     final out = StreamController<T>();
     out.onListen = () {
       final buffer = <T>[];
+      var head = 0;
       final sub = stream.listen(
         (v) {
           buffer.add(v);
-          if (buffer.length > count) buffer.removeAt(0);
+          if (buffer.length - head > count) head++;
+          // Amortised O(1): shift only once the dead prefix is as long as
+          // the window, so the buffer never holds more than 2x [count].
+          if (head >= buffer.length - head) {
+            buffer.removeRange(0, head);
+            head = 0;
+          }
         },
         onError: out.addError,
         onDone: () {
-          for (final v in buffer) {
-            out.add(v);
+          for (var i = head; i < buffer.length; i++) {
+            out.add(buffer[i]);
           }
           out.close();
         },
@@ -169,10 +176,15 @@ extension FxEventsChain<T> on FxEvents<T> {
     final out = StreamController<T>();
     out.onListen = () {
       final buffer = <T>[];
+      var head = 0;
       final sub = stream.listen(
         (v) {
           buffer.add(v);
-          if (buffer.length > count) out.add(buffer.removeAt(0));
+          if (buffer.length - head > count) out.add(buffer[head++]);
+          if (head >= buffer.length - head) {
+            buffer.removeRange(0, head);
+            head = 0;
+          }
         },
         onError: out.addError,
         onDone: out.close,

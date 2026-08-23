@@ -104,6 +104,47 @@ void main() {
     );
 
     test(
+      'reset: true cancels a source that keeps ticking after its error',
+      () async {
+        var live = 0;
+        final ticks = StreamController<int>.broadcast();
+        final source = Stream<int>.multi((controller) {
+          live++;
+          final sub = ticks.stream.listen(
+            controller.add,
+            onError: controller.addError,
+          );
+          controller.onCancel = () {
+            live--;
+            return sub.cancel();
+          };
+        });
+        final shared = fxEvents(source).share();
+        final first = <Object>[];
+        final sub = shared.listen(first.add, onError: first.add);
+        ticks.addError(StateError('boom'));
+        await Future<void>.delayed(Duration.zero);
+        expect(first.whereType<StateError>(), hasLength(1));
+        await sub.cancel();
+        expect(live, 0, reason: 'error must cancel the source, not just drop it');
+
+        ticks.add(99);
+        await Future<void>.delayed(Duration.zero);
+
+        final later = <Object>[];
+        final sub2 = shared.listen(later.add, onError: later.add);
+        ticks.add(2);
+        await Future<void>.delayed(Duration.zero);
+        expect(live, 1);
+        expect(later, equals([2]));
+        expect(later, isNot(contains(99)));
+        await sub2.cancel();
+        expect(live, 0);
+        await ticks.close();
+      },
+    );
+
+    test(
       'reset: true lets a later listener resubscribe after a source error',
       () async {
         var attempt = 0;

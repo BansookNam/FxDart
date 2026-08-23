@@ -483,7 +483,6 @@ extension FxEventsWindow<T> on FxEvents<T> {
           closeSlot(slot);
         }, onError: fail);
         slot.closer = sub;
-        aux.add(sub);
       }
 
       aux.add(openings.listen(openSlot, onError: fail));

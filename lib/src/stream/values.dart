@@ -21,6 +21,7 @@ class ReplayValue<T> {
   final Duration? _maxAge;
   final _controller = StreamController<T>.broadcast();
   final _buffer = <({DateTime at, T value})>[];
+  var _head = 0;
   var _closed = false;
 
   /// A replay buffer.
@@ -68,7 +69,7 @@ class ReplayValue<T> {
         // Synchronous replay-then-subscribe: no update can slip between
         // the replayed values and the live feed.
         _trim();
-        for (final entry in List.of(_buffer)) {
+        for (final entry in _buffer.sublist(_head)) {
           c.add(entry.value);
         }
         if (_closed) {
@@ -102,15 +103,22 @@ class ReplayValue<T> {
   void _trim() {
     if (_maxAge != null) {
       final cutoff = DateTime.now().subtract(_maxAge);
-      while (_buffer.isNotEmpty && _buffer.first.at.isBefore(cutoff)) {
-        _buffer.removeAt(0);
+      while (_head < _buffer.length && _buffer[_head].at.isBefore(cutoff)) {
+        _head++;
       }
     }
     final size = _size;
     if (size != null && size >= 1) {
-      while (_buffer.length > size) {
-        _buffer.removeAt(0);
+      while (_buffer.length - _head > size) {
+        _head++;
       }
+    }
+    // Drop the dead prefix only once it is as long as the live window, so
+    // the shift is amortised O(1) per add and the list never holds more
+    // than 2x the retained values.
+    if (_head > 0 && _head >= _buffer.length - _head) {
+      _buffer.removeRange(0, _head);
+      _head = 0;
     }
   }
 }
