@@ -1398,12 +1398,27 @@ List<A> _sortByImpl<A>(
   if (first is double) {
     final dk = Float64List(length);
     dk[0] = first;
+    // `compareTo` is the total order (NaN last, -0.0 < 0.0). `<=` is a VM
+    // compare and does not agree with that order, so it is only safe when
+    // every key is an ordinary finite number — the shape of a price, a
+    // running total, a score. Detected while extracting, not in a second
+    // pass: `isNaN` / `-0.0` are both cheap tests on a double already in a
+    // register. paginated-products is this shape (positive unique prices).
+    //
+    // One NaN or -0.0 anywhere drops the *entire* array onto compareTo.
+    // `sortBy((x) => -x.key)` is this repo's own descending spelling
+    // (top-expenses, and `_sortDoubleKeys`'s docstring); negating a `0.0`
+    // key produces `-0.0`, so a single zero-valued row is enough. The
+    // fallback is right — `-0.0 < 0.0` is contracted — but the fast path
+    // evaporates silently.
+    var needsCompareTo = first.isNaN || (first.isNegative && first == 0.0);
     for (var i = 1; i < length; i++) {
       final k = f(items[i]);
       if (k is! double) return _sortSpilled(f, items, dk, i, k, desc);
       dk[i] = k;
+      if (k.isNaN || (k.isNegative && k == 0.0)) needsCompareTo = true;
     }
-    return _sortDoubleKeys(dk, items, desc);
+    return _sortDoubleKeys(dk, items, desc, needsCompareTo);
   }
 
   if (first is int) {
@@ -1599,7 +1614,11 @@ List<A> _mergeByInt<A>(List<int> k, List<A> items, bool desc) {
   var srcK = k;
   var dstK = List<int>.filled(n, 0);
   var srcV = items;
-  var dstV = List<A>.of(items);
+  // The first pass overwrites every dst slot, so `List.of(items)` was a
+  // wasted n-element copy. `filled` only plants a dummy; growable so a
+  // result that lands on this buffer still accepts `.add`, matching
+  // `List.toList()`.
+  var dstV = List<A>.filled(n, items[0], growable: true);
   for (var width = 1; width < n; width <<= 1) {
     for (var lo = 0; lo < n; lo += width << 1) {
       var mid = lo + width;
@@ -1665,7 +1684,12 @@ List<A> _mergeByInt<A>(List<int> k, List<A> items, bool desc) {
 /// run sorted. NaN makes every comparison non-ordering, which fails both
 /// runs and falls through to the merge — where `compareTo` places it last, as
 /// before.
-List<A> _sortDoubleKeys<A>(Float64List k, List<A> items, bool desc) {
+List<A> _sortDoubleKeys<A>(
+  Float64List k,
+  List<A> items,
+  bool desc,
+  bool needsCompareTo,
+) {
   final n = items.length;
   var nonDec = true, nonInc = true, strictInc = true, strictDec = true;
   for (var i = 1; i < n; i++) {
@@ -1692,18 +1716,108 @@ List<A> _sortDoubleKeys<A>(Float64List k, List<A> items, bool desc) {
     if (nonDec) return items;
     if (strictDec) return [for (var i = n - 1; i >= 0; i--) items[i]];
   }
-  return _mergeByDouble(k, items, desc);
+  return _mergeByDouble(k, items, desc, needsCompareTo);
 }
 
 /// Stable bottom-up merge sort of [items] by the unboxed keys [k], moving
 /// both arrays in lockstep. Stable by construction: a tie takes the left run,
 /// so equal keys keep their source order.
-List<A> _mergeByDouble<A>(Float64List k, List<A> items, bool desc) {
+///
+/// [needsCompareTo] is true when a key was NaN or -0.0: those disagree with
+/// `<=` (`0.0 <= -0.0` is true while `0.0.compareTo(-0.0)` is positive; NaN
+/// compares greater than every finite). Ordinary finite keys — prices,
+/// totals, scores — take the `<=` path, which is a VM compare rather than
+/// a `compareTo` call per decision.
+///
+/// The `<=` / `>=` choice is hoisted out of `while (i < mid && j < hi)` so
+/// the inner loop is a single VM compare. The branch then runs once per
+/// merge block (~n times) instead of once per comparison (~n log n).
+List<A> _mergeByDouble<A>(
+  Float64List k,
+  List<A> items,
+  bool desc,
+  bool needsCompareTo,
+) {
+  if (needsCompareTo) return _mergeByDoubleCompareTo(k, items, desc);
+  return _mergeByDoubleRel(k, items, !desc);
+}
+
+List<A> _mergeByDoubleRel<A>(Float64List k, List<A> items, bool le) {
   final n = items.length;
   var srcK = k;
   var dstK = Float64List(n);
   var srcV = items;
-  var dstV = List<A>.of(items);
+  // First pass overwrites every dst slot, so `List.of(items)` was a wasted
+  // n-element copy. Growable: a result that lands on this buffer still
+  // accepts `.add`.
+  var dstV = List<A>.filled(n, items[0], growable: true);
+  for (var width = 1; width < n; width <<= 1) {
+    for (var lo = 0; lo < n; lo += width << 1) {
+      var mid = lo + width;
+      if (mid > n) mid = n;
+      var hi = mid + width;
+      if (hi > n) hi = n;
+      var i = lo, j = mid, t = lo;
+      if (le) {
+        while (i < mid && j < hi) {
+          final a = srcK[i];
+          final b = srcK[j];
+          if (a <= b) {
+            dstK[t] = a;
+            dstV[t] = srcV[i];
+            i++;
+          } else {
+            dstK[t] = b;
+            dstV[t] = srcV[j];
+            j++;
+          }
+          t++;
+        }
+      } else {
+        while (i < mid && j < hi) {
+          final a = srcK[i];
+          final b = srcK[j];
+          if (a >= b) {
+            dstK[t] = a;
+            dstV[t] = srcV[i];
+            i++;
+          } else {
+            dstK[t] = b;
+            dstV[t] = srcV[j];
+            j++;
+          }
+          t++;
+        }
+      }
+      while (i < mid) {
+        dstK[t] = srcK[i];
+        dstV[t] = srcV[i];
+        i++;
+        t++;
+      }
+      while (j < hi) {
+        dstK[t] = srcK[j];
+        dstV[t] = srcV[j];
+        j++;
+        t++;
+      }
+    }
+    final tk = srcK;
+    srcK = dstK;
+    dstK = tk;
+    final tv = srcV;
+    srcV = dstV;
+    dstV = tv;
+  }
+  return srcV;
+}
+
+List<A> _mergeByDoubleCompareTo<A>(Float64List k, List<A> items, bool desc) {
+  final n = items.length;
+  var srcK = k;
+  var dstK = Float64List(n);
+  var srcV = items;
+  var dstV = List<A>.filled(n, items[0], growable: true);
   for (var width = 1; width < n; width <<= 1) {
     for (var lo = 0; lo < n; lo += width << 1) {
       var mid = lo + width;
