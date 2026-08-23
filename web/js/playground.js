@@ -74,10 +74,10 @@
   // The version this browser confirmed on an earlier visit. Knowing it up
   // front is what lets a returning reader open the runtime cache immediately
   // instead of waiting on a round trip that only ever names a bucket. If the
-  // service has since moved on, evictOldCaches drops the stale bucket once the
-  // real version arrives, so the guess costs at most one page load — and that
-  // load is self-consistent, since the precompiled artifacts under pg/ were
-  // built against the same older SDK.
+  // service has since moved on, evictOldCaches drops the stale runtime
+  // bucket once the real version arrives. Prebuilts under pg/ are a separate
+  // generation: fetchPrebuilt refuses one whose DDC header does not match
+  // the runtime, so a DartPad upgrade cannot run 3.12 JS on a 3.13 SDK.
   function knownVersion() {
     try { return localStorage.getItem(VERSION_KEY) || ''; } catch (e) { return ''; }
   }
@@ -326,11 +326,33 @@
     return new Response(stream).text();
   }
 
+  // compileNewDDC output starts `// Version: 3.13.1 (stable) …`. A prebuilt
+  // compiled by an older DDC cannot run on a newer dart_sdk_new.js —
+  // Duration/Timer private fields moved, and the first symptom is
+  // `Unsupported operation: NaN` from `Future.delayed`. Throw so the
+  // existing catch falls back to a live compile.
+  function ddcVersionOf(js) {
+    var m = /(?:^|\n)\/\/ Version:\s+(\S+)/.exec(js);
+    return m ? m[1] : '';
+  }
+
   function fetchPrebuilt(id) {
-    return fetch(ROOT + 'pg/' + id + '.js.gz').then(function (r) {
-      if (!r.ok) throw new Error('no prebuilt artifact');
-      return r.arrayBuffer();
-    }).then(gunzip);
+    return Promise.all([
+      fetch(ROOT + 'pg/' + id + '.js.gz').then(function (r) {
+        if (!r.ok) throw new Error('no prebuilt artifact');
+        return r.arrayBuffer();
+      }).then(gunzip),
+      getVersion()
+    ]).then(function (parts) {
+      var js = parts[0];
+      var runtime = parts[1];
+      var built = ddcVersionOf(js);
+      if (runtime && built !== runtime) {
+        throw new Error('prebuilt DDC ' + (built || 'unknown') +
+          ' != runtime ' + runtime);
+      }
+      return js;
+    });
   }
 
   // --- execution frames -----------------------------------------------------

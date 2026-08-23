@@ -91,9 +91,40 @@ void main(List<String> args) async {
   final label = only != null ? 'only=${only.join(',')}' : scope;
 
   Directory('$root/$artifactDir').createSync(recursive: true);
-  var missing = targets.values
-      .where((s) => !File(artifactPath(root, s.id)).existsSync())
-      .toList();
+
+  // Native comparison panels are keyed `nolib`+source, so a DartPad DDC
+  // upgrade leaves their files on disk. Those files cannot run on the new
+  // dart_sdk_new.js (`Unsupported operation: NaN` from Future.delayed). Ask
+  // the compile service which DDC it is and rebuild anything compiled by
+  // another version. If the version lookup fails, keep the on-disk files —
+  // playground.js will still refuse a mismatch at run time.
+  final runtimeDdc = await _dartPadVersion();
+  if (runtimeDdc != null) {
+    stdout.writeln('DartPad dartVersion=$runtimeDdc');
+  } else {
+    stdout.writeln('DartPad dartVersion unknown — not invalidating by DDC');
+  }
+
+  var absent = 0, stale = 0;
+  var missing = <Snippet>[];
+  for (final s in targets.values) {
+    final path = artifactPath(root, s.id);
+    final file = File(path);
+    if (!file.existsSync()) {
+      absent++;
+      missing.add(s);
+      continue;
+    }
+    if (runtimeDdc == null) continue;
+    final built = _ddcVersionOfArtifact(path);
+    if (built != runtimeDdc) {
+      stale++;
+      missing.add(s);
+    }
+  }
+  if (stale > 0) {
+    stdout.writeln('$stale artifact(s) compiled by another DDC, will rebuild');
+  }
 
   // Stop after N compiles. Useful for smoke-testing the pipeline without
   // spending a few hundred round trips on the compile service.
@@ -112,7 +143,8 @@ void main(List<String> args) async {
     stdout.writeln('all ${targets.length} artifacts in scope "$label" are current');
   } else {
     stdout.writeln('compiling ${missing.length} of ${targets.length} '
-        'snippets in scope "$label" ($concurrency at a time)…');
+        'snippets in scope "$label" '
+        '($absent new, $stale stale DDC, $concurrency at a time)…');
     final failures = await _compileAll(missing, concurrency);
     if (failures.isNotEmpty) {
       stderr.writeln('\n${failures.length} snippet(s) failed to compile:');
@@ -241,6 +273,35 @@ Future<String> _attempt(HttpClient client, String source) async {
 class _CompileFailure implements Exception {
   _CompileFailure(this.message);
   final String message;
+}
+
+const _versionUrl = 'https://stable.api.dartpad.dev/api/v3/version';
+
+/// The compile service's `dartVersion`, or null if it cannot be reached.
+Future<String?> _dartPadVersion() async {
+  final client = HttpClient()..connectionTimeout = const Duration(seconds: 15);
+  try {
+    final req = await client.getUrl(Uri.parse(_versionUrl));
+    final resp = await req.close().timeout(const Duration(seconds: 15));
+    final text = await resp.transform(utf8.decoder).join();
+    if (resp.statusCode != 200) return null;
+    final v = jsonDecode(text)['dartVersion'];
+    return v is String && v.isNotEmpty ? v : null;
+  } catch (_) {
+    return null;
+  } finally {
+    client.close(force: true);
+  }
+}
+
+/// DDC version stamped inside a gzipped compileNewDDC artifact, or null.
+String? _ddcVersionOfArtifact(String path) {
+  try {
+    final js = utf8.decode(gzip.decode(File(path).readAsBytesSync()));
+    return ddcVersionOf(js);
+  } catch (_) {
+    return null;
+  }
 }
 
 /// Deletes artifacts no current snippet maps to — typically everything

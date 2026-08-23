@@ -76,6 +76,18 @@ jobs:
       - name: Build the playground bundle
         run: bash tools/build_single_file.sh
 
+      # Prebuilts are DDC bytecode. A DartPad upgrade (3.12.2 → 3.13.1) does
+      # not change snippet text, so the content hash below would still hit a
+      # cache of JS that cannot run on the new dart_sdk_new.js. Fold the
+      # compile service's dartVersion into the key so that cache misses when
+      # DDC moves, and the precompiler rebuilds rather than serving NaN.
+      - name: DartPad compiler version
+        run: |
+          v=$(curl -fsSL https://stable.api.dartpad.dev/api/v3/version \
+            | python3 -c 'import sys,json;print(json.load(sys.stdin)["dartVersion"])')
+          echo "DARTPAD_VERSION=$v" >> "$GITHUB_ENV"
+          echo "DartPad dartVersion=$v"
+
       # Artifacts are content-addressed, so a run that changes neither lib/
       # nor a snippet restores all of them and compiles nothing. A change to
       # lib/ rotates every id and the restore misses by design — that is the
@@ -85,11 +97,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: docs/pg
-          key: pg-${{ env.PG_SCOPE }}-${{ hashFiles('docs/assets/fxdart_single.dart', 'content/**/*.dart', 'content/theory/*.md') }}
+          key: pg-${{ env.PG_SCOPE }}-${{ env.DARTPAD_VERSION }}-${{ hashFiles('docs/assets/fxdart_single.dart', 'content/**/*.dart', 'content/theory/*.md') }}
           # Falls back to the same scope's older build, then to any build at
           # all: artifacts are content-addressed, so a partial restore is a
-          # head start and never wrong.
+          # head start and never wrong. The precompiler still drops files
+          # whose DDC header does not match DARTPAD_VERSION.
           restore-keys: |
+            pg-${{ env.PG_SCOPE }}-${{ env.DARTPAD_VERSION }}-
             pg-${{ env.PG_SCOPE }}-
             pg-
 

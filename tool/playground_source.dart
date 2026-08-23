@@ -90,6 +90,18 @@ String playgroundId(String root, String code) => _idCache.putIfAbsent(code, () {
 
 String artifactPath(String root, String id) => '$root/$artifactDir/$id.js.gz';
 
+/// DDC stamps `// Version: 3.13.1 (stable) …` on compileNewDDC output.
+///
+/// Native comparison panels are keyed `nolib`+source, so a DartPad DDC
+/// upgrade does not rotate their id. Running a 3.12.2 prebuilt on a 3.13.1
+/// `dart_sdk_new.js` is what produced `Unsupported operation: NaN` from
+/// `Future.delayed` on live-search's native panel. The precompiler and the
+/// browser both use this to refuse a mismatched artifact.
+final ddcVersionLine = RegExp(r'^// Version:\s+(\S+)', multiLine: true);
+
+/// The compiler version in a compileNewDDC JS payload, or null if absent.
+String? ddcVersionOf(String js) => ddcVersionLine.firstMatch(js)?.group(1);
+
 /// One runnable code block on the site.
 class Snippet {
   Snippet(this.path, this.code, this.id, {required this.isFirstOnPage});

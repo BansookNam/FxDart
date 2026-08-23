@@ -1,3 +1,15 @@
+## 0.8.10
+
+Docs playground: a DartPad DDC upgrade (3.12.2 → 3.13.1) left native
+comparison prebuilts — keyed `nolib`+source, so they never rotate with the
+library — running on a newer `dart_sdk_new.js`. The first symptom was
+`Unsupported operation: NaN` from `Future.delayed` on live-search's native
+panel (and any other native snippet still sitting on 3.12.2 JS). The runner
+now refuses a prebuilt whose DDC header does not match the runtime and falls
+back to a live compile; the precompiler rebuilds anything compiled by
+another DDC, and the Pages cache key includes DartPad's `dartVersion` so a
+future upgrade misses instead of restoring the stale JS.
+
 ## 0.8.9
 
 Documentation fix: the FxDart logo in the README was not displaying on GitHub
