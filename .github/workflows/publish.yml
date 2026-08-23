@@ -1,0 +1,86 @@
+# Publishes to pub.dev when a version tag is pushed.
+#
+# WHY THE TAG IS THE TRIGGER, AND NOT A PUSH TO main
+# --------------------------------------------------
+# Thirty versions are on pub.dev and four of them have a git tag. 0.8.6
+# cannot be checked out, `git diff v0.8.5..v0.8.6` does not resolve, and a
+# bisect for a perf regression has no range to walk. The release/0.8.x
+# branches exist because something had to stand in for the missing tags —
+# which is also why none of them were ever deleted.
+#
+# Making the tag the trigger fixes that at the root rather than by asking
+# someone to remember: an untagged release is now a release that never
+# shipped, because `dart pub publish` is not run by hand any more.
+#
+# NO CREDENTIAL LIVES HERE
+# ------------------------
+# pub.dev authenticates this workflow over OIDC. GitHub mints a short-lived
+# token for the individual run and pub.dev exchanges it, having been told in
+# advance — on the package's admin page — which repository and which tag
+# pattern to trust. Nothing is stored in repository secrets, so nothing can
+# leak from one. That trust must be configured on pub.dev before the first
+# tag is pushed, or the publish job fails at the exchange.
+#
+# WHY THERE IS A GUARD IN FRONT OF IT
+# -----------------------------------
+# The reusable workflow publishes. It does not run the tests, and it does not
+# check that the tag agrees with the tree. Both matter here:
+#
+#   * A tag can be placed on any commit, including one that never went
+#     through a pull request. ci.yml guards main; nothing guarded the tag.
+#   * `v0.8.8` on a tree whose pubspec still says 0.8.7 is not a warning —
+#     pub.dev derives the version from the tag, so it is either a wrong
+#     publish or a failed one.
+#   * pub.dev renders CHANGELOG.md on the package page. Publishing a version
+#     the changelog has never heard of ships release notes that stop one
+#     version short, and that cannot be fixed after the fact: a published
+#     version is immutable.
+#
+# The guard answers all three before the OIDC token is ever minted.
+name: publish
+
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: The tag, the pubspec and the changelog agree
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pubspec="$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | head -1)"
+          if [[ "$tag" != "$pubspec" ]]; then
+            echo "::error::tag ${GITHUB_REF_NAME} declares $tag, pubspec.yaml says $pubspec"
+            exit 1
+          fi
+          if ! grep -qxF "## $tag" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no '## $tag' section"
+            exit 1
+          fi
+          echo "${GITHUB_REF_NAME} == pubspec $pubspec, and the changelog has a section"
+
+      # ci.yml runs these on main. A tag is not necessarily on main.
+      - name: Analyze library
+        run: dart analyze lib
+
+      - name: Test
+        run: dart test
+
+  publish:
+    needs: guard
+    permissions:
+      # OIDC: mints the short-lived token pub.dev exchanges. This is the only
+      # credential in the flow, and it does not outlive the run.
+      id-token: write
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
