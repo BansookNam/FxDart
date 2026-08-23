@@ -1440,8 +1440,13 @@ class FxEvents<T> {
             if (reset) {
               // Drop this subscribe so a trailing onDone (Stream.error)
               // is not treated as a successful complete, and so the
-              // next 0→1 listen can start a fresh one.
+              // next 0→1 listen can start a fresh one. Cancel it too: a
+              // Dart stream survives an error, so leaving it attached
+              // keeps the chain running with nobody listening and lets
+              // the next listen stack a second run on top of it.
+              final current = sub;
               sub = null;
+              current?.cancel();
             } else {
               completed = true;
               if (!out.isClosed) out.close();

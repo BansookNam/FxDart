@@ -20,6 +20,18 @@ void main() {
       },
     );
 
+    test('size 2 over many adds still replays only the last two', () async {
+      final replay = ReplayValue<int>(size: 2);
+      for (var i = 0; i < 20; i++) {
+        replay.add(i);
+      }
+      final seen = <int>[];
+      replay.stream.listen(seen.add);
+      await Future<void>.delayed(Duration.zero);
+      expect(seen, equals([18, 19]));
+      await replay.close();
+    });
+
     test('size 2 replays the last two then follows', () async {
       final replay = ReplayValue<int>(size: 2);
       replay.add(1);
