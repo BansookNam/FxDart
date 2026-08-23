@@ -5,10 +5,10 @@ description: Tutorial de spaceBy en FxDart: dosifica una ráfaga sin perder nada
 heading: <code>delay</code>, <code>spaceBy</code> &amp; <code>sample</code>
 section: 14
 crumb: spaceBy
-prev: chunkOn.html
-prevLabel: chunkOn
-next: onErrorResume.html
-nextLabel: onErrorResume
+prev: groupsBy.html
+prevLabel: groupsBy
+next: debounceOn.html
+nextLabel: debounceOn
 ---
   <p class="hero-sub">Tres formas de mover eventos en el tiempo: desplazarlos todos, separarlos, o leer solo el más reciente a un ritmo fijo.</p>
 

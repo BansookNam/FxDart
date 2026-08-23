@@ -72,14 +72,18 @@ description: 실전 과제 50개를 두 번씩 풉니다 — RxDart 스트림 vs
     Rx 스타일의 push 연산자들 — debounce, throttle, sample,
     combineLatest, switchMap, race, 그리고 <code>LiveValue</code> — 를
     평범한 Dart 스트림 위에 올려 주므로, Part&nbsp;4의 시간 형태
-    쌍들은 연산자 대 연산자로 대등하게 만납니다. RxDart의 카탈로그는
-    여전히 훨씬 크고, 그 일상적인 동사들을 넘어서면 여전히 RxDart를
-    집어야 합니다. 이 쌍들이 드러내는 것은 이야기의 나머지 절반
-    — 스트림으로 풀리는 문제가 사실은 스트림 옷을 입은 <em>데이터
-    파이프라인</em>인 경우가 얼마나 많은가 — 입니다: 유한한 fetch,
-    배치 변환, 페이지네이션 크롤링 같은 것들이죠. 그런 문제에서는 pull
-    버전이 더 짧고, 순서가 보장되고, 타입이 있으며, 구독
-    라이프사이클이 아예 필요 없습니다.
+    쌍들은 연산자 대 연산자로 대등하게 만납니다. RxDart에는 여전히
+    Subject 클래스 계층과 인자 개수 접미사 <code>combineLatest2…9</code>
+    오버로드가 있고, fxdart는 같은 파일에서 rxdart와 충돌하지 않으면서
+    평범한 Dart 스트림 위의 <em>일</em>을 다룹니다 — 윈도,
+    라이브 <code>groupsBy</code>, <code>shareReplay</code>,
+    셀렉터 구동 debounce, <code>combine</code>, 네 가지
+    <code>fromStream*</code> pull 정책. 이 쌍들이 드러내는 것은 이야기의
+    나머지 절반 — 스트림으로 풀리는 문제가 사실은 스트림 옷을 입은
+    <em>데이터 파이프라인</em>인 경우가 얼마나 많은가 — 입니다: 유한한
+    fetch, 배치 변환, 페이지네이션 크롤링 같은 것들이죠. 그런
+    문제에서는 pull 버전이 더 짧고, 순서가 보장되고, 타입이 있으며,
+    구독 라이프사이클이 아예 필요 없습니다.
   </p>
 
   <p>

@@ -5,8 +5,8 @@ description: FxDart onErrorResume 튜토리얼: 에러마다 값으로 대체하
 heading: <code>onErrorReturn</code>, <code>onErrorResume</code> &amp; <code>retry</code>
 section: 14
 crumb: onErrorResume
-prev: spaceBy.html
-prevLabel: spaceBy
+prev: retryOn.html
+prevLabel: retryOn
 next: share.html
 nextLabel: share
 ---

@@ -7,8 +7,8 @@ section: 14
 crumb: mergeMap
 prev: switchMap.html
 prevLabel: switchMap
-next: race.html
-nextLabel: race
+next: switchLatest.html
+nextLabel: switchLatest
 ---
   <p class="hero-sub">"지난 이벤트가 아직 실행 중인데 새 이벤트가 도착했다"에 대한 나머지 세 가지 답: 전부 실행하거나, 순서대로 실행하거나, 새 것을 무시하거나.</p>
 

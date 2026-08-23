@@ -5,8 +5,8 @@ description: FxDart FxEvents.race 튜토리얼: 먼저 내보내는 스트림이
 heading: <code>race</code>
 section: 14
 crumb: race
-prev: mergeMap.html
-prevLabel: mergeMap
+prev: mergeScan.html
+prevLabel: mergeScan
 next: waitAll.html
 nextLabel: waitAll
 ---

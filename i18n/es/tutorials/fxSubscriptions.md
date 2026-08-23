@@ -5,6 +5,8 @@ description: Tutorial de FxSubscriptions en FxDart: guarda muchas suscripciones 
 heading: <code>FxSubscriptions</code>
 section: 14
 crumb: FxSubscriptions
+nextLabel: materialize
+next: materialize.html
 prev: liveValue.html
 prevLabel: LiveValue
 ---

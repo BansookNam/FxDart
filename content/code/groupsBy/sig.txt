@@ -1,0 +1,6 @@
+class GroupedEvents&lt;K, T&gt; {
+  final K key;
+  final FxEvents&lt;T&gt; events;
+}
+
+FxEvents&lt;GroupedEvents&lt;K, T&gt;&gt; FxEvents&lt;T&gt;.groupsBy&lt;K&gt;(K Function(T value) keyOf, {Stream&lt;void&gt; Function(K key)? lastFor}) // chain (events)

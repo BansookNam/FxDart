@@ -5,8 +5,8 @@ description: Tutorial de sampleOn en FxDart: emite el valor más reciente de la 
 heading: <code>sampleOn</code>
 section: 14
 crumb: sampleOn
-prev: fxEvents.html
-prevLabel: fxEvents
+prev: whenComplete.html
+prevLabel: whenComplete
 next: combineLatest.html
 nextLabel: combineLatest
 ---

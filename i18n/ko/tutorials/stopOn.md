@@ -5,8 +5,8 @@ description: FxDart stopOn 튜토리얼: 다른 스트림이 발화하면 이벤
 heading: <code>stopOn</code> &amp; <code>startOn</code>
 section: 14
 crumb: stopOn
-prev: waitAll.html
-prevLabel: waitAll
+prev: combine.html
+prevLabel: combine
 next: chunkOn.html
 nextLabel: chunkOn
 ---

@@ -27,7 +27,17 @@ Future<void> main() async {
   print(await b); // [10, 20]
   print('map ran $runs times for 2 listeners'); // 2, not 4
 
-  // The upstream chain is single-subscription, so it cannot be re-run:
-  // when the last listener leaves, the shared stream closes for good.
-  print(await shared.toList()); // [] — this listener came too late
+  // After the source completes, a later listener is handed a closed
+  // stream. reset: true (the default) only resubscribes when the last
+  // listener left BEFORE complete — and only if the source allows a
+  // second listen. share(reset: false) is the old forever-closed
+  // behaviour even on a mid-run cancel.
+  print(await shared.toList()); // [] — the source already completed
+
+  // fromIterable completes, so the second listen is empty even with
+  // reset: true. A cancel-before-complete on a re-listenable source
+  // would start a fresh run instead.
+  final finished = fxEvents(Stream.fromIterable([7, 8])).share();
+  print(await finished.toList()); // [7, 8]
+  print(await finished.toList()); // []
 }

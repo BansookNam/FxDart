@@ -1,0 +1,15 @@
+class ReplayValue&lt;T&gt; {
+  ReplayValue({int? size = 1, Duration? maxAge});
+  void add(T value);
+  FxEvents&lt;T&gt; get live;          // buffer, then live updates
+  Future&lt;void&gt; close();
+}
+class CompletionValue&lt;T&gt; {
+  CompletionValue();
+  void add(T value);             // remembered, emitted on close
+  FxEvents&lt;T&gt; get live;
+  Future&lt;void&gt; close();
+}
+ConnectableEvents&lt;T&gt; FxEvents&lt;T&gt;.connectable()
+FxEvents&lt;T&gt; ConnectableEvents&lt;T&gt;.refCount()
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.shareReplay({int? size, Duration? maxAge, bool resetOnCancel = true})

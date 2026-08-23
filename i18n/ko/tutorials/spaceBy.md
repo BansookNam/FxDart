@@ -5,10 +5,10 @@ description: FxDart spaceBy 튜토리얼: 하나도 버리지 않고 버스트�
 heading: <code>delay</code>, <code>spaceBy</code> &amp; <code>sample</code>
 section: 14
 crumb: spaceBy
-prev: chunkOn.html
-prevLabel: chunkOn
-next: onErrorResume.html
-nextLabel: onErrorResume
+prev: groupsBy.html
+prevLabel: groupsBy
+next: debounceOn.html
+nextLabel: debounceOn
 ---
   <p class="hero-sub">이벤트를 시간축에서 옮기는 세 가지 방법: 전부 미루거나, 넓게 펼치거나, 고정된 시계로 최신 것만 읽거나.</p>
 

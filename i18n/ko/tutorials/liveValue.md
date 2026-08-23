@@ -5,8 +5,8 @@ description: FxDart LiveValue 튜토리얼: 구독자를 거느린 현재 값 �
 heading: <code>LiveValue</code>
 section: 14
 crumb: LiveValue
-prev: share.html
-prevLabel: share
+prev: shareReplay.html
+prevLabel: shareReplay
 next: fxSubscriptions.html
 nextLabel: FxSubscriptions
 ---

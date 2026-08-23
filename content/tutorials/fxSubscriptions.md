@@ -7,6 +7,8 @@ section: 14
 crumb: FxSubscriptions
 prev: liveValue.html
 prevLabel: LiveValue
+next: materialize.html
+nextLabel: materialize
 ---
   <p class="hero-sub">A bag of subscriptions, cancelled together — so teardown is one call instead of one field per stream.</p>
 

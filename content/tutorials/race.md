@@ -5,8 +5,8 @@ description: FxDart FxEvents.race tutorial: the first stream to emit wins and ev
 heading: <code>race</code>
 section: 14
 crumb: race
-prev: mergeMap.html
-prevLabel: mergeMap
+prev: mergeScan.html
+prevLabel: mergeScan
 next: waitAll.html
 nextLabel: waitAll
 ---

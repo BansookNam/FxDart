@@ -7,6 +7,8 @@ section: 14
 crumb: FxSubscriptions
 prev: liveValue.html
 prevLabel: LiveValue
+next: materialize.html
+nextLabel: materialize
 ---
   <p class="hero-sub">함께 취소되는 구독 자루 — 스트림마다 필드 하나가 아니라 정리는 호출 한 번.</p>
 

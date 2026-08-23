@@ -7,8 +7,8 @@ section: 14
 crumb: mergeMap
 prev: switchMap.html
 prevLabel: switchMap
-next: race.html
-nextLabel: race
+next: switchLatest.html
+nextLabel: switchLatest
 ---
   <p class="hero-sub">Tres respuestas más a «llegó un evento mientras el anterior sigue en marcha»: ejecutarlos todos, ejecutarlos en orden, o ignorar el nuevo.</p>
 

@@ -1,4 +1,11 @@
-FxAsyncIterable&lt;T&gt; fromStream&lt;T&gt;(Stream&lt;T&gt; stream)
-FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)          // chain, wraps fromStream
-Stream&lt;T&gt; FxAsyncIterableToStream.toStream&lt;T&gt;()   // extension on FxAsyncIterable
-Stream&lt;T&gt; FxAsync.toStream()                        // chain
+FxAsyncIterable&lt;T&gt; fromStream&lt;T&gt;(Stream&lt;T&gt; stream)              // lossless FIFO + pause
+FxAsyncIterable&lt;T&gt; fromStreamLatest&lt;T&gt;(Stream&lt;T&gt; stream)        // drop superseded
+FxAsyncIterable&lt;List&lt;T&gt;&gt; fromStreamChunked&lt;T&gt;(Stream&lt;T&gt; stream) // batches
+FxAsyncIterable&lt;T&gt; fromStreamNext&lt;T&gt;(Stream&lt;T&gt; stream)          // demand-gated drop
+FxAsync&lt;T&gt; fxStream&lt;T&gt;(Stream&lt;T&gt; stream)                       // chain, wraps fromStream
+Stream&lt;T&gt; FxAsyncIterableToStream.toStream&lt;T&gt;()                // extension on FxAsyncIterable
+Stream&lt;T&gt; FxAsync.toStream()                                   // chain
+FxAsync&lt;T&gt; FxEvents.pull()                                     // = fromStream
+FxAsync&lt;T&gt; FxEvents.pullLatest()                               // = fromStreamLatest
+FxAsync&lt;List&lt;T&gt;&gt; FxEvents.pullChunked()                        // = fromStreamChunked
+FxAsync&lt;T&gt; FxEvents.pullNext()                                 // = fromStreamNext

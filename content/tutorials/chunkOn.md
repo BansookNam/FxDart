@@ -7,8 +7,8 @@ section: 14
 crumb: chunkOn
 prev: stopOn.html
 prevLabel: stopOn
-next: spaceBy.html
-nextLabel: spaceBy
+next: windowOn.html
+nextLabel: windowOn
 ---
   <p class="hero-sub">Collect events into lists — by count, by a trigger, or by a clock — so a chatty stream becomes a few batched calls.</p>
 

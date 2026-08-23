@@ -1,0 +1,5 @@
+FxEvents&lt;T&gt; FxEvents&lt;Stream&lt;T&gt;&gt;.switchLatest()
+FxEvents&lt;T&gt; FxEvents&lt;Stream&lt;T&gt;&gt;.flattenMerge({int? concurrent})
+FxEvents&lt;T&gt; FxEvents&lt;Stream&lt;T&gt;&gt;.flattenConcat()
+FxEvents&lt;T&gt; FxEvents&lt;Stream&lt;T&gt;&gt;.exhaustLatest()
+FxEvents&lt;T&gt; concatEager&lt;T&gt;(Iterable&lt;Stream&lt;T&gt;&gt; sources)

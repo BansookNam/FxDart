@@ -5,8 +5,8 @@ description: FxDart fxEvents 튜토리얼: 이벤트 계층 — 평범한 Dart S
 heading: <code>fxEvents</code>
 section: 14
 crumb: fxEvents
-next: sampleOn.html
-nextLabel: sampleOn
+next: fxEventsCreate.html
+nextLabel: fxEventsCreate
 ---
   <p class="hero-sub">평범한 Dart <code>Stream</code>을 체이닝 가능한 <code>FxEvents</code>로 감쌉니다 — FxDart push 세계로 들어가는 입구입니다.</p>
 

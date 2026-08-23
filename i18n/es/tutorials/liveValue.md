@@ -5,8 +5,8 @@ description: Tutorial de LiveValue en FxDart: un valor actual con suscriptores â
 heading: <code>LiveValue</code>
 section: 14
 crumb: LiveValue
-prev: share.html
-prevLabel: share
+prev: shareReplay.html
+prevLabel: shareReplay
 next: fxSubscriptions.html
 nextLabel: FxSubscriptions
 ---

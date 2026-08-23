@@ -1,0 +1,5 @@
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.retryOnError({int? count, Duration Function(int attempt)? delay}) // chain (events)
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.retryOn(Stream&lt;void&gt; Function(FxEvents&lt;Object&gt; errors) notifier)
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.repeat({int? count, Duration Function(int repeatCount)? delay})
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.repeatOn(Stream&lt;void&gt; Function(FxEvents&lt;void&gt; completions) notifier)
+FxEvents&lt;T&gt; FxEvents&lt;T&gt;.whenComplete(void Function() callback)
