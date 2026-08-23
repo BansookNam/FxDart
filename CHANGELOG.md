@@ -1,3 +1,155 @@
+## 0.8.8
+
+0.8.7 gave the chain a getter spelling and fused two lazy stage boundaries.
+This release is mostly about a different surface: the **events layer** —
+`FxEvents`, the push half of the library that sits on a Dart `Stream` — grows
+from a partial catalog into one that covers the jobs an Rx user actually asks
+for. Seventy-eight new entry points, twelve of them constructors, and one
+existing operator changes behaviour.
+
+Two smaller, independent halves ship alongside it: `sortBy` stops paying
+`compareTo` per decision on ordinary double keys, and `sequenceEqual` arrives
+on the strict surface. And the release itself is now performed by a tag —
+`dart pub publish` is not run by hand any more.
+
+### The events layer, by group
+
+Everything below is new. The naming rule from 0.8.7 holds throughout: an
+operator that takes a *selector* returning a `Stream` is spelled `xOn`, one
+that takes a fixed shape is spelled plainly, and the `FxEvents` wrapper is
+what they hang off.
+
+| group | entry points |
+|---|---|
+| constructors | `FxEvents.value` `.empty` `.never` `.error` `.fromFuture` `.periodic` `.timer` `.defer` `.generate` `.fromPattern` `.using` `.create` |
+| shaping | `peek` `takeWhile` `dropWhile` `skipWhile` `takeUntilInclusive` `takeRight` `dropRight` `whereType` `cast` `expand` `uniq` |
+| lifetime | `handleError` `timeout` `whenComplete` `ifEmpty` `defaultIfEmpty` `throwIfEmpty` `startWithAll` `endWith` `endWithAll` |
+| terminals | `drain` `last` `nth` `any` `every` `fold` `reduce` `forEach` |
+| combining | `switchLatest` `flattenMerge` `flattenConcat` `exhaustLatest` `zipAll` `withLatestFromAll` `connect` · top-level `combine` `concatEager` |
+| selector timing | `debounceOn` `throttleOn` `delayOn` |
+| retry / repeat | `retryOn` `retryOnError` `repeat` `repeatOn` |
+| windowing | `windowOn` `windowCount` `windowEvery` `windowToggle` `windowWhen` `chunkToggle` `groupsBy` |
+| scan | `mergeScan` `switchScan` `expandEach` |
+| notification | `materialize` `dematerialize` `sequenceEqual` |
+| sharing | `connectable` `refCount` `shareReplay` |
+| pulling a `Stream` | `pullLatest` `pullChunked` `pullNext` · top-level `fromStreamLatest` `fromStreamChunked` `fromStreamNext` |
+
+New public types: `EventEmitter`, `StreamEvent` / `Next` / `Err` / `Done`,
+`GroupedEvents`, `ConnectableEvents`, `CombineSpec`, `ReplayValue`,
+`CompletionValue`.
+
+This landed as one PR rather than a dozen, which is against this repository's
+own preference for small ones. The reason is that the operators share the
+naming rule, the lifetime rules and the wrapper: split, `main` would have
+carried a half-catalog whose second half redefined what the first half meant.
+
+### `share()` behaves differently, and that is the break
+
+`share({bool reset = true})`. The default **resubscribes** when the last
+listener leaves *before* the source completes. 0.8.7 closed forever on the
+first cancel; `share(reset: false)` is that old path, kept and spelled.
+
+What changes for existing code:
+
+- A widget that cancelled and came back expecting a dead stream now sees a
+  **new run** of the source.
+- After a *successful* complete, a later listener is still handed a closed
+  stream — completion is not undone by `reset`.
+- A `Stream.fromIterable` that already finished still looks empty on the
+  second listen, because the source itself is spent.
+
+`retryOn` / `repeat` re-listen the same `Stream`, so a spent
+single-subscription `StreamController` still cannot be replayed. That is
+documented rather than worked around: use `FxEvents.defer`, `Stream.multi`,
+or `FxEvents.retry(factory)`.
+
+Window and `groupsBy` inners **complete silently** when the outer is
+cancelled, following RxJS 9 rather than raising `ObjectUnsubscribedError`.
+
+### Four named ways to pull a `Stream`
+
+`fromStream` pauses the subscription and never drops. The three additions name
+the other policies, so the choice is at the call site instead of in a comment:
+
+| | while the consumer is between pulls |
+|---|---|
+| `fromStreamLatest` | each arrival replaces the single unread slot — a same-turn burst yields only its last value |
+| `fromStreamChunked` | arrivals accumulate and are yielded together as a list; empty lists are never yielded |
+| `fromStreamNext` | arrivals are **dropped**; only values that land while a pull is waiting are yielded |
+
+`fromStreamNext` can yield nothing at all from a synchronously completing
+source, which finishes before the first demand slot is installed. That is the
+policy, not a bug.
+
+### `sequenceEqual` on the strict surface
+
+`sequenceEqual(a, b, [eq])` and `sequenceEqualAsync`, with chain methods on
+both `Fx` and `FxAsync`, and `FxEvents.sequenceEqual` for the push side. After
+Rx's operator of the same name; the optional `eq` replaces `==`.
+
+### `sortBy` on double keys: a VM compare instead of `compareTo`
+
+`paginated-products` sat at 1.18× behind native. Its filter is already the
+SDK's `where().toList()`, so what was left is `sortBy`'s stable merge of ~900k
+double keys. Two changes, neither of which touches a public spelling:
+
+1. The merge's destination buffer is `List.filled` with a dummy rather than
+   `List.of(items)`. The first pass overwrites every slot, so that copy was
+   wasted work.
+2. Ordinary finite double keys compare with `<=` / `>=` — a VM compare —
+   instead of `compareTo`, with ascending and descending as separate inner
+   loops so the direction branch runs once per merge block rather than once
+   per decision.
+
+**The total order is still the contract.** `<=` does not agree with
+`compareTo` on NaN or on `-0.0`, so the extraction loop tests for both while
+each key is already in a register, and one such key anywhere drops the whole
+array back onto `compareTo`. This is not hypothetical: `sortBy((x) => -x.key)`
+is this repository's own descending spelling, and negating a `0.0` key
+produces `-0.0`, so a single zero-valued row is enough to lose the fast path —
+correctly, but silently.
+
+Paired A/B against `main`, `--rounds 20`, `--scale full`. Two clean-control
+readings of `paginated-products`: **−5.49%** and **−5.67%**. `top-expenses`
+read −2.79%. No other measured case moved past 3%.
+
+Rejected, with the readings that rejected them: an `Object?` workspace to skip
+the covariant `[]=` (**+5%** here), and `vm:prefer-inline` on the extract loop
+(−7% here, but **+21%** on `top-expenses`).
+
+### The release is a tag now
+
+`.github/workflows/publish.yml` publishes to pub.dev on a `v*.*.*` tag, over
+OIDC — no credential is stored in the repository. A guard job runs first: the
+tag must equal `pubspec.yaml`'s version, `CHANGELOG.md` must carry a section
+for it, and `dart analyze lib` + `dart test` must pass on that exact commit,
+because a tag need not sit on a commit that ever went through `main`.
+
+This exists because thirty versions were on pub.dev and four of them had a
+tag. `0.8.6` cannot be checked out, `git diff v0.8.5..v0.8.6` does not
+resolve, and a bisect for a perf regression had no range to walk.
+`CONTRIBUTING.md` now walks the whole path, from topic PRs to the tag.
+
+### Documentation
+
+Eleven new 101 pages — `combine`, `debounceOn`, `fxEventsCreate`, `groupsBy`,
+`materialize`, `mergeScan`, `retryOn`, `shareReplay`, `switchLatest`,
+`whenComplete`, `windowOn` — with Korean overlays in the same commit, and the
+four `fromStream*` policies added to the Stream bridges page. `share.md` now
+teaches the `reset` contract instead of documenting 0.8.7's close-forever
+behaviour as a feature.
+
+### What is deliberately not here
+
+No second `Observable` type, no `SchedulerLike`, no `rxjs/ajax` or WebSocket
+wrappers, and no `combineLatest2…9` — `combine` takes a list of specs instead.
+`animationFrames` stays out of core, since it needs Flutter and `dart:ui`.
+`observeOn` / `subscribeOn` are skipped until an example demands them.
+
+**The events layer carries no performance claim.** Nothing in it was
+A/B-measured; the only measured change in this release is `sortBy`. The
+`RxDartComparison` bars are unchanged.
+
 ## 0.8.7
 
 0.8.6 measured what a *strict* terminal costs when it hides the caller's
