@@ -5,8 +5,8 @@ description: Tutorial de stopOn en FxDart: termina una cadena de eventos cuando 
 heading: <code>stopOn</code> &amp; <code>startOn</code>
 section: 14
 crumb: stopOn
-prev: waitAll.html
-prevLabel: waitAll
+prev: combine.html
+prevLabel: combine
 next: chunkOn.html
 nextLabel: chunkOn
 ---

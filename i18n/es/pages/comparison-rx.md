@@ -75,14 +75,18 @@ description: 50 tareas reales resueltas dos veces —streams de RxDart frente a 
     combineLatest, switchMap, race, un <code>LiveValue</code> — sobre
     streams de Dart llanos, de modo que las parejas temporales de la
     Parte&nbsp;4 se encuentran como iguales, operador por operador.
-    El catálogo de RxDart sigue siendo mucho más amplio, y más allá de
-    esos verbos cotidianos sigue siendo la herramienta a la que acudir.
-    Lo que las parejas exponen es la otra mitad de la historia — cuántas veces un
-    problema que se resuelve con un stream es en realidad un
-    <em>pipeline de datos</em> disfrazado de stream: una descarga
-    acotada, una transformación por lotes, un rastreo paginado. Para esos,
-    la versión pull es más corta, ordenada, tipada y no necesita ciclo de
-    vida de suscripción alguno.
+    RxDart sigue teniendo una jerarquía de clases Subject y sobrecargas
+    con sufijo de aridad <code>combineLatest2…9</code>; fxdart cubre los
+    <em>trabajos</em> sobre streams de Dart llanos sin chocar con rxdart
+    en el mismo fichero — ventanas, <code>groupsBy</code> en vivo,
+    <code>shareReplay</code>, debounce guiado por selector,
+    <code>combine</code>, las cuatro políticas pull
+    <code>fromStream*</code>. Lo que las parejas exponen es la otra
+    mitad de la historia — cuántas veces un problema que se resuelve con
+    un stream es en realidad un <em>pipeline de datos</em> disfrazado de
+    stream: una descarga acotada, una transformación por lotes, un
+    rastreo paginado. Para esos, la versión pull es más corta, ordenada,
+    tipada y no necesita ciclo de vida de suscripción alguno.
   </p>
 
   <p>

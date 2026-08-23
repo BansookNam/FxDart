@@ -5,8 +5,8 @@ description: Tutorial de onErrorResume en FxDart: sustituye un valor por cada er
 heading: <code>onErrorReturn</code>, <code>onErrorResume</code> &amp; <code>retry</code>
 section: 14
 crumb: onErrorResume
-prev: spaceBy.html
-prevLabel: spaceBy
+prev: retryOn.html
+prevLabel: retryOn
 next: share.html
 nextLabel: share
 ---

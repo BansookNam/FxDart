@@ -7,8 +7,8 @@ section: 14
 crumb: chunkOn
 prev: stopOn.html
 prevLabel: stopOn
-next: spaceBy.html
-nextLabel: spaceBy
+next: windowOn.html
+nextLabel: windowOn
 ---
   <p class="hero-sub">Recoge eventos en listas — por cantidad, por disparador o por reloj — para que un stream parlanchín se convierta en unas pocas llamadas agrupadas.</p>
 

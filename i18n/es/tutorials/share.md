@@ -7,8 +7,8 @@ section: 14
 crumb: share
 prev: onErrorResume.html
 prevLabel: onErrorResume
-next: liveValue.html
-nextLabel: LiveValue
+next: shareReplay.html
+nextLabel: shareReplay
 ---
   <p class="hero-sub">Una ejecución de la cadena, muchos oyentes — y la versión que recuerda su último valor para quien llegue tarde.</p>
 
@@ -32,20 +32,28 @@ nextLabel: LiveValue
     de debounce, un socket, un map caro: uno de cada, no uno por suscriptor.
   </p>
   <p>
-    Hay un límite que conviene decir claramente, porque el <code>share</code>
-    de Rx no lo tiene. Rx se resuscribe cuando el número de oyentes vuelve a
-    cero y luego sube otra vez; aquí <strong>no puede</strong>, porque la
-    cadena de aguas arriba es de suscripción única y no hay una segunda
-    ejecución que dar. Así que cuando se va el último oyente, la fuente se
-    cancela y el stream compartido se cierra para siempre: a un oyente que
-    llegue después se le entrega un stream ya cerrado en vez de una ejecución
-    nueva. Engancha todos los oyentes antes del primer evento, o mantén uno
-    vivo.
+    <code>share({reset: true})</code> — el valor por defecto — ahora coincide
+    con el reset por recuento de Rx. Cuando el último oyente se va
+    <strong>antes de que la fuente haya completado</strong>, la suscripción
+    de aguas arriba se cancela y el siguiente oyente empieza una suscripción
+    nueva. Después de que la fuente <strong>completa</strong>, a un oyente
+    tardío se le sigue entregando un stream cerrado.
+    <code>share(reset: false)</code> es el comportamiento de 0.8.7: la
+    última cancelación cierra para siempre. Una resuscripción necesita una
+    fuente que permita un segundo listen —
+    <code>Stream.fromIterable</code>, <code>Stream.multi</code>,
+    <code>FxEvents.defer</code>, un broadcast — un
+    <code>StreamController</code> de suscripción única ya gastado sigue
+    sin poder volver a escucharse. Engancha todos los oyentes antes del
+    primer evento si la fuente es de un solo disparo, o mantén uno vivo.
   </p>
   <p>
     <code>share()</code> tampoco <em>recuerda</em>: un oyente que llega
-    después de que haya pasado un evento simplemente se lo ha perdido. Cuando
-    los rezagados necesitan el estado actual —que es casi toda la UI—,
+    después de que haya pasado un evento simplemente se lo ha perdido. Para
+    una ventana de historial,
+    <code><a href="shareReplay.html">shareReplay</a></code> es la página
+    siguiente. Cuando los rezagados necesitan el estado actual —que es
+    casi toda la UI—,
     <code><a href="liveValue.html">LiveValue</a></code> es la respuesta, y
     <code>LiveValue.from(source)</code> / <code>LiveValue.seededFrom(seed,
     source)</code> construyen uno directamente desde un stream. Esos son
@@ -70,6 +78,7 @@ nextLabel: LiveValue
 
   <div class="callout">
     <strong>Relacionado:</strong>
+    <a href="shareReplay.html"><code>shareReplay</code></a> — multicast que recuerda un búfer de historial ·
     <a href="liveValue.html"><code>LiveValue</code></a> — el compartir que recuerda: los suscriptores tardíos reciben primero el valor actual ·
     <a href="tee.html"><code>tee</code></a> — la respuesta del lado pull a dos lectores sobre una pasada, sin búfer ·
     <a href="fork.html"><code>fork</code></a> — dos cursores pull independientes sobre una fuente, a costa de un búfer

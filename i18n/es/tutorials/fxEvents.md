@@ -5,8 +5,8 @@ description: Tutorial de fxEvents en FxDart: la capa de eventos — un wrapper e
 heading: <code>fxEvents</code>
 section: 14
 crumb: fxEvents
-next: sampleOn.html
-nextLabel: sampleOn
+next: fxEventsCreate.html
+nextLabel: fxEventsCreate
 ---
   <p class="hero-sub">Envuelve un <code>Stream</code> normal de Dart en un <code>FxEvents</code> encadenable: la puerta de entrada al lado push de FxDart.</p>
 

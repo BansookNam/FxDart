@@ -38,6 +38,31 @@ nextLabel: concurrent
     paralelismo ocurra de verdad; la conversión a stream por sí sola no lo
     añade.
   </p>
+  <p>
+    Cruzar de push a pull no es una operación: son cuatro, porque un
+    stream puede seguir emitiendo mientras el consumidor está ocupado.
+    RxJS 9 nombra las cuatro <code>iterateEach</code>,
+    <code>iterateLatest</code>, <code>iterateBuffered</code> e
+    <code>iterateNext</code>. FxDart las mapea a
+    <code>fromStream*</code> (iterable crudo) y
+    <code>FxEvents.pull*</code> (cadena):
+  </p>
+  <table>
+    <thead><tr><th>RxJS 9</th><th>FxDart</th><th>mientras estás ocupado</th></tr></thead>
+    <tbody>
+      <tr><td><code>iterateEach</code></td><td><code>fromStream</code> / <code>.pull()</code></td><td>FIFO sin pérdidas — pausa la fuente, encola cada valor</td></tr>
+      <tr><td><code>iterateLatest</code></td><td><code>fromStreamLatest</code> / <code>.pullLatest()</code></td><td>descarta lo superado — quédate solo con el no leído más nuevo</td></tr>
+      <tr><td><code>iterateBuffered</code></td><td><code>fromStreamChunked</code> / <code>.pullChunked()</code></td><td>lote — emite las llegadas como una lista</td></tr>
+      <tr><td><code>iterateNext</code></td><td><code>fromStreamNext</code> / <code>.pullNext()</code></td><td>descarte por demanda — ignora lo que llegó sin un pull esperando</td></tr>
+    </tbody>
+  </table>
+  <p>
+    <code>fromStream</code> es el valor por defecto y el que usa la Demo 1,
+    porque un fichero o un socket no deberían perder bytes. Usa latest
+    cuando una UI solo le importa la lectura actual, chunked cuando el
+    consumidor quiere trabajo en lotes, y next cuando los eventos viejos
+    son peores que los huecos.
+  </p>
 
   <h2>Demo 1 · fromStream y fxStream</h2>
   <p>Ambos envuelven un <code>Stream.fromIterable</code> para que puedas pasar
@@ -53,6 +78,19 @@ nextLabel: concurrent
     <code>.toStream()</code>:
   </p>
   {{playground:1}}
+
+  <h2>Demo 3 · Cuatro formas de tirar de un stream</h2>
+  <p>
+    Un ráfaga síncrona de 1, 2, 3 llega mientras un pull ya está
+    esperando. <code>fromStream</code> conserva cada valor;
+    <code>fromStreamLatest</code> conserva solo el más nuevo;
+    <code>fromStreamChunked</code> los emite como una lista;
+    <code>fromStreamNext</code> conserva solo el valor que encontró el
+    pull en espera. Las grafías de la cadena de eventos son
+    <code>.pull()</code>, <code>.pullLatest()</code>,
+    <code>.pullChunked()</code>, <code>.pullNext()</code>.
+  </p>
+  {{playground:3}}
 
   <h2>Dos cadenas, un Stream</h2>
   <p>
@@ -76,9 +114,11 @@ nextLabel: concurrent
     la cadena pull, porque <code>concurrent(n)</code> solo significa algo
     cuando el consumidor controla la demanda. Si la pregunta es <em>«¿con qué
     frecuencia, y cuál gana?»</em> quieres la cadena de eventos. Empieza por
-    cualquiera y cruza — <code>.pull()</code> convierte un
-    <code>FxEvents</code> en la cadena pull y <code>.toStream()</code> devuelve
-    un <code>FxAsync</code> a <code>Stream</code>.
+    cualquiera y cruza —
+    <code>.pull()</code> / <code>.pullLatest()</code> /
+    <code>.pullChunked()</code> / <code>.pullNext()</code> convierten un
+    <code>FxEvents</code> en la cadena pull, <code>.toStream()</code> convierte
+    un <code>FxAsync</code> de nuevo en un <code>Stream</code>.
   </p>
   <p>
     Lecciones completas: <a href="fxEvents.html"><code>fxEvents</code></a> para
@@ -97,5 +137,6 @@ nextLabel: concurrent
     <a href="toAsync.html"><code>toAsync</code></a> — eleva un Iterable normal en su lugar ·
     <a href="asyncVariants.html">variantes asíncronas</a> — la convención de nombres *Async ·
     <a href="concurrent.html"><code>concurrent</code></a> — aplícalo antes de toStream() para tener paralelismo real ·
-    <a href="concurrentPool.html"><code>concurrentPool</code></a> — variante por orden de finalización
+    <a href="concurrentPool.html"><code>concurrentPool</code></a> — variante por orden de finalización ·
+    <a href="fxEvents.html"><code>fxEvents</code></a> — la cadena push; <code>.pull()</code> / <code>.pullLatest()</code> / <code>.pullChunked()</code> / <code>.pullNext()</code> cruzan de vuelta
   </div>
