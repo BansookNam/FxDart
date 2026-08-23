@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/BansookNam/FxDart/main/docs/assets/logo-web.png" alt="FxDart" width="380">
+<img src="https://bansooknam.github.io/FxDart/assets/logo-web.png" alt="FxDart" width="380">
 
 # fxdart
 
