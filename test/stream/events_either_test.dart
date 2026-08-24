@@ -300,6 +300,24 @@ void main() {
         equals(const Right<String, Either<String, int>>(Right<String, int>(2))),
       );
     });
+
+    test('flattenEither collapses attempt-after-mapEither', () async {
+      final out = await fxEvents(Stream.fromIterable([1, 2]))
+          .mapEither<String, int>((r, v) {
+            if (v == 1) throw StateError('boom');
+            return r.ensureNotNull(v, () => 'null');
+          })
+          .attempt<String>((e, _) => 'thrown')
+          .flattenEither()
+          .toList();
+      expect(
+        out,
+        equals([
+          const Left<String, int>('thrown'),
+          const Right<String, int>(2),
+        ]),
+      );
+    });
   });
 
   group('mapEitherAsync', () {
@@ -504,6 +522,13 @@ void main() {
               (c) => c.rights(),
               (c) => c.lefts(),
               (c) => c.raiseLefts(),
+              (c) => c.mapRight((v) => v),
+              (c) => c.mapLeft((e) => e),
+              (c) => c.filterOrElse((v) => v > 0, (v) => 'no: $v'),
+              (c) => c.alt(() => const Right(0)),
+              (c) => c.orElse((e) => Left('wrapped: $e')),
+              (c) => c.recover((r, e) => 0),
+              (c) => c.getOrElse((e) => -1),
             ]) {
           var cancelled = false;
           final c = StreamController<Either<String, int>>(
@@ -523,6 +548,19 @@ void main() {
       expect(chain.rights().stream.isBroadcast, isTrue);
       expect(chain.lefts().stream.isBroadcast, isTrue);
       expect(chain.raiseLefts().stream.isBroadcast, isTrue);
+      expect(chain.mapRight((v) => v).stream.isBroadcast, isTrue);
+      expect(chain.mapLeft((e) => e).stream.isBroadcast, isTrue);
+      expect(
+        chain.filterOrElse((v) => v > 0, (v) => 'no: $v').stream.isBroadcast,
+        isTrue,
+      );
+      expect(chain.alt(() => const Right(0)).stream.isBroadcast, isTrue);
+      expect(
+        chain.orElse((e) => Left('wrapped: $e')).stream.isBroadcast,
+        isTrue,
+      );
+      expect(chain.recover((r, e) => 0).stream.isBroadcast, isTrue);
+      expect(chain.getOrElse((e) => -1).stream.isBroadcast, isTrue);
       final (failures, successes) = chain.separated();
       expect(failures.stream.isBroadcast, isFalse);
       expect(successes.stream.isBroadcast, isFalse);
@@ -707,6 +745,261 @@ void main() {
       await done.future;
       expect(seen, isNotNull);
       expect(seen, isNot(StackTrace.empty));
+    });
+  });
+
+  group('mapRight / mapLeft', () {
+    final source = <Either<String, int>>[
+      const Right(1),
+      const Left('a'),
+      const Right(2),
+    ];
+
+    test('mapRight transforms only Right', () async {
+      expect(
+        await fxEvents(
+          Stream.fromIterable(source),
+        ).mapRight((v) => v * 10).toList(),
+        equals([
+          const Right<String, int>(10),
+          const Left<String, int>('a'),
+          const Right<String, int>(20),
+        ]),
+      );
+    });
+
+    test('mapLeft transforms only Left', () async {
+      expect(
+        await fxEvents(
+          Stream.fromIterable(source),
+        ).mapLeft((e) => e.length).toList(),
+        equals([
+          const Right<int, int>(1),
+          const Left<int, int>(1),
+          const Right<int, int>(2),
+        ]),
+      );
+    });
+
+    test(
+      'a throwing mapper errors that event and the chain continues',
+      () async {
+        final signals = await drain(
+          fxEvents(Stream.fromIterable(source)).mapRight((v) {
+            if (v == 1) throw StateError('boom');
+            return v;
+          }),
+        );
+        expect(signals.map((s) => s.$1), equals(['error', 'data', 'data']));
+        expect(signals[0].$2, isA<StateError>());
+        expect(signals[1].$2, equals(const Left<String, int>('a')));
+        expect(signals[2].$2, equals(const Right<String, int>(2)));
+      },
+    );
+
+    test('a source error passes through untouched', () async {
+      final c = StreamController<Either<String, int>>();
+      final signals = drain(fxEvents(c.stream).mapRight((v) => v));
+      c
+        ..add(const Right(1))
+        ..addError('boom')
+        ..add(const Left('a'));
+      await c.close();
+      expect(
+        await signals,
+        equals([
+          data(const Right<String, int>(1)),
+          err('boom'),
+          data(const Left<String, int>('a')),
+        ]),
+      );
+    });
+
+    test('empty source closes without a value', () async {
+      expect(
+        await fxEvents(
+          const Stream<Either<String, int>>.empty(),
+        ).mapRight((v) => v).toList(),
+        isEmpty,
+      );
+    });
+  });
+
+  group('filterOrElse', () {
+    test('demotes a failing Right, keeps a passing Right and a Left', () async {
+      expect(
+        await fxEvents(
+          Stream.fromIterable(<Either<String, int>>[
+            const Right(2),
+            const Right(3),
+            const Left('a'),
+          ]),
+        ).filterOrElse((n) => n.isEven, (n) => 'odd: $n').toList(),
+        equals([
+          const Right<String, int>(2),
+          const Left<String, int>('odd: 3'),
+          const Left<String, int>('a'),
+        ]),
+      );
+    });
+
+    test('predicate never runs on a Left', () async {
+      var ran = 0;
+      await fxEvents(
+        Stream.fromIterable(<Either<String, int>>[const Left('a')]),
+      ).filterOrElse((n) {
+        ran++;
+        return n.isEven;
+      }, (n) => 'odd: $n').toList();
+      expect(ran, equals(0));
+    });
+  });
+
+  group('alt / orElse / recover', () {
+    test('alt replaces each Left and skips Right', () async {
+      var calls = 0;
+      expect(
+        await fxEvents(
+          Stream.fromIterable(<Either<String, int>>[
+            const Right(1),
+            const Left('a'),
+            const Left('b'),
+          ]),
+        ).alt(() {
+          calls++;
+          return const Right(0);
+        }).toList(),
+        equals([
+          const Right<String, int>(1),
+          const Right<String, int>(0),
+          const Right<String, int>(0),
+        ]),
+      );
+      expect(calls, equals(2));
+    });
+
+    test('orElse sees the failure and may change its type', () async {
+      expect(
+        await fxEvents(
+          Stream.fromIterable(<Either<String, int>>[
+            const Right(1),
+            const Left('boom'),
+          ]),
+        ).orElse<int>((e) => Left(e.length)).toList(),
+        equals([const Right<int, int>(1), const Left<int, int>(4)]),
+      );
+    });
+
+    test('orElse can recover into a Right', () async {
+      expect(
+        await fxEvents(
+          Stream.fromIterable(<Either<String, int>>[const Left('boom')]),
+        ).orElse<String>((e) => Right(0)).toList(),
+        equals([const Right<String, int>(0)]),
+      );
+    });
+
+    test('recover returns a value or raises a new failure type', () async {
+      expect(
+        await fxEvents(
+          Stream.fromIterable(<Either<String, int>>[
+            const Right(1),
+            const Left('ab'),
+            const Left('x'),
+          ]),
+        ).recover<int>((r, e) {
+          if (e.length == 1) r.raise(e.length);
+          return e.length;
+        }).toList(),
+        equals([
+          const Right<int, int>(1),
+          const Right<int, int>(2),
+          const Left<int, int>(1),
+        ]),
+      );
+    });
+
+    test('a throwing recover stays on the error channel', () async {
+      final signals = await drain(
+        fxEvents(
+          Stream.fromIterable(<Either<String, int>>[
+            const Left('a'),
+            const Right(2),
+          ]),
+        ).recover<String>((r, e) {
+          throw StateError(e);
+        }),
+      );
+      expect(signals.map((s) => s.$1), equals(['error', 'data']));
+      expect(signals[0].$2, isA<StateError>());
+      expect(signals[1].$2, equals(const Right<String, int>(2)));
+    });
+  });
+
+  group('getOrElse', () {
+    test('unwraps Right, substitutes for Left', () async {
+      expect(
+        await fxEvents(
+          Stream.fromIterable(<Either<String, int>>[
+            const Right(1),
+            const Left('a'),
+            const Right(2),
+          ]),
+        ).getOrElse((e) => e.length).toList(),
+        equals([1, 1, 2]),
+      );
+    });
+
+    test(
+      'a throwing orElse errors that event and the chain continues',
+      () async {
+        final signals = await drain(
+          fxEvents(
+            Stream.fromIterable(<Either<String, int>>[
+              const Left('a'),
+              const Right(2),
+            ]),
+          ).getOrElse((e) => throw StateError(e)),
+        );
+        expect(signals.map((s) => s.$1), equals(['error', 'data']));
+        expect(signals[0].$2, isA<StateError>());
+        expect(signals[1].$2, equals(2));
+      },
+    );
+  });
+
+  group('flattenEither', () {
+    test('outer Left stays Left; inner Either is returned as-is', () async {
+      expect(
+        await fxEvents(
+          Stream.fromIterable(<Either<String, Either<String, int>>>[
+            const Left('outer'),
+            const Right(Left('inner')),
+            const Right(Right(7)),
+          ]),
+        ).flattenEither().toList(),
+        equals([
+          const Left<String, int>('outer'),
+          const Left<String, int>('inner'),
+          const Right<String, int>(7),
+        ]),
+      );
+    });
+
+    test('empty source closes without a value', () async {
+      expect(
+        await fxEvents(
+          const Stream<Either<String, Either<String, int>>>.empty(),
+        ).flattenEither().toList(),
+        isEmpty,
+      );
+    });
+
+    test('keeps broadcast', () {
+      final c =
+          StreamController<Either<String, Either<String, int>>>.broadcast();
+      addTearDown(c.close);
+      expect(fxEvents(c.stream).flattenEither().stream.isBroadcast, isTrue);
     });
   });
 }

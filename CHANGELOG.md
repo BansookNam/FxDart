@@ -1,5 +1,12 @@
 ## 0.8.10
 
+Events-layer `Either`, on the value channel: `mapRight` / `mapLeft`,
+`filterOrElse`, `alt` / `orElse` / `recover`, `getOrElse`, and
+`flattenEither` (the nest `attempt` after `mapEither` produces). Each
+is per-event — a `Left` is replaced, not a stream switch. The
+boundary pair `attempt` / `raiseLefts` and the extracts `rights` /
+`lefts` / `separated` landed in #22 on this same unreleased version.
+
 Docs playground: a DartPad DDC upgrade (3.12.2 → 3.13.1) left native
 comparison prebuilts — keyed `nolib`+source, so they never rotate with the
 library — running on a newer `dart_sdk_new.js`. The first symptom was
