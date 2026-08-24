@@ -5,8 +5,8 @@ description: FxDart share 튜토리얼: 여러 리스너가 이벤트 체인 한
 heading: <code>share</code> &amp; <code>LiveValue.from</code>
 section: 14
 crumb: share
-prev: onErrorResume.html
-prevLabel: onErrorResume
+prev: separated.html
+prevLabel: separated
 next: shareReplay.html
 nextLabel: shareReplay
 ---

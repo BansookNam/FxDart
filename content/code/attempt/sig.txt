@@ -1,0 +1,2 @@
+FxEvents&lt;Either&lt;E, T&gt;&gt; FxEvents&lt;T&gt;.attempt&lt;E&gt;(E Function(Object error, StackTrace stackTrace) onThrow)
+FxEvents&lt;R&gt; FxEvents&lt;Either&lt;L, R&gt;&gt;.raiseLefts()   // L extends Object

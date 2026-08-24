@@ -1,0 +1,3 @@
+FxEvents&lt;R&gt; FxEvents&lt;Either&lt;L, R&gt;&gt;.rights()
+FxEvents&lt;L&gt; FxEvents&lt;Either&lt;L, R&gt;&gt;.lefts()
+(FxEvents&lt;L&gt; failures, FxEvents&lt;R&gt; successes) FxEvents&lt;Either&lt;L, R&gt;&gt;.separated()

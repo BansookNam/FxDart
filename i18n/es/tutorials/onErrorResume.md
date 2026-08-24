@@ -7,8 +7,8 @@ section: 14
 crumb: onErrorResume
 prev: retryOn.html
 prevLabel: retryOn
-next: share.html
-nextLabel: share
+next: attempt.html
+nextLabel: attempt
 ---
   <p class="hero-sub">Tres profundidades de recuperación: parchear cada error con un valor, abandonar la fuente por una alternativa, o tirar el stream entero y reconstruirlo.</p>
 

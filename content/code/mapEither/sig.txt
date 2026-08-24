@@ -1,0 +1,2 @@
+FxEvents&lt;Either&lt;E, R&gt;&gt; FxEvents&lt;T&gt;.mapEither&lt;E, R&gt;(R Function(Raise&lt;E&gt; r, T value) f)
+FxEvents&lt;Either&lt;E, R&gt;&gt; FxEvents&lt;T&gt;.mapEitherAsync&lt;E, R&gt;(FutureOr&lt;R&gt; Function(Raise&lt;E&gt; r, T value) f)

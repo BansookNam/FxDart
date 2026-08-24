@@ -7,8 +7,8 @@ section: 14
 crumb: onErrorResume
 prev: retryOn.html
 prevLabel: retryOn
-next: share.html
-nextLabel: share
+next: attempt.html
+nextLabel: attempt
 ---
   <p class="hero-sub">복구의 세 깊이: 에러마다 값으로 때우거나, 소스를 버리고 대체물로 갈아타거나, 스트림 전체를 버리고 다시 만들거나.</p>
 

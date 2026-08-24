@@ -79,5 +79,6 @@ nextLabel: the naming rationale
     <a href="accumulate.html">accumulation</a> — the scope-level fail-slow vocabulary ·
     <a href="concurrent.html"><code>concurrent</code></a> — the back-channel the async variant rides ·
     <a href="partition.html"><code>partition</code></a> — <code>separated()</code>'s predicate cousin ·
+    <a href="separated.html"><code>rights</code> / <code>separated</code></a> — the same extracts on an event chain ·
     <a href="typedErrors.html">typed errors — full guide</a>
   </div>

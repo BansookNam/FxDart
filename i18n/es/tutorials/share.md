@@ -5,8 +5,8 @@ description: Tutorial de share en FxDart: deja que muchos oyentes consuman una s
 heading: <code>share</code> &amp; <code>LiveValue.from</code>
 section: 14
 crumb: share
-prev: onErrorResume.html
-prevLabel: onErrorResume
+prev: separated.html
+prevLabel: separated
 next: shareReplay.html
 nextLabel: shareReplay
 ---

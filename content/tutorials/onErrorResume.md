@@ -7,8 +7,8 @@ section: 14
 crumb: onErrorResume
 prev: retryOn.html
 prevLabel: retryOn
-next: share.html
-nextLabel: share
+next: attempt.html
+nextLabel: attempt
 ---
   <p class="hero-sub">Three depths of recovery: patch each error with a value, abandon the source for a fallback, or throw the whole stream away and rebuild it.</p>
 
@@ -52,10 +52,11 @@ nextLabel: share
   <p>
     fxdart events layer, after Rx's <code>onErrorReturn</code>,
     <code>onErrorResume</code> and <code>Rx.retry</code>. For failures
-    you want to <em>model</em> rather than recover from, the pull side's
-    <code><a href="either.html">Either</a></code> and
-    <code><a href="raise.html">Raise</a></code> make them values with
-    types — see <a href="either.html">Typed errors</a>.
+    you want to <em>model</em> rather than recover from,
+    <code><a href="attempt.html">attempt</a></code> moves them onto the
+    value channel as a typed <code>Left</code> — the events-layer
+    bridge to <code><a href="either.html">Either</a></code> and
+    <code><a href="raise.html">Raise</a></code>.
   </p>
 
   <h2>Demo 1 · A value per error</h2>
@@ -71,6 +72,6 @@ nextLabel: share
   <div class="callout">
     <strong>Related:</strong>
     <a href="retry.html"><code>retry</code></a> — the pull-layer original, with a backoff hook and per-element scope ·
-    <a href="either.html"><code>Either</code></a> — errors as typed values rather than events to recover from ·
-    <a href="race.html"><code>race</code></a> — a candidate that errors first wins with its error
+    <a href="attempt.html"><code>attempt</code></a> — the same failures, as typed <code>Left</code>s on the value channel ·
+    <a href="either.html"><code>Either</code></a> — errors as typed values rather than events to recover from
   </div>
