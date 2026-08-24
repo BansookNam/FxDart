@@ -70,9 +70,10 @@ extension FxEventsTypedErrors<T> on FxEvents<T> {
   /// A *thrown* exception stays on the error channel — that is the [either]
   /// builder's contract, and it keeps [attempt] the single place where a
   /// throw turns into a value. Chaining `attempt` after this one does catch
-  /// the throw, at the cost of a nested `Either<E, Either<E, R>>` this layer
-  /// has no flatten step for; when a callback both raises and throws, prefer
-  /// [eitherCatching] inside [mapEither] so one [Either] comes out.
+  /// the throw, wrapping the result in `Either<E, Either<E, R>>`;
+  /// [FxEventsFlattenEither.flattenEither] collapses that nest. When a
+  /// callback both raises and throws, prefer [eitherCatching] inside
+  /// [mapEither] so one [Either] comes out without the extra hop.
   FxEvents<Either<E, R>> mapEither<E, R>(R Function(Raise<E> r, T value) f) =>
       FxEvents(stream.map((v) => either<E, R>((r) => f(r, v))));
 
@@ -128,6 +129,67 @@ extension FxEventsEitherOps<L, R> on FxEvents<Either<L, R>> {
     ).partition((e) => e is Left<L, R>);
     return (failures.lefts(), successes.rights());
   }
+
+  /// Transforms each success; a [Left] passes through unchanged.
+  ///
+  /// Named [mapRight] rather than `map` so it does not shadow
+  /// [FxEvents.map], which maps the [Either] as a whole.
+  FxEvents<Either<L, R2>> mapRight<R2>(R2 Function(R value) f) =>
+      FxEvents(stream.map((e) => e.map(f)));
+
+  /// Transforms each failure; a [Right] passes through unchanged.
+  FxEvents<Either<L2, R>> mapLeft<L2>(L2 Function(L value) f) =>
+      FxEvents(stream.map((e) => e.mapLeft(f)));
+
+  /// Demotes a [Right] whose value fails [predicate] to a [Left] built by
+  /// [onFalse] — the events twin of [Either.filterOrElse].
+  ///
+  /// A [Left] passes through untouched and [predicate] never runs. Applied
+  /// per event: two failing [Right]s produce two [Left]s, they do not
+  /// cancel the source.
+  FxEvents<Either<L, R>> filterOrElse(
+    bool Function(R value) predicate,
+    L Function(R value) onFalse,
+  ) => FxEvents(stream.map((e) => e.filterOrElse(predicate, onFalse)));
+
+  /// Keeps each [Right]; replaces each [Left] with the result of [other].
+  ///
+  /// Per event, not a stream switch — [other] runs once per [Left] and is
+  /// skipped on [Right]. The failure is discarded; use [orElse] when the
+  /// fallback depends on what went wrong, and [FxEvents.onErrorResume]
+  /// when a failure on the *error* channel should abandon the source.
+  FxEvents<Either<L, R>> alt(Either<L, R> Function() other) =>
+      FxEvents(stream.map((e) => e.alt(other)));
+
+  /// Like [alt], but [other] receives the failure and may return a
+  /// different failure type.
+  FxEvents<Either<L2, R>> orElse<L2>(Either<L2, R> Function(L left) other) =>
+      FxEvents(stream.map((e) => e.orElse(other)));
+
+  /// Recovers from each [Left] inside a fresh raise scope: [transform]
+  /// may return a replacement success or `r.raise` a new failure of type
+  /// `L2` — the events twin of [Either.recover].
+  ///
+  /// A *thrown* exception stays on the error channel, as with [mapEither].
+  FxEvents<Either<L2, R>> recover<L2>(
+    R Function(Raise<L2> r, L error) transform,
+  ) => FxEvents(stream.map((e) => e.recover(transform)));
+
+  /// Unwraps each [Right], or the result of [orElse] applied to the
+  /// [Left] — leaves the value channel as `R`, discarding the [Either]
+  /// wrapper. A throwing [orElse] becomes an error event.
+  FxEvents<R> getOrElse(R Function(L left) orElse) =>
+      FxEvents(stream.map((e) => e.getOrElse(orElse)));
+}
+
+/// Collapses `Either<L, Either<L, R>>` produced by wrapping an already-
+/// Either chain — typically [FxEventsTypedErrors.attempt] after
+/// [FxEventsTypedErrors.mapEither].
+extension FxEventsFlattenEither<L, R> on FxEvents<Either<L, Either<L, R>>> {
+  /// Flattens one nest: an outer [Left] stays a [Left], an inner
+  /// [Either] is returned as-is.
+  FxEvents<Either<L, R>> flattenEither() =>
+      FxEvents(stream.map((e) => e.flatMap((inner) => inner)));
 }
 
 /// Puts a typed failure back on the error channel — the direction opposite to
