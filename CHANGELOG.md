@@ -1,5 +1,10 @@
 ## 0.8.10
 
+`parallel(n, worker)` — the CPU twin of `concurrent(n)`. A reused pool
+of `n` isolates, source order kept, top-level/static worker only.
+Capturing closures throw at spawn. Unsupported on the web (use
+`concurrent`). `workers == 1` still leaves the main isolate.
+
 Events-layer `Either`, on the value channel: `mapRight` / `mapLeft`,
 `filterOrElse`, `alt` / `orElse` / `recover`, `getOrElse`, and
 `flattenEither` (the nest `attempt` after `mapEither` produces). Each

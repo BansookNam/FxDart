@@ -7,8 +7,8 @@ section: 11
 crumb: using
 prev: timeout.html
 prevLabel: timeout
-next: debounce.html
-nextLabel: debounce
+next: parallel.html
+nextLabel: parallel
 ---
   <p class="hero-sub">Scopes a resource to one iteration: acquired on the first pull, released exactly once — on completion <em>or</em> on error.</p>
 

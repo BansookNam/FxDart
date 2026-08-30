@@ -7,8 +7,8 @@ section: 11
 crumb: using
 prev: timeout.html
 prevLabel: timeout
-next: debounce.html
-nextLabel: debounce
+next: parallel.html
+nextLabel: parallel
 ---
   <p class="hero-sub">Acota un recurso a una iteración: adquirido en el primer pull, liberado exactamente una vez — al completar <em>o</em> ante un error.</p>
 

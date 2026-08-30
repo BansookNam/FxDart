@@ -6,6 +6,7 @@ import 'lazy/combine.dart' as l;
 import 'lazy/effect.dart' as l;
 import 'lazy/filter.dart' as l;
 import 'lazy/map.dart' as l;
+import 'lazy/parallel.dart' as l;
 import 'lazy/take_drop.dart' as l;
 import 'lazy/zip.dart' as l;
 import 'strict/access.dart' as s;
@@ -393,6 +394,13 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   @pragma('vm:prefer-inline')
   FxAsync<R> mapConcurrent<R>(int concurrency, FutureOr<R> Function(T a) f) =>
       FxAsync(l.mapConcurrent(concurrency, f, _inner));
+
+  /// CPU-bound twin of [mapConcurrent]: runs [worker] on a pool of
+  /// [workers] isolates, preserving source order. [worker] must be a
+  /// top-level or static function. Throws [UnsupportedError] on the web.
+  @pragma('vm:prefer-inline')
+  FxAsync<R> parallel<R>(int workers, R Function(T input) worker) =>
+      FxAsync(l.parallel(workers, worker, _inner));
 
   /// Switches to the async chain and maps [f], retrying each call up to
   /// [attempts] times (with optional [delay] backoff) before the error
@@ -1004,6 +1012,11 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   @pragma('vm:prefer-inline')
   FxAsync<R> mapConcurrent<R>(int concurrency, FutureOr<R> Function(T a) f) =>
       FxAsync(l.mapConcurrentAsync(concurrency, f, _inner));
+
+  /// CPU-bound twin of [mapConcurrent] for an async source. See [Fx.parallel].
+  @pragma('vm:prefer-inline')
+  FxAsync<R> parallel<R>(int workers, R Function(T input) worker) =>
+      FxAsync(l.parallelAsync(workers, worker, _inner));
 
   /// Like [concurrent] but yields in completion order.
   @pragma('vm:prefer-inline')
