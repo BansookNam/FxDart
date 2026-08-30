@@ -58,25 +58,39 @@ const chainRoots = {'fx', 'fxAsync', 'fxStream', 'fxEvents'};
 
 const chainRootGetters = {'fx', 'fxAsync', 'fxEvents', 'fxLive'};
 
-/// Walks [node] up looking for a function expression that is the first
-/// argument of a call named in [names].
+/// Nearest function expression, if it is a callback of a call in [names].
+/// Stops at that function — nested `map`/`where` closures do not match.
 FunctionExpression? enclosingNamedCallback(AstNode node, Set<String> names) {
   AstNode? current = node;
   while (current != null) {
+    if (current is FunctionExpression) return _namedCallback(current, names);
+    current = current.parent;
+  }
+  return null;
+}
+
+/// Walks past nested closures to any ancestor callback named in [names].
+FunctionExpression? ancestorNamedCallback(AstNode node, Set<String> names) {
+  AstNode? current = node;
+  while (current != null) {
     if (current is FunctionExpression) {
-      final argList = current.parent;
-      final call = argList is ArgumentList ? argList.parent : null;
-      if (call is MethodInvocation && names.contains(call.methodName.name)) {
-        return current;
-      }
-      if (call is FunctionExpressionInvocation) {
-        final fn = call.function;
-        if (fn is SimpleIdentifier && names.contains(fn.name)) {
-          return current;
-        }
-      }
+      final match = _namedCallback(current, names);
+      if (match != null) return match;
     }
     current = current.parent;
+  }
+  return null;
+}
+
+FunctionExpression? _namedCallback(FunctionExpression fn, Set<String> names) {
+  final argList = fn.parent;
+  final call = argList is ArgumentList ? argList.parent : null;
+  if (call is MethodInvocation && names.contains(call.methodName.name)) {
+    return fn;
+  }
+  if (call is FunctionExpressionInvocation) {
+    final name = call.function;
+    if (name is SimpleIdentifier && names.contains(name.name)) return fn;
   }
   return null;
 }

@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -21,13 +22,19 @@ class AvoidLazyReturnFromRaise extends DartLintRule {
     CustomLintContext context,
   ) {
     context.registry.addReturnStatement((node) {
-      if (enclosingNamedCallback(node, raiseBuilders) == null) return;
-      final expr = node.expression;
-      if (expr == null) return;
-      if (!isFxChain(expr)) return;
-      final last = lastMethodName(expr);
-      if (last != null && chainTerminals.contains(last)) return;
-      reporter.atNode(node, _code);
+      _maybeReport(node, node.expression, reporter);
     });
+    context.registry.addExpressionFunctionBody((node) {
+      _maybeReport(node.expression, node.expression, reporter);
+    });
+  }
+
+  void _maybeReport(AstNode at, Expression? expr, DiagnosticReporter reporter) {
+    if (enclosingNamedCallback(at, raiseBuilders) == null) return;
+    if (expr == null) return;
+    if (!isFxChain(expr)) return;
+    final last = lastMethodName(expr);
+    if (last != null && chainTerminals.contains(last)) return;
+    reporter.atNode(at, _code);
   }
 }

@@ -22,6 +22,7 @@ class AttemptAfterRetry extends DartLintRule {
     context.registry.addMethodInvocation((node) {
       final name = node.methodName.name;
       if (name != 'retryOn' && name != 'retryOnError') return;
+      if (!isFxChain(node)) return;
       if (targetChainContains(node, 'attempt')) {
         reporter.atNode(node.methodName, _code);
       }

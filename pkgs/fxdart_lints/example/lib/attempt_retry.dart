@@ -16,3 +16,10 @@ FxEvents<Either<String, int>> after() {
 FxEvents<int> retryOnly() {
   return fxEvents(Stream<int>.empty()).retryOnError();
 }
+
+class Http {
+  Http attempt() => this;
+  Http retryOnError() => this;
+}
+
+Http unrelated() => Http().attempt().retryOnError();

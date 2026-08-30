@@ -22,18 +22,21 @@ class AvoidBareCatchInRaise extends DartLintRule {
     CustomLintContext context,
   ) {
     context.registry.addCatchClause((node) {
-      if (enclosingNamedCallback(node, raiseBuilders) == null) return;
-      if (_isSafeOnException(node)) return;
+      if (ancestorNamedCallback(node, raiseBuilders) == null) return;
+      if (!_swallowsRaiseSignal(node)) return;
       reporter.atNode(node, _code);
     });
   }
 
-  bool _isSafeOnException(CatchClause node) {
+  /// The raise signal is an [Error]. Bare catch / `on Object` / `on Error` /
+  /// `on dynamic` swallow it. `on Exception` and specific subtypes
+  /// (`on FormatException`) do not.
+  bool _swallowsRaiseSignal(CatchClause node) {
     final type = node.exceptionType;
-    if (type == null) return false;
+    if (type == null) return true;
     if (type is NamedType) {
       final name = type.name.lexeme;
-      return name == 'Exception';
+      return name == 'Object' || name == 'Error' || name == 'dynamic';
     }
     return false;
   }

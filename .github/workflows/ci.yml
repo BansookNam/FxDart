@@ -47,9 +47,9 @@ jobs:
         run: |
           dart pub get
           dart analyze lib
+          dart test
           dart pub get --directory example
           cd example && dart run custom_lint
-
 
       # Regenerates the single-file playground build and analyzes it. This is
       # the only check that sees wrapper drift in tools/build_single_file.sh.

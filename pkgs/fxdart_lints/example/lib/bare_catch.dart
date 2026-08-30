@@ -26,6 +26,23 @@ Either<String, int> onException() => either((r) {
   }
 });
 
+Either<String, int> onError() => either((r) {
+  try {
+    return int.parse('x');
+    // expect_lint: avoid_bare_catch_in_raise
+  } on Error {
+    r.raise('bad');
+  }
+});
+
+Either<String, int> onSpecific() => either((r) {
+  try {
+    return int.parse('x');
+  } on FormatException {
+    r.raise('bad');
+  }
+});
+
 int outside() {
   try {
     return 1;
