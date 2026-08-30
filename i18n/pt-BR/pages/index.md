@@ -27,6 +27,13 @@ description: FxDart é uma biblioteca de programação funcional para Dart, port
     </a>
   </p>
 
+  <p>
+    <a class="demo-cta cta-compare-rx" href="RxDartComparison/">
+      <span class="demo-cta-emoji">⚡</span>
+      RxDart vs FxDart — push vs pull, 50 vereditos honestos&nbsp;→
+    </a>
+  </p>
+
   {{playground:0}}
   <p class="dim">▲ Isto está ao vivo — edite o código e pressione <strong>Executar</strong>.
     Ele compila com o compilador Dart de verdade e executa no seu navegador.</p>
@@ -52,6 +59,11 @@ description: FxDart é uma biblioteca de programação funcional para Dart, port
       vez, mantendo os resultados em ordem. É o recurso mais marcante do FxTS,
       portado fielmente para Dart.</li>
   </ul>
+  <p>
+    Eventos no tempo, e falhas como valores, vivem nas outras duas superfícies.
+    <a href="{{root}}tutorials/whichSurface.html">Qual superfície?</a> é a
+    decisão; esta página continua sendo a de marketing.
+  </p>
 
   <h2>Por que precisamos disso?</h2>
   <p>

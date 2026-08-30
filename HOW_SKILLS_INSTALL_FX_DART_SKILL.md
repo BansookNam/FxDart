@@ -21,9 +21,13 @@ That's all. `fxdart` is simply a **package name published to pub.dev**, and it w
 
 ```
 skills/
-└── fxdart-pipelines/
-    ├── SKILL.md               ← convention: <skill-name>/SKILL.md
-    └── references/api-reference.md
+├── fxdart-pipelines/
+│   ├── SKILL.md               ← convention: <skill-name>/SKILL.md
+│   └── references/
+├── fxdart-events/
+│   └── SKILL.md
+└── fxdart-typed-errors/
+    └── SKILL.md
 ```
 
 Because the layout is a convention, `skills get <name>` works for **any** package that bundles a `skills/` directory — not just fxdart.

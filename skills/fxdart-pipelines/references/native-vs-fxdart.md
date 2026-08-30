@@ -105,13 +105,14 @@ passes with hand-negated predicates (which drift apart under maintenance).
 final (refunds, charges) = fx(txns).partition((t) => t.amount < 0);
 ```
 
-## 5. Stream buffering (`fxStream` + `chunk`)
+## 5. Stream buffering (`fromStream` + `chunk`)
 
 Recognize: `await for` with a manual buffer list that flushes at size N, or
-a custom `StreamTransformer` for windowing.
+a custom `StreamTransformer` for windowing. This is a Stream *used as a
+list* — pull it. Time-shaped work (debounce, switchMap) is `fxEvents`.
 
 ```dart
-final alerts = fxStream(sensorEvents)
+final alerts = fromStream(sensorEvents)
     .chunk(5)                       // windows of 5
     .filter((w) => avg(w) > limit)
     .map(formatAlert)

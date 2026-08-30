@@ -27,6 +27,13 @@ description: FxDart — библиотека функционального пр
     </a>
   </p>
 
+  <p>
+    <a class="demo-cta cta-compare-rx" href="RxDartComparison/">
+      <span class="demo-cta-emoji">⚡</span>
+      RxDart vs FxDart — push vs pull, 50 честных вердиктов&nbsp;→
+    </a>
+  </p>
+
   {{playground:0}}
   <p class="dim">▲ Это живой пример — измените код и нажмите <strong>Запустить</strong>.
     Он компилируется настоящим компилятором Dart и выполняется в вашем браузере.</p>
@@ -52,6 +59,11 @@ description: FxDart — библиотека функционального пр
       за раз, сохраняя порядок результатов. Это фирменная возможность FxTS,
       точно перенесённая в Dart.</li>
   </ul>
+  <p>
+    События во времени и отказы как значения живут на двух других слоях.
+    <a href="{{root}}tutorials/whichSurface.html">Какой слой?</a> — это
+    решение; эта страница остаётся маркетинговой.
+  </p>
 
   <h2>Зачем это нужно?</h2>
   <p>

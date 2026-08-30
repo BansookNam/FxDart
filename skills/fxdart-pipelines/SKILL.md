@@ -1,6 +1,6 @@
 ---
 name: fxdart-pipelines
-description: Use when writing Dart that transforms collections/Iterables, runs many Futures with a concurrency limit, processes Streams, or implements multi-step data-flow logic (group, batch, zip, running state). Replaces hand-rolled loops, Future.wait, and nested Stream transforms with fxdart's lazy, type-safe pipelines.
+description: Use when writing Dart that transforms collections/Iterables, runs many Futures with a concurrency limit, or implements multi-step data-flow logic (group, batch, zip, running state). Replaces hand-rolled loops, Future.wait, and manual worker pools with fxdart's lazy, type-safe pull pipelines. For debounce/switchMap/Stream-over-time, load fxdart-events instead.
 ---
 
 # fxdart pipelines
@@ -25,11 +25,19 @@ Reach for fxdart instead of hand-rolled code whenever the task involves:
   time, keep the results in order" — this is `concurrent(n)`, fxdart's
   signature feature. Do NOT write `Future.wait` + manual batching or a
   hand-rolled semaphore.
-- **Streams**: transform a `Stream` with rich operators via `fxStream(...)`,
-  and go back with `.toStream()`.
+- **A `Stream` used as a list** (paginate, bound, batch): pull it with
+  `fromStream` / `.pull()` and stay on this skill. **Events over time**
+  (debounce, switchMap, combineLatest) belong to the sibling
+  **`fxdart-events`** skill — do not reach for `fxStream` as the push
+  entry; that is a leftover alias. Use `fxEvents(stream)` / `.fxEvents`.
 - **Complex flow logic**: grouping, batching, windowing, running state
   (`scan`), pairing sources (`zip`), splitting one pass into two results
   (`partition`), early termination (`takeWhile`/`takeUntilInclusive`).
+
+Which surface? Data in hand → `fx()`. I/O over a collection, at most n
+in flight → `mapConcurrent` / `concurrent(n)`. Values arrive when they
+arrive → **`fxdart-events`**. Failures the caller handles →
+**`fxdart-typed-errors`**, on whichever surface you are already on.
 
 ## When plain Dart wins — do NOT wrap these
 
@@ -59,7 +67,9 @@ apply, write plain Dart.
 ## Core model
 
 1. Start a chain: `fx(iterable)` (sync), `fx(iterable).toAsync()` or
-   `fxAsync(fxAsyncIterable)` (async), `fxStream(stream)` (from a Stream).
+   `fxAsync(fxAsyncIterable)` (async). A `Stream` that is *demand* (you
+   pull pages, you bound fetches) crosses with `fromStream` / `.pull()`.
+   A `Stream` that is *time* is `fxEvents` — other skill.
 2. Chain lazy operators (`map`, `filter`, `take`, ...). **Nothing executes
    yet** — operators only build the pipeline.
 3. Finish with a terminal operator (`toList`, `fold`, `groupBy`, `each`,
@@ -150,14 +160,14 @@ concurrency back-channel that push-based `Stream`s cannot express — that is
 why the library doesn't build on `Stream`. Bridge when you need to:
 
 ```dart
-// Stream in → rich operators → Stream out.
-final out = fxStream(inputStream)
+// Stream used as a list → pull, then the operator set, then back.
+final out = fromStream(inputStream)
     .map(parse)
     .filter(valid)
     .chunk(100)
     .toStream();
 
-// toAsync also lifts a Stream or plain Iterable: toAsync(stream).
+// Time-shaped work (debounce, switchMap) is fxEvents — see fxdart-events.
 ```
 
 ## Replace this with that
@@ -169,7 +179,7 @@ final out = fxStream(inputStream)
 | Manual semaphore / batch-of-K loops | `.concurrent(n)` (ordered) or `.concurrentPool(n)` |
 | Nested `if`s building several lists in one loop | `.partition(f)`, `.groupBy(f)` |
 | `Map<K, List<T>>` built by hand with `putIfAbsent` | `.groupBy(f)` |
-| `await for` + manual buffer/batch | `fxStream(s).chunk(n)` |
+| `await for` + manual buffer/batch | `fromStream(s).chunk(n)` (pull) or `fxEvents(s).chunkOn` (time) |
 | break-out-of-loop on condition | `.takeWhile(f)` / `.takeUntilInclusive(f)` / `.find(f)` |
 | `list.toSet().toList()` (loses order? no — but verbose) | `.uniq()` / `.uniqBy(f)` |
 

@@ -59,6 +59,11 @@ description: FxDart es una librería de programación funcional para Dart, porta
       vez manteniendo el orden de los resultados. Es la característica insignia de FxTS,
       portada fielmente a Dart.</li>
   </ul>
+  <p>
+    Los eventos en el tiempo, y los fallos como valores, viven en las otras dos superficies.
+    <a href="{{root}}tutorials/whichSurface.html">¿Qué superficie?</a> es la
+    decisión; esta página sigue siendo la de marketing.
+  </p>
 
   <h2>¿Por qué la necesitamos?</h2>
   <p>

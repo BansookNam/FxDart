@@ -21,9 +21,13 @@ Uma dúvida comum: `skills` é um pacote de terceiros, então **como ele sabe do
 
 ```
 skills/
-└── fxdart-pipelines/
-    ├── SKILL.md               ← convenção: <nome-da-skill>/SKILL.md
-    └── references/api-reference.md
+├── fxdart-pipelines/
+│   ├── SKILL.md               ← convenção: <nome-da-skill>/SKILL.md
+│   └── references/
+├── fxdart-events/
+│   └── SKILL.md
+└── fxdart-typed-errors/
+    └── SKILL.md
 ```
 
 Como o layout é uma convenção, `skills get <nome>` funciona com **qualquer** pacote que empacote um diretório `skills/` — não apenas o fxdart.
