@@ -7,8 +7,8 @@ section: 14
 crumb: onErrorResume
 prev: retryOn.html
 prevLabel: retryOn
-next: share.html
-nextLabel: share
+next: attempt.html
+nextLabel: attempt
 ---
   <p class="hero-sub">복구의 세 깊이: 에러마다 값으로 때우거나, 소스를 버리고 대체물로 갈아타거나, 스트림 전체를 버리고 다시 만들거나.</p>
 
@@ -49,11 +49,12 @@ nextLabel: share
   </p>
   <p>
     fxdart 이벤트 레이어, Rx의 <code>onErrorReturn</code>,
-    <code>onErrorResume</code>, <code>Rx.retry</code>를 따랐습니다.
-    복구할 대상이 아니라 <em>모델링</em>하고 싶은 실패라면, 풀 쪽의
+    <code>onErrorResume</code>와 <code>Rx.retry</code>를 따랐습니다.
+    복구할 대상이 아니라 <em>모델링</em>하고 싶은 실패라면
+    <code><a href="attempt.html">attempt</a></code>가 그것을 값 채널
+    위의 타입 있는 <code>Left</code>로 옮깁니다 — 이벤트 레이어에서
     <code><a href="either.html">Either</a></code>와
-    <code><a href="raise.html">Raise</a></code>가 그것을 타입 있는 값으로
-    만들어 줍니다 — <a href="either.html">타입 있는 에러</a>를 보세요.
+    <code><a href="raise.html">Raise</a></code>로 가는 다리입니다.
   </p>
 
   <h2>데모 1 · 에러마다 값 하나</h2>
@@ -69,6 +70,6 @@ nextLabel: share
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="retry.html"><code>retry</code></a> — 백오프 훅과 원소 단위 범위를 가진 풀 레이어의 원본 ·
-    <a href="either.html"><code>Either</code></a> — 복구할 이벤트가 아니라 타입 있는 값으로서의 에러 ·
-    <a href="race.html"><code>race</code></a> — 먼저 에러를 낸 후보가 그 에러로 이김
+    <a href="attempt.html"><code>attempt</code></a> — 같은 실패를, 값 채널 위의 타입 있는 <code>Left</code>로 ·
+    <a href="either.html"><code>Either</code></a> — 복구할 이벤트가 아니라 타입 있는 값으로서의 에러
   </div>

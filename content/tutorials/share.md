@@ -5,8 +5,8 @@ description: FxDart share tutorial: let many listeners consume one run of an eve
 heading: <code>share</code> &amp; <code>LiveValue.from</code>
 section: 14
 crumb: share
-prev: onErrorResume.html
-prevLabel: onErrorResume
+prev: separated.html
+prevLabel: separated
 next: shareReplay.html
 nextLabel: shareReplay
 ---

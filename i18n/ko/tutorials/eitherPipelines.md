@@ -81,5 +81,6 @@ nextLabel: the naming rationale
     <a href="accumulate.html">에러 누적</a> — 스코프 수준의 fail-slow 어휘 ·
     <a href="concurrent.html"><code>concurrent</code></a> — 비동기 변형이 올라타는 백채널 ·
     <a href="partition.html"><code>partition</code></a> — <code>separated()</code>의 술어 사촌 ·
+    <a href="separated.html"><code>rights</code> / <code>separated</code></a> — 이벤트 체인의 같은 추출 ·
     <a href="typedErrors.html">타입 있는 에러 — 전체 가이드</a>
   </div>
