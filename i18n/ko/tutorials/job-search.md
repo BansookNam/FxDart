@@ -5,6 +5,8 @@ description: 일 튜토리얼: 타이핑이 잦아들 때까지 기다리고, �
 heading: 디바운스 검색
 section: 15
 crumb: debounced search
+prev: materialize.html
+prevLabel: materialize
 next: job-fetch.html
 nextLabel: bounded concurrent fetch
 ---

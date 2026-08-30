@@ -5,6 +5,8 @@ description: A job tutorial: wait for the typing to go quiet, keep only the late
 heading: Debounced search
 section: 15
 crumb: debounced search
+prev: materialize.html
+prevLabel: materialize
 next: job-fetch.html
 nextLabel: bounded concurrent fetch
 ---

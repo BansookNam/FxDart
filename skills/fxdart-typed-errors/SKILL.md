@@ -125,7 +125,7 @@ fx(results).sequence();                            // Either<L, List<R>> — fai
                                                    // (async: stops pulling at first Left)
 
 // Fail-slow concurrent validation, ordered, every failure kept:
-final outcome = await fromStream(records)
+final outcome = await fxStream(records)
     .mapOrAccumulate<String, User>((r, rec) async {
   final parsed = r.ensureNotNull(tryParse(rec), () => 'bad record: $rec');
   return await enrich(parsed);

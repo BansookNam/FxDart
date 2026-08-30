@@ -68,11 +68,11 @@ final results = await fxEvents(keystrokes())
 | `Rx.debounceTime(d)` / `stream.debounceTime(d)` | `fxEvents(s).debounce(d)` |
 | `switchMap(f)` (latest inner wins) | `.switchMap(f)` |
 | `flatMap` / `exhaustMap` / `concatMap` | `.mergeMap` / `.exhaustMap` / `.concatMap` |
-| `combineLatest2(a, b, f)` | `a.combineLatest(b, f)` or `FxEvents.combine` |
+| `combineLatest2(a, b, f)` | `a.combineLatest(b.stream, f)` (other is a `Stream`) or `FxEvents.combineLatestAll` |
 | `rx.whereType<T>()` / `distinctUntilChanged` | `.whereType<T>()` / `.uniqAdjacent()` |
 | `takeUntil(other)` (notifier stream) | `.stopOn(other)` — **not** pull `takeUntil` |
 | `BehaviorSubject` | `LiveValue<T>` |
-| `shareReplay(maxSize: n)` | `.shareReplay(n)` |
+| `shareReplay(maxSize: n)` | `.shareReplay(size: n)` |
 | nested `StreamTransformer` soup | name the job, pick the operator above |
 
 ## Either on the value channel
@@ -101,6 +101,8 @@ operators watch the error channel; a `Left` is not an error event.
   or `FxEvents.retry(factory)`.
 - Pull `takeUntil` is a **predicate**. Events `stopOn` is a notifier
   stream. Mixing them up is the classic rx-refugee bug.
+- **`combineLatest` / `withLatestFrom` take a `Stream`.** If the other
+  side is an `FxEvents`, pass `.stream`.
 
 ## Docs
 

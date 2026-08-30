@@ -26,10 +26,11 @@ Reach for fxdart instead of hand-rolled code whenever the task involves:
   signature feature. Do NOT write `Future.wait` + manual batching or a
   hand-rolled semaphore.
 - **A `Stream` used as a list** (paginate, bound, batch): pull it with
-  `fromStream` / `.pull()` and stay on this skill. **Events over time**
+  `fxStream` / `.pull()` and stay on this skill. `fromStream` is the
+  lower-level iterable (no chain methods). **Events over time**
   (debounce, switchMap, combineLatest) belong to the sibling
   **`fxdart-events`** skill — do not reach for `fxStream` as the push
-  entry; that is a leftover alias. Use `fxEvents(stream)` / `.fxEvents`.
+  entry. Use `fxEvents(stream)` / `.fxEvents`.
 - **Complex flow logic**: grouping, batching, windowing, running state
   (`scan`), pairing sources (`zip`), splitting one pass into two results
   (`partition`), early termination (`takeWhile`/`takeUntilInclusive`).
@@ -68,7 +69,8 @@ apply, write plain Dart.
 
 1. Start a chain: `fx(iterable)` (sync), `fx(iterable).toAsync()` or
    `fxAsync(fxAsyncIterable)` (async). A `Stream` that is *demand* (you
-   pull pages, you bound fetches) crosses with `fromStream` / `.pull()`.
+   pull pages, you bound fetches) crosses with `fxStream` / `.pull()`.
+   `fromStream` is the raw iterable if you don't need chain methods.
    A `Stream` that is *time* is `fxEvents` — other skill.
 2. Chain lazy operators (`map`, `filter`, `take`, ...). **Nothing executes
    yet** — operators only build the pipeline.
@@ -161,7 +163,7 @@ why the library doesn't build on `Stream`. Bridge when you need to:
 
 ```dart
 // Stream used as a list → pull, then the operator set, then back.
-final out = fromStream(inputStream)
+final out = fxStream(inputStream)
     .map(parse)
     .filter(valid)
     .chunk(100)
@@ -179,7 +181,7 @@ final out = fromStream(inputStream)
 | Manual semaphore / batch-of-K loops | `.concurrent(n)` (ordered) or `.concurrentPool(n)` |
 | Nested `if`s building several lists in one loop | `.partition(f)`, `.groupBy(f)` |
 | `Map<K, List<T>>` built by hand with `putIfAbsent` | `.groupBy(f)` |
-| `await for` + manual buffer/batch | `fromStream(s).chunk(n)` (pull) or `fxEvents(s).chunkOn` (time) |
+| `await for` + manual buffer/batch | `fxStream(s).chunk(n)` (pull) or `fxEvents(s).chunkOn` (time) |
 | break-out-of-loop on condition | `.takeWhile(f)` / `.takeUntilInclusive(f)` / `.find(f)` |
 | `list.toSet().toList()` (loses order? no — but verbose) | `.uniq()` / `.uniqBy(f)` |
 
