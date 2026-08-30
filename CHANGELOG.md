@@ -1,5 +1,11 @@
 ## 0.8.10
 
+`fxdart_lints` — a second package, same version, so the core stays
+zero-dep. Four analyzer diagnostics that name the fix: unbounded
+`Future.wait` on a mapped fetch, a bare `catch` inside `either`,
+returning a lazy chain from a raise block, and `attempt` before
+`retryOn`. Dev-dependency only (`custom_lint` + `fxdart_lints`).
+
 Events-layer `Either`, on the value channel: `mapRight` / `mapLeft`,
 `filterOrElse`, `alt` / `orElse` / `recover`, `getOrElse`, and
 `flattenEither` (the nest `attempt` after `mapEither` produces). Each
