@@ -497,6 +497,11 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
   FxAsyncIterator<T> get iterator => _FusedIterator<T>(this);
 }
 
+/// Test hook: whether [it] is a fused iterator that has not dropped to
+/// [legacy]. Not exported from the package.
+bool fusedFallbackIsNull<T>(FxAsyncIterator<T> it) =>
+    it is _FusedIterator<T> && it._fallback == null;
+
 class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
   // The iterable's derived state is lazy (see its constructor), so resolve it
   // once here rather than paying a late-initialisation check on every element.
@@ -553,6 +558,7 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
   }
 
   Future<IterResult<T>> _concurrentMapNext(Concurrent concurrent) {
+    if (_ended) return Future<IterResult<T>>.value(IterResult<T>.done());
     _source ??= _iterable.source.iterator;
     return _source!.next(concurrent).then((rr) {
       if (rr.done) {
