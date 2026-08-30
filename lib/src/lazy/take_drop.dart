@@ -85,10 +85,26 @@ FxAsyncIterable<A> _takeAsyncLegacy<A>(
   return DelegateAsyncIterable(() {
     final iterator = iterable.iterator;
     var remaining = length;
-    return DelegateAsyncIterator((concurrent) {
-      if (remaining-- < 1) return Future.value(IterResult<A>.done());
-      return iterator.next(concurrent);
-    });
+    var cancelled = false;
+    void cancelOnce() {
+      if (cancelled) return;
+      cancelled = true;
+      fxCancel(iterator);
+    }
+
+    return DelegateAsyncIterator(
+      (concurrent) {
+        if (remaining-- < 1) {
+          cancelOnce();
+          return Future.value(IterResult<A>.done());
+        }
+        return iterator.next(concurrent);
+      },
+      cancel: () {
+        cancelOnce();
+        return Future<void>.value();
+      },
+    );
   });
 }
 

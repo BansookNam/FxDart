@@ -21,7 +21,14 @@ void parallelIsolateEntry(List<dynamic> boot) {
     try {
       toMain.send([id, true, worker(input)]);
     } catch (e, st) {
-      toMain.send([id, false, '$e', st.toString()]);
+      // Same isolate group: sendable errors travel as themselves so
+      // `attempt` / `retryOn` can still match on type. Fall back to a
+      // string only when the object is not sendable.
+      try {
+        toMain.send([id, false, e, st]);
+      } catch (_) {
+        toMain.send([id, false, e, st.toString()]);
+      }
     }
   });
 }
@@ -54,7 +61,9 @@ class _ParallelIterable<A, R> implements FxAsyncIterable<R> {
       _ParallelIterator<A, R>(workers, worker, sync?.iterator, async?.iterator);
 }
 
-class _ParallelIterator<A, R> implements FxAsyncIterator<R> {
+class _ParallelIterator<A, R>
+    with FxFastNextGate<R>
+    implements FxFastIterator<R>, StreamPullCancel {
   _ParallelIterator(this._workers, this._worker, this._sync, this._async);
 
   final int _workers;
@@ -65,64 +74,97 @@ class _ParallelIterator<A, R> implements FxAsyncIterator<R> {
   _Pool<A, R>? _pool;
   final Queue<Future<R>> _inflight = Queue<Future<R>>();
   var _sourceDone = false;
-  var _shut = false;
+  var _ended = false;
+  var _cancelled = false;
 
   static final _finalizer = Finalizer<_Pool<dynamic, dynamic>>((p) => p.kill());
 
   @override
-  Future<IterResult<R>> next([Concurrent? concurrent]) async {
-    if (_shut) return IterResult<R>.done();
+  FutureOr<IterResult<R>> nextOr() {
+    if (_ended) return IterResult<R>.done();
+    return _step();
+  }
+
+  Future<IterResult<R>> _step() async {
+    if (_ended) return IterResult<R>.done();
     await _ensurePool();
+    if (_ended) return IterResult<R>.done();
     await _fill();
+    if (_ended) return IterResult<R>.done();
     if (_inflight.isEmpty) {
-      await _shutdown();
+      _shutdown();
       return IterResult<R>.done();
     }
     try {
       final value = await _inflight.removeFirst();
+      if (_ended) return IterResult<R>.done();
       return IterResult<R>.value(value);
     } catch (e, st) {
-      await _shutdown();
+      final cancelled = _cancelled;
+      _shutdown();
+      if (cancelled) return IterResult<R>.done();
       Error.throwWithStackTrace(e, st);
     }
   }
 
   Future<void> _ensurePool() async {
-    if (_pool != null) return;
+    if (_pool != null || _ended) return;
     final pool = await _Pool.spawn<A, R>(_workers, _worker);
+    if (_ended) {
+      pool.kill();
+      return;
+    }
     _pool = pool;
     _finalizer.attach(this, pool, detach: this);
   }
 
   Future<void> _fill() async {
-    final pool = _pool!;
-    while (_inflight.length < _workers && !_sourceDone) {
+    final pool = _pool;
+    if (pool == null || _ended) return;
+    while (_inflight.length < _workers && !_sourceDone && !_ended) {
       if (_sync != null) {
         if (!_sync.moveNext()) {
           _sourceDone = true;
           break;
         }
-        _inflight.add(pool.run(_sync.current));
+        _enqueue(pool.run(_sync.current));
       } else {
         final r = await _async!.next();
+        if (_ended) return;
         if (r.done) {
           _sourceDone = true;
           break;
         }
-        _inflight.add(pool.run(r.value));
+        _enqueue(pool.run(r.value));
       }
     }
   }
 
-  Future<void> _shutdown() async {
-    if (_shut) return;
-    _shut = true;
+  void _enqueue(Future<R> f) {
+    // Kill completes still-pending worker futures; those sitting in
+    // [_inflight] have no listener until a later [nextOr]. [ignore] keeps
+    // that completeError from becoming an unhandled async error.
+    f.ignore();
+    _inflight.add(f);
+  }
+
+  void _shutdown() {
+    if (_ended && _pool == null) return;
+    _ended = true;
     final pool = _pool;
     _pool = null;
     if (pool != null) {
       _finalizer.detach(this);
-      await pool.kill();
+      pool.kill();
     }
+  }
+
+  @override
+  Future<void> cancel() {
+    _cancelled = true;
+    _shutdown();
+    fxCancel(_async);
+    return Future<void>.value();
   }
 }
 
@@ -180,9 +222,15 @@ class _Pool<A, R> {
     }
   }
 
-  Future<void> kill() async {
+  void kill() {
     if (_dead) return;
     _dead = true;
+    while (_waiting.isNotEmpty) {
+      final (_, c) = _waiting.removeFirst();
+      if (!c.isCompleted) {
+        c.completeError(StateError('parallel pool is shut down'));
+      }
+    }
     for (final w in _workers) {
       w.kill();
     }
@@ -233,11 +281,15 @@ class _Iso<A, R> {
     if (c == null || c.isCompleted) return;
     if (ok) {
       c.complete(list[2] as R);
+      return;
+    }
+    final err = list[2];
+    final stack = list[3];
+    final st = stack is StackTrace ? stack : StackTrace.fromString('$stack');
+    if (err is Object && err is! String) {
+      c.completeError(err, st);
     } else {
-      c.completeError(
-        StateError(list[2] as String),
-        StackTrace.fromString(list[3] as String),
-      );
+      c.completeError(StateError('$err'), st);
     }
   }
 

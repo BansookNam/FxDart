@@ -75,21 +75,27 @@ class DelegateAsyncIterable<T> implements FxAsyncIterable<T> {
 }
 
 /// Builds an [FxAsyncIterator] from a `next` closure.
-class DelegateAsyncIterator<T> implements FxAsyncIterator<T> {
+class DelegateAsyncIterator<T> implements FxAsyncIterator<T>, StreamPullCancel {
   final Future<IterResult<T>> Function(Concurrent? concurrent) _next;
+  final Future<void> Function()? _cancel;
 
   /// Wraps a `next` closure as an [FxAsyncIterator].
-  const DelegateAsyncIterator(this._next);
+  const DelegateAsyncIterator(this._next, {Future<void> Function()? cancel})
+    : _cancel = cancel;
 
   @override
   Future<IterResult<T>> next([Concurrent? concurrent]) => _next(concurrent);
+
+  @override
+  Future<void> cancel() => _cancel?.call() ?? Future<void>.value();
 }
 
 /// Serializes overlapping `next()` calls, mimicking the implicit request
 /// queueing of JS async generators. Wrap hand-written sequential state
 /// machines with this so that a concurrent consumer cannot interleave pulls.
-class SerialAsyncIterator<T> implements FxAsyncIterator<T> {
+class SerialAsyncIterator<T> implements FxAsyncIterator<T>, StreamPullCancel {
   final Future<IterResult<T>> Function(Concurrent? concurrent) _inner;
+  final Future<void> Function()? _cancel;
   // The gate of the pull currently in flight, or null when idle. Null lets
   // the common serial consumer (one pull awaited at a time) call [_inner]
   // directly — chaining off an already-completed future would cost a
@@ -97,7 +103,8 @@ class SerialAsyncIterator<T> implements FxAsyncIterator<T> {
   Future<void>? _inFlight;
 
   /// Wraps [_inner], chaining each pull after the previous one settles.
-  SerialAsyncIterator(this._inner);
+  SerialAsyncIterator(this._inner, {Future<void> Function()? cancel})
+    : _cancel = cancel;
 
   @override
   Future<IterResult<T>> next([Concurrent? concurrent]) {
@@ -118,6 +125,9 @@ class SerialAsyncIterator<T> implements FxAsyncIterator<T> {
     _inFlight = gate;
     return result;
   }
+
+  @override
+  Future<void> cancel() => _cancel?.call() ?? Future<void>.value();
 }
 
 /// An empty async iterable.
@@ -496,7 +506,9 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
   FxAsyncIterator<T> get iterator => _FusedIterator<T>(this);
 }
 
-class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
+class _FusedIterator<T>
+    with FxFastNextGate<T>
+    implements FxFastIterator<T>, StreamPullCancel {
   // The iterable's derived state is lazy (see its constructor), so resolve it
   // once here rather than paying a late-initialisation check on every element.
   // Creating an iterator is the point at which the run is definitely going to
@@ -525,6 +537,19 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
 
   /// How many elements the run's [FxTakeStage] (at most one) has passed.
   int _taken = 0;
+
+  void _stop() {
+    if (_ended) return;
+    _ended = true;
+    fxCancel(_source);
+    fxCancel(_fallback);
+  }
+
+  @override
+  Future<void> cancel() {
+    _stop();
+    return Future<void>.value();
+  }
 
   @override
   Future<IterResult<T>> next([Concurrent? concurrent]) {
@@ -589,14 +614,14 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
       if (r is Future<IterResult<Object?>>) {
         return r.then((rr) {
           if (rr.done) {
-            _ended = true;
+            _stop();
             return IterResult<T>.done();
           }
           return _mapFrom(rr.value, _links);
         });
       }
       if (r.done) {
-        _ended = true;
+        _stop();
         return IterResult<T>.done();
       }
       return _mapFrom(r.value, _links);
@@ -658,7 +683,7 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
   /// Applies the stages to one source result; `null` means "filtered out".
   FutureOr<IterResult<T>?> _apply(IterResult<Object?> r) {
     if (r.done) {
-      _ended = true;
+      _stop();
       return IterResult<T>.done();
     }
     return _applyFrom(r.value, _links);
@@ -728,7 +753,7 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
         // would follow it: `take` never pulls past its last element. A later
         // stage may still drop this one — `_pull`'s loop sees `_ended` and
         // answers done without pulling again.
-        if (++_taken >= l.count) _ended = true;
+        if (++_taken >= l.count) _stop();
       } else {
         l as FxTakeWhileLink;
         final k = l.p(v);
@@ -736,12 +761,12 @@ class _FusedIterator<T> with FxFastNextGate<T> implements FxFastIterator<T> {
           final vv = v;
           return k.then<IterResult<T>?>((kk) {
             if (kk) return _applyFrom(vv, next);
-            _ended = true;
+            _stop();
             return IterResult<T>.done();
           });
         }
         if (!k) {
-          _ended = true;
+          _stop();
           return IterResult<T>.done();
         }
       }
@@ -974,12 +999,14 @@ Future<void>? fxFusedDrive<T>(
   void fail(Object e, StackTrace st) {
     if (terminated) return;
     terminated = true;
+    fxCancel(source);
     completer.completeError(e, st);
   }
 
   void finish() {
     if (terminated) return;
     terminated = true;
+    fxCancel(source);
     completer.complete();
   }
 
@@ -1249,11 +1276,21 @@ class _StreamBridgeIterator<T> implements FxFastIterator<T> {
   }
 }
 
-/// Tears down the [StreamSubscription] owned by a `fromStream*` policy
-/// iterator. [fromStream] itself has no cancel — it pauses instead.
+/// Tears down resources owned by an iterator: a `fromStream*` subscription,
+/// or a `parallel` isolate pool. [fromStream] itself has no cancel — it
+/// pauses instead. Early-stop operators (`take`, `head`, `find`) call
+/// [fxCancel] so a [ReceivePort] cannot keep the isolate alive after the
+/// consumer has stopped pulling.
 abstract interface class StreamPullCancel {
-  /// Cancels the source subscription and ends any in-flight pull as done.
+  /// Releases held resources. Idempotent.
   Future<void> cancel();
+}
+
+/// No-op when [it] is not a [StreamPullCancel].
+void fxCancel(Object? it) {
+  if (it is StreamPullCancel) {
+    it.cancel();
+  }
 }
 
 /// Latest-wins pull over a [Stream]. While the consumer is between pulls,
@@ -1570,12 +1607,14 @@ extension FxAsyncIterableToStream<T> on FxAsyncIterable<T> {
 
     void close() {
       stopped = true;
+      fxCancel(iterator);
       controller.close();
     }
 
     void failWith(Object e, StackTrace st) {
       if (stopped) return;
       stopped = true;
+      fxCancel(iterator);
       controller.addError(e, st);
       controller.close();
     }
@@ -1616,6 +1655,7 @@ extension FxAsyncIterableToStream<T> on FxAsyncIterable<T> {
       onResume: pump,
       onCancel: () {
         stopped = true;
+        fxCancel(iterator);
       },
     );
     return controller.stream;
@@ -1680,6 +1720,10 @@ FxAsyncIterable<A> concurrentAsync<A>(int length, FxAsyncIterable<A> iterable) {
       final iterator = iterable.iterator;
       return DelegateAsyncIterator(
         (concurrent) => iterator.next(concurrent ?? Concurrent.of(1)),
+        cancel: () {
+          fxCancel(iterator);
+          return Future<void>.value();
+        },
       );
     });
   }
@@ -1769,16 +1813,23 @@ FxAsyncIterable<A> concurrentAsync<A>(int length, FxAsyncIterable<A> iterable) {
       }
     };
 
-    return DelegateAsyncIterator((_) {
-      nextCallCount++;
-      if (finished) {
-        return Future.value(IterResult<A>.done());
-      }
-      final completer = Completer<IterResult<A>>();
-      settlementQueue.add(completer);
-      recur();
-      return completer.future;
-    });
+    return DelegateAsyncIterator(
+      (_) {
+        nextCallCount++;
+        if (finished) {
+          return Future.value(IterResult<A>.done());
+        }
+        final completer = Completer<IterResult<A>>();
+        settlementQueue.add(completer);
+        recur();
+        return completer.future;
+      },
+      cancel: () {
+        finished = true;
+        fxCancel(iterator);
+        return Future<void>.value();
+      },
+    );
   });
 }
 

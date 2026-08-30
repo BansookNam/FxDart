@@ -23,8 +23,18 @@ Future<A?> headAsync<A>(FxAsyncIterable<A> iterable) {
   final it = iterable.iterator;
   final r = it is FxFastIterator<A> ? it.nextOr() : it.next();
   if (r is Future<IterResult<A>>) {
-    return r.then((rr) => rr.done ? null : rr.value);
+    return r.then(
+      (rr) {
+        fxCancel(it);
+        return rr.done ? null : rr.value;
+      },
+      onError: (Object e, StackTrace st) {
+        fxCancel(it);
+        Error.throwWithStackTrace(e, st);
+      },
+    );
   }
+  fxCancel(it);
   return Future<A?>.value(r.done ? null : r.value);
 }
 
@@ -174,10 +184,18 @@ Future<bool> everyAsync<A>(
   FxAsyncIterable<A> iterable,
 ) async {
   final iterator = iterable.iterator;
-  while (true) {
-    final r = await iterator.next();
-    if (r.done) return true;
-    if (!await f(r.value)) return false;
+  try {
+    while (true) {
+      final r = await iterator.next();
+      if (r.done) return true;
+      if (!await f(r.value)) {
+        fxCancel(iterator);
+        return false;
+      }
+    }
+  } catch (_) {
+    fxCancel(iterator);
+    rethrow;
   }
 }
 
@@ -206,10 +224,18 @@ Future<bool> someAsync<A>(
   FxAsyncIterable<A> iterable,
 ) async {
   final iterator = iterable.iterator;
-  while (true) {
-    final r = await iterator.next();
-    if (r.done) return false;
-    if (await f(r.value)) return true;
+  try {
+    while (true) {
+      final r = await iterator.next();
+      if (r.done) return false;
+      if (await f(r.value)) {
+        fxCancel(iterator);
+        return true;
+      }
+    }
+  } catch (_) {
+    fxCancel(iterator);
+    rethrow;
   }
 }
 
@@ -244,10 +270,18 @@ Future<bool> noneAsync<A>(
   FxAsyncIterable<A> iterable,
 ) async {
   final iterator = iterable.iterator;
-  while (true) {
-    final r = await iterator.next();
-    if (r.done) return true;
-    if (await f(r.value)) return false;
+  try {
+    while (true) {
+      final r = await iterator.next();
+      if (r.done) return true;
+      if (await f(r.value)) {
+        fxCancel(iterator);
+        return false;
+      }
+    }
+  } catch (_) {
+    fxCancel(iterator);
+    rethrow;
   }
 }
 

@@ -4,9 +4,10 @@ import 'parallel_stub.dart' if (dart.library.io) 'parallel_vm.dart';
 /// CPU-bound twin of [mapConcurrent]. Runs [worker] on a pool of [workers]
 /// isolates, preserving source order.
 ///
-/// [worker] must be a top-level or static function — a capturing closure
-/// is not sendable and will throw [ArgumentError] at spawn. [A] and [R]
-/// must be sendable.
+/// Prefer a top-level or static [worker]. A capturing closure is fine when
+/// every capture is sendable; a closure that captures a non-sendable
+/// (a [ReceivePort], an open socket) throws [ArgumentError] at spawn — the
+/// isolate contract, not a fxdart invention. [A] and [R] must be sendable.
 ///
 /// Unsupported on the web: throws [UnsupportedError]. Use [mapConcurrent]
 /// / [concurrentAsync] to overlap Futures on any platform.

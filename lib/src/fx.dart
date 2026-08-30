@@ -396,8 +396,9 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
       FxAsync(l.mapConcurrent(concurrency, f, _inner));
 
   /// CPU-bound twin of [mapConcurrent]: runs [worker] on a pool of
-  /// [workers] isolates, preserving source order. [worker] must be a
-  /// top-level or static function. Throws [UnsupportedError] on the web.
+  /// [workers] isolates, preserving source order. Prefer a top-level or
+  /// static [worker]; a closure that captures a non-sendable throws
+  /// [ArgumentError] at spawn. Throws [UnsupportedError] on the web.
   @pragma('vm:prefer-inline')
   FxAsync<R> parallel<R>(int workers, R Function(T input) worker) =>
       FxAsync(l.parallel(workers, worker, _inner));
