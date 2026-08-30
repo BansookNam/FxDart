@@ -78,16 +78,29 @@ class DelegateAsyncIterable<T> implements FxAsyncIterable<T> {
 class DelegateAsyncIterator<T> implements FxAsyncIterator<T>, StreamPullCancel {
   final Future<IterResult<T>> Function(Concurrent? concurrent) _next;
   final Future<void> Function()? _cancel;
+  final Object? _upstream;
 
   /// Wraps a `next` closure as an [FxAsyncIterator].
-  const DelegateAsyncIterator(this._next, {Future<void> Function()? cancel})
-    : _cancel = cancel;
+  ///
+  /// [upstream] is the iterator (or iterable of iterators) this one pulls
+  /// from; [cancel] releases anything else this iterator owns. Both run on
+  /// [cancel] — pass [upstream] from every operator so the chain reaches the
+  /// source (see [StreamPullCancel]).
+  const DelegateAsyncIterator(
+    this._next, {
+    Future<void> Function()? cancel,
+    Object? upstream,
+  }) : _cancel = cancel,
+       _upstream = upstream;
 
   @override
   Future<IterResult<T>> next([Concurrent? concurrent]) => _next(concurrent);
 
   @override
-  Future<void> cancel() => _cancel?.call() ?? Future<void>.value();
+  Future<void> cancel() {
+    fxCancel(_upstream);
+    return _cancel?.call() ?? Future<void>.value();
+  }
 }
 
 /// Serializes overlapping `next()` calls, mimicking the implicit request
@@ -96,6 +109,7 @@ class DelegateAsyncIterator<T> implements FxAsyncIterator<T>, StreamPullCancel {
 class SerialAsyncIterator<T> implements FxAsyncIterator<T>, StreamPullCancel {
   final Future<IterResult<T>> Function(Concurrent? concurrent) _inner;
   final Future<void> Function()? _cancel;
+  final Object? _upstream;
   // The gate of the pull currently in flight, or null when idle. Null lets
   // the common serial consumer (one pull awaited at a time) call [_inner]
   // directly — chaining off an already-completed future would cost a
@@ -103,8 +117,14 @@ class SerialAsyncIterator<T> implements FxAsyncIterator<T>, StreamPullCancel {
   Future<void>? _inFlight;
 
   /// Wraps [_inner], chaining each pull after the previous one settles.
-  SerialAsyncIterator(this._inner, {Future<void> Function()? cancel})
-    : _cancel = cancel;
+  ///
+  /// [upstream] and [cancel] behave as on [DelegateAsyncIterator].
+  SerialAsyncIterator(
+    this._inner, {
+    Future<void> Function()? cancel,
+    Object? upstream,
+  }) : _cancel = cancel,
+       _upstream = upstream;
 
   @override
   Future<IterResult<T>> next([Concurrent? concurrent]) {
@@ -127,7 +147,10 @@ class SerialAsyncIterator<T> implements FxAsyncIterator<T>, StreamPullCancel {
   }
 
   @override
-  Future<void> cancel() => _cancel?.call() ?? Future<void>.value();
+  Future<void> cancel() {
+    fxCancel(_upstream);
+    return _cancel?.call() ?? Future<void>.value();
+  }
 }
 
 /// An empty async iterable.
@@ -1278,18 +1301,36 @@ class _StreamBridgeIterator<T> implements FxFastIterator<T> {
 
 /// Tears down resources owned by an iterator: a `fromStream*` subscription,
 /// or a `parallel` isolate pool. [fromStream] itself has no cancel — it
-/// pauses instead. Early-stop operators (`take`, `head`, `find`) call
-/// [fxCancel] so a [ReceivePort] cannot keep the isolate alive after the
-/// consumer has stopped pulling.
+/// pauses instead. Early-stop consumers (`take`, `head`, `find`, a cancelled
+/// `toStream` subscription) call [fxCancel] so a [ReceivePort] cannot keep an
+/// isolate alive after the consumer has stopped pulling.
+///
+/// A lazy operator sits *between* that consumer and the resource, so it must
+/// forward: every operator iterator hands its source to the `upstream:`
+/// argument of [DelegateAsyncIterator] / [SerialAsyncIterator], which is what
+/// makes the chain reach the bottom. An operator that skips it is a hole —
+/// `parallel` behind it never releases its pool, and the program does not
+/// exit. An operator that ends on its own terms (`zip` at the shortest side,
+/// `slice` at its end index) calls [fxCancel] itself, since no downstream
+/// cancel is coming.
 abstract interface class StreamPullCancel {
   /// Releases held resources. Idempotent.
   Future<void> cancel();
 }
 
-/// No-op when [it] is not a [StreamPullCancel].
+/// Cancels [it] when it is a [StreamPullCancel], or every element when it is
+/// an [Iterable] of them (the multi-source operators — `zip`, `concat`,
+/// `transpose` — hold a list). No-op otherwise, so a site can hand over
+/// whatever it holds without testing the type first.
 void fxCancel(Object? it) {
   if (it is StreamPullCancel) {
     it.cancel();
+    return;
+  }
+  if (it is Iterable) {
+    for (final e in it) {
+      fxCancel(e);
+    }
   }
 }
 
@@ -1973,16 +2014,23 @@ FxAsyncIterator<A> _poolIterator<A>(int length, FxAsyncIterable<A> iterable) {
       }
     };
 
-    return DelegateAsyncIterator((_) {
-      if (exhausted()) {
-        return Future.value(IterResult<A>.done());
-      }
-      final completer = Completer<IterResult<A>>();
-      settlementQueue.add(completer);
-      drain();
-      fill();
-      return completer.future;
-    });
+    return DelegateAsyncIterator(
+      (_) {
+        if (exhausted()) {
+          return Future.value(IterResult<A>.done());
+        }
+        final completer = Completer<IterResult<A>>();
+        settlementQueue.add(completer);
+        drain();
+        fill();
+        return completer.future;
+      },
+      cancel: () {
+        sourceDone = true;
+        fxCancel(iterator);
+        return Future<void>.value();
+      },
+    );
   }).iterator;
 }
 
@@ -2117,13 +2165,23 @@ FxAsyncIterable<B> dispatchAsync<A, B>(
 ) {
   return DelegateAsyncIterable(() {
     FxAsyncIterator<B>? inner;
-    return DelegateAsyncIterator((concurrent) {
-      inner ??= build(
-        concurrent is Concurrent
-            ? concurrentAsync(concurrent.length, upstream)
-            : upstream,
-      );
-      return inner!.next(concurrent);
-    });
+    return DelegateAsyncIterator(
+      (concurrent) {
+        inner ??= build(
+          concurrent is Concurrent
+              ? concurrentAsync(concurrent.length, upstream)
+              : upstream,
+        );
+        return inner!.next(concurrent);
+      },
+      // Every `dispatchAsync` operator hangs its cancel off this one point:
+      // [inner] is built on the first pull, so the upstream to release is
+      // whatever exists now, not a value known at construction. Nothing to
+      // do when the chain was never pulled — no source iterator was made.
+      cancel: () {
+        fxCancel(inner);
+        return Future<void>.value();
+      },
+    );
   });
 }

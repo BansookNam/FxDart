@@ -6,6 +6,27 @@ worker; a capturing closure is fine when every capture is sendable, and
 throws at spawn only when one isn't. Unsupported on the web (use
 `concurrent`). `workers == 1` still leaves the main isolate.
 
+An early stop now releases the source through the whole operator chain.
+`StreamPullCancel` existed, but only the terminals honoured it — every
+lazy operator in between dropped it, so a `take` / `head` / `find`
+behind `drop`, `chunk`, `windowed`, `pairwise`, `flatMap`, `flat`,
+`expand`, `concat`, `append`, `prepend`, `indexed`, `uniqAdjacent`,
+`slice`, `timeout`, `mapConcurrent`, `concurrentPool`, `zip` or `zip3`
+left the source running. That leaked a `fromStream*` subscription
+before; with `parallel` it leaves a pool of isolates alive and the
+process never exits.
+
+Every operator iterator now forwards `cancel` upstream, and the ones
+that end on their own terms release the source themselves — `zip` /
+`zip3` at the shortest side, `slice` at its end index,
+`takeUntilInclusive` at its predicate — since no downstream cancel is
+coming. `take` holds its release until pulls it already issued have
+settled, so a cancel under `concurrent(n)` cannot truncate values that
+were already on their way.
+
+`test/async_cancel_test.dart` covers the chain per operator: 20 of its
+37 cases fail without this change.
+
 Events-layer `Either`, on the value channel: `mapRight` / `mapLeft`,
 `filterOrElse`, `alt` / `orElse` / `recover`, `getOrElse`, and
 `flattenEither` (the nest `attempt` after `mapEither` produces). Each

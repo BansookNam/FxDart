@@ -328,6 +328,7 @@ FxAsyncIterable<B> _mapAsyncLegacy<A, B>(
         if (value is Future<B>) return value.then(IterResult<B>.value);
         return IterResult<B>.value(value);
       }),
+      upstream: iterator,
     );
   });
 }
@@ -570,7 +571,7 @@ FxAsyncIterable<dynamic> flatAsync(
         }
         return IterResult.value(value);
       }
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -685,7 +686,7 @@ FxAsyncIterable<B> flatMapAsync<A, B>(
 /// fresh iterator falls back to [_flatMapAsyncLegacy]'s dispatch layering.
 class _FlatMapAsyncIterator<A, B>
     with FxFastNextGate<B>
-    implements FxFastIterator<B> {
+    implements FxFastIterator<B>, StreamPullCancel {
   _FlatMapAsyncIterator(this._f, this._sourceIterable);
   final FutureOr<Iterable<B>> Function(A) _f;
   final FxAsyncIterable<A> _sourceIterable;
@@ -693,6 +694,14 @@ class _FlatMapAsyncIterator<A, B>
   FxAsyncIterator<B>? _fallback;
   Iterator<B>? _inner;
   bool _done = false;
+
+  @override
+  Future<void> cancel() {
+    _done = true;
+    fxCancel(_source);
+    fxCancel(_fallback);
+    return Future<void>.value();
+  }
 
   @override
   Future<IterResult<B>> next([Concurrent? concurrent]) {
@@ -790,7 +799,7 @@ FxAsyncIterable<B> _flatMapAsyncLegacy<A, B>(
       }
 
       return loop();
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -1093,7 +1102,7 @@ FxAsyncIterable<B> _scanAsyncLegacy<A, B>(
         acc = v;
         return IterResult.value(v);
       });
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -1125,7 +1134,7 @@ FxAsyncIterable<A> scan1Async<A>(
         acc = v;
         return IterResult.value(v);
       });
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -1249,6 +1258,6 @@ FxAsyncIterable<B> mapAccumAsync<A, B>(
         if (next is Future<B>) return next.then(IterResult<B>.value);
         return IterResult<B>.value(next);
       });
-    });
+    }, upstream: iterator);
   });
 }

@@ -568,16 +568,23 @@ FxAsyncIterable<A> _asyncConcurrent<A>(FxAsyncIterable<(bool, A)> iterable) {
       }
     };
 
-    return DelegateAsyncIterator((concurrent) {
-      nextCallCount++;
-      if (finished) {
-        return Future.value(IterResult<A>.done());
-      }
-      final completer = Completer<IterResult<A>>();
-      settlementQueue.add(completer);
-      recur(concurrent);
-      return completer.future;
-    });
+    return DelegateAsyncIterator(
+      (concurrent) {
+        nextCallCount++;
+        if (finished) {
+          return Future.value(IterResult<A>.done());
+        }
+        final completer = Completer<IterResult<A>>();
+        settlementQueue.add(completer);
+        recur(concurrent);
+        return completer.future;
+      },
+      cancel: () {
+        finished = true;
+        fxCancel(iterator);
+        return Future<void>.value();
+      },
+    );
   });
 }
 
@@ -615,15 +622,22 @@ FxAsyncIterable<A> _filterAsyncLegacy<A>(
   // FxFilterStage). A defensive unmarked first pull degrades to width 1.
   return DelegateAsyncIterable(() {
     FxAsyncIterator<A>? inner;
-    return DelegateAsyncIterator((concurrent) {
-      inner ??= _asyncConcurrent(
-        concurrentAsync(
-          concurrent is Concurrent ? concurrent.length : 1,
-          _toFilterIterable(f, iterable),
-        ),
-      ).iterator;
-      return inner!.next(concurrent);
-    });
+    return DelegateAsyncIterator(
+      (concurrent) {
+        inner ??= _asyncConcurrent(
+          concurrentAsync(
+            concurrent is Concurrent ? concurrent.length : 1,
+            _toFilterIterable(f, iterable),
+          ),
+        ).iterator;
+        return inner!.next(concurrent);
+      },
+      // Built on the first pull, like `dispatchAsync` — cancel what exists.
+      cancel: () {
+        fxCancel(inner);
+        return Future<void>.value();
+      },
+    );
   });
 }
 
@@ -1030,7 +1044,7 @@ FxAsyncIterable<A> uniqAdjacentByAsync<A, B>(
         hasPrev = true;
         if (isNew) return IterResult.value(result.value);
       }
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -1189,25 +1203,37 @@ FxAsyncIterable<A> _setOpAsync<A, B>(
   return dispatchAsync(iterable2, (source) {
     Set<B>? set;
     FxAsyncIterator<A>? inner;
-    return SerialAsyncIterator((concurrent) async {
-      if (set == null) {
-        final keys = <B>[];
-        final it1 = iterable1.iterator;
-        while (true) {
-          final r = await it1.next();
-          if (r.done) break;
-          keys.add(await f(r.value));
+    // Hoisted so a cancel that lands while the key side is still draining
+    // releases it too — it is a full pull of [iterable1], which may be a
+    // `parallel` pool or a stream subscription.
+    FxAsyncIterator<A>? keySide;
+    return SerialAsyncIterator(
+      (concurrent) async {
+        if (set == null) {
+          final keys = <B>[];
+          final it1 = keySide = iterable1.iterator;
+          while (true) {
+            final r = await it1.next();
+            if (r.done) break;
+            keys.add(await f(r.value));
+          }
+          keySide = null;
+          set = keys.toSet();
+          inner = uniqAsync(
+            filterAsync(
+              (A a) async => set!.contains(await f(a)) == keepWhenInSet,
+              source,
+            ),
+          ).iterator;
         }
-        set = keys.toSet();
-        inner = uniqAsync(
-          filterAsync(
-            (A a) async => set!.contains(await f(a)) == keepWhenInSet,
-            source,
-          ),
-        ).iterator;
-      }
-      return inner!.next(concurrent);
-    });
+        return inner!.next(concurrent);
+      },
+      cancel: () {
+        fxCancel(keySide);
+        fxCancel(inner);
+        return Future<void>.value();
+      },
+    );
   });
 }
 
