@@ -45,6 +45,11 @@ nextLabel: mapConcurrent
     equivalent to plain sequential awaiting (which is exactly what you get
     without <code>concurrent</code> at all).
   </p>
+  <p>
+    At N=100k of a zero-delay fetch, a hand-rolled worker pool is still
+    about 10% faster (AOT). That remaining tax is the ordered-batch
+    machinery, not the <code>map</code> layer — you pay it for the chain.
+  </p>
 
   <h2>Demo 1 · Sequential vs. concurrent(3), timed</h2>
   <p>Six items, each with a 200ms delay. Sequential takes ~1200ms; asking for

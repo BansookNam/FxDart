@@ -153,6 +153,43 @@ void main() {
       expect(out, equals([2, 4, 8, 10]));
     });
 
+    test('map-only fused concurrent overlaps and keeps order', () async {
+      var inFlight = 0;
+      var maxInFlight = 0;
+      final out = await fx([1, 2, 3, 4, 5, 6])
+          .toAsync()
+          .map((a) async {
+            inFlight++;
+            if (inFlight > maxInFlight) maxInFlight = inFlight;
+            await Future<void>.delayed(const Duration(milliseconds: 20));
+            inFlight--;
+            return a * 10;
+          })
+          .concurrent(3)
+          .toList();
+      expect(out, equals([10, 20, 30, 40, 50, 60]));
+      expect(maxInFlight, greaterThan(1));
+    });
+
+    test('two map stages fused stay overlapping under concurrent', () async {
+      var inFlight = 0;
+      var maxInFlight = 0;
+      final out = await fx([1, 2, 3, 4])
+          .toAsync()
+          .map((a) => a + 1)
+          .map((a) async {
+            inFlight++;
+            if (inFlight > maxInFlight) maxInFlight = inFlight;
+            await Future<void>.delayed(const Duration(milliseconds: 20));
+            inFlight--;
+            return a * 10;
+          })
+          .concurrent(2)
+          .toList();
+      expect(out, equals([20, 30, 40, 50]));
+      expect(maxInFlight, greaterThan(1));
+    });
+
     test(
       'marked first pull then unmarked pulls (legacy fallback mix)',
       () async {
@@ -491,9 +528,7 @@ void main() {
       final wit =
           chunkAsync(2, toAsync([1, 2, 3, 4, 5])).iterator
               as FxFastIterator<List<int>>;
-      final windows = <List<int>>[
-        (await wit.next(Concurrent.of(2))).value,
-      ];
+      final windows = <List<int>>[(await wit.next(Concurrent.of(2))).value];
       while (true) {
         final ro = wit.nextOr();
         final r = ro is Future<IterResult<List<int>>> ? await ro : ro;
