@@ -4,7 +4,7 @@ library;
 import 'dart:async';
 
 import 'package:fxdart/fxdart.dart';
-import 'package:fxdart/src/async_iterable.dart' show fxCancel;
+import 'package:fxdart/src/async_iterable.dart' show StreamPullCancel, fxCancel;
 import 'package:test/test.dart' hide isEmpty, isNull, isNotNull, isList, isMap;
 
 /// A live source that reports whether its subscription was released.
@@ -141,6 +141,119 @@ void main() {
       addTearDown(live.dispose);
       final out = await live.chain.take(3).toList();
       expect(out.length, 3);
+    });
+  });
+
+  group('operators with their own teardown', () {
+    test('using releases the resource on an early stop', () async {
+      var released = 0;
+      final out = await fxAsync(
+        usingAsync<String, int>(
+          () => 'db',
+          (r) => fx([1, 2, 3, 4]).toAsync(),
+          (r) => released++,
+        ),
+      ).take(2).toList();
+      expect(out, equals([1, 2]));
+      expect(released, 1);
+    });
+
+    test('using cancelled before the first pull releases nothing', () async {
+      var released = 0;
+      var acquired = 0;
+      final it = usingAsync<String, int>(
+        () {
+          acquired++;
+          return 'db';
+        },
+        (r) => fx([1, 2]).toAsync(),
+        (r) => released++,
+      ).iterator;
+      // Nothing was acquired, so there is nothing to release — and the
+      // release callback must not run for a resource that never existed.
+      await (it as StreamPullCancel).cancel();
+      expect(acquired, 0);
+      expect(released, 0);
+      expect((await it.next()).done, isTrue);
+    });
+
+    test('difference releases its source on an early stop', () async {
+      expect(
+        await releasedBy(
+          (s) => s.difference(fx([99]).toAsync()).take(2).toList(),
+        ),
+        isTrue,
+      );
+    });
+
+    test('intersection releases its source on an early stop', () async {
+      expect(
+        await releasedBy(
+          (s) => s.intersection(fx([1, 2, 3, 4]).toAsync()).take(2).toList(),
+        ),
+        isTrue,
+      );
+    });
+
+    test('take under concurrent forwards a cancel it is handed', () async {
+      // `take` fuses by default; a Concurrent marker drops it to the
+      // unfused layering, and that spelling has its own cancel to forward.
+      expect(await releasedBy((s) => s.take(5).concurrent(2).head()), isTrue);
+    });
+
+    test('take forwards a cancel it is handed', () async {
+      // `take` behind another early stop: the outer one cancels the inner
+      // take, which must pass it on rather than swallow it.
+      expect(await releasedBy((s) => s.take(5).head()), isTrue);
+      expect(await releasedBy((s) => s.take(5).take(2).toList()), isTrue);
+    });
+  });
+
+  group('an error releases the source too', () {
+    FxAsync<int> throwingAfter(int n, _LiveSource live) => live.chain.map((v) {
+      if (v > n) throw StateError('boom');
+      return v;
+    });
+
+    test('head', () async {
+      final live = _LiveSource();
+      addTearDown(live.dispose);
+      await expectLater(throwingAfter(0, live).head(), throwsStateError);
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(live.cancelled, isTrue);
+    });
+
+    test('every', () async {
+      final live = _LiveSource();
+      addTearDown(live.dispose);
+      await expectLater(
+        throwingAfter(1, live).every((v) => true),
+        throwsStateError,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(live.cancelled, isTrue);
+    });
+
+    test('some', () async {
+      final live = _LiveSource();
+      addTearDown(live.dispose);
+      await expectLater(
+        throwingAfter(1, live).some((v) => false),
+        throwsStateError,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(live.cancelled, isTrue);
+    });
+
+    test('none', () async {
+      final live = _LiveSource();
+      addTearDown(live.dispose);
+      await expectLater(
+        throwingAfter(1, live).none((v) => false),
+        throwsStateError,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(live.cancelled, isTrue);
     });
   });
 

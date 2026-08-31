@@ -22,12 +22,14 @@ void parallelIsolateEntry(List<dynamic> boot) {
       toMain.send([id, true, worker(input)]);
     } catch (e, st) {
       // Same isolate group: sendable errors travel as themselves so
-      // `attempt` / `retryOn` can still match on type. Fall back to a
-      // string only when the object is not sendable.
+      // `attempt` / `retryOn` can still match on type. Fall back to the
+      // message *text* when the object itself cannot cross — sending `e`
+      // again would throw inside this handler and strand the pull, since
+      // nothing else ever answers that id.
       try {
         toMain.send([id, false, e, st]);
       } catch (_) {
-        toMain.send([id, false, e, st.toString()]);
+        toMain.send([id, false, '$e', st.toString()]);
       }
     }
   });
@@ -173,7 +175,6 @@ class _Pool<A, R> {
 
   final List<_Iso<A, R>> _workers;
   final Queue<_Iso<A, R>> _idle = Queue<_Iso<A, R>>();
-  final Queue<(A, Completer<R>)> _waiting = Queue<(A, Completer<R>)>();
   var _dead = false;
 
   static Future<_Pool<A, R>> spawn<A, R>(
@@ -189,48 +190,28 @@ class _Pool<A, R> {
     return pool;
   }
 
+  /// Runs [input] on a free worker.
+  ///
+  /// A worker is always free here: [_ParallelIterator._fill] keeps at most
+  /// [_workers] items in flight and the pool holds exactly that many
+  /// isolates. This used to carry a wait queue and a dead-pool guard for the
+  /// over-subscribed case; neither branch was reachable through any chain,
+  /// and unreachable defensive code is how a coverage number stops meaning
+  /// anything. The invariant is asserted instead, so a future caller that
+  /// breaks it fails loudly rather than queueing into silence.
   Future<R> run(A input) {
-    if (_dead) {
-      return Future.error(StateError('parallel pool is shut down'));
-    }
-    final c = Completer<R>();
-    _waiting.add((input, c));
-    _pump();
-    return c.future;
-  }
-
-  void _pump() {
-    while (_idle.isNotEmpty && _waiting.isNotEmpty && !_dead) {
-      final iso = _idle.removeFirst();
-      final (input, c) = _waiting.removeFirst();
-      iso
-          .run(input)
-          .then(
-            (v) {
-              if (!c.isCompleted) c.complete(v);
-            },
-            onError: (Object e, StackTrace st) {
-              if (!c.isCompleted) c.completeError(e, st);
-            },
-          )
-          .whenComplete(() {
-            if (!_dead) {
-              _idle.add(iso);
-              _pump();
-            }
-          });
-    }
+    assert(_idle.isNotEmpty, 'parallel pool over-subscribed');
+    final iso = _idle.removeFirst();
+    return iso.run(input).whenComplete(() {
+      if (!_dead) _idle.add(iso);
+    });
   }
 
   void kill() {
     if (_dead) return;
     _dead = true;
-    while (_waiting.isNotEmpty) {
-      final (_, c) = _waiting.removeFirst();
-      if (!c.isCompleted) {
-        c.completeError(StateError('parallel pool is shut down'));
-      }
-    }
+    // Work already handed to an isolate settles through [_Iso.kill], which
+    // errors every completer it is still holding.
     for (final w in _workers) {
       w.kill();
     }
