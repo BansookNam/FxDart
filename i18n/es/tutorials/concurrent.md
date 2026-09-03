@@ -40,10 +40,12 @@ nextLabel: mapConcurrent
   </p>
   <p>
     Ajusta <code>n</code> según lo que te limite: una API REST puede tolerar de 5
-    a 10 peticiones concurrentes, una tarea local limitada por CPU querrá una
-    <code>n</code> cercana a tu número de núcleos, y <code>n = 1</code> equivale
+    a 10 peticiones concurrentes, y <code>n = 1</code> equivale
     a esperar secuencialmente sin más (que es exactamente lo que obtienes sin
-    <code>concurrent</code>).
+    <code>concurrent</code>). El trabajo limitado por CPU es
+    <a href="parallel.html"><code>parallel</code></a>, no una
+    <code>n</code> más grande — véase
+    <a href="concurrentOrParallel.html">concurrent or parallel</a>.
   </p>
 
   <h2>Demo 1 · Secuencial vs. concurrent(3), cronometrado</h2>
@@ -71,5 +73,6 @@ nextLabel: mapConcurrent
     <a href="concurrentPool.html"><code>concurrentPool</code></a> — variante por orden de finalización ·
     <a href="toAsync.html"><code>toAsync</code></a> — el modelo basado en pull en el que se apoya ·
     <a href="asyncVariants.html">variantes asíncronas</a> — la convención de nombres *Async ·
-    <a href="map.html"><code>map</code></a> — el operador que más a menudo acompaña a concurrent
+    <a href="map.html"><code>map</code></a> — el operador que más a menudo acompaña a concurrent ·
+    <a href="concurrentOrParallel.html">concurrent or parallel</a> — I/O vs CPU
   </div>

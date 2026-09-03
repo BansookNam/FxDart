@@ -5,8 +5,8 @@ description: FxDart parallel tutorial: the CPU twin of concurrent — a pool of 
 heading: <code>parallel</code>
 section: 11
 crumb: parallel
-prev: using.html
-prevLabel: using
+prev: concurrentOrParallel.html
+prevLabel: concurrent or parallel
 next: debounce.html
 nextLabel: debounce
 ---
@@ -21,15 +21,10 @@ nextLabel: debounce
     is isolates. <code>parallel(n, worker)</code> is the twin: a
     <strong>reused pool</strong> of <code>n</code> isolates, results in
     source order, like <code><a href="mapConcurrent.html">mapConcurrent</a></code>
-    is the combined form of map-plus-concurrent.
+    is the combined form of map-plus-concurrent. They are not the same
+    operator — the comparison lives on
+    <a href="concurrentOrParallel.html">concurrent or parallel</a>.
   </p>
-  <table>
-    <tr><th></th><th><code>concurrent(n)</code></th><th><code>parallel(n)</code></th></tr>
-    <tr><td>What overlaps</td><td><code>Future</code>s on this isolate</td><td>worker isolates</td></tr>
-    <tr><td>Callback</td><td>any closure</td><td>top-level or static function</td></tr>
-    <tr><td>Values</td><td>anything</td><td>sendable</td></tr>
-    <tr><td>Platforms</td><td>VM, Flutter, web</td><td>VM / Flutter only</td></tr>
-  </table>
   <p>
     Prefer a top-level or static function. A closure that captures a
     non-sendable (a <code>ReceivePort</code>, an open socket) throws
@@ -59,5 +54,6 @@ Future&lt;void&gt; main() async {
     <strong>Related:</strong>
     <a href="concurrent.html"><code>concurrent</code></a> — I/O, any closure ·
     <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — the combined I/O form ·
+    <a href="concurrentOrParallel.html">concurrent or parallel</a> — I/O vs CPU ·
     <code>mapParallel</code> — the same operator as <code>parallel</code>
   </div>

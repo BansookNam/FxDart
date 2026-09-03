@@ -39,10 +39,13 @@ nextLabel: mapConcurrent
   </p>
   <p>
     <code>n</code>은 무엇에 병목이 걸리는지에 따라 조절하세요. REST API라면
-    동시 요청 5~10개 정도는 견딜 수 있고, 로컬 CPU 바운드 작업이라면
-    <code>n</code>을 코어 수에 가깝게 두는 편이 좋습니다. <code>n = 1</code>은
+    동시 요청 5~10개 정도는 견딜 수 있고, <code>n = 1</code>은
     순차적으로 await하는 것과 같으며, 이는 <code>concurrent</code>를 아예 쓰지
-    않았을 때의 동작과 정확히 같습니다.
+    않았을 때의 동작과 정확히 같습니다. CPU 일은
+    <a href="parallel.html"><code>parallel</code></a>이지, 더 큰
+    <code>n</code>이 아닙니다 —
+    <a href="concurrentOrParallel.html">concurrent or parallel</a>을
+    보세요.
   </p>
 
   <h2>데모 1 · 순차 실행과 concurrent(3) 비교, 시간 측정</h2>
@@ -70,5 +73,6 @@ nextLabel: mapConcurrent
     <a href="concurrentPool.html"><code>concurrentPool</code></a> — 완료 순서로 내보내는 변형 ·
     <a href="toAsync.html"><code>toAsync</code></a> — 이 동작이 기반으로 삼는 pull 기반 모델 ·
     <a href="asyncVariants.html">async 변형</a> — *Async 명명 규칙 ·
-    <a href="map.html"><code>map</code></a> — concurrent와 가장 자주 함께 쓰이는 연산자
+    <a href="map.html"><code>map</code></a> — concurrent와 가장 자주 함께 쓰이는 연산자 ·
+    <a href="concurrentOrParallel.html">concurrent or parallel</a> — I/O vs CPU
   </div>

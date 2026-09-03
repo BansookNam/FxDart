@@ -184,12 +184,12 @@ class _ParallelIterator<A, R>
     final known = _length;
     if (known != null && known < n) n = known;
     final pool = await _Pool.spawn<A, R>(n, _worker);
-    if (_ended) {
-      pool.kill();
-      return;
-    }
     _pool = pool;
     _finalizer.attach(this, pool, detach: this);
+    // Cancel may have landed while we were spawning. One line so coverage
+    // does not depend on winning that race: `_shutdown` is a no-op when
+    // we are not ended, and tears this pool down when we are.
+    if (_ended) _shutdown();
   }
 
   Future<void> _fill() async {

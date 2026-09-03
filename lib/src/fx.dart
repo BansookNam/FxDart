@@ -1011,6 +1011,9 @@ class FxAsync<T> implements FxAsyncIterable<T> {
 
   /// Evaluates the upstream chain up to [length] items at a time.
   ///
+  /// Overlaps `Future`s on this isolate (I/O). CPU-bound work belongs
+  /// on [parallel].
+  ///
   /// Port of FxTS `concurrent`.
   @pragma('vm:prefer-inline')
   FxAsync<T> concurrent(int length) => FxAsync(concurrentAsync(length, _inner));

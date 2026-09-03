@@ -1,0 +1,4 @@
+FxAsync&lt;T&gt; FxAsync.concurrent(int length)
+FxAsync&lt;R&gt; Fx.parallel(int workers, R Function(T input) worker)
+FxAsync&lt;R&gt; Fx.mapConcurrent(int concurrency, FutureOr&lt;R&gt; Function(T a) f)
+FxAsync&lt;R&gt; Fx.mapParallel(int workers, R Function(T input) worker)

@@ -19,7 +19,9 @@ int get parallelWorkers => parallelWorkersImpl;
 /// rather than hanging.
 ///
 /// Unsupported on the web: throws [UnsupportedError]. Use [mapConcurrent]
-/// / [concurrentAsync] to overlap Futures on any platform.
+/// / [concurrentAsync] to overlap Futures on any platform. A cheap
+/// callback (`x + 1`) loses to the isolate hop — that work belongs on
+/// [concurrent], not here.
 ///
 /// `workers == 1` still uses the pool (the work ran off the main isolate).
 /// An empty source does not spawn isolates. A [List] source shorter than

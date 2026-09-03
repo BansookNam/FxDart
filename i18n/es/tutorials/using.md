@@ -7,8 +7,8 @@ section: 11
 crumb: using
 prev: timeout.html
 prevLabel: timeout
-next: parallel.html
-nextLabel: parallel
+next: concurrentOrParallel.html
+nextLabel: concurrent or parallel
 ---
   <p class="hero-sub">Acota un recurso a una iteración: adquirido en el primer pull, liberado exactamente una vez — al completar <em>o</em> ante un error.</p>
 

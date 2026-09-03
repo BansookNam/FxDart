@@ -12,7 +12,9 @@ the pool to `min(n, length)` when the source is a `List`. An unsendable
 input or result fails that pull with `ArgumentError` instead of hanging.
 `parallelWorkers` is the VM processor count when you do not want to pick
 `n`; `mapParallel` is the same operator under the name that sits next to
-`mapConcurrent`.
+`mapConcurrent`. The 101 page `concurrent or parallel` is the decision:
+I/O stays on `concurrent`, CPU goes to `parallel`, and a cheap callback
+(`x + 1`) is a loss on the isolate hop.
 
 An early stop now releases the source through the whole operator chain.
 `StreamPullCancel` existed, but only the terminals honoured it — every

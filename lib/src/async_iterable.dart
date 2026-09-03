@@ -1733,6 +1733,9 @@ class Rejected<T> extends Settled<T> {
 /// Balances the load of multiple asynchronous requests: pulls up to [length]
 /// items from [iterable] at once, preserving order.
 ///
+/// Overlaps `Future`s on this isolate (I/O). CPU-bound work that would
+/// block the event loop belongs on `parallel`, a pool of worker isolates.
+///
 /// Port of FxTS `concurrent` (`Lazy/concurrent.ts`).
 ///
 /// ```dart

@@ -577,6 +577,10 @@
       "label": "using"
     },
     {
+      "href": "concurrentOrParallel.html",
+      "label": "concurrent or parallel"
+    },
+    {
       "href": "parallel.html",
       "label": "parallel"
     }

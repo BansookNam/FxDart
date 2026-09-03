@@ -5,8 +5,8 @@ description: FxDart parallel 튜토리얼: concurrent의 CPU 짝 — isolate 풀
 heading: <code>parallel</code>
 section: 11
 crumb: parallel
-prev: using.html
-prevLabel: using
+prev: concurrentOrParallel.html
+prevLabel: concurrent or parallel
 next: debounce.html
 nextLabel: debounce
 ---
@@ -21,15 +21,11 @@ nextLabel: debounce
     isolate입니다. <code>parallel(n, worker)</code>가 그 짝입니다:
     <strong>재사용 풀</strong> <code>n</code>개 isolate, 결과는 소스
     순서, <code><a href="mapConcurrent.html">mapConcurrent</a></code>가
-    map-plus-concurrent의 결합형인 것과 같습니다.
+    map-plus-concurrent의 결합형인 것과 같습니다. 같은 연산자가
+    아닙니다 — 비교는
+    <a href="concurrentOrParallel.html">concurrent or parallel</a>에
+    있습니다.
   </p>
-  <table>
-    <tr><th></th><th><code>concurrent(n)</code></th><th><code>parallel(n)</code></th></tr>
-    <tr><td>겹치는 것</td><td>이 isolate의 <code>Future</code></td><td>워커 isolate</td></tr>
-    <tr><td>콜백</td><td>아무 클로저</td><td>top-level 또는 static 함수</td></tr>
-    <tr><td>값</td><td>무엇이든</td><td>보낼 수 있는 것</td></tr>
-    <tr><td>플랫폼</td><td>VM, Flutter, web</td><td>VM / Flutter만</td></tr>
-  </table>
   <p>
     top-level 또는 static 함수를 쓰세요. 보낼 수 없는 것
     (<code>ReceivePort</code>, 열린 소켓)을 캡처한 클로저는 spawn에서
@@ -60,5 +56,6 @@ Future&lt;void&gt; main() async {
     <strong>관련:</strong>
     <a href="concurrent.html"><code>concurrent</code></a> — I/O, 아무 클로저 ·
     <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — 결합된 I/O 형태 ·
+    <a href="concurrentOrParallel.html">concurrent or parallel</a> — I/O vs CPU ·
     <code>mapParallel</code> — <code>parallel</code>과 같은 연산
   </div>
