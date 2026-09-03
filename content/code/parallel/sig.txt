@@ -1,4 +1,9 @@
+int get parallelWorkers
 FxAsyncIterable&lt;R&gt; parallel&lt;A, R&gt;(int workers, R Function(A input) worker, Iterable&lt;A&gt; iterable)
 FxAsyncIterable&lt;R&gt; parallelAsync&lt;A, R&gt;(int workers, R Function(A input) worker, FxAsyncIterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;R&gt; mapParallel&lt;A, R&gt;(int workers, R Function(A input) worker, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;R&gt; mapParallelAsync&lt;A, R&gt;(int workers, R Function(A input) worker, FxAsyncIterable&lt;A&gt; iterable)
 FxAsync&lt;R&gt; Fx.parallel(int workers, R Function(T input) worker)
+FxAsync&lt;R&gt; Fx.mapParallel(int workers, R Function(T input) worker)
 FxAsync&lt;R&gt; FxAsync.parallel(int workers, R Function(T input) worker)
+FxAsync&lt;R&gt; FxAsync.mapParallel(int workers, R Function(T input) worker)

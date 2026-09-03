@@ -6,6 +6,14 @@ worker; a capturing closure is fine when every capture is sendable, and
 throws at spawn only when one isn't. Unsupported on the web (use
 `concurrent`). `workers == 1` still leaves the main isolate.
 
+The pool spawns its isolates together, talks to them over
+`RawReceivePort`, does not spawn at all for an empty source, and sizes
+the pool to `min(n, length)` when the source is a `List`. An unsendable
+input or result fails that pull with `ArgumentError` instead of hanging.
+`parallelWorkers` is the VM processor count when you do not want to pick
+`n`; `mapParallel` is the same operator under the name that sits next to
+`mapConcurrent`.
+
 An early stop now releases the source through the whole operator chain.
 `StreamPullCancel` existed, but only the terminals honoured it — every
 lazy operator in between dropped it, so a `take` / `head` / `find`

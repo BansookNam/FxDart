@@ -34,6 +34,13 @@ class Unsendable implements Exception {
 
 int throwsUnsendable(int x) => throw Unsendable(ReceivePort());
 
+int closePort(ReceivePort p) {
+  p.close();
+  return 1;
+}
+
+ReceivePort openPort(int x) => ReceivePort();
+
 int slowDouble(int x) {
   io.sleep(const Duration(milliseconds: 60));
   return x * 2;
@@ -66,6 +73,15 @@ void main() {
 
     test('a single element', () async {
       expect(await fx([7]).parallel(4, doubleIt).toList(), equals([14]));
+    });
+
+    test('a non-List iterable still runs', () async {
+      expect(
+        await fx(
+          Iterable<int>.generate(4, (i) => i + 1),
+        ).parallel(2, doubleIt).toList(),
+        equals([2, 4, 6, 8]),
+      );
     });
 
     test('workers < 1 throws', () {
@@ -163,12 +179,18 @@ void main() {
     test('a closure that captures a ReceivePort throws at spawn', () async {
       final port = ReceivePort();
       try {
-        expect(
+        await expectLater(
           fx([1, 2, 3]).parallel(2, (x) {
             port.toString();
             return x;
           }).toList(),
-          throwsA(isA<ArgumentError>()),
+          throwsA(
+            isA<ArgumentError>().having(
+              (e) => e.message,
+              'message',
+              contains('failed to spawn'),
+            ),
+          ),
         );
       } finally {
         port.close();
@@ -255,6 +277,91 @@ void main() {
       await (it as StreamPullCancel).cancel();
       expect((await pending).done, isTrue);
       await Future<void>.delayed(const Duration(milliseconds: 120));
+    });
+
+    test('an empty async source completes empty', () async {
+      expect(
+        await fx(<int>[]).toAsync().parallel(2, doubleIt).toList(),
+        equals(<int>[]),
+      );
+    });
+
+    test('cancel during the first async pull, before spawn', () async {
+      final it = parallelAsync(
+        2,
+        doubleIt,
+        toAsync<int>([
+          Future<int>.delayed(const Duration(milliseconds: 50), () => 1),
+          2,
+          3,
+        ]),
+      ).iterator;
+      final pull = it.next();
+      await (it as StreamPullCancel).cancel();
+      expect((await pull).done, isTrue);
+    });
+
+    test('an unsendable input fails that pull', () async {
+      final port = ReceivePort();
+      try {
+        await expectLater(
+          fx([port]).parallel(1, closePort).toList(),
+          throwsA(
+            isA<ArgumentError>().having(
+              (e) => e.message,
+              'message',
+              contains('not sendable'),
+            ),
+          ),
+        );
+      } finally {
+        port.close();
+      }
+    });
+
+    test('an unsendable result fails that pull, not hang', () async {
+      await expectLater(
+        fx([1]).parallel(1, openPort).toList(),
+        throwsA(
+          isA<ArgumentError>().having(
+            (e) => e.message,
+            'message',
+            contains('result is not sendable'),
+          ),
+        ),
+      );
+    });
+
+    test('parallelWorkers is a valid pool size', () async {
+      expect(parallelWorkers, greaterThanOrEqualTo(1));
+      expect(
+        await fx([1, 2, 3]).parallel(parallelWorkers, doubleIt).toList(),
+        equals([2, 4, 6]),
+      );
+    });
+
+    test('mapParallel is parallel under the mapConcurrent name', () async {
+      expect(
+        await fx([1, 2, 3]).mapParallel(2, doubleIt).toList(),
+        equals([2, 4, 6]),
+      );
+      expect(
+        await toListAsync(mapParallel(2, doubleIt, [1, 2])),
+        equals([2, 4]),
+      );
+      expect(
+        await fx([1, 2]).toAsync().mapParallel(1, doubleIt).toList(),
+        equals([2, 4]),
+      );
+      expect(
+        await toListAsync(mapParallelAsync(1, doubleIt, toAsync([3]))),
+        equals([6]),
+      );
+      expect(() => mapParallel(0, doubleIt, [1]), throwsRangeError);
+      expect(
+        () => mapParallelAsync(0, doubleIt, toAsync([1])),
+        throwsRangeError,
+      );
     });
   });
 }

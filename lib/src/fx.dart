@@ -399,9 +399,16 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// [workers] isolates, preserving source order. Prefer a top-level or
   /// static [worker]; a closure that captures a non-sendable throws
   /// [ArgumentError] at spawn. Throws [UnsupportedError] on the web.
+  /// Pass [parallelWorkers] when you do not want to pick [workers].
   @pragma('vm:prefer-inline')
   FxAsync<R> parallel<R>(int workers, R Function(T input) worker) =>
       FxAsync(l.parallel(workers, worker, _inner));
+
+  /// Alias of [parallel] — same operator, the name that sits next to
+  /// [mapConcurrent].
+  @pragma('vm:prefer-inline')
+  FxAsync<R> mapParallel<R>(int workers, R Function(T input) worker) =>
+      parallel(workers, worker);
 
   /// Switches to the async chain and maps [f], retrying each call up to
   /// [attempts] times (with optional [delay] backoff) before the error
@@ -1018,6 +1025,12 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   @pragma('vm:prefer-inline')
   FxAsync<R> parallel<R>(int workers, R Function(T input) worker) =>
       FxAsync(l.parallelAsync(workers, worker, _inner));
+
+  /// Alias of [FxAsync.parallel] — same operator, the name that sits next
+  /// to [mapConcurrent].
+  @pragma('vm:prefer-inline')
+  FxAsync<R> mapParallel<R>(int workers, R Function(T input) worker) =>
+      parallel(workers, worker);
 
   /// Like [concurrent] but yields in completion order.
   @pragma('vm:prefer-inline')

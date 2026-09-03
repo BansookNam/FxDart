@@ -14,6 +14,9 @@ Never parallelAsyncImpl<A, R>(
   FxAsyncIterable<A> iterable,
 ) => _unsupported();
 
+/// Web has no [Platform.numberOfProcessors]; [parallel] still throws.
+int get parallelWorkersImpl => 1;
+
 Never _unsupported() => throw UnsupportedError(
   'parallel is VM/Flutter-only; it uses dart:isolate. '
   'On the web, use concurrent(n) for overlapping Futures.',

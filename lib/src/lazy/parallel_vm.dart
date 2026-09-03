@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:io' as io;
 import 'dart:isolate';
 
 import '../async_iterable.dart';
@@ -8,34 +9,48 @@ import '../async_iterable.dart';
 void parallelIsolateEntry(List<dynamic> boot) {
   final toMain = boot[0] as SendPort;
   final worker = boot[1] as Function;
-  final inbox = ReceivePort();
+  final inbox = RawReceivePort();
   toMain.send(inbox.sendPort);
-  inbox.listen((msg) {
+  inbox.handler = (msg) {
     if (msg == _shutdown) {
       inbox.close();
       return;
     }
-    final list = msg as List<dynamic>;
-    final id = list[0] as int;
-    final input = list[1];
+    final input = (msg as List<dynamic>)[0];
     try {
-      toMain.send([id, true, worker(input)]);
+      final result = worker(input);
+      try {
+        toMain.send([true, result]);
+      } catch (_) {
+        // Same hang as an unsendable *error* if this send throws inside the
+        // handler and nothing answers that job. ArgumentError is sendable.
+        toMain.send([
+          false,
+          ArgumentError(
+            'parallel result is not sendable (${result.runtimeType})',
+          ),
+          StackTrace.current,
+        ]);
+      }
     } catch (e, st) {
       // Same isolate group: sendable errors travel as themselves so
       // `attempt` / `retryOn` can still match on type. Fall back to the
       // message *text* when the object itself cannot cross — sending `e`
       // again would throw inside this handler and strand the pull, since
-      // nothing else ever answers that id.
+      // nothing else ever answers that job.
       try {
-        toMain.send([id, false, e, st]);
+        toMain.send([false, e, st]);
       } catch (_) {
-        toMain.send([id, false, '$e', st.toString()]);
+        toMain.send([false, '$e', st.toString()]);
       }
     }
-  });
+  };
 }
 
 const _shutdown = 0;
+
+/// [Platform.numberOfProcessors]. See [parallelWorkers].
+int get parallelWorkersImpl => io.Platform.numberOfProcessors;
 
 /// VM implementation. See [parallel] for the contract.
 FxAsyncIterable<R> parallelImpl<A, R>(
@@ -59,19 +74,36 @@ class _ParallelIterable<A, R> implements FxAsyncIterable<R> {
   final FxAsyncIterable<A>? async;
 
   @override
-  FxAsyncIterator<R> get iterator =>
-      _ParallelIterator<A, R>(workers, worker, sync?.iterator, async?.iterator);
+  FxAsyncIterator<R> get iterator {
+    final source = sync;
+    return _ParallelIterator<A, R>(
+      workers,
+      worker,
+      source?.iterator,
+      async?.iterator,
+      source is List<A> ? source.length : null,
+    );
+  }
 }
 
 class _ParallelIterator<A, R>
     with FxFastNextGate<R>
     implements FxFastIterator<R>, StreamPullCancel {
-  _ParallelIterator(this._workers, this._worker, this._sync, this._async);
+  _ParallelIterator(
+    this._workers,
+    this._worker,
+    this._sync,
+    this._async,
+    this._length,
+  );
 
   final int _workers;
   final R Function(A input) _worker;
   final Iterator<A>? _sync;
   final FxAsyncIterator<A>? _async;
+
+  /// Known source length when [sync] is a [List]; null otherwise.
+  final int? _length;
 
   _Pool<A, R>? _pool;
   final Queue<Future<R>> _inflight = Queue<Future<R>>();
@@ -89,8 +121,22 @@ class _ParallelIterator<A, R>
 
   Future<IterResult<R>> _step() async {
     if (_ended) return IterResult<R>.done();
-    await _ensurePool();
-    if (_ended) return IterResult<R>.done();
+    if (_pool == null) {
+      // Pull one item before paying isolate spawn so an empty source is free.
+      // Bare (not `await`) on a sync source — `await` of a non-Future still
+      // schedules a microtask, and that gap is where cancel used to win
+      // the race against spawn.
+      final firstOr = _takeOne();
+      final first = firstOr is Future<A?> ? await firstOr : firstOr;
+      if (_ended) return IterResult<R>.done();
+      if (first == null) {
+        _shutdown();
+        return IterResult<R>.done();
+      }
+      await _ensurePool();
+      if (_ended) return IterResult<R>.done();
+      _enqueue(_pool!.run(first));
+    }
     await _fill();
     if (_ended) return IterResult<R>.done();
     if (_inflight.isEmpty) {
@@ -109,9 +155,35 @@ class _ParallelIterator<A, R>
     }
   }
 
+  FutureOr<A?> _takeOne() {
+    if (_sourceDone) return null;
+    final sync = _sync;
+    if (sync != null) {
+      if (!sync.moveNext()) {
+        _sourceDone = true;
+        return null;
+      }
+      return sync.current;
+    }
+    return _takeOneAsync();
+  }
+
+  Future<A?> _takeOneAsync() async {
+    final r = await _async!.next();
+    if (_ended) return null;
+    if (r.done) {
+      _sourceDone = true;
+      return null;
+    }
+    return r.value;
+  }
+
   Future<void> _ensurePool() async {
     if (_pool != null || _ended) return;
-    final pool = await _Pool.spawn<A, R>(_workers, _worker);
+    var n = _workers;
+    final known = _length;
+    if (known != null && known < n) n = known;
+    final pool = await _Pool.spawn<A, R>(n, _worker);
     if (_ended) {
       pool.kill();
       return;
@@ -124,21 +196,11 @@ class _ParallelIterator<A, R>
     final pool = _pool;
     if (pool == null || _ended) return;
     while (_inflight.length < _workers && !_sourceDone && !_ended) {
-      if (_sync != null) {
-        if (!_sync.moveNext()) {
-          _sourceDone = true;
-          break;
-        }
-        _enqueue(pool.run(_sync.current));
-      } else {
-        final r = await _async!.next();
-        if (_ended) return;
-        if (r.done) {
-          _sourceDone = true;
-          break;
-        }
-        _enqueue(pool.run(r.value));
-      }
+      final nextOr = _takeOne();
+      final next = nextOr is Future<A?> ? await nextOr : nextOr;
+      if (_ended) return;
+      if (next == null) break;
+      _enqueue(pool.run(next));
     }
   }
 
@@ -181,10 +243,33 @@ class _Pool<A, R> {
     int n,
     R Function(A input) worker,
   ) async {
-    final workers = <_Iso<A, R>>[];
-    for (var i = 0; i < n; i++) {
-      workers.add(await _Iso.spawn<A, R>(worker));
+    final spawned = List<_Iso<A, R>?>.filled(n, null);
+    Object? error;
+    StackTrace? errorSt;
+    await Future.wait([
+      for (var i = 0; i < n; i++)
+        () async {
+          try {
+            spawned[i] = await _Iso.spawn<A, R>(worker, i);
+          } catch (e, st) {
+            error ??= e;
+            errorSt ??= st;
+          }
+        }(),
+    ]);
+    final spawnError = error;
+    if (spawnError != null) {
+      // A sendability failure fails every spawn of the same worker, so
+      // [spawned] is all null. A resource failure that kills only some
+      // isolates is not a path a test can pin, and the leftover would
+      // keep a ReceivePort open — so we still tear down anything that
+      // did start before rethrowing.
+      for (final w in spawned) {
+        if (w != null) w.kill();
+      }
+      Error.throwWithStackTrace(spawnError, errorSt!);
     }
+    final workers = [for (final w in spawned) w!];
     final pool = _Pool<A, R>(workers);
     pool._idle.addAll(workers);
     return pool;
@@ -223,30 +308,39 @@ class _Iso<A, R> {
 
   final Isolate _isolate;
   final SendPort _toWorker;
-  final ReceivePort _incoming;
-  int _nextId = 0;
-  final Map<int, Completer<R>> _pending = {};
+  final RawReceivePort _incoming;
+  Completer<R>? _completer;
 
-  static Future<_Iso<A, R>> spawn<A, R>(R Function(A input) worker) async {
-    final incoming = ReceivePort();
+  static Future<_Iso<A, R>> spawn<A, R>(
+    R Function(A input) worker,
+    int index,
+  ) async {
+    final incoming = RawReceivePort();
     final ready = Completer<SendPort>();
     late final _Iso<A, R> iso;
-    incoming.listen((msg) {
-      if (!ready.isCompleted && msg is SendPort) {
-        ready.complete(msg);
+    incoming.handler = (msg) {
+      if (!ready.isCompleted) {
+        ready.complete(msg as SendPort);
         return;
       }
       iso._onMessage(msg);
-    });
+    };
     late Isolate isolate;
     try {
       isolate = await Isolate.spawn(parallelIsolateEntry, [
         incoming.sendPort,
         worker,
-      ]);
+      ], debugName: 'fxdart-parallel-$index');
     } catch (e, st) {
       incoming.close();
-      Error.throwWithStackTrace(e, st);
+      Error.throwWithStackTrace(
+        ArgumentError(
+          'parallel failed to spawn a worker isolate. The worker must be a '
+          'top-level or static function (or a closure whose captures are all '
+          'sendable). ($e)',
+        ),
+        st,
+      );
     }
     final toWorker = await ready.future;
     iso = _Iso<A, R>(isolate, toWorker, incoming);
@@ -254,18 +348,17 @@ class _Iso<A, R> {
   }
 
   void _onMessage(dynamic msg) {
-    if (msg is SendPort) return;
-    final list = msg as List<dynamic>;
-    final id = list[0] as int;
-    final ok = list[1] as bool;
-    final c = _pending.remove(id);
+    final c = _completer;
+    _completer = null;
     if (c == null || c.isCompleted) return;
+    final list = msg as List<dynamic>;
+    final ok = list[0] as bool;
     if (ok) {
-      c.complete(list[2] as R);
+      c.complete(list[1] as R);
       return;
     }
-    final err = list[2];
-    final stack = list[3];
+    final err = list[1];
+    final stack = list[2];
     final st = stack is StackTrace ? stack : StackTrace.fromString('$stack');
     if (err is Object && err is! String) {
       c.completeError(err, st);
@@ -275,20 +368,29 @@ class _Iso<A, R> {
   }
 
   Future<R> run(A input) {
-    final id = _nextId++;
+    assert(_completer == null, 'parallel worker over-subscribed');
     final c = Completer<R>();
-    _pending[id] = c;
-    _toWorker.send([id, input]);
+    _completer = c;
+    try {
+      _toWorker.send([input]);
+    } catch (e, st) {
+      _completer = null;
+      c.completeError(
+        ArgumentError(
+          'parallel cannot send this input to an isolate (not sendable). ($e)',
+        ),
+        st,
+      );
+    }
     return c.future;
   }
 
   void kill() {
-    for (final c in _pending.values) {
-      if (!c.isCompleted) {
-        c.completeError(StateError('parallel isolate shut down'));
-      }
+    final c = _completer;
+    _completer = null;
+    if (c != null && !c.isCompleted) {
+      c.completeError(StateError('parallel isolate shut down'));
     }
-    _pending.clear();
     _toWorker.send(_shutdown);
     _incoming.close();
     _isolate.kill(priority: Isolate.immediate);
