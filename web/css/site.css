@@ -396,12 +396,14 @@ main.cmp-wide { max-width: 1280px; }
 .pbench-case > h2 { margin: 0 0 0.8rem; }
 /* Wider name column than the two-way chart: these labels are sentences
    ("fxdart chain, one isolate"), not one word. */
-.pbench .bench-row { grid-template-columns: 12rem 1fr 10rem; }
+.pbench .bench-row { grid-template-columns: 12rem 1fr 14rem; }
 .pbench .bench-scale { margin: 0 0 1.4rem; }
 .pbench-base { background: var(--text-dim); }
 .pbench-win { background: var(--accent); }
 .pbench-loss { background: var(--warn); }
-.pbench-tie { background: var(--bg-soft); border: 1px solid var(--border); }
+/* Same fill as the baseline — a tie is "as fast as the loop", not an
+   empty track. --bg-soft on a --bg-soft track made the bar vanish. */
+.pbench-tie { background: var(--text-dim); }
 .pbench-note { font-style: normal; opacity: 0.85; margin-left: 0.35rem; }
 em.pbench-base { color: var(--text-dim); }
 em.pbench-win { color: var(--accent); }
@@ -427,6 +429,10 @@ em.pbench-tie { color: var(--text-dim); }
 @media (max-width: 700px) {
   .pbench .bench-row { grid-template-columns: 7.5rem 1fr 7.5rem; }
   .pbench .bench-name { font-size: 0.8rem; }
+  /* ko/es notes ("6.65배 더 빠름", "6.65x más rápido") do not fit 7.5rem
+     on one line; drop the multiplier under the time instead of clipping. */
+  .pbench .bench-val { white-space: normal; line-height: 1.25; }
+  .pbench-note { display: block; margin-left: 0; }
 }
 
 .cmp-expected summary {

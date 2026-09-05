@@ -275,5 +275,41 @@
   "@theoryGo": { "description": "Button that jumps to the page number typed into the picker. Very short." },
 
   "theoryEdited": "edited",
-  "@theoryEdited": { "description": "Badge on a textbook listing the reader has changed. Lowercase, very short." }
+  "@theoryEdited": { "description": "Badge on a textbook listing the reader has changed. Lowercase, very short." },
+
+  "pbenchCodeSummary": "The five programs, and the job they share",
+  "@pbenchCodeSummary": { "description": "Disclosure summary on the parallel-benchmark page that expands the five timed programs plus the shared worker." },
+
+  "pbenchCodeJob": "The job itself — all five call this one function",
+  "@pbenchCodeJob": { "description": "Figcaption above the shared work.dart listing on the parallel-benchmark page." },
+
+  "pbenchMeta": "Measured on {workers} workers, AOT (<code>dart compile exe</code>), median of 3 iterations ({rounds} round(s) × 3). All {count} variants compute the same checksum — the runner refuses the case otherwise.",
+  "@pbenchMeta": { "description": "Machine line above the parallel-benchmark bars. Keep {workers}, {rounds}, {count} and the <code>dart compile exe</code> tag intact." },
+
+  "pbenchLabelNative": "Native, one isolate",
+  "@pbenchLabelNative": { "description": "Bar and listing label for the plain-loop variant. 'isolate' is the Dart term." },
+
+  "pbenchLabelNativeIsolate": "Native + dart:isolate",
+  "@pbenchLabelNativeIsolate": { "description": "Bar and listing label for the hand-rolled Isolate.run variant. 'dart:isolate' is a library name — never translated." },
+
+  "pbenchLabelFxdart": "fxdart chain, one isolate",
+  "@pbenchLabelFxdart": { "description": "Bar and listing label for the single-isolate fxdart chain. 'fxdart' is the product name." },
+
+  "pbenchLabelParallel": "fxdart .parallel()",
+  "@pbenchLabelParallel": { "description": "Bar and listing label for default parallel. Keep 'fxdart' and '.parallel()'." },
+
+  "pbenchLabelParallelChunk": "fxdart .parallel(chunk:)",
+  "@pbenchLabelParallelChunk": { "description": "Bar and listing label for chunked parallel. Keep 'fxdart' and '.parallel(chunk:)'." },
+
+  "pbenchNoteBaseline": "baseline",
+  "@pbenchNoteBaseline": { "description": "Printed next to the plain-loop bar. Very short." },
+
+  "pbenchNoteFaster": "{n}x faster",
+  "@pbenchNoteFaster": { "description": "Printed next to a bar faster than the plain loop. Keep {n}." },
+
+  "pbenchNoteSlower": "{n}x slower",
+  "@pbenchNoteSlower": { "description": "Printed next to a bar slower than the plain loop. Keep {n}." },
+
+  "pbenchNoteSame": "same",
+  "@pbenchNoteSame": { "description": "Printed next to a bar within the tie margin of the plain loop. Very short." }
 }

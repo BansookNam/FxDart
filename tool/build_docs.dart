@@ -1455,7 +1455,7 @@ String _renderParallelBench(
   }
   b
     ..write(page.body)
-    ..write(_parallelBenchSection())
+    ..write(_parallelBenchSection(chrome))
     ..writeln('</main>')
     ..write(_footer(chrome))
     ..writeln('</body>')
@@ -1465,23 +1465,25 @@ String _renderParallelBench(
 
 /// The measured half of the page: one block per case, five bars per scale,
 /// and the five programs that produced them.
-String _parallelBenchSection() {
+String _parallelBenchSection(Map<String, String> chrome) {
   final f = File('$root/benchmark/results/results-parallel.json');
   if (!f.existsSync()) return '';
   final data = jsonDecode(f.readAsStringSync()) as Map<String, dynamic>;
   final impls = (data['impls'] as List).cast<String>();
-  final labels = (data['labels'] as Map).cast<String, dynamic>();
+  final jsonLabels = (data['labels'] as Map).cast<String, dynamic>();
+  final labels = <String, String>{
+    for (final i in impls)
+      i: chrome[_pbenchLabelKey[i]] ?? (jsonLabels[i] as String? ?? i),
+  };
   final workers = data['workers'];
+  final meta = (chrome['pbenchMeta'] ?? '')
+      .replaceAll('{workers}', '$workers')
+      .replaceAll('{rounds}', '${data['rounds']}')
+      .replaceAll('{count}', '${impls.length}');
 
   final out = StringBuffer()
     ..writeln('  <section class="cmp-bench pbench">')
-    ..writeln(
-      '  <p class="dim bench-meta">Measured on $workers workers, AOT '
-      '(<code>dart compile exe</code>), median of 3 iterations '
-      '(${data['rounds']} round(s) × 3). '
-      'All ${impls.length} variants compute the same checksum — the runner '
-      'refuses the case otherwise.</p>',
-    );
+    ..writeln('  <p class="dim bench-meta">$meta</p>');
 
   for (final c in (data['cases'] as List).cast<Map<String, dynamic>>()) {
     final slug = c['slug'] as String;
@@ -1508,12 +1510,14 @@ String _parallelBenchSection() {
         // Read against the plain loop, because that is the only baseline a
         // reader deciding "should I bother with isolates" actually has.
         final note = i == 'native'
-            ? 'baseline'
+            ? chrome['pbenchNoteBaseline']!
             : up >= 1.005
-            ? '${up.toStringAsFixed(2)}x faster'
+            ? chrome['pbenchNoteFaster']!
+                .replaceAll('{n}', up.toStringAsFixed(2))
             : up <= 0.995
-            ? '${(1 / up).toStringAsFixed(2)}x slower'
-            : 'same';
+            ? chrome['pbenchNoteSlower']!
+                .replaceAll('{n}', (1 / up).toStringAsFixed(2))
+            : chrome['pbenchNoteSame']!;
         final cls = i == 'native'
             ? 'base'
             : up >= 1.005
@@ -1539,7 +1543,7 @@ String _parallelBenchSection() {
       out.writeln('    </div>');
     }
     out
-      ..write(_parallelBenchCode(slug, impls, labels))
+      ..write(_parallelBenchCode(chrome, slug, impls, labels))
       ..writeln('  </div>');
   }
   out.writeln('  </section>');
@@ -1549,9 +1553,10 @@ String _parallelBenchSection() {
 /// The five programs, read straight off disk — so what the page shows is what
 /// was compiled and timed, and cannot drift from it.
 String _parallelBenchCode(
+  Map<String, String> chrome,
   String slug,
   List<String> impls,
-  Map<String, dynamic> labels,
+  Map<String, String> labels,
 ) {
   const files = {
     'native': 'native',
@@ -1562,15 +1567,12 @@ String _parallelBenchCode(
   };
   final out = StringBuffer()
     ..writeln('    <details class="pbench-code">')
-    ..writeln('      <summary>The five programs, and the job they share</summary>');
+    ..writeln('      <summary>${chrome['pbenchCodeSummary']}</summary>');
   final work = File('$root/benchmark/cases-parallel/$slug/work.dart');
   if (work.existsSync()) {
     out
       ..writeln('      <figure class="pbench-work">')
-      ..writeln(
-        '        <figcaption>The job itself — all five call this one '
-        'function</figcaption>',
-      )
+      ..writeln('        <figcaption>${chrome['pbenchCodeJob']}</figcaption>')
       ..writeln(
         '        <pre><code>'
         '${_escapeHtml(work.readAsStringSync().trimRight())}</code></pre>',
@@ -1599,6 +1601,14 @@ String _parallelBenchCode(
 String _pbenchMs(double ms) => ms >= 1000
     ? '${(ms / 1000).toStringAsFixed(2)} s'
     : '${ms.toStringAsFixed(1)} ms';
+
+const _pbenchLabelKey = {
+  'native': 'pbenchLabelNative',
+  'native-isolate': 'pbenchLabelNativeIsolate',
+  'fxdart': 'pbenchLabelFxdart',
+  'fxdart-parallel': 'pbenchLabelParallel',
+  'fxdart-parallel-chunk': 'pbenchLabelParallelChunk',
+};
 
 String _renderComparisonIndex(
   Locale locale,
