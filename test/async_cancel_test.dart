@@ -8,6 +8,7 @@ import 'package:fxdart/src/async_iterable.dart'
     show
         DelegateAsyncIterator,
         IterResult,
+        SerialAsyncIterator,
         StreamPullCancel,
         fxCancel,
         fxCancelAll;
@@ -140,6 +141,38 @@ void main() {
           .concurrent(4)
           .toList();
       expect(out, equals([10, 20, 30]));
+    });
+
+    test('an eager release under concurrent keeps every value', () async {
+      // `zip`, `slice` and `takeUntilInclusive` release the source the
+      // moment they know they are done, with no in-flight guard of `take`'s.
+      // That is only safe because the pull protocol answers in order, so an
+      // overlapping pull cannot reach the release before the pulls issued
+      // ahead of it have their values. Pinned, because nothing else states it.
+      FxAsync<int> slow(List<int> xs, int ms) =>
+          fx(xs).toAsync().map((a) async {
+            await Future<void>.delayed(Duration(milliseconds: ms));
+            return a;
+          });
+
+      expect(
+        await slow([1, 2, 3, 4, 5, 6], 20)
+            .zip(slow([1, 2, 3], 5))
+            .concurrent(4)
+            .toList(),
+        equals([(1, 1), (2, 2), (3, 3)]),
+      );
+      expect(
+        await slow([1, 2, 3, 4, 5, 6], 20).slice(0, 3).concurrent(4).toList(),
+        equals([1, 2, 3]),
+      );
+      expect(
+        await slow([1, 2, 3, 4, 5, 6], 20)
+            .takeUntilInclusive((v) => v == 3)
+            .concurrent(4)
+            .toList(),
+        equals([1, 2, 3]),
+      );
     });
 
     test('a full drain is unaffected', () async {
@@ -344,12 +377,15 @@ void main() {
 
     test('nth', () async {
       expect(
-        await releasedByThrow(
-          (s) => nthAsync(3, s.map((v) {
-            if (v > 1) throw StateError('boom');
-            return v;
-          })),
-        ),
+        await releasedByThrow((s) async {
+          await nthAsync(
+            3,
+            s.map((v) {
+              if (v > 1) throw StateError('boom');
+              return v;
+            }),
+          );
+        }),
         isTrue,
       );
     });
@@ -461,6 +497,27 @@ void main() {
       await it.cancel();
       expect(ownRan, isTrue);
       expect(live.cancelled, isTrue);
+    });
+
+    test('a serialized operator forwards a multi-source upstream', () async {
+      // `SerialAsyncIterator` takes the same `upstream:` as the delegate
+      // form, including the list shape the multi-source operators hold.
+      final a = _LiveSource();
+      final b = _LiveSource();
+      addTearDown(a.dispose);
+      addTearDown(b.dispose);
+      final ita = a.chain.iterator;
+      final itb = b.chain.iterator;
+      await ita.next();
+      await itb.next();
+      final it = SerialAsyncIterator<int>(
+        (_) => Future.value(IterResult<int>.done()),
+        upstream: [ita, itb],
+      );
+      await it.cancel();
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(a.cancelled, isTrue);
+      expect(b.cancelled, isTrue);
     });
 
     test('fxCancelAll with nothing to release still resolves', () async {

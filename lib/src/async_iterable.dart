@@ -90,7 +90,14 @@ class DelegateAsyncIterator<T> implements FxAsyncIterator<T>, StreamPullCancel {
     this._next, {
     Future<void> Function()? cancel,
     Object? upstream,
-  }) : _cancel = cancel,
+  }) : assert(
+         upstream == null ||
+             upstream is FxAsyncIterator ||
+             upstream is Iterable,
+         'upstream must be the iterator (or iterators) this one pulls from — '
+         'handing over the iterable instead silently cancels nothing',
+       ),
+       _cancel = cancel,
        _upstream = upstream;
 
   @override
@@ -120,7 +127,14 @@ class SerialAsyncIterator<T> implements FxAsyncIterator<T>, StreamPullCancel {
     this._inner, {
     Future<void> Function()? cancel,
     Object? upstream,
-  }) : _cancel = cancel,
+  }) : assert(
+         upstream == null ||
+             upstream is FxAsyncIterator ||
+             upstream is Iterable,
+         'upstream must be the iterator (or iterators) this one pulls from — '
+         'handing over the iterable instead silently cancels nothing',
+       ),
+       _cancel = cancel,
        _upstream = upstream;
 
   @override
