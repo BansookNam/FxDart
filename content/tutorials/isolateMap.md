@@ -1,6 +1,6 @@
 ---
 slug: isolateMap
-title: isolateMap2..5 — FxDart 101
+title: isolateMap — FxDart 101
 description: FxDart isolateMap2..5 tutorial: fuse 2–5 CPU stages into one sendable worker so parallel pays one isolate hop, with a live playground.
 heading: <code>isolateMap2..5</code>
 section: 11
