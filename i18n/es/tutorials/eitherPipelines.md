@@ -83,5 +83,6 @@ nextLabel: the naming rationale
     <a href="accumulate.html">acumulación</a> — el vocabulario fail-slow a nivel de ámbito ·
     <a href="concurrent.html"><code>concurrent</code></a> — el canal de retorno por el que viaja la variante asíncrona ·
     <a href="partition.html"><code>partition</code></a> — el primo de <code>separated()</code> basado en predicados ·
+    <a href="separated.html"><code>rights</code> / <code>separated</code></a> — las mismas extracciones en una cadena de eventos ·
     <a href="typedErrors.html">errores tipados — guía completa</a>
   </div>

@@ -52,10 +52,11 @@ nextLabel: attempt
   <p>
     Capa de eventos de fxdart, siguiendo a <code>onErrorReturn</code>,
     <code>onErrorResume</code> y <code>Rx.retry</code> de Rx. Para fallos que
-    quieres <em>modelar</em> en vez de recuperar, el
-    <code><a href="either.html">Either</a></code> y el
-    <code><a href="raise.html">Raise</a></code> del lado pull los convierten
-    en valores con tipo — ve a <a href="either.html">Errores con tipo</a>.
+    quieres <em>modelar</em> en vez de recuperar,
+    <code><a href="attempt.html">attempt</a></code> los mueve al canal de
+    valores como un <code>Left</code> tipado — el puente de la capa de
+    eventos hacia <code><a href="either.html">Either</a></code> y
+    <code><a href="raise.html">Raise</a></code>.
   </p>
 
   <h2>Demo 1 · Un valor por error</h2>
@@ -71,6 +72,6 @@ nextLabel: attempt
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="retry.html"><code>retry</code></a> — el original de la capa pull, con gancho de backoff y ámbito por elemento ·
-    <a href="either.html"><code>Either</code></a> — errores como valores con tipo en vez de eventos de los que recuperarse ·
-    <a href="race.html"><code>race</code></a> — un candidato que falla primero gana con su error
+    <a href="attempt.html"><code>attempt</code></a> — los mismos fallos, como <code>Left</code>s tipados en el canal de valores ·
+    <a href="either.html"><code>Either</code></a> — errores como valores con tipo en vez de eventos de los que recuperarse
   </div>
