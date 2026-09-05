@@ -26,22 +26,38 @@ heading: ¿Merece la pena <code>parallel</code>?
 
   <h2>Cuándo pasar <code>chunk</code> y cuándo no</h2>
   <p>
-    Imagina un mensajero. Cada viaje al otro lado del edificio cuesta
-    unos <strong>5µs</strong>, por ligero que sea el sobre.
+    Imagina diez habitaciones al fondo del pasillo, una persona en cada
+    una. Para dar un trabajo caminas, entregas una hoja y vuelves con la
+    respuesta. Ese camino son unos <strong>5µs</strong> — un instante —
+    cada vez, aunque la hoja esté casi en blanco. El número
+    <code>10</code> es cuántas habitaciones contrataste. En esta página
+    es 10 porque la máquina que midió los gráficos tiene 10 núcleos.
   </p>
   <p>
-    Rehashear una contraseña es un sobre pesado (~250µs de trabajo). Un
-    viaje por elemento está bien: el mensajero es barato junto al
-    trabajo. Deja <code>chunk</code> fuera:
+    <strong>Deja <code>chunk</code> fuera</strong> cuando el trabajo de
+    una hoja es pesado. Abajo hay 20.000 contraseñas y 10 trabajadores.
+    Rehashear una contraseña tarda unos 250µs — cincuenta caminos de
+    trabajo. Entonces el camino es ruido. Envía una contraseña por
+    viaje. Son 20.000 caminos, y está bien:
   </p>
-  <pre><code>await fx(creds).parallel(parallelWorkers, rehash).toList();</code></pre>
+  <pre><code>// 20,000 passwords, 10 workers. No chunk.
+await fx(creds).parallel(10, rehash).toList();
+// 20,000 trips. Each trip ~5µs, each job ~250µs.</code></pre>
   <p>
-    La huella de una línea de log es una postal (~3.5µs de trabajo). Un
-    viaje por elemento cuesta más que escribir la tarjeta. Empaqueta
-    muchas en un sobre: eso es <code>chunk</code>:
+    <strong>Pasa <code>chunk</code></strong> cuando el trabajo de una
+    hoja es más ligero que el camino. Abajo hay 1.500.000 líneas de log
+    y 10 trabajadores. La huella de una línea tarda unos 3,5µs — menos
+    que un camino. Una línea por viaje son 1.500.000 caminos, más lento
+    que hacerlo en tu propio escritorio. En su lugar mete 37.500 líneas
+    en cada sobre
+    (<code>1,500,000 ~/ (10 * 4) = 37,500</code>). ¿Por qué
+    <code>10 * 4</code>? Diez habitaciones, cuatro sobres cada una, así
+    que 40 viajes en lugar de 1.500.000 — y si un sobre va más lento,
+    las otras habitaciones aún tienen tres para repartir:
   </p>
-  <pre><code>await fx(lines).parallel(parallelWorkers, fingerprint,
-    chunk: lines.length ~/ (parallelWorkers * 4)).toList();</code></pre>
+  <pre><code>// 1,500,000 log lines, 10 workers, 37,500 lines per envelope.
+await fx(lines).parallel(10, fingerprint, chunk: 37500).toList();
+// 40 trips. 1,500,000 / (10 * 4) = 37,500.</code></pre>
 
   <h2>Las cinco maneras</h2>
   <ol>

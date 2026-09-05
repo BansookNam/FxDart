@@ -23,22 +23,38 @@ heading: <code>parallel</code>은 값어치를 하는가?
 
   <h2><code>chunk</code>를 넣을 때, 빼 둘 때</h2>
   <p>
-    택배를 떠올리세요. 봉투가 얼마나 가볍든 건물 건너편까지 한 번
-    가는 데 약 <strong>5µs</strong>가 듭니다.
+    복도 끝에 방 열 개가 있고, 방마다 사람이 한 명씩 일을 한다고
+    생각해 보세요. 일을 시키려면 걸어가서 종이 한 장을 건네고, 답을
+    들고 돌아와야 합니다. 그 왕복이 매번 약 <strong>5µs</strong> —
+    아주 짧은 시간 — 입니다. 종이가 거의 비어 있어도 걸음값은
+    같습니다. 숫자 <code>10</code>이 워커 수, 즉 고용한 방의
+    개수입니다. 이 페이지의 차트는 코어가 10개인 컴퓨터에서 돌렸기
+    때문에 10입니다.
   </p>
   <p>
-    비밀번호를 다시 해시하는 일은 무거운 봉투입니다 (일 ~250µs).
-    장당 한 번 보내는 게 괜찮습니다. 일에 비하면 택배비가 싸니까요.
-    <code>chunk</code>는 빼 두세요:
+    <strong><code>chunk</code>를 빼 두는 경우</strong>는 종이 한 장에
+    적힌 일이 무거울 때입니다. 아래는 비밀번호 2만 개, 사람 10명입니다.
+    비밀번호 하나를 다시 해시하는 데 약 250µs — 걸어가는 시간의 50배.
+    걸음값은 오차처럼 작아집니다. 한 번에 비밀번호 하나만 보내세요.
+    왕복 2만 번이고, 그래도 됩니다:
   </p>
-  <pre><code>await fx(creds).parallel(parallelWorkers, rehash).toList();</code></pre>
+  <pre><code>// 20,000 passwords, 10 workers. No chunk.
+await fx(creds).parallel(10, rehash).toList();
+// 20,000 trips. Each trip ~5µs, each job ~250µs.</code></pre>
   <p>
-    로그 한 줄의 지문은 엽서입니다 (일 ~3.5µs). 장당 한 번 보내면
-    쓰는 시간보다 우표가 더 비쌉니다. 한 봉투에 여러 장을 넣는 것이
-    <code>chunk</code>입니다:
+    <strong><code>chunk</code>를 넣는 경우</strong>는 종이 한 장의 일이
+    걸음보다 가벼울 때입니다. 아래는 로그 150만 줄, 사람 10명입니다.
+    한 줄의 지문을 내는 데 약 3.5µs — 걸어가는 시간보다 짧습니다.
+    한 줄마다 걸어가면 왕복 150만 번이고, 자기 책상에서 하는 것보다
+    느려집니다. 대신 봉투 하나에 37,500줄을 넣으세요
+    (<code>1,500,000 ~/ (10 * 4) = 37,500</code>).
+    <code>10 * 4</code>인 이유요? 방 열 개, 방마다 봉투 네 장, 그래서
+    왕복이 150만이 아니라 40번입니다. 한 봉투가 늦어도 다른 방에 남은
+    세 장이 있어 일을 나눠 가질 수 있습니다:
   </p>
-  <pre><code>await fx(lines).parallel(parallelWorkers, fingerprint,
-    chunk: lines.length ~/ (parallelWorkers * 4)).toList();</code></pre>
+  <pre><code>// 1,500,000 log lines, 10 workers, 37,500 lines per envelope.
+await fx(lines).parallel(10, fingerprint, chunk: 37500).toList();
+// 40 trips. 1,500,000 / (10 * 4) = 37,500.</code></pre>
 
   <h2>다섯 가지 방법</h2>
   <ol>

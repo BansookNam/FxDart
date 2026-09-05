@@ -24,22 +24,39 @@ heading: Is <code>parallel</code> worth it?
 
   <h2>When to pass <code>chunk</code>, and when not to</h2>
   <p>
-    Picture a courier. Each trip across the building costs about
-    <strong>5µs</strong>, no matter how light the envelope.
+    Picture ten rooms down a hall, one person in each room. To give
+    someone a job you walk over, hand them a sheet of paper, and walk
+    back with the answer. That walk is about <strong>5µs</strong> —
+    a tiny slice of time — every time, even if the sheet is almost
+    blank. The number <code>10</code> is the worker count: how many
+    rooms you hired. On this page it is 10, because the machine that
+    ran the charts has 10 cores.
   </p>
   <p>
-    A password rehash is a heavy envelope (~250µs of work). One trip
-    per item is fine — the courier is cheap next to the work. Leave
-    <code>chunk</code> off:
+    <strong>Leave <code>chunk</code> off</strong> when the job on one
+    sheet is heavy. Below there are 20,000 passwords and 10 workers.
+    Rehashing one password takes about 250µs — fifty walks of work.
+    The walk is then a rounding error. Send one password per trip.
+    That is 20,000 walks, and that is fine:
   </p>
-  <pre><code>await fx(creds).parallel(parallelWorkers, rehash).toList();</code></pre>
+  <pre><code>// 20,000 passwords, 10 workers. No chunk.
+await fx(creds).parallel(10, rehash).toList();
+// 20,000 trips. Each trip ~5µs, each job ~250µs.</code></pre>
   <p>
-    A log-line fingerprint is a postcard (~3.5µs of work). One trip
-    per item costs more than writing the card. Pack many into one
-    envelope — that is <code>chunk</code>:
+    <strong>Pass <code>chunk</code></strong> when the job on one sheet
+    is lighter than the walk. Below there are 1,500,000 log lines and
+    10 workers. Fingerprinting one line takes about 3.5µs — less than
+    one walk. Send one line per trip and you pay 1,500,000 walks, which
+    is slower than doing the work at your own desk. Instead pack 37,500
+    lines in each envelope
+    (<code>1,500,000 ~/ (10 * 4) = 37,500</code>). Why
+    <code>10 * 4</code>? Ten rooms, four envelopes each, so 40 trips
+    instead of 1,500,000 — and if one envelope is slower, the other
+    rooms still have three left to share:
   </p>
-  <pre><code>await fx(lines).parallel(parallelWorkers, fingerprint,
-    chunk: lines.length ~/ (parallelWorkers * 4)).toList();</code></pre>
+  <pre><code>// 1,500,000 log lines, 10 workers, 37,500 lines per envelope.
+await fx(lines).parallel(10, fingerprint, chunk: 37500).toList();
+// 40 trips. 1,500,000 / (10 * 4) = 37,500.</code></pre>
 
   <h2>The five ways</h2>
   <ol>
