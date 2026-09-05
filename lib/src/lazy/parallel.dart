@@ -170,12 +170,40 @@ FxAsyncIterable<R> mapParallelAsync<A, R>(
 ///
 /// [first] and [second] must be sendable (top-level or static, or a
 /// closure whose captures are). The returned function captures both; it
-/// is sendable when they are.
+/// is sendable when they are. Arity capped at 5, like
+/// `zipOrAccumulate2..5` — beyond that, write the fused worker yourself.
 R Function(A a) isolateMap2<A, M, R>(
   M Function(A a) first,
   R Function(M m) second,
 ) =>
     (A a) => second(first(a));
+
+/// 3-ary [isolateMap2].
+R Function(A a) isolateMap3<A, M1, M2, R>(
+  M1 Function(A a) first,
+  M2 Function(M1 m) second,
+  R Function(M2 m) third,
+) =>
+    (A a) => third(second(first(a)));
+
+/// 4-ary [isolateMap2].
+R Function(A a) isolateMap4<A, M1, M2, M3, R>(
+  M1 Function(A a) first,
+  M2 Function(M1 m) second,
+  M3 Function(M2 m) third,
+  R Function(M3 m) fourth,
+) =>
+    (A a) => fourth(third(second(first(a))));
+
+/// 5-ary [isolateMap2].
+R Function(A a) isolateMap5<A, M1, M2, M3, M4, R>(
+  M1 Function(A a) first,
+  M2 Function(M1 m) second,
+  M3 Function(M2 m) third,
+  M4 Function(M3 m) fourth,
+  R Function(M4 m) fifth,
+) =>
+    (A a) => fifth(fourth(third(second(first(a)))));
 
 /// A reused isolate pool for sequential [parallelOn] chains.
 ///

@@ -118,7 +118,10 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   ~3ms
   <p>
     <code>decodePng</code> y <code>thumbnail</code> tienen que ser
     enviables, igual que cualquier worker de <code>parallel</code>.
-    La función devuelta captura ambos.
+    La función devuelta captura ambos. <code>isolateMap3</code>..<code>isolateMap5</code>
+    aceptan más etapas — la aridad para en 5, como
+    <code>zipOrAccumulate2..5</code>. Más allá, escribe el worker
+    fusionado tú.
   </p>
 
   <h2>Reutilizar el pool</h2>

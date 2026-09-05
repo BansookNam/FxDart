@@ -12,12 +12,14 @@ without a length throws, and `chunk:` / `chunked:` together throw.
 await fx(rows).parallel(4, parseRow, chunked: true);
 ```
 
-**`isolateMap2(f, g)`** — run two CPU stages inside one hop. Two
+**`isolateMap2..5`** — run 2–5 CPU stages inside one hop. Two
 `.parallel` calls copy every result back to the main isolate and out
-again; compose the workers instead.
+again; compose the workers instead. Arity capped at 5, like
+`zipOrAccumulate2..5`.
 
 ```dart
 await fx(blobs).parallel(4, isolateMap2(decodePng, thumbnail), chunk: 64).toList();
+await fx(rows).parallel(4, isolateMap3(parse, normalise, score), chunked: true).toList();
 ```
 
 **`IsolatePool`** — spawn once, run sequential chains, kill in

@@ -116,7 +116,10 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   약 3ms
   <p>
     <code>decodePng</code>와 <code>thumbnail</code>은 다른
     <code>parallel</code> 워커와 같이 보낼 수 있어야 합니다. 반환
-    함수가 둘을 캡처합니다.
+    함수가 둘을 캡처합니다. <code>isolateMap3</code>..<code>isolateMap5</code>는
+    단계를 더 받습니다 — 인자는 5개에서 끝입니다
+    (<code>zipOrAccumulate2..5</code>와 같습니다). 그 이상은 워커를
+    직접 합치세요.
   </p>
 
   <h2>풀을 재사용하기</h2>

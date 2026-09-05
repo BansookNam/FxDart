@@ -201,6 +201,19 @@ FxAsyncIterable<R> _$parallelOnAsync<A, R>(IsolatePool pool,
 R Function(A a) _$isolateMap2<A, M, R>(
         M Function(A a) first, R Function(M m) second) =>
     isolateMap2(first, second);
+R Function(A a) _$isolateMap3<A, M1, M2, R>(
+        M1 Function(A a) first, M2 Function(M1 m) second,
+        R Function(M2 m) third) =>
+    isolateMap3(first, second, third);
+R Function(A a) _$isolateMap4<A, M1, M2, M3, R>(
+        M1 Function(A a) first, M2 Function(M1 m) second,
+        M3 Function(M2 m) third, R Function(M3 m) fourth) =>
+    isolateMap4(first, second, third, fourth);
+R Function(A a) _$isolateMap5<A, M1, M2, M3, M4, R>(
+        M1 Function(A a) first, M2 Function(M1 m) second,
+        M3 Function(M2 m) third, M4 Function(M3 m) fourth,
+        R Function(M4 m) fifth) =>
+    isolateMap5(first, second, third, fourth, fifth);
 typedef _$IsolatePool = IsolatePool;
 Iterable<(A, B)> _$attach<A, B>(B Function(A a) f, Iterable<A> iterable) =>
     attach(f, iterable);

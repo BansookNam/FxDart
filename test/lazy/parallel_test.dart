@@ -942,6 +942,31 @@ void main() {
         equals([12, 14, 16, 18]),
       );
     });
+
+    test('isolateMap3..5 compose on the worker', () async {
+      expect(
+        await fx([
+          1,
+          2,
+        ]).parallel(1, isolateMap3(doubleIt, addTen, doubleIt)).toList(),
+        equals([24, 28]),
+      );
+      expect(
+        await fx(
+          [1],
+        ).parallel(1, isolateMap4(doubleIt, addTen, doubleIt, addTen)).toList(),
+        equals([34]),
+      );
+      expect(
+        await fx([1])
+            .parallel(
+              1,
+              isolateMap5(doubleIt, addTen, doubleIt, addTen, doubleIt),
+            )
+            .toList(),
+        equals([68]),
+      );
+    });
   });
 
   group('IsolatePool', () {

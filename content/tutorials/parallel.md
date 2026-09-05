@@ -116,7 +116,10 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   ~3ms
   <p>
     <code>decodePng</code> and <code>thumbnail</code> must be sendable,
     same as any <code>parallel</code> worker. The returned function
-    captures both.
+    captures both. <code>isolateMap3</code>..<code>isolateMap5</code>
+    take more stages — arity stops at 5, like
+    <code>zipOrAccumulate2..5</code>. Beyond that, write the fused
+    worker yourself.
   </p>
 
   <h2>Reuse the pool</h2>
