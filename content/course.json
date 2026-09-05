@@ -587,6 +587,10 @@
     {
       "href": "parallel.html",
       "label": "parallel"
+    },
+    {
+      "href": "isolateMap.html",
+      "label": "isolateMap2..5"
     }
   ],
   "12": [

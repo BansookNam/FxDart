@@ -7,8 +7,8 @@ section: 11
 crumb: parallel
 prev: concurrentOrParallel.html
 prevLabel: concurrent or parallel
-next: debounce.html
-nextLabel: debounce
+next: isolateMap.html
+nextLabel: isolateMap2..5
 ---
   <p class="hero-sub">Overlaps CPU work across isolates, in source order. Not <code>concurrent</code> with a different name.</p>
 
@@ -143,5 +143,6 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   ~3ms
     <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — the combined I/O form ·
     <a href="concurrentOrParallel.html">concurrent or parallel</a> — I/O vs CPU ·
     <code>mapParallel</code> — the same operator as <code>parallel</code> ·
+    <a href="isolateMap.html"><code>isolateMap2..5</code></a> — fuse CPU stages into one hop ·
     <a href="../parallel-benchmark.html">is parallel worth it?</a> — the same job five ways, measured
   </div>

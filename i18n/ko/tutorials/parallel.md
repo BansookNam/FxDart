@@ -7,8 +7,8 @@ section: 11
 crumb: parallel
 prev: concurrentOrParallel.html
 prevLabel: concurrent or parallel
-next: debounce.html
-nextLabel: debounce
+next: isolateMap.html
+nextLabel: isolateMap2..5
 ---
   <p class="hero-sub">CPU 일을 isolate들에 겹칩니다, 소스 순서로. 이름만 다른 <code>concurrent</code>가 아닙니다.</p>
 
@@ -144,5 +144,6 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   약 3ms
     <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — 결합된 I/O 형태 ·
     <a href="concurrentOrParallel.html">concurrent or parallel</a> — I/O vs CPU ·
     <code>mapParallel</code> — <code>parallel</code>과 같은 연산 ·
+    <a href="isolateMap.html"><code>isolateMap2..5</code></a> — CPU 단계를 한 홉으로 ·
     <a href="../parallel-benchmark.html">parallel은 값어치를 하는가?</a> — 같은 작업 다섯 가지 방법, 측정
   </div>

@@ -5,8 +5,8 @@ description: FxDart debounce tutorial: delay a function call until things go qui
 heading: <code>debounce</code>
 section: 12
 crumb: debounce
-prev: parallel.html
-prevLabel: parallel
+prev: isolateMap.html
+prevLabel: isolateMap2..5
 next: throttle.html
 nextLabel: throttle
 ---

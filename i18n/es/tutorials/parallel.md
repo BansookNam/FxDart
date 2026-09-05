@@ -7,8 +7,8 @@ section: 11
 crumb: parallel
 prev: concurrentOrParallel.html
 prevLabel: concurrent or parallel
-next: debounce.html
-nextLabel: debounce
+next: isolateMap.html
+nextLabel: isolateMap2..5
 ---
   <p class="hero-sub">Solapa trabajo de CPU entre isolates, en el orden de la fuente. No es <code>concurrent</code> con otro nombre.</p>
 
@@ -146,5 +146,6 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   ~3ms
     <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — la forma combinada de I/O ·
     <a href="concurrentOrParallel.html">concurrent or parallel</a> — I/O vs CPU ·
     <code>mapParallel</code> — el mismo operador que <code>parallel</code> ·
+    <a href="isolateMap.html"><code>isolateMap2..5</code></a> — fusiona etapas de CPU en un hop ·
     <a href="../parallel-benchmark.html">¿merece la pena parallel?</a> — el mismo trabajo de cinco maneras, medido
   </div>

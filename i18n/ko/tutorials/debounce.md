@@ -5,8 +5,8 @@ description: FxDart debounce 튜토리얼 — 호출이 잠잠해질 때까지 �
 heading: <code>debounce</code>
 section: 12
 crumb: debounce
-prev: parallel.html
-prevLabel: parallel
+prev: isolateMap.html
+prevLabel: isolateMap2..5
 next: throttle.html
 nextLabel: throttle
 ---

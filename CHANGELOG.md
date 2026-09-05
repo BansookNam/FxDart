@@ -132,6 +132,10 @@ await IsolatePool.using(4, (pool) async {
 });
 ```
 
+The 101 page `isolateMap2..5` has a live playground on
+`isolateMap3(parse, normalise, score)` — the fused worker through
+`map`, because `parallel` itself is VM-only.
+
 A source that throws after the pool has started now shuts the pool
 down too — previously only worker errors did, and holding the
 iterator kept the process alive.
