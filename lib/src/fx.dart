@@ -6,6 +6,7 @@ import 'lazy/combine.dart' as l;
 import 'lazy/effect.dart' as l;
 import 'lazy/filter.dart' as l;
 import 'lazy/map.dart' as l;
+import 'lazy/parallel.dart' as l;
 import 'lazy/take_drop.dart' as l;
 import 'lazy/zip.dart' as l;
 import 'strict/access.dart' as s;
@@ -393,6 +394,21 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   @pragma('vm:prefer-inline')
   FxAsync<R> mapConcurrent<R>(int concurrency, FutureOr<R> Function(T a) f) =>
       FxAsync(l.mapConcurrent(concurrency, f, _inner));
+
+  /// CPU-bound twin of [mapConcurrent]: runs [worker] on a pool of
+  /// [workers] isolates, preserving source order. Prefer a top-level or
+  /// static [worker]; a closure that captures a non-sendable throws
+  /// [ArgumentError] at spawn. Throws [UnsupportedError] on the web.
+  /// Pass [parallelWorkers] when you do not want to pick [workers].
+  @pragma('vm:prefer-inline')
+  FxAsync<R> parallel<R>(int workers, R Function(T input) worker) =>
+      FxAsync(l.parallel(workers, worker, _inner));
+
+  /// Alias of [parallel] — same operator, the name that sits next to
+  /// [mapConcurrent].
+  @pragma('vm:prefer-inline')
+  FxAsync<R> mapParallel<R>(int workers, R Function(T input) worker) =>
+      parallel(workers, worker);
 
   /// Switches to the async chain and maps [f], retrying each call up to
   /// [attempts] times (with optional [delay] backoff) before the error
@@ -995,6 +1011,9 @@ class FxAsync<T> implements FxAsyncIterable<T> {
 
   /// Evaluates the upstream chain up to [length] items at a time.
   ///
+  /// Overlaps `Future`s on this isolate (I/O). CPU-bound work belongs
+  /// on [parallel].
+  ///
   /// Port of FxTS `concurrent`.
   @pragma('vm:prefer-inline')
   FxAsync<T> concurrent(int length) => FxAsync(concurrentAsync(length, _inner));
@@ -1004,6 +1023,17 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   @pragma('vm:prefer-inline')
   FxAsync<R> mapConcurrent<R>(int concurrency, FutureOr<R> Function(T a) f) =>
       FxAsync(l.mapConcurrentAsync(concurrency, f, _inner));
+
+  /// CPU-bound twin of [mapConcurrent] for an async source. See [Fx.parallel].
+  @pragma('vm:prefer-inline')
+  FxAsync<R> parallel<R>(int workers, R Function(T input) worker) =>
+      FxAsync(l.parallelAsync(workers, worker, _inner));
+
+  /// Alias of [FxAsync.parallel] — same operator, the name that sits next
+  /// to [mapConcurrent].
+  @pragma('vm:prefer-inline')
+  FxAsync<R> mapParallel<R>(int workers, R Function(T input) worker) =>
+      parallel(workers, worker);
 
   /// Like [concurrent] but yields in completion order.
   @pragma('vm:prefer-inline')

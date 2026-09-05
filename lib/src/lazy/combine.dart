@@ -131,7 +131,7 @@ FxAsyncIterable<T> cycleAsync<T>(FxAsyncIterable<T> iterable) {
       final value = arr[i % arr.length];
       i++;
       return IterResult.value(value);
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -155,7 +155,7 @@ FxAsyncIterable<A> appendAsync<A>(FutureOr<A> a, FxAsyncIterable<A> iterable) {
         return IterResult.value(await a);
       }
       return result;
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -184,7 +184,7 @@ FxAsyncIterable<A> prependAsync<A>(FutureOr<A> a, FxAsyncIterable<A> iterable) {
         return IterResult.value(await a);
       }
       return iterator.next(concurrent);
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -236,7 +236,7 @@ FxAsyncIterable<A> concatAsync<A>(
 
 class _ConcatAsyncIterator<A>
     with FxFastNextGate<A>
-    implements FxFastIterator<A> {
+    implements FxFastIterator<A>, StreamPullCancel {
   _ConcatAsyncIterator(this._iterable1, this._iterable2);
   final FxAsyncIterable<A> _iterable1;
   final FxAsyncIterable<A> _iterable2;
@@ -244,6 +244,9 @@ class _ConcatAsyncIterator<A>
   FxAsyncIterator<A>? _right;
   FxAsyncIterator<A>? _fallback;
   bool _leftDone = false;
+
+  @override
+  Future<void> cancel() => fxCancelAll([_left, _right, _fallback]);
 
   @override
   Future<IterResult<A>> next([Concurrent? concurrent]) {
@@ -309,7 +312,7 @@ FxAsyncIterable<A> _concatAsyncLegacy<A>(
         leftDone = true;
       }
       return right.next(concurrent);
-    });
+    }, upstream: [left, right]);
   });
 }
 
@@ -388,7 +391,7 @@ FxAsyncIterable<A> ifEmptyAsync<A>(
         }
         return result;
       });
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -457,7 +460,7 @@ FxAsyncIterable<A> reverseAsync<A>(FxAsyncIterable<A> iterable) {
       }
       if (reversed!.moveNext()) return IterResult.value(reversed!.current);
       return IterResult<A>.done();
-    });
+    }, upstream: iterator);
   });
 }
 

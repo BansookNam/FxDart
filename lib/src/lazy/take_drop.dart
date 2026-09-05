@@ -85,10 +85,39 @@ FxAsyncIterable<A> _takeAsyncLegacy<A>(
   return DelegateAsyncIterable(() {
     final iterator = iterable.iterator;
     var remaining = length;
-    return DelegateAsyncIterator((concurrent) {
-      if (remaining-- < 1) return Future.value(IterResult<A>.done());
-      return iterator.next(concurrent);
-    });
+    var cancelled = false;
+    // Under `concurrent(n)` the consumer issues n overlapping pulls, so the
+    // pull that runs out of count can be answered while earlier pulls are
+    // still upstream. Cancelling then would abort the values they are about
+    // to deliver, so the release waits for the last one to settle.
+    var inFlight = 0;
+    var wanted = false;
+    // Returns the release future, or null when the release is still owed to
+    // an in-flight pull — a `cancel()` that lands mid-pull therefore resolves
+    // before the source is let go, which is as close as this path gets: the
+    // release runs when that last pull settles, and there is no earlier
+    // moment to hand back.
+    Future<void>? cancelOnce() {
+      wanted = true;
+      if (cancelled || inFlight > 0) return null;
+      cancelled = true;
+      return fxCancelAsync(iterator);
+    }
+
+    return DelegateAsyncIterator(
+      (concurrent) {
+        if (remaining-- < 1) {
+          cancelOnce();
+          return Future.value(IterResult<A>.done());
+        }
+        inFlight++;
+        return iterator.next(concurrent).whenComplete(() {
+          inFlight--;
+          if (wanted) cancelOnce();
+        });
+      },
+      cancel: () => cancelOnce() ?? Future<void>.value(),
+    );
   });
 }
 
@@ -185,7 +214,7 @@ FxAsyncIterable<A> takeRightAsync<A>(int length, FxAsyncIterable<A> iterable) {
       }
       if (tail!.moveNext()) return IterResult.value(tail!.current);
       return IterResult<A>.done();
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -267,7 +296,7 @@ FxAsyncIterable<A> _takeWhileAsyncLegacy<A>(
         if (keep is Future<bool>) return keep.then(decide);
         return decide(keep);
       });
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -369,7 +398,7 @@ FxAsyncIterable<A> takeWhileRightAsync<A>(
       }
       if (tail!.moveNext()) return IterResult.value(tail!.current);
       return IterResult<A>.done();
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -419,10 +448,13 @@ FxAsyncIterable<A> takeUntilInclusiveAsync<A>(
       final result = await iterator.next(concurrent);
       if (result.done || end) return IterResult<A>.done();
       if (await f(result.value)) {
+        // The predicate just closed the run: this element is the last one,
+        // so nothing more will be pulled — release the source now.
         end = true;
+        fxCancel(iterator);
       }
       return result;
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -498,7 +530,7 @@ FxAsyncIterable<A> dropAsync<A>(int length, FxAsyncIterable<A> iterable) {
         if (r.done) return IterResult<A>.done();
       }
       return iterator.next(concurrent);
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -595,7 +627,7 @@ FxAsyncIterable<A> dropRightAsync<A>(int length, FxAsyncIterable<A> iterable) {
       }
       if (head!.moveNext()) return IterResult.value(head!.current);
       return IterResult<A>.done();
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -682,7 +714,7 @@ FxAsyncIterable<A> _dropWhileAsyncLegacy<A>(
         return decide(drop);
       });
       return loop();
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -783,7 +815,7 @@ FxAsyncIterable<A> dropWhileRightAsync<A>(
       }
       if (head!.moveNext()) return IterResult.value(head!.current);
       return IterResult<A>.done();
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -845,7 +877,7 @@ FxAsyncIterable<A> dropUntilAsync<A>(
         return decide(match);
       });
       return loop();
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -909,8 +941,11 @@ FxAsyncIterable<A> sliceAsync<A>(
         if (result.done) return IterResult<A>.done();
         if (i++ >= start) return result;
       }
+      // Stopped at [end] with the source still live — release it, as `take`
+      // does when its count runs out.
+      fxCancel(iterator);
       return IterResult<A>.done();
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -1380,7 +1415,7 @@ FxAsyncIterable<List<A>> _windowedAsync<A>(
 /// concurrent path.
 class _WindowedAsyncIterator<A>
     with FxFastNextGate<List<A>>
-    implements FxFastIterator<List<A>> {
+    implements FxFastIterator<List<A>>, StreamPullCancel {
   _WindowedAsyncIterator(
     this._size,
     this._step,
@@ -1394,6 +1429,13 @@ class _WindowedAsyncIterator<A>
   final FxAsyncIterable<A> _sourceIterable;
   FxAsyncIterator<A>? _source;
   FxAsyncIterator<List<A>>? _fallback;
+
+  @override
+  Future<void> cancel() {
+    _finished = true;
+    return fxCancelAll([_source, _fallback]);
+  }
+
   List<A> _carry = <A>[];
   int _pendingSkip = 0;
   bool _sourceDone = false;
@@ -1568,7 +1610,7 @@ FxAsyncIterable<List<A>> _windowedAsyncLegacy<A>(
         pendingSkip = step - size;
       }
       return IterResult.value(window);
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -1632,7 +1674,7 @@ FxAsyncIterable<(A, A)> pairwiseAsync<A>(FxAsyncIterable<A> iterable) {
         prev = value;
         hasPrev = true;
       }
-    });
+    }, upstream: iterator);
   });
 }
 
@@ -1721,7 +1763,7 @@ FxAsyncIterable<String> splitAsync(
         }
         acc += chr;
       }
-    });
+    }, upstream: iterator);
   });
 }
 

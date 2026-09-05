@@ -5,6 +5,8 @@ description: Tutorial de debounce en FxDart: retrasa la llamada a una función h
 heading: <code>debounce</code>
 section: 12
 crumb: debounce
+prev: parallel.html
+prevLabel: parallel
 next: throttle.html
 nextLabel: throttle
 ---

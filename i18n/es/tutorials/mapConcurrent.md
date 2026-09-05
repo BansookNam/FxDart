@@ -55,5 +55,6 @@ nextLabel: concurrentPool
     <strong>Relacionados:</strong>
     <a href="concurrent.html"><code>concurrent</code></a> — el limitador subyacente ·
     <a href="concurrentPool.html"><code>concurrentPool</code></a> — orden de finalización en vez de orden de origen ·
-    <a href="toAsync.html"><code>toAsync</code></a> — el puente sync→async que este operador absorbe
+    <a href="toAsync.html"><code>toAsync</code></a> — el puente sync→async que este operador absorbe ·
+    <a href="concurrentOrParallel.html">concurrent or parallel</a> — I/O vs CPU
   </div>

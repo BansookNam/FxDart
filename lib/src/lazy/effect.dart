@@ -123,10 +123,13 @@ FxAsyncIterable<A> timeoutAsync<A>(
   );
 }
 
-class _TimeoutAsyncIterator<A> implements FxFastIterator<A> {
+class _TimeoutAsyncIterator<A> implements FxFastIterator<A>, StreamPullCancel {
   _TimeoutAsyncIterator(this._limit, this._inner);
   final Duration _limit;
   final FxAsyncIterator<A> _inner;
+
+  @override
+  Future<void> cancel() => fxCancelAll(_inner);
 
   @override
   Future<IterResult<A>> next([Concurrent? concurrent]) =>
@@ -238,7 +241,7 @@ FxAsyncIterable<T> usingAsync<R, T>(
 /// The [usingAsync] iterator. Public `next` stays a pass-through (as
 /// before); the fast-pull path serves synchronously answered inner pulls
 /// without futures, releasing exactly once on completion or error.
-class _UsingAsyncIterator<R, T> implements FxFastIterator<T> {
+class _UsingAsyncIterator<R, T> implements FxFastIterator<T>, StreamPullCancel {
   _UsingAsyncIterator(this._acquire, this._use, this._release);
   final FutureOr<R> Function() _acquire;
   final FxAsyncIterable<T> Function(R resource) _use;
@@ -249,6 +252,15 @@ class _UsingAsyncIterator<R, T> implements FxFastIterator<T> {
   FxAsyncIterator<T>? _iterator; // cached once [_started] resolves
   Future<FxAsyncIterator<T>>? _started;
   Future<void>? _releasing;
+
+  /// An early stop releases the resource *and* the inner chain — the point
+  /// of `using` is that release happens on every exit, a cancelled consumer
+  /// included.
+  @override
+  Future<void> cancel() {
+    _done = true;
+    return fxCancelAll(_iterator, _acquired ? _releaseOnce : null);
+  }
 
   Future<void> _releaseOnce() =>
       _releasing ??= Future.sync(() => _release(_resource));

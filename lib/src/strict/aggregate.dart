@@ -30,21 +30,29 @@ Future<List<A>> toListAsync<A>(FxAsyncIterable<A> iterable) async {
     return result;
   }
   final iterator = iterable.iterator;
-  // Terminals own their iterator and consume serially, so they may use the
-  // internal fast-pull path: synchronously answered pulls (fused stages
-  // over a sync source) collect with no futures at all.
-  if (iterator is FxFastIterator<A>) {
+  // An error ends the drain with the source still live — release it, or a
+  // `parallel` pool upstream keeps its isolates (and the program) alive.
+  // The drive paths above do the same through [fxFusedDrive]'s `fail`.
+  try {
+    // Terminals own their iterator and consume serially, so they may use the
+    // internal fast-pull path: synchronously answered pulls (fused stages
+    // over a sync source) collect with no futures at all.
+    if (iterator is FxFastIterator<A>) {
+      while (true) {
+        final ro = iterator.nextOr();
+        final r = ro is Future<IterResult<A>> ? await ro : ro;
+        if (r.done) return result;
+        result.add(r.value);
+      }
+    }
     while (true) {
-      final ro = iterator.nextOr();
-      final r = ro is Future<IterResult<A>> ? await ro : ro;
+      final r = await iterator.next();
       if (r.done) return result;
       result.add(r.value);
     }
-  }
-  while (true) {
-    final r = await iterator.next();
-    if (r.done) return result;
-    result.add(r.value);
+  } catch (_) {
+    fxCancel(iterator);
+    rethrow;
   }
 }
 
@@ -80,24 +88,31 @@ Future<void> eachAsync<A>(
       fxFusedDrive<A>(iterable, f);
   if (drive != null) return drive;
   final iterator = iterable.iterator;
-  // Fast-pull loop where available (see [toListAsync]); awaits only
-  // genuinely asynchronous pulls and callback results.
-  if (iterator is FxFastIterator<A>) {
+  // A callback that throws abandons the source mid-drain: release it (see
+  // [toListAsync]).
+  try {
+    // Fast-pull loop where available (see [toListAsync]); awaits only
+    // genuinely asynchronous pulls and callback results.
+    if (iterator is FxFastIterator<A>) {
+      while (true) {
+        final ro = iterator.nextOr();
+        final r = ro is Future<IterResult<A>> ? await ro : ro;
+        if (r.done) return;
+        final v = f(r.value);
+        if (v is Future) await v;
+      }
+    }
     while (true) {
-      final ro = iterator.nextOr();
-      final r = ro is Future<IterResult<A>> ? await ro : ro;
+      final r = await iterator.next();
       if (r.done) return;
+      // Await only genuinely asynchronous callbacks — awaiting a sync one
+      // would cost a microtask hop per element.
       final v = f(r.value);
       if (v is Future) await v;
     }
-  }
-  while (true) {
-    final r = await iterator.next();
-    if (r.done) return;
-    // Await only genuinely asynchronous callbacks — awaiting a sync one
-    // would cost a microtask hop per element.
-    final v = f(r.value);
-    if (v is Future) await v;
+  } catch (_) {
+    fxCancel(iterator);
+    rethrow;
   }
 }
 
@@ -115,10 +130,17 @@ void consume<A>(Iterable<A> iterable, [int? n]) {
 Future<void> consumeAsync<A>(FxAsyncIterable<A> iterable, [int? n]) async {
   final iterator = iterable.iterator;
   var remaining = n;
-  while (remaining == null || remaining-- > 0) {
-    final r = await iterator.next();
-    if (r.done) return;
+  try {
+    while (remaining == null || remaining-- > 0) {
+      final r = await iterator.next();
+      if (r.done) return;
+    }
+  } catch (_) {
+    fxCancel(iterator);
+    rethrow;
   }
+  // Counted out with the source still live — release it, as [headAsync] does.
+  fxCancel(iterator);
 }
 
 /// Folds [iterable] through [f] using its first element as the seed.
@@ -284,27 +306,34 @@ Future<A> reduceAsync<A>(
   FxAsyncIterable<A> iterable,
 ) async {
   final iterator = iterable.iterator;
-  final first = await iterator.next();
-  if (first.done) {
-    throw StateError("'reduce' of empty iterable with no initial value");
-  }
-  var acc = first.value;
-  // Fast-pull loop where available (see [toListAsync]).
-  if (iterator is FxFastIterator<A>) {
+  // A reducer that throws abandons the source mid-drain: release it (see
+  // [toListAsync]).
+  try {
+    final first = await iterator.next();
+    if (first.done) {
+      throw StateError("'reduce' of empty iterable with no initial value");
+    }
+    var acc = first.value;
+    // Fast-pull loop where available (see [toListAsync]).
+    if (iterator is FxFastIterator<A>) {
+      while (true) {
+        final ro = iterator.nextOr();
+        final r = ro is Future<IterResult<A>> ? await ro : ro;
+        if (r.done) return acc;
+        final v = f(acc, r.value);
+        acc = v is Future<A> ? await v : v;
+      }
+    }
     while (true) {
-      final ro = iterator.nextOr();
-      final r = ro is Future<IterResult<A>> ? await ro : ro;
+      final r = await iterator.next();
       if (r.done) return acc;
+      // Sync accumulators continue without an await hop, as in [eachAsync].
       final v = f(acc, r.value);
       acc = v is Future<A> ? await v : v;
     }
-  }
-  while (true) {
-    final r = await iterator.next();
-    if (r.done) return acc;
-    // Sync accumulators continue without an await hop, as in [eachAsync].
-    final v = f(acc, r.value);
-    acc = v is Future<A> ? await v : v;
+  } catch (_) {
+    fxCancel(iterator);
+    rethrow;
   }
 }
 
@@ -335,22 +364,29 @@ Future<Acc> foldAsync<A, Acc>(
     return acc;
   }
   final iterator = iterable.iterator;
-  // Fast-pull loop where available (see [toListAsync]).
-  if (iterator is FxFastIterator<A>) {
+  // An accumulator that throws abandons the source mid-drain: release it
+  // (see [toListAsync]).
+  try {
+    // Fast-pull loop where available (see [toListAsync]).
+    if (iterator is FxFastIterator<A>) {
+      while (true) {
+        final ro = iterator.nextOr();
+        final r = ro is Future<IterResult<A>> ? await ro : ro;
+        if (r.done) return acc;
+        final v = f(acc, r.value);
+        acc = v is Future<Acc> ? await v : v;
+      }
+    }
     while (true) {
-      final ro = iterator.nextOr();
-      final r = ro is Future<IterResult<A>> ? await ro : ro;
+      final r = await iterator.next();
       if (r.done) return acc;
+      // Sync accumulators continue without an await hop, as in [eachAsync].
       final v = f(acc, r.value);
       acc = v is Future<Acc> ? await v : v;
     }
-  }
-  while (true) {
-    final r = await iterator.next();
-    if (r.done) return acc;
-    // Sync accumulators continue without an await hop, as in [eachAsync].
-    final v = f(acc, r.value);
-    acc = v is Future<Acc> ? await v : v;
+  } catch (_) {
+    fxCancel(iterator);
+    rethrow;
   }
 }
 
