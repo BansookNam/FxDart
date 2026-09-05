@@ -64,8 +64,12 @@ Every element costs two message copies, a port event and a completer *on
 the main isolate*, which is one thread and the one part of the system
 that cannot be parallelised: ~8 µs of coordination to hand off ~3.5 µs of
 work, with the workers idle waiting to be fed. A batch does not make the
-coordination cheaper, it makes there be less of it — 40 messages instead
-of three million.
+coordination cheaper, it makes there be less of it. `n ~/ (workers * 4)`
+always yields 40 messages with ten workers: `chunk: 2500` at this
+N=100,000 sweep (vs 100,000 round trips), `chunk: 37500` at the headline
+N=1,500,000 (vs 1.5 million trips). This sweep is a separate
+`BENCH_N=100000` / `BENCH_WORKERS` run; it is not in
+`results-parallel.json`.
 
 Run: `dart run benchmark/run_parallel_benchmarks.dart`
 (`--smoke` for one un-warmed iteration while authoring).

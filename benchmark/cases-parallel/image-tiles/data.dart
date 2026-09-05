@@ -22,7 +22,7 @@ List<Tile> makeTiles() {
   });
 }
 
-/// One number all four variants must agree on.
+/// One number all five variants must agree on.
 int checksum(List<TileStats> out) {
   var acc = 0;
   for (final s in out) {

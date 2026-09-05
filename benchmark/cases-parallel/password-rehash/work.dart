@@ -1,4 +1,4 @@
-// The per-element job, shared verbatim by all four variants.
+// The per-element job, shared verbatim by all five variants.
 //
 // Top-level and sendable, which is what `parallel` asks of a worker and
 // what `Isolate.run` needs anyway — so the four files differ only in where

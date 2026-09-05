@@ -90,5 +90,5 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   약 3ms
     <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — 결합된 I/O 형태 ·
     <a href="concurrentOrParallel.html">concurrent or parallel</a> — I/O vs CPU ·
     <code>mapParallel</code> — <code>parallel</code>과 같은 연산 ·
-    <a href="../parallel-benchmark.html">parallel은 값어치를 하는가?</a> — 같은 작업 네 가지 방법, 측정
+    <a href="../parallel-benchmark.html">parallel은 값어치를 하는가?</a> — 같은 작업 다섯 가지 방법, 측정
   </div>

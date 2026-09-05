@@ -1,4 +1,4 @@
-// The per-element job, shared verbatim by all four variants.
+// The per-element job, shared verbatim by all five variants.
 //
 // The middle of the three: ~40 µs per tile, so the round trip is a tenth of
 // the work rather than all of it or none of it.

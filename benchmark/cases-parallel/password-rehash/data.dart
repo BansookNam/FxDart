@@ -12,7 +12,7 @@ List<Credential> makeCredentials() {
   );
 }
 
-/// One number both sides must agree on.
+/// One number all five variants must agree on.
 int checksum(List<Derived> out) {
   var acc = 0;
   for (final d in out) {

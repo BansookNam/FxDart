@@ -4,8 +4,9 @@
 one each. The port round trip is ~5µs, which is more than most callbacks
 cost, and it is why the operator lost to a plain loop on anything but
 very heavy per-element work. On 20k elements of ~0.4µs each, four
-workers: **142ms → 3ms**, against 8ms for the same work inline. The
-batched form is the first one that beats the loop it replaces.
+workers (a probe of that shape, not one of the three page cases):
+**142ms → 3ms**, against 8ms for the same work inline. The batched
+form is the first one that beats the loop it replaces.
 
 What a batch does not change is what the caller observes. Order,
 back-pressure and the position an error lands at are the unbatched
@@ -42,14 +43,19 @@ sweeping the pool from 1 to 10 leaves the unchunked form flat (768 ms →
 element costs two message copies, a port event and a completer on the
 *main* isolate — one thread, the one part that cannot be parallelised —
 so `chunk` is not about making coordination cheaper but about there being
-less of it: 40 messages instead of three million.
+less of it. The formula `n ~/ (workers * 4)` always yields 40 messages
+with ten workers: `chunk: 2500` at the N=100,000 sweep (vs 100,000
+trips), `chunk: 37500` at the headline N=1,500,000 (vs 1.5 million
+trips).
 
 The chunked row also beats the hand-rolled `Isolate.run`-over-slices it
 is measured against — 2.1x on `image-tiles`, 3.3x on `log-fingerprint` —
 because slicing copies a whole slice up front while its isolate waits,
 where a chunked pull overlaps the copying with the computing. On
 `password-rehash`, whose elements are three ints, there is nothing to
-copy and the three isolate rows come out level.
+copy and the three isolate rows sit within a few percent (hand-rolled
+6.65×, chunked 6.57×, default `parallel` 6.27× — about 6% behind
+`Isolate.run`).
 
 Each case also runs at N=10,000 and N=100, so the crossover is on the
 page rather than asserted — `password-rehash` still wins at 100,

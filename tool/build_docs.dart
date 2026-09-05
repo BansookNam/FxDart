@@ -72,9 +72,9 @@ void main(List<String> args) {
       pages.add(_PageRef(locale, 'tutorials/$slug.html', page.translated));
     }
 
-    // The parallel benchmark: one job, four ways to run it. Standalone
+    // The parallel benchmark: one job, five ways to run it. Standalone
     // rather than a third comparison family — that machinery is built
-    // around two sides and a verdict between them, and this page has four
+    // around two sides and a verdict between them, and this page has five
     // sides and no winner to declare.
     final parallelBench = _loadPage('pages/parallel-benchmark.md', locale);
     written[_out(locale, 'parallel-benchmark.html')] =
@@ -1427,10 +1427,10 @@ ${row('cmpFxdart', 'fxdart', fxVal)}$strictRow
 
 // --- the parallel benchmark page --------------------------------------------
 
-/// One CPU-bound job, four ways to run it, measured.
+/// One CPU-bound job, five ways to run it, measured.
 ///
 /// Not a `_CmpFamily`: that machinery pairs a left side against fxdart and
-/// prints a verdict between them. Here there are four sides and the answer
+/// prints a verdict between them. Here there are five sides and the answer
 /// is a *shape* rather than a winner — "heavy work wins without tuning",
 /// "cheap work needs a chunk" — which a two-way verdict would flatten.
 ///
@@ -1463,8 +1463,8 @@ String _renderParallelBench(
   return b.toString();
 }
 
-/// The measured half of the page: one block per case, four bars per scale,
-/// and the four programs that produced them.
+/// The measured half of the page: one block per case, five bars per scale,
+/// and the five programs that produced them.
 String _parallelBenchSection() {
   final f = File('$root/benchmark/results/results-parallel.json');
   if (!f.existsSync()) return '';
@@ -1477,9 +1477,10 @@ String _parallelBenchSection() {
     ..writeln('  <section class="cmp-bench pbench">')
     ..writeln(
       '  <p class="dim bench-meta">Measured on $workers workers, AOT '
-      '(<code>dart compile exe</code>), median of ${data['rounds']} round(s). '
-      'All four variants compute the same checksum — the runner refuses the '
-      'case otherwise.</p>',
+      '(<code>dart compile exe</code>), median of 3 iterations '
+      '(${data['rounds']} round(s) × 3). '
+      'All ${impls.length} variants compute the same checksum — the runner '
+      'refuses the case otherwise.</p>',
     );
 
   for (final c in (data['cases'] as List).cast<Map<String, dynamic>>()) {
@@ -1545,7 +1546,7 @@ String _parallelBenchSection() {
   return out.toString();
 }
 
-/// The four programs, read straight off disk — so what the page shows is what
+/// The five programs, read straight off disk — so what the page shows is what
 /// was compiled and timed, and cannot drift from it.
 String _parallelBenchCode(
   String slug,
@@ -1561,13 +1562,13 @@ String _parallelBenchCode(
   };
   final out = StringBuffer()
     ..writeln('    <details class="pbench-code">')
-    ..writeln('      <summary>The four programs, and the job they share</summary>');
+    ..writeln('      <summary>The five programs, and the job they share</summary>');
   final work = File('$root/benchmark/cases-parallel/$slug/work.dart');
   if (work.existsSync()) {
     out
       ..writeln('      <figure class="pbench-work">')
       ..writeln(
-        '        <figcaption>The job itself — all four call this one '
+        '        <figcaption>The job itself — all five call this one '
         'function</figcaption>',
       )
       ..writeln(

@@ -94,6 +94,12 @@ heading: ¿Merece la pena <code>parallel</code>?
       5     899.1 ms              86.5 ms
      10     873.5 ms              71.0 ms</code></pre>
   <p>
+    Esta tabla es una medición aparte (<code>BENCH_N=100000</code>,
+    <code>BENCH_WORKERS</code> 1–10). No está en
+    <code>results-parallel.json</code>, así que regenerar los gráficos
+    de la página no refresca estas cuatro filas.
+  </p>
+  <p>
     La forma por defecto no mejora en absoluto — se va poniendo algo
     <em>peor</em>, y su coste se queda en torno a 8µs por elemento sea cual
     sea el tamaño del grupo. La forma con lotes escala 5,4× en ese mismo
@@ -103,17 +109,20 @@ heading: ¿Merece la pena <code>parallel</code>?
     Ese es el diagnóstico. Con <code>chunk: 1</code>, cada elemento cuesta
     dos copias de mensaje, un evento de puerto y un completer <strong>en el
     isolate principal</strong>, que es un único hilo y lo único del sistema
-    que no se puede paralelizar. Unos 8µs de coordinación para repartir
-    3,5µs de trabajo. El cuello de botella no son los trabajadores: están
-    parados, esperando a que les dé trabajo un isolate principal que se pasa
-    el tiempo echando cartas al buzón. Añadir trabajadores solo añade
-    contención por él.
+    que no se puede paralelizar. Unos 8µs de coordinación (el viaje más
+    ese completer y ese evento) para repartir 3,5µs de trabajo. El cuello
+    de botella no son los trabajadores: están parados, esperando a que les
+    dé trabajo un isolate principal que se pasa el tiempo echando cartas al
+    buzón. Añadir trabajadores solo añade contención por él.
   </p>
   <p>
-    Un lote no abarata la coordinación: hace que haya menos. Con
-    <code>chunk: 37500</code> esa misma ejecución son 40 mensajes en lugar
-    de tres millones, el isolate principal deja de ser el cuello de botella
-    y el trabajo por fin llega a donde tenía que ir.
+    Un lote no abarata la coordinación: hace que haya menos. La fila con
+    lote usa <code>n ~/ (workers * 4)</code>, así que diez trabajadores
+    siempre envían 40 mensajes. En este barrido eso es
+    <code>chunk: 2500</code> en lugar de 100.000 viajes; en el titular
+    (N = 1.500.000) es <code>chunk: 37500</code> en lugar de 1,5 millones
+    de viajes. El isolate principal deja de ser el cuello de botella y el
+    trabajo por fin llega a donde tenía que ir.
   </p>
 
   <p>

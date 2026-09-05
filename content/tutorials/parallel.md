@@ -88,5 +88,5 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   ~3ms
     <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — the combined I/O form ·
     <a href="concurrentOrParallel.html">concurrent or parallel</a> — I/O vs CPU ·
     <code>mapParallel</code> — the same operator as <code>parallel</code> ·
-    <a href="../parallel-benchmark.html">is parallel worth it?</a> — the same job four ways, measured
+    <a href="../parallel-benchmark.html">is parallel worth it?</a> — the same job five ways, measured
   </div>

@@ -90,6 +90,12 @@ heading: Is <code>parallel</code> worth it?
       5     899.1 ms              86.5 ms
      10     873.5 ms              71.0 ms</code></pre>
   <p>
+    This table is a separate measurement (<code>BENCH_N=100000</code>,
+    <code>BENCH_WORKERS</code> 1–10). It is not in
+    <code>results-parallel.json</code>, so regenerating the page charts
+    does not refresh these four rows.
+  </p>
+  <p>
     The default form does not improve at all — it drifts slightly
     <em>worse</em>, and its cost stays around 8µs per element whatever the
     pool size. The chunked form scales 5.4× across the same range.
@@ -98,16 +104,20 @@ heading: Is <code>parallel</code> worth it?
     That is the diagnosis. At <code>chunk: 1</code> every element costs two
     message copies, a port event and a completer <strong>on the main
     isolate</strong> — which is one thread, and the one thing in the system
-    that cannot be parallelised. About 8µs of coordination to hand off 3.5µs
-    of work. The workers are not the bottleneck; they are idle, waiting to
-    be fed by a main isolate that is spending all its time posting letters.
-    Extra workers only add contention for it.
+    that cannot be parallelised. About 8µs of coordination (the hop plus
+    that completer and event) to hand off 3.5µs of work. The workers are
+    not the bottleneck; they are idle, waiting to be fed by a main isolate
+    that is spending all its time posting letters. Extra workers only add
+    contention for it.
   </p>
   <p>
     A batch does not make the coordination cheaper — it makes there be less
-    of it. At <code>chunk: 37500</code> the same run is 40 messages instead
-    of three million, the main isolate stops being the bottleneck, and the
-    work finally lands where it was supposed to go.
+    of it. The chunked row uses <code>n ~/ (workers * 4)</code>, so ten
+    workers always send 40 messages. At this sweep that is
+    <code>chunk: 2500</code> instead of 100,000 round trips; at the
+    headline (N = 1,500,000) it is <code>chunk: 37500</code> instead of
+    1.5 million trips. The main isolate stops being the bottleneck, and
+    the work finally lands where it was supposed to go.
   </p>
 
   <p>

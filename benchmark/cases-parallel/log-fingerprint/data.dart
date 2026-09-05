@@ -24,7 +24,7 @@ List<LogLine> makeLines() {
   });
 }
 
-/// One number all four variants must agree on.
+/// One number all five variants must agree on.
 int checksum(List<Fingerprint> out) {
   var acc = 0;
   for (final f in out) {

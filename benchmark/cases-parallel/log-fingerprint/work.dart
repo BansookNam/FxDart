@@ -1,4 +1,4 @@
-// The per-element job, shared verbatim by all four variants.
+// The per-element job, shared verbatim by all five variants.
 //
 // Deliberately cheap — a few microseconds — because that is the case where
 // the isolate round trip costs more than the work, and where `chunk` stops
