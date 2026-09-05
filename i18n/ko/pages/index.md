@@ -59,6 +59,11 @@ description: FxDart는 FxTS를 포팅한 Dart 함수형 프로그래밍 라이�
       결과의 순서는 그대로 유지합니다. FxTS를 대표하는 기능이며,
       Dart에 충실하게 포팅했습니다.</li>
   </ul>
+  <p>
+    시간에 따른 이벤트, 그리고 값으로서의 실패는 나머지 두 표면에 있습니다.
+    <a href="{{root}}tutorials/whichSurface.html">어느 표면?</a>이
+    결정이고, 이 페이지는 소개 페이지로 남습니다.
+  </p>
 
   <h2>왜 필요한가?</h2>
   <p>

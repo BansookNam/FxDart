@@ -1,0 +1,5 @@
+// Pick the surface the job is.
+fx(iterable)                                  // data in hand
+fx(ids).mapConcurrent(n, fetch)               // bounded I/O, order kept
+fxEvents(stream)                              // values over time
+either((r) { … }) / .mapEither / .attempt     // failures as values

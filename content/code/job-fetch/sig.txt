@@ -1,0 +1,6 @@
+fx(ids).mapConcurrent(n, fetch)                       // bound + order
+fx(ids).mapRetry(attempts, fetch, delay: backoff)     // per-element retry
+await fx(ids).toAsync().mapOrAccumulate((r, id) async {
+  r.ensure(ok, () => '…');
+  return await fetch(id);
+}, concurrency: n);                                   // every failure kept

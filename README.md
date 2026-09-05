@@ -108,14 +108,15 @@ See the [installation guide](https://pub.dev/packages/fxdart/install) on pub.dev
 
 ## 🤖 AI agent skills
 
-fxdart ships two [Agent Skills](https://agentskills.io) that teach AI coding
+fxdart ships three [Agent Skills](https://agentskills.io) that teach AI coding
 assistants — Claude Code, Codex, Devin, Antigravity, OpenCode, pi, and
 anything reading `.agents/skills/` — **when** and **how** to use fxdart:
 
 | Skill | Covers |
 |---|---|
-| 🔗 `skills/fxdart-pipelines/` | Collections, concurrent Futures, Streams, and complex flow logic |
-| 🎯 `skills/fxdart-typed-errors/` | The typed-error system: `either` blocks, error accumulation, Either-aware pipeline validation |
+| 🔗 `skills/fxdart-pipelines/` | Collections, concurrent Futures, and complex pull flow logic |
+| ⚡ `skills/fxdart-events/` | Events over time: `fxEvents`, debounce, switchMap, combineLatest, the pull seam |
+| 🎯 `skills/fxdart-typed-errors/` | The typed-error system: `either` blocks, error accumulation, Either on pull and on events |
 
 **Option A** — the community [`skills`](https://pub.dev/packages/skills) CLI (auto-detects your IDE/agent):
 

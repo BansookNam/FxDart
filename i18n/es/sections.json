@@ -26,5 +26,7 @@
   "section13": "Errores tipados",
   "section13Blurb": "El enfoque de Arrow (Kotlin), portado: <code>either</code>, <code>Raise</code>, <code>bind</code>, <code>ensure</code>, acumulación de errores con <code>Nel</code> y validación fusionada con el pipeline. Código en línea recta, fallos tipados y ni una torre de wrappers.",
   "section14": "Streams de eventos (push)",
-  "section14Blurb": "El lado push de FxDart: operadores al estilo Rx sobre Stream de Dart, con puentes hacia los pipelines pull."
+  "section14Blurb": "El lado push de FxDart: operadores al estilo Rx sobre Stream de Dart, con puentes hacia los pipelines pull.",
+  "section15": "Trabajos",
+  "section15Blurb": "Programas que cruzan superficies — la razón de importar un paquete en lugar de tres."
 }

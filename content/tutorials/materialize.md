@@ -7,6 +7,8 @@ section: 14
 crumb: materialize
 prev: fxSubscriptions.html
 prevLabel: FxSubscriptions
+next: job-search.html
+nextLabel: debounced search
 ---
   <p class="hero-sub">Reify notifications as <code>Next</code> / <code>Err</code> / <code>Done</code>, stamp events with time, and test two sequences for equality.</p>
 

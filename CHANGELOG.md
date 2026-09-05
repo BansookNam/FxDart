@@ -1,5 +1,14 @@
 ## 0.8.10
 
+101 now opens on a decision, not on `map`. `whichSurface` is the first
+lesson: data in hand → `fx()`, I/O with a bound → `concurrent` /
+`mapConcurrent`, events over time → `fxEvents`, failures the caller
+handles → `Either` on the surface you are already on. Two job tutorials
+— debounced search, bounded concurrent fetch — are section 15. The
+pipelines skill no longer treats `fxStream` as the push entry; a third
+skill, `fxdart-events`, covers time. Typed-errors documents the channel
+rule: `attempt` after `retryOn`, never before.
+
 Events-layer `Either`, on the value channel: `mapRight` / `mapLeft`,
 `filterOrElse`, `alt` / `orElse` / `recover`, `getOrElse`, and
 `flattenEither` (the nest `attempt` after `mapEither` produces). Each

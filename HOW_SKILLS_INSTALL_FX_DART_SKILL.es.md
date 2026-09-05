@@ -21,9 +21,13 @@ Eso es todo. `fxdart` es simplemente un **nombre de paquete publicado en pub.dev
 
 ```
 skills/
-└── fxdart-pipelines/
-    ├── SKILL.md               ← convención: <nombre-skill>/SKILL.md
-    └── references/api-reference.md
+├── fxdart-pipelines/
+│   ├── SKILL.md               ← convención: <nombre-skill>/SKILL.md
+│   └── references/
+├── fxdart-events/
+│   └── SKILL.md
+└── fxdart-typed-errors/
+    └── SKILL.md
 ```
 
 Como el diseño es una convención, `skills get <nombre>` funciona con **cualquier** paquete que empaquete un directorio `skills/` — no solo fxdart.

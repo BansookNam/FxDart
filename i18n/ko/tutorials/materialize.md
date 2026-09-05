@@ -7,6 +7,8 @@ section: 14
 crumb: materialize
 prev: fxSubscriptions.html
 prevLabel: FxSubscriptions
+next: job-search.html
+nextLabel: debounced search
 ---
   <p class="hero-sub">알림을 <code>Next</code> / <code>Err</code> / <code>Done</code>으로 재화하고, 이벤트에 시각을 찍고, 두 수열이 같은지 묻습니다.</p>
 
