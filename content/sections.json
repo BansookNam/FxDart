@@ -26,5 +26,7 @@
   "section13": "Typed errors",
   "section13Blurb": "The Kotlin Arrow approach, ported: <code>either</code>, <code>Raise</code>, <code>bind</code>, <code>ensure</code>, error accumulation with <code>Nel</code>, and pipeline-fused validation. Straight-line code, typed failures, no wrapper tower.",
   "section14": "Event streams (push)",
-  "section14Blurb": "FxDart's push side — Rx-style operators over plain Dart Streams, bridging into the pull pipelines."
+  "section14Blurb": "FxDart's push side — Rx-style operators over plain Dart Streams, bridging into the pull pipelines.",
+  "section15": "Jobs",
+  "section15Blurb": "Cross-surface programs — the reason to import one package rather than three."
 }

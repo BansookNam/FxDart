@@ -26,5 +26,7 @@
   "section12": "유틸",
   "section12Blurb": "속도 제한과 난수.",
   "section14": "이벤트 스트림 (push)",
-  "section14Blurb": "FxDart의 push 쪽 — 평범한 Dart Stream 위의 Rx 스타일 연산자들, 그리고 pull 파이프라인으로 이어지는 다리."
+  "section14Blurb": "FxDart의 push 쪽 — 평범한 Dart Stream 위의 Rx 스타일 연산자들, 그리고 pull 파이프라인으로 이어지는 다리.",
+  "section15": "일",
+  "section15Blurb": "표면을 가로지르는 프로그램 — 패키지를 셋이 아니라 하나로 쓰는 이유."
 }

@@ -59,6 +59,11 @@ description: FxDart is a functional programming library for Dart, ported from Fx
       time while keeping results in order. It is FxTS's signature feature,
       ported faithfully to Dart.</li>
   </ul>
+  <p>
+    Events over time, and failures as values, live on the other two surfaces.
+    <a href="{{root}}tutorials/whichSurface.html">Which surface?</a> is the
+    decision; this page stays the marketing one.
+  </p>
 
   <h2>Why do we need it?</h2>
   <p>

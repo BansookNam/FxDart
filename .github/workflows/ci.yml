@@ -39,6 +39,18 @@ jobs:
       - name: Analyze tests and tooling
         run: dart analyze test tool benchmark
 
+      # Second package: analyzer lints. Independent of lib/, so a lib-only
+      # PR does not need it — but a PR that breaks the plugin should fail
+      # here, not on a contributor's machine after they add the dev dep.
+      - name: fxdart_lints plugin
+        working-directory: pkgs/fxdart_lints
+        run: |
+          dart pub get
+          dart analyze lib
+          dart test
+          dart pub get --directory example
+          cd example && dart run custom_lint
+
       # Regenerates the single-file playground build and analyzes it. This is
       # the only check that sees wrapper drift in tools/build_single_file.sh.
       #
