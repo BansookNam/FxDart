@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '../async_iterable.dart';
 import 'parallel_stub.dart' if (dart.library.io) 'parallel_vm.dart';
 
@@ -14,7 +16,12 @@ int get parallelWorkers => parallelWorkersImpl;
 /// Prefer a top-level or static [worker]. A capturing closure is fine when
 /// every capture is sendable; a closure that captures a non-sendable
 /// (a [ReceivePort], an open socket) throws [ArgumentError] at spawn — the
-/// isolate contract, not a fxdart invention. [A] and [R] must be sendable;
+/// isolate contract, not a fxdart invention. [worker] may return a [Future]
+/// ([FutureOr], same shape as [mapConcurrent]); a sync callback is still
+/// the fast path — the isolate does not `await` a non-Future. Nested
+/// `parallel` inside an async worker is allowed: that isolate spawns its
+/// own pool, and cancel of the outer chain shuts the nested pool down
+/// before the worker isolate is killed. [A] and [R] must be sendable;
 /// an unsendable input or result fails that pull with [ArgumentError]
 /// rather than hanging.
 ///
@@ -57,7 +64,7 @@ int get parallelWorkers => parallelWorkersImpl;
 /// `take(1)` wants a small [chunk] or none.
 FxAsyncIterable<R> parallel<A, R>(
   int workers,
-  R Function(A input) worker,
+  FutureOr<R> Function(A input) worker,
   Iterable<A> iterable, {
   int chunk = 1,
 }) {
@@ -68,7 +75,7 @@ FxAsyncIterable<R> parallel<A, R>(
 /// Async-source twin of [parallel].
 FxAsyncIterable<R> parallelAsync<A, R>(
   int workers,
-  R Function(A input) worker,
+  FutureOr<R> Function(A input) worker,
   FxAsyncIterable<A> iterable, {
   int chunk = 1,
 }) {
@@ -90,7 +97,7 @@ void _checkArgs(int workers, int chunk) {
 @pragma('vm:prefer-inline')
 FxAsyncIterable<R> mapParallel<A, R>(
   int workers,
-  R Function(A input) worker,
+  FutureOr<R> Function(A input) worker,
   Iterable<A> iterable, {
   int chunk = 1,
 }) => parallel(workers, worker, iterable, chunk: chunk);
@@ -99,7 +106,7 @@ FxAsyncIterable<R> mapParallel<A, R>(
 @pragma('vm:prefer-inline')
 FxAsyncIterable<R> mapParallelAsync<A, R>(
   int workers,
-  R Function(A input) worker,
+  FutureOr<R> Function(A input) worker,
   FxAsyncIterable<A> iterable, {
   int chunk = 1,
 }) => parallelAsync(workers, worker, iterable, chunk: chunk);

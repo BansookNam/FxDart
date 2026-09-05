@@ -68,6 +68,37 @@ int slowThrow(int x) {
   throw StateError('slow boom');
 }
 
+Future<int> laterDouble(int x) async {
+  await Future<void>.delayed(Duration.zero);
+  return x * 2;
+}
+
+Future<int> laterPause(int x) async {
+  await Future<void>.delayed(const Duration(milliseconds: 20));
+  return x * 2;
+}
+
+Future<int> laterThrow(int x) async {
+  await Future<void>.delayed(Duration.zero);
+  if (x == 3) throw StateError('async three');
+  return x * 2;
+}
+
+Future<int> laterThrowSlow(int x) async {
+  await Future<void>.delayed(const Duration(milliseconds: 20));
+  throw StateError('async boom');
+}
+
+Future<ReceivePort> laterPort(int x) async {
+  await Future<void>.delayed(Duration.zero);
+  return ReceivePort();
+}
+
+Future<int> nestedDoubleSum(int x) async {
+  final parts = await fx([x, x]).parallel(2, doubleIt).toList();
+  return parts[0] + parts[1];
+}
+
 void main() {
   group('parallel', () {
     test('yields every element, in order', () async {
@@ -361,10 +392,7 @@ void main() {
       // `null` used to double as "the source is exhausted", so a nullable
       // [A] silently dropped its nulls.
       const src = <int?>[1, null, 3, null, 5];
-      expect(
-        await fx(src).parallel(2, identityNullable).toList(),
-        equals(src),
-      );
+      expect(await fx(src).parallel(2, identityNullable).toList(), equals(src));
       expect(
         await fx(src).parallel(2, identityNullable, chunk: 2).toList(),
         equals(src),
@@ -441,10 +469,7 @@ void main() {
         () => fx([1]).toAsync().parallel(2, doubleIt, chunk: 0),
         throwsRangeError,
       );
-      expect(
-        () => mapParallel(2, doubleIt, [1], chunk: 0),
-        throwsRangeError,
-      );
+      expect(() => mapParallel(2, doubleIt, [1], chunk: 0), throwsRangeError);
       expect(
         () => mapParallelAsync(2, doubleIt, toAsync([1]), chunk: 0),
         throwsRangeError,
@@ -475,9 +500,9 @@ void main() {
         final seen = <int>[];
         await expectLater(
           () async {
-            await for (final v in fx(List<int>.generate(10, (i) => i))
-                .parallel(2, throwsOnSeven, chunk: k)
-                .toStream()) {
+            await for (final v in fx(
+              List<int>.generate(10, (i) => i),
+            ).parallel(2, throwsOnSeven, chunk: k).toStream()) {
               seen.add(v);
             }
           }(),
@@ -492,22 +517,24 @@ void main() {
       // Element 4 opens the second batch of four, so the failure arrives
       // with an empty partial list.
       final seen = <int>[];
-      await expectLater(
-        () async {
-          await for (final v in fx(List<int>.generate(9, (i) => i + 1))
-              .parallel(1, throwsOnFirst, chunk: 4)
-              .toStream()) {
-            seen.add(v);
-          }
-        }(),
-        throwsStateError,
-      );
+      await expectLater(() async {
+        await for (final v in fx(
+          List<int>.generate(9, (i) => i + 1),
+        ).parallel(1, throwsOnFirst, chunk: 4).toStream()) {
+          seen.add(v);
+        }
+      }(), throwsStateError);
       expect(seen, equals([1, 2, 3]));
     });
 
     test('an unsendable error in a batch arrives as its text', () async {
       await expectLater(
-        fx([1, 2, 3, 4]).parallel(1, throwsUnsendableOnThree, chunk: 4).toList(),
+        fx([
+          1,
+          2,
+          3,
+          4,
+        ]).parallel(1, throwsUnsendableOnThree, chunk: 4).toList(),
         throwsA(
           isA<StateError>().having(
             (e) => e.message,
@@ -545,18 +572,17 @@ void main() {
 
     test('an early stop shuts the pool mid-batch', () async {
       expect(
-        await fx(List<int>.generate(64, (i) => i))
-            .parallel(3, slowDouble, chunk: 8)
-            .take(2)
-            .toList(),
+        await fx(
+          List<int>.generate(64, (i) => i),
+        ).parallel(3, slowDouble, chunk: 8).take(2).toList(),
         equals([0, 2]),
       );
     });
 
     test('cancel with batches queued ends as done, not a throw', () async {
-      final it = fx(List<int>.generate(64, (i) => i))
-          .parallel(2, slowDouble, chunk: 8)
-          .iterator;
+      final it = fx(
+        List<int>.generate(64, (i) => i),
+      ).parallel(2, slowDouble, chunk: 8).iterator;
       final pull = it.next();
       await (it as StreamPullCancel).cancel();
       expect((await pull).done, isTrue);
@@ -567,9 +593,9 @@ void main() {
       // Distinct from the queued case above: the delay lets the pool finish
       // spawning and hand the batch to a worker, so the pull is parked on
       // the batch future when the kill errors it.
-      final it = fx(List<int>.generate(16, (i) => i))
-          .parallel(2, slowDouble, chunk: 8)
-          .iterator;
+      final it = fx(
+        List<int>.generate(16, (i) => i),
+      ).parallel(2, slowDouble, chunk: 8).iterator;
       final pull = it.next();
       await Future<void>.delayed(const Duration(milliseconds: 80));
       await (it as StreamPullCancel).cancel();
@@ -624,6 +650,125 @@ void main() {
         ),
         equals(want),
       );
+    });
+  });
+
+  group('parallel FutureOr worker', () {
+    test('an async worker yields in order', () async {
+      expect(
+        await fx([1, 2, 3, 4]).parallel(2, laterDouble).toList(),
+        equals([2, 4, 6, 8]),
+      );
+    });
+
+    test('an async worker error surfaces as itself', () async {
+      await expectLater(
+        fx([1, 2, 3, 4]).parallel(2, laterThrow).toList(),
+        throwsA(
+          isA<StateError>().having(
+            (e) => e.message,
+            'message',
+            contains('async three'),
+          ),
+        ),
+      );
+    });
+
+    test('an async unsendable result fails that pull', () async {
+      await expectLater(
+        fx([1]).parallel(1, laterPort).toList(),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('chunked async workers keep order', () async {
+      expect(
+        await fx([1, 2, 3, 4]).parallel(2, laterDouble, chunk: 2).toList(),
+        equals([2, 4, 6, 8]),
+      );
+    });
+
+    test('chunked async worker error emits the prefix then throws', () async {
+      final it = fx([1, 2, 3, 4]).parallel(1, laterThrow, chunk: 4).iterator;
+      expect((await it.next()).value, 2);
+      expect((await it.next()).value, 4);
+      await expectLater(it.next(), throwsA(isA<StateError>()));
+    });
+
+    test('cancel during an async worker ends as done', () async {
+      final it = fx([1, 2, 3]).parallel(1, laterPause).iterator;
+      final pull = it.next();
+      await Future<void>.delayed(const Duration(milliseconds: 5));
+      await (it as StreamPullCancel).cancel();
+      expect((await pull).done, isTrue);
+    });
+
+    test('cancel during an async worker error ends as done', () async {
+      final it = fx([1, 2, 3]).parallel(1, laterThrowSlow).iterator;
+      final pull = it.next();
+      await Future<void>.delayed(const Duration(milliseconds: 5));
+      await (it as StreamPullCancel).cancel();
+      expect((await pull).done, isTrue);
+    });
+
+    test('cancel during a chunked async worker ends as done', () async {
+      final it = fx([1, 2, 3, 4]).parallel(1, laterPause, chunk: 4).iterator;
+      final pull = it.next();
+      await Future<void>.delayed(const Duration(milliseconds: 5));
+      await (it as StreamPullCancel).cancel();
+      expect((await pull).done, isTrue);
+    });
+
+    test('cancel during a chunked async worker error ends as done', () async {
+      final it = fx([
+        1,
+        2,
+        3,
+        4,
+      ]).parallel(1, laterThrowSlow, chunk: 4).iterator;
+      final pull = it.next();
+      await Future<void>.delayed(const Duration(milliseconds: 5));
+      await (it as StreamPullCancel).cancel();
+      expect((await pull).done, isTrue);
+    });
+
+    test('nested parallel runs the inner pool to completion', () async {
+      expect(
+        await fx([1, 2, 3]).parallel(2, nestedDoubleSum).toList(),
+        equals([4, 8, 12]),
+      );
+    });
+
+    test('cancel reaps nested worker isolates', () async {
+      final ping = ReceivePort();
+      addTearDown(ping.close);
+      var n = 0;
+      ping.listen((_) => n++);
+      final pingPort = ping.sendPort;
+
+      int pingLoop(int x) {
+        for (var i = 0; i < 40; i++) {
+          pingPort.send(x);
+          io.sleep(const Duration(milliseconds: 25));
+        }
+        return x;
+      }
+
+      Future<int> outer(int x) async {
+        final parts = await fx([x, x + 1]).parallel(2, pingLoop).toList();
+        return parts[0];
+      }
+
+      final it = fx([1, 2]).parallel(1, outer).iterator;
+      final pull = it.next();
+      await Future<void>.delayed(const Duration(milliseconds: 80));
+      expect(n, greaterThan(0));
+      await (it as StreamPullCancel).cancel();
+      expect((await pull).done, isTrue);
+      await Future<void>.delayed(const Duration(milliseconds: 80));
+      final frozen = n;
+      await Future<void>.delayed(const Duration(milliseconds: 120));
+      expect(n, frozen);
     });
   });
 }

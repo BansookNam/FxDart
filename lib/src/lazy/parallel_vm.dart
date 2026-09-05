@@ -9,50 +9,97 @@ import '../async_iterable.dart';
 ///
 /// [chunked] is fixed for the isolate's life, so a batch needs no per-message
 /// tag and the unbatched path keeps the message shape it always had.
+///
+/// A sync [worker] still answers on this turn — no `await` of a non-Future,
+/// which is the hop the 5µs path cannot pay. A [Future] is subscribed with
+/// `then`; [_shutdown] arriving while that Future is pending reaps any
+/// nested [parallel] pool this isolate spawned, then the parent isolate
+/// kills this one after [_reapAfter].
 void parallelIsolateEntry(List<dynamic> boot) {
   final toMain = boot[0] as SendPort;
   final worker = boot[1] as Function;
   final chunked = boot[2] as bool;
   final inbox = RawReceivePort();
+  var closed = false;
   toMain.send(inbox.sendPort);
   inbox.handler = (msg) {
     if (msg == _shutdown) {
+      closed = true;
       inbox.close();
+      _killNested();
       return;
     }
     final input = (msg as List<dynamic>)[0];
     if (chunked) {
-      _runBatch(toMain, worker, input as List<dynamic>);
+      _runBatch(toMain, worker, input as List<dynamic>, () => closed);
       return;
     }
-    try {
-      final result = worker(input);
-      try {
-        toMain.send([true, result]);
-      } catch (_) {
-        // Same hang as an unsendable *error* if this send throws inside the
-        // handler and nothing answers that job. ArgumentError is sendable.
-        toMain.send([
-          false,
-          ArgumentError(
-            'parallel result is not sendable (${result.runtimeType})',
-          ),
-          StackTrace.current,
-        ]);
-      }
-    } catch (e, st) {
-      // Same isolate group: sendable errors travel as themselves so
-      // `attempt` / `retryOn` can still match on type. Fall back to the
-      // message *text* when the object itself cannot cross — sending `e`
-      // again would throw inside this handler and strand the pull, since
-      // nothing else ever answers that job.
-      try {
-        toMain.send([false, e, st]);
-      } catch (_) {
-        toMain.send([false, '$e', st.toString()]);
-      }
-    }
+    _runOne(toMain, worker, input, () => closed);
   };
+}
+
+/// Isolates this isolate spawned as a [parallel] pool. Isolate-local: a
+/// worker's list is its nested pool; the caller's list is the outer pool.
+final _nested = <Isolate>[];
+
+void _killNested() {
+  final spawned = List<Isolate>.of(_nested);
+  _nested.clear();
+  for (final iso in spawned) {
+    iso.kill(priority: Isolate.immediate);
+  }
+}
+
+void _runOne(
+  SendPort toMain,
+  Function worker,
+  dynamic input,
+  bool Function() closed,
+) {
+  try {
+    final result = worker(input);
+    if (result is Future) {
+      result.then(
+        (v) {
+          if (!closed()) _sendOk(toMain, v);
+        },
+        onError: (Object e, StackTrace st) {
+          if (!closed()) _sendErr(toMain, e, st);
+        },
+      );
+      return;
+    }
+    _sendOk(toMain, result);
+  } catch (e, st) {
+    _sendErr(toMain, e, st);
+  }
+}
+
+void _sendOk(SendPort toMain, Object? result) {
+  try {
+    toMain.send([true, result]);
+  } catch (_) {
+    // Same hang as an unsendable *error* if this send throws inside the
+    // handler and nothing answers that job. ArgumentError is sendable.
+    toMain.send([
+      false,
+      ArgumentError('parallel result is not sendable (${result.runtimeType})'),
+      StackTrace.current,
+    ]);
+  }
+}
+
+void _sendErr(SendPort toMain, Object e, StackTrace st) {
+  // Same isolate group: sendable errors travel as themselves so
+  // `attempt` / `retryOn` can still match on type. Fall back to the
+  // message *text* when the object itself cannot cross — sending `e`
+  // again would throw inside this handler and strand the pull, since
+  // nothing else ever answers that job.
+  try {
+    toMain.send([false, e, st]);
+  } catch (_) {
+    toMain.send([false, '$e', st.toString()]);
+  }
 }
 
 /// Applies [worker] across [batch] and answers with one message.
@@ -63,31 +110,59 @@ void parallelIsolateEntry(List<dynamic> boot) {
 /// still sends back the results of the elements *before* it: the iterator
 /// then emits those and raises at exactly the element that failed, which is
 /// where the unbatched operator raises.
-void _runBatch(SendPort toMain, Function worker, List<dynamic> batch) {
+///
+/// Sync elements stay on this turn (the loop does not `await`). A [Future]
+/// parks the rest of the batch on `then`, same as [_runOne].
+void _runBatch(
+  SendPort toMain,
+  Function worker,
+  List<dynamic> batch,
+  bool Function() closed,
+) {
   final out = <dynamic>[];
-  for (final input in batch) {
+  var i = 0;
+  void step() {
+    if (closed()) return;
+    while (i < batch.length) {
+      try {
+        final result = worker(batch[i]);
+        i++;
+        if (result is Future) {
+          result.then(
+            (v) {
+              out.add(v);
+              step();
+            },
+            onError: (Object e, StackTrace st) {
+              if (!closed()) _sendBatchError(toMain, e, st, out);
+            },
+          );
+          return;
+        }
+        out.add(result);
+      } catch (e, st) {
+        _sendBatchError(toMain, e, st, out);
+        return;
+      }
+    }
     try {
-      out.add(worker(input));
-    } catch (e, st) {
-      _sendBatchError(toMain, e, st, out);
-      return;
+      toMain.send([true, out]);
+    } catch (_) {
+      // A result that cannot cross fails the whole batch, where the unbatched
+      // path fails only that pull — the one place batching is observably
+      // coarser, and [parallel]'s dartdoc says so. Finding the offending index
+      // would mean sending each result separately, which is the cost the batch
+      // exists to avoid.
+      _sendBatchError(
+        toMain,
+        ArgumentError('parallel result is not sendable (in a chunked batch)'),
+        StackTrace.current,
+        const <dynamic>[],
+      );
     }
   }
-  try {
-    toMain.send([true, out]);
-  } catch (_) {
-    // A result that cannot cross fails the whole batch, where the unbatched
-    // path fails only that pull — the one place batching is observably
-    // coarser, and [parallel]'s dartdoc says so. Finding the offending index
-    // would mean sending each result separately, which is the cost the batch
-    // exists to avoid.
-    _sendBatchError(
-      toMain,
-      ArgumentError('parallel result is not sendable (in a chunked batch)'),
-      StackTrace.current,
-      const <dynamic>[],
-    );
-  }
+
+  step();
 }
 
 void _sendBatchError(
@@ -108,13 +183,17 @@ void _sendBatchError(
 
 const _shutdown = 0;
 
+/// After sending [_shutdown], wait this long before [Isolate.kill] so a
+/// worker that is waiting on nested [parallel] can reap its child pool.
+const _reapAfter = Duration(milliseconds: 50);
+
 /// [Platform.numberOfProcessors]. See [parallelWorkers].
 int get parallelWorkersImpl => io.Platform.numberOfProcessors;
 
 /// VM implementation. See [parallel] for the contract.
 FxAsyncIterable<R> parallelImpl<A, R>(
   int workers,
-  R Function(A input) worker,
+  FutureOr<R> Function(A input) worker,
   Iterable<A> iterable,
   int chunk,
 ) => _ParallelIterable<A, R>(workers, chunk, worker, iterable, null);
@@ -122,16 +201,22 @@ FxAsyncIterable<R> parallelImpl<A, R>(
 /// VM implementation. See [parallelAsync] for the contract.
 FxAsyncIterable<R> parallelAsyncImpl<A, R>(
   int workers,
-  R Function(A input) worker,
+  FutureOr<R> Function(A input) worker,
   FxAsyncIterable<A> iterable,
   int chunk,
 ) => _ParallelIterable<A, R>(workers, chunk, worker, null, iterable);
 
 class _ParallelIterable<A, R> implements FxAsyncIterable<R> {
-  _ParallelIterable(this.workers, this.chunk, this.worker, this.sync, this.async);
+  _ParallelIterable(
+    this.workers,
+    this.chunk,
+    this.worker,
+    this.sync,
+    this.async,
+  );
   final int workers;
   final int chunk;
-  final R Function(A input) worker;
+  final FutureOr<R> Function(A input) worker;
   final Iterable<A>? sync;
   final FxAsyncIterable<A>? async;
 
@@ -186,7 +271,7 @@ class _ParallelIterator<A, R>
 
   /// Elements per message. 1 is the streaming shape; see [parallel].
   final int _chunk;
-  final R Function(A input) _worker;
+  final FutureOr<R> Function(A input) _worker;
   final Iterator<A>? _sync;
   final FxAsyncIterator<A>? _async;
 
@@ -578,6 +663,7 @@ class _Iso<A, R> {
         st,
       );
     }
+    _nested.add(isolate);
     final toWorker = await ready.future;
     iso = _Iso<A, R>(isolate, toWorker, incoming);
     return iso;
@@ -596,9 +682,7 @@ class _Iso<A, R> {
     final err = list[1];
     final stack = list[2];
     final st = stack is StackTrace ? stack : StackTrace.fromString('$stack');
-    final cause = err is Object && err is! String
-        ? err
-        : StateError('$err');
+    final cause = err is Object && err is! String ? err : StateError('$err');
     // A fourth slot means a batch: it holds the results of the elements that
     // ran before the one that threw, and they are still owed to the caller.
     if (list.length > 3) {
@@ -626,14 +710,34 @@ class _Iso<A, R> {
     return c.future;
   }
 
+  var _dead = false;
+
   void kill() {
+    if (_dead) return;
+    _dead = true;
     final c = _completer;
+    final inFlight = c != null;
     _completer = null;
     if (c != null && !c.isCompleted) {
       c.completeError(StateError('parallel isolate shut down'));
     }
-    _toWorker.send(_shutdown);
-    _incoming.close();
-    _isolate.kill(priority: Isolate.immediate);
+    _nested.remove(_isolate);
+    try {
+      _toWorker.send(_shutdown);
+    } catch (_) {}
+    void reap() {
+      _incoming.close();
+      _isolate.kill(priority: Isolate.immediate);
+    }
+
+    // A job in flight may be an async worker waiting on nested parallel.
+    // Give that isolate a turn to [_killNested] before we SIGKILL it.
+    // Idle workers have no children; reap now so a finished chain does
+    // not sit on [_reapAfter] per isolate.
+    if (inFlight) {
+      Future<void>.delayed(_reapAfter, reap);
+    } else {
+      reap();
+    }
   }
 }
