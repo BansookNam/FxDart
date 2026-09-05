@@ -1,42 +1,3 @@
-## 0.8.11
-
-Three additions on `parallel`, all of them about not paying the isolate hop
-twice.
-
-**`chunked: true`** — size the message from the source length so the
-worker count is not repeated at the call site. `k = length ~/ (workers *
-4)`, the formula the 0.8.10 page measured. Needs a `List`; a source
-without a length throws, and `chunk:` / `chunked:` together throw.
-
-```dart
-await fx(rows).parallel(4, parseRow, chunked: true);
-```
-
-**`isolateMap2..5`** — run 2–5 CPU stages inside one hop. Two
-`.parallel` calls copy every result back to the main isolate and out
-again; compose the workers instead. Arity capped at 5, like
-`zipOrAccumulate2..5`.
-
-```dart
-await fx(blobs).parallel(4, isolateMap2(decodePng, thumbnail), chunk: 64).toList();
-await fx(rows).parallel(4, isolateMap3(parse, normalise, score), chunked: true).toList();
-```
-
-**`IsolatePool`** — spawn once, run sequential chains, kill in
-`finally`. `parallel` otherwise starts isolates on first pull and tears
-them down when that chain ends. `IsolatePool.using` is the bracket;
-cancel of one `parallelOn` chain does not kill the pool.
-
-```dart
-await IsolatePool.using(4, (pool) async {
-  final a = await fx(batchA).parallelOn(pool, parseRow, chunk: 256).toList();
-  final b = await fx(batchB).parallelOn(pool, parseRow, chunk: 256).toList();
-  return (a, b);
-});
-```
-
-Unsupported on the web, same as `parallel`.
-
 ## 0.8.10
 
 `parallel(n, worker, chunk: k)` — k elements ride one message instead of
@@ -85,7 +46,14 @@ so `chunk` is not about making coordination cheaper but about there being
 less of it. The formula `n ~/ (workers * 4)` always yields 40 messages
 with ten workers: `chunk: 2500` at the N=100,000 sweep (vs 100,000
 trips), `chunk: 37500` at the headline N=1,500,000 (vs 1.5 million
-trips).
+trips). `chunked: true` is that formula at the call site, so the worker
+count is not written twice — `k = length ~/ (workers * 4)` from a
+`List`. A source without a length throws; `chunk:` and `chunked:`
+together throw (one policy per call).
+
+```dart
+await fx(rows).parallel(4, parseRow, chunked: true);
+```
 
 The chunked row also beats the hand-rolled `Isolate.run`-over-slices it
 is measured against — 2.1x on `image-tiles`, 3.3x on `log-fingerprint` —
@@ -144,6 +112,25 @@ input or result fails that pull with `ArgumentError` instead of hanging.
 `mapConcurrent`. The 101 page `concurrent or parallel` is the decision:
 I/O stays on `concurrent`, CPU goes to `parallel`, and a cheap callback
 (`x + 1`) is a loss on the isolate hop.
+
+The hop is also paid twice if two CPU stages are two `.parallel` calls
+(every result copies back to the main isolate and out again) or if two
+jobs each spawn a pool. `isolateMap2..5` fuses 2–5 sendable workers into
+one hop (arity capped at 5, like `zipOrAccumulate2..5`; beyond that,
+write the fused worker). `IsolatePool` spawns once; `parallelOn` runs
+sequential chains against it; `IsolatePool.using` kills in `finally`.
+Cancel of one `parallelOn` chain does not kill the pool.
+
+```dart
+await fx(blobs).parallel(4, isolateMap2(decodePng, thumbnail), chunk: 64).toList();
+await fx(rows).parallel(4, isolateMap3(parse, normalise, score), chunked: true).toList();
+
+await IsolatePool.using(4, (pool) async {
+  final a = await fx(batchA).parallelOn(pool, parseRow, chunk: 256).toList();
+  final b = await fx(batchB).parallelOn(pool, parseRow, chunk: 256).toList();
+  return (a, b);
+});
+```
 
 A source that throws after the pool has started now shuts the pool
 down too — previously only worker errors did, and holding the
