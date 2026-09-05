@@ -10,10 +10,11 @@ function: https://bansooknam.github.io/FxDart/
 |---|---|---|
 | `fx(Iterable<T>)` | `Fx<T>` | Sync chain; `Fx` extends `Iterable` |
 | `fxAsync(FxAsyncIterable<T>)` | `FxAsync<T>` | Async chain |
-| `fxStream(Stream<T>)` | `FxAsync<T>` | Lift a Stream into an async chain |
+| `fxEvents(Stream<T>)` / `.fxEvents` | `FxEvents<T>` | Push chain — time. See **fxdart-events**. |
+| `fxStream(Stream<T>)` | `FxAsync<T>` | Pull a Stream into a chain. Preferred when you need chain methods. |
 | `.toAsync()` on `Fx` | `FxAsync<T>` | Lift a sync chain |
 | `toAsync(iterableOrStream)` | `FxAsyncIterable<T>` | Top-level lift |
-| `fromStream(stream)` | `FxAsyncIterable<T>` | Top-level Stream bridge |
+| `fromStream(stream)` | `FxAsyncIterable<T>` | Top-level Stream bridge (pull); no chain methods |
 | `.toStream()` on `FxAsync`/`FxAsyncIterable` | `Stream<T>` | Bridge out |
 | `asyncEmpty<T>()` | `FxAsyncIterable<T>` | Empty async source |
 

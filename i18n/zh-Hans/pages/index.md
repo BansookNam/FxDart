@@ -27,6 +27,13 @@ description: FxDart 是从 FxTS 移植而来的 Dart 函数式编程库：惰性
     </a>
   </p>
 
+  <p>
+    <a class="demo-cta cta-compare-rx" href="RxDartComparison/">
+      <span class="demo-cta-emoji">⚡</span>
+      RxDart vs FxDart —— push 对 pull，50 条诚实判定&nbsp;→
+    </a>
+  </p>
+
   {{playground:0}}
   <p class="dim">▲ 这是可运行的 —— 修改代码并按下 <strong>运行</strong>。
     它会用真正的 Dart 编译器编译，并在你的浏览器中执行。</p>
@@ -51,6 +58,11 @@ description: FxDart 是从 FxTS 移植而来的 Dart 函数式编程库：惰性
       同时保持结果有序。这是 FxTS 的标志性特性，
       已忠实移植到 Dart。</li>
   </ul>
+  <p>
+    随时间到来的事件，以及作为值的失败，在另外两面上。
+    <a href="{{root}}tutorials/whichSurface.html">选哪一面？</a> 才是
+    判断；本页仍是介绍页。
+  </p>
 
   <h2>为什么需要它？</h2>
   <p>

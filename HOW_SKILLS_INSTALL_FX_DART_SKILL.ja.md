@@ -21,9 +21,13 @@ skills get fxdart
 
 ```
 skills/
-└── fxdart-pipelines/
-    ├── SKILL.md               ← 規約: <スキル名>/SKILL.md
-    └── references/api-reference.md
+├── fxdart-pipelines/
+│   ├── SKILL.md               ← 規約: <スキル名>/SKILL.md
+│   └── references/
+├── fxdart-events/
+│   └── SKILL.md
+└── fxdart-typed-errors/
+    └── SKILL.md
 ```
 
 このレイアウトは規約なので、`skills get <名前>` は `skills/` ディレクトリを同梱する**あらゆる**パッケージで機能します — fxdart に限りません。

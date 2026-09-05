@@ -5,6 +5,8 @@ description: FxDart fx tutorial: the lazy chain model — fx, fxAsync, fxStream 
 heading: <code>fx</code>
 section: 1
 crumb: fx
+prev: whichSurface.html
+prevLabel: which surface
 next: pipe.html
 nextLabel: pipe
 ---

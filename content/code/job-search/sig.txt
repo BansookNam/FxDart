@@ -1,0 +1,4 @@
+fxEvents(keystrokes)
+    .debounce(Duration)              // wait for quiet
+    .switchMap(search)               // latest query wins
+    .mapEither((r, hit) => parse)    // failure as a Left
