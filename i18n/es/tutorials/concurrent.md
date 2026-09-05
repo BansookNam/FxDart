@@ -47,6 +47,12 @@ nextLabel: mapConcurrent
     <code>n</code> más grande — véase
     <a href="concurrentOrParallel.html">concurrent or parallel</a>.
   </p>
+  <p>
+    Con N=100k de un fetch sin retardo, un pool de workers escrito a mano
+    sigue siendo un 10% más rápido (AOT). Ese coste restante es la
+    maquinaria de lotes ordenados, no la capa <code>map</code> — lo pagas
+    por la cadena.
+  </p>
 
   <h2>Demo 1 · Secuencial vs. concurrent(3), cronometrado</h2>
   <p>Seis elementos, cada uno con 200ms de retardo. En secuencia tarda ~1200ms;
