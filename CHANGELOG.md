@@ -1,5 +1,30 @@
 ## 0.8.10
 
+`parallel(n, worker, chunk: k)` — k elements ride one message instead of
+one each. The port round trip is ~5µs, which is more than most callbacks
+cost, and it is why the operator lost to a plain loop on anything but
+very heavy per-element work. On 20k elements of ~0.4µs each, four
+workers: **142ms → 3ms**, against 8ms for the same work inline. The
+batched form is the first one that beats the loop it replaces.
+
+What a batch does not change is what the caller observes. Order,
+back-pressure and the position an error lands at are the unbatched
+operator's: a worker that throws sends back the results it had already
+finished, so the elements before the failing one are still emitted and
+the raise happens on the element that actually failed. A batch is served
+straight out of the list it arrives in, so it costs one future however
+many elements ride it — and the fast-pull terminals answer from it
+without a future at all. Two things do change, both documented: the
+first element waits for its whole batch (so a `take(1)` wants a small
+`chunk` or none), and an unsendable *result* fails its batch rather than
+only its own pull.
+
+Fixed alongside it: `parallel` silently **dropped `null` elements**.
+`null` doubled as "the source is exhausted" in the pull path, so on a
+nullable `A` a genuine null was read as the end of the source —
+`[1, null, 3, null, 5]` came back as `[1, 3, 5]`. There is a sentinel
+for that now, and a null is an element on every path.
+
 Map-only fused async runs honour `Concurrent` in-place instead of
 dropping to the unfused layering — the headline
 `toAsync().map(f).concurrent(n)` shape. Paired A/B (AOT, rounds=20)

@@ -182,12 +182,13 @@ FxAsyncIterable<B> _$mapConcurrent<A, B>(
 FxAsyncIterable<B> _$mapConcurrentAsync<A, B>(int concurrency,
         FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
     mapConcurrentAsync(concurrency, f, iterable);
-FxAsyncIterable<R> _$parallel<A, R>(
-        int workers, R Function(A input) worker, Iterable<A> iterable) =>
-    parallel(workers, worker, iterable);
+FxAsyncIterable<R> _$parallel<A, R>(int workers, R Function(A input) worker,
+        Iterable<A> iterable, {int chunk = 1}) =>
+    parallel(workers, worker, iterable, chunk: chunk);
 FxAsyncIterable<R> _$parallelAsync<A, R>(
-        int workers, R Function(A input) worker, FxAsyncIterable<A> iterable) =>
-    parallelAsync(workers, worker, iterable);
+        int workers, R Function(A input) worker, FxAsyncIterable<A> iterable,
+        {int chunk = 1}) =>
+    parallelAsync(workers, worker, iterable, chunk: chunk);
 Iterable<(A, B)> _$attach<A, B>(B Function(A a) f, Iterable<A> iterable) =>
     attach(f, iterable);
 FxAsyncIterable<(A, B)> _$attachAsync<A, B>(
