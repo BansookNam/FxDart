@@ -13,8 +13,8 @@ import '../async_iterable.dart';
 /// A sync [worker] still answers on this turn — no `await` of a non-Future,
 /// which is the hop the 5µs path cannot pay. A [Future] is subscribed with
 /// `then`; [_shutdown] arriving while that Future is pending reaps any
-/// nested [parallel] pool this isolate spawned, then the parent isolate
-/// kills this one after [_reapAfter].
+/// nested [parallel] pool this isolate spawned (see [_killNested]), then
+/// the parent isolate kills this one after [_reapAfter].
 void parallelIsolateEntry(List<dynamic> boot) {
   final toMain = boot[0] as SendPort;
   final worker = boot[1] as Function;
@@ -46,6 +46,14 @@ final _nested = <Isolate>[];
 /// shutdown is killed instead of leaking past the parent [Isolate.kill].
 var _reaping = false;
 
+/// SIGKILL every isolate this isolate spawned as a [parallel] pool.
+///
+/// Immediate, not [_shutdown]: this list holds [Isolate] objects, not
+/// the child SendPorts, so we cannot ask them to reap *their* children
+/// first. Two-level nested `parallel` (an outer worker awaits an inner
+/// pool) is the contract cancel pins — those inner isolates *are* these
+/// children. A third nested `parallel` inside them never sees
+/// [_shutdown], and Dart does not kill grandchildren with the parent.
 void _killNested() {
   _reaping = true;
   final spawned = List<Isolate>.of(_nested);
@@ -756,7 +764,8 @@ class _Iso<A, R> {
     }
 
     // A job in flight may be an async worker waiting on nested parallel.
-    // Give that isolate a turn to [_killNested] before we SIGKILL it.
+    // Give that isolate a turn to [_killNested] before we SIGKILL it —
+    // that reaps one nested pool, not a third level (see [_killNested]).
     // Idle workers have no children; reap now so a finished chain does
     // not sit on [_reapAfter] per isolate.
     if (inFlight) {

@@ -38,7 +38,9 @@ nextLabel: debounce
     <code>mapConcurrent</code>) — a sync callback is still the fast
     path. Nested <code>parallel</code> inside an async worker is
     allowed: that isolate spawns its own pool, and cancel of the outer
-    chain shuts the nested pool down.
+    chain shuts the nested pool down. One level of nesting is the
+    contract — a third nested <code>parallel</code> is killed with its
+    parent, so it cannot shut down <em>its</em> children.
   </p>
   <p>
     Don't want to pick <code>n</code>? <code>parallelWorkers</code> is

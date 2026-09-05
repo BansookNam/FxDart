@@ -90,7 +90,9 @@ throws at spawn only when one isn't. A worker may return a `Future`
 (`FutureOr`, same shape as `mapConcurrent`); a sync callback is still
 the fast path. Nested `parallel` inside an async worker is allowed:
 that isolate spawns its own pool, and cancel of the outer chain shuts
-the nested pool down before the worker isolate is killed. Unsupported
+the nested pool down before the worker isolate is killed. One level of
+nesting is the contract — a third nested `parallel` is SIGKILL'd with
+its parent, so it cannot shut down *its* children. Unsupported
 on the web (use `concurrent`). `workers == 1` still leaves the main
 isolate.
 

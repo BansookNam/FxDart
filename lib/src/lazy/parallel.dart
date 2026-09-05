@@ -21,7 +21,9 @@ int get parallelWorkers => parallelWorkersImpl;
 /// the fast path — the isolate does not `await` a non-Future. Nested
 /// `parallel` inside an async worker is allowed: that isolate spawns its
 /// own pool, and cancel of the outer chain shuts the nested pool down
-/// before the worker isolate is killed. [A] and [R] must be sendable;
+/// before the worker isolate is killed. One level of nesting is the
+/// contract — a third nested `parallel` is SIGKILL'd with its parent, so
+/// it cannot shut down *its* children. [A] and [R] must be sendable;
 /// an unsendable input or result fails that pull with [ArgumentError]
 /// rather than hanging.
 ///

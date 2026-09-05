@@ -39,7 +39,9 @@ nextLabel: debounce
     <code>mapConcurrent</code>) — un callback síncrono sigue siendo el
     camino rápido. Un <code>parallel</code> anidado dentro de un worker
     async está permitido: ese isolate crea su propio pool, y el cancel
-    de la cadena exterior apaga el pool interno.
+    de la cadena exterior apaga el pool interno. Un nivel de anidación
+    es el contrato — un tercer <code>parallel</code> anidado muere con
+    su padre, así que no puede apagar <em>sus</em> hijos.
   </p>
   <p>
     ¿No quieres elegir <code>n</code>? <code>parallelWorkers</code> es

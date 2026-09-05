@@ -39,7 +39,9 @@ nextLabel: debounce
     (<code>FutureOr</code>, <code>mapConcurrent</code>와 같은 모양) —
     동기 콜백은 여전히 빠른 경로입니다. 비동기 워커 안의 중첩
     <code>parallel</code>도 됩니다: 그 isolate가 자기 풀을 띄우고,
-    바깥 체인을 cancel하면 안쪽 풀을 먼저 걷습니다.
+    바깥 체인을 cancel하면 안쪽 풀을 먼저 걷습니다. 중첩은 한 단계가
+    계약입니다 — 세 번째 중첩 <code>parallel</code>은 부모와 함께
+    죽으므로, <em>자기</em> 자식 풀을 걷을 기회가 없습니다.
   </p>
   <p>
     <code>n</code>을 고르기 싫다면 <code>parallelWorkers</code>가 VM의

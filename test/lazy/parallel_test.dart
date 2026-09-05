@@ -825,6 +825,9 @@ void main() {
     });
 
     test('cancel reaps nested worker isolates', () async {
+      // Two-level nested `parallel` is the contract [_killNested] pins.
+      // A third nested pool would be SIGKILL'd with the inner workers
+      // and is not asserted here.
       final ping = ReceivePort();
       addTearDown(ping.close);
       var n = 0;

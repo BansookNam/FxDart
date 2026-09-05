@@ -399,7 +399,8 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// [workers] isolates, preserving source order. Prefer a top-level or
   /// static [worker]; a closure that captures a non-sendable throws
   /// [ArgumentError] at spawn. [worker] may return a [Future] — nested
-  /// `parallel` inside it is allowed. Throws [UnsupportedError] on the web.
+  /// `parallel` inside it is allowed (one level; see [l.parallel]).
+  /// Throws [UnsupportedError] on the web.
   /// Pass [parallelWorkers] when you do not want to pick [workers].
   ///
   /// [chunk] sets how many elements ride one message. The default 1 pays a
