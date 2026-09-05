@@ -293,10 +293,11 @@ class _ToAsyncIterator<T> implements FxFastIterator<T> {
 // A run of map / filter / takeWhile operators is a list of per-element
 // transformations. Layering them as separate iterators costs one future and
 // at least one microtask per element *per layer*; fusing them applies the
-// whole run inline on each pulled element. The moment a [Concurrent] marker
-// arrives on a fresh iterator, fusion is abandoned for [legacy] — the exact
-// operator layering fusion replaced — so the concurrency protocol behaves
-// identically to the unfused chain. Internal; not exported.
+// whole run inline on each pulled element. A [Concurrent] marker on a
+// map-only run is honoured in-place (overlapping source pulls, map links
+// applied independently). Stateful stages still fall back to [legacy] —
+// the unfused layering — because overlapping next() would race iterator
+// state. Internal; not exported.
 
 /// One fused per-element stage. Stage callbacks are wrapped `(Object?)`
 /// closures created once per operator call, never per element.
@@ -537,6 +538,11 @@ class FxFusedAsyncIterable<T> implements FxAsyncIterable<T> {
   FxAsyncIterator<T> get iterator => _FusedIterator<T>(this);
 }
 
+/// Test hook: whether [it] is a fused iterator that has not dropped to
+/// [legacy]. Not exported from the package.
+bool fusedFallbackIsNull<T>(FxAsyncIterator<T> it) =>
+    it is _FusedIterator<T> && it._fallback == null;
+
 class _FusedIterator<T>
     with FxFastNextGate<T>
     implements FxFastIterator<T>, StreamPullCancel {
@@ -586,18 +592,46 @@ class _FusedIterator<T>
 
   @override
   Future<IterResult<T>> next([Concurrent? concurrent]) {
+    // Map-only runs are stateless per element: overlapping next() can
+    // pass the Concurrent marker through to the source and apply the
+    // compiled map links independently. That is the headline
+    // `toAsync().map(f).concurrent(n)` shape. Do NOT go through
+    // [FxFastNextGate] — the gate serializes pulls and would undo
+    // concurrent. Stateful stages (scan / filter / take / uniq /
+    // dropWhile) still fall back to the unfused layering, whose
+    // iterators are parallel-safe by construction.
+    if (concurrent is Concurrent && _oneToOne && _iterable.scanIndex < 0) {
+      return _concurrentMapNext(concurrent);
+    }
     if (_fallback == null &&
         concurrent is Concurrent &&
         _source == null &&
         !_seedEmitted &&
         !_ended) {
-      // Nothing pulled yet and the consumer wants concurrency: hand the
-      // whole iteration to the unfused layering.
       _fallback = _iterable.legacy().iterator;
     }
     final fb = _fallback;
     if (fb != null) return fb.next(concurrent);
     return super.next(concurrent);
+  }
+
+  Future<IterResult<T>> _concurrentMapNext(Concurrent concurrent) {
+    if (_ended) return Future<IterResult<T>>.value(IterResult<T>.done());
+    _source ??= _iterable.source.iterator;
+    return _source!.next(concurrent).then((rr) {
+      if (rr.done) {
+        // [_stop], not a bare `_ended = true`: this is the one done-path
+        // that does not go through the gate, and it still owns the release
+        // of the source it pulled — on exactly the shape this path exists
+        // to speed up.
+        _stop();
+        return IterResult<T>.done();
+      }
+      final mapped = _mapFrom(rr.value, _links);
+      return mapped is Future<IterResult<T>>
+          ? mapped
+          : Future<IterResult<T>>.value(mapped);
+    });
   }
 
   @override

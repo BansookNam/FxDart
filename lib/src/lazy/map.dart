@@ -293,7 +293,8 @@ FxAsyncIterable<B> mapAsync<A, B>(
   FxAsyncIterable<A> iterable,
 ) {
   // Fused-stage form: a run of map/filter/takeWhile applies inline per
-  // element (see FxFusedAsyncIterable); a Concurrent marker falls back to
+  // element (see FxFusedAsyncIterable). A Concurrent marker on a map-only
+  // run is honoured in-place; stateful stages still fall back to
   // [_mapAsyncLegacy], the parallel-safe pass-through layering.
   final stage = FxMapStage((v) => f(v as A));
   if (iterable is FxFusedAsyncIterable<A>) {

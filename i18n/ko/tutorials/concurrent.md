@@ -47,6 +47,11 @@ nextLabel: mapConcurrent
     <a href="concurrentOrParallel.html">concurrent or parallel</a>을
     보세요.
   </p>
+  <p>
+    지연이 0인 fetch N=100k에서, 손으로 짠 워커 풀이 여전히 약 10% 더
+    빠릅니다 (AOT). 남은 값은 순서 있는 배치 장치이지
+    <code>map</code> 층이 아닙니다 — 체인을 쓰는 대가입니다.
+  </p>
 
   <h2>데모 1 · 순차 실행과 concurrent(3) 비교, 시간 측정</h2>
   <p>각각 200ms가 걸리는 항목 6개입니다. 순차 실행은 약 1200ms가 걸리지만,

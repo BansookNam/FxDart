@@ -91,6 +91,12 @@ void main() {
       'timeout + take': (s) =>
           s.timeout(const Duration(seconds: 5)).take(2).toList(),
       'concurrent + take': (s) => s.concurrent(2).take(2).toList(),
+      // The map-only fused run honours Concurrent in-place rather than
+      // dropping to the unfused layering, so it is its own cancel path.
+      'map + concurrent + take': (s) =>
+          s.map((v) => v).concurrent(2).take(2).toList(),
+      'map + map + concurrent + take': (s) =>
+          s.map((v) => v).map((v) => v).concurrent(2).take(2).toList(),
       'concurrentPool + take': (s) => s.concurrentPool(2).take(2).toList(),
       'mapConcurrent + take': (s) =>
           s.mapConcurrent(2, (v) async => v).take(2).toList(),
@@ -195,6 +201,34 @@ void main() {
       ).take(2).toList();
       expect(out, equals([1, 2]));
       expect(released, 1);
+    });
+
+    test('using releases once under a map-only concurrent run', () async {
+      // The in-place Concurrent path ends on its own `_stop()`, and the
+      // iterator releases on done as well — the resource must not be let
+      // go twice, on either the full drain or the early stop.
+      Future<int> drain(int Function() onRelease, {int? take}) async {
+        final chain = fxAsync(
+          usingAsync<String, int>(
+            () => 'db',
+            (r) => fx([1, 2, 3, 4]).toAsync(),
+            (r) => onRelease(),
+          ),
+        ).map((v) => v * 10).concurrent(2);
+        final out = take == null
+            ? await chain.toList()
+            : await chain.take(take).toList();
+        return out.length;
+      }
+
+      var drained = 0;
+      expect(await drain(() => drained++), 4);
+      expect(drained, 1);
+
+      var stopped = 0;
+      expect(await drain(() => stopped++, take: 2), 2);
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(stopped, 1);
     });
 
     test('using cancelled before the first pull releases nothing', () async {
