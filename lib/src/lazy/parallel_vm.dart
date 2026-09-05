@@ -243,35 +243,33 @@ class _Pool<A, R> {
     int n,
     R Function(A input) worker,
   ) async {
-    final spawned = List<_Iso<A, R>?>.filled(n, null);
+    // Workers are interchangeable, so each spawn appends as it lands and the
+    // list holds exactly the isolates that started. That is what lets the
+    // failure path reuse [kill] instead of a nullable slot per worker and a
+    // teardown branch of its own: a sendability failure fails every spawn of
+    // the same worker, but a resource failure need not, and the leftovers
+    // would keep a ReceivePort open.
+    final spawned = <_Iso<A, R>>[];
     Object? error;
     StackTrace? errorSt;
     await Future.wait([
       for (var i = 0; i < n; i++)
         () async {
           try {
-            spawned[i] = await _Iso.spawn<A, R>(worker, i);
+            spawned.add(await _Iso.spawn<A, R>(worker, i));
           } catch (e, st) {
             error ??= e;
             errorSt ??= st;
           }
         }(),
     ]);
+    final pool = _Pool<A, R>(spawned);
+    pool._idle.addAll(spawned);
     final spawnError = error;
     if (spawnError != null) {
-      // A sendability failure fails every spawn of the same worker, so
-      // [spawned] is all null. A resource failure that kills only some
-      // isolates is not a path a test can pin, and the leftover would
-      // keep a ReceivePort open — so we still tear down anything that
-      // did start before rethrowing.
-      for (final w in spawned) {
-        if (w != null) w.kill();
-      }
+      pool.kill();
       Error.throwWithStackTrace(spawnError, errorSt!);
     }
-    final workers = [for (final w in spawned) w!];
-    final pool = _Pool<A, R>(workers);
-    pool._idle.addAll(workers);
     return pool;
   }
 
