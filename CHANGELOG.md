@@ -2,11 +2,14 @@
 
 Map-only fused async runs honour `Concurrent` in-place instead of
 dropping to the unfused layering — the headline
-`toAsync().map(f).concurrent(n)` shape. Paired A/B on
-`bounded-concurrency` (AOT, N=100k, rounds=20): fxdart −2.47% against a
-+0.62% native control. Not a suite flip: a hand-rolled worker pool is
-still ~10% faster at that scale. The remaining hop is
-`concurrentAsync`'s ordered-batch machinery, not the map layer.
+`toAsync().map(f).concurrent(n)` shape. Paired A/B (AOT, rounds=20)
+re-measured against the merged baseline: `bounded-concurrency` −1.24%
+against a +0.39% native control, `concurrent-enrichment` −1.07% against
+−0.08%. (It read −2.47% before `parallel` landed the cancel chain in
+between; the effect is real either way, the magnitude is baseline-
+dependent.) Not a suite flip: a hand-rolled worker pool is still ~10%
+faster at that scale. The remaining hop is `concurrentAsync`'s
+ordered-batch machinery, not the map layer.
 
 `parallel(n, worker)` — the CPU twin of `concurrent(n)`. A reused pool
 of `n` isolates, source order kept. Prefer a top-level or static
