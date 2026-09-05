@@ -398,17 +398,30 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   /// CPU-bound twin of [mapConcurrent]: runs [worker] on a pool of
   /// [workers] isolates, preserving source order. Prefer a top-level or
   /// static [worker]; a closure that captures a non-sendable throws
-  /// [ArgumentError] at spawn. Throws [UnsupportedError] on the web.
+  /// [ArgumentError] at spawn. [worker] may return a [Future] — nested
+  /// `parallel` inside it is allowed (one level; see [l.parallel]).
+  /// Throws [UnsupportedError] on the web.
   /// Pass [parallelWorkers] when you do not want to pick [workers].
+  ///
+  /// [chunk] sets how many elements ride one message. The default 1 pays a
+  /// ~5µs round trip per element, which is more than most callbacks cost;
+  /// raise it and a cheap worker goes from losing to winning. See
+  /// [l.parallel] for how to size it.
   @pragma('vm:prefer-inline')
-  FxAsync<R> parallel<R>(int workers, R Function(T input) worker) =>
-      FxAsync(l.parallel(workers, worker, _inner));
+  FxAsync<R> parallel<R>(
+    int workers,
+    FutureOr<R> Function(T input) worker, {
+    int chunk = 1,
+  }) => FxAsync(l.parallel(workers, worker, _inner, chunk: chunk));
 
   /// Alias of [parallel] — same operator, the name that sits next to
   /// [mapConcurrent].
   @pragma('vm:prefer-inline')
-  FxAsync<R> mapParallel<R>(int workers, R Function(T input) worker) =>
-      parallel(workers, worker);
+  FxAsync<R> mapParallel<R>(
+    int workers,
+    FutureOr<R> Function(T input) worker, {
+    int chunk = 1,
+  }) => parallel(workers, worker, chunk: chunk);
 
   /// Switches to the async chain and maps [f], retrying each call up to
   /// [attempts] times (with optional [delay] backoff) before the error
@@ -1026,14 +1039,20 @@ class FxAsync<T> implements FxAsyncIterable<T> {
 
   /// CPU-bound twin of [mapConcurrent] for an async source. See [Fx.parallel].
   @pragma('vm:prefer-inline')
-  FxAsync<R> parallel<R>(int workers, R Function(T input) worker) =>
-      FxAsync(l.parallelAsync(workers, worker, _inner));
+  FxAsync<R> parallel<R>(
+    int workers,
+    FutureOr<R> Function(T input) worker, {
+    int chunk = 1,
+  }) => FxAsync(l.parallelAsync(workers, worker, _inner, chunk: chunk));
 
   /// Alias of [FxAsync.parallel] — same operator, the name that sits next
   /// to [mapConcurrent].
   @pragma('vm:prefer-inline')
-  FxAsync<R> mapParallel<R>(int workers, R Function(T input) worker) =>
-      parallel(workers, worker);
+  FxAsync<R> mapParallel<R>(
+    int workers,
+    FutureOr<R> Function(T input) worker, {
+    int chunk = 1,
+  }) => parallel(workers, worker, chunk: chunk);
 
   /// Like [concurrent] but yields in completion order.
   @pragma('vm:prefer-inline')

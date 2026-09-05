@@ -58,6 +58,40 @@ class Lcg {
   double nextDouble() => (_next() >> 20) / (1 << 43);
 }
 
+/// Worker count for the ParallelComparison cases (`benchmark/cases-parallel/`).
+///
+/// Every isolate-using variant reads the *same* number from here, so the
+/// hand-rolled slices and `parallel`'s pool are given identical hardware to
+/// work with and the comparison is about the machinery, not the pool size.
+/// BENCH_WORKERS overrides it; the default is the processor count, which is
+/// what `parallelWorkers` would pick.
+int get benchWorkers {
+  final env = Platform.environment['BENCH_WORKERS'];
+  if (env != null && env.isNotEmpty) return int.parse(env);
+  return Platform.numberOfProcessors;
+}
+
+/// Splits [items] into at most [parts] contiguous slices of near-equal size.
+///
+/// The hand-rolled isolate variant's decomposition: one slice per isolate,
+/// sent once. Slices are contiguous so the concatenated result is in source
+/// order, which is what makes its checksum comparable with the other three.
+List<List<T>> sliceEvenly<T>(List<T> items, int parts) {
+  if (items.isEmpty) return const [];
+  final k = parts < 1 ? 1 : (parts > items.length ? items.length : parts);
+  final out = <List<T>>[];
+  final base = items.length ~/ k;
+  final extra = items.length % k;
+  var start = 0;
+  for (var i = 0; i < k; i++) {
+    // The first [extra] slices take one more, so no element is left over.
+    final end = start + base + (i < extra ? 1 : 0);
+    out.add(items.sublist(start, end));
+    start = end;
+  }
+  return out;
+}
+
 /// Runs one benchmark side and prints its result line.
 ///
 /// [run] executes the full workload and returns a checksum object; its
@@ -70,7 +104,7 @@ class Lcg {
 /// used when authoring to verify a case works at all.
 Future<void> bench({
   required String slug,
-  required String impl, // 'native' | 'fxdart'
+  required String impl, // 'native' | 'fxdart' | 'native-isolate' | …
   required int n, // dataset size, echoed into the result
   required FutureOr<Object?> Function() run,
 }) async {

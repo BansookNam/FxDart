@@ -35,6 +35,13 @@ nextLabel: debounce
     <code>UnsupportedError</code> — 거기서는
     <code>concurrent(n)</code>을 쓰세요. 아래 프로그램은 VM 전용이며
     라이브 플레이그라운드가 아닙니다.
+    워커는 <code>Future</code>를 반환해도 됩니다
+    (<code>FutureOr</code>, <code>mapConcurrent</code>와 같은 모양) —
+    동기 콜백은 여전히 빠른 경로입니다. 비동기 워커 안의 중첩
+    <code>parallel</code>도 됩니다: 그 isolate가 자기 풀을 띄우고,
+    바깥 체인을 cancel하면 안쪽 풀을 먼저 걷습니다. 중첩은 한 단계가
+    계약입니다 — 세 번째 중첩 <code>parallel</code>은 부모와 함께
+    죽으므로, <em>자기</em> 자식 풀을 걷을 기회가 없습니다.
   </p>
   <p>
     <code>n</code>을 고르기 싫다면 <code>parallelWorkers</code>가 VM의
@@ -52,10 +59,43 @@ Future&lt;void&gt; main() async {
   // [10, 20, 30, 40]
 }</code></pre>
 
+  <h2><code>chunk</code> — 메시지 하나에 원소 몇 개를 실을지</h2>
+  <p>
+    기본값에서는 원소마다 하나씩 따로 워커로 건너갑니다. 그 왕복 비용이
+    약 <strong>5µs</strong>인데, 이는 웬만한 콜백보다 비쌉니다. 값싼
+    워커가 평범한 반복문보다 <em>느려지는</em> 것도,
+    <code>parallel</code>을 쓰고도 손해를 보는 것도 전부 이 때문입니다.
+    <code>chunk: k</code>는 그 비용을 원소 <code>k</code>개당 한 번만
+    냅니다.
+  </p>
+  <pre><code>// 원소 20,000개, 각각 약 0.4µs의 일, 워커 4개:
+await fx(rows).parallel(4, parseRow).toList();             // 약 142ms
+await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   약 3ms
+
+// 같은 일을 isolate 없이 평범한 반복문으로:               //   약 8ms</code></pre>
+  <p>
+    이 모양에서 47배이고, 배치 형태가 되어서야 비로소 대체하려던 그
+    반복문을 실제로 이깁니다. <code>k</code>는
+    <code>k × 콜백</code>이 5µs를 넉넉히 넘도록, 그러면서도 워커마다
+    배치가 여러 개는 돌아가도록 잡으세요.
+    <code>length ~/ (workers * 4)</code>가 무난한 출발점입니다.
+  </p>
+  <p>
+    배치는 관찰되는 동작을 바꾸지 않습니다. 순서도 그대로, 백프레셔도
+    그대로이고, 워커가 던져도 그 <em>앞</em> 원소들의 결과는 그대로
+    나온 뒤 실제로 실패한 원소에서 raise합니다. 바뀌는 것은 두 가지입니다.
+    첫 원소가 자기 배치 전체를 기다리게 되므로 <code>take(1)</code>에는
+    작은 <code>chunk</code>를 쓰거나 아예 쓰지 마세요. 그리고 보낼 수 없는
+    <em>입력</em>이나 <em>결과</em>는 자기 pull 하나가 아니라 배치 전체를 실패시킵니다 —
+    어느 원소가 문제인지 알아내려면 하나씩 보내야 하는데, 그것이 바로
+    배치가 피하려는 비용이기 때문입니다.
+  </p>
+
   <div class="callout">
     <strong>관련:</strong>
     <a href="concurrent.html"><code>concurrent</code></a> — I/O, 아무 클로저 ·
     <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — 결합된 I/O 형태 ·
     <a href="concurrentOrParallel.html">concurrent or parallel</a> — I/O vs CPU ·
-    <code>mapParallel</code> — <code>parallel</code>과 같은 연산
+    <code>mapParallel</code> — <code>parallel</code>과 같은 연산 ·
+    <a href="../parallel-benchmark.html">parallel은 값어치를 하는가?</a> — 같은 작업 다섯 가지 방법, 측정
   </div>

@@ -72,6 +72,16 @@ void main(List<String> args) {
       pages.add(_PageRef(locale, 'tutorials/$slug.html', page.translated));
     }
 
+    // The parallel benchmark: one job, five ways to run it. Standalone
+    // rather than a third comparison family — that machinery is built
+    // around two sides and a verdict between them, and this page has five
+    // sides and no winner to declare.
+    final parallelBench = _loadPage('pages/parallel-benchmark.md', locale);
+    written[_out(locale, 'parallel-benchmark.html')] =
+        _renderParallelBench(locale, locales, chrome, parallelBench);
+    pages.add(_PageRef(
+        locale, 'parallel-benchmark.html', parallelBench.translated));
+
     // The theory textbook — one page carrying the whole book.
     final theoryBook = _loadPage('theory/book.md', locale);
     written[_out(locale, 'theory/index.html')] =
@@ -170,6 +180,7 @@ void _copyStaticSources() {
 List<String> _translatable() => [
       'pages/index.md',
       'pages/101.md',
+      'pages/parallel-benchmark.md',
       'theory/book.md',
       for (final f in _theoryChapterFiles()) 'theory/${f.split('/').last}',
       for (final family in _cmpFamilies) family.indexMd,
@@ -1413,6 +1424,191 @@ ${row('cmpFxdart', 'fxdart', fxVal)}$strictRow
         ..writeln('  </section>'))
       .toString();
 }
+
+// --- the parallel benchmark page --------------------------------------------
+
+/// One CPU-bound job, five ways to run it, measured.
+///
+/// Not a `_CmpFamily`: that machinery pairs a left side against fxdart and
+/// prints a verdict between them. Here there are five sides and the answer
+/// is a *shape* rather than a winner — "heavy work wins without tuning",
+/// "cheap work needs a chunk" — which a two-way verdict would flatten.
+///
+/// Every label and number comes from `benchmark/results/results-parallel.json`,
+/// so the page carries no measurement of its own: regenerate with
+/// `dart run benchmark/run_parallel_benchmarks.dart` and it re-renders.
+String _renderParallelBench(
+  Locale locale,
+  List<Locale> locales,
+  Map<String, String> chrome,
+  Page page,
+) {
+  const path = 'parallel-benchmark.html';
+  final depth = locale.depth;
+  final b = StringBuffer()
+    ..write(_head(locale, locales, page, path, depth, playground: false))
+    ..write(_header(locale, locales, chrome, path, depth, 'compare'))
+    ..writeln('<main class="page cmp-page pbench-page">')
+    ..writeln('  <h1>${page.get('heading', page.get('title'))}</h1>');
+  if (!page.translated) {
+    b.writeln('  <p class="dim">${chrome['notTranslated'] ?? ''}</p>');
+  }
+  b
+    ..write(page.body)
+    ..write(_parallelBenchSection(chrome))
+    ..writeln('</main>')
+    ..write(_footer(chrome))
+    ..writeln('</body>')
+    ..writeln('</html>');
+  return b.toString();
+}
+
+/// The measured half of the page: one block per case, five bars per scale,
+/// and the five programs that produced them.
+String _parallelBenchSection(Map<String, String> chrome) {
+  final f = File('$root/benchmark/results/results-parallel.json');
+  if (!f.existsSync()) return '';
+  final data = jsonDecode(f.readAsStringSync()) as Map<String, dynamic>;
+  final impls = (data['impls'] as List).cast<String>();
+  final jsonLabels = (data['labels'] as Map).cast<String, dynamic>();
+  final labels = <String, String>{
+    for (final i in impls)
+      i: chrome[_pbenchLabelKey[i]] ?? (jsonLabels[i] as String? ?? i),
+  };
+  final workers = data['workers'];
+  final meta = (chrome['pbenchMeta'] ?? '')
+      .replaceAll('{workers}', '$workers')
+      .replaceAll('{rounds}', '${data['rounds']}')
+      .replaceAll('{count}', '${impls.length}');
+
+  final out = StringBuffer()
+    ..writeln('  <section class="cmp-bench pbench">')
+    ..writeln('  <p class="dim bench-meta">$meta</p>');
+
+  for (final c in (data['cases'] as List).cast<Map<String, dynamic>>()) {
+    final slug = c['slug'] as String;
+    final scales = (c['scales'] as Map).cast<String, dynamic>();
+    out
+      ..writeln('  <div class="pbench-case">')
+      ..writeln('    <h2 id="$slug"><code>$slug</code></h2>');
+    for (final scaleKey in const ['full', '10000', '100']) {
+      final s = scales[scaleKey] as Map<String, dynamic>?;
+      if (s == null) continue;
+      final ms = (s['ms'] as Map).cast<String, dynamic>();
+      final speedup = (s['speedupVsNative'] as Map).cast<String, dynamic>();
+      var max = 0.0;
+      for (final i in impls) {
+        final v = (ms[i] as num).toDouble();
+        if (v > max) max = v;
+      }
+      out
+        ..writeln('    <div class="bench-scale">')
+        ..writeln('      <h3>N = ${_benchFmtInt(s['n'] as num)}</h3>');
+      for (final i in impls) {
+        final v = (ms[i] as num).toDouble();
+        final up = (speedup[i] as num).toDouble();
+        // Read against the plain loop, because that is the only baseline a
+        // reader deciding "should I bother with isolates" actually has.
+        final note = i == 'native'
+            ? chrome['pbenchNoteBaseline']!
+            : up >= 1.005
+            ? chrome['pbenchNoteFaster']!
+                .replaceAll('{n}', up.toStringAsFixed(2))
+            : up <= 0.995
+            ? chrome['pbenchNoteSlower']!
+                .replaceAll('{n}', (1 / up).toStringAsFixed(2))
+            : chrome['pbenchNoteSame']!;
+        final cls = i == 'native'
+            ? 'base'
+            : up >= 1.005
+            ? 'win'
+            : up <= 0.995
+            ? 'loss'
+            : 'tie';
+        final pct = (v / max * 100).toStringAsFixed(1);
+        out
+          ..writeln('      <div class="bench-row">')
+          ..writeln('        <span class="bench-name">${labels[i]}</span>')
+          ..writeln(
+            '        <span class="bench-track">'
+            '<span class="bench-bar pbench-$cls" style="width:$pct%"></span>'
+            '</span>',
+          )
+          ..writeln(
+            '        <span class="bench-val">${_pbenchMs(v)} '
+            '<em class="pbench-note pbench-$cls">$note</em></span>',
+          )
+          ..writeln('      </div>');
+      }
+      out.writeln('    </div>');
+    }
+    out
+      ..write(_parallelBenchCode(chrome, slug, impls, labels))
+      ..writeln('  </div>');
+  }
+  out.writeln('  </section>');
+  return out.toString();
+}
+
+/// The five programs, read straight off disk — so what the page shows is what
+/// was compiled and timed, and cannot drift from it.
+String _parallelBenchCode(
+  Map<String, String> chrome,
+  String slug,
+  List<String> impls,
+  Map<String, String> labels,
+) {
+  const files = {
+    'native': 'native',
+    'native-isolate': 'native_isolate',
+    'fxdart': 'fxdart',
+    'fxdart-parallel': 'fxdart_parallel',
+    'fxdart-parallel-chunk': 'fxdart_parallel_chunk',
+  };
+  final out = StringBuffer()
+    ..writeln('    <details class="pbench-code">')
+    ..writeln('      <summary>${chrome['pbenchCodeSummary']}</summary>');
+  final work = File('$root/benchmark/cases-parallel/$slug/work.dart');
+  if (work.existsSync()) {
+    out
+      ..writeln('      <figure class="pbench-work">')
+      ..writeln('        <figcaption>${chrome['pbenchCodeJob']}</figcaption>')
+      ..writeln(
+        '        <pre><code>'
+        '${_escapeHtml(work.readAsStringSync().trimRight())}</code></pre>',
+      )
+      ..writeln('      </figure>');
+  }
+  out.writeln('      <div class="pbench-grid">');
+  for (final i in impls) {
+    final src = File('$root/benchmark/cases-parallel/$slug/${files[i]}.dart');
+    if (!src.existsSync()) continue;
+    out
+      ..writeln('        <figure>')
+      ..writeln('          <figcaption>${labels[i]}</figcaption>')
+      ..writeln(
+        '          <pre><code>'
+        '${_escapeHtml(src.readAsStringSync().trimRight())}</code></pre>',
+      )
+      ..writeln('        </figure>');
+  }
+  out
+    ..writeln('      </div>')
+    ..writeln('    </details>');
+  return out.toString();
+}
+
+String _pbenchMs(double ms) => ms >= 1000
+    ? '${(ms / 1000).toStringAsFixed(2)} s'
+    : '${ms.toStringAsFixed(1)} ms';
+
+const _pbenchLabelKey = {
+  'native': 'pbenchLabelNative',
+  'native-isolate': 'pbenchLabelNativeIsolate',
+  'fxdart': 'pbenchLabelFxdart',
+  'fxdart-parallel': 'pbenchLabelParallel',
+  'fxdart-parallel-chunk': 'pbenchLabelParallelChunk',
+};
 
 String _renderComparisonIndex(
   Locale locale,

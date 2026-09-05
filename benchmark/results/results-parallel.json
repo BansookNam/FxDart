@@ -1,0 +1,199 @@
+{
+  "generated": "2026-09-05T03:16:00.809997Z",
+  "workers": 10,
+  "impls": [
+    "native",
+    "native-isolate",
+    "fxdart",
+    "fxdart-parallel",
+    "fxdart-parallel-chunk"
+  ],
+  "labels": {
+    "native": "Native, one isolate",
+    "native-isolate": "Native + dart:isolate",
+    "fxdart": "fxdart chain, one isolate",
+    "fxdart-parallel": "fxdart .parallel()",
+    "fxdart-parallel-chunk": "fxdart .parallel(chunk:)"
+  },
+  "smoke": false,
+  "rounds": 1,
+  "cases": [
+    {
+      "slug": "password-rehash",
+      "scales": {
+        "100": {
+          "n": 100,
+          "checksum": "5985344128304328",
+          "ms": {
+            "native": 25.18,
+            "native-isolate": 4.962,
+            "fxdart": 25.23,
+            "fxdart-parallel": 4.667,
+            "fxdart-parallel-chunk": 4.853
+          },
+          "speedupVsNative": {
+            "native": 1.0,
+            "native-isolate": 5.074566706972995,
+            "fxdart": 0.9980182322631788,
+            "fxdart-parallel": 5.395328905078209,
+            "fxdart-parallel-chunk": 5.188543169173707
+          }
+        },
+        "10000": {
+          "n": 10000,
+          "checksum": "2443217226952964",
+          "ms": {
+            "native": 2479.75,
+            "native-isolate": 373.711,
+            "fxdart": 2480.049,
+            "fxdart-parallel": 417.277,
+            "fxdart-parallel-chunk": 370.382
+          },
+          "speedupVsNative": {
+            "native": 1.0,
+            "native-isolate": 6.635475006087591,
+            "fxdart": 0.9998794378659454,
+            "fxdart-parallel": 5.942695140158696,
+            "fxdart-parallel-chunk": 6.695114773396115
+          }
+        },
+        "full": {
+          "n": 20000,
+          "checksum": "141651551046228",
+          "ms": {
+            "native": 4979.171,
+            "native-isolate": 748.433,
+            "fxdart": 4945.466,
+            "fxdart-parallel": 794.163,
+            "fxdart-parallel-chunk": 758.075
+          },
+          "speedupVsNative": {
+            "native": 1.0,
+            "native-isolate": 6.652794572126029,
+            "fxdart": 1.0068153334791907,
+            "fxdart-parallel": 6.269709115131277,
+            "fxdart-parallel-chunk": 6.568177291165122
+          }
+        }
+      }
+    },
+    {
+      "slug": "image-tiles",
+      "scales": {
+        "100": {
+          "n": 100,
+          "checksum": "4980528741132890",
+          "ms": {
+            "native": 3.331,
+            "native-isolate": 0.8723333333333334,
+            "fxdart": 3.182,
+            "fxdart-parallel": 1.3565,
+            "fxdart-parallel-chunk": 1.4005
+          },
+          "speedupVsNative": {
+            "native": 1.0,
+            "native-isolate": 3.8184944593045467,
+            "fxdart": 1.046825895663105,
+            "fxdart-parallel": 2.4555842241061554,
+            "fxdart-parallel-chunk": 2.3784362727597284
+          }
+        },
+        "10000": {
+          "n": 10000,
+          "checksum": "4184854798624324",
+          "ms": {
+            "native": 326.287,
+            "native-isolate": 87.553,
+            "fxdart": 317.696,
+            "fxdart-parallel": 117.929,
+            "fxdart-parallel-chunk": 56.027
+          },
+          "speedupVsNative": {
+            "native": 1.0,
+            "native-isolate": 3.72673694790584,
+            "fxdart": 1.0270415743352135,
+            "fxdart-parallel": 2.766808842608688,
+            "fxdart-parallel-chunk": 5.8237456940403725
+          }
+        },
+        "full": {
+          "n": 147000,
+          "checksum": "1559526542676314",
+          "ms": {
+            "native": 5562.536,
+            "native-isolate": 1676.3,
+            "fxdart": 5502.664,
+            "fxdart-parallel": 1753.574,
+            "fxdart-parallel-chunk": 781.901
+          },
+          "speedupVsNative": {
+            "native": 1.0,
+            "native-isolate": 3.3183415856350296,
+            "fxdart": 1.010880548040004,
+            "fxdart-parallel": 3.1721136376337697,
+            "fxdart-parallel-chunk": 7.1141180277298535
+          }
+        }
+      }
+    },
+    {
+      "slug": "log-fingerprint",
+      "scales": {
+        "100": {
+          "n": 100,
+          "checksum": "757826477312232",
+          "ms": {
+            "native": 0.351,
+            "native-isolate": 0.30042857142857143,
+            "fxdart": 0.3405,
+            "fxdart-parallel": 1.2375,
+            "fxdart-parallel-chunk": 0.8933333333333334
+          },
+          "speedupVsNative": {
+            "native": 1.0,
+            "native-isolate": 1.1683309557774606,
+            "fxdart": 1.0308370044052861,
+            "fxdart-parallel": 0.28363636363636363,
+            "fxdart-parallel-chunk": 0.392910447761194
+          }
+        },
+        "10000": {
+          "n": 10000,
+          "checksum": "8824517526355157",
+          "ms": {
+            "native": 34.814,
+            "native-isolate": 8.99,
+            "fxdart": 34.705,
+            "fxdart-parallel": 87.366,
+            "fxdart-parallel-chunk": 6.733
+          },
+          "speedupVsNative": {
+            "native": 1.0,
+            "native-isolate": 3.8725250278086762,
+            "fxdart": 1.0031407578158766,
+            "fxdart-parallel": 0.3984845363184763,
+            "fxdart-parallel-chunk": 5.170652012475865
+          }
+        },
+        "full": {
+          "n": 1500000,
+          "checksum": "755522290282409",
+          "ms": {
+            "native": 5436.148,
+            "native-isolate": 3809.855,
+            "fxdart": 5432.503,
+            "fxdart-parallel": 13680.877,
+            "fxdart-parallel-chunk": 1158.082
+          },
+          "speedupVsNative": {
+            "native": 1.0,
+            "native-isolate": 1.4268648019412813,
+            "fxdart": 1.0006709614334315,
+            "fxdart-parallel": 0.39735376613648377,
+            "fxdart-parallel-chunk": 4.694095927576804
+          }
+        }
+      }
+    }
+  ]
+}

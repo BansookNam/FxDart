@@ -1,5 +1,77 @@
 ## 0.8.10
 
+`parallel(n, worker, chunk: k)` — k elements ride one message instead of
+one each. The port round trip is ~5µs, which is more than most callbacks
+cost, and it is why the operator lost to a plain loop on anything but
+very heavy per-element work. On 20k elements of ~0.4µs each, four
+workers (a probe of that shape, not one of the three page cases):
+**142ms → 3ms**, against 8ms for the same work inline. The batched
+form is the first one that beats the loop it replaces.
+
+What a batch does not change is what the caller observes. Order,
+back-pressure and the position an error lands at are the unbatched
+operator's: a worker that throws sends back the results it had already
+finished, so the elements before the failing one are still emitted and
+the raise happens on the element that actually failed. A batch is served
+straight out of the list it arrives in, so it costs one future however
+many elements ride it — and the fast-pull terminals answer from it
+without a future at all. Two things do change, both documented: the
+first element waits for its whole batch (so a `take(1)` wants a small
+`chunk` or none), and an unsendable *result* fails its batch rather than
+only its own pull.
+
+**Is `parallel` worth it?** — a new page, and a third benchmark family
+behind it. One CPU-bound job run five ways: a plain loop, hand-rolled
+`Isolate.run` over slices, the fxdart chain on one isolate,
+`fx(...).parallel(...)` at its default, and the same with `chunk:`.
+Three cases, each sized so the plain-loop baseline runs ~5 s, varying the
+one number that decides the answer — the cost of a single element — from
+~250 µs (`password-rehash`) through ~37 µs (`image-tiles`) to ~3.5 µs
+(`log-fingerprint`), against the ~5 µs it costs to hand one element to
+another isolate.
+
+The page exists because "use isolates for CPU work" is not advice, it is
+a slogan. Measured, on 10 workers: at ~250 µs an element `parallel` runs
+6.3x the plain loop and `chunk` adds nothing worth having. At ~3.5 µs it
+runs **2.5x slower** than the plain loop — 13.7 s against 5.4 s — and the
+same operator with a chunk runs **4.7x faster**. One parameter, an 11.8x
+swing. In the middle, at ~37 µs, 3.2x becomes 7.1x.
+
+More workers do not rescue the slow row, which is the part worth knowing:
+sweeping the pool from 1 to 10 leaves the unchunked form flat (768 ms →
+873 ms, slightly *worse*) while the chunked form scales 5.4x. Every
+element costs two message copies, a port event and a completer on the
+*main* isolate — one thread, the one part that cannot be parallelised —
+so `chunk` is not about making coordination cheaper but about there being
+less of it. The formula `n ~/ (workers * 4)` always yields 40 messages
+with ten workers: `chunk: 2500` at the N=100,000 sweep (vs 100,000
+trips), `chunk: 37500` at the headline N=1,500,000 (vs 1.5 million
+trips).
+
+The chunked row also beats the hand-rolled `Isolate.run`-over-slices it
+is measured against — 2.1x on `image-tiles`, 3.3x on `log-fingerprint` —
+because slicing copies a whole slice up front while its isolate waits,
+where a chunked pull overlaps the copying with the computing. On
+`password-rehash`, whose elements are three ints, there is nothing to
+copy and the three isolate rows sit within a few percent (hand-rolled
+6.65×, chunked 6.57×, default `parallel` 6.27× — about 6% behind
+`Isolate.run`).
+
+Each case also runs at N=10,000 and N=100, so the crossover is on the
+page rather than asserted — `password-rehash` still wins at 100,
+`log-fingerprint` has already lost at 10,000. It is total work that
+decides, not element count. Every variant calls the same top-level
+worker and the runner refuses a case whose checksums disagree, so the
+rows are always different ways of computing one answer.
+`benchmark/cases-parallel/`,
+`dart run benchmark/run_parallel_benchmarks.dart`.
+
+Fixed alongside it: `parallel` silently **dropped `null` elements**.
+`null` doubled as "the source is exhausted" in the pull path, so on a
+nullable `A` a genuine null was read as the end of the source —
+`[1, null, 3, null, 5]` came back as `[1, 3, 5]`. There is a sentinel
+for that now, and a null is an element on every path.
+
 Map-only fused async runs honour `Concurrent` in-place instead of
 dropping to the unfused layering — the headline
 `toAsync().map(f).concurrent(n)` shape. Paired A/B (AOT, rounds=20)
@@ -14,8 +86,15 @@ ordered-batch machinery, not the map layer.
 `parallel(n, worker)` — the CPU twin of `concurrent(n)`. A reused pool
 of `n` isolates, source order kept. Prefer a top-level or static
 worker; a capturing closure is fine when every capture is sendable, and
-throws at spawn only when one isn't. Unsupported on the web (use
-`concurrent`). `workers == 1` still leaves the main isolate.
+throws at spawn only when one isn't. A worker may return a `Future`
+(`FutureOr`, same shape as `mapConcurrent`); a sync callback is still
+the fast path. Nested `parallel` inside an async worker is allowed:
+that isolate spawns its own pool, and cancel of the outer chain shuts
+the nested pool down before the worker isolate is killed. One level of
+nesting is the contract — a third nested `parallel` is SIGKILL'd with
+its parent, so it cannot shut down *its* children. Unsupported
+on the web (use `concurrent`). `workers == 1` still leaves the main
+isolate.
 
 The pool spawns its isolates together, talks to them over
 `RawReceivePort`, does not spawn at all for an empty source, and sizes
@@ -26,6 +105,10 @@ input or result fails that pull with `ArgumentError` instead of hanging.
 `mapConcurrent`. The 101 page `concurrent or parallel` is the decision:
 I/O stays on `concurrent`, CPU goes to `parallel`, and a cheap callback
 (`x + 1`) is a loss on the isolate hop.
+
+A source that throws after the pool has started now shuts the pool
+down too — previously only worker errors did, and holding the
+iterator kept the process alive.
 
 An early stop now releases the source through the whole operator chain.
 `StreamPullCancel` existed, but only the terminals honoured it — every

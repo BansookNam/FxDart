@@ -23,6 +23,7 @@ dart run tool/rebuild_page.dart DartComparison/top-merchants.html  # optional: r
 ./benchmark.sh --check | --report-only | --smoke | --rx
 dart run benchmark/run_benchmarks.dart     # the raw runner benchmark.sh wraps (--smoke, --rounds N, [slugs…])
 dart run benchmark/run_benchmarks.dart --rx # RxDartComparison perf benchmarks (RxDart vs FxDart)
+dart run benchmark/run_parallel_benchmarks.dart # ParallelComparison — one CPU job, five ways (--smoke, --rounds N)
 ```
 
 ## Architecture
@@ -73,10 +74,11 @@ Async operator callbacks in `mapAsync`-style code must stay parallel-safe: overl
   ab_bench's default 12, four readings in the 0.8.6 pass looked solid against
   *clean* controls and vanished at 20. `--verify` catches the
   report-vs-results drift directly.
-- **Two benchmark families** exist and must be maintained separately:
+- **Three benchmark families** exist and must be maintained separately:
   - **DartComparison** (`docs/DartComparison/`, `benchmark/results/results.json`): native Dart vs FxDart perf comparison. Run with `dart run benchmark/run_benchmarks.dart`. Compares `benchmark/cases/<slug>/native.dart` against `benchmark/cases/<slug>/fxdart.dart`. Measures 3 scales (N=100, 10k, headline 1M or case-specific).
   - **RxDartComparison** (`docs/RxDartComparison/`, `benchmark/results/results-rx.json`): RxDart vs FxDart perf comparison. Run with `dart run benchmark/run_benchmarks.dart --rx`. Compares `benchmark/cases/<slug>/rxdart.dart` against `benchmark/cases/<slug>/fxdart.dart`. Measures 2 scales (N=100, headline 1M for sync / case-specific for async).
-- Both result files are build_docs **inputs**, rendering Benchmark bar-chart sections on their respective comparison pages. Benchmark cases in `benchmark/cases/<slug>/` must stay faithful to their `content/code-comparison/<slug>/` and `content/code-comparison-rx/<slug>/` examples — see `benchmark/AUTHORING.md`.
+  - **ParallelComparison** (`docs/parallel-benchmark.html`, `benchmark/results/results-parallel.json`): is `parallel` worth it? **Five** variants of one CPU-bound job — `native.dart`, `native_isolate.dart`, `fxdart.dart`, `fxdart_parallel.dart`, `fxdart_parallel_chunk.dart` in `benchmark/cases-parallel/<slug>/`, all calling the one worker in that case's `work.dart`. Its own runner (`dart run benchmark/run_parallel_benchmarks.dart`), because `run_benchmarks.dart` is built around two sides and a verdict between them and this family has five sides and no winner to declare. Cases are sized so the **plain-loop baseline runs ~5s** — below a second, isolate spawn and data copying are most of what gets measured — and they vary one axis, per-element cost, because that is what decides the answer. The runner refuses a case whose five variants disagree on the checksum. Re-run it after any change to `lib/src/lazy/parallel*`; the page renders straight from the JSON and the case sources, so it cannot drift from what was measured.
+- All three result files are build_docs **inputs**, rendering Benchmark bar-chart sections on their respective comparison pages. Benchmark cases in `benchmark/cases/<slug>/` must stay faithful to their `content/code-comparison/<slug>/` and `content/code-comparison-rx/<slug>/` examples — see `benchmark/AUTHORING.md`.
 - After translating, run `dart run tool/build_docs.dart --record` to mark it current.
 - Staleness is a hash of the **English file only**, so *any* edit to it — including a
   mechanical front-matter bump applied to the overlays in the same commit — marks every

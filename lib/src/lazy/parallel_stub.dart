@@ -1,17 +1,21 @@
+import 'dart:async';
+
 import '../async_iterable.dart';
 
 /// Web / non-isolate implementation. See [parallel] for the contract.
 Never parallelImpl<A, R>(
   int workers,
-  R Function(A input) worker,
+  FutureOr<R> Function(A input) worker,
   Iterable<A> iterable,
+  int chunk,
 ) => _unsupported();
 
 /// Web / non-isolate implementation. See [parallelAsync] for the contract.
 Never parallelAsyncImpl<A, R>(
   int workers,
-  R Function(A input) worker,
+  FutureOr<R> Function(A input) worker,
   FxAsyncIterable<A> iterable,
+  int chunk,
 ) => _unsupported();
 
 /// Web has no [Platform.numberOfProcessors]; [parallel] still throws.

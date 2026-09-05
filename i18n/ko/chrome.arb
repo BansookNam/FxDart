@@ -91,5 +91,18 @@
   "theoryContribute": "다른 언어 번역 기여하기",
   "theoryGoto": "쪽 이동",
   "theoryGo": "이동",
-  "theoryEdited": "수정됨"
+  "theoryEdited": "수정됨",
+
+  "pbenchCodeSummary": "다섯 프로그램, 그리고 이들이 공유하는 작업",
+  "pbenchCodeJob": "작업 자체 — 다섯 프로그램 모두 이 함수 하나를 호출합니다",
+  "pbenchMeta": "워커 {workers}개, AOT (<code>dart compile exe</code>), 3회 반복의 중앙값 ({rounds} 라운드 × 3). {count}개 프로그램이 같은 체크섬을 냅니다 — 그렇지 않으면 러너가 거부합니다.",
+  "pbenchLabelNative": "네이티브, isolate 하나",
+  "pbenchLabelNativeIsolate": "네이티브 + dart:isolate",
+  "pbenchLabelFxdart": "fxdart 체인, isolate 하나",
+  "pbenchLabelParallel": "fxdart .parallel()",
+  "pbenchLabelParallelChunk": "fxdart .parallel(chunk:)",
+  "pbenchNoteBaseline": "기준",
+  "pbenchNoteFaster": "{n}배 더 빠름",
+  "pbenchNoteSlower": "{n}배 더 느림",
+  "pbenchNoteSame": "동일"
 }
