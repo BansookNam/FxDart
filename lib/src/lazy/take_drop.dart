@@ -92,11 +92,16 @@ FxAsyncIterable<A> _takeAsyncLegacy<A>(
     // to deliver, so the release waits for the last one to settle.
     var inFlight = 0;
     var wanted = false;
-    void cancelOnce() {
+    // Returns the release future, or null when the release is still owed to
+    // an in-flight pull — a `cancel()` that lands mid-pull therefore resolves
+    // before the source is let go, which is as close as this path gets: the
+    // release runs when that last pull settles, and there is no earlier
+    // moment to hand back.
+    Future<void>? cancelOnce() {
       wanted = true;
-      if (cancelled || inFlight > 0) return;
+      if (cancelled || inFlight > 0) return null;
       cancelled = true;
-      fxCancel(iterator);
+      return fxCancelAsync(iterator);
     }
 
     return DelegateAsyncIterator(
@@ -111,10 +116,7 @@ FxAsyncIterable<A> _takeAsyncLegacy<A>(
           if (wanted) cancelOnce();
         });
       },
-      cancel: () {
-        cancelOnce();
-        return Future<void>.value();
-      },
+      cancel: () => cancelOnce() ?? Future<void>.value(),
     );
   });
 }
@@ -1431,9 +1433,7 @@ class _WindowedAsyncIterator<A>
   @override
   Future<void> cancel() {
     _finished = true;
-    fxCancel(_source);
-    fxCancel(_fallback);
-    return Future<void>.value();
+    return fxCancelAll([_source, _fallback]);
   }
 
   List<A> _carry = <A>[];

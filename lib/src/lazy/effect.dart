@@ -129,10 +129,7 @@ class _TimeoutAsyncIterator<A> implements FxFastIterator<A>, StreamPullCancel {
   final FxAsyncIterator<A> _inner;
 
   @override
-  Future<void> cancel() {
-    fxCancel(_inner);
-    return Future<void>.value();
-  }
+  Future<void> cancel() => fxCancelAll(_inner);
 
   @override
   Future<IterResult<A>> next([Concurrent? concurrent]) =>
@@ -262,9 +259,7 @@ class _UsingAsyncIterator<R, T> implements FxFastIterator<T>, StreamPullCancel {
   @override
   Future<void> cancel() {
     _done = true;
-    fxCancel(_iterator);
-    if (!_acquired) return Future<void>.value();
-    return _releaseOnce();
+    return fxCancelAll(_iterator, _acquired ? _releaseOnce : null);
   }
 
   Future<void> _releaseOnce() =>

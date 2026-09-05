@@ -581,8 +581,7 @@ FxAsyncIterable<A> _asyncConcurrent<A>(FxAsyncIterable<(bool, A)> iterable) {
       },
       cancel: () {
         finished = true;
-        fxCancel(iterator);
-        return Future<void>.value();
+        return fxCancelAll(iterator);
       },
     );
   });
@@ -633,10 +632,7 @@ FxAsyncIterable<A> _filterAsyncLegacy<A>(
         return inner!.next(concurrent);
       },
       // Built on the first pull, like `dispatchAsync` — cancel what exists.
-      cancel: () {
-        fxCancel(inner);
-        return Future<void>.value();
-      },
+      cancel: () => fxCancelAll(inner),
     );
   });
 }
@@ -1228,11 +1224,7 @@ FxAsyncIterable<A> _setOpAsync<A, B>(
         }
         return inner!.next(concurrent);
       },
-      cancel: () {
-        fxCancel(keySide);
-        fxCancel(inner);
-        return Future<void>.value();
-      },
+      cancel: () => fxCancelAll([keySide, inner]),
     );
   });
 }

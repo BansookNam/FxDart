@@ -97,10 +97,7 @@ class DelegateAsyncIterator<T> implements FxAsyncIterator<T>, StreamPullCancel {
   Future<IterResult<T>> next([Concurrent? concurrent]) => _next(concurrent);
 
   @override
-  Future<void> cancel() {
-    fxCancel(_upstream);
-    return _cancel?.call() ?? Future<void>.value();
-  }
+  Future<void> cancel() => fxCancelAll(_upstream, _cancel);
 }
 
 /// Serializes overlapping `next()` calls, mimicking the implicit request
@@ -147,10 +144,7 @@ class SerialAsyncIterator<T> implements FxAsyncIterator<T>, StreamPullCancel {
   }
 
   @override
-  Future<void> cancel() {
-    fxCancel(_upstream);
-    return _cancel?.call() ?? Future<void>.value();
-  }
+  Future<void> cancel() => fxCancelAll(_upstream, _cancel);
 }
 
 /// An empty async iterable.
@@ -561,18 +555,20 @@ class _FusedIterator<T>
   /// How many elements the run's [FxTakeStage] (at most one) has passed.
   int _taken = 0;
 
-  void _stop() {
-    if (_ended) return;
+  /// Ends the run and releases whatever it holds, handing back the release
+  /// future so [cancel] can be awaited. Only one of [_source] / [_fallback]
+  /// is ever live, but handing both to [fxCancelAsync] costs one list and
+  /// keeps the null cases in one place.
+  Future<void>? _release() {
+    if (_ended) return null;
     _ended = true;
-    fxCancel(_source);
-    fxCancel(_fallback);
+    return fxCancelAsync([_source, _fallback]);
   }
 
+  void _stop() => _release()?.ignore();
+
   @override
-  Future<void> cancel() {
-    _stop();
-    return Future<void>.value();
-  }
+  Future<void> cancel() => _release() ?? Future<void>.value();
 
   @override
   Future<IterResult<T>> next([Concurrent? concurrent]) {
@@ -1029,8 +1025,16 @@ Future<void>? fxFusedDrive<T>(
   void finish() {
     if (terminated) return;
     terminated = true;
-    fxCancel(source);
-    completer.complete();
+    // The run is over and the caller is still waiting, so this is the one
+    // place a failing release has somewhere to go: a `using` stopped early
+    // by a `take` reports its release error here, as a full drain does.
+    // [fail] stays fire-and-forget — the error it already carries wins.
+    final release = fxCancelAsync(source);
+    if (release == null) {
+      completer.complete();
+      return;
+    }
+    release.then((_) => completer.complete(), onError: completer.completeError);
   }
 
   late void Function() pump;
@@ -1322,16 +1326,44 @@ abstract interface class StreamPullCancel {
 /// an [Iterable] of them (the multi-source operators — `zip`, `concat`,
 /// `transpose` — hold a list). No-op otherwise, so a site can hand over
 /// whatever it holds without testing the type first.
-void fxCancel(Object? it) {
-  if (it is StreamPullCancel) {
-    it.cancel();
-    return;
-  }
+///
+/// Fire-and-forget: a `cancel` that fails is [Future.ignore]d rather than
+/// left to surface as an unhandled async error. `using`'s release runs on
+/// this path, and a release that throws must not kill a program that has
+/// already been handed its result. Use [fxCancelAsync] at a site that holds
+/// a future the failure can be delivered on — [fxFusedDrive] does, so the
+/// terminal still reports it.
+void fxCancel(Object? it) => fxCancelAsync(it)?.ignore();
+
+/// [fxCancel], handing back the release future instead of ignoring it —
+/// `null` when nothing being cancelled had one, which is the common case
+/// (a plain `Iterable` source, or a chain with nothing to release).
+Future<void>? fxCancelAsync(Object? it) {
+  if (it is StreamPullCancel) return it.cancel();
   if (it is Iterable) {
+    List<Future<void>>? pending;
     for (final e in it) {
-      fxCancel(e);
+      final f = fxCancelAsync(e);
+      if (f != null) (pending ??= <Future<void>>[]).add(f);
     }
+    if (pending == null) return null;
+    return pending.length == 1 ? pending.first : Future.wait<void>(pending);
   }
+  return null;
+}
+
+/// [fxCancelAsync] as a plain `Future`, joining both halves of an operator's
+/// teardown: the [upstream] it pulls from and the [own] release of anything
+/// else it holds. This is what a [StreamPullCancel.cancel] returns, so that
+/// `await it.cancel()` really does mean "everything under me is released" —
+/// returning a bare `Future.value()` while the release runs unobserved makes
+/// the future a lie, and `using`'s release is the one callers wait on.
+Future<void> fxCancelAll(Object? upstream, [Future<void> Function()? own]) {
+  final up = fxCancelAsync(upstream);
+  final mine = own?.call();
+  if (mine == null) return up ?? Future<void>.value();
+  if (up == null) return mine;
+  return Future.wait<void>([up, mine]);
 }
 
 /// Latest-wins pull over a [Stream]. While the consumer is between pulls,
@@ -1764,10 +1796,7 @@ FxAsyncIterable<A> concurrentAsync<A>(int length, FxAsyncIterable<A> iterable) {
       final iterator = iterable.iterator;
       return DelegateAsyncIterator(
         (concurrent) => iterator.next(concurrent ?? Concurrent.of(1)),
-        cancel: () {
-          fxCancel(iterator);
-          return Future<void>.value();
-        },
+        cancel: () => fxCancelAll(iterator),
       );
     });
   }
@@ -1870,8 +1899,7 @@ FxAsyncIterable<A> concurrentAsync<A>(int length, FxAsyncIterable<A> iterable) {
       },
       cancel: () {
         finished = true;
-        fxCancel(iterator);
-        return Future<void>.value();
+        return fxCancelAll(iterator);
       },
     );
   });
@@ -2030,8 +2058,7 @@ FxAsyncIterator<A> _poolIterator<A>(int length, FxAsyncIterable<A> iterable) {
       },
       cancel: () {
         sourceDone = true;
-        fxCancel(iterator);
-        return Future<void>.value();
+        return fxCancelAll(iterator);
       },
     );
   }).iterator;
@@ -2181,10 +2208,7 @@ FxAsyncIterable<B> dispatchAsync<A, B>(
       // [inner] is built on the first pull, so the upstream to release is
       // whatever exists now, not a value known at construction. Nothing to
       // do when the chain was never pulled — no source iterator was made.
-      cancel: () {
-        fxCancel(inner);
-        return Future<void>.value();
-      },
+      cancel: () => fxCancelAll(inner),
     );
   });
 }

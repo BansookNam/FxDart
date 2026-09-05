@@ -4,7 +4,13 @@ library;
 import 'dart:async';
 
 import 'package:fxdart/fxdart.dart';
-import 'package:fxdart/src/async_iterable.dart' show StreamPullCancel, fxCancel;
+import 'package:fxdart/src/async_iterable.dart'
+    show
+        DelegateAsyncIterator,
+        IterResult,
+        StreamPullCancel,
+        fxCancel,
+        fxCancelAll;
 import 'package:test/test.dart' hide isEmpty, isNull, isNotNull, isList, isMap;
 
 /// A live source that reports whether its subscription was released.
@@ -257,11 +263,208 @@ void main() {
     });
   });
 
+  group('a terminal that stops early releases the source', () {
+    // Every one of these ends the drain with the source still live. The
+    // observable stand-in is a subscription; behind a `parallel` the same
+    // hole is a pool of isolates that keeps the process alive forever.
+    test('nth', () async {
+      expect(await releasedBy((s) => nthAsync(1, s)), isTrue);
+    });
+
+    test('firstNotNullOf', () async {
+      expect(
+        await releasedBy((s) => s.firstNotNullOf((v) => v == 2 ? 'two' : null)),
+        isTrue,
+      );
+    });
+
+    test('consume with a count', () async {
+      expect(await releasedBy((s) => s.consume(2)), isTrue);
+    });
+
+    test('consume with no count drains and needs no release', () async {
+      // The counted form stops early; the uncounted one runs the source out,
+      // so there is nothing left holding anything.
+      await expectLater(fx([1, 2, 3]).toAsync().consume(), completes);
+    });
+  });
+
+  group('a throwing callback releases the source', () {
+    // The pull itself is fine here — it is the terminal's own callback that
+    // ends the drain, so nothing downstream will send a cancel.
+    Future<bool> releasedByThrow(
+      Future<void> Function(FxAsync<int> src) build,
+    ) => releasedBy((s) async {
+      await expectLater(build(s), throwsStateError);
+    });
+
+    test('each', () async {
+      expect(
+        await releasedByThrow((s) {
+          return s.each((v) {
+            if (v > 1) throw StateError('boom');
+          });
+        }),
+        isTrue,
+      );
+    });
+
+    test('fold', () async {
+      expect(
+        await releasedByThrow((s) {
+          return s.fold<int>(0, (acc, v) {
+            if (v > 1) throw StateError('boom');
+            return acc + v;
+          });
+        }),
+        isTrue,
+      );
+    });
+
+    test('reduce', () async {
+      expect(
+        await releasedByThrow((s) {
+          return s.reduce((acc, v) {
+            if (v > 1) throw StateError('boom');
+            return acc + v;
+          });
+        }),
+        isTrue,
+      );
+    });
+
+    test('firstNotNullOf', () async {
+      expect(
+        await releasedByThrow(
+          (s) => s.firstNotNullOf<String>((v) => throw StateError('boom')),
+        ),
+        isTrue,
+      );
+    });
+
+    test('nth', () async {
+      expect(
+        await releasedByThrow(
+          (s) => nthAsync(3, s.map((v) {
+            if (v > 1) throw StateError('boom');
+            return v;
+          })),
+        ),
+        isTrue,
+      );
+    });
+
+    test('consume', () async {
+      expect(
+        await releasedByThrow(
+          (s) => s.map<int>((v) {
+            if (v > 1) throw StateError('boom');
+            return v;
+          }).consume(4),
+        ),
+        isTrue,
+      );
+    });
+
+    test('toList', () async {
+      expect(
+        await releasedByThrow(
+          (s) => s.map<int>((v) {
+            if (v > 1) throw StateError('boom');
+            return v;
+          }).toList(),
+        ),
+        isTrue,
+      );
+    });
+  });
+
+  group('cancel is awaitable, and a failing release is reported', () {
+    test('await cancel() waits for an async release', () async {
+      // The release future used to be dropped on the way up, so `cancel`
+      // resolved while the resource was still open.
+      var released = false;
+      final it = fxAsync(
+        usingAsync<String, int>(
+          () => 'db',
+          (r) => fx([1, 2, 3, 4]).toAsync(),
+          (r) async {
+            await Future<void>.delayed(const Duration(milliseconds: 20));
+            released = true;
+          },
+        ),
+      ).map((v) => v).iterator;
+      await it.next();
+      await (it as StreamPullCancel).cancel();
+      expect(released, isTrue);
+    });
+
+    test('a release that throws on an early stop reaches the caller', () async {
+      // It used to kill the program: the failed release future had no
+      // listener, so it surfaced as an unhandled async error *after* the
+      // caller had already been handed its result.
+      await expectLater(
+        fxAsync(
+          usingAsync<String, int>(
+            () => 'db',
+            (r) => fx([1, 2, 3, 4]).toAsync(),
+            (r) => throw StateError('release boom'),
+          ),
+        ).take(2).toList(),
+        throwsStateError,
+      );
+      // A turn for anything unobserved to blow up in, had it been left so.
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    });
+
+    test('an error keeps its own identity over a failing release', () async {
+      // On the failure path the error already in hand wins; the release is
+      // still run, and its own failure must not replace it.
+      await expectLater(
+        fxAsync(
+          usingAsync<String, int>(
+            () => 'db',
+            (r) => fx([1, 2, 3]).toAsync(),
+            (r) => throw StateError('release boom'),
+          ),
+        ).map<int>((v) => throw FormatException('pull boom')).toList(),
+        throwsFormatException,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    });
+  });
+
   group('fxCancel', () {
     test('is a no-op on something that cannot be cancelled', () {
       expect(() => fxCancel(42), returnsNormally);
       expect(() => fxCancel(null), returnsNormally);
       expect(() => fxCancel(<Object>[1, 'two']), returnsNormally);
+    });
+
+    test('fxCancelAll joins an upstream with an owned release', () async {
+      // No operator in the library passes both halves today — `take` owns a
+      // release, the rest forward an upstream — but the join is what makes
+      // `cancel()` mean "everything under me", so it is pinned here.
+      final live = _LiveSource();
+      addTearDown(live.dispose);
+      final upstream = live.chain.iterator;
+      await upstream.next();
+      var ownRan = false;
+      final it = DelegateAsyncIterator<int>(
+        (_) => Future.value(IterResult<int>.done()),
+        upstream: upstream,
+        cancel: () async {
+          await Future<void>.delayed(const Duration(milliseconds: 20));
+          ownRan = true;
+        },
+      );
+      await it.cancel();
+      expect(ownRan, isTrue);
+      expect(live.cancelled, isTrue);
+    });
+
+    test('fxCancelAll with nothing to release still resolves', () async {
+      await expectLater(fxCancelAll(null), completes);
     });
 
     test('reaches every element of an iterable', () async {

@@ -34,6 +34,24 @@ coming. `take` holds its release until pulls it already issued have
 settled, so a cancel under `concurrent(n)` cannot truncate values that
 were already on their way.
 
+A terminal that stops early or throws releases the source too. `nth`,
+`firstNotNullOf` and `consume(n)` stop early with the source still live;
+`each`, `fold`, `reduce` and `toList` end the drain the moment their own
+callback throws, and nothing downstream is left to send a cancel. Every
+aggregate built on those three — `sumBy`, `minBy` / `maxBy`, `groupBy`,
+`countBy`, `indexBy`, `foldBy`, `partition`, `topBy`, `tee` and the rest
+— inherits the fix.
+
+`cancel()` now returns a future that is worth awaiting. Each layer used
+to hand back `Future.value()` while the release it started ran
+unobserved, so `await it.cancel()` resolved before the resource was
+let go, and a `using` whose release *threw* on an early stop killed the
+program with an unhandled async error — after the caller had already
+been handed its result. The release future is carried up the chain, a
+failing release is reported to the terminal that is still waiting for
+one (a full drain always did), and on the error path the error already
+in hand still wins.
+
 `test/async_cancel_test.dart` covers the chain per operator: 20 of its
 37 cases fail without this change.
 

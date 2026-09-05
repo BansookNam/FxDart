@@ -227,8 +227,7 @@ class _ParallelIterator<A, R>
   Future<void> cancel() {
     _cancelled = true;
     _shutdown();
-    fxCancel(_async);
-    return Future<void>.value();
+    return fxCancelAll(_async);
   }
 }
 

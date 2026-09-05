@@ -698,9 +698,7 @@ class _FlatMapAsyncIterator<A, B>
   @override
   Future<void> cancel() {
     _done = true;
-    fxCancel(_source);
-    fxCancel(_fallback);
-    return Future<void>.value();
+    return fxCancelAll([_source, _fallback]);
   }
 
   @override

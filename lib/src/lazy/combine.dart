@@ -246,12 +246,7 @@ class _ConcatAsyncIterator<A>
   bool _leftDone = false;
 
   @override
-  Future<void> cancel() {
-    fxCancel(_left);
-    fxCancel(_right);
-    fxCancel(_fallback);
-    return Future<void>.value();
-  }
+  Future<void> cancel() => fxCancelAll([_left, _right, _fallback]);
 
   @override
   Future<IterResult<A>> next([Concurrent? concurrent]) {
