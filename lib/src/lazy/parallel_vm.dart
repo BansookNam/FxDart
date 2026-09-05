@@ -42,7 +42,12 @@ void parallelIsolateEntry(List<dynamic> boot) {
 /// worker's list is its nested pool; the caller's list is the outer pool.
 final _nested = <Isolate>[];
 
+/// Set by [_killNested] so a child [Isolate.spawn] that returns after
+/// shutdown is killed instead of leaking past the parent [Isolate.kill].
+var _reaping = false;
+
 void _killNested() {
+  _reaping = true;
   final spawned = List<Isolate>.of(_nested);
   _nested.clear();
   for (final iso in spawned) {
@@ -321,6 +326,21 @@ class _ParallelIterator<A, R>
 
   Future<IterResult<R>> _step() async {
     if (_ended) return IterResult<R>.done();
+    try {
+      return await _stepBody();
+    } catch (e, st) {
+      // Worker errors already [_shutdown] in [_stepBody]; a throw from
+      // [_take] / [_fill] / [_ensurePool] used not to, and the pool's
+      // ReceivePorts kept the process alive. One catch so every path
+      // that fails after the pool exists also reaps it.
+      final cancelled = _cancelled;
+      _shutdown();
+      if (cancelled) return IterResult<R>.done();
+      Error.throwWithStackTrace(e, st);
+    }
+  }
+
+  Future<IterResult<R>> _stepBody() async {
     if (!_started) {
       // Pull one item (or one batch) before paying isolate spawn so an empty
       // source is free. Bare (not `await`) on a sync source — `await` of a
@@ -664,6 +684,11 @@ class _Iso<A, R> {
       );
     }
     _nested.add(isolate);
+    // Shutdown may have landed while [Isolate.spawn] was in flight — the
+    // child exists but was not in [_nested] yet. One line so coverage
+    // does not depend on winning that race: [_killNested] is a no-op
+    // when we are not reaping, and kills this child when we are.
+    if (_reaping) _killNested();
     final toWorker = await ready.future;
     iso = _Iso<A, R>(isolate, toWorker, incoming);
     return iso;

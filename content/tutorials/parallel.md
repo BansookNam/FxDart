@@ -33,6 +33,12 @@ nextLabel: debounce
     same way, rather than hanging. On the web the operator throws
     <code>UnsupportedError</code> — use <code>concurrent(n)</code>
     there. This listing is VM-only and is not a live playground.
+    The worker may return a <code>Future</code>
+    (<code>FutureOr</code>, same shape as
+    <code>mapConcurrent</code>) — a sync callback is still the fast
+    path. Nested <code>parallel</code> inside an async worker is
+    allowed: that isolate spawns its own pool, and cancel of the outer
+    chain shuts the nested pool down.
   </p>
   <p>
     Don't want to pick <code>n</code>? <code>parallelWorkers</code> is
@@ -76,7 +82,8 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   ~3ms
     results of the elements <em>before</em> it and then raises on the
     element that actually failed. Two things do change. The first element
     now waits for its whole batch, so a <code>take(1)</code> wants a
-    small <code>chunk</code> or none. And an unsendable <em>result</em>
+    small <code>chunk</code> or none. And an unsendable <em>input</em> or
+    <em>result</em>
     fails its whole batch rather than only its own pull — finding which
     element was at fault would mean sending them separately, which is the
     cost the batch exists to avoid.

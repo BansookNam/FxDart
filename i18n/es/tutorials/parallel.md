@@ -34,6 +34,12 @@ nextLabel: debounce
     del mismo modo, en lugar de colgarse. En la web el operador lanza
     <code>UnsupportedError</code> — usa <code>concurrent(n)</code>
     ahí. Este listado es solo VM y no es un playground en vivo.
+    El worker puede devolver un <code>Future</code>
+    (<code>FutureOr</code>, la misma forma que
+    <code>mapConcurrent</code>) — un callback síncrono sigue siendo el
+    camino rápido. Un <code>parallel</code> anidado dentro de un worker
+    async está permitido: ese isolate crea su propio pool, y el cancel
+    de la cadena exterior apaga el pool interno.
   </p>
   <p>
     ¿No quieres elegir <code>n</code>? <code>parallelWorkers</code> es
@@ -77,7 +83,8 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   ~3ms
     resultados de los elementos <em>anteriores</em> y luego raisea en el
     elemento que de verdad falló. Cambian dos cosas. El primer elemento
     ahora espera a todo su lote, así que un <code>take(1)</code> quiere un
-    <code>chunk</code> pequeño o ninguno. Y un <em>resultado</em> no
+    <code>chunk</code> pequeño o ninguno. Y un <em>input</em> o
+    <em>resultado</em> no
     enviable falla todo el lote en lugar de solo su pull — averiguar qué
     elemento tuvo la culpa significaría enviarlos por separado, que es el
     coste que el lote existe para evitar.

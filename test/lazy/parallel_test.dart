@@ -388,6 +388,91 @@ void main() {
       );
     });
 
+    test('a throwing source shuts the pool', () async {
+      // `_fill` used to let a source throw escape without [_shutdown], so
+      // the worker ReceivePorts kept the process alive. Same probe as
+      // nested-cancel: pings freeze after the error.
+      final ping = ReceivePort();
+      addTearDown(ping.close);
+      var n = 0;
+      ping.listen((_) => n++);
+      final pingPort = ping.sendPort;
+
+      int pingWork(int x) {
+        pingPort.send(x);
+        io.sleep(const Duration(milliseconds: 40));
+        pingPort.send(x);
+        return x;
+      }
+
+      Iterable<int> bad() sync* {
+        yield 1;
+        yield 2;
+        yield 3;
+        throw StateError('source boom');
+      }
+
+      final it = fx(bad()).parallel(2, pingWork).iterator;
+      try {
+        while (true) {
+          final r = await it.next();
+          if (r.done) break;
+        }
+        fail('expected throw');
+      } on StateError catch (e) {
+        expect(e.message, 'source boom');
+      }
+      expect((await it.next()).done, isTrue);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      final frozen = n;
+      expect(frozen, greaterThan(0));
+      await Future<void>.delayed(const Duration(milliseconds: 120));
+      expect(n, frozen);
+    });
+
+    test('a throwing source shuts a chunked pool', () async {
+      Iterable<int> bad() sync* {
+        yield 1;
+        yield 2;
+        yield 3;
+        yield 4;
+        throw StateError('chunked source boom');
+      }
+
+      final it = fx(bad()).parallel(2, doubleIt, chunk: 2).iterator;
+      try {
+        while (true) {
+          final r = await it.next();
+          if (r.done) break;
+        }
+        fail('expected throw');
+      } on StateError catch (e) {
+        expect(e.message, 'chunked source boom');
+      }
+      expect((await it.next()).done, isTrue);
+    });
+
+    test('a throwing async source shuts the pool', () async {
+      Stream<int> bad() async* {
+        yield 1;
+        yield 2;
+        yield 3;
+        throw StateError('async source boom');
+      }
+
+      final it = parallelAsync(2, doubleIt, fromStreamNext(bad())).iterator;
+      try {
+        while (true) {
+          final r = await it.next();
+          if (r.done) break;
+        }
+        fail('expected throw');
+      } on StateError catch (e) {
+        expect(e.message, 'async source boom');
+      }
+      expect((await it.next()).done, isTrue);
+    });
+
     test('a null element is an element, not the end of the source', () async {
       // `null` used to double as "the source is exhausted", so a nullable
       // [A] silently dropped its nulls.

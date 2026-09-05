@@ -59,9 +59,9 @@ int get parallelWorkers => parallelWorkersImpl;
 /// What a batch does not change: order, back-pressure, and where an error
 /// lands — a throwing element still emits the results before it, then
 /// raises at that element. The one thing it does change is an unsendable
-/// *result*, which fails the whole batch rather than only its own pull.
-/// It also delays the first element until its batch finishes, so a
-/// `take(1)` wants a small [chunk] or none.
+/// *input* or *result*, which fails the whole batch rather than only its
+/// own pull. It also delays the first element until its batch finishes,
+/// so a `take(1)` wants a small [chunk] or none.
 FxAsyncIterable<R> parallel<A, R>(
   int workers,
   FutureOr<R> Function(A input) worker,

@@ -86,8 +86,13 @@ ordered-batch machinery, not the map layer.
 `parallel(n, worker)` — the CPU twin of `concurrent(n)`. A reused pool
 of `n` isolates, source order kept. Prefer a top-level or static
 worker; a capturing closure is fine when every capture is sendable, and
-throws at spawn only when one isn't. Unsupported on the web (use
-`concurrent`). `workers == 1` still leaves the main isolate.
+throws at spawn only when one isn't. A worker may return a `Future`
+(`FutureOr`, same shape as `mapConcurrent`); a sync callback is still
+the fast path. Nested `parallel` inside an async worker is allowed:
+that isolate spawns its own pool, and cancel of the outer chain shuts
+the nested pool down before the worker isolate is killed. Unsupported
+on the web (use `concurrent`). `workers == 1` still leaves the main
+isolate.
 
 The pool spawns its isolates together, talks to them over
 `RawReceivePort`, does not spawn at all for an empty source, and sizes
@@ -98,6 +103,10 @@ input or result fails that pull with `ArgumentError` instead of hanging.
 `mapConcurrent`. The 101 page `concurrent or parallel` is the decision:
 I/O stays on `concurrent`, CPU goes to `parallel`, and a cheap callback
 (`x + 1`) is a loss on the isolate hop.
+
+A source that throws after the pool has started now shuts the pool
+down too — previously only worker errors did, and holding the
+iterator kept the process alive.
 
 An early stop now releases the source through the whole operator chain.
 `StreamPullCancel` existed, but only the terminals honoured it — every
