@@ -19,6 +19,39 @@ first element waits for its whole batch (so a `take(1)` wants a small
 `chunk` or none), and an unsendable *result* fails its batch rather than
 only its own pull.
 
+**Is `parallel` worth it?** — a new page, and a third benchmark family
+behind it. One CPU-bound job run five ways: a plain loop, hand-rolled
+`Isolate.run` over slices, the fxdart chain on one isolate,
+`fx(...).parallel(...)` at its default, and the same with `chunk:`.
+Three cases, each sized so the plain-loop baseline runs ~5 s, varying the
+one number that decides the answer — the cost of a single element — from
+~250 µs (`password-rehash`) through ~37 µs (`image-tiles`) to ~3.5 µs
+(`log-fingerprint`), against the ~5 µs it costs to hand one element to
+another isolate.
+
+The page exists because "use isolates for CPU work" is not advice, it is
+a slogan. Measured, on 10 workers: at ~250 µs an element `parallel` runs
+6.3x the plain loop and `chunk` adds nothing worth having. At ~3.5 µs it
+runs **2.5x slower** than the plain loop — 13.7 s against 5.4 s — and the
+same operator with a chunk runs **4.7x faster**. One parameter, an 11.8x
+swing. In the middle, at ~37 µs, 3.2x becomes 7.1x.
+
+The chunked row also beats the hand-rolled `Isolate.run`-over-slices it
+is measured against — 2.1x on `image-tiles`, 3.3x on `log-fingerprint` —
+because slicing copies a whole slice up front while its isolate waits,
+where a chunked pull overlaps the copying with the computing. On
+`password-rehash`, whose elements are three ints, there is nothing to
+copy and the three isolate rows come out level.
+
+Each case also runs at N=10,000 and N=100, so the crossover is on the
+page rather than asserted — `password-rehash` still wins at 100,
+`log-fingerprint` has already lost at 10,000. It is total work that
+decides, not element count. Every variant calls the same top-level
+worker and the runner refuses a case whose checksums disagree, so the
+rows are always different ways of computing one answer.
+`benchmark/cases-parallel/`,
+`dart run benchmark/run_parallel_benchmarks.dart`.
+
 Fixed alongside it: `parallel` silently **dropped `null` elements**.
 `null` doubled as "the source is exhausted" in the pull path, so on a
 nullable `A` a genuine null was read as the end of the source —
