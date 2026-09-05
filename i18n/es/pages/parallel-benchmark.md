@@ -24,6 +24,25 @@ heading: ¿Merece la pena <code>parallel</code>?
     lo único que los diferencia es dónde se ejecuta esa función.
   </p>
 
+  <h2>Cuándo pasar <code>chunk</code> y cuándo no</h2>
+  <p>
+    Imagina un mensajero. Cada viaje al otro lado del edificio cuesta
+    unos <strong>5µs</strong>, por ligero que sea el sobre.
+  </p>
+  <p>
+    Rehashear una contraseña es un sobre pesado (~250µs de trabajo). Un
+    viaje por elemento está bien: el mensajero es barato junto al
+    trabajo. Deja <code>chunk</code> fuera:
+  </p>
+  <pre><code>await fx(creds).parallel(parallelWorkers, rehash).toList();</code></pre>
+  <p>
+    La huella de una línea de log es una postal (~3.5µs de trabajo). Un
+    viaje por elemento cuesta más que escribir la tarjeta. Empaqueta
+    muchas en un sobre: eso es <code>chunk</code>:
+  </p>
+  <pre><code>await fx(lines).parallel(parallelWorkers, fingerprint,
+    chunk: lines.length ~/ (parallelWorkers * 4)).toList();</code></pre>
+
   <h2>Las cinco maneras</h2>
   <ol>
     <li><strong>Nativo, un isolate</strong> — un bucle <code>for</code>

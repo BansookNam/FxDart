@@ -21,6 +21,25 @@ heading: <code>parallel</code>은 값어치를 하는가?
     그 함수가 어디에서 실행되느냐입니다.
   </p>
 
+  <h2><code>chunk</code>를 넣을 때, 빼 둘 때</h2>
+  <p>
+    택배를 떠올리세요. 봉투가 얼마나 가볍든 건물 건너편까지 한 번
+    가는 데 약 <strong>5µs</strong>가 듭니다.
+  </p>
+  <p>
+    비밀번호를 다시 해시하는 일은 무거운 봉투입니다 (일 ~250µs).
+    장당 한 번 보내는 게 괜찮습니다. 일에 비하면 택배비가 싸니까요.
+    <code>chunk</code>는 빼 두세요:
+  </p>
+  <pre><code>await fx(creds).parallel(parallelWorkers, rehash).toList();</code></pre>
+  <p>
+    로그 한 줄의 지문은 엽서입니다 (일 ~3.5µs). 장당 한 번 보내면
+    쓰는 시간보다 우표가 더 비쌉니다. 한 봉투에 여러 장을 넣는 것이
+    <code>chunk</code>입니다:
+  </p>
+  <pre><code>await fx(lines).parallel(parallelWorkers, fingerprint,
+    chunk: lines.length ~/ (parallelWorkers * 4)).toList();</code></pre>
+
   <h2>다섯 가지 방법</h2>
   <ol>
     <li><strong>네이티브, isolate 하나</strong> — 평범한 <code>for</code>

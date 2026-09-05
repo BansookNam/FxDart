@@ -22,6 +22,25 @@ heading: Is <code>parallel</code> worth it?
     runs.
   </p>
 
+  <h2>When to pass <code>chunk</code>, and when not to</h2>
+  <p>
+    Picture a courier. Each trip across the building costs about
+    <strong>5µs</strong>, no matter how light the envelope.
+  </p>
+  <p>
+    A password rehash is a heavy envelope (~250µs of work). One trip
+    per item is fine — the courier is cheap next to the work. Leave
+    <code>chunk</code> off:
+  </p>
+  <pre><code>await fx(creds).parallel(parallelWorkers, rehash).toList();</code></pre>
+  <p>
+    A log-line fingerprint is a postcard (~3.5µs of work). One trip
+    per item costs more than writing the card. Pack many into one
+    envelope — that is <code>chunk</code>:
+  </p>
+  <pre><code>await fx(lines).parallel(parallelWorkers, fingerprint,
+    chunk: lines.length ~/ (parallelWorkers * 4)).toList();</code></pre>
+
   <h2>The five ways</h2>
   <ol>
     <li><strong>Native, one isolate</strong> — a plain <code>for</code>
