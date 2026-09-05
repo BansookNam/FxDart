@@ -25,6 +25,8 @@ FILES=(
   "lib/src/lazy/zip.dart"
   "lib/src/lazy/combine.dart"
   "lib/src/lazy/effect.dart"
+  "lib/src/lazy/parallel_stub.dart"
+  "lib/src/lazy/parallel.dart"
   "lib/src/strict/aggregate.dart"
   "lib/src/strict/access.dart"
   "lib/src/strict/object.dart"
@@ -180,6 +182,12 @@ FxAsyncIterable<B> _$mapConcurrent<A, B>(
 FxAsyncIterable<B> _$mapConcurrentAsync<A, B>(int concurrency,
         FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
     mapConcurrentAsync(concurrency, f, iterable);
+FxAsyncIterable<R> _$parallel<A, R>(
+        int workers, R Function(A input) worker, Iterable<A> iterable) =>
+    parallel(workers, worker, iterable);
+FxAsyncIterable<R> _$parallelAsync<A, R>(
+        int workers, R Function(A input) worker, FxAsyncIterable<A> iterable) =>
+    parallelAsync(workers, worker, iterable);
 Iterable<(A, B)> _$attach<A, B>(B Function(A a) f, Iterable<A> iterable) =>
     attach(f, iterable);
 FxAsyncIterable<(A, B)> _$attachAsync<A, B>(

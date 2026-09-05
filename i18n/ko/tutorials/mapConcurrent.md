@@ -55,5 +55,6 @@ nextLabel: concurrentPool
     <strong>관련 항목:</strong>
     <a href="concurrent.html"><code>concurrent</code></a> — 바탕이 되는 제한기 ·
     <a href="concurrentPool.html"><code>concurrentPool</code></a> — 원본 순서 대신 완료 순서 ·
-    <a href="toAsync.html"><code>toAsync</code></a> — 이 연산자가 흡수한 동기→비동기 브리지
+    <a href="toAsync.html"><code>toAsync</code></a> — 이 연산자가 흡수한 동기→비동기 브리지 ·
+    <a href="concurrentOrParallel.html">concurrent or parallel</a> — I/O vs CPU
   </div>

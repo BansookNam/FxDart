@@ -40,10 +40,12 @@ nextLabel: mapConcurrent
   </p>
   <p>
     Tune <code>n</code> based on what you're limited by: a REST API might
-    tolerate 5-10 concurrent requests, a local CPU-bound task might want
-    <code>n</code> close to your core count, and <code>n = 1</code> is
+    tolerate 5-10 concurrent requests, and <code>n = 1</code> is
     equivalent to plain sequential awaiting (which is exactly what you get
-    without <code>concurrent</code> at all).
+    without <code>concurrent</code> at all). CPU-bound work is
+    <a href="parallel.html"><code>parallel</code></a>, not a bigger
+    <code>n</code> — see
+    <a href="concurrentOrParallel.html">concurrent or parallel</a>.
   </p>
   <p>
     At N=100k of a zero-delay fetch, a hand-rolled worker pool is still
@@ -76,5 +78,6 @@ nextLabel: mapConcurrent
     <a href="concurrentPool.html"><code>concurrentPool</code></a> — completion-order variant ·
     <a href="toAsync.html"><code>toAsync</code></a> — the pull-based model this relies on ·
     <a href="asyncVariants.html">async variants</a> — the *Async naming convention ·
-    <a href="map.html"><code>map</code></a> — the operator most often paired with concurrent
+    <a href="map.html"><code>map</code></a> — the operator most often paired with concurrent ·
+    <a href="concurrentOrParallel.html">concurrent or parallel</a> — I/O vs CPU
   </div>

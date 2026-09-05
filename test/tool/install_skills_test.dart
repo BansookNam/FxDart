@@ -36,6 +36,16 @@ void main() {
       isTrue,
     );
     expect(
+      File('${tmp.path}/.claude/skills/fxdart-events/SKILL.md').existsSync(),
+      isTrue,
+    );
+    expect(
+      File(
+        '${tmp.path}/.claude/skills/fxdart-typed-errors/SKILL.md',
+      ).existsSync(),
+      isTrue,
+    );
+    expect(
       File(
         '${tmp.path}/.claude/skills/fxdart-pipelines/references/'
         'api-reference.md',
@@ -99,7 +109,12 @@ void main() {
       ..writeAsStringSync('---\nname: other-skill\n---\n');
 
     final listed = await run(['--project-root', tmp.path, '--list', 'claude']);
-    expect(listed.stdout, contains('installed: fxdart-pipelines'));
+    expect(
+      listed.stdout,
+      contains(
+        'installed: fxdart-events, fxdart-pipelines, fxdart-typed-errors',
+      ),
+    );
 
     final removed = await run([
       '--project-root',
@@ -110,6 +125,14 @@ void main() {
     expect(removed.exitCode, 0);
     expect(
       Directory('${tmp.path}/.claude/skills/fxdart-pipelines').existsSync(),
+      isFalse,
+    );
+    expect(
+      Directory('${tmp.path}/.claude/skills/fxdart-events').existsSync(),
+      isFalse,
+    );
+    expect(
+      Directory('${tmp.path}/.claude/skills/fxdart-typed-errors').existsSync(),
       isFalse,
     );
     expect(

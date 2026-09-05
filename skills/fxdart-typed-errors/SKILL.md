@@ -184,9 +184,28 @@ blocks.
 - **Exceptions beat accumulation**: a branch that *throws* aborts the whole
   accumulating scope and propagates. That is the contract, not a bug.
 
+## Events-layer Either (push)
+
+On `FxEvents`, failures start on Dart's untyped error channel.
+`retryOn` / `retryOnError` / `onErrorReturn` speak that channel.
+
+- `attempt(onThrow)` — error event → `Left`, data event → `Right`.
+- `mapEither((r, value) { ... })` — each event in its own raise scope.
+- `rights()` / `lefts()` / `separated()` — extract after that.
+
+**`attempt` AFTER `retryOn` / `retryOnError`, never before.** Those
+operators watch the error channel; a `Left` is not an error event. The
+same laziness rule applies: never return a lazy pipeline from a raise
+block on this surface either.
+
 ## Docs
 
 Guide with the Kotlin-Arrow comparison:
 https://bansooknam.github.io/FxDart/tutorials/typedErrors.html
+Decision page:
+https://bansooknam.github.io/FxDart/tutorials/whichSurface.html
+Bounded fetch as a job:
+https://bansooknam.github.io/FxDart/tutorials/job-fetch.html
 For pipelines, concurrency, and the operator catalog, see the sibling
-`fxdart-pipelines` skill.
+`fxdart-pipelines` skill. For debounce / switchMap / time, see
+`fxdart-events`.

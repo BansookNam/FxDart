@@ -21,9 +21,13 @@ skills get fxdart
 
 ```
 skills/
-└── fxdart-pipelines/
-    ├── SKILL.md               ← соглашение: <имя-скилла>/SKILL.md
-    └── references/api-reference.md
+├── fxdart-pipelines/
+│   ├── SKILL.md               ← соглашение: <имя-скилла>/SKILL.md
+│   └── references/
+├── fxdart-events/
+│   └── SKILL.md
+└── fxdart-typed-errors/
+    └── SKILL.md
 ```
 
 Поскольку такая структура — это соглашение, `skills get <имя>` работает с **любым** пакетом, который включает каталог `skills/`, а не только с fxdart.

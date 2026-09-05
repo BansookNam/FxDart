@@ -21,9 +21,13 @@ skills get fxdart
 
 ```
 skills/
-└── fxdart-pipelines/
-    ├── SKILL.md               ← 규약: <스킬이름>/SKILL.md
-    └── references/api-reference.md
+├── fxdart-pipelines/
+│   ├── SKILL.md               ← 규약: <스킬이름>/SKILL.md
+│   └── references/
+├── fxdart-events/
+│   └── SKILL.md
+└── fxdart-typed-errors/
+    └── SKILL.md
 ```
 
 이 레이아웃이 규약이므로, `skills get <이름>`은 `skills/` 폴더를 번들한 **어떤 패키지든** 동작합니다 — fxdart만의 이야기가 아니에요.

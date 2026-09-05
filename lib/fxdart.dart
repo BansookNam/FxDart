@@ -47,6 +47,7 @@ export 'src/lazy/combine.dart';
 export 'src/lazy/effect.dart';
 export 'src/lazy/filter.dart';
 export 'src/lazy/map.dart';
+export 'src/lazy/parallel.dart';
 export 'src/lazy/take_drop.dart';
 export 'src/lazy/zip.dart';
 export 'src/pipe.dart';

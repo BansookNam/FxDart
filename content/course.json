@@ -1,6 +1,10 @@
 {
   "1": [
     {
+      "href": "whichSurface.html",
+      "label": "which surface?"
+    },
+    {
       "href": "fx.html",
       "label": "fx"
     },
@@ -575,6 +579,14 @@
     {
       "href": "using.html",
       "label": "using"
+    },
+    {
+      "href": "concurrentOrParallel.html",
+      "label": "concurrent or parallel"
+    },
+    {
+      "href": "parallel.html",
+      "label": "parallel"
     }
   ],
   "12": [
@@ -659,5 +671,15 @@
     {"href": "liveValue.html", "label": "LiveValue"},
     {"href": "fxSubscriptions.html", "label": "FxSubscriptions"},
     {"href": "materialize.html", "label": "materialize"}
+  ],
+  "15": [
+    {
+      "href": "job-search.html",
+      "label": "debounced search"
+    },
+    {
+      "href": "job-fetch.html",
+      "label": "bounded concurrent fetch"
+    }
   ]
 }

@@ -7,8 +7,8 @@ section: 11
 crumb: using
 prev: timeout.html
 prevLabel: timeout
-next: debounce.html
-nextLabel: debounce
+next: concurrentOrParallel.html
+nextLabel: concurrent or parallel
 ---
   <p class="hero-sub">자원을 한 번의 반복에 묶습니다. 첫 pull에 획득하고, 완료 시<em>든</em> 에러 시든 정확히 한 번 해제합니다.</p>
 

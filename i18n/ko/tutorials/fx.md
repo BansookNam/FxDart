@@ -5,6 +5,8 @@ description: FxDart fx 튜토리얼: 지연 체인 모델인 fx, fxAsync, fxStre
 heading: <code>fx</code>
 section: 1
 crumb: fx
+prev: whichSurface.html
+prevLabel: which surface
 next: pipe.html
 nextLabel: pipe
 ---

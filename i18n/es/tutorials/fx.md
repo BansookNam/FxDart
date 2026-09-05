@@ -5,6 +5,8 @@ description: Tutorial de fx en FxDart: el modelo de cadenas perezosas — fx, fx
 heading: <code>fx</code>
 section: 1
 crumb: fx
+prev: whichSurface.html
+prevLabel: which surface
 next: pipe.html
 nextLabel: pipe
 ---

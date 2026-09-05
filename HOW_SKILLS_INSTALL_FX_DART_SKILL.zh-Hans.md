@@ -21,9 +21,13 @@ skills get fxdart
 
 ```
 skills/
-└── fxdart-pipelines/
-    ├── SKILL.md               ← 约定：<技能名>/SKILL.md
-    └── references/api-reference.md
+├── fxdart-pipelines/
+│   ├── SKILL.md               ← 约定：<技能名>/SKILL.md
+│   └── references/
+├── fxdart-events/
+│   └── SKILL.md
+└── fxdart-typed-errors/
+    └── SKILL.md
 ```
 
 由于这种布局是一种约定，`skills get <名称>` 对**任何**打包了 `skills/` 目录的包都有效 —— 不仅仅是 fxdart。

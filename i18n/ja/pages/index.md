@@ -27,6 +27,13 @@ description: FxDart は FxTS から移植された Dart 向けの関数型プロ
     </a>
   </p>
 
+  <p>
+    <a class="demo-cta cta-compare-rx" href="RxDartComparison/">
+      <span class="demo-cta-emoji">⚡</span>
+      RxDart vs FxDart — push 対 pull、正直な判定 50 件&nbsp;→
+    </a>
+  </p>
+
   {{playground:0}}
   <p class="dim">▲ これは実際に動きます。コードを編集して <strong>Run</strong> を押してください。
     本物の Dart コンパイラでコンパイルされ、ブラウザ上で実行されます。</p>
@@ -52,6 +59,11 @@ description: FxDart は FxTS から移植された Dart 向けの関数型プロ
       評価するよう要求します。FxTS を代表する機能であり、
       Dart に忠実に移植されています。</li>
   </ul>
+  <p>
+    時間とともに届くイベント、そして値としての失敗は、残る二つの面にあります。
+    <a href="{{root}}tutorials/whichSurface.html">どの面か？</a> が
+    判断で、このページは紹介のままです。
+  </p>
 
   <h2>なぜ必要なのか？</h2>
   <p>

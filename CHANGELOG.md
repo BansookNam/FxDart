@@ -8,6 +8,76 @@ dropping to the unfused layering — the headline
 still ~10% faster at that scale. The remaining hop is
 `concurrentAsync`'s ordered-batch machinery, not the map layer.
 
+`parallel(n, worker)` — the CPU twin of `concurrent(n)`. A reused pool
+of `n` isolates, source order kept. Prefer a top-level or static
+worker; a capturing closure is fine when every capture is sendable, and
+throws at spawn only when one isn't. Unsupported on the web (use
+`concurrent`). `workers == 1` still leaves the main isolate.
+
+The pool spawns its isolates together, talks to them over
+`RawReceivePort`, does not spawn at all for an empty source, and sizes
+the pool to `min(n, length)` when the source is a `List`. An unsendable
+input or result fails that pull with `ArgumentError` instead of hanging.
+`parallelWorkers` is the VM processor count when you do not want to pick
+`n`; `mapParallel` is the same operator under the name that sits next to
+`mapConcurrent`. The 101 page `concurrent or parallel` is the decision:
+I/O stays on `concurrent`, CPU goes to `parallel`, and a cheap callback
+(`x + 1`) is a loss on the isolate hop.
+
+An early stop now releases the source through the whole operator chain.
+`StreamPullCancel` existed, but only the terminals honoured it — every
+lazy operator in between dropped it, so a `take` / `head` / `find`
+behind `drop`, `chunk`, `windowed`, `pairwise`, `flatMap`, `flat`,
+`expand`, `concat`, `append`, `prepend`, `indexed`, `uniqAdjacent`,
+`slice`, `timeout`, `mapConcurrent`, `concurrentPool`, `zip` or `zip3`
+left the source running. That leaked a `fromStream*` subscription
+before; with `parallel` it leaves a pool of isolates alive and the
+process never exits.
+
+Every operator iterator now forwards `cancel` upstream, and the ones
+that end on their own terms release the source themselves — `zip` /
+`zip3` at the shortest side, `slice` at its end index,
+`takeUntilInclusive` at its predicate — since no downstream cancel is
+coming. `take` holds its release until pulls it already issued have
+settled, so a cancel under `concurrent(n)` cannot truncate values that
+were already on their way.
+
+A terminal that stops early or throws releases the source too. `nth`,
+`firstNotNullOf` and `consume(n)` stop early with the source still live;
+`each`, `fold`, `reduce` and `toList` end the drain the moment their own
+callback throws, and nothing downstream is left to send a cancel. Every
+aggregate built on those three — `sumBy`, `minBy` / `maxBy`, `groupBy`,
+`countBy`, `indexBy`, `foldBy`, `partition`, `topBy`, `tee` and the rest
+— inherits the fix.
+
+`cancel()` now returns a future that is worth awaiting. Each layer used
+to hand back `Future.value()` while the release it started ran
+unobserved, so `await it.cancel()` resolved before the resource was
+let go, and a `using` whose release *threw* on an early stop killed the
+program with an unhandled async error — after the caller had already
+been handed its result. The release future is carried up the chain, a
+failing release is reported to the terminal that is still waiting for
+one (a full drain always did), and on the error path the error already
+in hand still wins.
+
+`test/async_cancel_test.dart` covers the chain per operator: 20 of its
+37 cases fail without this change.
+
+`fxdart_lints` — a second package, same version, so the core stays
+zero-dep. Four analyzer diagnostics that name the fix: unbounded
+`Future.wait` on a mapped fetch, a bare `catch` inside `either`,
+returning a lazy chain from a raise block, and `attempt` before
+`retryOn`. Dev-dependency only (`custom_lint` + `fxdart_lints`).
+
+101 now opens on a decision, not on `map`. `whichSurface` is the first
+lesson: data in hand → `fx()`, I/O with a bound → `concurrent` /
+`mapConcurrent`, events over time → `fxEvents`, failures the caller
+handles → `Either` on the surface you are already on. Two job tutorials
+— debounced search, bounded concurrent fetch — are section 15. The
+pipelines skill no longer treats `fxStream` as the push entry; a third
+skill, `fxdart-events`, covers time. Typed-errors documents the channel
+rule: `attempt` after `retryOn`, never before.
+
 Events-layer `Either`, on the value channel: `mapRight` / `mapLeft`,
 `filterOrElse`, `alt` / `orElse` / `recover`, `getOrElse`, and
 `flattenEither` (the nest `attempt` after `mapEither` produces). Each

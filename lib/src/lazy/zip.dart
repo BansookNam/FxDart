@@ -393,9 +393,15 @@ FxAsyncIterable<(A, B)> zipAsync<A, B>(
       final f2 = it2.next(concurrent);
       final r1 = await f1;
       final r2 = await f2;
-      if (r1.done || r2.done) return IterResult<(A, B)>.done();
+      if (r1.done || r2.done) {
+        // Zip ends with the shorter side, so the longer one is abandoned
+        // mid-flight: release it here rather than waiting for a downstream
+        // cancel that a plain `toList()` never sends.
+        fxCancel([it1, it2]);
+        return IterResult<(A, B)>.done();
+      }
       return IterResult.value((r1.value, r2.value));
-    });
+    }, upstream: [it1, it2]);
   });
 }
 
@@ -418,10 +424,11 @@ FxAsyncIterable<(A, B, C)> zip3Async<A, B, C>(
       final r2 = await f2;
       final r3 = await f3;
       if (r1.done || r2.done || r3.done) {
+        fxCancel([it1, it2, it3]);
         return IterResult<(A, B, C)>.done();
       }
       return IterResult.value((r1.value, r2.value, r3.value));
-    });
+    }, upstream: [it1, it2, it3]);
   });
 }
 
@@ -534,6 +541,6 @@ FxAsyncIterable<List<A>> transposeAsync<A>(Iterable<FxAsyncIterable<A>> rows) {
       ];
       if (current.isEmpty) return IterResult<List<A>>.done();
       return IterResult.value(current);
-    });
+    }, upstream: iterators);
   });
 }
