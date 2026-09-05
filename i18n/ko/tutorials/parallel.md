@@ -90,6 +90,50 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   약 3ms
     어느 원소가 문제인지 알아내려면 하나씩 보내야 하는데, 그것이 바로
     배치가 피하려는 비용이기 때문입니다.
   </p>
+  <p>
+    <code>chunk: n ~/ (workers * 4)</code>를 적고 워커 수를 두 번
+    쓰기 싫다면 <code>chunked: true</code>가 소스 길이에서 그렇게
+    잡습니다:
+  </p>
+  <pre><code>await fx(rows).parallel(4, parseRow, chunked: true);
+// k = rows.length ~/ 16 — 4가 한 번, 두 번이 아님</code></pre>
+  <p>
+    소스는 <code>List</code>여야 합니다. generator나 async 소스에는
+    길이가 없습니다 — <code>chunk: k</code>를 넘기세요.
+    <code>chunk:</code>와 <code>chunked:</code>를 같이 쓰면 던집니다.
+    호출에는 정책이 하나입니다.
+  </p>
+
+  <h2>CPU 단계 두 개, 홉은 한 번</h2>
+  <p>
+    <code>.parallel</code>을 두 번 호출하면 결과가 이 isolate로
+    돌아왔다가 다시 나갑니다. <code>isolateMap2</code>로 워커를
+    합치면 두 단계가 워커 안에서 돕니다:
+  </p>
+  <pre><code>await fx(blobs)
+    .parallel(4, isolateMap2(decodePng, thumbnail), chunk: 64)
+    .toList();</code></pre>
+  <p>
+    <code>decodePng</code>와 <code>thumbnail</code>은 다른
+    <code>parallel</code> 워커와 같이 보낼 수 있어야 합니다. 반환
+    함수가 둘을 캡처합니다.
+  </p>
+
+  <h2>풀을 재사용하기</h2>
+  <p>
+    <code>parallel</code>은 첫 pull에서 spawn하고 그 체인이 끝나면
+    isolate를 죽입니다. 일이 두 번이면 시작 비용을 두 번 냅니다.
+    <code>IsolatePool</code>이 한 번 spawn하는 괄호입니다.
+    <code>IsolatePool.using</code>은 body가 던져도
+    <code>finally</code>에서 죽입니다. 한
+    <code>parallelOn</code> 체인을 cancel해도 풀은 살아 있고, 다음
+    체인이 쓸 수 있습니다.
+  </p>
+  <pre><code>await IsolatePool.using(4, (pool) async {
+  final a = await fx(batchA).parallelOn(pool, parseRow, chunk: 256).toList();
+  final b = await fx(batchB).parallelOn(pool, parseRow, chunk: 256).toList();
+  return (a, b);
+});</code></pre>
 
   <div class="callout">
     <strong>관련:</strong>

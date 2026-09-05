@@ -184,12 +184,24 @@ FxAsyncIterable<B> _$mapConcurrentAsync<A, B>(int concurrency,
     mapConcurrentAsync(concurrency, f, iterable);
 FxAsyncIterable<R> _$parallel<A, R>(int workers,
         FutureOr<R> Function(A input) worker, Iterable<A> iterable,
-        {int chunk = 1}) =>
-    parallel(workers, worker, iterable, chunk: chunk);
+        {int chunk = 1, bool chunked = false}) =>
+    parallel(workers, worker, iterable, chunk: chunk, chunked: chunked);
 FxAsyncIterable<R> _$parallelAsync<A, R>(int workers,
         FutureOr<R> Function(A input) worker, FxAsyncIterable<A> iterable,
-        {int chunk = 1}) =>
-    parallelAsync(workers, worker, iterable, chunk: chunk);
+        {int chunk = 1, bool chunked = false}) =>
+    parallelAsync(workers, worker, iterable, chunk: chunk, chunked: chunked);
+FxAsyncIterable<R> _$parallelOn<A, R>(IsolatePool pool,
+        FutureOr<R> Function(A input) worker, Iterable<A> iterable,
+        {int chunk = 1, bool chunked = false}) =>
+    parallelOn(pool, worker, iterable, chunk: chunk, chunked: chunked);
+FxAsyncIterable<R> _$parallelOnAsync<A, R>(IsolatePool pool,
+        FutureOr<R> Function(A input) worker, FxAsyncIterable<A> iterable,
+        {int chunk = 1, bool chunked = false}) =>
+    parallelOnAsync(pool, worker, iterable, chunk: chunk, chunked: chunked);
+R Function(A a) _$isolateMap2<A, M, R>(
+        M Function(A a) first, R Function(M m) second) =>
+    isolateMap2(first, second);
+typedef _$IsolatePool = IsolatePool;
 Iterable<(A, B)> _$attach<A, B>(B Function(A a) f, Iterable<A> iterable) =>
     attach(f, iterable);
 FxAsyncIterable<(A, B)> _$attachAsync<A, B>(

@@ -64,34 +64,76 @@ int get parallelWorkers => parallelWorkersImpl;
 /// *input* or *result*, which fails the whole batch rather than only its
 /// own pull. It also delays the first element until its batch finishes,
 /// so a `take(1)` wants a small [chunk] or none.
+///
+/// ## [chunked] — size the message from the source length
+///
+/// `chunked: true` picks `k = length ~/ (workers * 4)` when the source
+/// is a [List] (at least 1). That is the formula the parallel-benchmark
+/// page measured; the worker count is not repeated at the call site:
+///
+/// ```dart
+/// await fx(rows).parallel(4, parseRow, chunked: true);
+/// ```
+///
+/// Pass `chunk:` or `chunked:`, not both. `chunked: true` on a source
+/// without a length throws [StateError] — give a [List] or pick `chunk: k`.
 FxAsyncIterable<R> parallel<A, R>(
   int workers,
   FutureOr<R> Function(A input) worker,
   Iterable<A> iterable, {
   int chunk = 1,
+  bool chunked = false,
 }) {
-  _checkArgs(workers, chunk);
-  return parallelImpl(workers, worker, iterable, chunk);
+  final k = _resolveChunk(
+    workers: workers,
+    chunk: chunk,
+    chunked: chunked,
+    sync: iterable,
+  );
+  return parallelImpl(workers, worker, iterable, k);
 }
 
 /// Async-source twin of [parallel].
+///
+/// [chunked] is not available here — an async source has no length.
+/// Pass `chunk: k` to batch.
 FxAsyncIterable<R> parallelAsync<A, R>(
   int workers,
   FutureOr<R> Function(A input) worker,
   FxAsyncIterable<A> iterable, {
   int chunk = 1,
+  bool chunked = false,
 }) {
-  _checkArgs(workers, chunk);
-  return parallelAsyncImpl(workers, worker, iterable, chunk);
+  final k = _resolveChunk(
+    workers: workers,
+    chunk: chunk,
+    chunked: chunked,
+    sync: null,
+  );
+  return parallelAsyncImpl(workers, worker, iterable, k);
 }
 
-void _checkArgs(int workers, int chunk) {
+int _resolveChunk({
+  required int workers,
+  required int chunk,
+  required bool chunked,
+  Iterable<dynamic>? sync,
+}) {
   if (workers < 1) {
     throw RangeError("'workers' must be a positive integer");
   }
   if (chunk < 1) {
     throw RangeError("'chunk' must be a positive integer");
   }
+  if (!chunked) return chunk;
+  if (chunk != 1) {
+    throw ArgumentError('pass chunked: true or chunk: k, not both');
+  }
+  if (sync is! List) {
+    throw StateError('chunked: true needs a length; pass a List or chunk: k');
+  }
+  final k = sync.length ~/ (workers * 4);
+  return k < 1 ? 1 : k;
 }
 
 /// Alias of [parallel] — the CPU twin of [mapConcurrent], under the name
@@ -102,7 +144,8 @@ FxAsyncIterable<R> mapParallel<A, R>(
   FutureOr<R> Function(A input) worker,
   Iterable<A> iterable, {
   int chunk = 1,
-}) => parallel(workers, worker, iterable, chunk: chunk);
+  bool chunked = false,
+}) => parallel(workers, worker, iterable, chunk: chunk, chunked: chunked);
 
 /// Alias of [parallelAsync] — the CPU twin of [mapConcurrentAsync].
 @pragma('vm:prefer-inline')
@@ -111,4 +154,145 @@ FxAsyncIterable<R> mapParallelAsync<A, R>(
   FutureOr<R> Function(A input) worker,
   FxAsyncIterable<A> iterable, {
   int chunk = 1,
-}) => parallelAsync(workers, worker, iterable, chunk: chunk);
+  bool chunked = false,
+}) => parallelAsync(workers, worker, iterable, chunk: chunk, chunked: chunked);
+
+/// Runs [first] then [second] inside one isolate hop.
+///
+/// Two [parallel] stages copy every result back to the main isolate and
+/// out again. Compose the workers instead:
+///
+/// ```dart
+/// await fx(blobs)
+///     .parallel(4, isolateMap2(decodePng, thumbnail), chunk: 64)
+///     .toList();
+/// ```
+///
+/// [first] and [second] must be sendable (top-level or static, or a
+/// closure whose captures are). The returned function captures both; it
+/// is sendable when they are.
+R Function(A a) isolateMap2<A, M, R>(
+  M Function(A a) first,
+  R Function(M m) second,
+) =>
+    (A a) => second(first(a));
+
+/// A reused isolate pool for sequential [parallelOn] chains.
+///
+/// [parallel] spawns on first pull and kills when the chain ends. Two
+/// jobs then pay isolate startup twice. Spawn once, run many chains,
+/// kill in `finally` — or use [IsolatePool.using]:
+///
+/// ```dart
+/// await IsolatePool.using(4, (pool) async {
+///   final a = await fx(batchA).parallelOn(pool, parseRow, chunk: 256).toList();
+///   final b = await fx(batchB).parallelOn(pool, parseRow, chunk: 256).toList();
+///   return (a, b);
+/// });
+/// ```
+///
+/// Cancel of one [parallelOn] chain does not kill the pool — in-flight
+/// jobs finish and the isolates go idle. [kill] (and [using]'s `finally`)
+/// is what tears the isolates down. Unsupported on the web.
+class IsolatePool {
+  IsolatePool._(this._run, this._kill, this.workers);
+
+  final Future<List<dynamic>> Function(Function worker, List<dynamic> batch)
+  _run;
+  final void Function() _kill;
+
+  /// How many worker isolates this pool holds.
+  final int workers;
+
+  var _closed = false;
+
+  /// Spawns [workers] isolates with no worker baked in — each
+  /// [parallelOn] call sends its function with the batch.
+  static Future<IsolatePool> spawn(int workers) async {
+    if (workers < 1) {
+      throw RangeError("'workers' must be a positive integer");
+    }
+    final backend = await spawnSharedPoolImpl(workers);
+    return IsolatePool._(backend.run, backend.kill, backend.workers);
+  }
+
+  /// [spawn], run [body], [kill] in `finally`. Sequential chains share
+  /// the pool; the isolates die even if [body] throws.
+  static Future<T> using<T>(
+    int workers,
+    Future<T> Function(IsolatePool pool) body,
+  ) async {
+    final pool = await spawn(workers);
+    try {
+      return await body(pool);
+    } finally {
+      pool.kill();
+    }
+  }
+
+  /// Whether [kill] has run.
+  bool get isClosed => _closed;
+
+  Future<List<dynamic>> _runBatch(Function worker, List<dynamic> batch) {
+    if (_closed) {
+      return Future.error(StateError('IsolatePool is closed'));
+    }
+    return _run(worker, batch);
+  }
+
+  /// Shuts the isolates down. Idempotent. In-flight [parallelOn] pulls
+  /// fail with [StateError].
+  void kill() {
+    if (_closed) return;
+    _closed = true;
+    _kill();
+  }
+}
+
+/// [parallel] over a spawned [IsolatePool]. Does not spawn or kill;
+/// see [IsolatePool].
+FxAsyncIterable<R> parallelOn<A, R>(
+  IsolatePool pool,
+  FutureOr<R> Function(A input) worker,
+  Iterable<A> iterable, {
+  int chunk = 1,
+  bool chunked = false,
+}) {
+  if (pool.isClosed) {
+    throw StateError('IsolatePool is closed');
+  }
+  final k = _resolveChunk(
+    workers: pool.workers,
+    chunk: chunk,
+    chunked: chunked,
+    sync: iterable,
+  );
+  return parallelOnImpl(
+    pool._runBatch,
+    pool.workers,
+    worker,
+    iterable,
+    null,
+    k,
+  );
+}
+
+/// Async-source twin of [parallelOn].
+FxAsyncIterable<R> parallelOnAsync<A, R>(
+  IsolatePool pool,
+  FutureOr<R> Function(A input) worker,
+  FxAsyncIterable<A> iterable, {
+  int chunk = 1,
+  bool chunked = false,
+}) {
+  if (pool.isClosed) {
+    throw StateError('IsolatePool is closed');
+  }
+  final k = _resolveChunk(
+    workers: pool.workers,
+    chunk: chunk,
+    chunked: chunked,
+    sync: null,
+  );
+  return parallelOnAsyncImpl(pool._runBatch, pool.workers, worker, iterable, k);
+}

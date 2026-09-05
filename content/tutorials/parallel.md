@@ -1,7 +1,7 @@
 ---
 slug: parallel
 title: parallel — FxDart 101
-description: FxDart parallel tutorial: the CPU twin of concurrent — a pool of isolates, a sendable top-level worker, order kept, and chunk to amortise the isolate hop. VM and Flutter only.
+description: FxDart parallel tutorial: the CPU twin of concurrent — a pool of isolates, chunked: true, isolateMap2, and IsolatePool to reuse workers. VM and Flutter only.
 heading: <code>parallel</code>
 section: 11
 crumb: parallel
@@ -90,6 +90,49 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   ~3ms
     element was at fault would mean sending them separately, which is the
     cost the batch exists to avoid.
   </p>
+  <p>
+    Don't want to write <code>chunk: n ~/ (workers * 4)</code> and repeat
+    the worker count?
+    <code>chunked: true</code> does that from the source length:
+  </p>
+  <pre><code>await fx(rows).parallel(4, parseRow, chunked: true);
+// k = rows.length ~/ 16 — one 4, not two</code></pre>
+  <p>
+    The source must be a <code>List</code>. A generator or an async
+    source has no length — pass <code>chunk: k</code> instead.
+    <code>chunk:</code> and <code>chunked:</code> together throw; the
+    call has one policy.
+  </p>
+
+  <h2>Two CPU stages, one hop</h2>
+  <p>
+    Two <code>.parallel</code> calls copy every result back to this
+    isolate and out again. Compose the workers with
+    <code>isolateMap2</code> so both stages run on the worker:
+  </p>
+  <pre><code>await fx(blobs)
+    .parallel(4, isolateMap2(decodePng, thumbnail), chunk: 64)
+    .toList();</code></pre>
+  <p>
+    <code>decodePng</code> and <code>thumbnail</code> must be sendable,
+    same as any <code>parallel</code> worker. The returned function
+    captures both.
+  </p>
+
+  <h2>Reuse the pool</h2>
+  <p>
+    <code>parallel</code> spawns on the first pull and kills the
+    isolates when that chain ends. Two jobs then pay startup twice.
+    <code>IsolatePool</code> is the spawn-once bracket.
+    <code>IsolatePool.using</code> kills in <code>finally</code>, even
+    if the body throws. Cancel of one <code>parallelOn</code> chain
+    does not kill the pool — the next chain can use it.
+  </p>
+  <pre><code>await IsolatePool.using(4, (pool) async {
+  final a = await fx(batchA).parallelOn(pool, parseRow, chunk: 256).toList();
+  final b = await fx(batchB).parallelOn(pool, parseRow, chunk: 256).toList();
+  return (a, b);
+});</code></pre>
 
   <div class="callout">
     <strong>Related:</strong>

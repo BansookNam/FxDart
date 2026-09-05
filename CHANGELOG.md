@@ -1,3 +1,40 @@
+## 0.8.11
+
+Three additions on `parallel`, all of them about not paying the isolate hop
+twice.
+
+**`chunked: true`** — size the message from the source length so the
+worker count is not repeated at the call site. `k = length ~/ (workers *
+4)`, the formula the 0.8.10 page measured. Needs a `List`; a source
+without a length throws, and `chunk:` / `chunked:` together throw.
+
+```dart
+await fx(rows).parallel(4, parseRow, chunked: true);
+```
+
+**`isolateMap2(f, g)`** — run two CPU stages inside one hop. Two
+`.parallel` calls copy every result back to the main isolate and out
+again; compose the workers instead.
+
+```dart
+await fx(blobs).parallel(4, isolateMap2(decodePng, thumbnail), chunk: 64).toList();
+```
+
+**`IsolatePool`** — spawn once, run sequential chains, kill in
+`finally`. `parallel` otherwise starts isolates on first pull and tears
+them down when that chain ends. `IsolatePool.using` is the bracket;
+cancel of one `parallelOn` chain does not kill the pool.
+
+```dart
+await IsolatePool.using(4, (pool) async {
+  final a = await fx(batchA).parallelOn(pool, parseRow, chunk: 256).toList();
+  final b = await fx(batchB).parallelOn(pool, parseRow, chunk: 256).toList();
+  return (a, b);
+});
+```
+
+Unsupported on the web, same as `parallel`.
+
 ## 0.8.10
 
 `parallel(n, worker, chunk: k)` — k elements ride one message instead of

@@ -91,6 +91,51 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   ~3ms
     elemento tuvo la culpa significaría enviarlos por separado, que es el
     coste que el lote existe para evitar.
   </p>
+  <p>
+    ¿No quieres escribir <code>chunk: n ~/ (workers * 4)</code> y
+    repetir el número de workers?
+    <code>chunked: true</code> lo hace a partir de la longitud:
+  </p>
+  <pre><code>await fx(rows).parallel(4, parseRow, chunked: true);
+// k = rows.length ~/ 16 — un 4, no dos</code></pre>
+  <p>
+    La fuente tiene que ser una <code>List</code>. Un generator o una
+    fuente async no tiene longitud — pasa <code>chunk: k</code>.
+    <code>chunk:</code> y <code>chunked:</code> juntos lanzan; la
+    llamada tiene una sola política.
+  </p>
+
+  <h2>Dos etapas de CPU, un hop</h2>
+  <p>
+    Dos llamadas a <code>.parallel</code> copian cada resultado de
+    vuelta a este isolate y otra vez hacia fuera. Compón los workers
+    con <code>isolateMap2</code> para que ambas etapas corran en el
+    worker:
+  </p>
+  <pre><code>await fx(blobs)
+    .parallel(4, isolateMap2(decodePng, thumbnail), chunk: 64)
+    .toList();</code></pre>
+  <p>
+    <code>decodePng</code> y <code>thumbnail</code> tienen que ser
+    enviables, igual que cualquier worker de <code>parallel</code>.
+    La función devuelta captura ambos.
+  </p>
+
+  <h2>Reutilizar el pool</h2>
+  <p>
+    <code>parallel</code> hace spawn en el primer pull y mata los
+    isolates cuando esa cadena termina. Dos trabajos pagan el arranque
+    dos veces. <code>IsolatePool</code> es el corchete de spawn-una-vez.
+    <code>IsolatePool.using</code> mata en el <code>finally</code>,
+    incluso si el body lanza. Cancelar una cadena
+    <code>parallelOn</code> no mata el pool — la siguiente cadena
+    puede usarlo.
+  </p>
+  <pre><code>await IsolatePool.using(4, (pool) async {
+  final a = await fx(batchA).parallelOn(pool, parseRow, chunk: 256).toList();
+  final b = await fx(batchB).parallelOn(pool, parseRow, chunk: 256).toList();
+  return (a, b);
+});</code></pre>
 
   <div class="callout">
     <strong>Relacionado:</strong>

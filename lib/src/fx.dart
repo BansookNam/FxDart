@@ -412,7 +412,10 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
     int workers,
     FutureOr<R> Function(T input) worker, {
     int chunk = 1,
-  }) => FxAsync(l.parallel(workers, worker, _inner, chunk: chunk));
+    bool chunked = false,
+  }) => FxAsync(
+    l.parallel(workers, worker, _inner, chunk: chunk, chunked: chunked),
+  );
 
   /// Alias of [parallel] — same operator, the name that sits next to
   /// [mapConcurrent].
@@ -421,7 +424,19 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
     int workers,
     FutureOr<R> Function(T input) worker, {
     int chunk = 1,
-  }) => parallel(workers, worker, chunk: chunk);
+    bool chunked = false,
+  }) => parallel(workers, worker, chunk: chunk, chunked: chunked);
+
+  /// [parallel] on a reused [l.IsolatePool]. Does not spawn or kill.
+  @pragma('vm:prefer-inline')
+  FxAsync<R> parallelOn<R>(
+    l.IsolatePool pool,
+    FutureOr<R> Function(T input) worker, {
+    int chunk = 1,
+    bool chunked = false,
+  }) => FxAsync(
+    l.parallelOn(pool, worker, _inner, chunk: chunk, chunked: chunked),
+  );
 
   /// Switches to the async chain and maps [f], retrying each call up to
   /// [attempts] times (with optional [delay] backoff) before the error
@@ -1043,7 +1058,10 @@ class FxAsync<T> implements FxAsyncIterable<T> {
     int workers,
     FutureOr<R> Function(T input) worker, {
     int chunk = 1,
-  }) => FxAsync(l.parallelAsync(workers, worker, _inner, chunk: chunk));
+    bool chunked = false,
+  }) => FxAsync(
+    l.parallelAsync(workers, worker, _inner, chunk: chunk, chunked: chunked),
+  );
 
   /// Alias of [FxAsync.parallel] — same operator, the name that sits next
   /// to [mapConcurrent].
@@ -1052,7 +1070,19 @@ class FxAsync<T> implements FxAsyncIterable<T> {
     int workers,
     FutureOr<R> Function(T input) worker, {
     int chunk = 1,
-  }) => parallel(workers, worker, chunk: chunk);
+    bool chunked = false,
+  }) => parallel(workers, worker, chunk: chunk, chunked: chunked);
+
+  /// [Fx.parallelOn] for an async source.
+  @pragma('vm:prefer-inline')
+  FxAsync<R> parallelOn<R>(
+    l.IsolatePool pool,
+    FutureOr<R> Function(T input) worker, {
+    int chunk = 1,
+    bool chunked = false,
+  }) => FxAsync(
+    l.parallelOnAsync(pool, worker, _inner, chunk: chunk, chunked: chunked),
+  );
 
   /// Like [concurrent] but yields in completion order.
   @pragma('vm:prefer-inline')
