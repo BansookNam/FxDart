@@ -78,6 +78,38 @@ heading: Is <code>parallel</code> worth it?
     is worth.
   </div>
 
+  <h2>Why more workers cannot fix the slow row</h2>
+  <p>
+    If <code>log-fingerprint</code> were merely short of parallelism, a
+    bigger pool would help. It does not. The same program at
+    N&nbsp;=&nbsp;100,000, varying nothing but the number of workers:
+  </p>
+  <pre><code>workers   .parallel()        .parallel(chunk:)
+      1     768.8 ms             381.0 ms
+      2     831.9 ms             191.1 ms
+      5     899.1 ms              86.5 ms
+     10     873.5 ms              71.0 ms</code></pre>
+  <p>
+    The default form does not improve at all — it drifts slightly
+    <em>worse</em>, and its cost stays around 8µs per element whatever the
+    pool size. The chunked form scales 5.4× across the same range.
+  </p>
+  <p>
+    That is the diagnosis. At <code>chunk: 1</code> every element costs two
+    message copies, a port event and a completer <strong>on the main
+    isolate</strong> — which is one thread, and the one thing in the system
+    that cannot be parallelised. About 8µs of coordination to hand off 3.5µs
+    of work. The workers are not the bottleneck; they are idle, waiting to
+    be fed by a main isolate that is spending all its time posting letters.
+    Extra workers only add contention for it.
+  </p>
+  <p>
+    A batch does not make the coordination cheaper — it makes there be less
+    of it. At <code>chunk: 37500</code> the same run is 40 messages instead
+    of three million, the main isolate stops being the bottleneck, and the
+    work finally lands where it was supposed to go.
+  </p>
+
   <p>
     Sources: <code>benchmark/cases-parallel/</code>. Regenerate with
     <code>dart run benchmark/run_parallel_benchmarks.dart</code>. The runner

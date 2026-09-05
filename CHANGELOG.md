@@ -36,6 +36,14 @@ runs **2.5x slower** than the plain loop — 13.7 s against 5.4 s — and the
 same operator with a chunk runs **4.7x faster**. One parameter, an 11.8x
 swing. In the middle, at ~37 µs, 3.2x becomes 7.1x.
 
+More workers do not rescue the slow row, which is the part worth knowing:
+sweeping the pool from 1 to 10 leaves the unchunked form flat (768 ms →
+873 ms, slightly *worse*) while the chunked form scales 5.4x. Every
+element costs two message copies, a port event and a completer on the
+*main* isolate — one thread, the one part that cannot be parallelised —
+so `chunk` is not about making coordination cheaper but about there being
+less of it: 40 messages instead of three million.
+
 The chunked row also beats the hand-rolled `Isolate.run`-over-slices it
 is measured against — 2.1x on `image-tiles`, 3.3x on `log-fingerprint` —
 because slicing copies a whole slice up front while its isolate waits,

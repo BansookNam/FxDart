@@ -48,5 +48,24 @@ operator there; it is being asked to pay a per-element price for a
 per-element job. `chunk:` is the answer, and the page exists to make
 that trade visible rather than folklore.
 
+The reason more workers do not rescue it, measured at N=100,000 with
+`BENCH_WORKERS` swept:
+
+```
+workers   .parallel()   .parallel(chunk:)
+      1      768.8 ms            381.0 ms
+      2      831.9 ms            191.1 ms
+      5      899.1 ms             86.5 ms
+     10      873.5 ms             71.0 ms
+```
+
+The unchunked form does not scale at all — it drifts slightly worse.
+Every element costs two message copies, a port event and a completer *on
+the main isolate*, which is one thread and the one part of the system
+that cannot be parallelised: ~8 µs of coordination to hand off ~3.5 µs of
+work, with the workers idle waiting to be fed. A batch does not make the
+coordination cheaper, it makes there be less of it — 40 messages instead
+of three million.
+
 Run: `dart run benchmark/run_parallel_benchmarks.dart`
 (`--smoke` for one un-warmed iteration while authoring).

@@ -76,6 +76,38 @@ heading: <code>parallel</code>은 값어치를 하는가?
     마지막 두 행이 그 값어치입니다.
   </div>
 
+  <h2>워커를 늘려도 느린 행이 나아지지 않는 이유</h2>
+  <p>
+    <code>log-fingerprint</code>가 단지 병렬성이 모자란 것이라면 풀을
+    키우면 나아져야 합니다. 그렇지 않습니다. 같은 프로그램을
+    N&nbsp;=&nbsp;100,000에서 워커 수만 바꿔가며 돌린 결과입니다.
+  </p>
+  <pre><code>workers   .parallel()        .parallel(chunk:)
+      1     768.8 ms             381.0 ms
+      2     831.9 ms             191.1 ms
+      5     899.1 ms              86.5 ms
+     10     873.5 ms              71.0 ms</code></pre>
+  <p>
+    기본 형태는 전혀 나아지지 않습니다. 오히려 조금씩 <em>나빠지고</em>,
+    풀 크기와 무관하게 원소당 8µs 근처에 머뭅니다. chunk를 준 형태는 같은
+    구간에서 5.4배로 확장됩니다.
+  </p>
+  <p>
+    진단은 이것입니다. <code>chunk: 1</code>에서는 원소마다 메시지 복사
+    두 번, 포트 이벤트 하나, 컴플리터 하나가 <strong>메인 isolate에서</strong>
+    발생합니다. 메인 isolate는 스레드 하나이고, 이 시스템에서 유일하게
+    병렬화할 수 없는 지점입니다. 3.5µs짜리 일을 넘기려고 8µs쯤을 조율에
+    쓰는 셈입니다. 병목은 워커가 아닙니다. 워커들은 편지 부치느라 바쁜
+    메인 isolate가 일을 던져주기를 기다리며 놀고 있습니다. 워커를 더
+    붙이면 그 메인 isolate를 두고 경합만 늘어납니다.
+  </p>
+  <p>
+    배치는 조율을 싸게 만드는 것이 아니라, 조율할 일 자체를 줄입니다.
+    <code>chunk: 37500</code>이면 같은 실행이 300만 개가 아니라 40개의
+    메시지가 되고, 메인 isolate가 병목에서 벗어나면서 일이 비로소 원래
+    가야 할 곳으로 갑니다.
+  </p>
+
   <p>
     소스는 <code>benchmark/cases-parallel/</code>에 있습니다.
     <code>dart run benchmark/run_parallel_benchmarks.dart</code>로 다시
