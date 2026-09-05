@@ -1,0 +1,27 @@
+name: fxdart_lints
+description: >
+  Analyzer lints for fxdart: unbounded Future.wait, bare catch in either
+  blocks, lazy pipelines returned from raise scopes, and attempt before
+  retryOn. Dev-dependency only; fxdart itself stays zero-runtime-dep.
+version: 0.8.10
+homepage: https://github.com/bansooknam/fxDart
+repository: https://github.com/bansooknam/fxDart
+issue_tracker: https://github.com/bansooknam/fxDart/issues
+
+environment:
+  sdk: '>=3.10.4 <4.0.0'
+
+topics:
+  - lints
+  - analyzer
+  - functional
+
+dependencies:
+  analyzer: ^8.0.0
+  analyzer_plugin: ^0.13.0
+  custom_lint_builder: ^0.8.1
+
+dev_dependencies:
+  custom_lint: ^0.8.1
+  lints: ^5.0.0
+  test: ^1.25.0

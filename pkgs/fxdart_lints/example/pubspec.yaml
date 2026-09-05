@@ -1,0 +1,14 @@
+name: fxdart_lints_example
+publish_to: none
+
+environment:
+  sdk: '>=3.10.4 <4.0.0'
+
+dependencies:
+  fxdart:
+    path: ../../..
+
+dev_dependencies:
+  custom_lint: ^0.8.1
+  fxdart_lints:
+    path: ..

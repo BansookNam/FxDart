@@ -376,6 +376,17 @@ all. Step 2 works today because `v0.8.7` exists; the same step was impossible
 one release earlier, and `0.8.6` still cannot be checked out, diffed or
 bisected.
 
+**`pkgs/fxdart_lints` is a second package**, same version number, so the
+core stays zero-dep. It is not on the tag workflow yet — that needs OIDC
+trust on the new pub.dev package, which is its own packaging PR. Until
+then the exception to the sentence above is:
+
+```bash
+cd pkgs/fxdart_lints && dart pub publish
+```
+
+and only for this package. Do not publish `fxdart` from a laptop.
+
 **Why there is no long-lived `develop` or `release` line.** Those earn their
 keep when several versions are supported at once — a fix backported to `1.x`
 while `2.x` is built. fxdart supports one line, so a second permanent branch
