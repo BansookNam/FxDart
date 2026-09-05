@@ -891,6 +891,22 @@ void main() {
       );
     });
 
+    test('chunk: 0 with chunked: true auto-sizes', () async {
+      // Default chunk is 1; 0 is the other unspecified sentinel.
+      final src = [for (var i = 1; i <= 20; i++) i];
+      expect(
+        await fx(src).parallel(2, doubleIt, chunk: 0, chunked: true).toList(),
+        equals([for (final x in src) x * 2]),
+      );
+    });
+
+    test('chunk: -1 with chunked: true still throws', () {
+      expect(
+        () => fx([1, 2, 3, 4]).parallel(2, doubleIt, chunk: -1, chunked: true),
+        throwsRangeError,
+      );
+    });
+
     test('chunked: true on a non-List throws', () {
       expect(
         () => fx(

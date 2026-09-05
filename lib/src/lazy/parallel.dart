@@ -75,8 +75,11 @@ int get parallelWorkers => parallelWorkersImpl;
 /// await fx(rows).parallel(4, parseRow, chunked: true);
 /// ```
 ///
-/// Pass `chunk:` or `chunked:`, not both. `chunked: true` on a source
-/// without a length throws [StateError] — give a [List] or pick `chunk: k`.
+/// Pass `chunk:` or `chunked:`, not both — `chunked: true` with the
+/// default `chunk` (or `chunk: 0`) auto-sizes; an explicit `chunk: k`
+/// for k > 1 together with `chunked:` throws. `chunked: true` on a
+/// source without a length throws [StateError] — give a [List] or
+/// pick `chunk: k`.
 FxAsyncIterable<R> parallel<A, R>(
   int workers,
   FutureOr<R> Function(A input) worker,
@@ -122,18 +125,27 @@ int _resolveChunk({
   if (workers < 1) {
     throw RangeError("'workers' must be a positive integer");
   }
+  if (chunked) {
+    // Default `chunk: 1` and `chunk: 0` are unspecified — auto-size.
+    // k > 1 together with chunked: is two policies.
+    if (chunk > 1) {
+      throw ArgumentError('pass chunked: true or chunk: k, not both');
+    }
+    if (chunk < 0) {
+      throw RangeError("'chunk' must be a positive integer");
+    }
+    if (sync is! List) {
+      throw StateError(
+        'chunked: true needs a length; pass a List or chunk: k',
+      );
+    }
+    final k = sync.length ~/ (workers * 4);
+    return k < 1 ? 1 : k;
+  }
   if (chunk < 1) {
     throw RangeError("'chunk' must be a positive integer");
   }
-  if (!chunked) return chunk;
-  if (chunk != 1) {
-    throw ArgumentError('pass chunked: true or chunk: k, not both');
-  }
-  if (sync is! List) {
-    throw StateError('chunked: true needs a length; pass a List or chunk: k');
-  }
-  final k = sync.length ~/ (workers * 4);
-  return k < 1 ? 1 : k;
+  return chunk;
 }
 
 /// Alias of [parallel] — the CPU twin of [mapConcurrent], under the name
