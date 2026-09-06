@@ -487,6 +487,10 @@
       "label": "juxt"
     },
     {
+      "href": "fxPipe.html",
+      "label": "fxPipe"
+    },
+    {
       "href": "memoize.html",
       "label": "memoize"
     },

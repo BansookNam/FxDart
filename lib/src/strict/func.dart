@@ -113,6 +113,78 @@ bool lte(Object? a, Object? b) => _compare(a, b) <= 0;
 List<R> Function(T a) juxt<T, R>(List<R Function(T a)> fns) =>
     (a) => [for (final f in fns) f(a)];
 
+/// Starts a typed left-to-right function composition.
+///
+/// The typed sibling of [pipe] / [pipeLazy]: those thread a `dynamic`
+/// value (or return `dynamic Function(dynamic)`); this returns
+/// `R Function(A)`. Each [FxPipeThen.then] returns the composed
+/// function, so the last `.then` *is* the result — there is no
+/// `.build()`:
+///
+/// ```dart
+/// final f = fxPipe(parse).then(normalise).then(score);
+/// f(line);
+/// fx(lines).map(f);
+/// await fx(lines).parallel(4, f, chunked: true).toList();
+/// ```
+///
+/// [fxPipe] itself is the identity: `fxPipe(parse)` is `parse`. The
+/// name marks the start of the chain. No arity cap — add `.then` as
+/// needed. Stages must be sendable when the result is passed to
+/// [parallel].
+///
+/// [fxPipe2]..[fxPipe5] are the same composition as **one** closure, so
+/// a hot [map] or [parallel] worker does not pay a nested call per
+/// `.then`. Cap at 5, like `zipOrAccumulate2..5`.
+@pragma('vm:prefer-inline')
+R Function(A a) fxPipe<A, R>(R Function(A a) f) => f;
+
+/// Typed left-to-right compose on a unary function. See [fxPipe].
+extension FxPipeThen<A, R> on R Function(A a) {
+  /// Runs [next] after `this`. The returned function is the chain so far.
+  @pragma('vm:prefer-inline')
+  S Function(A a) then<S>(S Function(R r) next) => (A a) => next(this(a));
+}
+
+/// One-closure [fxPipe] of two stages. Prefer this over
+/// `fxPipe(first).then(second)` on a hot [map] or [parallel] worker.
+@pragma('vm:prefer-inline')
+R Function(A a) fxPipe2<A, M, R>(
+  M Function(A a) first,
+  R Function(M m) second,
+) =>
+    (A a) => second(first(a));
+
+/// 3-ary [fxPipe2].
+@pragma('vm:prefer-inline')
+R Function(A a) fxPipe3<A, M1, M2, R>(
+  M1 Function(A a) first,
+  M2 Function(M1 m) second,
+  R Function(M2 m) third,
+) =>
+    (A a) => third(second(first(a)));
+
+/// 4-ary [fxPipe2].
+@pragma('vm:prefer-inline')
+R Function(A a) fxPipe4<A, M1, M2, M3, R>(
+  M1 Function(A a) first,
+  M2 Function(M1 m) second,
+  M3 Function(M2 m) third,
+  R Function(M3 m) fourth,
+) =>
+    (A a) => fourth(third(second(first(a))));
+
+/// 5-ary [fxPipe2].
+@pragma('vm:prefer-inline')
+R Function(A a) fxPipe5<A, M1, M2, M3, M4, R>(
+  M1 Function(A a) first,
+  M2 Function(M1 m) second,
+  M3 Function(M2 m) third,
+  M4 Function(M3 m) fourth,
+  R Function(M4 m) fifth,
+) =>
+    (A a) => fifth(fourth(third(second(first(a)))));
+
 /// Memoizes a unary function by its argument (`==`/`hashCode` keyed).
 ///
 /// Port of FxTS `memoize` (unary only; TS's variadic/`WeakMap` behavior has

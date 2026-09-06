@@ -219,19 +219,65 @@ FxAsyncIterable<R> parallelAsyncImpl<A, R>(
   int chunk,
 ) => _ParallelIterable<A, R>(workers, chunk, worker, null, iterable);
 
+FxAsyncIterable<R> parallelOnImpl<A, R>(
+  Future<List<dynamic>> Function(Function worker, List<dynamic> batch) run,
+  int workers,
+  FutureOr<R> Function(A input) worker,
+  Iterable<A> iterable,
+  FxAsyncIterable<A>? async,
+  int chunk,
+) => _ParallelIterable<A, R>(
+  workers,
+  chunk,
+  worker,
+  iterable,
+  async,
+  shared: run,
+);
+
+FxAsyncIterable<R> parallelOnAsyncImpl<A, R>(
+  Future<List<dynamic>> Function(Function worker, List<dynamic> batch) run,
+  int workers,
+  FutureOr<R> Function(A input) worker,
+  FxAsyncIterable<A> iterable,
+  int chunk,
+) => _ParallelIterable<A, R>(
+  workers,
+  chunk,
+  worker,
+  null,
+  iterable,
+  shared: run,
+);
+
+Future<
+  ({
+    Future<List<dynamic>> Function(Function worker, List<dynamic> batch) run,
+    void Function() kill,
+    int workers,
+  })
+>
+spawnSharedPoolImpl(int workers) async {
+  final pool = await _SharedPool.spawn(workers);
+  return (run: pool.run, kill: pool.kill, workers: pool.length);
+}
+
 class _ParallelIterable<A, R> implements FxAsyncIterable<R> {
   _ParallelIterable(
     this.workers,
     this.chunk,
     this.worker,
     this.sync,
-    this.async,
-  );
+    this.async, {
+    this.shared,
+  });
   final int workers;
   final int chunk;
   final FutureOr<R> Function(A input) worker;
   final Iterable<A>? sync;
   final FxAsyncIterable<A>? async;
+  final Future<List<dynamic>> Function(Function worker, List<dynamic> batch)?
+  shared;
 
   @override
   FxAsyncIterator<R> get iterator {
@@ -243,6 +289,7 @@ class _ParallelIterable<A, R> implements FxAsyncIterable<R> {
       source?.iterator,
       async?.iterator,
       source is List<A> ? source.length : null,
+      shared,
     );
   }
 }
@@ -278,6 +325,7 @@ class _ParallelIterator<A, R>
     this._sync,
     this._async,
     this._length,
+    this._shared,
   );
 
   final int _workers;
@@ -290,6 +338,11 @@ class _ParallelIterator<A, R>
 
   /// Known source length when [sync] is a [List]; null otherwise.
   final int? _length;
+
+  /// A reused [IsolatePool]. When set, this iterator never spawns or
+  /// kills isolates — cancel just stops pulling.
+  final Future<List<dynamic>> Function(Function worker, List<dynamic> batch)?
+  _shared;
 
   /// Exactly one of these is ever live — [_chunk] decides which at
   /// construction. They differ in what a message carries, so they differ in
@@ -317,6 +370,7 @@ class _ParallelIterator<A, R>
   var _sourceDone = false;
   var _ended = false;
   var _cancelled = false;
+  var _sharedArmed = false;
 
   static final _finalizer = Finalizer<_Pool<dynamic, dynamic>>((p) => p.kill());
 
@@ -330,7 +384,8 @@ class _ParallelIterator<A, R>
     return _step();
   }
 
-  bool get _started => _pool != null || _batchPool != null;
+  bool get _started =>
+      _shared != null ? _sharedArmed : _pool != null || _batchPool != null;
 
   Future<IterResult<R>> _step() async {
     if (_ended) return IterResult<R>.done();
@@ -363,6 +418,7 @@ class _ParallelIterator<A, R>
       }
       await _ensurePool();
       if (_ended) return IterResult<R>.done();
+      if (_shared != null) _sharedArmed = true;
       _dispatch(first);
     }
     // The batch in hand is spent. If its worker threw after the elements
@@ -380,7 +436,7 @@ class _ParallelIterator<A, R>
     _current = null;
     await _fill();
     if (_ended) return IterResult<R>.done();
-    if (_batchPool != null) return _nextBatch();
+    if (_shared != null || _batchPool != null) return _nextBatch();
     if (_inflight.isEmpty) {
       _shutdown();
       return IterResult<R>.done();
@@ -486,12 +542,27 @@ class _ParallelIterator<A, R>
   }
 
   void _dispatch(Object? pulled) {
+    final shared = _shared;
+    if (shared != null) {
+      final batch = pulled is List<A> ? pulled : <A>[pulled as A];
+      _dispatchShared(shared, batch);
+      return;
+    }
     final pool = _pool;
     if (pool != null) {
       _enqueue(pool.run(pulled as A));
       return;
     }
     _dispatchBatch(pulled! as List<A>);
+  }
+
+  void _dispatchShared(
+    Future<List<dynamic>> Function(Function worker, List<dynamic> batch) run,
+    List<A> batch,
+  ) {
+    final f = run(_worker, batch);
+    f.ignore();
+    _batches.add(f);
   }
 
   /// Queues one message. The elements are served out of the list it comes
@@ -506,7 +577,7 @@ class _ParallelIterator<A, R>
   }
 
   Future<void> _ensurePool() async {
-    if (_started || _ended) return;
+    if (_shared != null || _started || _ended) return;
     var n = _workers;
     final known = _length;
     if (known != null) {
@@ -545,7 +616,9 @@ class _ParallelIterator<A, R>
     }
   }
 
-  int get _queued => _batchPool != null ? _batches.length : _inflight.length;
+  int get _queued => _shared != null || _batchPool != null
+      ? _batches.length
+      : _inflight.length;
 
   void _enqueue(Future<R> f) {
     // Kill completes still-pending worker futures; those sitting in
@@ -559,6 +632,8 @@ class _ParallelIterator<A, R>
     if (_ended && !_started) return;
     _ended = true;
     _current = null;
+    _sharedArmed = false;
+    if (_shared != null) return;
     final _Pool<dynamic, dynamic>? pool = _pool ?? _batchPool;
     _pool = null;
     _batchPool = null;
@@ -768,6 +843,209 @@ class _Iso<A, R> {
     // that reaps one nested pool, not a third level (see [_killNested]).
     // Idle workers have no children; reap now so a finished chain does
     // not sit on [_reapAfter] per isolate.
+    if (inFlight) {
+      Future<void>.delayed(_reapAfter, reap);
+    } else {
+      reap();
+    }
+  }
+}
+
+/// Isolate entry for [IsolatePool]: the worker arrives with each batch,
+/// so sequential [parallelOn] chains can share the isolates.
+void parallelPoolIsolateEntry(List<dynamic> boot) {
+  final toMain = boot[0] as SendPort;
+  final inbox = RawReceivePort();
+  var closed = false;
+  toMain.send(inbox.sendPort);
+  inbox.handler = (msg) {
+    if (msg == _shutdown) {
+      closed = true;
+      inbox.close();
+      _killNested();
+      return;
+    }
+    final list = msg as List<dynamic>;
+    _runBatch(
+      toMain,
+      list[0] as Function,
+      list[1] as List<dynamic>,
+      () => closed,
+    );
+  };
+}
+
+class _SharedPool {
+  _SharedPool(this._workers);
+  final List<_PooledIso> _workers;
+  final Queue<_PooledIso> _idle = Queue<_PooledIso>();
+  final Queue<Completer<_PooledIso>> _waiters = Queue<Completer<_PooledIso>>();
+  var _dead = false;
+  int get length => _workers.length;
+
+  static Future<_SharedPool> spawn(int n) async {
+    final spawned = <_PooledIso>[];
+    Object? error;
+    StackTrace? errorSt;
+    await Future.wait([
+      for (var i = 0; i < n; i++)
+        () async {
+          try {
+            spawned.add(await _PooledIso.spawn(i));
+          } catch (e, st) {
+            error ??= e;
+            errorSt ??= st;
+          }
+        }(),
+    ]);
+    final pool = _SharedPool(spawned);
+    pool._idle.addAll(spawned);
+    final spawnError = error;
+    // coverage:ignore-start
+    // Isolate.spawn of a SendPort-only entry fails only on resource
+    // exhaustion — the same class as [_Iso.spawn]'s leftover-kill, but
+    // there is no unsendable worker to provoke it from a test.
+    if (spawnError != null) {
+      pool.kill();
+      Error.throwWithStackTrace(spawnError, errorSt!);
+    }
+    // coverage:ignore-end
+    return pool;
+  }
+
+  Future<List<dynamic>> run(Function worker, List<dynamic> batch) async {
+    if (_dead) throw StateError('IsolatePool is closed');
+    final _PooledIso iso;
+    if (_idle.isNotEmpty) {
+      iso = _idle.removeFirst();
+    } else {
+      final c = Completer<_PooledIso>();
+      _waiters.add(c);
+      iso = await c.future;
+    }
+    try {
+      return await iso.run(worker, batch);
+    } finally {
+      if (_dead) {
+        iso.kill();
+      } else if (_waiters.isNotEmpty) {
+        _waiters.removeFirst().complete(iso);
+      } else {
+        _idle.add(iso);
+      }
+    }
+  }
+
+  void kill() {
+    if (_dead) return;
+    _dead = true;
+    while (_waiters.isNotEmpty) {
+      _waiters.removeFirst().completeError(StateError('IsolatePool is closed'));
+    }
+    for (final w in _workers) {
+      w.kill();
+    }
+  }
+}
+
+class _PooledIso {
+  _PooledIso(this._isolate, this._toWorker, this._incoming);
+
+  final Isolate _isolate;
+  final SendPort _toWorker;
+  final RawReceivePort _incoming;
+  Completer<List<dynamic>>? _completer;
+
+  static Future<_PooledIso> spawn(int index) async {
+    final incoming = RawReceivePort();
+    final ready = Completer<SendPort>();
+    late final _PooledIso iso;
+    incoming.handler = (msg) {
+      if (!ready.isCompleted) {
+        ready.complete(msg as SendPort);
+        return;
+      }
+      iso._onMessage(msg);
+    };
+    late Isolate isolate;
+    try {
+      isolate = await Isolate.spawn(parallelPoolIsolateEntry, [
+        incoming.sendPort,
+      ], debugName: 'fxdart-parallel-pool-$index');
+    } catch (e, st) {
+      // coverage:ignore-start
+      incoming.close();
+      Error.throwWithStackTrace(
+        ArgumentError('parallel failed to spawn a worker isolate. ($e)'),
+        st,
+      );
+      // coverage:ignore-end
+    }
+    _nested.add(isolate);
+    // Same race as [_Iso.spawn]: the child exists before it is listed.
+    if (_reaping) _killNested(); // coverage:ignore-line
+    final toWorker = await ready.future;
+    iso = _PooledIso(isolate, toWorker, incoming);
+    return iso;
+  }
+
+  void _onMessage(dynamic msg) {
+    final c = _completer;
+    _completer = null;
+    if (c == null || c.isCompleted) return;
+    final list = msg as List<dynamic>;
+    final ok = list[0] as bool;
+    if (ok) {
+      c.complete(list[1] as List<dynamic>);
+      return;
+    }
+    final err = list[1];
+    final stack = list[2];
+    final st = stack is StackTrace ? stack : StackTrace.fromString('$stack');
+    final cause = err is Object && err is! String ? err : StateError('$err');
+    // The pool isolate always batches, so an error always carries a
+    // fourth slot — the prefix the iterator still owes.
+    c.completeError(_BatchFailure(list[3] as List<dynamic>, cause, st), st);
+  }
+
+  Future<List<dynamic>> run(Function worker, List<dynamic> batch) {
+    assert(_completer == null, 'parallel worker over-subscribed');
+    final c = Completer<List<dynamic>>();
+    _completer = c;
+    try {
+      _toWorker.send([worker, batch]);
+    } catch (e, st) {
+      _completer = null;
+      c.completeError(
+        ArgumentError(
+          'parallel cannot send this input to an isolate (not sendable). ($e)',
+        ),
+        st,
+      );
+    }
+    return c.future;
+  }
+
+  var _dead = false;
+
+  void kill() {
+    if (_dead) return;
+    _dead = true;
+    final c = _completer;
+    final inFlight = c != null;
+    _completer = null;
+    if (c != null && !c.isCompleted) {
+      c.completeError(StateError('IsolatePool is closed'));
+    }
+    _nested.remove(_isolate);
+    try {
+      _toWorker.send(_shutdown);
+    } catch (_) {}
+    void reap() {
+      _incoming.close();
+      _isolate.kill(priority: Isolate.immediate);
+    }
+
     if (inFlight) {
       Future<void>.delayed(_reapAfter, reap);
     } else {

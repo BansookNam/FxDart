@@ -7,8 +7,8 @@ section: 10
 crumb: juxt
 prev: apply.html
 prevLabel: apply
-next: memoize.html
-nextLabel: memoize
+next: fxPipe.html
+nextLabel: fxPipe
 ---
   <p class="hero-sub">Applies every function in a list to the same value and collects the results.</p>
 

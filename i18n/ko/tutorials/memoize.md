@@ -5,8 +5,8 @@ description: FxDart memoize 튜토리얼 — 인자를 키로 단항 함수의 �
 heading: <code>memoize</code>
 section: 10
 crumb: memoize
-prev: juxt.html
-prevLabel: juxt
+prev: fxPipe.html
+prevLabel: fxPipe
 next: negate.html
 nextLabel: negate
 ---

@@ -7,8 +7,8 @@ section: 10
 crumb: juxt
 prev: apply.html
 prevLabel: apply
-next: memoize.html
-nextLabel: memoize
+next: fxPipe.html
+nextLabel: fxPipe
 ---
   <p class="hero-sub">리스트에 담긴 모든 함수를 같은 값에 적용하고 그 결과를 모읍니다.</p>
 

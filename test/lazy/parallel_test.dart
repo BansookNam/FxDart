@@ -11,6 +11,8 @@ import 'package:test/test.dart';
 
 int doubleIt(int x) => x * 2;
 
+int addTen(int x) => x + 10;
+
 int throwsOnThree(int x) {
   if (x == 3) throw StateError('three');
   return x;
@@ -857,6 +859,317 @@ void main() {
       final frozen = n;
       await Future<void>.delayed(const Duration(milliseconds: 120));
       expect(n, frozen);
+    });
+  });
+
+  group('parallel chunked: true', () {
+    test('sizes k from length and workers', () async {
+      // 20 items, 2 workers: 20 ~/ 8 = 2. Same values as chunk: 2.
+      final src = [for (var i = 1; i <= 20; i++) i];
+      final want = [for (final x in src) x * 2];
+      expect(
+        await fx(src).parallel(2, doubleIt, chunked: true).toList(),
+        equals(want),
+      );
+      expect(
+        await fx(src).parallel(2, doubleIt, chunk: 2).toList(),
+        equals(want),
+      );
+    });
+
+    test('a short list falls back to chunk 1', () async {
+      expect(
+        await fx([1, 2, 3]).parallel(8, doubleIt, chunked: true).toList(),
+        equals([2, 4, 6]),
+      );
+    });
+
+    test('chunked: true with chunk: k throws', () {
+      expect(
+        () => fx([1, 2, 3, 4]).parallel(2, doubleIt, chunk: 2, chunked: true),
+        throwsArgumentError,
+      );
+    });
+
+    test('chunk: 0 with chunked: true auto-sizes', () async {
+      // Default chunk is 1; 0 is the other unspecified sentinel.
+      final src = [for (var i = 1; i <= 20; i++) i];
+      expect(
+        await fx(src).parallel(2, doubleIt, chunk: 0, chunked: true).toList(),
+        equals([for (final x in src) x * 2]),
+      );
+    });
+
+    test('chunk: -1 with chunked: true still throws', () {
+      expect(
+        () => fx([1, 2, 3, 4]).parallel(2, doubleIt, chunk: -1, chunked: true),
+        throwsRangeError,
+      );
+    });
+
+    test('chunked: true on a non-List throws', () {
+      expect(
+        () => fx(
+          Iterable<int>.generate(8, (i) => i),
+        ).parallel(2, doubleIt, chunked: true),
+        throwsStateError,
+      );
+    });
+
+    test('chunked: true on an async source throws', () {
+      expect(
+        () => fx([1, 2, 3, 4]).toAsync().parallel(2, doubleIt, chunked: true),
+        throwsStateError,
+      );
+    });
+
+    test('mapParallel carries chunked', () async {
+      final src = [for (var i = 1; i <= 16; i++) i];
+      expect(
+        await fx(src).mapParallel(2, doubleIt, chunked: true).toList(),
+        equals([for (final x in src) x * 2]),
+      );
+    });
+
+    test('an empty list still spawns nothing', () async {
+      expect(
+        await fx(<int>[]).parallel(4, doubleIt, chunked: true).toList(),
+        equals(<int>[]),
+      );
+    });
+  });
+
+  group('fxPipe', () {
+    test('runs both workers in one hop', () async {
+      expect(
+        await fx([1, 2, 3]).parallel(2, fxPipe2(doubleIt, addTen)).toList(),
+        equals([12, 14, 16]),
+      );
+    });
+
+    test('composes under chunk', () async {
+      expect(
+        await fx([
+          1,
+          2,
+          3,
+          4,
+        ]).parallel(2, fxPipe2(doubleIt, addTen), chunk: 2).toList(),
+        equals([12, 14, 16, 18]),
+      );
+    });
+
+    test('fxPipe3..5 compose on the worker', () async {
+      expect(
+        await fx([
+          1,
+          2,
+        ]).parallel(1, fxPipe3(doubleIt, addTen, doubleIt)).toList(),
+        equals([24, 28]),
+      );
+      expect(
+        await fx(
+          [1],
+        ).parallel(1, fxPipe4(doubleIt, addTen, doubleIt, addTen)).toList(),
+        equals([34]),
+      );
+      expect(
+        await fx([1])
+            .parallel(1, fxPipe5(doubleIt, addTen, doubleIt, addTen, doubleIt))
+            .toList(),
+        equals([68]),
+      );
+    });
+
+    test('then-chain also runs on the worker', () async {
+      expect(
+        await fx([1, 2, 3]).parallel(2, fxPipe(doubleIt).then(addTen)).toList(),
+        equals([12, 14, 16]),
+      );
+    });
+  });
+
+  group('IsolatePool', () {
+    test('reuses isolates across two chains', () async {
+      await IsolatePool.using(2, (pool) async {
+        expect(
+          await fx([1, 2, 3, 4]).parallelOn(pool, doubleIt).toList(),
+          equals([2, 4, 6, 8]),
+        );
+        expect(
+          await fx([5, 6]).parallelOn(pool, doubleIt, chunk: 2).toList(),
+          equals([10, 12]),
+        );
+        expect(pool.isClosed, isFalse);
+      });
+    });
+
+    test('kill rejects a later parallelOn', () async {
+      final pool = await IsolatePool.spawn(1);
+      pool.kill();
+      expect(() => fx([1]).parallelOn(pool, doubleIt), throwsStateError);
+    });
+
+    test('kill rejects a later parallelOn on an async source', () async {
+      final pool = await IsolatePool.spawn(1);
+      pool.kill();
+      expect(
+        () => fx([1]).toAsync().parallelOn(pool, doubleIt),
+        throwsStateError,
+      );
+    });
+
+    test('kill between pulls fails the next dispatch', () async {
+      final pool = await IsolatePool.spawn(1);
+      final it = fx([1, 2, 3]).parallelOn(pool, doubleIt).iterator;
+      expect((await it.next()).value, 2);
+      pool.kill();
+      await expectLater(it.next(), throwsA(isA<StateError>()));
+    });
+
+    test('using kills the pool even when body throws', () async {
+      IsolatePool? seen;
+      try {
+        await IsolatePool.using(1, (pool) async {
+          seen = pool;
+          await fx([1]).parallelOn(pool, doubleIt).toList();
+          throw StateError('boom');
+        });
+      } on StateError catch (e) {
+        expect(e.message, 'boom');
+      }
+      expect(seen!.isClosed, isTrue);
+    });
+
+    test('cancel of one chain leaves the pool for the next', () async {
+      await IsolatePool.using(2, (pool) async {
+        final it = fx([1, 2, 3, 4, 5, 6]).parallelOn(pool, slowDouble).iterator;
+        expect((await it.next()).value, 2);
+        await (it as StreamPullCancel).cancel();
+        expect((await it.next()).done, isTrue);
+        expect(
+          await fx([7, 8]).parallelOn(pool, doubleIt).toList(),
+          equals([14, 16]),
+        );
+      });
+    });
+
+    test(
+      'two chains on one worker queue instead of over-subscribing',
+      () async {
+        await IsolatePool.using(1, (pool) async {
+          final a = fx([1, 2]).parallelOn(pool, slowDouble).toList();
+          final b = fx([3, 4]).parallelOn(pool, slowDouble).toList();
+          final results = await Future.wait([a, b]);
+          expect(results[0], equals([2, 4]));
+          expect(results[1], equals([6, 8]));
+        });
+      },
+    );
+
+    test('parallelOn chunked: true uses the pool size', () async {
+      final src = [for (var i = 1; i <= 20; i++) i];
+      await IsolatePool.using(2, (pool) async {
+        expect(
+          await fx(src).parallelOn(pool, doubleIt, chunked: true).toList(),
+          equals([for (final x in src) x * 2]),
+        );
+      });
+    });
+
+    test('async source via parallelOn', () async {
+      await IsolatePool.using(2, (pool) async {
+        expect(
+          await fx([1, 2, 3]).toAsync().parallelOn(pool, doubleIt).toList(),
+          equals([2, 4, 6]),
+        );
+      });
+    });
+
+    test('spawn rejects workers < 1', () {
+      expect(() => IsolatePool.spawn(0), throwsRangeError);
+    });
+
+    test('a chunked worker error emits the prefix', () async {
+      await IsolatePool.using(1, (pool) async {
+        final it = fx([
+          1,
+          2,
+          3,
+          4,
+        ]).parallelOn(pool, throwsOnThree, chunk: 4).iterator;
+        expect((await it.next()).value, 1);
+        expect((await it.next()).value, 2);
+        await expectLater(it.next(), throwsA(isA<StateError>()));
+      });
+    });
+
+    test('a worker error leaves the pool usable', () async {
+      await IsolatePool.using(1, (pool) async {
+        await expectLater(
+          fx([1, 2, 3]).parallelOn(pool, throwsOnThree).toList(),
+          throwsA(isA<StateError>()),
+        );
+        expect(await fx([4]).parallelOn(pool, doubleIt).toList(), equals([8]));
+      });
+    });
+
+    test('an unsendable result fails that pull', () async {
+      await IsolatePool.using(1, (pool) async {
+        await expectLater(
+          fx([1]).parallelOn(pool, openPort).toList(),
+          throwsA(isA<ArgumentError>()),
+        );
+      });
+    });
+
+    test('an unsendable input fails that pull', () async {
+      final port = ReceivePort();
+      try {
+        await IsolatePool.using(1, (pool) async {
+          await expectLater(
+            fx([port]).parallelOn(pool, closePort).toList(),
+            throwsA(
+              isA<ArgumentError>().having(
+                (e) => e.message,
+                'message',
+                contains('not sendable'),
+              ),
+            ),
+          );
+        });
+      } finally {
+        port.close();
+      }
+    });
+
+    test('kill errors a chain waiting on the worker', () async {
+      final pool = await IsolatePool.spawn(1);
+      final a = fx([1]).parallelOn(pool, slowDouble).toList();
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      final b = fx([2]).parallelOn(pool, slowDouble).toList();
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      pool.kill();
+      await expectLater(b, throwsA(isA<StateError>()));
+      try {
+        await a;
+      } on StateError catch (_) {}
+    });
+
+    test('kill during an in-flight job fails the pull', () async {
+      final pool = await IsolatePool.spawn(1);
+      final it = fx([1, 2, 3]).parallelOn(pool, slowDouble).iterator;
+      final pull = it.next();
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      pool.kill();
+      try {
+        await pull;
+      } on StateError catch (e) {
+        expect(e.message, contains('closed'));
+        return;
+      }
+      // The first result may already have been in hand.
+      expect((await it.next()).done, isTrue);
     });
   });
 }

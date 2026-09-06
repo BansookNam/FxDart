@@ -184,12 +184,38 @@ FxAsyncIterable<B> _$mapConcurrentAsync<A, B>(int concurrency,
     mapConcurrentAsync(concurrency, f, iterable);
 FxAsyncIterable<R> _$parallel<A, R>(int workers,
         FutureOr<R> Function(A input) worker, Iterable<A> iterable,
-        {int chunk = 1}) =>
-    parallel(workers, worker, iterable, chunk: chunk);
+        {int chunk = 1, bool chunked = false}) =>
+    parallel(workers, worker, iterable, chunk: chunk, chunked: chunked);
 FxAsyncIterable<R> _$parallelAsync<A, R>(int workers,
         FutureOr<R> Function(A input) worker, FxAsyncIterable<A> iterable,
-        {int chunk = 1}) =>
-    parallelAsync(workers, worker, iterable, chunk: chunk);
+        {int chunk = 1, bool chunked = false}) =>
+    parallelAsync(workers, worker, iterable, chunk: chunk, chunked: chunked);
+FxAsyncIterable<R> _$parallelOn<A, R>(IsolatePool pool,
+        FutureOr<R> Function(A input) worker, Iterable<A> iterable,
+        {int chunk = 1, bool chunked = false}) =>
+    parallelOn(pool, worker, iterable, chunk: chunk, chunked: chunked);
+FxAsyncIterable<R> _$parallelOnAsync<A, R>(IsolatePool pool,
+        FutureOr<R> Function(A input) worker, FxAsyncIterable<A> iterable,
+        {int chunk = 1, bool chunked = false}) =>
+    parallelOnAsync(pool, worker, iterable, chunk: chunk, chunked: chunked);
+R Function(A a) _$fxPipe<A, R>(R Function(A a) f) => fxPipe(f);
+R Function(A a) _$fxPipe2<A, M, R>(
+        M Function(A a) first, R Function(M m) second) =>
+    fxPipe2(first, second);
+R Function(A a) _$fxPipe3<A, M1, M2, R>(
+        M1 Function(A a) first, M2 Function(M1 m) second,
+        R Function(M2 m) third) =>
+    fxPipe3(first, second, third);
+R Function(A a) _$fxPipe4<A, M1, M2, M3, R>(
+        M1 Function(A a) first, M2 Function(M1 m) second,
+        M3 Function(M2 m) third, R Function(M3 m) fourth) =>
+    fxPipe4(first, second, third, fourth);
+R Function(A a) _$fxPipe5<A, M1, M2, M3, M4, R>(
+        M1 Function(A a) first, M2 Function(M1 m) second,
+        M3 Function(M2 m) third, M4 Function(M3 m) fourth,
+        R Function(M4 m) fifth) =>
+    fxPipe5(first, second, third, fourth, fifth);
+typedef _$IsolatePool = IsolatePool;
 Iterable<(A, B)> _$attach<A, B>(B Function(A a) f, Iterable<A> iterable) =>
     attach(f, iterable);
 FxAsyncIterable<(A, B)> _$attachAsync<A, B>(
