@@ -1,5 +1,12 @@
 ## 0.8.10
 
+The pub.dev archive no longer ships the docs-site Flutter demo
+(`web/DailyLedger/`, CanvasKit WASM) or the nested `fxdart_lints`
+package. Those live on GitHub Pages and as their own package. The
+tarball is the library, the example, the skills, and the changelog.
+
+
+
 `parallel(n, worker, chunk: k)` — k elements ride one message instead of
 one each. The port round trip is ~5µs, which is more than most callbacks
 cost, and it is why the operator lost to a plain loop on anything but
