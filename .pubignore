@@ -37,8 +37,11 @@ example/dart_comparison_plan.md
 # not the package.
 web/
 
-# Separate package, published from pkgs/fxdart_lints/.
-pkgs/
+# Do not ignore pkgs/. `cd pkgs/fxdart_lints && dart pub publish` still
+# reads this file (the git root), so `pkgs/` hides that package's own
+# pubspec, LICENSE and README and the publish dies. fxdart_lints is a
+# few dozen KB; leaving it in the fxdart tarball is cheaper than
+# breaking the nested publish.
 
 # Tests live on GitHub. Consumers never run them from the tarball.
 test/

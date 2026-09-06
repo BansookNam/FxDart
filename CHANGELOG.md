@@ -1,9 +1,10 @@
 ## 0.8.10
 
 The pub.dev archive no longer ships the docs-site Flutter demo
-(`web/DailyLedger/`, CanvasKit WASM) or the nested `fxdart_lints`
-package. Those live on GitHub Pages and as their own package. The
-tarball is the library, the example, the skills, and the changelog.
+(`web/DailyLedger/`, CanvasKit WASM). That lives on GitHub Pages.
+`pkgs/fxdart_lints` stays in the tree: ignoring `pkgs/` here hid that
+package's pubspec when publishing it as its own package. The tarball
+is the library, the example, the skills, and the changelog.
 
 
 

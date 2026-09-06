@@ -1,0 +1,4 @@
+# Nested package — this file is the one `dart pub publish` uses from here.
+.dart_tool/
+pubspec.lock
+example/custom_lint.log
