@@ -48,8 +48,9 @@ with ten workers: `chunk: 2500` at the N=100,000 sweep (vs 100,000
 trips), `chunk: 37500` at the headline N=1,500,000 (vs 1.5 million
 trips). `chunked: true` is that formula at the call site, so the worker
 count is not written twice — `k = length ~/ (workers * 4)` from a
-`List`. A source without a length throws; `chunk:` and `chunked:`
-together throw (one policy per call).
+`List`. A source without a length throws; `chunked: true` with the
+default `chunk` (or `chunk: 0`) auto-sizes; an explicit `chunk: k`
+for k > 1 together with `chunked:` throws (one policy per call).
 
 ```dart
 await fx(rows).parallel(4, parseRow, chunked: true);
@@ -115,15 +116,17 @@ I/O stays on `concurrent`, CPU goes to `parallel`, and a cheap callback
 
 The hop is also paid twice if two CPU stages are two `.parallel` calls
 (every result copies back to the main isolate and out again) or if two
-jobs each spawn a pool. `isolateMap2..5` fuses 2–5 sendable workers into
-one hop (arity capped at 5, like `zipOrAccumulate2..5`; beyond that,
-write the fused worker). `IsolatePool` spawns once; `parallelOn` runs
-sequential chains against it; `IsolatePool.using` kills in `finally`.
-Cancel of one `parallelOn` chain does not kill the pool.
+jobs each spawn a pool. `fxPipe2..5` fuses 2–5 stages into **one**
+closure (`fxPipe3(parse, normalise, score)`); `fxPipe(parse).then(score)`
+is the same composition with a nested closure per `.then`, no arity
+cap. Not isolate-specific — `map` takes it too. `IsolatePool` spawns once;
+`parallelOn` runs sequential chains against it; `IsolatePool.using`
+kills in `finally`. Cancel of one `parallelOn` chain does not kill the
+pool.
 
 ```dart
-await fx(blobs).parallel(4, isolateMap2(decodePng, thumbnail), chunk: 64).toList();
-await fx(rows).parallel(4, isolateMap3(parse, normalise, score), chunked: true).toList();
+await fx(blobs).parallel(4, fxPipe2(decodePng, thumbnail), chunk: 64).toList();
+await fx(rows).parallel(4, fxPipe3(parse, normalise, score), chunked: true).toList();
 
 await IsolatePool.using(4, (pool) async {
   final a = await fx(batchA).parallelOn(pool, parseRow, chunk: 256).toList();
@@ -132,8 +135,8 @@ await IsolatePool.using(4, (pool) async {
 });
 ```
 
-The 101 page `isolateMap2..5` has a live playground on
-`isolateMap3(parse, normalise, score)` — the fused worker through
+The 101 page `fxPipe` has a live playground on
+`fxPipe3(parse, normalise, score)` — the fused function through
 `map`, because `parallel` itself is VM-only.
 
 A source that throws after the pool has started now shuts the pool

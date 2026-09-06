@@ -19,11 +19,10 @@ double score(Row r) => r.qty * r.price;
 void main() {
   final lines = ['aa,2,1.5', 'bb,10,0.4', 'cc,3,2.0'];
 
-  // TODO: fuse parse → normalise → score and keep scores >= 4.
-  final top = fx(lines)
-      .map(isolateMap3(parse, normalise, score))
-      .filter((s) => s >= 4)
-      .toList();
+  final layered = fx(lines).map(parse).map(normalise).map(score).toList();
+  final fused = fx(lines).map(fxPipe3(parse, normalise, score)).toList();
 
-  print(top); // [4.0, 6.0]
+  print(layered); // [3.0, 4.0, 6.0]
+  print(fused); // [3.0, 4.0, 6.0]
+  print(layered.toString() == fused.toString()); // true
 }

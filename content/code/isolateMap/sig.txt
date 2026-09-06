@@ -1,5 +1,0 @@
-R Function(A) isolateMap2&lt;A, M, R&gt;(M Function(A) first, R Function(M) second)
-R Function(A) isolateMap3&lt;A, M1, M2, R&gt;(M1 Function(A) first, M2 Function(M1) second, R Function(M2) third)
-R Function(A) isolateMap4&lt;A, M1, M2, M3, R&gt;(M1 Function(A) first, M2 Function(M1) second, M3 Function(M2) third, R Function(M3) fourth)
-R Function(A) isolateMap5&lt;A, M1, M2, M3, M4, R&gt;(M1 Function(A) first, M2 Function(M1) second, M3 Function(M2) third, M4 Function(M3) fourth, R Function(M4) fifth)
-R Function(T) Fx.parallel(isolateMap3(parse, normalise, score), …)  // VM — one hop

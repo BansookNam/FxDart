@@ -939,10 +939,10 @@ void main() {
     });
   });
 
-  group('isolateMap2', () {
+  group('fxPipe', () {
     test('runs both workers in one hop', () async {
       expect(
-        await fx([1, 2, 3]).parallel(2, isolateMap2(doubleIt, addTen)).toList(),
+        await fx([1, 2, 3]).parallel(2, fxPipe2(doubleIt, addTen)).toList(),
         equals([12, 14, 16]),
       );
     });
@@ -954,33 +954,37 @@ void main() {
           2,
           3,
           4,
-        ]).parallel(2, isolateMap2(doubleIt, addTen), chunk: 2).toList(),
+        ]).parallel(2, fxPipe2(doubleIt, addTen), chunk: 2).toList(),
         equals([12, 14, 16, 18]),
       );
     });
 
-    test('isolateMap3..5 compose on the worker', () async {
+    test('fxPipe3..5 compose on the worker', () async {
       expect(
         await fx([
           1,
           2,
-        ]).parallel(1, isolateMap3(doubleIt, addTen, doubleIt)).toList(),
+        ]).parallel(1, fxPipe3(doubleIt, addTen, doubleIt)).toList(),
         equals([24, 28]),
       );
       expect(
         await fx(
           [1],
-        ).parallel(1, isolateMap4(doubleIt, addTen, doubleIt, addTen)).toList(),
+        ).parallel(1, fxPipe4(doubleIt, addTen, doubleIt, addTen)).toList(),
         equals([34]),
       );
       expect(
         await fx([1])
-            .parallel(
-              1,
-              isolateMap5(doubleIt, addTen, doubleIt, addTen, doubleIt),
-            )
+            .parallel(1, fxPipe5(doubleIt, addTen, doubleIt, addTen, doubleIt))
             .toList(),
         equals([68]),
+      );
+    });
+
+    test('then-chain also runs on the worker', () async {
+      expect(
+        await fx([1, 2, 3]).parallel(2, fxPipe(doubleIt).then(addTen)).toList(),
+        equals([12, 14, 16]),
       );
     });
   });

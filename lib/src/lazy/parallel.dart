@@ -37,7 +37,10 @@ int get parallelWorkers => parallelWorkersImpl;
 /// the work the pool can take sizes the pool down, so `parallel(8, w)` over
 /// two items starts two isolates, not eight. See [parallelWorkers] when you
 /// do not want to pick [workers]; [mapParallel] is the same operator under
-/// the name that sits next to [mapConcurrent].
+/// the name that sits next to [mapConcurrent]. Two CPU stages as two
+/// `.parallel` calls copy every result back to this isolate and out
+/// again — compose them with [fxPipe2] so both run in one hop:
+/// `fxPipe2(decodePng, thumbnail)`.
 ///
 /// ## [chunk] — how many elements ride one message
 ///
@@ -168,54 +171,6 @@ FxAsyncIterable<R> mapParallelAsync<A, R>(
   int chunk = 1,
   bool chunked = false,
 }) => parallelAsync(workers, worker, iterable, chunk: chunk, chunked: chunked);
-
-/// Runs [first] then [second] inside one isolate hop.
-///
-/// Two [parallel] stages copy every result back to the main isolate and
-/// out again. Compose the workers instead:
-///
-/// ```dart
-/// await fx(blobs)
-///     .parallel(4, isolateMap2(decodePng, thumbnail), chunk: 64)
-///     .toList();
-/// ```
-///
-/// [first] and [second] must be sendable (top-level or static, or a
-/// closure whose captures are). The returned function captures both; it
-/// is sendable when they are. Arity capped at 5, like
-/// `zipOrAccumulate2..5` — beyond that, write the fused worker yourself.
-R Function(A a) isolateMap2<A, M, R>(
-  M Function(A a) first,
-  R Function(M m) second,
-) =>
-    (A a) => second(first(a));
-
-/// 3-ary [isolateMap2].
-R Function(A a) isolateMap3<A, M1, M2, R>(
-  M1 Function(A a) first,
-  M2 Function(M1 m) second,
-  R Function(M2 m) third,
-) =>
-    (A a) => third(second(first(a)));
-
-/// 4-ary [isolateMap2].
-R Function(A a) isolateMap4<A, M1, M2, M3, R>(
-  M1 Function(A a) first,
-  M2 Function(M1 m) second,
-  M3 Function(M2 m) third,
-  R Function(M3 m) fourth,
-) =>
-    (A a) => fourth(third(second(first(a))));
-
-/// 5-ary [isolateMap2].
-R Function(A a) isolateMap5<A, M1, M2, M3, M4, R>(
-  M1 Function(A a) first,
-  M2 Function(M1 m) second,
-  M3 Function(M2 m) third,
-  M4 Function(M3 m) fourth,
-  R Function(M4 m) fifth,
-) =>
-    (A a) => fifth(fourth(third(second(first(a)))));
 
 /// A reused isolate pool for sequential [parallelOn] chains.
 ///

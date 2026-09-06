@@ -7,8 +7,8 @@ section: 11
 crumb: parallel
 prev: concurrentOrParallel.html
 prevLabel: concurrent or parallel
-next: isolateMap.html
-nextLabel: isolateMap2..5
+next: debounce.html
+nextLabel: debounce
 ---
   <p class="hero-sub">CPU 일을 isolate들에 겹칩니다, 소스 순서로. 이름만 다른 <code>concurrent</code>가 아닙니다.</p>
 
@@ -107,19 +107,19 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   약 3ms
   <h2>CPU 단계 두 개, 홉은 한 번</h2>
   <p>
     <code>.parallel</code>을 두 번 호출하면 결과가 이 isolate로
-    돌아왔다가 다시 나갑니다. <code>isolateMap2</code>로 워커를
+    돌아왔다가 다시 나갑니다.
+    <code><a href="fxPipe.html">fxPipe2</a></code>로 워커를
     합치면 두 단계가 워커 안에서 돕니다:
   </p>
   <pre><code>await fx(blobs)
-    .parallel(4, isolateMap2(decodePng, thumbnail), chunk: 64)
+    .parallel(4, fxPipe2(decodePng, thumbnail), chunk: 64)
     .toList();</code></pre>
   <p>
     <code>decodePng</code>와 <code>thumbnail</code>은 다른
     <code>parallel</code> 워커와 같이 보낼 수 있어야 합니다. 반환
-    함수가 둘을 캡처합니다. <code>isolateMap3</code>..<code>isolateMap5</code>는
-    단계를 더 받습니다 — 인자는 5개에서 끝입니다
-    (<code>zipOrAccumulate2..5</code>와 같습니다). 그 이상은 워커를
-    직접 합치세요.
+    함수가 둘을 캡처합니다. 단계가 더 있으면
+    <code>.then</code>을 붙이세요 — 인자 개수 제한은 없습니다.
+    마지막 <code>.then</code>이 <em>곧</em> 워커입니다.
   </p>
 
   <h2>풀을 재사용하기</h2>
@@ -144,6 +144,6 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   약 3ms
     <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — 결합된 I/O 형태 ·
     <a href="concurrentOrParallel.html">concurrent or parallel</a> — I/O vs CPU ·
     <code>mapParallel</code> — <code>parallel</code>과 같은 연산 ·
-    <a href="isolateMap.html"><code>isolateMap2..5</code></a> — CPU 단계를 한 홉으로 ·
+    <a href="fxPipe.html"><code>fxPipe</code></a> — 워커를 합성해 단계 두 개가 홉 한 번 ·
     <a href="../parallel-benchmark.html">parallel은 값어치를 하는가?</a> — 같은 작업 다섯 가지 방법, 측정
   </div>

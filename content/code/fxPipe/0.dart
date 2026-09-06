@@ -5,6 +5,8 @@ class Row {
   final String sku;
   final int qty;
   final double price;
+  @override
+  String toString() => '$sku x$qty @ $price';
 }
 
 Row parse(String line) {
@@ -19,10 +21,9 @@ double score(Row r) => r.qty * r.price;
 void main() {
   final lines = ['aa,2,1.5', 'bb,10,0.4', 'cc,3,2.0'];
 
-  final layered = fx(lines).map(parse).map(normalise).map(score).toList();
-  final fused = fx(lines).map(isolateMap3(parse, normalise, score)).toList();
+  // On the VM: fx(lines).parallel(4, fxPipe3(parse, normalise, score))
+  final scored =
+      fx(lines).map(fxPipe3(parse, normalise, score)).toList();
 
-  print(layered); // [3.0, 4.0, 6.0]
-  print(fused); // [3.0, 4.0, 6.0]
-  print(layered.toString() == fused.toString()); // true
+  print(scored); // [3.0, 4.0, 6.0]
 }

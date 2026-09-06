@@ -5,8 +5,8 @@ description: FxDart memoize tutorial: cache a unary function's results by argume
 heading: <code>memoize</code>
 section: 10
 crumb: memoize
-prev: juxt.html
-prevLabel: juxt
+prev: fxPipe.html
+prevLabel: fxPipe
 next: negate.html
 nextLabel: negate
 ---

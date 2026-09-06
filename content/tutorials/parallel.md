@@ -1,14 +1,14 @@
 ---
 slug: parallel
 title: parallel — FxDart 101
-description: FxDart parallel tutorial: the CPU twin of concurrent — a pool of isolates, chunked: true, isolateMap2, and IsolatePool to reuse workers. VM and Flutter only.
+description: FxDart parallel tutorial: the CPU twin of concurrent — a pool of isolates, chunked: true, fxPipe().then() to fuse workers, and IsolatePool to reuse them. VM and Flutter only.
 heading: <code>parallel</code>
 section: 11
 crumb: parallel
 prev: concurrentOrParallel.html
 prevLabel: concurrent or parallel
-next: isolateMap.html
-nextLabel: isolateMap2..5
+next: debounce.html
+nextLabel: debounce
 ---
   <p class="hero-sub">Overlaps CPU work across isolates, in source order. Not <code>concurrent</code> with a different name.</p>
 
@@ -108,18 +108,17 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   ~3ms
   <p>
     Two <code>.parallel</code> calls copy every result back to this
     isolate and out again. Compose the workers with
-    <code>isolateMap2</code> so both stages run on the worker:
+    <code><a href="fxPipe.html">fxPipe2</a></code> so both stages run on
+    the worker:
   </p>
   <pre><code>await fx(blobs)
-    .parallel(4, isolateMap2(decodePng, thumbnail), chunk: 64)
+    .parallel(4, fxPipe2(decodePng, thumbnail), chunk: 64)
     .toList();</code></pre>
   <p>
     <code>decodePng</code> and <code>thumbnail</code> must be sendable,
     same as any <code>parallel</code> worker. The returned function
-    captures both. <code>isolateMap3</code>..<code>isolateMap5</code>
-    take more stages — arity stops at 5, like
-    <code>zipOrAccumulate2..5</code>. Beyond that, write the fused
-    worker yourself.
+    captures both. Add <code>.then</code> for more stages — no arity
+    cap. The last <code>.then</code> <em>is</em> the worker.
   </p>
 
   <h2>Reuse the pool</h2>
@@ -143,6 +142,6 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   ~3ms
     <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — the combined I/O form ·
     <a href="concurrentOrParallel.html">concurrent or parallel</a> — I/O vs CPU ·
     <code>mapParallel</code> — the same operator as <code>parallel</code> ·
-    <a href="isolateMap.html"><code>isolateMap2..5</code></a> — fuse CPU stages into one hop ·
+    <a href="fxPipe.html"><code>fxPipe</code></a> — compose workers so two stages pay one hop ·
     <a href="../parallel-benchmark.html">is parallel worth it?</a> — the same job five ways, measured
   </div>

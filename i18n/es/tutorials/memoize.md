@@ -5,8 +5,8 @@ description: Tutorial de memoize en FxDart: cachea los resultados de una funció
 heading: <code>memoize</code>
 section: 10
 crumb: memoize
-prev: juxt.html
-prevLabel: juxt
+prev: fxPipe.html
+prevLabel: fxPipe
 next: negate.html
 nextLabel: negate
 ---

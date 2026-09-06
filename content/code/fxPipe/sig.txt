@@ -1,0 +1,6 @@
+R Function(A) fxPipe&lt;A, R&gt;(R Function(A) f)
+S Function(A) (R Function(A)).then&lt;S&gt;(S Function(R) next)
+R Function(A) fxPipe2&lt;A, M, R&gt;(M Function(A) first, R Function(M) second)
+R Function(A) fxPipe3&lt;A, M1, M2, R&gt;(M1 Function(A) first, M2 Function(M1) second, R Function(M2) third)
+R Function(A) fxPipe4&lt;A, M1, M2, M3, R&gt;(…)
+R Function(A) fxPipe5&lt;A, M1, M2, M3, M4, R&gt;(…)

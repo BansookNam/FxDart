@@ -487,6 +487,10 @@
       "label": "juxt"
     },
     {
+      "href": "fxPipe.html",
+      "label": "fxPipe"
+    },
+    {
       "href": "memoize.html",
       "label": "memoize"
     },
@@ -587,10 +591,6 @@
     {
       "href": "parallel.html",
       "label": "parallel"
-    },
-    {
-      "href": "isolateMap.html",
-      "label": "isolateMap2..5"
     }
   ],
   "12": [

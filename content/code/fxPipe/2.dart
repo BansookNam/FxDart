@@ -5,8 +5,6 @@ class Row {
   final String sku;
   final int qty;
   final double price;
-  @override
-  String toString() => '$sku x$qty @ $price';
 }
 
 Row parse(String line) {
@@ -21,9 +19,11 @@ double score(Row r) => r.qty * r.price;
 void main() {
   final lines = ['aa,2,1.5', 'bb,10,0.4', 'cc,3,2.0'];
 
-  // On the VM: fx(lines).parallel(4, isolateMap3(parse, normalise, score))
-  final scored =
-      fx(lines).map(isolateMap3(parse, normalise, score)).toList();
+  // TODO: compose parse → normalise → score and keep scores >= 4.
+  final top = fx(lines)
+      .map(fxPipe3(parse, normalise, score))
+      .filter((s) => s >= 4)
+      .toList();
 
-  print(scored); // [3.0, 4.0, 6.0]
+  print(top); // [4.0, 6.0]
 }

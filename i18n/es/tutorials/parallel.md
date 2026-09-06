@@ -7,8 +7,8 @@ section: 11
 crumb: parallel
 prev: concurrentOrParallel.html
 prevLabel: concurrent or parallel
-next: isolateMap.html
-nextLabel: isolateMap2..5
+next: debounce.html
+nextLabel: debounce
 ---
   <p class="hero-sub">Solapa trabajo de CPU entre isolates, en el orden de la fuente. No es <code>concurrent</code> con otro nombre.</p>
 
@@ -109,19 +109,19 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   ~3ms
   <p>
     Dos llamadas a <code>.parallel</code> copian cada resultado de
     vuelta a este isolate y otra vez hacia fuera. Compón los workers
-    con <code>isolateMap2</code> para que ambas etapas corran en el
+    con
+    <code><a href="fxPipe.html">fxPipe2</a></code> para que ambas etapas corran en el
     worker:
   </p>
   <pre><code>await fx(blobs)
-    .parallel(4, isolateMap2(decodePng, thumbnail), chunk: 64)
+    .parallel(4, fxPipe2(decodePng, thumbnail), chunk: 64)
     .toList();</code></pre>
   <p>
     <code>decodePng</code> y <code>thumbnail</code> tienen que ser
     enviables, igual que cualquier worker de <code>parallel</code>.
-    La función devuelta captura ambos. <code>isolateMap3</code>..<code>isolateMap5</code>
-    aceptan más etapas — la aridad para en 5, como
-    <code>zipOrAccumulate2..5</code>. Más allá, escribe el worker
-    fusionado tú.
+    La función devuelta captura ambos. Añade <code>.then</code> para
+    más etapas — no hay tope de aridad. El último
+    <code>.then</code> <em>es</em> el worker.
   </p>
 
   <h2>Reutilizar el pool</h2>
@@ -146,6 +146,6 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   ~3ms
     <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — la forma combinada de I/O ·
     <a href="concurrentOrParallel.html">concurrent or parallel</a> — I/O vs CPU ·
     <code>mapParallel</code> — el mismo operador que <code>parallel</code> ·
-    <a href="isolateMap.html"><code>isolateMap2..5</code></a> — fusiona etapas de CPU en un hop ·
+    <a href="fxPipe.html"><code>fxPipe</code></a> — compón workers para que dos etapas paguen un hop ·
     <a href="../parallel-benchmark.html">¿merece la pena parallel?</a> — el mismo trabajo de cinco maneras, medido
   </div>
