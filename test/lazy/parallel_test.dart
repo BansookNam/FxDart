@@ -1006,6 +1006,23 @@ void main() {
       expect(() => fx([1]).parallelOn(pool, doubleIt), throwsStateError);
     });
 
+    test('kill rejects a later parallelOn on an async source', () async {
+      final pool = await IsolatePool.spawn(1);
+      pool.kill();
+      expect(
+        () => fx([1]).toAsync().parallelOn(pool, doubleIt),
+        throwsStateError,
+      );
+    });
+
+    test('kill between pulls fails the next dispatch', () async {
+      final pool = await IsolatePool.spawn(1);
+      final it = fx([1, 2, 3]).parallelOn(pool, doubleIt).iterator;
+      expect((await it.next()).value, 2);
+      pool.kill();
+      await expectLater(it.next(), throwsA(isA<StateError>()));
+    });
+
     test('using kills the pool even when body throws', () async {
       IsolatePool? seen;
       try {
@@ -1100,6 +1117,39 @@ void main() {
           throwsA(isA<ArgumentError>()),
         );
       });
+    });
+
+    test('an unsendable input fails that pull', () async {
+      final port = ReceivePort();
+      try {
+        await IsolatePool.using(1, (pool) async {
+          await expectLater(
+            fx([port]).parallelOn(pool, closePort).toList(),
+            throwsA(
+              isA<ArgumentError>().having(
+                (e) => e.message,
+                'message',
+                contains('not sendable'),
+              ),
+            ),
+          );
+        });
+      } finally {
+        port.close();
+      }
+    });
+
+    test('kill errors a chain waiting on the worker', () async {
+      final pool = await IsolatePool.spawn(1);
+      final a = fx([1]).parallelOn(pool, slowDouble).toList();
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      final b = fx([2]).parallelOn(pool, slowDouble).toList();
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      pool.kill();
+      await expectLater(b, throwsA(isA<StateError>()));
+      try {
+        await a;
+      } on StateError catch (_) {}
     });
 
     test('kill during an in-flight job fails the pull', () async {

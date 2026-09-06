@@ -901,10 +901,15 @@ class _SharedPool {
     final pool = _SharedPool(spawned);
     pool._idle.addAll(spawned);
     final spawnError = error;
+    // coverage:ignore-start
+    // Isolate.spawn of a SendPort-only entry fails only on resource
+    // exhaustion — the same class as [_Iso.spawn]'s leftover-kill, but
+    // there is no unsendable worker to provoke it from a test.
     if (spawnError != null) {
       pool.kill();
       Error.throwWithStackTrace(spawnError, errorSt!);
     }
+    // coverage:ignore-end
     return pool;
   }
 
@@ -968,14 +973,17 @@ class _PooledIso {
         incoming.sendPort,
       ], debugName: 'fxdart-parallel-pool-$index');
     } catch (e, st) {
+      // coverage:ignore-start
       incoming.close();
       Error.throwWithStackTrace(
         ArgumentError('parallel failed to spawn a worker isolate. ($e)'),
         st,
       );
+      // coverage:ignore-end
     }
     _nested.add(isolate);
-    if (_reaping) _killNested();
+    // Same race as [_Iso.spawn]: the child exists before it is listed.
+    if (_reaping) _killNested(); // coverage:ignore-line
     final toWorker = await ready.future;
     iso = _PooledIso(isolate, toWorker, incoming);
     return iso;
@@ -995,11 +1003,9 @@ class _PooledIso {
     final stack = list[2];
     final st = stack is StackTrace ? stack : StackTrace.fromString('$stack');
     final cause = err is Object && err is! String ? err : StateError('$err');
-    if (list.length > 3) {
-      c.completeError(_BatchFailure(list[3] as List<dynamic>, cause, st), st);
-      return;
-    }
-    c.completeError(cause, st);
+    // The pool isolate always batches, so an error always carries a
+    // fourth slot — the prefix the iterator still owes.
+    c.completeError(_BatchFailure(list[3] as List<dynamic>, cause, st), st);
   }
 
   Future<List<dynamic>> run(Function worker, List<dynamic> batch) {
