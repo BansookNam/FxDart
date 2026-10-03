@@ -1,3 +1,295 @@
+## 0.9.0
+
+**Breaking: short top-level functions carry an `fx` prefix.** `map(f, xs)`
+is now `fxMap(f, xs)`, `range(5)` is `fxRange(5)`, `groupBy` is
+`fxGroupBy`, and the `Async` twins follow (`fxMapAsync`). Chain methods are
+unchanged — `fx(xs).map(f)` is still `fx(xs).map(f)` — and so is every
+class and extension member.
+
+Why: one `import 'package:fxdart/fxdart.dart'` put ~370 top-level names into
+the importing file, and the common ones collided. `join` was an ambiguous
+import next to `package:path`, `isEmpty` next to `package:test` (this repo's
+own tests had to `hide` five matchers). Worse, Dart lets a package name beat
+a `dart:` name with no diagnostic, so `max`/`min` shadowed `dart:math` and
+`sleep` shadowed `dart:io`: with both imported,
+`sleep(Duration(milliseconds: 500))` called fxdart's `Future<void> sleep`,
+dropped the future, and returned after 1 ms.
+
+The rule, so a name can be predicted rather than looked up: count the
+camelCase words of the name with a trailing `Async` and any digits removed.
+One or two words take the prefix; three or more keep the FxTS spelling,
+because nothing else uses names that long (`mapWithIndex`,
+`takeUntilInclusive`, `foldRightWithIndexAsync`). An `Async` twin follows
+its sync name. Two exceptions: `pipe` and `pipeLazy` keep their names,
+because `fxPipe` is already the typed composer.
+
+### Breaking changes
+
+- **310 top-level functions are renamed** to their `fx`-prefixed spelling
+  (`map` → `fxMap`, `toAsync` → `fxToAsync`, `either` → `fxEither`,
+  `sleep` → `fxSleep`). The old names are removed, not deprecated: a
+  deprecated alias would keep every collision this release exists to remove.
+  The complete mapping is the table at the end of this section.
+- **Unchanged:** every method on the `fx` / `fxAsync` / `fxStream` chain, on
+  `FxEvents`, on `Either` / `Raise` / `Nel`, every extension member (including
+  the existing `fxShuffle`, `fxDebounce` and `fxThrottle`), every class, and
+  every long name (`mapWithIndex`, `takeUntilInclusive`, `firstNotNullOf`,
+  `flattenOrAccumulate`, …). Code written entirely in chain form compiles
+  as before.
+- **`fxdart_lints` 0.9.0** recognises only the new builder names. Upgrade it
+  together with `fxdart`, or `avoid_bare_catch_in_raise` and
+  `avoid_lazy_return_from_raise` stop seeing your raise blocks.
+
+### Migration
+
+1. Raise the constraint to `fxdart: ^0.9.0` (and `fxdart_lints: ^0.9.0` if
+   you use it), then run `dart pub upgrade`.
+2. Run `dart fix --apply`. The package ships `lib/fix_data.yaml`, so every
+   unprefixed call or tear-off of a removed name (`map(f, xs)`,
+   `toListAsync(it)`, `.reduce(add)`) is rewritten to the new spelling.
+   Chain calls and long names are left alone. Two forms are not rewritten,
+   and the analyzer flags both: a reference through an import prefix
+   (`f.map(...)` after `import 'package:fxdart/fxdart.dart' as f;`, an
+   "isn't defined in any of the libraries imported" error) and a name in a
+   `show` or `hide` combinator (a "doesn't export a member with the shown
+   name" warning). Rename those by hand from the table.
+3. Run `dart analyze`. Anything left over is one of the cases `dart fix`
+   cannot see, because the old name no longer fails to resolve. It resolves
+   to something else:
+   - **A file that also imports `dart:io`, `dart:math` or another package
+     with the same name.** `sleep`, `max` and `min` now mean `dart:io`'s and
+     `dart:math`'s functions. `await sleep(d)` becomes a "value of type
+     `void` can't be used" error, and `max(xs)` an argument-count error. Rename
+     those to `fxSleep` / `fxMax` / `fxMin` by hand.
+   - **A bare `sleep(d);` without `await`, in a file that imports `dart:io`.**
+     This still compiles, and its behaviour changes. Under 0.8 the call
+     resolved to fxdart's `Future<void> sleep` and did nothing, because the
+     future was dropped. Under 0.9 it is `dart:io`'s `sleep`, which blocks the
+     isolate. Search for `sleep(` and decide which one you meant: `await
+     fxSleep(d)` for a pause in async code, `dart:io`'s `sleep` only if
+     blocking was the intent.
+   - **`dart fix` may offer to remove `import 'package:fxdart/fxdart.dart'`**
+     from such a file as unused, because nothing in it resolves to fxdart any
+     more. Fix the names first, then re-run `dart fix`.
+4. Remove any `hide` you added to work around the old collisions. A `hide`
+   on the fxdart import (`import 'package:fxdart/fxdart.dart' hide join;`)
+   now names a member that does not exist, and the analyzer warns about it.
+   A `hide` on the other import (`import 'package:test/test.dart' hide
+   isEmpty, isNull, …;`) is not reported, because those names still exist
+   there. It is simply no longer needed, and removing it gives those
+   matchers back.
+5. Search non-Dart text that names fxdart functions, such as docs, code
+   snippets in markdown and generated templates, for the old spellings.
+   `dart fix` only rewrites Dart files.
+
+Writing new code: if a function name has one or two words, add `fx`. Chain
+methods never take the prefix, so the chain form is still the shortest
+spelling of most pipelines: `fx(xs).map(f).toList()`.
+
+<details>
+<summary>All renamed functions</summary>
+
+| Before | After |
+|---|---|
+| `add` | `fxAdd` |
+| `always` | `fxAlways` |
+| `any` / `anyAsync` | `fxAny` / `fxAnyAsync` |
+| `append` / `appendAsync` | `fxAppend` / `fxAppendAsync` |
+| `apply` | `fxApply` |
+| `asyncEmpty` | `fxAsyncEmpty` |
+| `attach` / `attachAsync` | `fxAttach` / `fxAttachAsync` |
+| `average` / `averageAsync` | `fxAverage` / `fxAverageAsync` |
+| `averageBy` / `averageByAsync` | `fxAverageBy` / `fxAverageByAsync` |
+| `bottomBy` / `bottomByAsync` | `fxBottomBy` / `fxBottomByAsync` |
+| `cases` | `fxCases` |
+| `catching` / `catchingAsync` | `fxCatching` / `fxCatchingAsync` |
+| `chunk` / `chunkAsync` | `fxChunk` / `fxChunkAsync` |
+| `combine` | `fxCombine` |
+| `compact` / `compactAsync` | `fxCompact` / `fxCompactAsync` |
+| `compactObject` | `fxCompactObject` |
+| `compress` / `compressAsync` | `fxCompress` / `fxCompressAsync` |
+| `concat` / `concatAsync` | `fxConcat` / `fxConcatAsync` |
+| `concatEager` | `fxConcatEager` |
+| `concurrentAsync` | `fxConcurrentAsync` |
+| `concurrentPoolAsync` | `fxConcurrentPoolAsync` |
+| `consume` / `consumeAsync` | `fxConsume` / `fxConsumeAsync` |
+| `count` / `countAsync` | `fxCount` / `fxCountAsync` |
+| `countBy` / `countByAsync` | `fxCountBy` / `fxCountByAsync` |
+| `countWhere` / `countWhereAsync` | `fxCountWhere` / `fxCountWhereAsync` |
+| `curry` | `fxCurry` |
+| `cycle` / `cycleAsync` | `fxCycle` / `fxCycleAsync` |
+| `debounce` | `fxDebounce` |
+| `delay` | `fxDelay` |
+| `difference` / `differenceAsync` | `fxDifference` / `fxDifferenceAsync` |
+| `differenceBy` / `differenceByAsync` | `fxDifferenceBy` / `fxDifferenceByAsync` |
+| `distinct` / `distinctAsync` | `fxDistinct` / `fxDistinctAsync` |
+| `distinctBy` / `distinctByAsync` | `fxDistinctBy` / `fxDistinctByAsync` |
+| `drop` / `dropAsync` | `fxDrop` / `fxDropAsync` |
+| `dropRight` / `dropRightAsync` | `fxDropRight` / `fxDropRightAsync` |
+| `dropUntil` / `dropUntilAsync` | `fxDropUntil` / `fxDropUntilAsync` |
+| `dropWhile` / `dropWhileAsync` | `fxDropWhile` / `fxDropWhileAsync` |
+| `each` / `eachAsync` | `fxEach` / `fxEachAsync` |
+| `either` / `eitherAsync` | `fxEither` / `fxEitherAsync` |
+| `eitherCatching` / `eitherCatchingAsync` | `fxEitherCatching` / `fxEitherCatchingAsync` |
+| `entries` | `fxEntries` |
+| `every` / `everyAsync` | `fxEvery` / `fxEveryAsync` |
+| `evolve` | `fxEvolve` |
+| `expand` / `expandAsync` | `fxExpand` / `fxExpandAsync` |
+| `filter` / `filterAsync` | `fxFilter` / `fxFilterAsync` |
+| `find` / `findAsync` | `fxFind` / `fxFindAsync` |
+| `findIndex` / `findIndexAsync` | `fxFindIndex` / `fxFindIndexAsync` |
+| `flat` / `flatAsync` | `fxFlat` / `fxFlatAsync` |
+| `flatMap` / `flatMapAsync` | `fxFlatMap` / `fxFlatMapAsync` |
+| `flattened` / `flattenedAsync` | `fxFlattened` / `fxFlattenedAsync` |
+| `fold` / `foldAsync` | `fxFold` / `fxFoldAsync` |
+| `foldBy` / `foldByAsync` | `fxFoldBy` / `fxFoldByAsync` |
+| `foldRaise` / `foldRaiseAsync` | `fxFoldRaise` / `fxFoldRaiseAsync` |
+| `foldRight` / `foldRightAsync` | `fxFoldRight` / `fxFoldRightAsync` |
+| `forEach` / `forEachAsync` | `fxForEach` / `fxForEachAsync` |
+| `fork` / `forkAsync` | `fxFork` / `fxForkAsync` |
+| `fromEntries` | `fxFromEntries` |
+| `fromStream` | `fxFromStream` |
+| `groupBy` / `groupByAsync` | `fxGroupBy` / `fxGroupByAsync` |
+| `groupedBy` / `groupedByAsync` | `fxGroupedBy` / `fxGroupedByAsync` |
+| `gt` | `fxGt` |
+| `gte` | `fxGte` |
+| `head` / `headAsync` | `fxHead` / `fxHeadAsync` |
+| `identity` | `fxIdentity` |
+| `ifEmpty` / `ifEmptyAsync` | `fxIfEmpty` / `fxIfEmptyAsync` |
+| `includes` / `includesAsync` | `fxIncludes` / `fxIncludesAsync` |
+| `indexBy` / `indexByAsync` | `fxIndexBy` / `fxIndexByAsync` |
+| `indexed` / `indexedAsync` | `fxIndexed` / `fxIndexedAsync` |
+| `indexWhere` / `indexWhereAsync` | `fxIndexWhere` / `fxIndexWhereAsync` |
+| `intersection` / `intersectionAsync` | `fxIntersection` / `fxIntersectionAsync` |
+| `intersectionBy` / `intersectionByAsync` | `fxIntersectionBy` / `fxIntersectionByAsync` |
+| `isArray` | `fxIsArray` |
+| `isBool` | `fxIsBool` |
+| `isBoolean` | `fxIsBoolean` |
+| `isDate` | `fxIsDate` |
+| `isEmpty` | `fxIsEmpty` |
+| `isList` | `fxIsList` |
+| `isMap` | `fxIsMap` |
+| `isMatch` | `fxIsMatch` |
+| `isNil` | `fxIsNil` |
+| `isNull` | `fxIsNull` |
+| `isNum` | `fxIsNum` |
+| `isNumber` | `fxIsNumber` |
+| `isObject` | `fxIsObject` |
+| `isString` | `fxIsString` |
+| `isUndefined` | `fxIsUndefined` |
+| `join` / `joinAsync` | `fxJoin` / `fxJoinAsync` |
+| `juxt` | `fxJuxt` |
+| `keys` | `fxKeys` |
+| `last` / `lastAsync` | `fxLast` / `fxLastAsync` |
+| `lefts` / `leftsAsync` | `fxLefts` / `fxLeftsAsync` |
+| `lt` | `fxLt` |
+| `lte` | `fxLte` |
+| `map` / `mapAsync` | `fxMap` / `fxMapAsync` |
+| `mapAccum` / `mapAccumAsync` | `fxMapAccum` / `fxMapAccumAsync` |
+| `mapCatching` / `mapCatchingAsync` | `fxMapCatching` / `fxMapCatchingAsync` |
+| `mapConcurrent` / `mapConcurrentAsync` | `fxMapConcurrent` / `fxMapConcurrentAsync` |
+| `mapEffect` / `mapEffectAsync` | `fxMapEffect` / `fxMapEffectAsync` |
+| `mapEntries` | `fxMapEntries` |
+| `mapKeys` | `fxMapKeys` |
+| `mapParallel` / `mapParallelAsync` | `fxMapParallel` / `fxMapParallelAsync` |
+| `mapRetryAsync` | `fxMapRetryAsync` |
+| `mapValues` | `fxMapValues` |
+| `matches` | `fxMatches` |
+| `max` / `maxAsync` | `fxMax` / `fxMaxAsync` |
+| `maxBy` / `maxByAsync` | `fxMaxBy` / `fxMaxByAsync` |
+| `memoize` | `fxMemoize` |
+| `min` / `minAsync` | `fxMin` / `fxMinAsync` |
+| `minBy` / `minByAsync` | `fxMinBy` / `fxMinByAsync` |
+| `negate` | `fxNegate` |
+| `none` / `noneAsync` | `fxNone` / `fxNoneAsync` |
+| `nonNulls` / `nonNullsAsync` | `fxNonNulls` / `fxNonNullsAsync` |
+| `noop` | `fxNoop` |
+| `not` | `fxNot` |
+| `nth` / `nthAsync` | `fxNth` / `fxNthAsync` |
+| `nullable` / `nullableAsync` | `fxNullable` / `fxNullableAsync` |
+| `omit` | `fxOmit` |
+| `omitBy` | `fxOmitBy` |
+| `pairwise` / `pairwiseAsync` | `fxPairwise` / `fxPairwiseAsync` |
+| `parallel` / `parallelAsync` | `fxParallel` / `fxParallelAsync` |
+| `parallelOn` / `parallelOnAsync` | `fxParallelOn` / `fxParallelOnAsync` |
+| `partition` / `partitionAsync` | `fxPartition` / `fxPartitionAsync` |
+| `peek` / `peekAsync` | `fxPeek` / `fxPeekAsync` |
+| `pick` | `fxPick` |
+| `pickBy` | `fxPickBy` |
+| `pipe1` | `fxPipe1` |
+| `pluck` / `pluckAsync` | `fxPluck` / `fxPluckAsync` |
+| `prepend` / `prependAsync` | `fxPrepend` / `fxPrependAsync` |
+| `product` / `productAsync` | `fxProduct` / `fxProductAsync` |
+| `productBy` / `productByAsync` | `fxProductBy` / `fxProductByAsync` |
+| `prop` | `fxProp` |
+| `props` | `fxProps` |
+| `range` | `fxRange` |
+| `reduce` / `reduceAsync` | `fxReduce` / `fxReduceAsync` |
+| `reduceLazy` | `fxReduceLazy` |
+| `reject` / `rejectAsync` | `fxReject` / `fxRejectAsync` |
+| `repeat` | `fxRepeat` |
+| `resolveProps` | `fxResolveProps` |
+| `retry` | `fxRetry` |
+| `reverse` / `reverseAsync` | `fxReverse` / `fxReverseAsync` |
+| `rights` / `rightsAsync` | `fxRights` / `fxRightsAsync` |
+| `scan` / `scanAsync` | `fxScan` / `fxScanAsync` |
+| `scan1` / `scan1Async` | `fxScan1` / `fxScan1Async` |
+| `separateEither` / `separateEitherAsync` | `fxSeparateEither` / `fxSeparateEitherAsync` |
+| `sequenceEither` / `sequenceEitherAsync` | `fxSequenceEither` / `fxSequenceEitherAsync` |
+| `sequenceEqual` / `sequenceEqualAsync` | `fxSequenceEqual` / `fxSequenceEqualAsync` |
+| `shuffle` / `shuffleAsync` | `fxShuffle` / `fxShuffleAsync` |
+| `size` / `sizeAsync` | `fxSize` / `fxSizeAsync` |
+| `skip` / `skipAsync` | `fxSkip` / `fxSkipAsync` |
+| `skipWhile` / `skipWhileAsync` | `fxSkipWhile` / `fxSkipWhileAsync` |
+| `sleep` | `fxSleep` |
+| `slice` / `sliceAsync` | `fxSlice` / `fxSliceAsync` |
+| `some` / `someAsync` | `fxSome` / `fxSomeAsync` |
+| `sort` / `sortAsync` | `fxSort` / `fxSortAsync` |
+| `sortBy` / `sortByAsync` | `fxSortBy` / `fxSortByAsync` |
+| `sorted` | `fxSorted` |
+| `split` / `splitAsync` | `fxSplit` / `fxSplitAsync` |
+| `sum` / `sumAsync` | `fxSum` / `fxSumAsync` |
+| `sumBy` / `sumByAsync` | `fxSumBy` / `fxSumByAsync` |
+| `sumStrings` | `fxSumStrings` |
+| `take` / `takeAsync` | `fxTake` / `fxTakeAsync` |
+| `takeLast` / `takeLastAsync` | `fxTakeLast` / `fxTakeLastAsync` |
+| `takeRight` / `takeRightAsync` | `fxTakeRight` / `fxTakeRightAsync` |
+| `takeUntil` / `takeUntilAsync` | `fxTakeUntil` / `fxTakeUntilAsync` |
+| `takeWhile` / `takeWhileAsync` | `fxTakeWhile` / `fxTakeWhileAsync` |
+| `tap` | `fxTap` |
+| `tee` / `teeAsync` | `fxTee` / `fxTeeAsync` |
+| `tee3` | `fxTee3` |
+| `throttle` | `fxThrottle` |
+| `throwError` | `fxThrowError` |
+| `throwIf` | `fxThrowIf` |
+| `timeoutAsync` | `fxTimeoutAsync` |
+| `toAsync` | `fxToAsync` |
+| `toList` / `toListAsync` | `fxToList` / `fxToListAsync` |
+| `toPairs` | `fxToPairs` |
+| `topBy` / `topByAsync` | `fxTopBy` / `fxTopByAsync` |
+| `toSorted` | `fxToSorted` |
+| `transpose` / `transposeAsync` | `fxTranspose` / `fxTransposeAsync` |
+| `uniq` / `uniqAsync` | `fxUniq` / `fxUniqAsync` |
+| `uniqAdjacent` / `uniqAdjacentAsync` | `fxUniqAdjacent` / `fxUniqAdjacentAsync` |
+| `uniqBy` / `uniqByAsync` | `fxUniqBy` / `fxUniqByAsync` |
+| `uniqStrict` | `fxUniqStrict` |
+| `unless` | `fxUnless` |
+| `unzip` / `unzipAsync` | `fxUnzip` / `fxUnzipAsync` |
+| `using` / `usingAsync` | `fxUsing` / `fxUsingAsync` |
+| `values` | `fxValues` |
+| `when` | `fxWhen` |
+| `where` / `whereAsync` | `fxWhere` / `fxWhereAsync` |
+| `whereNot` / `whereNotAsync` | `fxWhereNot` / `fxWhereNotAsync` |
+| `windowed` / `windowedAsync` | `fxWindowed` / `fxWindowedAsync` |
+| `zip` / `zipAsync` | `fxZip` / `fxZipAsync` |
+| `zip3` / `zip3Async` | `fxZip3` / `fxZip3Async` |
+| `zipWith` / `zipWithAsync` | `fxZipWith` / `fxZipWithAsync` |
+
+</details>
+
+`fxdart_lints` 0.9.0 matches the new builder names (`fxEither`,
+`fxNullable`, `fxFoldRaise`, …).
+
 ## 0.8.10
 
 `parallel(n, worker, chunk: k)` — k elements ride one message instead of
