@@ -15,7 +15,7 @@ void main() {
         'should return Iterable by plucking the same named property off all objects in the Iterable supplied',
         () {
           final acc = <int?>[];
-          for (final a in pluck('age', given)) {
+          for (final a in fxPluck('age', given)) {
             acc.add(a);
           }
           expect(acc, equals([21, 22, 23, 24]));
@@ -23,7 +23,9 @@ void main() {
       );
 
       test('should be able to be used in the pipeline', () {
-        final res = toList(filter((int? a) => a! > 21, pluck('age', given)));
+        final res = fxToList(
+          fxFilter((int? a) => a! > 21, fxPluck('age', given)),
+        );
         expect(res, equals([22, 23, 24]));
       });
     });
@@ -32,14 +34,19 @@ void main() {
       test(
         'should return Iterable by plucking the same named property off all objects in the Iterable supplied',
         () async {
-          final acc = await toListAsync(pluckAsync('age', toAsync(given)));
+          final acc = await fxToListAsync(
+            fxPluckAsync('age', fxToAsync(given)),
+          );
           expect(acc, equals([21, 22, 23, 24]));
         },
       );
 
       test('should be able to be used in the pipeline', () async {
-        final res = await toListAsync(
-          filterAsync((int? a) => a! > 21, pluckAsync('age', toAsync(given))),
+        final res = await fxToListAsync(
+          fxFilterAsync(
+            (int? a) => a! > 21,
+            fxPluckAsync('age', fxToAsync(given)),
+          ),
         );
         expect(res, equals([22, 23, 24]));
       });

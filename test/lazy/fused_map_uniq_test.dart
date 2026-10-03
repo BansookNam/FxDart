@@ -15,11 +15,11 @@ void main() {
       // White-box: nothing else here fails if the two stages stop fusing, and
       // a silent un-fusing is a ~1.9x regression on a large source.
       expect(
-        uniq(map((int a) => a % 3, [1, 2, 3])).runtimeType.toString(),
+        fxUniq(fxMap((int a) => a % 3, [1, 2, 3])).runtimeType.toString(),
         startsWith('_MapUniq'),
       );
       // A source that cannot absorb it still gets the plain uniq stage.
-      expect(uniq([1, 2, 3]).runtimeType.toString(), startsWith('_Uniq'));
+      expect(fxUniq([1, 2, 3]).runtimeType.toString(), startsWith('_Uniq'));
     });
 
     test('same elements and order as the unfused pair', () {
@@ -28,7 +28,7 @@ void main() {
 
       const names = ['ann', 'bob', 'amy', 'cid', 'bea', 'al'];
       expect(fx(names).map((n) => n[0]).uniq().toList(), ['a', 'b', 'c']);
-      expect(uniqStrict(initials(names)), ['a', 'b', 'c']);
+      expect(fxUniqStrict(initials(names)), ['a', 'b', 'c']);
     });
 
     test('dedups the mapped value, not the source element', () {

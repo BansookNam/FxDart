@@ -1,1 +1,1 @@
-T identity&lt;T&gt;(T a) => a;
+T fxIdentity&lt;T&gt;(T a) => a;

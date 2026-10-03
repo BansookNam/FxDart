@@ -7,8 +7,8 @@ void main() {
     // ordered-batch machinery entirely; these pin that it behaves exactly
     // like the general path did.
     test('yields every element, in order', () async {
-      final res = concurrentAsync(1, toAsync([1, 2, 3, 4]));
-      expect(await toListAsync(res), equals([1, 2, 3, 4]));
+      final res = fxConcurrentAsync(1, fxToAsync([1, 2, 3, 4]));
+      expect(await fxToListAsync(res), equals([1, 2, 3, 4]));
     });
 
     test('runs serially — one in flight at a time', () async {
@@ -19,7 +19,7 @@ void main() {
           .map((a) async {
             inFlight++;
             maxInFlight = maxInFlight > inFlight ? maxInFlight : inFlight;
-            await delay(const Duration(milliseconds: 20), a);
+            await fxDelay(const Duration(milliseconds: 20), a);
             inFlight--;
             return a;
           })
@@ -30,19 +30,19 @@ void main() {
     });
 
     test('propagates an error from upstream', () async {
-      final res = concurrentAsync(
+      final res = fxConcurrentAsync(
         1,
-        toAsync(() sync* {
+        fxToAsync(() sync* {
           yield Future.value(1);
           yield Future<int>.error(StateError('boom'));
         }()),
       );
-      expect(toListAsync(res), throwsStateError);
+      expect(fxToListAsync(res), throwsStateError);
     });
 
     test('an empty source completes empty', () async {
       expect(
-        await toListAsync(concurrentAsync(1, toAsync(<int>[]))),
+        await fxToListAsync(fxConcurrentAsync(1, fxToAsync(<int>[]))),
         equals(<int>[]),
       );
     });
@@ -63,28 +63,28 @@ void main() {
 
   group('concurrent', () {
     test("should be consumed 'FxAsyncIterable' concurrently", () async {
-      final res = concurrentAsync(
+      final res = fxConcurrentAsync(
         2,
-        toAsync(() sync* {
+        fxToAsync(() sync* {
           for (var i = 1; i <= 4; i++) {
-            yield delay(const Duration(milliseconds: 150), i);
+            yield fxDelay(const Duration(milliseconds: 150), i);
           }
         }()),
       );
 
       final sw = Stopwatch()..start();
-      final acc = await toListAsync(res);
+      final acc = await fxToListAsync(res);
       expect(acc, equals([1, 2, 3, 4]));
       // sequential is ~600ms; concurrent(2) is ~300ms
       expect(sw.elapsedMilliseconds, lessThan(500));
     });
 
     test('should be able to be used in the pipeline', () async {
-      final it = concurrentAsync(
+      final it = fxConcurrentAsync(
         2,
-        mapAsync(
-          (int a) => delay(const Duration(milliseconds: 100), a),
-          toAsync(range(1, 101)),
+        fxMapAsync(
+          (int a) => fxDelay(const Duration(milliseconds: 100), a),
+          fxToAsync(fxRange(1, 101)),
         ),
       ).iterator;
 
@@ -102,9 +102,9 @@ void main() {
       'should be able to be used as a chaining method in the `fx`',
       () async {
         final sw = Stopwatch()..start();
-        final arr = await fx(range(1, 11))
+        final arr = await fx(fxRange(1, 11))
             .toAsync()
-            .map((a) => delay(const Duration(milliseconds: 100), a))
+            .map((a) => fxDelay(const Duration(milliseconds: 100), a))
             .concurrent(2)
             .toList();
         expect(arr, equals([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]));
@@ -116,11 +116,11 @@ void main() {
     test(
       "should return a done result after consuming all of the 'FxAsyncIterable'",
       () async {
-        final it = concurrentAsync(
+        final it = fxConcurrentAsync(
           2,
-          toAsync(() sync* {
-            yield delay(const Duration(milliseconds: 100), 1);
-            yield delay(const Duration(milliseconds: 100), 2);
+          fxToAsync(() sync* {
+            yield fxDelay(const Duration(milliseconds: 100), 1);
+            yield fxDelay(const Duration(milliseconds: 100), 2);
           }()),
         ).iterator;
 
@@ -141,15 +141,15 @@ void main() {
     );
 
     test('should be able to handle an error when working concurrent', () async {
-      final it = concurrentAsync(
+      final it = fxConcurrentAsync(
         2,
-        toAsync(() sync* {
-          yield delay(const Duration(milliseconds: 100), 1);
-          yield delay(const Duration(milliseconds: 100), 2);
-          yield delay(const Duration(milliseconds: 100), 3);
+        fxToAsync(() sync* {
+          yield fxDelay(const Duration(milliseconds: 100), 1);
+          yield fxDelay(const Duration(milliseconds: 100), 2);
+          yield fxDelay(const Duration(milliseconds: 100), 3);
           yield Future<int>.error(StateError('err'));
-          yield delay(const Duration(milliseconds: 100), 4);
-          yield delay(const Duration(milliseconds: 100), 5);
+          yield fxDelay(const Duration(milliseconds: 100), 4);
+          yield fxDelay(const Duration(milliseconds: 100), 5);
         }()),
       ).iterator;
 

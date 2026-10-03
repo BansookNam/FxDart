@@ -11,7 +11,7 @@ void main() {
     group('sync', () {
       test('should return initial value when the given iterable is empty', () {
         expect(
-          fold('seed', (String a, Object? b) => a, <Object?>[]),
+          fxFold('seed', (String a, Object? b) => a, <Object?>[]),
           equals('seed'),
         );
       });
@@ -19,18 +19,21 @@ void main() {
       test(
         'should throw when the given iterable is empty and initial value is absent',
         () {
-          expect(() => reduce((int a, int b) => a, <int>[]), throwsStateError);
+          expect(
+            () => fxReduce((int a, int b) => a, <int>[]),
+            throwsStateError,
+          );
         },
       );
 
       test('should work given it is initial value', () {
-        expect(fold(10, addNumber, range(1, 6)), equals(25));
+        expect(fxFold(10, addNumber, fxRange(1, 6)), equals(25));
       });
 
       test(
         'should use the first value as the initial value if initial value is absent',
         () {
-          expect(reduce(addNumber, range(1, 6)), equals(15));
+          expect(fxReduce(addNumber, fxRange(1, 6)), equals(15));
         },
       );
 
@@ -38,9 +41,9 @@ void main() {
         final res = pipe(
           ['1', '2', '3', '4', '5'],
           [
-            (Iterable<String> a) => map(int.parse, a),
-            (Iterable<int> a) => filter((int n) => n % 2 == 1, a),
-            (Iterable<int> a) => reduce(addNumber, a),
+            (Iterable<String> a) => fxMap(int.parse, a),
+            (Iterable<int> a) => fxFilter((int n) => n % 2 == 1, a),
+            (Iterable<int> a) => fxReduce(addNumber, a),
           ],
         );
         expect(res, equals(1 + 3 + 5));
@@ -63,7 +66,7 @@ void main() {
         'should fold the async iterable by the callback with a seed',
         () async {
           expect(
-            await foldAsync(10, addNumber, toAsync(range(1, 6))),
+            await fxFoldAsync(10, addNumber, fxToAsync(fxRange(1, 6))),
             equals(25),
           );
         },
@@ -73,7 +76,7 @@ void main() {
         'should use the first value as the initial value if initial value is absent',
         () async {
           expect(
-            await reduceAsync(addNumber, toAsync(range(1, 6))),
+            await fxReduceAsync(addNumber, fxToAsync(fxRange(1, 6))),
             equals(15),
           );
         },
@@ -83,7 +86,7 @@ void main() {
         "should fold the 'AsyncIterable' by the async callback with a seed",
         () async {
           expect(
-            await foldAsync(10, addNumberAsync, toAsync(range(1, 6))),
+            await fxFoldAsync(10, addNumberAsync, fxToAsync(fxRange(1, 6))),
             equals(25),
           );
         },
@@ -91,7 +94,7 @@ void main() {
 
       test("should reduce 'AsyncIterable' by the async callback", () async {
         expect(
-          await reduceAsync(addNumberAsync, toAsync(range(1, 6))),
+          await fxReduceAsync(addNumberAsync, fxToAsync(fxRange(1, 6))),
           equals(15),
         );
       });
@@ -100,18 +103,18 @@ void main() {
         "should return rejected 'Future' if an error is thrown in the callback",
         () async {
           await expectLater(
-            foldAsync<int, int>(
+            fxFoldAsync<int, int>(
               0,
               (a, b) => throw Exception('err'),
-              toAsync(range(1, 6)),
+              fxToAsync(fxRange(1, 6)),
             ),
             throwsA(isA<Exception>()),
           );
 
           await expectLater(
-            reduceAsync<int>(
+            fxReduceAsync<int>(
               (a, b) => throw Exception('err'),
-              toAsync(range(1, 6)),
+              fxToAsync(fxRange(1, 6)),
             ),
             throwsA(isA<Exception>()),
           );
@@ -122,18 +125,18 @@ void main() {
         "should return rejected 'Future' if the callback returns a rejected 'Future'",
         () async {
           await expectLater(
-            foldAsync<int, int>(
+            fxFoldAsync<int, int>(
               0,
               (a, b) => Future.error(Exception('err')),
-              toAsync(range(1, 6)),
+              fxToAsync(fxRange(1, 6)),
             ),
             throwsA(isA<Exception>()),
           );
 
           await expectLater(
-            reduceAsync<int>(
+            fxReduceAsync<int>(
               (a, b) => Future<int>.error(Exception('err')),
-              toAsync(range(1, 6)),
+              fxToAsync(fxRange(1, 6)),
             ),
             throwsA(isA<Exception>()),
           );
@@ -141,16 +144,16 @@ void main() {
       );
 
       test('should be able to be used in the pipeline', () async {
-        final res1 = await pipe(toAsync(['1', '2', '3', '4', '5']), [
-          (FxAsyncIterable<String> a) => mapAsync(int.parse, a),
-          (FxAsyncIterable<int> a) => filterAsync((int n) => n % 2 == 1, a),
-          (FxAsyncIterable<int> a) => reduceAsync(addNumber, a),
+        final res1 = await pipe(fxToAsync(['1', '2', '3', '4', '5']), [
+          (FxAsyncIterable<String> a) => fxMapAsync(int.parse, a),
+          (FxAsyncIterable<int> a) => fxFilterAsync((int n) => n % 2 == 1, a),
+          (FxAsyncIterable<int> a) => fxReduceAsync(addNumber, a),
         ]);
         // async callback
-        final res2 = await pipe(toAsync(['1', '2', '3', '4', '5']), [
-          (FxAsyncIterable<String> a) => mapAsync(int.parse, a),
-          (FxAsyncIterable<int> a) => filterAsync((int n) => n % 2 == 1, a),
-          (FxAsyncIterable<int> a) => reduceAsync(addNumberAsync, a),
+        final res2 = await pipe(fxToAsync(['1', '2', '3', '4', '5']), [
+          (FxAsyncIterable<String> a) => fxMapAsync(int.parse, a),
+          (FxAsyncIterable<int> a) => fxFilterAsync((int n) => n % 2 == 1, a),
+          (FxAsyncIterable<int> a) => fxReduceAsync(addNumberAsync, a),
         ]);
         expect(res1, equals(9));
         expect(res2, equals(9));
@@ -160,7 +163,7 @@ void main() {
         'should be able to be used as a chaining method in the `fx`',
         () async {
           final res1 = await fxAsync(
-            toAsync(['1', '2', '3', '4', '5']),
+            fxToAsync(['1', '2', '3', '4', '5']),
           ).map(int.parse).filter((a) => a % 2 == 1).reduce(addNumber);
 
           expect(res1, equals(9));

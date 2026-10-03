@@ -20,32 +20,37 @@ void main() {
     group('sync', () {
       test('folds the values under each key', () {
         expect(
-          foldBy((Tx t) => t.category, 0.0, (sum, t) => sum + t.amount, txns),
+          fxFoldBy((Tx t) => t.category, 0.0, (sum, t) => sum + t.amount, txns),
           equals({'Food': 16.5, 'Transport': 2.5, 'Fun': 7.0}),
         );
       });
 
       test('agrees with groupBy + fold per group', () {
         final viaGroup = {
-          for (final e in groupBy((Tx t) => t.category, txns).entries)
+          for (final e in fxGroupBy((Tx t) => t.category, txns).entries)
             e.key: e.value.fold(0.0, (double s, t) => s + t.amount),
         };
         expect(
-          foldBy((Tx t) => t.category, 0.0, (sum, t) => sum + t.amount, txns),
+          fxFoldBy((Tx t) => t.category, 0.0, (sum, t) => sum + t.amount, txns),
           equals(viaGroup),
         );
       });
 
       test('keys are in first-seen order, like groupBy', () {
         expect(
-          foldBy((Tx t) => t.category, 0, (n, _) => n + 1, txns).keys.toList(),
-          equals(groupBy((Tx t) => t.category, txns).keys.toList()),
+          fxFoldBy(
+            (Tx t) => t.category,
+            0,
+            (n, _) => n + 1,
+            txns,
+          ).keys.toList(),
+          equals(fxGroupBy((Tx t) => t.category, txns).keys.toList()),
         );
       });
 
       test('an empty source yields an empty map', () {
         expect(
-          foldBy(
+          fxFoldBy(
             (Tx t) => t.category,
             0.0,
             (s, t) => s + t.amount,
@@ -58,7 +63,7 @@ void main() {
       test('the seed starts every key, and is not applied twice', () {
         // seed 100 with a single element per key: exactly one fold step.
         expect(
-          foldBy(
+          fxFoldBy(
             (int a) => a.isEven ? 'even' : 'odd',
             100,
             (acc, a) => acc + a,
@@ -72,7 +77,7 @@ void main() {
         // The accumulator legitimately becomes null after the first element.
         // If that were read back as "key absent", the seed would be applied a
         // second time and the result would be null instead of 4.
-        final r = foldBy<int, bool, int?>(
+        final r = fxFoldBy<int, bool, int?>(
           (a) => a.isEven,
           -1,
           (acc, a) => acc == null ? a : null,
@@ -85,7 +90,7 @@ void main() {
       test('the callbacks run once per element, in source order', () {
         final seenKeys = <String>[];
         final folded = <double>[];
-        foldBy((Tx t) => t.category, 0.0, (sum, t) {
+        fxFoldBy((Tx t) => t.category, 0.0, (sum, t) {
           folded.add(t.amount);
           return sum + t.amount;
         }, txns);
@@ -102,9 +107,19 @@ void main() {
         }
 
         expect(
-          foldBy((Tx t) => t.category, 0.0, (sum, t) => sum + t.amount, gen()),
+          fxFoldBy(
+            (Tx t) => t.category,
+            0.0,
+            (sum, t) => sum + t.amount,
+            gen(),
+          ),
           equals(
-            foldBy((Tx t) => t.category, 0.0, (sum, t) => sum + t.amount, txns),
+            fxFoldBy(
+              (Tx t) => t.category,
+              0.0,
+              (sum, t) => sum + t.amount,
+              txns,
+            ),
           ),
         );
       });
@@ -114,7 +129,7 @@ void main() {
 
       test('every key gets its own accumulator', () {
         // One cell shared across keys would put the whole total under one key.
-        final r = foldBy(
+        final r = fxFoldBy(
           (int a) => a % 10,
           0,
           (acc, a) => acc + 1,
@@ -126,7 +141,7 @@ void main() {
 
       test('a null key folds like any other', () {
         expect(
-          foldBy((int? a) => a == null ? null : 'n', 0, (acc, a) => acc + 1, [
+          fxFoldBy((int? a) => a == null ? null : 'n', 0, (acc, a) => acc + 1, [
             1,
             null,
             2,
@@ -141,7 +156,7 @@ void main() {
         final b = String.fromCharCodes('ab'.codeUnits);
         expect(identical(a, b), isFalse);
         expect(
-          foldBy((String s) => s, 0, (acc, _) => acc + 1, [a, b, a]),
+          fxFoldBy((String s) => s, 0, (acc, _) => acc + 1, [a, b, a]),
           equals({'ab': 3}),
         );
       });
@@ -150,7 +165,7 @@ void main() {
         // The seed is a value shared by every key, so folding must return new
         // values rather than mutate the seed — documented behaviour, and the
         // cell rewrite must not quietly change it.
-        final r = foldBy<int, bool, List<int>>(
+        final r = fxFoldBy<int, bool, List<int>>(
           (a) => a.isEven,
           const [],
           (acc, a) => [...acc, a],
@@ -172,7 +187,7 @@ void main() {
         }
 
         expect(
-          foldBy<int, bool, int?>(
+          fxFoldBy<int, bool, int?>(
             (a) => a.isEven,
             -1,
             (acc, a) => acc == null ? a : null,
@@ -202,11 +217,11 @@ void main() {
     group('async', () {
       test('folds the values under each key', () async {
         expect(
-          await foldByAsync(
+          await fxFoldByAsync(
             (Tx t) => t.category,
             0.0,
             (double sum, Tx t) => sum + t.amount,
-            toAsync(txns),
+            fxToAsync(txns),
           ),
           equals({'Food': 16.5, 'Transport': 2.5, 'Fun': 7.0}),
         );
@@ -214,11 +229,11 @@ void main() {
 
       test('awaits an async key and an async accumulator', () async {
         expect(
-          await foldByAsync(
+          await fxFoldByAsync(
             (Tx t) async => t.category,
             0.0,
             (double sum, Tx t) async => sum + t.amount,
-            toAsync(txns),
+            fxToAsync(txns),
           ),
           equals({'Food': 16.5, 'Transport': 2.5, 'Fun': 7.0}),
         );
@@ -226,11 +241,11 @@ void main() {
 
       test('accepts a Future seed', () async {
         expect(
-          await foldByAsync(
+          await fxFoldByAsync(
             (Tx t) => t.category,
             Future.value(0.0),
             (double sum, Tx t) => sum + t.amount,
-            toAsync(txns),
+            fxToAsync(txns),
           ),
           equals({'Food': 16.5, 'Transport': 2.5, 'Fun': 7.0}),
         );
@@ -238,11 +253,11 @@ void main() {
 
       test('an empty source yields an empty map', () async {
         expect(
-          await foldByAsync(
+          await fxFoldByAsync(
             (Tx t) => t.category,
             0.0,
             (double s, Tx t) => s + t.amount,
-            toAsync(const <Tx>[]),
+            fxToAsync(const <Tx>[]),
           ),
           equals(<String, double>{}),
         );
@@ -251,7 +266,7 @@ void main() {
       test('is reachable from the fxAsync chain', () async {
         expect(
           await fxAsync(
-            toAsync(txns),
+            fxToAsync(txns),
           ).foldBy((t) => t.category, 0.0, (double sum, t) => sum + t.amount),
           equals({'Food': 16.5, 'Transport': 2.5, 'Fun': 7.0}),
         );

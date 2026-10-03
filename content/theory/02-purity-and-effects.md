@@ -59,7 +59,7 @@ Four capabilities, and you already rely on all of them:
 | **Parallelise** | Running two calls at once assumes neither can see the other |
 | **Test** | Asserting on a return value assumes the value is the whole story |
 
-FxDart's `memoize` is the sharpest example: it is *correct* for a pure function
+FxDart's `fxMemoize` is the sharpest example: it is *correct* for a pure function
 and a silent bug for an impure one.
 
 ```dart run
@@ -72,13 +72,13 @@ int slowSquare(int n) {
 }
 
 void main() {
-  final fast = memoize(slowSquare);
+  final fast = fxMemoize(slowSquare);
   print([fast(9), fast(9), fast(9)]);
   print('underlying calls: $calls');
 }
 ```
 
-Three calls, one evaluation. Nothing in `memoize` checks that `slowSquare` is
+Three calls, one evaluation. Nothing in `fxMemoize` checks that `slowSquare` is
 pure — it *assumes* it. That is the shape of most functional machinery: the
 library provides the mechanism, the law provides the licence, and you are the
 one who has to keep the bargain.
@@ -106,8 +106,8 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   // A seed makes randomness reproducible: same input, same
   // output, so a shuffle becomes testable.
-  final a = shuffle([1, 2, 3, 4, 5], 7);
-  final b = shuffle([1, 2, 3, 4, 5], 7);
+  final a = fxShuffle([1, 2, 3, 4, 5], 7);
+  final b = fxShuffle([1, 2, 3, 4, 5], 7);
   print(a);
   print('reproducible: ${a.toString() == b.toString()}');
 }
@@ -167,7 +167,7 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   final seen = <int>[];
-  final result = fx(range(1, 6))
+  final result = fx(fxRange(1, 6))
       // the effect is named, and it is the only one
       .peek(seen.add)
       .filter((n) => n.isEven)
@@ -196,7 +196,7 @@ case at length.
 2. Write a function that is pure in Dart's eyes but depends on a mutable field
    that never changes after construction. Is it referentially transparent? What
    would break the moment someone made the field non-final?
-3. `memoize` on a function of type `int Function(int)` is safe. What goes wrong
+3. `fxMemoize` on a function of type `int Function(int)` is safe. What goes wrong
    if the argument type is a mutable `List<int>`?
 4. Take the `receipts` pipeline above and add a requirement: log every order
    that was filtered out. Do it without making `receipts` impure.
@@ -209,15 +209,15 @@ case at length.
    stated relative to an observation — the same subtlety appears in Chapter 1's
    exercise about `Future` equality.
 2. Something like `class Rate { const Rate(this.pct); final int pct;
-   int apply(int n) => n * pct ~/ 100; }`. It is referentially transparent
+   int fxApply(int n) => n * pct ~/ 100; }`. It is referentially transparent
    because `pct` cannot change; the instance is part of the input, just spelled
    as a receiver rather than an argument. Drop `final` and the same call can
    return two answers, so substitution fails.
-3. `memoize` keys on the argument, and a mutable list's contents can change
+3. `fxMemoize` keys on the argument, and a mutable list's contents can change
    after it is used as a key — a caller mutates the list, calls again, and gets
    the answer for the *old* contents. The cache is not wrong; the assumption
    was.
-4. Return the rejected orders instead of logging them — `fork` or a
+4. Return the rejected orders instead of logging them — `fxFork` or a
    `partition`-style split makes the function total in what it reports, and the
    caller (the shell) decides what to print. If you only need to observe, use
    `.peek(rejected.add)` on the rejected branch: still a declared effect at a

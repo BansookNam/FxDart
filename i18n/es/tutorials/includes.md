@@ -22,10 +22,10 @@ nextLabel: isEmpty
     <code>fx(xs).contains(a)</code> funciona sin más. Eso sí, no existe una
     función <code>contains</code> de nivel superior — el nombre choca con el
     matcher de <code>package:test</code> —, de modo que la forma data-first
-    conserva su grafía de FxTS, <code>includes(a, iterable)</code>, que es
+    conserva su grafía de FxTS, <code>fxIncludes(a, iterable)</code>, que es
     literalmente <code>iterable.contains(a)</code>. La
-    versión asíncrona, <code>includesAsync</code>, está construida sobre
-    <a href="some.html"><code>someAsync</code></a> (con <code>b == a</code>
+    versión asíncrona, <code>fxIncludesAsync</code>, está construida sobre
+    <a href="some.html"><code>fxSomeAsync</code></a> (con <code>b == a</code>
     como predicado), lo que significa que hereda el mismo cortocircuito: deja
     de tirar de la fuente en cuanto encuentra una coincidencia.
   </p>
@@ -39,7 +39,7 @@ nextLabel: isEmpty
   {{playground:0}}
 
   <h2>Demo 2 · Async, y la prueba del cortocircuito</h2>
-  <p>Solo se piden 2 de los 5 elementos antes de que <code>includesAsync</code> se detenga:</p>
+  <p>Solo se piden 2 de los 5 elementos antes de que <code>fxIncludesAsync</code> se detenga:</p>
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
@@ -48,7 +48,7 @@ nextLabel: isEmpty
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="some.html"><code>some</code></a> — la base sobre la que se construye <code>includesAsync</code> ·
+    <a href="some.html"><code>some</code></a> — la base sobre la que se construye <code>fxIncludesAsync</code> ·
     <a href="find.html"><code>find</code></a> — obtén el valor coincidente, no solo un bool ·
     <a href="findIndex.html"><code>findIndex</code></a> — obtén la posición en su lugar ·
     <a href="isEmpty.html"><code>isEmpty</code></a> — la otra comprobación basada en valores que tienes cerca

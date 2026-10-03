@@ -25,7 +25,7 @@ nextLabel: foldRight
     <code>Iterable</code> already uses for exactly this operation.
   </p>
   <p>
-    Note the argument order carefully: it's <code>fold(seed, f, iterable)</code>
+    Note the argument order carefully: it's <code>fxFold(seed, f, iterable)</code>
     — seed first, then the combiner, then the source — mirroring
     <code>Iterable.fold(initialValue, combine)</code> on the chain form. That's
     different from FxTS's <code>reduce(f, seed, iterable)</code>, where the
@@ -53,7 +53,7 @@ nextLabel: foldRight
   <div class="callout">
     <strong>Related:</strong>
     <a href="reduce.html"><code>reduce</code></a> — the unseeded counterpart ·
-    <a href="reduceLazy.html"><code>reduceLazy</code></a> — a reusable, curried reducer ·
+    <a href="reduceLazy.html"><code>fxReduceLazy</code></a> — a reusable, curried reducer ·
     <a href="sum.html"><code>sum</code></a> — a common fold, specialized ·
     <a href="scan.html"><code>scan</code></a> — like fold, but lazily yields every intermediate value
   </div>

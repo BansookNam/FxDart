@@ -1,6 +1,6 @@
 import 'package:fxdart/fxdart.dart';
 
-Either<String, int> checkAge(String raw) => either((r) {
+Either<String, int> checkAge(String raw) => fxEither((r) {
   // TODO: replace int.parse with r.ensureNotNull(int.tryParse(raw), ...)
   // failing with '"$raw" is not a number', then use
   // r.ensure(age >= 18, ...) failing with 'must be an adult'.

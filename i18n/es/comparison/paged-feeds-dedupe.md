@@ -27,7 +27,7 @@ async: true
     toca hasta que el primario se ha agotado. Aquí esa es la herramienta
     correcta, porque la tarea quiere que ganen los eventos del primario.
     Cada almacén se convierte en una secuencia asíncrona con
-    <code>range</code> + <code>flatMap</code> (número de página → página
+    <code>fxRange</code> + <code>flatMap</code> (número de página → página
     de eventos), y <code>uniqBy</code> + <code>take(8)</code> rematan el
     trabajo. Como la cadena está basada en pull, que <code>take</code> se
     detenga detiene también la paginación: la última página de la réplica

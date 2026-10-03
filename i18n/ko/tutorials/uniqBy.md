@@ -23,7 +23,7 @@ nextLabel: uniqStrict
     받습니다 — 같은 연산자입니다. "고객당 한 행", "타입당 이벤트 하나"
     같은 요구나 임의의 필드 또는 계산된 값으로 중복을 없앨 때 쓰는 도구이며,
     <code>uniq</code> 자체도 결국
-    <code>distinctBy((a) =&gt; a, iterable)</code>일 뿐입니다.
+    <code>fxDistinctBy((a) =&gt; a, iterable)</code>일 뿐입니다.
   </p>
   <p>
     <code>uniq</code>와 마찬가지로 지연 평가되고 순서를 보존합니다. 각 키에
@@ -33,7 +33,7 @@ nextLabel: uniqStrict
   <p>
     비동기 규칙도 <code>uniq</code>와 같습니다. 동시성은 상류의
     fetch(<code>.map(...).concurrent(n)</code>)에 두고, 이미 해소되어 순서가
-    정해진 스트림에 <code>distinctBy</code>/<code>distinctByAsync</code>를
+    정해진 스트림에 <code>fxDistinctBy</code>/<code>fxDistinctByAsync</code>를
     적용하세요.
   </p>
 

@@ -66,6 +66,6 @@ nextLabel: fxEventsCreate
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="streams.html">Stream 다리</a> — 경계의 pull 쪽, 그리고 <code>stream.fx</code>와 <code>stream.fxEvents</code>의 비교 ·
-    <a href="debounce.html"><code>debounce</code></a> &amp; <a href="throttle.html"><code>throttle</code></a> — 둘 다 <code>FxEvents</code> 형태가 있음 ·
+    <a href="debounce.html"><code>fxDebounce</code></a> &amp; <a href="throttle.html"><code>fxThrottle</code></a> — 둘 다 <code>FxEvents</code> 형태가 있음 ·
     <a href="liveValue.html"><code>LiveValue</code></a> — 이 체인의 현재-값 동반자
   </div>

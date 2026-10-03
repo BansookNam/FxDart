@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fxdart/fxdart.dart' show EitherNel, Left, Nel, Right, find;
+import 'package:fxdart/fxdart.dart' show EitherNel, Left, Nel, Right, fxFind;
 
 import '../logic/errors.dart';
 import '../logic/validate.dart';
@@ -44,7 +44,7 @@ class _EntryDialogState extends State<_EntryDialog> {
   late DateTime _date = widget.existing?.date ?? DateTime.now();
   late DateTime? _dueDate = widget.existing?.dueDate;
 
-  /// Fail-slow (`zipOrAccumulate5`) or fail-fast (a plain `either` scope).
+  /// Fail-slow (`zipOrAccumulate5`) or fail-fast (a plain `fxEither` scope).
   bool _failSlow = true;
 
   /// Errors only appear after the first Save; from then on the form
@@ -120,7 +120,7 @@ class _EntryDialogState extends State<_EntryDialog> {
         : null;
     String? errorFor(String field) => errors == null
         ? null
-        : find((FieldError e) => e.field == field, errors)?.detail;
+        : fxFind((FieldError e) => e.field == field, errors)?.detail;
 
     return AlertDialog(
       title: Row(

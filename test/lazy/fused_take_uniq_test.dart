@@ -1,4 +1,4 @@
-// `takeAsync` and `uniqAsync`/`uniqByAsync` are fused stages (FxTakeStage,
+// `fxTakeAsync` and `fxUniqAsync`/`fxUniqByAsync` are fused stages (FxTakeStage,
 // FxUniqByStage) rather than their own iterator layers. That is what keeps a
 // stream-sourced chain on the subscription drive: before, `uniq` returned a
 // DelegateAsyncIterable, which broke the fused run and dropped the whole
@@ -22,7 +22,7 @@ import 'concurrent_mock.dart';
     pulled.add(v);
     return v;
   });
-  return (iterable: fromStream(stream), pulled: pulled);
+  return (iterable: fxFromStream(stream), pulled: pulled);
 }
 
 void main() {
@@ -65,13 +65,13 @@ void main() {
       () async {
         expect(
           await fxAsync(
-            toAsync([1, 2, 3, 4, 5, 6, 7]),
+            fxToAsync([1, 2, 3, 4, 5, 6, 7]),
           ).take(5).take(3).toList(),
           [1, 2, 3],
         );
         expect(
           await fxAsync(
-            toAsync([1, 2, 3, 4, 5, 6, 7]),
+            fxToAsync([1, 2, 3, 4, 5, 6, 7]),
           ).take(3).take(5).toList(),
           [1, 2, 3],
         );
@@ -89,11 +89,11 @@ void main() {
     });
 
     test('a count past the end drains the source', () async {
-      expect(await fxAsync(toAsync([1, 2, 3])).take(99).toList(), [1, 2, 3]);
+      expect(await fxAsync(fxToAsync([1, 2, 3])).take(99).toList(), [1, 2, 3]);
     });
 
     test('the counter is per iterator, not per iterable', () async {
-      final chain = fxAsync(toAsync([1, 2, 3, 4])).take(2);
+      final chain = fxAsync(fxToAsync([1, 2, 3, 4])).take(2);
       expect(await chain.toList(), [1, 2]);
       expect(await chain.toList(), [1, 2], reason: 'a fresh iterator restarts');
     });
@@ -101,7 +101,7 @@ void main() {
 
   group('uniq async fusion', () {
     test('uniq keeps the first of each value', () async {
-      expect(await fxAsync(toAsync([1, 1, 2, 2, 3, 1])).uniq().toList(), [
+      expect(await fxAsync(fxToAsync([1, 1, 2, 2, 3, 1])).uniq().toList(), [
         1,
         2,
         3,
@@ -111,7 +111,7 @@ void main() {
     test('uniqBy compares the key', () async {
       expect(
         await fxAsync(
-          toAsync([1, 11, 2, 21, 3]),
+          fxToAsync([1, 11, 2, 21, 3]),
         ).uniqBy((a) => a % 10).toList(),
         [1, 2, 3],
       );
@@ -120,7 +120,7 @@ void main() {
     test('uniqBy awaits an asynchronous key', () async {
       expect(
         await fxAsync(
-          toAsync([1, 11, 2, 21, 3]),
+          fxToAsync([1, 11, 2, 21, 3]),
         ).uniqBy((a) async => a % 10).toList(),
         [1, 2, 3],
       );
@@ -129,7 +129,7 @@ void main() {
     test(
       'a second uniq starts a new run rather than sharing the seen-set',
       () async {
-        expect(await fxAsync(toAsync([1, 1, 2])).uniq().uniq().toList(), [
+        expect(await fxAsync(fxToAsync([1, 1, 2])).uniq().uniq().toList(), [
           1,
           2,
         ]);
@@ -137,7 +137,7 @@ void main() {
     );
 
     test('the seen-set is per iterator, not per iterable', () async {
-      final chain = fxAsync(toAsync([1, 1, 2])).uniq();
+      final chain = fxAsync(fxToAsync([1, 1, 2])).uniq();
       expect(await chain.toList(), [1, 2]);
       expect(await chain.toList(), [1, 2], reason: 'a fresh iterator restarts');
     });
@@ -171,7 +171,7 @@ void main() {
     test('an error still reaches the terminal', () async {
       expect(
         fxAsync(
-          fromStream(Stream<int>.error(StateError('x'))),
+          fxFromStream(Stream<int>.error(StateError('x'))),
         ).uniq().take(3).toList(),
         throwsStateError,
       );
@@ -181,21 +181,21 @@ void main() {
       // The marker must abandon fusion for the layered form, which threads it
       // upstream — the contract filter/dropWhile already keep.
       final mock = ConcurrentMock<int>();
-      final it = takeAsync(3, mock).iterator;
+      final it = fxTakeAsync(3, mock).iterator;
       await it.next(Concurrent.of(2));
       expect(mock.received, isA<Concurrent>());
     });
 
     test('a Concurrent marker still reaches the source through uniq', () async {
       final mock = ConcurrentMock<int>();
-      final it = uniqAsync(mock).iterator;
+      final it = fxUniqAsync(mock).iterator;
       await it.next(Concurrent.of(2));
       expect(mock.received, isA<Concurrent>());
     });
 
     test('a concurrent chain still dedupes and truncates', () async {
       final res = await fxAsync(
-        toAsync([1, 2, 3, 4, 5, 6, 7, 8]),
+        fxToAsync([1, 2, 3, 4, 5, 6, 7, 8]),
       ).concurrent(4).map((a) async => a * 2).uniq().take(4).toList();
 
       expect(res, [2, 4, 6, 8]);

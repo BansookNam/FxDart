@@ -7,14 +7,14 @@ void main() {
   group('reverse', () {
     group('sync', () {
       test('should return the given elements in reverse order (numbers)', () {
-        expect(toList(reverse([1, 2, 3, 4])), equals([4, 3, 2, 1]));
+        expect(fxToList(fxReverse([1, 2, 3, 4])), equals([4, 3, 2, 1]));
       });
 
       test(
         'should return the given elements in reverse order (string chars)',
         () {
           expect(
-            toList(reverse('abcd'.split(''))),
+            fxToList(fxReverse('abcd'.split(''))),
             equals(['d', 'c', 'b', 'a']),
           );
         },
@@ -31,7 +31,7 @@ void main() {
         'should return the given elements in reverse order (numbers)',
         () async {
           expect(
-            await toListAsync(reverseAsync(toAsync([1, 2, 3, 4]))),
+            await fxToListAsync(fxReverseAsync(fxToAsync([1, 2, 3, 4]))),
             equals([4, 3, 2, 1]),
           );
         },
@@ -41,7 +41,7 @@ void main() {
         'should return the given elements in reverse order (string chars)',
         () async {
           expect(
-            await toListAsync(reverseAsync(toAsync('abcd'.split('')))),
+            await fxToListAsync(fxReverseAsync(fxToAsync('abcd'.split('')))),
             equals(['d', 'c', 'b', 'a']),
           );
         },
@@ -56,7 +56,7 @@ void main() {
         final sw = Stopwatch()..start();
         final res = await fx([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
             .toAsync()
-            .map((a) => delay(const Duration(milliseconds: 100), a))
+            .map((a) => fxDelay(const Duration(milliseconds: 100), a))
             .filter((a) => a % 2 == 0)
             .reverse()
             .concurrent(3)
@@ -70,7 +70,7 @@ void main() {
         'should be passed concurrent object when job works concurrently',
         () async {
           final mock = ConcurrentMock<int>();
-          final it = reverseAsync(mock).iterator;
+          final it = fxReverseAsync(mock).iterator;
           await it.next(Concurrent.of(2));
           expect(mock.received?.length, equals(2));
         },

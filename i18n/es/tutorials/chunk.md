@@ -25,7 +25,7 @@ nextLabel: windowed
     se divide de forma exacta.
   </p>
   <p>
-    La versión asíncrona, <code>chunkAsync</code>, espera <code>size</code>
+    La versión asíncrona, <code>fxChunkAsync</code>, espera <code>size</code>
     elementos antes de producir cada chunk; combínala con
     <code>.concurrent(n)</code> aguas arriba para resolver de forma
     concurrente el trabajo asíncrono de un chunk entero.
@@ -45,6 +45,6 @@ nextLabel: windowed
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="slice.html"><code>slice</code></a> — una única ventana arbitraria en lugar de lotes repetidos ·
-    <a href="split.html"><code>split</code></a> — agrupa por separador en lugar de por tamaño fijo ·
-    <a href="transpose.html"><code>transpose</code></a> — intercambia filas y columnas de datos ya troceados
+    <a href="split.html"><code>fxSplit</code></a> — agrupa por separador en lugar de por tamaño fijo ·
+    <a href="transpose.html"><code>fxTranspose</code></a> — intercambia filas y columnas de datos ya troceados
   </div>

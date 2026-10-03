@@ -4,7 +4,7 @@ void main() {
   // consume pulls values through the chain (running peek/mapEffect for
   // their side effects) but throws the results away — no List is built.
   var seen = <int>[];
-  fx(range(1000000))
+  fx(fxRange(1000000))
       .peek((a) => seen.add(a))
       .consume(5); // only pull 5, even though range has a million
 

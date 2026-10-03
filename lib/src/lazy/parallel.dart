@@ -3,11 +3,11 @@ import 'dart:async';
 import '../async_iterable.dart';
 import 'parallel_stub.dart' if (dart.library.io) 'parallel_vm.dart';
 
-/// Default pool size for [parallel]: the VM's processor count.
+/// Default pool size for [fxParallel]: the VM's processor count.
 ///
 /// Pass it when you do not want to pick `n`:
 /// `fx(items).parallel(parallelWorkers, parse)`. On the web this is `1`;
-/// [parallel] itself still throws [UnsupportedError] there.
+/// [fxParallel] itself still throws [UnsupportedError] there.
 int get parallelWorkers => parallelWorkersImpl;
 
 /// CPU-bound twin of [mapConcurrent]. Runs [worker] on a pool of [workers]
@@ -28,7 +28,7 @@ int get parallelWorkers => parallelWorkersImpl;
 /// rather than hanging.
 ///
 /// Unsupported on the web: throws [UnsupportedError]. Use [mapConcurrent]
-/// / [concurrentAsync] to overlap Futures on any platform. A cheap
+/// / [fxConcurrentAsync] to overlap Futures on any platform. A cheap
 /// callback (`x + 1`) loses to the isolate hop — that work belongs on
 /// [concurrent], not here.
 ///
@@ -36,7 +36,7 @@ int get parallelWorkers => parallelWorkersImpl;
 /// An empty source does not spawn isolates. A [List] source shorter than
 /// the work the pool can take sizes the pool down, so `parallel(8, w)` over
 /// two items starts two isolates, not eight. See [parallelWorkers] when you
-/// do not want to pick [workers]; [mapParallel] is the same operator under
+/// do not want to pick [workers]; [fxMapParallel] is the same operator under
 /// the name that sits next to [mapConcurrent]. Two CPU stages as two
 /// `.parallel` calls copy every result back to this isolate and out
 /// again — compose them with [fxPipe2] so both run in one hop:
@@ -83,7 +83,7 @@ int get parallelWorkers => parallelWorkersImpl;
 /// for k > 1 together with `chunked:` throws. `chunked: true` on a
 /// source without a length throws [StateError] — give a [List] or
 /// pick `chunk: k`.
-FxAsyncIterable<R> parallel<A, R>(
+FxAsyncIterable<R> fxParallel<A, R>(
   int workers,
   FutureOr<R> Function(A input) worker,
   Iterable<A> iterable, {
@@ -99,11 +99,11 @@ FxAsyncIterable<R> parallel<A, R>(
   return parallelImpl(workers, worker, iterable, k);
 }
 
-/// Async-source twin of [parallel].
+/// Async-source twin of [fxParallel].
 ///
 /// [chunked] is not available here — an async source has no length.
 /// Pass `chunk: k` to batch.
-FxAsyncIterable<R> parallelAsync<A, R>(
+FxAsyncIterable<R> fxParallelAsync<A, R>(
   int workers,
   FutureOr<R> Function(A input) worker,
   FxAsyncIterable<A> iterable, {
@@ -151,30 +151,30 @@ int _resolveChunk({
   return chunk;
 }
 
-/// Alias of [parallel] — the CPU twin of [mapConcurrent], under the name
+/// Alias of [fxParallel] — the CPU twin of [mapConcurrent], under the name
 /// that sits next to it.
 @pragma('vm:prefer-inline')
-FxAsyncIterable<R> mapParallel<A, R>(
+FxAsyncIterable<R> fxMapParallel<A, R>(
   int workers,
   FutureOr<R> Function(A input) worker,
   Iterable<A> iterable, {
   int chunk = 1,
   bool chunked = false,
-}) => parallel(workers, worker, iterable, chunk: chunk, chunked: chunked);
+}) => fxParallel(workers, worker, iterable, chunk: chunk, chunked: chunked);
 
-/// Alias of [parallelAsync] — the CPU twin of [mapConcurrentAsync].
+/// Alias of [fxParallelAsync] — the CPU twin of [mapConcurrentAsync].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<R> mapParallelAsync<A, R>(
+FxAsyncIterable<R> fxMapParallelAsync<A, R>(
   int workers,
   FutureOr<R> Function(A input) worker,
   FxAsyncIterable<A> iterable, {
   int chunk = 1,
   bool chunked = false,
-}) => parallelAsync(workers, worker, iterable, chunk: chunk, chunked: chunked);
+}) => fxParallelAsync(workers, worker, iterable, chunk: chunk, chunked: chunked);
 
-/// A reused isolate pool for sequential [parallelOn] chains.
+/// A reused isolate pool for sequential [fxParallelOn] chains.
 ///
-/// [parallel] spawns on first pull and kills when the chain ends. Two
+/// [fxParallel] spawns on first pull and kills when the chain ends. Two
 /// jobs then pay isolate startup twice. Spawn once, run many chains,
 /// kill in `finally` — or use [IsolatePool.using]:
 ///
@@ -186,7 +186,7 @@ FxAsyncIterable<R> mapParallelAsync<A, R>(
 /// });
 /// ```
 ///
-/// Cancel of one [parallelOn] chain does not kill the pool — in-flight
+/// Cancel of one [fxParallelOn] chain does not kill the pool — in-flight
 /// jobs finish and the isolates go idle. [kill] (and [using]'s `finally`)
 /// is what tears the isolates down. Unsupported on the web.
 class IsolatePool {
@@ -202,7 +202,7 @@ class IsolatePool {
   var _closed = false;
 
   /// Spawns [workers] isolates with no worker baked in — each
-  /// [parallelOn] call sends its function with the batch.
+  /// [fxParallelOn] call sends its function with the batch.
   static Future<IsolatePool> spawn(int workers) async {
     if (workers < 1) {
       throw RangeError("'workers' must be a positive integer");
@@ -235,7 +235,7 @@ class IsolatePool {
     return _run(worker, batch);
   }
 
-  /// Shuts the isolates down. Idempotent. In-flight [parallelOn] pulls
+  /// Shuts the isolates down. Idempotent. In-flight [fxParallelOn] pulls
   /// fail with [StateError].
   void kill() {
     if (_closed) return;
@@ -244,9 +244,9 @@ class IsolatePool {
   }
 }
 
-/// [parallel] over a spawned [IsolatePool]. Does not spawn or kill;
+/// [fxParallel] over a spawned [IsolatePool]. Does not spawn or kill;
 /// see [IsolatePool].
-FxAsyncIterable<R> parallelOn<A, R>(
+FxAsyncIterable<R> fxParallelOn<A, R>(
   IsolatePool pool,
   FutureOr<R> Function(A input) worker,
   Iterable<A> iterable, {
@@ -272,8 +272,8 @@ FxAsyncIterable<R> parallelOn<A, R>(
   );
 }
 
-/// Async-source twin of [parallelOn].
-FxAsyncIterable<R> parallelOnAsync<A, R>(
+/// Async-source twin of [fxParallelOn].
+FxAsyncIterable<R> fxParallelOnAsync<A, R>(
   IsolatePool pool,
   FutureOr<R> Function(A input) worker,
   FxAsyncIterable<A> iterable, {

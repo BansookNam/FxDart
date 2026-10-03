@@ -23,7 +23,7 @@ nextLabel: async variants
   </p>
   <p>
     <code>FxAsyncIterable</code>은 <strong>pull 기반</strong>입니다. 종결
-    연산자(<code>toListAsync</code>, <code>eachAsync</code>,
+    연산자(<code>fxToListAsync</code>, <code>fxEachAsync</code>,
     <code>FxAsync</code> 체인의 <code>.toList()</code> 등)가
     <code>next()</code>를 호출하기 전까지는 아무것도 실행되지 않고, 한 번에 한
     단계씩만 진행됩니다 — 평범한 <code>Iterable</code>과 똑같되 비동기라는
@@ -40,7 +40,7 @@ nextLabel: async variants
   </p>
   <p>
     날것의 <code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code>에는 최상위 함수
-    <code>toAsync(iterable)</code>을, 이미 만들어 둔 <code>Fx</code> 체인을
+    <code>fxToAsync(iterable)</code>을, 이미 만들어 둔 <code>Fx</code> 체인을
     <code>FxAsync</code> 체인으로 전환할 때는 체인 메서드
     <code>fx(iterable).toAsync()</code>를 쓰세요. 둘 다 지연 평가되므로,
     파이프라인을 구성하는 것만으로는 무엇도 실행되지 않고 누군가 값을 끌어당겨야
@@ -57,7 +57,7 @@ nextLabel: async variants
     Dart에서 <code>Future</code>는 await하는 시점이 아니라 생성되는 즉시
     실행을 시작합니다. 그래서 리스트 리터럴 안에서 미리 만들어진 Future 세 개는
     <code>toAsync</code>가 손대기도 전에 이미 함께 달리고 있습니다. 반면
-    <code>mapAsync</code>(또는 체인의 <code>.map</code>)는 원소를 실제로
+    <code>fxMapAsync</code>(또는 체인의 <code>.map</code>)는 원소를 실제로
     <em>끌어당길 때</em> 비로소 원소마다 새 Future를 하나씩 만듭니다 —
     <code>concurrent(n)</code>을 붙이지 않는 한, 지연 평가로 하나씩 말이죠.
   </p>
@@ -90,5 +90,5 @@ nextLabel: async variants
     <a href="asyncVariants.html"><code>*Async</code> 명명 규칙</a> — mapAsync, filterAsync, … ·
     <a href="streams.html">Stream 브리지</a> — fromStream, fxStream, toStream ·
     <a href="concurrent.html"><code>concurrent</code></a> — 역채널이 실제로 동작하는 모습 ·
-    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — 비동기 데모 만들기
+    <a href="delay.html"><code>fxDelay</code> &amp; <code>fxSleep</code></a> — 비동기 데모 만들기
   </div>

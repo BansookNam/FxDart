@@ -26,7 +26,7 @@ nextLabel: takeWhile
     acepta <code>takeRight</code>, la grafía de FxTS: son el mismo operador.
   </p>
   <p>
-    La versión asíncrona tiene la misma restricción: <code>takeLastAsync</code>
+    La versión asíncrona tiene la misma restricción: <code>fxTakeLastAsync</code>
     vacía todo lo que hay aguas arriba (esperando cada elemento) antes de poder
     devolver la cola. Úsalo solo cuando sepas que la fuente es finita y lo
     bastante pequeña como para almacenarla en memoria.

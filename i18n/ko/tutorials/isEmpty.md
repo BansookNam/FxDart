@@ -49,8 +49,8 @@ nextLabel: every
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="compact.html"><code>compact</code></a> — 이터러블에서 null 제거하기 ·
-    <a href="compactObject.html"><code>compactObject</code></a> — Map에서 null 제거하기 ·
+    <a href="compact.html"><code>fxCompact</code></a> — 이터러블에서 null 제거하기 ·
+    <a href="compactObject.html"><code>fxCompactObject</code></a> — Map에서 null 제거하기 ·
     <a href="predicates.html"><code>predicates</code></a> — filter에 바로 쓸 수 있는 타입 검사 모음 ·
-    <a href="includes.html"><code>includes</code></a> — 이웃한 포함 여부 검사
+    <a href="includes.html"><code>fxIncludes</code></a> — 이웃한 포함 여부 검사
   </div>

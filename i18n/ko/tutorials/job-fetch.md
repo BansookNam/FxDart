@@ -66,7 +66,7 @@ prevLabel: debounced search
     <a href="whichSurface.html">어느 표면</a> — 이것이 pull-async인 이유 ·
     <a href="concurrent.html"><code>concurrent</code></a> ·
     <a href="mapConcurrent.html"><code>mapConcurrent</code></a> ·
-    <a href="retry.html"><code>retry</code> / <code>mapRetry</code></a> ·
+    <a href="retry.html"><code>fxRetry</code> / <code>mapRetry</code></a> ·
     <a href="eitherPipelines.html"><code>mapOrAccumulate</code></a> ·
     <a href="job-search.html">디바운스 검색</a> — 시간 일 ·
     <a href="../DartComparison/bounded-concurrency.html">Dart vs FxDart: 한 번에 둘</a>

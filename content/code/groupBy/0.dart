@@ -4,7 +4,7 @@ void main() {
   final words = ['apple', 'banana', 'avocado', 'blueberry', 'cherry'];
 
   // Data-first form: key selector, then the iterable.
-  final byFirstLetter = groupBy((w) => w[0], words);
+  final byFirstLetter = fxGroupBy((w) => w[0], words);
   print(byFirstLetter);
   // {a: [apple, avocado], b: [banana, blueberry], c: [cherry]}
 

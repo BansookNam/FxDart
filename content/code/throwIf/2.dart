@@ -7,8 +7,8 @@ void main() {
   try {
     final total = fx(stock)
         .map((n) =>
-            throwIf<int>((v) => v == 0, (v) => StateError('out of stock'), n))
-        .reduce(add);
+            fxThrowIf<int>((v) => v == 0, (v) => StateError('out of stock'), n))
+        .reduce(fxAdd);
     print(total);
   } catch (e) {
     print('caught: $e'); // caught: Bad state: out of stock

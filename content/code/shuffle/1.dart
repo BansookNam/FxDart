@@ -6,8 +6,8 @@ Future<void> main() async {
   // shuffleAsync is the *Async twin — same seed gives the identical order
   // as the sync version, so a pipeline can switch between sync and async
   // sources without changing the reproducible result.
-  final syncShuffled = shuffle(deck, 99);
-  final asyncShuffled = await shuffleAsync(toAsync(deck), 99);
+  final syncShuffled = fxShuffle(deck, 99);
+  final asyncShuffled = await fxShuffleAsync(fxToAsync(deck), 99);
   print(syncShuffled); // [1, 3, 5, 4, 2]
   print(syncShuffled.toString() == asyncShuffled.toString()); // true
 

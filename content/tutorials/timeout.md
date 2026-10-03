@@ -38,7 +38,7 @@ nextLabel: using
     <code><a href="concurrent.html">concurrent(n)</a></code> each
     overlapping pull carries its own timer, so <em>n</em> slow-ish items
     that overlap still pass individually. Pair with
-    <code><a href="retry.html">retry</a></code> — timeout turns "hanging"
+    <code><a href="retry.html">fxRetry</a></code> — timeout turns "hanging"
     into "failing", and retry turns "failing" into "try again".
   </p>
 
@@ -54,7 +54,7 @@ nextLabel: using
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="retry.html"><code>retry</code></a> — what to do after the timeout fires ·
+    <a href="retry.html"><code>fxRetry</code></a> — what to do after the timeout fires ·
     <a href="concurrent.html"><code>concurrent</code></a> — overlapping pulls time out independently ·
     <a href="eitherPipelines.html">typed errors</a> — catching the <code>TimeoutException</code> as a value
   </div>

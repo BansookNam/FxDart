@@ -2,7 +2,7 @@
 slug: props
 title: props — FxDart 101
 description: FxDart props tutorial: read several Map keys at once as a List, missing keys become null.
-heading: <code>props</code>
+heading: <code>fxProps</code>
 section: 9
 crumb: props
 prev: prop.html
@@ -16,10 +16,10 @@ nextLabel: mapValues
 
   <h2>Lecture</h2>
   <p>
-    <code>props</code> is <code>prop</code> applied to several keys at once,
+    <code>fxProps</code> is <code>fxProp</code> applied to several keys at once,
     in order: give it a list of keys and a map, and get back a
     <code>List&lt;V?&gt;</code> with one slot per requested key. Unlike
-    <a href="pick.html"><code>pick</code></a>, a missing key does not get
+    <a href="pick.html"><code>fxPick</code></a>, a missing key does not get
     dropped from the result — it becomes <code>null</code> in that
     position, so the output <code>List</code> always has the same length as
     <code>propKeys</code>. That positional guarantee is what makes it pair
@@ -33,13 +33,13 @@ nextLabel: mapValues
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>props</code> to pull <code>['first', 'last']</code> out of <code>row</code> as a <code>List</code>.</p>
+  <p>Exercise: use <code>fxProps</code> to pull <code>['first', 'last']</code> out of <code>row</code> as a <code>List</code>.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="prop.html"><code>prop</code></a> — a single key at a time ·
-    <a href="pick.html"><code>pick</code></a> — the Map-shaped equivalent ·
-    <a href="fromEntries.html"><code>fromEntries</code></a> — build a Map back up ·
-    <a href="evolve.html"><code>evolve</code></a> — transform selected values in place
+    <a href="prop.html"><code>fxProp</code></a> — a single key at a time ·
+    <a href="pick.html"><code>fxPick</code></a> — the Map-shaped equivalent ·
+    <a href="fromEntries.html"><code>fxFromEntries</code></a> — build a Map back up ·
+    <a href="evolve.html"><code>fxEvolve</code></a> — transform selected values in place
   </div>

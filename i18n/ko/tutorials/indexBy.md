@@ -51,5 +51,5 @@ nextLabel: countBy
     <strong>관련 항목:</strong>
     <a href="groupBy.html"><code>groupBy</code></a> — 덮어쓰지 않고 중복을 모두 유지 ·
     <a href="countBy.html"><code>countBy</code></a> — 값을 남기는 대신 개수를 세기 ·
-    <a href="fromEntries.html"><code>fromEntries</code></a> — 키/값 쌍에서 곧바로 Map 만들기
+    <a href="fromEntries.html"><code>fxFromEntries</code></a> — 키/값 쌍에서 곧바로 Map 만들기
   </div>

@@ -114,7 +114,7 @@ description: FxDart は FxTS から移植された Dart 向けの関数型プロ
         <li><strong>非同期の抽象がもう1つ増える</strong> — <code>Stream</code> では並行処理のバックチャネルを表現できないため <code>FxAsyncIterable</code> が存在します。相互変換は簡単ですが、学ぶべき概念が1つ増えます。</li>
         <li><strong>学習コスト</strong> — 遅延パイプラインで考えることは、命令的なループとは異なります。</li>
         <li><strong>常に最速とは限らない</strong> — ごく小さなホットループでは、手書きの <code>for</code> が演算子の合成より速いことがあります。FxDart は明快さと I/O バウンドな処理に最適化しています。</li>
-        <li><strong>そのまま移植できない TS API もある</strong> — それらは Dart らしい書き方に置き換えられています: <code>curry</code> は型付きの <a href="tutorials/curried.html"><code>.curried</code></a> 拡張ゲッターになり、旧来の名前は移行用に非推奨スタブとして残されています。</li>
+        <li><strong>そのまま移植できない TS API もある</strong> — それらは Dart らしい書き方に置き換えられています: <code>fxCurry</code> は型付きの <a href="tutorials/curried.html"><code>.curried</code></a> 拡張ゲッターになり、旧来の名前は移行用に非推奨スタブとして残されています。</li>
       </ul>
     </div>
   </div>

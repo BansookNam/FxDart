@@ -5,20 +5,20 @@ void main() {
   group('slice', () {
     group('sync', () {
       test('should return elements from startIndex to endIndex', () {
-        expect(toList(slice(1, [1, 2, 3, 4, 5], 3)), equals([2, 3]));
-        expect(toList(slice(-1, [1, 2, 3, 4, 5], 3)), equals([1, 2, 3]));
-        expect(toList(slice(2, [1, 2, 3, 4, 5])), equals([3, 4, 5]));
-        expect(toList(slice(7, [1, 2, 3, 4, 5], 3)), equals([]));
-        expect(toList(slice(1, 'abcde'.split(''), 3)), equals(['b', 'c']));
+        expect(fxToList(fxSlice(1, [1, 2, 3, 4, 5], 3)), equals([2, 3]));
+        expect(fxToList(fxSlice(-1, [1, 2, 3, 4, 5], 3)), equals([1, 2, 3]));
+        expect(fxToList(fxSlice(2, [1, 2, 3, 4, 5])), equals([3, 4, 5]));
+        expect(fxToList(fxSlice(7, [1, 2, 3, 4, 5], 3)), equals([]));
+        expect(fxToList(fxSlice(1, 'abcde'.split(''), 3)), equals(['b', 'c']));
       });
 
       test('should return elements from startIndex to end', () {
-        expect(toList(slice(1, [1, 2, 3, 4, 5])), equals([2, 3, 4, 5]));
-        expect(toList(slice(-1, [1, 2, 3, 4, 5])), equals([1, 2, 3, 4, 5]));
-        expect(toList(slice(2, [1, 2, 3, 4, 5])), equals([3, 4, 5]));
-        expect(toList(slice(7, [1, 2, 3, 4, 5])), equals([]));
+        expect(fxToList(fxSlice(1, [1, 2, 3, 4, 5])), equals([2, 3, 4, 5]));
+        expect(fxToList(fxSlice(-1, [1, 2, 3, 4, 5])), equals([1, 2, 3, 4, 5]));
+        expect(fxToList(fxSlice(2, [1, 2, 3, 4, 5])), equals([3, 4, 5]));
+        expect(fxToList(fxSlice(7, [1, 2, 3, 4, 5])), equals([]));
         expect(
-          toList(slice(1, 'abcde'.split(''))),
+          fxToList(fxSlice(1, 'abcde'.split(''))),
           equals(['b', 'c', 'd', 'e']),
         );
       });
@@ -32,30 +32,30 @@ void main() {
           }
         }
 
-        expect(toList(slice(0, counted(), 3)), equals([0, 1, 2]));
+        expect(fxToList(fxSlice(0, counted(), 3)), equals([0, 1, 2]));
         expect(pulled, equals(3));
 
         pulled = 0;
-        expect(toList(slice(2, counted(), 5)), equals([2, 3, 4]));
+        expect(fxToList(fxSlice(2, counted(), 5)), equals([2, 3, 4]));
         expect(pulled, equals(5));
 
         // end below start yields nothing, and stops at end rather than
         // draining the source looking for a window that cannot open.
         pulled = 0;
-        expect(toList(slice(3, counted(), 1)), equals(<int>[]));
+        expect(fxToList(fxSlice(3, counted(), 1)), equals(<int>[]));
         expect(pulled, equals(1));
       });
 
       test('should be able to be used in the pipeline', () {
         final res1 = pipe(
           [1, 2, 3, 4, 5],
-          [(v) => slice(2, v), (v) => toList(v)],
+          [(v) => fxSlice(2, v), (v) => fxToList(v)],
         );
         expect(res1, equals([3, 4, 5]));
 
         final res2 = pipe(
           [1, 2, 3, 4, 5],
-          [(v) => slice(1, v, 3), (v) => toList(v)],
+          [(v) => fxSlice(1, v, 3), (v) => fxToList(v)],
         );
         expect(res2, equals([2, 3]));
       });
@@ -72,23 +72,23 @@ void main() {
     group('async', () {
       test('should return elements from startIndex to endIndex', () async {
         expect(
-          await toListAsync(sliceAsync(1, toAsync([1, 2, 3, 4, 5]), 3)),
+          await fxToListAsync(fxSliceAsync(1, fxToAsync([1, 2, 3, 4, 5]), 3)),
           equals([2, 3]),
         );
         expect(
-          await toListAsync(sliceAsync(-1, toAsync([1, 2, 3, 4, 5]), 3)),
+          await fxToListAsync(fxSliceAsync(-1, fxToAsync([1, 2, 3, 4, 5]), 3)),
           equals([1, 2, 3]),
         );
         expect(
-          await toListAsync(sliceAsync(2, toAsync([1, 2, 3, 4, 5]))),
+          await fxToListAsync(fxSliceAsync(2, fxToAsync([1, 2, 3, 4, 5]))),
           equals([3, 4, 5]),
         );
         expect(
-          await toListAsync(sliceAsync(7, toAsync([1, 2, 3, 4, 5]), 3)),
+          await fxToListAsync(fxSliceAsync(7, fxToAsync([1, 2, 3, 4, 5]), 3)),
           equals([]),
         );
         expect(
-          await toListAsync(sliceAsync(1, toAsync('abcde'.split('')), 3)),
+          await fxToListAsync(fxSliceAsync(1, fxToAsync('abcde'.split('')), 3)),
           equals(['b', 'c']),
         );
       });
@@ -103,14 +103,14 @@ void main() {
         }
 
         expect(
-          await toListAsync(sliceAsync(0, fromStream(counted()), 3)),
+          await fxToListAsync(fxSliceAsync(0, fxFromStream(counted()), 3)),
           equals([0, 1, 2]),
         );
         expect(pulled, equals(3));
 
         pulled = 0;
         expect(
-          await toListAsync(sliceAsync(2, fromStream(counted()), 5)),
+          await fxToListAsync(fxSliceAsync(2, fxFromStream(counted()), 5)),
           equals([2, 3, 4]),
         );
         expect(pulled, equals(5));
@@ -118,33 +118,35 @@ void main() {
 
       test('should return elements from startIndex to end', () async {
         expect(
-          await toListAsync(sliceAsync(1, toAsync([1, 2, 3, 4, 5]))),
+          await fxToListAsync(fxSliceAsync(1, fxToAsync([1, 2, 3, 4, 5]))),
           equals([2, 3, 4, 5]),
         );
         expect(
-          await toListAsync(sliceAsync(-1, toAsync([1, 2, 3, 4, 5]))),
+          await fxToListAsync(fxSliceAsync(-1, fxToAsync([1, 2, 3, 4, 5]))),
           equals([1, 2, 3, 4, 5]),
         );
         expect(
-          await toListAsync(sliceAsync(2, toAsync([1, 2, 3, 4, 5]))),
+          await fxToListAsync(fxSliceAsync(2, fxToAsync([1, 2, 3, 4, 5]))),
           equals([3, 4, 5]),
         );
         expect(
-          await toListAsync(sliceAsync(7, toAsync([1, 2, 3, 4, 5]))),
+          await fxToListAsync(fxSliceAsync(7, fxToAsync([1, 2, 3, 4, 5]))),
           equals([]),
         );
         expect(
-          await toListAsync(sliceAsync(1, toAsync('abcde'.split('')))),
+          await fxToListAsync(fxSliceAsync(1, fxToAsync('abcde'.split('')))),
           equals(['b', 'c', 'd', 'e']),
         );
       });
 
       test('should be able to be used in the pipeline', () async {
-        final res1 = await toListAsync(sliceAsync(2, toAsync([1, 2, 3, 4, 5])));
+        final res1 = await fxToListAsync(
+          fxSliceAsync(2, fxToAsync([1, 2, 3, 4, 5])),
+        );
         expect(res1, equals([3, 4, 5]));
 
-        final res2 = await toListAsync(
-          sliceAsync(1, toAsync([1, 2, 3, 4, 5]), 3),
+        final res2 = await fxToListAsync(
+          fxSliceAsync(1, fxToAsync([1, 2, 3, 4, 5]), 3),
         );
         expect(res2, equals([2, 3]));
       });

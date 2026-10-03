@@ -13,20 +13,20 @@ import 'raise.dart';
 // pipeline from a raise block; return one of these results instead).
 
 /// All [Right] values of [iterable], in order.
-List<R> rights<L, R>(Iterable<Either<L, R>> iterable) => [
+List<R> fxRights<L, R>(Iterable<Either<L, R>> iterable) => [
   for (final e in iterable)
     if (e case Right(:final value)) value,
 ];
 
 /// All [Left] values of [iterable], in order.
-List<L> lefts<L, R>(Iterable<Either<L, R>> iterable) => [
+List<L> fxLefts<L, R>(Iterable<Either<L, R>> iterable) => [
   for (final e in iterable)
     if (e case Left(:final value)) value,
 ];
 
 /// Splits [iterable] into `(lefts, rights)` — the Either analogue of
-/// `partition` (port of Arrow's `separateEither`).
-(List<L>, List<R>) separateEither<L, R>(Iterable<Either<L, R>> iterable) {
+/// `partition` (port of Arrow's `fxSeparateEither`).
+(List<L>, List<R>) fxSeparateEither<L, R>(Iterable<Either<L, R>> iterable) {
   final ls = <L>[];
   final rs = <R>[];
   for (final e in iterable) {
@@ -41,7 +41,7 @@ List<L> lefts<L, R>(Iterable<Either<L, R>> iterable) => [
 }
 
 /// Collects every success into one list, failing fast on the first [Left].
-Either<L, List<R>> sequenceEither<L, R>(Iterable<Either<L, R>> iterable) {
+Either<L, List<R>> fxSequenceEither<L, R>(Iterable<Either<L, R>> iterable) {
   final out = <R>[];
   for (final e in iterable) {
     switch (e) {
@@ -54,9 +54,9 @@ Either<L, List<R>> sequenceEither<L, R>(Iterable<Either<L, R>> iterable) {
   return Right(out);
 }
 
-/// Async twin of [sequenceEither]. Fail-fast: stops pulling from upstream at
+/// Async twin of [fxSequenceEither]. Fail-fast: stops pulling from upstream at
 /// the first [Left].
-Future<Either<L, List<R>>> sequenceEitherAsync<L, R>(
+Future<Either<L, List<R>>> fxSequenceEitherAsync<L, R>(
   FxAsyncIterable<Either<L, R>> iterable,
 ) async {
   final out = <R>[];
@@ -74,8 +74,8 @@ Future<Either<L, List<R>>> sequenceEitherAsync<L, R>(
   return Right(out);
 }
 
-/// Async twin of [rights].
-Future<List<R>> rightsAsync<L, R>(
+/// Async twin of [fxRights].
+Future<List<R>> fxRightsAsync<L, R>(
   FxAsyncIterable<Either<L, R>> iterable,
 ) async {
   final out = <R>[];
@@ -88,8 +88,10 @@ Future<List<R>> rightsAsync<L, R>(
   return out;
 }
 
-/// Async twin of [lefts].
-Future<List<L>> leftsAsync<L, R>(FxAsyncIterable<Either<L, R>> iterable) async {
+/// Async twin of [fxLefts].
+Future<List<L>> fxLeftsAsync<L, R>(
+  FxAsyncIterable<Either<L, R>> iterable,
+) async {
   final out = <L>[];
   final it = iterable.iterator;
   var res = await it.next();
@@ -100,8 +102,8 @@ Future<List<L>> leftsAsync<L, R>(FxAsyncIterable<Either<L, R>> iterable) async {
   return out;
 }
 
-/// Async twin of [separateEither].
-Future<(List<L>, List<R>)> separateEitherAsync<L, R>(
+/// Async twin of [fxSeparateEither].
+Future<(List<L>, List<R>)> fxSeparateEitherAsync<L, R>(
   FxAsyncIterable<Either<L, R>> iterable,
 ) async {
   final ls = <L>[];
@@ -121,7 +123,7 @@ Future<(List<L>, List<R>)> separateEitherAsync<L, R>(
 }
 
 /// Collects every success, or EVERY failure — the fail-slow twin of
-/// [sequenceEither] over an existing collection of `Either`s (port of
+/// [fxSequenceEither] over an existing collection of `Either`s (port of
 /// Arrow's `flattenOrAccumulate`).
 Either<NonEmptyList<E>, List<A>> flattenOrAccumulate<E, A>(
   Iterable<Either<E, A>> iterable,
@@ -139,15 +141,15 @@ Future<Either<NonEmptyList<E>, List<A>>> flattenOrAccumulateAsync<E, A>(
 Either<NonEmptyList<E>, List<R>> mapOrAccumulate<E, T, R>(
   R Function(AccumulatingRaise<E> r, T item) transform,
   Iterable<T> iterable,
-) => either<NonEmptyList<E>, List<R>>(
+) => fxEither<NonEmptyList<E>, List<R>>(
   (r) => r.mapOrAccumulate(iterable, transform),
 );
 
 /// Async twin of [mapOrAccumulate] — fail-slow concurrent validation.
 ///
 /// Implemented by composition: each element runs in its own
-/// [eitherAsync] scope (so a raise in one element can never leak into a
-/// sibling), mapped through the existing parallel-safe `mapAsync` machinery,
+/// [fxEitherAsync] scope (so a raise in one element can never leak into a
+/// sibling), mapped through the existing parallel-safe `fxMapAsync` machinery,
 /// then folded eagerly in order. Pass [concurrency] to evaluate up to that
 /// many elements at once via the `concurrent(n)` back-channel.
 Future<Either<NonEmptyList<E>, List<R>>> mapOrAccumulateAsync<E, T, R>(
@@ -156,7 +158,7 @@ Future<Either<NonEmptyList<E>, List<R>>> mapOrAccumulateAsync<E, T, R>(
   int? concurrency,
 }) async {
   var mapped = FxAsync(iterable).map(
-    (item) => eitherAsync<NonEmptyList<E>, R>(
+    (item) => fxEitherAsync<NonEmptyList<E>, R>(
       (r) => transform(AccumulatingRaise.over(r), item),
     ),
   );
@@ -189,17 +191,17 @@ extension FxEitherOps<L, R> on Fx<Either<L, R>> {
   ];
 
   /// Splits into `(lefts, rights)` — matches the `partition` record shape.
-  (List<L>, List<R>) separated() => separateEither(this);
+  (List<L>, List<R>) separated() => fxSeparateEither(this);
 
   /// Collects every success into one list, failing fast on the first [Left].
-  Either<L, List<R>> sequence() => sequenceEither(this);
+  Either<L, List<R>> sequence() => fxSequenceEither(this);
 
   /// Collects every success, or EVERY failure — the fail-slow twin of
   /// [sequence].
   EitherNel<L, List<R>> flattenOrAccumulate() =>
       // The top-level twin is shadowed by this member's name, so the
       // composition is spelled out (the FxEitherOps.rights precedent).
-      either<NonEmptyList<L>, List<R>>(
+      fxEither<NonEmptyList<L>, List<R>>(
         (r) => r.mapOrAccumulate(this, (br, Either<L, R> e) => br.bind(e)),
       );
 }
@@ -208,16 +210,16 @@ extension FxEitherOps<L, R> on Fx<Either<L, R>> {
 extension FxAsyncEitherOps<L, R> on FxAsync<Either<L, R>> {
   /// Async twin of [FxEitherOps.sequence] — stops pulling on the first
   /// [Left].
-  Future<Either<L, List<R>>> sequence() => sequenceEitherAsync(this);
+  Future<Either<L, List<R>>> sequence() => fxSequenceEitherAsync(this);
 
   /// Async twin of [FxEitherOps.rights].
-  Future<List<R>> rights() => rightsAsync(this);
+  Future<List<R>> rights() => fxRightsAsync(this);
 
   /// Async twin of [FxEitherOps.lefts].
-  Future<List<L>> lefts() => leftsAsync(this);
+  Future<List<L>> lefts() => fxLeftsAsync(this);
 
   /// Async twin of [FxEitherOps.separated].
-  Future<(List<L>, List<R>)> separated() => separateEitherAsync(this);
+  Future<(List<L>, List<R>)> separated() => fxSeparateEitherAsync(this);
 
   /// Async twin of [FxEitherOps.flattenOrAccumulate] — fail-slow, consumes
   /// the whole upstream.
@@ -231,7 +233,7 @@ extension FxAccumulateOps<T> on Fx<T> {
   /// at the first.
   Either<NonEmptyList<E>, List<R>> mapOrAccumulate<E, R>(
     R Function(AccumulatingRaise<E> r, T item) transform,
-  ) => either<NonEmptyList<E>, List<R>>(
+  ) => fxEither<NonEmptyList<E>, List<R>>(
     (r) => r.mapOrAccumulate(this, transform),
   );
 }

@@ -69,5 +69,5 @@ nextLabel: switchLatest
     <strong>Related:</strong>
     <a href="switchMap.html"><code>switchMap</code></a> — the fourth policy: newest wins, the rest are cancelled ·
     <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — pull-side bounded fan-out, where results stay in order ·
-    <a href="debounce.html"><code>debounce</code></a> — often the better fix: stop the extra events before they become inner streams
+    <a href="debounce.html"><code>fxDebounce</code></a> — often the better fix: stop the extra events before they become inner streams
   </div>

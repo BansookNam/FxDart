@@ -26,7 +26,7 @@ Reach for fxdart instead of hand-rolled code whenever the task involves:
   signature feature. Do NOT write `Future.wait` + manual batching or a
   hand-rolled semaphore.
 - **A `Stream` used as a list** (paginate, bound, batch): pull it with
-  `fxStream` / `.pull()` and stay on this skill. `fromStream` is the
+  `fxStream` / `.pull()` and stay on this skill. `fxFromStream` is the
   lower-level iterable (no chain methods). **Events over time**
   (debounce, switchMap, combineLatest) belong to the sibling
   **`fxdart-events`** skill — do not reach for `fxStream` as the push
@@ -70,7 +70,7 @@ apply, write plain Dart.
 1. Start a chain: `fx(iterable)` (sync), `fx(iterable).toAsync()` or
    `fxAsync(fxAsyncIterable)` (async). A `Stream` that is *demand* (you
    pull pages, you bound fetches) crosses with `fxStream` / `.pull()`.
-   `fromStream` is the raw iterable if you don't need chain methods.
+   `fxFromStream` is the raw iterable if you don't need chain methods.
    A `Stream` that is *time* is `fxEvents` — other skill.
 2. Chain lazy operators (`map`, `filter`, `take`, ...). **Nothing executes
    yet** — operators only build the pipeline.
@@ -80,7 +80,7 @@ apply, write plain Dart.
 
 ```dart
 // Only 3 squares are ever computed, even over a million-element range.
-fx(range(1, 1000000)).map((a) => a * a).take(3).toList(); // [1, 4, 9]
+fx(fxRange(1, 1000000)).map((a) => a * a).take(3).toList(); // [1, 4, 9]
 ```
 
 `Fx<T>` extends `Iterable<T>`, so a sync chain drops into any Dart API that
@@ -89,8 +89,8 @@ takes an `Iterable`, and inherited members (`fold`, `every`, `first`, spread
 `filter`, `skip` = `drop`, `distinct` = `uniq`, `whereNot` = `reject`.
 
 Every top-level lazy/aggregate function also exists as a data-last plain
-function (`map(f, iterable)`) and has an `*Async` twin (`mapAsync`,
-`toListAsync`, ...). Prefer the `fx()` chain — it keeps full static typing.
+function (`fxMap(f, iterable)`) and has an `*Async` twin (`fxMapAsync`,
+`fxToListAsync`, ...). Prefer the `fx()` chain — it keeps full static typing.
 
 ## Sync recipes
 
@@ -115,7 +115,7 @@ fx([1, 2, 3]).scan((acc, a) => acc + a, 0).toList(); // [0, 1, 3, 6]
 fx(ids).chunk(500).each(insertBatch);
 
 // Pair two sources; records destructure in the callback.
-fx(zip(names, scores)).map((pair) => '${pair.$1}: ${pair.$2}').toList();
+fx(fxZip(names, scores)).map((pair) => '${pair.$1}: ${pair.$2}').toList();
 fx(items).zipWithIndex().map((e) => '${e.$1}: ${e.$2}').toList();
 ```
 
@@ -190,21 +190,24 @@ final out = fxStream(inputStream)
 - **Lazy until terminal.** `fx(xs).peek(print)` alone prints nothing; a
   terminal (`toList`, `each`, `consume`) must run the pipeline.
 - **`fold` is seed-first**: `fold(seed, f)` on chains (like `Iterable.fold`)
-  and `fold(seed, f, iterable)` top-level. Unseeded `reduce(f)` throws on
+  and `fxFold(seed, f, iterable)` top-level. Unseeded `reduce(f)` throws on
   empty input; prefer `fold` when empty is possible.
 - **`head`/`last`/`find`/`nth`/`minBy`/`maxBy` return `T?`** (null when
   absent) — handle the null, don't `!` blindly.
 - **Top-level functions are data-last** with the callback first:
-  `map(f, iterable)`, `filter(f, iterable)`. Async top-levels are suffixed:
-  `mapAsync`, `filterAsync`, `toListAsync`.
+  `fxMap(f, iterable)`, `fxFilter(f, iterable)`. Async top-levels are suffixed:
+  `fxMapAsync`, `fxFilterAsync`, `fxToListAsync`. Only short names take the
+  `fx` prefix (one or two words); longer ones keep the FxTS spelling
+  (`mapWithIndex`, `takeUntilInclusive`). Chain methods never take it:
+  `fx(xs).map(f)`.
 - **Don't mix up `sort` argument styles**: `sort(comparator)` takes an
   `int Function(a, b)`; `sortBy(key)` takes a key extractor. Both are
   non-mutating (return new sequences).
-- **Deprecated stubs** exist for un-portable FxTS names (`curry`,
-  `isUndefined`, `isArray`, `isObject`, `takeUntil`) — follow the analyzer's
-  deprecation hint to the replacement (`.curried`, `isNull`, `isList`,
-  `isMap`, `takeUntilInclusive`).
-- **Currying** is per-arity extension getters, not `curry(f)`:
+- **Deprecated stubs** exist for un-portable FxTS names (`fxCurry`,
+  `fxIsUndefined`, `fxIsArray`, `fxIsObject`, `fxTakeUntil`) — follow the analyzer's
+  deprecation hint to the replacement (`.curried`, `fxIsNull`, `fxIsList`,
+  `fxIsMap`, `takeUntilInclusive`).
+- **Currying** is per-arity extension getters, not `fxCurry(f)`:
   `add.curried(1)` produces `int Function(int)` for a 2-ary `add`.
 - If you write a custom operator over `FxAsyncIterable`, overlapping
   `next()` calls must start overlapping upstream pulls — awaiting the
@@ -217,7 +220,7 @@ Chains gained `Either`-aware eager terminals: `rights()`, `lefts()`,
 variant stops pulling at the first `Left`), and
 `mapOrAccumulate(transform, concurrency: n)` — fail-slow validation that
 keeps **every** failure in input order while running k elements at a time.
-For the full typed-error system (`either((r) { ... })`, `Raise`, `ensure`,
+For the full typed-error system (`fxEither((r) { ... })`, `Raise`, `ensure`,
 error accumulation, exception boundaries), load the sibling
 **`fxdart-typed-errors`** skill.
 

@@ -91,7 +91,7 @@ nextLabel: either &amp; Raise
   <div class="callout">
     <strong>Related:</strong>
     <a href="either.html"><code>Either</code></a> — the type these extend ·
-    <a href="raise.html"><code>either</code> &amp; <code>Raise</code></a> — builder scope, <code>ensure</code> and <code>recover</code> ·
+    <a href="raise.html"><code>fxEither</code> &amp; <code>Raise</code></a> — builder scope, <code>ensure</code> and <code>recover</code> ·
     <a href="accumulate.html">accumulation</a> — every failure instead of the first ·
     <a href="eitherPipelines.html">Either × pipelines</a> — carrying Eithers through a chain
   </div>

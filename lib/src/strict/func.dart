@@ -2,73 +2,73 @@ import 'dart:async';
 
 /// Adds two values. Works for any type supporting `+` ([num], [String],
 /// [List], ...) — mirrors FxTS `add`, which accepts numbers and strings.
-T add<T extends Object>(T a, T b) => (a as dynamic) + b as T;
+T fxAdd<T extends Object>(T a, T b) => (a as dynamic) + b as T;
 
 /// Returns a function that always returns [a], ignoring an optional
 /// argument (so it can be used as a unary callback).
 ///
-/// Port of FxTS `always`.
-T Function([Object? _]) always<T>(T a) =>
+/// Port of FxTS `fxAlways`.
+T Function([Object? _]) fxAlways<T>(T a) =>
     ([Object? _]) => a;
 
 /// Calls [f] with [args] as positional arguments.
 ///
-/// Port of FxTS `apply`.
-R apply<R>(Function f, List<Object?> args) => Function.apply(f, args) as R;
+/// Port of FxTS `fxApply`.
+R fxApply<R>(Function f, List<Object?> args) => Function.apply(f, args) as R;
 
 /// Returns its argument unchanged.
 ///
-/// Port of FxTS `identity`.
-T identity<T>(T a) => a;
+/// Port of FxTS `fxIdentity`.
+T fxIdentity<T>(T a) => a;
 
 /// Does nothing.
 ///
-/// Port of FxTS `noop`.
-void noop() {}
+/// Port of FxTS `fxNoop`.
+void fxNoop() {}
 
 /// Boolean negation.
 ///
-/// Port of FxTS `not` (Dart has no truthiness, so this takes a [bool]).
-bool not(bool a) => !a;
+/// Port of FxTS `fxNot` (Dart has no truthiness, so this takes a [bool]).
+bool fxNot(bool a) => !a;
 
 /// Returns a predicate that negates [f].
 ///
 /// Port of FxTS `negate`.
-bool Function(T) negate<T>(bool Function(T) f) =>
+bool Function(T) fxNegate<T>(bool Function(T) f) =>
     (a) => !f(a);
 
 /// Calls [f] with [a] for its side effect, then returns [a].
 ///
-/// Port of FxTS `tap` (data-first; close over [f] for the curried style).
-T tap<T>(void Function(T a) f, T a) {
+/// Port of FxTS `fxTap` (data-first; close over [f] for the curried style).
+T fxTap<T>(void Function(T a) f, T a) {
   f(a);
   return a;
 }
 
 /// Returns `callback(value)` when the predicate holds, otherwise [value].
 ///
-/// Port of FxTS `when`. TS can widen the return union `T | R`; in Dart both
+/// Port of FxTS `fxWhen`. TS can widen the return union `T | R`; in Dart both
 /// branches must share the type [T].
-T when<T>(bool Function(T) predicate, T Function(T) callback, T value) =>
+T fxWhen<T>(bool Function(T) predicate, T Function(T) callback, T value) =>
     predicate(value) ? callback(value) : value;
 
-/// The opposite of [when]: applies [callback] when the predicate fails.
+/// The opposite of [fxWhen]: applies [callback] when the predicate fails.
 ///
-/// Port of FxTS `unless`.
-T unless<T>(bool Function(T) predicate, T Function(T) callback, T value) =>
+/// Port of FxTS `fxUnless`.
+T fxUnless<T>(bool Function(T) predicate, T Function(T) callback, T value) =>
     predicate(value) ? value : callback(value);
 
 /// Returns a unary function that throws `toError(value)`.
 ///
-/// Port of FxTS `throwError`.
-Never Function(T) throwError<T>(Object Function(T) toError) =>
+/// Port of FxTS `fxThrowError`.
+Never Function(T) fxThrowError<T>(Object Function(T) toError) =>
     (a) => throw toError(a);
 
 /// Throws `toError(value)` when the predicate holds; otherwise returns
 /// [value] unchanged.
 ///
-/// Port of FxTS `throwIf`.
-T throwIf<T>(bool Function(T) predicate, Object Function(T) toError, T value) {
+/// Port of FxTS `fxThrowIf`.
+T fxThrowIf<T>(bool Function(T) predicate, Object Function(T) toError, T value) {
   if (predicate(value)) throw toError(value);
   return value;
 }
@@ -90,27 +90,27 @@ int _compare(Object? a, Object? b) {
   throw ArgumentError('The values must be Comparable');
 }
 
-/// `a > b`. Port of FxTS `gt` (data-first; use a closure for currying:
-/// `(b) => gt(5, b)`).
-bool gt(Object? a, Object? b) => _compare(a, b) > 0;
+/// `a > b`. Port of FxTS `fxGt` (data-first; use a closure for currying:
+/// `(b) => fxGt(5, b)`).
+bool fxGt(Object? a, Object? b) => _compare(a, b) > 0;
 
-/// `a >= b`. Port of FxTS `gte`.
-bool gte(Object? a, Object? b) => _compare(a, b) >= 0;
+/// `a >= b`. Port of FxTS `fxGte`.
+bool fxGte(Object? a, Object? b) => _compare(a, b) >= 0;
 
-/// `a < b`. Port of FxTS `lt`.
-bool lt(Object? a, Object? b) => _compare(a, b) < 0;
+/// `a < b`. Port of FxTS `fxLt`.
+bool fxLt(Object? a, Object? b) => _compare(a, b) < 0;
 
-/// `a <= b`. Port of FxTS `lte`.
-bool lte(Object? a, Object? b) => _compare(a, b) <= 0;
+/// `a <= b`. Port of FxTS `fxLte`.
+bool fxLte(Object? a, Object? b) => _compare(a, b) <= 0;
 
 /// Applies every function in [fns] to [a] and collects the results.
 ///
-/// Port of FxTS `juxt` (unary form — Dart has no variadic generics).
+/// Port of FxTS `fxJuxt` (unary form — Dart has no variadic generics).
 ///
 /// ```dart
-/// juxt([min, max])([3, 4, 9, 1]); // [1, 9]
+/// fxJuxt([fxMin, fxMax])([3, 4, 9, 1]); // [1, 9]
 /// ```
-List<R> Function(T a) juxt<T, R>(List<R Function(T a)> fns) =>
+List<R> Function(T a) fxJuxt<T, R>(List<R Function(T a)> fns) =>
     (a) => [for (final f in fns) f(a)];
 
 /// Starts a typed left-to-right function composition.
@@ -187,9 +187,9 @@ R Function(A a) fxPipe5<A, M1, M2, M3, M4, R>(
 
 /// Memoizes a unary function by its argument (`==`/`hashCode` keyed).
 ///
-/// Port of FxTS `memoize` (unary only; TS's variadic/`WeakMap` behavior has
+/// Port of FxTS `fxMemoize` (unary only; TS's variadic/`WeakMap` behavior has
 /// no Dart equivalent).
-R Function(A) memoize<A, R>(R Function(A) f) {
+R Function(A) fxMemoize<A, R>(R Function(A) f) {
   final cache = <A, R>{};
   return (a) => cache.putIfAbsent(a, () => f(a));
 }
@@ -199,28 +199,28 @@ R Function(A) memoize<A, R>(R Function(A) f) {
 /// Port of FxTS `delay`.
 ///
 /// ```dart
-/// await delay(Duration(seconds: 1), 'a'); // 'a' after 1s
+/// await fxDelay(Duration(seconds: 1), 'a'); // 'a' after 1s
 /// ```
-Future<T> delay<T>(Duration wait, T value) => Future.delayed(wait, () => value);
+Future<T> fxDelay<T>(Duration wait, T value) => Future.delayed(wait, () => value);
 
 /// Returns a [Future] that completes after [wait].
-Future<void> sleep(Duration wait) => Future.delayed(wait);
+Future<void> fxSleep(Duration wait) => Future.delayed(wait);
 
 /// Builds a matcher from `predicate, mapper` pairs with an optional
 /// default. When nothing matches and no [orElse] is given, the value itself
 /// is returned (it must then be an `R`).
 ///
-/// Port of FxTS `cases`; Dart cannot type variadic pairs, so they are passed
+/// Port of FxTS `fxCases`; Dart cannot type variadic pairs, so they are passed
 /// as records.
 ///
 /// ```dart
-/// final classify = cases<int, String>([
+/// final classify = fxCases<int, String>([
 ///   ((n) => n < 0, (n) => 'negative'),
 ///   ((n) => n == 0, (n) => 'zero'),
 /// ], orElse: (n) => 'positive');
 /// classify(-4); // 'negative'
 /// ```
-R Function(T value) cases<T, R>(
+R Function(T value) fxCases<T, R>(
   List<(bool Function(T), R Function(T))> pairs, {
   R Function(T)? orElse,
 }) {
@@ -244,12 +244,12 @@ List<String> unicodeToList(String s) => [
 /// FxTS-named alias of [unicodeToList].
 List<String> unicodeToArray(String s) => unicodeToList(s);
 
-/// TypeScript's `curry` relies on reflection over a function's arity plus
+/// TypeScript's `fxCurry` relies on reflection over a function's arity plus
 /// recursive conditional types (`Curry<...>`), neither of which exists in
 /// Dart. This stub only curries binary functions and is untyped. The typed,
 /// Dart-native replacement is the `.curried` extension getter (arities 2–5)
 /// — see `WHY_CURRIED.md`.
 @Deprecated('Use the .curried extension getter instead (see WHY_CURRIED.md)')
-Function curry(Function f) =>
+Function fxCurry(Function f) =>
     (Object? a) =>
         (Object? b) => f(a, b);

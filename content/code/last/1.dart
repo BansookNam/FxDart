@@ -4,9 +4,9 @@ Future<void> main() async {
   // Async chain: .lastOrNull() is a method — with parens — and null-safe.
   final result = await fx([1, 2, 3])
       .toAsync()
-      .map((a) => delay(Duration(milliseconds: 50), a * 10))
+      .map((a) => fxDelay(Duration(milliseconds: 50), a * 10))
       .lastOrNull();
   print(result); // 30
 
-  print(await fxAsync(asyncEmpty<int>()).lastOrNull()); // null
+  print(await fxAsync(fxAsyncEmpty<int>()).lastOrNull()); // null
 }

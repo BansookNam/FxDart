@@ -16,7 +16,7 @@ nextLabel: onErrorResume
 
   <h2>Lección</h2>
   <p>
-    El <code><a href="retry.html">retry</a></code> de la capa pull
+    El <code><a href="retry.html">fxRetry</a></code> de la capa pull
     reconstruye un iterable. En el lado push la misma idea es una
     <strong>resuscripción</strong>, y hay dos formas. Una reconstruye
     el stream desde una factoría —
@@ -73,6 +73,6 @@ nextLabel: onErrorResume
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="onErrorResume.html"><code>FxEvents.retry</code></a> — la forma con factoría, para fuentes que no puedes volver a escuchar ·
-    <a href="retry.html"><code>retry</code></a> — el original de la capa pull, con gancho de backoff y ámbito por elemento ·
+    <a href="retry.html"><code>fxRetry</code></a> — el original de la capa pull, con gancho de backoff y ámbito por elemento ·
     <a href="timeout.html"><code>timeout</code></a> — acota cuánto puede tardar un pull, en vez de cuántas veces reintenta
   </div>

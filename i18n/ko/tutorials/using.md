@@ -2,7 +2,7 @@
 slug: using
 title: using — FxDart 101
 description: FxDart using과 usingAsync 튜토리얼: 자원을 한 번의 지연 반복에 묶기 — 첫 pull에 획득하고 정확히 한 번 해제 — 를 라이브 플레이그라운드와 함께 다룹니다.
-heading: <code>using</code>
+heading: <code>fxUsing</code>
 section: 11
 crumb: using
 prev: timeout.html
@@ -28,7 +28,7 @@ nextLabel: concurrent or parallel
     직전에 정확히 한 번 실행됩니다.
   </p>
   <p>
-    비동기 형태인 <code>usingAsync</code>는 세 단계 모두 비동기일 수
+    비동기 형태인 <code>fxUsingAsync</code>는 세 단계 모두 비동기일 수
     있게 하며
     <code><a href="concurrent.html">concurrent</a></code>와 조합됩니다 —
     겹쳐 진행 중인 pull이 있어도 해제는 여전히 정확히 한 번만
@@ -44,7 +44,7 @@ nextLabel: concurrent or parallel
     (한도가 있는 파이프라인은 완료되고, 완료는 해제로 이어집니다),
     조기 종료가 계획이라면 <code>try</code>/<code>finally</code>로 자원을
     직접 관리하세요. Dart 고유의 추가 기능입니다(FxTS에는 대응물이
-    없습니다). Rx의 <code>using</code>을 따랐습니다.
+    없습니다). Rx의 <code>fxUsing</code>을 따랐습니다.
   </p>
 
   <h2>데모 1 · 지연 읽기 둘레의 괄호</h2>
@@ -61,5 +61,5 @@ nextLabel: concurrent or parallel
     <strong>관련 항목:</strong>
     <a href="take.html"><code>take</code></a> — 반복에 한도를 두어 완료(그리고 해제)를 보장하기 ·
     <a href="peek.html"><code>peek</code></a> — 수명을 소유하지 않고 값 관찰하기 ·
-    <a href="retry.html"><code>retry</code></a> — 팩터리로 감싸면 시도마다 새로 획득
+    <a href="retry.html"><code>fxRetry</code></a> — 팩터리로 감싸면 시도마다 새로 획득
   </div>

@@ -6,7 +6,7 @@ void main() {
     group('sync', () {
       test("should be excluded 'null' - number", () {
         final acc = <int>[];
-        for (final a in compact([0, 1, null, 3, null, 5])) {
+        for (final a in fxCompact([0, 1, null, 3, null, 5])) {
           acc.add(a);
         }
         expect(acc, equals([0, 1, 3, 5]));
@@ -14,7 +14,7 @@ void main() {
 
       test("should be excluded 'null' - string", () {
         final acc = <String>[];
-        for (final a in compact(['', 'a', null, 'b', null])) {
+        for (final a in fxCompact(['', 'a', null, 'b', null])) {
           acc.add(a);
         }
         expect(acc, equals(['', 'a', 'b']));
@@ -24,10 +24,10 @@ void main() {
         final res = pipe(
           <int?>[1, null, 3, 4, 5, null, 7, 8],
           [
-            (v) => compact(v),
-            (v) => map((int a) => a + 10, v),
-            (v) => filter((int a) => a % 2 == 0, v),
-            (v) => toList(v),
+            (v) => fxCompact(v),
+            (v) => fxMap((int a) => a + 10, v),
+            (v) => fxFilter((int a) => a % 2 == 0, v),
+            (v) => fxToList(v),
           ],
         );
 
@@ -38,8 +38,8 @@ void main() {
     group('async', () {
       test("should be excluded 'null' - number", () async {
         final acc = <int>[];
-        final it = compactAsync(
-          toAsync<int?>([0, 1, null, 3, null, 5]),
+        final it = fxCompactAsync(
+          fxToAsync<int?>([0, 1, null, 3, null, 5]),
         ).iterator;
         while (true) {
           final r = await it.next();
@@ -50,15 +50,15 @@ void main() {
       });
 
       test("should be excluded 'null' - string", () async {
-        final res = await toListAsync(
-          compactAsync(toAsync<String?>(['', 'a', null, 'b', null])),
+        final res = await fxToListAsync(
+          fxCompactAsync(fxToAsync<String?>(['', 'a', null, 'b', null])),
         );
         expect(res, equals(['', 'a', 'b']));
       });
 
       test('should be able to be used in the pipeline', () async {
         final res = await fxAsync(
-          compactAsync(toAsync<int?>([1, null, 3, 4, 5, null, 7, 8])),
+          fxCompactAsync(fxToAsync<int?>([1, null, 3, 4, 5, null, 7, 8])),
         ).map((a) => a + 10).filter((a) => a % 2 == 0).toList();
 
         expect(res, equals([14, 18]));

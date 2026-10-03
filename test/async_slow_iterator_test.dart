@@ -23,55 +23,55 @@ FxAsyncIterable<T> slow<T>(List<T> values) => DelegateAsyncIterable(() {
 void main() {
   test('slow() really is not a fast iterator', () {
     expect(slow([1]).iterator, isNot(isA<FxFastIterator<int>>()));
-    expect(toAsync([1]).iterator, isA<FxFastIterator<int>>());
+    expect(fxToAsync([1]).iterator, isA<FxFastIterator<int>>());
   });
 
   group('concatAsync over a non-fast upstream', () {
     test('drains both sides in order', () async {
       expect(
-        await toListAsync(concatAsync(slow([1, 2]), slow([3, 4]))),
+        await fxToListAsync(fxConcatAsync(slow([1, 2]), slow([3, 4]))),
         equals([1, 2, 3, 4]),
       );
     });
 
     test('handles an empty left side', () async {
       expect(
-        await toListAsync(concatAsync(slow(<int>[]), slow([3, 4]))),
+        await fxToListAsync(fxConcatAsync(slow(<int>[]), slow([3, 4]))),
         equals([3, 4]),
       );
     });
 
     test('handles an empty right side', () async {
       expect(
-        await toListAsync(concatAsync(slow([1, 2]), slow(<int>[]))),
+        await fxToListAsync(fxConcatAsync(slow([1, 2]), slow(<int>[]))),
         equals([1, 2]),
       );
     });
 
     test('handles both sides empty', () async {
       expect(
-        await toListAsync(concatAsync(slow(<int>[]), slow(<int>[]))),
+        await fxToListAsync(fxConcatAsync(slow(<int>[]), slow(<int>[]))),
         equals(<int>[]),
       );
     });
 
     test('mixes a fast left with a non-fast right', () async {
       expect(
-        await toListAsync(concatAsync(toAsync([1, 2]), slow([3, 4]))),
+        await fxToListAsync(fxConcatAsync(fxToAsync([1, 2]), slow([3, 4]))),
         equals([1, 2, 3, 4]),
       );
     });
 
     test('mixes a non-fast left with a fast right', () async {
       expect(
-        await toListAsync(concatAsync(slow([1, 2]), toAsync([3, 4]))),
+        await fxToListAsync(fxConcatAsync(slow([1, 2]), fxToAsync([3, 4]))),
         equals([1, 2, 3, 4]),
       );
     });
 
     test('composes with downstream operators', () async {
-      final res = await toListAsync(
-        mapAsync((int a) => a * 10, concatAsync(slow([1, 2]), slow([3]))),
+      final res = await fxToListAsync(
+        fxMapAsync((int a) => a * 10, fxConcatAsync(slow([1, 2]), slow([3]))),
       );
       expect(res, equals([10, 20, 30]));
     });
@@ -80,7 +80,7 @@ void main() {
   group('concatAsync Concurrent fallback', () {
     test('a concurrent pull switches to the legacy path and still '
         'yields every element in order', () async {
-      final it = concatAsync(toAsync([1, 2]), toAsync([3, 4])).iterator;
+      final it = fxConcatAsync(fxToAsync([1, 2]), fxToAsync([3, 4])).iterator;
       final got = <int>[];
       while (true) {
         final r = await it.next(Concurrent.of(2));
@@ -91,7 +91,10 @@ void main() {
     });
 
     test('a concurrent pull mid-stream keeps the remaining order', () async {
-      final it = concatAsync(toAsync([1, 2, 3]), toAsync([4, 5])).iterator;
+      final it = fxConcatAsync(
+        fxToAsync([1, 2, 3]),
+        fxToAsync([4, 5]),
+      ).iterator;
       final got = <int>[(await it.next()).value];
       while (true) {
         final r = await it.next(Concurrent.of(2));
@@ -108,7 +111,7 @@ void main() {
         // terminal then drives the same iterator with nextOr, which must route
         // through the fallback rather than the fused path it replaced.
         final it =
-            concatAsync(toAsync([1, 2]), toAsync([3, 4])).iterator
+            fxConcatAsync(fxToAsync([1, 2]), fxToAsync([3, 4])).iterator
                 as FxFastIterator<int>;
         final got = <int>[(await it.next(Concurrent.of(2))).value];
         while (true) {
@@ -124,28 +127,34 @@ void main() {
   group('takeAsync over a non-fast upstream', () {
     test('takes fewer than available', () async {
       expect(
-        await toListAsync(takeAsync(2, slow([1, 2, 3, 4]))),
+        await fxToListAsync(fxTakeAsync(2, slow([1, 2, 3, 4]))),
         equals([1, 2]),
       );
     });
 
     test('takes exactly what is available', () async {
       expect(
-        await toListAsync(takeAsync(3, slow([1, 2, 3]))),
+        await fxToListAsync(fxTakeAsync(3, slow([1, 2, 3]))),
         equals([1, 2, 3]),
       );
     });
 
     test('stops cleanly when the source runs out early', () async {
-      expect(await toListAsync(takeAsync(10, slow([1, 2]))), equals([1, 2]));
+      expect(
+        await fxToListAsync(fxTakeAsync(10, slow([1, 2]))),
+        equals([1, 2]),
+      );
     });
 
     test('take(0) pulls nothing', () async {
-      expect(await toListAsync(takeAsync(0, slow([1, 2]))), equals(<int>[]));
+      expect(
+        await fxToListAsync(fxTakeAsync(0, slow([1, 2]))),
+        equals(<int>[]),
+      );
     });
 
     test('an exhausted source stays done on repeated pulls', () async {
-      final it = takeAsync(5, slow([1])).iterator;
+      final it = fxTakeAsync(5, slow([1])).iterator;
       expect((await it.next()).value, equals(1));
       expect((await it.next()).done, isTrue);
       expect((await it.next()).done, isTrue);
@@ -158,15 +167,17 @@ void main() {
     // builds is fast, so only a hand-rolled upstream reaches the second call.
     test('flattens each element in order', () async {
       expect(
-        await toListAsync(flatMapAsync((int a) => [a, a * 10], slow([1, 2]))),
+        await fxToListAsync(
+          fxFlatMapAsync((int a) => [a, a * 10], slow([1, 2])),
+        ),
         equals([1, 10, 2, 20]),
       );
     });
 
     test('an empty inner iterable pulls the next source element', () async {
       expect(
-        await toListAsync(
-          flatMapAsync(
+        await fxToListAsync(
+          fxFlatMapAsync(
             (int a) => a.isEven ? <int>[] : [a],
             slow([1, 2, 3, 4, 5]),
           ),
@@ -177,20 +188,22 @@ void main() {
 
     test('an empty source yields nothing', () async {
       expect(
-        await toListAsync(flatMapAsync((int a) => [a], slow(<int>[]))),
+        await fxToListAsync(fxFlatMapAsync((int a) => [a], slow(<int>[]))),
         equals(<int>[]),
       );
     });
 
     test('an async callback is awaited', () async {
       expect(
-        await toListAsync(flatMapAsync((int a) async => [a, -a], slow([1, 2]))),
+        await fxToListAsync(
+          fxFlatMapAsync((int a) async => [a, -a], slow([1, 2])),
+        ),
         equals([1, -1, 2, -2]),
       );
     });
 
     test('an exhausted source stays done on repeated pulls', () async {
-      final it = flatMapAsync((int a) => [a], slow([1])).iterator;
+      final it = fxFlatMapAsync((int a) => [a], slow([1])).iterator;
       expect((await it.next()).value, equals(1));
       expect((await it.next()).done, isTrue);
       expect((await it.next()).done, isTrue);
@@ -198,8 +211,11 @@ void main() {
 
     test('composes with downstream operators', () async {
       expect(
-        await toListAsync(
-          takeAsync(3, flatMapAsync((int a) => [a, a * 10], slow([1, 2, 3]))),
+        await fxToListAsync(
+          fxTakeAsync(
+            3,
+            fxFlatMapAsync((int a) => [a, a * 10], slow([1, 2, 3])),
+          ),
         ),
         equals([1, 10, 2]),
       );
@@ -208,8 +224,8 @@ void main() {
     test('matches the fast path element for element', () async {
       Iterable<int> f(int a) => [a, a + 100];
       expect(
-        await toListAsync(flatMapAsync(f, slow([1, 2, 3]))),
-        equals(await toListAsync(flatMapAsync(f, toAsync([1, 2, 3])))),
+        await fxToListAsync(fxFlatMapAsync(f, slow([1, 2, 3]))),
+        equals(await fxToListAsync(fxFlatMapAsync(f, fxToAsync([1, 2, 3])))),
       );
     });
   });
@@ -217,7 +233,10 @@ void main() {
   group('flatMapAsync Concurrent fallback', () {
     test('a concurrent pull switches to the legacy path and still '
         'yields every element in order', () async {
-      final it = flatMapAsync((int a) => [a, a * 10], toAsync([1, 2])).iterator;
+      final it = fxFlatMapAsync(
+        (int a) => [a, a * 10],
+        fxToAsync([1, 2]),
+      ).iterator;
       final got = <int>[];
       while (true) {
         final r = await it.next(Concurrent.of(2));
@@ -231,7 +250,7 @@ void main() {
   group('takeAsync Concurrent fallback', () {
     test('a concurrent pull switches to the legacy path and still '
         'respects the limit', () async {
-      final it = takeAsync(3, toAsync([1, 2, 3, 4, 5])).iterator;
+      final it = fxTakeAsync(3, fxToAsync([1, 2, 3, 4, 5])).iterator;
       final got = <int>[];
       while (true) {
         final r = await it.next(Concurrent.of(2));
@@ -242,7 +261,7 @@ void main() {
     });
 
     test('a concurrent pull after a serial one keeps the limit', () async {
-      final it = takeAsync(3, toAsync([1, 2, 3, 4, 5])).iterator;
+      final it = fxTakeAsync(3, fxToAsync([1, 2, 3, 4, 5])).iterator;
       final got = <int>[(await it.next()).value];
       while (true) {
         final r = await it.next(Concurrent.of(2));
@@ -256,7 +275,7 @@ void main() {
       'a serial nextOr after the fallback is installed reads through it',
       () async {
         final it =
-            takeAsync(3, toAsync([1, 2, 3, 4, 5])).iterator
+            fxTakeAsync(3, fxToAsync([1, 2, 3, 4, 5])).iterator
                 as FxFastIterator<int>;
         final got = <int>[(await it.next(Concurrent.of(2))).value];
         while (true) {

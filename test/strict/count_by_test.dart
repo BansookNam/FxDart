@@ -18,7 +18,7 @@ void main() {
   group('countBy', () {
     group('sync', () {
       test("should be counted by callback to the 'Iterable'", () {
-        final res = countBy((Obj a) => a.category, given);
+        final res = fxCountBy((Obj a) => a.category, given);
         expect(res, equals(then1));
       });
 
@@ -35,14 +35,14 @@ void main() {
 
       test('keys are in first-seen order, like groupBy', () {
         expect(
-          countBy((Obj a) => a.category, given).keys.toList(),
-          equals(groupBy((Obj a) => a.category, given).keys.toList()),
+          fxCountBy((Obj a) => a.category, given).keys.toList(),
+          equals(fxGroupBy((Obj a) => a.category, given).keys.toList()),
         );
       });
 
       test('an empty source yields an empty map', () {
         expect(
-          countBy((Obj a) => a.category, const <Obj>[]),
+          fxCountBy((Obj a) => a.category, const <Obj>[]),
           equals(<String, int>{}),
         );
       });
@@ -53,12 +53,17 @@ void main() {
         final a = 'ab';
         final b = String.fromCharCodes('ab'.codeUnits);
         expect(identical(a, b), isFalse);
-        expect(countBy((String s) => s, [a, b, a]), equals({'ab': 3}));
+        expect(fxCountBy((String s) => s, [a, b, a]), equals({'ab': 3}));
       });
 
       test('a null key is counted like any other', () {
         expect(
-          countBy((int? a) => a == null ? null : a.isEven, [1, null, 2, null]),
+          fxCountBy((int? a) => a == null ? null : a.isEven, [
+            1,
+            null,
+            2,
+            null,
+          ]),
           equals({false: 1, null: 2, true: 1}),
         );
       });
@@ -66,7 +71,7 @@ void main() {
       test('every key gets its own counter', () {
         // A cell accidentally shared between keys would show up as one key
         // holding the whole total.
-        final counts = countBy(
+        final counts = fxCountBy(
           (int a) => a % 50,
           List.generate(1000, (i) => i),
         );
@@ -76,7 +81,7 @@ void main() {
 
       test('the callback runs once per element, in source order', () {
         final seen = <String>[];
-        countBy((Obj a) {
+        fxCountBy((Obj a) {
           seen.add(a.category);
           return a.category;
         }, given);
@@ -85,17 +90,20 @@ void main() {
 
       test('agrees with groupBy lengths on a larger, skewed input', () {
         final xs = List.generate(5000, (i) => i % 7 == 0 ? 'a' : 'b$i');
-        final viaGroup = groupBy(
+        final viaGroup = fxGroupBy(
           (String s) => s,
           xs,
         ).map((k, v) => MapEntry(k, v.length));
-        expect(countBy((String s) => s, xs), equals(viaGroup));
+        expect(fxCountBy((String s) => s, xs), equals(viaGroup));
       });
     });
 
     group('async', () {
       test("should be counted by callback to the 'AsyncIterable'", () async {
-        final res = await countByAsync((Obj a) => a.category, toAsync(given));
+        final res = await fxCountByAsync(
+          (Obj a) => a.category,
+          fxToAsync(given),
+        );
         expect(res, equals(then1));
       });
 

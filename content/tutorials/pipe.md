@@ -64,6 +64,6 @@ nextLabel: pipe1
   <div class="callout">
     <strong>Related:</strong>
     <a href="fx.html"><code>fx</code></a> — the typed chain alternative ·
-    <a href="pipe1.html"><code>pipe1</code></a> — a single pipe step, sync/async aware ·
+    <a href="pipe1.html"><code>fxPipe1</code></a> — a single pipe step, sync/async aware ·
     <a href="toList.html"><code>toList</code></a> — common final step in a pipe
   </div>

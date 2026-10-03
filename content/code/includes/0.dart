@@ -7,6 +7,6 @@ void main() {
 
   // Data-first form keeps the FxTS name `includes` — there's no top-level
   // `contains` (it collides with package:test's matcher):
-  print(includes(3, [1, 2, 3]));         // true
+  print(fxIncludes(3, [1, 2, 3]));         // true
   print(fx(['a', 'b', 'c']).contains('b')); // true
 }

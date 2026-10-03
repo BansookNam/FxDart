@@ -27,13 +27,13 @@ nextLabel: each
   <p>
     That also means <code>toList</code> is exactly the operator you must
     <em>not</em> call directly on an infinite or unbounded source
-    (<code>range</code> with no end, <code>cycle</code>, <code>repeat</code>
+    (<code>fxRange</code> with no end, <code>cycle</code>, <code>repeat</code>
     with a huge count) — it will try to pull forever. Bound it first with
     <code>take(n)</code>, then call <code>toList</code> on the bounded
     result.
   </p>
   <p>
-    The async version, <code>toListAsync</code> (or <code>.toList()</code>
+    The async version, <code>fxToListAsync</code> (or <code>.toList()</code>
     on an <code>FxAsync</code> chain), awaits each element as it's pulled
     and returns a <code>Future&lt;List&lt;T&gt;&gt;</code>. Combined with
     <code>.concurrent(n)</code> upstream, the individual awaits can overlap

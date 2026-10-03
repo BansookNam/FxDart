@@ -1,7 +1,7 @@
 import 'package:fxdart/fxdart.dart';
 
 T Function(T) logger<T>(String label) =>
-    (v) => tap((x) => print('$label: $x'), v);
+    (v) => fxTap((x) => print('$label: $x'), v);
 
 void main() {
   final result = pipe(5, [

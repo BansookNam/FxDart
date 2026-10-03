@@ -27,7 +27,7 @@ async: false
 
   <h2>Por qué difieren</h2>
   <p>
-    <code>whereNotNull</code> <em>es</em> <code>compact</code> — el mismo
+    <code>whereNotNull</code> <em>es</em> <code>fxCompact</code> — el mismo
     operador vistiendo la convención de nombres de cada biblioteca. Ambos
     hacen lo que importa más allá de filtrar: <strong>estrechan el tipo
     estático</strong>, convirtiendo un tipo de elemento

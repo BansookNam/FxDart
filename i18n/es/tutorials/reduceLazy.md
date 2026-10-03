@@ -2,7 +2,7 @@
 slug: reduceLazy
 title: reduceLazy — FxDart 101
 description: Tutorial de reduceLazy en FxDart: construye una función reductora reutilizable que puedes aplicar a muchos iterables, con un playground en vivo.
-heading: <code>reduceLazy</code>
+heading: <code>fxReduceLazy</code>
 section: 7
 crumb: reduceLazy
 prev: foldRight.html
@@ -16,7 +16,7 @@ nextLabel: sum
 
   <h2>Lección</h2>
   <p>
-    <code>reduceLazy</code> no reduce nada por sí mismo: lo que hace es
+    <code>fxReduceLazy</code> no reduce nada por sí mismo: lo que hace es
     <strong>construir un reductor</strong>. Le das una función de combinación y
     un valor inicial, y recibes de vuelta una función corriente de tipo
     <code>Iterable&lt;A&gt; Function</code> que puedes llamar tantas veces como
@@ -26,8 +26,8 @@ nextLabel: sum
   <p>
     Por dentro es solo una envoltura fina sobre
     <code><a href="fold.html">fold</a></code>:
-    <code>reduceLazy(f, seed)</code> devuelve
-    <code>(iterable) =&gt; fold(seed, f, iterable)</code>. Fíjate en que el
+    <code>fxReduceLazy(f, seed)</code> devuelve
+    <code>(iterable) =&gt; fxFold(seed, f, iterable)</code>. Fíjate en que el
     orden de los argumentos se invierte respecto a <code>fold</code>: aquí es
     <code>(f, seed)</code>, siguiendo el estilo currificado de FxTS, donde el
     iterable se deja deliberadamente para más tarde.
@@ -49,7 +49,7 @@ nextLabel: sum
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: construye con <code>reduceLazy</code> un reductor reutilizable que encuentre el valor <strong>máximo</strong>.</p>
+  <p>Ejercicio: construye con <code>fxReduceLazy</code> un reductor reutilizable que encuentre el valor <strong>máximo</strong>.</p>
   {{playground:2}}
 
   <div class="callout">
@@ -57,5 +57,5 @@ nextLabel: sum
     <a href="fold.html"><code>fold</code></a> — el reductor con valor inicial al que envuelve ·
     <a href="reduce.html"><code>reduce</code></a> — el terminal sin valor inicial ·
     <a href="pipe.html"><code>pipe</code></a> — compón funciones como esta en un pipeline ·
-    <a href="memoize.html"><code>memoize</code></a> — otra forma de construir una función reutilizable
+    <a href="memoize.html"><code>fxMemoize</code></a> — otra forma de construir una función reutilizable
   </div>

@@ -9,7 +9,9 @@ Future<void> main() async {
   final userIds = [1, 2, 3];
   final orderIds = await fx(userIds)
       .toAsync()
-      .map((id) => delay(Duration(milliseconds: 150), [id * 100, id * 100 + 1]))
+      .map(
+        (id) => fxDelay(Duration(milliseconds: 150), [id * 100, id * 100 + 1]),
+      )
       .concurrent(3)
       .expand((list) => list) // FxTS alias: .flatMap((list) => list)
       .toList();

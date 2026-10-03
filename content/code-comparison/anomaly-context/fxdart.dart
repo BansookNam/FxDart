@@ -24,7 +24,7 @@ const readings = [
 void main() {
   // Walk the INDICES, not the readings: an anomaly is rare, so pairing every
   // reading with its index would allocate a record per element to keep a few.
-  final context = fx(range(0, readings.length))
+  final context = fx(fxRange(0, readings.length))
       .filter((i) => readings[i].temp > limit)
       .flatMap((i) => [i - 1, i, i + 1])
       .filter((i) => i >= 0 && i < readings.length)
@@ -36,7 +36,7 @@ void main() {
   });
 
   final peak = fx(readings).maxBy((r) => r.temp)!;
-  print(join('\n', [
+  print(fxJoin('\n', [
     'Readings above ${limit.toStringAsFixed(1)} C, with context',
     ...context,
     'Peak: ${peak.temp.toStringAsFixed(1)} C at ${peak.time}',

@@ -10,7 +10,7 @@ prevLabel: sampleOn
 next: withLatestFrom.html
 nextLabel: withLatestFrom
 ---
-  <p class="hero-sub">어느 쪽에서든 이벤트가 올 때마다 양쪽 최신 값의 <code>combine</code> 결과를 내보냅니다 — 양쪽 모두 최소 한 번씩 말한 뒤부터.</p>
+  <p class="hero-sub">어느 쪽에서든 이벤트가 올 때마다 양쪽 최신 값의 <code>fxCombine</code> 결과를 내보냅니다 — 양쪽 모두 최소 한 번씩 말한 뒤부터.</p>
 
   {{signature}}
 
@@ -21,7 +21,7 @@ nextLabel: withLatestFrom
     쪽에서든 키 입력이 있을 때마다 옳아야 하는 하나의 파생 상태.
     <code>combineLatest(other, combine)</code>이 바로 그 모양입니다: 각
     쪽의 최신 값을 기억해 두고, <em>어느 쪽</em> 스트림에서든 이벤트가
-    올 때마다 신선한 쌍에 대해 <code>combine</code>을 다시 실행합니다.
+    올 때마다 신선한 쌍에 대해 <code>fxCombine</code>을 다시 실행합니다.
   </p>
   <p>
     규칙을 정확히 짚으면 이렇습니다. <strong>양쪽</strong> 모두 최소 한

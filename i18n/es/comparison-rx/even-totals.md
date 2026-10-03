@@ -41,7 +41,7 @@ async: false
     <em>finitos y ya están aquí</em>, un stream añade un mecanismo de
     entrega que el problema nunca pidió. El vocabulario de operadores de
     RxDart es bueno — <code>whereNotNull</code> es exactamente
-    <code>compact</code> — pero el modelo de debajo cobra un impuesto
+    <code>fxCompact</code> — pero el modelo de debajo cobra un impuesto
     asíncrono en cada tarea sobre datos fijos. Aquí la respuesta entera es
     un número, así que la ceremonia — la elevación, el main asíncrono, el
     fold con await — es toda la diferencia entre los dos programas; eso es

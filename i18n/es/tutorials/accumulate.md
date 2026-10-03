@@ -21,7 +21,7 @@ nextLabel: Either × pipelines
 
   <h2>Lección</h2>
   <p>
-    Dentro de <code>either&lt;Nel&lt;E&gt;, _&gt;(...)</code> — cualquier
+    Dentro de <code>fxEither&lt;Nel&lt;E&gt;, _&gt;(...)</code> — cualquier
     ámbito cuyo tipo de error sea un <code>NonEmptyList</code> — el ámbito
     gana el vocabulario de acumulación:
   </p>
@@ -84,6 +84,6 @@ nextLabel: Either × pipelines
     <strong>Relacionado:</strong>
     <a href="nonEmptyList.html"><code>NonEmptyList</code></a> — el portador de los errores ·
     <a href="eitherPipelines.html">Either × pipelines</a> — validación fail-slow sobre cadenas <code>fx()</code>, con concurrencia ·
-    <a href="raise.html"><code>either</code> &amp; Raise</a> — el ámbito fail-fast que esto extiende ·
+    <a href="raise.html"><code>fxEither</code> &amp; Raise</a> — el ámbito fail-fast que esto extiende ·
     <a href="typedErrors.html">errores tipados — guía completa</a>
   </div>

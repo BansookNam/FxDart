@@ -2,7 +2,7 @@
 slug: split
 title: split — FxDart 101
 description: Tutorial de split en FxDart: divide un iterable de caracteres según un separador, con un playground en vivo.
-heading: <code>split</code>
+heading: <code>fxSplit</code>
 section: 5
 crumb: split
 prev: pairwise.html
@@ -16,7 +16,7 @@ nextLabel: append
 
   <h2>Lección</h2>
   <p>
-    <code>split</code> es un port directo del <code>split</code> carácter a
+    <code>fxSplit</code> es un port directo del <code>fxSplit</code> carácter a
     carácter de FxTS, y eso se nota en su firma: no recibe un
     <code>String</code> en absoluto — recibe un <code>Iterable&lt;String&gt;</code>
     de caracteres sueltos, y lo recorre carácter a carácter, acumulando
@@ -29,8 +29,8 @@ nextLabel: append
     Un separador final produce una cadena vacía al final de la salida,
     igual que en FxTS — <code>'a,b,'</code> se divide en
     <code>('a', 'b', '')</code>, no solo en <code>('a', 'b')</code>. No hay
-    forma de cadena <code>Fx</code> para <code>split</code>; llama a la función
-    de nivel superior (o a <code>splitAsync</code>) directamente.
+    forma de cadena <code>Fx</code> para <code>fxSplit</code>; llama a la función
+    de nivel superior (o a <code>fxSplitAsync</code>) directamente.
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>
@@ -40,7 +40,7 @@ nextLabel: append
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>split</code> para descomponer <code>csv</code> en
+  <p>Ejercicio: usa <code>fxSplit</code> para descomponer <code>csv</code> en
     nombres de colores según <code>'|'</code>.</p>
   {{playground:2}}
 

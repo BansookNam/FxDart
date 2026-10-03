@@ -6,12 +6,12 @@ import 'package:test/test.dart';
 void main() {
   group('timeout', () {
     test('should pass values through when every pull is fast enough', () async {
-      final res = await toListAsync(
-        timeoutAsync(
+      final res = await fxToListAsync(
+        fxTimeoutAsync(
           const Duration(milliseconds: 200),
-          mapAsync(
-            (int a) => delay(const Duration(milliseconds: 20), a),
-            toAsync([1, 2, 3]),
+          fxMapAsync(
+            (int a) => fxDelay(const Duration(milliseconds: 20), a),
+            fxToAsync([1, 2, 3]),
           ),
         ),
       );
@@ -20,12 +20,12 @@ void main() {
 
     test('should fail the pull that exceeds the limit', () async {
       await expectLater(
-        toListAsync(
-          timeoutAsync(
+        fxToListAsync(
+          fxTimeoutAsync(
             const Duration(milliseconds: 50),
-            mapAsync(
-              (int a) => delay(Duration(milliseconds: a == 2 ? 200 : 10), a),
-              toAsync([1, 2, 3]),
+            fxMapAsync(
+              (int a) => fxDelay(Duration(milliseconds: a == 2 ? 200 : 10), a),
+              fxToAsync([1, 2, 3]),
             ),
           ),
         ),
@@ -35,8 +35,8 @@ void main() {
 
     test('should apply per pull, not to the whole pipeline', () async {
       // Total time (~5 × 30ms) exceeds the limit; each pull stays under it.
-      final res = await fxAsync(toAsync(range(1, 6)))
-          .map((a) => delay(const Duration(milliseconds: 30), a))
+      final res = await fxAsync(fxToAsync(fxRange(1, 6)))
+          .map((a) => fxDelay(const Duration(milliseconds: 30), a))
           .timeout(const Duration(milliseconds: 100))
           .toList();
       expect(res, equals([1, 2, 3, 4, 5]));
@@ -47,8 +47,8 @@ void main() {
       () async {
         // Each item takes ~80ms; concurrent(3) overlaps them, and each pull's
         // own timer still sees only ~80ms.
-        final res = await fxAsync(toAsync(range(1, 7)))
-            .map((a) => delay(const Duration(milliseconds: 80), a))
+        final res = await fxAsync(fxToAsync(fxRange(1, 7)))
+            .map((a) => fxDelay(const Duration(milliseconds: 80), a))
             .timeout(const Duration(milliseconds: 300))
             .concurrent(3)
             .toList();
@@ -58,8 +58,8 @@ void main() {
 
     test('should pass an empty source through', () async {
       expect(
-        await toListAsync(
-          timeoutAsync(const Duration(milliseconds: 50), asyncEmpty<int>()),
+        await fxToListAsync(
+          fxTimeoutAsync(const Duration(milliseconds: 50), fxAsyncEmpty<int>()),
         ),
         equals([]),
       );
@@ -71,7 +71,7 @@ void main() {
         await expectLater(
           fx([1])
               .toAsync()
-              .map((a) => delay(const Duration(milliseconds: 200), a))
+              .map((a) => fxDelay(const Duration(milliseconds: 200), a))
               .timeout(const Duration(milliseconds: 50))
               .toList(),
           throwsA(isA<TimeoutException>()),

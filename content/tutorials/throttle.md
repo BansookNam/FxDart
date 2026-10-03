@@ -2,7 +2,7 @@
 slug: throttle
 title: throttle — FxDart 101
 description: FxDart throttle tutorial: invoke a function at most once per wait period, with leading/trailing edges and cancel(), plus a live playground.
-heading: <code>throttle</code>
+heading: <code>fxThrottle</code>
 section: 12
 crumb: throttle
 next: shuffle.html
@@ -14,9 +14,9 @@ nextLabel: shuffle
 
   <h2>Lecture</h2>
   <p>
-    <code>throttle</code> guarantees <code>func</code> runs at most once every
+    <code>fxThrottle</code> guarantees <code>func</code> runs at most once every
     <code>wait</code>, no matter how often the throttled function is called.
-    That's the key difference from <a href="debounce.html"><code>debounce</code></a>:
+    That's the key difference from <a href="debounce.html"><code>fxDebounce</code></a>:
     debounce keeps <em>resetting</em> its timer on every call, so a
     continuous stream of calls can delay execution indefinitely; throttle's
     window is fixed once it starts, so calls still get through on a regular
@@ -49,9 +49,9 @@ nextLabel: shuffle
 
   <h2>Method spelling</h2>
   <p>
-    Same as <a href="debounce.html"><code>debounce</code></a>:
+    Same as <a href="debounce.html"><code>fxDebounce</code></a>:
     <code>onScroll.fxThrottle(wait)</code> is
-    <code>throttle(onScroll, wait)</code>, and it forwards
+    <code>fxThrottle(onScroll, wait)</code>, and it forwards
     <code>leading</code> and <code>trailing</code> unchanged.
   </p>
   <pre><code>void onScroll(double offset) =&gt; _measure(offset);
@@ -66,7 +66,7 @@ final handler = onScroll.fxThrottle(
     <a href="fx.html"><code>fx</code></a>.
   </p>
   <h2>Try it yourself</h2>
-  <p>Exercise: wrap <code>onClick</code> in <code>throttle</code> (100ms
+  <p>Exercise: wrap <code>onClick</code> in <code>fxThrottle</code> (100ms
     wait) so rapid clicks register at most twice — leading and trailing —
     instead of three separate times.</p>
   {{playground:2}}
@@ -86,8 +86,8 @@ final handler = onScroll.fxThrottle(
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="debounce.html"><code>debounce</code></a> — waits for quiet instead of a fixed schedule ·
-    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — building timing demos ·
-    <a href="shuffle.html"><code>shuffle</code></a> — seeded randomness ·
+    <a href="debounce.html"><code>fxDebounce</code></a> — waits for quiet instead of a fixed schedule ·
+    <a href="delay.html"><code>fxDelay</code> &amp; <code>fxSleep</code></a> — building timing demos ·
+    <a href="shuffle.html"><code>fxShuffle</code></a> — seeded randomness ·
     <a href="concurrent.html"><code>concurrent</code></a> — rate-limiting for async pipelines
   </div>

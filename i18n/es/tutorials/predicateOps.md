@@ -53,7 +53,7 @@ nextLabel: when
   </p>
   <p>
     <code>.negate</code> es la forma de getter de extensión del
-    <a href="negate.html"><code>negate</code></a> de nivel superior: la misma
+    <a href="negate.html"><code>fxNegate</code></a> de nivel superior: la misma
     función, alcanzada desde el otro lado. Usa la que se lea mejor en el punto
     de llamada; <code>isBlank.or(isShort).negate</code> se lee de izquierda a
     derecha, mientras que <code>negate(...)</code> metería la expresión entera
@@ -72,8 +72,8 @@ nextLabel: when
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="negate.html"><code>negate</code></a> — la forma de nivel superior de <code>.negate</code> ·
-    <a href="not.html"><code>not</code></a> — voltea un solo valor booleano, no un predicado ·
+    <a href="negate.html"><code>fxNegate</code></a> — la forma de nivel superior de <code>.negate</code> ·
+    <a href="not.html"><code>fxNot</code></a> — voltea un solo valor booleano, no un predicado ·
     <a href="filter.html"><code>filter</code></a> / <a href="reject.html"><code>whereNot</code></a> — donde suele acabar un predicado compuesto ·
     <a href="predicates.html"><code>predicates</code></a> — los predicados de tipo integrados con los que combinar
   </div>

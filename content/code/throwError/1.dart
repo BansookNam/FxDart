@@ -1,10 +1,10 @@
 import 'package:fxdart/fxdart.dart';
 
 void main() {
-  final classify = cases<int, String>([
+  final classify = fxCases<int, String>([
     ((n) => n > 0, (n) => 'positive'),
     ((n) => n == 0, (n) => 'zero'),
-  ], orElse: throwError((n) => ArgumentError('unsupported value: $n')));
+  ], orElse: fxThrowError((n) => ArgumentError('unsupported value: $n')));
 
   print(classify(7)); // positive
 

@@ -12,13 +12,15 @@ void main() {
   group('chunk', () {
     group('sync', () {
       test('should be chunked by the given number - number', () {
-        final res = toList(chunk(3, range(1, 12)));
-        expect(toList(chunk(0, range(1, 12))), equals([]));
+        final res = fxToList(fxChunk(3, fxRange(1, 12)));
+        expect(fxToList(fxChunk(0, fxRange(1, 12))), equals([]));
         expect(res, equals(expected));
       });
 
       test('should be chunked by the given number - string', () {
-        final res = toList(chunk(3, 'abcdefghijklmnopqrstuvwxyz'.split('')));
+        final res = fxToList(
+          fxChunk(3, 'abcdefghijklmnopqrstuvwxyz'.split('')),
+        );
         expect(
           res,
           equals([
@@ -36,7 +38,10 @@ void main() {
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = pipe(range(1, 12), [(v) => chunk(3, v), (v) => toList(v)]);
+        final res = pipe(fxRange(1, 12), [
+          (v) => fxChunk(3, v),
+          (v) => fxToList(v),
+        ]);
         expect(res, equals(expected));
       });
 
@@ -61,19 +66,23 @@ void main() {
 
     group('async', () {
       test('should be chunked by the given number - number (empty)', () async {
-        final res = await toListAsync(chunkAsync(0, toAsync(range(1, 12))));
+        final res = await fxToListAsync(
+          fxChunkAsync(0, fxToAsync(fxRange(1, 12))),
+        );
         expect(res, equals([]));
       });
 
       test('should be chunked by the given number - number', () async {
-        final res = await toListAsync(chunkAsync(3, toAsync(range(1, 12))));
+        final res = await fxToListAsync(
+          fxChunkAsync(3, fxToAsync(fxRange(1, 12))),
+        );
         expect(res, equals(expected));
       });
 
       test('should be chunked after concurrent', () async {
         final sw = Stopwatch()..start();
-        final res = await fxAsync(toAsync(range(1, 12)))
-            .map((a) => delay(const Duration(milliseconds: 100), a))
+        final res = await fxAsync(fxToAsync(fxRange(1, 12)))
+            .map((a) => fxDelay(const Duration(milliseconds: 100), a))
             .concurrent(2)
             .chunk(3)
             .toList();
@@ -85,8 +94,8 @@ void main() {
       });
 
       test('should be chunked after concurrent with filter', () async {
-        final res = await fxAsync(toAsync(range(1, 21)))
-            .map((a) => delay(const Duration(milliseconds: 50), a))
+        final res = await fxAsync(fxToAsync(fxRange(1, 21)))
+            .map((a) => fxDelay(const Duration(milliseconds: 50), a))
             .filter((a) => a % 2 == 0)
             .concurrent(2)
             .chunk(3)
@@ -103,8 +112,8 @@ void main() {
       });
 
       test('should be chunked before concurrent', () async {
-        final res = await fxAsync(toAsync(range(1, 21)))
-            .map((a) => delay(const Duration(milliseconds: 50), a))
+        final res = await fxAsync(fxToAsync(fxRange(1, 21)))
+            .map((a) => fxDelay(const Duration(milliseconds: 50), a))
             .filter((a) => a % 2 == 0)
             .chunk(3)
             .concurrent(2)
@@ -124,8 +133,8 @@ void main() {
         'should be able to handle an error when the callback is asynchronous',
         () async {
           await expectLater(
-            fxAsync(toAsync(range(1, 21)))
-                .map((a) => delay(const Duration(milliseconds: 50), a))
+            fxAsync(fxToAsync(fxRange(1, 21)))
+                .map((a) => fxDelay(const Duration(milliseconds: 50), a))
                 .filter((a) {
                   if (a % 2 == 0) return Future<bool>.error(Exception('err'));
                   return true;
@@ -142,8 +151,8 @@ void main() {
         'should be able to handle an error when working concurrent',
         () async {
           await expectLater(
-            fxAsync(toAsync(range(1, 21)))
-                .map((a) => delay(const Duration(milliseconds: 50), a))
+            fxAsync(fxToAsync(fxRange(1, 21)))
+                .map((a) => fxDelay(const Duration(milliseconds: 50), a))
                 .filter((a) => a % 2 == 0)
                 .chunk(3)
                 .map<List<int>>((a) => throw Exception('err'))
@@ -155,7 +164,7 @@ void main() {
       );
 
       test('should be able to be used in the pipeline', () async {
-        final res = await fxAsync(toAsync(range(1, 12))).chunk(3).toList();
+        final res = await fxAsync(fxToAsync(fxRange(1, 12))).chunk(3).toList();
         expect(res, equals(expected));
       });
 

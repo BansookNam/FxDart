@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:fxdart/fxdart.dart' hide isEmpty;
+import 'package:fxdart/fxdart.dart' hide fxIsEmpty;
 import 'package:test/test.dart';
 
 /// Emits each (offsetMs, value) pair at its offset, closing at [closeMs].

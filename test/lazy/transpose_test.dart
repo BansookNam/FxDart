@@ -9,8 +9,8 @@ void main() {
       test(
         "should be merged values of each 'Iterable' with value at the corresponding position",
         () {
-          final res = toList(
-            transpose<Object>([
+          final res = fxToList(
+            fxTranspose<Object>([
               [1, 'a'],
               [2, 'b'],
               [3, 'c'],
@@ -26,7 +26,7 @@ void main() {
             ]),
           );
           expect(
-            toList(transpose(res)),
+            fxToList(fxTranspose(res)),
             equals([
               [1, 'a'],
               [2, 'b'],
@@ -38,8 +38,8 @@ void main() {
       );
 
       test('should be transposed if the iterables have different size', () {
-        final res = toList(
-          transpose([
+        final res = fxToList(
+          fxTranspose([
             [1, 2],
             [3],
             <int>[],
@@ -61,32 +61,32 @@ void main() {
 
       test('should be able to be used in the pipeline', () {
         final res = fx(
-          transpose([
+          fxTranspose([
             [1, 5],
             [2, 6],
             [3, 7],
             [4, 8, 9],
           ]),
-        ).take(2).map((row) => sum(row)).toList();
+        ).take(2).map((row) => fxSum(row)).toList();
 
         expect(res, equals([10, 26]));
       });
 
       test("should be transposed each 'Iterable' having a different type", () {
         final res = fx(
-          transpose<Object>([
+          fxTranspose<Object>([
             ['a', 1],
             ['b', 2],
             ['c', 3],
           ]),
-        ).map((value) => join('-', value)).toList();
+        ).map((value) => fxJoin('-', value)).toList();
 
         expect(res, equals(['a-b-c', '1-2-3']));
       });
 
       test('should transpose two rows into pairs', () {
-        final res = toList(
-          transpose([
+        final res = fxToList(
+          fxTranspose([
             [1, 2, 3, 4],
             [5, 6, 7, 8],
           ]),
@@ -108,12 +108,12 @@ void main() {
       test(
         "should be merged values of each 'AsyncIterable' with value at the corresponding position",
         () async {
-          final res = await toListAsync(
-            transposeAsync([
-              toAsync([1, 5]),
-              toAsync([2, 6]),
-              toAsync([3, 7]),
-              toAsync([4, 8]),
+          final res = await fxToListAsync(
+            fxTransposeAsync([
+              fxToAsync([1, 5]),
+              fxToAsync([2, 6]),
+              fxToAsync([3, 7]),
+              fxToAsync([4, 8]),
             ]),
           );
 
@@ -130,14 +130,14 @@ void main() {
       test(
         'should be transposed if the iterables have different size',
         () async {
-          final res = await toListAsync(
-            transposeAsync([
-              toAsync([1, 2]),
-              toAsync([3]),
-              toAsync(<int>[]),
-              toAsync([4, 5, 6]),
-              toAsync([7]),
-              toAsync([8, 9]),
+          final res = await fxToListAsync(
+            fxTransposeAsync([
+              fxToAsync([1, 2]),
+              fxToAsync([3]),
+              fxToAsync(<int>[]),
+              fxToAsync([4, 5, 6]),
+              fxToAsync([7]),
+              fxToAsync([8, 9]),
             ]),
           );
 
@@ -153,10 +153,10 @@ void main() {
       );
 
       test('should be able to be used in the pipeline', () async {
-        final res = await toListAsync(
-          transposeAsync([
-            toAsync([1, 2, 3, 4]),
-            toAsync([5, 6, 7, 8]),
+        final res = await fxToListAsync(
+          fxTransposeAsync([
+            fxToAsync([1, 2, 3, 4]),
+            fxToAsync([5, 6, 7, 8]),
           ]),
         );
 
@@ -172,12 +172,12 @@ void main() {
       });
 
       test('should be transposed sequentially', () async {
-        final res = await toListAsync(
-          transposeAsync([
-            toAsync([1, 2, 3, 4]),
-            mapAsync(
-              (int a) => delay(const Duration(milliseconds: 50), a),
-              toAsync([5, 6, 7, 8]),
+        final res = await fxToListAsync(
+          fxTransposeAsync([
+            fxToAsync([1, 2, 3, 4]),
+            fxMapAsync(
+              (int a) => fxDelay(const Duration(milliseconds: 50), a),
+              fxToAsync([5, 6, 7, 8]),
             ),
           ]),
         );
@@ -197,12 +197,12 @@ void main() {
         final sw = Stopwatch()..start();
         final res =
             await fxAsync(
-                  transposeAsync<Object>([
-                    toAsync<Object>([1, 2, 3, 4]),
-                    toAsync<Object>([5, 6, 7, 8]),
+                  fxTransposeAsync<Object>([
+                    fxToAsync<Object>([1, 2, 3, 4]),
+                    fxToAsync<Object>([5, 6, 7, 8]),
                   ]),
                 )
-                .map((l) => delay(const Duration(milliseconds: 100), l))
+                .map((l) => fxDelay(const Duration(milliseconds: 100), l))
                 .concurrent(4)
                 .toList();
 
@@ -223,8 +223,8 @@ void main() {
         'should be passed concurrent object when job works concurrently',
         () async {
           final mock = ConcurrentMock<int>();
-          final it = transposeAsync([
-            toAsync([1, 2, 3]),
+          final it = fxTransposeAsync([
+            fxToAsync([1, 2, 3]),
             mock,
           ]).iterator;
           final concurrent = Concurrent.of(2);

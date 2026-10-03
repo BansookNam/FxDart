@@ -20,7 +20,7 @@ nextLabel: join
     recorriéndolos todos: no hay atajo posible, porque el pipeline de aguas
     arriba puede ser una cadena de <code>map</code>/<code>filter</code>
     evaluada de forma perezosa, sin longitud fija hasta que realmente se tira
-    de ella. Es decir, llamar a <code>count</code> sobre un <code>range</code>
+    de ella. Es decir, llamar a <code>count</code> sobre un <code>fxRange</code>
     de un millón de elementos con <code>filter</code> recorre de verdad el
     millón de valores; simplemente no construye una <code>List</code> para
     ello. <code>count</code> es el nombre idiomático en Dart; fxdart también
@@ -38,7 +38,7 @@ nextLabel: join
     En la cadena síncrona, <code>count</code> <em>es</em> el getter
     <code>Iterable.length</code> heredado de Dart (sin paréntesis): como
     <code>Fx</code> es un <code>Iterable</code>, <code>fx(pipeline).length</code>
-    recorre la cadena y devuelve el total. Usa el <code>count(iterable)</code>
+    recorre la cadena y devuelve el total. Usa el <code>fxCount(iterable)</code>
     de nivel superior, o <code>.count()</code> en la cadena <em>asíncrona</em>,
     cuando prefieras escribirlo como un operador con nombre. Si ya tienes una
     <code>List</code> concreta, su <code>.length</code> es gratis: recurre a

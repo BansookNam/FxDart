@@ -11,6 +11,6 @@ Future<void> main() async {
   onClick('click2');
   onClick('click3');
 
-  await sleep(const Duration(milliseconds: 150));
+  await fxSleep(const Duration(milliseconds: 150));
   print(clicks); // currently [click1, click2, click3] — want just 2 calls
 }

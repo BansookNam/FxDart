@@ -29,7 +29,7 @@ nextLabel: predicates
     En una cadena síncrona, <code>.any(f)</code> viene directamente del
     <code>Iterable</code> de Dart —<code>Fx</code> lo hereda—, así que no
     necesita ninguna definición especial. La cadena asíncrona y la forma
-    data-first <code>any(f, iterable)</code> las aporta fxdart, y la grafía de
+    data-first <code>fxAny(f, iterable)</code> las aporta fxdart, y la grafía de
     FxTS <code>some</code> sigue funcionando en todas las posiciones.
   </p>
 
@@ -46,7 +46,7 @@ nextLabel: predicates
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="every.html"><code>every</code></a> — la contraparte «todos ellos» ·
-    <a href="includes.html"><code>includes</code></a> — una especialización de <code>any</code> ·
+    <a href="includes.html"><code>fxIncludes</code></a> — una especialización de <code>any</code> ·
     <a href="find.html"><code>find</code></a> — obtiene el elemento coincidente, no solo un bool ·
     <a href="predicates.html"><code>predicates</code></a> — predicados ya hechos para combinar con <code>any</code>
   </div>

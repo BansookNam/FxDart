@@ -7,29 +7,29 @@ void main() {
   group('every', () {
     group('sync', () {
       test('should return result for each input', () {
-        expect(every(_isEven, <int>[]), isTrue);
-        expect(every(_isEven, [2, 4, 6, 8, 10]), isTrue);
-        expect(every(_isEven, [1, 4, 6, 8, 10]), isFalse);
-        expect(every(_isEven, [2, 4, 7, 8, 10]), isFalse);
-        expect(every(_isEven, [2, 4, 6, 8, 11]), isFalse);
+        expect(fxEvery(_isEven, <int>[]), isTrue);
+        expect(fxEvery(_isEven, [2, 4, 6, 8, 10]), isTrue);
+        expect(fxEvery(_isEven, [1, 4, 6, 8, 10]), isFalse);
+        expect(fxEvery(_isEven, [2, 4, 7, 8, 10]), isFalse);
+        expect(fxEvery(_isEven, [2, 4, 6, 8, 11]), isFalse);
       });
 
       test('should be able to be used in the pipeline', () {
-        final res1 = every(
+        final res1 = fxEvery(
           _isEven,
-          filter(_isEven, [1, 2, 3, 4, 5, 6, 7, 8, 9]),
+          fxFilter(_isEven, [1, 2, 3, 4, 5, 6, 7, 8, 9]),
         );
         expect(res1, isTrue);
 
-        final res2 = every(
+        final res2 = fxEvery(
           (int a) => a > 10,
-          map((int a) => a + 10, [1, 2, 3, 4, 5, 6, 7, 8, 9]),
+          fxMap((int a) => a + 10, [1, 2, 3, 4, 5, 6, 7, 8, 9]),
         );
         expect(res2, isTrue);
 
-        final res3 = every(
+        final res3 = fxEvery(
           (int a) => a < 10,
-          map((int a) => a + 10, [1, 2, 3, 4, 5, 6, 7, 8, 9]),
+          fxMap((int a) => a + 10, [1, 2, 3, 4, 5, 6, 7, 8, 9]),
         );
         expect(res3, isFalse);
       });
@@ -80,29 +80,41 @@ void main() {
       test(
         "should return result when passed arguments are synchronous function and 'AsyncIterable'",
         () async {
-          expect(await everyAsync(_isEven, toAsync([2, 4, 6, 8, 10])), isTrue);
-          expect(await everyAsync(_isEven, toAsync([1, 4, 6, 8, 10])), isFalse);
-          expect(await everyAsync(_isEven, toAsync([2, 4, 7, 8, 10])), isFalse);
-          expect(await everyAsync(_isEven, toAsync([2, 4, 6, 8, 11])), isFalse);
+          expect(
+            await fxEveryAsync(_isEven, fxToAsync([2, 4, 6, 8, 10])),
+            isTrue,
+          );
+          expect(
+            await fxEveryAsync(_isEven, fxToAsync([1, 4, 6, 8, 10])),
+            isFalse,
+          );
+          expect(
+            await fxEveryAsync(_isEven, fxToAsync([2, 4, 7, 8, 10])),
+            isFalse,
+          );
+          expect(
+            await fxEveryAsync(_isEven, fxToAsync([2, 4, 6, 8, 11])),
+            isFalse,
+          );
         },
       );
 
       test('should be able to be used in the pipeline', () async {
-        final res1 = await everyAsync(
+        final res1 = await fxEveryAsync(
           _isEven,
-          filterAsync(_isEven, toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9])),
+          fxFilterAsync(_isEven, fxToAsync([1, 2, 3, 4, 5, 6, 7, 8, 9])),
         );
         expect(res1, isTrue);
 
-        final res2 = await everyAsync(
+        final res2 = await fxEveryAsync(
           (int a) => a > 10,
-          mapAsync((int a) => a + 10, toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9])),
+          fxMapAsync((int a) => a + 10, fxToAsync([1, 2, 3, 4, 5, 6, 7, 8, 9])),
         );
         expect(res2, isTrue);
 
-        final res3 = await everyAsync(
+        final res3 = await fxEveryAsync(
           (int a) => a < 10,
-          mapAsync((int a) => a + 10, toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9])),
+          fxMapAsync((int a) => a + 10, fxToAsync([1, 2, 3, 4, 5, 6, 7, 8, 9])),
         );
         expect(res3, isFalse);
       });

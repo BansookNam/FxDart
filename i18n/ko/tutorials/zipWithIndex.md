@@ -46,6 +46,6 @@ nextLabel: …WithIndex
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="zip.html"><code>zip</code></a> — 두 이터러블을 짝지어 묶습니다 ·
-    <a href="zipWith.html"><code>zipWith</code></a> — 묶으면서 한 번에 결합합니다 ·
-    <a href="entries.html"><code>entries</code></a> — Map의 키와 값을 짝지어 줍니다
+    <a href="zipWith.html"><code>fxZipWith</code></a> — 묶으면서 한 번에 결합합니다 ·
+    <a href="entries.html"><code>fxEntries</code></a> — Map의 키와 값을 짝지어 줍니다
   </div>

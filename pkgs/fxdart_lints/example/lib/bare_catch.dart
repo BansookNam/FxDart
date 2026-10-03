@@ -1,6 +1,6 @@
 import 'package:fxdart/fxdart.dart';
 
-Either<String, int> bare() => either((r) {
+Either<String, int> bare() => fxEither((r) {
   try {
     return int.parse('x');
     // expect_lint: avoid_bare_catch_in_raise
@@ -9,7 +9,7 @@ Either<String, int> bare() => either((r) {
   }
 });
 
-Either<String, int> onObject() => either((r) {
+Either<String, int> onObject() => fxEither((r) {
   try {
     return int.parse('x');
     // expect_lint: avoid_bare_catch_in_raise
@@ -18,7 +18,7 @@ Either<String, int> onObject() => either((r) {
   }
 });
 
-Either<String, int> onException() => either((r) {
+Either<String, int> onException() => fxEither((r) {
   try {
     return int.parse('x');
   } on Exception {
@@ -26,7 +26,7 @@ Either<String, int> onException() => either((r) {
   }
 });
 
-Either<String, int> onError() => either((r) {
+Either<String, int> onError() => fxEither((r) {
   try {
     return int.parse('x');
     // expect_lint: avoid_bare_catch_in_raise
@@ -35,7 +35,7 @@ Either<String, int> onError() => either((r) {
   }
 });
 
-Either<String, int> onSpecific() => either((r) {
+Either<String, int> onSpecific() => fxEither((r) {
   try {
     return int.parse('x');
   } on FormatException {

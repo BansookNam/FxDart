@@ -27,13 +27,13 @@ prevLabel: shuffle
     reproducibles, datos de demo estables, fuzzing basado en propiedades con
     fallos que se pueden reproducir, o cualquier caso donde lo que de verdad
     quieres es «aleatorio, pero igual en cada ejecución». Es lo que usa
-    <a href="shuffle.html"><code>shuffle</code></a> por debajo cuando le pasas
+    <a href="shuffle.html"><code>fxShuffle</code></a> por debajo cuando le pasas
     una semilla.
   </p>
   <p>
     A diferencia del <code>Random(seed)</code> de <code>dart:math</code>, la
     secuencia forma parte del contrato de la librería con FxTS: un
-    <code>shuffle</code> con semilla en FxDart y en FxTS produce el mismo
+    <code>fxShuffle</code> con semilla en FxDart y en FxTS produce el mismo
     orden para la misma semilla.
   </p>
 
@@ -43,7 +43,7 @@ prevLabel: shuffle
   <h2>Demo 2 · Selecciones y barajados reproducibles</h2>
   <p>
     Convierte el generador en la forma aleatoria que necesites; aquí, tiradas
-    de dados y un <code>shuffle</code> con semilla:
+    de dados y un <code>fxShuffle</code> con semilla:
   </p>
   {{playground:1}}
 
@@ -54,6 +54,6 @@ prevLabel: shuffle
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="shuffle.html"><code>shuffle</code></a> — barajado con semilla construido sobre este generador ·
-    <a href="cycle.html"><code>cycle</code></a> &amp; <a href="repeat.html"><code>repeat</code></a> — fuentes infinitas deterministas
+    <a href="shuffle.html"><code>fxShuffle</code></a> — barajado con semilla construido sobre este generador ·
+    <a href="cycle.html"><code>cycle</code></a> &amp; <a href="repeat.html"><code>fxRepeat</code></a> — fuentes infinitas deterministas
   </div>

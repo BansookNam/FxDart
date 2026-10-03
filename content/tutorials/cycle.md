@@ -28,13 +28,13 @@ nextLabel: entries
   <p>
     One edge case worth knowing: cycling an <em>empty</em> source yields
     nothing at all, rather than looping forever over zero elements — so
-    <code>cycle([])</code> is safe and simply produces an empty result.
+    <code>fxCycle([])</code> is safe and simply produces an empty result.
   </p>
   <p>
     It's a natural building block for round-robin assignment (cycle through
     a small list of workers/colors/slots as you map over a longer one) or
     for repeating a short async sequence to model a polling loop. The async
-    form, <code>cycleAsync</code> (or <code>.cycle()</code> on an
+    form, <code>fxCycleAsync</code> (or <code>.cycle()</code> on an
     <code>FxAsync</code> chain), buffers and loops the same way, but pulls
     each round through the usual async protocol.
   </p>
@@ -51,8 +51,8 @@ nextLabel: entries
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="range.html"><code>range</code></a> — a finite counting sequence ·
-    <a href="repeat.html"><code>repeat</code></a> — repeat a single value, a fixed number of times ·
+    <a href="range.html"><code>fxRange</code></a> — a finite counting sequence ·
+    <a href="repeat.html"><code>fxRepeat</code></a> — repeat a single value, a fixed number of times ·
     <a href="take.html"><code>take</code></a> — the bound cycle almost always needs ·
     <a href="concurrent.html"><code>concurrent</code></a> — overlap an async cycle's work
   </div>

@@ -80,7 +80,7 @@ description: 50 tareas reales resueltas dos veces —streams de RxDart frente a 
     <em>trabajos</em> sobre streams de Dart llanos sin chocar con rxdart
     en el mismo fichero — ventanas, <code>groupsBy</code> en vivo,
     <code>shareReplay</code>, debounce guiado por selector,
-    <code>combine</code>, las cuatro políticas pull
+    <code>fxCombine</code>, las cuatro políticas pull
     <code>fromStream*</code>. Lo que las parejas exponen es la otra
     mitad de la historia — cuántas veces un problema que se resuelve con
     un stream es en realidad un <em>pipeline de datos</em> disfrazado de

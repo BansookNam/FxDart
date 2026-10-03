@@ -2,7 +2,7 @@
 slug: evolve
 title: evolve — FxDart 101
 description: FxDart evolve tutorial: transform selected Map values by key, leaving the rest untouched.
-heading: <code>evolve</code>
+heading: <code>fxEvolve</code>
 section: 9
 crumb: evolve
 prev: mapValues.html
@@ -16,7 +16,7 @@ nextLabel: compactObject
 
   <h2>Lecture</h2>
   <p>
-    <code>evolve</code> takes a "recipe" map — key to transformation
+    <code>fxEvolve</code> takes a "recipe" map — key to transformation
     function — and a data map, and produces a new map where every key that
     appears in the recipe has its value passed through the matching
     function; every other key is copied through unchanged.
@@ -31,7 +31,7 @@ nextLabel: compactObject
     different value types within a single map. If you know the shape of
     your data ahead of time and don't need per-key heterogeneity, a plain
     <code>{...map, 'key': f(map['key'])}</code> spread is often more
-    idiomatic Dart; reach for <code>evolve</code> when the recipe itself is
+    idiomatic Dart; reach for <code>fxEvolve</code> when the recipe itself is
     data (e.g. built once and reused across many maps).
   </p>
 
@@ -42,13 +42,13 @@ nextLabel: compactObject
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>evolve</code> to double the <code>'price'</code> field and leave <code>'title'</code> untouched.</p>
+  <p>Exercise: use <code>fxEvolve</code> to double the <code>'price'</code> field and leave <code>'title'</code> untouched.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="prop.html"><code>prop</code></a> — read a single value out ·
-    <a href="omitBy.html"><code>omitBy</code></a> — drop entries instead of transforming them ·
-    <a href="compactObject.html"><code>compactObject</code></a> — a specialized cleanup pass ·
-    <a href="resolveProps.html"><code>resolveProps</code></a> — the async cousin, awaiting instead of transforming
+    <a href="prop.html"><code>fxProp</code></a> — read a single value out ·
+    <a href="omitBy.html"><code>fxOmitBy</code></a> — drop entries instead of transforming them ·
+    <a href="compactObject.html"><code>fxCompactObject</code></a> — a specialized cleanup pass ·
+    <a href="resolveProps.html"><code>fxResolveProps</code></a> — the async cousin, awaiting instead of transforming
   </div>

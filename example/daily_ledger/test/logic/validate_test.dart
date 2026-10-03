@@ -2,7 +2,7 @@ import 'package:daily_ledger/logic/errors.dart';
 import 'package:daily_ledger/logic/validate.dart';
 import 'package:daily_ledger/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fxdart/fxdart.dart' show Either, EitherNel, Raise, either;
+import 'package:fxdart/fxdart.dart' show Either, EitherNel, Raise, fxEither;
 
 const _categories = [
   Category(
@@ -24,7 +24,7 @@ const _categories = [
 /// Runs one validator in its own raise scope — the smallest possible
 /// `either { }`, which is exactly how the lecture introduces it.
 Either<FieldError, A> check<A>(A Function(Raise<FieldError> r) block) =>
-    either(block);
+    fxEither(block);
 
 /// The raised error, or null when the validator accepted the input.
 FieldError? errorOf<A>(Either<FieldError, A> result) => result.leftOrNull();

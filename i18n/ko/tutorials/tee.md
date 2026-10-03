@@ -39,11 +39,11 @@ nextLabel: tee3
     그 대가가 제약입니다. <code>tee</code>가 먹이는 것은 폴드이지
     파이프라인이 아닙니다 — 리더들은 각자의 속도로 전진하거나, 서로 다른
     개수만 가져가거나, 따로 일찍 멈출 수 없습니다. 정말로 <em>독립적인</em>
-    리더 둘이 필요하다면 <a href="fork.html"><code>fork</code></a>를
+    리더 둘이 필요하다면 <a href="fork.html"><code>fxFork</code></a>를
     쓰고, 뒤처진 커서가 따라올 수 있도록 유지되는 공유 버퍼를 감수하세요.
     기준은 이렇습니다: 두 리더가 모두 소스를 끝까지 소비해서 하나의 값으로
     줄인다면 <code>tee</code>, 둘 중 하나라도 그 자체로 파이프라인이라면
-    <code>fork</code>.
+    <code>fxFork</code>.
   </p>
 
   <h2>이름의 유래</h2>
@@ -68,8 +68,8 @@ nextLabel: tee3
     Python의 <code>itertools.tee()</code>도 같은 그림에서 이름을 빌려,
     하나의 이터러블을 여러 개의 독립적인 이터레이터로 갈라 줍니다. 알아
     둘 만한 점은, 그쪽이 바로 FxDart가
-    <a href="fork.html"><code>fork</code></a>라고 부르는 것이지
-    <code>tee</code>가 아니라는 것입니다. <code>fork</code>는 Python의
+    <a href="fork.html"><code>fxFork</code></a>라고 부르는 것이지
+    <code>tee</code>가 아니라는 것입니다. <code>fxFork</code>는 Python의
     것처럼 독립적인 커서를 주고, FxDart의 <code>tee</code>는 대신
     <em>소비</em>를 가릅니다 — 한 번의 순회를 여러 폴드가 보폭을 맞춰
     읽는 것이죠. 같은 T자 그림을, 한 단계 더 하류에서 가른 셈입니다.
@@ -103,7 +103,7 @@ nextLabel: tee3
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="fork.html"><code>fork</code></a> — 버퍼를 대가로 한 독립 리더 ·
+    <a href="fork.html"><code>fxFork</code></a> — 버퍼를 대가로 한 독립 리더 ·
     <a href="reduce.html"><code>reduce</code></a> — 폴드 하나 ·
     <a href="groupBy.html"><code>groupBy</code></a> — 값을 키로 하는 여러 누산기
   </div>

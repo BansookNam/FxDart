@@ -11,7 +11,7 @@ int maxInFlight = 0;
 Future<(int, double)> importBatch(List<Txn> batch) async {
   inFlight++;
   if (inFlight > maxInFlight) maxInFlight = inFlight;
-  final ack = await delay(Duration.zero, (
+  final ack = await fxDelay(Duration.zero, (
     batch.length,
     fx(batch).sumBy((t) => t.amount).toDouble(),
   ));

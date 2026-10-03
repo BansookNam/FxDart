@@ -29,7 +29,7 @@ void main() {
       final active = fx(cohort).filter((u) => u.active.contains(m)).size();
       return '$m ${(100 * active / cohort.length).round()}%';
     });
-    return '${e.key} (${cohort.length} users): ${join(' | ', cells)}';
+    return '${e.key} (${cohort.length} users): ${fxJoin(' | ', cells)}';
   });
-  print(join('\n', ['Cohort retention by signup month', ...rows]));
+  print(fxJoin('\n', ['Cohort retention by signup month', ...rows]));
 }

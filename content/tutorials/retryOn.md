@@ -16,7 +16,7 @@ nextLabel: onErrorResume
 
   <h2>Lecture</h2>
   <p>
-    The pull layer's <code><a href="retry.html">retry</a></code> rebuilds
+    The pull layer's <code><a href="retry.html">fxRetry</a></code> rebuilds
     an iterable. On the push side the same idea is a
     <strong>resubscribe</strong>, and there are two shapes. One rebuilds
     the stream from a factory —
@@ -69,6 +69,6 @@ nextLabel: onErrorResume
   <div class="callout">
     <strong>Related:</strong>
     <a href="onErrorResume.html"><code>FxEvents.retry</code></a> — the factory form, for sources you cannot re-listen ·
-    <a href="retry.html"><code>retry</code></a> — the pull-layer original, with a backoff hook and per-element scope ·
+    <a href="retry.html"><code>fxRetry</code></a> — the pull-layer original, with a backoff hook and per-element scope ·
     <a href="timeout.html"><code>timeout</code></a> — bound how long a pull may take, rather than how often it retries
   </div>

@@ -2,7 +2,7 @@
 slug: retry
 title: retry — FxDart 101
 description: FxDart retry와 mapRetry 튜토리얼: 불안정한 효과를 백오프와 함께, 원소 단위 또는 파이프라인 단위로, 병렬 안전하게 다시 실행하는 방법을 라이브 플레이그라운드와 함께 다룹니다.
-heading: <code>retry</code>
+heading: <code>fxRetry</code>
 section: 11
 crumb: retry
 prev: concurrentPool.html
@@ -32,7 +32,7 @@ nextLabel: timeout
     <code>mapRetry(attempts, f)</code>는 같은 아이디어를 원소 단위로 적용한
     것입니다. 모든 호출이 각자의 재시도 예산을 갖는
     <code><a href="map.html">map</a></code>입니다. 병렬 안전한
-    <code>mapAsync</code> 위에 만들어져 있어서
+    <code>fxMapAsync</code> 위에 만들어져 있어서
     <code><a href="concurrent.html">concurrent(n)</a></code> 아래에서는
     진행 중인 각 원소가 <em>독립적으로</em> 재시도합니다 — 느리고
     불안정한 항목 하나가 다시 실행되는 동안 이웃들은 그대로 지나가고,
@@ -44,11 +44,11 @@ nextLabel: timeout
   </p>
   <p>
     Dart 고유의 추가 기능입니다(FxTS에는 대응물이 없습니다). Rx의
-    <code>retry</code>/<code>retryWhen</code>을 따르되, "재구독"이
+    <code>fxRetry</code>/<code>retryWhen</code>을 따르되, "재구독"이
     "이터러블을 다시 만든다"를 뜻하는 pull 모델에 맞춰 다시
     설계했습니다. 재시도가 소진된 뒤의 <em>타입이 있는</em> 실패 처리는
     결과를
-    <code><a href="eitherPipelines.html">eitherCatching</a></code>에
+    <code><a href="eitherPipelines.html">fxEitherCatching</a></code>에
     넘기세요.
   </p>
 

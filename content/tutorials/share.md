@@ -80,5 +80,5 @@ nextLabel: shareReplay
     <a href="shareReplay.html"><code>shareReplay</code></a> — multicast that remembers a buffer of history ·
     <a href="liveValue.html"><code>LiveValue</code></a> — the sharing that remembers: late subscribers get the current value first ·
     <a href="tee.html"><code>tee</code></a> — the pull-side answer to two readers over one pass, with no buffer ·
-    <a href="fork.html"><code>fork</code></a> — two independent pull cursors over one source, at the cost of a buffer
+    <a href="fork.html"><code>fxFork</code></a> — two independent pull cursors over one source, at the cost of a buffer
   </div>

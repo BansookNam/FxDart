@@ -21,8 +21,8 @@ nextLabel: Either
     <strong>깊이 알아보기.</strong> 이 페이지는 전체 개요입니다. 각 주제마다
     실행 가능한 데모가 담긴 상세 튜토리얼이 있습니다:
     <a href="either.html"><code>Either</code></a> ·
-    <a href="raise.html"><code>either</code> &amp; <code>Raise</code> 스코프</a> ·
-    <a href="nullable.html"><code>nullable</code></a> ·
+    <a href="raise.html"><code>fxEither</code> &amp; <code>Raise</code> 스코프</a> ·
+    <a href="nullable.html"><code>fxNullable</code></a> ·
     <a href="nonEmptyList.html"><code>NonEmptyList</code></a> ·
     <a href="accumulate.html">에러 누적</a> ·
     <a href="eitherPipelines.html"><code>Either</code> × 파이프라인</a>
@@ -63,7 +63,7 @@ Either&lt;Failure, SuccessData&gt; getResult() =>
     Kotlin과의 차이 두 가지는 Dart의 현실입니다. Dart에는 람다 리시버가
     없으므로 스코프가 명시적 매개변수(<code>r</code>)로 전달되고,
     <code>inline</code>이 없으므로 비동기는 별도의 빌더
-    (<code>eitherAsync</code>)를 사용합니다. 내부 구현은 flatMap 연쇄가
+    (<code>fxEitherAsync</code>)를 사용합니다. 내부 구현은 flatMap 연쇄가
     <em>아닙니다</em>. Arrow와 마찬가지로, 실패한 <code>r.bind</code>는
     스코프 토큰이 달린 비공개 신호를 던지고 빌더가 경계에서 잡아냅니다 —
     그래서 이른 반환, 반복문, <code>if</code>가 블록 안에서 전부 그대로
@@ -103,16 +103,16 @@ switch (parsePort('8080')) {
       <code>Never</code>를 반환합니다.</li>
   </ul>
   <p>
-    <code>eitherAsync</code>는 비동기 쌍둥이이고(raise는 같은 await 체인
-    안에서만), <code>nullable</code>/<code>nullableAsync</code>는
+    <code>fxEitherAsync</code>는 비동기 쌍둥이이고(raise는 같은 await 체인
+    안에서만), <code>fxNullable</code>/<code>fxNullableAsync</code>는
     <code>Either</code> 대신 <code>T?</code>를 돌려주는 nullable 우선
     쌍둥이입니다 — FxDart는 nullable 우선이므로 <code>Option</code> 타입은
     없습니다.
   </p>
   <p>
-    <a href="raise.html">깊이 알아보기: <code>either</code> &amp;
+    <a href="raise.html">깊이 알아보기: <code>fxEither</code> &amp;
     <code>Raise</code> 스코프 →</a> ·
-    <a href="nullable.html">깊이 알아보기: <code>nullable</code> →</a>
+    <a href="nullable.html">깊이 알아보기: <code>fxNullable</code> →</a>
   </p>
 
   <h2>첫 실패만이 아니라 모든 실패를 모으기</h2>
@@ -168,7 +168,7 @@ final result = await fxStream(records)
   <h2>예외 vs raise된 에러</h2>
   <p>
     경계는 단호합니다. <em>raise된</em> 에러는 도메인의 타입 있는 실패이고,
-    <em>throw된</em> 예외는 결함이므로 <code>either</code>를 그대로 뚫고
+    <em>throw된</em> 예외는 결함이므로 <code>fxEither</code>를 그대로 뚫고
     전파됩니다. throw를 <code>Either</code>로 붙잡고 싶다면 명시적으로
     쓰세요:
   </p>
@@ -185,7 +185,7 @@ final typed  = Either.catchingWith(ParseFailure.new, () => jsonDecode(raw));</co
     위의 즉시 실행 종결 연산자를 사용하세요. 지연된 raise는
     <code>RaiseLeakedError</code>로 요란하게 실패합니다. (2) raise 블록 안에서
     맨몸 <code>catch</code>를 쓰지 마세요 — 단락 신호를 항상 통과시키는
-    <code>catching</code>/<code>catchingAsync</code>를 사용하세요
+    <code>fxCatching</code>/<code>fxCatchingAsync</code>를 사용하세요
     (신호는 <code>Error</code>이므로 <code>on Exception</code>은 이미
     안전합니다).
   </div>

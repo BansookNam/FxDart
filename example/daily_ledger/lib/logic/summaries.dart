@@ -108,14 +108,14 @@ class MonthTrendPoint {
 }
 
 /// Month-over-month comparison for the [months] months ending at [reference].
-/// Pipeline: `range` → `map` (month summaries) → `zip` the list against
+/// Pipeline: `fxRange` → `map` (month summaries) → `zip` the list against
 /// itself shifted by one, pairing each month with its predecessor.
 List<MonthTrendPoint> monthlyTrend(
   List<Entry> entries,
   DateTime reference, {
   int months = 6,
 }) {
-  final summaries = fx(range(months, -1, -1))
+  final summaries = fx(fxRange(months, -1, -1))
       .map((back) => DateTime(reference.year, reference.month - back))
       .map((m) => (m, monthSummary(entries, m)))
       .toList();
@@ -143,7 +143,7 @@ List<Entry> possibleDuplicates(List<Entry> entries) {
       '${e.title}|${e.amount}|${e.date.year}-${e.date.month}-${e.date.day}';
   final money = fx(entries).filter((e) => e.type.isMoney).toList();
   final firstSeen = fx(money).uniqBy(key).toList();
-  return difference(firstSeen, money).toList();
+  return fxDifference(firstSeen, money).toList();
 }
 
 /// Live search over entries: case-insensitive match on title and tags.

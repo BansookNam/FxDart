@@ -10,9 +10,9 @@ import 'map.dart';
 /// Port of FxTS `zip` (TS tuples become Dart records).
 ///
 /// ```dart
-/// zip(['a', 'b'], [1, 2]); // (('a', 1), ('b', 2))
+/// fxZip(['a', 'b'], [1, 2]); // (('a', 1), ('b', 2))
 /// ```
-Iterable<(A, B)> zip<A, B>(Iterable<A> iterable1, Iterable<B> iterable2) =>
+Iterable<(A, B)> fxZip<A, B>(Iterable<A> iterable1, Iterable<B> iterable2) =>
     _ZipIterable(iterable1, iterable2);
 
 class _ZipIterable<A, B> extends Iterable<(A, B)>
@@ -79,7 +79,7 @@ class _ZipRangeRangeIterator<A, B> implements Iterator<(A, B)> {
 
 /// [_ZipRangeRangeIterator] with a following `filter` folded in — see
 /// [FxFilterFusable]. Same elements and same order as
-/// `filter(p, zip(a, b))`; the predicate still runs exactly once per pair,
+/// `fxFilter(p, zip(a, b))`; the predicate still runs exactly once per pair,
 /// in order.
 class _ZipRangeRangeFilterIterator<A, B> implements Iterator<(A, B)> {
   _ZipRangeRangeFilterIterator(this._p, FxListRange<A> r1, FxListRange<B> r2)
@@ -175,9 +175,9 @@ class _ZipIterator<A, B> implements Iterator<(A, B)> {
   }
 }
 
-/// Three-iterable variant of [zip]. (Dart has no variadic generics, so each
+/// Three-iterable variant of [fxZip]. (Dart has no variadic generics, so each
 /// arity is a separate function.)
-Iterable<(A, B, C)> zip3<A, B, C>(
+Iterable<(A, B, C)> fxZip3<A, B, C>(
   Iterable<A> iterable1,
   Iterable<B> iterable2,
   Iterable<C> iterable3,
@@ -257,7 +257,7 @@ class _Zip3RangeIterator<A, B, C> implements Iterator<(A, B, C)> {
 
 /// [_Zip3RangeIterator] with a following `filter` folded in — see
 /// [FxFilterFusable]. This is the shape a sliding window of three takes
-/// (`zip3(xs, drop(1, xs), drop(2, xs))` then a predicate), and the one the
+/// (`fxZip3(xs, fxDrop(1, xs), fxDrop(2, xs))` then a predicate), and the one the
 /// fusion was measured on.
 class _Zip3RangeFilterIterator<A, B, C> implements Iterator<(A, B, C)> {
   _Zip3RangeFilterIterator(
@@ -327,21 +327,21 @@ class _Zip3Iterator<A, B, C> implements Iterator<(A, B, C)> {
 }
 
 /// Splits an iterable of pairs back into a pair of lists — the inverse of
-/// [zip], with `unzip(zip(a, b))` returning `a` and `b` truncated to the
+/// [fxZip], with `fxUnzip(zip(a, b))` returning `a` and `b` truncated to the
 /// shorter of the two.
 ///
 /// Strict, and it has to be: a lazy `unzip` would have to hand back two
 /// iterables over one source, so draining either would buffer everything the
-/// other has not reached (the cost `fork` pays). Both lists are filled in a
+/// other has not reached (the cost `fxFork` pays). Both lists are filled in a
 /// single pass instead.
 ///
 /// Dart-native addition (FxTS has no `unzip`); Kotlin and Rust spell it the
 /// same, and the TS tuple becomes a Dart record — as in `partition`.
 ///
 /// ```dart
-/// unzip([('a', 1), ('b', 2)]); // (['a', 'b'], [1, 2])
+/// fxUnzip([('a', 1), ('b', 2)]); // (['a', 'b'], [1, 2])
 /// ```
-(List<A>, List<B>) unzip<A, B>(Iterable<(A, B)> iterable) {
+(List<A>, List<B>) fxUnzip<A, B>(Iterable<(A, B)> iterable) {
   final lefts = <A>[];
   final rights = <B>[];
   if (iterable is List<(A, B)>) {
@@ -360,8 +360,8 @@ class _Zip3Iterator<A, B, C> implements Iterator<(A, B, C)> {
   return (lefts, rights);
 }
 
-/// Async counterpart of [unzip].
-Future<(List<A>, List<B>)> unzipAsync<A, B>(
+/// Async counterpart of [fxUnzip].
+Future<(List<A>, List<B>)> fxUnzipAsync<A, B>(
   FxAsyncIterable<(A, B)> iterable,
 ) async {
   final lefts = <A>[];
@@ -376,9 +376,9 @@ Future<(List<A>, List<B>)> unzipAsync<A, B>(
   }
 }
 
-/// Async counterpart of [zip]: pulls both sources in parallel per pair.
+/// Async counterpart of [fxZip]: pulls both sources in parallel per pair.
 @pragma('vm:prefer-inline')
-FxAsyncIterable<(A, B)> zipAsync<A, B>(
+FxAsyncIterable<(A, B)> fxZipAsync<A, B>(
   FxAsyncIterable<A> iterable1,
   FxAsyncIterable<B> iterable2,
 ) {
@@ -405,9 +405,9 @@ FxAsyncIterable<(A, B)> zipAsync<A, B>(
   });
 }
 
-/// Async counterpart of [zip3].
+/// Async counterpart of [fxZip3].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<(A, B, C)> zip3Async<A, B, C>(
+FxAsyncIterable<(A, B, C)> fxZip3Async<A, B, C>(
   FxAsyncIterable<A> iterable1,
   FxAsyncIterable<B> iterable2,
   FxAsyncIterable<C> iterable3,
@@ -435,19 +435,19 @@ FxAsyncIterable<(A, B, C)> zip3Async<A, B, C>(
 /// Zips two iterables through the combining function [f].
 ///
 /// Port of FxTS `zipWith`.
-Iterable<C> zipWith<A, B, C>(
+Iterable<C> fxZipWith<A, B, C>(
   C Function(A a, B b) f,
   Iterable<A> iterable1,
   Iterable<B> iterable2,
-) => map((r) => f(r.$1, r.$2), zip(iterable1, iterable2));
+) => fxMap((r) => f(r.$1, r.$2), fxZip(iterable1, iterable2));
 
-/// Async counterpart of [zipWith].
+/// Async counterpart of [fxZipWith].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<C> zipWithAsync<A, B, C>(
+FxAsyncIterable<C> fxZipWithAsync<A, B, C>(
   FutureOr<C> Function(A a, B b) f,
   FxAsyncIterable<A> iterable1,
   FxAsyncIterable<B> iterable2,
-) => mapAsync((r) => f(r.$1, r.$2), zipAsync(iterable1, iterable2));
+) => fxMapAsync((r) => f(r.$1, r.$2), fxZipAsync(iterable1, iterable2));
 
 /// Pairs each element with its index: `(index, value)`.
 ///
@@ -483,15 +483,15 @@ class _ZipWithIndexIterator<A> implements Iterator<(int, A)> {
 FxAsyncIterable<(int, A)> zipWithIndexAsync<A>(FxAsyncIterable<A> iterable) {
   return dispatchAsync(iterable, (source) {
     var i = 0;
-    return mapAsync((A a) => (i++, a), source).iterator;
+    return fxMapAsync((A a) => (i++, a), source).iterator;
   });
 }
 
 /// Returns the transposition of the given rows: the n-th output list holds
 /// the n-th element of every input row that has one.
 ///
-/// Port of FxTS `transpose` (single-arity: pass the rows as one iterable).
-Iterable<List<A>> transpose<A>(Iterable<Iterable<A>> rows) =>
+/// Port of FxTS `fxTranspose` (single-arity: pass the rows as one iterable).
+Iterable<List<A>> fxTranspose<A>(Iterable<Iterable<A>> rows) =>
     _TransposeIterable(rows);
 
 class _TransposeIterable<A> extends Iterable<List<A>> {
@@ -525,9 +525,11 @@ class _TransposeIterator<A> implements Iterator<List<A>> {
   }
 }
 
-/// Async counterpart of [transpose].
+/// Async counterpart of [fxTranspose].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<List<A>> transposeAsync<A>(Iterable<FxAsyncIterable<A>> rows) {
+FxAsyncIterable<List<A>> fxTransposeAsync<A>(
+  Iterable<FxAsyncIterable<A>> rows,
+) {
   return DelegateAsyncIterable(() {
     final iterators = rows.map((r) => r.iterator).toList(growable: false);
     return DelegateAsyncIterator((concurrent) async {

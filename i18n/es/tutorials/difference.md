@@ -16,7 +16,7 @@ nextLabel: differenceBy
 
   <h2>Lección</h2>
   <p>
-    Lee la firma con atención: <code>difference(iterable1, iterable2)</code>
+    Lee la firma con atención: <code>fxDifference(iterable1, iterable2)</code>
     recorre <strong><code>iterable2</code></strong> y emite cada uno de sus
     elementos que <em>no</em> se encuentre en <code>iterable1</code>
     (sin duplicados, como <code>uniq</code>). <code>iterable1</code> se usa
@@ -29,7 +29,7 @@ nextLabel: differenceBy
     <code>iterable2</code> como «la lista que estás filtrando».
   </p>
   <p>
-    Por dentro es <code>differenceBy((a) =&gt; a, iterable1, iterable2)</code> —
+    Por dentro es <code>fxDifferenceBy((a) =&gt; a, iterable1, iterable2)</code> —
     mira <a href="differenceBy.html"><code>differenceBy</code></a> si
     necesitas comparar por una clave calculada en vez de por igualdad de
     valor.
@@ -59,5 +59,5 @@ nextLabel: differenceBy
     <a href="differenceBy.html"><code>differenceBy</code></a> — lo mismo, por una clave calculada ·
     <a href="intersection.html"><code>intersection</code></a> — quedarse con los elementos comunes en su lugar ·
     <a href="uniq.html"><code>uniq</code></a> — elimina duplicados de un solo iterable ·
-    <a href="../tutorials/includes.html"><code>includes</code></a> — comprueba la pertenencia en un solo iterable
+    <a href="../tutorials/includes.html"><code>fxIncludes</code></a> — comprueba la pertenencia en un solo iterable
   </div>

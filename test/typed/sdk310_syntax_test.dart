@@ -34,7 +34,7 @@ void main() {
   });
 
   test('null-aware elements (3.8) power compactObject without casts', () {
-    expect(compactObject({'a': 1, 'b': null, 'c': 3}), {'a': 1, 'c': 3});
+    expect(fxCompactObject({'a': 1, 'b': null, 'c': 3}), {'a': 1, 'c': 3});
     // And in user code: collection literals drop null inline.
     int? missing;
     expect([1, ?missing, 3], [1, 3]);

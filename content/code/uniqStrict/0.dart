@@ -2,13 +2,13 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   // Data-first form: dedups now, and hands back a real List.
-  final ids = uniqStrict([3, 1, 3, 2, 1, 2]);
+  final ids = fxUniqStrict([3, 1, 3, 2, 1, 2]);
   print(ids); // [3, 1, 2]
   print(ids.length); // 3  -- a List, so .length/[i] work right away
   print(ids[0]); // 3
 
   // Same elements, same order as the lazy version.
-  print(toList(distinct([3, 1, 3, 2, 1, 2]))); // [3, 1, 2]
+  print(fxToList(fxDistinct([3, 1, 3, 2, 1, 2]))); // [3, 1, 2]
 
   // uniqByStrict dedups on a computed key instead of the whole value.
   final orders = [

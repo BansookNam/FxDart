@@ -20,25 +20,25 @@ nextLabel: peek
     intermedios a la vista: en lugar de colapsar un iterable en un único valor
     final, emite <em>todas</em> las acumulaciones parciales, incluido el propio
     valor inicial como primer valor. Ese detalle —que el primer valor es el
-    valor inicial— importa: <code>scan(f, 0, [1, 2, 3])</code> emite cuatro
+    valor inicial— importa: <code>fxScan(f, 0, [1, 2, 3])</code> emite cuatro
     valores
     (<code>0</code> y luego tres sumas parciales), no tres.
   </p>
   <p>
-    <code>scan1</code> es la variante sin valor inicial, portada de la sobrecarga
+    <code>fxScan1</code> es la variante sin valor inicial, portada de la sobrecarga
     <code>scan(f, iterable)</code> de FxTS (sin argumento de valor inicial). Usa el
     primer elemento del iterable como acumulador inicial y lo emite de
     inmediato, y luego sigue plegando el resto, reflejando la relación de
     <code>reduce</code> con <code>fold</code>. Sobre un iterable vacío,
-    <code>scan1</code> no tiene primer elemento con el que arrancar, así que no
+    <code>fxScan1</code> no tiene primer elemento con el que arrancar, así que no
     emite nada en absoluto. Ten en cuenta que no hay método de cadena para
-    <code>scan1</code> (solo <code>scan</code> está en
+    <code>fxScan1</code> (solo <code>scan</code> está en
     <code>Fx</code>/<code>FxAsync</code>): llámalo en forma data-first,
-    <code>scan1(f, iterable)</code>.
+    <code>fxScan1(f, iterable)</code>.
   </p>
   <p>
     Ambos son perezosos: no se ejecuta nada hasta que tiras de los valores. En
-    el lado asíncrono, <code>scanAsync</code>/<code>scan1Async</code> siguen
+    el lado asíncrono, <code>fxScanAsync</code>/<code>fxScan1Async</code> siguen
     plegando paso a paso y en orden (cada paso necesita el resultado
     anterior), así que
     <code>.concurrent(n)</code> no paraleliza el pliegue en sí; lo que sí hace

@@ -23,8 +23,8 @@ nextLabel: sortBy
     <code>sort</code> de FxDart <strong>nunca muta su entrada</strong>. Siempre
     crea una <code>List</code> nueva (<code>List.of(iterable)..sort(f)</code>),
     dejando el iterable original tal cual estaba. FxTS añadió más tarde
-    <code>toSorted</code> como alternativa no mutante a su <code>sort</code>
-    mutante; en FxDart, <code>toSorted</code> es simplemente un alias —
+    <code>fxToSorted</code> como alternativa no mutante a su <code>sort</code>
+    mutante; en FxDart, <code>fxToSorted</code> es simplemente un alias —
     como <code>sort</code> ya era no mutante, no quedaba nada
     que diferenciar.
   </p>

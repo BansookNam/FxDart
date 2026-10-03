@@ -71,7 +71,7 @@ nextLabel: attempt
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="retry.html"><code>retry</code></a> — the pull-layer original, with a backoff hook and per-element scope ·
+    <a href="retry.html"><code>fxRetry</code></a> — the pull-layer original, with a backoff hook and per-element scope ·
     <a href="attempt.html"><code>attempt</code></a> — the same failures, as typed <code>Left</code>s on the value channel ·
     <a href="either.html"><code>Either</code></a> — errors as typed values rather than events to recover from
   </div>

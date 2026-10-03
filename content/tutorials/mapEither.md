@@ -20,7 +20,7 @@ nextLabel: separated
     conversion — it turns whatever is already on the error channel into
     a <code>Left</code>. <code>mapEither</code> is the operator you
     reach for <em>after</em> that, or on a clean source: each event
-    runs inside an <code><a href="raise.html">either</a></code> builder,
+    runs inside an <code><a href="raise.html">fxEither</a></code> builder,
     so you write straight-line Dart with <code>r.ensure</code> /
     <code>r.raise</code> and the result of the whole map is
     <code>Either&lt;E, R&gt;</code>. A failing event does not cancel
@@ -28,15 +28,15 @@ nextLabel: separated
   </p>
   <p>
     A <em>thrown</em> exception stays on the error channel — that is the
-    <code>either</code> builder's contract, and it keeps
+    <code>fxEither</code> builder's contract, and it keeps
     <code>attempt</code> the single place where a throw turns into a
     value. When a callback both raises and throws, prefer
-    <code>eitherCatching</code> inside <code>mapEither</code> so one
+    <code>fxEitherCatching</code> inside <code>mapEither</code> so one
     <code>Either</code> comes out.
   </p>
   <p>
     <code>mapEitherAsync</code> is the async twin: one event at a time,
-    like <code>asyncMap</code>. <code>eitherAsync</code>'s rule carries
+    like <code>asyncMap</code>. <code>fxEitherAsync</code>'s rule carries
     over: a raise must happen inside the awaited chain. A raise from an
     unawaited future outlives the scope and surfaces as an unhandled
     zone error instead of a <code>Left</code>.
@@ -63,6 +63,6 @@ nextLabel: separated
   <div class="callout">
     <strong>Related:</strong>
     <a href="attempt.html"><code>attempt</code></a> — the boundary that turns a throw into a <code>Left</code> ·
-    <a href="raise.html"><code>either</code> builder</a> — the same raise scope, on a single value ·
+    <a href="raise.html"><code>fxEither</code> builder</a> — the same raise scope, on a single value ·
     <a href="separated.html"><code>rights</code> / <code>separated</code></a> — split the resulting <code>Either</code>s
   </div>

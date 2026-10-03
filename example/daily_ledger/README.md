@@ -20,7 +20,7 @@ flutter test              # pure-Dart tests for the logic/ pipelines
 - `lib/data/ledger_repository.dart` — hive_ce (IndexedDB on web) as a "dumb
   shelf"; startup loads 4 boxes through `toAsync().map(read).concurrent(3)`.
 - `lib/data/seed.dart` — deterministic fixtures via `createSeededRandom`,
-  `range` → `flatMap`, seeded `shuffle`.
+  `fxRange` → `flatMap`, seeded `fxShuffle`.
 - `lib/ui/widgets.dart` — the pipeline explainer (`PipelineExplanation` /
   `showPipelineDialog`): the "?" dialogs are built from closures over the
   same pipeline outputs the cards render, so their numbers can never drift.
@@ -34,17 +34,17 @@ flutter test              # pure-Dart tests for the logic/ pipelines
 | Where | Pipeline |
 | ----- | -------- |
 | Running balance sparkline | `sortBy(date)` → `scan(sum)` |
-| Cashflow forecast | `concat(actual, projected)` → `sortBy` → `scan` — history and future through one pipeline |
-| Calendar grid | `range(42)` → `map` → `chunk(7)` |
+| Cashflow forecast | `fxConcat(actual, projected)` → `sortBy` → `scan` — history and future through one pipeline |
+| Calendar grid | `fxRange(42)` → `map` → `chunk(7)` |
 | Due & overdue panel | `filter` → `sortBy` → `partition` |
-| Budgets | `groupBy` → `sumBy`; suggestions via `evolve` |
-| Heatmap | one `filter` source, two `fork()`s → `groupBy`/`sumBy` + `sumBy` |
+| Budgets | `groupBy` → `sumBy`; suggestions via `fxEvolve` |
+| Heatmap | one `filter` source, two `fxFork()`s → `groupBy`/`sumBy` + `sumBy` |
 | Weekday profile | `groupBy(day)` → `sumBy`, then `groupBy(weekday)` → `averageBy` |
-| Quick stats | `juxt` over the month slice; biggest expense via `maxBy` |
+| Quick stats | `fxJuxt` over the month slice; biggest expense via `maxBy` |
 | Duplicates | `uniqBy` + `difference` |
-| Tag explorer | `intersection` / `difference`; `compact(pluck(...))` → `sum` |
-| CSV export | `sortBy` → `map` → `pick` → `join`, header `prepend`ed |
-| CSV import | `split` → `zipWithIndex` → `map(parse)` → `compact` ×2; per row `zip(header, cells)` → `fromEntries` |
+| Tag explorer | `intersection` / `difference`; `fxCompact(fxPluck(...))` → `sum` |
+| CSV export | `sortBy` → `map` → `fxPick` → `join`, header `prepend`ed |
+| CSV import | `fxSplit` → `zipWithIndex` → `map(parse)` → `fxCompact` ×2; per row `zip(header, cells)` → `fxFromEntries` |
 | Search / reset / import preview | `debounce` / `throttle` / `debounce` |
-| Caching | nested `memoize` keyed by list identity (+ month, + rules, + `(month, today)` records) |
+| Caching | nested `fxMemoize` keyed by list identity (+ month, + rules, + `(month, today)` records) |
 | About dialog | the dynamic `pipe` (FxTS parity), run live |

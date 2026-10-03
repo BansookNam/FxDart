@@ -8,7 +8,7 @@ void main() {
       .windowed(3)
       .map((w) {
         final values = w.map((t) => t.toStringAsFixed(1)).join(' ');
-        return '$values -> avg ${average(w).toStringAsFixed(1)}';
+        return '$values -> avg ${fxAverage(w).toStringAsFixed(1)}';
       })
       .toList();
 

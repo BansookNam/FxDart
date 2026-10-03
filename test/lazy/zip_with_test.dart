@@ -14,7 +14,7 @@ void main() {
     group('sync', () {
       test('should apply `f` to each same positioned pair', () {
         final acc = <Map<String, int>>[];
-        for (final a in zipWith((String a, int b) => {a: b}, iter1, iter2)) {
+        for (final a in fxZipWith((String a, int b) => {a: b}, iter1, iter2)) {
           acc.add(a);
         }
         expect(acc, equals(then));
@@ -25,11 +25,11 @@ void main() {
       test(
         'should apply `f` to each same positioned pair [AsyncIterable/Iterable]',
         () async {
-          final res = await toListAsync(
-            zipWithAsync(
+          final res = await fxToListAsync(
+            fxZipWithAsync(
               (String a, int b) => {a: b},
-              toAsync(iter1),
-              toAsync(iter2),
+              fxToAsync(iter1),
+              fxToAsync(iter2),
             ),
           );
           expect(res, equals(then));
@@ -39,11 +39,11 @@ void main() {
       test(
         'should apply `f` to each same positioned pair [AsyncIterable/AsyncIterable] with async callback',
         () async {
-          final res = await toListAsync(
-            zipWithAsync(
+          final res = await fxToListAsync(
+            fxZipWithAsync(
               (String a, int b) async => {a: b},
-              toAsync(iter1),
-              toAsync(iter2),
+              fxToAsync(iter1),
+              fxToAsync(iter2),
             ),
           );
           expect(res, equals(then));

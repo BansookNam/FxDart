@@ -25,7 +25,7 @@ nextLabel: chunk
   <p>
     data-first 형태에서는 인자 순서에 주의하세요 — 대부분의 FxDart 함수와 달리
     <code>iterable</code>이 <strong>가운데</strong>에 옵니다:
-    <code>slice(start, iterable, [end])</code>로, FxTS를 그대로 따랐습니다.
+    <code>fxSlice(start, iterable, [end])</code>로, FxTS를 그대로 따랐습니다.
     체인 형태에서는 이터러블이 수신자이므로 이런 특이점이 없습니다:
     <code>fx(iterable).slice(start, end)</code>. 내부적으로
     <code>slice</code>는 소스를 한 번 훑으며 인덱스를 세는 것뿐이라

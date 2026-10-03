@@ -32,10 +32,10 @@ nextLabel: head
     <code>(List&lt;A&gt;, List&lt;A&gt;)</code>. Accede a las dos listas con
     <code>.$1</code> (los que pasan) y <code>.$2</code> (los que no), o
     desestructúralas directamente con la sintaxis de patrones:
-    <code>final (pass, fail) = partition(f, iterable);</code>. Es la misma
+    <code>final (pass, fail) = fxPartition(f, iterable);</code>. Es la misma
     convención de tupla a record que usan
     <code><a href="zip.html">zip</a></code> y
-    <code><a href="entries.html">entries</a></code> en el resto de FxDart.
+    <code><a href="entries.html">fxEntries</a></code> en el resto de FxDart.
   </p>
   <p>
     Como todos los terminales de esta sección, tira de todo el pipeline

@@ -22,7 +22,7 @@ nextLabel: find
     materializing the whole thing just to index into a <code>List</code>.
     <code>elementAtOrNull</code> is the Dart-idiomatic name (it mirrors
     <code>Iterable.elementAtOrNull</code>); fxdart also accepts the FxTS
-    spelling <code>nth</code> — they're the same operator. A negative index,
+    spelling <code>fxNth</code> — they're the same operator. A negative index,
     or one past the end, simply yields <code>null</code>; unlike some
     languages' array indexing, there's no wraparound-from-the-end behavior
     here — the index has to be a valid, non-negative position.

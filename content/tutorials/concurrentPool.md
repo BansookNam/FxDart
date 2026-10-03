@@ -56,5 +56,5 @@ nextLabel: retry
     <a href="concurrent.html"><code>concurrent</code></a> — order-preserving variant ·
     <a href="toAsync.html"><code>toAsync</code></a> — the pull-based model this relies on ·
     <a href="streams.html">Stream bridges</a> — apply concurrentPool before toStream() ·
-    <a href="debounce.html"><code>debounce</code></a> — rate-limiting for callbacks
+    <a href="debounce.html"><code>fxDebounce</code></a> — rate-limiting for callbacks
   </div>

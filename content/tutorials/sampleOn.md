@@ -35,7 +35,7 @@ nextLabel: combineLatest
     Lifetime follows the source: when the source closes, the chain closes
     and the trigger subscription is cancelled — an endless
     <code>Stream.periodic</code> tick makes a perfectly good trigger.
-    Compare the neighbors: <code><a href="throttle.html">throttle</a></code>
+    Compare the neighbors: <code><a href="throttle.html">fxThrottle</a></code>
     rate-limits with a fixed window measured from the source's own events;
     <code>sampleOn</code> hands the schedule to a second stream entirely.
     fxdart events layer, after Rx's <code>sample</code>.
@@ -53,7 +53,7 @@ nextLabel: combineLatest
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="throttle.html"><code>throttle</code></a> — rate limiting from the source's own timing ·
-    <a href="debounce.html"><code>debounce</code></a> — waiting for quiet instead of sampling ·
+    <a href="throttle.html"><code>fxThrottle</code></a> — rate limiting from the source's own timing ·
+    <a href="debounce.html"><code>fxDebounce</code></a> — waiting for quiet instead of sampling ·
     <a href="withLatestFrom.html"><code>withLatestFrom</code></a> — the same "latest value" idea, but combining two data streams
   </div>

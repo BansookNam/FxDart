@@ -2,14 +2,14 @@ import 'package:analyzer/dart/ast/ast.dart';
 
 /// Names of fxdart builders whose callback is a raise scope.
 const raiseBuilders = {
-  'either',
-  'eitherAsync',
-  'eitherCatching',
-  'eitherCatchingAsync',
-  'nullable',
-  'nullableAsync',
-  'foldRaise',
-  'foldRaiseAsync',
+  'fxEither',
+  'fxEitherAsync',
+  'fxEitherCatching',
+  'fxEitherCatchingAsync',
+  'fxNullable',
+  'fxNullableAsync',
+  'fxFoldRaise',
+  'fxFoldRaiseAsync',
 };
 
 /// Terminals that materialize a chain. Returning one of these from a raise

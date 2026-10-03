@@ -2,7 +2,7 @@
 slug: raise
 title: either 빌더 &amp; Raise 스코프 — FxDart 101
 description: FxDart raise 튜토리얼: either와 eitherAsync 빌더, 그리고 Raise 스코프의 어휘 — bind, ensure, ensureNotNull, recover, withError, raise.
-heading: <code>either</code> 빌더 &amp; <code>Raise</code> 스코프
+heading: <code>fxEither</code> 빌더 &amp; <code>Raise</code> 스코프
 section: 13
 crumb: either &amp; Raise
 prev: eitherCombinators.html
@@ -45,7 +45,7 @@ nextLabel: nullable
     <code>bind</code>는 스코프 토큰이 달린 비공개 신호를 던지고, 빌더가
     자신의 경계에서 그것을 잡아냅니다. 그래서 이른 반환, 반복문,
     <code>if</code>가 블록 안에서 전부 그대로 동작하고, 중첩된 빌더가 서로의
-    에러를 가로채는 일도 없습니다. <code>eitherAsync</code>는 비동기
+    에러를 가로채는 일도 없습니다. <code>fxEitherAsync</code>는 비동기
     쌍둥이입니다 — 어휘는 같고 <code>await</code>도 쓸 수 있습니다(raise는
     같은 await 체인 안에서만).
   </p>
@@ -64,8 +64,8 @@ nextLabel: nullable
     실제 파싱은 두 갈래로 동시에 실패합니다. 우리가 정한 규칙은 타입 있는
     오류를 <em>raise</em>하고, 플랫폼(<code>int.parse</code>,
     <code>jsonDecode</code>)은 <em>throw</em>합니다.
-    <code>eitherCatching</code>은 <code>either</code> +
-    <code>catching</code>을 하나로 합친 빌더입니다 — 블록은 raise하거나
+    <code>fxEitherCatching</code>은 <code>fxEither</code> +
+    <code>fxCatching</code>을 하나로 합친 빌더입니다 — 블록은 raise하거나
     throw할 수 있고, 두 번째 인자가 던져진 예외를 같은 타입의 오류로
     변환합니다. raise 시그널 자체는 절대 여기에 전달되지 않습니다.
     <code>recover</code>도 같은 선택적 <code>onThrow:</code> 절을 받아
@@ -90,13 +90,13 @@ nextLabel: nullable
     사용하세요. 지연된 raise는 <code>RaiseLeakedError</code>로 요란하게
     실패합니다. (2) raise 블록 안에서 맨몸 <code>catch</code>를 쓰지
     마세요 — 단락 신호를 항상 통과시키는
-    <code>catching</code>/<code>catchingAsync</code>를 사용하세요.
+    <code>fxCatching</code>/<code>fxCatchingAsync</code>를 사용하세요.
   </div>
 
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="either.html"><code>Either</code></a> — 경계 타입 ·
-    <a href="nullable.html"><code>nullable</code></a> — <code>T?</code>를 돌려주는 정보 없는 쌍둥이 ·
+    <a href="nullable.html"><code>fxNullable</code></a> — <code>T?</code>를 돌려주는 정보 없는 쌍둥이 ·
     <a href="accumulate.html">에러 누적</a> — 모든 실패를 모읍니다 ·
     <a href="typedErrors.html">타입 있는 에러 — 전체 가이드</a>
   </div>

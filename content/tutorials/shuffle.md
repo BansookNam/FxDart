@@ -2,7 +2,7 @@
 slug: shuffle
 title: shuffle — FxDart 101
 description: FxDart shuffle tutorial: Fisher-Yates shuffle with an optional seed for reproducible order, sync and async, with a live playground.
-heading: <code>shuffle</code>
+heading: <code>fxShuffle</code>
 section: 12
 crumb: shuffle
 next: createSeededRandom.html
@@ -14,7 +14,7 @@ nextLabel: createSeededRandom
 
   <h2>Lecture</h2>
   <p>
-    <code>shuffle</code> runs a Fisher-Yates shuffle over the elements of
+    <code>fxShuffle</code> runs a Fisher-Yates shuffle over the elements of
     <code>iterable</code> and returns a brand-new <code>List&lt;T&gt;</code> —
     the input is never mutated. Called with no seed, it uses
     <code>dart:math</code>'s <code>Random</code>, so every call gives a
@@ -31,8 +31,8 @@ nextLabel: createSeededRandom
     deterministic replays of a randomized simulation.
   </p>
   <p>
-    <code>shuffleAsync</code> is the <code>*Async</code> twin: it materializes
-    an <code>FxAsyncIterable</code> first (via <code>toListAsync</code>
+    <code>fxShuffleAsync</code> is the <code>*Async</code> twin: it materializes
+    an <code>FxAsyncIterable</code> first (via <code>fxToListAsync</code>
     internally) and then shuffles the result, so a seeded async shuffle
     produces the identical order to its sync counterpart given the same seed.
   </p>
@@ -51,12 +51,12 @@ nextLabel: createSeededRandom
 
   <h2>Method spelling</h2>
   <p>
-    <code>xs.fxShuffle(seed)</code> is <code>shuffle(xs, seed)</code>, and on an
+    <code>xs.fxShuffle(seed)</code> is <code>fxShuffle(xs, seed)</code>, and on an
     <code>FxAsyncIterable</code> the same name is
-    <code>shuffleAsync</code>.
+    <code>fxShuffleAsync</code>.
   </p>
   <p>
-    It is not called <code>shuffle</code>, and that is not a style choice.
+    It is not called <code>fxShuffle</code>, and that is not a style choice.
     <code>List.shuffle</code> already exists in <code>dart:core</code> and
     shuffles <strong>in place, returning void</strong>. An instance member
     always beats an extension, so a <code>List</code> receiver would silently
@@ -71,8 +71,8 @@ final b = [1, 2, 3]..shuffle();      // dart:core, in place, void</code></pre>
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="throttle.html"><code>throttle</code></a> — rate-limiting for callbacks ·
-    <a href="debounce.html"><code>debounce</code></a> — wait-for-quiet rate limiting ·
+    <a href="throttle.html"><code>fxThrottle</code></a> — rate-limiting for callbacks ·
+    <a href="debounce.html"><code>fxDebounce</code></a> — wait-for-quiet rate limiting ·
     <a href="toAsync.html"><code>toAsync</code></a> — lifting a list for shuffleAsync ·
     <a href="sort.html"><code>sort</code></a> — the opposite instinct: deterministic order
   </div>

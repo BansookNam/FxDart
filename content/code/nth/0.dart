@@ -11,5 +11,5 @@ void main() {
   print(fx(letters).elementAtOrNull(2)); // c
 
   // FxTS alias: nth — the same operator.
-  print(nth(2, letters)); // c
+  print(fxNth(2, letters)); // c
 }

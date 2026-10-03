@@ -8,23 +8,31 @@ void main() {
     test(
       'should return an empty array when the list of functions is absent',
       () {
-        final res = juxt<int, Object?>([])(0);
+        final res = fxJuxt<int, Object?>([])(0);
         expect(res, equals(<Object?>[]));
       },
     );
 
     test('should apply a list of functions to a value', () {
-      final res = juxt<Iterable<num>, num>([min, max])([1, 2, 3, -4, 5, 6, 7]);
+      final res = fxJuxt<Iterable<num>, num>([fxMin, fxMax])([
+        1,
+        2,
+        3,
+        -4,
+        5,
+        6,
+        7,
+      ]);
       expect(res, equals([-4, 7]));
     });
 
     test('should be able to be used in the pipeline', () {
       List<(Object?, Object?)> entriesOf(Map<String, int> obj) {
-        final r = juxt<Map<String, int>, List<Object?>>([
-          (m) => toList(keys(m)),
-          (m) => toList(values(m)),
+        final r = fxJuxt<Map<String, int>, List<Object?>>([
+          (m) => fxToList(fxKeys(m)),
+          (m) => fxToList(fxValues(m)),
         ])(obj);
-        return toList(zip(r[0], r[1]));
+        return fxToList(fxZip(r[0], r[1]));
       }
 
       final res = entriesOf({'a': 1, 'b': 2});

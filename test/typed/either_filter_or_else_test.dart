@@ -78,7 +78,7 @@ void main() {
       Either<String, int> viaFilter(int n) => Right<String, int>(
         n,
       ).filterOrElse((v) => v > 0, (v) => 'not positive');
-      Either<String, int> viaEnsure(int n) => either((r) {
+      Either<String, int> viaEnsure(int n) => fxEither((r) {
         r.ensure(n > 0, () => 'not positive');
         return n;
       });

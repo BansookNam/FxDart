@@ -8,7 +8,7 @@ void main() {
         "should iterate and call the function to each item of 'Iterable'",
         () {
           var acc = 0;
-          each((int a) {
+          fxEach((int a) {
             acc += a;
           }, [1, 2, 3, 4, 5]);
           expect(acc, equals(15));
@@ -17,9 +17,9 @@ void main() {
 
       test('should be able to be used in the pipeline', () {
         var acc = 0;
-        each((int a) {
+        fxEach((int a) {
           acc += a;
-        }, map((int a) => a + 10, [1, 2, 3, 4]));
+        }, fxMap((int a) => a + 10, [1, 2, 3, 4]));
         expect(acc, equals(50));
       });
 
@@ -37,38 +37,38 @@ void main() {
         "should iterate and call the function to each item of 'AsyncIterable'",
         () async {
           var acc = 0;
-          await eachAsync((int a) {
+          await fxEachAsync((int a) {
             acc += a;
-          }, toAsync([1, 2, 3, 4, 5]));
+          }, fxToAsync([1, 2, 3, 4, 5]));
           expect(acc, equals(15));
         },
       );
 
       test('should work when the given function is asynchronous', () async {
         var acc = 0;
-        await eachAsync((int a) async {
+        await fxEachAsync((int a) async {
           acc += a;
-        }, toAsync([1, 2, 3, 4, 5]));
+        }, fxToAsync([1, 2, 3, 4, 5]));
         expect(acc, equals(15));
       });
 
       test('should work with a lazy range source', () async {
         var acc = 0;
-        await eachAsync((int a) {
+        await fxEachAsync((int a) {
           acc += a;
-        }, toAsync(range(1, 6, 1)));
+        }, fxToAsync(fxRange(1, 6, 1)));
         expect(acc, equals(15));
       });
 
       test('should throw an error occurs in the callback', () async {
         var res1 = 0;
         try {
-          await eachAsync((int a) {
+          await fxEachAsync((int a) {
             if (a == 3) {
               throw 'err';
             }
             res1 += a;
-          }, toAsync(range(1, 6, 1)));
+          }, fxToAsync(fxRange(1, 6, 1)));
           fail('should have thrown');
         } catch (err) {
           expect(err, equals('err'));
@@ -77,13 +77,13 @@ void main() {
 
         var res2 = 0;
         try {
-          await eachAsync((int a) {
+          await fxEachAsync((int a) {
             if (a == 3) {
               return Future<void>.error('err');
             }
             res2 += a;
             return null;
-          }, toAsync(range(1, 6, 1)));
+          }, fxToAsync(fxRange(1, 6, 1)));
           fail('should have thrown');
         } catch (err) {
           expect(err, equals('err'));
@@ -93,15 +93,15 @@ void main() {
 
       test('should be able to be used in the pipeline', () async {
         var res1 = 0;
-        await eachAsync((int a) {
+        await fxEachAsync((int a) {
           res1 += a;
-        }, mapAsync((int a) => a + 10, toAsync([1, 2, 3, 4])));
+        }, fxMapAsync((int a) => a + 10, fxToAsync([1, 2, 3, 4])));
         expect(res1, equals(50));
 
         var res2 = 0;
-        await eachAsync((int a) async {
+        await fxEachAsync((int a) async {
           res2 += a;
-        }, mapAsync((int a) => a + 10, toAsync([1, 2, 3, 4])));
+        }, fxMapAsync((int a) => a + 10, fxToAsync([1, 2, 3, 4])));
         expect(res2, equals(50));
       });
 

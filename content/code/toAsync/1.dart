@@ -7,12 +7,12 @@ Future<void> main() async {
   // Future's work the moment it's constructed, not when it's awaited.
   // By the time toAsync/toListAsync touch them, all three are already
   // racing in parallel, so the total time is ~200ms, not ~600ms.
-  final alreadyStarted = toAsync([
-    delay(const Duration(milliseconds: 200), 'a'),
-    delay(const Duration(milliseconds: 200), 'b'),
-    delay(const Duration(milliseconds: 200), 'c'),
+  final alreadyStarted = fxToAsync([
+    fxDelay(const Duration(milliseconds: 200), 'a'),
+    fxDelay(const Duration(milliseconds: 200), 'b'),
+    fxDelay(const Duration(milliseconds: 200), 'c'),
   ]);
-  print(await toListAsync(alreadyStarted)); // [a, b, c]
+  print(await fxToListAsync(alreadyStarted)); // [a, b, c]
   print('eager futures: ${sw.elapsedMilliseconds}ms'); // ~200ms
 
   // Contrast: mapAsync creates one Future per element, lazily, only when
@@ -20,7 +20,7 @@ Future<void> main() async {
   sw.reset();
   final lazyPerPull = await fx(['x', 'y', 'z'])
       .toAsync()
-      .map((a) => delay(const Duration(milliseconds: 200), a))
+      .map((a) => fxDelay(const Duration(milliseconds: 200), a))
       .toList();
   print(lazyPerPull); // [x, y, z]
   print('lazy pulls: ${sw.elapsedMilliseconds}ms'); // ~600ms

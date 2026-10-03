@@ -1,2 +1,2 @@
-Iterable&lt;String&gt; split(String sep, Iterable&lt;String&gt; iterable)
-FxAsyncIterable&lt;String&gt; splitAsync(String sep, FxAsyncIterable&lt;String&gt; iterable)
+Iterable&lt;String&gt; fxSplit(String sep, Iterable&lt;String&gt; iterable)
+FxAsyncIterable&lt;String&gt; fxSplitAsync(String sep, FxAsyncIterable&lt;String&gt; iterable)

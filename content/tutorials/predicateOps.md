@@ -50,7 +50,7 @@ nextLabel: when
   </p>
   <p>
     <code>.negate</code> is the extension-getter form of the top-level
-    <a href="negate.html"><code>negate</code></a> — the same function, reached
+    <a href="negate.html"><code>fxNegate</code></a> — the same function, reached
     from the other side. Use whichever reads better at the call site;
     <code>isBlank.or(isShort).negate</code> reads left to right, where
     <code>negate(...)</code> would push the whole expression inside a call.
@@ -68,8 +68,8 @@ nextLabel: when
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="negate.html"><code>negate</code></a> — the top-level form of <code>.negate</code> ·
-    <a href="not.html"><code>not</code></a> — flips a single boolean value, not a predicate ·
+    <a href="negate.html"><code>fxNegate</code></a> — the top-level form of <code>.negate</code> ·
+    <a href="not.html"><code>fxNot</code></a> — flips a single boolean value, not a predicate ·
     <a href="filter.html"><code>filter</code></a> / <a href="reject.html"><code>whereNot</code></a> — where a combined predicate usually lands ·
     <a href="predicates.html"><code>predicates</code></a> — the built-in type predicates to combine with
   </div>

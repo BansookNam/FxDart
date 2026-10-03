@@ -10,7 +10,7 @@ prevLabel: unicodeToList
 next: toAsync.html
 nextLabel: toAsync
 ---
-  <p class="hero-sub">확장 게터로 제공하는 완전한 타입의 커링 — FxTS <code>curry</code>를 대신하는 Dart다운 방식입니다.</p>
+  <p class="hero-sub">확장 게터로 제공하는 완전한 타입의 커링 — FxTS <code>fxCurry</code>를 대신하는 Dart다운 방식입니다.</p>
 
   {{signature}}
 
@@ -23,7 +23,7 @@ nextLabel: toAsync
     함수가 원하는 콜백 형태와 정확히 일치합니다.
   </p>
   <p>
-    FxTS는 이를 <code>curry(f)</code>라는 함수로 제공하는데, 여기에는 Dart에
+    FxTS는 이를 <code>fxCurry(f)</code>라는 함수로 제공하는데, 여기에는 Dart에
     없는 두 가지가 쓰입니다. 런타임 항수 리플렉션(<code>fn.length</code>)과
     재귀적 조건부 타입입니다. 그래서 FxDart는 항수(2–5)마다 확장을 하나씩
     선언하고 모두 동일한 <code>curried</code> 게터를 노출한 뒤, 함수의
@@ -38,7 +38,7 @@ nextLabel: toAsync
     다인자 함수로 펼칩니다. 연쇄가 두 단계보다 깊게 중첩된 경우에는 가장
     깊게 일치하는 항수가 선택되므로, 더 적은 단계만 펼치려면 확장을 명시적으로
     적용하면 됩니다(<code>Uncurry2(f).uncurried</code>). 게터 이름이 왜
-    <code>curry</code>가 아니라 <code>curried</code>인지를 포함한 설계 전반의
+    <code>fxCurry</code>가 아니라 <code>curried</code>인지를 포함한 설계 전반의
     이야기는
     <a href="https://github.com/BansookNam/FxDart/blob/main/WHY_CURRIED.md">WHY_CURRIED.md</a>에 있습니다.
   </p>
@@ -71,13 +71,13 @@ nextLabel: toAsync
     타입이 그냥 <code>Function</code>인 값은 확장에 매칭되지 않으니 그런
     곳에는 클로저를 쓰세요. 선택적 위치 매개변수는 매칭<em>되지만</em>,
     연쇄 안에서는 그 자리가 필수가 됩니다. deprecated된 최상위
-    <code>curry</code> 스텁은 FxTS 마이그레이션을 이쪽으로 안내하기
+    <code>fxCurry</code> 스텁은 FxTS 마이그레이션을 이쪽으로 안내하기
     위해서만 남아 있습니다.
   </div>
 
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="pipe.html"><code>pipe</code></a> — 부분 적용된 함수의 주된 소비자인 합성 ·
-    <a href="identity.html"><code>identity</code></a> &amp; <a href="always.html"><code>always</code></a> — 함수 형태를 다루는 다른 도우미들 ·
-    <a href="apply.html"><code>apply</code></a> — 리스트를 위치 인자로 펼쳐 넘깁니다
+    <a href="identity.html"><code>fxIdentity</code></a> &amp; <a href="always.html"><code>fxAlways</code></a> — 함수 형태를 다루는 다른 도우미들 ·
+    <a href="apply.html"><code>fxApply</code></a> — 리스트를 위치 인자로 펼쳐 넘깁니다
   </div>

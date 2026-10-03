@@ -25,7 +25,7 @@ nextLabel: prepend
   </p>
   <p>
     En el lado asíncrono, <code>a</code> puede ser a su vez un <code>Future</code>:
-    <code>appendAsync</code> lo espera solo cuando la fuente de aguas arriba ha terminado, así que un
+    <code>fxAppendAsync</code> lo espera solo cuando la fuente de aguas arriba ha terminado, así que un
     valor de «cierre» lento no bloquea nada antes de tiempo.
   </p>
 

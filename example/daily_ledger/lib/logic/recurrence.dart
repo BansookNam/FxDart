@@ -1,4 +1,4 @@
-/// Recurring-rule projection: an infinite `range` of occurrence indexes,
+/// Recurring-rule projection: an infinite `fxRange` of occurrence indexes,
 /// mapped to dates, windowed with `dropWhile` / `takeWhile`. Laziness is the
 /// point — the pipeline never materializes occurrences beyond the horizon.
 library;
@@ -9,7 +9,7 @@ import '../models/models.dart';
 
 /// The dates a rule fires between [from] (exclusive of earlier) and
 /// [horizon] (inclusive).
-/// Pipeline: infinite `range` → `map` (i → date) → `dropWhile` → `takeWhile`.
+/// Pipeline: infinite `fxRange` → `map` (i → date) → `dropWhile` → `takeWhile`.
 List<DateTime> occurrences(
   RecurringRule rule,
   DateTime from,
@@ -20,7 +20,7 @@ List<DateTime> occurrences(
     RecurrencePeriod.weekly => DateTime(a.year, a.month, a.day + 7 * i),
     RecurrencePeriod.monthly => DateTime(a.year, a.month + i, a.day),
   };
-  return fx(range(100000)) // effectively infinite; laziness does the bounding
+  return fx(fxRange(100000)) // effectively infinite; laziness does the bounding
       .map(occurrence)
       .dropWhile((d) => d.isBefore(from))
       .takeWhile((d) => !d.isAfter(horizon))
@@ -35,7 +35,7 @@ List<Entry> projectRule(
   DateTime from,
   DateTime horizon,
 ) {
-  final template = last(
+  final template = fxLast(
     fx(
       existing,
     ).filter((e) => e.recurringRuleId == rule.id).sortBy((e) => e.date),

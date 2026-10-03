@@ -16,7 +16,7 @@ nextLabel: intersection
 
   <h2>Lecture</h2>
   <p>
-    <code>differenceBy(f, iterable1, iterable2)</code> follows the exact
+    <code>fxDifferenceBy(f, iterable1, iterable2)</code> follows the exact
     same argument-order rule as <a href="difference.html"><code>difference</code></a>:
     the result comes <strong>from <code>iterable2</code></strong>, keeping
     only the elements whose <code>f</code>-key does <em>not</em> appear
@@ -36,10 +36,10 @@ nextLabel: intersection
   </p>
   <p>
     <code>difference</code> itself is just
-    <code>differenceBy((a) =&gt; a, iterable1, iterable2)</code>. There's no
+    <code>fxDifferenceBy((a) =&gt; a, iterable1, iterable2)</code>. There's no
     chain method for either — call the data-first function directly. On the
     async side, the concurrency marker applies to <code>iterable2</code>,
-    same as <code>differenceAsync</code>.
+    same as <code>fxDifferenceAsync</code>.
   </p>
 
   <h2>Demo 1 · Basics</h2>
@@ -58,5 +58,5 @@ nextLabel: intersection
     <a href="difference.html"><code>difference</code></a> — the value-equality version ·
     <a href="intersectionBy.html"><code>intersectionBy</code></a> — keep by a shared computed key instead ·
     <a href="uniqBy.html"><code>uniqBy</code></a> — dedupe a single iterable by key ·
-    <a href="compress.html"><code>compress</code></a> — filter by a parallel boolean mask
+    <a href="compress.html"><code>fxCompress</code></a> — filter by a parallel boolean mask
   </div>

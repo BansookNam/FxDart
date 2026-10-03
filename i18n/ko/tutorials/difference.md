@@ -16,7 +16,7 @@ nextLabel: differenceBy
 
   <h2>강의</h2>
   <p>
-    시그니처를 주의 깊게 보세요. <code>difference(iterable1, iterable2)</code>는
+    시그니처를 주의 깊게 보세요. <code>fxDifference(iterable1, iterable2)</code>는
     <strong><code>iterable2</code></strong>를 순회하면서
     <em>오직</em> <code>iterable1</code>에 없는 원소만 내보냅니다
     (<code>uniq</code>처럼 중복은 제거됩니다). <code>iterable1</code>은
@@ -28,7 +28,7 @@ nextLabel: differenceBy
     "걸러 낼 목록"으로 생각하는 것입니다.
   </p>
   <p>
-    내부 구현은 <code>differenceBy((a) =&gt; a, iterable1, iterable2)</code>입니다 —
+    내부 구현은 <code>fxDifferenceBy((a) =&gt; a, iterable1, iterable2)</code>입니다 —
     값 동등성 대신 계산된 키로 비교해야 한다면
     <a href="differenceBy.html"><code>differenceBy</code></a>를 참고하세요.
   </p>
@@ -57,5 +57,5 @@ nextLabel: differenceBy
     <a href="differenceBy.html"><code>differenceBy</code></a> — 계산된 키로 비교하는 같은 동작 ·
     <a href="intersection.html"><code>intersection</code></a> — 반대로 공통 원소만 남기기 ·
     <a href="uniq.html"><code>uniq</code></a> — 이터러블 하나에서 중복 제거 ·
-    <a href="../tutorials/includes.html"><code>includes</code></a> — 이터러블 하나에 포함되는지 검사
+    <a href="../tutorials/includes.html"><code>fxIncludes</code></a> — 이터러블 하나에 포함되는지 검사
   </div>

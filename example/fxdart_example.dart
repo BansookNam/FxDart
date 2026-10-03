@@ -13,13 +13,13 @@ Future<void> main() async {
 
   // Everything stays lazy until a terminal operator runs.
   final firstThreeSquares = fx(
-    range(1, 100),
+    fxRange(1, 100),
   ).map((a) => a * a).take(3).toList();
   print(firstThreeSquares); // [1, 4, 9]
 
   // Top-level data-first functions compose too.
-  print(toList(chunk(2, range(5)))); // [[0, 1], [2, 3], [4]]
-  print(groupBy((int a) => a % 2 == 0 ? 'even' : 'odd', [1, 2, 3, 4]));
+  print(fxToList(fxChunk(2, fxRange(5)))); // [[0, 1], [2, 3], [4]]
+  print(fxGroupBy((int a) => a % 2 == 0 ? 'even' : 'odd', [1, 2, 3, 4]));
   // {odd: [1, 3], even: [2, 4]}
 
   // Async pipelines: toAsync lifts an Iterable (of values or Futures) into
@@ -37,7 +37,7 @@ Future<void> main() async {
   final stopwatch = Stopwatch()..start();
   final fetched = await fx([1, 2, 3, 4, 5, 6])
       .toAsync()
-      .map((id) => delay(const Duration(milliseconds: 200), 'user$id'))
+      .map((id) => fxDelay(const Duration(milliseconds: 200), 'user$id'))
       .concurrent(3)
       .toList();
   print('$fetched in ${stopwatch.elapsedMilliseconds}ms');

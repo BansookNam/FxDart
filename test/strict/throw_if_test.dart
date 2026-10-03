@@ -9,7 +9,7 @@ void main() {
     test('if return of predicate is true', () {
       const input = 'input is string';
       expect(
-        () => throwIf<Object>(isString, (v) => Exception('$v'), input),
+        () => fxThrowIf<Object>(fxIsString, (v) => Exception('$v'), input),
         throwsA(isA<Exception>()),
       );
     });
@@ -17,7 +17,7 @@ void main() {
     test('if return of predicate is false', () {
       const input = 10;
       expect(
-        throwIf<Object>(isString, (v) => Exception('$v'), input),
+        fxThrowIf<Object>(fxIsString, (v) => Exception('$v'), input),
         equals(10),
       );
     });

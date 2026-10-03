@@ -7,7 +7,11 @@ import '../async_iterable.dart';
 /// Stops at the first mismatch. A length mismatch is not equal. Optional
 /// [eq] replaces `==`. After Rx's `sequenceEqual`.
 @pragma('vm:prefer-inline')
-bool sequenceEqual<T>(Iterable<T> a, Iterable<T> b, [bool Function(T, T)? eq]) {
+bool fxSequenceEqual<T>(
+  Iterable<T> a,
+  Iterable<T> b, [
+  bool Function(T, T)? eq,
+]) {
   final equal = eq ?? (T x, T y) => x == y;
   final ia = a.iterator;
   final ib = b.iterator;
@@ -20,9 +24,9 @@ bool sequenceEqual<T>(Iterable<T> a, Iterable<T> b, [bool Function(T, T)? eq]) {
   }
 }
 
-/// Async counterpart of [sequenceEqual]. Pulls both sides in parallel per
+/// Async counterpart of [fxSequenceEqual]. Pulls both sides in parallel per
 /// step; an error from either iterator fails the future.
-Future<bool> sequenceEqualAsync<T>(
+Future<bool> fxSequenceEqualAsync<T>(
   FxAsyncIterable<T> a,
   FxAsyncIterable<T> b, [
   bool Function(T, T)? eq,

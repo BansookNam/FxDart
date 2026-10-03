@@ -5,9 +5,9 @@ Future<void> main() async {
 
   // take is a pass-through: concurrent(3) upstream still overlaps pulls
   // even though only 4 elements are ultimately taken.
-  final result = await fx(range(10))
+  final result = await fx(fxRange(10))
       .toAsync()
-      .map((a) => delay(Duration(milliseconds: 100), a * 10))
+      .map((a) => fxDelay(Duration(milliseconds: 100), a * 10))
       .concurrent(3)
       .take(4)
       .toList();

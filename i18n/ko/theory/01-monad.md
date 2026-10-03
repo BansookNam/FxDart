@@ -23,7 +23,7 @@ description: 모나드는 연산 두 개와 법칙 세 개를 갖춘 타입입�
 ```dart run
 import 'package:fxdart/fxdart.dart';
 
-Either<String, int> parsePort(String text) => either((r) {
+Either<String, int> parsePort(String text) => fxEither((r) {
   final n = r.ensureNotNull(
       int.tryParse(text), () => 'not a number: $text');
   r.ensure(n > 1023, () => 'privileged port: $n');
@@ -123,12 +123,12 @@ Dart는 `flatMap`을 매일 쓰는 문법 뒤에 숨겨 둡니다. `await`가 �
 `Either`의 `flatMap`입니다.
 
 같은 계산을 두 가지로 써 봅시다. 먼저 명시적인 체인, 그다음 FxDart의
-`either` 스코프.
+`fxEither` 스코프.
 
 ```dart run
 import 'package:fxdart/fxdart.dart';
 
-Either<String, int> parseAge(String text) => either((r) {
+Either<String, int> parseAge(String text) => fxEither((r) {
   final n = r.ensureNotNull(
       int.tryParse(text), () => 'not a number: $text');
   r.ensure(n >= 0, () => 'negative age: $n');
@@ -149,7 +149,7 @@ Either<String, String> greetChained(String id, String ageText) =>
 // The same steps in a Raise scope: straight-line code,
 // with the same short-circuiting.
 Either<String, String> greetScoped(String id, String ageText) =>
-    either((r) {
+    fxEither((r) {
   final name = r.bind(lookup(id));
   final age = r.bind(parseAge(ageText));
   return '$name is $age';
@@ -167,7 +167,7 @@ void main() {
 둘째 단계는 실행되지 않습니다. 차이는 체인 버전이 단계마다 오른쪽으로 한
 칸씩 밀려난다는 것 — 모나드를 가진 언어라면 결국 이 모양을 감추는 문법을
 발명하게 됩니다. 하스켈은 `do` 표기법, 스칼라는 `for` 컴프리헨션, Dart는 그
-특수한 경우인 `async`/`await`를 만들었습니다. FxDart의 `either` 블록은 같은
+특수한 경우인 `async`/`await`를 만들었습니다. FxDart의 `fxEither` 블록은 같은
 생각에 다른 방식으로 도달한 것이고, [그 이야기는 15장](#ch15)입니다.
 
 ## 세 법칙
@@ -301,7 +301,7 @@ FxDart의 타입 있는 오류가 이식해 온 코틀린 Arrow는 컴파일러 
 
 - **`Either<L, R>`** 에는 `flatMap`이 있고 `Either.right`가 그 `of`입니다.
   법칙은 성립합니다 — 두 쪽 앞에서 직접 확인했죠.
-- **`either((r) { … })`** 은 `do` 표기법의 실용적 대체물입니다. 문법
+- **`fxEither((r) { … })`** 은 `do` 표기법의 실용적 대체물입니다. 문법
   설탕(desugaring)이 아닙니다 — `r.bind`는 스코프로 raise 하여 단락
   평가합니다(15장). 모나드 재작성이 아니라 제한된 연속(delimited
   continuation) 기법이죠. 같은 직선형 코드, 다른 메커니즘이고, 왜 `Raise`

@@ -23,7 +23,7 @@ So here are three instances first. You have written all three.
 ```dart run
 import 'package:fxdart/fxdart.dart';
 
-Either<String, int> parsePort(String text) => either((r) {
+Either<String, int> parsePort(String text) => fxEither((r) {
   final n = r.ensureNotNull(
       int.tryParse(text), () => 'not a number: $text');
   r.ensure(n > 1023, () => 'privileged port: $n');
@@ -125,12 +125,12 @@ on it, and the result is one future — never a `Future<Future<T>>`. A
 `either { }` block is `flatMap` for `Either`.
 
 Watch the same computation written both ways — first as an explicit chain,
-then in FxDart's `either` scope:
+then in FxDart's `fxEither` scope:
 
 ```dart run
 import 'package:fxdart/fxdart.dart';
 
-Either<String, int> parseAge(String text) => either((r) {
+Either<String, int> parseAge(String text) => fxEither((r) {
   final n = r.ensureNotNull(
       int.tryParse(text), () => 'not a number: $text');
   r.ensure(n >= 0, () => 'negative age: $n');
@@ -151,7 +151,7 @@ Either<String, String> greetChained(String id, String ageText) =>
 // The same steps in a Raise scope: straight-line code,
 // with the same short-circuiting.
 Either<String, String> greetScoped(String id, String ageText) =>
-    either((r) {
+    fxEither((r) {
   final name = r.bind(lookup(id));
   final age = r.bind(parseAge(ageText));
   return '$name is $age';
@@ -171,7 +171,7 @@ that the chained version slides one indentation level to the right per step —
 the shape every language with monads eventually invents syntax to hide.
 Haskell calls its version `do`-notation, Scala calls it a
 `for`-comprehension, Dart calls the special case of it `async`/`await`. FxDart's
-`either` block is the same idea reached by a different mechanism, which is
+`fxEither` block is the same idea reached by a different mechanism, which is
 [the subject of Chapter 15](#ch15).
 
 ## The three laws
@@ -308,7 +308,7 @@ and never pretends to abstract over it.
 
 - **`Either<L, R>`** has `flatMap`, and `Either.right` is its `of`. The laws
   hold; you ran the check two pages ago.
-- **`either((r) { … })`** is the ergonomic replacement for `do`-notation. It
+- **`fxEither((r) { … })`** is the ergonomic replacement for `do`-notation. It
   is not desugaring — `r.bind` short-circuits by raising into a scope
   (Chapter 15), a delimited-continuation trick rather than a monadic
   rewrite. Same straight-line code, different mechanism, and a distinction

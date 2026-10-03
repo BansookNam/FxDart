@@ -40,7 +40,7 @@ Future<void> main() async {
                     '  ${p.$1 + 1}. ${p.$2.$1.padRight(13)}${money(p.$2.$2)}',
               );
 
-      return join('\n', [
+      return fxJoin('\n', [
         'July 2026 ledger',
         'Total spent: ${money(total)}',
         '',

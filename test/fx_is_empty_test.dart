@@ -21,12 +21,12 @@ void main() {
     });
 
     test('terminate on an unbounded chain', () {
-      expect(fx(cycle([1, 2])).isEmpty, isFalse);
-      expect(fx(cycle([1, 2])).isNotEmpty, isTrue);
+      expect(fx(fxCycle([1, 2])).isEmpty, isFalse);
+      expect(fx(fxCycle([1, 2])).isNotEmpty, isTrue);
     }, timeout: const Timeout(Duration(seconds: 5)));
 
     test('terminate on an unbounded chain built with map/filter stages', () {
-      final chain = fx(cycle([1, 2, 3])).map((a) => a * 2).filter((a) => a > 2);
+      final chain = fx(fxCycle([1, 2, 3])).map((a) => a * 2).filter((a) => a > 2);
       expect(chain.isEmpty, isFalse);
       expect(chain.isNotEmpty, isTrue);
     }, timeout: const Timeout(Duration(seconds: 5)));

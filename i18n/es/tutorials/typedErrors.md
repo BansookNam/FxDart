@@ -21,8 +21,8 @@ nextLabel: Either
     <strong>En profundidad.</strong> Esta página es el resumen; cada tema
     tiene un tutorial detallado con demos ejecutables:
     <a href="either.html"><code>Either</code></a> ·
-    <a href="raise.html"><code>either</code> &amp; el ámbito <code>Raise</code></a> ·
-    <a href="nullable.html"><code>nullable</code></a> ·
+    <a href="raise.html"><code>fxEither</code> &amp; el ámbito <code>Raise</code></a> ·
+    <a href="nullable.html"><code>fxNullable</code></a> ·
     <a href="nonEmptyList.html"><code>NonEmptyList</code></a> ·
     <a href="accumulate.html">acumulación</a> ·
     <a href="eitherPipelines.html"><code>Either</code> × pipelines</a>
@@ -64,7 +64,7 @@ Either&lt;Failure, SuccessData&gt; getResult() =>
     Las dos diferencias con Kotlin son realidades de Dart: el ámbito es un
     parámetro explícito (<code>r</code>) porque Dart no tiene receptores en
     las lambdas, y la versión asíncrona tiene su propio constructor
-    (<code>eitherAsync</code>) porque Dart no tiene <code>inline</code>. Por
+    (<code>fxEitherAsync</code>) porque Dart no tiene <code>inline</code>. Por
     dentro esto <em>no</em> es encadenado con flatMap: igual que en Arrow,
     <code>r.bind</code> sobre un fallo lanza una señal privada, etiquetada con
     el ámbito, que el constructor captura en la frontera. Por eso los retornos
@@ -106,17 +106,17 @@ switch (parsePort('8080')) {
       <code>Never</code>.</li>
   </ul>
   <p>
-    <code>eitherAsync</code> es el gemelo asíncrono (elevar errores solo dentro
+    <code>fxEitherAsync</code> es el gemelo asíncrono (elevar errores solo dentro
     de la misma cadena de awaits);
-    <code>nullable</code>/<code>nullableAsync</code> son los gemelos
+    <code>fxNullable</code>/<code>fxNullableAsync</code> son los gemelos
     nullable-first que devuelven <code>T?</code> en lugar de un
     <code>Either</code> — FxDart es nullable-first, así que no hay tipo
     <code>Option</code>.
   </p>
   <p>
-    <a href="raise.html">En profundidad: <code>either</code> &amp; el ámbito
+    <a href="raise.html">En profundidad: <code>fxEither</code> &amp; el ámbito
     <code>Raise</code> →</a> ·
-    <a href="nullable.html">En profundidad: <code>nullable</code> →</a>
+    <a href="nullable.html">En profundidad: <code>fxNullable</code> →</a>
   </p>
 
   <h2>Acumula todos los fallos, no solo el primero</h2>
@@ -176,7 +176,7 @@ final result = await fxStream(records)
   <p>
     La frontera es tajante: los errores <em>elevados</em> son los fallos
     tipados de tu dominio; las excepciones <em>lanzadas</em> son defectos, y
-    salen de <code>either</code> sin que nadie las toque. Para capturar un
+    salen de <code>fxEither</code> sin que nadie las toque. Para capturar un
     throw dentro de un <code>Either</code>, sé explícito:
   </p>
   <pre class="code"><code>final parsed = Either.catching(() => jsonDecode(raw));       // Either&lt;Object, dynamic&gt;
@@ -193,7 +193,7 @@ final typed  = Either.catchingWith(ParseFailure.new, () => jsonDecode(raw));</co
     diferido falla ruidosamente con
     <code>RaiseLeakedError</code>. (2) Nunca hagas un <code>catch</code> pelado
     dentro de un bloque raise: usa
-    <code>catching</code>/<code>catchingAsync</code>, que siempre dejan pasar
+    <code>fxCatching</code>/<code>fxCatchingAsync</code>, que siempre dejan pasar
     la señal de cortocircuito (<code>on Exception</code> ya es seguro: la
     señal es un <code>Error</code>).
   </div>

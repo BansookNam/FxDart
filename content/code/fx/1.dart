@@ -2,8 +2,8 @@ import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
   // fxAsync wraps an FxAsyncIterable (from toAsync/fromStream/*Async ops).
-  final total = await fxAsync(toAsync([1, 2, 3]))
-      .map((a) => delay(const Duration(milliseconds: 50), a * 10))
+  final total = await fxAsync(fxToAsync([1, 2, 3]))
+      .map((a) => fxDelay(const Duration(milliseconds: 50), a * 10))
       .reduce((acc, a) => acc + a);
   print('fxAsync total: $total'); // 60
 

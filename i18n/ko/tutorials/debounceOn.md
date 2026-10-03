@@ -17,9 +17,9 @@ nextLabel: retryOn
   <h2>강의</h2>
   <p>
     Duration 형태는 이미
-    <code><a href="debounce.html">debounce</a></code>,
-    <code><a href="throttle.html">throttle</a></code>,
-    <code><a href="spaceBy.html">delay</a></code>에 있습니다 — 고정된
+    <code><a href="debounce.html">fxDebounce</a></code>,
+    <code><a href="throttle.html">fxThrottle</a></code>,
+    <code><a href="spaceBy.html">fxDelay</a></code>에 있습니다 — 고정된
     시계, 모든 값에 같은 대기. <code>xOn</code> 가족은 그 시계를
     <strong>선택자</strong>에 넘깁니다: 값마다 스트림을 만들고, 그
     스트림의 첫 이벤트가 값이 나갈 순간입니다. 300ms 대신 포커스가
@@ -33,7 +33,7 @@ nextLabel: retryOn
     중인 값을 내보내고, next 없이 완료된 내부는 그 값을
     <strong>버립니다</strong>. 소스가 닫힐 때 아직 대기 중인 값은
     흘려보내져, Duration
-    <code><a href="debounce.html">debounce</a></code>와 같습니다.
+    <code><a href="debounce.html">fxDebounce</a></code>와 같습니다.
   </p>
   <p>
     <code>delayOn(selector)</code>는 <em>모든</em> 값을 자기 내부가
@@ -64,7 +64,7 @@ nextLabel: retryOn
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="debounce.html"><code>debounce</code></a> — Duration 형태, 그리고 콜백 래퍼 ·
-    <a href="throttle.html"><code>throttle</code></a> — Duration 형태, leading과 trailing ·
-    <a href="spaceBy.html"><code>delay</code></a> — 고정된 시계로 스트림 전체를 밀기
+    <a href="debounce.html"><code>fxDebounce</code></a> — Duration 형태, 그리고 콜백 래퍼 ·
+    <a href="throttle.html"><code>fxThrottle</code></a> — Duration 형태, leading과 trailing ·
+    <a href="spaceBy.html"><code>fxDelay</code></a> — 고정된 시계로 스트림 전체를 밀기
   </div>

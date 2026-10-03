@@ -63,7 +63,7 @@ class Category { id, name, icon, colorSeed, kind (money | task) }
 class RecurringRule { id, period (weekly | monthly), anchorDate }
 ```
 
-Hive stores each as a box (`entries`, `categories`, `rules`) via generated
+Hive stores each as a box (`fxEntries`, `categories`, `rules`) via generated
 `TypeAdapter`s. That's the entire persistence story.
 
 ## Screens → fxdart usage map
@@ -74,15 +74,15 @@ Hive stores each as a box (`entries`, `categories`, `rules`) via generated
 | Dashboard: category breakdown (top 5)     | `groupBy` → `sortBy` → `take(5)`                   |
 | Dashboard: running balance sparkline      | `sortBy` (date) → `scan` (cumulative sum)          |
 | Dashboard: upcoming bills / overdue tasks | `filter` + `partition` (overdue vs upcoming)       |
-| Calendar: month grid                      | `range` (day offsets) → `map` → `chunk(7)`         |
+| Calendar: month grid                      | `fxRange` (day offsets) → `map` → `chunk(7)`         |
 | Calendar: entries per day cell            | `indexBy` / `groupBy` (day key)                    |
 | Entries list: grouped by day, filtered    | `filter` → `groupBy` → `sortBy`, `countBy` badges  |
 | Entries list: search-as-you-type          | `debounce` on the query, `filter` on entries       |
 | Insights: month-over-month comparison     | `zip` / `zipWithIndex` over consecutive months     |
 | Insights: tag stats, duplicates cleanup   | `countBy`, `uniqBy`                                |
-| Recurring rules → projected entries       | `cycle` / `range` → `map` → `takeWhile` (horizon)  |
+| Recurring rules → projected entries       | `cycle` / `fxRange` → `map` → `takeWhile` (horizon)  |
 | Repository load (entries+categories+rules)| `toAsync().map(...).concurrent(3)` + `delay`       |
-| Seed fixtures                             | `createSeededRandom`, `range`, `map`, `shuffle`    |
+| Seed fixtures                             | `createSeededRandom`, `fxRange`, `map`, `fxShuffle`    |
 
 The repository adds a small artificial `delay` per box read so the
 `concurrent(3)` startup load is a visible, honest demo of the async story
@@ -190,9 +190,9 @@ Track which fxdart operators the app demonstrates; grow it every round.
 | ✅ round 8 | concat (forecast), averageBy — **new operator added to fxdart 0.5.0 this round** |
 | ✅ round 9 | polish: cached the last per-rebuild pipelines; fxdart-consistency sweep in the ? dialogs |
 | ⏸ intentionally uncovered | omit, slice, cycle, tap, scan1, repeat — no natural fit in this app; forcing them would violate the "readable over clever" principle |
-| ✅ round 10 | typed errors, chapters 1·2·6-sync: `either`, `Raise.raise`, `ensure`, `ensureNotNull`, `bind`, `withError`, `catching`, `Either.left/right`, `Left`/`Right` patterns, `isLeft`/`isRight`, `mapLeft`, `getOrElse`, `getOrNull`, `leftOrNull`, `Nel`/`Nel.of`/`orNull`/`head`/`tail`/`map`/`+`/`toList`/`deepEquals`, `separated()`, `sequence()`, `rights()`, `mapOrAccumulate` |
+| ✅ round 10 | typed errors, chapters 1·2·6-sync: `fxEither`, `Raise.raise`, `ensure`, `ensureNotNull`, `bind`, `withError`, `fxCatching`, `Either.left/right`, `Left`/`Right` patterns, `isLeft`/`isRight`, `mapLeft`, `getOrElse`, `getOrNull`, `leftOrNull`, `Nel`/`Nel.of`/`orNull`/`head`/`tail`/`map`/`+`/`toList`/`deepEquals`, `separated()`, `sequence()`, `rights()`, `mapOrAccumulate` |
 | ✅ round 11 | typed errors, chapters 4·5: `zipOrAccumulate5` (entry form), `zipOrAccumulate2` (budget dialog), `accumulate`, `Accumulator.accumulating`, `hasErrors`, `Accumulated.value`, `AccumulatingRaise.over`, `toEitherNel` |
-| ⏭ rounds 12–13 (planned) | `nullable`/`SingletonRaise`, the async half (`eitherAsync`, `mapOrAccumulateAsync`, `sequenceEitherAsync`, `FxAsyncEitherOps.sequence`), `foldRaise(Async)`, `swap`, `flatMap`, `map`, `bindAll`, `RaiseOps.recover`, `Either.recover`, `Either.catching(With)`, `bindNel`, `lefts()`, top-level `rights`/`lefts`/`separateEither`/`sequenceEither`/`mapOrAccumulate` — plus `zipOrAccumulate3`/`4`, which need the recurring-rule editor and the shareable view link to exist first (see round 11 log) |
+| ⏭ rounds 12–13 (planned) | `fxNullable`/`SingletonRaise`, the async half (`fxEitherAsync`, `mapOrAccumulateAsync`, `fxSequenceEitherAsync`, `FxAsyncEitherOps.sequence`), `fxFoldRaise(Async)`, `swap`, `flatMap`, `map`, `bindAll`, `RaiseOps.recover`, `Either.recover`, `Either.catching(With)`, `bindNel`, `lefts()`, top-level `fxRights`/`fxLefts`/`fxSeparateEither`/`fxSequenceEither`/`mapOrAccumulate` — plus `zipOrAccumulate3`/`4`, which need the recurring-rule editor and the shareable view link to exist first (see round 11 log) |
 
 ## Round log
 
@@ -210,13 +210,13 @@ Track which fxdart operators the app demonstrates; grow it every round.
    → fixed with a sentinel-based copyWith.
 4. `FX` — `possibleDuplicates` hand-rolled a set difference with
    `!firstSeen.contains(e)` inside a filter. → fixed: now literally
-   `difference(firstSeen, money)`.
+   `fxDifference(firstSeen, money)`.
 5. `FX` — `LedgerState.categoryById` was an imperative O(n) for-loop.
    → fixed: cached `indexBy`-built lookup map.
 6. `PERF` — `dueCount()` scanned all entries once per calendar cell (42×N per
    frame). → fixed: one `countBy(due day)` index per build, cells do O(1) reads.
 7. `PERF` — every `notifyListeners` rebuilds all four IndexedStack screens and
-   recomputes summaries. Deferred → `memoize` candidate for a later round.
+   recomputes summaries. Deferred → `fxMemoize` candidate for a later round.
 8. `UX` — Dashboard "Upcoming" silently truncated at 6 items. → fixed: shows
    "+N more in the Entries tab".
 9. `UX` — Type-filter chip counts ignored the active search query, so badge
@@ -228,12 +228,12 @@ Track which fxdart operators the app demonstrates; grow it every round.
 
 **Features suggested (3):**
 - A. **Category budgets** — monthly budget per category with progress bars,
-  over-budget flags, and auto-suggestions. Operators: `fold`, `evolve`,
+  over-budget flags, and auto-suggestions. Operators: `fold`, `fxEvolve`,
   `groupBy`, `sortBy`. ← *chosen*
 - B. **Weekly spending heatmap** — weekday×week intensity grid on Insights.
-  Operators: `fork`, `countBy`, `chunk`.
+  Operators: `fxFork`, `countBy`, `chunk`.
 - C. **Quick stats strip** — biggest expense / busiest day / daily average in
-  one pass. Operators: `juxt`, `fork`.
+  one pass. Operators: `fxJuxt`, `fxFork`.
 
 **Strategy:** fix all CORRECT (1–3), all FX (4–5), plus PERF 6 and UX/DX 8–10;
 defer PERF 7 to the memoize round. Build feature A pipeline-first:
@@ -253,9 +253,9 @@ Tests: 34 passing (new `budgets_test.dart`; the float-noise test caught
 
 **Feedbacks (10):**
 1. `FX` — `spentByCategory` rebuilt its result map with a raw map
-   comprehension. → fixed: `fromEntries(fx(...).map(...))`.
+   comprehension. → fixed: `fxFromEntries(fx(...).map(...))`.
 2. `FX` — `suggestedBudgets` did the same for the averages map. → fixed with
-   `fromEntries` too.
+   `fxFromEntries` too.
 3. `UX` — the month-over-month table gave no hint that the newest row is a
    partial month, making the red "spending down" arrow misleading. → fixed:
    "· in progress" marker on the current month.
@@ -263,30 +263,30 @@ Tests: 34 passing (new `budgets_test.dart`; the float-noise test caught
 5. `UX` — Insights had numbers but no at-a-glance shape of the month. → fixed
    via the heatmap feature.
 6. `PERF` — summaries recompute on every rebuild (carried from R1). → still
-   deferred; `memoize` is Round 3's headline.
+   deferred; `fxMemoize` is Round 3's headline.
 7. `CORRECT` — verified `duePartition` uses *today* (not the viewed month) on
    purpose: due-ness is about now. Documented here as intended behavior.
 8. `DX` — `heatmap` needed the calendar grid; reusing `monthGrid` keeps one
    source of truth for week layout (no second grid implementation).
 9. `DX` — export columns are a single `csvColumns` const shared by header and
-   `pick`, so the header can never drift from the row shape.
+   `fxPick`, so the header can never drift from the row shape.
 10. `UX` — heatmap cells needed hover tooltips with day + amount to be
     readable (added).
 
 **Features suggested (3):**
-- B. **Weekly spending heatmap** — `fork` (one filtered walk feeds two
-  aggregations), `groupBy` → `fold`, grid reuse of `range` → `chunk(7)`.
+- B. **Weekly spending heatmap** — `fxFork` (one filtered walk feeds two
+  aggregations), `groupBy` → `fold`, grid reuse of `fxRange` → `chunk(7)`.
   ← *chosen*
-- D. **CSV export to clipboard** — `sortBy` → `map` → `pick` → `join`,
+- D. **CSV export to clipboard** — `sortBy` → `map` → `fxPick` → `join`,
   `prepend` for the header row. ← *chosen*
 - E. **Recent activity feed** — `takeRight` / `reverse` / `slice` over
   date-sorted entries. Deferred to Round 3/4.
 
 **Strategy:** pipeline-first. Heatmap: one lazy `filter` source consumed via
-two `fork()`s — per-day `groupBy`→`fold` and month `sum` — proving the source
-is walked once; cells normalize against `max`. CSV: entry → full map, `pick`
-keeps `csvColumns`, escape → `join(',')`, header `prepend`ed. Fix FX 1–2 with
-`fromEntries`, UX 3 marker, tooltips.
+two `fxFork()`s — per-day `groupBy`→`fold` and month `sum` — proving the source
+is walked once; cells normalize against `max`. CSV: entry → full map, `fxPick`
+keeps `csvColumns`, escape → `fxJoin(',')`, header `prepend`ed. Fix FX 1–2 with
+`fxFromEntries`, UX 3 marker, tooltips.
 
 **Implemented:** all of the above. New `logic/heatmap.dart`, `logic/export.dart`;
 heatmap card on Insights, Export CSV button on Entries (copies the currently
@@ -297,7 +297,7 @@ filtered list). Tests: 40 passing (`heatmap_test.dart`, `export_test.dart`).
 
 **Feedbacks (10):**
 1. `PERF` — (carried twice) summaries recomputed on every rebuild. → fixed:
-   `logic/cached.dart` with **nested `memoize`** — outer keyed by the entries
+   `logic/cached.dart` with **nested `fxMemoize`** — outer keyed by the entries
    list *instance* (state swaps the list on every change, so identity is a
    correct key), inner keyed by month. Rebuild = cache hit, data change =
    natural miss.
@@ -319,21 +319,21 @@ filtered list). Tests: 40 passing (`heatmap_test.dart`, `export_test.dart`).
 9. `DX` — memoize caches are unbounded (superseded lists keep inner caches
    alive); acceptable for an app session, documented in `cached.dart` rather
    than hidden.
-10. `FX` — quick stats were the textbook `juxt` shape (a list of stat
+10. `FX` — quick stats were the textbook `fxJuxt` shape (a list of stat
     functions over one input) — implemented that way instead of four separate
     walks of the widget code.
 
 **Features suggested (3):**
 - E. **Recent activity feed** — `sortBy` → `takeRight(8)` → `reverse`.
   ← *chosen*
-- F. **Quick stats strip** — `juxt` over the month slice: biggest expense,
+- F. **Quick stats strip** — `fxJuxt` over the month slice: biggest expense,
   busiest day (`countBy` → `sortBy` → `head`), avg daily spend, open due
   items. ← *chosen*
 - G. **Tag explorer** — pick a tag, see spending overlap between months via
-  `intersection` / `difference`, `pluck`. Deferred to Round 4.
+  `intersection` / `difference`, `fxPluck`. Deferred to Round 4.
 
-**Strategy:** pipeline-first. Cache layer as composition (`memoize` ∘
-`memoize`) rather than hand-rolled maps; `juxt` list where each stat is one
+**Strategy:** pipeline-first. Cache layer as composition (`fxMemoize` ∘
+`fxMemoize`) rather than hand-rolled maps; `fxJuxt` list where each stat is one
 lambda; recent feed as a 3-operator chain; throttle wraps the existing reseed
 without touching state code.
 
@@ -355,8 +355,8 @@ validation; WYSIWYG export. Tests: 45 passing (`stats_test.dart` includes an
 4. `FX` — the dynamic `pipe` — the FxTS-parity API the library keeps on
    purpose — was showcased nowhere. → fixed: the About dialog runs a live
    `pipe([filter, map, sum])` over the ledger and shows code + result.
-5. `FX` — `pluck`/`compact` unused. → fixed: tag spend maps non-spending
-   entries to a null amount, then `compact(pluck('amount'))` → `sum`.
+5. `FX` — `fxPluck`/`fxCompact` unused. → fixed: tag spend maps non-spending
+   entries to a null amount, then `fxCompact(fxPluck('amount'))` → `sum`.
 6. `PERF` — `quickStats` was the one dashboard pipeline left uncached.
    → fixed: `cachedQuickStats` joins the nested-memoize family.
 7. `DX` — the example's README was still the flutter-create boilerplate.
@@ -367,23 +367,23 @@ validation; WYSIWYG export. Tests: 45 passing (`stats_test.dart` includes an
    tags: both dedupe their output per the library contract, which is exactly
    right for tag *sets*. No change needed — noted so future rounds don't
    "fix" it.
-10. `DX` — coverage table closed out: `omit`, `slice`, `cycle`, `tap`,
-    `scan1`, `repeat` are declared intentionally uncovered — no natural fit
+10. `DX` — coverage table closed out: `fxOmit`, `slice`, `cycle`, `fxTap`,
+    `fxScan1`, `repeat` are declared intentionally uncovered — no natural fit
     in this app, and forcing them would violate principle #3 (readable over
     clever).
 
 **Features suggested (3):**
 - G. **Tag explorer** — month-over-month tag set algebra
   (`intersection` / `difference` both directions) + per-tag spend
-  (`compact(pluck)` → `sum`). ← *chosen*
+  (`fxCompact(pluck)` → `sum`). ← *chosen*
 - H. **About dialog with a live `pipe`** — documentation-as-feature for the
   FxTS parity API. ← *chosen*
 - I. **CSV import** — parse pasted CSV back into entries (`map`, `zip` with
-  the header, `compact` for bad rows). Left on the table for a future round.
+  the header, `fxCompact` for bad rows). Left on the table for a future round.
 
 **Strategy:** pipeline-first as always: `compareTagMonths` is two
 `flatMap` → `uniq` tag sets fed into `intersection` + both `difference`
-directions; `tagSpend` is the `pluck`/`compact` chain; the About dialog uses
+directions; `tagSpend` is the `fxPluck`/`fxCompact` chain; the About dialog uses
 `pipe` verbatim so the displayed snippet is the code that ran.
 
 **Implemented:** all of the above. New `logic/tags.dart`; Tag explorer card on
@@ -432,8 +432,8 @@ Tests: 49 passing (`tags_test.dart`). `flutter analyze` clean;
   numerals. ← *chosen*
 - K. **Adaptive layout** — one breakpoint, bottom nav + stacked cards on
   narrow viewports. ← *chosen*
-- L. **CSV import** (round-trip with the round-2 export) — `split`, `zip`
-  with the header, `compact` for bad rows. Deferred to Round 6.
+- L. **CSV import** (round-trip with the round-2 export) — `fxSplit`, `zip`
+  with the header, `fxCompact` for bad rows. Deferred to Round 6.
 
 **Strategy:** design-system first (ui-ux-pro-max: trust-blue #1E40AF seed,
 profit-green income, dark OLED variant, density 7), then the FX/CORRECT
@@ -442,7 +442,7 @@ keeping the best element; ties keep the first, empty returns null (the
 `head`/`last` contract), keys compare exactly like `sortBy`.
 
 **Implemented:** all of the above. New `ui/theme.dart`, `logic/format.dart`;
-fxdart 0.3.0 with `maxBy`/`minBy` (+`maxByAsync`/`minByAsync`); library 986
+fxdart 0.3.0 with `maxBy`/`minBy` (+`fxMaxByAsync`/`fxMinByAsync`); library 986
 tests passing, app 49 passing, `flutter analyze` clean, docs site rebuilt
 with the two new tutorial pages.
 
@@ -506,10 +506,10 @@ tests, app 49 tests, `flutter analyze` clean.
    → CSV import feature (chosen; deferred since Round 4).
 2. `FX` — `export.dart` hand-joined rows with Dart's `List.join` while
    fxdart ships `join`. → export now ends in
-   `join('\n', prepend(header, rows))` — no List materialization.
+   `fxJoin('\n', fxPrepend(header, rows))` — no List materialization.
 3. `PERF` — Calendar rebuilt its `groupBy`/`countBy` indexes on every
    rebuild. → `cachedEntriesByDay` / `cachedDueCountByDay` join the memoize
-   family (single-arg `memoize(entriesByDay)` — the simplest member yet).
+   family (single-arg `fxMemoize(entriesByDay)` — the simplest member yet).
 4. `PERF` — `projectAll` did `List.contains` per ghost entry
    (O(ghosts × materialized)). → Set lookup.
 5. `CORRECT` — import must round-trip export exactly: quoted commas,
@@ -525,10 +525,10 @@ tests, app 49 tests, `flutter analyze` clean.
    `putEntries` + `LedgerState.upsertEntries`: one Hive write, one notify.
 9. `CORRECT` — CSV has no id column; imported rows need fresh, unique,
    *deterministic* ids. → `'$idPrefix-L<line>'`, pure and pinned by tests.
-10. `FX` — the import pipeline is itself a showcase: `split('\n')` →
-    `zipWithIndex` → `map(parse)` → **`compact` ×2 as an Either-splitter**
+10. `FX` — the import pipeline is itself a showcase: `fxSplit('\n')` →
+    `zipWithIndex` → `map(parse)` → **`fxCompact` ×2 as an Either-splitter**
     (a row parses to `(Entry?, ImportIssue?)`; compact separates the
-    streams); per row `zip(header, cells)` → `fromEntries`; `find` picks
+    streams); per row `zip(header, cells)` → `fxFromEntries`; `find` picks
     the EntryType. The import dialog carries its own formula + "?" with
     live counts, consistent with Round 6.
 
@@ -587,7 +587,7 @@ compiles.
 - P. **Budget "what-if" slider** — evolve a budgets map under a scaling
   factor and preview over/under states. Left on the table.
 
-**Strategy:** pipeline-first as always. Forecast: `concat(actual, ghosts) →
+**Strategy:** pipeline-first as always. Forecast: `fxConcat(actual, ghosts) →
 sortBy(date) → scan`, `projectedFrom` = `findIndex(date > today)`.
 Weekday: two-stage `groupBy(day) → sumBy` then `groupBy(weekday) →
 averageBy(day total)`.
@@ -623,7 +623,7 @@ build compiles.
    below.
 9. `CORRECT` — verified the Insights projection window follows *today* (not
    the viewed month) on purpose — same rationale as due-ness (Round 2 #7).
-10. `DX` — coverage closeout: `omit`, `slice`, `cycle`, `tap`, `scan1`,
+10. `DX` — coverage closeout: `fxOmit`, `slice`, `cycle`, `fxTap`, `fxScan1`,
     `repeat`, `append`, `takeUntil`, `dropRight`, `zipWith`, `union` remain
     intentionally uncovered — no natural fit; forcing them would violate
     principle #3.

@@ -1,4 +1,4 @@
-import 'package:fxdart/fxdart.dart' hide isEmpty, isNotNull, isNull;
+import 'package:fxdart/fxdart.dart' hide fxIsEmpty, isNotNull, fxIsNull;
 import 'package:test/test.dart';
 
 // Async twins of rights / lefts / separated — sync forms are covered in
@@ -13,12 +13,12 @@ void main() {
 
   group('rightsAsync', () {
     test('should extract every Right, in order', () async {
-      expect(await rightsAsync(toAsync(eithers)), equals([1, 2]));
+      expect(await fxRightsAsync(fxToAsync(eithers)), equals([1, 2]));
     });
 
     test('should return empty for no Rights', () async {
       expect(
-        await rightsAsync(toAsync(<Either<String, int>>[const Left('x')])),
+        await fxRightsAsync(fxToAsync(<Either<String, int>>[const Left('x')])),
         isEmpty,
       );
     });
@@ -33,7 +33,7 @@ void main() {
 
   group('leftsAsync', () {
     test('should extract every Left, in order', () async {
-      expect(await leftsAsync(toAsync(eithers)), equals(['a', 'b']));
+      expect(await fxLeftsAsync(fxToAsync(eithers)), equals(['a', 'b']));
     });
 
     test('should be able to be used as a chain terminal', () async {
@@ -43,14 +43,14 @@ void main() {
 
   group('separateEitherAsync', () {
     test('should split into (lefts, rights)', () async {
-      final (ls, rs) = await separateEitherAsync(toAsync(eithers));
+      final (ls, rs) = await fxSeparateEitherAsync(fxToAsync(eithers));
       expect(ls, equals(['a', 'b']));
       expect(rs, equals([1, 2]));
     });
 
     test('should return empty pairs for an empty upstream', () async {
-      final (ls, rs) = await separateEitherAsync(
-        toAsync(<Either<String, int>>[]),
+      final (ls, rs) = await fxSeparateEitherAsync(
+        fxToAsync(<Either<String, int>>[]),
       );
       expect(ls, isEmpty);
       expect(rs, isEmpty);

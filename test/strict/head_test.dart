@@ -1,30 +1,33 @@
-import 'package:fxdart/fxdart.dart' hide isNull;
+import 'package:fxdart/fxdart.dart' hide fxIsNull;
 import 'package:test/test.dart';
 
 void main() {
   group('head', () {
     group('sync', () {
       test("should return first item of the given 'Iterable'", () {
-        final result = head(range(5));
+        final result = fxHead(fxRange(5));
         expect(result, equals(0));
       });
 
       test("should return first item of the given 'Iterable' - array", () {
-        final res = head([1, 2, 3, 4]);
+        final res = fxHead([1, 2, 3, 4]);
         expect(res, equals(1));
       });
 
       test(
         "should return first item of the given 'Iterable' - string chars",
         () {
-          final result = head('marpple'.split(''));
+          final result = fxHead('marpple'.split(''));
           expect(result, equals('m'));
         },
       );
 
       test('should be able to be used in the pipeline', () {
-        final res1 = head(
-          filter((int a) => a % 2 == 0, map((int a) => a + 10, [1, 2, 3, 4])),
+        final res1 = fxHead(
+          fxFilter(
+            (int a) => a % 2 == 0,
+            fxMap((int a) => a + 10, [1, 2, 3, 4]),
+          ),
         );
         expect(res1, equals(12));
       });
@@ -40,15 +43,15 @@ void main() {
 
     group('async', () {
       test("should return first item of the given 'AsyncIterable'", () async {
-        final res = await headAsync(toAsync([1, 2, 3, 4]));
+        final res = await fxHeadAsync(fxToAsync([1, 2, 3, 4]));
         expect(res, equals(1));
       });
 
       test('should be able to be used in the pipeline', () async {
-        final res = await headAsync(
-          filterAsync(
+        final res = await fxHeadAsync(
+          fxFilterAsync(
             (int a) => a % 2 == 0,
-            mapAsync((int a) => a + 10, toAsync([1, 2, 3, 4])),
+            fxMapAsync((int a) => a + 10, fxToAsync([1, 2, 3, 4])),
           ),
         );
         expect(res, equals(12));

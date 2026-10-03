@@ -6,9 +6,9 @@ void main() {
   group('throwError', () {
     test('throw in a pipeline via unless', () {
       try {
-        unless<Object>(
-          isNum,
-          throwError((input) => Exception('input is $input')),
+        fxUnless<Object>(
+          fxIsNum,
+          fxThrowError((input) => Exception('input is $input')),
           '0',
         );
         fail('should have thrown');
@@ -19,7 +19,7 @@ void main() {
 
     test('throw error', () {
       try {
-        throwError((input) => Exception('input is $input'))(0);
+        fxThrowError((input) => Exception('input is $input'))(0);
       } on Exception catch (error) {
         expect(error.toString(), contains('input is 0'));
       }

@@ -11,7 +11,7 @@ void main() {
 
   // TODO: use intersectionBy (keyed on 'sku') to find products that are
   // on sale.
-  final saleProducts = toList(products);
+  final saleProducts = fxToList(products);
 
   print(saleProducts);
 }

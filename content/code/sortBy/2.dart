@@ -8,7 +8,7 @@ void main() {
   ];
 
   // TODO: sort the people BY AGE, youngest first.
-  final sorted = sortBy((p) => p['name'], people);
+  final sorted = fxSortBy((p) => p['name'], people);
 
   print(sorted.map((p) => p['name']).toList());
 }

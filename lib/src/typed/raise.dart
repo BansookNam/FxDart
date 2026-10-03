@@ -6,12 +6,12 @@ import 'either.dart';
 /// system, ported from Kotlin Arrow 2.x's `Raise<E>`.
 ///
 /// A [Raise] is a *scope* in which computations may short-circuit with a
-/// typed error `E`. You never construct one yourself: builders like [either],
-/// [eitherAsync], and [nullable] create a scope, hand it to your block, and
+/// typed error `E`. You never construct one yourself: builders like [fxEither],
+/// [fxEitherAsync], and [fxNullable] create a scope, hand it to your block, and
 /// turn a raised error into their result type at the boundary.
 ///
 /// ```dart
-/// Either<String, int> parse(String s) => either((r) {
+/// Either<String, int> parse(String s) => fxEither((r) {
 ///   final n = int.tryParse(s);
 ///   return r.ensureNotNull(n, () => '"$s" is not a number');
 /// });
@@ -50,7 +50,7 @@ final class RaiseLeakedError extends Error {
 /// `on Exception catch (e)` in user code must not swallow it. This is the
 /// Dart analogue of Arrow making its signal a `CancellationException` — the
 /// one throwable idiomatic Kotlin never catches. A bare `catch (e)` still
-/// catches it (unavoidable, same as Arrow); use [catching] instead.
+/// catches it (unavoidable, same as Arrow); use [fxCatching] instead.
 final class _RaiseSignal implements Error {
   _RaiseSignal(this.raised, this.scope);
 
@@ -76,7 +76,7 @@ final class _RaiseSignal implements Error {
 /// `DefaultRaise : Raise<Any?>`. Dart reifies type arguments, so if a scope
 /// is covariantly upcast (`Raise<String>` seen as `Raise<Object?>`) and
 /// misused, the covariant-parameter check fails AT THE `raise()` CALL SITE
-/// with a clean [TypeError] — and the `as E` cast in [foldRaise] is then
+/// with a clean [TypeError] — and the `as E` cast in [fxFoldRaise] is then
 /// provably safe.
 final class _DefaultRaise<E> implements Raise<E> {
   bool _active = true;
@@ -95,9 +95,9 @@ final class _DefaultRaise<E> implements Raise<E> {
 /// - a raise signal from a *different* scope → rethrown untouched (this is
 ///   what makes nested scopes correct with no dynamic scoping)
 ///
-/// Named `foldRaise` because top-level `fold` already exists in fxdart —
+/// Named `fxFoldRaise` because top-level `fxFold` already exists in fxdart —
 /// the forced-suffix situation `WHY_CURRIED.md` blesses.
-B foldRaise<E, A, B>(
+B fxFoldRaise<E, A, B>(
   A Function(Raise<E> r) block, {
   required B Function(E error) onRaise,
   required B Function(A value) onValue,
@@ -119,10 +119,10 @@ B foldRaise<E, A, B>(
   }
 }
 
-/// Async twin of [foldRaise]. Sync and async are separate functions because
+/// Async twin of [fxFoldRaise]. Sync and async are separate functions because
 /// Dart has no `inline` — the same split fxdart applies to every
 /// `op`/`opAsync` pair.
-Future<B> foldRaiseAsync<E, A, B>(
+Future<B> fxFoldRaiseAsync<E, A, B>(
   FutureOr<A> Function(Raise<E> r) block, {
   required FutureOr<B> Function(E error) onRaise,
   required FutureOr<B> Function(A value) onValue,
@@ -153,59 +153,59 @@ Future<B> foldRaiseAsync<E, A, B>(
 /// Port of Arrow's `either { }` builder.
 ///
 /// ```dart
-/// final result = either<String, int>((r) {
+/// final result = fxEither<String, int>((r) {
 ///   final n = r.bind(parse('42'));
 ///   r.ensure(n > 0, () => 'must be positive');
 ///   return n * 2;
 /// }); // Right(84)
 /// ```
-Either<E, A> either<E, A>(A Function(Raise<E> r) block) =>
-    foldRaise<E, A, Either<E, A>>(
+Either<E, A> fxEither<E, A>(A Function(Raise<E> r) block) =>
+    fxFoldRaise<E, A, Either<E, A>>(
       block,
       onRaise: (error) => Left(error),
       onValue: (value) => Right(value),
     );
 
-/// Async twin of [either]. Raise only within the same awaited chain — a
+/// Async twin of [fxEither]. Raise only within the same awaited chain — a
 /// raise inside an unawaited future cannot be captured and surfaces as an
 /// unhandled zone error.
-Future<Either<E, A>> eitherAsync<E, A>(
+Future<Either<E, A>> fxEitherAsync<E, A>(
   FutureOr<A> Function(Raise<E> r) block,
-) => foldRaiseAsync<E, A, Either<E, A>>(
+) => fxFoldRaiseAsync<E, A, Either<E, A>>(
   block,
   onRaise: (error) => Left(error),
   onValue: (value) => Right(value),
 );
 
-/// [either] with an exception boundary: a *thrown* exception is transformed
+/// [fxEither] with an exception boundary: a *thrown* exception is transformed
 /// by [onThrow] into the scope's typed error. The pre-combined form of the
-/// `either` + [catching] envelope (Arrow: `either { }` with `Raise.catch`).
+/// `fxEither` + [fxCatching] envelope (Arrow: `either { }` with `Raise.catch`).
 ///
 /// The library's own raise signal is never handed to [onThrow] — a raise
 /// from this scope becomes [Left] as usual, and a foreign scope's signal is
 /// rethrown untouched.
 ///
 /// ```dart
-/// Either<RowError, Entry> parseRow(int line, String raw) => eitherCatching(
+/// Either<RowError, Entry> parseRow(int line, String raw) => fxEitherCatching(
 ///   (r) => entryFrom(r, raw),  // may raise RowError OR throw FormatException
 ///   (e, _) => RowError.one(line, FieldError('row', 'could not parse: $e')),
 /// );
 /// ```
-Either<E, A> eitherCatching<E, A>(
+Either<E, A> fxEitherCatching<E, A>(
   A Function(Raise<E> r) block,
   E Function(Object thrown, StackTrace stackTrace) onThrow,
-) => foldRaise<E, A, Either<E, A>>(
+) => fxFoldRaise<E, A, Either<E, A>>(
   block,
   onRaise: (error) => Left(error),
   onValue: (value) => Right(value),
   onThrow: (thrown, stackTrace) => Left(onThrow(thrown, stackTrace)),
 );
 
-/// Async twin of [eitherCatching].
-Future<Either<E, A>> eitherCatchingAsync<E, A>(
+/// Async twin of [fxEitherCatching].
+Future<Either<E, A>> fxEitherCatchingAsync<E, A>(
   FutureOr<A> Function(Raise<E> r) block,
   FutureOr<E> Function(Object thrown, StackTrace stackTrace) onThrow,
-) => foldRaiseAsync<E, A, Either<E, A>>(
+) => fxFoldRaiseAsync<E, A, Either<E, A>>(
   block,
   onRaise: (error) => Left(error),
   onValue: (value) => Right(value),
@@ -213,7 +213,7 @@ Future<Either<E, A>> eitherCatchingAsync<E, A>(
       Left(await onThrow(thrown, stackTrace)),
 );
 
-/// The info-free raise scope used by [nullable] — the port of Arrow's
+/// The info-free raise scope used by [fxNullable] — the port of Arrow's
 /// `SingletonRaise` (errors carry no information).
 final class SingletonRaise implements Raise<void> {
   SingletonRaise._(this._raise);
@@ -244,21 +244,22 @@ final class SingletonRaise implements Raise<void> {
 /// `Option` type (`T?` is fxdart's absence channel).
 ///
 /// ```dart
-/// final total = nullable((r) {
+/// final total = fxNullable((r) {
 ///   final a = r.bind(int.tryParse(x));
 ///   final b = r.bind(int.tryParse(y));
 ///   return a + b;
 /// }); // int? — null if either parse failed
 /// ```
-A? nullable<A>(A Function(SingletonRaise r) block) => foldRaise<void, A, A?>(
-  (r) => block(SingletonRaise._(r)),
-  onRaise: (_) => null,
-  onValue: (value) => value,
-);
+A? fxNullable<A>(A Function(SingletonRaise r) block) =>
+    fxFoldRaise<void, A, A?>(
+      (r) => block(SingletonRaise._(r)),
+      onRaise: (_) => null,
+      onValue: (value) => value,
+    );
 
-/// Async twin of [nullable].
-Future<A?> nullableAsync<A>(FutureOr<A> Function(SingletonRaise r) block) =>
-    foldRaiseAsync<void, A, A?>(
+/// Async twin of [fxNullable].
+Future<A?> fxNullableAsync<A>(FutureOr<A> Function(SingletonRaise r) block) =>
+    fxFoldRaiseAsync<void, A, A?>(
       (r) => block(SingletonRaise._(r)),
       onRaise: (_) => null,
       onValue: (value) => value,
@@ -269,7 +270,7 @@ Future<A?> nullableAsync<A>(FutureOr<A> Function(SingletonRaise r) block) =>
 /// replacement for a bare `catch` inside raise scopes (the port of Arrow's
 /// `catch` + `nonFatalOrThrow` discipline; `catch` is a Dart reserved word,
 /// hence `catching`).
-A catching<A>(
+A fxCatching<A>(
   A Function() block,
   A Function(Object error, StackTrace stackTrace) onError,
 ) {
@@ -282,8 +283,8 @@ A catching<A>(
   }
 }
 
-/// Async twin of [catching].
-Future<A> catchingAsync<A>(
+/// Async twin of [fxCatching].
+Future<A> fxCatchingAsync<A>(
   FutureOr<A> Function() block,
   FutureOr<A> Function(Object error, StackTrace stackTrace) onError,
 ) async {
@@ -330,7 +331,7 @@ extension RaiseOps<E> on Raise<E> {
     A Function(Raise<E> r) block,
     A Function(E error) onRaise, {
     A Function(Object thrown, StackTrace stackTrace)? onThrow,
-  }) => foldRaise<E, A, A>(
+  }) => fxFoldRaise<E, A, A>(
     block,
     onRaise: onRaise,
     onValue: (value) => value,
@@ -343,7 +344,7 @@ extension RaiseOps<E> on Raise<E> {
   A withError<E2, A>(
     E Function(E2 error) transform,
     A Function(Raise<E2> r) block,
-  ) => foldRaise<E2, A, A>(
+  ) => fxFoldRaise<E2, A, A>(
     block,
     onRaise: (error) => raise(transform(error)),
     onValue: (value) => value,

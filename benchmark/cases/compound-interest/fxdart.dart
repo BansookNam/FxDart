@@ -9,7 +9,7 @@ Future<void> main() async {
     impl: 'fxdart',
     n: n,
     run: () {
-      final table = fx(range(1, n + 1))
+      final table = fx(fxRange(1, n + 1))
           .scan((row, year) => (year, row.$2 * (1 + rate)), (0, principal))
           .map((row) => 'year ${row.$1}: \$${row.$2.toStringAsFixed(2)}')
           .toList();

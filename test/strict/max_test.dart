@@ -16,9 +16,9 @@ void main() {
       for (final (input, result) in cases) {
         test('should return the largest of given iterable $input', () {
           if (result.isNaN) {
-            expect(max(input).isNaN, isTrue);
+            expect(fxMax(input).isNaN, isTrue);
           } else {
-            expect(max(input), equals(result));
+            expect(fxMax(input), equals(result));
           }
         });
       }
@@ -29,7 +29,7 @@ void main() {
         test(
           'should return the largest of given asyncIterable $input',
           () async {
-            final res = await maxAsync(toAsync(input));
+            final res = await fxMaxAsync(fxToAsync(input));
             if (result.isNaN) {
               expect(res.isNaN, isTrue);
             } else {

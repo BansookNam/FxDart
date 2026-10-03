@@ -2,7 +2,7 @@
 slug: evolve
 title: evolve — FxDart 101
 description: FxDart evolve 튜토리얼: Map에서 지정한 값만 키별로 변환하고 나머지는 그대로 둡니다.
-heading: <code>evolve</code>
+heading: <code>fxEvolve</code>
 section: 9
 crumb: evolve
 prev: mapValues.html
@@ -16,7 +16,7 @@ nextLabel: compactObject
 
   <h2>강의</h2>
   <p>
-    <code>evolve</code>는 "레시피" 맵 — 키에서 변환 함수로의 매핑 — 과
+    <code>fxEvolve</code>는 "레시피" 맵 — 키에서 변환 함수로의 매핑 — 과
     데이터 맵을 받아, 레시피에 등장하는 키의 값은 대응하는 함수를 거치고
     나머지 키는 그대로 복사되는 새 맵을 만들어 냅니다.
   </p>
@@ -30,7 +30,7 @@ nextLabel: compactObject
     미리 알고 있고 키마다 다른 처리가 필요하지 않다면, 대개는 평범한
     <code>{...map, 'key': f(map['key'])}</code> 전개가 더 Dart다운
     표현입니다. 레시피 자체가 데이터일 때(예: 한 번 만들어 두고 여러
-    맵에 재사용할 때) <code>evolve</code>를 꺼내 쓰세요.
+    맵에 재사용할 때) <code>fxEvolve</code>를 꺼내 쓰세요.
   </p>
 
   <h2>데모 1 · 기본</h2>
@@ -40,13 +40,13 @@ nextLabel: compactObject
   {{playground:1}}
 
   <h2>직접 해 보기</h2>
-  <p>연습: <code>evolve</code>로 <code>'price'</code> 필드를 두 배로 만들고 <code>'title'</code>은 그대로 두어 보세요.</p>
+  <p>연습: <code>fxEvolve</code>로 <code>'price'</code> 필드를 두 배로 만들고 <code>'title'</code>은 그대로 두어 보세요.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="prop.html"><code>prop</code></a> — 값 하나를 꺼내 읽습니다 ·
-    <a href="omitBy.html"><code>omitBy</code></a> — 변환하는 대신 엔트리를 버립니다 ·
-    <a href="compactObject.html"><code>compactObject</code></a> — 특수한 목적의 정리 과정 ·
-    <a href="resolveProps.html"><code>resolveProps</code></a> — 변환 대신 await하는 비동기 사촌
+    <a href="prop.html"><code>fxProp</code></a> — 값 하나를 꺼내 읽습니다 ·
+    <a href="omitBy.html"><code>fxOmitBy</code></a> — 변환하는 대신 엔트리를 버립니다 ·
+    <a href="compactObject.html"><code>fxCompactObject</code></a> — 특수한 목적의 정리 과정 ·
+    <a href="resolveProps.html"><code>fxResolveProps</code></a> — 변환 대신 await하는 비동기 사촌
   </div>

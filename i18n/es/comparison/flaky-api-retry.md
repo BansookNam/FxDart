@@ -23,7 +23,7 @@ async: true
   </p>
   <p>
     La versión con FxDart escribe el reintento como datos:
-    <code>range(1, 11)</code> es el calendario de sondeos,
+    <code>fxRange(1, 11)</code> es el calendario de sondeos,
     <code>map</code> es el transporte, <code>peek</code> anota el registro,
     y <code>dropWhile</code> + <code>head</code> son la política de éxito.
     Como la cadena es perezosa y se tira de ella valor a valor,

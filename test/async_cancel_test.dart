@@ -193,7 +193,7 @@ void main() {
     test('using releases the resource on an early stop', () async {
       var released = 0;
       final out = await fxAsync(
-        usingAsync<String, int>(
+        fxUsingAsync<String, int>(
           () => 'db',
           (r) => fx([1, 2, 3, 4]).toAsync(),
           (r) => released++,
@@ -209,7 +209,7 @@ void main() {
       // go twice, on either the full drain or the early stop.
       Future<int> drain(int Function() onRelease, {int? take}) async {
         final chain = fxAsync(
-          usingAsync<String, int>(
+          fxUsingAsync<String, int>(
             () => 'db',
             (r) => fx([1, 2, 3, 4]).toAsync(),
             (r) => onRelease(),
@@ -234,7 +234,7 @@ void main() {
     test('using cancelled before the first pull releases nothing', () async {
       var released = 0;
       var acquired = 0;
-      final it = usingAsync<String, int>(
+      final it = fxUsingAsync<String, int>(
         () {
           acquired++;
           return 'db';
@@ -335,7 +335,7 @@ void main() {
     // observable stand-in is a subscription; behind a `parallel` the same
     // hole is a pool of isolates that keeps the process alive forever.
     test('nth', () async {
-      expect(await releasedBy((s) => nthAsync(1, s)), isTrue);
+      expect(await releasedBy((s) => fxNthAsync(1, s)), isTrue);
     });
 
     test('firstNotNullOf', () async {
@@ -412,7 +412,7 @@ void main() {
     test('nth', () async {
       expect(
         await releasedByThrow((s) async {
-          await nthAsync(
+          await fxNthAsync(
             3,
             s.map((v) {
               if (v > 1) throw StateError('boom');
@@ -455,7 +455,7 @@ void main() {
       // resolved while the resource was still open.
       var released = false;
       final it = fxAsync(
-        usingAsync<String, int>(
+        fxUsingAsync<String, int>(
           () => 'db',
           (r) => fx([1, 2, 3, 4]).toAsync(),
           (r) async {
@@ -475,7 +475,7 @@ void main() {
       // caller had already been handed its result.
       await expectLater(
         fxAsync(
-          usingAsync<String, int>(
+          fxUsingAsync<String, int>(
             () => 'db',
             (r) => fx([1, 2, 3, 4]).toAsync(),
             (r) => throw StateError('release boom'),
@@ -492,7 +492,7 @@ void main() {
       // still run, and its own failure must not replace it.
       await expectLater(
         fxAsync(
-          usingAsync<String, int>(
+          fxUsingAsync<String, int>(
             () => 'db',
             (r) => fx([1, 2, 3]).toAsync(),
             (r) => throw StateError('release boom'),

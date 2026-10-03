@@ -1,6 +1,6 @@
 import 'package:fxdart/fxdart.dart';
 
-Either<String, int> parsePort(String raw) => either((r) {
+Either<String, int> parsePort(String raw) => fxEither((r) {
   final n = r.ensureNotNull(int.tryParse(raw), () => '"$raw" is not a number');
   r.ensure(n > 0 && n < 65536, () => '$n is out of range');
   return n;

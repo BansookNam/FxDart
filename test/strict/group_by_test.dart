@@ -40,14 +40,14 @@ void main() {
   group('groupBy', () {
     group('sync', () {
       test("should be grouped by callback to given 'Iterable'", () {
-        final res = groupBy((Obj a) => a.category, given);
+        final res = fxGroupBy((Obj a) => a.category, given);
         expect(res, equals(then1));
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = groupBy(
+        final res = fxGroupBy(
           (Obj a) => a.category,
-          filter((Obj a) => a.category != 'clothes', given),
+          fxFilter((Obj a) => a.category != 'clothes', given),
         );
         expect(res, equals(then2));
       });
@@ -64,15 +64,18 @@ void main() {
       test(
         "should be grouped by the callback to given 'AsyncIterable'",
         () async {
-          final res = await groupByAsync((Obj a) => a.category, toAsync(given));
+          final res = await fxGroupByAsync(
+            (Obj a) => a.category,
+            fxToAsync(given),
+          );
           expect(res, equals(then1));
         },
       );
 
       test('should be able to be used in the pipeline', () async {
-        final res = await groupByAsync(
+        final res = await fxGroupByAsync(
           (Obj a) => a.category,
-          filterAsync((Obj a) => a.category != 'clothes', toAsync(given)),
+          fxFilterAsync((Obj a) => a.category != 'clothes', fxToAsync(given)),
         );
         expect(res, equals(then2));
       });
@@ -98,12 +101,12 @@ void main() {
           (id: 4, status: Status.todo, priority: 2),
         ];
 
-        final result = fromEntries(
-          fx(entries(groupBy((t) => t.status, tasks)))
+        final result = fxFromEntries(
+          fx(fxEntries(fxGroupBy((t) => t.status, tasks)))
               .map(
                 (e) => (
                   e.$1,
-                  fold(0, (int sum, item) => sum + item.priority, e.$2),
+                  fxFold(0, (int sum, item) => sum + item.priority, e.$2),
                 ),
               )
               .toList(),
@@ -123,11 +126,11 @@ void main() {
           (name: 'rose', color: 'red', value: 15),
         ];
 
-        final result = fx(entries(groupBy((item) => item.color, items)))
+        final result = fx(fxEntries(fxGroupBy((item) => item.color, items)))
             .map(
               (e) => (
                 color: e.$1,
-                total: fold(0, (int sum, item) => sum + item.value, e.$2),
+                total: fxFold(0, (int sum, item) => sum + item.value, e.$2),
                 count: e.$2.length,
               ),
             )
@@ -153,7 +156,7 @@ void main() {
           (id: 3, status: pending),
         ];
 
-        final result = groupBy((item) => item.status, data);
+        final result = fxGroupBy((item) => item.status, data);
 
         expect(
           result,
@@ -171,9 +174,9 @@ void main() {
           (name: 'task3', priority: 'low'),
         ];
 
-        final result = await groupByAsync(
+        final result = await fxGroupByAsync(
           (item) async => item.priority,
-          toAsync(items),
+          fxToAsync(items),
         );
 
         expect(

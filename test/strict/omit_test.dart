@@ -8,15 +8,15 @@ void main() {
     group('sync', () {
       test('should be omitted properties as given keys', () {
         final obj = {'a': 1, 'b': 2, 'c': '3'};
-        expect(omit(['a', 'c'], obj), equals({'b': 2}));
+        expect(fxOmit(['a', 'c'], obj), equals({'b': 2}));
       });
 
       test('should be able to be used in the pipeline', () {
         final res = pipe(
           {'a': 1, 'b': '2', 'c': true},
           [
-            (Map<String, Object> m) => omit(['a', 'b'], m),
-            (Map<String, Object> m) => toList(entries(m)),
+            (Map<String, Object> m) => fxOmit(['a', 'b'], m),
+            (Map<String, Object> m) => fxToList(fxEntries(m)),
           ],
         );
         expect(res, equals([('c', true)]));

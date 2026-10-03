@@ -35,7 +35,7 @@ presenta.
 | **join** | `flatten`, μ | `flat()`, `expand(id)` | 20 |
 | **map2** | `zipWith`, `liftA2` | `map2`, `zipOrAccumulate2` | 6 |
 | **traverse** | — | `mapOrAccumulate`, `.map(f).sequence()` | 9 |
-| **sequence** | — | `sequenceEither`, `Future.wait` | 9 |
+| **sequence** | — | `fxSequenceEither`, `Future.wait` | 9 |
 | **fold** | catamorfismo, `reduce` con semilla | `fold`, `Either.fold` | 8 |
 
 ## Evaluación
@@ -56,12 +56,12 @@ presenta.
 | Término | También llamado | En Dart / FxDart | Cap. |
 |---|---|---|---|
 | **Either** | `Result`, `Validation`, unión disjunta | `Either<L, R>`, `Left`, `Right` | 16 |
-| **Ámbito Raise** | ámbito de receptor de contexto, ámbito de efecto | `either((r) { … })`, `r.bind`, `r.ensure` | 15 |
-| **Continuación delimitada** | `shift`/`reset`, manejador de efectos | la salida no local dentro de `either` | 15 |
+| **Ámbito Raise** | ámbito de receptor de contexto, ámbito de efecto | `fxEither((r) { … })`, `r.bind`, `r.ensure` | 15 |
+| **Continuación delimitada** | `shift`/`reset`, manejador de efectos | la salida no local dentro de `fxEither` | 15 |
 | **Cortocircuito** | fallo rápido | el primer `Left` termina la cadena | 16 |
 | **Acumulación** | fallo lento, validación aplicativa | `accumulate`, `zipOrAccumulate`, `mapOrAccumulate` | 17 |
 | **NonEmptyList** | `Nel` | `NonEmptyList<E>` — extension type sobre `List` | 8 |
-| **Transformador de mónadas** | `EitherT`, `OptionT` | *no se usa* — en su lugar, `eitherAsync` | 7 |
+| **Transformador de mónadas** | `EitherT`, `OptionT` | *no se usa* — en su lugar, `fxEitherAsync` | 7 |
 
 ## Fundamentos
 

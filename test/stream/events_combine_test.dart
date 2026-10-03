@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:fxdart/fxdart.dart' hide isEmpty;
+import 'package:fxdart/fxdart.dart' hide fxIsEmpty;
 import 'package:test/test.dart';
 
 Future<void> flush() => Future<void>.delayed(Duration.zero);
@@ -309,7 +309,7 @@ void main() {
         final b = StreamController<int>();
         final seen = <int>[];
         final done = Completer<void>();
-        concatEager([
+        fxConcatEager([
           a.stream,
           b.stream,
         ]).listen(seen.add, onDone: done.complete);
@@ -344,7 +344,7 @@ void main() {
       final c = StreamController<int>();
       final seen = <int>[];
       final done = Completer<void>();
-      concatEager([
+      fxConcatEager([
         a.stream,
         b.stream,
         c.stream,
@@ -360,12 +360,12 @@ void main() {
     });
 
     test('an empty source list closes immediately', () async {
-      expect(await concatEager<int>(const []).toList(), isEmpty);
+      expect(await fxConcatEager<int>(const []).toList(), isEmpty);
     });
 
     test('sync sources still emit in order', () async {
       expect(
-        await concatEager([
+        await fxConcatEager([
           Stream.fromIterable([1, 2]),
           Stream<int>.empty(),
           Stream.fromIterable([3]),
@@ -378,7 +378,7 @@ void main() {
       final a = StreamController<int>();
       final b = StreamController<int>();
       final seen = <Object>[];
-      final sub = concatEager([
+      final sub = fxConcatEager([
         a.stream,
         b.stream,
       ]).listen(seen.add, onError: seen.add);
@@ -398,7 +398,10 @@ void main() {
       final a = StreamController<int>();
       final b = StreamController<int>();
       final seen = <List<int>>[];
-      combine([CombineSpec(a.stream), CombineSpec(b.stream)]).listen(seen.add);
+      fxCombine([
+        CombineSpec(a.stream),
+        CombineSpec(b.stream),
+      ]).listen(seen.add);
 
       a.add(1);
       await Future<void>.delayed(Duration.zero);
@@ -424,7 +427,7 @@ void main() {
       final src = StreamController<int>();
       final other = StreamController<int>();
       final seen = <List<int>>[];
-      combine([
+      fxCombine([
         CombineSpec(src.stream),
         CombineSpec(other.stream, causesEmit: false),
       ]).listen(seen.add);
@@ -456,7 +459,7 @@ void main() {
         final a = StreamController<int?>();
         final b = StreamController<int?>();
         final seen = <List<int?>>[];
-        combine<int?>([
+        fxCombine<int?>([
           CombineSpec(a.stream),
           CombineSpec(b.stream, requireFirst: false),
         ]).listen(seen.add);
@@ -489,7 +492,7 @@ void main() {
       final a = StreamController<int?>();
       final b = StreamController<int?>();
       final seen = <List<int?>>[];
-      combine<int?>([
+      fxCombine<int?>([
         CombineSpec(a.stream, requireFirst: false),
         CombineSpec(b.stream, requireFirst: false, causesEmit: false),
       ]).listen(seen.add);
@@ -511,7 +514,7 @@ void main() {
       final a = StreamController<int>();
       final seen = <List<int>>[];
       final done = Completer<void>();
-      combine([
+      fxCombine([
         CombineSpec(a.stream, causesEmit: false),
       ]).listen(seen.add, onDone: done.complete);
       a.add(1);
@@ -521,13 +524,13 @@ void main() {
     });
 
     test('an empty spec list closes immediately', () async {
-      expect(await combine<int>(const []).toList(), isEmpty);
+      expect(await fxCombine<int>(const []).toList(), isEmpty);
     });
 
     test('forwards errors and supports cancel', () async {
       final a = StreamController<int>();
       final seen = <Object>[];
-      final sub = combine([
+      final sub = fxCombine([
         CombineSpec(a.stream),
       ]).listen(seen.add, onError: seen.add);
       a.addError(StateError('boom'));

@@ -16,7 +16,7 @@ nextLabel: intersection
 
   <h2>강의</h2>
   <p>
-    <code>differenceBy(f, iterable1, iterable2)</code>는
+    <code>fxDifferenceBy(f, iterable1, iterable2)</code>는
     <a href="difference.html"><code>difference</code></a>와 완전히 동일한
     인자 순서 규칙을 따릅니다. 결과는
     <strong><code>iterable2</code>에서</strong> 나오며,
@@ -35,9 +35,9 @@ nextLabel: intersection
   </p>
   <p>
     <code>difference</code> 자체가 사실
-    <code>differenceBy((a) =&gt; a, iterable1, iterable2)</code>입니다. 둘 다
+    <code>fxDifferenceBy((a) =&gt; a, iterable1, iterable2)</code>입니다. 둘 다
     체인 메서드가 없으니 data-first 함수를 직접 호출하세요. 비동기 쪽에서는
-    <code>differenceAsync</code>와 마찬가지로 동시성 표시가
+    <code>fxDifferenceAsync</code>와 마찬가지로 동시성 표시가
     <code>iterable2</code>에 적용됩니다.
   </p>
 
@@ -57,5 +57,5 @@ nextLabel: intersection
     <a href="difference.html"><code>difference</code></a> — 값 동등성으로 비교하는 버전 ·
     <a href="intersectionBy.html"><code>intersectionBy</code></a> — 반대로 공통 키를 가진 원소만 남기기 ·
     <a href="uniqBy.html"><code>uniqBy</code></a> — 키 기준으로 이터러블 하나에서 중복 제거 ·
-    <a href="compress.html"><code>compress</code></a> — 나란한 불리언 마스크로 필터링
+    <a href="compress.html"><code>fxCompress</code></a> — 나란한 불리언 마스크로 필터링
   </div>

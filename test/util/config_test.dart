@@ -28,11 +28,11 @@ void main() {
         test('$label yield every element in completion order', () async {
           FxDart.config.optimizeMemoryForConcurrentPool = legacy;
           final delays = [200, 50, 100];
-          final it = concurrentPoolAsync(
+          final it = fxConcurrentPoolAsync(
             3,
-            toAsync(() sync* {
+            fxToAsync(() sync* {
               for (var i = 0; i < 3; i++) {
-                yield delay(Duration(milliseconds: delays[i]), i + 1);
+                yield fxDelay(Duration(milliseconds: delays[i]), i + 1);
               }
             }()),
           ).iterator;
@@ -43,8 +43,8 @@ void main() {
 
         test('$label drain a fast source completely', () async {
           FxDart.config.optimizeMemoryForConcurrentPool = legacy;
-          final acc = await toListAsync(
-            concurrentPoolAsync(3, instantSource(500)),
+          final acc = await fxToListAsync(
+            fxConcurrentPoolAsync(3, instantSource(500)),
           );
           expect(acc.length, equals(500));
           expect(
@@ -61,7 +61,7 @@ void main() {
             3,
           ]).toAsync().map((i) async => i == 2 ? throw StateError('boom') : i);
           await expectLater(
-            toListAsync(concurrentPoolAsync(2, source)),
+            fxToListAsync(fxConcurrentPoolAsync(2, source)),
             throwsA(isA<StateError>()),
           );
         });
@@ -70,18 +70,18 @@ void main() {
       test(
         'is read when iteration starts, not when the pipeline is built',
         () async {
-          final pipeline = concurrentPoolAsync(3, instantSource(20));
+          final pipeline = fxConcurrentPoolAsync(3, instantSource(20));
           FxDart.config.optimizeMemoryForConcurrentPool = true;
           // Built under the default, iterated under the flag: the flag wins,
           // and either way the result is the same 20 elements.
-          expect((await toListAsync(pipeline)).length, equals(20));
+          expect((await fxToListAsync(pipeline)).length, equals(20));
         },
       );
 
       test('queue buffers keep a fast source linear', () async {
         Future<int> run(int n) async {
           final sw = Stopwatch()..start();
-          await toListAsync(concurrentPoolAsync(3, instantSource(n)));
+          await fxToListAsync(fxConcurrentPoolAsync(3, instantSource(n)));
           return sw.elapsedMicroseconds;
         }
 

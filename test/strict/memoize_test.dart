@@ -8,7 +8,7 @@ void main() {
   group('memoize', () {
     test('should memoize results based on the argument given', () {
       var callCount = 0;
-      final memoized = memoize<int, int>((a) {
+      final memoized = fxMemoize<int, int>((a) {
         callCount++;
         return a + 50;
       });
@@ -25,7 +25,7 @@ void main() {
 
     test('should cache per object argument (identity/equality keyed)', () {
       var callCount = 0;
-      final memoized = memoize<Map<String, String>, String>((obj) {
+      final memoized = fxMemoize<Map<String, String>, String>((obj) {
         callCount++;
         return '${obj['key']} world';
       });

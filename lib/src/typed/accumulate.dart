@@ -10,7 +10,7 @@ import 'raise.dart';
 /// enclosing scope. Run all branches first, read values at the end:
 ///
 /// ```dart
-/// final user = either<Nel<String>, User>((r) => r.accumulate((acc) {
+/// final user = fxEither<Nel<String>, User>((r) => r.accumulate((acc) {
 ///   final name = acc.accumulating((r) => validateName(r, input));
 ///   final age  = acc.accumulating((r) => validateAge(r, input));
 ///   return User(name.value, age.value); // detonates here if anything failed
@@ -121,7 +121,7 @@ final class _AccumulatorImpl<E> implements Accumulator<E> {
 
   @override
   Accumulated<A> accumulating<A>(A Function(AccumulatingRaise<E> r) block) =>
-      foldRaise<NonEmptyList<E>, A, Accumulated<A>>(
+      fxFoldRaise<NonEmptyList<E>, A, Accumulated<A>>(
         (r) => block(_AccumulatingRaiseImpl(r)),
         onRaise: (errors) {
           _errors.addAll(errors);
@@ -136,7 +136,7 @@ final class _AccumulatorImpl<E> implements Accumulator<E> {
 }
 
 /// The accumulation vocabulary, available on any `Raise<NonEmptyList<E>>`
-/// scope (i.e. inside `either<Nel<E>, _>(...)`) — the Arrow 2.x replacement
+/// scope (i.e. inside `fxEither<Nel<E>, _>(...)`) — the Arrow 2.x replacement
 /// for a `Validated` type.
 ///
 /// Contract (copied from Arrow's `RaiseAccumulate`):
@@ -174,7 +174,7 @@ extension AccumulatingRaiseOps<E> on Raise<NonEmptyList<E>> {
     final errors = <E>[];
     final results = <B>[];
     for (final item in items) {
-      foldRaise<NonEmptyList<E>, B, void>(
+      fxFoldRaise<NonEmptyList<E>, B, void>(
         (r) => transform(_AccumulatingRaiseImpl(r), item),
         onRaise: (nel) => errors.addAll(nel),
         onValue: (result) {

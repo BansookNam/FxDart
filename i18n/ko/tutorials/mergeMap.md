@@ -70,5 +70,5 @@ nextLabel: switchLatest
     <strong>관련 항목:</strong>
     <a href="switchMap.html"><code>switchMap</code></a> — 네 번째 정책: 최신이 이기고 나머지는 취소 ·
     <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — 풀 쪽의 한도 있는 팬아웃, 결과는 순서를 지킴 ·
-    <a href="debounce.html"><code>debounce</code></a> — 더 나은 해법일 때가 많음: 내부 스트림이 되기 전에 여분의 이벤트를 막기
+    <a href="debounce.html"><code>fxDebounce</code></a> — 더 나은 해법일 때가 많음: 내부 스트림이 되기 전에 여분의 이벤트를 막기
   </div>

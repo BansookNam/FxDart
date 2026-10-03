@@ -2,7 +2,7 @@
 slug: transpose
 title: transpose — FxDart 101
 description: Tutorial de transpose en FxDart: convierte filas en columnas para cualquier número de iterables, con playground en vivo.
-heading: <code>transpose</code>
+heading: <code>fxTranspose</code>
 section: 6
 crumb: transpose
 prev: withIndex.html
@@ -16,19 +16,19 @@ nextLabel: reverse
 
   <h2>Lección</h2>
   <p>
-    <code>transpose</code> es <code>zip</code> generalizado a <em>cualquier</em>
+    <code>fxTranspose</code> es <code>zip</code> generalizado a <em>cualquier</em>
     número de iterables: la n-ésima lista de salida contiene el n-ésimo
     elemento de cada fila de entrada que aún tenga uno. Mientras que
     <code>zip</code>/<code>zip3</code> toman cada fila como un argumento
     aparte (porque Dart no puede expresar genéricos variádicos),
-    <code>transpose</code> toma todas las filas como un
+    <code>fxTranspose</code> toma todas las filas como un
     <strong>único</strong> iterable de iterables —
-    <code>transpose([row1, row2, row3])</code> — así que funciona para
+    <code>fxTranspose([row1, row2, row3])</code> — así que funciona para
     cualquier número de filas decidido en tiempo de ejecución.
   </p>
   <p>
     A diferencia de <code>zip</code>, que para en cuanto se agota la entrada
-    más corta, <code>transpose</code> sigue mientras <em>alguna</em> fila
+    más corta, <code>fxTranspose</code> sigue mientras <em>alguna</em> fila
     todavía tenga valores: una fila más corta simplemente deja de contribuir a
     las listas de salida posteriores, que pueden acabar siendo más cortas que
     el número de filas. Solo se detiene del todo cuando se han agotado todas

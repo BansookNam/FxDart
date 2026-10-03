@@ -9,7 +9,7 @@ void main() {
 
   // Data-first form: key extractor, then the iterable. Ascending, and never
   // mutates the input (same NEW-list guarantee as sort).
-  final byAge = sortBy((p) => p['age'], people);
+  final byAge = fxSortBy((p) => p['age'], people);
   print(byAge.map((p) => p['name']).toList()); // [lee, kim, park]
 
   // Chain form:

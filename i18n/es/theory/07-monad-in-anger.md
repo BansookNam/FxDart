@@ -87,7 +87,7 @@ cálculo, cuatro superficies:
 | Haskell | `do { id <- parseId raw; … }` | una cadena de `>>=` |
 | Scala | `for { id <- parseId(raw) } yield …` | una cadena de `flatMap`/`map` |
 | Kotlin (Arrow) | `either { val id = parseId(raw).bind() }` | un ámbito con una salida no local |
-| Dart | `either((r) { final id = r.bind(parseId(raw)); … })` | un ámbito con una salida no local |
+| Dart | `fxEither((r) { final id = r.bind(parseId(raw)); … })` | un ámbito con una salida no local |
 
 Los dos primeros son *azúcar sintáctico*: el compilador reescribe el bloque en
 llamadas a métodos, y funciona para cualquier mónada que el verificador de
@@ -113,7 +113,7 @@ Either<String, List<String>> loadOrders(String user) =>
         ? Either.right(['mug', 'book'])
         : Either.left('none');
 
-Either<String, String> summary(String raw) => either((r) {
+Either<String, String> summary(String raw) => fxEither((r) {
       final id = r.bind(parseId(raw));
       final user = r.bind(loadUser(id));
       final orders = r.bind(loadOrders(user));
@@ -151,7 +151,7 @@ void main() async {
 }
 ```
 
-Línea por línea, esto es el bloque `either` de arriba con `await` donde estaba
+Línea por línea, esto es el bloque `fxEither` de arriba con `await` donde estaba
 `r.bind`. `async` marca el ámbito; `await` desenvuelve una capa; el compilador
 reescribe el cuerpo en continuaciones, que es `flatMap` con otro nombre. La
 prueba de que es monádico y no magia: `await` sobre un `Future<Future<T>>` te
@@ -167,7 +167,7 @@ luego generalizaron; el `async` de Dart es donde esa generalización se detuvo.
 > mónadas y ningún `flatMap` único para el par. Scala recurre a los
 > *transformadores de mónadas* (`EitherT[Future, E, A]`), una envoltura por
 > combinación, con una torre de elevaciones. Kotlin y Dart evitan la torre
-> haciendo que el ámbito cumpla doble función: `eitherAsync` te da un ámbito
+> haciendo que el ámbito cumpla doble función: `fxEitherAsync` te da un ámbito
 > `Raise` *dentro* de un cuerpo `async`, así que `await` se ocupa del tiempo y
 > `r.bind` del fallo, sin un tercer tipo. No es más potente que los
 > transformadores — es menos general y mucho más fácil de leer, y el
@@ -184,7 +184,7 @@ Future<Either<String, int>> fetchPort(String key) async =>
         : Either.left('unknown: $key');
 
 Future<Either<String, String>> describe(String key) =>
-    eitherAsync((r) async {
+    fxEitherAsync((r) async {
       // `await` sequences time; `r.bind` sequences failure.
       final port = r.bind(await fetchPort(key));
       return 'listening on $port';
@@ -198,7 +198,7 @@ void main() async {
 
 Dos efectos, un bloque en línea recta, ningún `EitherT`. El coste es que esto
 solo funciona para las combinaciones que FxDart escribió a mano —
-`eitherAsync`, `nullable`, `catching`. No hay un mecanismo genérico que puedas
+`fxEitherAsync`, `fxNullable`, `fxCatching`. No hay un mecanismo genérico que puedas
 extender, porque expresar «cualquier mónada» requiere una característica de
 tipos que Dart no tiene. Eso es el capítulo 10.
 

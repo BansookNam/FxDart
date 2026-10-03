@@ -32,7 +32,7 @@ nextLabel: Either combinators
     one side, <code>flatMap</code> chains a dependent fallible step, and
     <code>getOrNull</code>/<code>getOrElse</code> bridge back to plain Dart.
     <code>Either</code> is meant to live <em>at the boundary</em>: inside a
-    computation, prefer the <a href="raise.html"><code>either</code>
+    computation, prefer the <a href="raise.html"><code>fxEither</code>
     builder</a>, where each step is one straight-line <code>r.bind</code>
     instead of a <code>flatMap</code> pyramid.
   </p>
@@ -69,7 +69,7 @@ nextLabel: Either combinators
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="raise.html"><code>either</code> builder</a> — build Eithers with straight-line code ·
+    <a href="raise.html"><code>fxEither</code> builder</a> — build Eithers with straight-line code ·
     <a href="accumulate.html">accumulation</a> — collect every failure, not just the first ·
     <a href="eitherPipelines.html">Either × pipelines</a> — <code>rights</code>, <code>lefts</code>, <code>sequence</code> over chains ·
     <a href="typedErrors.html">typed errors — full guide</a>

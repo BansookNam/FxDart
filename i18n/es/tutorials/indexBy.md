@@ -53,5 +53,5 @@ nextLabel: countBy
     <strong>Relacionado:</strong>
     <a href="groupBy.html"><code>groupBy</code></a> — conserva todos los duplicados en lugar de sobrescribirlos ·
     <a href="countBy.html"><code>countBy</code></a> — cuenta en vez de conservar el valor ·
-    <a href="fromEntries.html"><code>fromEntries</code></a> — construye un Map directamente a partir de pares clave/valor
+    <a href="fromEntries.html"><code>fxFromEntries</code></a> — construye un Map directamente a partir de pares clave/valor
   </div>

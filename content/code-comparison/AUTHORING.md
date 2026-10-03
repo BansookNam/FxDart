@@ -44,8 +44,8 @@ Optional key `alsoLink:` — extra fxdart function names mentioned in the prose
 **Chip rule:** every name in `functions:` (and `alsoLink:`) MUST have a
 tutorial at `content/tutorials/<name>.md` (the build fails otherwise — check
 with ls).
-Use chain-method names (`concurrent`, not `concurrentAsync`). For
-`fromStream`/`toStream` use the chip name `streams`. List each function once
+Use chain-method names (`concurrent`, not `fxConcurrentAsync`). For
+`fxFromStream`/`toStream` use the chip name `streams`. List each function once
 (distinct names). `toList` never counts as a function.
 Tier sets the count: tier 1 = exactly 2, tier 2 = exactly 3, tier 3 =
 exactly 5, tier 4 = 6–10 distinct functions.

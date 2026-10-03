@@ -2,7 +2,7 @@
 slug: throttle
 title: throttle — FxDart 101
 description: Tutorial de throttle en FxDart: invoca una función como máximo una vez por periodo de espera, con flancos leading/trailing y cancel(), más playground en vivo.
-heading: <code>throttle</code>
+heading: <code>fxThrottle</code>
 section: 12
 crumb: throttle
 next: shuffle.html
@@ -14,10 +14,10 @@ nextLabel: shuffle
 
   <h2>Lección</h2>
   <p>
-    <code>throttle</code> garantiza que <code>func</code> se ejecute como
+    <code>fxThrottle</code> garantiza que <code>func</code> se ejecute como
     máximo una vez cada <code>wait</code>, por muchas veces que se llame a la
     función con throttle. Esa es la diferencia clave con
-    <a href="debounce.html"><code>debounce</code></a>: debounce
+    <a href="debounce.html"><code>fxDebounce</code></a>: debounce
     <em>reinicia</em> su temporizador en cada llamada, así que un flujo
     continuo de llamadas puede retrasar la ejecución indefinidamente; la
     ventana de throttle es fija una vez arranca, así que las llamadas siguen
@@ -52,9 +52,9 @@ nextLabel: shuffle
 
   <h2>La forma con método</h2>
   <p>
-    Igual que <a href="debounce.html"><code>debounce</code></a>:
+    Igual que <a href="debounce.html"><code>fxDebounce</code></a>:
     <code>onScroll.fxThrottle(wait)</code> es
-    <code>throttle(onScroll, wait)</code>, y reenvía
+    <code>fxThrottle(onScroll, wait)</code>, y reenvía
     <code>leading</code> y <code>trailing</code> sin cambios.
   </p>
   <pre><code>void onScroll(double offset) =&gt; _measure(offset);
@@ -69,7 +69,7 @@ final handler = onScroll.fxThrottle(
     <a href="fx.html"><code>fx</code></a>.
   </p>
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: envuelve <code>onClick</code> en <code>throttle</code> (100 ms
+  <p>Ejercicio: envuelve <code>onClick</code> en <code>fxThrottle</code> (100 ms
     de espera) para que los clics rápidos se registren como mucho dos veces
     —leading y trailing— en lugar de tres veces por separado.</p>
   {{playground:2}}
@@ -89,8 +89,8 @@ final handler = onScroll.fxThrottle(
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="debounce.html"><code>debounce</code></a> — espera a que haya calma en vez de seguir un ritmo fijo ·
-    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — para construir demos con tiempos ·
-    <a href="shuffle.html"><code>shuffle</code></a> — aleatoriedad con semilla ·
+    <a href="debounce.html"><code>fxDebounce</code></a> — espera a que haya calma en vez de seguir un ritmo fijo ·
+    <a href="delay.html"><code>fxDelay</code> &amp; <code>fxSleep</code></a> — para construir demos con tiempos ·
+    <a href="shuffle.html"><code>fxShuffle</code></a> — aleatoriedad con semilla ·
     <a href="concurrent.html"><code>concurrent</code></a> — limitación de tasa para pipelines asíncronos
   </div>

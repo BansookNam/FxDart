@@ -2,8 +2,8 @@ import 'dart:async';
 
 /// Applies [f] to [a], awaiting [a] first when it is a [Future].
 ///
-/// Port of FxTS `pipe1`.
-FutureOr<R> pipe1<A, R>(FutureOr<A> a, FutureOr<R> Function(A a) f) {
+/// Port of FxTS `fxPipe1`.
+FutureOr<R> fxPipe1<A, R>(FutureOr<A> a, FutureOr<R> Function(A a) f) {
   if (a is Future<A>) {
     return a.then(f);
   }
@@ -27,9 +27,9 @@ dynamic _applyStep(dynamic acc, Function f) {
 ///
 /// ```dart
 /// pipe([1, 2, 3, 4, 5], [
-///   (Iterable<int> a) => map((n) => n + 10, a),
-///   (Iterable<int> a) => filter((n) => n % 2 == 0, a),
-///   toList,
+///   (Iterable<int> a) => fxMap((n) => n + 10, a),
+///   (Iterable<int> a) => fxFilter((n) => n % 2 == 0, a),
+///   fxToList,
 /// ]); // [12, 14]
 /// ```
 dynamic pipe(dynamic a, List<Function> fns) {

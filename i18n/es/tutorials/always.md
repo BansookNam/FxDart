@@ -2,7 +2,7 @@
 slug: always
 title: always — FxDart 101
 description: Tutorial de always en FxDart: crea una función que ignora su argumento y siempre devuelve un valor fijo, con un playground en vivo.
-heading: <code>always</code>
+heading: <code>fxAlways</code>
 section: 10
 crumb: always
 prev: identity.html
@@ -16,7 +16,7 @@ nextLabel: tap
 
   <h2>Lección</h2>
   <p>
-    <code>always(a)</code> captura <code>a</code> y te devuelve una
+    <code>fxAlways(a)</code> captura <code>a</code> y te devuelve una
     función que descarta aquello con lo que la llames y devuelve <code>a</code>
     cada vez. El parámetro opcional es el truco que le permite encajar en
     cualquier sitio donde se espere un callback <em>unario</em> — un
@@ -24,8 +24,8 @@ nextLabel: tap
     tengas que escribir <code>(_) => a</code> a mano cada vez.
   </p>
   <p>
-    Es la contraparte constante de <a href="identity.html"><code>identity</code></a>:
-    <code>identity</code> deja pasar la entrada, <code>always</code>
+    Es la contraparte constante de <a href="identity.html"><code>fxIdentity</code></a>:
+    <code>fxIdentity</code> deja pasar la entrada, <code>fxAlways</code>
     la desecha. Ambas son funciones síncronas simples, sin variante asíncrona
     ni forma encadenada.
   </p>
@@ -37,21 +37,21 @@ nextLabel: tap
 
   <h2>Demo 2 · Valor por defecto constante en una tabla de despacho</h2>
   <p>
-    <code>always</code> encaja de forma natural como <code>orElse</code> en
-    <a href="cases.html"><code>cases</code></a> — un valor por defecto fijo que
+    <code>fxAlways</code> encaja de forma natural como <code>orElse</code> en
+    <a href="cases.html"><code>fxCases</code></a> — un valor por defecto fijo que
     no necesita mirar el valor que no coincidió:
   </p>
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>always</code> para reemplazar cada nota de esta lista
+  <p>Ejercicio: usa <code>fxAlways</code> para reemplazar cada nota de esta lista
     por la cadena <code>'graded'</code>.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="identity.html"><code>identity</code></a> — deja pasar el argumento en lugar de descartarlo ·
-    <a href="cases.html"><code>cases</code></a> — tabla de despacho que suele acompañarse de always como orElse ·
-    <a href="when.html"><code>when</code></a> — transformación condicional, entra un valor y sale un valor ·
-    <a href="memoize.html"><code>memoize</code></a> — cachea un valor calculado en vez de uno constante
+    <a href="identity.html"><code>fxIdentity</code></a> — deja pasar el argumento en lugar de descartarlo ·
+    <a href="cases.html"><code>fxCases</code></a> — tabla de despacho que suele acompañarse de always como orElse ·
+    <a href="when.html"><code>fxWhen</code></a> — transformación condicional, entra un valor y sale un valor ·
+    <a href="memoize.html"><code>fxMemoize</code></a> — cachea un valor calculado en vez de uno constante
   </div>

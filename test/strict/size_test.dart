@@ -6,21 +6,21 @@ void main() {
   group('size', () {
     group('sync', () {
       test('should return the size of elements (list)', () {
-        expect(size([1, 2, 3, 4, 5]), equals(5));
+        expect(fxSize([1, 2, 3, 4, 5]), equals(5));
       });
 
       test('should return the size of elements (string chars)', () {
-        expect(size('abcdef'.split('')), equals(6));
+        expect(fxSize('abcdef'.split('')), equals(6));
       });
     });
 
     group('async', () {
       test('should return the size of elements (list)', () async {
-        expect(await sizeAsync(toAsync([1, 2, 3, 4, 5])), equals(5));
+        expect(await fxSizeAsync(fxToAsync([1, 2, 3, 4, 5])), equals(5));
       });
 
       test('should return the size of elements (string chars)', () async {
-        expect(await sizeAsync(toAsync('abcdef'.split(''))), equals(6));
+        expect(await fxSizeAsync(fxToAsync('abcdef'.split(''))), equals(6));
       });
     });
   });

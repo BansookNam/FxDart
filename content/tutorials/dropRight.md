@@ -25,7 +25,7 @@ nextLabel: dropWhile
     sentinel — but it needs a finite source.
   </p>
   <p>
-    <code>dropRightAsync</code> carries the same constraint: it awaits the
+    <code>fxDropRightAsync</code> carries the same constraint: it awaits the
     entire upstream before it can start producing values.
   </p>
 

@@ -1,5 +1,5 @@
 /// Calendar pipelines: the month grid is literally
-/// `range` → `map` → `chunk(7)`, and day cells look entries up in a
+/// `fxRange` → `map` → `chunk(7)`, and day cells look entries up in a
 /// `groupBy`-built index.
 library;
 
@@ -10,11 +10,11 @@ import '../models/models.dart';
 DateTime dayKey(DateTime d) => DateTime(d.year, d.month, d.day);
 
 /// A 6×7 grid of days covering [month], starting on Sunday.
-/// Pipeline: `range(42)` → `map` (day offset → date) → `chunk(7)` (weeks).
+/// Pipeline: `fxRange(42)` → `map` (day offset → date) → `chunk(7)` (weeks).
 List<List<DateTime>> monthGrid(DateTime month) {
   final first = DateTime(month.year, month.month, 1);
   final leading = first.weekday % 7; // days shown before the 1st (Sun = 0)
-  return fx(range(42))
+  return fx(fxRange(42))
       .map((i) => DateTime(first.year, first.month, 1 - leading + i))
       .chunk(7)
       .toList();

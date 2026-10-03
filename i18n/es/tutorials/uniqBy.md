@@ -24,7 +24,7 @@ nextLabel: uniqStrict
     herramienta para «una fila por cliente», «un evento por tipo» o para
     deduplicar por cualquier campo o valor calculado — el propio
     <code>uniq</code> no es más que
-    <code>distinctBy((a) =&gt; a, iterable)</code>.
+    <code>fxDistinctBy((a) =&gt; a, iterable)</code>.
   </p>
   <p>
     Igual que <code>uniq</code>, es perezoso y conserva el orden: gana el primer
@@ -34,7 +34,7 @@ nextLabel: uniqStrict
   <p>
     Aquí aplica la misma regla asíncrona que en <code>uniq</code>: pon la
     concurrencia en un fetch anterior (<code>.map(...).concurrent(n)</code>) y
-    luego aplica <code>distinctBy</code>/<code>distinctByAsync</code> al flujo
+    luego aplica <code>fxDistinctBy</code>/<code>fxDistinctByAsync</code> al flujo
     ya resuelto y en orden.
   </p>
 

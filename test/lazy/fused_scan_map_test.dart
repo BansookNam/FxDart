@@ -10,7 +10,7 @@
 // other, over each of the three source shapes `toList` distinguishes:
 //
 //   * a `List`, which `fxListRangeOf` resolves and the loop indexes;
-//   * a `range()`, which only `fxIntRangeOf` resolves and the loop counts;
+//   * a `fxRange()`, which only `fxIntRangeOf` resolves and the loop counts;
 //   * a generator, which neither resolves and the loop pulls.
 import 'package:fxdart/fxdart.dart';
 import 'package:test/test.dart';
@@ -22,7 +22,7 @@ Iterable<C> unfused<A, B, C>(
   B seed,
   Iterable<A> src,
   C Function(B) g,
-) => scan(f, seed, src).map(g);
+) => fxScan(f, seed, src).map(g);
 
 /// A source neither `fxListRangeOf` nor `fxIntRangeOf` can resolve, so the
 /// pulled branch is taken.
@@ -32,10 +32,10 @@ Iterable<A> pulled<A>(Iterable<A> xs) sync* {
   }
 }
 
-/// `map(g, scan(f, seed, src))` over each of the three source shapes, against
+/// `fxMap(g, fxScan(f, seed, src))` over each of the three source shapes, against
 /// [expected] and against the layered reference for that shape.
 ///
-/// [src] must be consecutive ascending ints, so that a `range()` can stand in
+/// [src] must be consecutive ascending ints, so that a `fxRange()` can stand in
 /// for it. Each shape is checked twice, once collected by `toList` and once by
 /// walking the iterator, because those are two separate copies of the
 /// accumulation.
@@ -46,10 +46,12 @@ void expectAllShapes<B, C>(
   C Function(B) g, {
   required List<C> expected,
 }) {
-  final counted = src.isEmpty ? range(0, 0) : range(src.first, src.last + 1);
+  final counted = src.isEmpty
+      ? fxRange(0, 0)
+      : fxRange(src.first, src.last + 1);
   expect(counted.toList(), src, reason: 'the range must stand in for src');
   for (final source in <Iterable<int>>[src, counted, pulled(src)]) {
-    final chain = map(g, scan(f, seed, source));
+    final chain = fxMap(g, fxScan(f, seed, source));
     expect(chain.toList(), expected, reason: '$source toList');
     expect([for (final v in chain) v], expected, reason: '$source lazy walk');
     expect(
@@ -66,22 +68,22 @@ void main() {
       // White-box: nothing else here fails if the two stages stop fusing, and
       // the boundary is paid once per source element.
       expect(
-        map(
+        fxMap(
           (int acc) => acc * 2,
-          scan((int acc, int a) => acc + a, 0, [1, 2, 3]),
+          fxScan((int acc, int a) => acc + a, 0, [1, 2, 3]),
         ).runtimeType.toString(),
         startsWith('_ScanMap'),
       );
       expect(
-        map(
+        fxMap(
           (int acc) => acc * 2,
-          scan((int acc, int a) => acc + a, 0, [1, 2]),
+          fxScan((int acc, int a) => acc + a, 0, [1, 2]),
         ).iterator.runtimeType.toString(),
         startsWith('_ScanMapIterator'),
       );
       // A source that cannot absorb a map still gets the plain map stage.
       expect(
-        map((int a) => a, [1, 2, 3]).runtimeType.toString(),
+        fxMap((int a) => a, [1, 2, 3]).runtimeType.toString(),
         startsWith('_MapIterable'),
       );
       // The same fusion through the fluent wrapper.
@@ -106,9 +108,9 @@ void main() {
     });
 
     test('emits the mapped seed first', () {
-      final chain = map(
+      final chain = fxMap(
         (int acc) => 'v$acc',
-        scan((int acc, int a) => acc + a, 100, [1, 2]),
+        fxScan((int acc, int a) => acc + a, 100, [1, 2]),
       );
       expect(chain.first, 'v100');
       expect(chain.toList().first, 'v100');
@@ -129,9 +131,9 @@ void main() {
           expected: [0, for (var i = 1, acc = 0; i <= length; i++) acc += i],
         );
         expect(
-          map(
+          fxMap(
             (int acc) => acc,
-            scan((int acc, int a) => acc + a, 0, src),
+            fxScan((int acc, int a) => acc + a, 0, src),
           ).length,
           length + 1,
           reason: 'length=$length',
@@ -147,9 +149,9 @@ void main() {
         (int acc) => 'v$acc',
         expected: ['v7'],
       );
-      final it = map(
+      final it = fxMap(
         (int acc) => acc,
-        scan((int acc, int a) => acc + a, 7, <int>[]),
+        fxScan((int acc, int a) => acc + a, 7, <int>[]),
       ).iterator;
       expect(it.moveNext(), isTrue);
       expect(it.current, 7);
@@ -159,9 +161,9 @@ void main() {
     test('a range() source is counted, not pulled', () {
       // The `fxIntRangeOf` branch of the fused `toList` — what the
       // compound-interest shape needs.
-      final chain = map(
+      final chain = fxMap(
         (double acc) => acc.toStringAsFixed(2),
-        scan((double acc, int a) => acc + a, 0.0, range(1, 5)),
+        fxScan((double acc, int a) => acc + a, 0.0, fxRange(1, 5)),
       );
       expect(chain.toList(), ['0.00', '1.00', '3.00', '6.00', '10.00']);
       expect([for (final v in chain) v], chain.toList());
@@ -170,22 +172,22 @@ void main() {
         unfused(
           (double acc, int a) => acc + a,
           0.0,
-          range(1, 5),
+          fxRange(1, 5),
           (double acc) => acc.toStringAsFixed(2),
         ).toList(),
       );
       // A descending range walks the same counter the other way.
-      final down = map(
+      final down = fxMap(
         (int acc) => 'v$acc',
-        scan((int acc, int a) => acc + a, 0, range(10, 0, -3)),
+        fxScan((int acc, int a) => acc + a, 0, fxRange(10, 0, -3)),
       );
       expect(down.toList(), ['v0', 'v10', 'v17', 'v21', 'v22']);
       expect([for (final v in down) v], down.toList());
       // An empty range is still one element.
       expect(
-        map(
+        fxMap(
           (int acc) => acc,
-          scan((int acc, int a) => acc + a, 5, range(0, 0)),
+          fxScan((int acc, int a) => acc + a, 5, fxRange(0, 0)),
         ).toList(),
         [5],
       );
@@ -194,10 +196,10 @@ void main() {
     test('a range() seen through a wider element type still counts', () {
       // The counted branch casts the callback once rather than each value, so
       // it has to hold when `A` is only a supertype of `int`.
-      final Iterable<num> src = range(1, 4);
-      final chain = map(
+      final Iterable<num> src = fxRange(1, 4);
+      final chain = fxMap(
         (num acc) => 'v$acc',
-        scan((num acc, num a) => acc + a, 0, src),
+        fxScan((num acc, num a) => acc + a, 0, src),
       );
       expect(chain.toList(), ['v0', 'v1', 'v3', 'v6']);
       expect([for (final v in chain) v], chain.toList());
@@ -206,12 +208,12 @@ void main() {
     test('the fused toList agrees with the lazy walk on every shape', () {
       for (final source in <Iterable<int>>[
         [2, 4, 6, 8],
-        range(2, 9, 2),
+        fxRange(2, 9, 2),
         pulled([2, 4, 6, 8]),
       ]) {
-        final chain = map(
+        final chain = fxMap(
           (String acc) => acc.length,
-          scan((String acc, int a) => '$acc:$a', 'seed', source),
+          fxScan((String acc, int a) => '$acc:$a', 'seed', source),
         );
         expect([for (final v in chain) v], chain.toList(), reason: '$source');
         expect(chain.toList(), [4, 6, 8, 10, 12], reason: '$source');
@@ -221,12 +223,12 @@ void main() {
     test('toList(growable: false) is fixed-length on every shape', () {
       for (final source in <Iterable<int>>[
         [1, 2, 3],
-        range(1, 4),
+        fxRange(1, 4),
         pulled([1, 2, 3]),
       ]) {
-        final out = map(
+        final out = fxMap(
           (int acc) => 'v$acc',
-          scan((int acc, int a) => acc + a, 0, source),
+          fxScan((int acc, int a) => acc + a, 0, source),
         ).toList(growable: false);
         expect(out, ['v0', 'v1', 'v3', 'v6'], reason: '$source');
         expect(
@@ -235,9 +237,9 @@ void main() {
           reason: '$source is fixed-length',
         );
         // ...and the default stays growable.
-        final growable = map(
+        final growable = fxMap(
           (int acc) => 'v$acc',
-          scan((int acc, int a) => acc + a, 0, source),
+          fxScan((int acc, int a) => acc + a, 0, source),
         ).toList();
         expect(() => growable.add('v9'), returnsNormally, reason: '$source');
       }
@@ -246,17 +248,17 @@ void main() {
     test('runs both callbacks once per element consumed, in order', () {
       for (final source in <Iterable<int>>[
         [1, 2, 3],
-        range(1, 4),
+        fxRange(1, 4),
         pulled([1, 2, 3]),
       ]) {
         final folds = <String>[];
         final maps = <int>[];
-        final result = map(
+        final result = fxMap(
           (int acc) {
             maps.add(acc);
             return 'v$acc';
           },
-          scan(
+          fxScan(
             (int acc, int a) {
               folds.add('$acc+$a');
               return acc + a;
@@ -311,12 +313,12 @@ void main() {
     test('supports repeated iteration with a fresh accumulator', () {
       for (final source in <Iterable<int>>[
         [1, 2, 3],
-        range(1, 4),
+        fxRange(1, 4),
         pulled([1, 2, 3]),
       ]) {
-        final chain = map(
+        final chain = fxMap(
           (int acc) => 'v$acc',
-          scan((int acc, int a) => acc + a, 0, source),
+          fxScan((int acc, int a) => acc + a, 0, source),
         );
         expect(chain.toList(), ['v0', 'v1', 'v3', 'v6'], reason: '$source');
         expect(chain.toList(), ['v0', 'v1', 'v3', 'v6'], reason: '$source');
@@ -331,9 +333,9 @@ void main() {
 
     test('sees a List source that grew between iterations', () {
       final src = [1, 2];
-      final chain = map(
+      final chain = fxMap(
         (int acc) => 'v$acc',
-        scan((int acc, int a) => acc + a, 0, src),
+        fxScan((int acc, int a) => acc + a, 0, src),
       );
       expect(chain.toList(), ['v0', 'v1', 'v3']);
       src.add(3);
@@ -354,7 +356,7 @@ void main() {
       double f(double acc, double r) => acc * (1 + r);
 
       for (final source in <Iterable<double>>[rates, pulled(rates)]) {
-        final chain = map(g, scan(f, 100.0, source));
+        final chain = fxMap(g, fxScan(f, 100.0, source));
         expect(chain.toList(), [
           ('total', 100.0),
           ('total', 150.0),
@@ -381,10 +383,10 @@ void main() {
       // here, so a fused loop that ignored `start` would fold the wrong
       // elements.
       const src = [1, 2, 3, 4, 5, 6, 7, 8];
-      final window = drop(2, take(6, src));
-      final chain = map(
+      final window = fxDrop(2, fxTake(6, src));
+      final chain = fxMap(
         (int acc) => 'v$acc',
-        scan((int acc, int a) => acc + a, 0, window),
+        fxScan((int acc, int a) => acc + a, 0, window),
       );
       expect(chain.toList(), ['v0', 'v3', 'v7', 'v12', 'v18']);
       expect(
@@ -399,9 +401,9 @@ void main() {
       expect([for (final v in chain) v], chain.toList());
       // A range that is empty after the offset is still the seed alone.
       expect(
-        map(
+        fxMap(
           (int acc) => acc,
-          scan((int acc, int a) => acc + a, 9, drop(8, src)),
+          fxScan((int acc, int a) => acc + a, 9, fxDrop(8, src)),
         ).toList(),
         [9],
       );
@@ -410,20 +412,18 @@ void main() {
     test('the unfused scan is untouched by the fusion', () {
       // The fusion must not have changed what `scan` alone does, on either of
       // its own paths.
-      expect(scan((int acc, int a) => acc + a, 0, [1, 2, 3]).toList(), [
-        0,
-        1,
-        3,
-        6,
-      ]);
-      expect(scan((int acc, int a) => acc + a, 0, pulled([1, 2, 3])).toList(), [
+      expect(fxScan((int acc, int a) => acc + a, 0, [1, 2, 3]).toList(), [
         0,
         1,
         3,
         6,
       ]);
       expect(
-        scan((int acc, int a) => acc + a, 0, [1, 2]).runtimeType.toString(),
+        fxScan((int acc, int a) => acc + a, 0, pulled([1, 2, 3])).toList(),
+        [0, 1, 3, 6],
+      );
+      expect(
+        fxScan((int acc, int a) => acc + a, 0, [1, 2]).runtimeType.toString(),
         startsWith('_ScanIterable'),
       );
     });

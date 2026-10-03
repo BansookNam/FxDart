@@ -17,7 +17,7 @@ nextLabel: compress
   <h2>Lecture</h2>
   <p>
     Same shape as <a href="differenceBy.html"><code>differenceBy</code></a>,
-    opposite condition: <code>intersectionBy(f, iterable1, iterable2)</code>
+    opposite condition: <code>fxIntersectionBy(f, iterable1, iterable2)</code>
     walks <strong><code>iterable2</code></strong> and keeps each element
     whose <code>f</code>-key <em>is</em> found among <code>iterable1</code>'s
     <code>f</code>-keys, deduplicated by that key. <code>f</code> applies to
@@ -30,13 +30,13 @@ nextLabel: compress
     identifying field: a list of "featured" SKUs and a product catalog, a
     list of active-user IDs and a list of full user objects, and so on.
     <code>intersection</code> itself is
-    <code>intersectionBy((a) =&gt; a, iterable1, iterable2)</code>.
+    <code>fxIntersectionBy((a) =&gt; a, iterable1, iterable2)</code>.
   </p>
   <p>
     No chain method exists; call the data-first function or its async
     counterpart. The concurrency marker from <code>.concurrent(n)</code>
     applies to <code>iterable2</code>, exactly as with
-    <code>intersectionAsync</code>.
+    <code>fxIntersectionAsync</code>.
   </p>
 
   <h2>Demo 1 · Basics</h2>
@@ -55,5 +55,5 @@ nextLabel: compress
     <a href="intersection.html"><code>intersection</code></a> — the value-equality version ·
     <a href="differenceBy.html"><code>differenceBy</code></a> — exclude by a shared computed key instead ·
     <a href="uniqBy.html"><code>uniqBy</code></a> — dedupe a single iterable by key ·
-    <a href="compress.html"><code>compress</code></a> — filter by a parallel boolean mask
+    <a href="compress.html"><code>fxCompress</code></a> — filter by a parallel boolean mask
   </div>

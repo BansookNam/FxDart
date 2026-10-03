@@ -7,7 +7,7 @@ void main() {
   group('accumulate', () {
     test('all branches run; errors concatenate in branch order', () {
       final ran = <String>[];
-      final result = either<Nel<String>, int>(
+      final result = fxEither<Nel<String>, int>(
         (r) => r.accumulate((acc) {
           final a = acc.accumulating<int>((r) {
             ran.add('a');
@@ -29,7 +29,7 @@ void main() {
     });
 
     test('all branches succeed → combined value', () {
-      final result = either<Nel<String>, int>(
+      final result = fxEither<Nel<String>, int>(
         (r) => r.accumulate((acc) {
           final a = acc.accumulating((r) => 1);
           final b = acc.accumulating((r) => 2);
@@ -41,7 +41,7 @@ void main() {
 
     test('reading an errored Accumulated detonates with the FULL accumulated '
         'list (lazy detonation)', () {
-      final result = either<Nel<String>, int>(
+      final result = fxEither<Nel<String>, int>(
         (r) => r.accumulate((acc) {
           final a = acc.accumulating<int>((r) => r.raise('one'));
           acc.accumulating<int>((r) => r.raise('two'));
@@ -54,7 +54,7 @@ void main() {
 
     test('END-OF-BLOCK contract: errors raise even when no .value is ever '
         'read', () {
-      final result = either<Nel<String>, int>(
+      final result = fxEither<Nel<String>, int>(
         (r) => r.accumulate((acc) {
           acc.accumulating((r) => r.raise('silent'));
           return 42; // must NOT become Right(42)
@@ -64,7 +64,7 @@ void main() {
     });
 
     test('hasErrors reflects branch failures', () {
-      either<Nel<String>, void>(
+      fxEither<Nel<String>, void>(
         (r) => r.accumulate((acc) {
           expect(acc.hasErrors, isFalse);
           acc.accumulating((r) => r.raise('x'));
@@ -75,7 +75,7 @@ void main() {
 
     test('a THROWN exception beats accumulation and propagates', () {
       expect(
-        () => either<Nel<String>, int>(
+        () => fxEither<Nel<String>, int>(
           (r) => r.accumulate((acc) {
             acc.accumulating((r) => r.raise('raised'));
             acc.accumulating<int>((r) => throw StateError('thrown'));
@@ -87,7 +87,7 @@ void main() {
     });
 
     test('a branch can contribute MULTIPLE errors via bindNel', () {
-      final result = either<Nel<String>, int>(
+      final result = fxEither<Nel<String>, int>(
         (r) => r.accumulate((acc) {
           acc.accumulating((r) => r.bindNel(Left(NonEmptyList.of('x', ['y']))));
           acc.accumulating((r) => r.raise('z'));
@@ -98,7 +98,7 @@ void main() {
     });
 
     test('nested mapOrAccumulate inside a branch joins all errors', () {
-      final result = either<Nel<String>, List<int>>(
+      final result = fxEither<Nel<String>, List<int>>(
         (r) => r.accumulate((acc) {
           final xs = acc.accumulating(
             (r) => r.mapOrAccumulate([
@@ -116,8 +116,8 @@ void main() {
 
   group('bindNel', () {
     test('unwraps Right and raises all errors of Left', () {
-      expect(either<Nel<String>, int>((r) => r.bindNel(Right(5))), Right(5));
-      final result = either<Nel<String>, int>(
+      expect(fxEither<Nel<String>, int>((r) => r.bindNel(Right(5))), Right(5));
+      final result = fxEither<Nel<String>, int>(
         (r) => r.bindNel(Left(NonEmptyList.of('a', ['b']))),
       );
       expect(result.leftOrNull()!.toList(), ['a', 'b']);
@@ -126,7 +126,7 @@ void main() {
 
   group('mapOrAccumulate (scope)', () {
     test('collects every failure instead of stopping at the first', () {
-      final result = either<Nel<String>, List<int>>(
+      final result = fxEither<Nel<String>, List<int>>(
         (r) => r.mapOrAccumulate([
           1,
           2,
@@ -138,7 +138,7 @@ void main() {
     });
 
     test('returns all results when nothing fails', () {
-      final result = either<Nel<String>, List<int>>(
+      final result = fxEither<Nel<String>, List<int>>(
         (r) => r.mapOrAccumulate([1, 2], (r, n) => n * 10),
       );
       expect(result.getOrNull(), [10, 20]);
@@ -147,7 +147,7 @@ void main() {
     test('keeps iterating after the first error (fail-slow), and results '
         'are dropped once an error exists', () {
       final seen = <int>[];
-      either<Nel<String>, List<int>>(
+      fxEither<Nel<String>, List<int>>(
         (r) => r.mapOrAccumulate([1, 2, 3], (r, n) {
           seen.add(n);
           return n == 2 ? r.raise('two') : n;
@@ -159,7 +159,7 @@ void main() {
 
   group('AccumulatingRaise.over', () {
     test('wraps single raises into singleton Nels', () {
-      final result = either<Nel<String>, int>((r) {
+      final result = fxEither<Nel<String>, int>((r) {
         final single = AccumulatingRaise.over(r);
         return single.raise('one');
       });
@@ -167,7 +167,7 @@ void main() {
     });
 
     test('delegates bindNel and mapOrAccumulate', () {
-      final result = either<Nel<String>, List<int>>((r) {
+      final result = fxEither<Nel<String>, List<int>>((r) {
         final single = AccumulatingRaise.over(r);
         expect(single.bindNel(Right(1)), 1);
         return single.mapOrAccumulate([
@@ -181,14 +181,14 @@ void main() {
 
   group('zipOrAccumulate', () {
     test('2-ary combines successes', () {
-      final result = either<Nel<String>, String>(
+      final result = fxEither<Nel<String>, String>(
         (r) => r.zipOrAccumulate2((r) => 'a', (r) => 'b', (a, b) => '$a$b'),
       );
       expect(result, Right('ab'));
     });
 
     test('2-ary accumulates both failures', () {
-      final result = either<Nel<String>, String>(
+      final result = fxEither<Nel<String>, String>(
         (r) => r.zipOrAccumulate2(
           (r) => r.raise('e1'),
           (r) => r.raise('e2'),
@@ -199,7 +199,7 @@ void main() {
     });
 
     test('3-ary mixes successes and failures', () {
-      final result = either<Nel<String>, String>(
+      final result = fxEither<Nel<String>, String>(
         (r) => r.zipOrAccumulate3(
           (r) => 'a',
           (r) => r.raise('e2'),
@@ -212,7 +212,7 @@ void main() {
 
     test('4-ary and 5-ary combine successes', () {
       expect(
-        either<Nel<String>, String>(
+        fxEither<Nel<String>, String>(
           (r) => r.zipOrAccumulate4(
             (r) => 'a',
             (r) => 'b',
@@ -224,7 +224,7 @@ void main() {
         Right('abcd'),
       );
       expect(
-        either<Nel<String>, String>(
+        fxEither<Nel<String>, String>(
           (r) => r.zipOrAccumulate5(
             (r) => 'a',
             (r) => 'b',
@@ -239,7 +239,7 @@ void main() {
     });
 
     test('5-ary accumulates across all arities', () {
-      final result = either<Nel<String>, String>(
+      final result = fxEither<Nel<String>, String>(
         (r) => r.zipOrAccumulate5(
           (r) => r.raise('1'),
           (r) => 'b',
@@ -254,7 +254,7 @@ void main() {
 
     test('branches receive an accumulating scope: bindNel contributes '
         'multiple errors from ONE branch', () {
-      final result = either<Nel<String>, int>(
+      final result = fxEither<Nel<String>, int>(
         (r) => r.zipOrAccumulate2(
           (r) => r.bindNel(Left(NonEmptyList.of('x', ['y']))),
           (r) => r.raise('z'),

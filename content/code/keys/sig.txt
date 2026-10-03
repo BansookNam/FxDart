@@ -1,1 +1,1 @@
-Iterable&lt;K&gt; keys&lt;K, V&gt;(Map&lt;K, V&gt; map)
+Iterable&lt;K&gt; fxKeys&lt;K, V&gt;(Map&lt;K, V&gt; map)

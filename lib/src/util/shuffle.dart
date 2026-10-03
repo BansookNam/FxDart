@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import '../async_iterable.dart';
-import '../strict/aggregate.dart' show toListAsync;
+import '../strict/aggregate.dart' show fxToListAsync;
 
 /// Mulberry32-style seeded PRNG — port of FxTS `_internal/seededRandom.ts`
 /// so seeded shuffles are reproducible.
@@ -30,38 +30,43 @@ List<T> _shuffleList<T>(List<T> result, double Function() random) {
 /// Returns a new list with the elements of [iterable] shuffled
 /// (Fisher-Yates). Pass [seed] for a reproducible order.
 ///
-/// Port of FxTS `shuffle`.
-List<T> shuffle<T>(Iterable<T> iterable, [int? seed]) {
+/// Port of FxTS `fxShuffle`.
+List<T> fxShuffle<T>(Iterable<T> iterable, [int? seed]) =>
+    _shuffle(iterable, seed);
+
+// The extension members below share the top-level names, so inside their
+// bodies a bare `fxShuffle(...)` would resolve to the member itself.
+List<T> _shuffle<T>(Iterable<T> iterable, int? seed) {
   final random = seed != null
       ? createSeededRandom(seed)
       : math.Random().nextDouble;
   return _shuffleList(List.of(iterable), random);
 }
 
-/// Async counterpart of [shuffle].
-Future<List<T>> shuffleAsync<T>(
-  FxAsyncIterable<T> iterable, [
-  int? seed,
-]) async {
+/// Async counterpart of [fxShuffle].
+Future<List<T>> fxShuffleAsync<T>(FxAsyncIterable<T> iterable, [int? seed]) =>
+    _shuffleAsync(iterable, seed);
+
+Future<List<T>> _shuffleAsync<T>(FxAsyncIterable<T> iterable, int? seed) async {
   final random = seed != null
       ? createSeededRandom(seed)
       : math.Random().nextDouble;
-  return _shuffleList(await toListAsync(iterable), random);
+  return _shuffleList(await fxToListAsync(iterable), random);
 }
 
-/// Method spellings of [shuffle] and [shuffleAsync].
+/// Method spellings of [fxShuffle] and [fxShuffleAsync].
 ///
-/// Named `fxShuffle`, not `shuffle`: `List.shuffle` already exists in
+/// Named `fxShuffle`, not `fxShuffle`: `List.shuffle` already exists in
 /// `dart:core` and shuffles **in place, returning void**. An extension can
 /// never win against it, so a `List` receiver would silently call the wrong
 /// one — the prefix makes the two impossible to confuse.
 extension FxShuffleEntry<T> on Iterable<T> {
-  /// A new list with these elements shuffled. See [shuffle].
-  List<T> fxShuffle([int? seed]) => shuffle(this, seed);
+  /// A new list with these elements shuffled. See [fxShuffle].
+  List<T> fxShuffle([int? seed]) => _shuffle(this, seed);
 }
 
 /// Async counterpart of [FxShuffleEntry].
 extension FxShuffleAsyncEntry<T> on FxAsyncIterable<T> {
-  /// A new list with these elements shuffled. See [shuffleAsync].
-  Future<List<T>> fxShuffle([int? seed]) => shuffleAsync(this, seed);
+  /// A new list with these elements shuffled. See [fxShuffleAsync].
+  Future<List<T>> fxShuffle([int? seed]) => _shuffleAsync(this, seed);
 }

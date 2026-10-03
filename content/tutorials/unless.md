@@ -2,7 +2,7 @@
 slug: unless
 title: unless — FxDart 101
 description: FxDart unless tutorial: apply a transform only when a predicate fails, with a live playground.
-heading: <code>unless</code>
+heading: <code>fxUnless</code>
 section: 10
 crumb: unless
 prev: when.html
@@ -16,8 +16,8 @@ nextLabel: throwError
 
   <h2>Lecture</h2>
   <p>
-    <code>unless</code> is <a href="when.html"><code>when</code></a> with the
-    condition flipped: <code>unless(predicate, callback, value)</code> runs
+    <code>fxUnless</code> is <a href="when.html"><code>fxWhen</code></a> with the
+    condition flipped: <code>fxUnless(predicate, callback, value)</code> runs
     <code>callback(value)</code> when <code>predicate(value)</code> is
     <strong>false</strong>, and returns <code>value</code> untouched when the
     predicate holds. It reads well for "fill in a default unless this
@@ -25,7 +25,7 @@ nextLabel: throwError
     normalizing edge cases.
   </p>
   <p>
-    Like <code>when</code>, both branches must return the same type
+    Like <code>fxWhen</code>, both branches must return the same type
     <code>T</code> in Dart (no union return types), and there's no chain
     form — it's a plain data-first function.
   </p>
@@ -37,14 +37,14 @@ nextLabel: throwError
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>unless</code> to fill in <code>'general'</code> for
+  <p>Exercise: use <code>fxUnless</code> to fill in <code>'general'</code> for
     any tag that hasn't been set.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="when.html"><code>when</code></a> — the inverse-condition sibling of unless ·
-    <a href="cases.html"><code>cases</code></a> — multiple predicates instead of just one ·
-    <a href="throwIf.html"><code>throwIf</code></a> — throw instead of substituting a value ·
-    <a href="compact.html"><code>compact</code></a> — drop missing values instead of filling them in
+    <a href="when.html"><code>fxWhen</code></a> — the inverse-condition sibling of unless ·
+    <a href="cases.html"><code>fxCases</code></a> — multiple predicates instead of just one ·
+    <a href="throwIf.html"><code>fxThrowIf</code></a> — throw instead of substituting a value ·
+    <a href="compact.html"><code>fxCompact</code></a> — drop missing values instead of filling them in
   </div>

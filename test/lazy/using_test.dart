@@ -20,7 +20,7 @@ void main() {
     group('sync', () {
       test('should acquire lazily and release after completion', () {
         final resource = Resource();
-        final iterable = using(
+        final iterable = fxUsing(
           () {
             resource.open();
             return resource;
@@ -30,7 +30,7 @@ void main() {
         );
 
         expect(resource.opened, isFalse);
-        expect(toList(iterable), equals([1, 2, 3]));
+        expect(fxToList(iterable), equals([1, 2, 3]));
         expect(resource.opened, isTrue);
         expect(resource.closed, isTrue);
       });
@@ -38,14 +38,13 @@ void main() {
       test('should release when iteration throws', () {
         final resource = Resource();
         expect(
-          () => toList(
-            using(
+          () => fxToList(
+            fxUsing(
               () => resource,
-              (r) => map<int, int>((a) => a == 2 ? throw Exception('err') : a, [
-                1,
-                2,
-                3,
-              ]),
+              (r) => fxMap<int, int>(
+                (a) => a == 2 ? throw Exception('err') : a,
+                [1, 2, 3],
+              ),
               (r) => r.close(),
             ),
           ),
@@ -56,7 +55,7 @@ void main() {
 
       test('should not release when abandoned mid-iteration (documented)', () {
         final resource = Resource();
-        final iterable = using(
+        final iterable = fxUsing(
           () => resource,
           (r) => [1, 2, 3],
           (r) => r.close(),
@@ -71,9 +70,13 @@ void main() {
 
       test('should release once per full iteration', () {
         final resource = Resource();
-        final iterable = using(() => resource, (r) => [1, 2], (r) => r.close());
-        toList(iterable);
-        toList(iterable);
+        final iterable = fxUsing(
+          () => resource,
+          (r) => [1, 2],
+          (r) => r.close(),
+        );
+        fxToList(iterable);
+        fxToList(iterable);
         expect(resource.closeCalls, equals(2));
       });
     });
@@ -81,17 +84,17 @@ void main() {
     group('async', () {
       test('should acquire lazily and release after completion', () async {
         final resource = Resource();
-        final iterable = usingAsync(
+        final iterable = fxUsingAsync(
           () async {
             resource.open();
             return resource;
           },
-          (r) => toAsync([1, 2, 3]),
+          (r) => fxToAsync([1, 2, 3]),
           (r) async => r.close(),
         );
 
         expect(resource.opened, isFalse);
-        expect(await toListAsync(iterable), equals([1, 2, 3]));
+        expect(await fxToListAsync(iterable), equals([1, 2, 3]));
         expect(resource.opened, isTrue);
         expect(resource.closed, isTrue);
         expect(resource.closeCalls, equals(1));
@@ -101,13 +104,13 @@ void main() {
         final resource = Resource();
         final order = <String>[];
         await expectLater(
-          toListAsync(
-            usingAsync(
+          fxToListAsync(
+            fxUsingAsync(
               () => resource,
-              (r) => mapAsync((int a) {
+              (r) => fxMapAsync((int a) {
                 if (a == 2) throw Exception('err');
                 return a;
-              }, toAsync([1, 2, 3])),
+              }, fxToAsync([1, 2, 3])),
               (r) {
                 order.add('release');
                 r.close();
@@ -126,10 +129,10 @@ void main() {
       test('should propagate an acquire failure without releasing', () async {
         var released = false;
         await expectLater(
-          toListAsync(
-            usingAsync<Resource, int>(
+          fxToListAsync(
+            fxUsingAsync<Resource, int>(
               () => throw Exception('cannot open'),
-              (r) => toAsync([1]),
+              (r) => fxToAsync([1]),
               (r) => released = true,
             ),
           ),
@@ -140,9 +143,9 @@ void main() {
 
       test('should release only once even with pulls past the end', () async {
         final resource = Resource();
-        final iterable = usingAsync(
+        final iterable = fxUsingAsync(
           () => resource,
-          (r) => toAsync([1]),
+          (r) => fxToAsync([1]),
           (r) => r.close(),
         );
         final iterator = iterable.iterator;
@@ -155,11 +158,11 @@ void main() {
       test('should compose with concurrent', () async {
         final resource = Resource();
         final res = await fxAsync(
-          usingAsync(
+          fxUsingAsync(
             () => resource,
-            (r) => mapAsync(
-              (int a) => delay(const Duration(milliseconds: 50), a),
-              toAsync(range(1, 7)),
+            (r) => fxMapAsync(
+              (int a) => fxDelay(const Duration(milliseconds: 50), a),
+              fxToAsync(fxRange(1, 7)),
             ),
             (r) => r.close(),
           ),

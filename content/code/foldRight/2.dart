@@ -4,7 +4,7 @@ void main() {
   final steps = ['trim', 'lower', 'slug'];
 
   // TODO: describe the pipeline as nested calls, outermost step first.
-  final described = foldRight('input', (acc, String s) => '$s($acc)', steps);
+  final described = fxFoldRight('input', (acc, String s) => '$s($acc)', steps);
 
   print(described); // trim(lower(slug(input)))
 }

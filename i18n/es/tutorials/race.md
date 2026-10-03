@@ -33,7 +33,7 @@ nextLabel: waitAll
     a uno sano pero lento, que es exactamente el comportamiento honesto —
     preguntaste quién responde primero, y «falló» es una respuesta. Protege
     los campos lentos y poco fiables con
-    <code><a href="timeout.html">timeout</a></code>/<code><a href="retry.html">retry</a></code>
+    <code><a href="timeout.html">timeout</a></code>/<code><a href="retry.html">fxRetry</a></code>
     en cada candidato antes de ponerlos a correr.
   </p>
   <p>

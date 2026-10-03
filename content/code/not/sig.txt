@@ -1,1 +1,1 @@
-bool not(bool a) => !a;
+bool fxNot(bool a) => !a;

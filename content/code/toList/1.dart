@@ -6,7 +6,7 @@ Future<void> main() async {
   // toListAsync / .toList() awaits every element, then hands back a List.
   final result = await fx([1, 2, 3, 4])
       .toAsync()
-      .map((a) => delay(const Duration(milliseconds: 100), a * 10))
+      .map((a) => fxDelay(const Duration(milliseconds: 100), a * 10))
       .concurrent(4)
       .toList();
 

@@ -2,7 +2,7 @@ import 'package:fxdart/fxdart.dart';
 
 class Feed {
   var open = false;
-  Iterable<int> ticks() => range(1, 100);
+  Iterable<int> ticks() => fxRange(1, 100);
 }
 
 void main() {

@@ -7,7 +7,7 @@ section: 13
 crumb: naming
 ---
   <p class="hero-sub">
-    The feature behind <code>either</code> has famous names in other
+    The feature behind <code>fxEither</code> has famous names in other
     ecosystems — <a href="monad.html"><em>Monad</em></a>,
     <em>Railway-oriented programming</em>. This page explains why FxDart
     deliberately calls it none of those. (Never met a monad? Start with
@@ -21,7 +21,7 @@ crumb: naming
     exists to <strong>replace</strong> <code>flatMap</code>-chaining with
     straight-line code. You saw this on the
     <a href="typedErrors.html">typed errors page</a>: the
-    <code>either((r) { ... })</code> block is the alternative to the nested
+    <code>fxEither((r) { ... })</code> block is the alternative to the nested
     <code>flatMap</code> pyramid, not a wrapper around it.
   </p>
   <p>

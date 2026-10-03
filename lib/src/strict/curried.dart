@@ -1,6 +1,6 @@
 /// Dart-idiomatic currying: the `.curried` / `.uncurried` extension getters.
 ///
-/// FxTS's `curry` cannot be ported as a function — it relies on runtime arity
+/// FxTS's `fxCurry` cannot be ported as a function — it relies on runtime arity
 /// reflection and recursive conditional types, neither of which exists in
 /// Dart. Instead, one extension per arity is declared under the same getter
 /// name, and the compiler picks the right one from the function's *static*
@@ -15,7 +15,7 @@ library;
 
 /// Curries a binary function: `f.curried(a)(b) == f(a, b)`.
 ///
-/// Dart-native replacement for FxTS `curry` (see `WHY_CURRIED.md`).
+/// Dart-native replacement for FxTS `fxCurry` (see `WHY_CURRIED.md`).
 extension Curry2<A, B, R> on R Function(A, B) {
   /// The curried form: `f.curried(a)(b) == f(a, b)`.
   R Function(B) Function(A) get curried =>

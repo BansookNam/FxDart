@@ -49,8 +49,8 @@ nextLabel: every
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="compact.html"><code>compact</code></a> — descarta los nulls de un iterable ·
-    <a href="compactObject.html"><code>compactObject</code></a> — descarta los nulls de un Map ·
+    <a href="compact.html"><code>fxCompact</code></a> — descarta los nulls de un iterable ·
+    <a href="compactObject.html"><code>fxCompactObject</code></a> — descarta los nulls de un Map ·
     <a href="predicates.html"><code>predicates</code></a> — más comprobaciones de tipo listas para filtrar ·
-    <a href="includes.html"><code>includes</code></a> — la comprobación de pertenencia vecina
+    <a href="includes.html"><code>fxIncludes</code></a> — la comprobación de pertenencia vecina
   </div>

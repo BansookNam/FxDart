@@ -24,7 +24,7 @@ nextLabel: fork
     it will never terminate on an infinite one.
   </p>
   <p>
-    <code>reverseAsync</code> follows the same rule: it awaits every element
+    <code>fxReverseAsync</code> follows the same rule: it awaits every element
     of the upstream first, then replays them back to front. If you only need
     the tail of a sequence rather than a true reversal, prefer
     <code>takeRight</code> — it materializes too, but at least stops as soon

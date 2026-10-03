@@ -17,9 +17,9 @@ nextLabel: retryOn
   <h2>Lecture</h2>
   <p>
     The Duration forms already live on
-    <code><a href="debounce.html">debounce</a></code>,
-    <code><a href="throttle.html">throttle</a></code>, and
-    <code><a href="spaceBy.html">delay</a></code> — a fixed clock, the
+    <code><a href="debounce.html">fxDebounce</a></code>,
+    <code><a href="throttle.html">fxThrottle</a></code>, and
+    <code><a href="spaceBy.html">fxDelay</a></code> — a fixed clock, the
     same wait for every value. The <code>xOn</code> family hands that
     clock to a <strong>selector</strong>: each value produces a stream,
     and the first event on that stream is the moment the value is due.
@@ -34,7 +34,7 @@ nextLabel: retryOn
     the pending value; an inner that completes without a next
     <strong>drops</strong> it. A value still pending when the source
     closes is flushed, matching Duration
-    <code><a href="debounce.html">debounce</a></code>.
+    <code><a href="debounce.html">fxDebounce</a></code>.
   </p>
   <p>
     <code>delayOn(selector)</code> holds <em>every</em> value until its
@@ -65,7 +65,7 @@ nextLabel: retryOn
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="debounce.html"><code>debounce</code></a> — the Duration form, and the callback wrapper ·
-    <a href="throttle.html"><code>throttle</code></a> — the Duration form, leading and trailing ·
-    <a href="spaceBy.html"><code>delay</code></a> — shift a whole stream by a fixed clock
+    <a href="debounce.html"><code>fxDebounce</code></a> — the Duration form, and the callback wrapper ·
+    <a href="throttle.html"><code>fxThrottle</code></a> — the Duration form, leading and trailing ·
+    <a href="spaceBy.html"><code>fxDelay</code></a> — shift a whole stream by a fixed clock
   </div>

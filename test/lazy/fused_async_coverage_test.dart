@@ -28,7 +28,7 @@ Future<List<T>> pullAll<T>(FxAsyncIterable<T> iterable) async {
 void main() {
   group('pull path — one stage per element', () {
     test('map only (the one-to-one shortcut)', () async {
-      expect(await pullAll(fxAsync(toAsync([1, 2, 3])).map((a) => a * 2)), [
+      expect(await pullAll(fxAsync(fxToAsync([1, 2, 3])).map((a) => a * 2)), [
         2,
         4,
         6,
@@ -37,7 +37,7 @@ void main() {
 
     test('map only, asynchronous transform', () async {
       expect(
-        await pullAll(fxAsync(toAsync([1, 2, 3])).map((a) async => a * 2)),
+        await pullAll(fxAsync(fxToAsync([1, 2, 3])).map((a) async => a * 2)),
         [2, 4, 6],
       );
     });
@@ -46,7 +46,7 @@ void main() {
       expect(
         await pullAll(
           fxAsync(
-            toAsync([1, 2, 3, 4]),
+            fxToAsync([1, 2, 3, 4]),
           ).filter((a) => a.isEven).map((a) async => a * 10),
         ),
         [20, 40],
@@ -56,7 +56,7 @@ void main() {
     test('uniqBy with a synchronous key', () async {
       expect(
         await pullAll(
-          fxAsync(toAsync([1, 11, 2, 21, 3])).uniqBy((a) => a % 10),
+          fxAsync(fxToAsync([1, 11, 2, 21, 3])).uniqBy((a) => a % 10),
         ),
         [1, 2, 3],
       );
@@ -65,14 +65,14 @@ void main() {
     test('uniqBy with an asynchronous key', () async {
       expect(
         await pullAll(
-          fxAsync(toAsync([1, 11, 2, 21, 3])).uniqBy((a) async => a % 10),
+          fxAsync(fxToAsync([1, 11, 2, 21, 3])).uniqBy((a) async => a % 10),
         ),
         [1, 2, 3],
       );
     });
 
     test('uniq with no key at all', () async {
-      expect(await pullAll(fxAsync(toAsync([1, 1, 2, 2, 3])).uniq()), [
+      expect(await pullAll(fxAsync(fxToAsync([1, 1, 2, 2, 3])).uniq()), [
         1,
         2,
         3,
@@ -80,13 +80,13 @@ void main() {
     });
 
     test('take ends the run without pulling past its last', () async {
-      expect(await pullAll(fxAsync(toAsync([1, 2, 3, 4])).take(2)), [1, 2]);
+      expect(await pullAll(fxAsync(fxToAsync([1, 2, 3, 4])).take(2)), [1, 2]);
     });
 
     test('takeWhile with an asynchronous predicate', () async {
       expect(
         await pullAll(
-          fxAsync(toAsync([1, 2, 3, 1])).takeWhile((a) async => a < 3),
+          fxAsync(fxToAsync([1, 2, 3, 1])).takeWhile((a) async => a < 3),
         ),
         [1, 2],
       );
@@ -95,7 +95,7 @@ void main() {
     test('dropWhile with an asynchronous predicate', () async {
       expect(
         await pullAll(
-          fxAsync(toAsync([1, 2, 3, 1])).dropWhile((a) async => a < 3),
+          fxAsync(fxToAsync([1, 2, 3, 1])).dropWhile((a) async => a < 3),
         ),
         [3, 1],
       );
@@ -103,7 +103,7 @@ void main() {
 
     test('scan emits its seed, then each accumulation', () async {
       expect(
-        await pullAll(fxAsync(toAsync([1, 2, 3])).scan((a, b) => a + b, 10)),
+        await pullAll(fxAsync(fxToAsync([1, 2, 3])).scan((a, b) => a + b, 10)),
         [10, 11, 13, 16],
       );
     });
@@ -112,7 +112,7 @@ void main() {
       expect(
         await pullAll(
           fxAsync(
-            toAsync([1, 2, 3]),
+            fxToAsync([1, 2, 3]),
           ).scan((a, b) => a + b, Future<int>.value(10)),
         ),
         [10, 11, 13, 16],
@@ -122,7 +122,7 @@ void main() {
     test('scan with an asynchronous fold', () async {
       expect(
         await pullAll(
-          fxAsync(toAsync([1, 2, 3])).scan((a, b) async => a + b, 10),
+          fxAsync(fxToAsync([1, 2, 3])).scan((a, b) async => a + b, 10),
         ),
         [10, 11, 13, 16],
       );
@@ -132,7 +132,7 @@ void main() {
       expect(
         await pullAll(
           fxAsync(
-            toAsync([1, 2]),
+            fxToAsync([1, 2]),
           ).scan((int a, int b) => a + b, 10).map((a) async => a * 2),
         ),
         [20, 22, 26],
@@ -148,7 +148,7 @@ void main() {
       }
 
       expect(
-        await pullAll(fxAsync(fromStream(slow())).filter((a) => a.isOdd)),
+        await pullAll(fxAsync(fxFromStream(slow())).filter((a) => a.isOdd)),
         [1, 3],
       );
     });
@@ -177,7 +177,9 @@ void main() {
   group('fused drive — take ends the loop', () {
     test('after an element the stages finished synchronously', () async {
       expect(
-        await fxAsync(toAsync([1, 2, 3, 4])).map((a) => a * 2).take(2).toList(),
+        await fxAsync(
+          fxToAsync([1, 2, 3, 4]),
+        ).map((a) => a * 2).take(2).toList(),
         [2, 4],
       );
     });
@@ -185,7 +187,7 @@ void main() {
     test('after an element an asynchronous stage held', () async {
       expect(
         await fxAsync(
-          toAsync([1, 2, 3, 4]),
+          fxToAsync([1, 2, 3, 4]),
         ).map((a) async => a * 2).take(2).toList(),
         [2, 4],
       );
@@ -194,7 +196,7 @@ void main() {
     test('after an asynchronous uniq key dropped one', () async {
       expect(
         await fxAsync(
-          toAsync([1, 1, 2, 3]),
+          fxToAsync([1, 1, 2, 3]),
         ).uniqBy((a) async => a).take(2).toList(),
         [1, 2],
       );
@@ -205,7 +207,7 @@ void main() {
     test('take over a concurrent chain yields in order', () async {
       expect(
         await fxAsync(
-          toAsync([1, 2, 3, 4, 5, 6]),
+          fxToAsync([1, 2, 3, 4, 5, 6]),
         ).concurrent(3).map((a) async => a * 2).take(4).toList(),
         [2, 4, 6, 8],
       );
@@ -221,7 +223,7 @@ void main() {
     test('the legacy uniqBy awaits an asynchronous key', () async {
       expect(
         await fxAsync(
-          toAsync([1, 11, 2, 21, 3]),
+          fxToAsync([1, 11, 2, 21, 3]),
         ).concurrent(2).uniqBy((a) async => a % 10).toList(),
         [1, 2, 3],
       );
@@ -229,7 +231,9 @@ void main() {
 
     test('take pulls through the legacy iterator', () async {
       expect(
-        await fxAsync(toAsync([1, 2, 3, 4, 5])).concurrent(2).take(3).toList(),
+        await fxAsync(
+          fxToAsync([1, 2, 3, 4, 5]),
+        ).concurrent(2).take(3).toList(),
         [1, 2, 3],
       );
     });
@@ -239,7 +243,7 @@ void main() {
     final xs = List<int>.generate(9, (i) => i);
 
     test('the first side is the shortest', () {
-      expect(filter((t) => true, zip3([0, 1], xs, xs)).toList(), [
+      expect(fxFilter((t) => true, fxZip3([0, 1], xs, xs)).toList(), [
         (0, 0, 0),
         (1, 1, 1),
       ]);
@@ -247,14 +251,14 @@ void main() {
 
     test('the third side is the shortest, with the first shorter than the '
         'second', () {
-      expect(filter((t) => true, zip3([0, 1, 2, 3], xs, [7, 8])).toList(), [
+      expect(fxFilter((t) => true, fxZip3([0, 1, 2, 3], xs, [7, 8])).toList(), [
         (0, 0, 7),
         (1, 1, 8),
       ]);
     });
 
     test('the second side is the shortest', () {
-      expect(filter((t) => true, zip3(xs, [5], xs)).toList(), [(0, 5, 0)]);
+      expect(fxFilter((t) => true, fxZip3(xs, [5], xs)).toList(), [(0, 5, 0)]);
     });
   });
 
@@ -291,7 +295,7 @@ void main() {
       expect(
         await pullAll(
           fxAsync(
-            toAsync([1, 2, 3, 4]),
+            fxToAsync([1, 2, 3, 4]),
           ).filter((a) => a.isOdd).scan((int acc, int a) => acc + a, 100),
         ),
         [100, 101, 104],
@@ -302,7 +306,7 @@ void main() {
       expect(
         await pullAll(
           fxAsync(
-            toAsync([1, 2, 3, 4]),
+            fxToAsync([1, 2, 3, 4]),
           ).filter((a) => a.isOdd).scan((int acc, int a) async => acc + a, 100),
         ),
         [100, 101, 104],
@@ -316,7 +320,7 @@ void main() {
       expect(
         await pullAll(
           fxAsync(
-            toAsync([1, 2, 3]),
+            fxToAsync([1, 2, 3]),
           ).scan((int acc, int a) => acc + a, 0).filter((a) => a > 0),
         ),
         [1, 3, 6],
@@ -327,7 +331,7 @@ void main() {
   group('legacy uniqBy with an asynchronous key', () {
     test('reached when a Concurrent marker lands on uniqBy itself', () async {
       final chain = fxAsync(
-        toAsync([1, 11, 2, 21, 3]),
+        fxToAsync([1, 11, 2, 21, 3]),
       ).uniqBy((a) async => a % 10);
       final it = chain.iterator;
       final out = <int>[];
@@ -343,7 +347,7 @@ void main() {
   group('fused drive — take ends the loop from a held continuation', () {
     test('the terminal callback itself is asynchronous', () async {
       final seen = <int>[];
-      await fxAsync(toAsync([1, 2, 3, 4])).take(2).each((a) async {
+      await fxAsync(fxToAsync([1, 2, 3, 4])).take(2).each((a) async {
         await Future<void>.delayed(Duration.zero);
         seen.add(a);
       });
@@ -357,7 +361,7 @@ void main() {
       // ends from inside that continuation rather than after an emit.
       expect(
         await fxAsync(
-          toAsync([1, 2, 2]),
+          fxToAsync([1, 2, 2]),
         ).take(3).uniqBy((a) async => a).toList(),
         [1, 2],
       );

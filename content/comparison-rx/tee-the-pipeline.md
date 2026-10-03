@@ -47,7 +47,7 @@ async: false
     The constraint is the price. <code>publish()</code> will feed any
     stream operators you care to subscribe; <code>tee</code> only feeds
     folds. When the two readers really are independent pipelines, FxDart's
-    answer is <code>fork</code> — every fork of the same iterable object
+    answer is <code>fxFork</code> — every fork of the same iterable object
     is a cursor over one shared, buffered pass — and there the buffer
     comes back, holding every value until the slowest cursor has consumed
     it. So this is a tie on capability: the general tool costs memory on

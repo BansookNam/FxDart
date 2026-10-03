@@ -1,7 +1,7 @@
 import 'package:fxdart/fxdart.dart';
 
 void main() {
-  final fail = throwError<String>((msg) => StateError(msg));
+  final fail = fxThrowError<String>((msg) => StateError(msg));
 
   try {
     fail('boom');

@@ -10,7 +10,7 @@ prevLabel: mergeMap
 next: mergeScan.html
 nextLabel: mergeScan
 ---
-  <p class="hero-sub">스트림의 스트림을 평탄화합니다: 최신만 남기거나, 전부 실행하거나, 순서대로 재생하거나, 여분을 무시하거나 — 그리고 <code>concatEager</code>로 나중 소스를 즉시 시작합니다.</p>
+  <p class="hero-sub">스트림의 스트림을 평탄화합니다: 최신만 남기거나, 전부 실행하거나, 순서대로 재생하거나, 여분을 무시하거나 — 그리고 <code>fxConcatEager</code>로 나중 소스를 즉시 시작합니다.</p>
 
   {{signature}}
 
@@ -45,17 +45,17 @@ nextLabel: mergeScan
     하나가 도는 동안 도착한 내부를 무시합니다.
   </p>
   <p>
-    <code>concatEager</code>는
+    <code>fxConcatEager</code>는
     <code><a href="waitAll.html">FxEvents.concat</a></code>의
     형제입니다. 둘 다 소스 순서로 내보내지만, concat은 현재 것이
     완료될 때까지 다음 소스를 <em>구독</em>하지 않습니다 — 콜드인
     나중 소스는 시작조차 하지 않은 상태입니다.
-    <code>concatEager</code>는 모든 소스를 즉시 구독하고 나중
+    <code>fxConcatEager</code>는 모든 소스를 즉시 구독하고 나중
     이벤트를 자기 차례까지 버퍼에 담습니다. 요청은 지금 시작하고
     응답은 여전히 순서대로 재생하는 방법이 그것입니다. fxdart
     이벤트 레이어, Rx의 <code>switchAll</code>,
     <code>mergeAll</code>, <code>concatAll</code>,
-    <code>exhaustAll</code>, <code>concatEager</code>를
+    <code>exhaustAll</code>, <code>fxConcatEager</code>를
     따랐습니다.
   </p>
 
@@ -66,12 +66,12 @@ nextLabel: mergeScan
   {{playground:1}}
 
   <h2>직접 해 보기</h2>
-  <p>연습: <code>concatEager</code> 대 concat — 나중 소스가 즉시 시작됩니다.</p>
+  <p>연습: <code>fxConcatEager</code> 대 concat — 나중 소스가 즉시 시작됩니다.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="switchMap.html"><code>switchMap</code></a> — switchLatest의 매핑 형태 ·
     <a href="mergeMap.html"><code>mergeMap</code></a> — mergeMap, concatMap, exhaustMap ·
-    <a href="waitAll.html"><code>FxEvents.concat</code></a> — <code>concatEager</code>의 나중에-구독하는 형제
+    <a href="waitAll.html"><code>FxEvents.concat</code></a> — <code>fxConcatEager</code>의 나중에-구독하는 형제
   </div>

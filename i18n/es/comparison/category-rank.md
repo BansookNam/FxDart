@@ -48,5 +48,5 @@ async: false
     La cadena se gana el sueldo conforme el informe crece — cada paso
     añadido (un filtro, un segundo criterio de ranking) extiende el
     pipeline en vez de otro viaje de ida y vuelta por
-    <code>entries</code>.
+    <code>fxEntries</code>.
   </p>

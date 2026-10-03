@@ -36,7 +36,7 @@ nextLabel: combineLatest
     La vida útil sigue a la fuente: cuando la fuente se cierra, la cadena
     se cierra y la suscripción al disparador se cancela — un tic infinito
     de <code>Stream.periodic</code> es un disparador perfectamente válido.
-    Compara con los vecinos: <code><a href="throttle.html">throttle</a></code>
+    Compara con los vecinos: <code><a href="throttle.html">fxThrottle</a></code>
     limita la tasa con una ventana fija medida desde los propios eventos de
     la fuente; <code>sampleOn</code> le entrega el calendario por completo a
     un segundo stream. Capa de eventos de fxdart, según el
@@ -55,7 +55,7 @@ nextLabel: combineLatest
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="throttle.html"><code>throttle</code></a> — limitación de tasa desde el propio timing de la fuente ·
-    <a href="debounce.html"><code>debounce</code></a> — esperar la calma en lugar de muestrear ·
+    <a href="throttle.html"><code>fxThrottle</code></a> — limitación de tasa desde el propio timing de la fuente ·
+    <a href="debounce.html"><code>fxDebounce</code></a> — esperar la calma en lugar de muestrear ·
     <a href="withLatestFrom.html"><code>withLatestFrom</code></a> — la misma idea de «valor más reciente», pero combinando dos streams de datos
   </div>

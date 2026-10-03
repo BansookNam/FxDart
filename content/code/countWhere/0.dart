@@ -9,9 +9,9 @@ void main() {
   // was: fx(amounts).filter((a) => a > 40).size()
 
   // Data-first form:
-  print(countWhere((int n) => n.isEven, [1, 2, 3, 4, 5, 6])); // 3
+  print(fxCountWhere((int n) => n.isEven, [1, 2, 3, 4, 5, 6])); // 3
 
   // Empty input and no matches are both just 0:
-  print(countWhere((int n) => n > 9, <int>[])); // 0
-  print(countWhere((int n) => n > 9, [1, 2])); // 0
+  print(fxCountWhere((int n) => n > 9, <int>[])); // 0
+  print(fxCountWhere((int n) => n > 9, [1, 2])); // 0
 }

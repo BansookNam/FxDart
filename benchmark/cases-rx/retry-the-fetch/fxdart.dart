@@ -32,7 +32,7 @@ Future<void> main() async {
       for (final id in manifestIds) {
         // retry re-runs the function — up to 3 attempts in total, rethrowing
         // the last error once the budget is spent.
-        final payload = await retry(3, () => fetchManifest(id));
+        final payload = await fxRetry(3, () => fetchManifest(id));
         fetched++;
         last = payload;
       }

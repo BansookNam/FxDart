@@ -16,7 +16,7 @@ nextLabel: intersectionBy
 
   <h2>강의</h2>
   <p>
-    <code>intersection(iterable1, iterable2)</code>은
+    <code>fxIntersection(iterable1, iterable2)</code>은
     <code>difference</code>와 같은 인자 순서 규칙을 따릅니다. 결과는
     <strong><code>iterable2</code></strong>를 훑으면서
     <code>iterable1</code>에 <em>들어 있는</em> 원소를
@@ -28,7 +28,7 @@ nextLabel: intersectionBy
   </p>
   <p>
     내부적으로는
-    <code>intersectionBy((a) =&gt; a, iterable1, iterable2)</code>입니다.
+    <code>fxIntersectionBy((a) =&gt; a, iterable1, iterable2)</code>입니다.
     값 동등성이 아니라 계산된 키로 온전한 레코드 두 목록을 맞춰야 한다면
     <a href="intersectionBy.html"><code>intersectionBy</code></a>를
     바로 쓰세요.
@@ -56,5 +56,5 @@ nextLabel: intersectionBy
     <a href="difference.html"><code>difference</code></a> — 제외하는 쪽의 짝 ·
     <a href="intersectionBy.html"><code>intersectionBy</code></a> — 대신 계산된 키로 맞추기 ·
     <a href="uniq.html"><code>uniq</code></a> — 이터러블 하나에서 중복 제거 ·
-    <a href="../tutorials/includes.html"><code>includes</code></a> — 값 하나의 포함 여부 확인
+    <a href="../tutorials/includes.html"><code>fxIncludes</code></a> — 값 하나의 포함 여부 확인
   </div>

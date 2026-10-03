@@ -21,7 +21,7 @@ nextLabel: uniqBy
     la primera vez que aparece. <code>distinct</code> es el nombre idiomático en
     Dart; fxdart también acepta <code>uniq</code>, la grafía de FxTS: son el
     mismo operador. Está implementado como
-    <code>uniqBy((a) =&gt; a, iterable)</code> —con la clave identidad—, así que
+    <code>fxUniqBy((a) =&gt; a, iterable)</code> —con la clave identidad—, así que
     si alguna vez necesitas deduplicar por algo que no sea la igualdad del valor
     completo, recurre a
     <a href="uniqBy.html"><code>uniqBy</code></a> en su lugar.
@@ -33,7 +33,7 @@ nextLabel: uniqBy
     la última.
   </p>
   <p>
-    En el lado asíncrono, <code>distinctAsync</code> se puede combinar sin riesgo
+    En el lado asíncrono, <code>fxDistinctAsync</code> se puede combinar sin riesgo
     con <code>.concurrent(n)</code> siempre que la concurrencia viva en una etapa
     de fetch anterior: primero descarga con <code>.map(...).concurrent(n)</code> y
     luego aplica <code>.distinct()</code> a los resultados ya resueltos y en
@@ -56,5 +56,5 @@ nextLabel: uniqBy
     <a href="uniqBy.html"><code>uniqBy</code></a> — deduplica por una clave calculada ·
     <a href="difference.html"><code>difference</code></a> — elimina los elementos presentes en otro iterable ·
     <a href="intersection.html"><code>intersection</code></a> — conserva solo los elementos comunes ·
-    <a href="compact.html"><code>compact</code></a> — descarta los null
+    <a href="compact.html"><code>fxCompact</code></a> — descarta los null
   </div>

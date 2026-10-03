@@ -6,47 +6,47 @@ void main() {
   group('sum', () {
     group('sync', () {
       test('should sum all elements [1, 2, 3]', () {
-        expect(sum([1, 2, 3]), equals(6));
+        expect(fxSum([1, 2, 3]), equals(6));
       });
 
       test('should switch to double accumulation at the first double', () {
-        expect(sum([1, 2, 2.5]), equals(5.5));
-        expect(sum([1, 2.5, 3]), equals(6.5));
+        expect(fxSum([1, 2, 2.5]), equals(5.5));
+        expect(fxSum([1, 2.5, 3]), equals(6.5));
       });
 
       test('should sum all elements []', () {
-        expect(sum(<num>[]), equals(0));
+        expect(fxSum(<num>[]), equals(0));
       });
 
       test('should be able to be used in the pipeline', () {
-        final res1 = pipe([1, 2, 3], [sum]);
+        final res1 = pipe([1, 2, 3], [fxSum]);
         expect(res1, equals(6));
-        final res2 = pipe(<num>[], [sum]);
+        final res2 = pipe(<num>[], [fxSum]);
         expect(res2, equals(0));
       });
     });
 
     group('async', () {
       test('should sum all elements [1, 2, 3]', () async {
-        expect(await sumAsync(toAsync(<num>[1, 2, 3])), equals(6));
+        expect(await fxSumAsync(fxToAsync(<num>[1, 2, 3])), equals(6));
       });
 
       test('should sum all elements []', () async {
-        expect(await sumAsync(toAsync(<num>[])), equals(0));
+        expect(await fxSumAsync(fxToAsync(<num>[])), equals(0));
       });
 
       test('should be able to be used in the pipeline', () async {
         final res1 = await pipe(
           <num>[1, 2, 3],
           [
-            (List<num> a) => toAsync(a),
-            (FxAsyncIterable<num> a) => sumAsync(a),
+            (List<num> a) => fxToAsync(a),
+            (FxAsyncIterable<num> a) => fxSumAsync(a),
           ],
         );
         expect(res1, equals(6));
         final res2 = await pipe(<num>[], [
-          (List<num> a) => toAsync(a),
-          (FxAsyncIterable<num> a) => sumAsync(a),
+          (List<num> a) => fxToAsync(a),
+          (FxAsyncIterable<num> a) => fxSumAsync(a),
         ]);
         expect(res2, equals(0));
       });

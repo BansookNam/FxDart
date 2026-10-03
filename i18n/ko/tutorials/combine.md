@@ -2,7 +2,7 @@
 slug: combine
 title: combine — FxDart 101
 description: FxDart combine 튜토리얼: CombineSpec으로 조종하는 하나의 결합자 — combineLatest 식, withLatestFrom 식, zipAll, withLatestFromAll — 을 라이브 플레이그라운드와 함께 다룹니다.
-heading: <code>combine</code> &amp; <code>CombineSpec</code>
+heading: <code>fxCombine</code> &amp; <code>CombineSpec</code>
 section: 14
 crumb: combine
 prev: waitAll.html
@@ -20,7 +20,7 @@ nextLabel: stopOn
     <code><a href="withLatestFrom.html">withLatestFrom</a></code>,
     <code><a href="waitAll.html">zip</a></code>의 차이는 누가
     방출을 일으킬 수 있는지, 그리고 모든 쪽이 이미 말했는지를
-    요구하는지입니다. <code>combine</code>이 통합 형태입니다:
+    요구하는지입니다. <code>fxCombine</code>이 통합 형태입니다:
     <code>CombineSpec</code>의 리스트, 각각은
     <code>source</code>와 플래그 둘. 최상위 함수이지
     <code>FxEvents.combine</code>이 아닙니다 — Dart는 다른

@@ -17,7 +17,7 @@ nextLabel: flatMap
   <h2>Lección</h2>
   <p>
     Si miras el código fuente verás que <code>mapEffect</code> es literalmente
-    <code>B mapEffect(f, iterable) =&gt; map(f, iterable);</code> — la misma
+    <code>B fxMapEffect(f, iterable) =&gt; fxMap(f, iterable);</code> — la misma
     función, la misma pereza, la misma firma. Existe únicamente para
     documentar la <em>intención</em> en el punto de llamada: usa
     <code>mapEffect</code> cuando el valor de retorno del callback importa
@@ -40,8 +40,8 @@ nextLabel: flatMap
 
   <h2>Demo 2 · Asíncrono, con concurrencia</h2>
   <p>
-    <code>mapEffectAsync</code> se ejecuta exactamente sobre el mismo motor que
-    <code>mapAsync</code>, así que <code>.concurrent(n)</code> lo paraleliza
+    <code>fxMapEffectAsync</code> se ejecuta exactamente sobre el mismo motor que
+    <code>fxMapAsync</code>, así que <code>.concurrent(n)</code> lo paraleliza
     igual — muy útil para pipelines de «procesar y persistir»:
   </p>
   {{playground:1}}

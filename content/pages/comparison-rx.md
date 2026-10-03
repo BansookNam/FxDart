@@ -75,7 +75,7 @@ description: 50 real tasks solved twice — RxDart streams vs FxDart pull pipeli
     <code>combineLatest2…9</code> overloads; fxdart covers the <em>jobs</em>
     on plain Dart streams without colliding with rxdart in the same file —
     windows, live <code>groupsBy</code>, <code>shareReplay</code>,
-    selector-driven debounce, <code>combine</code>, the four
+    selector-driven debounce, <code>fxCombine</code>, the four
     <code>fromStream*</code> pull policies. What the pairs expose is the
     other half of the story — how often a problem that gets solved with a
     stream is really a <em>data pipeline</em> wearing a stream costume: a

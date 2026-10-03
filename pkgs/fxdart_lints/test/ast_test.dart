@@ -10,7 +10,7 @@ void main() {
     test('matches a return from the raise callback', () {
       final returns = collect<ReturnStatement>(
         parse('''
-f() => either((r) {
+f() => fxEither((r) {
   return fx([1, 2, 3]).map((n) => n);
 });
 '''),
@@ -22,7 +22,7 @@ f() => either((r) {
     test('does not match a return from a nested map callback', () {
       final returns = collect<ReturnStatement>(
         parse('''
-f() => either((r) {
+f() => fxEither((r) {
   return fx([1, 2, 3]).map((n) {
     return fx([n]).map((m) => m * 2);
   }).toList();
@@ -41,7 +41,7 @@ f() => either((r) {
     test('matches an arrow-body raise callback from its expression', () {
       final bodies = collect<ExpressionFunctionBody>(
         parse('''
-f() => either((r) => fx([1, 2, 3]).map((n) => n));
+f() => fxEither((r) => fx([1, 2, 3]).map((n) => n));
 '''),
       );
       final raise = bodies.singleWhere(

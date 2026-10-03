@@ -21,7 +21,7 @@ nextLabel: join
     might be a lazily-computed <code>map</code>/<code>filter</code> chain with
     no fixed length until it's actually pulled. That means calling
     <code>count</code> on a <code>filter</code>ed million-element
-    <code>range</code> really does iterate all million values; it just
+    <code>fxRange</code> really does iterate all million values; it just
     doesn't build a <code>List</code> to do it. <code>count</code> is the
     Dart-idiomatic name; fxdart also accepts the FxTS spelling
     <code>size</code> — they're the same operator.
@@ -38,7 +38,7 @@ nextLabel: join
     On the sync chain, <code>count</code> <em>is</em> Dart's inherited
     <code>Iterable.length</code> getter (no parens) — since <code>Fx</code> is
     an <code>Iterable</code>, <code>fx(pipeline).length</code> walks the chain
-    and returns the total. Use the top-level <code>count(iterable)</code>, or
+    and returns the total. Use the top-level <code>fxCount(iterable)</code>, or
     <code>.count()</code> on the <em>async</em> chain, when you'd rather write
     it as a named operator. If you already have a concrete <code>List</code>,
     its <code>.length</code> is free — reach for <code>count</code>

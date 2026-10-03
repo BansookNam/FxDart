@@ -2,7 +2,7 @@
 slug: debounce
 title: debounce — FxDart 101
 description: FxDart debounce tutorial: delay a function call until things go quiet, with leading edge and cancel(), plus a live playground.
-heading: <code>debounce</code>
+heading: <code>fxDebounce</code>
 section: 12
 crumb: debounce
 prev: parallel.html
@@ -16,7 +16,7 @@ nextLabel: throttle
 
   <h2>Lecture</h2>
   <p>
-    <code>debounce</code> wraps a callback so that repeated calls in quick
+    <code>fxDebounce</code> wraps a callback so that repeated calls in quick
     succession collapse into a single call. Every call restarts a timer of
     length <code>wait</code>; the wrapped <code>func</code> only actually
     fires once <code>wait</code> has passed <em>without</em> another call —
@@ -55,7 +55,7 @@ nextLabel: throttle
   <p>
     The callback carries the same thing as a method:
     <code>saveDraft.fxDebounce(wait)</code> is
-    <code>debounce(saveDraft, wait)</code>, named arguments and all.
+    <code>fxDebounce(saveDraft, wait)</code>, named arguments and all.
   </p>
   <pre><code>void saveDraft(String text) =&gt; _post(text);
 
@@ -70,7 +70,7 @@ save('hello');   // only this one reaches _post</code></pre>
     <a href="fx.html"><code>fx</code></a>.
   </p>
   <h2>Try it yourself</h2>
-  <p>Exercise: wrap <code>save</code> in <code>debounce</code> (100ms wait)
+  <p>Exercise: wrap <code>save</code> in <code>fxDebounce</code> (100ms wait)
     so only the final value survives the burst of calls below.</p>
   {{playground:2}}
 
@@ -88,8 +88,8 @@ save('hello');   // only this one reaches _post</code></pre>
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="throttle.html"><code>throttle</code></a> — fires on a schedule instead of after quiet ·
-    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — building timing demos ·
+    <a href="throttle.html"><code>fxThrottle</code></a> — fires on a schedule instead of after quiet ·
+    <a href="delay.html"><code>fxDelay</code> &amp; <code>fxSleep</code></a> — building timing demos ·
     <a href="concurrent.html"><code>concurrent</code></a> — rate-limiting for async pipelines ·
-    <a href="shuffle.html"><code>shuffle</code></a> — seeded randomness
+    <a href="shuffle.html"><code>fxShuffle</code></a> — seeded randomness
   </div>

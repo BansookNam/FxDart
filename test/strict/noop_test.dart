@@ -6,7 +6,7 @@ import 'package:test/test.dart' hide isEmpty, isNull, isNotNull, isList, isMap;
 void main() {
   group('noop', () {
     test('should do nothing and return normally', () {
-      expect(() => noop(), returnsNormally);
+      expect(() => fxNoop(), returnsNormally);
     });
   });
 }

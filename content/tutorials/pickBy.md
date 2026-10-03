@@ -2,7 +2,7 @@
 slug: pickBy
 title: pickBy — FxDart 101
 description: FxDart pickBy tutorial: keep only Map entries matching a (key, value) predicate.
-heading: <code>pickBy</code>
+heading: <code>fxPickBy</code>
 section: 9
 crumb: pickBy
 prev: omitBy.html
@@ -16,7 +16,7 @@ nextLabel: prop
 
   <h2>Lecture</h2>
   <p>
-    <code>pickBy</code> is <code>omitBy</code>'s mirror, and shares its
+    <code>fxPickBy</code> is <code>fxOmitBy</code>'s mirror, and shares its
     calling convention: the predicate receives one <code>(K, V)</code>
     record per entry, so use <code>e.$1</code> for the key and
     <code>e.$2</code> for the value. Only entries where the predicate
@@ -36,13 +36,13 @@ nextLabel: prop
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>pickBy</code> to keep only entries whose value is <code>true</code>.</p>
+  <p>Exercise: use <code>fxPickBy</code> to keep only entries whose value is <code>true</code>.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="omitBy.html"><code>omitBy</code></a> — the inverse: drop by predicate ·
-    <a href="pick.html"><code>pick</code></a> — keep by a fixed key list ·
-    <a href="matches.html"><code>matches</code></a> — a ready-made predicate for shape matching ·
-    <a href="compactObject.html"><code>compactObject</code></a> — a specialized "drop nulls" pickBy
+    <a href="omitBy.html"><code>fxOmitBy</code></a> — the inverse: drop by predicate ·
+    <a href="pick.html"><code>fxPick</code></a> — keep by a fixed key list ·
+    <a href="matches.html"><code>fxMatches</code></a> — a ready-made predicate for shape matching ·
+    <a href="compactObject.html"><code>fxCompactObject</code></a> — a specialized "drop nulls" pickBy
   </div>

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fxdart/fxdart.dart'
-    show Throttled, throttle, pipe, filter, map, sum;
+    show Throttled, fxThrottle, pipe, fxFilter, fxMap, fxSum;
 
 import '../logic/summaries.dart' show sameMonth;
 import '../main.dart' show DailyLedgerApp;
@@ -44,7 +44,7 @@ class _AppShellState extends State<AppShell> {
 
   /// fxdart `throttle` (leading edge only): double-clicking "Reset demo
   /// data" cannot start two overlapping reseeds.
-  late final Throttled<LedgerState> _throttledReseed = throttle(
+  late final Throttled<LedgerState> _throttledReseed = fxThrottle(
     (state) => state.reseed(),
     const Duration(seconds: 3),
     trailing: false,
@@ -258,12 +258,12 @@ class _MonthBar extends StatelessWidget {
     // Here it runs for real on the live ledger:
     final net =
         pipe(state.entries, [
-              (List<Entry> es) => filter(
+              (List<Entry> es) => fxFilter(
                 (Entry e) => e.type.isMoney && sameMonth(e.date, state.month),
                 es,
               ),
-              (Iterable<Entry> es) => map((Entry e) => e.signedAmount, es),
-              (Iterable<double> ns) => sum(ns),
+              (Iterable<Entry> es) => fxMap((Entry e) => e.signedAmount, es),
+              (Iterable<double> ns) => fxSum(ns),
             ])
             as num;
 

@@ -6,7 +6,7 @@ void main() {
     group('sync', () {
       test('visits the elements from last to first', () {
         final seen = <int>[];
-        foldRight(0, (acc, int a) {
+        fxFoldRight(0, (acc, int a) {
           seen.add(a);
           return acc;
         }, [1, 2, 3]);
@@ -15,32 +15,32 @@ void main() {
 
       test('nests from the right where fold nests from the left', () {
         // 1 - (2 - (3 - 0)) == 2, but ((0 - 1) - 2) - 3 == -6.
-        expect(foldRight(0, (acc, int a) => a - acc, [1, 2, 3]), equals(2));
-        expect(fold(0, (acc, int a) => acc - a, [1, 2, 3]), equals(-6));
+        expect(fxFoldRight(0, (acc, int a) => a - acc, [1, 2, 3]), equals(2));
+        expect(fxFold(0, (acc, int a) => acc - a, [1, 2, 3]), equals(-6));
       });
 
       test('returns the seed for an empty source', () {
-        expect(foldRight(42, (acc, int a) => acc + a, <int>[]), equals(42));
+        expect(fxFoldRight(42, (acc, int a) => acc + a, <int>[]), equals(42));
       });
 
       test('agrees with fold over a reversed source', () {
         final source = [3, 1, 4, 1, 5];
         expect(
-          foldRight('', (acc, int a) => '$acc$a', source),
-          equals(fold('', (acc, int a) => '$acc$a', reverse(source))),
+          fxFoldRight('', (acc, int a) => '$acc$a', source),
+          equals(fxFold('', (acc, int a) => '$acc$a', fxReverse(source))),
         );
       });
 
       test('works on a lazy, non-List source', () {
         final source = fx([1, 2, 3]).map((a) => a * 10);
         expect(
-          foldRight(<int>[], (acc, int a) => acc..add(a), source),
+          fxFoldRight(<int>[], (acc, int a) => acc..add(a), source),
           equals([30, 20, 10]),
         );
       });
 
       test('can build a right-nested structure', () {
-        final res = foldRight('nil', (acc, String a) => '($a . $acc)', [
+        final res = fxFoldRight('nil', (acc, String a) => '($a . $acc)', [
           'a',
           'b',
           'c',
@@ -56,32 +56,40 @@ void main() {
     group('async', () {
       test('visits the values from last to first', () async {
         final seen = <int>[];
-        await foldRightAsync(0, (acc, int a) {
+        await fxFoldRightAsync(0, (acc, int a) {
           seen.add(a);
           return acc;
-        }, toAsync([1, 2, 3]));
+        }, fxToAsync([1, 2, 3]));
         expect(seen, equals([3, 2, 1]));
       });
 
       test('nests from the right', () async {
         expect(
-          await foldRightAsync(0, (acc, int a) => a - acc, toAsync([1, 2, 3])),
+          await fxFoldRightAsync(
+            0,
+            (acc, int a) => a - acc,
+            fxToAsync([1, 2, 3]),
+          ),
           equals(2),
         );
       });
 
       test('accepts an async seed and accumulator', () async {
-        final res = await foldRightAsync(
+        final res = await fxFoldRightAsync(
           Future.value(0),
           (acc, int a) async => a - acc,
-          toAsync([1, 2, 3]),
+          fxToAsync([1, 2, 3]),
         );
         expect(res, equals(2));
       });
 
       test('returns the seed for an empty source', () async {
         expect(
-          await foldRightAsync(42, (acc, int a) => acc + a, toAsync(<int>[])),
+          await fxFoldRightAsync(
+            42,
+            (acc, int a) => acc + a,
+            fxToAsync(<int>[]),
+          ),
           equals(42),
         );
       });
@@ -89,14 +97,18 @@ void main() {
       test('agrees with the sync form over the same values', () async {
         final source = [3, 1, 4, 1, 5];
         expect(
-          await foldRightAsync('', (acc, int a) => '$acc$a', toAsync(source)),
-          equals(foldRight('', (acc, int a) => '$acc$a', source)),
+          await fxFoldRightAsync(
+            '',
+            (acc, int a) => '$acc$a',
+            fxToAsync(source),
+          ),
+          equals(fxFoldRight('', (acc, int a) => '$acc$a', source)),
         );
       });
 
       test('is available as an fxAsync chain method', () async {
         final res = await fxAsync(
-          toAsync([1, 2, 3]),
+          fxToAsync([1, 2, 3]),
         ).foldRight(0, (acc, a) => a - acc);
         expect(res, equals(2));
       });
@@ -160,7 +172,7 @@ void main() {
         await foldRightWithIndexAsync(0, (acc, String a, i) {
           seen.add((a, i));
           return acc;
-        }, toAsync(['a', 'b', 'c']));
+        }, fxToAsync(['a', 'b', 'c']));
         expect(seen, equals([('c', 2), ('b', 1), ('a', 0)]));
       });
 
@@ -168,7 +180,7 @@ void main() {
         final res = await foldRightWithIndexAsync(
           Future.value(0),
           (acc, int a, i) async => acc + a * i,
-          toAsync([1, 2, 3]),
+          fxToAsync([1, 2, 3]),
         );
         expect(res, equals(8));
       });
@@ -177,14 +189,14 @@ void main() {
         final res = await foldRightWithIndexAsync(
           42,
           (acc, int a, i) => acc + i,
-          toAsync(<int>[]),
+          fxToAsync(<int>[]),
         );
         expect(res, equals(42));
       });
 
       test('is available as an fxAsync chain method', () async {
         final res = await fxAsync(
-          toAsync([1, 2, 3]),
+          fxToAsync([1, 2, 3]),
         ).foldRightWithIndex(0, (acc, a, i) => acc + a * i);
         expect(res, equals(8));
       });

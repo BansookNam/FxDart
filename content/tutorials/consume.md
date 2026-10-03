@@ -27,13 +27,13 @@ nextLabel: performance
   <p>
     The optional <code>n</code> makes it the natural partner for infinite
     or huge sources: <code>consume(5)</code> pulls exactly 5 values and
-    stops, even if the underlying iterable (<code>range</code> with no
+    stops, even if the underlying iterable (<code>fxRange</code> with no
     bound, <code>cycle</code>, <code>repeat</code> with a huge count) would
     otherwise go on forever. Omit <code>n</code> to drain a finite iterable
     completely.
   </p>
   <p>
-    <code>consumeAsync</code> (or <code>.consume()</code> on an
+    <code>fxConsumeAsync</code> (or <code>.consume()</code> on an
     <code>FxAsync</code> chain) works the same way, awaiting each pulled
     value's side effects in turn — handy for forcing an async
     <code>peek</code>/logging pipeline to actually run without paying to
@@ -42,7 +42,7 @@ nextLabel: performance
 
   <h2>Demo 1 · Bounding an infinite source</h2>
   <p>
-    <code>range(1000000)</code> would normally never finish if fully pulled
+    <code>fxRange(1000000)</code> would normally never finish if fully pulled
     — but <code>consume(5)</code> stops after 5 elements:
   </p>
   {{playground:0}}

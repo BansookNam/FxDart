@@ -2,7 +2,7 @@
 slug: reduceLazy
 title: reduceLazy — FxDart 101
 description: FxDart reduceLazy tutorial: build a reusable reducer function you can apply to many iterables, with a live playground.
-heading: <code>reduceLazy</code>
+heading: <code>fxReduceLazy</code>
 section: 7
 crumb: reduceLazy
 prev: foldRight.html
@@ -16,7 +16,7 @@ nextLabel: sum
 
   <h2>Lecture</h2>
   <p>
-    <code>reduceLazy</code> doesn't reduce anything by itself — it
+    <code>fxReduceLazy</code> doesn't reduce anything by itself — it
     <strong>builds a reducer</strong>. Give it a combining function and a
     seed, and you get back a plain function of type
     <code>Iterable&lt;A&gt; Function</code> that you can call as many times
@@ -26,8 +26,8 @@ nextLabel: sum
   <p>
     Under the hood it's just a thin wrapper around
     <code><a href="fold.html">fold</a></code>:
-    <code>reduceLazy(f, seed)</code> returns
-    <code>(iterable) =&gt; fold(seed, f, iterable)</code>. Notice the argument
+    <code>fxReduceLazy(f, seed)</code> returns
+    <code>(iterable) =&gt; fxFold(seed, f, iterable)</code>. Notice the argument
     order flips relative to <code>fold</code> — here it's
     <code>(f, seed)</code>, matching FxTS's curried style, where the
     iterable is deliberately left off until later.
@@ -48,7 +48,7 @@ nextLabel: sum
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: build a reusable reducer with <code>reduceLazy</code> that finds the <strong>max</strong> value.</p>
+  <p>Exercise: build a reusable reducer with <code>fxReduceLazy</code> that finds the <strong>max</strong> value.</p>
   {{playground:2}}
 
   <div class="callout">
@@ -56,5 +56,5 @@ nextLabel: sum
     <a href="fold.html"><code>fold</code></a> — the seeded reducer this wraps ·
     <a href="reduce.html"><code>reduce</code></a> — the unseeded terminal ·
     <a href="pipe.html"><code>pipe</code></a> — compose functions like this into a pipeline ·
-    <a href="memoize.html"><code>memoize</code></a> — another way to build a reusable function
+    <a href="memoize.html"><code>fxMemoize</code></a> — another way to build a reusable function
   </div>

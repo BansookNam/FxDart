@@ -25,7 +25,7 @@ async: true
     병합이 아니라 <strong>순차적인</strong> 이어붙이기입니다 — 기본
     저장소가 소진되기 전까지는 복제본을 건드리지 않습니다. 이 작업은
     기본 저장소의 이벤트를 우선시해야 하므로 정확히 맞는 도구입니다. 각
-    저장소는 <code>range</code> + <code>flatMap</code>(페이지 번호 →
+    저장소는 <code>fxRange</code> + <code>flatMap</code>(페이지 번호 →
     이벤트 페이지)으로 비동기 시퀀스가 되고, <code>uniqBy</code> +
     <code>take(8)</code>가 나머지를 마무리합니다. 체인이 풀 기반이기
     때문에 <code>take</code>가 멈추면 페이징도 함께 멈춥니다: 복제본의

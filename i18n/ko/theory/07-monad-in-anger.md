@@ -84,7 +84,7 @@ parseId(raw).flatMap((id) =>
 | 하스켈 | `do { id <- parseId raw; … }` | `>>=` 사슬 |
 | 스칼라 | `for { id <- parseId(raw) } yield …` | `flatMap`/`map` 사슬 |
 | 코틀린 (Arrow) | `either { val id = parseId(raw).bind() }` | 비국소 탈출이 있는 스코프 |
-| Dart | `either((r) { final id = r.bind(parseId(raw)); … })` | 비국소 탈출이 있는 스코프 |
+| Dart | `fxEither((r) { final id = r.bind(parseId(raw)); … })` | 비국소 탈출이 있는 스코프 |
 
 앞의 둘은 *문법 설탕 해제(desugaring)* 입니다. 컴파일러가 블록을 메서드 호출로
 다시 쓰며, 타입 검사기가 이름 붙일 수 있는 어떤 모나드에도 통합니다. 뒤의 둘은
@@ -109,7 +109,7 @@ Either<String, List<String>> loadOrders(String user) =>
         ? Either.right(['mug', 'book'])
         : Either.left('none');
 
-Either<String, String> summary(String raw) => either((r) {
+Either<String, String> summary(String raw) => fxEither((r) {
       final id = r.bind(parseId(raw));
       final user = r.bind(loadUser(id));
       final orders = r.bind(loadOrders(user));
@@ -146,7 +146,7 @@ void main() async {
 }
 ```
 
-한 줄 한 줄, 이것은 위의 `either` 블록에서 `r.bind`를 `await`로 바꾼 것입니다.
+한 줄 한 줄, 이것은 위의 `fxEither` 블록에서 `r.bind`를 `await`로 바꾼 것입니다.
 `async`가 스코프를 표시하고, `await`가 한 겹을 벗기고, 컴파일러가 본문을
 연속(continuation)으로 다시 쓰는데 그것이 이름만 다른 `flatMap`입니다. 이것이
 마법이 아니라 모나드라는 증거 — `Future<Future<T>>`에 `await`를 걸면 `Future<T>`가
@@ -161,7 +161,7 @@ Dart가 하지 *않은* 것은 그것을 일반화하는 일입니다. `await`�
 > 둘인데 그 쌍을 위한 `flatMap`은 없습니다. 스칼라는 *모나드 트랜스포머*
 > (`EitherT[Future, E, A]`)를 꺼내 듭니다 — 조합마다 래퍼 하나에 리프트가 탑처럼
 > 쌓이죠. 코틀린과 Dart는 스코프에게 두 몫을 맡겨 그 탑을 피합니다.
-> `eitherAsync`는 `async` 본문 *안에서* `Raise` 스코프를 주므로, `await`가 시간을
+> `fxEitherAsync`는 `async` 본문 *안에서* `Raise` 스코프를 주므로, `await`가 시간을
 > 맡고 `r.bind`가 실패를 맡으며 제3의 타입은 없습니다. 트랜스포머보다 강력한 것은
 > 아닙니다 — 덜 일반적이고 훨씬 읽기 쉬우며, 누가 무엇을 치렀는지는 21장에 적혀
 > 있습니다.
@@ -177,7 +177,7 @@ Future<Either<String, int>> fetchPort(String key) async =>
         : Either.left('unknown: $key');
 
 Future<Either<String, String>> describe(String key) =>
-    eitherAsync((r) async {
+    fxEitherAsync((r) async {
       // `await` sequences time; `r.bind` sequences failure.
       final port = r.bind(await fetchPort(key));
       return 'listening on $port';
@@ -190,7 +190,7 @@ void main() async {
 ```
 
 효과 둘, 직선형 블록 하나, `EitherT` 없음. 대가는 FxDart가 손으로 써 둔 조합에서만
-통한다는 것입니다 — `eitherAsync`, `nullable`, `catching`. 여러분이 확장할 수 있는
+통한다는 것입니다 — `fxEitherAsync`, `fxNullable`, `fxCatching`. 여러분이 확장할 수 있는
 일반적인 장치는 없는데, "임의의 모나드"를 표현하려면 Dart에 없는 타입 기능이
 필요하기 때문입니다. 그것이 10장입니다.
 

@@ -38,7 +38,7 @@ nextLabel: fx
     </tr>
     <tr>
       <td>호출자가 실패를 다룸</td>
-      <td>이미 있는 표면 위의 <code><a href="raise.html">either</a></code> / <code><a href="mapEither.html">mapEither</a></code> / <code><a href="attempt.html">attempt</a></code></td>
+      <td>이미 있는 표면 위의 <code><a href="raise.html">fxEither</a></code> / <code><a href="mapEither.html">mapEither</a></code> / <code><a href="attempt.html">attempt</a></code></td>
       <td>도메인 에러에 <code>throw</code>; 이유를 잃은 <code>null</code></td>
     </tr>
   </table>

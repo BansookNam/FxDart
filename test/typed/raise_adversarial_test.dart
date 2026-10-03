@@ -11,7 +11,7 @@ void main() {
     test('captured scope raising after the builder returned throws '
         'RaiseLeakedError', () {
       late Raise<String> leaked;
-      either<String, int>((r) {
+      fxEither<String, int>((r) {
         leaked = r;
         return 1;
       });
@@ -20,7 +20,7 @@ void main() {
 
     test('LAZY iterable escaping the builder detonates as RaiseLeakedError '
         'at the consumption site (sync)', () {
-      final result = either<String, Iterable<int>>(
+      final result = fxEither<String, Iterable<int>>(
         (r) => fx([1, 2, 3]).map((n) => r.raise('lazy')),
       );
       // The builder happily returned Right(<unevaluated pipeline>) …
@@ -34,8 +34,8 @@ void main() {
 
     test('LAZY async chain escaping the builder detonates as '
         'RaiseLeakedError (async)', () async {
-      final result = await eitherAsync<String, FxAsync<int>>(
-        (r) async => fxAsync(toAsync([1, 2])).map((n) => r.raise('lazy')),
+      final result = await fxEitherAsync<String, FxAsync<int>>(
+        (r) async => fxAsync(fxToAsync([1, 2])).map((n) => r.raise('lazy')),
       );
       expect(result.isRight, isTrue);
       await expectLater(
@@ -54,24 +54,24 @@ void main() {
 
   group('scope nesting', () {
     test('inner either does not capture the outer raise', () {
-      final outer = either<String, int>((ro) {
-        final inner = either<int, String>((ri) => ro.raise('outer'));
+      final outer = fxEither<String, int>((ro) {
+        final inner = fxEither<int, String>((ri) => ro.raise('outer'));
         fail('unreachable: $inner');
       });
       expect(outer, Left('outer'));
     });
 
     test('outer either does not capture the inner raise type confusion', () {
-      final outer = either<String, String>((ro) {
-        final inner = either<int, String>((ri) => ri.raise(9));
+      final outer = fxEither<String, String>((ro) {
+        final inner = fxEither<int, String>((ri) => ri.raise(9));
         return 'inner was ${inner.leftOrNull()}';
       });
       expect(outer, Right('inner was 9'));
     });
 
     test('same-error-type nesting still resolves by scope identity', () {
-      final outer = either<String, String>((ro) {
-        final inner = either<String, String>((ri) => ri.raise('inner'));
+      final outer = fxEither<String, String>((ro) {
+        final inner = fxEither<String, String>((ri) => ri.raise('inner'));
         expect(inner, Left('inner'));
         return ro.bind(inner);
       });
@@ -82,7 +82,7 @@ void main() {
   group('reified scope (Dart improves on Arrow here)', () {
     test('covariant upcast misuse fails at the raise call site with '
         'TypeError, not corruption', () {
-      final result = either<String, int>((r) {
+      final result = fxEither<String, int>((r) {
         final Raise<Object?> upcast = r;
         expect(() => upcast.raise(42), throwsA(isA<TypeError>()));
         return 7;
@@ -93,7 +93,7 @@ void main() {
 
   group('signal transparency', () {
     test('`on Exception` does NOT catch the signal (it is an Error)', () {
-      final result = either<String, int>((r) {
+      final result = fxEither<String, int>((r) {
         try {
           r.raise('boom');
         } on Exception {
@@ -107,7 +107,7 @@ void main() {
 
     test('PINNED: a bare catch DOES swallow the signal (documented hazard '
         '— use catching instead)', () {
-      final result = either<String, int>((r) {
+      final result = fxEither<String, int>((r) {
         try {
           r.raise('swallowed');
         } catch (_) {
@@ -119,16 +119,16 @@ void main() {
     });
 
     test('catching rethrows the signal instead of handing it to onError', () {
-      final result = either<String, int>(
-        (r) => catching(() => r.raise('through'), (e, st) => -1),
+      final result = fxEither<String, int>(
+        (r) => fxCatching(() => r.raise('through'), (e, st) => -1),
       );
       expect(result, Left('through'));
     });
 
     test('catching rethrows a signal from a nested different-E scope', () {
-      final outer = either<String, int>((ro) {
-        final inner = either<int, String>(
-          (ri) => catching(() => ro.raise('outer'), (e, st) => 'nope'),
+      final outer = fxEither<String, int>((ro) {
+        final inner = fxEither<int, String>(
+          (ri) => fxCatching(() => ro.raise('outer'), (e, st) => 'nope'),
         );
         fail('unreachable: $inner');
       });
@@ -136,14 +136,14 @@ void main() {
     });
 
     test('catchingAsync rethrows the signal', () async {
-      final result = await eitherAsync<String, int>(
-        (r) => catchingAsync(() async => r.raise('through'), (e, st) => -1),
+      final result = await fxEitherAsync<String, int>(
+        (r) => fxCatchingAsync(() async => r.raise('through'), (e, st) => -1),
       );
       expect(result, Left('through'));
     });
 
     test('Either.catching rethrows the signal', () {
-      final result = either<String, int>(
+      final result = fxEither<String, int>(
         (r) => r.bind(
           Either.catching(
             () => r.raise('through'),
@@ -155,7 +155,7 @@ void main() {
 
     test('the signal toString is diagnostic when it does surface', () {
       Object? seen;
-      either<String, int>((r) {
+      fxEither<String, int>((r) {
         try {
           r.raise('x');
         } catch (e) {
@@ -174,7 +174,7 @@ void main() {
   group('async failure modes', () {
     test('PINNED: Future.catchError without a test swallows the signal '
         '(documented hazard)', () async {
-      final result = await eitherAsync<String, int>((r) async {
+      final result = await fxEitherAsync<String, int>((r) async {
         final recovered = await Future<int>(
           () => r.raise('swallowed'),
         ).catchError((Object e) => -1);
@@ -185,7 +185,7 @@ void main() {
 
     test('PINNED: Future.wait drops the second branch raise silently — the '
         'first error wins', () async {
-      final result = await eitherAsync<String, int>((r) async {
+      final result = await fxEitherAsync<String, int>((r) async {
         final results = await Future.wait([
           Future<int>(() => r.raise('first')),
           Future<int>.delayed(
@@ -202,7 +202,7 @@ void main() {
         'an unhandled zone error with the diagnostic message', () async {
       final errors = <Object>[];
       await runZonedGuarded(() async {
-        final result = await eitherAsync<String, int>((r) async {
+        final result = await fxEitherAsync<String, int>((r) async {
           unawaited(Future.microtask(() => r.raise('lost')));
           await Future<void>.delayed(const Duration(milliseconds: 5));
           return 1;
@@ -218,7 +218,7 @@ void main() {
         'RaiseLeakedError', () async {
       final errors = <Object>[];
       await runZonedGuarded(() async {
-        final result = await eitherAsync<String, int>((r) async {
+        final result = await fxEitherAsync<String, int>((r) async {
           unawaited(
             Future<void>.delayed(
               const Duration(milliseconds: 5),

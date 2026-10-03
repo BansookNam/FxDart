@@ -12,7 +12,7 @@ void main() {
         'd': 'non-future value',
       };
 
-      final result = await resolveProps(obj);
+      final result = await fxResolveProps(obj);
       expect(
         result,
         equals({'a': 1, 'b': '2', 'c': true, 'd': 'non-future value'}),

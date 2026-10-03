@@ -1,1 +1,1 @@
-List&lt;R&gt; Function(T a) juxt&lt;T, R&gt;(List&lt;R Function(T a)&gt; fns)
+List&lt;R&gt; Function(T a) fxJuxt&lt;T, R&gt;(List&lt;R Function(T a)&gt; fns)

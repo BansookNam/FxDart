@@ -17,8 +17,8 @@ nextLabel: debounceOn
   <h2>Lecture</h2>
   <p>
     Rate limiting always costs you something, and the only real question
-    is <em>what</em>. <code><a href="throttle.html">throttle</a></code>
-    and <code><a href="debounce.html">debounce</a></code> pay in
+    is <em>what</em>. <code><a href="throttle.html">fxThrottle</a></code>
+    and <code><a href="debounce.html">fxDebounce</a></code> pay in
     <strong>events</strong>: they keep one per window and drop the rest,
     which is right when the events are samples of a continuous thing and
     an old one is worthless. <code>spaceBy(gap)</code> pays in
@@ -64,7 +64,7 @@ nextLabel: debounceOn
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="throttle.html"><code>throttle</code></a> — the lossy counterpart: one event per window, immediately ·
-    <a href="debounce.html"><code>debounce</code></a> — wait for the burst to end, then take its last value ·
+    <a href="throttle.html"><code>fxThrottle</code></a> — the lossy counterpart: one event per window, immediately ·
+    <a href="debounce.html"><code>fxDebounce</code></a> — wait for the burst to end, then take its last value ·
     <a href="chunkOn.html"><code>chunkEvery</code></a> — keep every event too, but grouped rather than spread out
   </div>

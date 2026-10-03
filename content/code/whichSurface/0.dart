@@ -23,7 +23,7 @@ Future<void> main() async {
   // [q:f, q:fx, q:fxd]
 
   // 4. The caller handles the failure → either.
-  print(either<String, int>((r) {
+  print(fxEither<String, int>((r) {
     final n = r.ensureNotNull(int.tryParse('12'), () => 'bad');
     r.ensure(n > 0, () => 'not positive');
     return n;

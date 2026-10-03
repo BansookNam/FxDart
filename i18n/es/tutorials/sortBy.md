@@ -63,5 +63,5 @@ nextLabel: sortByDesc
     <strong>Relacionado:</strong>
     <a href="sort.html"><code>sort</code></a> — la forma basada en comparador sobre la que se construye ·
     <a href="min.html"><code>min</code></a> · <a href="max.html"><code>max</code></a> — para un solo extremo en lugar de una ordenación completa ·
-    <a href="pluck.html"><code>pluck</code></a> — extrae la misma clave sin ordenar
+    <a href="pluck.html"><code>fxPluck</code></a> — extrae la misma clave sin ordenar
   </div>

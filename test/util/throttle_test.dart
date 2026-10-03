@@ -10,7 +10,7 @@ void main() {
     group('basic throttle behavior', () {
       test('should throttle function calls within wait period', () async {
         var callCount = 0;
-        final throttled = throttle<Object?>(
+        final throttled = fxThrottle<Object?>(
           (_) => callCount++,
           const Duration(milliseconds: 60),
         );
@@ -29,7 +29,7 @@ void main() {
 
       test('should allow call after throttle period expires', () async {
         var callCount = 0;
-        final throttled = throttle<Object?>(
+        final throttled = fxThrottle<Object?>(
           (_) => callCount++,
           const Duration(milliseconds: 60),
         );
@@ -48,7 +48,7 @@ void main() {
         'should not reset timer on subsequent calls (key difference from debounce)',
         () async {
           var callCount = 0;
-          final throttled = throttle<Object?>(
+          final throttled = fxThrottle<Object?>(
             (_) => callCount++,
             const Duration(milliseconds: 60),
           );
@@ -66,7 +66,7 @@ void main() {
 
       test('should handle multiple consecutive throttle periods', () async {
         var callCount = 0;
-        final throttled = throttle<Object?>(
+        final throttled = fxThrottle<Object?>(
           (_) => callCount++,
           const Duration(milliseconds: 60),
         );
@@ -92,7 +92,7 @@ void main() {
     group('leading edge', () {
       test('should call immediately when leading is true (default)', () {
         var callCount = 0;
-        final throttled = throttle<Object?>(
+        final throttled = fxThrottle<Object?>(
           (_) => callCount++,
           const Duration(milliseconds: 60),
         );
@@ -105,7 +105,7 @@ void main() {
 
       test('should not call immediately when leading is false', () async {
         var callCount = 0;
-        final throttled = throttle<Object?>(
+        final throttled = fxThrottle<Object?>(
           (_) => callCount++,
           const Duration(milliseconds: 60),
           leading: false,
@@ -121,7 +121,7 @@ void main() {
 
       test('should handle leading only option', () async {
         var callCount = 0;
-        final throttled = throttle<Object?>(
+        final throttled = fxThrottle<Object?>(
           (_) => callCount++,
           const Duration(milliseconds: 60),
           leading: true,
@@ -144,7 +144,7 @@ void main() {
         'should call at end of period when trailing is true (default)',
         () async {
           var callCount = 0;
-          final throttled = throttle<Object?>(
+          final throttled = fxThrottle<Object?>(
             (_) => callCount++,
             const Duration(milliseconds: 60),
           );
@@ -160,7 +160,7 @@ void main() {
 
       test('should not call at end when trailing is false', () async {
         var callCount = 0;
-        final throttled = throttle<Object?>(
+        final throttled = fxThrottle<Object?>(
           (_) => callCount++,
           const Duration(milliseconds: 60),
           leading: true,
@@ -176,7 +176,7 @@ void main() {
 
       test('should use latest arguments for trailing call', () async {
         final received = <int>[];
-        final throttled = throttle<int>(
+        final throttled = fxThrottle<int>(
           received.add,
           const Duration(milliseconds: 60),
         );
@@ -193,7 +193,7 @@ void main() {
 
       test('should handle trailing only option', () async {
         var callCount = 0;
-        final throttled = throttle<Object?>(
+        final throttled = fxThrottle<Object?>(
           (_) => callCount++,
           const Duration(milliseconds: 60),
           leading: false,
@@ -214,7 +214,7 @@ void main() {
     group('leading and trailing combined', () {
       test('should call on both edges when both true', () async {
         var callCount = 0;
-        final throttled = throttle<Object?>(
+        final throttled = fxThrottle<Object?>(
           (_) => callCount++,
           const Duration(milliseconds: 60),
           leading: true,
@@ -233,7 +233,7 @@ void main() {
 
       test('should not call twice if only one call made', () async {
         var callCount = 0;
-        final throttled = throttle<Object?>(
+        final throttled = fxThrottle<Object?>(
           (_) => callCount++,
           const Duration(milliseconds: 60),
           leading: true,
@@ -251,7 +251,7 @@ void main() {
         'should execute leading then trailing with different args',
         () async {
           final received = <int>[];
-          final throttled = throttle<int>(
+          final throttled = fxThrottle<int>(
             received.add,
             const Duration(milliseconds: 60),
             leading: true,
@@ -273,7 +273,7 @@ void main() {
     group('cancel', () {
       test('should cancel pending trailing execution', () async {
         var callCount = 0;
-        final throttled = throttle<Object?>(
+        final throttled = fxThrottle<Object?>(
           (_) => callCount++,
           const Duration(milliseconds: 60),
         );
@@ -289,7 +289,7 @@ void main() {
 
       test('should allow fresh start after cancel', () async {
         var callCount = 0;
-        final throttled = throttle<Object?>(
+        final throttled = fxThrottle<Object?>(
           (_) => callCount++,
           const Duration(milliseconds: 60),
         );
@@ -311,7 +311,7 @@ void main() {
     group('edge cases', () {
       test('should handle rapid successive calls', () async {
         var callCount = 0;
-        final throttled = throttle<Object?>(
+        final throttled = fxThrottle<Object?>(
           (_) => callCount++,
           const Duration(milliseconds: 60),
         );
@@ -328,7 +328,10 @@ void main() {
 
       test('should handle wait time of 0', () async {
         var callCount = 0;
-        final throttled = throttle<Object?>((_) => callCount++, Duration.zero);
+        final throttled = fxThrottle<Object?>(
+          (_) => callCount++,
+          Duration.zero,
+        );
 
         throttled(null);
         expect(callCount, equals(1));
@@ -341,7 +344,7 @@ void main() {
 
       test('should handle calls during and after throttle period', () async {
         var callCount = 0;
-        final throttled = throttle<Object?>(
+        final throttled = fxThrottle<Object?>(
           (_) => callCount++,
           const Duration(milliseconds: 60),
         );
@@ -362,7 +365,7 @@ void main() {
 
       test('should work with no options provided', () async {
         var callCount = 0;
-        final throttled = throttle<Object?>(
+        final throttled = fxThrottle<Object?>(
           (_) => callCount++,
           const Duration(milliseconds: 60),
         );

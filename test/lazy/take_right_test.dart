@@ -6,26 +6,26 @@ void main() {
     group('sync', () {
       test('should be able to take the element', () {
         final res = <int>[];
-        for (final item in takeRight(1, [1, 2, 3, 4])) {
+        for (final item in fxTakeRight(1, [1, 2, 3, 4])) {
           res.add(item);
         }
         expect(res, equals([4]));
 
-        expect(toList(takeRight(0, [1, 2, 3, 4])), equals([]));
-        expect(toList(takeRight(1, [1, 2, 3, 4])), equals([4]));
-        expect(toList(takeRight(2, [1, 2, 3, 4])), equals([3, 4]));
-        expect(toList(takeRight(3, [1, 2, 3, 4])), equals([2, 3, 4]));
-        expect(toList(takeRight(4, [1, 2, 3, 4])), equals([1, 2, 3, 4]));
-        expect(toList(takeRight(5, [1, 2, 3, 4])), equals([1, 2, 3, 4]));
+        expect(fxToList(fxTakeRight(0, [1, 2, 3, 4])), equals([]));
+        expect(fxToList(fxTakeRight(1, [1, 2, 3, 4])), equals([4]));
+        expect(fxToList(fxTakeRight(2, [1, 2, 3, 4])), equals([3, 4]));
+        expect(fxToList(fxTakeRight(3, [1, 2, 3, 4])), equals([2, 3, 4]));
+        expect(fxToList(fxTakeRight(4, [1, 2, 3, 4])), equals([1, 2, 3, 4]));
+        expect(fxToList(fxTakeRight(5, [1, 2, 3, 4])), equals([1, 2, 3, 4]));
       });
 
       test('should take from a lazy (non-list) source via the ring buffer', () {
         final lazy = [1, 2, 3, 4].where((_) => true);
-        expect(toList(takeRight(0, lazy)), equals(<int>[]));
-        expect(toList(takeRight(2, lazy)), equals([3, 4]));
-        expect(toList(takeRight(5, lazy)), equals([1, 2, 3, 4]));
+        expect(fxToList(fxTakeRight(0, lazy)), equals(<int>[]));
+        expect(fxToList(fxTakeRight(2, lazy)), equals([3, 4]));
+        expect(fxToList(fxTakeRight(5, lazy)), equals([1, 2, 3, 4]));
         expect(
-          toList(takeRight(2, <int>[].where((_) => true))),
+          fxToList(fxTakeRight(2, <int>[].where((_) => true))),
           equals(<int>[]),
         );
       });
@@ -34,10 +34,10 @@ void main() {
         final res1 = pipe(
           [1, 2, 3, 4, 5, 6],
           [
-            (v) => map((int a) => a + 10, v),
-            (v) => filter((int a) => a % 2 == 0, v),
-            (v) => takeRight(2, v),
-            (v) => toList(v),
+            (v) => fxMap((int a) => a + 10, v),
+            (v) => fxFilter((int a) => a % 2 == 0, v),
+            (v) => fxTakeRight(2, v),
+            (v) => fxToList(v),
           ],
         );
 
@@ -45,7 +45,7 @@ void main() {
       });
 
       test('should be able to take the rest element', () {
-        final it = takeRight(5, range(1, 11)).iterator;
+        final it = fxTakeRight(5, fxRange(1, 11)).iterator;
         it.moveNext();
         it.moveNext();
         var sum = 0;
@@ -59,7 +59,7 @@ void main() {
     group('async', () {
       test('should be able to take the element', () async {
         final res = <int>[];
-        final it = takeRightAsync(1, toAsync([1, 2, 3, 4])).iterator;
+        final it = fxTakeRightAsync(1, fxToAsync([1, 2, 3, 4])).iterator;
         while (true) {
           final r = await it.next();
           if (r.done) break;
@@ -68,34 +68,34 @@ void main() {
         expect(res, equals([4]));
 
         expect(
-          await toListAsync(takeRightAsync(0, toAsync([1, 2, 3, 4]))),
+          await fxToListAsync(fxTakeRightAsync(0, fxToAsync([1, 2, 3, 4]))),
           equals([]),
         );
         expect(
-          await toListAsync(takeRightAsync(1, toAsync([1, 2, 3, 4]))),
+          await fxToListAsync(fxTakeRightAsync(1, fxToAsync([1, 2, 3, 4]))),
           equals([4]),
         );
         expect(
-          await toListAsync(takeRightAsync(2, toAsync([1, 2, 3, 4]))),
+          await fxToListAsync(fxTakeRightAsync(2, fxToAsync([1, 2, 3, 4]))),
           equals([3, 4]),
         );
         expect(
-          await toListAsync(takeRightAsync(3, toAsync([1, 2, 3, 4]))),
+          await fxToListAsync(fxTakeRightAsync(3, fxToAsync([1, 2, 3, 4]))),
           equals([2, 3, 4]),
         );
         expect(
-          await toListAsync(takeRightAsync(4, toAsync([1, 2, 3, 4]))),
+          await fxToListAsync(fxTakeRightAsync(4, fxToAsync([1, 2, 3, 4]))),
           equals([1, 2, 3, 4]),
         );
         expect(
-          await toListAsync(takeRightAsync(5, toAsync([1, 2, 3, 4]))),
+          await fxToListAsync(fxTakeRightAsync(5, fxToAsync([1, 2, 3, 4]))),
           equals([1, 2, 3, 4]),
         );
       });
 
       test('should be able to be used in the pipeline', () async {
         final res1 = await fxAsync(
-          toAsync([1, 2, 3, 4, 5, 6]),
+          fxToAsync([1, 2, 3, 4, 5, 6]),
         ).map((a) => a + 10).filter((a) => a % 2 == 0).takeRight(2).toList();
 
         expect(res1, equals([14, 16]));
@@ -103,8 +103,8 @@ void main() {
 
       test('should be able to take the element concurrently', () async {
         final sw = Stopwatch()..start();
-        final res = await fxAsync(toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
-            .map((a) => delay(const Duration(milliseconds: 100), a))
+        final res = await fxAsync(fxToAsync([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+            .map((a) => fxDelay(const Duration(milliseconds: 100), a))
             .filter((a) => a % 2 == 0)
             .takeRight(3)
             .concurrent(3)

@@ -2,7 +2,7 @@
 slug: omit
 title: omit — FxDart 101
 description: Tutorial de omit en FxDart: devuelve una copia de un Map sin las claves indicadas, dejando el original intacto.
-heading: <code>omit</code>
+heading: <code>fxOmit</code>
 section: 9
 crumb: omit
 prev: fromEntries.html
@@ -16,7 +16,7 @@ nextLabel: pick
 
   <h2>Lección</h2>
   <p>
-    <code>omit</code> construye un <code>Map</code> completamente nuevo con todas
+    <code>fxOmit</code> construye un <code>Map</code> completamente nuevo con todas
     las entradas del original <em>excepto</em> las claves que enumeres — el mapa
     de origen nunca se muta. Las claves de <code>keysToOmit</code> que no existen
     realmente en el mapa se ignoran sin más; no da error por indicar claves
@@ -36,13 +36,13 @@ nextLabel: pick
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>omit</code> para descartar la clave <code>'debug'</code> de <code>config</code>.</p>
+  <p>Ejercicio: usa <code>fxOmit</code> para descartar la clave <code>'debug'</code> de <code>config</code>.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="pick.html"><code>pick</code></a> — el inverso: conservar solo algunas claves ·
-    <a href="omitBy.html"><code>omitBy</code></a> — descartar por predicado en vez de por lista de claves ·
-    <a href="compactObject.html"><code>compactObject</code></a> — descartar las claves con valor null ·
-    <a href="fromEntries.html"><code>fromEntries</code></a> — construir un Map desde cero
+    <a href="pick.html"><code>fxPick</code></a> — el inverso: conservar solo algunas claves ·
+    <a href="omitBy.html"><code>fxOmitBy</code></a> — descartar por predicado en vez de por lista de claves ·
+    <a href="compactObject.html"><code>fxCompactObject</code></a> — descartar las claves con valor null ·
+    <a href="fromEntries.html"><code>fxFromEntries</code></a> — construir un Map desde cero
   </div>

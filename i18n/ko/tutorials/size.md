@@ -20,7 +20,7 @@ nextLabel: join
     지름길은 없습니다. 상류 파이프라인이 지연 계산되는
     <code>map</code>/<code>filter</code> 체인이라면 실제로 값을 끌어당기기
     전까지는 길이가 정해져 있지 않기 때문입니다. 즉 100만 개짜리
-    <code>range</code>에 <code>filter</code>를 걸고 <code>count</code>를
+    <code>fxRange</code>에 <code>filter</code>를 걸고 <code>count</code>를
     호출하면 정말로 100만 개를 모두 순회합니다. 다만 그 과정에서
     <code>List</code>를 만들지는 않습니다. <code>count</code>가 Dart다운
     이름이고, fxdart는 FxTS식 표기인 <code>size</code>도 함께 받습니다 —
@@ -39,7 +39,7 @@ nextLabel: join
     <code>Iterable.length</code> 게터입니다(괄호 없음).
     <code>Fx</code>가 <code>Iterable</code>이므로
     <code>fx(pipeline).length</code>가 체인을 훑으며 총 개수를 돌려줍니다.
-    이름 붙은 연산자로 쓰는 편이 좋다면 최상위 <code>count(iterable)</code>를,
+    이름 붙은 연산자로 쓰는 편이 좋다면 최상위 <code>fxCount(iterable)</code>를,
     <code>.count()</code>는 <em>비동기</em> 체인에서 쓰세요. 이미 구체적인
     <code>List</code>를 들고 있다면 <code>.length</code>가 공짜입니다 —
     <code>count</code>는 지연 체인의 결과를 <code>List</code>로 —

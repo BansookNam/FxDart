@@ -22,7 +22,7 @@ nextLabel: bounded concurrent fetch
     un «da» lento puede pisar un «dart» rápido. Eso es un
     trabajo <em>push</em>:
     <code><a href="fxEvents.html">fxEvents</a></code> +
-    <code><a href="debounce.html">debounce</a></code> +
+    <code><a href="debounce.html">fxDebounce</a></code> +
     <code><a href="switchMap.html">switchMap</a></code>.
   </p>
   <p>
@@ -67,7 +67,7 @@ nextLabel: bounded concurrent fetch
     <strong>Relacionado:</strong>
     <a href="whichSurface.html">which surface</a> — por qué esto es push ·
     <a href="fxEvents.html"><code>fxEvents</code></a> ·
-    <a href="debounce.html"><code>debounce</code></a> ·
+    <a href="debounce.html"><code>fxDebounce</code></a> ·
     <a href="switchMap.html"><code>switchMap</code></a> ·
     <a href="mapEither.html"><code>mapEither</code></a> ·
     <a href="job-fetch.html">fetch concurrente acotado</a> — el trabajo de I/O ·

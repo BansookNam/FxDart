@@ -8,19 +8,19 @@ void main() {
     group('sync', () {
       test('should be called the provided callback', () {
         var sum = 0;
-        final res = peek((int a) => sum = sum + a, [1, 2, 3, 4]);
+        final res = fxPeek((int a) => sum = sum + a, [1, 2, 3, 4]);
         for (final _ in res) {}
         expect(sum, equals(10));
       });
 
       test('should be able to be used in the pipeline', () {
         var sum = 0;
-        final res = toList(
-          map(
+        final res = fxToList(
+          fxMap(
             (int a) => a + 10,
-            peek(
+            fxPeek(
               (int a) => sum = sum + a,
-              map((int a) => a + 10, [1, 2, 3, 4]),
+              fxMap((int a) => a + 10, [1, 2, 3, 4]),
             ),
           ),
         );
@@ -62,9 +62,9 @@ void main() {
     group('async', () {
       test('should be called the provided callback', () async {
         var sum = 0;
-        await eachAsync(
+        await fxEachAsync(
           (int _) {},
-          peekAsync((int a) => sum = sum + a, toAsync([1, 2, 3, 4])),
+          fxPeekAsync((int a) => sum = sum + a, fxToAsync([1, 2, 3, 4])),
         );
         expect(sum, equals(10));
       });
@@ -103,7 +103,7 @@ void main() {
         'should be passed concurrent object when job works concurrently',
         () async {
           final mock = ConcurrentMock<int>();
-          final it = peekAsync((int a) => a, mock).iterator;
+          final it = fxPeekAsync((int a) => a, mock).iterator;
           await it.next(Concurrent.of(2));
           expect(mock.received?.length, equals(2));
         },

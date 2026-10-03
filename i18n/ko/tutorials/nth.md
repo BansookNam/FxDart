@@ -22,7 +22,7 @@ nextLabel: find
     <code>List</code>로 구체화하는 것보다 훨씬 저렴합니다.
     <code>elementAtOrNull</code>은 Dart다운 이름이고
     (<code>Iterable.elementAtOrNull</code>과 짝을 이룹니다), fxdart는 FxTS식
-    표기인 <code>nth</code>도 함께 받아들입니다 — 둘은 같은 연산자입니다.
+    표기인 <code>fxNth</code>도 함께 받아들입니다 — 둘은 같은 연산자입니다.
     음수 인덱스나 끝을 넘어선 인덱스는 그냥 <code>null</code>을 내놓습니다.
     일부 언어의 배열 인덱싱과 달리 여기에는
     끝에서부터 되감는 동작이 없습니다 — 인덱스는 유효한 음이 아닌 위치여야 합니다.

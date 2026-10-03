@@ -37,7 +37,7 @@ nextLabel: flat
     value per input, or an empty list to emit none.
   </p>
   <p>
-    On the async side, <code>expandAsync</code>'s internal state machine
+    On the async side, <code>fxExpandAsync</code>'s internal state machine
     has to track "which sub-iterable am I currently draining" between pulls,
     so it consumes its upstream <em>serially</em> — wrapping it in
     <code>.concurrent(n)</code> only speeds up pulling already-available

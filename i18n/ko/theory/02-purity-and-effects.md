@@ -59,7 +59,7 @@ void main() {
 | **병렬화** | 두 호출을 동시에 돌린다는 것은 서로를 볼 수 없다고 가정하는 것 |
 | **테스트** | 반환값만 검사한다는 것은 그 값이 이야기의 전부라고 가정하는 것 |
 
-FxDart의 `memoize`가 가장 날카로운 예입니다. 순수한 함수에 대해서는 *옳고*,
+FxDart의 `fxMemoize`가 가장 날카로운 예입니다. 순수한 함수에 대해서는 *옳고*,
 순수하지 않은 함수에 대해서는 조용한 버그입니다.
 
 ```dart run
@@ -72,13 +72,13 @@ int slowSquare(int n) {
 }
 
 void main() {
-  final fast = memoize(slowSquare);
+  final fast = fxMemoize(slowSquare);
   print([fast(9), fast(9), fast(9)]);
   print('underlying calls: $calls');
 }
 ```
 
-세 번 호출, 한 번 계산. `memoize` 안에는 `slowSquare`가 순수한지 확인하는
+세 번 호출, 한 번 계산. `fxMemoize` 안에는 `slowSquare`가 순수한지 확인하는
 코드가 없습니다 — 그냥 *가정*합니다. 함수형 도구 대부분이 이런 모양입니다.
 라이브러리는 장치를 주고, 법칙은 허가증을 주며, 약속을 지키는 것은 여러분
 몫입니다.
@@ -106,8 +106,8 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   // A seed makes randomness reproducible: same input, same
   // output, so a shuffle becomes testable.
-  final a = shuffle([1, 2, 3, 4, 5], 7);
-  final b = shuffle([1, 2, 3, 4, 5], 7);
+  final a = fxShuffle([1, 2, 3, 4, 5], 7);
+  final b = fxShuffle([1, 2, 3, 4, 5], 7);
   print(a);
   print('reproducible: ${a.toString() == b.toString()}');
 }
@@ -168,7 +168,7 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   final seen = <int>[];
-  final result = fx(range(1, 6))
+  final result = fx(fxRange(1, 6))
       // the effect is named, and it is the only one
       .peek(seen.add)
       .filter((n) => n.isEven)
@@ -196,7 +196,7 @@ void main() {
 2. Dart가 보기엔 순수하지만, 생성 이후 절대 바뀌지 않는 가변 필드에 의존하는
    함수를 써 보세요. 참조 투명한가요? 누군가 그 필드에서 `final`을 떼는 순간
    무엇이 깨지나요?
-3. `int Function(int)` 타입 함수에 대한 `memoize`는 안전합니다. 인자 타입이
+3. `int Function(int)` 타입 함수에 대한 `fxMemoize`는 안전합니다. 인자 타입이
    가변 `List<int>`라면 무엇이 잘못되나요?
 4. 위의 `receipts` 파이프라인에 요구사항을 하나 더합니다: 걸러진 주문을 모두
    기록할 것. `receipts`를 순수하지 않게 만들지 말고 해 보세요.
@@ -209,14 +209,14 @@ void main() {
    "순수함"은 언제나 어떤 관찰을 기준으로 말해야 합니다 — 1장의 `Future` 상등
    연습문제와 같은 미묘함입니다.
 2. 예를 들어 `class Rate { const Rate(this.pct); final int pct;
-   int apply(int n) => n * pct ~/ 100; }`. `pct`가 바뀔 수 없으므로 참조
+   int fxApply(int n) => n * pct ~/ 100; }`. `pct`가 바뀔 수 없으므로 참조
    투명합니다. 인스턴스는 인자의 일부이고, 다만 인자가 아니라 수신자로 적혔을
    뿐입니다. `final`을 떼면 같은 호출이 두 가지 답을 돌려줄 수 있으므로 치환이
    깨집니다.
-3. `memoize`는 인자를 키로 삼는데, 가변 리스트의 내용은 키로 쓰인 뒤에도 바뀔
+3. `fxMemoize`는 인자를 키로 삼는데, 가변 리스트의 내용은 키로 쓰인 뒤에도 바뀔
    수 있습니다 — 호출자가 리스트를 바꾸고 다시 호출하면 *예전* 내용에 대한 답을
    받습니다. 캐시가 틀린 게 아니라 가정이 틀린 것입니다.
-4. 걸러진 주문을 기록하는 대신 *돌려주세요* — `fork`나 `partition` 형태의 분리를
+4. 걸러진 주문을 기록하는 대신 *돌려주세요* — `fxFork`나 `partition` 형태의 분리를
    쓰면 함수가 보고하는 내용이 완전해지고, 무엇을 출력할지는 호출자(껍질)가
    정합니다. 관찰만 하면 된다면 걸러진 가지에 `.peek(rejected.add)`를 쓰세요.
    여전히 이름 붙은 이음매의 선언된 효과이고, 핵심 안에는 IO가 없습니다.

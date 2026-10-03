@@ -8,11 +8,11 @@ void main() {
   ];
 
   // Data-first form: map + sum in one step.
-  print(sumBy((({String name, double price}) i) => i.price, cart)); // 13.7
+  print(fxSumBy((({String name, double price}) i) => i.price, cart)); // 13.7
 
   // Chain form — no .map((i) => i.price) stage needed:
   print(fx(cart).sumBy((i) => i.price)); // 13.7
 
   // Empty input sums to 0, exactly like sum:
-  print(sumBy((int n) => n, <int>[])); // 0
+  print(fxSumBy((int n) => n, <int>[])); // 0
 }

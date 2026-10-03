@@ -19,9 +19,9 @@ Future<void> main() async {
           final active = fx(cohort).filter((u) => u.active.contains(m)).size();
           return '$m ${(100 * active / cohort.length).round()}%';
         });
-        return '${e.key} (${cohort.length} users): ${join(' | ', cells)}';
+        return '${e.key} (${cohort.length} users): ${fxJoin(' | ', cells)}';
       });
-      return join('\n', ['Cohort retention by signup month', ...rows]);
+      return fxJoin('\n', ['Cohort retention by signup month', ...rows]);
     },
   );
 }

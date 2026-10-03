@@ -100,7 +100,7 @@ Either<RangeError2, int> inStock(int n) =>
 
 void main() {
   // mapLeft lifts both into the pipeline's own error type.
-  Either<OrderError, int> order(String raw) => either((r) {
+  Either<OrderError, int> order(String raw) => fxEither((r) {
         final n = r.bind(
             parse(raw).mapLeft((e) => BadInput('$e')));
         final ok = r.bind(
@@ -180,7 +180,7 @@ void main() {
   print(fx(rows).map(parseRow).sequence());
 
   // Everything that failed, and everything that did not.
-  final (errors, values) = separateEither(rows.map(parseRow));
+  final (errors, values) = fxSeparateEither(rows.map(parseRow));
   print('imported ${values.length}, rejected: $errors');
 
   // Keep going, but report every reason at the end.
@@ -219,7 +219,7 @@ void main() {
 3. 한 모듈에서 `Either<A, T>`가, 다른 모듈에서 `Either<B, T>`가 오고, 호출자는
    `Either<C, T>`를 원합니다. `mapLeft` 세 번을 스케치하고, 계층형 애플리케이션에서
    그것이 어디에 놓여야 하는지 말하세요.
-4. `separateEither`는 `(errors, values)`를 돌려줍니다. 왜 그 순서이고, 그 선택이
+4. `fxSeparateEither`는 `(errors, values)`를 돌려줍니다. 왜 그 순서이고, 그 선택이
    코드를 훑어볼 때 어떤 결과를 낳나요?
 
 ## 정답과 해설

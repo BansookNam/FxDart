@@ -1,6 +1,6 @@
 /// Budget pipelines (Round 1 feature).
 /// Spending per category is a `groupBy` → `fold`; budget suggestions run the
-/// averages map through `evolve`.
+/// averages map through `fxEvolve`.
 library;
 
 import 'package:fxdart/fxdart.dart';
@@ -24,14 +24,14 @@ bool _isSpending(Entry e) =>
 
 /// Total spent per category in [month].
 /// Pipeline: `filter` → `groupBy` (category) → `sumBy` each group →
-/// `fromEntries` reassembles the map.
+/// `fxFromEntries` reassembles the map.
 Map<String, double> spentByCategory(List<Entry> entries, DateTime month) {
   final groups = fx(entries)
       .filter((e) => _isSpending(e) && sameMonth(e.date, month))
       .groupBy((e) => e.categoryId);
-  return fromEntries(
+  return fxFromEntries(
     fx(groups.entries).map(
-      (kv) => (kv.key, sumBy((Entry e) => e.amount ?? 0, kv.value).toDouble()),
+      (kv) => (kv.key, fxSumBy((Entry e) => e.amount ?? 0, kv.value).toDouble()),
     ),
   );
 }
@@ -51,20 +51,20 @@ List<BudgetStatus> budgetStatuses(
 }
 
 /// Suggests budgets from the average spend of the [months] months before
-/// [month]: the per-category average map is run through `evolve`, which
+/// [month]: the per-category average map is run through `fxEvolve`, which
 /// transforms every value to "average + 10% headroom, rounded up to \$10".
 Map<String, double> suggestedBudgets(
   List<Entry> entries,
   DateTime month, {
   int months = 3,
 }) {
-  final perMonthSpend = fx(range(1, months + 1))
+  final perMonthSpend = fx(fxRange(1, months + 1))
       .map(
         (back) =>
             spentByCategory(entries, DateTime(month.year, month.month - back)),
       )
       .toList();
-  final averages = fromEntries<String, Object?>(
+  final averages = fxFromEntries<String, Object?>(
     fx(perMonthSpend)
         .flatMap((m) => m.keys)
         .uniq()
@@ -79,7 +79,7 @@ Map<String, double> suggestedBudgets(
   // 220.00000000000003) cannot bump the suggestion a whole $10 step up.
   double headroom(Object? avg) =>
       ((((avg as double) * 1.1 * 100).round()) / 1000).ceil() * 10.0;
-  return evolve({
+  return fxEvolve({
     for (final k in averages.keys) k: headroom,
   }, averages).cast<String, double>();
 }

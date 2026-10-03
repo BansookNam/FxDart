@@ -38,7 +38,7 @@ async: false
     그것이 이 파트의 반복되는 주제입니다: <em>유한하고 이미 손에
     있는</em> 데이터에 대해, 스트림은 문제가 요구한 적 없는 전달
     메커니즘을 얹습니다. RxDart의 연산자 어휘는 훌륭하지만 —
-    <code>whereNotNull</code>은 정확히 <code>compact</code>입니다 — 그
+    <code>whereNotNull</code>은 정확히 <code>fxCompact</code>입니다 — 그
     아래의 모델은 모든 고정 데이터 과제에 비동기 세금을 물립니다.
     여기서는 답 전체가 숫자 하나이므로, 그 격식 — 리프트, async main,
     await된 fold — 이 두 프로그램의 차이 전부입니다. 이 페이지의 판정을

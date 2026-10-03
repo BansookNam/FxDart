@@ -33,8 +33,8 @@ nextLabel: uniqAdjacent
   </p>
   <p>
     El precio es que nada aguas abajo puede interrumpir el trabajo.
-    <code>distinct(xs).take(3)</code> deja de tirar de <code>xs</code> en cuanto
-    han aparecido 3 valores distintos; <code>uniqStrict(xs).take(3)</code>
+    <code>fxDistinct(xs).take(3)</code> deja de tirar de <code>xs</code> en cuanto
+    han aparecido 3 valores distintos; <code>fxUniqStrict(xs).take(3)</code>
     deduplica todo <code>xs</code> primero y luego toma 3. Nunca pongas la forma
     estricta delante de un consumidor que corta pronto, y nunca la apuntes a un
     iterable infinito: no terminará.

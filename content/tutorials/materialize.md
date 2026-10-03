@@ -64,7 +64,7 @@ nextLabel: debounced search
     mismatch, and an error from either side fails the future. The same
     question exists on pull: <code>sequenceEqual</code> /
     <code>Fx.sequenceEqual</code> for iterables,
-    <code>sequenceEqualAsync</code> /
+    <code>fxSequenceEqualAsync</code> /
     <code>FxAsync.sequenceEqual</code> for
     <code>FxAsyncIterable</code>s. After Rx's
     <code>sequenceEqual</code>.

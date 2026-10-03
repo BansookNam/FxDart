@@ -31,10 +31,10 @@ void main() {
 
   group('length agrees with iteration', () {
     for (final (name, build) in <(String, Iterable<int> Function())>[
-      ('difference', () => difference(a, b)),
-      ('intersection', () => intersection(a, b)),
-      ('differenceBy', () => differenceBy((int v) => v % 10, a, b)),
-      ('intersectionBy', () => intersectionBy((int v) => v % 10, a, b)),
+      ('difference', () => fxDifference(a, b)),
+      ('intersection', () => fxIntersection(a, b)),
+      ('differenceBy', () => fxDifferenceBy((int v) => v % 10, a, b)),
+      ('intersectionBy', () => fxIntersectionBy((int v) => v % 10, a, b)),
     ]) {
       test('$name — length, toList and a pull all agree', () {
         expect(build().length, build().toList().length);
@@ -45,14 +45,14 @@ void main() {
 
     test('the dedup is counted, not just filtered', () {
       // b holds 5 twice and neither is in a, so difference yields [5, 6].
-      expect(difference(a, b).toList(), [5, 6]);
-      expect(difference(a, b).length, 2);
+      expect(fxDifference(a, b).toList(), [5, 6]);
+      expect(fxDifference(a, b).length, 2);
     });
 
     test('elements distinct by identity but equal by key both count', () {
       const before = [Tx(1, 'x')];
       const after = [Tx(1, 'p'), Tx(1, 'q')];
-      final it = intersectionBy((Tx t) => t.id, before, after);
+      final it = fxIntersectionBy((Tx t) => t.id, before, after);
 
       expect(it.length, 2, reason: 'the dedup is by element, not by key');
       expect(it.length, pulled(it));
@@ -62,7 +62,7 @@ void main() {
       const t = Tx(1, 'x');
       const before = [Tx(1, 'k')];
       const after = [t, t];
-      final it = intersectionBy((Tx e) => e.id, before, after);
+      final it = fxIntersectionBy((Tx e) => e.id, before, after);
 
       expect(it.length, 1);
       expect(it.length, pulled(it));
@@ -75,30 +75,30 @@ void main() {
     }
 
     test('a non-List second source is pulled and still agrees', () {
-      expect(difference(a, gen(b)).length, difference(a, b).length);
-      expect(difference(a, gen(b)).toList(), difference(a, b).toList());
-      expect(pulled(difference(a, gen(b))), difference(a, b).length);
+      expect(fxDifference(a, gen(b)).length, fxDifference(a, b).length);
+      expect(fxDifference(a, gen(b)).toList(), fxDifference(a, b).toList());
+      expect(pulled(fxDifference(a, gen(b))), fxDifference(a, b).length);
     });
 
     test('a non-List first source builds the same key set', () {
-      expect(difference(gen(a), b).length, difference(a, b).length);
+      expect(fxDifference(gen(a), b).length, fxDifference(a, b).length);
     });
 
     test('an empty second source counts nothing', () {
-      expect(difference(a, const <int>[]).length, 0);
-      expect(intersection(a, const <int>[]).length, 0);
+      expect(fxDifference(a, const <int>[]).length, 0);
+      expect(fxIntersection(a, const <int>[]).length, 0);
     });
 
     test('an empty first source keeps everything difference sees', () {
       expect(
-        difference(const <int>[], b).length,
-        pulled(difference(const <int>[], b)),
+        fxDifference(const <int>[], b).length,
+        pulled(fxDifference(const <int>[], b)),
       );
-      expect(intersection(const <int>[], b).length, 0);
+      expect(fxIntersection(const <int>[], b).length, 0);
     });
 
     test('counting twice gives the same answer', () {
-      final it = difference(a, b);
+      final it = fxDifference(a, b);
       expect(it.length, it.length);
       expect(it.length, it.toList().length);
     });
@@ -106,8 +106,8 @@ void main() {
 
   group('size() and the pulled path', () {
     test('counts a set operation without materialising it', () {
-      expect(fx(intersection(a, b)).size(), 2);
-      expect(fx(difference(a, b)).size(), 2);
+      expect(fx(fxIntersection(a, b)).size(), 2);
+      expect(fx(fxDifference(a, b)).size(), 2);
     });
 
     test('and still counts a plain lazy chain', () {
@@ -116,9 +116,9 @@ void main() {
     });
 
     test('stays O(1)-shaped for a List or Set', () {
-      expect(size([1, 2, 3]), 3);
-      expect(size({1, 2, 3}), 3);
-      expect(size(const <int>[]), 0);
+      expect(fxSize([1, 2, 3]), 3);
+      expect(fxSize({1, 2, 3}), 3);
+      expect(fxSize(const <int>[]), 0);
     });
   });
 }

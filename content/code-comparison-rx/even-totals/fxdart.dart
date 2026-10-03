@@ -4,7 +4,7 @@ import 'package:fxdart/fxdart.dart';
 const List<int?> amounts = [12, 7, null, 40, 3, 88, null, 15, 62, 9];
 
 void main() {
-  final total = fx(compact(amounts)).filter((a) => a.isEven).sum();
+  final total = fx(fxCompact(amounts)).filter((a) => a.isEven).sum();
 
   print('Even total: $total');
 }

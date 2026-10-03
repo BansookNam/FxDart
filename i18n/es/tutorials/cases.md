@@ -2,7 +2,7 @@
 slug: cases
 title: cases — FxDart 101
 description: Tutorial de cases en FxDart: construye una tabla de despacho de predicado/mapeador con un valor por defecto opcional, con playground en vivo.
-heading: <code>cases</code>
+heading: <code>fxCases</code>
 section: 10
 crumb: cases
 prev: throwIf.html
@@ -16,7 +16,7 @@ nextLabel: add
 
   <h2>Lección</h2>
   <p>
-    <code>cases</code> construye una función de coincidencia a partir de una lista de pares
+    <code>fxCases</code> construye una función de coincidencia a partir de una lista de pares
     <code>(predicado, mapeador)</code>: prueba cada par en orden y, al primero
     cuyo predicado devuelve true, le aplica su mapeador para producir el
     resultado. Es el sustituto funcional de una cadena de
@@ -26,7 +26,7 @@ nextLabel: add
   </p>
   <p>
     <strong>Esta forma difiere de FxTS a propósito.</strong> El
-    <code>cases</code> de FxTS es variádico: cada par
+    <code>fxCases</code> de FxTS es variádico: cada par
     <code>[predicate, mapper]</code> se pasa como su propio argumento final, con
     una función suelta opcional al final que actúa como valor por defecto, y los genéricos
     sobrecargados de TypeScript tipan cada aridad a mano. Dart no tiene ni
@@ -38,7 +38,7 @@ nextLabel: add
     aparte, para que el valor por defecto nunca se confunda con un par más.
   </p>
   <p>
-    Si no coincide nada y no se pasa <code>orElse</code>, <code>cases</code>
+    Si no coincide nada y no se pasa <code>orElse</code>, <code>fxCases</code>
     recurre a devolver el propio <code>value</code>, lo cual solo compila en el
     punto de llamada si <code>T</code> resulta satisfacer también <code>R</code>;
     en caso contrario lanza un <code>StateError</code> en tiempo de ejecución.
@@ -59,8 +59,8 @@ nextLabel: add
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="when.html"><code>when</code></a> / <a href="unless.html"><code>unless</code></a> — un solo predicado, mismo tipo de resultado ·
-    <a href="throwError.html"><code>throwError</code></a> — un orElse habitual cuando no encontrar coincidencia debe ser fatal ·
-    <a href="always.html"><code>always</code></a> — un orElse constante ·
-    <a href="matches.html"><code>matches</code></a> — un predicado que puedes conectar a un caso
+    <a href="when.html"><code>fxWhen</code></a> / <a href="unless.html"><code>fxUnless</code></a> — un solo predicado, mismo tipo de resultado ·
+    <a href="throwError.html"><code>fxThrowError</code></a> — un orElse habitual cuando no encontrar coincidencia debe ser fatal ·
+    <a href="always.html"><code>fxAlways</code></a> — un orElse constante ·
+    <a href="matches.html"><code>fxMatches</code></a> — un predicado que puedes conectar a un caso
   </div>

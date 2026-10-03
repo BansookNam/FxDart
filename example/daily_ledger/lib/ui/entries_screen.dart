@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
-import 'package:fxdart/fxdart.dart' show Debounced, debounce, fx;
+import 'package:fxdart/fxdart.dart' show Debounced, fxDebounce, fx;
 
 import '../logic/export.dart';
 
@@ -27,7 +27,7 @@ class _EntriesScreenState extends State<EntriesScreen> {
   final _searchController = TextEditingController();
 
   /// fxdart's `debounce`: keystrokes only reach setState after 250ms of quiet.
-  late final Debounced<String> _debouncedSearch = debounce(
+  late final Debounced<String> _debouncedSearch = fxDebounce(
     (q) => setState(() => _query = q),
     const Duration(milliseconds: 250),
   );

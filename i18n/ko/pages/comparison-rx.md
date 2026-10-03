@@ -77,7 +77,7 @@ description: 실전 과제 50개를 두 번씩 풉니다 — RxDart 스트림 vs
     오버로드가 있고, fxdart는 같은 파일에서 rxdart와 충돌하지 않으면서
     평범한 Dart 스트림 위의 <em>일</em>을 다룹니다 — 윈도,
     라이브 <code>groupsBy</code>, <code>shareReplay</code>,
-    셀렉터 구동 debounce, <code>combine</code>, 네 가지
+    셀렉터 구동 debounce, <code>fxCombine</code>, 네 가지
     <code>fromStream*</code> pull 정책. 이 쌍들이 드러내는 것은 이야기의
     나머지 절반 — 스트림으로 풀리는 문제가 사실은 스트림 옷을 입은
     <em>데이터 파이프라인</em>인 경우가 얼마나 많은가 — 입니다: 유한한

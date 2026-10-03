@@ -5,7 +5,7 @@ import 'package:test/test.dart' hide isEmpty, isNull, isNotNull, isList, isMap;
 void main() {
   group('when', () {
     group('with a general predicate', () {
-      Object testFn(Object value) => when<Object>((v) => v == 100, (v) {
+      Object testFn(Object value) => fxWhen<Object>((v) => v == 100, (v) {
         expect(v, equals(100));
         return 'value is 100';
       }, value);
@@ -13,7 +13,8 @@ void main() {
       Object withPipe(Object value) =>
           pipe(value, [
                 testFn,
-                (Object v) => when<Object>(isString, (_) => 'Hello fxts', v),
+                (Object v) =>
+                    fxWhen<Object>(fxIsString, (_) => 'Hello fxts', v),
               ])
               as Object;
 
@@ -47,7 +48,7 @@ void main() {
       test(
         'should return the result of the callback when the predicate is true',
         () {
-          final result = when<Object>(
+          final result = fxWhen<Object>(
             isCircle,
             (shape) => 'A circle with radius ${(shape as Map)['radius']}',
             circle,
@@ -57,7 +58,7 @@ void main() {
       );
 
       test('should return the original value when the predicate is false', () {
-        final result = when<Object>(
+        final result = fxWhen<Object>(
           isCircle,
           (shape) => 'A circle with radius ${(shape as Map)['radius']}',
           square,
@@ -66,7 +67,7 @@ void main() {
       });
 
       test('should work correctly with pipe', () {
-        Object shapeHandler(Object shape) => when<Object>(
+        Object shapeHandler(Object shape) => fxWhen<Object>(
           isCircle,
           (s) => 'A circle with radius ${(s as Map)['radius']}',
           shape,

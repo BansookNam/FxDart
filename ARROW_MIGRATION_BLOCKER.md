@@ -11,8 +11,8 @@ says why, and what the future plan is.
 **Why it blocks:** Arrow's `either { }` is `inline`, so one builder serves both
 plain and `suspend` blocks. Dart cannot inline a callback, and a sync function
 cannot await, so one builder cannot serve both worlds.
-**What we did:** `either`/`eitherAsync`, `foldRaise`/`foldRaiseAsync`,
-`nullable`/`nullableAsync`, `catching`/`catchingAsync` — consistent with the
+**What we did:** `fxEither`/`fxEitherAsync`, `fxFoldRaise`/`fxFoldRaiseAsync`,
+`fxNullable`/`fxNullableAsync`, `fxCatching`/`fxCatchingAsync` — consistent with the
 `op`/`opAsync` split fxdart already uses everywhere.
 **Future plan:** none needed; this is permanent Dart reality. If Dart ever
 gets macros able to abstract over asynchrony, revisit.
@@ -31,7 +31,7 @@ and the whole vocabulary hangs off `r.` for discoverability — the same tax
 mitigates by subclassing `CancellationException`, which idiomatic Kotlin never
 catches; Dart's `catch (e)` is untyped and catches everything.
 **What we did:** the signal implements `Error` (so `on Exception` never sees
-it), carries a diagnostic `toString()`, `catching`/`catchingAsync` rethrow it
+it), carries a diagnostic `toString()`, `fxCatching`/`fxCatchingAsync` rethrow it
 before invoking handlers, and the pinned tests + docs teach the rule.
 **Future plan:** a custom lint (separate `fxdart_lints` package, so the core
 stays zero-dependency) that flags bare `catch` inside raise blocks.

@@ -6,7 +6,7 @@ void main() {
 
   // TODO: use intersection to find which of the candidate's skills are
   // actually required.
-  final matched = toList(candidateSkills);
+  final matched = fxToList(candidateSkills);
 
   print(matched);
 }

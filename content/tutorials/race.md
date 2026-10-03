@@ -33,7 +33,7 @@ nextLabel: waitAll
     endpoint beats a slow healthy one, which is exactly the honest
     behavior — you asked who answers first, and "it failed" is an answer.
     Guard slow-and-flaky fields with
-    <code><a href="timeout.html">timeout</a></code>/<code><a href="retry.html">retry</a></code>
+    <code><a href="timeout.html">timeout</a></code>/<code><a href="retry.html">fxRetry</a></code>
     on each candidate before racing them.
   </p>
   <p>

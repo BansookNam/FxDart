@@ -9,10 +9,10 @@ Future<void> main() async {
   final userIds = [1, 2, 3];
   final fetched = fx(userIds)
       .toAsync()
-      .map((id) => delay(Duration(milliseconds: 150), {'id': id, 'name': 'user$id'}))
+      .map((id) => fxDelay(Duration(milliseconds: 150), {'id': id, 'name': 'user$id'}))
       .concurrent(3);
 
-  final ids = await fxAsync(pluckAsync('id', fetched)).toList();
+  final ids = await fxAsync(fxPluckAsync('id', fetched)).toList();
 
   print(ids); // [1, 2, 3]
   print('took ${sw.elapsedMilliseconds}ms'); // ~150ms, not ~450ms

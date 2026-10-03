@@ -10,5 +10,5 @@ void main() {
 
   // Deprecated alias kept for FxTS parity:
   // ignore: deprecated_member_use
-  print(takeUntil((a) => a == 3, [1, 2, 3, 4])); // (1, 2, 3)
+  print(fxTakeUntil((a) => a == 3, [1, 2, 3, 4])); // (1, 2, 3)
 }

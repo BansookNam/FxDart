@@ -34,7 +34,7 @@ description: 이 책이 정의하는 모든 용어와 그 별칭, Dart에서의 
 | **join** | `flatten`, μ | `flat()`, `expand(id)` | 20 |
 | **map2** | `zipWith`, `liftA2` | `map2`, `zipOrAccumulate2` | 6 |
 | **traverse** | 순회 | `mapOrAccumulate`, `.map(f).sequence()` | 9 |
-| **sequence** | — | `sequenceEither`, `Future.wait` | 9 |
+| **sequence** | — | `fxSequenceEither`, `Future.wait` | 9 |
 | **fold** | 카타모피즘, 씨앗 있는 `reduce` | `fold`, `Either.fold` | 8 |
 
 ## 평가
@@ -55,12 +55,12 @@ description: 이 책이 정의하는 모든 용어와 그 별칭, Dart에서의 
 | 용어 | 다른 이름 | Dart / FxDart에서 | 장 |
 |---|---|---|---|
 | **Either** | `Result`, `Validation`, 분리합 | `Either<L, R>`, `Left`, `Right` | 16 |
-| **Raise 스코프** | 컨텍스트 리시버 스코프, 효과 스코프 | `either((r) { … })`, `r.bind`, `r.ensure` | 15 |
-| **제한된 연속** | `shift`/`reset`, 효과 핸들러 | `either` 안의 비국소 탈출 | 15 |
+| **Raise 스코프** | 컨텍스트 리시버 스코프, 효과 스코프 | `fxEither((r) { … })`, `r.bind`, `r.ensure` | 15 |
+| **제한된 연속** | `shift`/`reset`, 효과 핸들러 | `fxEither` 안의 비국소 탈출 | 15 |
 | **단락 평가** | 빨리 실패 | 첫 `Left`가 사슬을 끝냄 | 16 |
 | **누적** | 천천히 실패, 어플리커티브 검증 | `accumulate`, `zipOrAccumulate`, `mapOrAccumulate` | 17 |
 | **NonEmptyList** | `Nel` | `NonEmptyList<E>` — `List` 위의 확장 타입 | 8 |
-| **모나드 트랜스포머** | `EitherT`, `OptionT` | *쓰지 않음* — 대신 `eitherAsync` | 7 |
+| **모나드 트랜스포머** | `EitherT`, `OptionT` | *쓰지 않음* — 대신 `fxEitherAsync` | 7 |
 
 ## 기초
 

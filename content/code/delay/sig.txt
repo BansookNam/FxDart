@@ -1,2 +1,2 @@
-Future&lt;T&gt; delay&lt;T&gt;(Duration wait, T value)
-Future&lt;void&gt; sleep(Duration wait)
+Future&lt;T&gt; fxDelay&lt;T&gt;(Duration wait, T value)
+Future&lt;void&gt; fxSleep(Duration wait)

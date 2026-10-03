@@ -11,12 +11,12 @@ import '../async_iterable.dart';
 /// for the iterator, so it bypasses every operator `toList` override — the
 /// SDK hand-offs on `map`/`filter` over a `List` source, and the fused
 /// single-loop materialisations on `uniq`/`uniqBy`/`map`+`uniq`.
-List<A> toList<A>(Iterable<A> iterable) => iterable.toList();
+List<A> fxToList<A>(Iterable<A> iterable) => iterable.toList();
 
 /// Materializes an [FxAsyncIterable] into a [List].
 ///
-/// Port of FxTS `toArray` (async); named `toListAsync` for Dart idiom.
-Future<List<A>> toListAsync<A>(FxAsyncIterable<A> iterable) async {
+/// Port of FxTS `toArray` (async); named `fxToListAsync` for Dart idiom.
+Future<List<A>> fxToListAsync<A>(FxAsyncIterable<A> iterable) async {
   final result = <A>[];
   // Push execution where it applies — a stream source, a concurrency pool,
   // or a fused stage run — instead of pulling element by element. All three
@@ -63,7 +63,7 @@ Future<List<A>> toListAsync<A>(FxAsyncIterable<A> iterable) async {
 // pragma is what lets AOT inline the caller's callback, and only then is the
 // iterator worth removing.
 @pragma('vm:prefer-inline')
-void each<A>(void Function(A a) f, Iterable<A> iterable) {
+void fxEach<A>(void Function(A a) f, Iterable<A> iterable) {
   if (iterable is List<A>) {
     final length = iterable.length;
     for (var i = 0; i < length; i++) {
@@ -76,8 +76,8 @@ void each<A>(void Function(A a) f, Iterable<A> iterable) {
   }
 }
 
-/// Async counterpart of [each]; awaits [f] per element.
-Future<void> eachAsync<A>(
+/// Async counterpart of [fxEach]; awaits [f] per element.
+Future<void> fxEachAsync<A>(
   FutureOr<void> Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) async {
@@ -120,14 +120,14 @@ Future<void> eachAsync<A>(
 /// discarding the values — useful to force side effects of a lazy pipeline.
 ///
 /// Port of FxTS `consume`.
-void consume<A>(Iterable<A> iterable, [int? n]) {
+void fxConsume<A>(Iterable<A> iterable, [int? n]) {
   final iterator = iterable.iterator;
   var remaining = n;
   while ((remaining == null || remaining-- > 0) && iterator.moveNext()) {}
 }
 
-/// Async counterpart of [consume].
-Future<void> consumeAsync<A>(FxAsyncIterable<A> iterable, [int? n]) async {
+/// Async counterpart of [fxConsume].
+Future<void> fxConsumeAsync<A>(FxAsyncIterable<A> iterable, [int? n]) async {
   final iterator = iterable.iterator;
   var remaining = n;
   try {
@@ -146,9 +146,9 @@ Future<void> consumeAsync<A>(FxAsyncIterable<A> iterable, [int? n]) async {
 /// Folds [iterable] through [f] using its first element as the seed.
 /// Throws a [StateError] on an empty iterable.
 ///
-/// Port of FxTS `reduce(f, iterable)`. For the seeded form use [fold].
+/// Port of FxTS `fxReduce(f, iterable)`. For the seeded form use [fxFold].
 @pragma('vm:prefer-inline')
-A reduce<A>(A Function(A acc, A a) f, Iterable<A> iterable) {
+A fxReduce<A>(A Function(A acc, A a) f, Iterable<A> iterable) {
   if (iterable is List<A>) {
     final length = iterable.length;
     if (length == 0) {
@@ -176,7 +176,11 @@ A reduce<A>(A Function(A acc, A a) f, Iterable<A> iterable) {
 /// Port of FxTS `reduce(f, seed, iterable)` (named after Dart's
 /// `Iterable.fold` since Dart cannot overload by arity).
 @pragma('vm:prefer-inline')
-Acc fold<A, Acc>(Acc seed, Acc Function(Acc acc, A a) f, Iterable<A> iterable) {
+Acc fxFold<A, Acc>(
+  Acc seed,
+  Acc Function(Acc acc, A a) f,
+  Iterable<A> iterable,
+) {
   var acc = seed;
   if (iterable is List<A>) {
     final length = iterable.length;
@@ -191,7 +195,7 @@ Acc fold<A, Acc>(Acc seed, Acc Function(Acc acc, A a) f, Iterable<A> iterable) {
   return acc;
 }
 
-/// Like [fold], but the callback also receives the element's 0-based
+/// Like [fxFold], but the callback also receives the element's 0-based
 /// position.
 ///
 /// ```dart
@@ -219,17 +223,17 @@ Acc foldWithIndex<A, Acc>(
 }
 
 /// Folds [iterable] **from the last element to the first**, starting from
-/// [seed] — the right-associative counterpart of [fold].
+/// [seed] — the right-associative counterpart of [fxFold].
 ///
 /// Use it when the combining step is not associative and has to nest from
-/// the right: `foldRight(0, (acc, a) => a - acc, [1, 2, 3])` is
-/// `1 - (2 - (3 - 0))`, where [fold] would give `((0 - 1) - 2) - 3`.
+/// the right: `fxFoldRight(0, (acc, a) => a - acc, [1, 2, 3])` is
+/// `1 - (2 - (3 - 0))`, where [fxFold] would give `((0 - 1) - 2) - 3`.
 ///
-/// The reducer keeps [fold]'s `(acc, element)` argument order rather than
+/// The reducer keeps [fxFold]'s `(acc, element)` argument order rather than
 /// Haskell's `foldr` flip, so the same callback works with either
 /// direction. A non-[List] source is materialized first — walking backwards
 /// requires knowing where the end is.
-Acc foldRight<A, Acc>(
+Acc fxFoldRight<A, Acc>(
   Acc seed,
   Acc Function(Acc acc, A a) f,
   Iterable<A> iterable,
@@ -244,7 +248,7 @@ Acc foldRight<A, Acc>(
   return acc;
 }
 
-/// Like [foldRight], but the callback also receives the element's position.
+/// Like [fxFoldRight], but the callback also receives the element's position.
 ///
 /// The index is the element's 0-based position in the **source**, so the
 /// last element arrives first carrying the highest index. That is the
@@ -265,18 +269,18 @@ Acc foldRightWithIndex<A, Acc>(
   return acc;
 }
 
-/// Async counterpart of [foldRight].
+/// Async counterpart of [fxFoldRight].
 ///
 /// There is no way to start from the end of a stream without reaching it,
-/// so this drains [iterable] into a list first — unlike [foldAsync], it
+/// so this drains [iterable] into a list first — unlike [fxFoldAsync], it
 /// holds every element in memory and cannot short-circuit.
-Future<Acc> foldRightAsync<A, Acc>(
+Future<Acc> fxFoldRightAsync<A, Acc>(
   FutureOr<Acc> seed,
   FutureOr<Acc> Function(Acc acc, A a) f,
   FxAsyncIterable<A> iterable,
 ) async {
   var acc = seed is Future<Acc> ? await seed : seed;
-  final list = await toListAsync(iterable);
+  final list = await fxToListAsync(iterable);
   for (var i = list.length - 1; i >= 0; i--) {
     // Sync accumulators continue without an await hop, as in [foldAsync].
     final v = f(acc, list[i]);
@@ -292,7 +296,7 @@ Future<Acc> foldRightWithIndexAsync<A, Acc>(
   FxAsyncIterable<A> iterable,
 ) async {
   var acc = seed is Future<Acc> ? await seed : seed;
-  final list = await toListAsync(iterable);
+  final list = await fxToListAsync(iterable);
   for (var i = list.length - 1; i >= 0; i--) {
     final v = f(acc, list[i], i);
     acc = v is Future<Acc> ? await v : v;
@@ -300,8 +304,8 @@ Future<Acc> foldRightWithIndexAsync<A, Acc>(
   return acc;
 }
 
-/// Async counterpart of [reduce].
-Future<A> reduceAsync<A>(
+/// Async counterpart of [fxReduce].
+Future<A> fxReduceAsync<A>(
   FutureOr<A> Function(A acc, A a) f,
   FxAsyncIterable<A> iterable,
 ) async {
@@ -337,8 +341,8 @@ Future<A> reduceAsync<A>(
   }
 }
 
-/// Async counterpart of [fold].
-Future<Acc> foldAsync<A, Acc>(
+/// Async counterpart of [fxFold].
+Future<Acc> fxFoldAsync<A, Acc>(
   FutureOr<Acc> seed,
   FutureOr<Acc> Function(Acc acc, A a) f,
   FxAsyncIterable<A> iterable,
@@ -393,7 +397,7 @@ Future<Acc> foldAsync<A, Acc>(
 /// Async counterpart of [foldWithIndex].
 ///
 /// A fold is a terminal that consumes its source strictly in order, so the
-/// counter lives in the accumulator and every one of [foldAsync]'s fast
+/// counter lives in the accumulator and every one of [fxFoldAsync]'s fast
 /// paths still applies.
 @pragma('vm:prefer-inline')
 Future<Acc> foldWithIndexAsync<A, Acc>(
@@ -402,24 +406,24 @@ Future<Acc> foldWithIndexAsync<A, Acc>(
   FxAsyncIterable<A> iterable,
 ) {
   var i = 0;
-  return foldAsync<A, Acc>(seed, (acc, a) => f(acc, a, i++), iterable);
+  return fxFoldAsync<A, Acc>(seed, (acc, a) => f(acc, a, i++), iterable);
 }
 
-/// Returns a reducer section for use in a pipeline: `reduceLazy(f, seed)`
+/// Returns a reducer section for use in a pipeline: `fxReduceLazy(f, seed)`
 /// gives a function `Iterable<A> -> Acc`.
 ///
-/// Port of FxTS `reduceLazy`.
-Acc Function(Iterable<A>) reduceLazy<A, Acc>(
+/// Port of FxTS `fxReduceLazy`.
+Acc Function(Iterable<A>) fxReduceLazy<A, Acc>(
   Acc Function(Acc acc, A a) f,
   Acc seed,
 ) =>
-    (iterable) => fold(seed, f, iterable);
+    (iterable) => fxFold(seed, f, iterable);
 
 /// Adds every number in the iterable.
 ///
 /// Port of FxTS `sum`.
 @pragma('vm:prefer-inline')
-num sum(Iterable<num> iterable) {
+num fxSum(Iterable<num> iterable) {
   // Monomorphic lists take an indexed loop: no iterator, and the element
   // loads stay unboxed. Values match the generic path exactly (same
   // accumulation order; empty stays the int 0).
@@ -461,15 +465,15 @@ num sum(Iterable<num> iterable) {
   return isInt ? iacc : dacc;
 }
 
-/// Sums the key [f] of every element — `map` + [sum] in one step, so a
+/// Sums the key [f] of every element — `map` + [fxSum] in one step, so a
 /// pipeline that only needs a field total doesn't spell out the projection.
 ///
-/// Empty input returns `0` (the [sum] contract).
+/// Empty input returns `0` (the [fxSum] contract).
 ///
 /// Dart-native addition (FxTS has only the numeric `sum`); named after
-/// [maxBy]/[minBy] — Kotlin spells it `sumOf`.
+/// [fxMaxBy]/[fxMinBy] — Kotlin spells it `sumOf`.
 @pragma('vm:prefer-inline')
-num sumBy<A>(num Function(A a) f, Iterable<A> iterable) {
+num fxSumBy<A>(num Function(A a) f, Iterable<A> iterable) {
   // Same unboxed int-then-double accumulation as [sum]; lists iterate by
   // index so no iterator is allocated.
   var iacc = 0;
@@ -506,32 +510,32 @@ num sumBy<A>(num Function(A a) f, Iterable<A> iterable) {
   return isInt ? iacc : dacc;
 }
 
-/// Async counterpart of [sumBy].
-Future<num> sumByAsync<A>(
+/// Async counterpart of [fxSumBy].
+Future<num> fxSumByAsync<A>(
   FutureOr<num> Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => foldAsync<A, num>(0, (acc, a) async => acc + await f(a), iterable);
+) => fxFoldAsync<A, num>(0, (acc, a) async => acc + await f(a), iterable);
 
-/// Async counterpart of [sum].
-Future<num> sumAsync(FxAsyncIterable<num> iterable) =>
-    foldAsync<num, num>(0, (a, b) => a + b, iterable);
+/// Async counterpart of [fxSum].
+Future<num> fxSumAsync(FxAsyncIterable<num> iterable) =>
+    fxFoldAsync<num, num>(0, (a, b) => a + b, iterable);
 
 /// Multiplies every number in the iterable.
 ///
 /// Empty input returns `1`, the multiplicative identity — the value that
-/// makes `product(concat(xs, ys)) == product(xs) * product(ys)` hold for
-/// every pair of inputs, including empty ones, exactly as [sum]'s empty `0`
+/// makes `fxProduct(fxConcat(xs, ys)) == fxProduct(xs) * fxProduct(ys)` hold for
+/// every pair of inputs, including empty ones, exactly as [fxSum]'s empty `0`
 /// does for addition.
 ///
 /// Dart-native addition (FxTS has `sum` but no `product`); Kotlin spells the
 /// keyed form `fold(1) { … }`, Rust `product`.
 ///
 /// ```dart
-/// product([2, 3, 4]); // 24
-/// product(<num>[]); // 1
+/// fxProduct([2, 3, 4]); // 24
+/// fxProduct(<num>[]); // 1
 /// ```
 @pragma('vm:prefer-inline')
-num product(Iterable<num> iterable) {
+num fxProduct(Iterable<num> iterable) {
   // Same unboxed int-then-double accumulation as [sum]: ints multiply in an
   // int until the first double arrives, then accumulation switches to double
   // seeded with the int total — the value a boxed `num acc *= v` would hold
@@ -553,14 +557,14 @@ num product(Iterable<num> iterable) {
   return isInt ? iacc : dacc;
 }
 
-/// Multiplies the key [f] of every element — `map` + [product] in one step,
-/// the counterpart of [sumBy].
+/// Multiplies the key [f] of every element — `map` + [fxProduct] in one step,
+/// the counterpart of [fxSumBy].
 ///
-/// Empty input returns `1` (the [product] contract).
+/// Empty input returns `1` (the [fxProduct] contract).
 ///
-/// Dart-native addition; named after [sumBy]/[maxBy]/[minBy].
+/// Dart-native addition; named after [fxSumBy]/[fxMaxBy]/[fxMinBy].
 @pragma('vm:prefer-inline')
-num productBy<A>(num Function(A a) f, Iterable<A> iterable) {
+num fxProductBy<A>(num Function(A a) f, Iterable<A> iterable) {
   // Same unboxed accumulation as [product]; lists iterate by index so no
   // iterator is allocated.
   var iacc = 1;
@@ -597,28 +601,28 @@ num productBy<A>(num Function(A a) f, Iterable<A> iterable) {
   return isInt ? iacc : dacc;
 }
 
-/// Async counterpart of [product].
-Future<num> productAsync(FxAsyncIterable<num> iterable) =>
-    foldAsync<num, num>(1, (a, b) => a * b, iterable);
+/// Async counterpart of [fxProduct].
+Future<num> fxProductAsync(FxAsyncIterable<num> iterable) =>
+    fxFoldAsync<num, num>(1, (a, b) => a * b, iterable);
 
-/// Async counterpart of [productBy].
-Future<num> productByAsync<A>(
+/// Async counterpart of [fxProductBy].
+Future<num> fxProductByAsync<A>(
   FutureOr<num> Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => foldAsync<A, num>(1, (acc, a) async => acc * await f(a), iterable);
+) => fxFoldAsync<A, num>(1, (acc, a) async => acc * await f(a), iterable);
 
 /// Concatenates every string in the iterable.
 ///
 /// `Iterable.join()`, not `fold('', (a, b) => a + b)`: the fold copies the
 /// whole accumulator on every element, so its cost is quadratic in the total
 /// output length.
-String sumStrings(Iterable<String> iterable) => iterable.join();
+String fxSumStrings(Iterable<String> iterable) => iterable.join();
 
 /// Returns the average of the numbers. `NaN` for an empty iterable.
 ///
 /// Port of FxTS `average`.
 @pragma('vm:prefer-inline')
-double average(Iterable<num> iterable) {
+double fxAverage(Iterable<num> iterable) {
   // Monomorphic-list fast paths, as in [sum].
   if (iterable is List<double>) {
     final len = iterable.length;
@@ -659,25 +663,25 @@ double average(Iterable<num> iterable) {
   return isInt ? iacc / size : dacc / size;
 }
 
-/// Async counterpart of [average].
-Future<double> averageAsync(FxAsyncIterable<num> iterable) async {
+/// Async counterpart of [fxAverage].
+Future<double> fxAverageAsync(FxAsyncIterable<num> iterable) async {
   var size = 0;
   num total = 0;
-  await eachAsync((num a) {
+  await fxEachAsync((num a) {
     size++;
     total += a;
   }, iterable);
   return size == 0 ? double.nan : total / size;
 }
 
-/// Averages the key [f] of every element — `map` + [average] in one step.
+/// Averages the key [f] of every element — `map` + [fxAverage] in one step.
 ///
-/// Empty input returns `double.nan` (the [average] contract).
+/// Empty input returns `double.nan` (the [fxAverage] contract).
 ///
 /// Dart-native addition completing the by-key family
-/// ([sumBy] / [maxBy] / [minBy]).
+/// ([fxSumBy] / [fxMaxBy] / [fxMinBy]).
 @pragma('vm:prefer-inline')
-double averageBy<A>(num Function(A a) f, Iterable<A> iterable) {
+double fxAverageBy<A>(num Function(A a) f, Iterable<A> iterable) {
   if (iterable is List<A>) {
     final len = iterable.length;
     if (len == 0) return double.nan;
@@ -696,14 +700,14 @@ double averageBy<A>(num Function(A a) f, Iterable<A> iterable) {
   return count == 0 ? double.nan : total / count;
 }
 
-/// Async counterpart of [averageBy].
-Future<double> averageByAsync<A>(
+/// Async counterpart of [fxAverageBy].
+Future<double> fxAverageByAsync<A>(
   FutureOr<num> Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) async {
   var total = 0.0;
   var count = 0;
-  await eachAsync((A a) async {
+  await fxEachAsync((A a) async {
     total += await f(a);
     count++;
   }, iterable);
@@ -725,7 +729,7 @@ num _maxOf(num acc, num a) => a.isNaN || acc.isNaN
 /// Returns the smallest number; `infinity` for an empty iterable, `NaN` if
 /// any element is `NaN` — mirroring FxTS `min`.
 @pragma('vm:prefer-inline')
-num min(Iterable<num> iterable) {
+num fxMin(Iterable<num> iterable) {
   // Monomorphic-list fast paths, as in [sum]; results match the [_minOf]
   // fold exactly (empty → infinity, any NaN → NaN, strict < keeps the
   // first of equal values).
@@ -757,14 +761,14 @@ num min(Iterable<num> iterable) {
   return acc;
 }
 
-/// Async counterpart of [min].
-Future<num> minAsync(FxAsyncIterable<num> iterable) =>
-    foldAsync(double.infinity, _minOf, iterable);
+/// Async counterpart of [fxMin].
+Future<num> fxMinAsync(FxAsyncIterable<num> iterable) =>
+    fxFoldAsync(double.infinity, _minOf, iterable);
 
 /// Returns the largest number; `-infinity` for an empty iterable, `NaN` if
 /// any element is `NaN` — mirroring FxTS `max`.
 @pragma('vm:prefer-inline')
-num max(Iterable<num> iterable) {
+num fxMax(Iterable<num> iterable) {
   // Mirror image of [min]'s fast paths.
   if (iterable is List<double>) {
     final length = iterable.length;
@@ -794,13 +798,13 @@ num max(Iterable<num> iterable) {
   return acc;
 }
 
-/// Async counterpart of [max].
-Future<num> maxAsync(FxAsyncIterable<num> iterable) =>
-    foldAsync(-double.infinity, _maxOf, iterable);
+/// Async counterpart of [fxMax].
+Future<num> fxMaxAsync(FxAsyncIterable<num> iterable) =>
+    fxFoldAsync(-double.infinity, _maxOf, iterable);
 
 /// Returns the element whose key [f] is smallest, or `null` when empty.
 ///
-/// Keys are compared like [sortBy] compares them ([Comparable.compare]);
+/// Keys are compared like [fxSortBy] compares them ([Comparable.compare]);
 /// on ties the **first** encountered element wins. One O(n) walk — no sort.
 ///
 /// Dart-native addition (FxTS has only numeric `min`); named after Kotlin's
@@ -822,7 +826,7 @@ Future<num> maxAsync(FxAsyncIterable<num> iterable) =>
 // rejected them. With the callback inlined there is no longer a callback to
 // hide behind, and the iterator shows up.
 @pragma('vm:prefer-inline')
-A? minBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
+A? fxMinBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
   // The key of the running best is extracted once and cached; [f] runs
   // exactly once per element.
   if (iterable is List<A>) {
@@ -854,14 +858,14 @@ A? minBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
   return best;
 }
 
-/// Async counterpart of [minBy].
-Future<A?> minByAsync<A>(
+/// Async counterpart of [fxMinBy].
+Future<A?> fxMinByAsync<A>(
   Object? Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) async {
   A? best;
   var seen = false;
-  await eachAsync((A a) {
+  await fxEachAsync((A a) {
     if (!seen || _compareBy(f, a, best as A) < 0) {
       best = a;
       seen = true;
@@ -872,14 +876,14 @@ Future<A?> minByAsync<A>(
 
 /// Returns the element whose key [f] is largest, or `null` when empty.
 ///
-/// Keys are compared like [sortBy] compares them ([Comparable.compare]);
+/// Keys are compared like [fxSortBy] compares them ([Comparable.compare]);
 /// on ties the **first** encountered element wins. One O(n) walk — no sort.
 ///
 /// Dart-native addition (FxTS has only numeric `max`); named after Kotlin's
 /// `maxByOrNull` shape, nullable like [head]/[last].
-/// Inlined for the reason given on [minBy].
+/// Inlined for the reason given on [fxMinBy].
 @pragma('vm:prefer-inline')
-A? maxBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
+A? fxMaxBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
   if (iterable is List<A>) {
     final length = iterable.length;
     if (length == 0) return null;
@@ -909,14 +913,14 @@ A? maxBy<A>(Object? Function(A a) f, Iterable<A> iterable) {
   return best;
 }
 
-/// Async counterpart of [maxBy].
-Future<A?> maxByAsync<A>(
+/// Async counterpart of [fxMaxBy].
+Future<A?> fxMaxByAsync<A>(
   Object? Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) async {
   A? best;
   var seen = false;
-  await eachAsync((A a) {
+  await fxEachAsync((A a) {
     if (!seen || _compareBy(f, a, best as A) > 0) {
       best = a;
       seen = true;
@@ -929,7 +933,7 @@ Future<A?> maxByAsync<A>(
 ///
 /// Port of FxTS `size`. O(1) for a [List] or [Set].
 @pragma('vm:prefer-inline')
-int size<A>(Iterable<A> iterable) {
+int fxSize<A>(Iterable<A> iterable) {
   if (iterable is List || iterable is Set) return iterable.length;
   var n = 0;
   for (final _ in iterable) {
@@ -938,10 +942,10 @@ int size<A>(Iterable<A> iterable) {
   return n;
 }
 
-/// Async counterpart of [size].
-Future<int> sizeAsync<A>(FxAsyncIterable<A> iterable) async {
+/// Async counterpart of [fxSize].
+Future<int> fxSizeAsync<A>(FxAsyncIterable<A> iterable) async {
   var n = 0;
-  await eachAsync((_) => n++, iterable);
+  await fxEachAsync((_) => n++, iterable);
   return n;
 }
 
@@ -949,7 +953,7 @@ Future<int> sizeAsync<A>(FxAsyncIterable<A> iterable) async {
 ///
 /// Dart-native addition (Kotlin's `count { }`).
 @pragma('vm:prefer-inline')
-int countWhere<A>(bool Function(A a) f, Iterable<A> iterable) {
+int fxCountWhere<A>(bool Function(A a) f, Iterable<A> iterable) {
   var n = 0;
   if (iterable is List<A>) {
     final length = iterable.length;
@@ -964,13 +968,13 @@ int countWhere<A>(bool Function(A a) f, Iterable<A> iterable) {
   return n;
 }
 
-/// Async counterpart of [countWhere].
-Future<int> countWhereAsync<A>(
+/// Async counterpart of [fxCountWhere].
+Future<int> fxCountWhereAsync<A>(
   FutureOr<bool> Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) async {
   var n = 0;
-  await eachAsync((A a) async {
+  await fxEachAsync((A a) async {
     if (await f(a)) n++;
   }, iterable);
   return n;
@@ -979,17 +983,17 @@ Future<int> countWhereAsync<A>(
 /// Returns all elements joined into a string, separated by [sep].
 ///
 /// Port of FxTS `join`.
-String join<A>(String sep, Iterable<A> iterable) => iterable.join(sep);
+String fxJoin<A>(String sep, Iterable<A> iterable) => iterable.join(sep);
 
-/// Async counterpart of [join].
-Future<String> joinAsync<A>(String sep, FxAsyncIterable<A> iterable) async =>
-    (await toListAsync(iterable)).join(sep);
+/// Async counterpart of [fxJoin].
+Future<String> fxJoinAsync<A>(String sep, FxAsyncIterable<A> iterable) async =>
+    (await fxToListAsync(iterable)).join(sep);
 
 /// Splits values into groups keyed by [f].
 ///
 /// Port of FxTS `groupBy` (TS objects become Dart Maps).
 @pragma('vm:prefer-inline')
-Map<K, List<A>> groupBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
+Map<K, List<A>> fxGroupBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
   final result = <K, List<A>>{};
   // `??=` instead of putIfAbsent: putIfAbsent allocates an ifAbsent closure
   // per element.
@@ -1007,13 +1011,13 @@ Map<K, List<A>> groupBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
   return result;
 }
 
-/// Async counterpart of [groupBy].
-Future<Map<K, List<A>>> groupByAsync<A, K>(
+/// Async counterpart of [fxGroupBy].
+Future<Map<K, List<A>>> fxGroupByAsync<A, K>(
   FutureOr<K> Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) async {
   final result = <K, List<A>>{};
-  await eachAsync(
+  await fxEachAsync(
     (A a) async => result.putIfAbsent(await f(a), () => []).add(a),
     iterable,
   );
@@ -1021,32 +1025,32 @@ Future<Map<K, List<A>>> groupByAsync<A, K>(
 }
 
 /// Groups values into `(key, items)` records, in first-seen key order —
-/// the chainable view of [groupBy], so per-group aggregation continues in
+/// the chainable view of [fxGroupBy], so per-group aggregation continues in
 /// the same pipeline instead of re-entering through `Map.entries`.
 ///
 /// Dart-native addition (no FxTS counterpart).
 ///
 /// ```dart
-/// groupedBy((w) => w.length, ['ab', 'cd', 'e']);
+/// fxGroupedBy((w) => w.length, ['ab', 'cd', 'e']);
 /// // [(key: 2, items: [ab, cd]), (key: 1, items: [e])]
 /// ```
 // Inlined for the same reason as [groupBy] itself: this is the hop between the
 // caller's key-extractor literal and the loop, and a hop that does not inline
 // leaves the callback opaque while still paying for the indexed branch.
 @pragma('vm:prefer-inline')
-List<({K key, List<A> items})> groupedBy<A, K>(
+List<({K key, List<A> items})> fxGroupedBy<A, K>(
   K Function(A a) f,
   Iterable<A> iterable,
 ) => [
-  for (final e in groupBy(f, iterable).entries) (key: e.key, items: e.value),
+  for (final e in fxGroupBy(f, iterable).entries) (key: e.key, items: e.value),
 ];
 
-/// Async counterpart of [groupedBy].
-Future<List<({K key, List<A> items})>> groupedByAsync<A, K>(
+/// Async counterpart of [fxGroupedBy].
+Future<List<({K key, List<A> items})>> fxGroupedByAsync<A, K>(
   FutureOr<K> Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) async => [
-  for (final e in (await groupByAsync(f, iterable)).entries)
+  for (final e in (await fxGroupByAsync(f, iterable)).entries)
     (key: e.key, items: e.value),
 ];
 
@@ -1054,7 +1058,7 @@ Future<List<({K key, List<A> items})>> groupedByAsync<A, K>(
 ///
 /// Port of FxTS `indexBy`.
 @pragma('vm:prefer-inline')
-Map<K, A> indexBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
+Map<K, A> fxIndexBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
   final result = <K, A>{};
   if (iterable is List<A>) {
     final length = iterable.length;
@@ -1070,13 +1074,13 @@ Map<K, A> indexBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
   return result;
 }
 
-/// Async counterpart of [indexBy].
-Future<Map<K, A>> indexByAsync<A, K>(
+/// Async counterpart of [fxIndexBy].
+Future<Map<K, A>> fxIndexByAsync<A, K>(
   FutureOr<K> Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) async {
   final result = <K, A>{};
-  await eachAsync((A a) async => result[await f(a)] = a, iterable);
+  await fxEachAsync((A a) async => result[await f(a)] = a, iterable);
   return result;
 }
 
@@ -1091,7 +1095,7 @@ class _IntCell {
   _IntCell(this.n);
 }
 
-/// [_IntCell] for an arbitrary accumulator (see [foldBy]). Holds `Object?`
+/// [_IntCell] for an arbitrary accumulator (see [fxFoldBy]). Holds `Object?`
 /// rather than a type parameter for the same covariant-store reason.
 class _Cell {
   Object? v;
@@ -1102,7 +1106,7 @@ class _Cell {
 ///
 /// Port of FxTS `countBy`.
 @pragma('vm:prefer-inline')
-Map<K, int> countBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
+Map<K, int> fxCountBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
   // `result[k] = (result[k] ?? 0) + 1` reads the map and then writes it back,
   // so every element hashes its key twice and walks the bucket twice — and on
   // this workload the map is essentially the whole cost. Over 1,000,000 log
@@ -1151,8 +1155,8 @@ Map<K, int> countBy<A, K>(K Function(A a) f, Iterable<A> iterable) {
   return result;
 }
 
-/// Async counterpart of [countBy].
-Future<Map<K, int>> countByAsync<A, K>(
+/// Async counterpart of [fxCountBy].
+Future<Map<K, int>> fxCountByAsync<A, K>(
   FutureOr<K> Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) async {
@@ -1166,7 +1170,7 @@ Future<Map<K, int>> countByAsync<A, K>(
   // overlapping callbacks under `concurrent(n)` cannot interleave inside the
   // count — the same guarantee the single `update` call gave.
   final cells = <K, _IntCell>{};
-  await eachAsync((A a) async {
+  await fxEachAsync((A a) async {
     final k = await f(a);
     final cell = cells[k];
     if (cell == null) {
@@ -1185,25 +1189,25 @@ Future<Map<K, int>> countByAsync<A, K>(
 ///
 /// `groupBy` followed by a fold per group builds a `List` for every key first
 /// — allocation proportional to the input for an answer proportional to the
-/// number of keys. [foldBy] accumulates straight into the result map, which
+/// number of keys. [fxFoldBy] accumulates straight into the result map, which
 /// is what the hand-written `totals[k] = (totals[k] ?? 0) + v` loop does:
 ///
 /// ```dart
-/// foldBy((Tx t) => t.category, 0.0, (sum, t) => sum + t.amount, txns);
+/// fxFoldBy((Tx t) => t.category, 0.0, (sum, t) => sum + t.amount, txns);
 /// // {Food: 812.40, Transport: 96.15, …}
 /// ```
 ///
 /// Not an FxTS port; the shape is Kotlin's `groupingBy().fold()`. Keys appear
-/// in first-seen order, like [groupBy]. Reach for [groupBy] when you actually
+/// in first-seen order, like [fxGroupBy]. Reach for [fxGroupBy] when you actually
 /// want the elements — this is for when you only want the aggregate.
 ///
 /// [seed] is a **value**, shared as the starting point for every key, exactly
-/// as in [fold]. A mutable seed would therefore be shared across keys: fold
-/// into new values (`sum + t.amount`), or use [groupBy] if you need to
+/// as in [fxFold]. A mutable seed would therefore be shared across keys: fold
+/// into new values (`sum + t.amount`), or use [fxGroupBy] if you need to
 /// accumulate into a mutable structure per group.
-/// Inlined so the caller's callback is inlined with it — see [minBy].
+/// Inlined so the caller's callback is inlined with it — see [fxMinBy].
 @pragma('vm:prefer-inline')
-Map<K, Acc> foldBy<A, K, Acc>(
+Map<K, Acc> fxFoldBy<A, K, Acc>(
   K Function(A a) key,
   Acc seed,
   Acc Function(Acc acc, A a) f,
@@ -1254,7 +1258,7 @@ Map<K, Acc> foldBy<A, K, Acc>(
   return result;
 }
 
-/// [foldBy] where a `null` key skips the element, so [key] both selects and
+/// [fxFoldBy] where a `null` key skips the element, so [key] both selects and
 /// buckets — `filter(...).foldBy(...)` as one strict call.
 ///
 /// The reason it exists is the same one [takeUniqBy] documents: `filter` is a
@@ -1321,9 +1325,9 @@ Map<K, Acc> foldByOrSkip<A, K extends Object, Acc>(
   return result;
 }
 
-/// Async counterpart of [foldBy]. [key] and [f] may each return a [Future];
+/// Async counterpart of [fxFoldBy]. [key] and [f] may each return a [Future];
 /// values are folded in source order.
-Future<Map<K, Acc>> foldByAsync<A, K, Acc>(
+Future<Map<K, Acc>> fxFoldByAsync<A, K, Acc>(
   FutureOr<K> Function(A a) key,
   FutureOr<Acc> seed,
   FutureOr<Acc> Function(Acc acc, A a) f,
@@ -1331,7 +1335,7 @@ Future<Map<K, Acc>> foldByAsync<A, K, Acc>(
 ) async {
   final result = <K, Acc>{};
   final start = await seed;
-  await eachAsync((A a) async {
+  await fxEachAsync((A a) async {
     final k = await key(a);
     final acc = result[k];
     result[k] = await f(
@@ -1346,19 +1350,19 @@ Future<Map<K, Acc>> foldByAsync<A, K, Acc>(
 ///
 /// Port of FxTS `sort`. Unlike the TS version (which mutates arrays in
 /// place), the Dart port never mutates its input.
-List<A> sort<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
+List<A> fxSort<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
     iterable.toList()..sort(f);
 
-/// Async counterpart of [sort].
-Future<List<A>> sortAsync<A>(
+/// Async counterpart of [fxSort].
+Future<List<A>> fxSortAsync<A>(
   int Function(A a, A b) f,
   FxAsyncIterable<A> iterable,
-) async => (await toListAsync(iterable))..sort(f);
+) async => (await fxToListAsync(iterable))..sort(f);
 
-/// Alias of [sort]; FxTS added `toSorted` as the non-mutating variant, which
-/// the Dart [sort] already is.
-List<A> toSorted<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
-    sort(f, iterable);
+/// Alias of [fxSort]; FxTS added `fxToSorted` as the non-mutating variant, which
+/// the Dart [fxSort] already is.
+List<A> fxToSorted<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
+    fxSort(f, iterable);
 
 int _compareKeys(Object? fa, Object? fb) {
   // `num` first: it is the overwhelmingly common key kind, and its direct
@@ -1387,12 +1391,12 @@ int _compareBy<A>(Object? Function(A a) f, A a, A b) =>
 /// Returns a new list sorted by the key extractor [f] (ascending).
 ///
 /// Port of FxTS `sortBy`.
-List<A> sortBy<A>(Object? Function(A a) f, Iterable<A> iterable) =>
+List<A> fxSortBy<A>(Object? Function(A a) f, Iterable<A> iterable) =>
     _sortByImpl(f, iterable, false);
 
 /// Returns a new list sorted by the key extractor [f], descending.
 ///
-/// The symmetric twin of [sortBy] (Kotlin's `sortedByDescending`) — works
+/// The symmetric twin of [fxSortBy] (Kotlin's `sortedByDescending`) — works
 /// for any comparable key, unlike the numeric-only `sortBy((a) => -key)`
 /// negation trick.
 List<A> sortByDesc<A>(Object? Function(A a) f, Iterable<A> iterable) =>
@@ -1590,7 +1594,7 @@ List<A> _sortIntKeys<A>(List<int> k, List<A> items, bool desc) {
     }
   }
   final range = max - min;
-  // A negative `range` is the 64-bit wrap of a min/max pair further apart
+  // A negative `fxRange` is the 64-bit wrap of a min/max pair further apart
   // than the int range — not a width a counter array could ever cover.
   if (range >= 0 && range < n && range <= _countingSortMaxRange) {
     return _countingSortByInt(k, items, desc, min, max, range);
@@ -1898,17 +1902,17 @@ List<A> _mergeByDoubleCompareTo<A>(Float64List k, List<A> items, bool desc) {
   return srcV;
 }
 
-/// Async counterpart of [sortBy].
-Future<List<A>> sortByAsync<A>(
+/// Async counterpart of [fxSortBy].
+Future<List<A>> fxSortByAsync<A>(
   Object? Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => sortAsync((a, b) => _compareBy(f, a, b), iterable);
+) => fxSortAsync((a, b) => _compareBy(f, a, b), iterable);
 
 /// Async counterpart of [sortByDesc].
 Future<List<A>> sortByDescAsync<A>(
   Object? Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => sortAsync((a, b) => _compareBy(f, b, a), iterable);
+) => fxSortAsync((a, b) => _compareBy(f, b, a), iterable);
 
 /// The [k] elements with the largest keys [f], largest first.
 ///
@@ -1929,9 +1933,9 @@ Future<List<A>> sortByDescAsync<A>(
 /// - **[k]** — `k <= 0` returns an empty list; a [k] beyond the input length
 ///   returns every element, ordered.
 ///
-/// Keys are compared exactly as [sortBy] compares them. Pairs that do not both
+/// Keys are compared exactly as [fxSortBy] compares them. Pairs that do not both
 /// implement [Comparable] compare equal; incompatible [Comparable] key types
-/// may throw instead, exactly as they do in [sortBy].
+/// may throw instead, exactly as they do in [fxSortBy].
 ///
 /// The boundary is maintained by insertion, so the worst case is `O(n·k)`
 /// comparisons: this is for a small [k] over a large input. Use [sortByDesc]
@@ -1942,26 +1946,26 @@ Future<List<A>> sortByDescAsync<A>(
 /// `k_largest_by_key` and Guava's `Ordering.greatestOf`.
 ///
 /// ```dart
-/// topBy(2, (e) => e.amount, expenses); // the two largest, largest first
+/// fxTopBy(2, (e) => e.amount, expenses); // the two largest, largest first
 /// ```
 // Inlined for the reason given on [minBy]: it is the caller's key extractor
 // that inlining exposes, not this call. `Fx.topBy` carries the same pragma —
 // a single non-inlined hop between the caller's closure literal and the loop
 // breaks the chain for every hop.
 @pragma('vm:prefer-inline')
-List<A> topBy<A>(int k, Object? Function(A a) f, Iterable<A> iterable) =>
+List<A> fxTopBy<A>(int k, Object? Function(A a) f, Iterable<A> iterable) =>
     _topByImpl(k, f, iterable, 1);
 
 /// The [k] elements with the smallest keys [f], smallest first.
 ///
-/// Mirror image of [topBy]: same boundary pass, same tie rule (the element
+/// Mirror image of [fxTopBy]: same boundary pass, same tie rule (the element
 /// seen first wins), same handling of [k]. Replaces
-/// `sortBy(f, xs).take(k)`.
+/// `fxSortBy(f, xs).take(k)`.
 @pragma('vm:prefer-inline')
-List<A> bottomBy<A>(int k, Object? Function(A a) f, Iterable<A> iterable) =>
+List<A> fxBottomBy<A>(int k, Object? Function(A a) f, Iterable<A> iterable) =>
     _topByImpl(k, f, iterable, -1);
 
-/// [sign] is `1` for [topBy] and `-1` for [bottomBy] — it flips every key
+/// [sign] is `1` for [fxTopBy] and `-1` for [fxBottomBy] — it flips every key
 /// comparison, so one boundary pass serves both. Inlined along with its two
 /// callers: that is what keeps [f] visible inside the loop.
 @pragma('vm:prefer-inline')
@@ -2022,17 +2026,17 @@ void _offerBoundary<A>(
   values[i] = a;
 }
 
-/// Async counterpart of [topBy]: the same boundary pass over an
+/// Async counterpart of [fxTopBy]: the same boundary pass over an
 /// [FxAsyncIterable], with the same order, tie and [k] contract. [f] stays
-/// synchronous, as it does on [sortByAsync] and [minByAsync].
-Future<List<A>> topByAsync<A>(
+/// synchronous, as it does on [fxSortByAsync] and [fxMinByAsync].
+Future<List<A>> fxTopByAsync<A>(
   int k,
   Object? Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) => _topByAsyncImpl(k, f, iterable, 1);
 
-/// Async counterpart of [bottomBy].
-Future<List<A>> bottomByAsync<A>(
+/// Async counterpart of [fxBottomBy].
+Future<List<A>> fxBottomByAsync<A>(
   int k,
   Object? Function(A a) f,
   FxAsyncIterable<A> iterable,
@@ -2047,7 +2051,7 @@ Future<List<A>> _topByAsyncImpl<A>(
   final values = <A>[];
   if (k <= 0) return values;
   final keys = <Object?>[];
-  await eachAsync(
+  await fxEachAsync(
     (A a) => _offerBoundary(values, keys, k, sign, a, f(a)),
     iterable,
   );
@@ -2058,7 +2062,7 @@ Future<List<A>> _topByAsyncImpl<A>(
 ///
 /// Port of FxTS `partition` (TS tuple becomes a Dart record).
 @pragma('vm:prefer-inline')
-(List<A>, List<A>) partition<A>(bool Function(A a) f, Iterable<A> iterable) {
+(List<A>, List<A>) fxPartition<A>(bool Function(A a) f, Iterable<A> iterable) {
   final pass = <A>[];
   final fail = <A>[];
   if (iterable is List<A>) {
@@ -2075,20 +2079,20 @@ Future<List<A>> _topByAsyncImpl<A>(
   return (pass, fail);
 }
 
-/// Async counterpart of [partition].
-Future<(List<A>, List<A>)> partitionAsync<A>(
+/// Async counterpart of [fxPartition].
+Future<(List<A>, List<A>)> fxPartitionAsync<A>(
   FutureOr<bool> Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) async {
   final pass = <A>[];
   final fail = <A>[];
-  await eachAsync((A a) async => (await f(a) ? pass : fail).add(a), iterable);
+  await fxEachAsync((A a) async => (await f(a) ? pass : fail).add(a), iterable);
   return (pass, fail);
 }
 
 // --- tee: several folds over one pass -------------------------------------
 
-/// One reduction in a [tee] / [tee3] pass: where it starts, and how each
+/// One reduction in a [fxTee] / [fxTee3] pass: where it starts, and how each
 /// element advances it.
 typedef Fold<A, R> = ({R seed, R Function(R acc, A a) step});
 
@@ -2108,12 +2112,12 @@ typedef Fold<A, R> = ({R seed, R Function(R acc, A a) step});
 /// fxdart extension (not part of FxTS).
 ///
 /// ```dart
-/// final (total, peak) = tee(readings,
+/// final (total, peak) = fxTee(readings,
 ///     (seed: 0, step: (int a, int r) => a + r),
 ///     (seed: 0, step: (int a, int r) => r > a ? r : a));
 /// ```
 @pragma('vm:align-loops')
-(R1, R2) tee<A, R1, R2>(
+(R1, R2) fxTee<A, R1, R2>(
   Iterable<A> iterable,
   Fold<A, R1> first,
   Fold<A, R2> second,
@@ -2129,9 +2133,9 @@ typedef Fold<A, R> = ({R seed, R Function(R acc, A a) step});
   return (a1, a2);
 }
 
-/// Three-fold [tee].
+/// Three-fold [fxTee].
 @pragma('vm:align-loops')
-(R1, R2, R3) tee3<A, R1, R2, R3>(
+(R1, R2, R3) fxTee3<A, R1, R2, R3>(
   Iterable<A> iterable,
   Fold<A, R1> first,
   Fold<A, R2> second,
@@ -2151,9 +2155,9 @@ typedef Fold<A, R> = ({R seed, R Function(R acc, A a) step});
   return (a1, a2, a3);
 }
 
-/// Async counterpart of [tee]. Steps may return a [Future]; each element is
+/// Async counterpart of [fxTee]. Steps may return a [Future]; each element is
 /// applied to both accumulators before the next is pulled.
-Future<(R1, R2)> teeAsync<A, R1, R2>(
+Future<(R1, R2)> fxTeeAsync<A, R1, R2>(
   FxAsyncIterable<A> iterable,
   AsyncFold<A, R1> first,
   AsyncFold<A, R2> second,
@@ -2162,7 +2166,7 @@ Future<(R1, R2)> teeAsync<A, R1, R2>(
   final f2 = second.step;
   var a1 = await first.seed;
   var a2 = await second.seed;
-  await eachAsync((A a) {
+  await fxEachAsync((A a) {
     final r1 = f1(a1, a);
     if (r1 is Future<R1>) {
       return r1.then((v1) {
@@ -2180,7 +2184,7 @@ Future<(R1, R2)> teeAsync<A, R1, R2>(
   return (a1, a2);
 }
 
-/// The [teeAsync] counterpart of [Fold].
+/// The [fxTeeAsync] counterpart of [Fold].
 typedef AsyncFold<A, R> = ({
   FutureOr<R> seed,
   FutureOr<R> Function(R acc, A a) step,

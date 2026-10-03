@@ -18,7 +18,7 @@ nextLabel: sumBy
   <p>
     <code>sum</code> is a terminal operator, and one of the simplest
     special-cased folds in the library: it's literally
-    <code>fold(0, (a, b) =&gt; a + b, iterable)</code> underneath. Like every
+    <code>fxFold(0, (a, b) =&gt; a + b, iterable)</code> underneath. Like every
     terminal, calling it pulls the entire lazy pipeline upstream of it — so
     you can build an elaborate chain of <code>map</code>/<code>filter</code>
     steps and only pay for the values <code>sum</code> actually needs, which

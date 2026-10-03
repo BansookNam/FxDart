@@ -52,7 +52,7 @@ import 'package:fxdart/fxdart.dart';
 void main() async {
   var produced = 0;
 
-  final source = fx(range(1, 1000)).map((n) {
+  final source = fx(fxRange(1, 1000)).map((n) {
     produced++;
     return n;
   }).toAsync();
@@ -196,7 +196,7 @@ void main() async {
    어느 부분이 앞뒤가 맞지 않는지 말하세요.
 3. 페이지당 100행을 돌려주는 HTTP API를 두 방식 모두로 모델링한 뒤, "첫 일치에서
    멈추기"가 어느 쪽에서 더 싸고 요청 몇 개나 차이 나는지 말하세요.
-4. `Stream`에는 `asBroadcastStream`이, 풀 사슬에는 `fork`/`tee`가 있습니다. 둘 다
+4. `Stream`에는 `asBroadcastStream`이, 풀 사슬에는 `fxFork`/`tee`가 있습니다. 둘 다
    소비자 둘이 소스 하나를 보게 해 줍니다. 한 소비자가 느릴 때 무엇이 본질적으로
    다른가요?
 
@@ -216,7 +216,7 @@ void main() async {
    보통 여러 페이지를 이미 가져왔고, 차이는 상한이 없으며 지연 시간에 비례해
    커집니다.
 4. `asBroadcastStream`은 모든 리스너에게 생산자의 속도로 같은 이벤트를 줍니다.
-   느린 리스너는 버퍼링하거나 흘리며, 생산자를 늦출 수 없습니다. `fork`/`tee`는
+   느린 리스너는 버퍼링하거나 흘리며, 생산자를 늦출 수 없습니다. `fxFork`/`tee`는
    *당김*을 쪼개므로 공유된 소스는 두 소비자가 모두 요청했을 때만 전진합니다 —
    느린 소비자가 빠른 쪽을 붙잡는 것이고, 이는 설계대로 동작하는 배압이며,
    활성보다 정확성이 중요할 때 옳은 기본값입니다.

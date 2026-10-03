@@ -59,7 +59,7 @@ Cuatro capacidades, y ya dependes de las cuatro:
 | **Paralelizar** | Ejecutar dos llamadas a la vez supone que ninguna puede ver a la otra |
 | **Probar** | Aseverar sobre un valor de retorno supone que el valor es toda la historia |
 
-El `memoize` de FxDart es el ejemplo más nítido: es *correcto* para una
+El `fxMemoize` de FxDart es el ejemplo más nítido: es *correcto* para una
 función pura y un bug silencioso para una impura.
 
 ```dart run
@@ -72,13 +72,13 @@ int slowSquare(int n) {
 }
 
 void main() {
-  final fast = memoize(slowSquare);
+  final fast = fxMemoize(slowSquare);
   print([fast(9), fast(9), fast(9)]);
   print('underlying calls: $calls');
 }
 ```
 
-Tres llamadas, una evaluación. Nada dentro de `memoize` comprueba que
+Tres llamadas, una evaluación. Nada dentro de `fxMemoize` comprueba que
 `slowSquare` sea pura — lo *supone*. Esa es la forma de casi toda la
 maquinaria funcional: la librería aporta el mecanismo, la ley aporta la
 licencia, y quien tiene que cumplir el trato eres tú.
@@ -108,8 +108,8 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   // A seed makes randomness reproducible: same input, same
   // output, so a shuffle becomes testable.
-  final a = shuffle([1, 2, 3, 4, 5], 7);
-  final b = shuffle([1, 2, 3, 4, 5], 7);
+  final a = fxShuffle([1, 2, 3, 4, 5], 7);
+  final b = fxShuffle([1, 2, 3, 4, 5], 7);
   print(a);
   print('reproducible: ${a.toString() == b.toString()}');
 }
@@ -170,7 +170,7 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   final seen = <int>[];
-  final result = fx(range(1, 6))
+  final result = fx(fxRange(1, 6))
       // the effect is named, and it is the only one
       .peek(seen.add)
       .filter((n) => n.isEven)
@@ -201,7 +201,7 @@ nada. El capítulo 22 defiende ese caso con calma.
    campo mutable que nunca cambia tras la construcción. ¿Es referencialmente
    transparente? ¿Qué se rompería en el momento en que alguien quitara el
    `final`?
-3. `memoize` sobre una función de tipo `int Function(int)` es seguro. ¿Qué
+3. `fxMemoize` sobre una función de tipo `int Function(int)` es seguro. ¿Qué
    sale mal si el tipo del argumento es una `List<int>` mutable?
 4. Toma la tubería `receipts` de arriba y añade un requisito: registrar cada
    pedido que quedó filtrado. Hazlo sin volver impura a `receipts`.
@@ -214,15 +214,15 @@ nada. El capítulo 22 defiende ese caso con calma.
    «pura» se enuncia siempre relativa a una observación — la misma sutileza
    aparece en el ejercicio del capítulo 1 sobre la igualdad de `Future`.
 2. Algo como `class Rate { const Rate(this.pct); final int pct;
-   int apply(int n) => n * pct ~/ 100; }`. Es referencialmente transparente
+   int fxApply(int n) => n * pct ~/ 100; }`. Es referencialmente transparente
    porque `pct` no puede cambiar; la instancia es parte de la entrada, solo
    que escrita como receptor en vez de como argumento. Quita `final` y la
    misma llamada puede devolver dos respuestas, así que la sustitución falla.
-3. `memoize` indexa por el argumento, y el contenido de una lista mutable
+3. `fxMemoize` indexa por el argumento, y el contenido de una lista mutable
    puede cambiar después de haberse usado como clave — quien llama muta la
    lista, vuelve a llamar y recibe la respuesta del contenido *antiguo*. La
    caché no está mal; la suposición sí lo estaba.
-4. Devuelve los pedidos rechazados en lugar de registrarlos — `fork` o una
+4. Devuelve los pedidos rechazados en lugar de registrarlos — `fxFork` o una
    división al estilo `partition` hacen la función total en lo que informa, y
    quien llama (la cáscara) decide qué imprimir. Si solo necesitas observar,
    usa `.peek(rejected.add)` en la rama rechazada: sigue siendo un efecto

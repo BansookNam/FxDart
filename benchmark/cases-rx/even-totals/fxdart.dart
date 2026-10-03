@@ -10,7 +10,7 @@ Future<void> main() async {
     impl: 'fxdart',
     n: n,
     run: () {
-      final total = fx(compact(amounts)).filter((a) => a.isEven).sum();
+      final total = fx(fxCompact(amounts)).filter((a) => a.isEven).sum();
       return total;
     },
   );

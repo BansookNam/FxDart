@@ -34,7 +34,7 @@ extension FxEventsTypedErrors<T> on FxEvents<T> {
   ///
   /// This is not a raise-signal boundary: whatever is on the error channel
   /// becomes a [Left] — including the raise signal that `catching` and
-  /// `foldRaise` always rethrow, and the [RaiseLeakedError] the raise layer
+  /// `fxFoldRaise` always rethrow, and the [RaiseLeakedError] the raise layer
   /// means to be loud about. Keep raise scopes inside [mapEither], where they
   /// belong.
   FxEvents<Either<E, T>> attempt<E>(
@@ -67,24 +67,24 @@ extension FxEventsTypedErrors<T> on FxEvents<T> {
   /// Runs [f] for each event in its own raise scope: `r.raise` (and
   /// `r.ensure` / `r.bind`) becomes a [Left], a normal return a [Right].
   ///
-  /// A *thrown* exception stays on the error channel — that is the [either]
+  /// A *thrown* exception stays on the error channel — that is the [fxEither]
   /// builder's contract, and it keeps [attempt] the single place where a
   /// throw turns into a value. Chaining `attempt` after this one does catch
   /// the throw, wrapping the result in `Either<E, Either<E, R>>`;
   /// [FxEventsFlattenEither.flattenEither] collapses that nest. When a
-  /// callback both raises and throws, prefer [eitherCatching] inside
+  /// callback both raises and throws, prefer [fxEitherCatching] inside
   /// [mapEither] so one [Either] comes out without the extra hop.
   FxEvents<Either<E, R>> mapEither<E, R>(R Function(Raise<E> r, T value) f) =>
-      FxEvents(stream.map((v) => either<E, R>((r) => f(r, v))));
+      FxEvents(stream.map((v) => fxEither<E, R>((r) => f(r, v))));
 
   /// Async twin of [mapEither]; one event at a time, like `asyncMap`.
   ///
-  /// [eitherAsync]'s rule carries over: a raise must happen inside the awaited
+  /// [fxEitherAsync]'s rule carries over: a raise must happen inside the awaited
   /// chain. A raise from an unawaited future outlives the scope and surfaces
   /// as an unhandled zone error instead of a [Left].
   FxEvents<Either<E, R>> mapEitherAsync<E, R>(
     FutureOr<R> Function(Raise<E> r, T value) f,
-  ) => FxEvents(stream.asyncMap((v) => eitherAsync<E, R>((r) => f(r, v))));
+  ) => FxEvents(stream.asyncMap((v) => fxEitherAsync<E, R>((r) => f(r, v))));
 }
 
 /// Either-aware operators on an event chain of [Either] values — the push-side
@@ -122,7 +122,7 @@ extension FxEventsEitherOps<L, R> on FxEvents<Either<L, R>> {
   /// events in its own controller instead of applying backpressure upstream.
   (FxEvents<L> failures, FxEvents<R> successes) separated() {
     // The extension is applied explicitly because the playground bundle merges
-    // every file into one library, where the top-level `partition(f, iterable)`
+    // every file into one library, where the top-level `fxPartition(f, iterable)`
     // would win this unqualified call over the implicit-`this` extension member.
     final (failures, successes) = FxEventsNotify(
       this,

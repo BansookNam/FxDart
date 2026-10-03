@@ -23,7 +23,7 @@ aquí van tres instancias primero. Has escrito las tres.
 ```dart run
 import 'package:fxdart/fxdart.dart';
 
-Either<String, int> parsePort(String text) => either((r) {
+Either<String, int> parsePort(String text) => fxEither((r) {
   final n = r.ensureNotNull(
       int.tryParse(text), () => 'not a number: $text');
   r.ensure(n > 1023, () => 'privileged port: $n');
@@ -127,12 +127,12 @@ función sobre él, y el resultado es un solo future — nunca un
 para `Either`.
 
 Observa el mismo cálculo escrito de las dos maneras — primero como cadena
-explícita, luego dentro del ámbito `either` de FxDart:
+explícita, luego dentro del ámbito `fxEither` de FxDart:
 
 ```dart run
 import 'package:fxdart/fxdart.dart';
 
-Either<String, int> parseAge(String text) => either((r) {
+Either<String, int> parseAge(String text) => fxEither((r) {
   final n = r.ensureNotNull(
       int.tryParse(text), () => 'not a number: $text');
   r.ensure(n >= 0, () => 'negative age: $n');
@@ -153,7 +153,7 @@ Either<String, String> greetChained(String id, String ageText) =>
 // The same steps in a Raise scope: straight-line code,
 // with the same short-circuiting.
 Either<String, String> greetScoped(String id, String ageText) =>
-    either((r) {
+    fxEither((r) {
   final name = r.bind(lookup(id));
   final age = r.bind(parseAge(ageText));
   return '$name is $age';
@@ -173,7 +173,7 @@ la versión encadenada se desplaza un nivel de indentación a la derecha por
 cada paso — la forma que todo lenguaje con mónadas acaba inventando sintaxis
 para ocultar. Haskell llama a la suya notación `do`, Scala la llama
 `for`-comprehension, Dart llama al caso especial `async`/`await`. El bloque
-`either` de FxDart es la misma idea alcanzada por otro mecanismo, que es
+`fxEither` de FxDart es la misma idea alcanzada por otro mecanismo, que es
 [el tema del capítulo 15](#ch15).
 
 ## Las tres leyes
@@ -314,7 +314,7 @@ nunca finge abstraer sobre ella.
 
 - **`Either<L, R>`** tiene `flatMap`, y `Either.right` es su `of`. Las leyes
   se cumplen; ejecutaste la comprobación dos páginas atrás.
-- **`either((r) { … })`** es el sustituto ergonómico de la notación `do`. No
+- **`fxEither((r) { … })`** es el sustituto ergonómico de la notación `do`. No
   es azúcar sintáctico — `r.bind` cortocircuita elevando hacia un ámbito
   (capítulo 15), un truco de continuaciones delimitadas y no una reescritura
   monádica. El mismo código en línea recta, distinto mecanismo, y una

@@ -69,7 +69,7 @@ nextLabel: attempt
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="retry.html"><code>retry</code></a> — 백오프 훅과 원소 단위 범위를 가진 풀 레이어의 원본 ·
+    <a href="retry.html"><code>fxRetry</code></a> — 백오프 훅과 원소 단위 범위를 가진 풀 레이어의 원본 ·
     <a href="attempt.html"><code>attempt</code></a> — 같은 실패를, 값 채널 위의 타입 있는 <code>Left</code>로 ·
     <a href="either.html"><code>Either</code></a> — 복구할 이벤트가 아니라 타입 있는 값으로서의 에러
   </div>

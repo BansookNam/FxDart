@@ -10,7 +10,7 @@ prevLabel: mergeMap
 next: mergeScan.html
 nextLabel: mergeScan
 ---
-  <p class="hero-sub">Un stream de streams, aplanado: quédate con el más nuevo, ejecútalos todos, reprodúcelos en orden, o ignora los de más — y arranca fuentes posteriores de inmediato con <code>concatEager</code>.</p>
+  <p class="hero-sub">Un stream de streams, aplanado: quédate con el más nuevo, ejecútalos todos, reprodúcelos en orden, o ignora los de más — y arranca fuentes posteriores de inmediato con <code>fxConcatEager</code>.</p>
 
   {{signature}}
 
@@ -45,16 +45,16 @@ nextLabel: mergeScan
     los internos que llegan mientras uno sigue en marcha.
   </p>
   <p>
-    <code>concatEager</code> es el hermano de
+    <code>fxConcatEager</code> es el hermano de
     <code><a href="waitAll.html">FxEvents.concat</a></code>. Ambos emiten
     en el orden de la fuente, pero concat espera a <em>suscribirse</em> a la siguiente
     fuente hasta que la actual completa — una fuente posterior fría ni
-    siquiera ha arrancado. <code>concatEager</code> se suscribe a todas las
+    siquiera ha arrancado. <code>fxConcatEager</code> se suscribe a todas las
     fuentes de inmediato y almacena en búfer los eventos posteriores hasta que les toca. Así
     es como arrancas una petición ahora y aun así reproduces las respuestas en
     orden. Capa de eventos de fxdart, siguiendo a <code>switchAll</code>,
     <code>mergeAll</code>, <code>concatAll</code>,
-    <code>exhaustAll</code> y <code>concatEager</code> de Rx.
+    <code>exhaustAll</code> y <code>fxConcatEager</code> de Rx.
   </p>
 
   <h2>Demo 1 · switchLatest — gana el interno más nuevo</h2>
@@ -64,12 +64,12 @@ nextLabel: mergeScan
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: <code>concatEager</code> frente a concat — las posteriores arrancan de inmediato.</p>
+  <p>Ejercicio: <code>fxConcatEager</code> frente a concat — las posteriores arrancan de inmediato.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="switchMap.html"><code>switchMap</code></a> — la forma mapeada de switchLatest ·
     <a href="mergeMap.html"><code>mergeMap</code></a> — mergeMap, concatMap, exhaustMap ·
-    <a href="waitAll.html"><code>FxEvents.concat</code></a> — el hermano que se suscribe después de <code>concatEager</code>
+    <a href="waitAll.html"><code>FxEvents.concat</code></a> — el hermano que se suscribe después de <code>fxConcatEager</code>
   </div>

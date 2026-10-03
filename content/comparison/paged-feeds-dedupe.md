@@ -24,7 +24,7 @@ async: true
     <strong>sequential</strong> append, not a merge — the replica is not
     touched until the primary is exhausted. That is the right tool here,
     because the task wants primary events to win. Each store becomes an
-    async sequence with <code>range</code> + <code>flatMap</code> (page
+    async sequence with <code>fxRange</code> + <code>flatMap</code> (page
     number → page of events), and <code>uniqBy</code> + <code>take(8)</code>
     finish the job. Because the chain is pull-based, <code>take</code>
     stopping also stops the paging: the last replica page is never fetched.

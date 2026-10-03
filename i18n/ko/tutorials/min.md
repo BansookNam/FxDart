@@ -17,7 +17,7 @@ nextLabel: max
   <h2>강의</h2>
   <p>
     <code>min</code>은 숫자 전용 종결 연산자이자 fold입니다. 내부적으로는
-    <code>fold(double.infinity, ..., iterable)</code>로, <code>+infinity</code>에서
+    <code>fxFold(double.infinity, ..., iterable)</code>로, <code>+infinity</code>에서
     시작하는 최솟값과 각 원소를 비교해 나갑니다.
   </p>
   <p>

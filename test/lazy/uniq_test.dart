@@ -7,16 +7,16 @@ void main() {
   group('uniq', () {
     group('sync', () {
       test('should be removed duplicate values', () {
-        final res1 = uniq('marpple'.split(''));
+        final res1 = fxUniq('marpple'.split(''));
         expect(res1.toList(), equals(['m', 'a', 'r', 'p', 'l', 'e']));
 
-        final res2 = uniq([1, 2, 3, 4]);
+        final res2 = fxUniq([1, 2, 3, 4]);
         expect(res2.toList(), equals([1, 2, 3, 4]));
       });
 
       test('should keep distinct (identity-unequal) map objects', () {
-        final res = toList(
-          uniq([
+        final res = fxToList(
+          fxUniq([
             {'v': 1},
             {'v': 1},
             {'v': 1},
@@ -45,8 +45,8 @@ void main() {
           yield 2;
         }
 
-        expect(uniq(generated()).toList(), equals([1, 2, 3]));
-        expect(uniq(generated()).toList(growable: false), equals([1, 2, 3]));
+        expect(fxUniq(generated()).toList(), equals([1, 2, 3]));
+        expect(fxUniq(generated()).toList(growable: false), equals([1, 2, 3]));
       });
 
       test('should be able to be used in the pipeline', () {
@@ -64,10 +64,12 @@ void main() {
 
     group('async', () {
       test('should be removed duplicate values', () async {
-        final res1 = await toListAsync(uniqAsync(toAsync('marpple'.split(''))));
+        final res1 = await fxToListAsync(
+          fxUniqAsync(fxToAsync('marpple'.split(''))),
+        );
         expect(res1, equals(['m', 'a', 'r', 'p', 'l', 'e']));
 
-        final res2 = await toListAsync(uniqAsync(toAsync([1, 2, 3, 4])));
+        final res2 = await fxToListAsync(fxUniqAsync(fxToAsync([1, 2, 3, 4])));
         expect(res2, equals([1, 2, 3, 4]));
       });
 
@@ -85,7 +87,7 @@ void main() {
         'should be passed concurrent object when job works concurrently',
         () async {
           final mock = ConcurrentMock<int>();
-          final it = uniqAsync(mock).iterator;
+          final it = fxUniqAsync(mock).iterator;
           await it.next(Concurrent.of(2));
           expect(mock.received?.length, equals(2));
         },

@@ -6,8 +6,8 @@ void main() {
     group('sync', () {
       test('should pass a non-empty source through untouched', () {
         var called = false;
-        final res = toList(
-          ifEmpty(() {
+        final res = fxToList(
+          fxIfEmpty(() {
             called = true;
             return [0];
           }, [1, 2]),
@@ -17,21 +17,23 @@ void main() {
       });
 
       test('should switch to the fallback when empty', () {
-        expect(toList(ifEmpty(() => [0], <int>[])), equals([0]));
+        expect(fxToList(fxIfEmpty(() => [0], <int>[])), equals([0]));
         expect(
-          toList(ifEmpty(() => [7, 8], filter((int a) => a > 10, [1, 2]))),
+          fxToList(
+            fxIfEmpty(() => [7, 8], fxFilter((int a) => a > 10, [1, 2])),
+          ),
           equals([7, 8]),
         );
       });
 
       test('defaultIfEmpty should yield the single default', () {
-        expect(toList(defaultIfEmpty(0, <int>[])), equals([0]));
-        expect(toList(defaultIfEmpty(0, [1, 2])), equals([1, 2]));
+        expect(fxToList(defaultIfEmpty(0, <int>[])), equals([0]));
+        expect(fxToList(defaultIfEmpty(0, [1, 2])), equals([1, 2]));
       });
 
       test('should support repeated iteration', () {
         final res = defaultIfEmpty(0, <int>[]);
-        expect(toList(res), toList(res));
+        expect(fxToList(res), fxToList(res));
       });
 
       test('should be able to be used as a chaining method in the `fx`', () {
@@ -47,11 +49,11 @@ void main() {
     group('async', () {
       test('should pass a non-empty source through untouched', () async {
         var called = false;
-        final res = await toListAsync(
-          ifEmptyAsync(() {
+        final res = await fxToListAsync(
+          fxIfEmptyAsync(() {
             called = true;
-            return toAsync([0]);
-          }, toAsync([1, 2])),
+            return fxToAsync([0]);
+          }, fxToAsync([1, 2])),
         );
         expect(res, equals([1, 2]));
         expect(called, isFalse);
@@ -59,8 +61,8 @@ void main() {
 
       test('should switch to the fallback when empty', () async {
         expect(
-          await toListAsync(
-            ifEmptyAsync(() => toAsync([0]), asyncEmpty<int>()),
+          await fxToListAsync(
+            fxIfEmptyAsync(() => fxToAsync([0]), fxAsyncEmpty<int>()),
           ),
           equals([0]),
         );
@@ -68,20 +70,20 @@ void main() {
 
       test('defaultIfEmpty should accept a future default', () async {
         expect(
-          await toListAsync(
-            defaultIfEmptyAsync(Future.value(0), asyncEmpty<int>()),
+          await fxToListAsync(
+            defaultIfEmptyAsync(Future.value(0), fxAsyncEmpty<int>()),
           ),
           equals([0]),
         );
         expect(
-          await toListAsync(defaultIfEmptyAsync(0, toAsync([1, 2]))),
+          await fxToListAsync(defaultIfEmptyAsync(0, fxToAsync([1, 2]))),
           equals([1, 2]),
         );
       });
 
       test('should work after concurrent', () async {
-        final res = await fxAsync(toAsync(range(1, 7)))
-            .map((a) => delay(const Duration(milliseconds: 20), a))
+        final res = await fxAsync(fxToAsync(fxRange(1, 7)))
+            .map((a) => fxDelay(const Duration(milliseconds: 20), a))
             .filter((a) => a > 10)
             .concurrent(3)
             .defaultIfEmpty(-1)
@@ -92,7 +94,7 @@ void main() {
       test('should propagate an upstream error', () async {
         await expectLater(
           fxAsync(
-            toAsync([1, 2]),
+            fxToAsync([1, 2]),
           ).map<int>((a) => throw Exception('err')).defaultIfEmpty(0).toList(),
           throwsException,
         );
@@ -102,7 +104,7 @@ void main() {
         'should be able to be used as a chaining method in the `fx`',
         () async {
           expect(
-            await fx(<int>[]).toAsync().ifEmpty(() => toAsync([1])).toList(),
+            await fx(<int>[]).toAsync().ifEmpty(() => fxToAsync([1])).toList(),
             equals([1]),
           );
           expect(

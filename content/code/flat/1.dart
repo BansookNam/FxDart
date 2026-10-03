@@ -7,7 +7,7 @@ Future<void> main() async {
   // flattens the already-resolved, purely synchronous nesting.
   final result = await fx([1, 2, 3])
       .toAsync()
-      .map((id) => delay(Duration(milliseconds: 100), [id, [id * 10]]))
+      .map((id) => fxDelay(Duration(milliseconds: 100), [id, [id * 10]]))
       .concurrent(3)
       .flattened() // FxTS alias: .flat()
       .toList();

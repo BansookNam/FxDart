@@ -6,27 +6,27 @@ void main() {
   group('join', () {
     group('sync', () {
       test('should return an empty string if there are no iterable items', () {
-        expect(join(', ', ''.split('')), equals(''));
-        expect(join(', ', <int>[]), equals(''));
-        expect(join(', ', const Iterable<int>.empty()), equals(''));
+        expect(fxJoin(', ', ''.split('')), equals(''));
+        expect(fxJoin(', ', <int>[]), equals(''));
+        expect(fxJoin(', ', const Iterable<int>.empty()), equals(''));
       });
 
       test('should be joined with separator', () {
-        expect(join('_', [1]), equals('1'));
-        expect(join(', ', 'hello'.split('')), equals('h, e, l, l, o'));
+        expect(fxJoin('_', [1]), equals('1'));
+        expect(fxJoin(', ', 'hello'.split('')), equals('h, e, l, l, o'));
       });
 
       test('should work given it is initial value', () {
-        expect(join('~', [1, 2, 3, 4, 5]), equals('1~2~3~4~5'));
+        expect(fxJoin('~', [1, 2, 3, 4, 5]), equals('1~2~3~4~5'));
       });
 
       test('should be able to be used in the pipeline', () {
         final res = pipe(
           [1, 2, 3, 4, 5, 6, 7],
           [
-            (Iterable<int> a) => map((int n) => n + 10, a),
-            (Iterable<int> a) => filter((int n) => n % 2 == 0, a),
-            (Iterable<int> a) => join('-', a),
+            (Iterable<int> a) => fxMap((int n) => n + 10, a),
+            (Iterable<int> a) => fxFilter((int n) => n % 2 == 0, a),
+            (Iterable<int> a) => fxJoin('-', a),
           ],
         );
         expect(res, equals('12-14-16'));
@@ -50,11 +50,11 @@ void main() {
         // overrides Iterable.join — so the default has to survive here.
         expect(fx([1, 2, 3]).join(), equals('123'));
         expect(fx(<int>[]).join(), equals(''));
-        expect(fx(repeat(4, '-')).join(), equals('----'));
+        expect(fx(fxRepeat(4, '-')).join(), equals('----'));
       });
 
       test('should return an empty string when it is an empty array', () {
-        expect(join('~', <int>[]), equals(''));
+        expect(fxJoin('~', <int>[]), equals(''));
       });
     });
 
@@ -62,20 +62,20 @@ void main() {
       test(
         'should return an empty string if there are no iterable items',
         () async {
-          expect(await joinAsync(', ', asyncEmpty<int>()), equals(''));
+          expect(await fxJoinAsync(', ', fxAsyncEmpty<int>()), equals(''));
         },
       );
 
       test('should join elements of the async iterable', () async {
-        final res = await joinAsync('-', toAsync([1, 2, 3, 4, 5]));
+        final res = await fxJoinAsync('-', fxToAsync([1, 2, 3, 4, 5]));
         expect(res, equals('1-2-3-4-5'));
       });
 
       test('should be able to be used in the pipeline', () async {
-        final res = await pipe(toAsync([1, 2, 3, 4, 5, 6, 7]), [
-          (FxAsyncIterable<int> a) => mapAsync((int n) => n + 10, a),
-          (FxAsyncIterable<int> a) => filterAsync((int n) => n % 2 == 0, a),
-          (FxAsyncIterable<int> a) => joinAsync('-', a),
+        final res = await pipe(fxToAsync([1, 2, 3, 4, 5, 6, 7]), [
+          (FxAsyncIterable<int> a) => fxMapAsync((int n) => n + 10, a),
+          (FxAsyncIterable<int> a) => fxFilterAsync((int n) => n % 2 == 0, a),
+          (FxAsyncIterable<int> a) => fxJoinAsync('-', a),
         ]);
         expect(res, equals('12-14-16'));
       });
@@ -99,7 +99,7 @@ void main() {
       test('should be able to handle an error when asynchronous', () async {
         await expectLater(
           fxAsync(
-            toAsync('marpple'.split('')),
+            fxToAsync('marpple'.split('')),
           ).filter((_) => throw Exception('err')).join('!'),
           throwsA(isA<Exception>()),
         );

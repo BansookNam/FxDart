@@ -180,7 +180,7 @@ carencia.
    cadena de FxDart es métodos. Nombra algo que FxTS puede expresar y
    FxDart no, y algo que FxDart obtiene y FxTS no.
 3. Scala resuelve `Future` + `Either` con `EitherT`; FxDart lo resuelve con
-   `eitherAsync`. ¿Cuál de los dos generaliza a un tercer efecto, y qué
+   `fxEitherAsync`. ¿Cuál de los dos generaliza a un tercer efecto, y qué
    hace el otro en su lugar?
 4. ¿Qué capítulos de este libro habría que reescribir si Dart ganara tipos
    de orden superior mañana? ¿Cuáles no cambiarían en absoluto?
@@ -202,7 +202,7 @@ carencia.
    overloads escritos a mano.
 3. `EitherT` generaliza: es un wrapper por mónada, así que un tercer efecto
    es otro transformer más en la pila (al costo de lifts en todas partes).
-   `eitherAsync` no generaliza — FxDart escribe cada combinación útil a
+   `fxEitherAsync` no generaliza — FxDart escribe cada combinación útil a
    mano, y hay pocas, porque las combinaciones que la gente realmente usa
    son pocas.
 4. El capítulo 10 habría que reescribirlo (trata *sobre* la ausencia), y la

@@ -20,7 +20,7 @@ nextLabel: separated
     frontera — convierte lo que ya está en el canal de error en
     un <code>Left</code>. <code>mapEither</code> es el operador al que
     llegas <em>después</em> de eso, o sobre una fuente limpia: cada evento
-    corre dentro de un constructor <code><a href="raise.html">either</a></code>,
+    corre dentro de un constructor <code><a href="raise.html">fxEither</a></code>,
     así que escribes Dart en línea recta con <code>r.ensure</code> /
     <code>r.raise</code> y el resultado del map entero es
     <code>Either&lt;E, R&gt;</code>. Un evento que falla no cancela
@@ -28,15 +28,15 @@ nextLabel: separated
   </p>
   <p>
     Una excepción <em>lanzada</em> se queda en el canal de error — ese es el
-    contrato del constructor <code>either</code>, y mantiene
+    contrato del constructor <code>fxEither</code>, y mantiene
     a <code>attempt</code> como el único sitio donde un throw se convierte en un
     valor. Cuando un callback tanto eleva como lanza, prefiere
-    <code>eitherCatching</code> dentro de <code>mapEither</code> para que salga un
+    <code>fxEitherCatching</code> dentro de <code>mapEither</code> para que salga un
     <code>Either</code>.
   </p>
   <p>
     <code>mapEitherAsync</code> es el gemelo async: un evento a la vez,
-    como <code>asyncMap</code>. La regla de <code>eitherAsync</code> se
+    como <code>asyncMap</code>. La regla de <code>fxEitherAsync</code> se
     conserva: un raise debe ocurrir dentro de la cadena awaited. Un raise desde un
     future no awaited sobrevive al ámbito y aparece como un error de zona
     no manejado en vez de un <code>Left</code>.
@@ -63,6 +63,6 @@ nextLabel: separated
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="attempt.html"><code>attempt</code></a> — la frontera que convierte un throw en un <code>Left</code> ·
-    <a href="raise.html"><code>either</code> constructor</a> — el mismo ámbito raise, sobre un solo valor ·
+    <a href="raise.html"><code>fxEither</code> constructor</a> — el mismo ámbito raise, sobre un solo valor ·
     <a href="separated.html"><code>rights</code> / <code>separated</code></a> — parte los <code>Either</code>s resultantes
   </div>

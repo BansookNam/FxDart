@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:fxdart/fxdart.dart';
 import 'package:test/test.dart';
 
-/// `scanAsync` fuses into the same stage run as map/filter/takeWhile, and the
+/// `fxScanAsync` fuses into the same stage run as map/filter/takeWhile, and the
 /// all-consuming terminals drive that run directly. Both are invisible from
 /// the outside — these pin the observable behaviour of the combinations.
 void main() {
@@ -121,7 +121,7 @@ void main() {
       final sw = Stopwatch()..start();
       final res = await fx([1, 2, 3, 4, 5, 6])
           .toAsync()
-          .map((a) => delay(const Duration(milliseconds: 100), a))
+          .map((a) => fxDelay(const Duration(milliseconds: 100), a))
           .scan<int>((acc, a) => acc + a, 0)
           .concurrent(3)
           .toList();
@@ -160,11 +160,11 @@ void main() {
     });
 
     test('a Future element in the source is awaited', () async {
-      final res = await toListAsync(
-        scanAsync<int, int>(
+      final res = await fxToListAsync(
+        fxScanAsync<int, int>(
           (acc, a) => acc + a,
           0,
-          toAsync(<FutureOr<int>>[1, Future.value(2), 3]),
+          fxToAsync(<FutureOr<int>>[1, Future.value(2), 3]),
         ),
       );
       expect(res, equals([0, 1, 3, 6]));

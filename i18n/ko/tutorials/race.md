@@ -33,7 +33,7 @@ nextLabel: waitAll
     이깁니다. 이것이 정확히 정직한 동작입니다 — 누가 먼저 답하는지
     물었고, "실패했다"도 하나의 답이니까요. 느리고 불안정한 구간은
     경주에 내보내기 전에 각 후보에
-    <code><a href="timeout.html">timeout</a></code>/<code><a href="retry.html">retry</a></code>로
+    <code><a href="timeout.html">timeout</a></code>/<code><a href="retry.html">fxRetry</a></code>로
     안전장치를 거세요.
   </p>
   <p>

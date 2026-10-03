@@ -19,14 +19,14 @@ nextLabel: takeRight
     <code>take</code> es lo que mantiene finito a un pipeline perezoso. Deja de
     pedir valores a su fuente en cuanto ha emitido <code>length</code> valores:
     aguas arriba nunca recibe más peticiones que esas. Dado que fuentes de
-    FxDart como <code>range</code>, <code>repeat</code> y <code>cycle</code>
+    FxDart como <code>fxRange</code>, <code>repeat</code> y <code>cycle</code>
     pueden ser infinitas, muchas veces <code>take</code> es lo único que hace
     que un pipeline sea seguro de ejecutar.
   </p>
   <p>
-    Viene como función data-first (<code>take(n, iterable)</code>) y como método
+    Viene como función data-first (<code>fxTake(n, iterable)</code>) y como método
     de cadena (<code>fx(iterable).take(n)</code>). En el lado asíncrono,
-    <code>takeAsync</code>/<code>.take()</code> es transparente: no serializa lo
+    <code>fxTakeAsync</code>/<code>.take()</code> es transparente: no serializa lo
     que hay aguas arriba, así que un <code>concurrent(n)</code> más arriba en la
     cadena sigue solapando sus peticiones hasta que <code>take</code> tiene lo
     que necesita.
@@ -53,6 +53,6 @@ nextLabel: takeRight
     <strong>Relacionado:</strong>
     <a href="takeRight.html"><code>takeRight</code></a> — los últimos n en vez de los primeros n ·
     <a href="takeWhile.html"><code>takeWhile</code></a> — tomar según un predicado ·
-    <a href="range.html"><code>range</code></a> · <a href="cycle.html"><code>cycle</code></a> — fuentes infinitas ·
+    <a href="range.html"><code>fxRange</code></a> · <a href="cycle.html"><code>cycle</code></a> — fuentes infinitas ·
     <a href="concurrent.html"><code>concurrent</code></a> — evaluación en paralelo
   </div>

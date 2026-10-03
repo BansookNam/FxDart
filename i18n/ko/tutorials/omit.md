@@ -2,7 +2,7 @@
 slug: omit
 title: omit — FxDart 101
 description: FxDart omit 튜토리얼: 원본은 그대로 둔 채 지정한 키를 뺀 Map의 복사본을 얻는 방법을 알아봅니다.
-heading: <code>omit</code>
+heading: <code>fxOmit</code>
 section: 9
 crumb: omit
 prev: fromEntries.html
@@ -16,7 +16,7 @@ nextLabel: pick
 
   <h2>강의</h2>
   <p>
-    <code>omit</code>은 원본의 모든 항목을 그대로 담은 새 <code>Map</code>을
+    <code>fxOmit</code>은 원본의 모든 항목을 그대로 담은 새 <code>Map</code>을
     만들되, 나열한 키만 <em>제외합니다</em> —
     원본 맵은 절대 변경되지 않습니다.
     <code>keysToOmit</code>에 넣었지만 실제로는 맵에 없는 키는
@@ -36,13 +36,13 @@ nextLabel: pick
   {{playground:1}}
 
   <h2>직접 해 보기</h2>
-  <p>연습: <code>omit</code>으로 <code>config</code>에서 <code>'debug'</code> 키를 제거해 보세요.</p>
+  <p>연습: <code>fxOmit</code>으로 <code>config</code>에서 <code>'debug'</code> 키를 제거해 보세요.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="pick.html"><code>pick</code></a> — 반대로, 일부 키만 남기기 ·
-    <a href="omitBy.html"><code>omitBy</code></a> — 키 목록 대신 술어로 제거하기 ·
-    <a href="compactObject.html"><code>compactObject</code></a> — 값이 null인 키 제거하기 ·
-    <a href="fromEntries.html"><code>fromEntries</code></a> — Map을 처음부터 만들기
+    <a href="pick.html"><code>fxPick</code></a> — 반대로, 일부 키만 남기기 ·
+    <a href="omitBy.html"><code>fxOmitBy</code></a> — 키 목록 대신 술어로 제거하기 ·
+    <a href="compactObject.html"><code>fxCompactObject</code></a> — 값이 null인 키 제거하기 ·
+    <a href="fromEntries.html"><code>fxFromEntries</code></a> — Map을 처음부터 만들기
   </div>

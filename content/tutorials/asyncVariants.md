@@ -21,11 +21,11 @@ nextLabel: streams
     top-level forms: the plain one for <code>Iterable</code>, and an
     <code>*Async</code> twin for <code>FxAsyncIterable</code> whose callback
     returns <code>FutureOr&lt;R&gt;</code> instead of <code>R</code>. You've
-    already met a few: <code>map</code>/<code>mapAsync</code>,
-    <code>filter</code>/<code>filterAsync</code>,
-    <code>toList</code>/<code>toListAsync</code>,
-    <code>reduce</code>/<code>reduceAsync</code>, <code>fold</code>/<code>foldAsync</code>,
-    <code>each</code>/<code>eachAsync</code>, <code>find</code>/<code>findAsync</code> —
+    already met a few: <code>fxMap</code>/<code>fxMapAsync</code>,
+    <code>fxFilter</code>/<code>fxFilterAsync</code>,
+    <code>fxToList</code>/<code>fxToListAsync</code>,
+    <code>fxReduce</code>/<code>fxReduceAsync</code>, <code>fxFold</code>/<code>fxFoldAsync</code>,
+    <code>fxEach</code>/<code>fxEachAsync</code>, <code>fxFind</code>/<code>fxFindAsync</code> —
     the pattern holds for essentially every function in the library.
   </p>
   <p>

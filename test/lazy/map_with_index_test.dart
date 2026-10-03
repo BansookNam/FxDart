@@ -6,13 +6,13 @@ void main() {
     group('sync', () {
       test('passes the 0-based position alongside the value', () {
         expect(
-          toList(mapWithIndex((a, i) => '$i:$a', ['a', 'b', 'c'])),
+          fxToList(mapWithIndex((a, i) => '$i:$a', ['a', 'b', 'c'])),
           equals(['0:a', '1:b', '2:c']),
         );
       });
 
       test('is empty for an empty source', () {
-        expect(toList(mapWithIndex((a, i) => a, <int>[])), equals(<int>[]));
+        expect(fxToList(mapWithIndex((a, i) => a, <int>[])), equals(<int>[]));
       });
 
       test('stays lazy', () {
@@ -48,7 +48,7 @@ void main() {
         expect(
           mapWithIndex((a, i) => a + i, list).toList(),
           equals(
-            toList(mapWithIndex((a, i) => a + i, list.where((_) => true))),
+            fxToList(mapWithIndex((a, i) => a + i, list.where((_) => true))),
           ),
         );
       });
@@ -78,7 +78,7 @@ void main() {
 
       test('is available as an fx chain method', () {
         expect(
-          fx(range(1, 4)).mapWithIndex((a, i) => a * i).toList(),
+          fx(fxRange(1, 4)).mapWithIndex((a, i) => a * i).toList(),
           equals([0, 2, 6]),
         );
       });
@@ -86,28 +86,28 @@ void main() {
 
     group('async', () {
       test('passes the 0-based position alongside the value', () async {
-        final res = await toListAsync(
-          mapWithIndexAsync((a, i) => '$i:$a', toAsync(['a', 'b', 'c'])),
+        final res = await fxToListAsync(
+          mapWithIndexAsync((a, i) => '$i:$a', fxToAsync(['a', 'b', 'c'])),
         );
         expect(res, equals(['0:a', '1:b', '2:c']));
       });
 
       test('accepts an async callback', () async {
-        final res = await toListAsync(
-          mapWithIndexAsync((a, i) async => a * i, toAsync([1, 2, 3])),
+        final res = await fxToListAsync(
+          mapWithIndexAsync((a, i) async => a * i, fxToAsync([1, 2, 3])),
         );
         expect(res, equals([0, 2, 6]));
       });
 
       test('restarts the index on every iteration', () async {
-        final it = mapWithIndexAsync((a, i) => i, toAsync(['a', 'b']));
-        expect(await toListAsync(it), equals([0, 1]));
-        expect(await toListAsync(it), equals([0, 1]));
+        final it = mapWithIndexAsync((a, i) => i, fxToAsync(['a', 'b']));
+        expect(await fxToListAsync(it), equals([0, 1]));
+        expect(await fxToListAsync(it), equals([0, 1]));
       });
 
       test('numbers in source order under concurrency', () async {
-        final res = await fxAsync(toAsync([5, 4, 3, 2, 1]))
-            .map((a) => delay(Duration(milliseconds: a * 20), a))
+        final res = await fxAsync(fxToAsync([5, 4, 3, 2, 1]))
+            .map((a) => fxDelay(Duration(milliseconds: a * 20), a))
             .mapWithIndex((a, i) => (i, a))
             .concurrent(5)
             .toList();
@@ -116,7 +116,7 @@ void main() {
 
       test('is available as an fxAsync chain method', () async {
         final res = await fxAsync(
-          toAsync(range(1, 4)),
+          fxToAsync(fxRange(1, 4)),
         ).mapWithIndex((a, i) => a * i).toList();
         expect(res, equals([0, 2, 6]));
       });

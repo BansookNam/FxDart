@@ -2,7 +2,7 @@
 slug: nullable
 title: nullable — FxDart 101
 description: FxDart nullable 튜토리얼: nullable과 nullableAsync 빌더 — nullable 값을 일직선으로 풀어내는, Option 타입을 대신하는 nullable 우선 대안.
-heading: <code>nullable</code>
+heading: <code>fxNullable</code>
 section: 13
 crumb: nullable
 prev: raise.html
@@ -22,8 +22,8 @@ nextLabel: NonEmptyList
   <p>
     필요한 실패 정보가 <em>부재</em>뿐이라면 <code>Either</code>는
     과합니다 — Dart에는 이미 부재 전용 채널이 있으니까요: <code>T?</code>.
-    <code>nullable</code>은
-    <a href="raise.html"><code>either</code> 빌더</a>의 정보 없는
+    <code>fxNullable</code>은
+    <a href="raise.html"><code>fxEither</code> 빌더</a>의 정보 없는
     쌍둥이입니다(Arrow의 <code>nullable&nbsp;{&nbsp;}</code>를 이식한
     것입니다). 스코프의 <code>r.bind(value)</code>가 nullable을 풀어내고,
     값이 <code>null</code>이면 블록 전체가 <code>null</code>을 반환합니다.
@@ -55,8 +55,8 @@ nextLabel: NonEmptyList
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="raise.html"><code>either</code> 빌더</a> — 실패에 이유가 필요할 때 ·
+    <a href="raise.html"><code>fxEither</code> 빌더</a> — 실패에 이유가 필요할 때 ·
     <a href="either.html"><code>Either</code></a> — <code>getOrNull()</code>이 nullable로 돌아가는 다리를 놓아 줍니다 ·
-    <a href="compact.html"><code>nonNulls</code></a> — 파이프라인에서 null 걸러 내기 ·
+    <a href="compact.html"><code>fxNonNulls</code></a> — 파이프라인에서 null 걸러 내기 ·
     <a href="typedErrors.html">타입 있는 에러 — 전체 가이드</a>
   </div>

@@ -26,7 +26,7 @@ nextLabel: takeWhile
     FxTS spelling <code>takeRight</code> — they're the same operator.
   </p>
   <p>
-    The async version has the same constraint: <code>takeLastAsync</code>
+    The async version has the same constraint: <code>fxTakeLastAsync</code>
     drains the entire upstream (awaiting every element) before it can hand
     back the tail. Reach for it only when you know the source is finite and
     small enough to buffer.

@@ -10,7 +10,7 @@ prevLabel: combineLatest
 next: switchMap.html
 nextLabel: switchMap
 ---
-  <p class="hero-sub"><em>소스</em> 이벤트가 올 때마다, 그 이벤트와 다른 스트림의 최신 값에 대한 <code>combine</code> 결과를 내보냅니다 — 다른 쪽은 트리거가 아니라 컨텍스트입니다.</p>
+  <p class="hero-sub"><em>소스</em> 이벤트가 올 때마다, 그 이벤트와 다른 스트림의 최신 값에 대한 <code>fxCombine</code> 결과를 내보냅니다 — 다른 쪽은 트리거가 아니라 컨텍스트입니다.</p>
 
   {{signature}}
 
@@ -22,7 +22,7 @@ nextLabel: switchMap
     한쪽이 이끌고, 다른 쪽은 참조됩니다.
     <code>withLatestFrom(other, combine)</code>이 그 비대칭을
     표현합니다 — 각 소스 이벤트는
-    <code>combine(event, latestOfOther)</code>를 내보내고,
+    <code>fxCombine(event, latestOfOther)</code>를 내보내고,
     <code>other</code>의 이벤트는 기억된 값을 갱신할 뿐
     <strong>아무것도</strong> 내보내지 않습니다.
   </p>

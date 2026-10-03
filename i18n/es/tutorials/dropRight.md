@@ -25,7 +25,7 @@ nextLabel: dropWhile
     necesita una fuente finita.
   </p>
   <p>
-    <code>dropRightAsync</code> tiene la misma restricción: espera a todo lo que
+    <code>fxDropRightAsync</code> tiene la misma restricción: espera a todo lo que
     hay aguas arriba antes de poder empezar a producir valores.
   </p>
 

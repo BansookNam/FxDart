@@ -1,4 +1,4 @@
-import 'package:fxdart/fxdart.dart' hide isEmpty, isNotNull, isNull;
+import 'package:fxdart/fxdart.dart' hide fxIsEmpty, isNotNull, fxIsNull;
 import 'package:test/test.dart';
 
 void main() {
@@ -6,14 +6,14 @@ void main() {
     group('sync', () {
       test('should pair each element with the derived value', () {
         expect(
-          attach((String w) => w.length, ['a', 'bb', 'ccc']).toList(),
+          fxAttach((String w) => w.length, ['a', 'bb', 'ccc']).toList(),
           equals([('a', 1), ('bb', 2), ('ccc', 3)]),
         );
       });
 
       test('should stay lazy', () {
         var calls = 0;
-        final pairs = attach((int n) {
+        final pairs = fxAttach((int n) {
           calls++;
           return n * 10;
         }, [1, 2, 3, 4]);
@@ -23,7 +23,7 @@ void main() {
       });
 
       test('should handle an empty iterable', () {
-        expect(attach((int n) => n, <int>[]), isEmpty);
+        expect(fxAttach((int n) => n, <int>[]), isEmpty);
       });
 
       test('should be able to be used in the pipeline', () {
@@ -38,8 +38,8 @@ void main() {
 
     group('async', () {
       test('should pair each element with the awaited result', () async {
-        final result = await toListAsync(
-          attachAsync((int n) async => n * 10, toAsync([1, 2, 3])),
+        final result = await fxToListAsync(
+          fxAttachAsync((int n) async => n * 10, fxToAsync([1, 2, 3])),
         );
         expect(result, equals([(1, 10), (2, 20), (3, 30)]));
       });

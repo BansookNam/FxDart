@@ -27,7 +27,7 @@ Future<List<Object?>> drainBurst<T>(
 }
 
 Future<void> main() async {
-  print('fromStream        ${await drainBurst(fromStream)}');
+  print('fromStream        ${await drainBurst(fxFromStream)}');
   // [1, 2, 3] — lossless FIFO
   print('fromStreamLatest  ${await drainBurst(fromStreamLatest)}');
   // [3] — latest-wins

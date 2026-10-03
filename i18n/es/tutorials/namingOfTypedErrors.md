@@ -7,7 +7,7 @@ section: 13
 crumb: naming
 ---
   <p class="hero-sub">
-    La funcionalidad que hay detrás de <code>either</code> tiene nombres
+    La funcionalidad que hay detrás de <code>fxEither</code> tiene nombres
     famosos en otros ecosistemas: <a href="monad.html"><em>mónada</em></a>,
     <em>railway-oriented programming</em>. Esta página explica por qué FxDart
     ha decidido deliberadamente no llamarla de ninguna de esas maneras. (¿No
@@ -22,7 +22,7 @@ crumb: naming
     <strong>sustituir</strong> el encadenado con <code>flatMap</code> por
     código en línea recta. Ya lo viste en la
     <a href="typedErrors.html">página de errores tipados</a>: el bloque
-    <code>either((r) { ... })</code> es la alternativa a la pirámide anidada
+    <code>fxEither((r) { ... })</code> es la alternativa a la pirámide anidada
     de <code>flatMap</code>, no una envoltura sobre ella.
   </p>
   <p>

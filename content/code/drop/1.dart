@@ -3,9 +3,9 @@ import 'package:fxdart/fxdart.dart';
 Future<void> main() async {
   final sw = Stopwatch()..start();
 
-  final result = await fx(range(6))
+  final result = await fx(fxRange(6))
       .toAsync()
-      .map((a) => delay(Duration(milliseconds: 100), a))
+      .map((a) => fxDelay(Duration(milliseconds: 100), a))
       .concurrent(3)
       .skip(2) // FxTS alias: .drop(2)
       .toList();

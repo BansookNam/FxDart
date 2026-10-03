@@ -23,7 +23,7 @@ nextLabel: async variants
   </p>
   <p>
     <code>FxAsyncIterable</code> is <strong>pull-based</strong>: nothing runs
-    until a terminal (<code>toListAsync</code>, <code>eachAsync</code>, the
+    until a terminal (<code>fxToListAsync</code>, <code>fxEachAsync</code>, the
     <code>FxAsync</code> chain's <code>.toList()</code>, …) calls
     <code>next()</code> on it, one step at a time — exactly like a plain
     <code>Iterable</code>, just asynchronous. This is a deliberate departure
@@ -38,7 +38,7 @@ nextLabel: async variants
     building on <code>Stream</code>.
   </p>
   <p>
-    Use the top-level <code>toAsync(iterable)</code> for a raw
+    Use the top-level <code>fxToAsync(iterable)</code> for a raw
     <code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code>, or the chain method
     <code>fx(iterable).toAsync()</code> to switch an existing <code>Fx</code>
     chain into its <code>FxAsync</code> counterpart. Both are lazy: building
@@ -55,7 +55,7 @@ nextLabel: async variants
     In Dart, a <code>Future</code> starts running the instant it's created —
     not when it's awaited. So three Futures built eagerly in a list literal
     are already racing before <code>toAsync</code> ever touches them. Contrast
-    that with <code>mapAsync</code> (or chain <code>.map</code>), which creates
+    that with <code>fxMapAsync</code> (or chain <code>.map</code>), which creates
     one new Future per element only when it's <em>pulled</em> — lazily, one at
     a time, unless you add <code>concurrent(n)</code>:
   </p>
@@ -88,5 +88,5 @@ nextLabel: async variants
     <a href="asyncVariants.html"><code>*Async</code> naming convention</a> — mapAsync, filterAsync, … ·
     <a href="streams.html">Stream bridges</a> — fromStream, fxStream, toStream ·
     <a href="concurrent.html"><code>concurrent</code></a> — the back-channel in action ·
-    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — building async demos
+    <a href="delay.html"><code>fxDelay</code> &amp; <code>fxSleep</code></a> — building async demos
   </div>

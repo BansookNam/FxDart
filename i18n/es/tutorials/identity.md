@@ -2,7 +2,7 @@
 slug: identity
 title: identity — FxDart 101
 description: Tutorial de identity en FxDart: la función que devuelve su argumento sin tocarlo, y por qué resulta útil como retrollamada por defecto.
-heading: <code>identity</code>
+heading: <code>fxIdentity</code>
 section: 10
 crumb: identity
 prev: matches.html
@@ -16,7 +16,7 @@ nextLabel: always
 
   <h2>Lección</h2>
   <p>
-    <code>identity</code> es la función más simple de la librería, y una de
+    <code>fxIdentity</code> es la función más simple de la librería, y una de
     las más útiles: recibe un valor y lo devuelve tal cual. Por sí sola
     parece inútil. Su valor aparece siempre que una API <em>espera una
     función</em> pero en realidad no quieres transformar nada: una
@@ -25,7 +25,7 @@ nextLabel: always
     pipeline condicional.
   </p>
   <p>
-    Como <code>identity</code> es genérica (<code>T identity&lt;T&gt;(T a)</code>),
+    Como <code>fxIdentity</code> es genérica (<code>T fxIdentity&lt;T&gt;(T a)</code>),
     encaja en cualquier hueco que pida una función unaria sin que tengas que escribir
     <code>(x) => x</code> a mano. No tiene variante asíncrona ni forma de
     cadena: es una función corriente de valor a valor que pasas de un lado a otro.
@@ -39,20 +39,20 @@ nextLabel: always
   <h2>Demo 2 · Como la rama que «no hace nada»</h2>
   <p>
     Una tabla de despacho de transformaciones de cadenas de texto, en la que una entrada no hace
-    nada a propósito: <code>identity</code> ocupa ese hueco limpiamente, sin
+    nada a propósito: <code>fxIdentity</code> ocupa ese hueco limpiamente, sin
     escribir una lambda vacía a mano:
   </p>
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: <code>sortBy</code> recibe una función clave. Usa <code>identity</code>
+  <p>Ejercicio: <code>sortBy</code> recibe una función clave. Usa <code>fxIdentity</code>
     como esa clave para ordenar esta lista de palabras por su orden natural (alfabético).</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="always.html"><code>always</code></a> — una constante en vez de dejar pasar el valor ·
-    <a href="tap.html"><code>tap</code></a> — deja pasar el valor, pero antes ejecuta un efecto secundario ·
-    <a href="cases.html"><code>cases</code></a> — tabla de despacho con predicados ·
+    <a href="always.html"><code>fxAlways</code></a> — una constante en vez de dejar pasar el valor ·
+    <a href="tap.html"><code>fxTap</code></a> — deja pasar el valor, pero antes ejecuta un efecto secundario ·
+    <a href="cases.html"><code>fxCases</code></a> — tabla de despacho con predicados ·
     <a href="sortBy.html"><code>sortBy</code></a> — un destino habitual para una función clave
   </div>

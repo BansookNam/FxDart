@@ -14,7 +14,7 @@ void main() {
     {'sku': 'C3', 'title': 'Monitor'},
   ];
 
-  final featuredProducts = intersectionBy((p) => p['sku'], featured, catalog);
-  print(toList(featuredProducts));
+  final featuredProducts = fxIntersectionBy((p) => p['sku'], featured, catalog);
+  print(fxToList(featuredProducts));
   // [{sku: A1, title: Keyboard}, {sku: B2, title: Mouse}]
 }

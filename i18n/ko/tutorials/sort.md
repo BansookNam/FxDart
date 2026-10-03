@@ -26,8 +26,8 @@ nextLabel: sortBy
     (<code>List.of(iterable)..sort(f)</code>),
     원본 이터러블은 그대로 남습니다. FxTS는 나중에 원본을 변경하는
     <code>sort</code>에 대해 변경을 일으키지 않는 대안으로
-    <code>toSorted</code>를 추가했지만,
-    FxDart에서 <code>toSorted</code>는 그저 별칭입니다 —
+    <code>fxToSorted</code>를 추가했지만,
+    FxDart에서 <code>fxToSorted</code>는 그저 별칭입니다 —
     <code>sort</code>가 이미 원본을 건드리지 않으니 구분할 이유가
     없기 때문입니다.
   </p>

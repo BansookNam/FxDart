@@ -25,7 +25,7 @@ nextLabel: foldRight
     <code>Iterable</code>이 바로 이 연산에 이미 쓰고 있는 이름이기도 합니다.
   </p>
   <p>
-    인자 순서를 잘 봐 두세요. <code>fold(seed, f, iterable)</code>입니다 —
+    인자 순서를 잘 봐 두세요. <code>fxFold(seed, f, iterable)</code>입니다 —
     초깃값이 먼저, 그다음 결합 함수, 마지막이 소스입니다. 체인 형태에서
     <code>Iterable.fold(initialValue, combine)</code>과 같은 순서죠. 함수가 먼저
     오는 FxTS의 <code>reduce(f, seed, iterable)</code>과는 다릅니다.
@@ -52,7 +52,7 @@ nextLabel: foldRight
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="reduce.html"><code>reduce</code></a> — 초깃값이 없는 짝 ·
-    <a href="reduceLazy.html"><code>reduceLazy</code></a> — 재사용 가능한 커링된 리듀서 ·
+    <a href="reduceLazy.html"><code>fxReduceLazy</code></a> — 재사용 가능한 커링된 리듀서 ·
     <a href="sum.html"><code>sum</code></a> — 흔히 쓰는 fold를 특화한 함수 ·
     <a href="scan.html"><code>scan</code></a> — fold와 비슷하지만 중간값을 모두 지연 방출
   </div>

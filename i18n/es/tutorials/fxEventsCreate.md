@@ -48,7 +48,7 @@ nextLabel: whenComplete
     la cadena se mantiene de suscripción única. <code>using</code>
     adquiere un recurso al escuchar, lo refleja y lo libera exactamente
     una vez — la contraparte push del
-    <code><a href="using.html">using</a></code> pull.
+    <code><a href="using.html">fxUsing</a></code> pull.
     <code>fromPattern(add, remove)</code> es el puente típico
     <code>on</code>/<code>off</code>. Y
     <code>create(init)</code> llama a <code>init</code> con un
@@ -78,6 +78,6 @@ nextLabel: whenComplete
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="fxEvents.html"><code>fxEvents</code></a> — envolver un Stream que ya tienes ·
-    <a href="using.html"><code>using</code></a> — el original de la capa pull: adquirir en el primer pull, liberar una vez ·
+    <a href="using.html"><code>fxUsing</code></a> — el original de la capa pull: adquirir en el primer pull, liberar una vez ·
     <a href="share.html"><code>share</code></a> — cuando una ejecución de una cadena necesita muchos listeners
   </div>

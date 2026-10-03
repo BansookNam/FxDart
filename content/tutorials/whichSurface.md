@@ -34,11 +34,11 @@ nextLabel: fx
     <tr>
       <td>Values arrive when they arrive (keystrokes, ticks, sockets)</td>
       <td><code><a href="fxEvents.html">fxEvents(stream)</a></code></td>
-      <td>a pull pipeline with <code>sleep</code></td>
+      <td>a pull pipeline with <code>fxSleep</code></td>
     </tr>
     <tr>
       <td>The caller handles the failure</td>
-      <td><code><a href="raise.html">either</a></code> / <code><a href="mapEither.html">mapEither</a></code> / <code><a href="attempt.html">attempt</a></code> on the surface you are already on</td>
+      <td><code><a href="raise.html">fxEither</a></code> / <code><a href="mapEither.html">mapEither</a></code> / <code><a href="attempt.html">attempt</a></code> on the surface you are already on</td>
       <td><code>throw</code> for domain errors; <code>null</code> with the reason lost</td>
     </tr>
   </table>

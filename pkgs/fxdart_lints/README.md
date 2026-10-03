@@ -21,8 +21,8 @@ dev_dependencies:
 | Lint | Flags | Does not flag |
 |---|---|---|
 | `avoid_unbounded_future_wait` | `Future.wait(xs.map(fetch))`, `Future.wait([for (x in xs) fetch(x)])` | `Future.wait([a, b, c])` |
-| `avoid_bare_catch_in_raise` | `catch (` / `on Object` / `on Error` inside `either` / `nullable` / `foldRaise` | `on Exception` / `on FormatException`; `catching(...)` |
-| `avoid_lazy_return_from_raise` | `return fx(xs).map(...)` or `either((r) => fx(xs).map(...))` | `return fx(xs).toList()` / `.sequence()`; a `return` inside a nested `map` |
+| `avoid_bare_catch_in_raise` | `catch (` / `on Object` / `on Error` inside `fxEither` / `fxNullable` / `fxFoldRaise` | `on Exception` / `on FormatException`; `fxCatching(...)` |
+| `avoid_lazy_return_from_raise` | `return fx(xs).map(...)` or `fxEither((r) => fx(xs).map(...))` | `return fx(xs).toList()` / `.sequence()`; a `return` inside a nested `map` |
 | `attempt_after_retry` | `.attempt(...).retryOn(...)` on an fxdart chain | `.retryOn(...).attempt(...)`; a non-fxdart receiver |
 
 Each diagnostic names the fix. `attempt` after `retryOn`, never before:

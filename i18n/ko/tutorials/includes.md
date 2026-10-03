@@ -22,10 +22,10 @@ nextLabel: isEmpty
     <code>fx(xs).contains(a)</code>가 그대로 동작합니다. 다만 최상위
     <code>contains</code> 함수는 없습니다 — 이 이름이
     <code>package:test</code>의 matcher와 충돌하기 때문입니다. 그래서
-    data-first 형태는 FxTS식 표기인 <code>includes(a, iterable)</code>를
+    data-first 형태는 FxTS식 표기인 <code>fxIncludes(a, iterable)</code>를
     유지하며, 이는 말 그대로 <code>iterable.contains(a)</code>입니다.
-    비동기 버전인 <code>includesAsync</code>는
-    <a href="some.html"><code>someAsync</code></a> 위에 얹혀 있으며
+    비동기 버전인 <code>fxIncludesAsync</code>는
+    <a href="some.html"><code>fxSomeAsync</code></a> 위에 얹혀 있으며
     (술어로 <code>b == a</code>를 씁니다), 덕분에 단락도 그대로
     물려받습니다. 일치하는 값을 찾는 순간 소스에서 값을 끌어오는 것을
     멈춥니다.
@@ -49,7 +49,7 @@ nextLabel: isEmpty
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="some.html"><code>some</code></a> — <code>includesAsync</code>의 토대가 되는 함수 ·
+    <a href="some.html"><code>some</code></a> — <code>fxIncludesAsync</code>의 토대가 되는 함수 ·
     <a href="find.html"><code>find</code></a> — 불리언 대신 일치하는 값 자체를 얻기 ·
     <a href="findIndex.html"><code>findIndex</code></a> — 대신 위치를 얻기 ·
     <a href="isEmpty.html"><code>isEmpty</code></a> — 가까운 곳에 있는 또 다른 값 기반 검사

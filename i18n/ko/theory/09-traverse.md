@@ -112,19 +112,19 @@ Either<String, int> parsePort(String s) {
 
 void main() {
   final results = ['8080', 'x', '9000'].map(parsePort).toList();
-  final (bad, good) = separateEither(results);
+  final (bad, good) = fxSeparateEither(results);
   print('kept: $good');
   print('dropped: $bad');
 
   // …or take just one side.
-  print(rights(results));
-  print(lefts(results));
+  print(fxRights(results));
+  print(fxLefts(results));
 }
 ```
 
 셋 중 무엇을 고를지는 기술이 아니라 제품의 결정입니다. 임포트 도구는
-`separateEither`를, 설정 로더는 `flattenOrAccumulate`를, API 핸들러는
-`sequenceEither`를 원합니다.
+`fxSeparateEither`를, 설정 로더는 `flattenOrAccumulate`를, API 핸들러는
+`fxSequenceEither`를 원합니다.
 
 ## 비동기 쌍둥이
 
@@ -171,9 +171,9 @@ void main() async {
 
 ## 일반적으로 갖지 못한 대가
 
-위 코드에 나온 버전을 세어 보세요. `sequenceEither`, `flattenOrAccumulate`,
-`mapOrAccumulate`, `separateEither` — 여기에 비동기 체인을 위한
-`sequenceEitherAsync`, `flattenOrAccumulateAsync`, `mapOrAccumulateAsync`까지.
+위 코드에 나온 버전을 세어 보세요. `fxSequenceEither`, `flattenOrAccumulate`,
+`mapOrAccumulate`, `fxSeparateEither` — 여기에 비동기 체인을 위한
+`fxSequenceEitherAsync`, `flattenOrAccumulateAsync`, `mapOrAccumulateAsync`까지.
 고차 타입이 있는 언어가 하나로 쓰는 자리에 함수 일곱 개입니다.
 
 이것은 무능이 아니라 언어의 천장이고, 여러분에게 실제 비용을 물립니다. FxDart에
@@ -188,7 +188,7 @@ in xs) { final r = f(x); if (r.isLeft) return r; out.add(...); }` 를 두 번 �
 쓰셨다면 그것이 순회이고, 그렇게 말해야 합니다.
 
 모음이 원소 하나뿐이면 건너뛰세요(그냥 `Either`를 쓰면 됩니다). 부분 성공 의미가
-필요할 때도(그건 `separateEither`입니다), 루프가 순수한 map이 아닌 무언가를
+필요할 때도(그건 `fxSeparateEither`입니다), 루프가 순수한 map이 아닌 무언가를
 원소마다 정말로 하고 있을 때도 마찬가지입니다 — 부수효과를 감춘 순회는 그것이
 대체한 루프보다 나쁩니다.
 

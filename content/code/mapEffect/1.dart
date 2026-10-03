@@ -9,7 +9,7 @@ Future<void> main() async {
   final result = await fx([1, 2, 3, 4])
       .toAsync()
       .mapEffect((a) async {
-        await delay(Duration(milliseconds: 100), null);
+        await fxDelay(Duration(milliseconds: 100), null);
         saved.add(a);
         return a * a;
       })

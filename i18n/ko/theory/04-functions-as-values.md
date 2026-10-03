@@ -42,7 +42,7 @@ void main() {
   print(['  a ', ' b'].map(shout2).toList());
 
   // pipe1 is the same idea with the value supplied first.
-  print(pipe1('  hi ', shout2));
+  print(fxPipe1('  hi ', shout2));
 }
 ```
 
@@ -103,8 +103,8 @@ Dart에는 오버로드도 가변 제네릭도 없습니다. 단계 개수를 �
 final result = pipe(
   [1, 2, 3, 4],
   (dynamic xs) =>
-      map((dynamic n) => (n as int) * 2, xs as Iterable),
-  (dynamic xs) => toList(xs as Iterable<int>),
+      fxMap((dynamic n) => (n as int) * 2, xs as Iterable),
+  (dynamic xs) => fxToList(xs as Iterable<int>),
 );
 ```
 
@@ -154,7 +154,7 @@ bool odd(int n) => n.isOdd;
 
 void main() {
   // juxt: one input, several functions, all their results.
-  final stats = juxt([
+  final stats = fxJuxt([
     (Iterable<int> xs) => xs.length,
     (Iterable<int> xs) => xs.reduce((a, b) => a + b),
   ]);
@@ -163,7 +163,7 @@ void main() {
   // Predicates are values too, so they combine.
   final both = (int n) => small(n) && odd(n);
   print(fx([3, 12, 7, 20]).filter(both).toList());
-  print(fx([3, 12, 7, 20]).filter(negate(small)).toList());
+  print(fx([3, 12, 7, 20]).filter(fxNegate(small)).toList());
 }
 ```
 

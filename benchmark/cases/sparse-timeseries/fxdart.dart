@@ -13,13 +13,13 @@ Future<void> main() async {
     n: n,
     run: () {
       final byDay = fx(txns).groupBy((t) => t.day);
-      final daily = fx(range(1, totalDays + 1))
+      final daily = fx(fxRange(1, totalDays + 1))
           .map((d) => fx(byDay[d] ?? const <Tx>[]).sumBy((t) => t.amount))
           .toList();
 
       final weeks = fx(daily).chunk(7).zipWithIndex().map((w) {
         final start = w.$1 * 7 + 1;
-        final cells = join(' ', fx(w.$2).map((v) => v.toStringAsFixed(2)));
+        final cells = fxJoin(' ', fx(w.$2).map((v) => v.toStringAsFixed(2)));
         final total = fx(w.$2).sumBy((v) => v);
         return 'Day ${dd(start)}-${dd(start + 6)}: $cells'
             '  | week total ${total.toStringAsFixed(2)}';

@@ -5,7 +5,7 @@ void main() {
 
   // TODO: turn every score into a letter grade, keeping the names.
   final grades =
-      mapValues((s) => s >= 90 ? 'A' : (s >= 80 ? 'B' : 'C'), scores);
+      fxMapValues((s) => s >= 90 ? 'A' : (s >= 80 ? 'B' : 'C'), scores);
 
   print(grades); // {kim: B, lee: A, park: C}
 }

@@ -5,7 +5,7 @@ void main() {
 
   // TODO: turn entries(scores) into a list of "name: PASS/FAIL" strings,
   // where >= 60 is a PASS.
-  final report = fx(entries(scores))
+  final report = fx(fxEntries(scores))
       .map((e) => '${e.$1}: ${e.$2 >= 60 ? 'PASS' : 'FAIL'}')
       .toList();
 

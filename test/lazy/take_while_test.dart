@@ -8,32 +8,32 @@ void main() {
         'should be able to take the element while the callback result is truthy',
         () {
           final res = <int>[];
-          for (final item in takeWhile((a) => a < 3, [1, 2, 3, 4])) {
+          for (final item in fxTakeWhile((a) => a < 3, [1, 2, 3, 4])) {
             res.add(item);
           }
           expect(res, equals([1, 2]));
 
-          final res1 = toList(takeWhile((a) => a > 10, [1, 2, 3, 4]));
+          final res1 = fxToList(fxTakeWhile((a) => a > 10, [1, 2, 3, 4]));
           expect(res1, equals([]));
 
-          final res2 = toList(takeWhile((a) => a > 0, [1, 2, 3, 4]));
+          final res2 = fxToList(fxTakeWhile((a) => a > 0, [1, 2, 3, 4]));
           expect(res2, equals([1, 2, 3, 4]));
         },
       );
 
       test('should be able to be used in the pipeline', () {
-        final res = pipe(range(1, 20), [
-          (v) => map((int a) => a + 10, v),
-          (v) => filter((int a) => a % 2 == 0, v),
-          (v) => takeWhile((int a) => a < 20, v),
-          (v) => toList(v),
+        final res = pipe(fxRange(1, 20), [
+          (v) => fxMap((int a) => a + 10, v),
+          (v) => fxFilter((int a) => a % 2 == 0, v),
+          (v) => fxTakeWhile((int a) => a < 20, v),
+          (v) => fxToList(v),
         ]);
 
         expect(res, equals([12, 14, 16, 18]));
       });
 
       test('should be able to be used as a chaining method in the `fx`', () {
-        final res = fx(range(1, 20))
+        final res = fx(fxRange(1, 20))
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
             .takeWhile((a) => a < 20)
@@ -48,9 +48,9 @@ void main() {
         'should be able to take the element while the callback result is truthy',
         () async {
           final res = <int>[];
-          final it = takeWhileAsync(
+          final it = fxTakeWhileAsync(
             (a) => a < 3,
-            toAsync([1, 2, 3, 4]),
+            fxToAsync([1, 2, 3, 4]),
           ).iterator;
           while (true) {
             final r = await it.next();
@@ -59,13 +59,13 @@ void main() {
           }
           expect(res, equals([1, 2]));
 
-          final res1 = await toListAsync(
-            takeWhileAsync((a) => a > 10, toAsync([1, 2, 3, 4])),
+          final res1 = await fxToListAsync(
+            fxTakeWhileAsync((a) => a > 10, fxToAsync([1, 2, 3, 4])),
           );
           expect(res1, equals([]));
 
-          final res2 = await toListAsync(
-            takeWhileAsync((a) => a > 0, toAsync([1, 2, 3, 4])),
+          final res2 = await fxToListAsync(
+            fxTakeWhileAsync((a) => a > 0, fxToAsync([1, 2, 3, 4])),
           );
           expect(res2, equals([1, 2, 3, 4]));
         },
@@ -74,25 +74,25 @@ void main() {
       test(
         'should be able to take the element while the async callback result is truthy',
         () async {
-          final res = await toListAsync(
-            takeWhileAsync((a) async => a < 3, toAsync([1, 2, 3, 4])),
+          final res = await fxToListAsync(
+            fxTakeWhileAsync((a) async => a < 3, fxToAsync([1, 2, 3, 4])),
           );
           expect(res, equals([1, 2]));
 
-          final res1 = await toListAsync(
-            takeWhileAsync((a) async => a > 10, toAsync([1, 2, 3, 4])),
+          final res1 = await fxToListAsync(
+            fxTakeWhileAsync((a) async => a > 10, fxToAsync([1, 2, 3, 4])),
           );
           expect(res1, equals([]));
 
-          final res2 = await toListAsync(
-            takeWhileAsync((a) async => a > 0, toAsync([1, 2, 3, 4])),
+          final res2 = await fxToListAsync(
+            fxTakeWhileAsync((a) async => a > 0, fxToAsync([1, 2, 3, 4])),
           );
           expect(res2, equals([1, 2, 3, 4]));
         },
       );
 
       test('should be able to be used in the pipeline', () async {
-        final res = await fxAsync(toAsync(range(1, 20)))
+        final res = await fxAsync(fxToAsync(fxRange(1, 20)))
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
             .takeWhile((a) => a < 20)
@@ -104,7 +104,7 @@ void main() {
       test(
         'should be able to be used as a chaining method in the `fx`',
         () async {
-          final res = await fx(range(1, 20))
+          final res = await fx(fxRange(1, 20))
               .toAsync()
               .map((a) => a + 10)
               .filter((a) => a % 2 == 0)
@@ -118,8 +118,8 @@ void main() {
       test(
         "should be consumed 'AsyncIterable' as many times as called with 'next'",
         () async {
-          final res = fxAsync(toAsync(range(1, 500)))
-              .map((a) => delay(const Duration(milliseconds: 50), a + 10))
+          final res = fxAsync(fxToAsync(fxRange(1, 500)))
+              .map((a) => fxDelay(const Duration(milliseconds: 50), a + 10))
               .takeWhile((a) => a < 16)
               .concurrent(2);
 
@@ -143,8 +143,8 @@ void main() {
 
       test('should be able to take the element concurrently', () async {
         final sw = Stopwatch()..start();
-        final res = await fxAsync(toAsync(range(1, 500)))
-            .map((a) => delay(const Duration(milliseconds: 50), a + 10))
+        final res = await fxAsync(fxToAsync(fxRange(1, 500)))
+            .map((a) => fxDelay(const Duration(milliseconds: 50), a + 10))
             .filter((a) => a % 2 == 0)
             .takeWhile((a) => a < 22)
             .concurrent(2)

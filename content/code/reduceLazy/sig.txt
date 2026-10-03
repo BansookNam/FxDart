@@ -1,1 +1,1 @@
-Acc Function(Iterable&lt;A&gt;) reduceLazy&lt;A, Acc&gt;(Acc Function(Acc acc, A a) f, Acc seed)
+Acc Function(Iterable&lt;A&gt;) fxReduceLazy&lt;A, Acc&gt;(Acc Function(Acc acc, A a) f, Acc seed)

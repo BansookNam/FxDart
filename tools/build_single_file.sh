@@ -99,8 +99,8 @@ HEADER
   echo "// ---- lib/src/typed/either.dart (transformed: raise_. -> _\$typed* / plain) ----"
   strip_directives "$ROOT/lib/src/typed/either.dart" | perl -pe '
     s/(?<![A-Za-z0-9_])raise_\.Raise(?![A-Za-z0-9_])/Raise/g;
-    s/(?<![A-Za-z0-9_])raise_\.either(?![A-Za-z0-9_])/_\$typedEither/g;
-    s/(?<![A-Za-z0-9_])raise_\.catching(?![A-Za-z0-9_])/_\$typedCatching/g;
+    s/(?<![A-Za-z0-9_])raise_\.fxEither(?![A-Za-z0-9_])/_\$typedEither/g;
+    s/(?<![A-Za-z0-9_])raise_\.fxCatching(?![A-Za-z0-9_])/_\$typedCatching/g;
   '
 
   # Wrapper section: every `_$NAME` used above, defined as a small top-level
@@ -119,38 +119,38 @@ HEADER
 // ---- wrappers for either.dart's raise_. prefixed calls ----
 
 Either<E, A> _$typedEither<E, A>(A Function(Raise<E> r) block) =>
-    either(block);
+    fxEither(block);
 A _$typedCatching<A>(A Function() block,
         A Function(Object error, StackTrace stackTrace) onError) =>
-    catching(block, onError);
+    fxCatching(block, onError);
 
 // ---- wrappers for fx.dart's l./s./async_. prefixed calls ----
 
 // async_iterable.dart
-FxAsyncIterable<T> _$toAsync<T>(Iterable<FutureOr<T>> iterable) =>
-    toAsync(iterable);
+FxAsyncIterable<T> _$fxToAsync<T>(Iterable<FutureOr<T>> iterable) =>
+    fxToAsync(iterable);
 
 // lazy/map.dart
-Iterable<B> _$map<A, B>(B Function(A a) f, Iterable<A> iterable) =>
-    map(f, iterable);
-FxAsyncIterable<B> _$mapAsync<A, B>(
+Iterable<B> _$fxMap<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    fxMap(f, iterable);
+FxAsyncIterable<B> _$fxMapAsync<A, B>(
         FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    mapAsync(f, iterable);
-Iterable<A> _$peek<A>(void Function(A a) f, Iterable<A> iterable) =>
-    peek(f, iterable);
-FxAsyncIterable<A> _$peekAsync<A>(
+    fxMapAsync(f, iterable);
+Iterable<A> _$fxPeek<A>(void Function(A a) f, Iterable<A> iterable) =>
+    fxPeek(f, iterable);
+FxAsyncIterable<A> _$fxPeekAsync<A>(
         FutureOr<void> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    peekAsync(f, iterable);
-Iterable<dynamic> _$flat(Iterable<dynamic> iterable, [int depth = 1]) =>
-    flat(iterable, depth);
-FxAsyncIterable<dynamic> _$flatAsync(FxAsyncIterable<dynamic> iterable,
+    fxPeekAsync(f, iterable);
+Iterable<dynamic> _$fxFlat(Iterable<dynamic> iterable, [int depth = 1]) =>
+    fxFlat(iterable, depth);
+FxAsyncIterable<dynamic> _$fxFlatAsync(FxAsyncIterable<dynamic> iterable,
         [int depth = 1]) =>
-    flatAsync(iterable, depth);
-Iterable<B> _$flatMap<A, B>(Iterable<B> Function(A a) f, Iterable<A> iterable) =>
-    flatMap(f, iterable);
-FxAsyncIterable<B> _$flatMapAsync<A, B>(
+    fxFlatAsync(iterable, depth);
+Iterable<B> _$fxFlatMap<A, B>(Iterable<B> Function(A a) f, Iterable<A> iterable) =>
+    fxFlatMap(f, iterable);
+FxAsyncIterable<B> _$fxFlatMapAsync<A, B>(
         FutureOr<Iterable<B>> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    flatMapAsync(f, iterable);
+    fxFlatMapAsync(f, iterable);
 Iterable<B> _$mapWithIndex<A, B>(
         B Function(A a, int index) f, Iterable<A> iterable) =>
     mapWithIndex(f, iterable);
@@ -164,40 +164,40 @@ FxAsyncIterable<B> _$flatMapWithIndexAsync<A, B>(
         FutureOr<Iterable<B>> Function(A a, int index) f,
         FxAsyncIterable<A> iterable) =>
     flatMapWithIndexAsync(f, iterable);
-Iterable<B> _$scan<A, B>(
+Iterable<B> _$fxScan<A, B>(
         B Function(B acc, A a) f, B seed, Iterable<A> iterable) =>
-    scan(f, seed, iterable);
-FxAsyncIterable<B> _$scanAsync<A, B>(FutureOr<B> Function(B acc, A a) f,
+    fxScan(f, seed, iterable);
+FxAsyncIterable<B> _$fxScanAsync<A, B>(FutureOr<B> Function(B acc, A a) f,
         FutureOr<B> seed, FxAsyncIterable<A> iterable) =>
-    scanAsync(f, seed, iterable);
-Iterable<B> _$mapAccum<A, B>(
+    fxScanAsync(f, seed, iterable);
+Iterable<B> _$fxMapAccum<A, B>(
         B Function(B acc, A a) f, B seed, Iterable<A> iterable) =>
-    mapAccum(f, seed, iterable);
-FxAsyncIterable<B> _$mapAccumAsync<A, B>(FutureOr<B> Function(B acc, A a) f,
+    fxMapAccum(f, seed, iterable);
+FxAsyncIterable<B> _$fxMapAccumAsync<A, B>(FutureOr<B> Function(B acc, A a) f,
         FutureOr<B> seed, FxAsyncIterable<A> iterable) =>
-    mapAccumAsync(f, seed, iterable);
-FxAsyncIterable<B> _$mapConcurrent<A, B>(
+    fxMapAccumAsync(f, seed, iterable);
+FxAsyncIterable<B> _$fxMapConcurrent<A, B>(
         int concurrency, FutureOr<B> Function(A a) f, Iterable<A> iterable) =>
-    mapConcurrent(concurrency, f, iterable);
-FxAsyncIterable<B> _$mapConcurrentAsync<A, B>(int concurrency,
+    fxMapConcurrent(concurrency, f, iterable);
+FxAsyncIterable<B> _$fxMapConcurrentAsync<A, B>(int concurrency,
         FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    mapConcurrentAsync(concurrency, f, iterable);
-FxAsyncIterable<R> _$parallel<A, R>(int workers,
+    fxMapConcurrentAsync(concurrency, f, iterable);
+FxAsyncIterable<R> _$fxParallel<A, R>(int workers,
         FutureOr<R> Function(A input) worker, Iterable<A> iterable,
         {int chunk = 1, bool chunked = false}) =>
-    parallel(workers, worker, iterable, chunk: chunk, chunked: chunked);
-FxAsyncIterable<R> _$parallelAsync<A, R>(int workers,
+    fxParallel(workers, worker, iterable, chunk: chunk, chunked: chunked);
+FxAsyncIterable<R> _$fxParallelAsync<A, R>(int workers,
         FutureOr<R> Function(A input) worker, FxAsyncIterable<A> iterable,
         {int chunk = 1, bool chunked = false}) =>
-    parallelAsync(workers, worker, iterable, chunk: chunk, chunked: chunked);
-FxAsyncIterable<R> _$parallelOn<A, R>(IsolatePool pool,
+    fxParallelAsync(workers, worker, iterable, chunk: chunk, chunked: chunked);
+FxAsyncIterable<R> _$fxParallelOn<A, R>(IsolatePool pool,
         FutureOr<R> Function(A input) worker, Iterable<A> iterable,
         {int chunk = 1, bool chunked = false}) =>
-    parallelOn(pool, worker, iterable, chunk: chunk, chunked: chunked);
-FxAsyncIterable<R> _$parallelOnAsync<A, R>(IsolatePool pool,
+    fxParallelOn(pool, worker, iterable, chunk: chunk, chunked: chunked);
+FxAsyncIterable<R> _$fxParallelOnAsync<A, R>(IsolatePool pool,
         FutureOr<R> Function(A input) worker, FxAsyncIterable<A> iterable,
         {int chunk = 1, bool chunked = false}) =>
-    parallelOnAsync(pool, worker, iterable, chunk: chunk, chunked: chunked);
+    fxParallelOnAsync(pool, worker, iterable, chunk: chunk, chunked: chunked);
 R Function(A a) _$fxPipe<A, R>(R Function(A a) f) => fxPipe(f);
 R Function(A a) _$fxPipe2<A, M, R>(
         M Function(A a) first, R Function(M m) second) =>
@@ -216,18 +216,18 @@ R Function(A a) _$fxPipe5<A, M1, M2, M3, M4, R>(
         R Function(M4 m) fifth) =>
     fxPipe5(first, second, third, fourth, fifth);
 typedef _$IsolatePool = IsolatePool;
-Iterable<(A, B)> _$attach<A, B>(B Function(A a) f, Iterable<A> iterable) =>
-    attach(f, iterable);
-FxAsyncIterable<(A, B)> _$attachAsync<A, B>(
+Iterable<(A, B)> _$fxAttach<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    fxAttach(f, iterable);
+FxAsyncIterable<(A, B)> _$fxAttachAsync<A, B>(
         FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    attachAsync(f, iterable);
+    fxAttachAsync(f, iterable);
 
 // lazy/filter.dart
-Iterable<A> _$filter<A>(bool Function(A a) f, Iterable<A> iterable) =>
-    filter(f, iterable);
-FxAsyncIterable<A> _$filterAsync<A>(
+Iterable<A> _$fxFilter<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    fxFilter(f, iterable);
+FxAsyncIterable<A> _$fxFilterAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    filterAsync(f, iterable);
+    fxFilterAsync(f, iterable);
 Iterable<A> _$filterWithIndex<A>(
         bool Function(A a, int index) f, Iterable<A> iterable) =>
     filterWithIndex(f, iterable);
@@ -235,20 +235,20 @@ FxAsyncIterable<A> _$filterWithIndexAsync<A>(
         FutureOr<bool> Function(A a, int index) f,
         FxAsyncIterable<A> iterable) =>
     filterWithIndexAsync(f, iterable);
-Iterable<A> _$reject<A>(bool Function(A a) f, Iterable<A> iterable) =>
-    reject(f, iterable);
-FxAsyncIterable<A> _$rejectAsync<A>(
+Iterable<A> _$fxReject<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    fxReject(f, iterable);
+FxAsyncIterable<A> _$fxRejectAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    rejectAsync(f, iterable);
-Iterable<A> _$uniq<A>(Iterable<A> iterable) => uniq(iterable);
-FxAsyncIterable<A> _$uniqAsync<A>(FxAsyncIterable<A> iterable) =>
-    uniqAsync(iterable);
-Iterable<A> _$uniqBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
-    uniqBy(f, iterable);
-FxAsyncIterable<A> _$uniqByAsync<A, B>(
+    fxRejectAsync(f, iterable);
+Iterable<A> _$fxUniq<A>(Iterable<A> iterable) => fxUniq(iterable);
+FxAsyncIterable<A> _$fxUniqAsync<A>(FxAsyncIterable<A> iterable) =>
+    fxUniqAsync(iterable);
+Iterable<A> _$fxUniqBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    fxUniqBy(f, iterable);
+FxAsyncIterable<A> _$fxUniqByAsync<A, B>(
         FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    uniqByAsync(f, iterable);
-List<A> _$uniqStrict<A>(Iterable<A> iterable) => uniqStrict(iterable);
+    fxUniqByAsync(f, iterable);
+List<A> _$fxUniqStrict<A>(Iterable<A> iterable) => fxUniqStrict(iterable);
 List<A> _$uniqByStrict<A, B>(B Function(A a) f, Iterable<A> iterable) =>
     uniqByStrict(f, iterable);
 Map<K, Acc> _$foldByOrSkip<A, K extends Object, Acc>(
@@ -266,44 +266,44 @@ Iterable<B> _$mapNotNull<A, B extends Object>(
 FxAsyncIterable<B> _$mapNotNullAsync<A, B extends Object>(
         FutureOr<B?> Function(A a) f, FxAsyncIterable<A> iterable) =>
     mapNotNullAsync(f, iterable);
-Iterable<A> _$differenceBy<A, B>(
+Iterable<A> _$fxDifferenceBy<A, B>(
         B Function(A a) f, Iterable<A> iterable1, Iterable<A> iterable2) =>
-    differenceBy(f, iterable1, iterable2);
-FxAsyncIterable<A> _$differenceByAsync<A, B>(FutureOr<B> Function(A a) f,
+    fxDifferenceBy(f, iterable1, iterable2);
+FxAsyncIterable<A> _$fxDifferenceByAsync<A, B>(FutureOr<B> Function(A a) f,
         FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
-    differenceByAsync(f, iterable1, iterable2);
-Iterable<A> _$difference<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
-    difference(iterable1, iterable2);
-FxAsyncIterable<A> _$differenceAsync<A>(
+    fxDifferenceByAsync(f, iterable1, iterable2);
+Iterable<A> _$fxDifference<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
+    fxDifference(iterable1, iterable2);
+FxAsyncIterable<A> _$fxDifferenceAsync<A>(
         FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
-    differenceAsync(iterable1, iterable2);
-Iterable<A> _$intersectionBy<A, B>(
+    fxDifferenceAsync(iterable1, iterable2);
+Iterable<A> _$fxIntersectionBy<A, B>(
         B Function(A a) f, Iterable<A> iterable1, Iterable<A> iterable2) =>
-    intersectionBy(f, iterable1, iterable2);
-FxAsyncIterable<A> _$intersectionByAsync<A, B>(FutureOr<B> Function(A a) f,
+    fxIntersectionBy(f, iterable1, iterable2);
+FxAsyncIterable<A> _$fxIntersectionByAsync<A, B>(FutureOr<B> Function(A a) f,
         FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
-    intersectionByAsync(f, iterable1, iterable2);
-Iterable<A> _$intersection<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
-    intersection(iterable1, iterable2);
-FxAsyncIterable<A> _$intersectionAsync<A>(
+    fxIntersectionByAsync(f, iterable1, iterable2);
+Iterable<A> _$fxIntersection<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
+    fxIntersection(iterable1, iterable2);
+FxAsyncIterable<A> _$fxIntersectionAsync<A>(
         FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
-    intersectionAsync(iterable1, iterable2);
+    fxIntersectionAsync(iterable1, iterable2);
 
 // lazy/take_drop.dart
-Iterable<A> _$take<A>(int length, Iterable<A> iterable) =>
-    take(length, iterable);
-FxAsyncIterable<A> _$takeAsync<A>(int length, FxAsyncIterable<A> iterable) =>
-    takeAsync(length, iterable);
-Iterable<A> _$takeRight<A>(int length, Iterable<A> iterable) =>
-    takeRight(length, iterable);
-FxAsyncIterable<A> _$takeRightAsync<A>(
+Iterable<A> _$fxTake<A>(int length, Iterable<A> iterable) =>
+    fxTake(length, iterable);
+FxAsyncIterable<A> _$fxTakeAsync<A>(int length, FxAsyncIterable<A> iterable) =>
+    fxTakeAsync(length, iterable);
+Iterable<A> _$fxTakeRight<A>(int length, Iterable<A> iterable) =>
+    fxTakeRight(length, iterable);
+FxAsyncIterable<A> _$fxTakeRightAsync<A>(
         int length, FxAsyncIterable<A> iterable) =>
-    takeRightAsync(length, iterable);
-Iterable<A> _$takeWhile<A>(bool Function(A a) f, Iterable<A> iterable) =>
-    takeWhile(f, iterable);
-FxAsyncIterable<A> _$takeWhileAsync<A>(
+    fxTakeRightAsync(length, iterable);
+Iterable<A> _$fxTakeWhile<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    fxTakeWhile(f, iterable);
+FxAsyncIterable<A> _$fxTakeWhileAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    takeWhileAsync(f, iterable);
+    fxTakeWhileAsync(f, iterable);
 Iterable<A> _$takeWhileRight<A>(bool Function(A a) f, Iterable<A> iterable) =>
     takeWhileRight(f, iterable);
 FxAsyncIterable<A> _$takeWhileRightAsync<A>(
@@ -320,105 +320,105 @@ Iterable<A> _$takeUntilInclusive<A>(
 FxAsyncIterable<A> _$takeUntilInclusiveAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
     takeUntilInclusiveAsync(f, iterable);
-Iterable<A> _$drop<A>(int length, Iterable<A> iterable) =>
-    drop(length, iterable);
-FxAsyncIterable<A> _$dropAsync<A>(int length, FxAsyncIterable<A> iterable) =>
-    dropAsync(length, iterable);
-Iterable<A> _$dropRight<A>(int length, Iterable<A> iterable) =>
-    dropRight(length, iterable);
-FxAsyncIterable<A> _$dropRightAsync<A>(
+Iterable<A> _$fxDrop<A>(int length, Iterable<A> iterable) =>
+    fxDrop(length, iterable);
+FxAsyncIterable<A> _$fxDropAsync<A>(int length, FxAsyncIterable<A> iterable) =>
+    fxDropAsync(length, iterable);
+Iterable<A> _$fxDropRight<A>(int length, Iterable<A> iterable) =>
+    fxDropRight(length, iterable);
+FxAsyncIterable<A> _$fxDropRightAsync<A>(
         int length, FxAsyncIterable<A> iterable) =>
-    dropRightAsync(length, iterable);
-Iterable<A> _$dropWhile<A>(bool Function(A a) f, Iterable<A> iterable) =>
-    dropWhile(f, iterable);
-FxAsyncIterable<A> _$dropWhileAsync<A>(
+    fxDropRightAsync(length, iterable);
+Iterable<A> _$fxDropWhile<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    fxDropWhile(f, iterable);
+FxAsyncIterable<A> _$fxDropWhileAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    dropWhileAsync(f, iterable);
-Iterable<A> _$dropUntil<A>(bool Function(A a) f, Iterable<A> iterable) =>
-    dropUntil(f, iterable);
-FxAsyncIterable<A> _$dropUntilAsync<A>(
+    fxDropWhileAsync(f, iterable);
+Iterable<A> _$fxDropUntil<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    fxDropUntil(f, iterable);
+FxAsyncIterable<A> _$fxDropUntilAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    dropUntilAsync(f, iterable);
-Iterable<A> _$slice<A>(int start, Iterable<A> iterable, [int? end]) =>
-    slice(start, iterable, end);
-FxAsyncIterable<A> _$sliceAsync<A>(int start, FxAsyncIterable<A> iterable,
+    fxDropUntilAsync(f, iterable);
+Iterable<A> _$fxSlice<A>(int start, Iterable<A> iterable, [int? end]) =>
+    fxSlice(start, iterable, end);
+FxAsyncIterable<A> _$fxSliceAsync<A>(int start, FxAsyncIterable<A> iterable,
         [int? end]) =>
-    sliceAsync(start, iterable, end);
-Iterable<List<A>> _$chunk<A>(int size, Iterable<A> iterable) =>
-    chunk(size, iterable);
-FxAsyncIterable<List<A>> _$chunkAsync<A>(
+    fxSliceAsync(start, iterable, end);
+Iterable<List<A>> _$fxChunk<A>(int size, Iterable<A> iterable) =>
+    fxChunk(size, iterable);
+FxAsyncIterable<List<A>> _$fxChunkAsync<A>(
         int size, FxAsyncIterable<A> iterable) =>
-    chunkAsync(size, iterable);
+    fxChunkAsync(size, iterable);
 
 // lazy/zip.dart
-Iterable<(A, B)> _$zip<A, B>(Iterable<A> iterable1, Iterable<B> iterable2) =>
-    zip(iterable1, iterable2);
-FxAsyncIterable<(A, B)> _$zipAsync<A, B>(
+Iterable<(A, B)> _$fxZip<A, B>(Iterable<A> iterable1, Iterable<B> iterable2) =>
+    fxZip(iterable1, iterable2);
+FxAsyncIterable<(A, B)> _$fxZipAsync<A, B>(
         FxAsyncIterable<A> iterable1, FxAsyncIterable<B> iterable2) =>
-    zipAsync(iterable1, iterable2);
-Iterable<(A, B, C)> _$zip3<A, B, C>(Iterable<A> iterable1,
+    fxZipAsync(iterable1, iterable2);
+Iterable<(A, B, C)> _$fxZip3<A, B, C>(Iterable<A> iterable1,
         Iterable<B> iterable2, Iterable<C> iterable3) =>
-    zip3(iterable1, iterable2, iterable3);
-FxAsyncIterable<(A, B, C)> _$zip3Async<A, B, C>(FxAsyncIterable<A> iterable1,
+    fxZip3(iterable1, iterable2, iterable3);
+FxAsyncIterable<(A, B, C)> _$fxZip3Async<A, B, C>(FxAsyncIterable<A> iterable1,
         FxAsyncIterable<B> iterable2, FxAsyncIterable<C> iterable3) =>
-    zip3Async(iterable1, iterable2, iterable3);
+    fxZip3Async(iterable1, iterable2, iterable3);
 Iterable<(int, A)> _$zipWithIndex<A>(Iterable<A> iterable) =>
     zipWithIndex(iterable);
 FxAsyncIterable<(int, A)> _$zipWithIndexAsync<A>(
         FxAsyncIterable<A> iterable) =>
     zipWithIndexAsync(iterable);
-(List<A>, List<B>) _$unzip<A, B>(Iterable<(A, B)> iterable) =>
-    unzip(iterable);
-Future<(List<A>, List<B>)> _$unzipAsync<A, B>(
+(List<A>, List<B>) _$fxUnzip<A, B>(Iterable<(A, B)> iterable) =>
+    fxUnzip(iterable);
+Future<(List<A>, List<B>)> _$fxUnzipAsync<A, B>(
         FxAsyncIterable<(A, B)> iterable) =>
-    unzipAsync(iterable);
+    fxUnzipAsync(iterable);
 
 // lazy/combine.dart
-Iterable<A> _$append<A>(A a, Iterable<A> iterable) => append(a, iterable);
-FxAsyncIterable<A> _$appendAsync<A>(
+Iterable<A> _$fxAppend<A>(A a, Iterable<A> iterable) => fxAppend(a, iterable);
+FxAsyncIterable<A> _$fxAppendAsync<A>(
         FutureOr<A> a, FxAsyncIterable<A> iterable) =>
-    appendAsync(a, iterable);
-Iterable<A> _$prepend<A>(A a, Iterable<A> iterable) => prepend(a, iterable);
-FxAsyncIterable<A> _$prependAsync<A>(
+    fxAppendAsync(a, iterable);
+Iterable<A> _$fxPrepend<A>(A a, Iterable<A> iterable) => fxPrepend(a, iterable);
+FxAsyncIterable<A> _$fxPrependAsync<A>(
         FutureOr<A> a, FxAsyncIterable<A> iterable) =>
-    prependAsync(a, iterable);
-Iterable<A> _$concat<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
-    concat(iterable1, iterable2);
-FxAsyncIterable<A> _$concatAsync<A>(
+    fxPrependAsync(a, iterable);
+Iterable<A> _$fxConcat<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
+    fxConcat(iterable1, iterable2);
+FxAsyncIterable<A> _$fxConcatAsync<A>(
         FxAsyncIterable<A> iterable1, FxAsyncIterable<A> iterable2) =>
-    concatAsync(iterable1, iterable2);
-Iterable<A> _$reverse<A>(Iterable<A> iterable) => reverse(iterable);
-FxAsyncIterable<A> _$reverseAsync<A>(FxAsyncIterable<A> iterable) =>
-    reverseAsync(iterable);
-Iterable<T> _$cycle<T>(Iterable<T> iterable) => cycle(iterable);
-FxAsyncIterable<T> _$cycleAsync<T>(FxAsyncIterable<T> iterable) =>
-    cycleAsync(iterable);
+    fxConcatAsync(iterable1, iterable2);
+Iterable<A> _$fxReverse<A>(Iterable<A> iterable) => fxReverse(iterable);
+FxAsyncIterable<A> _$fxReverseAsync<A>(FxAsyncIterable<A> iterable) =>
+    fxReverseAsync(iterable);
+Iterable<T> _$fxCycle<T>(Iterable<T> iterable) => fxCycle(iterable);
+FxAsyncIterable<T> _$fxCycleAsync<T>(FxAsyncIterable<T> iterable) =>
+    fxCycleAsync(iterable);
 
 // lazy/take_drop.dart + lazy/filter.dart + lazy/combine.dart (0.7.2)
-Iterable<List<A>> _$windowed<A>(int size, Iterable<A> iterable,
+Iterable<List<A>> _$fxWindowed<A>(int size, Iterable<A> iterable,
         {int step = 1, bool partial = false}) =>
-    windowed(size, iterable, step: step, partial: partial);
-FxAsyncIterable<List<A>> _$windowedAsync<A>(
+    fxWindowed(size, iterable, step: step, partial: partial);
+FxAsyncIterable<List<A>> _$fxWindowedAsync<A>(
         int size, FxAsyncIterable<A> iterable,
         {int step = 1, bool partial = false}) =>
-    windowedAsync(size, iterable, step: step, partial: partial);
-Iterable<(A, A)> _$pairwise<A>(Iterable<A> iterable) => pairwise(iterable);
-FxAsyncIterable<(A, A)> _$pairwiseAsync<A>(FxAsyncIterable<A> iterable) =>
-    pairwiseAsync(iterable);
-Iterable<A> _$uniqAdjacent<A>(Iterable<A> iterable) => uniqAdjacent(iterable);
-FxAsyncIterable<A> _$uniqAdjacentAsync<A>(FxAsyncIterable<A> iterable) =>
-    uniqAdjacentAsync(iterable);
+    fxWindowedAsync(size, iterable, step: step, partial: partial);
+Iterable<(A, A)> _$fxPairwise<A>(Iterable<A> iterable) => fxPairwise(iterable);
+FxAsyncIterable<(A, A)> _$fxPairwiseAsync<A>(FxAsyncIterable<A> iterable) =>
+    fxPairwiseAsync(iterable);
+Iterable<A> _$fxUniqAdjacent<A>(Iterable<A> iterable) => fxUniqAdjacent(iterable);
+FxAsyncIterable<A> _$fxUniqAdjacentAsync<A>(FxAsyncIterable<A> iterable) =>
+    fxUniqAdjacentAsync(iterable);
 Iterable<A> _$uniqAdjacentBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
     uniqAdjacentBy(f, iterable);
 FxAsyncIterable<A> _$uniqAdjacentByAsync<A, B>(
         FutureOr<B> Function(A a) f, FxAsyncIterable<A> iterable) =>
     uniqAdjacentByAsync(f, iterable);
-Iterable<A> _$ifEmpty<A>(
+Iterable<A> _$fxIfEmpty<A>(
         Iterable<A> Function() fallback, Iterable<A> iterable) =>
-    ifEmpty(fallback, iterable);
-FxAsyncIterable<A> _$ifEmptyAsync<A>(FxAsyncIterable<A> Function() fallback,
+    fxIfEmpty(fallback, iterable);
+FxAsyncIterable<A> _$fxIfEmptyAsync<A>(FxAsyncIterable<A> Function() fallback,
         FxAsyncIterable<A> iterable) =>
-    ifEmptyAsync(fallback, iterable);
+    fxIfEmptyAsync(fallback, iterable);
 Iterable<A> _$defaultIfEmpty<A>(A value, Iterable<A> iterable) =>
     defaultIfEmpty(value, iterable);
 FxAsyncIterable<A> _$defaultIfEmptyAsync<A>(
@@ -426,44 +426,44 @@ FxAsyncIterable<A> _$defaultIfEmptyAsync<A>(
     defaultIfEmptyAsync(value, iterable);
 
 // lazy/effect.dart (0.7.2)
-FxAsyncIterable<R> _$mapRetryAsync<A, R>(
+FxAsyncIterable<R> _$fxMapRetryAsync<A, R>(
         int attempts, FutureOr<R> Function(A a) f, FxAsyncIterable<A> iterable,
         {Duration Function(int failed)? delay}) =>
-    mapRetryAsync(attempts, f, iterable, delay: delay);
-Iterable<R> _$mapCatching<A, R>(R Function(A a) f,
+    fxMapRetryAsync(attempts, f, iterable, delay: delay);
+Iterable<R> _$fxMapCatching<A, R>(R Function(A a) f,
         R Function(Object error, StackTrace stackTrace) onError,
         Iterable<A> iterable) =>
-    mapCatching(f, onError, iterable);
-FxAsyncIterable<R> _$mapCatchingAsync<A, R>(FutureOr<R> Function(A a) f,
+    fxMapCatching(f, onError, iterable);
+FxAsyncIterable<R> _$fxMapCatchingAsync<A, R>(FutureOr<R> Function(A a) f,
         FutureOr<R> Function(Object error, StackTrace stackTrace) onError,
         FxAsyncIterable<A> iterable) =>
-    mapCatchingAsync(f, onError, iterable);
-FxAsyncIterable<A> _$timeoutAsync<A>(
+    fxMapCatchingAsync(f, onError, iterable);
+FxAsyncIterable<A> _$fxTimeoutAsync<A>(
         Duration limit, FxAsyncIterable<A> iterable) =>
-    timeoutAsync(limit, iterable);
+    fxTimeoutAsync(limit, iterable);
 
 // strict/aggregate.dart
-List<A> _$toList<A>(Iterable<A> iterable) => toList(iterable);
-Future<List<A>> _$toListAsync<A>(FxAsyncIterable<A> iterable) =>
-    toListAsync(iterable);
-A _$reduce<A>(A Function(A acc, A a) f, Iterable<A> iterable) =>
-    reduce(f, iterable);
-Acc _$fold<A, Acc>(
+List<A> _$fxToList<A>(Iterable<A> iterable) => fxToList(iterable);
+Future<List<A>> _$fxToListAsync<A>(FxAsyncIterable<A> iterable) =>
+    fxToListAsync(iterable);
+A _$fxReduce<A>(A Function(A acc, A a) f, Iterable<A> iterable) =>
+    fxReduce(f, iterable);
+Acc _$fxFold<A, Acc>(
         Acc seed, Acc Function(Acc acc, A a) f, Iterable<A> iterable) =>
-    fold(seed, f, iterable);
-void _$each<A>(void Function(A a) f, Iterable<A> iterable) => each(f, iterable);
-Future<void> _$eachAsync<A>(
+    fxFold(seed, f, iterable);
+void _$fxEach<A>(void Function(A a) f, Iterable<A> iterable) => fxEach(f, iterable);
+Future<void> _$fxEachAsync<A>(
         FutureOr<void> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    eachAsync(f, iterable);
-void _$consume<A>(Iterable<A> iterable, [int? n]) => consume(iterable, n);
-Future<void> _$consumeAsync<A>(FxAsyncIterable<A> iterable, [int? n]) =>
-    consumeAsync(iterable, n);
-Future<A> _$reduceAsync<A>(
+    fxEachAsync(f, iterable);
+void _$fxConsume<A>(Iterable<A> iterable, [int? n]) => fxConsume(iterable, n);
+Future<void> _$fxConsumeAsync<A>(FxAsyncIterable<A> iterable, [int? n]) =>
+    fxConsumeAsync(iterable, n);
+Future<A> _$fxReduceAsync<A>(
         FutureOr<A> Function(A acc, A a) f, FxAsyncIterable<A> iterable) =>
-    reduceAsync(f, iterable);
-Future<Acc> _$foldAsync<A, Acc>(FutureOr<Acc> seed,
+    fxReduceAsync(f, iterable);
+Future<Acc> _$fxFoldAsync<A, Acc>(FutureOr<Acc> seed,
         FutureOr<Acc> Function(Acc acc, A a) f, FxAsyncIterable<A> iterable) =>
-    foldAsync(seed, f, iterable);
+    fxFoldAsync(seed, f, iterable);
 Acc _$foldWithIndex<A, Acc>(Acc seed,
         Acc Function(Acc acc, A a, int index) f, Iterable<A> iterable) =>
     foldWithIndex(seed, f, iterable);
@@ -472,176 +472,176 @@ Future<Acc> _$foldWithIndexAsync<A, Acc>(
         FutureOr<Acc> Function(Acc acc, A a, int index) f,
         FxAsyncIterable<A> iterable) =>
     foldWithIndexAsync(seed, f, iterable);
-Acc _$foldRight<A, Acc>(
+Acc _$fxFoldRight<A, Acc>(
         Acc seed, Acc Function(Acc acc, A a) f, Iterable<A> iterable) =>
-    foldRight(seed, f, iterable);
+    fxFoldRight(seed, f, iterable);
 Acc _$foldRightWithIndex<A, Acc>(Acc seed,
         Acc Function(Acc acc, A a, int index) f, Iterable<A> iterable) =>
     foldRightWithIndex(seed, f, iterable);
-Future<Acc> _$foldRightAsync<A, Acc>(FutureOr<Acc> seed,
+Future<Acc> _$fxFoldRightAsync<A, Acc>(FutureOr<Acc> seed,
         FutureOr<Acc> Function(Acc acc, A a) f, FxAsyncIterable<A> iterable) =>
-    foldRightAsync(seed, f, iterable);
+    fxFoldRightAsync(seed, f, iterable);
 Future<Acc> _$foldRightWithIndexAsync<A, Acc>(
         FutureOr<Acc> seed,
         FutureOr<Acc> Function(Acc acc, A a, int index) f,
         FxAsyncIterable<A> iterable) =>
     foldRightWithIndexAsync(seed, f, iterable);
-num _$sum(Iterable<num> iterable) => sum(iterable);
-Future<num> _$sumAsync(FxAsyncIterable<num> iterable) => sumAsync(iterable);
-num _$product(Iterable<num> iterable) => product(iterable);
-Future<num> _$productAsync(FxAsyncIterable<num> iterable) =>
-    productAsync(iterable);
-double _$average(Iterable<num> iterable) => average(iterable);
-Future<double> _$averageAsync(FxAsyncIterable<num> iterable) =>
-    averageAsync(iterable);
-num _$min(Iterable<num> iterable) => min(iterable);
-Future<num> _$minAsync(FxAsyncIterable<num> iterable) => minAsync(iterable);
-num _$max(Iterable<num> iterable) => max(iterable);
-Future<num> _$maxAsync(FxAsyncIterable<num> iterable) => maxAsync(iterable);
-A? _$minBy<A>(Object? Function(A a) f, Iterable<A> iterable) =>
-    minBy(f, iterable);
-Future<A?> _$minByAsync<A>(
+num _$fxSum(Iterable<num> iterable) => fxSum(iterable);
+Future<num> _$fxSumAsync(FxAsyncIterable<num> iterable) => fxSumAsync(iterable);
+num _$fxProduct(Iterable<num> iterable) => fxProduct(iterable);
+Future<num> _$fxProductAsync(FxAsyncIterable<num> iterable) =>
+    fxProductAsync(iterable);
+double _$fxAverage(Iterable<num> iterable) => fxAverage(iterable);
+Future<double> _$fxAverageAsync(FxAsyncIterable<num> iterable) =>
+    fxAverageAsync(iterable);
+num _$fxMin(Iterable<num> iterable) => fxMin(iterable);
+Future<num> _$fxMinAsync(FxAsyncIterable<num> iterable) => fxMinAsync(iterable);
+num _$fxMax(Iterable<num> iterable) => fxMax(iterable);
+Future<num> _$fxMaxAsync(FxAsyncIterable<num> iterable) => fxMaxAsync(iterable);
+A? _$fxMinBy<A>(Object? Function(A a) f, Iterable<A> iterable) =>
+    fxMinBy(f, iterable);
+Future<A?> _$fxMinByAsync<A>(
         Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
-    minByAsync(f, iterable);
-A? _$maxBy<A>(Object? Function(A a) f, Iterable<A> iterable) =>
-    maxBy(f, iterable);
-Future<A?> _$maxByAsync<A>(
+    fxMinByAsync(f, iterable);
+A? _$fxMaxBy<A>(Object? Function(A a) f, Iterable<A> iterable) =>
+    fxMaxBy(f, iterable);
+Future<A?> _$fxMaxByAsync<A>(
         Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
-    maxByAsync(f, iterable);
-num _$sumBy<A>(num Function(A a) f, Iterable<A> iterable) =>
-    sumBy(f, iterable);
-Future<num> _$sumByAsync<A>(
+    fxMaxByAsync(f, iterable);
+num _$fxSumBy<A>(num Function(A a) f, Iterable<A> iterable) =>
+    fxSumBy(f, iterable);
+Future<num> _$fxSumByAsync<A>(
         FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    sumByAsync(f, iterable);
-num _$productBy<A>(num Function(A a) f, Iterable<A> iterable) =>
-    productBy(f, iterable);
-Future<num> _$productByAsync<A>(
+    fxSumByAsync(f, iterable);
+num _$fxProductBy<A>(num Function(A a) f, Iterable<A> iterable) =>
+    fxProductBy(f, iterable);
+Future<num> _$fxProductByAsync<A>(
         FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    productByAsync(f, iterable);
-double _$averageBy<A>(num Function(A a) f, Iterable<A> iterable) =>
-    averageBy(f, iterable);
-Future<double> _$averageByAsync<A>(
+    fxProductByAsync(f, iterable);
+double _$fxAverageBy<A>(num Function(A a) f, Iterable<A> iterable) =>
+    fxAverageBy(f, iterable);
+Future<double> _$fxAverageByAsync<A>(
         FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    averageByAsync(f, iterable);
-int _$size<A>(Iterable<A> iterable) => size(iterable);
-Future<int> _$sizeAsync<A>(FxAsyncIterable<A> iterable) => sizeAsync(iterable);
-Future<String> _$joinAsync<A>(String sep, FxAsyncIterable<A> iterable) =>
-    joinAsync(sep, iterable);
-Map<K, List<A>> _$groupBy<A, K>(K Function(A a) f, Iterable<A> iterable) =>
-    groupBy(f, iterable);
-Future<Map<K, List<A>>> _$groupByAsync<A, K>(
+    fxAverageByAsync(f, iterable);
+int _$fxSize<A>(Iterable<A> iterable) => fxSize(iterable);
+Future<int> _$fxSizeAsync<A>(FxAsyncIterable<A> iterable) => fxSizeAsync(iterable);
+Future<String> _$fxJoinAsync<A>(String sep, FxAsyncIterable<A> iterable) =>
+    fxJoinAsync(sep, iterable);
+Map<K, List<A>> _$fxGroupBy<A, K>(K Function(A a) f, Iterable<A> iterable) =>
+    fxGroupBy(f, iterable);
+Future<Map<K, List<A>>> _$fxGroupByAsync<A, K>(
         FutureOr<K> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    groupByAsync(f, iterable);
-Map<K, A> _$indexBy<A, K>(K Function(A a) f, Iterable<A> iterable) =>
-    indexBy(f, iterable);
-Future<Map<K, A>> _$indexByAsync<A, K>(
+    fxGroupByAsync(f, iterable);
+Map<K, A> _$fxIndexBy<A, K>(K Function(A a) f, Iterable<A> iterable) =>
+    fxIndexBy(f, iterable);
+Future<Map<K, A>> _$fxIndexByAsync<A, K>(
         FutureOr<K> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    indexByAsync(f, iterable);
-Map<K, int> _$countBy<A, K>(K Function(A a) f, Iterable<A> iterable) =>
-    countBy(f, iterable);
-Map<K, Acc> _$foldBy<A, K, Acc>(K Function(A a) key, Acc seed,
+    fxIndexByAsync(f, iterable);
+Map<K, int> _$fxCountBy<A, K>(K Function(A a) f, Iterable<A> iterable) =>
+    fxCountBy(f, iterable);
+Map<K, Acc> _$fxFoldBy<A, K, Acc>(K Function(A a) key, Acc seed,
         Acc Function(Acc acc, A a) f, Iterable<A> iterable) =>
-    foldBy(key, seed, f, iterable);
-Future<Map<K, Acc>> _$foldByAsync<A, K, Acc>(
+    fxFoldBy(key, seed, f, iterable);
+Future<Map<K, Acc>> _$fxFoldByAsync<A, K, Acc>(
         FutureOr<K> Function(A a) key,
         FutureOr<Acc> seed,
         FutureOr<Acc> Function(Acc acc, A a) f,
         FxAsyncIterable<A> iterable) =>
-    foldByAsync(key, seed, f, iterable);
-Future<Map<K, int>> _$countByAsync<A, K>(
+    fxFoldByAsync(key, seed, f, iterable);
+Future<Map<K, int>> _$fxCountByAsync<A, K>(
         FutureOr<K> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    countByAsync(f, iterable);
-List<A> _$sort<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
-    sort(f, iterable);
-Future<List<A>> _$sortAsync<A>(
+    fxCountByAsync(f, iterable);
+List<A> _$fxSort<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
+    fxSort(f, iterable);
+Future<List<A>> _$fxSortAsync<A>(
         int Function(A a, A b) f, FxAsyncIterable<A> iterable) =>
-    sortAsync(f, iterable);
-List<A> _$sortBy<A>(Object? Function(A a) f, Iterable<A> iterable) =>
-    sortBy(f, iterable);
-Future<List<A>> _$sortByAsync<A>(
+    fxSortAsync(f, iterable);
+List<A> _$fxSortBy<A>(Object? Function(A a) f, Iterable<A> iterable) =>
+    fxSortBy(f, iterable);
+Future<List<A>> _$fxSortByAsync<A>(
         Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
-    sortByAsync(f, iterable);
+    fxSortByAsync(f, iterable);
 List<A> _$sortByDesc<A>(Object? Function(A a) f, Iterable<A> iterable) =>
     sortByDesc(f, iterable);
 Future<List<A>> _$sortByDescAsync<A>(
         Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
     sortByDescAsync(f, iterable);
-List<A> _$topBy<A>(
+List<A> _$fxTopBy<A>(
         int k, Object? Function(A a) f, Iterable<A> iterable) =>
-    topBy(k, f, iterable);
-List<A> _$bottomBy<A>(
+    fxTopBy(k, f, iterable);
+List<A> _$fxBottomBy<A>(
         int k, Object? Function(A a) f, Iterable<A> iterable) =>
-    bottomBy(k, f, iterable);
-Future<List<A>> _$topByAsync<A>(
+    fxBottomBy(k, f, iterable);
+Future<List<A>> _$fxTopByAsync<A>(
         int k, Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
-    topByAsync(k, f, iterable);
-Future<List<A>> _$bottomByAsync<A>(
+    fxTopByAsync(k, f, iterable);
+Future<List<A>> _$fxBottomByAsync<A>(
         int k, Object? Function(A a) f, FxAsyncIterable<A> iterable) =>
-    bottomByAsync(k, f, iterable);
-List<({K key, List<A> items})> _$groupedBy<A, K>(
+    fxBottomByAsync(k, f, iterable);
+List<({K key, List<A> items})> _$fxGroupedBy<A, K>(
         K Function(A a) f, Iterable<A> iterable) =>
-    groupedBy(f, iterable);
-Future<List<({K key, List<A> items})>> _$groupedByAsync<A, K>(
+    fxGroupedBy(f, iterable);
+Future<List<({K key, List<A> items})>> _$fxGroupedByAsync<A, K>(
         FutureOr<K> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    groupedByAsync(f, iterable);
-int _$countWhere<A>(bool Function(A a) f, Iterable<A> iterable) =>
-    countWhere(f, iterable);
-Future<int> _$countWhereAsync<A>(
+    fxGroupedByAsync(f, iterable);
+int _$fxCountWhere<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    fxCountWhere(f, iterable);
+Future<int> _$fxCountWhereAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    countWhereAsync(f, iterable);
-(List<A>, List<A>) _$partition<A>(bool Function(A a) f, Iterable<A> iterable) =>
-    partition(f, iterable);
-Future<(List<A>, List<A>)> _$partitionAsync<A>(
+    fxCountWhereAsync(f, iterable);
+(List<A>, List<A>) _$fxPartition<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    fxPartition(f, iterable);
+Future<(List<A>, List<A>)> _$fxPartitionAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    partitionAsync(f, iterable);
+    fxPartitionAsync(f, iterable);
 // tee's fold records reach fx.dart as `s.Fold` / `s.AsyncFold`, so the
 // prefix rewrite needs these two names to exist as types, not functions.
 typedef _$Fold<A, R> = Fold<A, R>;
 typedef _$AsyncFold<A, R> = AsyncFold<A, R>;
-(R1, R2) _$tee<A, R1, R2>(
+(R1, R2) _$fxTee<A, R1, R2>(
         Iterable<A> iterable, Fold<A, R1> first, Fold<A, R2> second) =>
-    tee(iterable, first, second);
-(R1, R2, R3) _$tee3<A, R1, R2, R3>(Iterable<A> iterable, Fold<A, R1> first,
+    fxTee(iterable, first, second);
+(R1, R2, R3) _$fxTee3<A, R1, R2, R3>(Iterable<A> iterable, Fold<A, R1> first,
         Fold<A, R2> second, Fold<A, R3> third) =>
-    tee3(iterable, first, second, third);
-Future<(R1, R2)> _$teeAsync<A, R1, R2>(FxAsyncIterable<A> iterable,
+    fxTee3(iterable, first, second, third);
+Future<(R1, R2)> _$fxTeeAsync<A, R1, R2>(FxAsyncIterable<A> iterable,
         AsyncFold<A, R1> first, AsyncFold<A, R2> second) =>
-    teeAsync(iterable, first, second);
+    fxTeeAsync(iterable, first, second);
 
 // strict/access.dart
-A? _$head<A>(Iterable<A> iterable) => head(iterable);
-Future<A?> _$headAsync<A>(FxAsyncIterable<A> iterable) => headAsync(iterable);
-A? _$last<A>(Iterable<A> iterable) => last(iterable);
-Future<A?> _$lastAsync<A>(FxAsyncIterable<A> iterable) => lastAsync(iterable);
-A? _$find<A>(bool Function(A a) f, Iterable<A> iterable) => find(f, iterable);
-Future<A?> _$findAsync<A>(
+A? _$fxHead<A>(Iterable<A> iterable) => fxHead(iterable);
+Future<A?> _$fxHeadAsync<A>(FxAsyncIterable<A> iterable) => fxHeadAsync(iterable);
+A? _$fxLast<A>(Iterable<A> iterable) => fxLast(iterable);
+Future<A?> _$fxLastAsync<A>(FxAsyncIterable<A> iterable) => fxLastAsync(iterable);
+A? _$fxFind<A>(bool Function(A a) f, Iterable<A> iterable) => fxFind(f, iterable);
+Future<A?> _$fxFindAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    findAsync(f, iterable);
-int _$findIndex<A>(bool Function(A a) f, Iterable<A> iterable) =>
-    findIndex(f, iterable);
-Future<int> _$findIndexAsync<A>(
+    fxFindAsync(f, iterable);
+int _$fxFindIndex<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    fxFindIndex(f, iterable);
+Future<int> _$fxFindIndexAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    findIndexAsync(f, iterable);
-bool _$some<A>(bool Function(A a) f, Iterable<A> iterable) => some(f, iterable);
-Future<bool> _$someAsync<A>(
+    fxFindIndexAsync(f, iterable);
+bool _$fxSome<A>(bool Function(A a) f, Iterable<A> iterable) => fxSome(f, iterable);
+Future<bool> _$fxSomeAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    someAsync(f, iterable);
-bool _$every<A>(bool Function(A a) f, Iterable<A> iterable) =>
-    every(f, iterable);
-Future<bool> _$everyAsync<A>(
+    fxSomeAsync(f, iterable);
+bool _$fxEvery<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    fxEvery(f, iterable);
+Future<bool> _$fxEveryAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    everyAsync(f, iterable);
-bool _$none<A>(bool Function(A a) f, Iterable<A> iterable) =>
-    none(f, iterable);
-Future<bool> _$noneAsync<A>(
+    fxEveryAsync(f, iterable);
+bool _$fxNone<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    fxNone(f, iterable);
+Future<bool> _$fxNoneAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
-    noneAsync(f, iterable);
-bool _$sequenceEqual<A>(
+    fxNoneAsync(f, iterable);
+bool _$fxSequenceEqual<A>(
         Iterable<A> a, Iterable<A> b, [bool Function(A, A)? eq]) =>
-    sequenceEqual(a, b, eq);
-Future<bool> _$sequenceEqualAsync<A>(
+    fxSequenceEqual(a, b, eq);
+Future<bool> _$fxSequenceEqualAsync<A>(
         FxAsyncIterable<A> a, FxAsyncIterable<A> b, [bool Function(A, A)? eq]) =>
-    sequenceEqualAsync(a, b, eq);
+    fxSequenceEqualAsync(a, b, eq);
 B? _$firstNotNullOf<A, B extends Object>(
         B? Function(A a) f, Iterable<A> iterable) =>
     firstNotNullOf(f, iterable);

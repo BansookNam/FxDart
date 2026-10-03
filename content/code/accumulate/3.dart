@@ -1,7 +1,7 @@
 import 'package:fxdart/fxdart.dart';
 
 EitherNel<String, (String, String)> signup(String user, String email) =>
-    either((r) => r.zipOrAccumulate2(
+    fxEither((r) => r.zipOrAccumulate2(
           // TODO branch 1: r.ensure user is not empty → 'user is empty'
           (r) => user,
           // TODO branch 2: r.ensure email contains '@' → 'email is invalid'

@@ -83,14 +83,14 @@ void main() {
   group('fromStream (each / lossless)', () {
     test('a sync burst is delivered in full, in order', () async {
       expect(
-        await toListAsync(fromStream(syncStream([1, 2, 3]))),
+        await fxToListAsync(fxFromStream(syncStream([1, 2, 3]))),
         equals([1, 2, 3]),
       );
     });
 
     test('values that arrive between pulls stay queued', () async {
       final c = StreamController<int>(sync: true);
-      final it = fromStream(c.stream).iterator;
+      final it = fxFromStream(c.stream).iterator;
       final first = it.next();
       c.add(0);
       expect((await first).value, 0);
@@ -109,7 +109,7 @@ void main() {
   group('fromStreamLatest', () {
     test('a sync burst collapses to the last value', () async {
       expect(
-        await toListAsync(fromStreamLatest(syncStream([1, 2, 3]))),
+        await fxToListAsync(fromStreamLatest(syncStream([1, 2, 3]))),
         equals([3]),
       );
     });
@@ -170,7 +170,7 @@ void main() {
 
     test('completion with nothing accepted ends immediately', () async {
       expect(
-        await toListAsync(fromStreamLatest(const Stream<int>.empty())),
+        await fxToListAsync(fromStreamLatest(const Stream<int>.empty())),
         equals(<int>[]),
       );
     });
@@ -221,7 +221,7 @@ void main() {
 
     test('error with no accepted latest fails the next pull', () async {
       await expectLater(
-        toListAsync(fromStreamLatest(Stream<int>.error(StateError('boom')))),
+        fxToListAsync(fromStreamLatest(Stream<int>.error(StateError('boom')))),
         throwsStateError,
       );
     });
@@ -230,7 +230,9 @@ void main() {
       'sync source that errors after values yields latest then throws',
       () async {
         await expectLater(
-          toListAsync(fromStreamLatest(syncStream([1, 2], StateError('boom')))),
+          fxToListAsync(
+            fromStreamLatest(syncStream([1, 2], StateError('boom'))),
+          ),
           throwsStateError,
         );
       },
@@ -317,7 +319,7 @@ void main() {
   group('fromStreamChunked', () {
     test('a sync burst is one list', () async {
       expect(
-        await toListAsync(fromStreamChunked(syncStream([1, 2, 3]))),
+        await fxToListAsync(fromStreamChunked(syncStream([1, 2, 3]))),
         equals([
           [1, 2, 3],
         ]),
@@ -385,7 +387,7 @@ void main() {
 
     test('completion with an empty buffer does not yield []', () async {
       expect(
-        await toListAsync(fromStreamChunked(const Stream<int>.empty())),
+        await fxToListAsync(fromStreamChunked(const Stream<int>.empty())),
         equals(<List<int>>[]),
       );
     });
@@ -436,7 +438,7 @@ void main() {
 
     test('error with no accepted buffer fails the next pull', () async {
       await expectLater(
-        toListAsync(fromStreamChunked(Stream<int>.error(StateError('boom')))),
+        fxToListAsync(fromStreamChunked(Stream<int>.error(StateError('boom')))),
         throwsStateError,
       );
     });
@@ -495,7 +497,7 @@ void main() {
   group('fromStreamNext', () {
     test('a sync-completing source yields nothing', () async {
       expect(
-        await toListAsync(fromStreamNext(syncStream([1, 2, 3]))),
+        await fxToListAsync(fromStreamNext(syncStream([1, 2, 3]))),
         equals(<int>[]),
       );
     });
@@ -573,7 +575,7 @@ void main() {
 
     test('a sync-erroring source fails the first pull', () async {
       await expectLater(
-        toListAsync(fromStreamNext(Stream<int>.error(StateError('boom')))),
+        fxToListAsync(fromStreamNext(Stream<int>.error(StateError('boom')))),
         throwsStateError,
       );
     });

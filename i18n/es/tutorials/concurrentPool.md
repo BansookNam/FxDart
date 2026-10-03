@@ -57,5 +57,5 @@ nextLabel: retry
     <a href="concurrent.html"><code>concurrent</code></a> — variante que preserva el orden ·
     <a href="toAsync.html"><code>toAsync</code></a> — el modelo basado en pull en el que se apoya ·
     <a href="streams.html">puentes con Stream</a> — aplica concurrentPool antes de toStream() ·
-    <a href="debounce.html"><code>debounce</code></a> — limitación de frecuencia para callbacks
+    <a href="debounce.html"><code>fxDebounce</code></a> — limitación de frecuencia para callbacks
   </div>

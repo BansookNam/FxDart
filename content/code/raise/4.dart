@@ -2,7 +2,7 @@ import 'package:fxdart/fxdart.dart';
 
 /// One builder for both failure channels: a raise stays typed, a THROWN
 /// exception is mapped into the same error type by the second argument.
-Either<String, int> parsePort(String raw) => eitherCatching(
+Either<String, int> parsePort(String raw) => fxEitherCatching(
       (r) {
         final port = int.parse(raw); // may throw FormatException
         r.ensure(port > 0 && port < 65536, () => 'port out of range: $port');
@@ -19,7 +19,7 @@ void main() {
   // was: either((r) => catching(() => ..., (e, _) => r.raise(...)))
 
   // recover gained the same third clause (Arrow's recover/catch):
-  final fallback = either<String, int>((r) => r.recover(
+  final fallback = fxEither<String, int>((r) => r.recover(
         (inner) => int.parse('x'), // throws
         (raised) => -1,
         onThrow: (thrown, _) => 0,

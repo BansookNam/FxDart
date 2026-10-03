@@ -54,7 +54,7 @@ nextLabel: mergeMap
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="debounce.html"><code>debounce</code></a> — its natural upstream partner: fewer queries in, no stale results out ·
+    <a href="debounce.html"><code>fxDebounce</code></a> — its natural upstream partner: fewer queries in, no stale results out ·
     <a href="race.html"><code>race</code></a> — cancellation between <em>sibling</em> streams instead of successive ones ·
     <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — when every result matters, pull-side fan-out
   </div>

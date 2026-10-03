@@ -29,7 +29,7 @@ async: false
   <p>
     A streak is a running value, and that is <code>scan</code>'s exact
     job: fold's every intermediate state, kept. The pipeline reads as the
-    definition — the days (<code>range</code>), <code>map</code>ped to
+    definition — the days (<code>fxRange</code>), <code>map</code>ped to
     spent-or-not, <code>scan</code>ned into a running streak that resets
     on a spend day, and <code>max</code> picks the peak. The native loop
     computes the same thing with two mutable counters and an
@@ -37,5 +37,5 @@ async: false
     and the streak logic is fused to the strip-building beside it. In the
     FxDart version the strip (<code>map</code> + <code>join</code>) and
     the streak are two independent, separately readable pipelines over
-    the same <code>range</code>.
+    the same <code>fxRange</code>.
   </p>

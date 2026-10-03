@@ -4,7 +4,7 @@ void main() {
   var calls = 0;
 
   // TODO: wrap this function with memoize
-  final cached = memoize<int, int>((n) {
+  final cached = fxMemoize<int, int>((n) {
     calls++;
     return n * n * n;
   });

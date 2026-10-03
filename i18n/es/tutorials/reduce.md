@@ -30,7 +30,7 @@ nextLabel: fold
   </p>
   <p>
     FxTS sobrecarga <code>reduce</code> para los casos con y sin valor inicial
-    según el número de argumentos: <code>reduce(f, iterable)</code> frente a
+    según el número de argumentos: <code>fxReduce(f, iterable)</code> frente a
     <code>reduce(f, seed, iterable)</code>. Dart no tiene sobrecarga por
     aridad, así que FxDart reserva <code>reduce</code> para la forma sin valor
     inicial y renombra la otra como <code><a href="fold.html">fold</a></code>,
@@ -64,7 +64,7 @@ nextLabel: fold
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="fold.html"><code>fold</code></a> — la contraparte con valor inicial ·
-    <a href="reduceLazy.html"><code>reduceLazy</code></a> — un reductor currificado y reutilizable ·
+    <a href="reduceLazy.html"><code>fxReduceLazy</code></a> — un reductor currificado y reutilizable ·
     <a href="sum.html"><code>sum</code></a> — reduce especializado para números ·
     <a href="concurrent.html"><code>concurrent</code></a> — evaluación paralela aguas arriba
   </div>

@@ -2,7 +2,7 @@
 slug: retry
 title: retry — FxDart 101
 description: FxDart retry and mapRetry tutorial: rerun flaky effects with backoff, per element or per pipeline, parallel-safe — with a live playground.
-heading: <code>retry</code>
+heading: <code>fxRetry</code>
 section: 11
 crumb: retry
 prev: concurrentPool.html
@@ -31,7 +31,7 @@ nextLabel: timeout
   <p>
     <code>mapRetry(attempts, f)</code> is the same idea per element: a
     <code><a href="map.html">map</a></code> whose every call gets its own
-    retry budget. It is built on the parallel-safe <code>mapAsync</code>,
+    retry budget. It is built on the parallel-safe <code>fxMapAsync</code>,
     so under <code><a href="concurrent.html">concurrent(n)</a></code>
     each in-flight element retries <em>independently</em> — one slow,
     flaky item re-runs while its neighbors sail through, and order is
@@ -42,10 +42,10 @@ nextLabel: timeout
   </p>
   <p>
     fxdart extension (no FxTS counterpart), after Rx's
-    <code>retry</code>/<code>retryWhen</code> — re-designed for the pull
+    <code>fxRetry</code>/<code>retryWhen</code> — re-designed for the pull
     model, where "resubscribe" means "build the iterable again". For
     <em>typed</em> failure handling after the retries run out, hand the
-    result to <code><a href="eitherPipelines.html">eitherCatching</a></code>.
+    result to <code><a href="eitherPipelines.html">fxEitherCatching</a></code>.
   </p>
 
   <h2>Demo 1 · A flaky fetch, with backoff</h2>

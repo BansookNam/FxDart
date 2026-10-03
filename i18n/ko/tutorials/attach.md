@@ -29,7 +29,7 @@ nextLabel: filter
     품목을 (없을 수도 있는) 가격 옆에 붙잡아 두므로, 대체 값
     <code>r.$2&nbsp;??&nbsp;r.$1.listPrice</code>도 "그게 어느 SKU였지?"
     라벨도 여전히 손 닿는 곳에 있습니다. 비동기 형태는
-    <code>mapAsync</code> 위에 만들어져 병렬 안전합니다 — 뒤에
+    <code>fxMapAsync</code> 위에 만들어져 병렬 안전합니다 — 뒤에
     <code><a href="concurrent.html">concurrent(n)</a></code>을 붙이면
     조회가 <em>n</em>개씩 동시에 실행됩니다.
   </p>

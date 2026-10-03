@@ -1,7 +1,7 @@
 import 'package:fxdart/fxdart.dart';
 
 Future<String> fetchUser(int id) async {
-  await sleep(const Duration(milliseconds: 100));
+  await fxSleep(const Duration(milliseconds: 100));
   return 'user$id';
 }
 

@@ -1,6 +1,6 @@
-# Why `.curried` (and not `curry`)
+# Why `.curried` (and not `fxCurry`)
 
-FxTS ships a `curry` function. fxdart ships a `.curried` extension getter
+FxTS ships a `fxCurry` function. fxdart ships a `.curried` extension getter
 instead. This document explains why the direct port is impossible, how the
 Dart-native replacement works, why it is named the way it is, and how the same
 philosophy resolves the other "unportable" FxTS APIs.
@@ -14,9 +14,9 @@ addOne(2); // 3
 fx([1, 2, 3]).map(multiply.curried(10)).toList(); // [10, 20, 30]
 ```
 
-## The problem: FxTS `curry` cannot be ported
+## The problem: FxTS `fxCurry` cannot be ported
 
-FxTS's `curry` takes *any* function and returns a curried version of it,
+FxTS's `fxCurry` takes *any* function and returns a curried version of it,
 whatever its arity:
 
 ```ts
@@ -27,7 +27,7 @@ add(1, 2)(3); // 6 — partial application at any split
 
 It leans on two TypeScript/JavaScript capabilities:
 
-1. **Runtime arity reflection** — JS functions expose `fn.length`, so `curry`
+1. **Runtime arity reflection** — JS functions expose `fn.length`, so `fxCurry`
    can count parameters at runtime and decide when to stop collecting
    arguments and call the original.
 2. **Recursive conditional types** — the `Curry<...>` type recursively peels
@@ -39,7 +39,7 @@ Dart has neither. A Dart function value does not expose its parameter count
 system has no variadic generics, no conditional types, and no function
 overloads. A faithful one-function port is impossible — not merely awkward.
 
-The first release of fxdart therefore shipped `curry` as a deprecated stub:
+The first release of fxdart therefore shipped `fxCurry` as a deprecated stub:
 untyped (`Function` in, `Function` out), binary-only, existing purely so that
 code migrating from FxTS gets an analyzer warning instead of silent breakage.
 That left currying itself unresolved — this document is the resolution.
@@ -89,7 +89,7 @@ opaque conditional type.
 
 Constraints on the name:
 
-- It cannot be `curry` at the top level — that identifier is taken by the
+- It cannot be `fxCurry` at the top level — that identifier is taken by the
   deprecated migration stub, and the two must coexist so FxTS code gets
   analyzer-guided migration (`@Deprecated('Use the .curried extension getter
   instead')`) rather than a breaking rename.
@@ -105,7 +105,7 @@ name derived views of an object with past participles: `Iterable.reversed`,
 `List.sorted(...)`, `String.split(...).reversed`. `fn.curried` follows that
 convention exactly — it reads as "the curried form of `fn`", a *view*, which
 is precisely what it returns. `fn.curry` would read as an imperative command;
-`curry(fn)` was FxTS's spelling for a language that needed it.
+`fxCurry(fn)` was FxTS's spelling for a language that needed it.
 
 There is precedent: [fpdart](https://pub.dev/packages/fpdart) exposes currying
 through arity-specific extensions on function types, so Dart FP users will
@@ -151,7 +151,7 @@ Uncurry2(add3.curried).uncurried(1, 2)(3); // (A, B) => C => R
 
 ## What the extension approach cannot do
 
-Honesty section. Compared with FxTS `curry`:
+Honesty section. Compared with FxTS `fxCurry`:
 
 - **No mixed application.** FxTS allows `add(1, 2)(3)`. `.curried` produces a
   strictly unary chain: `add.curried(1)(2)(3)`. Supporting every split would
@@ -203,7 +203,7 @@ extension Curry<A, ...Rest, R> on R Function(A, ...Rest) {
 That needs three sub-features Dart lacks: a **variadic type parameter**
 (`...Rest`), **spreading a type pack into a function type's parameter list**,
 and **spreading it into an argument list** at the call. TypeScript spells all
-three `...Rest`, which is why FxTS's `curry` needs no arity table.
+three `...Rest`, which is why FxTS's `fxCurry` needs no arity table.
 
 Dart 3 records look adjacent but are not the same thing. A record is a *value*
 whose shape is fixed and statically known at each use; there is no way to write
@@ -269,9 +269,9 @@ int _arity(Function f) => (reflect(f) as ClosureMirror)
     .function.parameters.where((p) => !p.isOptional).length;
 // …accumulate arguments until the count is reached, then Function.apply.
 
-curry(add3)(1)(2)(3);             // 6   — full currying
-curry(add3)(1, 2)(3);             // 6   — mixed application
-curry(add7)(1)(2)(3)(4)(5)(6)(7); // 28  — arity 7, past the 2–5 ceiling
+fxCurry(add3)(1)(2)(3);             // 6   — full currying
+fxCurry(add3)(1, 2)(3);             // 6   — mixed application
+fxCurry(add7)(1)(2)(3)(4)(5)(6)(7); // 28  — arity 7, past the 2–5 ceiling
 ```
 
 Every limitation in this document except the typing lifts. And it is still
@@ -293,7 +293,7 @@ the type names do not resolve at all. Anything built this way could not ship in
 `tool/precompile_playgrounds.dart` compiles every snippet for the browser.
 
 **It gives back untyped results.** The reflective chain returns `dynamic`, so
-the analyzer accepts `String bad = curry(add3)(1)(2)(3);` without complaint and
+the analyzer accepts `String bad = fxCurry(add3)(1)(2)(3);` without complaint and
 the program fails at runtime instead. That is the deprecated stub's ergonomics
 exactly — which is the deeper point of this section.
 
@@ -318,7 +318,7 @@ needs them.
 
 ## The same philosophy, applied to the rest
 
-`curry` was the last unresolved entry on the unportable list, but the shape of
+`fxCurry` was the last unresolved entry on the unportable list, but the shape of
 the resolution — **port the meaning, not the spelling** — is the same one the
 other entries already follow. Each keeps a `@Deprecated` stub for
 analyzer-guided migration, with a Dart-native replacement that says what it
@@ -326,16 +326,16 @@ actually does in this language:
 
 | FxTS API | Why it can't port literally | fxdart replacement |
 |---|---|---|
-| `curry(f)` | needs arity reflection + recursive conditional types | `.curried` / `.uncurried` extension getters |
-| `isUndefined` | Dart has no `undefined`, only `null` | `isNull` |
-| `isArray` | JS `Array` is Dart `List` | `isList` |
-| `isObject` | JS plain-object semantics don't exist; closest analogue is `Map` | `isMap` |
+| `fxCurry(f)` | needs arity reflection + recursive conditional types | `.curried` / `.uncurried` extension getters |
+| `fxIsUndefined` | Dart has no `undefined`, only `null` | `fxIsNull` |
+| `fxIsArray` | JS `Array` is Dart `List` | `fxIsList` |
+| `fxIsObject` | JS plain-object semantics don't exist; closest analogue is `Map` | `fxIsMap` |
 | `takeUntil` | name deprecated upstream in FxTS itself (inclusive semantics were surprising) | `takeUntilInclusive` |
 
 The predicates follow Dart's type names because a predicate's name *is* its
-contract — `isArray` returning true for a `List` would be a lie about which
+contract — `fxIsArray` returning true for a `List` would be a lie about which
 language you're in. `takeUntilInclusive` follows FxTS's own deprecation, with
-the honest name. And `curry` becomes `curried` because in Dart the natural
+the honest name. And `fxCurry` becomes `curried` because in Dart the natural
 home for function-shape transformations is an extension getter on the function
 type itself.
 
@@ -343,16 +343,16 @@ type itself.
 
 ```dart
 // FxTS style (deprecated stubs — analyzer will flag these):
-final f = curry((int a, int b) => a + b);   // untyped Function
-isUndefined(x);
-isArray(x);
-isObject(x);
-takeUntil(predicate, iterable);
+final f = fxCurry((int a, int b) => a + b);   // untyped Function
+fxIsUndefined(x);
+fxIsArray(x);
+fxIsObject(x);
+fxTakeUntil(predicate, iterable);
 
 // fxdart style:
 final f = ((int a, int b) => a + b).curried; // int Function(int) Function(int)
-isNull(x);
-isList(x);
-isMap(x);
+fxIsNull(x);
+fxIsList(x);
+fxIsMap(x);
 takeUntilInclusive(predicate, iterable);
 ```

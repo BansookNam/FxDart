@@ -18,7 +18,7 @@ nextLabel: sumBy
   <p>
     <code>sum</code>은 종결 연산자이며, 라이브러리에서 특수화된 fold 중
     가장 단순한 축에 속합니다. 내부적으로는 말 그대로
-    <code>fold(0, (a, b) =&gt; a + b, iterable)</code>입니다. 다른 종결
+    <code>fxFold(0, (a, b) =&gt; a + b, iterable)</code>입니다. 다른 종결
     연산자와 마찬가지로 호출하는 순간 상류의 지연 파이프라인 전체를
     끌어당깁니다 — 그래서 <code>map</code>/<code>filter</code> 단계를
     아무리 길게 엮어도 <code>sum</code>이 실제로 필요로 하는 값만큼만

@@ -16,7 +16,7 @@ nextLabel: intersectionBy
 
   <h2>Lección</h2>
   <p>
-    <code>intersection(iterable1, iterable2)</code> comparte la convención de
+    <code>fxIntersection(iterable1, iterable2)</code> comparte la convención de
     orden de argumentos de <code>difference</code>: el resultado recorre
     <strong><code>iterable2</code></strong> y conserva cada elemento (en el
     orden de <code>iterable2</code>, sin duplicados) que <em>sí</em> se
@@ -29,7 +29,7 @@ nextLabel: intersectionBy
   </p>
   <p>
     Por dentro es
-    <code>intersectionBy((a) =&gt; a, iterable1, iterable2)</code> — recurre
+    <code>fxIntersectionBy((a) =&gt; a, iterable1, iterable2)</code> — recurre
     directamente a <a href="intersectionBy.html"><code>intersectionBy</code></a>
     cuando necesites emparejar por una clave calculada entre dos listas de
     registros completos en vez de por igualdad de valor.
@@ -57,5 +57,5 @@ nextLabel: intersectionBy
     <a href="difference.html"><code>difference</code></a> — la contraparte de exclusión ·
     <a href="intersectionBy.html"><code>intersectionBy</code></a> — empareja por una clave calculada en su lugar ·
     <a href="uniq.html"><code>uniq</code></a> — elimina duplicados de un solo iterable ·
-    <a href="../tutorials/includes.html"><code>includes</code></a> — comprueba la pertenencia de un único valor
+    <a href="../tutorials/includes.html"><code>fxIncludes</code></a> — comprueba la pertenencia de un único valor
   </div>

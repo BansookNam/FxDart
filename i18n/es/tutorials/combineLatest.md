@@ -10,7 +10,7 @@ prevLabel: sampleOn
 next: withLatestFrom.html
 nextLabel: withLatestFrom
 ---
-  <p class="hero-sub">En cada evento de cualquiera de los dos lados, emite <code>combine</code> de los dos valores más recientes — una vez que ambos lados han hablado al menos una vez.</p>
+  <p class="hero-sub">En cada evento de cualquiera de los dos lados, emite <code>fxCombine</code> de los dos valores más recientes — una vez que ambos lados han hablado al menos una vez.</p>
 
   {{signature}}
 
@@ -22,7 +22,7 @@ nextLabel: withLatestFrom
     pulsación en cualquiera de los dos.
     <code>combineLatest(other, combine)</code> es esa forma: recuerda el
     último valor de cada lado, y cada evento de <em>cualquiera</em> de los
-    streams vuelve a ejecutar <code>combine</code> sobre el par fresco.
+    streams vuelve a ejecutar <code>fxCombine</code> sobre el par fresco.
   </p>
   <p>
     Las reglas, con precisión. Nada se emite hasta que <strong>ambos</strong>

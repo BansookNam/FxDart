@@ -2,7 +2,7 @@
 slug: throwError
 title: throwError — FxDart 101
 description: FxDart throwError 튜토리얼: 예외를 던지는 동작을 재사용 가능한 단항 함수로 바꾸는 방법을 라이브 플레이그라운드와 함께 익힙니다.
-heading: <code>throwError</code>
+heading: <code>fxThrowError</code>
 section: 10
 crumb: throwError
 prev: unless.html
@@ -17,12 +17,12 @@ nextLabel: throwIf
   <h2>강의</h2>
   <p>
     Dart에서 <code>throw</code>는 문장이라 함수 값을 기대하는 자리에
-    그대로 넣을 수 없습니다. <code>throwError(toError)</code>가 이 문제를
+    그대로 넣을 수 없습니다. <code>fxThrowError(toError)</code>가 이 문제를
     해결합니다. 문제가 된 값으로부터 <code>Object</code>(예외나 에러)를
     만드는 함수를 넘기면, 콜백이 필요한 어디에든 전달할 수 있는
     <code>Never Function(T)</code>를 돌려받습니다. 가장 흔한 쓰임은
     <code>orElse</code> 자리입니다 —
-    <a href="cases.html"><code>cases</code></a>에 넘겨서
+    <a href="cases.html"><code>fxCases</code></a>에 넘겨서
     "아무것도 일치하지 않음"을 조용한 폴백 대신 확실한 실패로 바꿔 줍니다.
   </p>
   <p>
@@ -37,7 +37,7 @@ nextLabel: throwIf
 
   <h2>데모 2 · cases의 폴백으로 사용하기</h2>
   <p>
-    조용히 흘려보내는 대신, <code>throwError</code>는 일치하지 않은 값을
+    조용히 흘려보내는 대신, <code>fxThrowError</code>는 일치하지 않은 값을
     눈에 띄고 잡을 수 있는 실패로 만들어 줍니다.
   </p>
   {{playground:1}}
@@ -48,8 +48,8 @@ nextLabel: throwIf
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="throwIf.html"><code>throwIf</code></a> — 별도의 빌더 함수 없이 조건부로 던집니다 ·
-    <a href="cases.html"><code>cases</code></a> — throwError가 orElse로 자리 잡는 곳 ·
-    <a href="when.html"><code>when</code></a> / <a href="unless.html"><code>unless</code></a> — 예외를 던지지 않는 조건부 변환 ·
+    <a href="throwIf.html"><code>fxThrowIf</code></a> — 별도의 빌더 함수 없이 조건부로 던집니다 ·
+    <a href="cases.html"><code>fxCases</code></a> — throwError가 orElse로 자리 잡는 곳 ·
+    <a href="when.html"><code>fxWhen</code></a> / <a href="unless.html"><code>fxUnless</code></a> — 예외를 던지지 않는 조건부 변환 ·
     <a href="find.html"><code>find</code></a> — 일치하는 값이 없으면 예외 대신 null을 반환합니다
   </div>

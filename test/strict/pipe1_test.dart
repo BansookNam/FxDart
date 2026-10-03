@@ -11,7 +11,7 @@ void main() {
       test(
         'should return the value evaluated by applying the initial value to a given function',
         () {
-          final result = pipe1(1, add10);
+          final result = fxPipe1(1, add10);
           expect(result, equals(11));
         },
       );
@@ -19,19 +19,19 @@ void main() {
 
     group('async', () {
       test("should have an initial value of 'Future'", () async {
-        final result = await pipe1(Future.value(1), add10);
+        final result = await fxPipe1(Future.value(1), add10);
         expect(result, equals(11));
       });
 
       test('should work even if the given function is asynchronous', () async {
-        final result = await pipe1(1, add10Async);
+        final result = await fxPipe1(1, add10Async);
         expect(result, equals(11));
       });
 
       test(
         "should work even if the given function is asynchronous and initial value is 'Future'",
         () async {
-          final result = await pipe1(Future.value(1), add10Async);
+          final result = await fxPipe1(Future.value(1), add10Async);
           expect(result, equals(11));
         },
       );

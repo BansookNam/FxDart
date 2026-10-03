@@ -1,4 +1,4 @@
-import 'package:fxdart/fxdart.dart' hide isNull;
+import 'package:fxdart/fxdart.dart' hide fxIsNull;
 import 'package:test/test.dart';
 
 void main() {
@@ -8,18 +8,21 @@ void main() {
         "should return result when passed arguments are synchronous function and 'Iterable'",
         () {
           expect(
-            find((String a) => a == 'r', 'marpple'.split('')),
+            fxFind((String a) => a == 'r', 'marpple'.split('')),
             equals('r'),
           );
-          expect(find((int a) => a == 2, [1, 2, 3, 4]), equals(2));
-          expect(find((int a) => a == 5, [1, 2, 3, 4]), isNull);
+          expect(fxFind((int a) => a == 2, [1, 2, 3, 4]), equals(2));
+          expect(fxFind((int a) => a == 5, [1, 2, 3, 4]), isNull);
         },
       );
 
       test('should be able to be used in the pipeline', () {
-        final res1 = find(
+        final res1 = fxFind(
           (int a) => a == 14,
-          filter((int a) => a % 2 == 0, map((int a) => a + 10, [1, 2, 3, 4])),
+          fxFilter(
+            (int a) => a % 2 == 0,
+            fxMap((int a) => a + 10, [1, 2, 3, 4]),
+          ),
         );
         expect(res1, equals(14));
       });
@@ -39,26 +42,26 @@ void main() {
       test(
         "should find out the result by the callback to given 'AsyncIterable'",
         () async {
-          final res1 = await findAsync(
+          final res1 = await fxFindAsync(
             (int a) => a == 5,
-            toAsync([1, 2, 3, 4, 5, 6]),
+            fxToAsync([1, 2, 3, 4, 5, 6]),
           );
           expect(res1, equals(5));
 
-          final res2 = await findAsync(
+          final res2 = await fxFindAsync(
             (int a) => a == 7,
-            toAsync([1, 2, 3, 4, 5, 6]),
+            fxToAsync([1, 2, 3, 4, 5, 6]),
           );
           expect(res2, isNull);
         },
       );
 
       test('should be able to be used in the pipeline', () async {
-        final res1 = await findAsync(
+        final res1 = await fxFindAsync(
           (int a) => a == 14,
-          filterAsync(
+          fxFilterAsync(
             (int a) => a % 2 == 0,
-            mapAsync((int a) => a + 10, toAsync([1, 2, 3, 4])),
+            fxMapAsync((int a) => a + 10, fxToAsync([1, 2, 3, 4])),
           ),
         );
         expect(res1, equals(14));

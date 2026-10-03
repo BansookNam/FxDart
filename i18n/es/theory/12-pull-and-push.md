@@ -57,7 +57,7 @@ import 'package:fxdart/fxdart.dart';
 void main() async {
   var produced = 0;
 
-  final source = fx(range(1, 1000)).map((n) {
+  final source = fx(fxRange(1, 1000)).map((n) {
     produced++;
     return n;
   }).toAsync();
@@ -211,7 +211,7 @@ forma, no cuando el vocabulario suena mejor.
 3. Una API HTTP paginada devuelve 100 filas por petición. Modélala de las dos
    formas, y di cuál hace más barato «parar tras la primera coincidencia» —
    y por cuántas peticiones.
-4. `Stream` tiene `asBroadcastStream`; las cadenas pull tienen `fork`/`tee`.
+4. `Stream` tiene `asBroadcastStream`; las cadenas pull tienen `fxFork`/`tee`.
    Ambos dejan que dos consumidores vean una fuente. ¿Cuál es la diferencia
    esencial en lo que pasa cuando un consumidor es lento?
 
@@ -236,7 +236,7 @@ forma, no cuando el vocabulario suena mejor.
    tiene límite y crece con la latencia.
 4. `asBroadcastStream` da a cada listener los mismos eventos al ritmo del
    productor: un listener lento o hace búfer o descarta, y no puede frenar al
-   productor. `fork`/`tee` dividen un *pull*, así que la fuente compartida
+   productor. `fxFork`/`tee` dividen un *pull*, así que la fuente compartida
    avanza solo cuando ambos consumidores han preguntado — el consumidor lento
    retiene al rápido, que es el backpressure funcionando como está diseñado,
    y es la opción por defecto correcta cuando la corrección importa más que

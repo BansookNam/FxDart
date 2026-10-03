@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fxdart/fxdart.dart' show Left, Nel, Right, find, fx;
+import 'package:fxdart/fxdart.dart' show Left, Nel, Right, fxFind, fx;
 
 import '../logic/errors.dart';
 import '../logic/validate.dart';
@@ -91,7 +91,7 @@ class _BudgetDialogState extends State<_BudgetDialog> {
         : null;
     String? errorFor(String field) => errors == null
         ? null
-        : find((FieldError e) => e.field == field, errors)?.detail;
+        : fxFind((FieldError e) => e.field == field, errors)?.detail;
 
     return AlertDialog(
       title: Row(
@@ -191,7 +191,7 @@ class _BudgetDialogState extends State<_BudgetDialog> {
             'categories" is the same rule as "an expense needs a money '
             'category"',
         errors == null ||
-                find((FieldError e) => e.field == 'category', errors) == null
+                fxFind((FieldError e) => e.field == 'category', errors) == null
             ? 'ok'
             : 'raised',
       ),
@@ -200,7 +200,7 @@ class _BudgetDialogState extends State<_BudgetDialog> {
         'vAmountValue plus one ensureNotNull: blank is "no money" on an '
             'entry, but a budget with no number is not a budget',
         errors == null ||
-                find((FieldError e) => e.field == 'amount', errors) == null
+                fxFind((FieldError e) => e.field == 'amount', errors) == null
             ? 'ok'
             : 'raised',
       ),

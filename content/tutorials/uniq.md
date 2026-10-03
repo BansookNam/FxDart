@@ -20,7 +20,7 @@ nextLabel: uniqBy
     values already seen, and yields each element only the first time it
     shows up. <code>distinct</code> is the Dart-idiomatic name; fxdart also
     accepts the FxTS spelling <code>uniq</code> — they're the same operator.
-    It's implemented as <code>uniqBy((a) =&gt; a, iterable)</code> —
+    It's implemented as <code>fxUniqBy((a) =&gt; a, iterable)</code> —
     the identity key — so if you ever need to dedupe by something other than
     equality of the whole value, reach for
     <a href="uniqBy.html"><code>uniqBy</code></a> instead.
@@ -32,7 +32,7 @@ nextLabel: uniqBy
     last.
   </p>
   <p>
-    On the async side, <code>distinctAsync</code> is safe to combine with
+    On the async side, <code>fxDistinctAsync</code> is safe to combine with
     <code>.concurrent(n)</code> as long as the concurrency lives in an
     upstream fetch stage: fetch with <code>.map(...).concurrent(n)</code>
     first, then apply <code>.distinct()</code> to the already-resolved,
@@ -55,5 +55,5 @@ nextLabel: uniqBy
     <a href="uniqBy.html"><code>uniqBy</code></a> — dedupe by a computed key ·
     <a href="difference.html"><code>difference</code></a> — remove elements found in another iterable ·
     <a href="intersection.html"><code>intersection</code></a> — keep only shared elements ·
-    <a href="compact.html"><code>compact</code></a> — drop nulls
+    <a href="compact.html"><code>fxCompact</code></a> — drop nulls
   </div>

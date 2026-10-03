@@ -4,26 +4,26 @@ import 'package:test/test.dart';
 void main() {
   group('concurrentPool', () {
     test("should be consumed 'FxAsyncIterable' (concurrency 1)", () async {
-      final res = concurrentPoolAsync(
+      final res = fxConcurrentPoolAsync(
         1,
-        toAsync(() sync* {
+        fxToAsync(() sync* {
           for (var i = 1; i <= 3; i++) {
-            yield delay(const Duration(milliseconds: 100), i);
+            yield fxDelay(const Duration(milliseconds: 100), i);
           }
         }()),
       );
 
-      final acc = await toListAsync(res);
+      final acc = await fxToListAsync(res);
       expect(acc, equals([1, 2, 3]));
     });
 
     test('should yield results in completion order', () async {
       final delays = [200, 50, 100];
-      final it = concurrentPoolAsync(
+      final it = fxConcurrentPoolAsync(
         3,
-        toAsync(() sync* {
+        fxToAsync(() sync* {
           for (var i = 0; i < 3; i++) {
-            yield delay(Duration(milliseconds: delays[i]), i + 1);
+            yield fxDelay(Duration(milliseconds: delays[i]), i + 1);
           }
         }()),
       ).iterator;
@@ -36,11 +36,11 @@ void main() {
       "should be consumed 'FxAsyncIterable' concurrently (concurrency 2)",
       () async {
         final delays = [50, 200, 100, 200, 100, 50];
-        final it = concurrentPoolAsync(
+        final it = fxConcurrentPoolAsync(
           2,
-          toAsync(() sync* {
+          fxToAsync(() sync* {
             for (var i = 0; i < 6; i++) {
-              yield delay(Duration(milliseconds: delays[i]), i + 1);
+              yield fxDelay(Duration(milliseconds: delays[i]), i + 1);
             }
           }()),
         ).iterator;
@@ -59,9 +59,9 @@ void main() {
       () async {
         final delays = [50, 150, 50, 150];
         final it = fxAsync(
-          toAsync(() sync* {
+          fxToAsync(() sync* {
             for (var i = 0; i < 4; i++) {
-              yield delay(Duration(milliseconds: delays[i]), i + 1);
+              yield fxDelay(Duration(milliseconds: delays[i]), i + 1);
             }
           }()),
         ).concurrentPool(2).iterator;
@@ -80,15 +80,15 @@ void main() {
     test(
       'should be able to handle an error when working concurrentPool',
       () async {
-        final it = concurrentPoolAsync(
+        final it = fxConcurrentPoolAsync(
           2,
-          toAsync(() sync* {
-            yield delay(const Duration(milliseconds: 50), 1);
-            yield delay(const Duration(milliseconds: 200), 2);
-            yield delay(const Duration(milliseconds: 50), 3);
+          fxToAsync(() sync* {
+            yield fxDelay(const Duration(milliseconds: 50), 1);
+            yield fxDelay(const Duration(milliseconds: 200), 2);
+            yield fxDelay(const Duration(milliseconds: 50), 3);
             yield Future<int>.error(StateError('err'));
-            yield delay(const Duration(milliseconds: 50), 4);
-            yield delay(const Duration(milliseconds: 200), 5);
+            yield fxDelay(const Duration(milliseconds: 50), 4);
+            yield fxDelay(const Duration(milliseconds: 200), 5);
           }()),
         ).iterator;
 
@@ -117,12 +117,12 @@ void main() {
         // toList awaits each pull before the next; the pool must still keep
         // itself full so total time is ~ceil(6/3)*100ms, not 6*100ms.
         final sw = Stopwatch()..start();
-        final acc = await toListAsync(
-          concurrentPoolAsync(
+        final acc = await fxToListAsync(
+          fxConcurrentPoolAsync(
             3,
-            toAsync(() sync* {
+            fxToAsync(() sync* {
               for (var i = 1; i <= 6; i++) {
-                yield delay(const Duration(milliseconds: 100), i);
+                yield fxDelay(const Duration(milliseconds: 100), i);
               }
             }()),
           ),
@@ -135,11 +135,11 @@ void main() {
     test('answers surplus overlapping pulls with done', () async {
       // More concurrent pulls than the source has elements: the extras must
       // settle as done once the pool drains, not hang.
-      final it = concurrentPoolAsync(
+      final it = fxConcurrentPoolAsync(
         2,
-        toAsync(() sync* {
+        fxToAsync(() sync* {
           for (var i = 1; i <= 3; i++) {
-            yield delay(const Duration(milliseconds: 10), i);
+            yield fxDelay(const Duration(milliseconds: 10), i);
           }
         }()),
       ).iterator;

@@ -144,9 +144,9 @@ void main() {
 
   // Four spellings of "swap the structures", because there is no
   // way to write one that works for every effect type.
-  print(sequenceEither(xs));
+  print(fxSequenceEither(xs));
   print(flattenOrAccumulate(xs));
-  print(separateEither(xs));
+  print(fxSeparateEither(xs));
   print(fx(xs).sequence());
   // …plus sequenceEitherAsync, flattenOrAccumulateAsync,
   //   mapOrAccumulateAsync for the async chain.
@@ -154,7 +154,7 @@ void main() {
 ```
 
 거래를 정직하게 보려면 반대쪽도 봐야 합니다. 이것들은 구체적이기 때문에
-*빠르고* 타입이 정확합니다. `sequenceEither`는 `Either<L, List<R>>`를
+*빠르고* 타입이 정확합니다. `fxSequenceEither`는 `Either<L, List<R>>`를
 돌려줍니다 — `Kind<F, List<R>>`도 아니고, 손으로 풀어야 하는 래퍼도 아닙니다.
 Dart의 추론이 동작하고, 에디터가 자동완성하며, 오류가 여러분의 코드를 가리킵니다.
 `Kind` 인코딩의 제네릭 버전이라면 캐스트 없이는 아무도 쓸 수 없는 무언가를

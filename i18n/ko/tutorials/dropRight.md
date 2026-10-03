@@ -24,7 +24,7 @@ nextLabel: dropWhile
     센티널만 빼고 싶을 때 딱 맞는 도구지만, 소스가 유한해야 합니다.
   </p>
   <p>
-    <code>dropRightAsync</code>도 같은 제약을 그대로 갖습니다. 값을 만들어
+    <code>fxDropRightAsync</code>도 같은 제약을 그대로 갖습니다. 값을 만들어
     내기 시작하려면 상류 전체를 먼저 await 해야 합니다.
   </p>
 

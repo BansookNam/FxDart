@@ -7,6 +7,6 @@ void main() {
   print([for (var i = 0; i < 5; i++) roll()]); // same rolls every run
 
   // shuffle(iterable, seed) uses createSeededRandom internally:
-  print(shuffle([1, 2, 3, 4, 5], 2024)); // same order every run
-  print(shuffle([1, 2, 3, 4, 5], 2024)); // ...see?
+  print(fxShuffle([1, 2, 3, 4, 5], 2024)); // same order every run
+  print(fxShuffle([1, 2, 3, 4, 5], 2024)); // ...see?
 }

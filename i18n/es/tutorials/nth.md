@@ -22,7 +22,7 @@ nextLabel: find
     perezosa enorme, y mucho más barato que materializarla entera solo para
     indexar en una <code>List</code>. <code>elementAtOrNull</code> es el nombre
     idiomático en Dart (refleja <code>Iterable.elementAtOrNull</code>); fxdart
-    también acepta la grafía de FxTS <code>nth</code> — son el mismo operador.
+    también acepta la grafía de FxTS <code>fxNth</code> — son el mismo operador.
     Un índice negativo, o uno más allá del final, simplemente da <code>null</code>;
     a diferencia de la indexación de arrays de algunos lenguajes, aquí los índices
     no dan la vuelta para contar desde el final — el índice tiene que ser una posición

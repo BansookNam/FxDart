@@ -2,7 +2,7 @@
 slug: memoize
 title: memoize — FxDart 101
 description: FxDart memoize tutorial: cache a unary function's results by argument, sync and async, with a live playground.
-heading: <code>memoize</code>
+heading: <code>fxMemoize</code>
 section: 10
 crumb: memoize
 prev: fxPipe.html
@@ -16,7 +16,7 @@ nextLabel: negate
 
   <h2>Lecture</h2>
   <p>
-    <code>memoize(f)</code> wraps <code>f</code> in a cache: the first time
+    <code>fxMemoize(f)</code> wraps <code>f</code> in a cache: the first time
     it's called with a given argument, it runs <code>f</code> and remembers
     the result; every later call with an <code>==</code>-equal argument
     returns the cached result instantly, without calling <code>f</code>
@@ -25,7 +25,7 @@ nextLabel: negate
     inputs.
   </p>
   <p>
-    FxDart's <code>memoize</code> is <strong>unary only</strong> and keys the
+    FxDart's <code>fxMemoize</code> is <strong>unary only</strong> and keys the
     cache by the argument's <code>==</code>/<code>hashCode</code>. FxTS's
     version is variadic and keys on the full argument list via a
     <code>WeakMap</code>-backed cache — Dart has no direct equivalent (no
@@ -51,14 +51,14 @@ nextLabel: negate
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: wrap this "slow" cubing function with <code>memoize</code> so
+  <p>Exercise: wrap this "slow" cubing function with <code>fxMemoize</code> so
     that calling it twice with <code>3</code> only runs the real computation once.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — used above to simulate a slow async call ·
-    <a href="debounce.html"><code>debounce</code></a> — rate-limit calls instead of caching them ·
-    <a href="identity.html"><code>identity</code></a> — the simplest possible function to wrap ·
-    <a href="always.html"><code>always</code></a> — a constant value, no caching needed
+    <a href="delay.html"><code>fxDelay</code> &amp; <code>fxSleep</code></a> — used above to simulate a slow async call ·
+    <a href="debounce.html"><code>fxDebounce</code></a> — rate-limit calls instead of caching them ·
+    <a href="identity.html"><code>fxIdentity</code></a> — the simplest possible function to wrap ·
+    <a href="always.html"><code>fxAlways</code></a> — a constant value, no caching needed
   </div>

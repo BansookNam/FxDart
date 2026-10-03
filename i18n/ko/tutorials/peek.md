@@ -30,7 +30,7 @@ nextLabel: pluck
     정확히 한 번씩, 순서대로, 그 이전에는 절대 실행되지 않습니다.
   </p>
   <p>
-    <code>peekAsync</code>는 <code>mapAsync</code> 위에 그대로 얹혀
+    <code>fxPeekAsync</code>는 <code>fxMapAsync</code> 위에 그대로 얹혀
     있으므로(<code>f</code>를 await한 뒤 원래 값을 다시 내보냅니다)
     <code>map</code>의 동시성 동작을 그대로 물려받습니다.
     <code>.concurrent(n)</code>을 붙이면 콜백 <code>n</code>개가 실제로
@@ -56,6 +56,6 @@ nextLabel: pluck
     <strong>관련 항목:</strong>
     <a href="mapEffect.html"><code>mapEffect</code></a> — peek과 비슷하지만 변환할 수 있습니다 ·
     <a href="map.html"><code>map</code></a> — 원소마다 변환합니다 ·
-    <a href="pluck.html"><code>pluck</code></a> — 각 맵에서 필드 하나를 뽑아냅니다 ·
+    <a href="pluck.html"><code>fxPluck</code></a> — 각 맵에서 필드 하나를 뽑아냅니다 ·
     <a href="concurrent.html"><code>concurrent</code></a> — 병렬 평가
   </div>

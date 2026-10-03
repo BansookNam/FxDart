@@ -24,7 +24,7 @@ nextLabel: windowed
     않는 경우, 개수가 모자랄 수 있는 것은 마지막 청크뿐입니다.
   </p>
   <p>
-    비동기 버전인 <code>chunkAsync</code>는 청크 하나를 만들기 전에
+    비동기 버전인 <code>fxChunkAsync</code>는 청크 하나를 만들기 전에
     <code>size</code>개를 await합니다 — 상류에
     <code>.concurrent(n)</code>을 함께 쓰면 청크 하나 분량의 비동기 작업을
     동시에 처리할 수 있습니다.
@@ -44,6 +44,6 @@ nextLabel: windowed
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="slice.html"><code>slice</code></a> — 반복 배치 대신 임의의 구간 하나 ·
-    <a href="split.html"><code>split</code></a> — 고정 크기 대신 구분자 기준으로 묶기 ·
-    <a href="transpose.html"><code>transpose</code></a> — 이미 청크로 나뉜 데이터의 행과 열 뒤집기
+    <a href="split.html"><code>fxSplit</code></a> — 고정 크기 대신 구분자 기준으로 묶기 ·
+    <a href="transpose.html"><code>fxTranspose</code></a> — 이미 청크로 나뉜 데이터의 행과 열 뒤집기
   </div>

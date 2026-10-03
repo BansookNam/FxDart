@@ -3,7 +3,7 @@ import 'package:fxdart/fxdart.dart';
 // The general form: open an accumulating scope with r.accumulate, run each
 // branch with acc.accumulating, combine the .value results at the end.
 EitherNel<String, String> validate(Map<String, String> input) =>
-    either((r) => r.accumulate((acc) {
+    fxEither((r) => r.accumulate((acc) {
           final name = acc.accumulating((r) {
             final v = r.ensureNotNull(input['name'], () => 'name missing');
             r.ensure(v.isNotEmpty, () => 'name is empty');

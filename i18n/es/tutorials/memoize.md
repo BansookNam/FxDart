@@ -2,7 +2,7 @@
 slug: memoize
 title: memoize — FxDart 101
 description: Tutorial de memoize en FxDart: cachea los resultados de una función unaria según su argumento, en modo síncrono y asíncrono, con playground en vivo.
-heading: <code>memoize</code>
+heading: <code>fxMemoize</code>
 section: 10
 crumb: memoize
 prev: fxPipe.html
@@ -16,7 +16,7 @@ nextLabel: negate
 
   <h2>Lección</h2>
   <p>
-    <code>memoize(f)</code> envuelve <code>f</code> en una caché: la primera vez
+    <code>fxMemoize(f)</code> envuelve <code>f</code> en una caché: la primera vez
     que se llama con un argumento dado, ejecuta <code>f</code> y recuerda
     el resultado; toda llamada posterior con un argumento igual según
     <code>==</code> devuelve el resultado cacheado al instante, sin volver a
@@ -25,7 +25,7 @@ nextLabel: negate
     mismas entradas.
   </p>
   <p>
-    El <code>memoize</code> de FxDart es <strong>solo unario</strong> e indexa la
+    El <code>fxMemoize</code> de FxDart es <strong>solo unario</strong> e indexa la
     caché por el <code>==</code>/<code>hashCode</code> del argumento. La versión de
     FxTS es variádica e indexa por la lista completa de argumentos mediante una caché
     respaldada por <code>WeakMap</code>; Dart no tiene un equivalente directo (no hay
@@ -51,14 +51,14 @@ nextLabel: negate
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: envuelve con <code>memoize</code> esta función «lenta» que eleva al cubo, para
+  <p>Ejercicio: envuelve con <code>fxMemoize</code> esta función «lenta» que eleva al cubo, para
     que llamarla dos veces con <code>3</code> ejecute el cálculo real una sola vez.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — usados arriba para simular una llamada asíncrona lenta ·
-    <a href="debounce.html"><code>debounce</code></a> — limita la frecuencia de las llamadas en lugar de cachearlas ·
-    <a href="identity.html"><code>identity</code></a> — la función más simple posible que envolver ·
-    <a href="always.html"><code>always</code></a> — un valor constante, sin necesidad de caché
+    <a href="delay.html"><code>fxDelay</code> &amp; <code>fxSleep</code></a> — usados arriba para simular una llamada asíncrona lenta ·
+    <a href="debounce.html"><code>fxDebounce</code></a> — limita la frecuencia de las llamadas en lugar de cachearlas ·
+    <a href="identity.html"><code>fxIdentity</code></a> — la función más simple posible que envolver ·
+    <a href="always.html"><code>fxAlways</code></a> — un valor constante, sin necesidad de caché
   </div>

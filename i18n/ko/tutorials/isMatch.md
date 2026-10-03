@@ -2,7 +2,7 @@
 slug: isMatch
 title: isMatch — FxDart 101
 description: FxDart isMatch 튜토리얼 — Map이나 리스트 패턴에 대한 깊은 부분 일치 검사를 살펴봅니다.
-heading: <code>isMatch</code>
+heading: <code>fxIsMatch</code>
 section: 9
 crumb: isMatch
 prev: resolveProps.html
@@ -16,7 +16,7 @@ nextLabel: matches
 
   <h2>강의</h2>
   <p>
-    <code>isMatch</code>는 <code>pattern</code>을 재귀적으로 훑으면서
+    <code>fxIsMatch</code>는 <code>pattern</code>을 재귀적으로 훑으면서
     <code>target</code>이 그것을 "담고 있는지" 확인합니다. 규칙은 모양에 따라 다릅니다.
   </p>
   <p>
@@ -44,13 +44,13 @@ nextLabel: matches
   {{playground:1}}
 
   <h2>직접 해 보기</h2>
-  <p>연습: <code>isMatch</code>로 <code>order</code>가 <code>{'status': 'shipped'}</code>와 일치하는지 확인해 보세요.</p>
+  <p>연습: <code>fxIsMatch</code>로 <code>order</code>가 <code>{'status': 'shipped'}</code>와 일치하는지 확인해 보세요.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="matches.html"><code>matches</code></a> — 이 함수를 커링해 filter에 바로 쓸 수 있게 만든 버전 ·
-    <a href="pickBy.html"><code>pickBy</code></a> — 모양 기반 필터링에서 자주 함께 쓰는 함수 ·
+    <a href="matches.html"><code>fxMatches</code></a> — 이 함수를 커링해 filter에 바로 쓸 수 있게 만든 버전 ·
+    <a href="pickBy.html"><code>fxPickBy</code></a> — 모양 기반 필터링에서 자주 함께 쓰는 함수 ·
     <a href="find.html"><code>find</code></a> — 처음으로 일치하는 원소 찾기 ·
-    <a href="omitBy.html"><code>omitBy</code></a> — 술어로 항목 제거하기
+    <a href="omitBy.html"><code>fxOmitBy</code></a> — 술어로 항목 제거하기
   </div>

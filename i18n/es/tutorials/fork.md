@@ -2,7 +2,7 @@
 slug: fork
 title: fork — FxDart 101
 description: Tutorial de fork en FxDart: ramifica una única iteración con buffer de una fuente en varios lectores independientes, con un playground en vivo.
-heading: <code>fork</code>
+heading: <code>fxFork</code>
 section: 6
 crumb: fork
 prev: reverse.html
@@ -21,8 +21,8 @@ nextLabel: tee
     empezar desde cero cada vez que pides un <code>.iterator</code> nuevo. Eso
     es un derroche (o directamente un error) cuando producir un valor sale
     caro: una petición de red, un cálculo lento, un stream que solo puedes
-    leer una vez. <code>fork</code> lo arregla: cada llamada a
-    <code>fork(iterable)</code> con el <em>mismo</em> objeto
+    leer una vez. <code>fxFork</code> lo arregla: cada llamada a
+    <code>fxFork(iterable)</code> con el <em>mismo</em> objeto
     <code>iterable</code> devuelve un cursor independiente sobre un único
     buffer compartido que crece de forma perezosa. La fuente subyacente se
     recorre exactamente una vez, sin importar cuántos forks lean de ella ni en
@@ -36,7 +36,7 @@ nextLabel: tee
     adelantarse en un fork tira de nuevos valores de la fuente y los añade al
     buffer compartido; un fork que va rezagado simplemente reproduce los
     valores que ya están en el buffer, sin coste adicional.
-    <code>forkAsync</code> funciona igual para <code>FxAsyncIterable</code> y,
+    <code>fxForkAsync</code> funciona igual para <code>FxAsyncIterable</code> y,
     además, permite que la demanda concurrente de varios forks aguas abajo
     tire de la fuente asíncrona compartida en paralelo.
   </p>
@@ -63,7 +63,7 @@ nextLabel: tee
   <h2>Pruébalo tú</h2>
   <p>
     Ejercicio: ahora mismo <code>readings</code> se itera dos veces sin
-    <code>fork</code>, así que <code>sensor()</code> se ejecuta dos veces y
+    <code>fxFork</code>, así que <code>sensor()</code> se ejecuta dos veces y
     <code>reads</code> acaba en 6. Haz fork de <code>readings</code> para cada
     consumidor de modo que el sensor se lea una sola vez (<code>reads</code>
     debería ser 3).
@@ -74,5 +74,5 @@ nextLabel: tee
     <strong>Relacionado:</strong>
     <a href="peek.html"><code>peek</code></a> — observar sin ramificar ·
     <a href="concurrent.html"><code>concurrent</code></a> — evaluación paralela dentro de una sola rama ·
-    <a href="memoize.html"><code>memoize</code></a> — cachear un único valor en lugar de una secuencia entera
+    <a href="memoize.html"><code>fxMemoize</code></a> — cachear un único valor en lugar de una secuencia entera
   </div>

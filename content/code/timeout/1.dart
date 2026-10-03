@@ -9,7 +9,7 @@ void main() async {
   // between events" (that is what Rx's push-based timeout measures).
   final readings = await fx([1, 2, 3, 4, 5])
       .toAsync()
-      .map((id) => delay(const Duration(milliseconds: 60), 'reading-$id'))
+      .map((id) => fxDelay(const Duration(milliseconds: 60), 'reading-$id'))
       .timeout(const Duration(milliseconds: 100))
       .toList();
 

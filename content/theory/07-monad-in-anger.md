@@ -85,7 +85,7 @@ computation, four surfaces:
 | Haskell | `do { id <- parseId raw; … }` | `>>=` chain |
 | Scala | `for { id <- parseId(raw) } yield …` | `flatMap`/`map` chain |
 | Kotlin (Arrow) | `either { val id = parseId(raw).bind() }` | a scope with a non-local exit |
-| Dart | `either((r) { final id = r.bind(parseId(raw)); … })` | a scope with a non-local exit |
+| Dart | `fxEither((r) { final id = r.bind(parseId(raw)); … })` | a scope with a non-local exit |
 
 The first two are *desugaring*: the compiler rewrites the block into method
 calls, and it works for any monad the type checker can name. The last two are
@@ -110,7 +110,7 @@ Either<String, List<String>> loadOrders(String user) =>
         ? Either.right(['mug', 'book'])
         : Either.left('none');
 
-Either<String, String> summary(String raw) => either((r) {
+Either<String, String> summary(String raw) => fxEither((r) {
       final id = r.bind(parseId(raw));
       final user = r.bind(loadUser(id));
       final orders = r.bind(loadOrders(user));
@@ -147,7 +147,7 @@ void main() async {
 }
 ```
 
-Line for line, this is the `either` block above with `await` where `r.bind`
+Line for line, this is the `fxEither` block above with `await` where `r.bind`
 was. `async` marks the scope; `await` unwraps one layer; the compiler rewrites
 the body into continuations, which is `flatMap` by another name. The evidence
 that it is monadic and not magic: `await` on a `Future<Future<T>>` gives you
@@ -163,7 +163,7 @@ Dart's `async` is where that generalisation stopped.
 > and no single `flatMap` for the pair. Scala reaches for *monad transformers*
 > (`EitherT[Future, E, A]`), a wrapper per combination, with a tower of lifts.
 > Kotlin and Dart avoid the tower by making the scope do double duty:
-> `eitherAsync` gives you a `Raise` scope *inside* an `async` body, so `await`
+> `fxEitherAsync` gives you a `Raise` scope *inside* an `async` body, so `await`
 > handles time and `r.bind` handles failure, with no third type. It is not more
 > powerful than transformers — it is less general and much easier to read, and
 > Chapter 21 records who paid what for that trade.
@@ -179,7 +179,7 @@ Future<Either<String, int>> fetchPort(String key) async =>
         : Either.left('unknown: $key');
 
 Future<Either<String, String>> describe(String key) =>
-    eitherAsync((r) async {
+    fxEitherAsync((r) async {
       // `await` sequences time; `r.bind` sequences failure.
       final port = r.bind(await fetchPort(key));
       return 'listening on $port';
@@ -192,8 +192,8 @@ void main() async {
 ```
 
 Two effects, one straight-line block, no `EitherT`. The cost is that this only
-works for the combinations FxDart wrote by hand — `eitherAsync`, `nullable`,
-`catching`. There is no generic mechanism you can extend, because expressing
+works for the combinations FxDart wrote by hand — `fxEitherAsync`, `fxNullable`,
+`fxCatching`. There is no generic mechanism you can extend, because expressing
 "any monad" needs a type feature Dart does not have. That is Chapter 10.
 
 ## When this earns its keep

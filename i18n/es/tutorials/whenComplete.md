@@ -23,7 +23,7 @@ nextLabel: sampleOn
     Los ganchos opcionales <code>onError</code> / <code>onDone</code> cubren las
     otras dos notificaciones. Un callback que lanza se convierte en un evento de
     error y la cadena continúa — el evento cuyo peek falló
-    no se reemite. Capa de eventos de fxdart, siguiendo a <code>tap</code> /
+    no se reemite. Capa de eventos de fxdart, siguiendo a <code>fxTap</code> /
     <code>doOn*</code> de Rx.
   </p>
   <p>
@@ -49,10 +49,10 @@ nextLabel: sampleOn
     repeticiones consecutivas.
   </p>
   <p>
-    Capa de eventos de fxdart, siguiendo a <code>tap</code>,
+    Capa de eventos de fxdart, siguiendo a <code>fxTap</code>,
     <code>catchError</code> en su forma que no cambia de stream, y
     <code>finalize</code> de Rx. Los nombres de la capa pull ganan donde ya
-    significan lo mismo: <code>peek</code> no <code>tap</code>,
+    significan lo mismo: <code>peek</code> no <code>fxTap</code>,
     <code>takeRight</code> no <code>takeLast</code>,
     <code>uniq</code> no <code>distinct</code>.
   </p>
@@ -71,5 +71,5 @@ nextLabel: sampleOn
     <strong>Relacionado:</strong>
     <a href="peek.html"><code>peek</code></a> — el original de la capa pull, que observa valores a medida que se tiran ·
     <a href="onErrorResume.html"><code>onErrorResume</code></a> — abandonar y cambiar; <code>handleError</code> es la forma que continúa ·
-    <a href="tap.html"><code>tap</code></a> — efecto secundario data-first sobre un solo valor, no un stream
+    <a href="tap.html"><code>fxTap</code></a> — efecto secundario data-first sobre un solo valor, no un stream
   </div>

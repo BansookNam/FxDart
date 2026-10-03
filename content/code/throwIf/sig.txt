@@ -1,1 +1,1 @@
-T throwIf&lt;T&gt;(bool Function(T) predicate, Object Function(T) toError, T value)
+T fxThrowIf&lt;T&gt;(bool Function(T) predicate, Object Function(T) toError, T value)

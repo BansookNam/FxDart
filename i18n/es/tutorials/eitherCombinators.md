@@ -95,7 +95,7 @@ nextLabel: either &amp; Raise
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="either.html"><code>Either</code></a> — el tipo que estos extienden ·
-    <a href="raise.html"><code>either</code> &amp; <code>Raise</code></a> — ámbito constructor, <code>ensure</code> y <code>recover</code> ·
+    <a href="raise.html"><code>fxEither</code> &amp; <code>Raise</code></a> — ámbito constructor, <code>ensure</code> y <code>recover</code> ·
     <a href="accumulate.html">acumulación</a> — todos los fallos en vez del primero ·
     <a href="eitherPipelines.html">Either × pipelines</a> — llevar Eithers a través de una cadena
   </div>

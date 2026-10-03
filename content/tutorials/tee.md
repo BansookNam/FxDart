@@ -40,11 +40,11 @@ nextLabel: tee3
     pipelines — the readers cannot advance at their own pace, take
     different amounts, or stop early independently. When you genuinely need
     two <em>independent</em> readers, reach for
-    <a href="fork.html"><code>fork</code></a> instead, and accept the shared
+    <a href="fork.html"><code>fxFork</code></a> instead, and accept the shared
     buffer it keeps so a lagging cursor can catch up. Rule of thumb: if both
     readers consume the whole source and reduce it to a value,
     <code>tee</code>; if either one is a pipeline in its own right,
-    <code>fork</code>.
+    <code>fxFork</code>.
   </p>
 
   <h2>Where the name comes from</h2>
@@ -68,8 +68,8 @@ nextLabel: tee3
   <p>
     Python's <code>itertools.tee()</code> borrows the same picture, splitting
     one iterable into several independent iterators. Worth knowing, because
-    that is the part FxDart spells <a href="fork.html"><code>fork</code></a>,
-    not <code>tee</code>: <code>fork</code> gives you independent cursors,
+    that is the part FxDart spells <a href="fork.html"><code>fxFork</code></a>,
+    not <code>tee</code>: <code>fxFork</code> gives you independent cursors,
     the way Python's does. FxDart's <code>tee</code> branches the
     <em>consumption</em> instead — one pass, several folds reading it in
     step. Same T-shaped picture, split one level further downstream.
@@ -103,7 +103,7 @@ nextLabel: tee3
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="fork.html"><code>fork</code></a> — independent readers, at the cost of a buffer ·
+    <a href="fork.html"><code>fxFork</code></a> — independent readers, at the cost of a buffer ·
     <a href="reduce.html"><code>reduce</code></a> — a single fold ·
     <a href="groupBy.html"><code>groupBy</code></a> — many accumulators keyed by value
   </div>

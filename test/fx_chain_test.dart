@@ -112,7 +112,7 @@ void main() {
       });
 
       test('returns null when nothing matches and no orElse is given', () {
-        expect(fx([1, 3]).firstWhere((a) => a.isEven), isNull);
+        expect(fx([1, 3]).firstWhere((a) => a.isEven), fxIsNull);
       });
 
       test('calls orElse when nothing matches', () {
@@ -142,7 +142,7 @@ void main() {
       });
 
       test('returns null when nothing matches and no orElse is given', () {
-        expect(fx([1, 3]).lastWhere((a) => a.isEven), isNull);
+        expect(fx([1, 3]).lastWhere((a) => a.isEven), fxIsNull);
       });
 
       test('calls orElse when nothing matches', () {
@@ -213,13 +213,13 @@ void main() {
     });
 
     test('to should apply a converter to the whole chain', () async {
-      final res = await fxAsync(toAsync([1, 2, 3])).to((it) => it.size());
+      final res = await fxAsync(fxToAsync([1, 2, 3])).to((it) => it.size());
       expect(res, equals(3));
     });
 
     test('mapEffect should map like map', () async {
       final seen = <int>[];
-      final res = await fxAsync(toAsync([1, 2, 3])).mapEffect((a) {
+      final res = await fxAsync(fxToAsync([1, 2, 3])).mapEffect((a) {
         seen.add(a);
         return a * 2;
       }).toList();
@@ -229,7 +229,7 @@ void main() {
 
     test('zipWithIndex should pair each element with its index', () async {
       expect(
-        await fxAsync(toAsync(['a', 'b'])).zipWithIndex().toList(),
+        await fxAsync(fxToAsync(['a', 'b'])).zipWithIndex().toList(),
         equals([(0, 'a'), (1, 'b')]),
       );
     });
@@ -237,32 +237,32 @@ void main() {
     test('scan should emit the seed then the running accumulator', () async {
       expect(
         await fxAsync(
-          toAsync([1, 2, 3]),
+          fxToAsync([1, 2, 3]),
         ).scan<int>((acc, a) => acc + a, 0).toList(),
         equals([0, 1, 3, 6]),
       );
     });
 
     test('toStream should emit the chain as a Stream', () async {
-      final stream = fxAsync(toAsync([1, 2, 3])).map((a) => a + 1).toStream();
+      final stream = fxAsync(fxToAsync([1, 2, 3])).map((a) => a + 1).toStream();
       expect(await stream.toList(), equals([2, 3, 4]));
     });
 
     test('fold should reduce with a seed', () async {
       final res = await fxAsync(
-        toAsync([1, 2, 3]),
+        fxToAsync([1, 2, 3]),
       ).fold<int>(10, (acc, a) => acc + a);
       expect(res, equals(16));
     });
 
     test('last should return the final element', () async {
-      expect(await fxAsync(toAsync([1, 2, 3])).last(), equals(3));
-      expect(await fxAsync(toAsync(<int>[])).last(), isNull);
+      expect(await fxAsync(fxToAsync([1, 2, 3])).last(), equals(3));
+      expect(await fxAsync(fxToAsync(<int>[])).last(), fxIsNull);
     });
 
     test('sort should sort with the comparator', () async {
       expect(
-        await fxAsync(toAsync([3, 1, 2])).sort((a, b) => a.compareTo(b)),
+        await fxAsync(fxToAsync([3, 1, 2])).sort((a, b) => a.compareTo(b)),
         equals([1, 2, 3]),
       );
     });
@@ -270,7 +270,7 @@ void main() {
     test('sortBy should sort by the selected key', () async {
       expect(
         await fxAsync(
-          toAsync([
+          fxToAsync([
             {'n': 3},
             {'n': 1},
           ]),
@@ -283,24 +283,24 @@ void main() {
     });
 
     test('size should count the elements', () async {
-      expect(await fxAsync(toAsync([1, 2, 3])).size(), equals(3));
+      expect(await fxAsync(fxToAsync([1, 2, 3])).size(), equals(3));
     });
 
     group('FxAsyncNum', () {
       test('sum should add the elements', () async {
-        expect(await fxAsync(toAsync(<num>[1, 2, 3])).sum(), equals(6));
+        expect(await fxAsync(fxToAsync(<num>[1, 2, 3])).sum(), equals(6));
       });
 
       test('average should average the elements', () async {
-        expect(await fxAsync(toAsync(<num>[1, 2, 3])).average(), equals(2));
+        expect(await fxAsync(fxToAsync(<num>[1, 2, 3])).average(), equals(2));
       });
 
       test('min should return the smallest element', () async {
-        expect(await fxAsync(toAsync(<num>[3, 1, 2])).min(), equals(1));
+        expect(await fxAsync(fxToAsync(<num>[3, 1, 2])).min(), equals(1));
       });
 
       test('max should return the largest element', () async {
-        expect(await fxAsync(toAsync(<num>[3, 1, 2])).max(), equals(3));
+        expect(await fxAsync(fxToAsync(<num>[3, 1, 2])).max(), equals(3));
       });
     });
   });

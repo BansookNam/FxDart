@@ -35,7 +35,7 @@ nextLabel: Either combinators
     <code>getOrNull</code>/<code>getOrElse</code> hacen de puente de vuelta al
     Dart de siempre. <code>Either</code> está pensado para vivir <em>en la
     frontera</em>: dentro de un cómputo, es preferible el
-    <a href="raise.html">constructor <code>either</code></a>, donde cada paso
+    <a href="raise.html">constructor <code>fxEither</code></a>, donde cada paso
     es un <code>r.bind</code> en línea recta en vez de una pirámide de
     <code>flatMap</code>.
   </p>
@@ -75,7 +75,7 @@ nextLabel: Either combinators
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="raise.html">constructor <code>either</code></a> — construye Eithers con código en línea recta ·
+    <a href="raise.html">constructor <code>fxEither</code></a> — construye Eithers con código en línea recta ·
     <a href="accumulate.html">acumulación</a> — recoge todos los fallos, no solo el primero ·
     <a href="eitherPipelines.html">Either × pipelines</a> — <code>rights</code>, <code>lefts</code>, <code>sequence</code> sobre cadenas ·
     <a href="typedErrors.html">errores tipados — guía completa</a>

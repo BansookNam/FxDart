@@ -24,7 +24,7 @@ nextLabel: prepend
   </p>
   <p>
     비동기 쪽에서는 <code>a</code> 자체가 <code>Future</code>일 수 있습니다.
-    <code>appendAsync</code>는 상류가 끝난 뒤에야 이를 await 하므로, 느린
+    <code>fxAppendAsync</code>는 상류가 끝난 뒤에야 이를 await 하므로, 느린
     "마무리" 값 때문에 앞단이 미리 붙잡히는 일이 없습니다.
   </p>
 

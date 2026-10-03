@@ -2,7 +2,7 @@
 slug: isMatch
 title: isMatch — FxDart 101
 description: FxDart isMatch tutorial: deep partial matching against a Map or list pattern.
-heading: <code>isMatch</code>
+heading: <code>fxIsMatch</code>
 section: 9
 crumb: isMatch
 prev: resolveProps.html
@@ -16,7 +16,7 @@ nextLabel: matches
 
   <h2>Lecture</h2>
   <p>
-    <code>isMatch</code> recurses through <code>pattern</code> and checks
+    <code>fxIsMatch</code> recurses through <code>pattern</code> and checks
     that <code>target</code> "contains" it, with different rules per shape:
   </p>
   <p>
@@ -45,13 +45,13 @@ nextLabel: matches
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>isMatch</code> to check whether <code>order</code> matches <code>{'status': 'shipped'}</code>.</p>
+  <p>Exercise: use <code>fxIsMatch</code> to check whether <code>order</code> matches <code>{'status': 'shipped'}</code>.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="matches.html"><code>matches</code></a> — the curried, filter-ready version of this ·
-    <a href="pickBy.html"><code>pickBy</code></a> — often paired for shape-based filtering ·
+    <a href="matches.html"><code>fxMatches</code></a> — the curried, filter-ready version of this ·
+    <a href="pickBy.html"><code>fxPickBy</code></a> — often paired for shape-based filtering ·
     <a href="find.html"><code>find</code></a> — locate the first matching element ·
-    <a href="omitBy.html"><code>omitBy</code></a> — drop entries by predicate
+    <a href="omitBy.html"><code>fxOmitBy</code></a> — drop entries by predicate
   </div>

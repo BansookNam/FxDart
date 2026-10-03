@@ -10,8 +10,8 @@ void main() {
   }
 
   final shared = source();
-  final a = fork(shared).iterator;
-  final b = fork(shared).iterator;
+  final a = fxFork(shared).iterator;
+  final b = fxFork(shared).iterator;
 
   a.moveNext();
   print('a: ${a.current}, calls: $calls'); // a: 1, calls: 1

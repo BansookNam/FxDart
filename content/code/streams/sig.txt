@@ -1,4 +1,4 @@
-FxAsyncIterable&lt;T&gt; fromStream&lt;T&gt;(Stream&lt;T&gt; stream)              // lossless FIFO + pause
+FxAsyncIterable&lt;T&gt; fxFromStream&lt;T&gt;(Stream&lt;T&gt; stream)              // lossless FIFO + pause
 FxAsyncIterable&lt;T&gt; fromStreamLatest&lt;T&gt;(Stream&lt;T&gt; stream)        // drop superseded
 FxAsyncIterable&lt;List&lt;T&gt;&gt; fromStreamChunked&lt;T&gt;(Stream&lt;T&gt; stream) // batches
 FxAsyncIterable&lt;T&gt; fromStreamNext&lt;T&gt;(Stream&lt;T&gt; stream)          // demand-gated drop

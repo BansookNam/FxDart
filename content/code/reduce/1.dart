@@ -5,7 +5,7 @@ Future<void> main() async {
 
   final total = await fx([1, 2, 3, 4, 5, 6])
       .toAsync()
-      .map((a) => delay(const Duration(milliseconds: 150), a))
+      .map((a) => fxDelay(const Duration(milliseconds: 150), a))
       .concurrent(3)
       .reduce((acc, a) => acc + a);
 

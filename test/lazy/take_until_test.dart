@@ -11,11 +11,11 @@ void main() {
         'should be able to take the element until the callback result is truthy',
         () {
           // ignore: deprecated_member_use
-          final res = toList(takeUntil((a) => a % 2 == 0, [1, 2, 3, 4]));
+          final res = fxToList(fxTakeUntil((a) => a % 2 == 0, [1, 2, 3, 4]));
           expect(res, equals([1, 2]));
 
           // ignore: deprecated_member_use
-          final res1 = toList(takeUntil((a) => a > 5, [1, 2, 3, 4]));
+          final res1 = fxToList(fxTakeUntil((a) => a > 5, [1, 2, 3, 4]));
           expect(res1, equals([1, 2, 3, 4]));
         },
       );
@@ -36,15 +36,15 @@ void main() {
       test(
         'should be able to take the element until the callback result is truthy',
         () async {
-          final res = await toListAsync(
+          final res = await fxToListAsync(
             // ignore: deprecated_member_use
-            takeUntilAsync((a) => a % 2 == 0, toAsync([1, 2, 3, 4])),
+            fxTakeUntilAsync((a) => a % 2 == 0, fxToAsync([1, 2, 3, 4])),
           );
           expect(res, equals([1, 2]));
 
-          final res1 = await toListAsync(
+          final res1 = await fxToListAsync(
             // ignore: deprecated_member_use
-            takeUntilAsync((a) async => a > 5, toAsync([1, 2, 3, 4])),
+            fxTakeUntilAsync((a) async => a > 5, fxToAsync([1, 2, 3, 4])),
           );
           expect(res1, equals([1, 2, 3, 4]));
         },
@@ -53,7 +53,7 @@ void main() {
       test(
         'should be able to be used as a chaining method in the `fx`',
         () async {
-          final res = await fxAsync(toAsync([1, 2, 3, 4]))
+          final res = await fxAsync(fxToAsync([1, 2, 3, 4]))
               .map((a) => a + 10)
               .filter((a) => a % 2 == 0)
               // ignore: deprecated_member_use

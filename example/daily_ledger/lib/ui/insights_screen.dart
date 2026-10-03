@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fxdart/fxdart.dart' show fx, maxBy;
+import 'package:fxdart/fxdart.dart' show fx, fxMaxBy;
 
 import '../logic/cached.dart';
 import '../logic/calendar.dart' show dayKey;
@@ -17,7 +17,7 @@ const _weekdayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 String weekdayName(int weekday) => _weekdayNames[weekday - 1];
 
 WeekdayStat? maxByStat(List<WeekdayStat> profile) =>
-    maxBy((w) => w.avgSpend, profile.where((w) => w.dayCount > 0));
+    fxMaxBy((w) => w.avgSpend, profile.where((w) => w.dayCount > 0));
 
 class InsightsScreen extends StatefulWidget {
   const InsightsScreen({super.key});

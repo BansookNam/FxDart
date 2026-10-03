@@ -60,7 +60,7 @@ nextLabel: last
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="last.html"><code>last</code></a> — 반대쪽 끝에서 같은 일을 합니다 ·
-    <a href="nth.html"><code>nth</code></a> — 임의의 인덱스를 가져옵니다 ·
+    <a href="nth.html"><code>fxNth</code></a> — 임의의 인덱스를 가져옵니다 ·
     <a href="find.html"><code>find</code></a> — 술어에 처음 부합하는 원소를 찾습니다 ·
     <a href="isEmpty.html"><code>isEmpty</code></a> — 값 기반으로 비어 있는지 확인합니다
   </div>

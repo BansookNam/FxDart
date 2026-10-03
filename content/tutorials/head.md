@@ -59,7 +59,7 @@ nextLabel: last
   <div class="callout">
     <strong>Related:</strong>
     <a href="last.html"><code>last</code></a> — same idea from the other end ·
-    <a href="nth.html"><code>nth</code></a> — pull any index ·
+    <a href="nth.html"><code>fxNth</code></a> — pull any index ·
     <a href="find.html"><code>find</code></a> — first match to a predicate ·
     <a href="isEmpty.html"><code>isEmpty</code></a> — value-based emptiness check
   </div>

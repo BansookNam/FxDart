@@ -64,6 +64,6 @@ nextLabel: windowOn
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="chunk.html"><code>chunk</code></a> — el original de la capa pull, que agrupa por cantidad sobre un Iterable ·
-    <a href="throttle.html"><code>throttle</code></a> — cuando quieres un evento por ventana en vez de todos ·
+    <a href="throttle.html"><code>fxThrottle</code></a> — cuando quieres un evento por ventana en vez de todos ·
     <a href="spaceBy.html"><code>spaceBy</code></a> — la otra forma de frenar una ráfaga: estirarla en vez de agruparla
   </div>

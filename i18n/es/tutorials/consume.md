@@ -27,13 +27,13 @@ nextLabel: performance
   <p>
     El <code>n</code> opcional lo convierte en la pareja natural de las fuentes
     infinitas o enormes: <code>consume(5)</code> tira exactamente de 5 valores y
-    se detiene, aunque el iterable subyacente (<code>range</code> sin límite,
+    se detiene, aunque el iterable subyacente (<code>fxRange</code> sin límite,
     <code>cycle</code>, <code>repeat</code> con una cuenta enorme) siguiera
     indefinidamente. Omite <code>n</code> para vaciar por completo un iterable
     finito.
   </p>
   <p>
-    <code>consumeAsync</code> (o <code>.consume()</code> sobre una cadena
+    <code>fxConsumeAsync</code> (o <code>.consume()</code> sobre una cadena
     <code>FxAsync</code>) funciona igual, esperando por turno los efectos
     secundarios de cada valor del que tira — práctico para forzar que un
     pipeline asíncrono de <code>peek</code>/logging se ejecute de verdad sin
@@ -43,7 +43,7 @@ nextLabel: performance
 
   <h2>Demo 1 · Acotar una fuente infinita</h2>
   <p>
-    <code>range(1000000)</code> normalmente no terminaría nunca si se consumiera
+    <code>fxRange(1000000)</code> normalmente no terminaría nunca si se consumiera
     entero — pero <code>consume(5)</code> se para tras 5 elementos:
   </p>
   {{playground:0}}

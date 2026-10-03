@@ -39,7 +39,7 @@ async: false
     That is the recurring theme of this Part: for data that is
     <em>finite and already here</em>, a stream adds a delivery mechanism
     the problem never asked for. RxDart's operator vocabulary is good —
-    <code>whereNotNull</code> is exactly <code>compact</code> — but the
+    <code>whereNotNull</code> is exactly <code>fxCompact</code> — but the
     model underneath charges an async tax on every fixed-data task. Here
     the entire answer is one number, so the ceremony — the lift, the
     async main, the awaited fold — is the whole difference between the

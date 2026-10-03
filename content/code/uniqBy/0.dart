@@ -8,8 +8,8 @@ void main() {
   ];
 
   // Data-first form: keep the first person seen from each department.
-  final firstPerDept = distinctBy((p) => p['dept'], people);
-  print(toList(firstPerDept));
+  final firstPerDept = fxDistinctBy((p) => p['dept'], people);
+  print(fxToList(firstPerDept));
   // [{name: kim, dept: eng}, {name: park, dept: sales}]
   // FxTS alias: uniqBy((p) => p['dept'], people) does the same thing.
 

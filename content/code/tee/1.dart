@@ -2,7 +2,7 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   // The two accumulators are independent, and need not share a type:
-  final (chars, longest) = tee(
+  final (chars, longest) = fxTee(
       ['alpha', 'be', 'gamma!', 'de'],
       (seed: 0, step: (int acc, String s) => acc + s.length),
       (seed: '', step: (String acc, String s) => s.length > acc.length ? s : acc));
@@ -11,7 +11,7 @@ void main() {
   print('longest: $longest'); // gamma!
 
   // tee3 adds a third. Here: sum, max, and a running count.
-  final (sum, max, count) = tee3(
+  final (sum, max, count) = fxTee3(
       [4, 8, 2],
       (seed: 0, step: (int a, int x) => a + x),
       (seed: 0, step: (int a, int x) => x > a ? x : a),

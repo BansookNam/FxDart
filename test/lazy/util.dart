@@ -13,7 +13,7 @@ class SharedAsyncIterable<T> implements FxAsyncIterable<T> {
   FxAsyncIterator<T> get iterator => _iterator;
 }
 
-/// An infinite iterable 0, 1, 2, ... — stand-in for FxTS `range(Infinity)`.
+/// An infinite iterable 0, 1, 2, ... — stand-in for FxTS `fxRange(Infinity)`.
 Iterable<int> naturals() sync* {
   var i = 0;
   while (true) {

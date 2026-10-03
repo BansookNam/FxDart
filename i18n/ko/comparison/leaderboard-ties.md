@@ -32,7 +32,7 @@ async: false
     재생해 봐야 확인할 수 있습니다. FxDart 버전은 그 구조를 그대로
     선언합니다: <code>sortBy</code>로 내림차순 정렬하고,
     <code>groupBy</code>로 점수별 그룹을 만들고(순위 하나당 그룹 하나),
-    <code>entries</code> + <code>zipWithIndex</code>로 그룹을 순회하며(그룹
+    <code>fxEntries</code> + <code>zipWithIndex</code>로 그룹을 순회하며(그룹
     인덱스 = 순위), <code>flatMap</code>으로 각 그룹을 다시 선수 줄로
     펼칩니다. "동점 점수는 같은 순위를 공유한다"는 규칙은 루프에서 우연히
     나타나는 동작이 아니라 파이프라인의 구조 자체가 됩니다.

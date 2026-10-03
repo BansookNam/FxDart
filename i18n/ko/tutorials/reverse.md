@@ -24,7 +24,7 @@ nextLabel: fork
     연산자이며, 무한한 소스에서는 절대 끝나지 않습니다.
   </p>
   <p>
-    <code>reverseAsync</code>도 같은 규칙을 따릅니다. 상류의 모든 원소를
+    <code>fxReverseAsync</code>도 같은 규칙을 따릅니다. 상류의 모든 원소를
     먼저 await한 다음 뒤에서부터 되돌려 줍니다. 진짜 역순이 아니라 시퀀스의
     뒷부분만 필요하다면 <code>takeRight</code>을 쓰는 편이 낫습니다.
     이쪽도 구체화하기는 하지만, 적어도 순서대로 출력할 값이 모이는 즉시

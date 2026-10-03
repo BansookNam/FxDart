@@ -47,7 +47,7 @@ nextLabel: reduceLazy
   <p>
     둘 다 <code>fold</code>와 달리 엄격합니다. 뒤에서부터 걸으려면 끝이
     어디인지 알아야 하므로, <code>List</code>가 아닌 소스는 먼저 실체화되고
-    <code>foldRightAsync</code>는 스트림을 모두 받아낸 뒤에 시작합니다.
+    <code>fxFoldRightAsync</code>는 스트림을 모두 받아낸 뒤에 시작합니다.
     무한한 소스에는 절대 겨누지 마세요.
   </p>
 

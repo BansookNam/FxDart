@@ -20,7 +20,7 @@ nextLabel: findIndex
     accepts the FxTS spelling <code>find</code> — they're the same operator.
     It's what <code>head</code> and <code>filter</code>
     look like fused together — in fact it's implemented as exactly that:
-    <code>head(filter(f, iterable))</code>. That fusion is what makes it
+    <code>fxHead(fxFilter(f, iterable))</code>. That fusion is what makes it
     lazy and short-circuiting: it pulls elements one at a time, testing each
     against <code>f</code>, and stops the instant it finds a match. Nothing
     further downstream is ever touched.
@@ -47,5 +47,5 @@ nextLabel: findIndex
     <a href="findIndex.html"><code>findIndex</code></a> — same search, returns a position ·
     <a href="filter.html"><code>filter</code></a> — every match, not just the first ·
     <a href="head.html"><code>head</code></a> — what <code>find</code> is built from ·
-    <a href="matches.html"><code>matches</code></a> — a ready-made shape-matching predicate
+    <a href="matches.html"><code>fxMatches</code></a> — a ready-made shape-matching predicate
   </div>
