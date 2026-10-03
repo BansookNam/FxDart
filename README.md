@@ -150,6 +150,8 @@ fxdart_skills --global claude
 
 > 💡 `--list` shows install status · `--remove` uninstalls.
 
+How `skills get fxdart` finds the package, with no fxdart-specific code in the `skills` CLI: [content/skills-install](content/skills-install/README.md).
+
 ---
 
 ## 🛠️ Usage

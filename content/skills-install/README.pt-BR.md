@@ -1,6 +1,6 @@
 # Como o CLI `skills` instala a skill do fxdart
 
-**Idioma:** [English](HOW_SKILLS_INSTALL_FX_DART_SKILL.md) · [한국어](HOW_SKILLS_INSTALL_FX_DART_SKILL.ko.md) · [简体中文](HOW_SKILLS_INSTALL_FX_DART_SKILL.zh-Hans.md) · [日本語](HOW_SKILLS_INSTALL_FX_DART_SKILL.ja.md) · [Español](HOW_SKILLS_INSTALL_FX_DART_SKILL.es.md) · **Português** · [Русский](HOW_SKILLS_INSTALL_FX_DART_SKILL.ru.md)
+**Idioma:** [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-Hans.md) · [日本語](README.ja.md) · [Español](README.es.md) · **Português** · [Русский](README.ru.md)
 
 ---
 
